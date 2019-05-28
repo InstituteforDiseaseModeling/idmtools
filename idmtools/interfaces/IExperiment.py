@@ -29,6 +29,8 @@ class IExperiment(IEntity):
             for func in simulation_functions:
                 tags.update(func(simulation=simulation))
 
+            simulation.tags = tags
+
     def simulation(self, **kwargs):
         if not self.base_simulation:
             sim = self.simulation_type(**kwargs)

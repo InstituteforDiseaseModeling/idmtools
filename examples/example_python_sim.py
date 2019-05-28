@@ -12,7 +12,8 @@ def param_update(simulation, param, value):
 
 
 experiment = PythonExperiment(name="My First experiment", model_path=os.path.join("inputs", "model.py"))
-experiment.base_simulation.set_parameter("Parameter1", 0)
+experiment.tags["tag1"] = 1
+experiment.base_simulation.set_parameter("c", 0)
 experiment.assets.add_directory(assets_directory=os.path.join("inputs", "Assets"))
 
 setA = partial(param_update, param="a")

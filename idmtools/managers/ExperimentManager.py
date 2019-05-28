@@ -39,6 +39,8 @@ class ExperimentManager:
 
         # Run
         self.platform.run_simulation(self.experiment.simulations[0])
+
         for s in self.experiment.simulations:
             print(s)
+            print(s.tags)
             RunTask.send(f"python ./Assets/model.py config.json", self.experiment.uid, s.uid)
