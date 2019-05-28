@@ -8,14 +8,32 @@ from utils.filters.types import AssetFilterList, FilterMode
 
 
 class AssetCollection:
+    """
+    Represents a collection of Assets
+    """
 
     # region Constructors
     def __init__(self, assets: List[Asset] = None):
+        """
+        Constructor.
+        Args:
+            assets: Optional list of assets to create the collection with
+        """
         self.assets = assets or []
 
     @classmethod
-    def from_directory(cls, assets_directory: str, recursive: bool = True) -> object:
-        assets = cls.assets_from_directory(assets_directory, recursive)
+    def from_directory(cls, assets_directory: str, recursive: bool = True, flatten: bool = False,
+                       filters: AssetFilterList = None, filters_mode: FilterMode = FilterMode.OR,
+                       relative_path: str = None) -> object:
+        """
+        Fill up an AssetCollection from the specified directory
+        Args:
+            See `AssetCollection.assets_from_directory`.
+
+        Returns: A created AssetCollection object
+
+        """
+        assets = cls.assets_from_directory(assets_directory, recursive, flatten, filters, filters_mode, relative_path)
         return cls(assets=assets)
 
     # endregion
@@ -24,33 +42,44 @@ class AssetCollection:
         yield from self.assets
 
     @staticmethod
-    def assets_from_directory(assets_directory: str, recursive: bool = True) -> List[Asset]:
-        assets = []
+    def assets_from_directory(assets_directory: str, recursive: bool = True, flatten: bool = False,
+                              filters: AssetFilterList = None, filters_mode: FilterMode = FilterMode.OR,
+                              relative_path: str = None) -> List[Asset]:
+        """
+        Create assets for files in a given directory.
+
+        Args:
+            assets_directory: The root directory of the assets.
+            recursive:  Recursively traverse sub directory. ON by default
+            flatten: Put all the files in root regardless of whether we found them in a sub-directory or not
+            filters: A list of filters to apply to the assets. The filters are functions taking an `asset` as argument
+            and returning true or false. True: Adding the asset to the collection, False: filter out.
+            See `idmtools.utils.filters.asset_filters`
+            filters_mode: When given multiple filters, either OR or AND the results
+            relative_path: Prefix a relative path to the path created from the root directory
+
+        Examples:
+            For relative_path. Given the following folder structure root/a/1,txt root/b.txt and relative_path="test"
+            Will return assets with relative path: test/a/1,txt and test/b.txt
+
+            Given the previous example, if flatten is also set to True. The following relative_path will be set:
+            /1.txt and /b.txt
+
+        Returns: A list of assets
+
+        """
+        found_assets = []
         for entry in scan_directory(assets_directory, recursive):
             relative_path = os.path.dirname(entry.path.replace(assets_directory, "")).strip(os.sep)
-            assets.append(Asset(absolute_path=os.path.abspath(entry.path),
-                                relative_path=relative_path, filename=entry.name))
-        return assets
-
-    def add_asset(self, asset:Asset):
-        if asset in self.assets:
-            print(f"Asset already present! \n{asset}")
-            return
-        self.assets.append(asset)
-
-    def add_directory(self, assets_directory: str, recursive: bool = True, flatten: bool = False,
-                      filters: AssetFilterList = None, filters_mode: FilterMode = FilterMode.OR,
-                      relative_path: str = None):
-
-        # Retrieve all the assets of the directory
-        assets = self.assets_from_directory(assets_directory, recursive)
-
+            found_assets.append(Asset(absolute_path=os.path.abspath(entry.path),
+                                      relative_path=relative_path, filename=entry.name))
         # Create the filters (add the default one to the list)
         filters = filters or []
         filters.append(default_asset_file_filter)
 
         # Operations on assets (filter, flatten, force relative_path)
-        for asset in assets:
+        assets = []
+        for asset in found_assets:
             results = [f(asset) for f in filters]
             keep_asset = (filters_mode == FilterMode.OR and any(results)) \
                          or (filters_mode == FilterMode.AND and all(results))
@@ -62,4 +91,29 @@ class AssetCollection:
             if relative_path:
                 asset.relative_path = os.path.join(relative_path, asset.relative_path)
 
-            self.add_asset(asset)
+            assets.append(asset)
+
+        return assets
+
+    def add_directory(self, assets_directory: str, recursive: bool = True, flatten: bool = False,
+                      filters: AssetFilterList = None, filters_mode: FilterMode = FilterMode.OR,
+                      relative_path: str = None):
+        """
+        Retrieve assets from the specified directory and add them to the collection.
+        Args:
+            See `AssetCollection.assets_from_directory`.
+        """
+        assets = self.assets_from_directory(assets_directory, recursive, flatten, filters, filters_mode, relative_path)
+        self.assets.extend(assets)
+
+    def add_asset(self, asset: Asset):
+        """
+        Add an asset to the collection.
+
+        Args:
+           asset: An `idmtools.assets.Asset` object to add.
+        """
+        if asset in self.assets:
+            print(f"Asset already present! \n{asset}")
+            return
+        self.assets.append(asset)

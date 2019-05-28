@@ -1,4 +1,4 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta
 
 from interfaces.IExperiment import IExperiment
 from interfaces.ISimulation import ISimulation

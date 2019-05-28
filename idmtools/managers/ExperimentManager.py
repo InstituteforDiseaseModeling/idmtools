@@ -17,6 +17,9 @@ class ExperimentManager:
         self.experiment = experiment
 
     def create_simulations(self):
+        """
+        Create all the simulations contained in the experiment on the platform.
+        """
         if not self.experiment.simulations:
             raise Exception("No simulations to run")
 
@@ -25,6 +28,13 @@ class ExperimentManager:
             self.platform.create_simulation(simulation)
 
     def run(self):
+        """
+        Main entry point of the manager.
+        - Create the experiment
+        - Execute the builder (if any) to generate all the simulations
+        - Create the simulations on the platform
+        - Trigger the run on the platform
+        """
         # Create experiment
         self.platform.create_experiment(self.experiment)
 

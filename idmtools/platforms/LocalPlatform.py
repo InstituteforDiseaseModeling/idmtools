@@ -1,13 +1,18 @@
 from dramatiq import group
 
 from idmtools_local.core import CreateExperimentTask, CreateSimulationTask, RunTask, AddAssetTask
+from interfaces.IExperiment import IExperiment
 from interfaces.IPlatform import IPlatform
+from interfaces.ISimulation import ISimulation
 
 
 class LocalPlatform(IPlatform):
+    """
+    Represents the platform allowing to run simulations locally.
+    """
 
     @staticmethod
-    def create_experiment(experiment):
+    def create_experiment(experiment:IExperiment):
         m = CreateExperimentTask.send()
         eid = m.get_result(block=True)
         experiment.uid = eid
@@ -19,7 +24,7 @@ class LocalPlatform(IPlatform):
         group(messages).run().wait()
 
     @staticmethod
-    def create_simulation(simulation):
+    def create_simulation(simulation:ISimulation):
         m = CreateSimulationTask.send(simulation.experiment_id)
         sid = m.get_result(block=True)
         simulation.uid = sid
@@ -33,5 +38,5 @@ class LocalPlatform(IPlatform):
         group(messages).run().wait()
 
     @staticmethod
-    def run_simulation(simulation):
+    def run_simulation(simulation:ISimulation):
         RunTask.send(f"python ./Assets/model.py config.json", simulation.experiment_id, simulation.uid)

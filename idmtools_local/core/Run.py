@@ -5,6 +5,12 @@ from dramatiq import GenericActor
 
 
 class CreateExperimentTask(GenericActor):
+    """
+    Creates an experiment.
+    - Create the folder
+    - Also create the Assets folder to hold the experiments assets
+    - Return the UUID of the newly created experiment
+    """
     class Meta:
         store_results = True
         max_retries = 0
@@ -19,6 +25,11 @@ class CreateExperimentTask(GenericActor):
 
 
 class CreateSimulationTask(GenericActor):
+    """
+    Creates a simulation.
+    - Create the simulation folder in the experiment_id parent folder
+    - Returns the UUID of the newly created simulation folder
+    """
     class Meta:
         store_results = True
         max_retries = 5
@@ -32,6 +43,11 @@ class CreateSimulationTask(GenericActor):
 
 
 class AddAssetTask(GenericActor):
+    """
+    Allows to add assets either to the experiment assets or the simulation assets
+    - If simulation_id is None -> experiment asset
+    - Else simulation asset
+    """
     class Meta:
         store_results = True
         max_retries = 0
@@ -43,6 +59,7 @@ class AddAssetTask(GenericActor):
         else:
             path = os.path.join("/data", experiment_id, "Assets", path, filename)
 
+        # Sometimes, workers tries to create the same folder at the same time, silence the exception
         if not os.path.exists(os.path.dirname(path)):
             try:
                 os.mkdir(os.path.dirname(path))
@@ -54,6 +71,9 @@ class AddAssetTask(GenericActor):
 
 
 class RunTask(GenericActor):
+    """
+    Run the given `command` in the simulation folder.
+    """
     class Meta:
         store_results = False
         max_retries = 0
@@ -68,5 +88,3 @@ class RunTask(GenericActor):
             import shlex
             p = subprocess.Popen(shlex.split(command), cwd=os.path.join("/data", experiment_id, simulation_id), shell=False, stdout=out,
                                  stderr=err)
-
-        p.wait(1000)

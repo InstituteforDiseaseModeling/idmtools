@@ -17,11 +17,18 @@ experiment.base_simulation.set_parameter("c", 0)
 experiment.assets.add_directory(assets_directory=os.path.join("inputs", "Assets"))
 
 setA = partial(param_update, param="a")
-setB = partial(param_update, param="b")
+
+class setB:
+    def __init__(self, param):
+        self.param = param
+
+    def __call__(self, simulation, value):
+        return param_update(simulation, self.param, value)
+
 
 builder = IExperimentBuilder()
 builder.add_sweep_definition(setA, range(100))
-builder.add_sweep_definition(setB, [1, 2, 3])
+builder.add_sweep_definition(setB("b"), [1, 2, 3])
 
 experiment.builder = builder
 

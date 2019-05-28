@@ -1,6 +1,7 @@
 import json
 
 from assets.Asset import Asset
+from assets.AssetCollection import AssetCollection
 from interfaces.IEntity import IEntity
 
 
@@ -10,12 +11,21 @@ class ISimulation(IEntity):
     This class needs to be implemented for each model type with specifics.
     """
 
-    def __init__(self, parameters=None, assets=None):
+    def __init__(self, parameters: dict = None, assets: AssetCollection = None):
         super().__init__(assets=assets)
-        self.parameters = parameters or {"parameters":{}}
+        self.parameters = parameters or {"parameters": {}}
         self.experiment_id = None
 
-    def set_parameter(self, name:str, value:any) -> dict:
+    def set_parameter(self, name: str, value: any) -> dict:
+        """
+        Set a parameter in the simulation
+        Args:
+            name: Name of the parameter
+            value: Value of the parameter
+
+        Returns: Tag to record the change
+
+        """
         self.parameters["parameters"][name] = value
         return {name: value}
 
@@ -23,4 +33,8 @@ class ISimulation(IEntity):
         return f"<Simulation: {self.uid} - Exp_id: {self.experiment_id}>"
 
     def gather_assets(self):
+        """
+        Gather all the assets for the simulation.
+        By default, only create a config.json containing the parameters
+        """
         self.assets.add_asset(Asset(filename="config.json", content=json.dumps(self.parameters)))
