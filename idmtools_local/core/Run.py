@@ -32,7 +32,7 @@ class CreateSimulationTask(GenericActor):
     """
     class Meta:
         store_results = True
-        max_retries = 5
+        max_retries = 0
 
     def perform(self, experiment_id):
         import random

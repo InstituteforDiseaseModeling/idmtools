@@ -2,12 +2,13 @@ import os
 from typing import List
 
 from assets.Asset import Asset
+from entities.IEntity import IEntity
 from utils.file import scan_directory
 from utils.filters.asset_filters import default_asset_file_filter
 from utils.filters.types import AssetFilterList, FilterMode
 
 
-class AssetCollection:
+class AssetCollection(IEntity):
     """
     Represents a collection of Assets
     """
@@ -19,6 +20,7 @@ class AssetCollection:
         Args:
             assets: Optional list of assets to create the collection with
         """
+        super().__init__()
         self.assets = assets or []
 
     @classmethod

@@ -2,7 +2,7 @@ import json
 
 from assets.Asset import Asset
 from assets.AssetCollection import AssetCollection
-from interfaces.IEntity import IEntity
+from entities.IEntity import IEntity
 
 
 class ISimulation(IEntity):
@@ -11,10 +11,11 @@ class ISimulation(IEntity):
     This class needs to be implemented for each model type with specifics.
     """
 
-    def __init__(self, parameters: dict = None, assets: AssetCollection = None):
-        super().__init__(assets=assets)
+    def __init__(self, parameters: dict = None, assets: AssetCollection = None, experiment: IEntity = None):
+        super().__init__()
+        self.assets = assets or AssetCollection()
         self.parameters = parameters or {"parameters": {}}
-        self.experiment_id = None
+        self.experiment = experiment
 
     def set_parameter(self, name: str, value: any) -> dict:
         """

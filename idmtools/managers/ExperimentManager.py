@@ -1,5 +1,5 @@
 from idmtools_local.core import RunTask
-from interfaces import IPlatform, IExperiment
+from entities import IPlatform, IExperiment
 
 
 class ExperimentManager:
@@ -23,9 +23,12 @@ class ExperimentManager:
         if not self.experiment.simulations:
             raise Exception("No simulations to run")
 
+        # Gather the assets
         for simulation in self.experiment.simulations:
             simulation.gather_assets()
-            self.platform.create_simulation(simulation)
+
+        # Send the experiment to the platform
+        self.platform.create_simulations(self.experiment)
 
     def run(self):
         """
@@ -48,9 +51,8 @@ class ExperimentManager:
         self.create_simulations()
 
         # Run
-        self.platform.run_simulation(self.experiment.simulations[0])
+        self.platform.run_simulations(self.experiment)
 
-        for s in self.experiment.simulations:
-            print(s)
-            print(s.tags)
-            RunTask.send(f"python ./Assets/model.py config.json", self.experiment.uid, s.uid)
+        for simulation in self.experiment.simulations:
+            print(simulation)
+            print(simulation.tags)

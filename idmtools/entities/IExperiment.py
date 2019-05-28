@@ -1,8 +1,9 @@
 import copy
 
 from assets.AssetCollection import AssetCollection
-from interfaces.IEntity import IEntity
-from interfaces.ISimulation import ISimulation
+from entities.CommandLine import CommandLine
+from entities.IEntity import IEntity
+from entities.ISimulation import ISimulation
 
 
 class IExperiment(IEntity):
@@ -12,7 +13,7 @@ class IExperiment(IEntity):
     """
 
     def __init__(self, name, simulation_type: type, assets: AssetCollection = None,
-                 base_simulation: ISimulation = None):
+                 base_simulation: ISimulation = None, command: CommandLine = None):
         """
         Constructor.
         Args:
@@ -20,13 +21,17 @@ class IExperiment(IEntity):
             simulation_type: A class to initialize the simulations that will be created for this experiment
             assets: The asset collection for assets global to this experiment
             base_simulation: Optional a simulation that will be the base for all simulations created for this experiment
+            command: Command to run on simulations
         """
-        super().__init__(assets=assets)
+        super().__init__()
+        self.command = command or CommandLine()
         self.simulation_type = simulation_type
         self.simulations = []
         self.name = name
         self.base_simulation = base_simulation or self.simulation_type()
         self.builder = None
+        self.suite_id = None
+        self.assets = assets or AssetCollection()
 
     def __repr__(self):
         return f"<Experiment: {self.uid} - {self.name} / Sim count {len(self.simulations)}>"
@@ -54,4 +59,5 @@ class IExperiment(IEntity):
 
         sim.experiment_id = self.uid
         self.simulations.append(sim)
+        sim.experiment = self
         return sim

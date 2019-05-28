@@ -1,4 +1,4 @@
-from interfaces.ISimulation import ISimulation
+from entities.ISimulation import ISimulation
 
 
 class PythonSimulation(ISimulation):

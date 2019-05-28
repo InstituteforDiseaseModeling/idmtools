@@ -1,8 +1,9 @@
 import os
 from functools import partial
 
-from interfaces.IExperimentBuilder import IExperimentBuilder
+from entities.IExperimentBuilder import IExperimentBuilder
 from managers.ExperimentManager import ExperimentManager
+from platforms.COMPSPlatform import COMPSPlatform
 from platforms.LocalPlatform import LocalPlatform
 from python.PythonExperiment import PythonExperiment
 
@@ -32,7 +33,7 @@ builder.add_sweep_definition(setB("b"), [1, 2, 3])
 
 experiment.builder = builder
 
-platform = LocalPlatform()
+platform = COMPSPlatform()
 
 em = ExperimentManager(experiment=experiment, platform=platform)
 em.run()

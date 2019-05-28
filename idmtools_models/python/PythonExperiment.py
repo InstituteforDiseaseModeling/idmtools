@@ -3,13 +3,15 @@ import subprocess
 import tempfile
 
 from assets.Asset import Asset
-from interfaces.IExperiment import IExperiment
+from entities.CommandLine import CommandLine
+from entities.IExperiment import IExperiment
 from python.PythonSimulation import PythonSimulation
 
 
 class PythonExperiment(IExperiment):
     def __init__(self, name, model_path, assets=None, extra_libraries=None):
-        super().__init__(name=name, assets=assets, simulation_type=PythonSimulation)
+        super().__init__(name=name, assets=assets, simulation_type=PythonSimulation,
+                         command=CommandLine("python", "./Assets/model.py", "config.json"))
         self.model_path = model_path
         self.extra_libraries = extra_libraries or []
         self.assets.add_asset(Asset(absolute_path=model_path))
@@ -36,4 +38,3 @@ class PythonExperiment(IExperiment):
                 extra_libraries = [line.strip() for line in fp.readlines()]
 
         return extra_libraries
-

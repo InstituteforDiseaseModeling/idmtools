@@ -31,13 +31,14 @@ class Asset:
         return f"<Asset: {os.path.join(self.relative_path, self.filename)} from {self.absolute_path}>"
 
     @property
-    def content(self):
+    def content(self) -> bytes:
         """
         Returns: content of the file. Either from the content attribute or by opening the absolute path.
         """
-        if self._content: return self._content
+        if self._content:
+            return self._content if isinstance(self._content, bytes) else str.encode(self._content)
 
-        with open(self.absolute_path, "r") as fp:
+        with open(self.absolute_path, "rb") as fp:
             return fp.read()
 
     # region Equality and Hashing
