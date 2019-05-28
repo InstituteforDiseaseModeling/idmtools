@@ -1,0 +1,20 @@
+version: "3.7"
+services:
+  redis:
+    image: redis:5.0.4-alpine
+    volumes:
+      - ../data/redis-data:/data
+    ports:
+      - 6379:6379
+
+  workers:
+    build:
+      context: .
+    environment:
+      - REDIS_URL=redis://redis:6379
+    command: "dramatiq brokers:redis_broker tasks --watch ."
+    volumes:
+      - .:/app
+      - ../data/workers:/data
+    depends_on:
+      - redis

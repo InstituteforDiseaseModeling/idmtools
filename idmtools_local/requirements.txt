@@ -1,0 +1,4 @@
+dramatiq[redis, watch]==1.6.0
+gevent
+pymongo
+mongoengine
