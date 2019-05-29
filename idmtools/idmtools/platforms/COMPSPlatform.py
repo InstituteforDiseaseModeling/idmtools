@@ -2,14 +2,9 @@ import os
 
 from COMPS import Client
 from COMPS.Data import Configuration, Experiment, AssetCollection, AssetCollectionFile, Simulation, SimulationFile
-from COMPS.Data.AssetFile import AssetFile
-from dramatiq import group
 
-from idmtools_local.core import CreateSimulationTask, RunTask, AddAssetTask
-from entities.IExperiment import IExperiment
-from entities.IPlatform import IPlatform
-from entities.ISimulation import ISimulation
-from utils.time import timestamp
+from idmtools.entities import IPlatform, IExperiment
+from idmtools.utils.time import timestamp
 
 
 class COMPSPriority:

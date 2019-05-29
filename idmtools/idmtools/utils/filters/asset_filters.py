@@ -13,7 +13,7 @@ AssetCollection.from_directory(... filters=[fname], ...)
 """
 from typing import List
 
-from assets.Asset import Asset
+from idmtools.assets.Asset import Asset
 
 
 def default_asset_file_filter(asset:Asset):

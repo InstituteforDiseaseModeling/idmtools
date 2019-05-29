@@ -2,10 +2,9 @@ import os
 import subprocess
 import tempfile
 
-from assets.Asset import Asset
-from entities.CommandLine import CommandLine
-from entities.IExperiment import IExperiment
-from python.PythonSimulation import PythonSimulation
+from idmtools.assets.Asset import Asset
+from idmtools.entities import IExperiment, CommandLine
+from idmtools_models.python.PythonSimulation import PythonSimulation
 
 
 class PythonExperiment(IExperiment):

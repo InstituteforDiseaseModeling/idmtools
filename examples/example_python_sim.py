@@ -1,11 +1,11 @@
 import os
 from functools import partial
 
-from entities.IExperimentBuilder import IExperimentBuilder
-from managers.ExperimentManager import ExperimentManager
-from platforms.COMPSPlatform import COMPSPlatform
-from platforms.LocalPlatform import LocalPlatform
-from python.PythonExperiment import PythonExperiment
+from idmtools.entities import ExperimentBuilder
+from idmtools.managers import ExperimentManager
+from idmtools.platforms import COMPSPlatform
+from idmtools.platforms import LocalPlatform
+from idmtools_models.python.PythonExperiment import PythonExperiment
 
 
 def param_update(simulation, param, value):
@@ -19,7 +19,7 @@ experiment.assets.add_directory(assets_directory=os.path.join("inputs", "Assets"
 
 setA = partial(param_update, param="a")
 
-class setB:
+class setParam:
     def __init__(self, param):
         self.param = param
 
@@ -27,13 +27,13 @@ class setB:
         return param_update(simulation, self.param, value)
 
 
-builder = IExperimentBuilder()
+builder = ExperimentBuilder()
 builder.add_sweep_definition(setA, range(100))
-builder.add_sweep_definition(setB("b"), [1, 2, 3])
+builder.add_sweep_definition(setParam("b"), [1, 2, 3])
 
 experiment.builder = builder
 
-platform = COMPSPlatform()
+platform = LocalPlatform()
 
 em = ExperimentManager(experiment=experiment, platform=platform)
 em.run()

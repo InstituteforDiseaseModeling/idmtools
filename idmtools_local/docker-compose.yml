@@ -14,7 +14,7 @@ services:
       - REDIS_URL=redis://redis:6379
     command: "dramatiq brokers:redis_broker tasks --watch ."
     volumes:
-      - .:/app
+      - ./idmtools_local:/app
       - ../data/workers:/data
     depends_on:
       - redis

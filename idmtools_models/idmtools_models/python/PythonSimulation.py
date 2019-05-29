@@ -1,4 +1,4 @@
-from entities.ISimulation import ISimulation
+from idmtools.entities import ISimulation
 
 
 class PythonSimulation(ISimulation):

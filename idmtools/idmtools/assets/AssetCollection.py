@@ -1,11 +1,11 @@
 import os
 from typing import List
 
-from assets.Asset import Asset
-from entities.IEntity import IEntity
-from utils.file import scan_directory
-from utils.filters.asset_filters import default_asset_file_filter
-from utils.filters.types import AssetFilterList, FilterMode
+from idmtools.assets import Asset
+from idmtools.core.IEntity import IEntity
+from idmtools.utils.file import scan_directory
+from idmtools.utils.filters import AssetFilterList, FilterMode
+from idmtools.utils.filters.asset_filters import default_asset_file_filter
 
 
 class AssetCollection(IEntity):
@@ -75,17 +75,19 @@ class AssetCollection(IEntity):
             relative_path = os.path.dirname(entry.path.replace(assets_directory, "")).strip(os.sep)
             found_assets.append(Asset(absolute_path=os.path.abspath(entry.path),
                                       relative_path=relative_path, filename=entry.name))
-        # Create the filters (add the default one to the list)
-        filters = filters or []
-        filters.append(default_asset_file_filter)
+
+        # Apply the default filter
+        found_assets = filter(default_asset_file_filter, found_assets)
 
         # Operations on assets (filter, flatten, force relative_path)
         assets = []
         for asset in found_assets:
-            results = [f(asset) for f in filters]
-            keep_asset = (filters_mode == FilterMode.OR and any(results)) \
-                         or (filters_mode == FilterMode.AND and all(results))
-            if not keep_asset: continue
+            if filters:
+                results = [f(asset) for f in filters]
+                if filters_mode == FilterMode.OR and not any(results):
+                    continue
+                if filters_mode == FilterMode.AND and not all(results):
+                    continue
 
             if flatten:
                 asset.relative_path = relative_path
@@ -105,8 +107,10 @@ class AssetCollection(IEntity):
         Args:
             See `AssetCollection.assets_from_directory`.
         """
-        assets = self.assets_from_directory(assets_directory, recursive, flatten, filters, filters_mode, relative_path)
-        self.assets.extend(assets)
+        assets = AssetCollection.assets_from_directory(assets_directory, recursive, flatten, filters, filters_mode,
+                                                       relative_path)
+        for asset in assets:
+            self.add_asset(asset)
 
     def add_asset(self, asset: Asset):
         """

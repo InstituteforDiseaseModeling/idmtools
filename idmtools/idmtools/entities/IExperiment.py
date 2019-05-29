@@ -1,14 +1,14 @@
 import copy
+from abc import ABCMeta
 
-from assets.AssetCollection import AssetCollection
-from entities.CommandLine import CommandLine
-from entities.IEntity import IEntity
-from entities.ISimulation import ISimulation
+from idmtools.entities import ISimulation, CommandLine
+from idmtools.assets.AssetCollection import AssetCollection
+from idmtools.core import IEntity
 
 
-class IExperiment(IEntity):
+class IExperiment(IEntity, metaclass=ABCMeta):
     """
-    Represents a generic Simulation.
+    Represents a generic Experiment.
     This class needs to be implemented for each model type with specifics.
     """
 

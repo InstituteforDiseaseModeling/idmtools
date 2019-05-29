@@ -1,0 +1,9 @@
+version: "3.7"
+services:
+  examples:
+    build: .
+    volumes:
+      - ../imdtools:/tmp/extra/idmtools
+      - .:/home/jovyan/work
+    ports:
+      - 8888:8888

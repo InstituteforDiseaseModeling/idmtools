@@ -1,8 +1,8 @@
 import json
 
-from assets.Asset import Asset
-from assets.AssetCollection import AssetCollection
-from entities.IEntity import IEntity
+from idmtools.assets import AssetCollection, Asset
+from idmtools.entities import IExperiment
+from idmtools.core.IEntity import IEntity
 
 
 class ISimulation(IEntity):
@@ -11,7 +11,7 @@ class ISimulation(IEntity):
     This class needs to be implemented for each model type with specifics.
     """
 
-    def __init__(self, parameters: dict = None, assets: AssetCollection = None, experiment: IEntity = None):
+    def __init__(self, parameters: dict = None, assets: AssetCollection = None, experiment: IExperiment = None):
         super().__init__()
         self.assets = assets or AssetCollection()
         self.parameters = parameters or {"parameters": {}}
@@ -31,7 +31,7 @@ class ISimulation(IEntity):
         return {name: value}
 
     def __repr__(self):
-        return f"<Simulation: {self.uid} - Exp_id: {self.experiment_id}>"
+        return f"<Simulation: {self.uid} - Exp_id: {self.experiment.uid}>"
 
     def gather_assets(self):
         """

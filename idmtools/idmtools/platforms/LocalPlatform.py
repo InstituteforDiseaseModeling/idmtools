@@ -1,9 +1,7 @@
 from dramatiq import group
 
 from idmtools_local.core import CreateExperimentTask, CreateSimulationTask, RunTask, AddAssetTask
-from entities.IExperiment import IExperiment
-from entities.IPlatform import IPlatform
-from entities.ISimulation import ISimulation
+from idmtools.entities import IPlatform, IExperiment
 
 
 class LocalPlatform(IPlatform):

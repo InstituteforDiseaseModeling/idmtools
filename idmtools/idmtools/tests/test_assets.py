@@ -2,10 +2,9 @@ import os
 import unittest
 from functools import partial
 
-from assets.Asset import Asset
-from assets.AssetCollection import AssetCollection
-from utils.filters import FilterMode
-from utils.filters.asset_filters import file_name_is, asset_in_directory
+from idmtools.assets import Asset, AssetCollection
+from idmtools.utils.filters import FilterMode
+from idmtools.utils.filters.asset_filters import file_name_is, asset_in_directory
 
 
 class TestAssets(unittest.TestCase):

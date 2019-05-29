@@ -1,7 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
-from entities.IExperiment import IExperiment
-from entities.ISimulation import ISimulation
+from idmtools.entities import IExperiment, ISimulation
 
 
 class IPlatform(metaclass=ABCMeta):
@@ -42,9 +41,9 @@ class IPlatform(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def send_assets_for_experiment(self, experiment):
+    def send_assets_for_experiment(self, experiment: IExperiment):
         pass
 
     @abstractmethod
-    def send_assets_for_simulation(self, simulation):
+    def send_assets_for_simulation(self, simulation:ISimulation):
         pass

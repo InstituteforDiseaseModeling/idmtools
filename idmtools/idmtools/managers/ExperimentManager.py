@@ -1,5 +1,4 @@
-from idmtools_local.core import RunTask
-from entities import IPlatform, IExperiment
+from idmtools.entities import IPlatform, IExperiment
 
 
 class ExperimentManager:

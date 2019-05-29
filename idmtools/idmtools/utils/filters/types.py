@@ -1,11 +1,12 @@
 from enum import Enum
 from typing import List, Callable
 
-from assets.Asset import Asset
+from idmtools.assets import Asset
 
 # Type for a list of filters to filter assets
 # Used in the AssetCollection
-AssetFilterList = List[Callable[[Asset], bool]]
+AssetFilter = Callable[[Asset], bool]
+AssetFilterList = List[AssetFilter]
 
 
 class FilterMode(Enum):
