@@ -18,3 +18,8 @@ services:
       - ../data/workers:/data
     depends_on:
       - redis
+
+networks:
+  default:
+    external:
+      name: idmtools_network
