@@ -1,4 +1,4 @@
-from idmtools.entities.IWorkflowStep import IWorkflowStep
+from idmtools.workflows.IWorkflowStep import IWorkflowStep
 
 
 class GenerateSamplesStep(IWorkflowStep):

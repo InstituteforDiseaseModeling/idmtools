@@ -46,7 +46,7 @@ class AssetCollection(IEntity):
     @staticmethod
     def assets_from_directory(assets_directory: str, recursive: bool = True, flatten: bool = False,
                               filters: AssetFilterList = None, filters_mode: FilterMode = FilterMode.OR,
-                              relative_path: str = None) -> List[Asset]:
+                              forced_relative_path: str = None) -> List[Asset]:
         """
         Create assets for files in a given directory.
 
@@ -58,7 +58,7 @@ class AssetCollection(IEntity):
             and returning true or false. True: Adding the asset to the collection, False: filter out.
             See `idmtools.utils.filters.asset_filters`
             filters_mode: When given multiple filters, either OR or AND the results
-            relative_path: Prefix a relative path to the path created from the root directory
+            forced_relative_path: Prefix a relative path to the path created from the root directory
 
         Examples:
             For relative_path. Given the following folder structure root/a/1,txt root/b.txt and relative_path="test"
@@ -77,7 +77,7 @@ class AssetCollection(IEntity):
                                       relative_path=relative_path, filename=entry.name))
 
         # Apply the default filter
-        found_assets = filter(default_asset_file_filter, found_assets)
+        found_assets = list(filter(default_asset_file_filter, found_assets))
 
         # Operations on assets (filter, flatten, force relative_path)
         assets = []
@@ -90,10 +90,10 @@ class AssetCollection(IEntity):
                     continue
 
             if flatten:
-                asset.relative_path = relative_path
+                asset.relative_path = forced_relative_path or ""
 
-            if relative_path:
-                asset.relative_path = os.path.join(relative_path, asset.relative_path)
+            if forced_relative_path:
+                asset.relative_path = os.path.join(forced_relative_path, asset.relative_path)
 
             assets.append(asset)
 

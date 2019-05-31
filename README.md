@@ -33,9 +33,9 @@ Run the local runner:
 ```
 
 For development purpose, it is important to set the following folders as `Source Root` (on PyCharm, right click and `Mark Directoy as > Source Root`):
-- `idmtools/idmtools`
-- `idmtools/idmtools_local`
-- `idmtools/idmtools_models`
+- `idmtools/idmtools_core`
+- `idmtools/idmtools_local_runner`
+- `idmtools/idmtools_models_collection`
 
 ## Running the examples in Jupyter
 Ensure that the local runner is up:

@@ -6,6 +6,6 @@ if __name__ == "__main__":
         a = config["parameters"]["a"]
         b = config["parameters"]["b"]
 
-    with open("output.json", 'wb') as fp:
+    with open("output.json", 'w') as fp:
         output = {"result": a + b}
         json.dump(output, fp)
