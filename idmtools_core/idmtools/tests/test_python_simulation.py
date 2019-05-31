@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from python.PythonExperiment import PythonExperiment
+from idmtools_models.python.PythonExperiment import PythonExperiment
 
 
 class TestPythonSimulation(unittest.TestCase):

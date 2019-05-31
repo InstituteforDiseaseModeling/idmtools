@@ -3,9 +3,9 @@ services:
   examples:
     build: .
     volumes:
-      - ../idmtools/idmtools:/tmp/extra/idmtools
-      - ../idmtools_local/idmtools_local:/tmp/extra/idmtools_local
-      - ../idmtools_models/idmtools_models:/tmp/extra/idmtools_models
+      - ../idmtools_core/idmtools:/tmp/extra/idmtools
+      - ../idmtools_local_runner/idmtools_local:/tmp/extra/idmtools_local
+      - ../idmtools_models_collection/idmtools_models:/tmp/extra/idmtools_models
       - ./work:/home/jovyan/work
     ports:
       - 8888:8888

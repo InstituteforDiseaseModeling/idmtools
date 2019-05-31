@@ -11,13 +11,13 @@ Create a virtual environment
 
 Install the packages in dev mode
 ```bash
-> cd idmtools
+> cd idmtools_core
 > pip install -e . --extra-index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
 > cd ..
-> cd idmtools_local
+> cd idmtools_local_runner
 > pip install -e .
 > cd ..
-> cd idmtools_models
+> cd idmtools_models_collection
 > pip install -e .
 ```
 
