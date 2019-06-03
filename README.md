@@ -1,7 +1,8 @@
 # IDM Modeling Tools
 
 ## Pre-requisites
-Python 3.7
+Python 3.7 x64
+Docker
 
 ## Development installation steps
 Create a virtual environment
@@ -32,7 +33,7 @@ Run the local runner:
 > docker-compose up
 ```
 
-For development purpose, it is important to set the following folders as `Source Root` (on PyCharm, right click and `Mark Directoy as > Source Root`):
+For development purpose, it is important to add the following folders as to your `PYTHONPATH` (In PyCharm, right click and `Mark Directoy as > Source Root`):
 - `idmtools/idmtools_core`
 - `idmtools/idmtools_local_runner`
 - `idmtools/idmtools_models_collection`
@@ -40,7 +41,7 @@ For development purpose, it is important to set the following folders as `Source
 ## Running the examples in Jupyter
 Ensure that the local runner is up:
 ```bash
-> cd idmtools_local
+> cd idmtools_local_runner
 > docker-compose up
 ```
 
