@@ -25,7 +25,6 @@ class ISimulation(IEntity):
             value: Value of the parameter
 
         Returns: Tag to record the change
-
         """
         self.parameters["parameters"][name] = value
         return {name: value}
