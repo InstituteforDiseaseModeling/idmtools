@@ -1,7 +1,10 @@
+import typing
 from abc import ABCMeta, abstractmethod
 
 from idmtools.core import IEntity
-from idmtools.entities import IExperiment, ISimulation
+
+if typing.TYPE_CHECKING:
+    from idmtools.core.types import TExperiment, TSimulation
 
 
 class IPlatform(IEntity, metaclass=ABCMeta):
@@ -15,7 +18,7 @@ class IPlatform(IEntity, metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def create_experiment(self, experiment: IExperiment):
+    def create_experiment(self, experiment: 'TExperiment'):
         """
         Function creating an experiment on the platform.
         Args:
@@ -24,7 +27,7 @@ class IPlatform(IEntity, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def create_simulations(self, experiment: IExperiment):
+    def create_simulations(self, experiment: 'TExperiment'):
         """
         Function creating experiments simulations on the platform for a given experiment.
         Args:
@@ -33,7 +36,7 @@ class IPlatform(IEntity, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def run_simulations(self, experiment: IExperiment):
+    def run_simulations(self, experiment: 'TExperiment'):
         """
         Run the simulations for a given experiment on the platform
         Args:
@@ -42,9 +45,9 @@ class IPlatform(IEntity, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def send_assets_for_experiment(self, experiment: IExperiment):
+    def send_assets_for_experiment(self, experiment: 'TExperiment'):
         pass
 
     @abstractmethod
-    def send_assets_for_simulation(self, simulation:ISimulation):
+    def send_assets_for_simulation(self, simulation: 'TSimulation'):
         pass

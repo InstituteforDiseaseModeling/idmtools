@@ -1,8 +1,11 @@
 import inspect
+import typing
 from functools import partial
 from inspect import signature
 from itertools import product
-from typing import Callable, Any, Iterable
+
+if typing.TYPE_CHECKING:
+    from typing import Callable, Any, Iterable
 
 
 class ExperimentBuilder:
@@ -15,7 +18,7 @@ class ExperimentBuilder:
     def __init__(self):
         self.sweeps = []
 
-    def add_sweep_definition(self, function: Callable, values: Iterable[Any]):
+    def add_sweep_definition(self, function: 'Callable', values: 'Iterable[Any]'):
         """
         Add sweep definition.
         A sweep definition is composed of a function and a list of values to call the function with.

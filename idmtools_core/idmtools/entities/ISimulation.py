@@ -1,8 +1,11 @@
 import json
+import typing
 
 from idmtools.assets import AssetCollection, Asset
 from idmtools.core import IEntity
-from idmtools.entities import IExperiment
+
+if typing.TYPE_CHECKING:
+    from idmtools.core.types import TExperiment
 
 
 class ISimulation(IEntity):
@@ -11,7 +14,7 @@ class ISimulation(IEntity):
     This class needs to be implemented for each model type with specifics.
     """
 
-    def __init__(self, parameters: dict = None, assets: AssetCollection = None, experiment: IExperiment = None):
+    def __init__(self, parameters: dict = None, assets: 'AssetCollection' = None, experiment: 'TExperiment' = None):
         super().__init__()
         self.assets = assets or AssetCollection()
         self.parameters = parameters or {"parameters": {}}

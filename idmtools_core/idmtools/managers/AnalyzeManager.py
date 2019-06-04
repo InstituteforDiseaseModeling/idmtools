@@ -1,12 +1,12 @@
-from typing import List, Union
+import typing
 
-from idmtools.analysis import IAnalyzer
-from idmtools.entities import IExperiment
+if typing.TYPE_CHECKING:
+    from idmtools.core.types import TExperimentsList, TAnalyzerList
 
 
 class AnalyzeManager:
 
-    def __init__(self, experiments: List[Union[IExperiment, str]], analyzers=List[IAnalyzer]):
+    def __init__(self, experiments: 'TExperimentsList', analyzers: 'TAnalyzerList'):
         self.experiments = experiments
         self.analyzers = analyzers
 

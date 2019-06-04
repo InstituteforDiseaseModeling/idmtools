@@ -1,11 +1,13 @@
 import copy
+import typing
 from abc import ABCMeta
 
 from idmtools.assets.AssetCollection import AssetCollection
 from idmtools.core import IEntity
-from idmtools.core.types import SimulationType
 from idmtools.entities import CommandLine
-from idmtools.entities.ISimulation import ISimulation
+
+if typing.TYPE_CHECKING:
+    from idmtools.core.types import TSimulation, TSimulationClass, TCommandLine
 
 
 class IExperiment(IEntity, metaclass=ABCMeta):
@@ -15,8 +17,8 @@ class IExperiment(IEntity, metaclass=ABCMeta):
     """
     pickle_ignore_fields = ["builder"]
 
-    def __init__(self, name, simulation_type: SimulationType = ISimulation, assets: AssetCollection = None,
-                 base_simulation: ISimulation = None, command: CommandLine = None):
+    def __init__(self, name, simulation_type: 'TSimulationClass' = None, assets: 'AssetCollection' = None,
+                 base_simulation: 'TSimulation' = None, command: 'TCommandLine' = None):
         """
         Constructor.
         Args:
@@ -31,10 +33,18 @@ class IExperiment(IEntity, metaclass=ABCMeta):
         self.simulation_type = simulation_type
         self.simulations = []
         self.name = name
-        self.base_simulation = base_simulation or self.simulation_type()
         self.builder = None
         self.suite_id = None
         self.assets = assets or AssetCollection()
+
+        # Take care of the base simulation
+        if base_simulation:
+            self.base_simulation = base_simulation
+        elif simulation_type:
+            self.base_simulation = simulation_type()
+        else:
+            from idmtools.entities import ISimulation
+            self.base_simulation = ISimulation()
 
     def __repr__(self):
         return f"<Experiment: {self.uid} - {self.name} / Sim count {len(self.simulations)}>"

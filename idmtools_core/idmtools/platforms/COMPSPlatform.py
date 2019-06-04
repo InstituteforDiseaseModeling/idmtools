@@ -1,10 +1,14 @@
 import os
+import typing
 
 from COMPS import Client
-from COMPS.Data import Configuration, Experiment, AssetCollection, AssetCollectionFile, Simulation, SimulationFile
+from COMPS.Data import AssetCollection, AssetCollectionFile, Configuration, Experiment, Simulation, SimulationFile
 
-from idmtools.entities import IPlatform, IExperiment
+from idmtools.entities import IPlatform
 from idmtools.utils.time import timestamp
+
+if typing.TYPE_CHECKING:
+    from idmtools.core.types import TExperiment
 
 
 class COMPSPriority:
@@ -21,7 +25,8 @@ class COMPSPlatform(IPlatform):
     """
     MAX_SUBDIRECTORY_LENGTH = 35  # avoid maxpath issues on COMPS
 
-    def __init__(self, endpoint: str = None, environment: str = None, priority: COMPSPriority = None):
+    def __init__(self, endpoint: 'str' = None, environment: 'str' = None, priority: 'COMPSPriority' = None):
+        super().__init__()
         self.endpoint = endpoint or "https://comps2.idmod.org"
         self.environment = environment or "Bayesian"
         self.priority = priority or COMPSPriority.Lowest
@@ -39,7 +44,7 @@ class COMPSPlatform(IPlatform):
         except:
             Client.login(self.endpoint)
 
-    def send_assets_for_experiment(self, experiment):
+    def send_assets_for_experiment(self, experiment: 'TExperiment'):
         ac = AssetCollection()
         for asset in experiment.assets:
             ac.add_asset(AssetCollectionFile(file_name=asset.filename, relative_path=asset.relative_path),
@@ -52,7 +57,7 @@ class COMPSPlatform(IPlatform):
         pass
 
     @staticmethod
-    def _clean_experiment_name(experiment_name: str) -> str:
+    def _clean_experiment_name(experiment_name: 'str') -> 'str':
         """
         Enforce any COMPS-specific demands on experiment names.
         Args:
@@ -63,7 +68,7 @@ class COMPSPlatform(IPlatform):
             experiment_name = experiment_name.replace(c, '_')
         return experiment_name
 
-    def create_experiment(self, experiment: IExperiment):
+    def create_experiment(self, experiment: 'TExperiment'):
         self._login()
 
         # Cleanup the name
@@ -99,7 +104,7 @@ class COMPSPlatform(IPlatform):
         experiment.uid = str(e.id)
         self.send_assets_for_experiment(experiment)
 
-    def create_simulations(self, experiment: IExperiment):
+    def create_simulations(self, experiment: 'TExperiment'):
         self._login()
         created_simulations = []
         for simulation in experiment.simulations:
@@ -117,6 +122,6 @@ class COMPSPlatform(IPlatform):
         for i, comps_simulation in enumerate(created_simulations):
             experiment.simulations[i].uid = comps_simulation.id
 
-    def run_simulations(self, experiment: IExperiment):
+    def run_simulations(self, experiment: 'TExperiment'):
         self._login()
         self.comps_experiment.commission()

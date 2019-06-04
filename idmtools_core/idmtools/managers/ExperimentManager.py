@@ -1,6 +1,10 @@
-from idmtools.entities import IPlatform, IExperiment
+import typing
+
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.services.platforms import PlatformPersistService
+
+if typing.TYPE_CHECKING:
+    from idmtools.core.types import TExperiment, TPlatform
 
 
 class ExperimentManager:
@@ -8,7 +12,7 @@ class ExperimentManager:
     Manages an experiment.
     """
 
-    def __init__(self, experiment: IExperiment, platform: IPlatform):
+    def __init__(self, experiment: 'TExperiment', platform: 'TPlatform'):
         """
         Constructor
         Args:

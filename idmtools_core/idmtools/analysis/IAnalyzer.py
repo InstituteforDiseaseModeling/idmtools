@@ -1,7 +1,9 @@
 from abc import ABCMeta, abstractmethod
-from typing import Any, Mapping
+import typing
 
-from idmtools.entities import IExperiment, ISimulation
+if typing.TYPE_CHECKING:
+    from idmtools.core.types import TExperiment, TSimulation, TAllSimulationData
+    from typing import Any
 
 
 class IAnalyzer(metaclass=ABCMeta):
@@ -31,7 +33,7 @@ class IAnalyzer(metaclass=ABCMeta):
         """
         pass
 
-    def per_experiment(self, experiment: IExperiment) -> None:
+    def per_experiment(self, experiment: 'TExperiment') -> None:
         """
         Called once per experiment before doing the apply on the simulations.
         Args:
@@ -39,7 +41,7 @@ class IAnalyzer(metaclass=ABCMeta):
         """
         pass
 
-    def filter(self, simulation: ISimulation) -> bool:
+    def filter(self, simulation: 'TSimulation') -> bool:
         """
         Decide whether analyzer should process a simulation
         Args:
@@ -49,7 +51,7 @@ class IAnalyzer(metaclass=ABCMeta):
         """
         return True
 
-    def select_simulation_data(self, data: Any, simulation:ISimulation) -> Any:
+    def select_simulation_data(self, data: 'Any', simulation: 'TSimulation') -> 'Any':
         """
         In parallel for each simulation, consume raw data from filenames and emit selected data
         Args:
@@ -60,7 +62,7 @@ class IAnalyzer(metaclass=ABCMeta):
         """
         return None
 
-    def finalize(self, all_data: Mapping[ISimulation, Any]) -> Any:
+    def finalize(self, all_data: 'TAllSimulationData') -> 'Any':
         """
         On a single process, get all the selected data
         Args:
