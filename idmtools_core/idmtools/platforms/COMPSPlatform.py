@@ -3,7 +3,9 @@ import typing
 
 from COMPS import Client
 from COMPS.Data import AssetCollection, AssetCollectionFile, Configuration, Experiment, Simulation, SimulationFile
+from COMPS.Data.Simulation import SimulationState
 
+from idmtools.core import EntityStatus
 from idmtools.entities import IPlatform
 from idmtools.utils.time import timestamp
 
@@ -23,6 +25,7 @@ class COMPSPlatform(IPlatform):
     """
     Represents the platform allowing to run simulations on COMPS.
     """
+
     MAX_SUBDIRECTORY_LENGTH = 35  # avoid maxpath issues on COMPS
 
     def __init__(self, endpoint: 'str' = None, environment: 'str' = None, priority: 'COMPSPriority' = None):
@@ -44,6 +47,13 @@ class COMPSPlatform(IPlatform):
         except:
             Client.login(self.endpoint)
 
+    def _retrieve_comps_experiment(self, experiment_id: 'str'):
+        if self.comps_experiment and str(self.comps_experiment.id) == experiment_id:
+            return
+
+        self._login()
+        self.comps_experiment = Experiment.get(id=experiment_id)
+
     def send_assets_for_experiment(self, experiment: 'TExperiment'):
         ac = AssetCollection()
         for asset in experiment.assets:
@@ -53,8 +63,9 @@ class COMPSPlatform(IPlatform):
         experiment.assets.uid = ac.id
         print("Asset collection for experiment: {}".format(ac.id))
 
-    def send_assets_for_simulation(self, simulation, assets):
-        pass
+    def send_assets_for_simulation(self, simulation, comps_simulation):
+        for asset in simulation.assets:
+            comps_simulation.add_file(simulationfile=SimulationFile(asset.filename, 'input'), data=asset.content)
 
     @staticmethod
     def _clean_experiment_name(experiment_name: 'str') -> 'str':
@@ -111,8 +122,7 @@ class COMPSPlatform(IPlatform):
             s = Simulation(name=experiment.name, experiment_id=experiment.uid,
                            configuration=Configuration(asset_collection_id=experiment.assets.uid))
 
-            for asset in simulation.assets:
-                s.add_file(simulationfile=SimulationFile(asset.filename, 'input'), data=asset.content)
+            self.send_assets_for_simulation(simulation, s)
             s.set_tags(simulation.tags)
             created_simulations.append(s)
 
@@ -125,3 +135,19 @@ class COMPSPlatform(IPlatform):
     def run_simulations(self, experiment: 'TExperiment'):
         self._login()
         self.comps_experiment.commission()
+
+    def refresh_experiment_status(self, experiment):
+        self._login()
+        self._retrieve_comps_experiment(experiment.uid)
+        for s in experiment.simulations:
+            for comps_simulation in self.comps_experiment.get_simulations():
+                if comps_simulation.id == s.uid:
+                    if comps_simulation.state == SimulationState.Succeeded:
+                        s.status = EntityStatus.SUCCEEDED
+                    elif comps_simulation.state in (SimulationState.Canceled, SimulationState.CancelRequested, SimulationState.Failed):
+                        s.status = EntityStatus.FAILED
+                    elif comps_simulation.state == SimulationState.Created:
+                        s.status = EntityStatus.CREATED
+                    else:
+                        s.status = EntityStatus.RUNNING
+                    break

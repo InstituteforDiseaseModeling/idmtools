@@ -5,12 +5,13 @@ from functools import partial
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core import FilterMode
 from idmtools.utils.filters.asset_filters import file_name_is, asset_in_directory
+from tests import INPUT_PATH
 
 
 class TestAssets(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.base_path = os.path.abspath(os.path.join("inputs", "assets", "collections"))
+        self.base_path = os.path.abspath(os.path.join(INPUT_PATH, "assets", "collections"))
 
     def test_assets_collection_from_dir(self):
         assets_to_find = [

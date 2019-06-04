@@ -9,11 +9,12 @@ from idmtools_models.python.PythonSimulation import PythonSimulation
 
 class PythonExperiment(IExperiment):
     def __init__(self, name, model_path, assets=None, extra_libraries=None):
-        super().__init__(name=name, assets=assets, simulation_type=PythonSimulation,
-                         command=CommandLine("python", "./Assets/model.py", "config.json"))
+        super().__init__(name=name, assets=assets, simulation_type=PythonSimulation)
         self.model_path = model_path
         self.extra_libraries = extra_libraries or []
         self.assets.add_asset(Asset(absolute_path=model_path))
+        model_filename = os.path.basename(model_path)
+        self.command = CommandLine("python", f"./Assets/{model_filename}", "config.json")
 
     def retrieve_python_dependencies(self):
         """

@@ -3,7 +3,7 @@ import typing
 from abc import ABCMeta
 
 from idmtools.assets.AssetCollection import AssetCollection
-from idmtools.core import IEntity
+from idmtools.core import IEntity, EntityStatus
 from idmtools.entities import CommandLine
 
 if typing.TYPE_CHECKING:
@@ -74,3 +74,12 @@ class IExperiment(IEntity, metaclass=ABCMeta):
         self.simulations.append(sim)
         sim.experiment = self
         return sim
+
+    @property
+    def done(self):
+        return all([s.done for s in self.simulations])
+
+    @property
+    def succeeded(self):
+        return all([s.succeeded for s in self.simulations])
+

@@ -11,12 +11,14 @@ fname = partial(file_name_is, filenames=["a.txt", "b.txt"])
 AssetCollection.from_directory(... filters=[fname], ...)
 ```
 """
-from typing import List
+import typing
 
-from idmtools.assets.Asset import Asset
+if typing.TYPE_CHECKING:
+    from typing import List
+    from idmtools.core import TAsset
 
 
-def default_asset_file_filter(asset:Asset):
+def default_asset_file_filter(asset: 'TAsset') -> 'bool':
     """
     Default filter to leave out python caching.
     This filter is used in the creation of AssetCollection regardless of user filters.
@@ -28,7 +30,7 @@ def default_asset_file_filter(asset:Asset):
     return not any([p in asset.absolute_path for p in patterns])
 
 
-def file_name_is(asset:Asset, filenames:List[str]):
+def file_name_is(asset: 'TAsset', filenames: 'List[str]') -> 'bool':
     """
     Filter allowing to only consider assets with a filename contained in the `filenames` list.
     Args:
@@ -38,7 +40,7 @@ def file_name_is(asset:Asset, filenames:List[str]):
     return asset.filename in filenames
 
 
-def asset_in_directory(asset, directories):
+def asset_in_directory(asset: 'TAsset', directories: 'List[str]') -> 'bool':
     """
     Filter allowing to only consider assets within a given directory.
     This filter is not strict and simply check if the directory portion is present in the assets absolute path.

@@ -2,7 +2,7 @@ import json
 import typing
 
 from idmtools.assets import AssetCollection, Asset
-from idmtools.core import IEntity
+from idmtools.core import IEntity, EntityStatus
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TExperiment
@@ -19,6 +19,7 @@ class ISimulation(IEntity):
         self.assets = assets or AssetCollection()
         self.parameters = parameters or {"parameters": {}}
         self.experiment = experiment
+        self.status = None
 
     def set_parameter(self, name: str, value: any) -> dict:
         """
@@ -41,3 +42,11 @@ class ISimulation(IEntity):
         By default, only create a config.json containing the parameters
         """
         self.assets.add_asset(Asset(filename="config.json", content=json.dumps(self.parameters)))
+
+    @property
+    def done(self):
+        return self.status in (EntityStatus.SUCCEEDED, EntityStatus.FAILED)
+
+    @property
+    def succeeded(self):
+        return self.status == EntityStatus.SUCCEEDED

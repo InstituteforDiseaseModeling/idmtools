@@ -1,27 +1,14 @@
-import os
-import shutil
 import unittest
 
-from idmtools.entities import IExperiment, ISimulation
+from idmtools.entities import IExperiment
 from idmtools.managers import ExperimentManager
 from idmtools.platforms import LocalPlatform
-from idmtools.services.IPersistanceService import IPersistenceService
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.services.platforms import PlatformPersistService
+from tests.ITestWithPersistence import ITestWithPersistence
 
-current_directory = os.path.dirname(os.path.realpath(__file__))
 
-
-class TestExperimentManager(unittest.TestCase):
-    def setUp(self) -> None:
-        self.data_dir = os.path.join(current_directory, "data")
-        os.makedirs(self.data_dir, exist_ok=True)
-        IPersistenceService.shelve_directory = self.data_dir
-        PlatformPersistService.shelf_name = "ptests"
-        ExperimentPersistService.shelf_name = "etests"
-
-    def tearDown(self) -> None:
-        shutil.rmtree(self.data_dir)
+class TestExperimentManager(ITestWithPersistence):
 
     def test_from_experiment(self):
         e = IExperiment("My experiment")

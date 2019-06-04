@@ -1,5 +1,5 @@
 from dramatiq import group
-
+from idmtools.core import EntityStatus
 from idmtools_local.core import CreateExperimentTask, CreateSimulationTask, RunTask, AddAssetTask
 from idmtools.entities import IPlatform, IExperiment
 
@@ -8,6 +8,11 @@ class LocalPlatform(IPlatform):
     """
     Represents the platform allowing to run simulations locally.
     """
+
+    def refresh_experiment_status(self, experiment):
+        for s in experiment.simulations:
+            s.status = EntityStatus.SUCCEEDED
+
     def create_experiment(self, experiment: IExperiment):
         m = CreateExperimentTask.send()
         eid = m.get_result(block=True)

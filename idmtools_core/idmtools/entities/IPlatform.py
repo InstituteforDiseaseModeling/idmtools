@@ -4,7 +4,8 @@ from abc import ABCMeta, abstractmethod
 from idmtools.core import IEntity
 
 if typing.TYPE_CHECKING:
-    from idmtools.core.types import TExperiment, TSimulation, TAssetCollection
+    from idmtools.core.types import TExperiment, TSimulation
+    from idmtools.core import EntityStatus
 
 
 class IPlatform(IEntity, metaclass=ABCMeta):
@@ -18,7 +19,7 @@ class IPlatform(IEntity, metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def create_experiment(self, experiment: 'TExperiment'):
+    def create_experiment(self, experiment: 'TExperiment') -> None:
         """
         Function creating an experiment on the platform.
         Args:
@@ -27,7 +28,7 @@ class IPlatform(IEntity, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def create_simulations(self, experiment: 'TExperiment'):
+    def create_simulations(self, experiment: 'TExperiment') -> None:
         """
         Function creating experiments simulations on the platform for a given experiment.
         Args:
@@ -36,7 +37,7 @@ class IPlatform(IEntity, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def run_simulations(self, experiment: 'TExperiment'):
+    def run_simulations(self, experiment: 'TExperiment') -> None:
         """
         Run the simulations for a given experiment on the platform
         Args:
@@ -45,9 +46,30 @@ class IPlatform(IEntity, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def send_assets_for_experiment(self, experiment: 'TExperiment'):
+    def send_assets_for_experiment(self, experiment: 'TExperiment', **kwargs) -> None:
+        """
+        Send the assets for a given experiment to the platform.
+        Args:
+            experiment: The experiment to process. Expected to have an `assets` attribute containing the collection.
+            **kwargs: Extra parameters used by the platform
+        """
         pass
 
     @abstractmethod
-    def send_assets_for_simulation(self, simulation: 'TSimulation', assets:'TAssetCollection'):
+    def send_assets_for_simulation(self, simulation: 'TSimulation', **kwargs) -> None:
+        """
+        Send the assets for a given simulation to the platform.
+        Args:
+            simulation: The simulation to process. Expected to have an `assets` attribute containing the collection.
+            **kwargs: Extra parameters used by the platform
+        """
+        pass
+
+    @abstractmethod
+    def refresh_experiment_status(self, experiment: 'TExperiment') -> None:
+        """
+        Populate the experiment and its simulations with status.
+        Args:
+            experiment: The experiment to check status for
+        """
         pass

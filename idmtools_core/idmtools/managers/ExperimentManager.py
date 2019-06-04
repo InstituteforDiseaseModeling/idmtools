@@ -1,5 +1,6 @@
 import typing
 
+from idmtools.core import EntityStatus
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.services.platforms import PlatformPersistService
 
@@ -27,12 +28,19 @@ class ExperimentManager:
         platform = PlatformPersistService.retrieve(experiment.platform_id)
         return cls(experiment, platform)
 
+    def create_experiment(self):
+        # Create experiment
+        self.platform.create_experiment(self.experiment)
+
     def create_simulations(self):
         """
         Create all the simulations contained in the experiment on the platform.
         """
-        if not self.experiment.simulations:
-            raise Exception("No simulations to run")
+        # Execute the builder if present
+        if self.experiment.builder:
+            self.experiment.execute_builder()
+        else:
+            self.experiment.simulations = [self.experiment.base_simulation]
 
         # Gather the assets
         for simulation in self.experiment.simulations:
@@ -40,6 +48,13 @@ class ExperimentManager:
 
         # Send the experiment to the platform
         self.platform.create_simulations(self.experiment)
+
+        # Refresh experiment status
+        self.refresh_status()
+
+    def start_experiment(self):
+        self.platform.run_simulations(self.experiment)
+        self.refresh_status()
 
     def run(self):
         """
@@ -49,20 +64,16 @@ class ExperimentManager:
         - Create the simulations on the platform
         - Trigger the run on the platform
         """
-        # Create experiment
-        self.platform.create_experiment(self.experiment)
+        # Create experiment on the platform
+        self.create_experiment()
 
-        # Execute the builder if present
-        if self.experiment.builder:
-            self.experiment.execute_builder()
+        # Create the simulations the platform
+        self.create_simulations()
 
         print(self.experiment)
 
-        # Create the simulations based on builder
-        self.create_simulations()
-
         # Run
-        self.platform.run_simulations(self.experiment)
+        self.start_experiment()
 
         for simulation in self.experiment.simulations:
             print(simulation)
@@ -72,3 +83,22 @@ class ExperimentManager:
         PlatformPersistService.save(self.platform)
         self.experiment.platform_id = self.platform.uid
         ExperimentPersistService.save(self.experiment)
+
+    def wait_till_done(self, timeout: 'int' = 60 * 60 * 24, refresh_interval: 'int' = 5):
+        """
+        Wait for the experiment to be done
+        Args:
+            refresh_interval: How long in between polling
+            timeout: How long to wait before failing
+        """
+        import time
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            self.refresh_status()
+            if self.experiment.done:
+                return
+            time.sleep(refresh_interval)
+        raise TimeoutError(f"Timeout of {timeout} seconds exceeded when monitoring experiment {self.experiment}")
+
+    def refresh_status(self):
+        self.platform.refresh_experiment_status(self.experiment)

@@ -1,4 +1,4 @@
-from typing import Any, Callable, List, Mapping, Type, TypeVar, Union, TYPE_CHECKING
+from typing import Any, Callable, List, Mapping, Type, TYPE_CHECKING, TypeVar, Union
 
 if TYPE_CHECKING:
     from idmtools.analysis import IAnalyzer
