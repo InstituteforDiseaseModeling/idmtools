@@ -14,23 +14,22 @@ class TestExperimentManager(ITestWithPersistence):
         e = IExperiment("My experiment")
         p = LocalPlatform()
 
-        e.uid = "123"
-        e.platform_id = p.uid
-        s = e.simulation()
-        s.parameters = {"a": 1}
+        em = ExperimentManager(experiment=e, platform=p)
+        em.create_experiment()
+        em.create_simulations()
 
-        s = e.simulation()
-        s.parameters = {"a": 2}
+        em2 = ExperimentManager.from_experiment_id(e.uid)
 
-        PlatformPersistService.save(p)
-        ExperimentPersistService.save(e)
+        # Ensure we get the same thing when calling from_experiment
+        self.assertListEqual(em.experiment.simulations, em2.experiment.simulations)
+        self.assertEqual(em.experiment, em2.experiment)
+        self.assertEqual(em.platform, em2.platform)
 
-        em = ExperimentManager.from_experiment_id("123")
-
-        self.assertEqual(em.experiment.simulations[0], e.simulations[0])
-        self.assertEqual(em.experiment.simulations[1], e.simulations[1])
-        self.assertEqual(em.experiment, e)
-        self.assertEqual(em.platform, p)
+        # Ensure we have the status persisted too
+        em.start_experiment()
+        em.wait_till_done()
+        e = ExperimentPersistService.retrieve(e.uid)
+        self.assertEqual(e, em.experiment)
 
 
 if __name__ == '__main__':

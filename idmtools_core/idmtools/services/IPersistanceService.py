@@ -15,14 +15,14 @@ class IPersistenceService(metaclass=ABCMeta):
     @classmethod
     def retrieve(cls, uid):
         shelf = cls._open_shelf()
-        obj = shelf[uid]
+        obj = shelf[str(uid)]
         shelf.close()
         return obj
 
     @classmethod
     def save(cls, obj):
         shelf = cls._open_shelf()
-        shelf[obj.uid] = obj
+        shelf[str(obj.uid)] = obj
         shelf.close()
         return obj.uid
 

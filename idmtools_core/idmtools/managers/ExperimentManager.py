@@ -1,6 +1,5 @@
 import typing
 
-from idmtools.core import EntityStatus
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.services.platforms import PlatformPersistService
 
@@ -31,6 +30,10 @@ class ExperimentManager:
     def create_experiment(self):
         # Create experiment
         self.platform.create_experiment(self.experiment)
+        # Persist the platform
+        PlatformPersistService.save(self.platform)
+        self.experiment.platform_id = self.platform.uid
+        ExperimentPersistService.save(self.experiment)
 
     def create_simulations(self):
         """
@@ -39,8 +42,8 @@ class ExperimentManager:
         # Execute the builder if present
         if self.experiment.builder:
             self.experiment.execute_builder()
-        else:
-            self.experiment.simulations = [self.experiment.base_simulation]
+        elif not self.experiment.simulations:
+            self.experiment.simulations = [self.experiment.simulation()]
 
         # Gather the assets
         for simulation in self.experiment.simulations:
@@ -79,11 +82,6 @@ class ExperimentManager:
             print(simulation)
             print(simulation.tags)
 
-        # Save the objects
-        PlatformPersistService.save(self.platform)
-        self.experiment.platform_id = self.platform.uid
-        ExperimentPersistService.save(self.experiment)
-
     def wait_till_done(self, timeout: 'int' = 60 * 60 * 24, refresh_interval: 'int' = 5):
         """
         Wait for the experiment to be done
@@ -102,3 +100,4 @@ class ExperimentManager:
 
     def refresh_status(self):
         self.platform.refresh_experiment_status(self.experiment)
+        ExperimentPersistService.save(self.experiment)

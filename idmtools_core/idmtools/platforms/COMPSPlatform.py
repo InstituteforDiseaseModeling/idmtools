@@ -112,7 +112,7 @@ class COMPSPlatform(IPlatform):
         e.save()
         self.comps_experiment = e
 
-        experiment.uid = str(e.id)
+        experiment.uid = e.id
         self.send_assets_for_experiment(experiment)
 
     def create_simulations(self, experiment: 'TExperiment'):
@@ -137,6 +137,10 @@ class COMPSPlatform(IPlatform):
         self.comps_experiment.commission()
 
     def refresh_experiment_status(self, experiment):
+        # Do nothing if we are already done
+        if experiment.done:
+            return
+
         self._login()
         self._retrieve_comps_experiment(experiment.uid)
         for s in experiment.simulations:
