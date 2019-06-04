@@ -1,5 +1,5 @@
 from idmtools.entities import IPlatform, IExperiment
-from idmtools.services.experiments import ExperimentsPersistService
+from idmtools.services.experiments import ExperimentPersistService
 from idmtools.services.platforms import PlatformPersistService
 
 
@@ -19,7 +19,7 @@ class ExperimentManager:
 
     @classmethod
     def from_experiment_id(cls, experiment_id):
-        experiment = ExperimentsPersistService.retrieve(experiment_id)
+        experiment = ExperimentPersistService.retrieve(experiment_id)
         platform = PlatformPersistService.retrieve(experiment.platform_id)
         return cls(experiment, platform)
 
@@ -67,4 +67,4 @@ class ExperimentManager:
         # Save the objects
         PlatformPersistService.save(self.platform)
         self.experiment.platform_id = self.platform.uid
-        ExperimentsPersistService.save(self.experiment)
+        ExperimentPersistService.save(self.experiment)

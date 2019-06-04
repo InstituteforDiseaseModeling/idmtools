@@ -3,7 +3,7 @@ class CommandLine:
     A class to construct command line strings from executable, options, and params
     """
 
-    def __init__(self, executable, *args, **kwargs):
+    def __init__(self, executable=None, *args, **kwargs):
         self._executable = executable
         self._options = kwargs or {}
         self._args = args or []

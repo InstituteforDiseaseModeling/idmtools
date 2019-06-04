@@ -1,8 +1,8 @@
 import json
 
 from idmtools.assets import AssetCollection, Asset
+from idmtools.core import IEntity
 from idmtools.entities import IExperiment
-from idmtools.core.IEntity import IEntity
 
 
 class ISimulation(IEntity):

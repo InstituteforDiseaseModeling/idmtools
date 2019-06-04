@@ -1,9 +1,11 @@
 import copy
 from abc import ABCMeta
 
-from idmtools.entities import ISimulation, CommandLine
 from idmtools.assets.AssetCollection import AssetCollection
 from idmtools.core import IEntity
+from idmtools.core.types import SimulationType
+from idmtools.entities import CommandLine
+from idmtools.entities.ISimulation import ISimulation
 
 
 class IExperiment(IEntity, metaclass=ABCMeta):
@@ -13,7 +15,7 @@ class IExperiment(IEntity, metaclass=ABCMeta):
     """
     pickle_ignore_fields = ["builder"]
 
-    def __init__(self, name, simulation_type: type, assets: AssetCollection = None,
+    def __init__(self, name, simulation_type: SimulationType = ISimulation, assets: AssetCollection = None,
                  base_simulation: ISimulation = None, command: CommandLine = None):
         """
         Constructor.
@@ -62,4 +64,3 @@ class IExperiment(IEntity, metaclass=ABCMeta):
         self.simulations.append(sim)
         sim.experiment = self
         return sim
-

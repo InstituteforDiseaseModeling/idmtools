@@ -1,5 +1,5 @@
 from idmtools.services.IPersistanceService import IPersistenceService
 
 
-class ExperimentsPersistService(IPersistenceService):
+class ExperimentPersistService(IPersistenceService):
     shelf_name = "experiments"

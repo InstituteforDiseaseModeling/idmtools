@@ -1,10 +1,10 @@
 from abc import ABCMeta, abstractmethod
 
+from idmtools.core import IEntity
 from idmtools.entities import IExperiment, ISimulation
-from idmtools.utils.hashing import hash_obj
 
 
-class IPlatform(metaclass=ABCMeta):
+class IPlatform(IEntity, metaclass=ABCMeta):
     """
     Interface defining a platform.
     A platform needs to implement basic operation such as:
@@ -48,7 +48,3 @@ class IPlatform(metaclass=ABCMeta):
     @abstractmethod
     def send_assets_for_simulation(self, simulation:ISimulation):
         pass
-
-    @property
-    def uid(self):
-        return hash_obj(self)
