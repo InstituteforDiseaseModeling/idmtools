@@ -53,7 +53,7 @@ class COMPSPlatform(IPlatform):
         experiment.assets.uid = ac.id
         print("Asset collection for experiment: {}".format(ac.id))
 
-    def send_assets_for_simulation(self, simulation):
+    def send_assets_for_simulation(self, simulation, assets):
         pass
 
     @staticmethod

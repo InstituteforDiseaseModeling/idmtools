@@ -1,11 +1,14 @@
 import os
-from typing import List
+import typing
 
 from idmtools.assets import Asset
 from idmtools.core.IEntity import IEntity
 from idmtools.utils.file import scan_directory
-from idmtools.utils.filters import AssetFilterList, FilterMode
 from idmtools.utils.filters.asset_filters import default_asset_file_filter
+from idmtools.core import FilterMode
+
+if typing.TYPE_CHECKING:
+    from idmtools.core import TAssetList, TAssetFilterList, TAsset
 
 
 class AssetCollection(IEntity):
@@ -14,7 +17,7 @@ class AssetCollection(IEntity):
     """
 
     # region Constructors
-    def __init__(self, assets: List[Asset] = None):
+    def __init__(self, assets: 'TAssetList' = None):
         """
         Constructor.
         Args:
@@ -25,7 +28,7 @@ class AssetCollection(IEntity):
 
     @classmethod
     def from_directory(cls, assets_directory: str, recursive: bool = True, flatten: bool = False,
-                       filters: AssetFilterList = None, filters_mode: FilterMode = FilterMode.OR,
+                       filters: 'TAssetFilterList' = None, filters_mode: 'FilterMode' = FilterMode.OR,
                        relative_path: str = None) -> object:
         """
         Fill up an AssetCollection from the specified directory
@@ -44,9 +47,9 @@ class AssetCollection(IEntity):
         yield from self.assets
 
     @staticmethod
-    def assets_from_directory(assets_directory: str, recursive: bool = True, flatten: bool = False,
-                              filters: AssetFilterList = None, filters_mode: FilterMode = FilterMode.OR,
-                              forced_relative_path: str = None) -> List[Asset]:
+    def assets_from_directory(assets_directory: 'str', recursive: 'bool' = True, flatten: 'bool' = False,
+                              filters: 'TAssetFilterList' = None, filters_mode: 'FilterMode' = FilterMode.OR,
+                              forced_relative_path: 'str' = None) -> 'TAssetList':
         """
         Create assets for files in a given directory.
 
@@ -99,9 +102,9 @@ class AssetCollection(IEntity):
 
         return assets
 
-    def add_directory(self, assets_directory: str, recursive: bool = True, flatten: bool = False,
-                      filters: AssetFilterList = None, filters_mode: FilterMode = FilterMode.OR,
-                      relative_path: str = None):
+    def add_directory(self, assets_directory: 'str', recursive: 'bool' = True, flatten: 'bool' = False,
+                      filters: 'TAssetFilterList' = None, filters_mode: 'FilterMode' = FilterMode.OR,
+                      relative_path: 'str' = None):
         """
         Retrieve assets from the specified directory and add them to the collection.
         Args:
@@ -112,7 +115,7 @@ class AssetCollection(IEntity):
         for asset in assets:
             self.add_asset(asset)
 
-    def add_asset(self, asset: Asset):
+    def add_asset(self, asset: 'TAsset'):
         """
         Add an asset to the collection.
 

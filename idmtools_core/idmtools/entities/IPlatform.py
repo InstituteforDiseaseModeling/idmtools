@@ -4,7 +4,7 @@ from abc import ABCMeta, abstractmethod
 from idmtools.core import IEntity
 
 if typing.TYPE_CHECKING:
-    from idmtools.core.types import TExperiment, TSimulation
+    from idmtools.core.types import TExperiment, TSimulation, TAssetCollection
 
 
 class IPlatform(IEntity, metaclass=ABCMeta):
@@ -49,5 +49,5 @@ class IPlatform(IEntity, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def send_assets_for_simulation(self, simulation: 'TSimulation'):
+    def send_assets_for_simulation(self, simulation: 'TSimulation', assets:'TAssetCollection'):
         pass

@@ -1,20 +1,31 @@
-from typing import Type, List, Union, TypeVar, Mapping, Any
+from typing import Any, Callable, List, Mapping, Type, TypeVar, Union, TYPE_CHECKING
 
-from idmtools.analysis import IAnalyzer
-from idmtools.entities import CommandLine, IPlatform, IExperiment, ISimulation
+if TYPE_CHECKING:
+    from idmtools.analysis import IAnalyzer
+    from idmtools.entities import CommandLine, IExperiment, IPlatform, ISimulation
+    from idmtools.assets import Asset, AssetCollection
 
-# Base Types
-TExperiment = TypeVar("TExperiment", bound=IExperiment)
-TSimulation = TypeVar("TSimulation", bound=ISimulation)
-TCommandLine = TypeVar("TCommandLine", bound=CommandLine)
-TAnalyzer = TypeVar("TAnalyzer", bound=IAnalyzer)
-TPlatform = TypeVar("TPlatform", bound=IPlatform)
+    # Base Types
+    TExperiment = TypeVar("TExperiment", bound=IExperiment)
+    TSimulation = TypeVar("TSimulation", bound=ISimulation)
+    TCommandLine = TypeVar("TCommandLine", bound=CommandLine)
+    TAnalyzer = TypeVar("TAnalyzer", bound=IAnalyzer)
+    TPlatform = TypeVar("TPlatform", bound=IPlatform)
+    TAssetCollection = TypeVar("TAssetCollection", bound=AssetCollection)
+    TAsset = TypeVar("TAsset", bound=Asset)
 
-TSimulationClass = Type[TSimulation]
+    TSimulationClass = Type[TSimulation]
 
-# Composed types
-TExperimentsList = List[Union[TExperiment, str]]
+    # Composed types
+    TExperimentsList = List[Union[TExperiment, str]]
 
-# Analysis types
-TAllSimulationData = Mapping[TSimulation, Any]
-TAnalyzerList = List[IAnalyzer]
+    # Analysis types
+    TAllSimulationData = Mapping[TSimulation, Any]
+    TAnalyzerList = List[IAnalyzer]
+
+    # Assets types
+    TAssetList = List[TAsset]
+
+    # Filters types
+    TAssetFilter = Callable[[TAsset], bool]
+    TAssetFilterList = List[TAssetFilter]

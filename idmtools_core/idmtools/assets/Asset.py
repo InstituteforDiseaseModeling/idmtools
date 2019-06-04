@@ -8,8 +8,8 @@ class Asset:
     and content.
     """
 
-    def __init__(self, absolute_path: str = None, relative_path: str = None,
-                 filename: str = None, content: bytes = None):
+    def __init__(self, absolute_path: 'str' = None, relative_path: 'str' = None,
+                 filename: 'str' = None, content: 'bytes' = None):
         """
         Constructor.
         Args:

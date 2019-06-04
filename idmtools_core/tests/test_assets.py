@@ -3,7 +3,7 @@ import unittest
 from functools import partial
 
 from idmtools.assets import Asset, AssetCollection
-from idmtools.utils.filters import FilterMode
+from idmtools.core import FilterMode
 from idmtools.utils.filters.asset_filters import file_name_is, asset_in_directory
 
 
