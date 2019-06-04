@@ -11,6 +11,7 @@ class IExperiment(IEntity, metaclass=ABCMeta):
     Represents a generic Experiment.
     This class needs to be implemented for each model type with specifics.
     """
+    pickle_ignore_fields = ["builder"]
 
     def __init__(self, name, simulation_type: type, assets: AssetCollection = None,
                  base_simulation: ISimulation = None, command: CommandLine = None):
@@ -61,3 +62,4 @@ class IExperiment(IEntity, metaclass=ABCMeta):
         self.simulations.append(sim)
         sim.experiment = self
         return sim
+

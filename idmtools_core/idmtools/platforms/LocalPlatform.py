@@ -8,7 +8,6 @@ class LocalPlatform(IPlatform):
     """
     Represents the platform allowing to run simulations locally.
     """
-
     def create_experiment(self, experiment: IExperiment):
         m = CreateExperimentTask.send()
         eid = m.get_result(block=True)

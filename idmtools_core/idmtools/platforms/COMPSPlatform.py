@@ -19,7 +19,6 @@ class COMPSPlatform(IPlatform):
     """
     Represents the platform allowing to run simulations on COMPS.
     """
-
     MAX_SUBDIRECTORY_LENGTH = 35  # avoid maxpath issues on COMPS
 
     def __init__(self, endpoint: str = None, environment: str = None, priority: COMPSPriority = None):

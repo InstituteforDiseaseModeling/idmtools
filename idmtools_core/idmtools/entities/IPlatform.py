@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
 from idmtools.entities import IExperiment, ISimulation
+from idmtools.utils.hashing import hash_obj
 
 
 class IPlatform(metaclass=ABCMeta):
@@ -47,3 +48,7 @@ class IPlatform(metaclass=ABCMeta):
     @abstractmethod
     def send_assets_for_simulation(self, simulation:ISimulation):
         pass
+
+    @property
+    def uid(self):
+        return hash_obj(self)

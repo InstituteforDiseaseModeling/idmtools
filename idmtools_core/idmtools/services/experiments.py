@@ -1,2 +1,5 @@
-def retrieve_experiment_by_id(experiment_id):
-    pass
+from idmtools.services.IPersistanceService import IPersistenceService
+
+
+class ExperimentsPersistService(IPersistenceService):
+    shelf_name = "experiments"

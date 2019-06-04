@@ -1,4 +1,6 @@
 from idmtools.entities import IPlatform, IExperiment
+from idmtools.services.experiments import ExperimentsPersistService
+from idmtools.services.platforms import PlatformPersistService
 
 
 class ExperimentManager:
@@ -14,6 +16,12 @@ class ExperimentManager:
         """
         self.platform = platform
         self.experiment = experiment
+
+    @classmethod
+    def from_experiment_id(cls, experiment_id):
+        experiment = ExperimentsPersistService.retrieve(experiment_id)
+        platform = PlatformPersistService.retrieve(experiment.platform_id)
+        return cls(experiment, platform)
 
     def create_simulations(self):
         """
@@ -55,3 +63,8 @@ class ExperimentManager:
         for simulation in self.experiment.simulations:
             print(simulation)
             print(simulation.tags)
+
+        # Save the objects
+        PlatformPersistService.save(self.platform)
+        self.experiment.platform_id = self.platform.uid
+        ExperimentsPersistService.save(self.experiment)
