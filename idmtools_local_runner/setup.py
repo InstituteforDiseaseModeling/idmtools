@@ -11,8 +11,12 @@ with open('README.md') as readme_file:
 with open('requirements.txt') as requirements_file:
     requirements = requirements_file.read().split("\n")
 
-setup_requirements = ['pytest-runner']
-test_requirements = ['pytest']
+setup_requirements = []
+test_requirements = ['pytest', 'pytest-runner']
+
+extras = {
+    'test': test_requirements,
+}
 
 setup(
     author="Clinton Collins"
@@ -40,8 +44,8 @@ setup(
     packages=find_packages(),
     setup_requires=setup_requirements,
     test_suite='tests',
-    tests_require=test_requirements,
+    extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='1.0.0',
+    version='0.1.0',
     zip_safe=False,
 )
