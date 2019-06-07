@@ -1,5 +1,6 @@
 from idmtools.workflows.calibration.steps.GenerateSamplesStep import GenerateSamplesStep
 from idmtools.workflows.steps.RunSamples import RunSamples
+from prettytable import PrettyTable
 
 
 class CalibrationWorkflow:
@@ -11,6 +12,7 @@ class CalibrationWorkflow:
             GenerateSamplesStep(next_point_algorithm=next_point_algorithm, parameters=parameters),
             RunSamples(base_experiment=self.base_experiment, builder_function=sample_to_simulation, platform=platform)
         ]
+        self.printout = PrettyTable(["Step name", "Input"])
 
     def execute(self):
         previous_step_output = None
@@ -19,5 +21,10 @@ class CalibrationWorkflow:
             if previous_step_output:
                 step.set_inputs(previous_step_output)
 
+            inputStr = str(previous_step_output)[:50] + "..." if len(str(previous_step_output)) > 50 else previous_step_output
+
+            self.printout.add_row([step.name, inputStr])
             previous_step_output = step.execute()
-            print(previous_step_output)
+
+
+        print(self.printout)

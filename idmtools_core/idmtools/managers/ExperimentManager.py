@@ -1,4 +1,6 @@
 import typing
+from prettytable import PrettyTable
+
 
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.services.platforms import PlatformPersistService
@@ -20,6 +22,7 @@ class ExperimentManager:
         """
         self.platform = platform
         self.experiment = experiment
+        self.printout = PrettyTable(["Simulation id", "Experiment id", "Input"])
 
     @classmethod
     def from_experiment_id(cls, experiment_id):
@@ -73,14 +76,17 @@ class ExperimentManager:
         # Create the simulations the platform
         self.create_simulations()
 
+
         print(self.experiment)
 
         # Run
         self.start_experiment()
 
         for simulation in self.experiment.simulations:
-            print(simulation)
-            print(simulation.tags)
+            self.printout.add_row([simulation.uid, simulation.experiment_id, simulation.tags])
+
+
+        print(self.printout)
 
     def wait_till_done(self, timeout: 'int' = 60 * 60 * 24, refresh_interval: 'int' = 5):
         """
