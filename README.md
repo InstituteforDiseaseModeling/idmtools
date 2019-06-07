@@ -28,9 +28,8 @@ Create a Docker network named `idmtools_network`:
 > docker network create idmtools_network
 ```
 
-Run the local runner:
+Navigate to the `idmtools_local_runner` folder and start the local runner:
 ```bash
-> cd idmtools_local_runner
 > docker-compose up
 ```
 
