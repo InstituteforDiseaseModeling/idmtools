@@ -5,7 +5,6 @@ from idmtools.core import IEntity
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TExperiment, TSimulation
-    from idmtools.core import EntityStatus
 
 
 class IPlatform(IEntity, metaclass=ABCMeta):
