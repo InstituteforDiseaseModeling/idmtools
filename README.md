@@ -1,16 +1,17 @@
 # IDM Modeling Tools
 
 ## Pre-requisites
-Python 3.7 x64
-Docker
+- Python 3.6/3.7 x64
+- Docker
 
-## Development installation steps
-Create a virtual environment
+## Development Environment Setup
+
+Clone the repository:
 ```bash
-> virtualenv idmtools
+> git clone https://github.com/InstituteforDiseaseModeling/idmtools.git
 ```
 
-Install the packages in dev mode
+Install the packages in dev mode with the `test` extra (from repository folder):
 ```bash
 > cd idmtools_core
 > pip install -e .[test] --extra-index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
@@ -27,9 +28,8 @@ Create a Docker network named `idmtools_network`:
 > docker network create idmtools_network
 ```
 
-Run the local runner:
+Navigate to the `idmtools_local_runner` folder and start the local runner:
 ```bash
-> cd idmtools_local
 > docker-compose up
 ```
 
