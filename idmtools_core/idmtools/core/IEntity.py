@@ -23,6 +23,13 @@ class IEntity(metaclass=ABCMeta):
     def uid(self, uid):
         self._uid = uid
 
+    # region State Management and Hashing
+    def _post_setstate(self):
+        """
+        Function called after restoring the state if additional initialization is required
+        """
+        pass
+
     def __getstate__(self):
         """
         Ignore the fields in pickle_ignore_fields during pickling.
@@ -41,6 +48,8 @@ class IEntity(metaclass=ABCMeta):
         self.__dict__.update(state)
         for f in self.pickle_ignore_fields:
             setattr(self, f, None)
+        self._post_setstate()
 
     def __eq__(self, other):
         return hash_obj(self) == hash_obj(other)
+    # endregion

@@ -3,7 +3,7 @@ import typing
 from abc import ABCMeta
 
 from idmtools.assets.AssetCollection import AssetCollection
-from idmtools.core import IEntity, EntityStatus
+from idmtools.core import IEntity
 from idmtools.entities import CommandLine
 
 if typing.TYPE_CHECKING:
