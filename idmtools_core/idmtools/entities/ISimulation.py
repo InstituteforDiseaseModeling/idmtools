@@ -1,6 +1,6 @@
 import json
 import typing
-from abc import ABC, abstractmethod
+from abc import ABC
 
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core import EntityStatus, IAssetsEnabled, IEntity

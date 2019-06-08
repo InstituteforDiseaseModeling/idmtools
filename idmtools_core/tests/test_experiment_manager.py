@@ -1,18 +1,18 @@
 import unittest
 
-from idmtools.entities import IExperiment
+from idmtools.core import EntityStatus
 from idmtools.managers import ExperimentManager
-from idmtools.platforms import LocalPlatform
 from idmtools.services.experiments import ExperimentPersistService
-from idmtools.services.platforms import PlatformPersistService
-from tests.ITestWithPersistence import ITestWithPersistence
+from tests.utils.ITestWithPersistence import ITestWithPersistence
+from tests.utils.TestExperiment import TestExperiment
+from tests.utils.TestPlatform import TestPlatform
 
 
 class TestExperimentManager(ITestWithPersistence):
 
     def test_from_experiment(self):
-        e = IExperiment("My experiment")
-        p = LocalPlatform()
+        e = TestExperiment("My experiment")
+        p = TestPlatform()
 
         em = ExperimentManager(experiment=e, platform=p)
         em.create_experiment()
@@ -27,6 +27,7 @@ class TestExperimentManager(ITestWithPersistence):
 
         # Ensure we have the status persisted too
         em.start_experiment()
+        p.set_simulation_status(e.uid, EntityStatus.SUCCEEDED)
         em.wait_till_done()
         e = ExperimentPersistService.retrieve(e.uid)
         self.assertEqual(e, em.experiment)

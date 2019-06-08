@@ -1,16 +1,15 @@
 import copy
 import typing
-from abc import ABCMeta
+from abc import ABC
 
 from idmtools.assets.AssetCollection import AssetCollection
-from idmtools.core import IEntity, EntityStatus
-from idmtools.entities import CommandLine
+from idmtools.core import IAssetsEnabled, IEntity
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TSimulation, TSimulationClass, TCommandLine
 
 
-class IExperiment(IEntity, metaclass=ABCMeta):
+class IExperiment(IAssetsEnabled, IEntity, ABC):
     """
     Represents a generic Experiment.
     This class needs to be implemented for each model type with specifics.
@@ -28,14 +27,14 @@ class IExperiment(IEntity, metaclass=ABCMeta):
             base_simulation: Optional a simulation that will be the base for all simulations created for this experiment
             command: Command to run on simulations
         """
-        super().__init__()
-        self.command = command or CommandLine()
+        IAssetsEnabled.__init__(self, assets=assets)
+        IEntity.__init__(self)
+        self.command = command
         self.simulation_type = simulation_type
         self.simulations = []
         self.name = name
         self.builder = None
         self.suite_id = None
-        self.assets = assets or AssetCollection()
 
         # Take care of the base simulation
         if base_simulation:
@@ -74,6 +73,9 @@ class IExperiment(IEntity, metaclass=ABCMeta):
         self.simulations.append(sim)
         sim.experiment = self
         return sim
+
+    def pre_creation(self):
+        self.gather_assets()
 
     @property
     def done(self):
