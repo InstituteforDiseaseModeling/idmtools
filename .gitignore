@@ -361,3 +361,7 @@ dmypy.json
 .dropbox
 .dropbox.attr
 .dropbox.cache
+
+### IDMTools specific
+/data
+idmtools_core/tests/data
