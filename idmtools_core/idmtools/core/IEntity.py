@@ -23,6 +23,21 @@ class IEntity(metaclass=ABCMeta):
     def uid(self, uid):
         self._uid = uid
 
+    # region Events methods
+    def pre_creation(self) -> None:
+        """
+        Called before the actual creation of the entity.
+        """
+        pass
+
+    def post_creation(self) -> None:
+        """
+        Called after the actual creation of the entity.
+        """
+        pass
+    # endregion
+
+    # region State management and Hashing
     def __getstate__(self):
         """
         Ignore the fields in pickle_ignore_fields during pickling.
@@ -44,3 +59,5 @@ class IEntity(metaclass=ABCMeta):
 
     def __eq__(self, other):
         return hash_obj(self) == hash_obj(other)
+
+    # endregion

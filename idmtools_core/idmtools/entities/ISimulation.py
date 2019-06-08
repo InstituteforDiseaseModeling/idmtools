@@ -1,21 +1,23 @@
 import json
 import typing
+from abc import ABC, abstractmethod
 
-from idmtools.assets import AssetCollection, Asset
-from idmtools.core import IEntity, EntityStatus
+from idmtools.assets import Asset, AssetCollection
+from idmtools.core import EntityStatus, IAssetsEnabled, IEntity
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TExperiment
 
 
-class ISimulation(IEntity):
+class ISimulation(IAssetsEnabled, IEntity, ABC):
     """
     Represents a generic Simulation.
     This class needs to be implemented for each model type with specifics.
     """
 
     def __init__(self, parameters: dict = None, assets: 'AssetCollection' = None, experiment: 'TExperiment' = None):
-        super().__init__()
+        IAssetsEnabled.__init__(self, assets)
+        IEntity.__init__(self)
         self.assets = assets or AssetCollection()
         self.parameters = parameters or {"parameters": {}}
         self.experiment = experiment
@@ -35,6 +37,9 @@ class ISimulation(IEntity):
 
     def __repr__(self):
         return f"<Simulation: {self.uid} - Exp_id: {self.experiment.uid}>"
+
+    def pre_creation(self):
+        self.gather_assets()
 
     def gather_assets(self):
         """

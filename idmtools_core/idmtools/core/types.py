@@ -1,3 +1,4 @@
+from functools import partial
 from typing import Any, Callable, List, Mapping, Type, TYPE_CHECKING, TypeVar, Union
 
 if TYPE_CHECKING:
@@ -27,5 +28,5 @@ if TYPE_CHECKING:
     TAssetList = List[TAsset]
 
     # Filters types
-    TAssetFilter = Callable[[TAsset], bool]
+    TAssetFilter = Union[Callable[[TAsset], bool], partial[bool]]
     TAssetFilterList = List[TAssetFilter]
