@@ -14,4 +14,7 @@ class ITestWithPersistence(unittest.TestCase):
         IPersistenceService.shelve_directory = self.data_dir
 
     def tearDown(self) -> None:
-        shutil.rmtree(self.data_dir)
+        try:
+            shutil.rmtree(self.data_dir)
+        except:
+            pass

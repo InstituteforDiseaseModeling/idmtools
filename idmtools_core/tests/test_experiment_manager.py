@@ -1,17 +1,17 @@
 import unittest
 
 from idmtools.core import EntityStatus
-from idmtools.entities import IExperiment
 from idmtools.managers import ExperimentManager
 from idmtools.services.experiments import ExperimentPersistService
-from tests.ITestWithPersistence import ITestWithPersistence
-from tests.utilities.TestPlatform import TestPlatform
+from tests.utils.ITestWithPersistence import ITestWithPersistence
+from tests.utils.TestExperiment import TestExperiment
+from tests.utils.TestPlatform import TestPlatform
 
 
 class TestExperimentManager(ITestWithPersistence):
 
     def test_from_experiment(self):
-        e = IExperiment("My experiment")
+        e = TestExperiment("My experiment")
         p = TestPlatform()
 
         em = ExperimentManager(experiment=e, platform=p)

@@ -28,11 +28,18 @@ class ExperimentManager:
         return cls(experiment, platform)
 
     def create_experiment(self):
+        self.experiment.pre_creation()
+
         # Create experiment
         self.platform.create_experiment(self.experiment)
+
         # Persist the platform
         PlatformPersistService.save(self.platform)
         self.experiment.platform_id = self.platform.uid
+
+        self.experiment.post_creation()
+
+        # Save the experiment
         ExperimentPersistService.save(self.experiment)
 
     def create_simulations(self):
@@ -45,12 +52,15 @@ class ExperimentManager:
         elif not self.experiment.simulations:
             self.experiment.simulations = [self.experiment.simulation()]
 
-        # Gather the assets
+        # Call the pre_creation event on the simulations
         for simulation in self.experiment.simulations:
-            simulation.gather_assets()
+            simulation.pre_creation()
 
         # Send the experiment to the platform
         self.platform.create_simulations(self.experiment)
+
+        for simulation in self.experiment.simulations:
+            simulation.post_creation()
 
         # Refresh experiment status
         self.refresh_status()

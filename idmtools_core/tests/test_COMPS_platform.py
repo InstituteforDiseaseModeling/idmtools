@@ -6,7 +6,7 @@ from idmtools.entities import ExperimentBuilder
 from idmtools.platforms import COMPSPlatform
 from idmtools_models.python import PythonExperiment
 from tests import INPUT_PATH
-from tests.ITestWithPersistence import ITestWithPersistence
+from tests.utils.ITestWithPersistence import ITestWithPersistence
 
 
 class TestCOMPSPlatform(ITestWithPersistence):
@@ -24,13 +24,15 @@ class TestCOMPSPlatform(ITestWithPersistence):
         experiment.builder = self.builder
 
         # Create experiment on platform
+        experiment.pre_creation()
         self.platform.create_experiment(experiment)
 
         # Create the simulations on the platform
         experiment.execute_builder()
-        # Gather the assets
+
+        # Dispatch events
         for simulation in experiment.simulations:
-            simulation.gather_assets()
+            simulation.pre_creation()
 
         self.platform.create_simulations(experiment)
         self.platform.refresh_experiment_status(experiment)

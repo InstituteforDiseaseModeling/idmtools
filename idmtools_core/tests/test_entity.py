@@ -3,7 +3,7 @@ import pickle
 import unittest
 
 from idmtools.core import IEntity
-from tests.ITestWithPersistence import ITestWithPersistence
+from tests.utils.ITestWithPersistence import ITestWithPersistence
 
 
 class EntityWithIgnoreField(IEntity):
@@ -48,7 +48,7 @@ class TestEntity(ITestWithPersistence):
         self.assertIsNone(b.ignore)
 
         # If we have a post_restore_state, unpickling should restore the attribute to the value defined in the function
-        EntityWithIgnoreField._post_setstate = _custom_post_setstate
+        EntityWithIgnoreField.post_setstate = _custom_post_setstate
         b = pickle.loads(pickle.dumps(a))
         self.assertEqual(b.ignore, 5)
 

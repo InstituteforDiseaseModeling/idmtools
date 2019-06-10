@@ -5,10 +5,10 @@ from idmtools.assets import Asset
 from idmtools.core.IEntity import IEntity
 from idmtools.utils.file import scan_directory
 from idmtools.utils.filters.asset_filters import default_asset_file_filter
-from idmtools.core import FilterMode
+from idmtools.core import FilterMode, DuplicatedAssetError
 
 if typing.TYPE_CHECKING:
-    from idmtools.core import TAssetList, TAssetFilterList, TAsset
+    from idmtools.core import TAssetList, TAssetFilterList, TAsset, TAssetCollection
 
 
 class AssetCollection(IEntity):
@@ -29,7 +29,7 @@ class AssetCollection(IEntity):
     @classmethod
     def from_directory(cls, assets_directory: str, recursive: bool = True, flatten: bool = False,
                        filters: 'TAssetFilterList' = None, filters_mode: 'FilterMode' = FilterMode.OR,
-                       relative_path: str = None) -> object:
+                       relative_path: str = None) -> 'TAssetCollection':
         """
         Fill up an AssetCollection from the specified directory
         Args:
@@ -75,9 +75,10 @@ class AssetCollection(IEntity):
         """
         found_assets = []
         for entry in scan_directory(assets_directory, recursive):
-            relative_path = os.path.dirname(entry.path.replace(assets_directory, "")).strip(os.sep)
+            relative_path = os.path.relpath(os.path.dirname(entry.path), assets_directory)
             found_assets.append(Asset(absolute_path=os.path.abspath(entry.path),
-                                      relative_path=relative_path, filename=entry.name))
+                                      relative_path=None if relative_path == "." else relative_path,
+                                      filename=entry.name))
 
         # Apply the default filter
         found_assets = list(filter(default_asset_file_filter, found_assets))
@@ -93,7 +94,7 @@ class AssetCollection(IEntity):
                     continue
 
             if flatten:
-                asset.relative_path = forced_relative_path or ""
+                asset.relative_path = forced_relative_path or None
 
             if forced_relative_path:
                 asset.relative_path = os.path.join(forced_relative_path, asset.relative_path)
@@ -115,14 +116,21 @@ class AssetCollection(IEntity):
         for asset in assets:
             self.add_asset(asset)
 
-    def add_asset(self, asset: 'TAsset'):
+    def add_asset(self, asset: 'TAsset', fail_on_duplicate: 'bool' = True):
         """
         Add an asset to the collection.
 
         Args:
            asset: An `idmtools.assets.Asset` object to add.
+           fail_on_duplicate: Raise a `DuplicateAssetError` if an asset is duplicated.
         """
         if asset in self.assets:
-            print(f"Asset already present! \n{asset}")
-            return
+            if fail_on_duplicate:
+                raise DuplicatedAssetError(asset)
+            else:
+                return
         self.assets.append(asset)
+
+    @property
+    def count(self):
+        return len(self.assets)

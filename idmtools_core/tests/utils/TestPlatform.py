@@ -27,7 +27,8 @@ class TestPlatform(IPlatform):
         self.shelf.clear()
 
     def __del__(self):
-        self.shelf.close()
+        if self.shelf:
+            self.shelf.close()
 
     def _post_setstate(self):
         self.shelf = shelve.open(os.path.join(data_path, "shelve"), writeback=True)
