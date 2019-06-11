@@ -88,14 +88,11 @@ class ExperimentManager:
         # Create the simulations the platform
         self.create_simulations()
 
-        print(self.experiment)
+        # Display the experiment contents
+        self.experiment.display()
 
         # Run
         self.start_experiment()
-
-        for simulation in self.experiment.simulations:
-            print(simulation)
-            print(simulation.tags)
 
     def wait_till_done(self, timeout: 'int' = 60 * 60 * 24, refresh_interval: 'int' = 5):
         """
