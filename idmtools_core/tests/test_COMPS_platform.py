@@ -8,9 +8,11 @@ from idmtools.managers import ExperimentManager
 from idmtools.platforms import COMPSPlatform
 from idmtools_models.python import PythonExperiment
 from tests import INPUT_PATH
+from tests.utils.decorators import comps_test
 from tests.utils.ITestWithPersistence import ITestWithPersistence
 
 
+@comps_test
 class TestCOMPSPlatform(ITestWithPersistence):
     def setUp(self) -> None:
         super().setUp()

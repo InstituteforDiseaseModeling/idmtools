@@ -12,14 +12,11 @@ from idmtools.managers import ExperimentManager
 from idmtools.platforms import COMPSPlatform
 from idmtools_models.python.PythonExperiment import PythonExperiment
 from tests import INPUT_PATH
+from tests.utils.decorators import comps_test
 from tests.utils.ITestWithPersistence import ITestWithPersistence
 
 
 class TestPythonSimulation(ITestWithPersistence):
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
 
     def test_retrieve_extra_libraries(self):
         ps = PythonExperiment(name="Test experiment", model_path=os.path.join(INPUT_PATH, "python", "model.py"))
@@ -30,8 +27,9 @@ class TestPythonSimulation(ITestWithPersistence):
     # Second way: define a setParam class and __call__ method
     # Also current add_sweep_definition will do product of each call. if first call has 5 parameters, second call also
     # has 5 parameter, total sweep parameters are 5*5=25
+    @comps_test
     def test_python_model_in_comps_sweeps_with_partial(self):
-
+        self.platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
         current_time = datetime.datetime.utcnow()
         name = "Test python experiment"
         experiment = PythonExperiment(name=name,
@@ -72,7 +70,7 @@ class TestPythonSimulation(ITestWithPersistence):
         experiment = Experiment.get(query_criteria=QueryCriteria().where(qc))[0]
         print(experiment.id)
         exp_id = experiment.id
-        #exp_id = "a727e802-d88b-e911-a2bb-f0921c167866"
+        # exp_id = "a727e802-d88b-e911-a2bb-f0921c167866"
 
         # validation each simulation output to compare output/config.json is equal to config.json
         self.validate_output(exp_id, 4)
@@ -87,7 +85,9 @@ class TestPythonSimulation(ITestWithPersistence):
     # Test parameter "b" set is depending on parameter "a"
     # a=[0,1,2,3,4] <--sweep parameter
     # b=[2,3,4,5,6]  <-- b = a + 2
+    @comps_test
     def test_python_model_in_comps_sweeps_2_related_parameters(self):
+        self.platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
         current_time = datetime.datetime.utcnow()
         name = "Test python experiment"
         experiment = PythonExperiment(name=name,
@@ -122,7 +122,9 @@ class TestPythonSimulation(ITestWithPersistence):
         expected_tags = [{'a': '0'}, {'a': '1'}, {'a': '2'}, {'a': '3'}, {'a': '4'}]
         self.validate_sim_tags(exp_id, expected_tags)
 
+    @comps_test
     def test_python_model_in_comps_direct_sweep_one_paramater(self):
+        self.platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
         current_time = datetime.datetime.utcnow()
         name = "Test python experiment"
         experiment = PythonExperiment(name=name,
@@ -150,17 +152,18 @@ class TestPythonSimulation(ITestWithPersistence):
         expected_tags = [{'a': '0'}, {'a': '1'}, {'a': '2'}, {'a': '3'}, {'a': '4'}]
         self.validate_sim_tags(exp_id, expected_tags)
 
-    #sweep in arms:
-    #|__ P1 = 1
+    # sweep in arms:
+    # |__ P1 = 1
     #      |_ P2 = [2,3]
     #      |_ P3 = [4,5]
-    #|__ P1 = [6,7]
+    # |__ P1 = [6,7]
     #    |_ P2 = 2
     def test_python_model_in_comps_sweep_In_arms(self):
         print("TODO")
 
+    @comps_test
     def test_duplicate_asset_file_not_allowed(self):
-
+        self.platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
         name = "Test dup files -experiment"
         experiment = PythonExperiment(name=name,
                                       model_path=os.path.join(INPUT_PATH, "python", "model1.py"))
