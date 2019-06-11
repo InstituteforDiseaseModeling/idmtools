@@ -10,3 +10,10 @@ class Suite(INamedEntity):
 
     def post_setstate(self):
         self.experiments = EntityContainer()
+
+    def display(self):
+        from idmtools.utils.display import display, suite_table_display
+        display(self, suite_table_display)
+
+    def __repr__(self):
+        return f"<Suite {self.uid} - {len(self.experiments)} experiments>"

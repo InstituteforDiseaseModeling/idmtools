@@ -49,6 +49,10 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
     def __repr__(self):
         return f"<Experiment: {self.uid} - {self.name} / Sim count {len(self.simulations)}>"
 
+    def display(self):
+        from idmtools.utils.display import display, experiment_table_display
+        display(self, experiment_table_display)
+
     def execute_builder(self):
         """
         Execute the builder of this experiment, generating all the simulations.
@@ -88,3 +92,7 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
     @property
     def succeeded(self):
         return all([s.succeeded for s in self.simulations])
+
+    @property
+    def simulation_count(self):
+        return len(self.simulations)
