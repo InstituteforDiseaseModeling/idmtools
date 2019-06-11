@@ -3,18 +3,18 @@ import typing
 from abc import ABC
 
 from idmtools.assets.AssetCollection import AssetCollection
-from idmtools.core import IAssetsEnabled, IEntity
+from idmtools.core import EntityContainer, IAssetsEnabled, INamedEntity
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TSimulation, TSimulationClass, TCommandLine
 
 
-class IExperiment(IAssetsEnabled, IEntity, ABC):
+class IExperiment(IAssetsEnabled, INamedEntity, ABC):
     """
     Represents a generic Experiment.
     This class needs to be implemented for each model type with specifics.
     """
-    pickle_ignore_fields = ["builder"]
+    pickle_ignore_fields = ["simulations", "builder"]
 
     def __init__(self, name, simulation_type: 'TSimulationClass' = None, assets: 'AssetCollection' = None,
                  base_simulation: 'TSimulation' = None, command: 'TCommandLine' = None):
@@ -28,13 +28,14 @@ class IExperiment(IAssetsEnabled, IEntity, ABC):
             command: Command to run on simulations
         """
         IAssetsEnabled.__init__(self, assets=assets)
-        IEntity.__init__(self)
+        INamedEntity.__init__(self, name=name)
+
         self.command = command
         self.simulation_type = simulation_type
-        self.simulations = []
         self.name = name
         self.builder = None
         self.suite_id = None
+        self.simulations = EntityContainer()
 
         # Take care of the base simulation
         if base_simulation:
@@ -47,6 +48,10 @@ class IExperiment(IAssetsEnabled, IEntity, ABC):
 
     def __repr__(self):
         return f"<Experiment: {self.uid} - {self.name} / Sim count {len(self.simulations)}>"
+
+    def display(self):
+        from idmtools.utils.display import display, experiment_table_display
+        display(self, experiment_table_display)
 
     def execute_builder(self):
         """
@@ -77,6 +82,9 @@ class IExperiment(IAssetsEnabled, IEntity, ABC):
     def pre_creation(self):
         self.gather_assets()
 
+    def post_setstate(self):
+        self.simulations = EntityContainer()
+
     @property
     def done(self):
         return all([s.done for s in self.simulations])
@@ -85,3 +93,6 @@ class IExperiment(IAssetsEnabled, IEntity, ABC):
     def succeeded(self):
         return all([s.succeeded for s in self.simulations])
 
+    @property
+    def simulation_count(self):
+        return len(self.simulations)

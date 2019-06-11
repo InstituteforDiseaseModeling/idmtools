@@ -21,6 +21,7 @@ class TestExperimentManager(ITestWithPersistence):
         em2 = ExperimentManager.from_experiment_id(e.uid)
 
         # Ensure we get the same thing when calling from_experiment
+        self.assertEqual(em.experiment.base_simulation, em2.experiment.base_simulation)
         self.assertListEqual(em.experiment.simulations, em2.experiment.simulations)
         self.assertEqual(em.experiment, em2.experiment)
         self.assertEqual(em.platform, em2.platform)

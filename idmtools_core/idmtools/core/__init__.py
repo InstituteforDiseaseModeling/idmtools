@@ -1,4 +1,7 @@
+from idmtools.core.IPicklableObject import IPicklableObject
 from idmtools.core.IEntity import IEntity
+from idmtools.core.INamedEntity import INamedEntity
+from idmtools.core.EntityContainer import EntityContainer
 from idmtools.core.IAssetsEnabled import IAssetsEnabled
 from idmtools.core.types import *
 from idmtools.core.enums import *
