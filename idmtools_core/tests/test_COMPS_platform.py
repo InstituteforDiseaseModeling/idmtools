@@ -1,8 +1,10 @@
+import copy
 import os
 import unittest
 
 from idmtools.core import EntityStatus
 from idmtools.entities import ExperimentBuilder
+from idmtools.managers import ExperimentManager
 from idmtools.platforms import COMPSPlatform
 from idmtools_models.python import PythonExperiment
 from tests import INPUT_PATH
@@ -78,6 +80,16 @@ class TestCOMPSPlatform(ITestWithPersistence):
         self.assertFalse(experiment.succeeded)
         for s in experiment.simulations:
             self.assertTrue(s.tags["P"] == 2 and s.status == EntityStatus.FAILED or s.status == EntityStatus.SUCCEEDED)
+
+    def test_from_experiment(self):
+        experiment = PythonExperiment(name="Test Python Experiment Mixed",
+                                      model_path=os.path.join(INPUT_PATH, "compsplatform", "mixed_model.py"))
+        self._run_and_test_experiment(experiment)
+        experiment2 = copy.deepcopy(experiment)
+        experiment2.simulations.clear()
+        self.platform.restore_simulations(experiment2)
+
+        self.assertEqual(len(experiment.simulations), len(experiment2.simulations))
 
 
 if __name__ == '__main__':

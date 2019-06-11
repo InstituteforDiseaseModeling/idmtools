@@ -72,3 +72,12 @@ class IPlatform(IEntity, metaclass=ABCMeta):
             experiment: The experiment to check status for
         """
         pass
+
+    @abstractmethod
+    def restore_simulations(self, experiment: 'TExperiment') -> None:
+        """
+        Populate the experiment with the associated simulations.
+        Args:
+            experiment: The experiment to populate
+        """
+        pass

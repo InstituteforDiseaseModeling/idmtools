@@ -25,6 +25,8 @@ class TestPersistenceServices(ITestWithPersistence):
         ExperimentPersistService.save(e)
         e2 = ExperimentPersistService.retrieve(e.uid)
         self.assertEqual(e, e2)
+        # Simulations should not be persisted
+        self.assertEqual(e2.simulations, [])
 
 
 if __name__ == '__main__':
