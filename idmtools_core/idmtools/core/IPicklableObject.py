@@ -1,9 +1,4 @@
-import typing
-
 from idmtools.utils.hashing import hash_obj
-
-if typing.TYPE_CHECKING:
-    from typing import List
 
 
 class IPicklableObject:

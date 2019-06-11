@@ -134,3 +134,10 @@ class AssetCollection(IEntity):
     @property
     def count(self):
         return len(self.assets)
+
+    @IEntity.uid.getter
+    def uid(self):
+        if self.count == 0:
+            return None
+        return super().uid
+
