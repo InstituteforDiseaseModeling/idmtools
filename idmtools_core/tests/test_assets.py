@@ -1,3 +1,4 @@
+import json
 import os
 import unittest
 from functools import partial
@@ -16,6 +17,10 @@ class TestAssets(unittest.TestCase):
     def test_hashing(self):
         a = Asset(relative_path="1", absolute_path=os.path.join(self.base_path, "1", "a.txt"))
         b = Asset(relative_path="1", absolute_path=os.path.join(self.base_path, "1", "a.txt"))
+        self.assertEqual(a, b)
+
+        a = Asset(relative_path=None, filename="test.json", content=json.dumps({"a":1, "b":2}))
+        b = Asset(relative_path=None, filename="test.json", content=json.dumps({"a":1, "b":2}))
         self.assertEqual(a, b)
 
     def test_assets_collection_from_dir(self):
@@ -75,6 +80,15 @@ class TestAssets(unittest.TestCase):
         ac.add_directory(assets_directory=self.base_path, filters=[filter_name, filter_dir],
                          filters_mode=FilterMode.AND)
         self.assertSetEqual(set(ac.assets), set(assets_to_find))
+
+    def test_empty_collection(self):
+        ac = AssetCollection()
+        self.assertEqual(ac.count, 0)
+        self.assertIsNone(ac.uid)
+
+        ac.add_asset(Asset(filename="test", content="blah"))
+        ac.uid = 3
+        self.assertEqual(ac.uid, 3)
 
 
 if __name__ == '__main__':

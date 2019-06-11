@@ -62,7 +62,10 @@ class COMPSPlatform(IPlatform):
         self._comps_experiment = comps_experiment
         self._comps_experiment_id = comps_experiment.id
 
-    def send_assets_for_experiment(self, experiment: 'TExperiment'):
+    def send_assets_for_experiment(self, experiment: 'TExperiment', **kwargs):
+        if experiment.assets.count == 0:
+            return
+
         ac = AssetCollection()
         for asset in experiment.assets:
             ac.add_asset(AssetCollectionFile(file_name=asset.filename, relative_path=asset.relative_path),
@@ -148,8 +151,7 @@ class COMPSPlatform(IPlatform):
     def _convert_COMPS_status(comps_status):
         if comps_status == SimulationState.Succeeded:
             return EntityStatus.SUCCEEDED
-        elif comps_status in (
-        SimulationState.Canceled, SimulationState.CancelRequested, SimulationState.Failed):
+        elif comps_status in (SimulationState.Canceled, SimulationState.CancelRequested, SimulationState.Failed):
             return EntityStatus.FAILED
         elif comps_status == SimulationState.Created:
             return EntityStatus.CREATED

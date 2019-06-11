@@ -1,4 +1,5 @@
 import os
+from typing import Union
 
 
 class Asset:
@@ -9,7 +10,7 @@ class Asset:
     """
 
     def __init__(self, absolute_path: 'str' = None, relative_path: 'str' = None,
-                 filename: 'str' = None, content: 'bytes' = None):
+                 filename: 'str' = None, content: 'Union[bytes,str]' = None):
         """
         Constructor.
         Args:
@@ -46,7 +47,7 @@ class Asset:
         return self.__key() == other.__key()
 
     def __key(self):
-        return self.absolute_path, self.relative_path, self.filename
+        return self.absolute_path, self.relative_path, self.filename, self._content
 
     def __hash__(self):
         return hash(self.__key())
