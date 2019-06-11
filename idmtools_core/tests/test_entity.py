@@ -58,6 +58,14 @@ class TestEntity(ITestWithPersistence):
     def test_pickle_ignore(self):
         a = TestExperiment(name="test")
         self.assertEqual(a.pickle_ignore_fields, ["simulations", "builder"])
+        b = pickle.loads(pickle.dumps(a))
+        self.assertEqual(b.simulations, [])
+        self.assertIsNone(b.builder)
+
+        s = Suite(name="test")
+        self.assertEqual(s.pickle_ignore_fields, ["experiments"])
+        b = pickle.loads(pickle.dumps(s))
+        self.assertEqual(b.experiments, [])
 
     def test_experiment(self):
         a = TestExperiment(name="test")

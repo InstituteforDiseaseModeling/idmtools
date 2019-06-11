@@ -7,3 +7,6 @@ class Suite(INamedEntity):
     def __init__(self, name: 'str'):
         super().__init__(name=name)
         self.experiments = EntityContainer()
+
+    def post_setstate(self):
+        self.experiments = EntityContainer()
