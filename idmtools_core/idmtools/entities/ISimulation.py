@@ -16,8 +16,9 @@ class ISimulation(IAssetsEnabled, IEntity, ABC):
     """
 
     def __init__(self, parameters: dict = None, assets: 'AssetCollection' = None, experiment: 'TExperiment' = None):
-        IAssetsEnabled.__init__(self, assets)
+        IAssetsEnabled.__init__(self, assets=assets)
         IEntity.__init__(self)
+
         self.assets = assets or AssetCollection()
         self.parameters = parameters or {"parameters": {}}
         self.experiment = experiment

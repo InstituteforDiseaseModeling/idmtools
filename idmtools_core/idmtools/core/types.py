@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Any, Callable, List, Mapping, Type, TYPE_CHECKING, TypeVar, Union
+from typing import Any, Callable, List, Mapping, Type, TYPE_CHECKING, TypeVar, Union, Dict
 
 if TYPE_CHECKING:
     from idmtools.analysis import IAnalyzer
@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     TPlatform = TypeVar("TPlatform", bound=IPlatform)
     TAssetCollection = TypeVar("TAssetCollection", bound=AssetCollection)
     TAsset = TypeVar("TAsset", bound=Asset)
+    TTags = Dict[str, str]
 
     TSimulationClass = Type[TSimulation]
 

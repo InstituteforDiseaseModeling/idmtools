@@ -23,9 +23,14 @@ class ExperimentManager:
 
     @classmethod
     def from_experiment_id(cls, experiment_id):
-        experiment = ExperimentPersistService.retrieve(experiment_id)
+        experiment = ExperimentPersistService.retrieve(str(experiment_id))
         platform = PlatformPersistService.retrieve(experiment.platform_id)
-        return cls(experiment, platform)
+        em = cls(experiment, platform)
+        em.restore_simulations()
+        return em
+
+    def restore_simulations(self):
+        self.platform.restore_simulations(self.experiment)
 
     def create_experiment(self):
         self.experiment.pre_creation()

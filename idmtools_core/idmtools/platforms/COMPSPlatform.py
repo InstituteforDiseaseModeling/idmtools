@@ -38,7 +38,8 @@ class COMPSPlatform(IPlatform):
         self.num_retires = 0
         self.num_cores = 1
         self.exclusive = False
-        self.comps_experiment = None
+        self._comps_experiment = None
+        self._comps_experiment_id = None
         self._login()
 
     def _login(self):
@@ -47,12 +48,19 @@ class COMPSPlatform(IPlatform):
         except:
             Client.login(self.endpoint)
 
-    def _retrieve_comps_experiment(self, experiment_id: 'str'):
-        if self.comps_experiment and str(self.comps_experiment.id) == experiment_id:
-            return
+    @property
+    def comps_experiment(self):
+        if self._comps_experiment and str(self._comps_experiment.id) == self._comps_experiment_id:
+            return self._comps_experiment
 
         self._login()
-        self.comps_experiment = Experiment.get(id=experiment_id)
+        self._comps_experiment = Experiment.get(id=self._comps_experiment_id)
+        return self._comps_experiment
+
+    @comps_experiment.setter
+    def comps_experiment(self, comps_experiment):
+        self._comps_experiment = comps_experiment
+        self._comps_experiment_id = comps_experiment.id
 
     def send_assets_for_experiment(self, experiment: 'TExperiment'):
         ac = AssetCollection()
@@ -136,22 +144,37 @@ class COMPSPlatform(IPlatform):
         self._login()
         self.comps_experiment.commission()
 
+    @staticmethod
+    def _convert_COMPS_status(comps_status):
+        if comps_status == SimulationState.Succeeded:
+            return EntityStatus.SUCCEEDED
+        elif comps_status in (
+        SimulationState.Canceled, SimulationState.CancelRequested, SimulationState.Failed):
+            return EntityStatus.FAILED
+        elif comps_status == SimulationState.Created:
+            return EntityStatus.CREATED
+        else:
+            return EntityStatus.RUNNING
+
     def refresh_experiment_status(self, experiment):
         # Do nothing if we are already done
         if experiment.done:
             return
 
+        self._comps_experiment_id = experiment.uid
         self._login()
-        self._retrieve_comps_experiment(experiment.uid)
+
         for s in experiment.simulations:
             for comps_simulation in self.comps_experiment.get_simulations():
                 if comps_simulation.id == s.uid:
-                    if comps_simulation.state == SimulationState.Succeeded:
-                        s.status = EntityStatus.SUCCEEDED
-                    elif comps_simulation.state in (SimulationState.Canceled, SimulationState.CancelRequested, SimulationState.Failed):
-                        s.status = EntityStatus.FAILED
-                    elif comps_simulation.state == SimulationState.Created:
-                        s.status = EntityStatus.CREATED
-                    else:
-                        s.status = EntityStatus.RUNNING
+                    s.status = COMPSPlatform._convert_COMPS_status(comps_simulation.state)
                     break
+
+    def restore_simulations(self, experiment: 'TExperiment') -> None:
+        self._comps_experiment_id = experiment.uid
+
+        for s in self.comps_experiment.get_simulations():
+            sim = experiment.simulation()
+            sim.uid = s.id
+            sim.tags = s.tags
+            sim.status = COMPSPlatform._convert_COMPS_status(s.state)
