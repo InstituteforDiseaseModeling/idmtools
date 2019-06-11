@@ -43,8 +43,8 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         elif simulation_type:
             self.base_simulation = simulation_type()
         else:
-            from idmtools.entities import ISimulation
-            self.base_simulation = ISimulation()
+            from idmtools.entities import BaseSimulation
+            self.base_simulation = BaseSimulation()
 
     def __repr__(self):
         return f"<Experiment: {self.uid} - {self.name} / Sim count {len(self.simulations)}>"

@@ -1,8 +1,7 @@
-import json
 import typing
-from abc import ABC
+from abc import ABC, abstractmethod
 
-from idmtools.assets import Asset, AssetCollection
+from idmtools.assets import AssetCollection
 from idmtools.core import EntityStatus, IAssetsEnabled, IEntity
 
 if typing.TYPE_CHECKING:
@@ -15,15 +14,15 @@ class ISimulation(IAssetsEnabled, IEntity, ABC):
     This class needs to be implemented for each model type with specifics.
     """
 
-    def __init__(self, parameters: dict = None, assets: 'AssetCollection' = None, experiment: 'TExperiment' = None):
+    def __init__(self, assets: 'AssetCollection' = None, experiment: 'TExperiment' = None):
         IAssetsEnabled.__init__(self, assets=assets)
         IEntity.__init__(self)
 
         self.assets = assets or AssetCollection()
-        self.parameters = parameters or {"parameters": {}}
         self.experiment = experiment
         self.status = None
 
+    @abstractmethod
     def set_parameter(self, name: str, value: any) -> dict:
         """
         Set a parameter in the simulation
@@ -33,8 +32,7 @@ class ISimulation(IAssetsEnabled, IEntity, ABC):
 
         Returns: Tag to record the change
         """
-        self.parameters["parameters"][name] = value
-        return {name: value}
+        pass
 
     def __repr__(self):
         return f"<Simulation: {self.uid} - Exp_id: {self.experiment.uid}>"
@@ -42,12 +40,12 @@ class ISimulation(IAssetsEnabled, IEntity, ABC):
     def pre_creation(self):
         self.gather_assets()
 
+    @abstractmethod
     def gather_assets(self):
         """
         Gather all the assets for the simulation.
-        By default, only create a config.json containing the parameters
         """
-        self.assets.add_asset(Asset(filename="config.json", content=json.dumps(self.parameters)))
+        pass
 
     @property
     def done(self):
@@ -56,3 +54,11 @@ class ISimulation(IAssetsEnabled, IEntity, ABC):
     @property
     def succeeded(self):
         return self.status == EntityStatus.SUCCEEDED
+
+
+class BaseSimulation(ISimulation):
+    def set_parameter(self, name: str, value: any) -> dict:
+        pass
+
+    def gather_assets(self):
+        pass
