@@ -5,7 +5,6 @@ if typing.TYPE_CHECKING:
 
 
 class EntityContainer(list):
-
     def __init__(self, children: 'List[IEntity]' = None):
         super().__init__()
         self.extend(children or [])

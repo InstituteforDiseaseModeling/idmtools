@@ -1,8 +1,8 @@
 import typing
 from abc import ABCMeta
 
-from idmtools.utils.hashing import hash_obj
 from idmtools.core import IPicklableObject
+from idmtools.utils.hashing import hash_obj
 
 if typing.TYPE_CHECKING:
     import uuid
@@ -26,6 +26,9 @@ class IEntity(IPicklableObject, metaclass=ABCMeta):
     @uid.setter
     def uid(self, uid):
         self._uid = uid
+
+    def display(self):
+        return self.__repr__()
 
     # region Events methods
     def pre_creation(self) -> None:
