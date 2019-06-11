@@ -11,7 +11,6 @@ class PythonExperiment(IExperiment):
     def __init__(self, name, model_path, assets=None, extra_libraries=None):
         super().__init__(name=name, assets=assets, simulation_type=PythonSimulation)
         self.model_path = os.path.abspath(model_path)
-        self.model_asset = None
         self.extra_libraries = extra_libraries or []
 
     def retrieve_python_dependencies(self):
@@ -38,7 +37,6 @@ class PythonExperiment(IExperiment):
         return extra_libraries
 
     def gather_assets(self):
-        self.model_asset = Asset(absolute_path=self.model_path)
         self.assets.add_asset(Asset(absolute_path=self.model_path), fail_on_duplicate=False)
 
     def pre_creation(self):

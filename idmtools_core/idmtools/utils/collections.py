@@ -1,5 +1,4 @@
-from collections import Iterable
-from typing import Tuple, List, Mapping, Union
+from typing import Tuple, List, Mapping, Union, Iterable
 
 from more_itertools import take
 
