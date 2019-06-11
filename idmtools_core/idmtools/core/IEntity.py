@@ -3,6 +3,7 @@ from abc import ABCMeta
 
 from idmtools.core import IPicklableObject
 from idmtools.utils.hashing import hash_obj
+from idmtools.core import IPicklableObject
 
 if typing.TYPE_CHECKING:
     import uuid

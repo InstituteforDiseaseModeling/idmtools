@@ -4,6 +4,7 @@ import unittest
 
 from idmtools.core import EntityStatus
 from idmtools.entities import ExperimentBuilder
+from idmtools.managers import ExperimentManager
 from idmtools.platforms import COMPSPlatform
 from idmtools_models.python import PythonExperiment
 from tests import INPUT_PATH
