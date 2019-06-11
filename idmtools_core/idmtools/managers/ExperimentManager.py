@@ -23,9 +23,14 @@ class ExperimentManager:
 
     @classmethod
     def from_experiment_id(cls, experiment_id):
-        experiment = ExperimentPersistService.retrieve(experiment_id)
+        experiment = ExperimentPersistService.retrieve(str(experiment_id))
         platform = PlatformPersistService.retrieve(experiment.platform_id)
-        return cls(experiment, platform)
+        em = cls(experiment, platform)
+        em.restore_simulations()
+        return em
+
+    def restore_simulations(self):
+        self.platform.restore_simulations(self.experiment)
 
     def create_experiment(self):
         self.experiment.pre_creation()
@@ -83,14 +88,11 @@ class ExperimentManager:
         # Create the simulations the platform
         self.create_simulations()
 
-        print(self.experiment)
+        # Display the experiment contents
+        self.experiment.display()
 
         # Run
         self.start_experiment()
-
-        for simulation in self.experiment.simulations:
-            print(simulation)
-            print(simulation.tags)
 
     def wait_till_done(self, timeout: 'int' = 60 * 60 * 24, refresh_interval: 'int' = 5):
         """
