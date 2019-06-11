@@ -3,7 +3,10 @@ import pickle
 import unittest
 
 from idmtools.core import IEntity
+from idmtools.entities.Suite import Suite
 from tests.utils.ITestWithPersistence import ITestWithPersistence
+from tests.utils.TestExperiment import TestExperiment
+from tests.utils.TestSimulation import TestSimulation
 
 
 class EntityWithIgnoreField(IEntity):
@@ -51,6 +54,27 @@ class TestEntity(ITestWithPersistence):
         EntityWithIgnoreField.post_setstate = _custom_post_setstate
         b = pickle.loads(pickle.dumps(a))
         self.assertEqual(b.ignore, 5)
+
+    def test_pickle_ignore(self):
+        a = TestExperiment(name="test")
+        self.assertEqual(a.pickle_ignore_fields, ["simulations", "builder"])
+
+    def test_experiment(self):
+        a = TestExperiment(name="test")
+        self.assertEqual(a.name, "test")
+
+        a.simulations.append(TestSimulation())
+        a.simulations.append(TestSimulation())
+        self.assertEqual(len(a.simulations), 2)
+
+    def test_suite(self):
+        s = Suite(name="test")
+        self.assertEqual(s.name, "test")
+
+        s.experiments.append(TestExperiment("t1"))
+        s.experiments.append(TestExperiment("t2"))
+        self.assertEqual(len(s.experiments), 2)
+
 
 
 if __name__ == '__main__':

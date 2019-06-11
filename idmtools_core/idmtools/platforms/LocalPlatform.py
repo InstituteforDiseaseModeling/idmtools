@@ -1,15 +1,17 @@
-from uuid import UUID
-
 from dramatiq import group
+
 from idmtools.core import EntityStatus
-from idmtools_local.core import CreateExperimentTask, CreateSimulationTask, RunTask, AddAssetTask
-from idmtools.entities import IPlatform, IExperiment
+from idmtools.entities import IExperiment, IPlatform
+from idmtools_local.core import AddAssetTask, CreateExperimentTask, CreateSimulationTask, RunTask
 
 
 class LocalPlatform(IPlatform):
     """
     Represents the platform allowing to run simulations locally.
     """
+
+    def restore_simulations(self, experiment: 'TExperiment') -> None:
+        raise NotImplemented("Not implemented yet in the LocalPlatform")
 
     def refresh_experiment_status(self, experiment):
         for s in experiment.simulations:
