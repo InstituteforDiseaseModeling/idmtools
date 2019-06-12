@@ -41,11 +41,11 @@ class TestPythonSimulation(ITestWithPersistence):
         platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
         current_time = datetime.datetime.utcnow()
         name = self.casename
-        experiment = PythonExperiment(name=name,
+        pe = PythonExperiment(name=name,
                                       model_path=os.path.join(INPUT_PATH, "python", "model1.py"))
-        experiment.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123, "KeyOnly": None}
+        pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123, "KeyOnly": None}
 
-        experiment.base_simulation.set_parameter("c", "c-value")
+        pe.base_simulation.set_parameter("c", "c-value")
 
         def param_update(simulation, param, value):
             return simulation.set_parameter(param, value)
@@ -70,12 +70,12 @@ class TestPythonSimulation(ITestWithPersistence):
         builder.add_sweep_definition(setParam("b"), [i * i for i in range(1, 4, 2)])
         # ------------------------------------------------------
 
-        experiment.builder = builder
+        pe.builder = builder
 
-        em = ExperimentManager(experiment=experiment, platform=platform)
+        em = ExperimentManager(experiment=pe, platform=platform)
         em.run()
         em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in experiment.simulations]))
+        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
         qc = ['name~%{}'.format(name), 'date_created>={}'.format(current_time)]
         experiment = Experiment.get(query_criteria=QueryCriteria().where(qc))[0]
         print(experiment.id)
@@ -100,11 +100,11 @@ class TestPythonSimulation(ITestWithPersistence):
         platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
         current_time = datetime.datetime.utcnow()
         name = self.casename
-        experiment = PythonExperiment(name=name,
+        pe = PythonExperiment(name=name,
                                       model_path=os.path.join(INPUT_PATH, "python", "model1.py"))
-        experiment.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
+        pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
 
-        experiment.base_simulation.set_parameter("c", "c-value")
+        pe.base_simulation.set_parameter("c", "c-value")
 
         def param_update(simulation, param, value):
             # Set B within
@@ -118,11 +118,11 @@ class TestPythonSimulation(ITestWithPersistence):
         builder = ExperimentBuilder()
         # Sweep parameter "a" and make "b" depends on "a"
         builder.add_sweep_definition(setAB, range(0, 5))
-        experiment.builder = builder
-        em = ExperimentManager(experiment=experiment, platform=platform)
+        pe.builder = builder
+        em = ExperimentManager(experiment=pe, platform=platform)
         em.run()
         em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in experiment.simulations]))
+        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
         qc = ['name~%{}'.format(name), 'date_created>={}'.format(current_time)]
         experiment = Experiment.get(query_criteria=QueryCriteria().where(qc))[0]
         print(experiment.id)
@@ -142,12 +142,12 @@ class TestPythonSimulation(ITestWithPersistence):
         ac = AssetCollection()
         assets_path = os.path.join(INPUT_PATH, "python", "Assets", "MyExternalLibrary")
         ac.add_directory(assets_directory=assets_path, relative_path="MyExternalLibrary")
-        experiment = PythonExperiment(name=name,
+        pe = PythonExperiment(name=name,
                                       model_path=model_path, assets=ac)
                 #assets=AssetCollection.from_directory(assets_directory=assets_path, relative_path="MyExternalLibrary"))
 
-        experiment.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
-        experiment.base_simulation.set_parameter("b", 10)
+        pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
+        pe.base_simulation.set_parameter("b", 10)
         def param_a_update(simulation, value):
             simulation.set_parameter("a", value)
             return {"a": value}
@@ -155,11 +155,11 @@ class TestPythonSimulation(ITestWithPersistence):
         builder = ExperimentBuilder()
         # Sweep parameter "a"
         builder.add_sweep_definition(param_a_update, range(0, 2))
-        experiment.builder = builder
-        em = ExperimentManager(experiment=experiment, platform=platform)
+        pe.builder = builder
+        em = ExperimentManager(experiment=pe, platform=platform)
         em.run()
         em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in experiment.simulations]))
+        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
 
     @comps_test
     def test_add_dirs_to_assets_comps(self):
@@ -169,18 +169,18 @@ class TestPythonSimulation(ITestWithPersistence):
         ac = AssetCollection()
         assets_path = os.path.join(INPUT_PATH, "python", "Assets")
         ac.add_directory(assets_directory=assets_path)
-        experiment = PythonExperiment(name=name,
+        pe = PythonExperiment(name=name,
                                       model_path=model_path, assets=ac)
 
-        experiment.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
+        pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         builder = ExperimentBuilder()
-        experiment.base_simulation.set_parameter("a", 1)
-        experiment.base_simulation.set_parameter("b", 10)
-        experiment.builder = builder
-        em = ExperimentManager(experiment=experiment, platform=platform)
+        pe.base_simulation.set_parameter("a", 1)
+        pe.base_simulation.set_parameter("b", 10)
+        pe.builder = builder
+        em = ExperimentManager(experiment=pe, platform=platform)
         em.run()
         em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in experiment.simulations]))
+        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
 
     @comps_test
     def test_add_specific_files_to_assets_comps(self):
@@ -191,18 +191,18 @@ class TestPythonSimulation(ITestWithPersistence):
         a = Asset(relative_path="MyExternalLibrary",
                   absolute_path=os.path.join(INPUT_PATH, "python", "Assets", "MyExternalLibrary", "functions.py"))
         ac.add_asset(a)
-        experiment = PythonExperiment(name=name,
+        pe = PythonExperiment(name=name,
                                       model_path=model_path, assets=ac)
 
-        experiment.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
+        pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         builder = ExperimentBuilder()
-        experiment.base_simulation.set_parameter("a", 1)
-        experiment.base_simulation.set_parameter("b", 10)
-        experiment.builder = builder
-        em = ExperimentManager(experiment=experiment, platform=platform)
+        pe.base_simulation.set_parameter("a", 1)
+        pe.base_simulation.set_parameter("b", 10)
+        pe.builder = builder
+        em = ExperimentManager(experiment=pe, platform=platform)
         em.run()
         em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in experiment.simulations]))
+        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
 
 
     # sweep in arms:
@@ -238,9 +238,9 @@ class TestPythonSimulation(ITestWithPersistence):
 
         platform = LocalPlatform()
         name = self.casename
-        experiment = PythonExperiment(name=name,
+        pe = PythonExperiment(name=name,
                                       model_path=os.path.join(INPUT_PATH, "python", "model1.py"))
-        experiment.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
+        pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
 
         def param_a_update(simulation, value):
             simulation.set_parameter("a", value)
@@ -249,23 +249,23 @@ class TestPythonSimulation(ITestWithPersistence):
         builder = ExperimentBuilder()
         # Sweep parameter "a"
         builder.add_sweep_definition(param_a_update, range(0, 5))
-        experiment.builder = builder
+        pe.builder = builder
 
-        em = ExperimentManager(experiment=experiment, platform=platform)
+        em = ExperimentManager(experiment=pe, platform=platform)
         em.run()
         em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in experiment.simulations]))
+        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
         # validation
-        self.assertEqual(experiment.name, name)
-        self.assertEqual(experiment.simulation_count, 5)
-        self.assertIsNotNone(experiment.uid)
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in experiment.simulations]))
-        self.assertTrue(experiment.succeeded)
+        self.assertEqual(pe.name, name)
+        self.assertEqual(pe.simulation_count, 5)
+        self.assertIsNotNone(pe.uid)
+        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
+        self.assertTrue(pe.succeeded)
 
         # validate tags
         tags = []
-        for simulation in experiment.simulations:
-            self.assertEqual(simulation.experiment_id,experiment.uid)
+        for simulation in pe.simulations:
+            self.assertEqual(simulation.experiment_id,pe.uid)
             tags.append(simulation.tags)
         expected_tags = [{'a': 0}, {'a': 1}, {'a': 2}, {'a': 3}, {'a': 4}]
         sorted_tags = sorted(tags, key=itemgetter('a'))
@@ -283,12 +283,12 @@ class TestPythonSimulation(ITestWithPersistence):
         ac.add_directory(assets_directory=assets_path, relative_path="MyExternalLibrary")
         # assets_path = os.path.join(INPUT_PATH, "python", "Assets")
         # ac.add_directory(assets_directory=assets_path)
-        experiment = PythonExperiment(name=name,
+        pe = PythonExperiment(name=name,
                                       model_path=model_path, assets=ac)
         # assets=AssetCollection.from_directory(assets_directory=assets_path, relative_path="MyExternalLibrary"))
 
-        experiment.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
-        experiment.base_simulation.set_parameter("b", 10)
+        pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
+        pe.base_simulation.set_parameter("b", 10)
 
         def param_a_update(simulation, value):
             simulation.set_parameter("a", value)
@@ -297,11 +297,11 @@ class TestPythonSimulation(ITestWithPersistence):
         builder = ExperimentBuilder()
         # Sweep parameter "a"
         builder.add_sweep_definition(param_a_update, range(0, 2))
-        experiment.builder = builder
-        em = ExperimentManager(experiment=experiment, platform=platform)
+        pe.builder = builder
+        em = ExperimentManager(experiment=pe, platform=platform)
         em.run()
         em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in experiment.simulations]))
+        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
 
     def validate_output(self, exp_id, expected_sim_count):
         sim_count = 0
