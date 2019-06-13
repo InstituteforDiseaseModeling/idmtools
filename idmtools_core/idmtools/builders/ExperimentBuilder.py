@@ -1,11 +1,11 @@
 import inspect
 import typing
-from functools import partial
+from functools import partial, reduce
 from inspect import signature
 from itertools import product
 
 if typing.TYPE_CHECKING:
-    from typing import Callable, Any, Iterable
+    from typing import Callable, Any, List, Iterable, Union
 
 
 class ExperimentBuilder:
@@ -17,8 +17,9 @@ class ExperimentBuilder:
 
     def __init__(self):
         self.sweeps = []
+        self.count = 1
 
-    def add_sweep_definition(self, function: 'Callable', values: 'Iterable[Any]'):
+    def add_sweep_definition(self, function: 'Callable', values: 'Union[List[Any], Iterable]'):
         """
         Add sweep definition.
         A sweep definition is composed of a function and a list of values to call the function with.
@@ -80,6 +81,8 @@ class ExperimentBuilder:
         # Everything is OK, create a partial to have everything set in the signature except `simulation` and add
         self.sweeps.append((partial(function, **{remaining_parameters[0]: v})) for v in values)
 
+        # Update the count of simulations generated
+        self.count *= len(values)
+
     def __iter__(self):
-        for tup in product(*self.sweeps):
-            yield tup
+        yield from product(*self.sweeps)

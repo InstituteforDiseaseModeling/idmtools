@@ -1,5 +1,6 @@
 import os
 
+from idmtools.builders import StandAloneSimulationsBuilder
 from idmtools.managers import ExperimentManager
 from idmtools.platforms import COMPSPlatform
 from idmtools_models.dtk import DTKExperiment
@@ -17,6 +18,10 @@ class TestDTK(ITestWithPersistence):
                                        eradication_path=os.path.join(INPUT_PATH, "dtk", "Eradication.exe"))
         sim = e.simulation()
         sim.set_parameter("Enable_Immunity", 0)
+        b = StandAloneSimulationsBuilder()
+        b.add_simulation(sim)
+        e.builder = b
+
         p = COMPSPlatform()
         em = ExperimentManager(platform=p, experiment=e)
         em.run()

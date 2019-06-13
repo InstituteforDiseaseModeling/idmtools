@@ -2,6 +2,9 @@ import copy
 import pickle
 import unittest
 
+import numpy as np
+
+from idmtools.builders import ExperimentBuilder
 from idmtools.core import IEntity
 from idmtools.entities.Suite import Suite
 from tests.utils.ITestWithPersistence import ITestWithPersistence
@@ -67,14 +70,6 @@ class TestEntity(ITestWithPersistence):
         b = pickle.loads(pickle.dumps(s))
         self.assertEqual(b.experiments, [])
 
-    def test_experiment(self):
-        a = TestExperiment(name="test")
-        self.assertEqual(a.name, "test")
-
-        a.simulations.append(TestSimulation())
-        a.simulations.append(TestSimulation())
-        self.assertEqual(len(a.simulations), 2)
-
     def test_suite(self):
         s = Suite(name="test")
         self.assertEqual(s.name, "test")
@@ -82,7 +77,6 @@ class TestEntity(ITestWithPersistence):
         s.experiments.append(TestExperiment("t1"))
         s.experiments.append(TestExperiment("t2"))
         self.assertEqual(len(s.experiments), 2)
-
 
 
 if __name__ == '__main__':

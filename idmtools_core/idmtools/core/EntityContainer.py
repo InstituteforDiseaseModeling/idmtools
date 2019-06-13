@@ -9,3 +9,6 @@ class EntityContainer(list):
         super().__init__()
         self.extend(children or [])
 
+    def set_status(self, status):
+        for entity in self:
+            entity.status = status
