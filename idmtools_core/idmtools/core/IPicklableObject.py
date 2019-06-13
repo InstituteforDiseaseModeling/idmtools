@@ -35,5 +35,5 @@ class IPicklableObject:
         self.post_setstate()
 
     def __eq__(self, other):
-        return hash_obj(self) == hash_obj(other)
+        return hash_obj(self.__getstate__()) == hash_obj(self.__getstate__())
     # endregion

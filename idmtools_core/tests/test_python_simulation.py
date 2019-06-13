@@ -1,13 +1,11 @@
-import datetime
 import os
 import unittest
 from functools import partial
 from operator import itemgetter
 
-from COMPS.Data import Experiment
-from COMPS.Data import QueryCriteria
+from COMPS.Data import Experiment, QueryCriteria
 
-from idmtools.entities import ExperimentBuilder
+from idmtools.builders import ExperimentBuilder
 from idmtools.managers import ExperimentManager
 from idmtools.platforms import COMPSPlatform
 from idmtools_models.python.PythonExperiment import PythonExperiment
@@ -30,7 +28,6 @@ class TestPythonSimulation(ITestWithPersistence):
     @comps_test
     def test_python_model_in_comps_sweeps_with_partial(self):
         self.platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
-        current_time = datetime.datetime.utcnow()
         name = "Test python experiment"
         experiment = PythonExperiment(name=name,
                                       model_path=os.path.join(INPUT_PATH, "python", "model1.py"))
@@ -66,8 +63,7 @@ class TestPythonSimulation(ITestWithPersistence):
         em = ExperimentManager(experiment=experiment, platform=self.platform)
         em.run()
         em.wait_till_done()
-        qc = ['name~%{}'.format(name), 'date_created>={}'.format(current_time)]
-        experiment = Experiment.get(query_criteria=QueryCriteria().where(qc))[0]
+        experiment = Experiment.get(em.experiment.uid)
         print(experiment.id)
         exp_id = experiment.id
         # exp_id = "a727e802-d88b-e911-a2bb-f0921c167866"
@@ -88,7 +84,6 @@ class TestPythonSimulation(ITestWithPersistence):
     @comps_test
     def test_python_model_in_comps_sweeps_2_related_parameters(self):
         self.platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
-        current_time = datetime.datetime.utcnow()
         name = "Test python experiment"
         experiment = PythonExperiment(name=name,
                                       model_path=os.path.join(INPUT_PATH, "python", "model1.py"))
@@ -112,8 +107,7 @@ class TestPythonSimulation(ITestWithPersistence):
         em = ExperimentManager(experiment=experiment, platform=self.platform)
         em.run()
         em.wait_till_done()
-        qc = ['name~%{}'.format(name), 'date_created>={}'.format(current_time)]
-        experiment = Experiment.get(query_criteria=QueryCriteria().where(qc))[0]
+        experiment = Experiment.get(em.experiment.uid)
         print(experiment.id)
         exp_id = experiment.id
         self.validate_output(exp_id, 5)
@@ -125,7 +119,6 @@ class TestPythonSimulation(ITestWithPersistence):
     @comps_test
     def test_python_model_in_comps_direct_sweep_one_paramater(self):
         self.platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
-        current_time = datetime.datetime.utcnow()
         name = "Test python experiment"
         experiment = PythonExperiment(name=name,
                                       model_path=os.path.join(INPUT_PATH, "python", "model1.py"))
@@ -142,8 +135,7 @@ class TestPythonSimulation(ITestWithPersistence):
         em = ExperimentManager(experiment=experiment, platform=self.platform)
         em.run()
         em.wait_till_done()
-        qc = ['name~%{}'.format(name), 'date_created>={}'.format(current_time)]
-        experiment = Experiment.get(query_criteria=QueryCriteria().where(qc))[0]
+        experiment = Experiment.get(em.experiment.uid)
         print(experiment.id)
         exp_id = experiment.id
         self.validate_output(exp_id, 5)

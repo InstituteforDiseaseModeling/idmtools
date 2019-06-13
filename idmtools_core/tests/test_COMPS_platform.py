@@ -2,9 +2,8 @@ import copy
 import os
 import unittest
 
+from idmtools.builders import ExperimentBuilder
 from idmtools.core import EntityStatus
-from idmtools.entities import ExperimentBuilder
-from idmtools.managers import ExperimentManager
 from idmtools.platforms import COMPSPlatform
 from idmtools_models.python import PythonExperiment
 from tests import INPUT_PATH
@@ -31,14 +30,21 @@ class TestCOMPSPlatform(ITestWithPersistence):
         experiment.pre_creation()
         self.platform.create_experiment(experiment)
 
-        # Create the simulations on the platform
-        experiment.execute_builder()
+        for simulation_batch in experiment.batch_simulations(batch_size=10):
+            # Create the simulations on the platform
+            for simulation in simulation_batch:
+                simulation.pre_creation()
 
-        # Dispatch events
-        for simulation in experiment.simulations:
-            simulation.pre_creation()
+            ids = self.platform.create_simulations(simulation_batch)
 
-        self.platform.create_simulations(experiment)
+            for uid, simulation in zip(ids, simulation_batch):
+                simulation.uid = uid
+                simulation.post_creation()
+
+                from idmtools.entities import ISimulation
+                simulation.__class__ = ISimulation
+                experiment.simulations.append(simulation)
+
         self.platform.refresh_experiment_status(experiment)
 
         # Test if we have all simulations at status CREATED
@@ -84,14 +90,16 @@ class TestCOMPSPlatform(ITestWithPersistence):
             self.assertTrue(s.tags["P"] == 2 and s.status == EntityStatus.FAILED or s.status == EntityStatus.SUCCEEDED)
 
     def test_from_experiment(self):
-        experiment = PythonExperiment(name="Test Python Experiment Mixed",
-                                      model_path=os.path.join(INPUT_PATH, "compsplatform", "mixed_model.py"))
+        experiment = PythonExperiment(name="Test Python Experiment Success",
+                                      model_path=os.path.join(INPUT_PATH, "compsplatform", "working_model.py"))
         self._run_and_test_experiment(experiment)
         experiment2 = copy.deepcopy(experiment)
         experiment2.simulations.clear()
         self.platform.restore_simulations(experiment2)
 
         self.assertEqual(len(experiment.simulations), len(experiment2.simulations))
+        self.assertTrue(experiment2.done)
+        self.assertTrue(experiment2.succeeded)
 
 
 if __name__ == '__main__':

@@ -1,7 +1,7 @@
 import os
 from functools import partial
 
-from idmtools.entities import ExperimentBuilder
+from idmtools.builders import ExperimentBuilder
 from idmtools.managers import ExperimentManager
 from idmtools.platforms import COMPSPlatform
 from idmtools.platforms import LocalPlatform
@@ -29,7 +29,7 @@ class setParam:
 
 
 builder = ExperimentBuilder()
-builder.add_sweep_definition(setA, range(5))
+builder.add_sweep_definition(setA, range(10))
 builder.add_sweep_definition(setParam("b"), [1, 2, 3])
 
 experiment.builder = builder
@@ -38,3 +38,4 @@ platform = LocalPlatform()
 
 em = ExperimentManager(experiment=experiment, platform=platform)
 em.run()
+em.wait_till_done()
