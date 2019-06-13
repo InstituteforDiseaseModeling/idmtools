@@ -12,10 +12,16 @@ def param_update(simulation, param, value):
     return simulation.set_parameter(param, 'sweepR04_a_' + str(value) + '.json')
 
 
-experiment = PythonExperiment(name="Allee python model example", model_path=os.path.join("work", "inputs", "allee_python_model", "run_dtk_sweep.py"))
-experiment.tags["tag1"] = "example from allee python model with idmtools"
+pe = PythonExperiment(name="Allee python model example",
+                              model_path=os.path.join("work", "inputs", "allee_python_model", "run_dtk_sweep.py"),
+                              extra_libraries="pandas")
+pe.retrieve_python_dependencies()
+# pe = PythonExperiment(name="Allee python model example",
+#                               model_path=os.path.join("work", "inputs", "allee_python_model", "run_dtk_sweep.py"))
 
-experiment.assets.add_directory(assets_directory=os.path.join("work", "inputs", "allee_python_model"))
+pe.tags["tag1"] = "example from allee python model with idmtools"
+
+pe.assets.add_directory(assets_directory=os.path.join("work", "inputs", "allee_python_model"))
 
 setA = partial(param_update, param="infile")
 
@@ -30,14 +36,14 @@ class setParam:
 
 builder = ExperimentBuilder()
 builder.add_sweep_definition(setA, range(7850,7855))
-experiment.base_simulation.set_parameter("fname", "runNsim100.json")
-experiment.base_simulation.set_parameter("customGrid", 1)
-experiment.base_simulation.set_parameter("nsims", 100)
+pe.base_simulation.set_parameter("fname", "runNsim100.json")
+pe.base_simulation.set_parameter("customGrid", 1)
+pe.base_simulation.set_parameter("nsims", 100)
 
-experiment.builder = builder
+pe.builder = builder
 
 #platform = LocalPlatform()
 platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
 
-em = ExperimentManager(experiment=experiment, platform=platform)
+em = ExperimentManager(experiment=pe, platform=platform)
 em.run()
