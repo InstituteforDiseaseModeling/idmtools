@@ -1,14 +1,12 @@
-import datetime
 import os
 import sys
 import unittest
 from functools import partial
 from operator import itemgetter
 
-from COMPS.Data import Experiment
-from COMPS.Data import QueryCriteria
+from COMPS.Data import Experiment, QueryCriteria
 
-from idmtools.entities import ExperimentBuilder
+from idmtools.builders import ExperimentBuilder
 from idmtools.managers import ExperimentManager
 from idmtools.platforms import COMPSPlatform
 from idmtools.platforms import LocalPlatform
@@ -39,7 +37,6 @@ class TestPythonSimulation(ITestWithPersistence):
     @comps_test
     def test_sweeps_with_partial_comps(self):
         platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
-        current_time = datetime.datetime.utcnow()
         name = self.casename
         pe = PythonExperiment(name=name,
                                       model_path=os.path.join(INPUT_PATH, "python", "model1.py"))
@@ -76,8 +73,7 @@ class TestPythonSimulation(ITestWithPersistence):
         em.run()
         em.wait_till_done()
         self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
-        qc = ['name~%{}'.format(name), 'date_created>={}'.format(current_time)]
-        experiment = Experiment.get(query_criteria=QueryCriteria().where(qc))[0]
+        experiment = Experiment.get(em.experiment.uid)
         print(experiment.id)
         exp_id = experiment.id
         # exp_id = "a727e802-d88b-e911-a2bb-f0921c167866"
@@ -98,7 +94,6 @@ class TestPythonSimulation(ITestWithPersistence):
     @comps_test
     def test_sweeps_2_related_parameters_comps(self):
         platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
-        current_time = datetime.datetime.utcnow()
         name = self.casename
         pe = PythonExperiment(name=name,
                                       model_path=os.path.join(INPUT_PATH, "python", "model1.py"))
@@ -123,8 +118,7 @@ class TestPythonSimulation(ITestWithPersistence):
         em.run()
         em.wait_till_done()
         self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
-        qc = ['name~%{}'.format(name), 'date_created>={}'.format(current_time)]
-        experiment = Experiment.get(query_criteria=QueryCriteria().where(qc))[0]
+        experiment = Experiment.get(em.experiment.uid)
         print(experiment.id)
         exp_id = experiment.id
         self.validate_output(exp_id, 5)
@@ -143,11 +137,12 @@ class TestPythonSimulation(ITestWithPersistence):
         assets_path = os.path.join(INPUT_PATH, "python", "Assets", "MyExternalLibrary")
         ac.add_directory(assets_directory=assets_path, relative_path="MyExternalLibrary")
         pe = PythonExperiment(name=name,
-                                      model_path=model_path, assets=ac)
-                #assets=AssetCollection.from_directory(assets_directory=assets_path, relative_path="MyExternalLibrary"))
+                              model_path=model_path, assets=ac)
+        # assets=AssetCollection.from_directory(assets_directory=assets_path, relative_path="MyExternalLibrary"))
 
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         pe.base_simulation.set_parameter("b", 10)
+
         def param_a_update(simulation, value):
             simulation.set_parameter("a", value)
             return {"a": value}
@@ -182,6 +177,7 @@ class TestPythonSimulation(ITestWithPersistence):
         em.wait_till_done()
         self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
 
+
     @comps_test
     def test_add_specific_files_to_assets_comps(self):
         platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
@@ -203,6 +199,10 @@ class TestPythonSimulation(ITestWithPersistence):
         em.run()
         em.wait_till_done()
         self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
+        experiment = Experiment.get(em.experiment.uid)
+        print(experiment.id)
+        exp_id = experiment.id
+        self.validate_output(exp_id, 5)
 
 
     # sweep in arms:

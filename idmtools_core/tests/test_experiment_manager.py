@@ -8,6 +8,10 @@ from tests.utils.TestExperiment import TestExperiment
 from tests.utils.TestPlatform import TestPlatform
 
 
+def set_parameter_no_tags(simulation, value):
+    simulation.set_parameter("p", value)
+
+
 class TestExperimentManager(ITestWithPersistence):
 
     def test_from_experiment(self):

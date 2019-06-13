@@ -1,5 +1,6 @@
 import typing
 
+from idmtools.core import EntityStatus
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.services.platforms import PlatformPersistService
 
@@ -47,32 +48,39 @@ class ExperimentManager:
         # Save the experiment
         ExperimentPersistService.save(self.experiment)
 
+    def simulation_batch_worker_thread(self, simulation_batch):
+        for simulation in simulation_batch:
+            simulation.pre_creation()
+
+        ids = self.platform.create_simulations(simulation_batch)
+
+        for uid, simulation in zip(ids, simulation_batch):
+            simulation.uid = uid
+            simulation.post_creation()
+
+        return simulation_batch
+
     def create_simulations(self):
         """
         Create all the simulations contained in the experiment on the platform.
         """
-        # Execute the builder if present
-        if self.experiment.builder:
-            self.experiment.execute_builder()
-        elif not self.experiment.simulations:
-            self.experiment.simulations = [self.experiment.simulation()]
+        from concurrent.futures.thread import ThreadPoolExecutor
 
-        # Call the pre_creation event on the simulations
-        for simulation in self.experiment.simulations:
-            simulation.pre_creation()
+        with ThreadPoolExecutor(max_workers=16) as executor:
+            results = executor.map(self.simulation_batch_worker_thread,
+                                   self.experiment.batch_simulations(batch_size=10))
 
-        # Send the experiment to the platform
-        self.platform.create_simulations(self.experiment)
-
-        for simulation in self.experiment.simulations:
-            simulation.post_creation()
-
-        # Refresh experiment status
-        self.refresh_status()
+        for sim_batch in results:
+            # Add to the container but only preserve the metadata
+            for simulation in sim_batch:
+                from idmtools.entities import ISimulation
+                simulation.__class__ = ISimulation
+                self.experiment.simulations.append(simulation)
+                self.experiment.simulations.set_status(EntityStatus.CREATED)
 
     def start_experiment(self):
         self.platform.run_simulations(self.experiment)
-        self.refresh_status()
+        self.experiment.simulations.set_status(EntityStatus.RUNNING)
 
     def run(self):
         """
