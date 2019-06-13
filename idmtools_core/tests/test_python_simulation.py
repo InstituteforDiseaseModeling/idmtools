@@ -166,7 +166,7 @@ class TestPythonSimulation(ITestWithPersistence):
         ac.add_directory(assets_directory=assets_path)
         pe = PythonExperiment(name=name,
                                       model_path=model_path, assets=ac)
-
+        pe.gather_assets()
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         builder = ExperimentBuilder()
         pe.base_simulation.set_parameter("a", 1)
@@ -199,11 +199,6 @@ class TestPythonSimulation(ITestWithPersistence):
         em.run()
         em.wait_till_done()
         self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
-        experiment = Experiment.get(em.experiment.uid)
-        print(experiment.id)
-        exp_id = experiment.id
-        self.validate_output(exp_id, 5)
-
 
     # sweep in arms:
     # |__ P1 = 1
@@ -265,7 +260,7 @@ class TestPythonSimulation(ITestWithPersistence):
         # validate tags
         tags = []
         for simulation in pe.simulations:
-            self.assertEqual(simulation.experiment_id,pe.uid)
+            self.assertEqual(simulation.experiment.uid,pe.uid)
             tags.append(simulation.tags)
         expected_tags = [{'a': 0}, {'a': 1}, {'a': 2}, {'a': 3}, {'a': 4}]
         sorted_tags = sorted(tags, key=itemgetter('a'))
