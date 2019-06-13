@@ -7,7 +7,7 @@ from COMPS.Data import Experiment, QueryCriteria, Simulation
 
 from idmtools.assets import AssetCollection, Asset
 from idmtools.core import EntityStatus
-from idmtools.entities import ExperimentBuilder
+from idmtools.builders import ExperimentBuilder
 from idmtools.platforms import COMPSPlatform
 from idmtools_models.python import PythonExperiment
 from tests import INPUT_PATH
@@ -36,14 +36,21 @@ class TestAssetsInComps(unittest.TestCase):
         experiment.pre_creation()
         self.platform.create_experiment(experiment)
 
-        # Create the simulations on the platform
-        experiment.execute_builder()
+        for simulation_batch in experiment.batch_simulations(batch_size=10):
+            # Create the simulations on the platform
+            for simulation in simulation_batch:
+                simulation.pre_creation()
 
-        # Dispatch events
-        for simulation in experiment.simulations:
-            simulation.pre_creation()
+            ids = self.platform.create_simulations(simulation_batch)
 
-        self.platform.create_simulations(experiment)
+            for uid, simulation in zip(ids, simulation_batch):
+                simulation.uid = uid
+                simulation.post_creation()
+
+                from idmtools.entities import ISimulation
+                simulation.__class__ = ISimulation
+                experiment.simulations.append(simulation)
+
         self.platform.refresh_experiment_status(experiment)
 
         # Test if we have all simulations at status CREATED
