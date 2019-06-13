@@ -36,16 +36,19 @@ class LocalPlatform(IPlatform):
         messages = []
         for asset in simulation.assets:
             messages.append(
-                AddAssetTask.message(simulation.experiment_id, asset.filename, path=asset.relative_path,
+                AddAssetTask.message(simulation.experiment.uid, asset.filename, path=asset.relative_path,
                                      contents=asset.content.decode("utf-8"), simulation_id=simulation.uid))
         group(messages).run().wait()
 
-    def create_simulations(self, experiment: IExperiment):
-        for simulation in experiment.simulations:
+    def create_simulations(self, simulations_batch):
+        ids = []
+        for simulation in simulations_batch:
             m = CreateSimulationTask.send(simulation.experiment.uid)
             sid = m.get_result(block=True)
             simulation.uid = sid
             self.send_assets_for_simulation(simulation)
+            ids.append(sid)
+        return ids
 
     def run_simulations(self, experiment: IExperiment):
         for simulation in experiment.simulations:

@@ -15,6 +15,7 @@ if TYPE_CHECKING:
     TAssetCollection = TypeVar("TAssetCollection", bound=AssetCollection)
     TAsset = TypeVar("TAsset", bound=Asset)
     TTags = Dict[str, str]
+    TSimulationBatch = List[TSimulation]
 
     TSimulationClass = Type[TSimulation]
 

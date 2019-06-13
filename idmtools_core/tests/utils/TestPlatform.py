@@ -50,12 +50,15 @@ class TestPlatform(IPlatform):
         experiment.uid = uid
         self.experiments[str(uid)] = experiment
 
-    def create_simulations(self, experiment: 'TExperiment') -> None:
+    def create_simulations(self, batch):
         simulations = []
-        for simulation in experiment.simulations:
+        experiment_id = None
+        for simulation in batch:
+            experiment_id = simulation.experiment.uid
             simulation.uid = uuid.uuid4()
             simulations.append(simulation)
-        self.simulations[str(experiment.uid)] = simulations
+        self.simulations[str(experiment_id)] = simulations
+        return [s.uid for s in simulations]
 
     def set_simulation_status(self, experiment_uid, status):
         self.set_simulation_prob_status(experiment_uid, {status: 1})
