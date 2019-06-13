@@ -27,32 +27,41 @@ Function for running fits from command line
 def runFits(fname='', customGrid=0, gridFile='',
             agentbased=0, outpath=''):
 
-    parser = argparse.ArgumentParser(description='Run fits')
-    parser.add_argument('--fname', type=str,
-                        help='output file name')
-    parser.add_argument('--gridfile', type=str,
-                        help='input file name for custom grid')
-    parser.add_argument('-cg', '--customgrid', action='store_true',
-                        help='use custom grid')
-    parser.add_argument('--nsim', type=int,
-                        help='number of sims to run per sample')
-    parser.add_argument('-ab','--agentbased', action='store_true',
-                        help='set to agent-based mode')
-    args = parser.parse_args()
-    if args.fname:
-        fname = args.fname
-    if args.gridfile:
-        gridFile = args.gridfile
+    # parser = argparse.ArgumentParser(description='Run fits')
+    # parser.add_argument('--fname', type=str,
+    #                     help='output file name')
+    # parser.add_argument('--gridfile', type=str,
+    #                     help='input file name for custom grid')
+    # parser.add_argument('-cg', '--customgrid', action='store_true',
+    #                     help='use custom grid')
+    # parser.add_argument('--nsim', type=int,
+    #                     help='number of sims to run per sample')
+    # parser.add_argument('-ab','--agentbased', action='store_true',
+    #                     help='set to agent-based mode')
+    # args = parser.parse_args()
+    # if args.fname:
+    #     fname = args.fname
+    # if args.gridfile:
+    #     gridFile = args.gridfile
+    #     customGrid=1
+    # if args.customgrid:
+    #     customGrid=1
+    # if args.nsim:
+    #     bmf.nSims = args.nsim
+    # if args.agentbased:
+    #     bmf.agentbased = 1
+    # else:
+    #     bmf.agentbased = 0
+
+
+    if gridFile:
         customGrid=1
-    if args.customgrid:
+    if customGrid:
         customGrid=1
-    if args.nsim:
-        bmf.nSims = args.nsim
-    if args.agentbased:
+    if agentbased:
         bmf.agentbased = 1
     else:
         bmf.agentbased = 0
-
     timeTag = str(time.time())
     if fname=='':
         fname = timeTag+'.json'

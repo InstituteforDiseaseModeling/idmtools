@@ -40,26 +40,27 @@ if __name__ == "__main__":
         #                                          customGrid=1,
         #                                          setPath=pathname)
         None
-        
+
     else:
         pathname = os.path.dirname(os.path.abspath(__file__))
-        pathname= os.path.abspath(os.path.join(pathname, '..'))
-        file = os.path.join(pathname,'config.json')
-        config = bdata.readJson(file)
-        print(config)
+        pathname = os.path.abspath(os.path.join(pathname, '..'))
+        with open("config.json", 'r') as fp:
+            config = json.load(fp)
+            parameters = config["parameters"]
+            print(config)
         
-        fname = config['config'][0]['fname']
-        customGrid = config['config'][0]['customGrid']
-
+        fname = parameters['fname']
+        customGrid = parameters['customGrid']
         outpath = os.path.abspath(os.path.join(pathname,'output'))
         if not os.path.exists(outpath):
             os.makedirs(outpath)
 
-        infile = config['config'][0]['infile']
+        infile = parameters['infile']
+
         pathname = os.path.dirname(os.path.abspath(__file__))
         gridfile = os.path.abspath(os.path.join(pathname, 'input',infile))
-        
-        nsims = config['config'][0]['nsims']
+
+        nsims = parameters['nsims']
         if nsims > 1:
             bmf.nSims = nsims
         bs.runFits(fname=fname,customGrid=customGrid,gridFile=gridfile,outpath=outpath)
