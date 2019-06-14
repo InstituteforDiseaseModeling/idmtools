@@ -8,8 +8,11 @@ from DAG import DAG
 
 class Workflow:
     def __init__(self, tasks):
-        # self.tasks = {task.name: task for task in tasks}
         self.dag = DAG(nodes=tasks)
+
+    @property
+    def status(self):
+        return {task.name: task.status for task in self.dag.nodes}
 
     def start(self):
         # if there is state indicating a partial run, this method should just skip all the stuff that is done

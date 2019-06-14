@@ -1,3 +1,4 @@
+import diskcache
 import subprocess
 
 
@@ -21,7 +22,24 @@ class Task:
         self.dependees = list()
         self.dependents = list()
 
-        self.status = self.UNSTARTED if status is None else status
+        self.cache = None
+
+        self.status = self.UNSTARTED
+
+    # TODO: This basic implementation of diskcache-backed state only supports a single Workflow object
+    # Duplicate workflows (or ones with in-common task names) will collide.
+    @property
+    def status(self):
+        if not self.cache:
+            self.cache = diskcache.Cache('task.diskcache')
+        return self.cache[self.name]
+
+    @status.setter
+    def status(self, value):
+        if not self.cache:
+            self.cache = diskcache.Cache('task.diskcache')
+        self.cache[self.name] = value
+        return self.status
 
     def run(self):
         if self.status not in self.READY_STATUSES:
