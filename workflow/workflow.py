@@ -1,4 +1,6 @@
 from copy import deepcopy
+import diskcache
+import shutil
 import time
 import yaml
 
@@ -7,6 +9,9 @@ from DAG import DAG
 
 
 class Workflow:
+
+    CACHE = diskcache.Cache('workflow.diskcache')
+
     def __init__(self, tasks):
         self.dag = DAG(nodes=tasks)
 
@@ -45,7 +50,12 @@ class Workflow:
         return all([task.status in Task.COMPLETED_STATUSES for task in self.dag.nodes])
 
     @classmethod
-    def from_yaml(cls, yaml_filename):
+    def from_yaml(cls, yaml_filename, clear_cache=False):
+
+        # TODO: is this really the right way/place for this?
+        if clear_cache:
+            cls.CACHE.clear()
+
         # TODO: make sure dependents/dependees are set on task load
         with open(yaml_filename, 'r') as f:
             dict_spec = yaml.safe_load(f)
@@ -57,6 +67,7 @@ class Workflow:
         for task_name, task_details in workflow_dict.items():
             task_definition = cls.deep_merge(task_defaults, task_details)
             task_definition['name'] = task_name
+            task_definition['cache'] = cls.CACHE
             task = Task(**task_definition)
             tasks.append(task)
         return cls(tasks=tasks)
