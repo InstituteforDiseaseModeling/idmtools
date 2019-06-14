@@ -28,17 +28,21 @@ class TestEntity(ITestWithPersistence):
 
     def test_hashing(self):
         a = IEntity()
-        a.tats = {"a": 1}
+        a.tags = {"a": 1}
+
+        c = IEntity()
+        c.tags = {"a": 2}
+        self.assertNotEqual(a, c)
 
         b = IEntity()
         b.tags = {"a": 1}
 
-        # Those 2 entities are different
-        self.assertNotEqual(a, b)
-
-        # a and b should be identical after deepcopy
-        b = copy.deepcopy(a)
+        # Those 2 entities are the same because same elements
         self.assertEqual(a, b)
+
+        # a and c should be identical after deepcopy
+        c = copy.deepcopy(a)
+        self.assertEqual(a, c)
 
         # a and b should be identical after pickling
         b = pickle.loads(pickle.dumps(a))
