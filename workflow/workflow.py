@@ -1,6 +1,5 @@
 from copy import deepcopy
 import diskcache
-import shutil
 import time
 import yaml
 
