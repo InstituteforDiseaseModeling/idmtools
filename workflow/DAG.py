@@ -63,3 +63,5 @@ class DAG:
             nodes = list({n.name: n for n in (nodes + indirect_dependees)}.values())
         return nodes
 
+    def to_json(self):
+        return [node.to_json() for node in self.nodes]

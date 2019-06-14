@@ -87,3 +87,6 @@ class Workflow:
                     # the key is in both the destination and source and the value is NOT a dict; use the source value
                     merged_dict[k] = deepcopy(dict2[k])
         return merged_dict
+
+    def to_json(self):
+        return self.dag.to_json()

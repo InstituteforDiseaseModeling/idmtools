@@ -54,3 +54,12 @@ class Task:
             self.status = self.FAILED
         print(f'Task result: {self.status}\n<<<')
         return self.status
+
+    def to_json(self):
+        task_dict = {
+            'name': self.name,
+            'status': self.status,
+            'dependees': [task.name for task in self.dependees],
+            'dependents': [task.name for task in self.dependents]
+        }
+        return task_dict
