@@ -173,10 +173,8 @@ class TestPythonSimulation(ITestWithPersistence):
                                       model_path=model_path, assets=ac)
 
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
-        builder = ExperimentBuilder()
         pe.base_simulation.set_parameter("a", 1)
         pe.base_simulation.set_parameter("b", 10)
-        pe.builder = builder
         em = ExperimentManager(experiment=pe, platform=platform)
         em.run()
         em.wait_till_done()
@@ -195,10 +193,8 @@ class TestPythonSimulation(ITestWithPersistence):
                                       model_path=model_path, assets=ac)
 
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
-        builder = ExperimentBuilder()
         pe.base_simulation.set_parameter("a", 1)
         pe.base_simulation.set_parameter("b", 10)
-        pe.builder = builder
         em = ExperimentManager(experiment=pe, platform=platform)
         em.run()
         em.wait_till_done()
