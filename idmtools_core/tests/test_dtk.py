@@ -1,6 +1,9 @@
+import json
 import os
 
-from idmtools.builders import StandAloneSimulationsBuilder
+from COMPS.Data import Experiment
+
+from idmtools.builders import StandAloneSimulationsBuilder, ExperimentBuilder
 from idmtools.managers import ExperimentManager
 from idmtools.platforms import COMPSPlatform
 from idmtools_models.dtk import DTKExperiment
@@ -13,17 +16,59 @@ from tests.utils.ITestWithPersistence import ITestWithPersistence
 @comps_test
 class TestDTK(ITestWithPersistence):
 
-    def test_sir(self):
-        e = DTKExperiment.from_default("test SIR", default=DTKSIR,
+    def setUp(self) -> None:
+        self.casename = os.path.basename(__file__) + "--"+ self._testMethodName
+        print(self.casename)
+
+    def test_sir_with_StandAloneSimulationsBuilder(self):
+        p = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
+
+        e = DTKExperiment.from_default(self.casename, default=DTKSIR,
                                        eradication_path=os.path.join(INPUT_PATH, "dtk", "Eradication.exe"))
-        sim = e.simulation()
+        e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
+        #sim = e.simulation() #issue 138
+        sim = e.base_simulation
         sim.set_parameter("Enable_Immunity", 0)
         b = StandAloneSimulationsBuilder()
         b.add_simulation(sim)
         e.builder = b
 
-        p = COMPSPlatform()
         em = ExperimentManager(platform=p, experiment=e)
         em.run()
         em.wait_till_done()
         self.assertTrue(e.succeeded)
+        exp_id = em.experiment.uid
+        for simulation in Experiment.get(exp_id).get_simulations():
+            configString = simulation.retrieve_output_files(paths=["config.json"])
+            config_parameters = json.loads(configString[0].decode('utf-8'))["parameters"]
+            self.assertEqual(config_parameters["Enable_Immunity"], 0)
+
+    def test_sir(self):
+        p = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
+
+        e = DTKExperiment.from_default(self.casename, default=DTKSIR,
+                                       eradication_path=os.path.join(INPUT_PATH, "dtk", "Eradication.exe"))
+        e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
+
+        e.base_simulation.set_parameter("Enable_Immunity", 0)
+
+        def param_a_update(simulation, value):
+            simulation.set_parameter("Run_Number", value)
+            return {"Run_Number": value}
+
+        builder = ExperimentBuilder()
+        # Sweep parameter "Run_Number"
+        builder.add_sweep_definition(param_a_update, range(0, 2))
+        e.builder = builder
+        em = ExperimentManager(platform=p, experiment=e)
+        em.run()
+        em.wait_till_done()
+        self.assertTrue(e.succeeded)
+        exp_id = em.experiment.uid
+        run_number = 0
+        for simulation in Experiment.get(exp_id).get_simulations():
+            configString = simulation.retrieve_output_files(paths=["config.json"])
+            config_parameters = json.loads(configString[0].decode('utf-8'))["parameters"]
+            self.assertEqual(config_parameters["Enable_Immunity"], 0)
+            self.assertEqual(config_parameters["Run_Number"], run_number)
+            run_number = run_number + 1
