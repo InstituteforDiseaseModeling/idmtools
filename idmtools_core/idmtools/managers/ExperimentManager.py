@@ -1,3 +1,4 @@
+import copy
 import typing
 
 from idmtools.core import EntityStatus
@@ -71,11 +72,8 @@ class ExperimentManager:
                                    self.experiment.batch_simulations(batch_size=10))
 
         for sim_batch in results:
-            # Add to the container but only preserve the metadata
             for simulation in sim_batch:
-                from idmtools.entities import ISimulation
-                simulation.__class__ = ISimulation
-                self.experiment.simulations.append(simulation)
+                self.experiment.simulations.append(copy.deepcopy(simulation))
                 self.experiment.simulations.set_status(EntityStatus.CREATED)
 
     def start_experiment(self):

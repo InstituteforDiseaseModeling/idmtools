@@ -14,6 +14,7 @@ class IEntity(IPicklableObject, metaclass=ABCMeta):
     """
     Interface for all entities in the system.
     """
+
     def __init__(self, uid: 'uuid' = None, tags: 'TTags' = None):
         super().__init__()
         self._uid = uid
@@ -43,5 +44,10 @@ class IEntity(IPicklableObject, metaclass=ABCMeta):
         Called after the actual creation of the entity.
         """
         pass
+
     # endregion
 
+    # region State management
+    def __eq__(self, other):
+        return self.uid == other.uid
+    # endregion
