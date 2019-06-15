@@ -29,7 +29,12 @@ class TestPlatform(IPlatform):
         self.simulations = shelve.open(os.path.join(data_path, "simulations"), writeback=True)
 
     def restore_simulations(self, experiment: 'TExperiment') -> None:
-        experiment.simulations = self.simulations[str(experiment.uid)]
+        for sim in self.simulations[str(experiment.uid)]:
+            s = experiment.simulation()
+            s.uid = sim.uid
+            s.status = sim.status
+            s.tags = sim.tags
+            experiment.simulations.append(s)
 
     def cleanup(self):
         self.experiments.clear()
@@ -61,7 +66,7 @@ class TestPlatform(IPlatform):
         return [s.uid for s in simulations]
 
     def set_simulation_status(self, experiment_uid, status):
-        self.set_simulation_prob_status(experiment_uid, {status: 1})
+        self.set_simulation_prob_status(str(experiment_uid), {status: 1})
 
     def set_simulation_prob_status(self, experiment_uid, status):
         for simulation in self.simulations[str(experiment_uid)]:
@@ -70,9 +75,11 @@ class TestPlatform(IPlatform):
                 p=list(status.values())
             )
             simulation.status = status
+        self.simulations.sync()
 
     def run_simulations(self, experiment: 'TExperiment') -> None:
-        pass
+        from idmtools.core import EntityStatus
+        self.set_simulation_status(str(experiment.uid), EntityStatus.RUNNING)
 
     def send_assets_for_experiment(self, experiment: 'TExperiment', **kwargs) -> None:
         pass
@@ -81,4 +88,8 @@ class TestPlatform(IPlatform):
         pass
 
     def refresh_experiment_status(self, experiment: 'TExperiment') -> None:
-        pass
+        for simulation in self.simulations[str(experiment.uid)]:
+            for esim in experiment.simulations:
+                if esim == simulation:
+                    esim.status = simulation.status
+                    break
