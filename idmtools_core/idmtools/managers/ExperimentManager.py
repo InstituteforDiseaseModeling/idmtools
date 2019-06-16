@@ -73,7 +73,7 @@ class ExperimentManager:
 
         for sim_batch in results:
             for simulation in sim_batch:
-                self.experiment.simulations.append(copy.deepcopy(simulation))
+                self.experiment.simulations.append(simulation)
                 self.experiment.simulations.set_status(EntityStatus.CREATED)
 
     def start_experiment(self):
