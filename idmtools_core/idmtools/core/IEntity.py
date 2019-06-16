@@ -1,7 +1,7 @@
 import typing
 from abc import ABCMeta
 
-from idmtools.core import IPicklableObject
+from idmtools.core import PicklableObject
 from idmtools.utils.hashing import hash_obj
 from idmtools.core import IPicklableObject
 
@@ -10,7 +10,7 @@ if typing.TYPE_CHECKING:
     from idmtools.core import TTags
 
 
-class IEntity(IPicklableObject, metaclass=ABCMeta):
+class IEntity(PicklableObject, metaclass=ABCMeta):
     """
     Interface for all entities in the system.
     """
