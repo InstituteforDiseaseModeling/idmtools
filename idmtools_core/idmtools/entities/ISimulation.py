@@ -1,11 +1,11 @@
 import typing
 from abc import ABC, abstractmethod
 
-from idmtools.assets import AssetCollection
 from idmtools.core import EntityStatus, IAssetsEnabled, IEntity
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TExperiment
+    from idmtools.assets import AssetCollection
 
 
 class ISimulation(IAssetsEnabled, IEntity, ABC):
@@ -18,7 +18,6 @@ class ISimulation(IAssetsEnabled, IEntity, ABC):
         IAssetsEnabled.__init__(self, assets=assets)
         IEntity.__init__(self)
 
-        self.assets = assets or AssetCollection()
         self.experiment = experiment
         self.status = None
 
@@ -54,11 +53,3 @@ class ISimulation(IAssetsEnabled, IEntity, ABC):
     @property
     def succeeded(self):
         return self.status == EntityStatus.SUCCEEDED
-
-
-class BaseSimulation(ISimulation):
-    def set_parameter(self, name: str, value: any) -> dict:
-        pass
-
-    def gather_assets(self):
-        pass

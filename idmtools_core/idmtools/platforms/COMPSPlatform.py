@@ -1,5 +1,7 @@
+import logging
 import os
 import typing
+from threading import Semaphore
 
 from COMPS import Client
 from COMPS.Data import AssetCollection, AssetCollectionFile, Configuration, Experiment, Simulation, SimulationFile
@@ -12,6 +14,8 @@ from idmtools.utils.time import timestamp
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TExperiment
 
+logger = logging.getLogger('COMPS.Data.Simulation')
+logger.disabled = True
 
 class COMPSPriority:
     Lowest = "Lowest"
@@ -126,22 +130,22 @@ class COMPSPlatform(IPlatform):
         experiment.uid = e.id
         self.send_assets_for_experiment(experiment)
 
-    def create_simulations(self, experiment: 'TExperiment'):
+    def create_simulations(self, simulation_batch):
         self._login()
         created_simulations = []
-        for simulation in experiment.simulations:
-            s = Simulation(name=experiment.name, experiment_id=experiment.uid,
-                           configuration=Configuration(asset_collection_id=experiment.assets.uid))
+
+        for simulation in simulation_batch:
+            s = Simulation(name=simulation.experiment.name, experiment_id=simulation.experiment.uid,
+                           configuration=Configuration(asset_collection_id=simulation.experiment.assets.uid))
 
             self.send_assets_for_simulation(simulation, s)
             s.set_tags(simulation.tags)
             created_simulations.append(s)
 
-        Simulation.save_all()
+            Simulation.save_all(None, save_semaphore=Simulation.get_save_semaphore())
 
         # Register the IDs
-        for i, comps_simulation in enumerate(created_simulations):
-            experiment.simulations[i].uid = comps_simulation.id
+        return [s.id for s in created_simulations]
 
     def run_simulations(self, experiment: 'TExperiment'):
         self._login()
@@ -180,3 +184,4 @@ class COMPSPlatform(IPlatform):
             sim.uid = s.id
             sim.tags = s.tags
             sim.status = COMPSPlatform._convert_COMPS_status(s.state)
+            experiment.simulations.append(sim)

@@ -2,19 +2,22 @@ import copy
 import typing
 from abc import ABC
 
+from more_itertools import grouper
+
 from idmtools.assets.AssetCollection import AssetCollection
 from idmtools.core import EntityContainer, IAssetsEnabled, INamedEntity
+from idmtools.utils.decorators import pickle_ignore_fields
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TSimulation, TSimulationClass, TCommandLine
 
 
+@pickle_ignore_fields(["simulations", "builder"])
 class IExperiment(IAssetsEnabled, INamedEntity, ABC):
     """
     Represents a generic Experiment.
     This class needs to be implemented for each model type with specifics.
     """
-    pickle_ignore_fields = ["simulations", "builder"]
 
     def __init__(self, name, simulation_type: 'TSimulationClass' = None, assets: 'AssetCollection' = None,
                  base_simulation: 'TSimulation' = None, command: 'TCommandLine' = None):
@@ -43,8 +46,7 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         elif simulation_type:
             self.base_simulation = simulation_type()
         else:
-            from idmtools.entities import BaseSimulation
-            self.base_simulation = BaseSimulation()
+            raise Exception("A `base_simulation` or `simulation_type` needs to be provided to the Experiment object!")
 
     def __repr__(self):
         return f"<Experiment: {self.uid} - {self.name} / Sim count {len(self.simulations)}>"
@@ -53,18 +55,26 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         from idmtools.utils.display import display, experiment_table_display
         display(self, experiment_table_display)
 
-    def execute_builder(self):
-        """
-        Execute the builder of this experiment, generating all the simulations.
-        """
-        for simulation_functions in self.builder:
-            simulation = self.simulation()
-            tags = {}
+    def batch_simulations(self, batch_size=5):
+        if not self.builder:
+            yield (self.simulation(),)
+            return
 
-            for func in simulation_functions:
-                tags.update(func(simulation=simulation))
+        for groups in grouper(self.builder, batch_size):
+            sims = []
+            for simulation_functions in filter(None, groups):
+                simulation = self.simulation()
+                tags = {}
 
-            simulation.tags = tags
+                for func in simulation_functions:
+                    new_tags = func(simulation=simulation)
+                    if new_tags:
+                        tags.update(new_tags)
+
+                simulation.tags = tags
+                sims.append(simulation)
+
+            yield sims
 
     def simulation(self):
         """
@@ -73,10 +83,8 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         Returns: The created simulation
         """
         sim = copy.deepcopy(self.base_simulation)
-
-        sim.experiment_id = self.uid
-        self.simulations.append(sim)
         sim.experiment = self
+        sim.assets = copy.deepcopy(self.base_simulation.assets)
         return sim
 
     def pre_creation(self):

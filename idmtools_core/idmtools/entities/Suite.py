@@ -1,9 +1,9 @@
 from idmtools.core import EntityContainer, INamedEntity
+from idmtools.utils.decorators import pickle_ignore_fields
 
 
+@pickle_ignore_fields(["experiments"])
 class Suite(INamedEntity):
-    pickle_ignore_fields = ["experiments"]
-
     def __init__(self, name: 'str'):
         super().__init__(name=name)
         self.experiments = EntityContainer()

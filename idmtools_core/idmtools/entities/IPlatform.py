@@ -4,7 +4,7 @@ from abc import ABCMeta, abstractmethod
 from idmtools.core import IEntity
 
 if typing.TYPE_CHECKING:
-    from idmtools.core.types import TExperiment, TSimulation
+    from idmtools.core.types import TExperiment, TSimulation, TSimulationBatch
 
 
 class IPlatform(IEntity, metaclass=ABCMeta):
@@ -27,11 +27,13 @@ class IPlatform(IEntity, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def create_simulations(self, experiment: 'TExperiment') -> None:
+    def create_simulations(self, simulation_batch: 'TSimulationBatch') -> 'List[Any]':
         """
         Function creating experiments simulations on the platform for a given experiment.
         Args:
-            experiment: The experiment containing the simulations to create
+            simulation_batch: The batch of simulations to create
+        Returns:
+            List of ids created
         """
         pass
 

@@ -53,11 +53,7 @@ class AddAssetTask(GenericActor):
         max_retries = 0
 
     def perform(self, experiment_id, filename, path=None, contents=None, simulation_id=None):
-        path = path or ""
-        if simulation_id:
-            path = os.path.join("/data", experiment_id, simulation_id, path, filename)
-        else:
-            path = os.path.join("/data", experiment_id, "Assets", path, filename)
+        path = os.path.join("/data", experiment_id, simulation_id or "Assets", path or "", filename)
 
         # Sometimes, workers tries to create the same folder at the same time, silence the exception
         if not os.path.exists(os.path.dirname(path)):

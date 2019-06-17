@@ -365,3 +365,5 @@ dmypy.json
 ### IDMTools specific
 /data
 idmtools_core/tests/data
+examples/**/.pytest_cache/
+examples/**/__pycache__/
