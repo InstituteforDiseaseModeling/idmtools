@@ -13,7 +13,6 @@ class ISimulation(IAssetsEnabled, IEntity, ABC):
     Represents a generic Simulation.
     This class needs to be implemented for each model type with specifics.
     """
-    pickle_ignore_fields = ["assets"]
 
     def __init__(self, assets: 'AssetCollection' = None, experiment: 'TExperiment' = None):
         IAssetsEnabled.__init__(self, assets=assets)
@@ -54,4 +53,3 @@ class ISimulation(IAssetsEnabled, IEntity, ABC):
     @property
     def succeeded(self):
         return self.status == EntityStatus.SUCCEEDED
-

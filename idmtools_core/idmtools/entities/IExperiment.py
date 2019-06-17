@@ -6,17 +6,18 @@ from more_itertools import grouper
 
 from idmtools.assets.AssetCollection import AssetCollection
 from idmtools.core import EntityContainer, IAssetsEnabled, INamedEntity
+from idmtools.utils.decorators import pickle_ignore_fields
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TSimulation, TSimulationClass, TCommandLine
 
 
+@pickle_ignore_fields(["simulations", "builder"])
 class IExperiment(IAssetsEnabled, INamedEntity, ABC):
     """
     Represents a generic Experiment.
     This class needs to be implemented for each model type with specifics.
     """
-    pickle_ignore_fields = ["simulations", "builder"]
 
     def __init__(self, name, simulation_type: 'TSimulationClass' = None, assets: 'AssetCollection' = None,
                  base_simulation: 'TSimulation' = None, command: 'TCommandLine' = None):
@@ -56,7 +57,7 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
 
     def batch_simulations(self, batch_size=5):
         if not self.builder:
-            yield (self.simulation(), )
+            yield (self.simulation(),)
             return
 
         for groups in grouper(self.builder, batch_size):

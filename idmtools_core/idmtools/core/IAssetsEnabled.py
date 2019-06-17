@@ -1,10 +1,13 @@
 from abc import ABCMeta, abstractmethod
 import typing
 
+from idmtools.utils.decorators import pickle_ignore_fields
+
 if typing.TYPE_CHECKING:
     from idmtools.core import TAssetCollection
 
 
+@pickle_ignore_fields(["assets"])
 class IAssetsEnabled(metaclass=ABCMeta):
     """
     Base class for objects containing an asset collection

@@ -1,4 +1,4 @@
-from idmtools.core.IPicklableObject import IPicklableObject
+from idmtools.core.PicklableObject import PicklableObject
 from idmtools.core.IEntity import IEntity
 from idmtools.core.INamedEntity import INamedEntity
 from idmtools.core.EntityContainer import EntityContainer

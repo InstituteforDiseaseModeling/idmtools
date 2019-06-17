@@ -1,7 +1,7 @@
 import typing
 from abc import ABCMeta
 
-from idmtools.core import IPicklableObject
+from idmtools.core import PicklableObject
 from idmtools.utils.hashing import hash_obj
 
 if typing.TYPE_CHECKING:
@@ -9,10 +9,11 @@ if typing.TYPE_CHECKING:
     from idmtools.core import TTags
 
 
-class IEntity(IPicklableObject, metaclass=ABCMeta):
+class IEntity(PicklableObject, metaclass=ABCMeta):
     """
     Interface for all entities in the system.
     """
+
     def __init__(self, uid: 'uuid' = None, tags: 'TTags' = None):
         super().__init__()
         self._uid = uid
@@ -42,5 +43,10 @@ class IEntity(IPicklableObject, metaclass=ABCMeta):
         Called after the actual creation of the entity.
         """
         pass
+
     # endregion
 
+    # region State management
+    def __eq__(self, other):
+        return self.uid == other.uid
+    # endregion
