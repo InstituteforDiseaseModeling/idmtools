@@ -1,39 +1,45 @@
-import numpy as np
 import pandas as pd
-from idmtools.builders import ArmExperimentBuilder
-from idmtools.builders.ArmExperimentBuilder import SweepArm, ArmType
+from itertools import product
+from idmtools.builders import ExperimentBuilder
 
 
-class CsvExperimentBuilder(ArmExperimentBuilder):
+class CsvExperimentBuilder(ExperimentBuilder):
     """
     Represents an experiment builder
     """
 
     def __init__(self):
         super().__init__()
+        self.SweepFunctions = []
 
-    def add_sweeps_from_file(self, file_path, func_map={}):
+    def add_sweeps_from_file(self, file_path, func_map={}, type_map={}, sep=","):
+        df_sweeps = pd.read_csv(file_path, sep=sep)
+        # print(df_sweeps)
 
-        # file_path = 'arm_funcs1.csv'
-        df_sweeps = pd.read_csv(file_path, sep='\t')
-        print(df_sweeps)
+        row_count = df_sweeps.shape[0]
+        for k in range(row_count):
+            self.sweeps = []
+            df = df_sweeps.iloc[[k]]
 
-        for index, row in df_sweeps.iterrows():
-            # print(row)
-            df = pd.DataFrame(row)
-            df = df.dropna()
-            df = df.astype(np.int)
-            d = df.to_dict()
-            key = list(d.keys())[0]
-            d_funcs = d[key]
+            # drop columns with nan
+            df = df.dropna(axis=1)
 
-            funcs = []
-            for func, values in d_funcs.items():
-                funcs.append((func_map[func], values))
+            # make parameter with the correct value type
+            type_map_t = {k: v for k, v in type_map.items() if k in df.columns.tolist()}
+            df = df.astype(type_map_t)
 
-            arm = SweepArm(ArmType.zip, funcs)
-            self.add_arm(arm)
+            # make dict like: {'a': [1], 'b': [2]}
+            sweep = df.to_dict(orient='list')
+
+            # go through each (key, value)
+            for param, value in sweep.items():
+                # get the mapping function
+                func = func_map[param]
+
+                self.add_sweep_definition(func, value)
+
+            self.SweepFunctions.extend(product(*self.sweeps))
 
     def __iter__(self):
-        for tup in self.sweep_definitions:
+        for tup in self.SweepFunctions:
             yield tup
