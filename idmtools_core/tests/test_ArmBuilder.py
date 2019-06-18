@@ -32,7 +32,7 @@ class TestArmBuilder(ITestWithPersistence):
     def tearDown(self):
         super().tearDown()
 
-    def test_simple_arm(self):
+    def test_simple_arm_cross(self):
         arm = SweepArm(type=ArmType.cross)
         arm.add_sweep_function(setA, range(5))
         arm.add_sweep_function(setB, [1, 2, 3])
@@ -77,6 +77,27 @@ class TestArmBuilder(ITestWithPersistence):
         simulations2 = list(experiment.batch_simulations(20))[0]
 
         self.assertListEqual(simulations2, simulations)
+
+    def test_simple_arm_pair(self):
+        arm = SweepArm(type=ArmType.pair)
+        arm.add_sweep_function(setA, range(5))
+        arm.add_sweep_function(setB, [1, 2, 3])
+        self.builder.add_arm(arm)
+
+        expected_values = list(zip(range(5), [1, 2, 3]))
+
+        experiment = TestExperiment("test")
+        experiment.builder = self.builder
+
+        simulations = list(experiment.batch_simulations(10))[0]
+
+        # Test if we have correct number of simulations
+        self.assertEqual(len(simulations), 5)
+
+        # Verify simulations individually
+        for simulation in simulations:
+            found = verify_simulation(simulation, ["a", "b"], expected_values)
+            self.assertTrue(found)
 
     def test_complex_scenario(self):
         pass
