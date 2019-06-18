@@ -7,7 +7,7 @@ from idmtools.builders import ExperimentBuilder
 
 class ArmType(Enum):
     cross = 0
-    zip = 1
+    pair = 1
 
 
 class SweepArm:
@@ -25,7 +25,7 @@ class SweepArm:
     def add_sweep_function(self, func: 'Callable', values: 'Iterable[Any]'):
         self.sweep_functions.append((func, values if isinstance(values, collections.Iterable) else [values]))
 
-        if self.type == ArmType.zip:
+        if self.type == ArmType.pair:
             self.adjust_values_length()
 
     def get_max_values_count(self):
@@ -33,13 +33,14 @@ class SweepArm:
         return max(cnts)
 
     def adjust_values_length(self):
-        if self.type != ArmType.zip:
+        if self.type != ArmType.pair:
             return
 
         count_max = self.get_max_values_count()
         temp_sweep_functions = []
         for func, values in self.sweep_functions:
             values_new = copy.deepcopy(values)
+            values_new = list(values_new)
             values_new.extend([values[-1]] * (count_max - len(values)))
             temp_sweep_functions.append((func, values_new))
 
@@ -69,9 +70,8 @@ class ArmExperimentBuilder(ExperimentBuilder):
 
         if arm.type == ArmType.cross:
             self.sweep_definitions.extend(product(*self.sweeps))
-        elif arm.type == ArmType.zip:
+        elif arm.type == ArmType.pair:
             self.sweep_definitions.extend(zip(*self.sweeps))
-
 
     def __iter__(self):
         for tup in self.sweep_definitions:
