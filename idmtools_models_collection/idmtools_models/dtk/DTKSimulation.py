@@ -1,16 +1,16 @@
 import json
+from dataclasses import dataclass, field
 
 from idmtools.assets import Asset
 from idmtools.entities import ISimulation
 from idmtools_models.dtk.interventions.DTKEmptyCampaign import DTKEmptyCampaign
 
 
+@dataclass
 class DTKSimulation(ISimulation):
-    def __init__(self, config=None, campaign=None, demographics=None):
-        super().__init__()
-        self.config = config
-        self.demographics = demographics or {}
-        self.campaign = campaign or DTKEmptyCampaign.campaign
+    config: dict = field(default_factory=lambda: {})
+    campaign: dict = field(default_factory=lambda: DTKEmptyCampaign.campaign())
+    demographics: dict = field(default_factory=lambda: {})
 
     def set_parameter(self, name: str, value: any) -> dict:
         self.config[name] = value

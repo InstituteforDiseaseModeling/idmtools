@@ -1,15 +1,11 @@
 import typing
 from abc import ABCMeta
+from dataclasses import dataclass, field
 
 from idmtools.core import IEntity
 
-if typing.TYPE_CHECKING:
-    import uuid
-    from idmtools.core import TTags
 
-
+@dataclass
 class INamedEntity(IEntity, metaclass=ABCMeta):
-    def __init__(self, name:'str'=None, uid: 'uuid' = None, tags: 'TTags' = None):
-        super().__init__(uid=uid, tags=tags)
-        self.name = name
+    name: str = field(default=None, metadata={"md": True}, compare=False)
 

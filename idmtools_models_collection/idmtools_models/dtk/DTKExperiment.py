@@ -1,4 +1,6 @@
+import os
 import typing
+from dataclasses import dataclass, field
 
 from idmtools.assets import Asset
 from idmtools.entities import IExperiment, CommandLine
@@ -8,15 +10,18 @@ if typing.TYPE_CHECKING:
     from idmtools_models.dtk.defaults import IDTKDefault
 
 
+@dataclass(repr=False)
 class DTKExperiment(IExperiment):
-    def __init__(self, name, assets=None, base_simulation=None, eradication_path=None):
-        super().__init__(name=name, assets=assets, simulation_type=DTKSimulation, base_simulation=base_simulation)
-        self.eradication_path = eradication_path
+    eradication_path: str = field(default=None, compare=False, metadata={"md": True})
+
+    def __post_init__(self, simulation_type):
+        super().__post_init__(simulation_type=DTKSimulation)
+        self.eradication_path = os.path.abspath(self.eradication_path)
 
     @classmethod
     def from_default(cls, name, default: 'IDTKDefault', eradication_path=None):
         base_simulation = DTKSimulation()
-        default().process_simulation(base_simulation)
+        default.process_simulation(base_simulation)
         return cls(name=name, base_simulation=base_simulation, eradication_path=eradication_path)
 
     def gather_assets(self) -> None:
