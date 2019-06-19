@@ -11,7 +11,7 @@ from idmtools.core import EntityStatus
 from idmtools.managers import ExperimentManager
 from idmtools.platforms import COMPSPlatform, LocalPlatform
 
-from idmtools_models.python import PythonExperiment
+from idmtools_models.python import PythonExperiment, PythonSimulation
 from tests import INPUT_PATH
 from tests.utils.decorators import comps_test
 from tests.utils.ITestWithPersistence import ITestWithPersistence
@@ -20,13 +20,40 @@ from tests.utils.ITestWithPersistence import ITestWithPersistence
 class TestPythonSimulation(ITestWithPersistence):
 
     def setUp(self) -> None:
-        self.casename = os.path.basename(__file__) + "--"+ self._testMethodName
+        self.casename = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.casename)
 
     def test_retrieve_extra_libraries(self):
         name = self.casename
         ps = PythonExperiment(name=name, model_path=os.path.join(INPUT_PATH, "python", "model.py"))
         self.assertTrue("numpy" in ps.retrieve_python_dependencies()[0])
+
+    def test_envelope(self):
+        import json
+        # No envelope
+        p = PythonSimulation(parameters={"a": 1})
+        self.assertEqual(p.parameters, {"a": 1})
+        p.gather_assets()
+        self.assertEqual(p.assets.assets[0].content, str.encode(json.dumps({"a": 1})))
+
+        # Envelope
+        p = PythonSimulation(parameters={"a": 1}, envelope="config")
+        self.assertEqual(p.parameters, {"a": 1})
+        p.gather_assets()
+        self.assertEqual(p.assets.assets[0].content, str.encode(json.dumps({"config":{"a": 1}})))
+
+        # Envelope already set in parameters
+        p = PythonSimulation(parameters={"config":{"a": 1}}, envelope="config")
+        self.assertEqual(p.parameters, {"a": 1})
+        p.gather_assets()
+        self.assertEqual(p.assets.assets[0].content, str.encode(json.dumps({"config": {"a": 1}})))
+
+        # Envelope already set in parameters but no envelope parameter
+        p = PythonSimulation(parameters={"config": {"a": 1}})
+        self.assertEqual(p.parameters, {"config": {"a": 1}})
+        p.gather_assets()
+        self.assertEqual(p.assets.assets[0].content, str.encode(json.dumps({"config": {"a": 1}})))
+
 
     # Test 2 ways to sweep parameters
     # First way: use partial function
@@ -38,7 +65,7 @@ class TestPythonSimulation(ITestWithPersistence):
         platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
         name = self.casename
         pe = PythonExperiment(name=name,
-                                      model_path=os.path.join(INPUT_PATH, "python", "model1.py"))
+                              model_path=os.path.join(INPUT_PATH, "python", "model1.py"))
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123, "KeyOnly": None}
 
         pe.base_simulation.set_parameter("c", "c-value")
@@ -85,7 +112,8 @@ class TestPythonSimulation(ITestWithPersistence):
 
         # validate experiment tags
         exp_tags = experiment.get(experiment.id, QueryCriteria().select_children('tags')).tags
-        self.assertEqual({'idmtools': 'idmtools-automation', 'number_tag': '123', 'string_tag': 'test', 'KeyOnly': ''}, exp_tags)
+        self.assertEqual({'idmtools': 'idmtools-automation', 'number_tag': '123', 'string_tag': 'test', 'KeyOnly': ''},
+                         exp_tags)
 
     # Test parameter "b" set is depending on parameter "a"
     # a=[0,1,2,3,4] <--sweep parameter
@@ -95,7 +123,7 @@ class TestPythonSimulation(ITestWithPersistence):
         platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
         name = self.casename
         pe = PythonExperiment(name=name,
-                                      model_path=os.path.join(INPUT_PATH, "python", "model1.py"))
+                              model_path=os.path.join(INPUT_PATH, "python", "model1.py"))
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
 
         pe.base_simulation.set_parameter("c", "c-value")
@@ -164,7 +192,7 @@ class TestPythonSimulation(ITestWithPersistence):
         assets_path = os.path.join(INPUT_PATH, "python", "Assets")
         ac.add_directory(assets_directory=assets_path)
         pe = PythonExperiment(name=name,
-                                      model_path=model_path, assets=ac)
+                              model_path=model_path, assets=ac)
         pe.gather_assets()
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         pe.base_simulation.set_parameter("a", 1)
@@ -173,7 +201,6 @@ class TestPythonSimulation(ITestWithPersistence):
         em.run()
         em.wait_till_done()
         self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
-
 
     @comps_test
     def test_add_specific_files_to_assets_comps(self):
@@ -185,7 +212,7 @@ class TestPythonSimulation(ITestWithPersistence):
                   absolute_path=os.path.join(INPUT_PATH, "python", "Assets", "MyExternalLibrary", "functions.py"))
         ac.add_asset(a)
         pe = PythonExperiment(name=name,
-                                      model_path=model_path, assets=ac)
+                              model_path=model_path, assets=ac)
 
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         pe.base_simulation.set_parameter("a", 1)
@@ -229,7 +256,7 @@ class TestPythonSimulation(ITestWithPersistence):
         platform = LocalPlatform()
         name = self.casename
         pe = PythonExperiment(name=name,
-                                      model_path=os.path.join(INPUT_PATH, "python", "model1.py"))
+                              model_path=os.path.join(INPUT_PATH, "python", "model1.py"))
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
 
         def param_a_update(simulation, value):
@@ -255,7 +282,7 @@ class TestPythonSimulation(ITestWithPersistence):
         # validate tags
         tags = []
         for simulation in pe.simulations:
-            self.assertEqual(simulation.experiment.uid,pe.uid)
+            self.assertEqual(simulation.experiment.uid, pe.uid)
             tags.append(simulation.tags)
         expected_tags = [{'a': 0}, {'a': 1}, {'a': 2}, {'a': 3}, {'a': 4}]
         sorted_tags = sorted(tags, key=itemgetter('a'))
@@ -274,7 +301,7 @@ class TestPythonSimulation(ITestWithPersistence):
         # assets_path = os.path.join(INPUT_PATH, "python", "Assets")
         # ac.add_directory(assets_directory=assets_path)
         pe = PythonExperiment(name=name,
-                                      model_path=model_path, assets=ac)
+                              model_path=model_path, assets=ac)
         # assets=AssetCollection.from_directory(assets_directory=assets_path, relative_path="MyExternalLibrary"))
 
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
