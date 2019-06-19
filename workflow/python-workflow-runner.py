@@ -2,7 +2,13 @@ import diskcache
 from pprint import pprint
 
 from system_task import SystemTask
+from python_task import PythonTask
 from workflow import Workflow
+
+def add(a, b):
+    result = a + b
+    print(f'Add result: {a} + {b} = {result}')
+    return result
 
 
 cache = diskcache.Cache('workflow.diskcache')
@@ -19,7 +25,9 @@ tasks = [
 
     SystemTask(command='python --version', name='zeta', depends_on=['gamma', 'delta']),
 
-    SystemTask(command='python --version', name='eta', depends_on=['zeta'])
+    SystemTask(command='python --version', name='eta', depends_on=['zeta']),
+
+    PythonTask(name='theta', method=add, method_kwargs={'a':3, 'b': 10}, depends_on=['eta'])
 
 ]
 
