@@ -40,10 +40,10 @@ class TestPythonSimulation(ITestWithPersistence):
         p = PythonSimulation(parameters={"a": 1}, envelope="config")
         self.assertEqual(p.parameters, {"a": 1})
         p.gather_assets()
-        self.assertEqual(p.assets.assets[0].content, str.encode(json.dumps({"config":{"a": 1}})))
+        self.assertEqual(p.assets.assets[0].content, str.encode(json.dumps({"config": {"a": 1}})))
 
         # Envelope already set in parameters
-        p = PythonSimulation(parameters={"config":{"a": 1}}, envelope="config")
+        p = PythonSimulation(parameters={"config": {"a": 1}}, envelope="config")
         self.assertEqual(p.parameters, {"a": 1})
         p.gather_assets()
         self.assertEqual(p.assets.assets[0].content, str.encode(json.dumps({"config": {"a": 1}})))
@@ -53,7 +53,6 @@ class TestPythonSimulation(ITestWithPersistence):
         self.assertEqual(p.parameters, {"config": {"a": 1}})
         p.gather_assets()
         self.assertEqual(p.assets.assets[0].content, str.encode(json.dumps({"config": {"a": 1}})))
-
 
     # Test 2 ways to sweep parameters
     # First way: use partial function
@@ -195,6 +194,7 @@ class TestPythonSimulation(ITestWithPersistence):
                               model_path=model_path, assets=ac)
         pe.gather_assets()
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
+        pe.base_simulation.envelope = "parameters"
         pe.base_simulation.set_parameter("a", 1)
         pe.base_simulation.set_parameter("b", 10)
         em = ExperimentManager(experiment=pe, platform=platform)
@@ -217,6 +217,7 @@ class TestPythonSimulation(ITestWithPersistence):
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         pe.base_simulation.set_parameter("a", 1)
         pe.base_simulation.set_parameter("b", 10)
+        pe.base_simulation.envelope = "parameters"
         em = ExperimentManager(experiment=pe, platform=platform)
         em.run()
         em.wait_till_done()
