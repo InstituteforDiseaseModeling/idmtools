@@ -25,13 +25,16 @@ class Task:
 
         self.cache = cache
 
-        self.status = self.UNSTARTED
-
     # TODO: This basic implementation of diskcache-backed state only supports a single Workflow object
     # Duplicate workflows (or ones with in-common task names) will collide.
     @property
     def status(self):
-        return self.cache[self.name]
+        try:
+            s = self.cache[self.name]
+        except KeyError:  # it a task is not in the db, add it as unstarted
+            s = self.UNSTARTED
+            self.status = s
+        return s
 
     @status.setter
     def status(self, value):

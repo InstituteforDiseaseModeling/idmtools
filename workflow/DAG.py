@@ -32,11 +32,12 @@ class DAG:
         # any node in the subgraph containing it, not just starting at nodes in the loop. But I don't really want to dye
         # mark the nodes (modifying the Task objects, which may technically be passed around between DAGs... who knows
         # why though). This algorithm will be used with a small set of nodes, so efficiency is irrelevant.
+        # A simple optimization would be to start at only root nodes (add method: self.root_nodes())
         for node in self.nodes:
             nodes_to_check = node.dependees
             while len(nodes_to_check) > 0:
                 nodes_to_check_next = []
-                print(f'Nodes to check: {[n.name for n in nodes_to_check]}')
+                # print(f'Nodes to check: {[n.name for n in nodes_to_check]}')
                 for comparison_node in nodes_to_check:
                     if comparison_node.name == node.name:
                         raise self.LoopException(f'Loop detected in DAG including node: {node.name}')
