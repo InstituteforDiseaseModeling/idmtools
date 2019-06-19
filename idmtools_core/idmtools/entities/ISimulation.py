@@ -1,5 +1,4 @@
 import typing
-import uuid
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
 
@@ -7,7 +6,6 @@ from idmtools.core import EntityStatus, IAssetsEnabled, IEntity
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TExperiment
-    from idmtools.assets import AssetCollection
 
 
 @dataclass
