@@ -1,21 +1,19 @@
 import copy
 import pickle
 import unittest
+from dataclasses import dataclass, field
 
 from idmtools.core import IEntity
 from idmtools.entities.Suite import Suite
-from idmtools.utils.decorators import pickle_ignore_fields
 from tests.utils.ITestWithPersistence import ITestWithPersistence
 from tests.utils.TestExperiment import TestExperiment
 
 
-@pickle_ignore_fields(["ignore", "ignore_with_restore"])
+@dataclass
 class EntityWithIgnoreField(IEntity):
-    def __init__(self):
-        super().__init__()
-        self.ignore = 3
-        self.ignore_with_restore = 1
-        self.not_ignored = 4
+    ignore: int = field(default=3, compare=False, metadata={"pickle_ignore": True})
+    ignore_with_restore: int = field(default=1, compare=False, metadata={"pickle_ignore": True})
+    not_ignored:int = field(default=4, metadata={"md": True})
 
     def post_setstate(self):
         self.ignore_with_restore = 5
@@ -51,9 +49,9 @@ class TestEntity(ITestWithPersistence):
 
     def test_pickle_ignore(self):
         a = TestExperiment(name="test")
-        self.assertSetEqual(a.pickle_ignore_fields, {'assets', 'builder', 'simulations'})
+        self.assertSetEqual(a.pickle_ignore_fields, {'builder'})
+        a.builder = 1
         b = pickle.loads(pickle.dumps(a))
-        self.assertEqual(b.simulations, [])
         self.assertIsNone(b.builder)
 
         s = Suite(name="test")
@@ -61,17 +59,16 @@ class TestEntity(ITestWithPersistence):
         b = pickle.loads(pickle.dumps(s))
         self.assertEqual(b.experiments, [])
 
-        a = EntityWithIgnoreField()
-        self.assertEqual(a.ignore, 3)
-        self.assertEqual(a.ignore_with_restore, 1)
+        a = EntityWithIgnoreField(ignore=10, ignore_with_restore=5)
+        self.assertEqual(a.ignore, 10)
+        self.assertEqual(a.ignore_with_restore, 5)
         self.assertEqual(a.not_ignored, 4)
         b = pickle.loads(pickle.dumps(a))
         self.assertNotEqual(b.ignore, a.ignore)
-        self.assertIsNone(b.ignore)
         self.assertEqual(b.not_ignored, a.not_ignored)
         self.assertEqual(b.ignore_with_restore, 5)
 
-        # Test that object remains equal even with different parameters if those are ignored
+        # Test that object remains equal even with different parameters if those are not part of compare
         a = EntityWithIgnoreField()
         b = EntityWithIgnoreField()
         a.ignore = "A"

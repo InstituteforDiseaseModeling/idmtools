@@ -1,13 +1,13 @@
-
+import json
 import os
 import unittest
-import json
+
 from COMPS import Data
 from COMPS.Data import Experiment, QueryCriteria, Simulation
 
-from idmtools.assets import AssetCollection, Asset
-from idmtools.core import EntityStatus
+from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import ExperimentBuilder
+from idmtools.core import EntityStatus
 from idmtools.platforms import COMPSPlatform
 from idmtools_models.python import PythonExperiment
 from tests import INPUT_PATH
@@ -106,3 +106,6 @@ class TestAssetsInComps(unittest.TestCase):
             return Data.AssetCollection.get(collection_id, query_criteria)
         except (RuntimeError, ValueError):
             return None
+
+if __name__ == '__main__':
+    unittest.main()

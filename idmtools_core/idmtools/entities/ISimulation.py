@@ -1,5 +1,7 @@
 import typing
-from abc import ABC, abstractmethod
+import uuid
+from abc import ABCMeta, abstractmethod
+from dataclasses import dataclass, field
 
 from idmtools.core import EntityStatus, IAssetsEnabled, IEntity
 
@@ -8,18 +10,14 @@ if typing.TYPE_CHECKING:
     from idmtools.assets import AssetCollection
 
 
-class ISimulation(IAssetsEnabled, IEntity, ABC):
+@dataclass
+class ISimulation(IAssetsEnabled, IEntity, metaclass=ABCMeta):
     """
     Represents a generic Simulation.
     This class needs to be implemented for each model type with specifics.
     """
-
-    def __init__(self, assets: 'AssetCollection' = None, experiment: 'TExperiment' = None):
-        IAssetsEnabled.__init__(self, assets=assets)
-        IEntity.__init__(self)
-
-        self.experiment = experiment
-        self.status = None
+    experiment: 'TExperiment' = field(default=None, compare=False, metadata={"md": True})
+    status: 'EntityStatus' = field(default=None, compare=False)
 
     @abstractmethod
     def set_parameter(self, name: str, value: any) -> dict:

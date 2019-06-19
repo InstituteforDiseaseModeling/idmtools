@@ -3,15 +3,16 @@ import os
 
 from COMPS.Data import Experiment
 
-from idmtools.builders import StandAloneSimulationsBuilder, ExperimentBuilder
+from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
 from idmtools.managers import ExperimentManager
 from idmtools.platforms import COMPSPlatform
-from idmtools_models.dtk import DTKExperiment
-from idmtools_models.dtk.defaults import DTKSIR
-from tests import INPUT_PATH
 from tests.utils.decorators import comps_test
 from tests.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_models.dtk import DTKExperiment
+from idmtools_models.dtk.defaults import DTKSIR
 
+current_directory = os.path.dirname(os.path.realpath(__file__))
+INPUT_PATH = os.path.join(current_directory, "inputs")
 
 @comps_test
 class TestDTK(ITestWithPersistence):

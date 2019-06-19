@@ -1,17 +1,22 @@
 import os
 import subprocess
 import tempfile
+from dataclasses import dataclass, field
 
 from idmtools.assets.Asset import Asset
-from idmtools.entities import IExperiment, CommandLine
+from idmtools.entities import CommandLine, IExperiment
 from idmtools_models.python.PythonSimulation import PythonSimulation
 
 
+
+@dataclass(repr=False)
 class PythonExperiment(IExperiment):
-    def __init__(self, name, model_path, assets=None, extra_libraries=None):
-        super().__init__(name=name, assets=assets, simulation_type=PythonSimulation)
-        self.model_path = os.path.abspath(model_path)
-        self.extra_libraries = extra_libraries or []
+    model_path: str = field(default=None, compare=False, metadata={"md": True})
+    extra_libraries: list = field(default_factory=lambda: [], compare=False, metadata={"md": True})
+
+    def __post_init__(self, simulation_type):
+        super().__post_init__(simulation_type=PythonSimulation)
+        self.model_path = os.path.abspath(self.model_path)
 
     def retrieve_python_dependencies(self):
         """
@@ -44,6 +49,3 @@ class PythonExperiment(IExperiment):
 
         # Create the command line according to the location of the model
         self.command = CommandLine("python", f"./Assets/{os.path.basename(self.model_path)}", "config.json")
-
-
-

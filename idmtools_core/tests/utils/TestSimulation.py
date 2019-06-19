@@ -1,13 +1,13 @@
 import json
+from dataclasses import dataclass, field
 
 from idmtools.assets import Asset
 from idmtools.entities import ISimulation
 
 
+@dataclass(repr=False)
 class TestSimulation(ISimulation):
-    def __init__(self):
-        super().__init__()
-        self.parameters = {}
+    parameters: dict = field(default_factory=lambda: {})
 
     def set_parameter(self, name: str, value: any) -> dict:
         self.parameters[name] = value
