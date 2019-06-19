@@ -12,7 +12,7 @@ services:
       context: .
     environment:
       - REDIS_URL=redis://redis:6379
-    command: "dramatiq brokers:redis_broker tasks --watch ."
+    command: "dramatiq --verbose brokers:redis_broker tasks --watch ."
     volumes:
       - ./idmtools_local:/app
       - ../data/workers:/data
@@ -20,15 +20,15 @@ services:
       - redis
 
 # this can be uncommented for development to allow gui for Redis at http://localhost:8081
-#  redis-commander:
-#    container_name: redis-commander
-#    hostname: redis-commander
-#    image: rediscommander/redis-commander:latest
-#    restart: always
-#    environment:
-#      - REDIS_HOSTS=local:redis:6379
-#    ports:
-#      - "8081:8081"
+  redis-commander:
+    container_name: redis-commander
+    hostname: redis-commander
+    image: rediscommander/redis-commander:latest
+    restart: always
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - "8081:8081"
 
 networks:
   default:
