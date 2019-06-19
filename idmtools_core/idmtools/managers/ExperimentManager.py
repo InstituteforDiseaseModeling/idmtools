@@ -1,4 +1,3 @@
-import copy
 import typing
 
 from idmtools.core import EntityStatus
@@ -47,7 +46,7 @@ class ExperimentManager:
         self.experiment.post_creation()
 
         # Save the experiment
-        ExperimentPersistService.save(self.experiment)
+        ExperimentPersistService.save(self.experiment.metadata)
 
     def simulation_batch_worker_thread(self, simulation_batch):
         for simulation in simulation_batch:
@@ -73,7 +72,7 @@ class ExperimentManager:
 
         for sim_batch in results:
             for simulation in sim_batch:
-                self.experiment.simulations.append(simulation)
+                self.experiment.simulations.append(simulation.metadata)
                 self.experiment.simulations.set_status(EntityStatus.CREATED)
 
     def start_experiment(self):
@@ -118,4 +117,4 @@ class ExperimentManager:
 
     def refresh_status(self):
         self.platform.refresh_experiment_status(self.experiment)
-        ExperimentPersistService.save(self.experiment)
+        ExperimentPersistService.save(self.experiment.metadata)

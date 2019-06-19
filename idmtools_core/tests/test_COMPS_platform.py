@@ -5,11 +5,13 @@ import unittest
 from idmtools.builders import ExperimentBuilder
 from idmtools.core import EntityStatus
 from idmtools.platforms import COMPSPlatform
-from idmtools_models.python import PythonExperiment
 from tests import INPUT_PATH
 from tests.utils.decorators import comps_test
-from tests.utils.ITestWithPersistence import ITestWithPersistence
 
+from tests.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_models.python import PythonExperiment
+
+current_directory = os.path.dirname(os.path.realpath(__file__))
 
 @comps_test
 class TestCOMPSPlatform(ITestWithPersistence):
@@ -40,9 +42,6 @@ class TestCOMPSPlatform(ITestWithPersistence):
             for uid, simulation in zip(ids, simulation_batch):
                 simulation.uid = uid
                 simulation.post_creation()
-
-                from idmtools.entities import ISimulation
-                simulation.__class__ = ISimulation
                 experiment.simulations.append(simulation)
 
         self.platform.refresh_experiment_status(experiment)
