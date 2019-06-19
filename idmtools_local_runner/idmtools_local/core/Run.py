@@ -1,7 +1,8 @@
 import os
 import sys
-
+import uuid
 from dramatiq import GenericActor
+from idmtools_local.core.Data import ExperimentDatabase, SimulationDatabase, JobStatus, Status
 
 
 class CreateExperimentTask(GenericActor):
@@ -19,6 +20,11 @@ class CreateExperimentTask(GenericActor):
         import random
         import string
         uuid = ''.join(random.choice(string.digits + string.ascii_uppercase) for _ in range(5))
+
+        # Save our experiment to our local platform db
+        experiment_status: JobStatus = JobStatus(uid=uuid, data_path=os.path.join("/data", uuid))
+        ExperimentDatabase.save(experiment_status)
+
         os.mkdir(os.path.join("/data", uuid))
         os.mkdir(os.path.join("/data", uuid, "Assets"))
         return uuid
@@ -38,6 +44,11 @@ class CreateSimulationTask(GenericActor):
         import random
         import string
         uuid = ''.join(random.choice(string.digits + string.ascii_uppercase) for _ in range(5))
+
+        simulation_status: JobStatus = JobStatus(uid=uuid, parent_uuid= experiment_id,
+                                                 data_path=os.path.join("/data", experiment_id, uuid))
+        SimulationDatabase.save(simulation_status)
+
         os.mkdir(os.path.join("/data", experiment_id, uuid))
         return uuid
 
@@ -74,13 +85,16 @@ class RunTask(GenericActor):
         store_results = False
         max_retries = 0
 
-    def perform(self, command, experiment_id, simulation_id):
+    def perform(self, command, experiment_uuid: uuid.UUID, simulation_uuid: uuid.UUID):
         import subprocess
-        simulation_path = os.path.join("/data", experiment_id, simulation_id)
-        subprocess.call(['ln', '-s', os.path.join('/data', experiment_id, "Assets"), os.path.join(simulation_path, 'Assets')])
-        sys.path.insert(0, os.path.join("/data", experiment_id, "Assets"))
+        simulation_path = os.path.join("/data", str(experiment_uuid), str(simulation_uuid))
+        asset_dir = os.path.join("/data", str(experiment_uuid), "Assets")
+        subprocess.call(['ln', '-s', asset_dir, os.path.join(simulation_path, 'Assets')])
+        sys.path.insert(0, asset_dir)
         with open(os.path.join(simulation_path, "StdOut.txt"), "w") as out, open(os.path.join(simulation_path, "StdErr.txt"), "w") as err:
 
             import shlex
-            p = subprocess.Popen(shlex.split(command), cwd=os.path.join("/data", experiment_id, simulation_id), shell=False, stdout=out,
-                                 stderr=err)
+            p = subprocess.Popen(shlex.split(command), cwd=simulation_path, shell=False, stdout=out,stderr=err)
+            sim_status = SimulationDatabase.retrieve(simulation_uuid)
+            sim_status.status = Status.done if p.returncode == 0 else Status.failed
+            SimulationDatabase.save(sim_status)

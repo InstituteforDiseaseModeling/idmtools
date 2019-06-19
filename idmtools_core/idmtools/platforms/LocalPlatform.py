@@ -43,7 +43,7 @@ class LocalPlatform(IPlatform):
     def create_simulations(self, simulations_batch):
         ids = []
         for simulation in simulations_batch:
-            m = CreateSimulationTask.send(simulation.experiment.uid)
+            m = CreateSimulationTask.send(simulation.experiment.uid, simulation.uid)
             sid = m.get_result(block=True)
             simulation.uid = sid
             self.send_assets_for_simulation(simulation)

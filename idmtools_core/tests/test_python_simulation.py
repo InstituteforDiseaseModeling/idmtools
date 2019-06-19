@@ -35,7 +35,8 @@ class TestPythonSimulation(ITestWithPersistence):
     # has 5 parameter, total sweep parameters are 5*5=25
     @comps_test
     def test_sweeps_with_partial_comps(self):
-        platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
+        #platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
+        platform = LocalPlatform()
         name = self.casename
         pe = PythonExperiment(name=name,
                                       model_path=os.path.join(INPUT_PATH, "python", "model1.py"))
