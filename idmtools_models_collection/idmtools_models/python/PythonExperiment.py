@@ -8,7 +8,6 @@ from idmtools.entities import CommandLine, IExperiment
 from idmtools_models.python.PythonSimulation import PythonSimulation
 
 
-
 @dataclass(repr=False)
 class PythonExperiment(IExperiment):
     model_path: str = field(default=None, compare=False, metadata={"md": True})
