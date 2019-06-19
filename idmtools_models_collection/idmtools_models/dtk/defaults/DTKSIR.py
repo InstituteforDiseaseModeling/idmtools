@@ -4,8 +4,8 @@ from idmtools_models.dtk.defaults.IDTKDefault import IDTKDefault
 
 
 class DTKSIR(IDTKDefault):
-    @property
-    def config(self) -> Dict:
+    @staticmethod
+    def config() -> Dict:
         return {
             "Acquisition_Blocking_Immunity_Decay_Rate": 0.1,
             "Acquisition_Blocking_Immunity_Duration_Before_Decay": 60,
@@ -47,22 +47,22 @@ class DTKSIR(IDTKDefault):
             "Enable_Immunity": 1,
             "Enable_Infectivity_Reservoir": 0,
             "Enable_Initial_Prevalence": 0,
-            "Enable_Initial_Susceptibility_Distribution":0,
+            "Enable_Initial_Susceptibility_Distribution": 0,
             "Enable_Interventions": 1,
             "Enable_Maternal_Transmission": 0,
             "Enable_Property_Output": 0,
             "Enable_Skipping": 0,
             "Enable_Spatial_Output": 0,
-            "Enable_Strain_Tracking":0,
+            "Enable_Strain_Tracking": 0,
             "Enable_Superinfection": 0,
-            "Enable_Termination_On_Zero_Total_Infectivity":0,
+            "Enable_Termination_On_Zero_Total_Infectivity": 0,
             "Enable_Vital_Dynamics": 0,
             "Geography": "SamplesInput",
             "Immunity_Acquisition_Factor": 0,
             "Immunity_Initialization_Distribution_Type": "DISTRIBUTION_OFF",
             "Immunity_Mortality_Factor": 0,
             "Immunity_Transmission_Factor": 0,
-            "Incubation_Period_Constant":0,
+            "Incubation_Period_Constant": 0,
             "Incubation_Period_Distribution": "CONSTANT_DISTRIBUTION",
             "Individual_Sampling_Type": "TRACK_ALL",
             "Infection_Updates_Per_Timestep": 1,
@@ -93,10 +93,10 @@ class DTKSIR(IDTKDefault):
             "Post_Infection_Acquisition_Multiplier": 0,
             "Post_Infection_Mortality_Multiplier": 0,
             "Post_Infection_Transmission_Multiplier": 0,
-            "Report_Coordinator_Event_Recorder":0,
+            "Report_Coordinator_Event_Recorder": 0,
             "Report_Event_Recorder": 0,
-            "Report_Node_Event_Recorder":0,
-            "Report_Surveillance_Event_Recorder":0,
+            "Report_Node_Event_Recorder": 0,
+            "Report_Surveillance_Event_Recorder": 0,
             "Run_Number": 1,
             "Sample_Rate_0_18mo": 1,
             "Sample_Rate_10_14": 1,
@@ -111,7 +111,7 @@ class DTKSIR(IDTKDefault):
             "Simulation_Type": "GENERIC_SIM",
             "Start_Time": 0,
             "Susceptibility_Scale_Type": "CONSTANT_SUSCEPTIBILITY",
-            "Symptomatic_Infectious_Offset":0,
+            "Symptomatic_Infectious_Offset": 0,
             "Transmission_Blocking_Immunity_Decay_Rate": 0.1,
             "Transmission_Blocking_Immunity_Duration_Before_Decay": 60,
             "x_Air_Migration": 1,
@@ -124,8 +124,8 @@ class DTKSIR(IDTKDefault):
             "x_Temporary_Larval_Habitat": 1
         }
 
-    @property
-    def campaign(self) -> Dict:
+    @staticmethod
+    def campaign() -> Dict:
         return {
             "Campaign_Name": "Initial Seeding",
             "Events": [
@@ -148,8 +148,8 @@ class DTKSIR(IDTKDefault):
             "Use_Defaults": 1
         }
 
-    @property
-    def demographics(self) -> Dict:
+    @staticmethod
+    def demographics() -> Dict:
         return {"generic_scenarios_demographics.json": {
             "Metadata": {
                 "DateCreated": "Sun Sep 25 23:19:55 2011",

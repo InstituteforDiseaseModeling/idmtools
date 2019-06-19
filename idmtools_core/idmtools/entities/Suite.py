@@ -1,12 +1,15 @@
+from dataclasses import field, dataclass
+
 from idmtools.core import EntityContainer, INamedEntity
-from idmtools.utils.decorators import pickle_ignore_fields
 
 
-@pickle_ignore_fields(["experiments"])
+def default_experiments():
+    return EntityContainer()
+
+
+@dataclass
 class Suite(INamedEntity):
-    def __init__(self, name: 'str'):
-        super().__init__(name=name)
-        self.experiments = EntityContainer()
+    experiments: 'EntityContainer' = field(default_factory=default_experiments, metadata={"pickle_ignore": True})
 
     def post_setstate(self):
         self.experiments = EntityContainer()

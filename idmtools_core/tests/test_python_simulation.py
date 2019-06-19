@@ -1,21 +1,20 @@
 import os
-import sys
 import unittest
 from functools import partial
 from operator import itemgetter
 
 from COMPS.Data import Experiment, QueryCriteria
 
+from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import ExperimentBuilder
+from idmtools.core import EntityStatus
 from idmtools.managers import ExperimentManager
-from idmtools.platforms import COMPSPlatform
-from idmtools.platforms import LocalPlatform
-from idmtools_models.python.PythonExperiment import PythonExperiment
+from idmtools.platforms import COMPSPlatform, LocalPlatform
+
+from idmtools_models.python import PythonExperiment
 from tests import INPUT_PATH
 from tests.utils.decorators import comps_test
 from tests.utils.ITestWithPersistence import ITestWithPersistence
-from idmtools.core import EntityStatus
-from idmtools.assets import Asset, AssetCollection
 
 
 class TestPythonSimulation(ITestWithPersistence):
