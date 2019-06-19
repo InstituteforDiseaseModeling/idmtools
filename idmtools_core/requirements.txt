@@ -4,4 +4,5 @@ dramatiq[redis]
 pyCOMPS
 marshmallow==3.0.0rc6
 prettytable==0.7.2
+diskcache
 more-itertools==7.0.0
