@@ -1,26 +1,29 @@
 from abc import ABCMeta
 from typing import Dict
 
+from idmtools.utils.decorators import abstractstatic
+
 
 class IDTKDefault(metaclass=ABCMeta):
-    @property
-    def config(self) -> Dict:
+    @abstractstatic
+    def config() -> Dict:
         return {}
 
-    @property
-    def campaign(self) -> Dict:
+    @abstractstatic
+    def campaign() -> Dict:
         return {}
 
-    @property
-    def demographics(self) -> Dict:
+    @abstractstatic
+    def demographics() -> Dict:
         return {}
 
-    def process_simulation(self, simulation):
-        if self.campaign:
-            simulation.campaign = self.campaign
+    @classmethod
+    def process_simulation(cls, simulation):
+        if cls.campaign:
+            simulation.campaign = cls.campaign()
 
-        if self.config:
-            simulation.config = self.config
+        if cls.config:
+            simulation.config = cls.config()
 
-        if self.demographics:
-            simulation.demographics = self.demographics
+        if cls.demographics:
+            simulation.demographics = cls.demographics()

@@ -5,6 +5,7 @@ if TYPE_CHECKING:
     from idmtools.analysis import IAnalyzer
     from idmtools.entities import CommandLine, IExperiment, IPlatform, ISimulation
     from idmtools.assets import Asset, AssetCollection
+    from idmtools.builders import ExperimentBuilder
 
     # Base Types
     TExperiment = TypeVar("TExperiment", bound=IExperiment)
@@ -14,6 +15,8 @@ if TYPE_CHECKING:
     TPlatform = TypeVar("TPlatform", bound=IPlatform)
     TAssetCollection = TypeVar("TAssetCollection", bound=AssetCollection)
     TAsset = TypeVar("TAsset", bound=Asset)
+    TExperimentBuilder = TypeVar("TExperimentBuilder", bound=ExperimentBuilder)
+
     TTags = Dict[str, str]
     TSimulationBatch = List[TSimulation]
 

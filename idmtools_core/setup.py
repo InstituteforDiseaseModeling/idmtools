@@ -16,6 +16,7 @@ test_requirements = ['pytest', 'pytest-runner', 'numpy==1.16.4']
 
 extras = {
     'test': test_requirements,
+    '3.6': ['dataclasses']
 }
 
 setup(

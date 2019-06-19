@@ -4,8 +4,8 @@ from idmtools_models.dtk.defaults.IDTKDefault import IDTKDefault
 
 
 class DTKEmptyCampaign(IDTKDefault):
-    @property
-    def campaign(self) -> Dict:
+    @staticmethod
+    def campaign() -> Dict:
         return {
             "Campaign_Name": "Empty campaign",
             "Events": [],

@@ -1,7 +1,8 @@
+import copy
 import typing
 from abc import ABCMeta
+from dataclasses import dataclass, field, fields
 
-from idmtools.core import PicklableObject
 from idmtools.utils.hashing import hash_obj
 
 if typing.TYPE_CHECKING:
@@ -9,16 +10,28 @@ if typing.TYPE_CHECKING:
     from idmtools.core import TTags
 
 
-class IEntity(PicklableObject, metaclass=ABCMeta):
+@dataclass
+class IEntity(metaclass=ABCMeta):
     """
     Interface for all entities in the system.
     """
+    _uid: 'uuid' = field(default=None, metadata={"md": True})
+    platform_id: int = field(default=None, metadata={"md": True})
+    tags: 'TTags' = field(default_factory=lambda: {}, metadata={"md": True})
 
-    def __init__(self, uid: 'uuid' = None, tags: 'TTags' = None):
-        super().__init__()
-        self._uid = uid
-        self.tags = tags or {}
-        self.platform_id = None
+    @property
+    def metadata(self):
+        attrs = set(vars(self).keys())
+        obj_dict = {k: getattr(self, k) for k in attrs.intersection(self.metadata_fields)}
+        return self.__class__(**obj_dict)
+
+    @property
+    def pickle_ignore_fields(self):
+        return set(f.name for f in fields(self) if "pickle_ignore" in f.metadata and f.metadata["pickle_ignore"])
+
+    @property
+    def metadata_fields(self):
+        return set(f.name for f in fields(self) if "md" in f.metadata and f.metadata["md"])
 
     @property
     def uid(self):
@@ -44,9 +57,33 @@ class IEntity(PicklableObject, metaclass=ABCMeta):
         """
         pass
 
+    def post_setstate(self):
+        """
+        Function called after restoring the state if additional initialization is required
+        """
+        pass
+
     # endregion
 
     # region State management
-    def __eq__(self, other):
-        return self.uid == other.uid
+    def __getstate__(self):
+        """
+        Ignore the fields in pickle_ignore_fields during pickling.
+        """
+        state = self.__dict__.copy()
+        attrs = set(vars(self).keys())
+
+        # Don't pickle ignore_pickle fields
+        for field_name in attrs.intersection(self.pickle_ignore_fields):
+            if field_name in state:
+                del state[field_name]
+
+        return state
+
+    def __setstate__(self, state):
+        """
+        Add ignored fields back since they don't exist in the pickle
+        """
+        self.__dict__.update(state)
+        self.post_setstate()
     # endregion

@@ -4,8 +4,8 @@ import unittest
 from functools import partial
 
 from idmtools.assets import Asset, AssetCollection
-from idmtools.core import FilterMode, DuplicatedAssetError
-from idmtools.utils.filters.asset_filters import file_name_is, asset_in_directory
+from idmtools.core import DuplicatedAssetError, FilterMode
+from idmtools.utils.filters.asset_filters import asset_in_directory, file_name_is
 from tests import INPUT_PATH
 
 

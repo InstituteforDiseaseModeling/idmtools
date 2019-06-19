@@ -2,9 +2,9 @@ import os
 import unittest
 
 from idmtools.assets import AssetCollection
-from idmtools_models.python import PythonExperiment
 from tests import INPUT_PATH
 from tests.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_models.python import PythonExperiment
 
 
 class TestPersistenceServices(ITestWithPersistence):
