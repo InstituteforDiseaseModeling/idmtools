@@ -31,8 +31,14 @@ class TestPersistenceServices(ITestWithPersistence):
     def test_fix_125(self):
         # https://github.com/InstituteforDiseaseModeling/idmtools/issues/125
         ac = AssetCollection()
-        ac.add_directory(assets_directory=os.path.join(INPUT_PATH, "regression", "107", "Assets"),
+        ac.add_directory(assets_directory=os.path.join(INPUT_PATH, "regression", "125", "Assets"),
                          relative_path="MyExternalLibrary")
+        self.assertTrue(all([a.relative_path == "MyExternalLibrary" for a in ac]))
+
+        ac = AssetCollection()
+        ac.add_directory(assets_directory=os.path.join(INPUT_PATH, "regression", "125", "Assets2"),
+                         relative_path="MyExternalLibrary")
+        self.assertTrue(all([a.relative_path.startswith("MyExternalLibrary") for a in ac]))
 
     def test_fix_142(self):
         # https://github.com/InstituteforDiseaseModeling/idmtools/issues/142
