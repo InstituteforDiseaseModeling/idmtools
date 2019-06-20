@@ -27,7 +27,7 @@ class IPersistenceService(metaclass=ABCMeta):
     def save(cls, obj):
         cache = cls._open_cache()
         if logger.isEnabledFor(logging.DEBUG):
-            logging.debug('Saving {} to {}', obj.uid, cls.cache_name)
+            logging.debug('Saving %s to %s', obj.uid, cls.cache_name)
         cache.set(obj.uid, obj)
         cache.close()
         return obj.uid
