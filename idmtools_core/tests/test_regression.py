@@ -26,5 +26,12 @@ class TestPersistenceServices(ITestWithPersistence):
                              base_simulation=s)
         self.assertEqual(e.base_simulation, s)
 
+    def test_fix_125(self):
+        # https://github.com/InstituteforDiseaseModeling/idmtools/issues/125
+        ac = AssetCollection()
+        ac.add_directory(assets_directory=os.path.join(INPUT_PATH, "regression", "107", "Assets"),
+                         relative_path="MyExternalLibrary")
+
+
 if __name__ == '__main__':
     unittest.main()
