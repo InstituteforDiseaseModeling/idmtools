@@ -269,9 +269,8 @@ class TestPythonSimulation(ITestWithPersistence):
         self.assertEqual(sorted_tags, sorted_expected_tags)
 
     @comps_test
-    @unittest.skip("Do not run this one until issue #125 and #126 are fixed")
     def test_add_prefixed_relative_path_to_assets_local(self):
-        platform = LocalPlatform()
+        platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
         name = self.casename
         model_path = os.path.join(INPUT_PATH, "python", "model.py")
         ac = AssetCollection()
@@ -285,6 +284,7 @@ class TestPythonSimulation(ITestWithPersistence):
 
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         pe.base_simulation.set_parameter("b", 10)
+        pe.base_simulation.envelope = "parameters"
 
         def param_a_update(simulation, value):
             simulation.set_parameter("a", value)

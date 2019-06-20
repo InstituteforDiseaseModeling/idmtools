@@ -24,7 +24,7 @@ class Asset:
             raise ValueError("Impossible to create the asset without either absolute path or filename and content!")
 
         self.absolute_path = absolute_path
-        self._relative_path = relative_path
+        self.relative_path = relative_path
         self.filename = filename or os.path.basename(self.absolute_path)
         self._content = content
 
@@ -37,7 +37,7 @@ class Asset:
 
     @relative_path.setter
     def relative_path(self, relative_path):
-        self._relative_path = relative_path
+        self._relative_path = relative_path.strip(" \\/") if relative_path else None
 
     @property
     def content(self) -> bytes:
