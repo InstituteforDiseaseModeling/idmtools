@@ -144,7 +144,7 @@ class COMPSPlatform(IPlatform):
             s.set_tags(simulation.tags)
             created_simulations.append(s)
 
-            Simulation.save_all(None, save_semaphore=Simulation.get_save_semaphore())
+        Simulation.save_all(None, save_semaphore=Simulation.get_save_semaphore())
 
         # Register the IDs
         return [s.id for s in created_simulations]
