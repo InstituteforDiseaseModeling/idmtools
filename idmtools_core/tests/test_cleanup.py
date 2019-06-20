@@ -8,7 +8,6 @@ from tests.utils.decorators import comps_test
 from tests.utils.ITestWithPersistence import ITestWithPersistence
 
 
-
 class TestCleanup(ITestWithPersistence):
 
     @comps_test
@@ -18,7 +17,7 @@ class TestCleanup(ITestWithPersistence):
         name = '%%,Owner=shchen'
         #name = '%Test%,Owner=shchen'  # name contains Test, and Owner is shchen
         opr = '~' if '%' in name else '='
-        qc = ['name{}{}'.format(opr, name),'date_created<={}'.format(self.get_comps_start_ndays_ago(1))] #7 days ago
+        qc = ['name{}{}'.format(opr, name),'date_created<={}'.format(self.get_comps_start_ndays_ago(7))] #7 days ago
         #ee = Experiment.get(query_criteria=QueryCriteria().where(qc)  #filter by name and owner
         #filter: name contains anything, owner=shchen, AND tag key with 'idmtools'
         ee = Experiment.get(query_criteria=QueryCriteria().where(qc).select_children('tags').where_tag(['idmtools']))

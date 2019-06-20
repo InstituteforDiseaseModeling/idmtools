@@ -18,6 +18,9 @@ class TestPersistenceServices(ITestWithPersistence):
                               model_path=os.path.join(assets_path, "model.py"),
                               assets=AssetCollection.from_directory(assets_path))
         pe.gather_assets()
+        self.assertEqual(len(pe.assets.assets), 2)
+        self.assertEqual(pe.assets.assets[0].filename, 'model.py')
+        self.assertEqual(pe.assets.assets[1].filename, '__init__.py')
 
     def test_fix_114(self):
         # https://github.com/InstituteforDiseaseModeling/idmtools/issues/114
