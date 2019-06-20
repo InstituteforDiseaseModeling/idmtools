@@ -24,12 +24,20 @@ class Asset:
             raise ValueError("Impossible to create the asset without either absolute path or filename and content!")
 
         self.absolute_path = absolute_path
-        self.relative_path = relative_path
+        self._relative_path = relative_path
         self.filename = filename or os.path.basename(self.absolute_path)
         self._content = content
 
     def __repr__(self):
-        return f"<Asset: {os.path.join(self.relative_path or '', self.filename)} from {self.absolute_path}>"
+        return f"<Asset: {os.path.join(self.relative_path, self.filename)} from {self.absolute_path}>"
+
+    @property
+    def relative_path(self):
+        return self._relative_path or ""
+
+    @relative_path.setter
+    def relative_path(self, relative_path):
+        self._relative_path = relative_path
 
     @property
     def content(self) -> bytes:
