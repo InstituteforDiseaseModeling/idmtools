@@ -4,7 +4,8 @@ import typing
 from threading import Semaphore
 
 from COMPS import Client
-from COMPS.Data import AssetCollection, AssetCollectionFile, Configuration, Experiment, Simulation, SimulationFile
+from COMPS.Data import AssetCollection, AssetCollectionFile, Configuration, Experiment, Simulation, SimulationFile, \
+    QueryCriteria
 from COMPS.Data.Simulation import SimulationState
 
 from idmtools.core import EntityStatus
@@ -16,6 +17,7 @@ if typing.TYPE_CHECKING:
 
 logger = logging.getLogger('COMPS.Data.Simulation')
 logger.disabled = True
+
 
 class COMPSPriority:
     Lowest = "Lowest"
@@ -170,8 +172,14 @@ class COMPSPlatform(IPlatform):
         self._comps_experiment_id = experiment.uid
         self._login()
 
+        comps_simulations = self.comps_experiment.get_simulations(
+            query_criteria=QueryCriteria().select(["id", "state"]))
+
         for s in experiment.simulations:
-            for comps_simulation in self.comps_experiment.get_simulations():
+            if s.done:
+                continue
+
+            for comps_simulation in comps_simulations:
                 if comps_simulation.id == s.uid:
                     s.status = COMPSPlatform._convert_COMPS_status(comps_simulation.state)
                     break
