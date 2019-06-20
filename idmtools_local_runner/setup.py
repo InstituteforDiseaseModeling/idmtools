@@ -14,9 +14,7 @@ with open('requirements.txt') as requirements_file:
 setup_requirements = []
 test_requirements = ['pytest', 'pytest-runner']
 
-extras = {
-    'test': test_requirements,
-}
+extras = dict(test=test_requirements, dev=['Pympler'])
 
 setup(
     author="Clinton Collins"
