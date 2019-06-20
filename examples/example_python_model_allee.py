@@ -1,7 +1,7 @@
 import os
 from functools import partial
 
-from idmtools.entities import ExperimentBuilder
+from idmtools.builders import ExperimentBuilder
 from idmtools.managers import ExperimentManager
 from idmtools.platforms import COMPSPlatform
 from idmtools.platforms import LocalPlatform
@@ -13,8 +13,8 @@ def param_update(simulation, param, value):
 
 
 pe = PythonExperiment(name="Allee python model example",
-                              model_path=os.path.join("work", "inputs", "allee_python_model", "run_dtk_sweep.py"),
-                              extra_libraries="pandas")
+                      model_path=os.path.join("work", "inputs", "allee_python_model", "run_dtk_sweep.py"))
+pe.base_simulation.envelope = "parameters"
 pe.retrieve_python_dependencies()
 # pe = PythonExperiment(name="Allee python model example",
 #                               model_path=os.path.join("work", "inputs", "allee_python_model", "run_dtk_sweep.py"))
@@ -35,14 +35,14 @@ class setParam:
 
 
 builder = ExperimentBuilder()
-builder.add_sweep_definition(setA, range(7850,7855))
+builder.add_sweep_definition(setA, range(7850, 7855))
 pe.base_simulation.set_parameter("fname", "runNsim100.json")
 pe.base_simulation.set_parameter("customGrid", 1)
 pe.base_simulation.set_parameter("nsims", 100)
 
 pe.builder = builder
 
-#platform = LocalPlatform()
+# platform = LocalPlatform()
 platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
 
 em = ExperimentManager(experiment=pe, platform=platform)
