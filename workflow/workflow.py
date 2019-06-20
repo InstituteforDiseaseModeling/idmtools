@@ -14,6 +14,11 @@ class Workflow:
         cache = diskcache.Cache('workflow.diskcache')
         for task in tasks:
             task.set_cache(cache)
+
+        # reset all FAILED tasks to UNSTARTED
+        for task in tasks:
+            if task.status == Task.FAILED:
+                task.status = Task.UNSTARTED
         self.dag = DAG(nodes=tasks)
 
     @property
@@ -23,8 +28,11 @@ class Workflow:
     def start(self):
         # if there is state indicating a partial run, this method should just skip all the stuff that is done
 
+        # While there are tasks that could potentially be started in the future (the non-fail-blocked, non-succeeded
+        # subgraph is not empty
+
         # we should really allow > 1 task at a time, using a single execution process (this one) for prototype
-        while not self.all_completed:
+        while len(self.get_unblocked_tasks()) > 0:
             print('Not all completed, continuing...')
             task = self.get_task_for_processing()
             if task is not None:
@@ -36,14 +44,32 @@ class Workflow:
         print('DONE EXECUTING WORKFLOW')
 
     def get_task_for_processing(self):
+        ready_tasks = self.get_ready_tasks()
+        if len(ready_tasks) > 0:
+            selected_task = ready_tasks[0]
+        else:
+            selected_task = None
+        return selected_task
+
+    def get_ready_tasks(self):
         # returns None if no task is ready for processing,
-        selected_task = None
+        ready_tasks = []
         for task in self.dag.nodes:
             dependee_tasks = task.dependees
             if task.status in Task.READY_STATUSES and all([dt.status == Task.SUCCEEDED for dt in dependee_tasks]):
-                selected_task = task
-                break
-        return selected_task
+                ready_tasks.append(task)
+        return ready_tasks
+
+    def get_unblocked_tasks(self):
+        # an unblocked task is one that is not in a self.COMPLETED state (SUCCEEDED, FAILED) and does not descend from
+        # a FAILED task. Meaning, a Task that is running or could potentially run in the future.
+        unblocked_tasks = []
+        for task in self.dag.nodes:
+            if task.status not in Task.COMPLETED_STATUSES:
+                dependee_nodes = self.dag.get_dependee_nodes(node=task, include_indirect=True)
+                if all([t.status != Task.FAILED for t in dependee_nodes]):
+                    unblocked_tasks.append(task)
+        return unblocked_tasks
 
     @property
     def all_completed(self):

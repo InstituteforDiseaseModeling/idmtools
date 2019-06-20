@@ -1,6 +1,7 @@
 import diskcache
 from pprint import pprint
 
+from file_exists_task import FileExistsTask
 from system_task import SystemTask
 from python_task import PythonTask
 from workflow import Workflow
@@ -25,9 +26,9 @@ tasks = [
 
     SystemTask(command='python --version', name='zeta', depends_on=['gamma', 'delta']),
 
-    SystemTask(command='python --version', name='eta', depends_on=['zeta']),
+    FileExistsTask(name='eta', path='continue.txt', depends_on=['zeta']),
 
-    PythonTask(name='theta', method=add, method_kwargs={'a':3, 'b': 10}, depends_on=['eta'])
+    PythonTask(name='theta', method=add, method_kwargs={'a': 3, 'b': 10}, depends_on=['eta'])
 
 ]
 
