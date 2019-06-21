@@ -18,3 +18,4 @@ cd ${LOCAL_PATH}/idmtools_core/tests
    python run_tests.py
 echo "deactivate..."
 deactivate
+
