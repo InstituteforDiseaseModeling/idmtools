@@ -10,6 +10,7 @@ cd ..
 cd idmtools_local_runner && \
 	docker-compose up -d
 pip install dataclasses
+cd ..
 LOCAL_PATH="$(realpath $(dirname '$0')/)"
 echo "auto login..."
 cd ${LOCAL_PATH}/idmtools_core/tests && \
