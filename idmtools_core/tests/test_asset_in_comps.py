@@ -2,8 +2,7 @@ import json
 import os
 import unittest
 
-from COMPS import Data
-from COMPS.Data import Experiment, QueryCriteria, Simulation
+from COMPS.Data import Experiment
 
 from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import ExperimentBuilder
@@ -12,6 +11,7 @@ from idmtools.platforms import COMPSPlatform
 from idmtools_models.python import PythonExperiment
 from tests import INPUT_PATH
 from tests.utils.decorators import comps_test
+from tests.utils.utils import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id
 
 
 @comps_test
@@ -20,8 +20,8 @@ class TestAssetsInComps(unittest.TestCase):
     def setUp(self) -> None:
         self.base_path = os.path.abspath(os.path.join(INPUT_PATH, "assets", "collections"))
         self.platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
-        self.casename = os.path.basename(__file__) + "--" + self._testMethodName
-        print(self.casename)
+        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        print(self.case_name)
 
         def setP(simulation, p):
             return simulation.set_parameter("P", p)
@@ -73,7 +73,7 @@ class TestAssetsInComps(unittest.TestCase):
             time.sleep(3)
         self.assertTrue(experiment.done)
 
-    def test_md5hashing_for_same_files_content(self):
+    def test_md5_hashing_for_same_file_contents(self):
         a = Asset(relative_path=None, filename="test.json", content=json.dumps({"a": 1, "b": 2}))
         b = Asset(relative_path=None, filename="test1.json", content=json.dumps({"a": 1, "b": 2}))
 
@@ -81,31 +81,19 @@ class TestAssetsInComps(unittest.TestCase):
         ac.add_asset(a)
         ac.add_asset(b)
 
-        pe = PythonExperiment(name=self.casename,
-                                      model_path=os.path.join(INPUT_PATH, "compsplatform", "working_model.py"), assets=ac)
+        pe = PythonExperiment(name=self.case_name,
+                              model_path=os.path.join(INPUT_PATH, "compsplatform", "working_model.py"), assets=ac)
         pe.tags = {"idmtools": "idmtools-automation"}
         self._run_and_test_experiment(pe)
         exp_id = pe.uid
-        #exp_id = 'ae077ddd-668d-e911-a2bb-f0921c167866'
+        # exp_id = 'ae077ddd-668d-e911-a2bb-f0921c167866'
         for simulation in Experiment.get(exp_id).get_simulations():
-            collection_id = self.get_asset_collection_id_for_simulation_id(simulation.id)
-            asset_collection = self.get_asset_collection_by_id(collection_id)
+            collection_id = get_asset_collection_id_for_simulation_id(simulation.id)
+            asset_collection = get_asset_collection_by_id(collection_id)
             self.assertEqual(asset_collection.assets[0]._md5_checksum, asset_collection.assets[1]._md5_checksum)
-            self.assertEqual(asset_collection.assets[0]._file_name,'test.json')
-            self.assertEqual(asset_collection.assets[1]._file_name,'test1.json')
+            self.assertEqual(asset_collection.assets[0]._file_name, 'test.json')
+            self.assertEqual(asset_collection.assets[1]._file_name, 'test1.json')
 
-    def get_asset_collection_id_for_simulation_id(self, sim_id):
-        query_criteria = QueryCriteria().select_children('configuration')
-        simulation = Simulation.get(id=sim_id, query_criteria=query_criteria)
-        collection_id = simulation.configuration.asset_collection_id
-        return collection_id
-
-    def get_asset_collection_by_id(self, collection_id, query_criteria=None):
-        query_criteria = query_criteria or QueryCriteria().select_children('assets')
-        try:
-            return Data.AssetCollection.get(collection_id, query_criteria)
-        except (RuntimeError, ValueError):
-            return None
 
 if __name__ == '__main__':
     unittest.main()
