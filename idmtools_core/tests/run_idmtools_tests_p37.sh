@@ -4,7 +4,6 @@ echo "env" $VIRTUALENV_DIR
 trap 'rm -r "${VIRTUALENV_DIR}"' EXIT
 virtualenv -p python3.7 "${VIRTUALENV_DIR}"
 source "${VIRTUALENV_DIR}/bin/activate"
-python -m pip install python3.6-tk
 cd dev_scripts
 ./setup_virtualenv.sh
 cd ..
