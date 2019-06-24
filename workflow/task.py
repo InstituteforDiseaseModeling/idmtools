@@ -1,3 +1,4 @@
+# Not intended for direct instantiation. Use subclasses
 class Task:
     UNSTARTED = 'unstarted'
     RUNNING = 'running'

@@ -18,6 +18,11 @@ class DAG:
         # resolve depends_on attribute of each node to dependent/dependee references
         self.nodes_by_name = {node.name: node for node in self.nodes}
 
+        # clear then rebuild dependees and dependents. TODO: THIS IS NOT MULTIPROCESS SAFT RIGHT NOW
+        for node in self.nodes:
+            node.dependees = []
+            node.dependents = []
+
         for node in self.nodes:
             for dependee_node_name in node.depends_on:
                 dependee_node = self.get_node_by_name(node_name=dependee_node_name)
