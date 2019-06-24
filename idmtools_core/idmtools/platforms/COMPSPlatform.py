@@ -1,7 +1,6 @@
 import logging
 import os
 import typing
-from threading import Semaphore
 
 from COMPS import Client
 from COMPS.Data import AssetCollection, AssetCollectionFile, Configuration, Experiment, Simulation, SimulationFile, \
@@ -11,6 +10,7 @@ from COMPS.Data.Simulation import SimulationState
 from idmtools.core import EntityStatus
 from idmtools.entities import IPlatform
 from idmtools.utils.time import timestamp
+from dataclasses import dataclass, field
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TExperiment
@@ -27,6 +27,7 @@ class COMPSPriority:
     Highest = "Highest"
 
 
+@dataclass
 class COMPSPlatform(IPlatform):
     """
     Represents the platform allowing to run simulations on COMPS.
@@ -34,19 +35,20 @@ class COMPSPlatform(IPlatform):
 
     MAX_SUBDIRECTORY_LENGTH = 35  # avoid maxpath issues on COMPS
 
-    def __init__(self, endpoint: 'str' = None, environment: 'str' = None, priority: 'COMPSPriority' = None):
-        super().__init__()
-        self.endpoint = endpoint or "https://comps2.idmod.org"
-        self.environment = environment or "Bayesian"
-        self.priority = priority or COMPSPriority.Lowest
-        self.simulation_root = "$COMPS_PATH(USER)\output"
-        self.node_group = "emod_abcd"
-        self.num_retires = 0
-        self.num_cores = 1
-        self.exclusive = False
+    endpoint: str = field(default="https://comps2.idmod.org")
+    environment: str = field(default="Bayesian")
+    priority: str = field(default=COMPSPriority.Lowest)
+    simulation_root: str = field(default="$COMPS_PATH(USER)\output")
+    node_group: str = field(default="emod_abcd")
+    num_retires: int = field(default=0)
+    num_cores: int = field(default=1)
+    exclusive: bool = field(default=False)
+
+    def __post_init__(self):
         self._comps_experiment = None
         self._comps_experiment_id = None
-        self._login()
+        self.update_from_config()
+        # self._login()
 
     def _login(self):
         try:
