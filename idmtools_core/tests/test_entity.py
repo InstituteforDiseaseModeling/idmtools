@@ -13,7 +13,7 @@ from tests.utils.TestExperiment import TestExperiment
 class EntityWithIgnoreField(IEntity):
     ignore: int = field(default=3, compare=False, metadata={"pickle_ignore": True})
     ignore_with_restore: int = field(default=1, compare=False, metadata={"pickle_ignore": True})
-    not_ignored:int = field(default=4, metadata={"md": True})
+    not_ignored: int = field(default=4, metadata={"md": True})
 
     def post_setstate(self):
         self.ignore_with_restore = 5

@@ -10,7 +10,13 @@ class LocalPlatform(IPlatform):
     Represents the platform allowing to run simulations locally.
     """
 
-    def restore_simulations(self, experiment: 'TExperiment') -> None:
+    def retrieve_experiment(self, experiment_id):
+        pass
+
+    def get_assets_for_simulation(self, simulation, output_files):
+        raise NotImplemented("Not implemented yet in the LocalPlatform")
+
+    def restore_simulations(self, experiment):
         raise NotImplemented("Not implemented yet in the LocalPlatform")
 
     def refresh_experiment_status(self, experiment):

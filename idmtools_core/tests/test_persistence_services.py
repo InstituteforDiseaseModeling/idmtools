@@ -1,4 +1,3 @@
-import os
 import unittest
 
 from idmtools.services.experiments import ExperimentPersistService
@@ -6,8 +5,6 @@ from idmtools.services.platforms import PlatformPersistService
 from tests.utils.ITestWithPersistence import ITestWithPersistence
 from tests.utils.TestExperiment import TestExperiment
 from tests.utils.TestPlatform import TestPlatform
-
-current_directory = os.path.dirname(os.path.realpath(__file__))
 
 
 class TestPersistenceServices(ITestWithPersistence):
@@ -21,12 +18,14 @@ class TestPersistenceServices(ITestWithPersistence):
     def test_persist_retrieve_experiment(self):
         e = TestExperiment("test")
         e.simulation()
-        e.simulation()
         ExperimentPersistService.save(e)
         e2 = ExperimentPersistService.retrieve(e.uid)
         self.assertEqual(e, e2)
         # Simulations should not be persisted
         self.assertEqual(e2.simulations, [])
+
+        e3 = ExperimentPersistService.retrieve("Missing")
+        self.assertIsNone(e3)
 
 
 if __name__ == '__main__':

@@ -1,6 +1,9 @@
 import os
+import shutil
 import uuid
 import typing
+from dataclasses import dataclass, field
+
 import diskcache
 import numpy as np
 from idmtools.entities import IPlatform
@@ -12,25 +15,27 @@ current_directory = os.path.dirname(os.path.realpath(__file__))
 data_path = os.path.abspath(os.path.join(current_directory, "..", "data"))
 
 
+@dataclass(repr=False)
 class TestPlatform(IPlatform):
     """
     Test platform simulating a working platform to use in the test suites.
     """
-    pickle_ignore_fields = ["experiments", "simulations"]
+    experiments: 'diskcache.Cache' = field(default=None, compare=False, metadata={"pickle_ignore": True})
+    simulations: 'diskcache.Cache' = field(default=None, compare=False, metadata={"pickle_ignore": True})
 
-    def __init__(self):
-        super().__init__()
-        # Create the data path
-        print(data_path)
+    def __del__(self):
+        # Close and delete the cache when finished
+        self.experiments.close()
+        self.simulations.close()
+        shutil.rmtree(data_path)
+
+    def __post_init__(self):
         os.makedirs(data_path, exist_ok=True)
-        self.experiments: diskcache.Cache = None
-        self.simulations: diskcache.Cache = None
         self.initialize_test_cache()
 
     def initialize_test_cache(self):
         """
         Create a cache experiments/simulations that will only exist during test
-        :return:
         """
         self.experiments = diskcache.Cache(os.path.join(data_path, 'experiments_test'))
         self.simulations = diskcache.Cache(os.path.join(data_path, 'simulations_test'))
@@ -73,11 +78,11 @@ class TestPlatform(IPlatform):
     def set_simulation_prob_status(self, experiment_uid, status):
         simulations = self.simulations.get(experiment_uid)
         for simulation in simulations:
-            status = np.random.choice(
+            new_status = np.random.choice(
                 a=list(status.keys()),
                 p=list(status.values())
             )
-            simulation.status = status
+            simulation.status = new_status
         self.simulations.set(experiment_uid, simulations)
 
     def run_simulations(self, experiment: 'TExperiment') -> None:
@@ -96,3 +101,11 @@ class TestPlatform(IPlatform):
                 if esim == simulation:
                     esim.status = simulation.status
                     break
+
+    def get_assets_for_simulation(self, simulation, output_files):
+        pass
+
+    def retrieve_experiment(self, experiment_id: 'uuid') -> 'TExperiment':
+        if not experiment_id in self.experiments:
+            return None
+        return self.experiments[experiment_id]
