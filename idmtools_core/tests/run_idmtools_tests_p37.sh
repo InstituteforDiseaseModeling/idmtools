@@ -2,10 +2,11 @@
 VIRTUALENV_DIR="$(mktemp -d)"
 echo "env" $VIRTUALENV_DIR
 trap 'rm -r "${VIRTUALENV_DIR}"' EXIT
-virtualenv -p python3.7 "${VIRTUALENV_DIR}"
+virtualenv -p /usr/bin/python3.7 "${VIRTUALENV_DIR}"
 source "${VIRTUALENV_DIR}/bin/activate"
 cd dev_scripts
 ./setup_virtualenv.sh
+pip install xmlrunner
 cd ..
 cd idmtools_local_runner && \
 	docker-compose up -d
