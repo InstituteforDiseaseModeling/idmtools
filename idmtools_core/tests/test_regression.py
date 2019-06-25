@@ -20,8 +20,8 @@ class TestPersistenceServices(ITestWithPersistence):
                               model_path=os.path.join(assets_path, "model.py"),
                               assets=AssetCollection.from_directory(assets_path))
         pe.gather_assets()
-        self.assertEqual(len(pe.assets.assets), 3)
-        expected_files = ['model.py','model.py', '__init__.py']
+        self.assertEqual(len(pe.assets.assets), 2)
+        expected_files = ['model.py','__init__.py']
         actual_files =[asset.filename for asset in pe.assets.assets]
         self.assertEqual(actual_files.sort(), expected_files.sort())
 

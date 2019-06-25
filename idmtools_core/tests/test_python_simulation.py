@@ -260,6 +260,7 @@ class TestPythonSimulation(ITestWithPersistence):
                              {'filename': 'functions.py', 'relative_path': 'MyExternalLibrary'}]
             self.validate_assets(assets, expected_list)
 
+
     # Test will test pythonExperiment's assets parameter which adds only specific file under
     # tests/inputs/python/Assets/MyExternalLibrary to COMPS' Assets and add relative_path MyExternalLibrary in comps
     # Comps' Assets
