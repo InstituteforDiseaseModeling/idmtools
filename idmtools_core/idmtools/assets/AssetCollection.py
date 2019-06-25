@@ -131,7 +131,6 @@ class AssetCollection(IEntity):
                 # The equality not considering the content of the asset, even if it is already present
                 # nothing guarantees that the content is the same. So remove and add the fresh one.
                 self.assets.remove(asset)
-                self.assets.append(asset)
         self.assets.append(asset)
 
     @property
