@@ -43,6 +43,9 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
             else:
                 raise Exception("A `base_simulation` or `simulation_type` needs to be provided to the Experiment object!")
 
+        # Add a tag to keep the class name
+        self.tags["type"] = self.__class__.__name__
+
     def __repr__(self):
         return f"<Experiment: {self.uid} - {self.name} / Sim count {len(self.simulations)}>"
 
@@ -83,6 +86,7 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         return sim
 
     def pre_creation(self):
+        # Gather the assets
         self.gather_assets()
 
     def post_setstate(self):
