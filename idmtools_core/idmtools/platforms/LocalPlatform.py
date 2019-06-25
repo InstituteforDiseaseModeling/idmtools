@@ -14,7 +14,6 @@ class LocalPlatform(IPlatform):
     def __post_init__(self):
         self.update_from_config()
 
-    def restore_simulations(self, experiment: 'TExperiment') -> None:
     def retrieve_experiment(self, experiment_id):
         pass
 
