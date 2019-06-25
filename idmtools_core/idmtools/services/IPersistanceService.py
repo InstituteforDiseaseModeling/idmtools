@@ -18,17 +18,21 @@ class IPersistenceService(metaclass=ABCMeta):
 
     @classmethod
     def retrieve(cls, uid):
-        cache = cls._open_cache()
-        obj = cache.get(uid)
-        cache.close()
-        return obj
+        with cls._open_cache() as cache:
+            obj = cache.get(uid)
+            return obj
 
     @classmethod
     def save(cls, obj):
-        cache = cls._open_cache()
-        if logger.isEnabledFor(logging.DEBUG):
-            logging.debug('Saving %s to %s', obj.uid, cls.cache_name)
-        cache.set(obj.uid, obj)
-        cache.close()
+        with cls._open_cache() as cache:
+            if logger.isEnabledFor(logging.DEBUG):
+                logging.debug('Saving %s to %s', obj.uid, cls.cache_name)
+            cache.set(obj.uid, obj)
+
         return obj.uid
+
+    @classmethod
+    def delete(cls, uid):
+        with cls._open_cache() as cache:
+            cache.delete(uid)
 

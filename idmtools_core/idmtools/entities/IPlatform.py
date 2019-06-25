@@ -6,6 +6,7 @@ from idmtools.config import IdmConfigParser
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TExperiment, TSimulation, TSimulationBatch
+    from typing import List, Dict
 
 
 class IPlatform(IEntity, metaclass=ABCMeta):
@@ -84,6 +85,17 @@ class IPlatform(IEntity, metaclass=ABCMeta):
             experiment: The experiment to populate
         """
         pass
+
+    @abstractmethod
+    def get_assets_for_simulation(self, simulation: 'TSimulation', output_files: 'List[str]') -> 'Dict[str, bytearray]':
+        pass
+
+    @abstractmethod
+    def retrieve_experiment(self, experiment_id: 'uuid') -> 'TExperiment':
+        pass
+
+    def __repr__(self):
+        return f"<Platform {self.__class__.__name__} - id: {self.uid}>"
 
     def update_from_config(self):
         # find, load and get settings from config file

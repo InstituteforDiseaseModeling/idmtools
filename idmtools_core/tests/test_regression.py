@@ -2,11 +2,13 @@ import os
 import unittest
 
 from idmtools.assets import AssetCollection
-from idmtools.builders import ExperimentBuilder
+from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
+from idmtools.managers import ExperimentManager
 from tests import INPUT_PATH
 from tests.utils.ITestWithPersistence import ITestWithPersistence
 from idmtools_models.python import PythonExperiment, PythonSimulation
 from tests.utils.TestExperiment import TestExperiment
+from tests.utils.TestPlatform import TestPlatform
 
 
 class TestPersistenceServices(ITestWithPersistence):
@@ -64,6 +66,40 @@ class TestPersistenceServices(ITestWithPersistence):
             self.assertTrue(len(batch) in (100, 200))
             counter += 1
         self.assertEqual(counter, 3)
+
+    def test_fix_138(self):
+        # https://github.com/InstituteforDiseaseModeling/idmtools/issues/138
+        e = TestExperiment(name="test")
+        p = TestPlatform()
+
+        # Set a parameter in the base simulation
+        e.base_simulation.set_parameter("test", 0)
+        self.assertEqual(e.base_simulation.parameters["test"], 0)
+
+        # Create a standalone simulation
+        s = e.simulation()
+        s.set_parameter("test", 10)
+        self.assertEqual(s.parameters["test"], 10)
+
+        # Create a builder and add this simulation
+        b = StandAloneSimulationsBuilder()
+        b.add_simulation(s)
+        e.builder = b
+
+        # Make sure the simulation in the builder is correct
+        self.assertEqual(b.simulations[0].parameters["test"], 10)
+        self.assertEqual(b.simulations[0], s)
+
+        # Run the experiment
+        em = ExperimentManager(e, p)
+        em.run()
+
+        # Make sure the base simulation was left untouched
+        self.assertEqual(e.base_simulation.parameters["test"], 0)
+        self.assertEqual(s.parameters["test"], 10)
+
+        # Ensure that we actually ran with the correct parameter
+        self.assertEqual(p.simulations[em.experiment.uid][0].parameters["test"], 10, "Parameter in platform")
 
 
 if __name__ == '__main__':
