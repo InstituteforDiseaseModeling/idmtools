@@ -2,7 +2,7 @@
 VIRTUALENV_DIR="$(mktemp -d)"
 echo "env" $VIRTUALENV_DIR
 trap 'rm -r "${VIRTUALENV_DIR}"' EXIT
-virtualenv -p /usr/bin/python3.6 "${VIRTUALENV_DIR}"
+virtualenv -p python3.6 "${VIRTUALENV_DIR}"
 source "${VIRTUALENV_DIR}/bin/activate"
 cd dev_scripts
 ./setup_virtualenv.sh
@@ -10,6 +10,7 @@ cd ..
 cd idmtools_local_runner && \
 	docker-compose up -d
 pip install dataclasses
+pip install xmlrunner
 cd ..
 LOCAL_PATH="$(realpath $(dirname '$0')/)"
 echo "auto login..."
