@@ -17,6 +17,6 @@ class ExampleAnalyzer(IAnalyzer):
             print("---")
 
 
-am = AnalyzeManager(experiments=["123"],
+am = AnalyzeManager(experiments=["8L47F"],
                     analyzers=[ExampleAnalyzer()])
 am.analyze()

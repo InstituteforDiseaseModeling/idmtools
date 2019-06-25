@@ -21,6 +21,7 @@ if TYPE_CHECKING:
     TSimulationBatch = List[TSimulation]
 
     TSimulationClass = Type[TSimulation]
+    TExperimentClass = Type[TExperiment]
 
     # Composed types
     TExperimentsList = List[Union[TExperiment, str]]
