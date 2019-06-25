@@ -2,6 +2,7 @@ import os
 import sys
 import glob
 import unittest
+import xmlrunner
 
 root_idmtools = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -19,4 +20,6 @@ def create_test_suite():
 
 
 testSuite = create_test_suite()
-text_runner = unittest.TextTestRunner().run(testSuite)
+#text_runner = unittest.TextTestRunner().run(testSuite)
+xml_runner = xmlrunner.XMLTestRunner(output="reports")
+results = xml_runner.run(testSuite)

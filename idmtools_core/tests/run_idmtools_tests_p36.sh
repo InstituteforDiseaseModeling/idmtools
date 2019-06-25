@@ -10,6 +10,7 @@ cd ..
 cd idmtools_local_runner && \
 	docker-compose up -d
 pip install dataclasses
+pip install xmlrunner
 cd ..
 LOCAL_PATH="$(realpath $(dirname '$0')/)"
 echo "auto login..."
