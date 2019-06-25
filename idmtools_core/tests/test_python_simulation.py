@@ -251,13 +251,15 @@ class TestPythonSimulation(ITestWithPersistence):
             collection_id = get_asset_collection_id_for_simulation_id(simulation.id)
             asset_collection = get_asset_collection_by_id(collection_id)
             assets = asset_collection.assets
-            self.assertEqual(len(assets), 4)
+            self.assertEqual(len(assets), 5)
 
             expected_list = [{'filename': '__init__.py', 'relative_path': 'MyExternalLibrary'},
                              {'filename': '__init__.py', 'relative_path': ''},
                              {'filename': 'model.py', 'relative_path': ''},
+                             {'filename': 'temp.py', 'relative_path': 'Lib'},
                              {'filename': 'functions.py', 'relative_path': 'MyExternalLibrary'}]
             self.validate_assets(assets, expected_list)
+
 
     # Test will test pythonExperiment's assets parameter which adds only specific file under
     # tests/inputs/python/Assets/MyExternalLibrary to COMPS' Assets and add relative_path MyExternalLibrary in comps
@@ -315,6 +317,7 @@ class TestPythonSimulation(ITestWithPersistence):
     # {1,3,5}
     # {6,2}
     # {7,2}
+    @comps_test
     def test_sweep_in_arms_cross(self):
         pe = PythonExperiment(name=self.case_name,
                               model_path=os.path.join(INPUT_PATH, "python", "model1.py"))
