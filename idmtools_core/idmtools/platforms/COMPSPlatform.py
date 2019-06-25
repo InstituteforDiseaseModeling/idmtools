@@ -48,7 +48,7 @@ class COMPSPlatform(IPlatform):
         self._comps_experiment = None
         self._comps_experiment_id = None
         self.update_from_config()
-        # self._login()
+        self._login()
 
     def _login(self):
         try:

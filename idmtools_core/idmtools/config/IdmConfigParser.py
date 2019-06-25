@@ -82,16 +82,18 @@ class IdmConfigParser:
         print(cls.get_config_path())
 
     @classmethod
+    def view_config_file(cls):
+        cls.ensure_init()
+        print("View Config INI: \n{}".format(cls._config_path))
+        print('-' * len(cls._config_path), '\n')
+        with open(cls._config_path) as f:
+            read_data = f.read()
+            print(read_data)
+
+    @classmethod
     def get_option(cls, section, option):
         cls.ensure_init()
         return cls._config.get(section.upper(), option)
-
-    # @classmethod
-    # def init(cls, dir_path='.', file_name=default_config):
-    #     if cls._instance:
-    #         print("IdmConfigParser has been initialized already!")
-    #     else:
-    #         cls(dir_path, file_name)
 
     @classmethod
     def ensure_init(cls, dir_path='.', file_name=default_config):
