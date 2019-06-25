@@ -22,8 +22,8 @@ pip install xmlrunner #should add this to setup requirment"
 
 echo "auto login..."
 cd ${LOCAL_PATH}/idmtools_core/tests && \
-   #python create_auth_token_args.py --comps_url "$1" --username "$2" --password "$3"
-   python create_auth_token_args.py --comps_url "https://comps2.idmod.org" --username "shchen" --password "Password123"
+   python create_auth_token_args.py --comps_url "$1" --username "$2" --password "$3"
+   #python create_auth_token_args.py --comps_url "https://comps2.idmod.org" --username "shchen" --password "Password123"
 
 echo "run all tests..."
 cd ${LOCAL_PATH}/idmtools_core/tests
