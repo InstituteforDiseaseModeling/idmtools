@@ -15,7 +15,7 @@ def cli():
 @click.option('--simulation', default=None, help="Filter status by simulation ID")
 @click.option('--status', default=None, type=click.Choice(['md5', 'sha1']))
 def status(experiment, simulation, status):
-    df = pd.DataFrame(columns=['parent_uuid',  'uid', 'status', 'data_path'])
+    df = pd.DataFrame(columns=['parent_uuid',  'uid', 'status', 'tags', 'data_path'])
 
     cache = SimulationDatabase._open_cache()
     for k in cache.iterkeys():

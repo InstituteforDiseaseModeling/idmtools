@@ -29,7 +29,7 @@ class LocalPlatform(IPlatform):
             s.status = EntityStatus.SUCCEEDED
 
     def create_experiment(self, experiment: IExperiment):
-        m = CreateExperimentTask.send()
+        m = CreateExperimentTask.send(experiment.tags)
         eid = m.get_result(block=True)
         experiment.uid = eid
         self.send_assets_for_experiment(experiment)
@@ -54,7 +54,7 @@ class LocalPlatform(IPlatform):
     def create_simulations(self, simulations_batch):
         ids = []
         for simulation in simulations_batch:
-            m = CreateSimulationTask.send(simulation.experiment.uid)
+            m = CreateSimulationTask.send(simulation.experiment.uid, simulation.tags)
             sid = m.get_result(block=True)
             simulation.uid = sid
             self.send_assets_for_simulation(simulation)

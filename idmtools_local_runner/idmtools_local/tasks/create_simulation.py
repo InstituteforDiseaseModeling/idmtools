@@ -17,7 +17,7 @@ class CreateSimulationTask(GenericActor):
         store_results = True
         max_retries = 0
 
-    def perform(self, experiment_id):
+    def perform(self, experiment_id, tags):
         import random
         import string
         uuid = ''.join(random.choice(string.digits + string.ascii_uppercase) for _ in range(5))
@@ -26,5 +26,5 @@ class CreateSimulationTask(GenericActor):
             logger.debug('Creating simulation %s for experiment %s', uuid, experiment_id)
 
         os.makedirs(os.path.join(DATA_PATH, experiment_id, uuid), exist_ok=True)
-        save_simulation_status(uuid, experiment_id)
+        save_simulation_status(uuid, experiment_id, tags)
         return uuid

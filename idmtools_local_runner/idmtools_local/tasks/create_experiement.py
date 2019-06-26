@@ -17,8 +17,7 @@ class CreateExperimentTask(GenericActor):
         store_results = True
         max_retries = 0
 
-    def perform(self):
-        print(__name__)
+    def perform(self, tags):
         import random
         import string
         uuid = ''.join(random.choice(string.digits + string.ascii_uppercase) for _ in range(5))

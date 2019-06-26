@@ -36,4 +36,4 @@ class RunTask(GenericActor):
                              simulation_uuid,  experiment_uuid, p.returncode)
             elif logger.isEnabledFor(logging.DEBUG):
                 logging.debug('Simulation %s finished with status of %s', simulation_uuid, str(status))
-            save_simulation_status(simulation_uuid, experiment_uuid, status)
+            save_simulation_status(simulation_uuid, experiment_uuid, status=status)

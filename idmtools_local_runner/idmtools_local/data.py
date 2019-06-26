@@ -1,5 +1,6 @@
 import os
 from abc import ABCMeta
+from typing import List
 
 import backoff
 
@@ -26,7 +27,7 @@ class IPersistenceService(metaclass=ABCMeta):
     @classmethod
     def retrieve(cls, uid):
         cache = cls._open_cache()
-        obj = cache.get(uid)
+        obj = cache.get(uid, None)
         cache.close()
         return obj
 
@@ -55,6 +56,7 @@ class JobStatus:
     status: Status = Status.created
     parent_uuid: str = None
     data_path: str = None
+    tags: List[str] = None
 
 
 class ExperimentDatabase(IPersistenceService):
@@ -66,8 +68,16 @@ class SimulationDatabase(IPersistenceService):
 
 
 @backoff.on_exception(backoff.expo, diskcache.core.Timeout)
-def save_simulation_status(uuid, experiment_id, status=Status.created):
-    simulation_status: JobStatus = JobStatus(uid=uuid, parent_uuid=experiment_id,
-                                             data_path=os.path.join(DATA_PATH, experiment_id, uuid),
-                                             status=status)
+def save_simulation_status(uuid, experiment_id, tags, status=Status.created):
+    if tags is None:
+        tags = []
+
+    simulation_status = SimulationDatabase.retrieve(uuid)
+    if simulation_status is None:
+        simulation_status: JobStatus = JobStatus(uid=uuid, parent_uuid=experiment_id,
+                                                 data_path=os.path.join(DATA_PATH, experiment_id, uuid),
+                                                 tags=tags,
+                                                 status=status)
+    else:
+        simulation_status.status = status
     SimulationDatabase.save(simulation_status)
