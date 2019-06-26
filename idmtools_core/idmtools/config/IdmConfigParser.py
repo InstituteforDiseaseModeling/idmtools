@@ -58,7 +58,8 @@ class IdmConfigParser:
     def _load_config_file(cls, dir_path='.', file_name=default_config):
         ini_file = cls._find_config(dir_path, file_name)
         if ini_file is None:
-            raise Exception("File '{}' Not Found!".format(file_name))
+            print("/!\\ WARNING: File '{}' Not Found!".format(file_name))
+            return
 
         print("INI File Used: {}\n".format(ini_file))
 
@@ -68,6 +69,9 @@ class IdmConfigParser:
     @classmethod
     def _get_section(cls, section=None):
         cls.ensure_init()
+        if cls._config is None:
+            return {}
+
         section = cls._config.items(section)
         return dict(section)
 
