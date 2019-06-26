@@ -23,8 +23,8 @@ RUN useradd -s /bin/bash idmtools \
       && rm -rf /tmp/s6-overlay-amd64.tar.gz
 
 # Our script that does smart user mapping
-COPY scripts/user_conf.sh /etc/cont-init.d/01-user_conf.sh
-COPY scripts/start_workers.sh /etc/services.d/idmtools_workers/run
+COPY docker_scripts /etc/cont-init.d/01-user_conf.sh
+COPY docker_scripts /etc/services.d/idmtools_workers/run
 
 WORKDIR /app
 ENV PYTHONPATH=/app:${PYTHONPATH}
