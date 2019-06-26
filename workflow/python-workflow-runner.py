@@ -13,9 +13,6 @@ def add(a, b):
     return result
 
 
-cache = diskcache.Cache('workflow.diskcache')
-
-
 tasks = [
 
     SystemTask(command='python --version', name='alpha'),

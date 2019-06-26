@@ -10,16 +10,30 @@ from DAG import DAG
 
 class Workflow:
 
-    def __init__(self, tasks):
-        cache = diskcache.Cache('workflow.diskcache')
-        for task in tasks:
-            task.set_cache(cache)
+    CACHE = diskcache.Cache('workflow.diskcache')
+
+    BLANK_CACHE_ENTRY = {
+        'name': None,
+        'tasks': []
+    }
+
+    def __init__(self, name, tasks):
+        self.name = name
+        # for task in tasks:
+        #     task.set_cache(cache)
 
         # reset all FAILED tasks to UNSTARTED
         for task in tasks:
             if task.status == Task.FAILED:
                 task.status = Task.UNSTARTED
         self.dag = DAG(nodes=tasks)
+
+        # not ALL tasks are necessarily specified in the arguments. Iterative tasks are NOT
+        # and must be discovered (they are dynamically generated). To get them, we ask every
+        # task we know about to discover and splice in the appropriate tasks.
+        for task in tasks:
+            if hasattr(task, 'discover_additional_tasks'):
+                task.discover_additional_tasks(workflow=self)
 
     @property
     def status(self):
@@ -34,14 +48,16 @@ class Workflow:
         # we should really allow > 1 task at a time, using a single execution process (this one) for prototype
         while len(self.get_unblocked_tasks()) > 0:
             print('Not all completed, continuing...')
+            print({t.name: t.status for t in self.dag.nodes})
             task = self.get_task_for_processing()
             if task is not None:
-                print(f'Got new task for running: {task.name} - {task.status}')
+                print(f'Got new task for running: {task.name} - {task.status} - {task.depends_on} - {len(task.dependees)}')
                 task.run()
             else:
                 print('No task is ready, waiting...')
                 time.sleep(1)
         print('DONE EXECUTING WORKFLOW')
+        print('Final state:\n%s' % self.status)
 
     def get_task_for_processing(self):
         ready_tasks = self.get_ready_tasks()
@@ -61,14 +77,26 @@ class Workflow:
         return ready_tasks
 
     def get_unblocked_tasks(self):
+        import sys
         # an unblocked task is one that is not in a self.COMPLETED state (SUCCEEDED, FAILED) and does not descend from
         # a FAILED task. Meaning, a Task that is running or could potentially run in the future.
         unblocked_tasks = []
         for task in self.dag.nodes:
+            print('CHECKING TO SEE IF TASK %s IS UNBLOCKED...' % task.name)
+            sys.stdout.flush()
             if task.status not in Task.COMPLETED_STATUSES:
                 dependee_nodes = self.dag.get_dependee_nodes(node=task, include_indirect=True)
                 if all([t.status != Task.FAILED for t in dependee_nodes]):
+                    print('%s IS UNBLOCKED...' % task.name)
+                    sys.stdout.flush()
                     unblocked_tasks.append(task)
+                else:
+                    print('%s IS **BLOCKED...' % task.name)
+                    sys.stdout.flush()
+            else:
+                print('%s IS ALREADY IN A COMPLETED STATE: %s' % (task.name, task.status))
+                sys.stdout.flush()
+
         return unblocked_tasks
 
     @property
@@ -122,3 +150,29 @@ class Workflow:
 
     def to_json(self):
         return self.dag.to_json()
+
+    def to_cache(self):
+        # fully update workflow & contained task state in the the caches
+        try:
+            entry = self.CACHE[self.name]
+        except KeyError:  # it a task is not in the db, create a new entry
+            entry = deepcopy(self.BLANK_CACHE_ENTRY)
+
+        # update info, then write to cache
+        entry['tasks'] = [task.name for task in self.dag.nodes]
+        self.CACHE[self.name] = entry
+        for task in self.dag.nodes:
+            task.to_cache()
+
+    def from_cache(self):
+        raise Exception('unimplemented. Do it, and do it for task classes where needed, particularly'
+                        'the dynamically created tasks. Might need to dump a lot more info to task cache?')
+
+    def build_dag(self):
+        # the purpose of this method is to make sure the in-memory/in-DB state of the workflow is
+        # the same. Otherwise, the dag knows how to build itself.
+        print('REBUILDING DAG')
+        self.dag.build()
+        print('DONE REBUILDING DAG')
+        self.to_cache()
+

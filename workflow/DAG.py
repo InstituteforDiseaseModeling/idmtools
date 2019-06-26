@@ -1,8 +1,10 @@
 class DAG:
 
-    class NoSuchNodeException(Exception): pass
+    class NoSuchNodeException(Exception):
+        pass
 
-    class LoopException(Exception): pass
+    class LoopException(Exception):
+        pass
 
     def __init__(self, nodes):
         # TODO: we currently assume each node has a different name; we should error check this
@@ -18,7 +20,7 @@ class DAG:
         # resolve depends_on attribute of each node to dependent/dependee references
         self.nodes_by_name = {node.name: node for node in self.nodes}
 
-        # clear then rebuild dependees and dependents. TODO: THIS IS NOT MULTIPROCESS SAFT RIGHT NOW
+        # clear then rebuild dependees and dependents. TODO: THIS IS NOT MULTIPROCESS SAFE RIGHT NOW
         for node in self.nodes:
             node.dependees = []
             node.dependents = []
@@ -30,6 +32,7 @@ class DAG:
                 dependee_node.dependents.append(node)
         self.verify()
 
+    # TODO: the loop detection is broken. Fix it, do it right.
     def verify(self):
         # Make sure there are no loops
         # Current algorithm may be overkill, but is sufficient. It is a search starting at each node that tries to find
@@ -39,8 +42,10 @@ class DAG:
         # why though). This algorithm will be used with a small set of nodes, so efficiency is irrelevant.
         # A simple optimization would be to start at only root nodes (add method: self.root_nodes())
         for node in self.nodes:
+            print('verifying node: %s' % node.name)
             nodes_to_check = node.dependees
             while len(nodes_to_check) > 0:
+                print('nodes to check: %s' % [n.name for n in nodes_to_check])
                 nodes_to_check_next = []
                 # print(f'Nodes to check: {[n.name for n in nodes_to_check]}')
                 for comparison_node in nodes_to_check:
@@ -54,7 +59,7 @@ class DAG:
         try:
             node = self.nodes_by_name[node_name]
         except KeyError:
-            raise self.NoSuchNode(f'Requested node with name: {node_name} not in DAG.')
+            raise self.NoSuchNodeException(f'Requested node with name: {node_name} not in DAG.') # ck4, revert node_name.name to node_name after debug
         return node
 
     def get_dependee_nodes(self, node, include_indirect=False):
@@ -71,3 +76,9 @@ class DAG:
 
     def to_json(self):
         return [node.to_json() for node in self.nodes]
+
+    def add_node(self, node):
+        # any depends_on must have already been set or the node is disjoint from the existing dag
+        if node.name not in self.nodes_by_name:
+            self.nodes.append(node)
+

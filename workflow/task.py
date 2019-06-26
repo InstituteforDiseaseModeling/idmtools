@@ -1,3 +1,6 @@
+import diskcache
+
+
 # Not intended for direct instantiation. Use subclasses
 class Task:
     UNSTARTED = 'unstarted'
@@ -6,6 +9,8 @@ class Task:
     SUCCEEDED = 'succeeded'
     READY_STATUSES = [UNSTARTED]
     COMPLETED_STATUSES = [SUCCEEDED, FAILED]
+
+    CACHE = diskcache.Cache('task.diskcache')
 
     class NoCacheException(Exception):
         pass
@@ -20,14 +25,14 @@ class Task:
         self.dependees = list()
         self.dependents = list()
 
-        self.cache = None
+    # TODO: MAJOR: update code for keeping track of task/workflow states! use two caches!
 
     # TODO: This basic implementation of diskcache-backed state only supports a single Workflow object
     # Duplicate workflows (or ones with in-common task names) will collide.
     @property
     def status(self):
         try:
-            s = self.cache[self.name]
+            s = self.CACHE[self.name]
         except KeyError:  # it a task is not in the db, add it as unstarted
             s = self.UNSTARTED
             self.status = s
@@ -35,14 +40,18 @@ class Task:
 
     @status.setter
     def status(self, value):
-        self.cache[self.name] = value
+        self.CACHE[self.name] = value
         return self.status
 
     def set_cache(self, cache):
-        self.cache = cache
+        self.CACHE = cache
+
+    def to_cache(self):
+        # force write of status to cache
+        self.CACHE[self.name] = self.status
 
     def run(self):
-        if self.cache is None:
+        if self.CACHE is None:
             raise self.NoCacheException('The state cache for the task has not been set. Cannot execute.')
         if self.status not in self.READY_STATUSES:
             raise Exception(f'Cannot run task {self.name}, status: {self.status}. '
