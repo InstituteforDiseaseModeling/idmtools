@@ -40,3 +40,7 @@ class TestConfig(ITestWithPersistence):
         max_threads = IdmConfigParser.get_option("COMMON", 'max_threads')
         self.assertEqual(int(max_threads), 16)
 
+        idm = IdmConfigParser()
+        max_threads = idm.get_option("COMMON", 'max_threads')
+        self.assertEqual(int(max_threads), 16)
+
