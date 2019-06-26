@@ -47,11 +47,11 @@ class IdmConfigParser:
             cls._config_path = os.path.join(full_dir_path, file_name)
             return cls._config_path
         else:
-            dir = os.path.dirname(full_dir_path)
-            if dir == full_dir_path:
+            dir_parent = os.path.dirname(full_dir_path)
+            if dir_parent == full_dir_path:
                 return None
             else:
-                cls._config_path = cls._find_config(dir, file_name)
+                cls._config_path = cls._find_config(dir_parent, file_name)
                 return cls._config_path
 
     @classmethod
