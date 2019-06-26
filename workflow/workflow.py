@@ -22,10 +22,6 @@ class Workflow:
         # for task in tasks:
         #     task.set_cache(cache)
 
-        # reset all FAILED tasks to UNSTARTED
-        for task in tasks:
-            if task.status == Task.FAILED:
-                task.status = Task.UNSTARTED
         self.dag = DAG(nodes=tasks)
 
         # not ALL tasks are necessarily specified in the arguments. Iterative tasks are NOT
@@ -34,6 +30,12 @@ class Workflow:
         for task in tasks:
             if hasattr(task, 'discover_additional_tasks'):
                 task.discover_additional_tasks(workflow=self)
+
+        # reset all FAILED tasks to UNSTARTED, including discovered ones
+        for task in tasks:
+            if task.status == Task.FAILED:
+                task.status = Task.UNSTARTED
+
 
     @property
     def status(self):
