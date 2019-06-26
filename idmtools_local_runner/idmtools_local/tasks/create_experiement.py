@@ -1,5 +1,7 @@
 import os
-from dramatiq import GenericActor
+from dramatiq import GenericActor, get_broker
+
+from idmtools_local.config import DATA_PATH
 from idmtools_local.core.Data import JobStatus, ExperimentDatabase
 
 
@@ -24,6 +26,8 @@ class CreateExperimentTask(GenericActor):
         experiment_status: JobStatus = JobStatus(uid=uuid, data_path=os.path.join("/data", uuid))
         ExperimentDatabase.save(experiment_status)
 
-        os.mkdir(os.path.join("/data", uuid))
-        os.mkdir(os.path.join("/data", uuid, "Assets"))
+        os.makedirs(os.path.join(DATA_PATH, uuid, "Assets"), exist_ok=True)
         return uuid
+
+broker = get_broker()
+broker.declare_actor(CreateExperimentTask)

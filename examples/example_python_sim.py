@@ -3,7 +3,6 @@ from functools import partial
 
 from idmtools.builders import ExperimentBuilder
 from idmtools.managers import ExperimentManager
-from idmtools.platforms import COMPSPlatform
 from idmtools.platforms import LocalPlatform
 from idmtools_models.python.PythonExperiment import PythonExperiment
 

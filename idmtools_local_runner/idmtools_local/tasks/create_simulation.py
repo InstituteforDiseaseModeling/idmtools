@@ -1,5 +1,7 @@
 import os
 from dramatiq import GenericActor
+
+from idmtools_local.config import DATA_PATH
 from idmtools_local.core.Data import JobStatus
 from idmtools_local.data import SimulationDatabase
 
@@ -21,8 +23,8 @@ class CreateSimulationTask(GenericActor):
         uuid = ''.join(random.choice(string.digits + string.ascii_uppercase) for _ in range(5))
 
         simulation_status: JobStatus = JobStatus(uid=uuid, parent_uuid= experiment_id,
-                                                 data_path=os.path.join("/data", experiment_id, uuid))
+                                                 data_path=os.path.join(DATA_PATH, experiment_id, uuid))
         SimulationDatabase.save(simulation_status)
 
-        os.mkdir(os.path.join("/data", experiment_id, uuid))
+        os.mkdir(os.path.join(DATA_PATH, experiment_id, uuid))
         return uuid
