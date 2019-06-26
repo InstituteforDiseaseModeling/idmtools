@@ -98,9 +98,6 @@ class IPlatform(IEntity, metaclass=ABCMeta):
         return f"<Platform {self.__class__.__name__} - id: {self.uid}>"
 
     def update_from_config(self):
-        # find, load and get settings from config file
-        field_config = IdmConfigParser.retrieve_settings(self.__class__.__name__.upper())
-
         # retrieve field values, default values and types
         fds = fields(self)
         field_name = [f.name for f in fields(self)]
