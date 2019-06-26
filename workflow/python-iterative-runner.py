@@ -82,3 +82,15 @@ pprint(final_status)
 # import json
 # print('Final json representation:')
 # print(json.dumps(wf.to_json(), indent=2))
+
+
+
+# Questions/Discussion:
+# - passing results from one task to another (can we do it programmatically for PythonTasks?)
+# - discovery of iterative tasks seems bad. But where else to store/find their definitions if
+#   they are generated programmatically? Their data can include function names (can we pickle this?)
+# - appropriate data store type/usage?
+# - iteration: the alternatives to adding new tasks to a workflow are:
+#   - Having a loop task with additional written-out state (e.g. ids of workflows attached to loop passes)
+#   - Having no iteration in tasks directly. Iteration is handled by individual tasks themselves internally
+#     (e.g. run_calib_iterations.py <calib_dir> -n_iter 10
