@@ -59,11 +59,12 @@ class COMPSPlatform(IPlatform):
 
     @property
     def comps_experiment(self):
-        if self._comps_experiment and str(self._comps_experiment.id) == self._comps_experiment_id:
+        if self._comps_experiment and self._comps_experiment.id == self._comps_experiment_id:
             return self._comps_experiment
 
         self._login()
-        self._comps_experiment = COMPSExperiment.get(id=self._comps_experiment_id)
+        self._comps_experiment = COMPSExperiment.get(id=self._comps_experiment_id,
+                                                     query_criteria=QueryCriteria().select(["id"]).select_children(["tags"]))
         return self._comps_experiment
 
     @comps_experiment.setter
@@ -154,6 +155,7 @@ class COMPSPlatform(IPlatform):
 
     def run_simulations(self, experiment: 'TExperiment'):
         self._login()
+        self._comps_experiment_id = experiment.uid
         self.comps_experiment.commission()
 
     @staticmethod
@@ -199,10 +201,9 @@ class COMPSPlatform(IPlatform):
             experiment.simulations.append(sim)
 
     def retrieve_experiment(self, experiment_id: 'uuid') -> 'TExperiment':
-        comps_experiment = COMPSExperiment.get(experiment_id,
-                                               query_criteria=QueryCriteria().select(["id"]).select_children(["tags"]))
-        experiment = experiment_factory.create(comps_experiment.tags.get("type"), tags=comps_experiment.tags)
-        experiment.uid = comps_experiment.id
+        self._comps_experiment_id = experiment_id
+        experiment = experiment_factory.create(self.comps_experiment.tags.get("type"), tags=self.comps_experiment.tags)
+        experiment.uid = self.comps_experiment.id
         return experiment
 
     def get_assets_for_simulation(self, simulation, output_files):

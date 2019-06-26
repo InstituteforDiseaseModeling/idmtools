@@ -9,7 +9,7 @@ if typing.TYPE_CHECKING:
     import uuid
 
 
-def retrieve_experiment(experiment_id:'uuid', platform: 'TPlatform' = None) -> 'TExperiment':
+def retrieve_experiment(experiment_id:'uuid', platform: 'TPlatform' = None, with_simulations:'bool'=False) -> 'TExperiment':
     experiment = ExperimentPersistService.retrieve(experiment_id)
     if experiment:
         return experiment
@@ -21,6 +21,10 @@ def retrieve_experiment(experiment_id:'uuid', platform: 'TPlatform' = None) -> '
     experiment = platform.retrieve_experiment(experiment_id)
     if not experiment:
         raise ExperimentNotFound(experiment_id, platform)
+
+    # Restore the simulations as well?
+    if with_simulations:
+        platform.restore_simulations(experiment)
 
     # We have the experiment -> persist and return
     experiment.platform_id = PlatformPersistService.save(platform)
