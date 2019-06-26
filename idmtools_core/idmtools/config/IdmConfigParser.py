@@ -10,7 +10,7 @@ class IdmConfigParser:
     _instance = None
     _config_path = None
 
-    def __new__(cls, dir_path, file_name):
+    def __new__(cls, dir_path='.', file_name=default_config):
         if not cls._instance:
             cls._instance = super(IdmConfigParser, cls).__new__(cls)
             cls._instance._load_config_file(dir_path, file_name)
