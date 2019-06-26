@@ -122,13 +122,15 @@ class AssetCollection(IEntity):
 
         Args:
            asset: An `idmtools.assets.Asset` object to add.
-           fail_on_duplicate: Raise a `DuplicateAssetError` if an asset is duplicated.
+           fail_on_duplicate: Raise a `DuplicateAssetError` if an asset is duplicated. If not, simply replace it.
         """
         if asset in self.assets:
             if fail_on_duplicate:
                 raise DuplicatedAssetError(asset)
             else:
-                return
+                # The equality not considering the content of the asset, even if it is already present
+                # nothing guarantees that the content is the same. So remove and add the fresh one.
+                self.assets.remove(asset)
         self.assets.append(asset)
 
     @property

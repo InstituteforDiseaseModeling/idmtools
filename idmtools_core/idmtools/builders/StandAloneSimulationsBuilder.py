@@ -13,7 +13,7 @@ class StandAloneSimulationsBuilder(ExperimentBuilder):
 
     @staticmethod
     def set_simulation(simulation, simulation_to_set):
-        simulation = simulation_to_set
+        simulation.__dict__ = simulation_to_set.__dict__
         return {}
 
     def __iter__(self):

@@ -18,7 +18,8 @@ class TestCOMPSPlatform(ITestWithPersistence):
     def setUp(self) -> None:
         super().setUp()
         self.platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
-
+        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        print(self.case_name)
         def setP(simulation, p):
             return simulation.set_parameter("P", p)
 
@@ -67,20 +68,20 @@ class TestCOMPSPlatform(ITestWithPersistence):
         self.assertTrue(experiment.done)
 
     def test_status_retrieval_succeeded(self):
-        experiment = PythonExperiment(name="Test Python Experiment Success",
+        experiment = PythonExperiment(name=self.case_name,
                                       model_path=os.path.join(INPUT_PATH, "compsplatform", "working_model.py"))
         self._run_and_test_experiment(experiment)
         self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in experiment.simulations]))
 
     def test_status_retrieval_failed(self):
-        experiment = PythonExperiment(name="Test Python Experiment Failed",
+        experiment = PythonExperiment(name=self.case_name,
                                       model_path=os.path.join(INPUT_PATH, "compsplatform", "failing_model.py"))
         self._run_and_test_experiment(experiment)
         self.assertTrue(all([s.status == EntityStatus.FAILED for s in experiment.simulations]))
         self.assertFalse(experiment.succeeded)
 
     def test_status_retrieval_mixed(self):
-        experiment = PythonExperiment(name="Test Python Experiment Mixed",
+        experiment = PythonExperiment(name=self.case_name,
                                       model_path=os.path.join(INPUT_PATH, "compsplatform", "mixed_model.py"))
         self._run_and_test_experiment(experiment)
         self.assertTrue(experiment.done)
@@ -89,7 +90,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
             self.assertTrue(s.tags["P"] == 2 and s.status == EntityStatus.FAILED or s.status == EntityStatus.SUCCEEDED)
 
     def test_from_experiment(self):
-        experiment = PythonExperiment(name="Test Python Experiment Success",
+        experiment = PythonExperiment(name=self.case_name,
                                       model_path=os.path.join(INPUT_PATH, "compsplatform", "working_model.py"))
         self._run_and_test_experiment(experiment)
         experiment2 = copy.deepcopy(experiment)
