@@ -47,7 +47,7 @@ iteration_args = {
 }
 
 iteration_mgr = IterationManagerPythonTask(name='iteration-manager',
-                                           depends_on=['alpha', 'beta'],
+                                           depends_on=['rename_file'],
                                            iteration_args=iteration_args,  # these define it
                                            workflow=None)  # must be set after Workflow creation to be functional
 
@@ -58,7 +58,10 @@ tasks = [
     iteration_mgr,
     SystemTask(name='gamma', command='python --version', depends_on=['iteration-manager']),
     PythonTask(name='delta', method=add, method_kwargs={'a': 3, 'b': 10}, depends_on=['gamma', 'zeta']),
-    FinalizeTask(name='finalize', depends_on=[])
+    FinalizeTask(name='finalize', depends_on=[]),
+
+    PythonTask(name='rename_file', method=rename_file, method_kwargs={'file': 'rename_me.csv', 'to': 'add_result_-1.csv'},
+               depends_on=['alpha', 'beta'])
 
 ]
 
@@ -79,8 +82,6 @@ pprint(final_status)
 # print('Final json representation:')
 # print(json.dumps(wf.to_json(), indent=2))
 
-# PythonTask(name='rename_file', method=rename_file, method_kwargs={'file': 'rename_me.csv', 'to': 'add_result_-1.csv'},
-#            depends_on=['alpha', 'beta'])
 
 # Questions/Discussion:
 # - passing results from one task to another (can we do it programmatically for PythonTasks?)

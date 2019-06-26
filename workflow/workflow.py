@@ -84,20 +84,20 @@ class Workflow:
         # a FAILED task. Meaning, a Task that is running or could potentially run in the future.
         unblocked_tasks = []
         for task in self.dag.nodes:
-            print('CHECKING TO SEE IF TASK %s IS UNBLOCKED...' % task.name)
+            # print('CHECKING TO SEE IF TASK %s IS UNBLOCKED...' % task.name)
             sys.stdout.flush()
             if task.status not in Task.COMPLETED_STATUSES:
                 dependee_nodes = self.dag.get_dependee_nodes(node=task, include_indirect=True)
                 if all([t.status != Task.FAILED for t in dependee_nodes]):
-                    print('%s IS UNBLOCKED...' % task.name)
+                    # print('%s IS UNBLOCKED...' % task.name)
                     sys.stdout.flush()
                     unblocked_tasks.append(task)
-                else:
-                    print('%s IS **BLOCKED...' % task.name)
-                    sys.stdout.flush()
-            else:
-                print('%s IS ALREADY IN A COMPLETED STATE: %s' % (task.name, task.status))
-                sys.stdout.flush()
+            #     else:
+            #         print('%s IS **BLOCKED...' % task.name)
+            #         sys.stdout.flush()
+            # else:
+            #     print('%s IS ALREADY IN A COMPLETED STATE: %s' % (task.name, task.status))
+            #     sys.stdout.flush()
 
         return unblocked_tasks
 
@@ -173,8 +173,8 @@ class Workflow:
     def build_dag(self):
         # the purpose of this method is to make sure the in-memory/in-DB state of the workflow is
         # the same. Otherwise, the dag knows how to build itself.
-        print('REBUILDING DAG')
+        # print('REBUILDING DAG')
         self.dag.build()
-        print('DONE REBUILDING DAG')
+        # print('DONE REBUILDING DAG')
         self.to_cache()
 

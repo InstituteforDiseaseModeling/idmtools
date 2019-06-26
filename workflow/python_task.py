@@ -2,6 +2,7 @@ from task import Task
 
 import traceback
 
+
 class PythonTask(Task):
 
     def __init__(self, method, method_kwargs=None, **kwargs):
@@ -15,7 +16,7 @@ class PythonTask(Task):
         self.status = self.RUNNING
         print(f'>>>\nRunning task: {self.name}')
         try:
-            print('%s %s' % (self.method, self.method_kwargs))
+            # print('%s %s' % (self.method, self.method_kwargs))
             result, next_status = self.method(**self.method_kwargs)
         except:
             print(f'Error in task {self.name}:')
