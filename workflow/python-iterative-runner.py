@@ -1,6 +1,5 @@
 from pprint import pprint
 
-# from file_exists_task import FileExistsTask
 from finalize_task import FinalizeTask
 from system_task import SystemTask
 from python_task import PythonTask
@@ -63,9 +62,6 @@ tasks = [
 
 ]
 
-# PythonTask(name='rename_file', method=rename_file, method_kwargs={'file': 'rename_me.csv', 'to': 'add_result_-1.csv'},
-#            depends_on=['alpha', 'beta'])
-
 wf = Workflow(name='demo', tasks=tasks)
 iteration_mgr.workflow = wf
 
@@ -83,7 +79,8 @@ pprint(final_status)
 # print('Final json representation:')
 # print(json.dumps(wf.to_json(), indent=2))
 
-
+# PythonTask(name='rename_file', method=rename_file, method_kwargs={'file': 'rename_me.csv', 'to': 'add_result_-1.csv'},
+#            depends_on=['alpha', 'beta'])
 
 # Questions/Discussion:
 # - passing results from one task to another (can we do it programmatically for PythonTasks?)
