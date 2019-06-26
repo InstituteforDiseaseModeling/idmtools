@@ -1,11 +1,10 @@
 import logging
 import os
-from logging import getLogger
-from dramatiq import GenericActor, get_broker
+from dramatiq import GenericActor
 
 from idmtools_local.config import DATA_PATH
 
-logger = getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class AddAssetTask(GenericActor):
@@ -19,9 +18,8 @@ class AddAssetTask(GenericActor):
         max_retries = 0
 
     def perform(self, experiment_id, filename, path=None, contents=None, simulation_id=None):
-        print(__name__)
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug('Adding assets for Experiment %s, simulation_id %s', experiment_id)
+            logger.debug('Adding assets for Experiment %s', experiment_id)
         path = os.path.join(DATA_PATH, experiment_id, simulation_id or "Assets", path or "", filename)
 
         # Sometimes, workers tries to create the same folder at the same time, silence the exception
@@ -33,6 +31,3 @@ class AddAssetTask(GenericActor):
 
         with open(path, "wb") as fp:
             fp.write(bytes(contents, 'utf-8'))
-
-broker = get_broker()
-broker.declare_actor(AddAssetTask)

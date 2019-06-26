@@ -10,11 +10,12 @@ services:
   workers:
     build:
       context: .
+      #image: idmtools_local.workers
     environment:
       - REDIS_URL=redis://redis:6379
-    command: "dramatiq --verbose brokers:redis_broker tasks --watch ."
     volumes:
-      - ./idmtools_local:/app
+      # You should only link in the library in development
+      #- ./idmtools_local:/app/idmtools_local
       - ../data/workers:/data
     depends_on:
       - redis
