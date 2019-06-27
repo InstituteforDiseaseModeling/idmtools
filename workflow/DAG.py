@@ -43,17 +43,27 @@ class DAG:
         # A simple optimization would be to start at only root nodes (add method: self.root_nodes())
         for node in self.nodes:
             print('verifying node: %s' % node.name)
-            nodes_to_check = node.dependees
-            while len(nodes_to_check) > 0:
-                print('nodes to check: %s' % [n.name for n in nodes_to_check])
-                nodes_to_check_next = []
-                # print(f'Nodes to check: {[n.name for n in nodes_to_check]}')
-                for comparison_node in nodes_to_check:
-                    if comparison_node.name == node.name:
-                        raise self.LoopException(f'Loop detected in DAG including node: {node.name}')
-                    else:
-                        nodes_to_check_next += comparison_node.dependees
-                nodes_to_check = nodes_to_check_next
+            loop_detected = self.loop_check(node)
+            if loop_detected is not None:
+                raise self.LoopException(f'Loop detected in DAG including node: {loop_detected.name}')
+
+    def loop_check(self, node, node_path=None):
+        # Returns None if no loop is detected starting at node, returns the first node in a detected loop otherwise
+        node_path = list() if node_path is None else node_path
+        if node.name in [visited.name for visited in node_path]:
+            return node  # loop detected involving this node (report it)
+        else:
+            # descend through this node's dependents
+            loop_detected = None
+            for dependent in node.dependents:
+                loop_detected = self.loop_check(dependent, node_path=node_path + [node])
+                if loop_detected:
+                    break
+        return loop_detected
+
+
+
+
 
     def get_node_by_name(self, node_name):
         try:
