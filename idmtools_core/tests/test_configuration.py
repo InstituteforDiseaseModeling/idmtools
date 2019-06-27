@@ -1,7 +1,7 @@
 import os
 from idmtools.config import IdmConfigParser
-from idmtools.platforms import COMPSPlatform, LocalPlatform, PlatformType
-from idmtools.platforms.PlatformFactory import PlatformFactory
+from idmtools.platforms import COMPSPlatform, LocalPlatform
+from idmtools.platforms.PlatformFactory import PlatformFactory, PlatformType
 from tests.utils.ITestWithPersistence import ITestWithPersistence
 
 
@@ -44,3 +44,8 @@ class TestConfig(ITestWithPersistence):
         max_threads = idm.get_option("COMMON", 'max_threads')
         self.assertEqual(int(max_threads), 16)
 
+    def test_idmtools_path(self):
+        IdmConfigParser("./inputs/configuration/", "idmtools_test.ini")
+        platform = COMPSPlatform()
+        file_path = os.path.join("./inputs/configuration/","idmtools_test.ini" )
+        self.assertEqual(IdmConfigParser.get_config_path(), os.path.abspath(file_path))

@@ -19,6 +19,9 @@ class IPlatform(IEntity, metaclass=ABCMeta):
     - File handling
     """
 
+    def __post_init__(self):
+        self.update_from_config()
+
     @abstractmethod
     def create_experiment(self, experiment: 'TExperiment') -> None:
         """
