@@ -19,7 +19,10 @@ class IPlatform(IEntity, metaclass=ABCMeta):
     - File handling
     """
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
+        """
+        Got called from Platform creation
+        """
         self.update_from_config()
 
     @abstractmethod
@@ -100,7 +103,7 @@ class IPlatform(IEntity, metaclass=ABCMeta):
     def __repr__(self):
         return f"<Platform {self.__class__.__name__} - id: {self.uid}>"
 
-    def update_from_config(self):
+    def update_from_config(self) -> None:
         # retrieve field values, default values and types
         fds = fields(self)
         field_name = [f.name for f in fields(self)]
@@ -124,5 +127,3 @@ class IPlatform(IEntity, metaclass=ABCMeta):
                 setattr(self, fn, field_value[fn])
             elif field_config[fn] != field_value[fn]:
                 setattr(self, fn, field_config[fn])
-            else:
-                pass
