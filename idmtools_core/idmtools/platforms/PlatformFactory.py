@@ -1,4 +1,10 @@
-from idmtools.platforms import PlatformType
+from enum import Enum
+from idmtools.platforms import LocalPlatform, COMPSPlatform
+
+
+class PlatformType(Enum):
+    COMPSPlatform = COMPSPlatform
+    LocalPlatform = LocalPlatform
 
 
 class PlatformFactory:

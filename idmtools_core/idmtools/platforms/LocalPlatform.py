@@ -12,7 +12,7 @@ class LocalPlatform(IPlatform):
     """
 
     def __post_init__(self):
-        self.update_from_config()
+        super().__post_init__()
 
     def retrieve_experiment(self, experiment_id):
         pass

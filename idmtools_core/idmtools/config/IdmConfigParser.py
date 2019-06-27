@@ -31,12 +31,10 @@ class IdmConfigParser:
 
         for fn in fs:
             ft = field_type[fn]
-            if ft in [int, float, str]:
+            if ft in (int, float, str):
                 field_config_updated[fn] = ft(field_config[fn])
             elif ft is bool:
                 field_config_updated[fn] = ast.literal_eval(field_config[fn])
-            else:
-                pass
 
         return field_config_updated
 
@@ -86,7 +84,7 @@ class IdmConfigParser:
         return cls._config_path
 
     @classmethod
-    def display_config_path(cls) -> object:
+    def display_config_path(cls):
         cls.ensure_init()
         print(cls.get_config_path())
 
