@@ -119,3 +119,9 @@ class IdmConfigParser:
     def ensure_init(cls, dir_path: str = '.', file_name: str = default_config):
         if cls._instance is None:
             cls(dir_path, file_name)
+
+    @classmethod
+    def clear_instance(cls):
+        cls._config = None
+        cls._instance = None
+        cls._config_path = None
