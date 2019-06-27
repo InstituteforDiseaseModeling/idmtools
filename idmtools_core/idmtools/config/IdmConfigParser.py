@@ -72,6 +72,11 @@ class IdmConfigParser:
         if cls._config is None:
             return {}
 
+        section_dict = dict(cls._config.items())
+        if section not in section_dict:
+            print("/!\\ WARNING: Section '{}' Not Found!".format(section))
+            return {}
+
         section = cls._config.items(section)
         return dict(section)
 
