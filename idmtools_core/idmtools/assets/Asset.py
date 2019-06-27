@@ -29,7 +29,15 @@ class Asset:
         self._content = content
 
     def __repr__(self):
-        return f"<Asset: {os.path.join(self.relative_path or '', self.filename)} from {self.absolute_path}>"
+        return f"<Asset: {os.path.join(self.relative_path, self.filename)} from {self.absolute_path}>"
+
+    @property
+    def relative_path(self):
+        return self._relative_path or ""
+
+    @relative_path.setter
+    def relative_path(self, relative_path):
+        self._relative_path = relative_path.strip(" \\/") if relative_path else None
 
     @property
     def content(self) -> bytes:

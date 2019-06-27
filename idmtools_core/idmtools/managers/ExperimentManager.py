@@ -3,6 +3,7 @@ import typing
 from idmtools.core import EntityStatus
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.services.platforms import PlatformPersistService
+from idmtools.utils.entities import retrieve_experiment
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TExperiment, TPlatform
@@ -23,8 +24,8 @@ class ExperimentManager:
         self.experiment = experiment
 
     @classmethod
-    def from_experiment_id(cls, experiment_id):
-        experiment = ExperimentPersistService.retrieve(str(experiment_id))
+    def from_experiment_id(cls, experiment_id, platform):
+        experiment = retrieve_experiment(experiment_id, platform)
         platform = PlatformPersistService.retrieve(experiment.platform_id)
         em = cls(experiment, platform)
         em.restore_simulations()
