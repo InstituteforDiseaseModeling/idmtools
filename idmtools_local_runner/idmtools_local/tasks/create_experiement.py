@@ -2,9 +2,10 @@ import logging
 import os
 from dramatiq import GenericActor
 from idmtools_local.config import DATA_PATH
-from idmtools_local.data import JobStatus, ExperimentDatabase
+from idmtools_local.utils import create_or_update_status
 
 logger = logging.getLogger(__name__)
+
 
 class CreateExperimentTask(GenericActor):
     """
@@ -20,16 +21,18 @@ class CreateExperimentTask(GenericActor):
     def perform(self, tags):
         import random
         import string
-        uuid = ''.join(random.choice(string.digits + string.ascii_uppercase) for _ in range(5))
+        uuid = ''.join(random.choice(string.digits + string.ascii_uppercase) for _ in range(8))
         if logger.isEnabledFor(logging.INFO):
             logger.debug('Creating experiment with id %s', uuid)
 
-        # Save our experiment to our local platform db
-        experiment_status: JobStatus = JobStatus(uid=uuid, data_path=os.path.join(DATA_PATH, uuid))
-        ExperimentDatabase.save(experiment_status)
+        data_path = os.path.join(DATA_PATH, uuid)
 
-        asset_path = os.path.join(DATA_PATH, uuid, "Assets")
+        # Update the database with experiment
+        create_or_update_status(uuid, data_path, tags)
+
+        asset_path = os.path.join(data_path, "Assets")
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug('Creating asset directory for experiment %s at %s', uuid, asset_path)
         os.makedirs(asset_path, exist_ok=True)
         return uuid
+
