@@ -1,2 +1,5 @@
 #!/usr/bin/with-contenv sh
-exec /usr/local/bin/dramatiq --verbose idmtools_local.brokers:redis_broker idmtools_local.run
+
+# This script launches the idmtools locald workers
+
+exec /usr/local/bin/dramatiq  idmtools_local.brokers:redis_broker idmtools_local.run
