@@ -104,6 +104,11 @@ class IPlatform(IEntity, metaclass=ABCMeta):
         return f"<Platform {self.__class__.__name__} - id: {self.uid}>"
 
     def update_from_config(self) -> None:
+        """
+        Get INI config values and update platform values by the priority rules:
+            #1 Code, #2 INI config, #2 default
+        Returns: None
+        """
         # retrieve field values, default values and types
         fds = fields(self)
         field_name = [f.name for f in fields(self)]
