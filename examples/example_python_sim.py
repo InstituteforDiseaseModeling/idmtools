@@ -3,7 +3,7 @@ from functools import partial
 
 from idmtools.builders import ExperimentBuilder
 from idmtools.managers import ExperimentManager
-from idmtools.platforms import LocalPlatform
+from idmtools.platforms import LocalPlatform, COMPSPlatform
 from idmtools_models.python.PythonExperiment import PythonExperiment
 
 
@@ -34,6 +34,9 @@ builder.add_sweep_definition(setParam("b"), [1, 2, 3])
 experiment.builder = builder
 
 platform = LocalPlatform()
+# You can easily switch platforms by simply commenting out the previous line and then
+# uncommenting the following line
+#platform = COMPSPlatform()
 
 em = ExperimentManager(experiment=experiment, platform=platform)
 em.run()
