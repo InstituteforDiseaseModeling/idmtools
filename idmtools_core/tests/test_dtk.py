@@ -3,6 +3,7 @@ import os
 
 from COMPS.Data import Experiment
 from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
+from idmtools.config import IdmConfigParser
 from idmtools.managers import ExperimentManager
 from idmtools.platforms import COMPSPlatform
 from tests.utils.decorators import comps_test
@@ -20,7 +21,8 @@ class TestDTK(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
-        self.p = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
+        IdmConfigParser()
+        self.p = COMPSPlatform()
 
     def test_sir_with_StandAloneSimulationsBuilder(self):
         e = DTKExperiment.from_default(self.case_name, default=DTKSIR,

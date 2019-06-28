@@ -1,10 +1,11 @@
 from dramatiq import group
-
+from dataclasses import dataclass
 from idmtools.core import EntityStatus
 from idmtools.entities import IExperiment, IPlatform
 from idmtools_local.core import AddAssetTask, CreateExperimentTask, CreateSimulationTask, RunTask
 
 
+@dataclass
 class LocalPlatform(IPlatform):
     """
     Represents the platform allowing to run simulations locally.

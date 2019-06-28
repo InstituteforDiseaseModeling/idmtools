@@ -30,6 +30,7 @@ class TestPlatform(IPlatform):
         shutil.rmtree(data_path)
 
     def __post_init__(self):
+        super().__post_init__()
         os.makedirs(data_path, exist_ok=True)
         self.initialize_test_cache()
 
