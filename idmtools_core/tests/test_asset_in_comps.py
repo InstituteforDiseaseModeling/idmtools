@@ -6,6 +6,7 @@ from COMPS.Data import Experiment
 
 from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import ExperimentBuilder
+from idmtools.config import IdmConfigParser
 from idmtools.core import EntityStatus
 from idmtools.platforms import COMPSPlatform
 from idmtools_models.python import PythonExperiment
@@ -19,7 +20,8 @@ class TestAssetsInComps(unittest.TestCase):
 
     def setUp(self) -> None:
         self.base_path = os.path.abspath(os.path.join(INPUT_PATH, "assets", "collections"))
-        self.platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
+        IdmConfigParser()
+        self.platform = COMPSPlatform()
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
 
