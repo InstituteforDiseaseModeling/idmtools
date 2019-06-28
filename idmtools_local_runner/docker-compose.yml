@@ -23,7 +23,6 @@ services:
     mem_reservation: 32m
     # allow passing uid to compose on Unix
     # run like so CURRENT_UID=$(id -u):$(id -g) docker-compose up -d
-    #user: "${CURRENT_UID:-999:999}"
     volumes:
       - idmtools_local_postgres:/var/lib/postgresql/data
   workers:
