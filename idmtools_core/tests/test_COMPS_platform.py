@@ -3,6 +3,7 @@ import os
 import unittest
 
 from idmtools.builders import ExperimentBuilder
+from idmtools.config import IdmConfigParser
 from idmtools.core import EntityStatus
 from idmtools.platforms import COMPSPlatform
 from tests import INPUT_PATH
@@ -13,13 +14,16 @@ from idmtools_models.python import PythonExperiment
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 
+
 @comps_test
 class TestCOMPSPlatform(ITestWithPersistence):
     def setUp(self) -> None:
         super().setUp()
-        self.platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
+        IdmConfigParser()
+        self.platform = COMPSPlatform()
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
+
         def setP(simulation, p):
             return simulation.set_parameter("P", p)
 

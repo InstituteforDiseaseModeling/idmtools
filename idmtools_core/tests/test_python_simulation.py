@@ -7,6 +7,7 @@ from operator import itemgetter
 from COMPS.Data import Experiment, QueryCriteria
 from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder, SweepArm, ArmType, ArmExperimentBuilder
+from idmtools.config import IdmConfigParser
 from idmtools.core import EntityStatus
 from idmtools.managers import ExperimentManager
 from idmtools.platforms import COMPSPlatform, LocalPlatform
@@ -39,7 +40,8 @@ class TestPythonSimulation(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
-        self.platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
+        IdmConfigParser()
+        self.platform = COMPSPlatform()
 
     def test_retrieve_extra_libraries(self):
         ps = PythonExperiment(name=self.case_name, model_path=os.path.join(INPUT_PATH, "python", "model.py"))
@@ -47,7 +49,7 @@ class TestPythonSimulation(ITestWithPersistence):
 
     def test_add_class_tag(self):
         ps = PythonExperiment(name=self.case_name, model_path=os.path.join(INPUT_PATH, "python", "model.py"))
-        self.assertEqual(ps.tags.get('type'), "PythonExperiment")
+        self.assertEqual(ps.tags.get('type'), "idmtools_models.python.PythonExperiment")
 
     def test_envelope(self):
         import json
