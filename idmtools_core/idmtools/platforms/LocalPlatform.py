@@ -11,9 +11,6 @@ class LocalPlatform(IPlatform):
     Represents the platform allowing to run simulations locally.
     """
 
-    def __post_init__(self):
-        super().__post_init__()
-
     def retrieve_experiment(self, experiment_id):
         pass
 
