@@ -33,8 +33,8 @@ running at http://localhost:5000
 
 # Using the CLI
 
-The CLI requires the workers service to already be running. From the idmtools_local_runner directory run
-`docker-compose exec workers python -m idmtools_local.cli.run`
+The CLI requires the workers service to already be running.
+`python -m idmtools_local.cli.run`
 
 ## Experiment commands
 
@@ -44,25 +44,25 @@ You can check the status of experiments use the follow command. It will also sum
 the experiment as a progress bar with green section for completed tasks, yellow for in progress, red for failed, and
 white for queued. 
 
-`docker-compose exec workers python -m idmtools_local.cli.run experiment status`
+`python -m idmtools_local.cli.run experiment status`
 
 Alternatively, you can run from anywhere using
-`docker-compose exec -t workers python -m idmtools_local.cli.run experiment status` 
+`python -m idmtools_local.cli.run experiment status` 
 
 In addition, we used in conjunction with a console that supports auto-highlighting of hyperlinks, you will be able to
 easily open up the asset directories by clicking on the data path URLs.
 
 You can also perform filtering on the experiments
-`docker-compose exec workers python -m idmtools_local.cli.run experiment status --tag type PythonExperiment`
+`python -m idmtools_local.cli.run experiment status --tag type PythonExperiment`
 
-`docker-compose exec workers python -m idmtools_local.cli.run experiment status --id 8EHU147Z`
+`python -m idmtools_local.cli.run experiment status --id 8EHU147Z`
 
 ### Delete
 
 You can delete experiments and their child simulations using the following command. Optionally you can also delete
 the associated data directories as well by using the *--data* option.
 
-`docker-compose exec workers python -m idmtools_local.cli.run experiment delete <experiment_id>`
+`python -m idmtools_local.cli.run experiment delete <experiment_id>`
 
 ## Simulation Commands
 
@@ -70,19 +70,19 @@ the associated data directories as well by using the *--data* option.
 
 You can check the status of simulations use the follow command.
 
-`docker-compose exec workers python -m idmtools_local.cli.run simulation status`
+`python -m idmtools_local.cli.run simulation status`
 
 You can also filter by a either id, experiment id, status, and tags or any combination of the aforementioned
 
-`docker-compose exec workers python -m idmtools_local.cli.run simulation status --experiment-id EFX6JXBV`
+`python -m idmtools_local.cli.run simulation status --experiment-id EFX6JXBV`
 
-`docker-compose exec workers python -m idmtools_local.cli.run simulation status --id XDT0VMVV`
+`python -m idmtools_local.cli.run simulation status --id XDT0VMVV`
 
-`docker-compose exec workers python -m idmtools_local.cli.run simulation status --status failed`
+`python -m idmtools_local.cli.run simulation status --status failed`
 
-`docker-compose exec workers python -m idmtools_local.cli.run simulation status --tag a 5 --tag b`
+`python -m idmtools_local.cli.run simulation status --tag a 5 --tag b`
 
-`docker-compose exec workers python -m idmtools_local.cli.run simulation status --experiment-id --status failed`
+`python -m idmtools_local.cli.run simulation status --experiment-id --status failed`
 
 
 # Using the UI
