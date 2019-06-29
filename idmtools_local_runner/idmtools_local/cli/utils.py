@@ -1,8 +1,10 @@
+import sys
 from math import floor
 from typing import Dict
+import requests
 from colorama import  Fore, Back
 from idmtools_local.config import DATA_PATH
-from idmtools_local.data.job_status import Status
+from idmtools_local.status import Status
 
 status_text_color_map = dict(failed=Fore.RED, in_progress=Fore.YELLOW, done=Fore.GREEN)
 status_progress_color_map = dict(failed=Back.RED, in_progress=Back.YELLOW, done=Back.GREEN)
@@ -74,4 +76,8 @@ def urlize_data_path(path: str) ->str:
     Returns:
         str: Path as URL.
     """
-    return path.replace(DATA_PATH, 'http://localhost:5000')
+    return path.replace(DATA_PATH, 'http://localhost:5000/data')
+
+def show_api_error(response: requests.Response):
+    print(f'{Fore.RED}Error{Fore.RESET}: {response.json()["message"]}')
+    sys.exit(-1)

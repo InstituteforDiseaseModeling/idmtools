@@ -1,21 +1,7 @@
-
-import enum
 from sqlalchemy import  Enum, Column, String
 from sqlalchemy.dialects.postgresql import JSON
 from idmtools_local.data import Base
-
-
-class Status(enum.Enum):
-    """
-    Our status enum for jobs
-    """
-    created = 'created'
-    in_progress = 'in_progress'
-    failed = 'failed'
-    done = 'done'
-
-    def __str__(self):
-        return str(self.value)
+from idmtools_local.status import Status
 
 
 class JobStatus(Base):

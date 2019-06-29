@@ -45,7 +45,7 @@ COPY README.md setup.py requirements.txt /tmp/
 # Also we specially use the internal pypy for ALL packages to take advantage of package caching
 
 RUN cd /tmp && \
-    pip install . --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple && \
+    pip install .[workers,ui] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple && \
     # cleanup pip cache and tmp
     rm -rf /root/.cache && \
     rm -rf /tmp/*

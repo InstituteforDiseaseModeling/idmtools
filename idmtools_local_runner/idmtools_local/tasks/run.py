@@ -6,8 +6,6 @@ import subprocess
 from dramatiq import GenericActor
 
 from idmtools_local.config import DATA_PATH
-from idmtools_local.data.job_status import Status
-from idmtools_local.utils import create_or_update_status
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +19,9 @@ class RunTask(GenericActor):
         max_retries = 0
 
     def perform(self, command: str, experiment_uuid: str, simulation_uuid: str):
+        # we only want to import this here so that clients don't need postgres/sqlalchemy packages
+        from idmtools_local.utils import create_or_update_status
+        from idmtools_local.data.job_status import Status
 
         # Define our simulation path and our root asset path
         simulation_path = os.path.join(DATA_PATH, experiment_uuid, simulation_uuid)

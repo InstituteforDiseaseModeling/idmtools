@@ -1,8 +1,9 @@
 import logging
 import os
+import random
+import string
 from dramatiq import GenericActor
 from idmtools_local.config import DATA_PATH
-from idmtools_local.utils import create_or_update_status
 
 logger = logging.getLogger(__name__)
 
@@ -19,8 +20,8 @@ class CreateExperimentTask(GenericActor):
         max_retries = 0
 
     def perform(self, tags):
-        import random
-        import string
+        # we only want to import this here so that clients don't need postgres/sqlalchemy packages
+        from idmtools_local.utils import create_or_update_status
         uuid = ''.join(random.choice(string.digits + string.ascii_uppercase) for _ in range(8))
         if logger.isEnabledFor(logging.INFO):
             logger.debug('Creating experiment with id %s', uuid)
