@@ -45,6 +45,8 @@ COPY README.md setup.py requirements.txt /tmp/
 # Also we specially use the internal pypy for ALL packages to take advantage of package caching
 
 RUN cd /tmp && \
+    # we need install the full version of local_runner as it is both a Client and Server package
+    # to do this, we specify we want the workers and the UI
     pip install .[workers,ui] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple && \
     # cleanup pip cache and tmp
     rm -rf /root/.cache && \

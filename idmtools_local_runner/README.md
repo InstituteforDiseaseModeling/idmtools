@@ -13,7 +13,7 @@ somewhat similar to COMPS, though much more limited
     │   ├── ui                    <- Web UI for idmtool_local
     ├── docker-compose.yml        <- Docker-compose file for the local service
     ├── Dockerfile                <- Dockfile for both Development and Production
-    ├── requirements.txt          <- Python requirements for fopr the idmtools_local_runner
+    ├── requirements.txt          <- Python requirements for fopr the idmtools_local_runner. This ONLY specifies client requirements
     ├── setup.py                  <- Python setup file with dependencies
     └── README.md                 <- The top-level README for developers using this project.
 
@@ -87,5 +87,5 @@ You can also filter by a either id, experiment id, status, and tags or any combi
 
 # Using the UI
 
-The Web UI is available at http://localhost:5000. Currently it only supports displaying the data directories from
+The Web UI is available at http://localhost:5000/data. Currently it only supports displaying the data directories from
 experiments. It is best used in conjunction with the CLI status commands
