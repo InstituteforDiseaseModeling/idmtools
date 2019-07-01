@@ -3,7 +3,6 @@ from dramatiq import group
 from idmtools.core import EntityStatus
 from idmtools.entities import IExperiment, IPlatform
 # we have to import brokers so that the proper configuration is achieved for redis
-from idmtools_local import brokers
 from idmtools_local.tasks.create_assest_task import AddAssetTask
 from idmtools_local.tasks.create_experiement import CreateExperimentTask
 from idmtools_local.tasks.create_simulation import CreateSimulationTask
@@ -29,7 +28,7 @@ class LocalPlatform(IPlatform):
             s.status = EntityStatus.SUCCEEDED
 
     def create_experiment(self, experiment: IExperiment):
-        m = CreateExperimentTask.send(experiment.tags)
+        m = CreateExperimentTask.send(experiment.tags, experiment.simulation_type)
         eid = m.get_result(block=True)
         experiment.uid = eid
         self.send_assets_for_experiment(experiment)

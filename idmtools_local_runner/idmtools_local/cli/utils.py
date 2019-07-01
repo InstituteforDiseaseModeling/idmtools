@@ -6,8 +6,8 @@ from colorama import  Fore, Back
 from idmtools_local.config import DATA_PATH
 from idmtools_local.status import Status
 
-status_text_color_map = dict(failed=Fore.RED, in_progress=Fore.YELLOW, done=Fore.GREEN)
-status_progress_color_map = dict(failed=Back.RED, in_progress=Back.YELLOW, done=Back.GREEN)
+status_text_color_map = dict(failed=Fore.RED, in_progress=Fore.YELLOW, done=Fore.GREEN, canceled=Fore.CYAN)
+status_progress_color_map = dict(failed=Back.RED, in_progress=Back.YELLOW, done=Back.GREEN, canceled=Fore.CYAN)
 
 tags_help = "Tag to filter by. This should be in the form name value. For example, if you have a tag type=PythonTask " \
             "you would use --tags type PythonTask. In addition, you can provide multiple tags, ie --tags a 1 " \
@@ -78,6 +78,12 @@ def urlize_data_path(path: str) ->str:
     """
     return path.replace(DATA_PATH, 'http://localhost:5000/data')
 
+
 def show_api_error(response: requests.Response):
+    """
+    Display an error response from API on the command line
+    :param response:
+    :return:
+    """
     print(f'{Fore.RED}Error{Fore.RESET}: {response.json()["message"]}')
     sys.exit(-1)

@@ -10,6 +10,7 @@ class Status(enum.Enum):
     """
     created = 'created'
     in_progress = 'in_progress'
+    canceled = 'canceled'
     failed = 'failed'
     done = 'done'
 

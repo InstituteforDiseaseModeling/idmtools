@@ -1,6 +1,6 @@
 from sqlalchemy import  Enum, Column, String
 from sqlalchemy.dialects.postgresql import JSON
-from idmtools_local.data import Base
+from idmtools_local.workers.data import Base
 from idmtools_local.status import Status
 
 
@@ -16,6 +16,7 @@ class JobStatus(Base):
     status = Column(Enum(Status), nullable=False, default=Status.created)
     data_path = Column(String(), nullable=False)
     tags = Column(JSON, default=[])
+    metadata = Column(JSON, default=[])
 
 
 

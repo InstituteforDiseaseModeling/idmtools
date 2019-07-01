@@ -19,9 +19,9 @@ class CreateExperimentTask(GenericActor):
         store_results = True
         max_retries = 0
 
-    def perform(self, tags):
+    def perform(self, tags, simulation_type):
         # we only want to import this here so that clients don't need postgres/sqlalchemy packages
-        from idmtools_local.utils import create_or_update_status
+        from idmtools_local.workers.utils import create_or_update_status
         uuid = ''.join(random.choice(string.digits + string.ascii_uppercase) for _ in range(8))
         if logger.isEnabledFor(logging.INFO):
             logger.debug('Creating experiment with id %s', uuid)
@@ -29,7 +29,7 @@ class CreateExperimentTask(GenericActor):
         data_path = os.path.join(DATA_PATH, uuid)
 
         # Update the database with experiment
-        create_or_update_status(uuid, data_path, tags)
+        create_or_update_status(uuid, data_path, tags, metadata=dict(simulation_type=simulation_type))
 
         asset_path = os.path.join(data_path, "Assets")
         if logger.isEnabledFor(logging.DEBUG):

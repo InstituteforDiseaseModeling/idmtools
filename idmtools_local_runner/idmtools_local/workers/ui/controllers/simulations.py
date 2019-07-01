@@ -1,11 +1,17 @@
+import logging
+import os
 from typing import Optional, List, Tuple
 import pandas as pd
+from flask import request
 from flask_restful import Resource, reqparse, abort
 from sqlalchemy import String
-from idmtools_local.data.job_status import JobStatus
-from idmtools_local.database import get_session
+from idmtools_local.workers.data.job_status import JobStatus
+from idmtools_local.workers.database import get_session
 from idmtools_local.status import Status
-from idmtools_local.ui.controllers.utils import validate_tags
+from idmtools_local.workers.ui.controllers.utils import validate_tags
+
+
+logger = logging.getLogger(__name__)
 
 
 def sim_status(id: Optional[str], experiment_id: Optional[str], status: Optional[str],
@@ -73,4 +79,26 @@ class Simulations(Resource):
         validate_tags(args['tag'])
 
         return sim_status(**args).to_dict(orient='records')
+
+    def put(self, id):
+        data = request.json()
+        # at moment, only allow status to be updated(ie canceled'
+        # later, we may support resuming but we will need to include more data in the db to do this
+        data = {k:v for k,v in data.items() if k == 'status' and v in ['canceled']}
+        if len(data) > 0:
+            s = get_session()
+            current_job: JobStatus = s.query(JobStatus).filter(JobStatus.uuid == id).first()
+            # check if we have a PID, if so kill it
+            if current_job.metadata is not None and 'pid' in current_job.metadata:
+                try:
+                    os.killpg(current_job.metadata['pid'], 9)
+                except Exception as e:
+                    logger.exception(e)
+            current_job.__dict__.update(data)
+            s.add(current_job)
+            s.commit()
+        else:
+            abort(400, message='Currently the only allowed simulation update is canceling a simulation')
+
+
 

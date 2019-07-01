@@ -2,8 +2,8 @@ from flask_autoindex import AutoIndex, Flask
 from idmtools_local.config import DATA_PATH
 from flask_restful import Api
 
-from idmtools_local.ui.controllers.experiments import Experiments
-from idmtools_local.ui.controllers.simulations import Simulations
+from idmtools_local.workers.ui.controllers import Experiments
+from idmtools_local.workers.ui.controllers.simulations import Simulations
 
 application = Flask(__name__)
 api = Api(application, prefix='/api')
