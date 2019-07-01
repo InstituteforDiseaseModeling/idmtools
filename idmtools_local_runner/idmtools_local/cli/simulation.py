@@ -1,9 +1,9 @@
 from typing import Optional, Tuple, List, Dict, Any
 import click
-import requests
 from tabulate import tabulate
 from idmtools_local.cli.base import cli
-from idmtools_local.cli.utils import colorize_status, tags_help, urlize_data_path, show_api_error
+from idmtools_local.cli.utils import colorize_status, tags_help, urlize_data_path, show_error
+from idmtools_local.client.simulations_client import SimulationsClient
 from idmtools_local.config import API_PATH
 from idmtools_local.status import Status
 
@@ -57,14 +57,11 @@ def status(id: Optional[str], experiment_id: Optional[str], status: Optional[str
     Returns:
         None
     """
-    args=dict(experiment_id=experiment_id,
-              status=str(status) + 'a' if status is not None else status,
-              tag=tag if tag is not None and len(tag) > 0 else None)
-    args={k:v for k,v in args.items() if v is not None}
-    response = requests.get(SIMULATIONS_URL if id is None else (SIMULATIONS_URL + '/' + id), params=args)
-    if response.status_code != 200:
-        show_api_error(response)
-    result = response.json()
-    result = list(map(lambda x: prettify_simulation(x), result))
-    print(tabulate(result, headers='keys', tablefmt='psql', showindex=False))
+    try:
+        simulations = SimulationsClient.get_all(id, experiment_id=experiment_id, status=status, tag=tag)
+    except RuntimeError as e:
+        show_error(e.args[0])
+
+    simulations = list(map(lambda x: prettify_simulation(x), simulations))
+    print(tabulate(simulations, headers='keys', tablefmt='psql', showindex=False))
 

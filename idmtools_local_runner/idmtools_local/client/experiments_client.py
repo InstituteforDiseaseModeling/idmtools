@@ -29,8 +29,8 @@ class ExperimentsClient(BaseClient):
             if logger.isEnabledFor(logging.DEBUG):
                 logging.debug(f'Error fetching simulations {cls.base_url if id is None else cls.base_url + "/" + id}'
                               f'Response Status Code: {response.status_code}. Response Content: {response.text}')
-            raise RuntimeError(f'Could not fetch simulations from IDMs Local '
-                               f'URL {cls.base_url if id is None else cls.base_url + "/" + id}')
+            data = response.json()
+            raise RuntimeError(data['message'])
         result = response.json()
         return result
 
@@ -47,6 +47,8 @@ class ExperimentsClient(BaseClient):
             dict: Dictionary containing the experiment objects
         """
         result = cls.get_all(id, tag)
+        if len(result) < 1:
+            raise RuntimeError(f"Cannot find experiment with ID {id}")
         return result[0]
 
     @classmethod
@@ -66,4 +68,7 @@ class ExperimentsClient(BaseClient):
 
         if response.status_code != 204 and (response.status_code != 404 and ignore_doesnt_exist):
             return False
+        elif response.status_code != 204:
+            data = response.json()
+            raise RuntimeError(data['message'])
         return True

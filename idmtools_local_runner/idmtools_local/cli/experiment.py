@@ -1,9 +1,9 @@
 from typing import Optional, Tuple, List, Any, Dict
 import click
-import requests
 from tabulate import tabulate
 from idmtools_local.cli.base import cli
-from idmtools_local.cli.utils import parent_status_to_progress, urlize_data_path, tags_help, show_api_error
+from idmtools_local.cli.utils import parent_status_to_progress, urlize_data_path, tags_help, show_error
+from idmtools_local.client.experiments_client import ExperimentsClient
 from idmtools_local.config import API_PATH
 
 
@@ -47,13 +47,12 @@ def status(id: Optional[str], tag: Optional[List[Tuple[str, str]]]):
         tag (Optional[List[Tuple[str, str]]]): Optional list of tuples in form of tag_name tag_value to user to filter
             experiments with
     """
-
-    response = requests.get(EXPERIMENTS_URL if id is None else (EXPERIMENTS_URL + '/' + id), params=dict(tag=tag))
-    if response.status_code != 200:
-        show_api_error(response)
-    result = response.json()
-    result = list(map(lambda x: prettify_experiment(x), result))
-    print(tabulate(result, headers='keys', tablefmt='psql', showindex=False))
+    try:
+        experiments = ExperimentsClient.get_all(id, tag=tag)
+    except RuntimeError as e:
+        show_error(e.args[0])
+    experiments = list(map(lambda x: prettify_experiment(x), experiments))
+    print(tabulate(experiments, headers='keys', tablefmt='psql', showindex=False))
 
 
 @experiment.command()
@@ -68,18 +67,23 @@ def delete(id: str, data: bool):
         data (bool): If true, specifies data folder for experiment should be deleted, otherwise it will be kept
     """
     print(f'Deleting Experiment: {id}')
-    experiment_url = f'{EXPERIMENTS_URL}/{id}'
-    response = requests.get(experiment_url)
-    experiment_data = response.json()
+    experiment: Dict = None
+    try:
+        experiment = ExperimentsClient.get_all(id)
+    except RuntimeError as e:
+        show_error(e.args[0])
+
     if not data or (data and
                     click.confirm('Deleting experiment data is irreversible. Are you sure you want to delete all '
                                   'experiment data?')):
-        print(f'Deleting {experiment_data["data_path"]}')
-        response = requests.delete(experiment_url, params=dict(data=data))
-        if response.status_code == 204:
-            print('Experiment removed successfully')
-        else:
-            show_api_error(response)
+        print(f'Deleting {experiment["data_path"]}')
+        try:
+            response = ExperimentsClient.delete(id, data)
+            if response:
+                print('Experiment removed successfully')
+        except RuntimeError as e:
+            show_error(e.args[0])
+
 
 
 

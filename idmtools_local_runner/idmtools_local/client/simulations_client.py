@@ -34,8 +34,8 @@ class SimulationsClient(BaseClient):
             if logger.isEnabledFor(logging.DEBUG):
                 logging.debug(f'Error fetching simulations {cls.base_url if id is None else cls.base_url + "/" + id}'
                               f'Response Status Code: {response.status_code}. Response Content: {response.text}')
-            raise RuntimeError(f'Could not fetch simulations from IDMs Local '
-                               f'URL {cls.base_url if id is None else cls.base_url + "/" + id}')
+            data = response.json()
+            raise RuntimeError(data['message'])
         result = response.json()
         return result
 
@@ -54,6 +54,8 @@ class SimulationsClient(BaseClient):
             Dict[str, Any]: the simulation as a dict
         """
         result = cls.get_all(id, experiment_id, status, tag)
+        if len(result) == 0:
+            raise RuntimeError(f"Could not find Simulation with ID {id}")
         return result[0]
 
     @classmethod

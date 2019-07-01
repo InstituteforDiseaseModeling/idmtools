@@ -79,11 +79,15 @@ def urlize_data_path(path: str) ->str:
     return path.replace(DATA_PATH, 'http://localhost:5000/data')
 
 
-def show_api_error(response: requests.Response):
+def show_error(message: requests.Response):
     """
     Display an error response from API on the command line
-    :param response:
-    :return:
+
+    Args:
+        message (str): message to display
+
+    Returns:
+
     """
-    print(f'{Fore.RED}Error{Fore.RESET}: {response.json()["message"]}')
+    print(f'{Fore.RED}Error{Fore.RESET}: {message}')
     sys.exit(-1)
