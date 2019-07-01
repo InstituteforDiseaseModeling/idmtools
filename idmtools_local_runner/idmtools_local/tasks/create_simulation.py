@@ -2,7 +2,8 @@ import logging
 import os
 from dramatiq import GenericActor
 from idmtools_local.config import DATA_PATH
-from idmtools_local.utils import create_or_update_status
+import random
+import string
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +19,7 @@ class CreateSimulationTask(GenericActor):
         max_retries = 0
 
     def perform(self, experiment_id, tags):
+
         """
         Creates our simulation task
         Args:
@@ -27,9 +29,8 @@ class CreateSimulationTask(GenericActor):
         Returns:
             The generated simulation uuid
         """
-
-        import random
-        import string
+        # we only want to import this here so that clients don't need postgres/sqlalchemy packages
+        from idmtools_local.workers.utils import create_or_update_status
         uuid = ''.join(random.choice(string.digits + string.ascii_uppercase) for _ in range(8))
 
         if logger.isEnabledFor(logging.DEBUG):
