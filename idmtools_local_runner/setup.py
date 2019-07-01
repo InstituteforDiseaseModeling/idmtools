@@ -18,7 +18,7 @@ extras = dict(test=test_requirements, dev=['Pympler'],
               # Requirements for running workers server
               workers=['pandas~=0.24.2', 'sqlalchemy~=1.3.5', 'psycopg2-binary~=2.8.3'],
               # these are only needed when not running UI
-              ui=['flask~=1.0.3','Flask-AutoIndex~=0.6.4'])
+              ui=['flask~=1.0.3','Flask-AutoIndex~=0.6.4', 'flask_restful~=0.3.7'])
 
 setup(
     author="Clinton Collins"

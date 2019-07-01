@@ -29,7 +29,7 @@ class CreateExperimentTask(GenericActor):
         data_path = os.path.join(DATA_PATH, uuid)
 
         # Update the database with experiment
-        create_or_update_status(uuid, data_path, tags, metadata=dict(simulation_type=simulation_type))
+        create_or_update_status(uuid, data_path, tags, extra_details=dict(simulation_type=simulation_type))
 
         asset_path = os.path.join(data_path, "Assets")
         if logger.isEnabledFor(logging.DEBUG):

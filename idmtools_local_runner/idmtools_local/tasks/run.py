@@ -28,12 +28,12 @@ class RunTask(GenericActor):
         current_job: JobStatus = get_session().query(JobStatus). \
             filter(JobStatus.uuid == simulation_uuid, JobStatus.parent_uuid == experiment_uuid).first()
 
-        current_job.metadata['command'] = command
+        current_job.extra_details['command'] = command
 
         if current_job.status == Status.canceled:
             logger.info(f'Job {current_job.uuid} has been canceled')
-            # update command metadata. Useful in future for deletion
-            create_or_update_status(simulation_uuid, metadata=current_job.metadata)
+            # update command extra_details. Useful in future for deletion
+            create_or_update_status(simulation_uuid, extra_details=current_job.extra_details)
             return current_job.status
 
         # Define our simulation path and our root asset path
@@ -56,9 +56,9 @@ class RunTask(GenericActor):
             # Run our task
             p = subprocess.Popen(shlex.split(command), cwd=simulation_path, shell=False, stdout=out, stderr=err)
             # store the pid in case we want to cancel later
-            current_job.metadata['pid'] = p.pid
+            current_job.extra_details['pid'] = p.pid
             # Log that we have started this particular simulation
-            create_or_update_status(simulation_uuid, status=Status.in_progress, metadata=current_job.metadata)
+            create_or_update_status(simulation_uuid, status=Status.in_progress, extra_details=current_job.extra_details)
             p.wait()
 
             # Determine if the task succeeded or failed
@@ -78,7 +78,7 @@ class RunTask(GenericActor):
                 logging.debug('Simulation %s finished with status of %s', simulation_uuid, str(status))
 
             # let's remove the pid
-            del current_job.metadata['pid']
+            del current_job.extra_details['pid']
             # Update task with the final status
-            create_or_update_status(simulation_uuid, status=status, metadata=current_job.metadata)
+            create_or_update_status(simulation_uuid, status=status, extra_details=current_job.extra_details)
             return status

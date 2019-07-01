@@ -10,7 +10,6 @@ services:
       - 6379:6379
     mem_limit: 128m
     mem_reservation: 64m
-
   postgres:
     image: postgres:11.4
     ports:
@@ -20,7 +19,8 @@ services:
       POSTGRES_PASSWORD: idmtools
     mem_limit: 64m
     mem_reservation: 32m
-
+    volumes:
+      - ../data/postgres-data:/var/lib/postgresql/data
   workers:
     build:
       context: .
@@ -37,6 +37,7 @@ services:
       - ../data/workers:/data
     depends_on:
       - redis
+      - postgres
 # This can be uncomment development to have a web ui interface for Postgres
 #  adminer:
 #    image: adminer

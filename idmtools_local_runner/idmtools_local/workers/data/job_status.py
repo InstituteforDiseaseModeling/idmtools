@@ -16,7 +16,7 @@ class JobStatus(Base):
     status = Column(Enum(Status), nullable=False, default=Status.created)
     data_path = Column(String(), nullable=False)
     tags = Column(JSON, default=[])
-    metadata = Column(JSON, default=[])
+    extra_details = Column(JSON, default={})
 
 
 
