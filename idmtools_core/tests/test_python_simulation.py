@@ -7,6 +7,7 @@ from operator import itemgetter
 from COMPS.Data import Experiment, QueryCriteria
 from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder, SweepArm, ArmType, ArmExperimentBuilder
+from idmtools.config import IdmConfigParser
 from idmtools.core import EntityStatus
 from idmtools.managers import ExperimentManager
 from idmtools.platforms import COMPSPlatform, LocalPlatform
@@ -39,12 +40,16 @@ class TestPythonSimulation(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
-        self.platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
-
+        IdmConfigParser()
+        self.platform = COMPSPlatform()
 
     def test_retrieve_extra_libraries(self):
         ps = PythonExperiment(name=self.case_name, model_path=os.path.join(INPUT_PATH, "python", "model.py"))
         self.assertTrue("numpy" in ps.retrieve_python_dependencies()[0])
+
+    def test_add_class_tag(self):
+        ps = PythonExperiment(name=self.case_name, model_path=os.path.join(INPUT_PATH, "python", "model.py"))
+        self.assertEqual(ps.tags.get('type'), "idmtools_models.python.PythonExperiment")
 
     def test_envelope(self):
         import json
@@ -113,7 +118,8 @@ class TestPythonSimulation(ITestWithPersistence):
 
         # validate experiment tags
         actual_exp_tags = experiment.get(experiment.id, QueryCriteria().select_children('tags')).tags
-        expected_exp_tags = {'idmtools': 'idmtools-automation', 'number_tag': '123', 'string_tag': 'test', 'KeyOnly': ''}
+        expected_exp_tags = {'idmtools': 'idmtools-automation', 'number_tag': '123', 'string_tag': 'test',
+                             'KeyOnly': ''}
         self.assertEqual(expected_exp_tags, actual_exp_tags)
 
     # Test parameter "b" set is depending on parameter "a"
@@ -179,7 +185,7 @@ class TestPythonSimulation(ITestWithPersistence):
         em.wait_till_done()
         self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
         exp_id = em.experiment.uid
-        #exp_id ='ef8e7f2f-a793-e911-a2bb-f0921c167866'
+        # exp_id ='ef8e7f2f-a793-e911-a2bb-f0921c167866'
         count = 0
         for simulation in Experiment.get(exp_id).get_simulations():
             # validate output/config.json
@@ -217,12 +223,10 @@ class TestPythonSimulation(ITestWithPersistence):
         assets_path = os.path.join(INPUT_PATH, "python", "Assets")
         ac.add_directory(assets_directory=assets_path)
         pe = PythonExperiment(name=self.case_name, model_path=model_path, assets=ac)
-
-        pe.gather_assets()
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         pe.base_simulation.envelope = "parameters"
         # sim = pe.simulation() # uncomment this line when issue #138 gets fixed
-        sim = pe.base_simulation
+        sim = pe.simulation()
         sim.set_parameter("a", 1)
         sim.set_parameter("b", 10)
         builder = StandAloneSimulationsBuilder()
@@ -253,10 +257,11 @@ class TestPythonSimulation(ITestWithPersistence):
 
             expected_list = [{'filename': '__init__.py', 'relative_path': 'MyExternalLibrary'},
                              {'filename': '__init__.py', 'relative_path': ''},
-                             {'filename': 'temp.py', 'relative_path': 'Lib'},
                              {'filename': 'model.py', 'relative_path': ''},
+                             {'filename': 'temp.py', 'relative_path': 'Lib'},
                              {'filename': 'functions.py', 'relative_path': 'MyExternalLibrary'}]
             self.validate_assets(assets, expected_list)
+
 
     # Test will test pythonExperiment's assets parameter which adds only specific file under
     # tests/inputs/python/Assets/MyExternalLibrary to COMPS' Assets and add relative_path MyExternalLibrary in comps
@@ -314,6 +319,7 @@ class TestPythonSimulation(ITestWithPersistence):
     # {1,3,5}
     # {6,2}
     # {7,2}
+    @comps_test
     def test_sweep_in_arms_cross(self):
         pe = PythonExperiment(name=self.case_name,
                               model_path=os.path.join(INPUT_PATH, "python", "model1.py"))
@@ -395,9 +401,8 @@ class TestPythonSimulation(ITestWithPersistence):
         sorted_expected_tags = sorted(expected_tags, key=itemgetter('a'))
         self.assertEqual(sorted_tags, sorted_expected_tags)
 
-    @unittest.skip("Do not run this one until issue #126 are fixed")
     def test_add_prefixed_relative_path_to_assets_local(self):
-        #platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
+        # platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
         platform = LocalPlatform()
         model_path = os.path.join(INPUT_PATH, "python", "model.py")
         ac = AssetCollection()

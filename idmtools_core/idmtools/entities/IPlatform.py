@@ -1,10 +1,12 @@
 import typing
 from abc import ABCMeta, abstractmethod
-
+from dataclasses import fields
 from idmtools.core import IEntity
+from idmtools.config import IdmConfigParser
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TExperiment, TSimulation, TSimulationBatch
+    from typing import List, Dict
 
 
 class IPlatform(IEntity, metaclass=ABCMeta):
@@ -16,6 +18,12 @@ class IPlatform(IEntity, metaclass=ABCMeta):
     - Commissioning
     - File handling
     """
+
+    def __post_init__(self) -> None:
+        """
+        Got called from Platform creation
+        """
+        self.update_from_config()
 
     @abstractmethod
     def create_experiment(self, experiment: 'TExperiment') -> None:
@@ -83,3 +91,44 @@ class IPlatform(IEntity, metaclass=ABCMeta):
             experiment: The experiment to populate
         """
         pass
+
+    @abstractmethod
+    def get_assets_for_simulation(self, simulation: 'TSimulation', output_files: 'List[str]') -> 'Dict[str, bytearray]':
+        pass
+
+    @abstractmethod
+    def retrieve_experiment(self, experiment_id: 'uuid') -> 'TExperiment':
+        pass
+
+    def __repr__(self):
+        return f"<Platform {self.__class__.__name__} - id: {self.uid}>"
+
+    def update_from_config(self) -> None:
+        """
+        Get INI config values and update platform values by the priority rules:
+            #1 Code, #2 INI config, #2 default
+        Returns: None
+        """
+        # retrieve field values, default values and types
+        fds = fields(self)
+        field_name = [f.name for f in fields(self)]
+        field_default = {f.name: f.default for f in fds}
+        field_value = {f.name: getattr(self, f.name) for f in fds}
+        field_type = {f.name: f.type for f in fds}
+
+        # find, load and get settings from config file. Return with the correct data types
+        field_config = IdmConfigParser.retrieve_settings(self.__class__.__name__.upper(), field_type)
+
+        # display not used fields from config
+        field_config_not_used = set(field_config.keys()) - set(field_name)
+        if len(field_config_not_used) > 0:
+            field_config_not_used = [" - {} = {}".format(fn, field_config[fn]) for fn in field_config_not_used]
+            print("The following Config Settings are not used:")
+            print("\n".join(field_config_not_used))
+
+        # update attr based on priority: #1 Code, #2 INI, #3 Default
+        for fn in set(field_config.keys()).intersection(set(field_name)):
+            if field_value[fn] != field_default[fn]:
+                setattr(self, fn, field_value[fn])
+            elif field_config[fn] != field_value[fn]:
+                setattr(self, fn, field_config[fn])

@@ -1,16 +1,17 @@
 import logging
 import os
 import typing
-from threading import Semaphore
 
 from COMPS import Client
-from COMPS.Data import AssetCollection, AssetCollectionFile, Configuration, Experiment, Simulation, SimulationFile, \
-    QueryCriteria
+from COMPS.Data import AssetCollection, AssetCollectionFile, Configuration, Experiment as COMPSExperiment, \
+    QueryCriteria, Simulation as COMPSSimulation, \
+    SimulationFile
 from COMPS.Data.Simulation import SimulationState
 
-from idmtools.core import EntityStatus
+from idmtools.core import EntityStatus, experiment_factory
 from idmtools.entities import IPlatform
 from idmtools.utils.time import timestamp
+from dataclasses import dataclass, field
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TExperiment
@@ -27,6 +28,7 @@ class COMPSPriority:
     Highest = "Highest"
 
 
+@dataclass
 class COMPSPlatform(IPlatform):
     """
     Represents the platform allowing to run simulations on COMPS.
@@ -34,18 +36,19 @@ class COMPSPlatform(IPlatform):
 
     MAX_SUBDIRECTORY_LENGTH = 35  # avoid maxpath issues on COMPS
 
-    def __init__(self, endpoint: 'str' = None, environment: 'str' = None, priority: 'COMPSPriority' = None):
-        super().__init__()
-        self.endpoint = endpoint or "https://comps2.idmod.org"
-        self.environment = environment or "Bayesian"
-        self.priority = priority or COMPSPriority.Lowest
-        self.simulation_root = "$COMPS_PATH(USER)\output"
-        self.node_group = "emod_abcd"
-        self.num_retires = 0
-        self.num_cores = 1
-        self.exclusive = False
+    endpoint: str = field(default="https://comps2.idmod.org")
+    environment: str = field(default="Bayesian")
+    priority: str = field(default=COMPSPriority.Lowest)
+    simulation_root: str = field(default="$COMPS_PATH(USER)\output")
+    node_group: str = field(default="emod_abcd")
+    num_retires: int = field(default=0)
+    num_cores: int = field(default=1)
+    exclusive: bool = field(default=False)
+
+    def __post_init__(self):
         self._comps_experiment = None
         self._comps_experiment_id = None
+        super().__post_init__()
         self._login()
 
     def _login(self):
@@ -56,11 +59,12 @@ class COMPSPlatform(IPlatform):
 
     @property
     def comps_experiment(self):
-        if self._comps_experiment and str(self._comps_experiment.id) == self._comps_experiment_id:
+        if self._comps_experiment and self._comps_experiment.id == self._comps_experiment_id:
             return self._comps_experiment
 
         self._login()
-        self._comps_experiment = Experiment.get(id=self._comps_experiment_id)
+        self._comps_experiment = COMPSExperiment.get(id=self._comps_experiment_id,
+                                                     query_criteria=QueryCriteria().select(["id"]).select_children(["tags"]))
         return self._comps_experiment
 
     @comps_experiment.setter
@@ -118,9 +122,9 @@ class COMPSPlatform(IPlatform):
             exclusive=self.exclusive
         )
 
-        e = Experiment(name=experiment_name,
-                       configuration=config,
-                       suite_id=experiment.suite_id)
+        e = COMPSExperiment(name=experiment_name,
+                            configuration=config,
+                            suite_id=experiment.suite_id)
 
         # Add tags if present
         if experiment.tags: e.set_tags(experiment.tags)
@@ -137,20 +141,21 @@ class COMPSPlatform(IPlatform):
         created_simulations = []
 
         for simulation in simulation_batch:
-            s = Simulation(name=simulation.experiment.name, experiment_id=simulation.experiment.uid,
-                           configuration=Configuration(asset_collection_id=simulation.experiment.assets.uid))
+            s = COMPSSimulation(name=simulation.experiment.name, experiment_id=simulation.experiment.uid,
+                                configuration=Configuration(asset_collection_id=simulation.experiment.assets.uid))
 
             self.send_assets_for_simulation(simulation, s)
             s.set_tags(simulation.tags)
             created_simulations.append(s)
 
-        Simulation.save_all(None, save_semaphore=Simulation.get_save_semaphore())
+        COMPSSimulation.save_all(None, save_semaphore=COMPSSimulation.get_save_semaphore())
 
         # Register the IDs
         return [s.id for s in created_simulations]
 
     def run_simulations(self, experiment: 'TExperiment'):
         self._login()
+        self._comps_experiment_id = experiment.uid
         self.comps_experiment.commission()
 
     @staticmethod
@@ -187,9 +192,19 @@ class COMPSPlatform(IPlatform):
     def restore_simulations(self, experiment: 'TExperiment') -> None:
         self._comps_experiment_id = experiment.uid
 
-        for s in self.comps_experiment.get_simulations():
+        for s in self.comps_experiment.get_simulations(
+                query_criteria=QueryCriteria().select(["id", "state"]).select_children(["tags"])):
             sim = experiment.simulation()
             sim.uid = s.id
             sim.tags = s.tags
             sim.status = COMPSPlatform._convert_COMPS_status(s.state)
             experiment.simulations.append(sim)
+
+    def retrieve_experiment(self, experiment_id: 'uuid') -> 'TExperiment':
+        self._comps_experiment_id = experiment_id
+        experiment = experiment_factory.create(self.comps_experiment.tags.get("type"), tags=self.comps_experiment.tags)
+        experiment.uid = self.comps_experiment.id
+        return experiment
+
+    def get_assets_for_simulation(self, simulation, output_files):
+        raise NotImplemented("Not implemented yet in the COMPSPlatform")

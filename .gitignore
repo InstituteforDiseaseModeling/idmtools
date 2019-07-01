@@ -367,3 +367,4 @@ dmypy.json
 idmtools_core/tests/data
 examples/**/.pytest_cache/
 examples/**/__pycache__/
+idmtools_core/tests/reports/
