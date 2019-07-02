@@ -4,7 +4,6 @@ from abc import ABCMeta
 from dataclasses import dataclass, field, fields
 
 from idmtools.utils.hashing import hash_obj
-from idmtools.core import IPicklableObject
 
 if typing.TYPE_CHECKING:
     import uuid
