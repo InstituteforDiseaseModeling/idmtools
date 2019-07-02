@@ -10,13 +10,16 @@ echo "install idmtools ..."
 LOCAL_PATH="$(realpath $(dirname '$0')/)"
 echo ${LOCAL_PATH}
 cd ${LOCAL_PATH}/idmtools_core && \
-    pip install -e .\[test,3.6\] --extra-index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+    pip install -e .\[test,3.6\] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
 cd ${LOCAL_PATH}/idmtools_local_runner && \
     pip install -e .\[test\]
 cd ${LOCAL_PATH}/idmtools_models_collection && \
     pip install -e .\[test\]
+# ensure we don't have a copy running and previous instances have been stopped
 cd ${LOCAL_PATH}/idmtools_local_runner && \
-	docker-compose up -d
+	docker-compose down -v && \
+	docker-compose build && \
+	./start.sh
 
 echo "auto login..."
 cd ${LOCAL_PATH}/idmtools_core/tests && \

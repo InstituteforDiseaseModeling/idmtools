@@ -3,8 +3,12 @@
 ## Set defaults for environmental variables in case they are undefined
 USER=${USER:=idmtools}
 PASSWORD=${PASSWORD:=idmtools}
-USERID=${USERID:=1000}
-GROUPID=${GROUPID:=1000}
+USER_DATA=
+# load the user and group ids
+IFS=':' read -r -a id_array <<< "${CURRENT_UID:=1000:1000}"
+
+USERID=${id_array[0]}
+GROUPID=${id_array[1]}
 ROOT=${ROOT:=FALSE}
 UMASK=${UMASK:=022}
 
