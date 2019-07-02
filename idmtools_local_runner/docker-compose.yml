@@ -65,4 +65,4 @@ services:
 networks:
   default:
     external:
-name: idmtools_network
+      name: idmtools_network
