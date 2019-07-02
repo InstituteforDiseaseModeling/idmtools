@@ -15,8 +15,11 @@ cd ${LOCAL_PATH}/idmtools_local_runner && \
     pip install -e .\[test\]
 cd ${LOCAL_PATH}/idmtools_models_collection && \
     pip install -e .\[test\]
+# ensure we don't have a copy running and previous instances have been stopped
 cd ${LOCAL_PATH}/idmtools_local_runner && \
-	docker-compose up -d
+	docker-compose down -v && \
+	docker-compose build && \
+	./start.sh
 
 echo "auto login..."
 cd ${LOCAL_PATH}/idmtools_core/tests && \
