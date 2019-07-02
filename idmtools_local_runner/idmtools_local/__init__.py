@@ -1,1 +1,1 @@
-from .brokers import *
+from idmtools_local.workers.brokers import *
