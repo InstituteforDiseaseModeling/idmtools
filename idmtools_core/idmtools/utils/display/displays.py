@@ -1,7 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from typing import Any
-
-from prettytable import ALL, PrettyTable
+from tabulate import tabulate
 
 from idmtools.utils.collections import cut_iterable_to
 
@@ -110,10 +109,11 @@ class TableDisplay(IDisplaySetting):
         slice, remaining = cut_iterable_to(obj, self.max_rows)
 
         # Create the table
-        printout = PrettyTable([s.header for s in self.columns])
-        printout.hrules = ALL
+        rows=[]
         for child in slice:
-            printout.add_row([s.display(child) for s in self.columns])
+            rows.append([s.display(child) for s in self.columns])
+
+        printout = tabulate(rows, headers=[s.header for s in self.columns], tablefmt='psql', showindex=False)
 
         # If there are items remaining, display
         if remaining > 0:
