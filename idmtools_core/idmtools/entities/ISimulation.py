@@ -1,28 +1,23 @@
-import json
 import typing
-from abc import ABC
+from abc import ABCMeta, abstractmethod
+from dataclasses import dataclass, field
 
-from idmtools.assets import Asset, AssetCollection
 from idmtools.core import EntityStatus, IAssetsEnabled, IEntity
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TExperiment
 
 
-class ISimulation(IAssetsEnabled, IEntity, ABC):
+@dataclass
+class ISimulation(IAssetsEnabled, IEntity, metaclass=ABCMeta):
     """
     Represents a generic Simulation.
     This class needs to be implemented for each model type with specifics.
     """
+    experiment: 'TExperiment' = field(default=None, compare=False, metadata={"md": True})
+    status: 'EntityStatus' = field(default=None, compare=False)
 
-    def __init__(self, parameters: dict = None, assets: 'AssetCollection' = None, experiment: 'TExperiment' = None):
-        IAssetsEnabled.__init__(self, assets)
-        IEntity.__init__(self)
-        self.assets = assets or AssetCollection()
-        self.parameters = parameters or {"parameters": {}}
-        self.experiment = experiment
-        self.status = None
-
+    @abstractmethod
     def set_parameter(self, name: str, value: any) -> dict:
         """
         Set a parameter in the simulation
@@ -32,8 +27,7 @@ class ISimulation(IAssetsEnabled, IEntity, ABC):
 
         Returns: Tag to record the change
         """
-        self.parameters["parameters"][name] = value
-        return {name: value}
+        pass
 
     def __repr__(self):
         return f"<Simulation: {self.uid} - Exp_id: {self.experiment.uid}>"
@@ -41,12 +35,12 @@ class ISimulation(IAssetsEnabled, IEntity, ABC):
     def pre_creation(self):
         self.gather_assets()
 
+    @abstractmethod
     def gather_assets(self):
         """
         Gather all the assets for the simulation.
-        By default, only create a config.json containing the parameters
         """
-        self.assets.add_asset(Asset(filename="config.json", content=json.dumps(self.parameters)))
+        pass
 
     @property
     def done(self):

@@ -5,7 +5,7 @@
 
 from setuptools import setup, find_packages
 
-with open('README.md') as readme_file:
+with open('README.md', encoding='utf-8') as readme_file:
     readme = readme_file.read()
 
 with open('requirements.txt') as requirements_file:
@@ -14,9 +14,11 @@ with open('requirements.txt') as requirements_file:
 setup_requirements = []
 test_requirements = ['pytest', 'pytest-runner']
 
-extras = {
-    'test': test_requirements,
-}
+extras = dict(test=test_requirements, dev=['Pympler'],
+              # Requirements for running workers server
+              workers=['pandas~=0.24.2', 'sqlalchemy~=1.3.5', 'psycopg2-binary~=2.8.3'],
+              # these are only needed when not running UI
+              ui=['flask~=1.0.3','Flask-AutoIndex~=0.6.4', 'flask_restful~=0.3.7'])
 
 setup(
     author="Clinton Collins"

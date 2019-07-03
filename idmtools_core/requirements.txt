@@ -3,3 +3,7 @@ pipreqs==0.4.9
 dramatiq[redis]
 pyCOMPS
 marshmallow==3.0.0rc6
+tabulate~=0.8.3
+diskcache==3.1.1
+more-itertools==7.0.0
+pandas==0.24.2

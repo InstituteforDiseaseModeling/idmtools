@@ -11,10 +11,10 @@ Clone the repository:
 > git clone https://github.com/InstituteforDiseaseModeling/idmtools.git
 ```
 
-Install the packages in dev mode with the `test` extra (from repository folder):
+Install the packages in dev mode with the `test` extra (from repository folder).
 ```bash
 > cd idmtools_core
-> pip install -e .[test] --extra-index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+> pip install -e .[test,3.6] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
 > cd ..
 > cd idmtools_local_runner
 > pip install -e .[test]

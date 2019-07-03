@@ -1,19 +1,37 @@
-import uuid
+import copy
+import typing
 from abc import ABCMeta
+from dataclasses import dataclass, field, fields
 
 from idmtools.utils.hashing import hash_obj
 
+if typing.TYPE_CHECKING:
+    import uuid
+    from idmtools.core import TTags
 
+
+@dataclass
 class IEntity(metaclass=ABCMeta):
     """
     Interface for all entities in the system.
     """
-    pickle_ignore_fields = []
+    _uid: 'uuid' = field(default=None, metadata={"md": True})
+    platform_id: int = field(default=None, metadata={"md": True})
+    tags: 'TTags' = field(default_factory=lambda: {}, metadata={"md": True})
 
-    def __init__(self, uid: uuid = None, tags: dict = None):
-        self._uid = uid
-        self.tags = tags or {}
-        self.platform_id = None
+    @property
+    def metadata(self):
+        attrs = set(vars(self).keys())
+        obj_dict = {k: getattr(self, k) for k in attrs.intersection(self.metadata_fields)}
+        return self.__class__(**obj_dict)
+
+    @property
+    def pickle_ignore_fields(self):
+        return set(f.name for f in fields(self) if "pickle_ignore" in f.metadata and f.metadata["pickle_ignore"])
+
+    @property
+    def metadata_fields(self):
+        return set(f.name for f in fields(self) if "md" in f.metadata and f.metadata["md"])
 
     @property
     def uid(self):
@@ -22,6 +40,9 @@ class IEntity(metaclass=ABCMeta):
     @uid.setter
     def uid(self, uid):
         self._uid = uid
+
+    def display(self):
+        return self.__repr__()
 
     # region Events methods
     def pre_creation(self) -> None:
@@ -41,17 +62,21 @@ class IEntity(metaclass=ABCMeta):
         Function called after restoring the state if additional initialization is required
         """
         pass
+
     # endregion
 
-    # region State management and Hashing
+    # region State management
     def __getstate__(self):
         """
         Ignore the fields in pickle_ignore_fields during pickling.
         """
         state = self.__dict__.copy()
-        # Don't pickle baz
-        for f in self.pickle_ignore_fields:
-            del state[f]
+        attrs = set(vars(self).keys())
+
+        # Don't pickle ignore_pickle fields
+        for field_name in attrs.intersection(self.pickle_ignore_fields):
+            if field_name in state:
+                del state[field_name]
 
         return state
 
@@ -60,11 +85,5 @@ class IEntity(metaclass=ABCMeta):
         Add ignored fields back since they don't exist in the pickle
         """
         self.__dict__.update(state)
-        for f in self.pickle_ignore_fields:
-            setattr(self, f, None)
         self.post_setstate()
-
-    def __eq__(self, other):
-        return hash_obj(self) == hash_obj(other)
-
     # endregion

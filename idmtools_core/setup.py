@@ -12,10 +12,11 @@ with open('requirements.txt') as requirements_file:
     requirements = requirements_file.read().split("\n")
 
 setup_requirements = []
-test_requirements = ['pytest', 'pytest-runner', 'numpy==1.16.4']
+test_requirements = ['pytest', 'pytest-runner', 'numpy==1.16.4', 'xmlrunner']
 
 extras = {
     'test': test_requirements,
+    '3.6': ['dataclasses']
 }
 
 setup(
