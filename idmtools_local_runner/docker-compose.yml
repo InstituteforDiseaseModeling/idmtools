@@ -23,9 +23,8 @@ services:
     mem_reservation: 32m
     # allow passing uid to compose on Unix
     # run like so CURRENT_UID=$(id -u):$(id -g) docker-compose up -d
-    user: "${CURRENT_UID:-999:999}"
     volumes:
-      - ../data/postgres-data:/var/lib/postgresql/data
+      - idmtools_local_postgres:/var/lib/postgresql/data
   workers:
     build:
       context: .
@@ -61,6 +60,11 @@ services:
 #      - REDIS_HOSTS=local:redis:6379
 #    ports:
 #      - "8081:8081"
+
+# Windows docker and Postgres permissions don't get along
+# because of that we need to use a mounted volume
+volumes:
+  idmtools_local_postgres:
 
 networks:
   default:
