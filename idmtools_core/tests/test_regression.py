@@ -21,8 +21,8 @@ class TestPersistenceServices(ITestWithPersistence):
                               assets=AssetCollection.from_directory(assets_path))
         pe.gather_assets()
         self.assertEqual(len(pe.assets.assets), 2)
-        expected_files = ['model.py','__init__.py']
-        actual_files =[asset.filename for asset in pe.assets.assets]
+        expected_files = ['model.py', '__init__.py']
+        actual_files = [asset.filename for asset in pe.assets.assets]
         self.assertEqual(actual_files.sort(), expected_files.sort())
 
     def test_fix_114(self):
@@ -101,6 +101,14 @@ class TestPersistenceServices(ITestWithPersistence):
 
         # Ensure that we actually ran with the correct parameter
         self.assertEqual(p.simulations[em.experiment.uid][0].parameters["test"], 10, "Parameter in platform")
+
+    def test_fix_170(self):
+        # https://github.com/InstituteforDiseaseModeling/idmtools/issues/170
+        e = TestExperiment("Experiment")
+        e.tags = {"test": 1}
+        e.pre_creation()
+        self.assertEqual(e.tags.get("type"), "tests.utils.TestExperiment")
+        self.assertEqual(e.tags.get("test"), 1)
 
 
 if __name__ == '__main__':
