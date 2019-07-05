@@ -49,6 +49,8 @@ class TestPythonSimulation(ITestWithPersistence):
 
     def test_add_class_tag(self):
         ps = PythonExperiment(name=self.case_name, model_path=os.path.join(INPUT_PATH, "python", "model.py"))
+        # The tag for type is added at runtime during the pre_creation event
+        ps.pre_creation()
         self.assertEqual(ps.tags.get('type'), "idmtools_models.python.PythonExperiment")
 
     def test_envelope(self):
@@ -119,8 +121,8 @@ class TestPythonSimulation(ITestWithPersistence):
         # validate experiment tags
         actual_exp_tags = experiment.get(experiment.id, QueryCriteria().select_children('tags')).tags
         expected_exp_tags = {'idmtools': 'idmtools-automation', 'number_tag': '123', 'string_tag': 'test',
-                             'KeyOnly': ''}
-        self.assertEqual(expected_exp_tags, actual_exp_tags)
+                             'KeyOnly': '', 'type': 'idmtools_models.python.PythonExperiment'}
+        self.assertDictEqual(expected_exp_tags, actual_exp_tags)
 
     # Test parameter "b" set is depending on parameter "a"
     # a=[0,1,2,3,4] <--sweep parameter
@@ -261,7 +263,6 @@ class TestPythonSimulation(ITestWithPersistence):
                              {'filename': 'temp.py', 'relative_path': 'Lib'},
                              {'filename': 'functions.py', 'relative_path': 'MyExternalLibrary'}]
             self.validate_assets(assets, expected_list)
-
 
     # Test will test pythonExperiment's assets parameter which adds only specific file under
     # tests/inputs/python/Assets/MyExternalLibrary to COMPS' Assets and add relative_path MyExternalLibrary in comps
