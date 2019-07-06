@@ -5,9 +5,9 @@ from functools import partial
 from operator import itemgetter
 
 from COMPS.Data import Experiment, QueryCriteria
+
 from idmtools.assets import Asset, AssetCollection
-from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder, SweepArm, ArmType, ArmExperimentBuilder
-from idmtools.config import IdmConfigParser
+from idmtools.builders import ArmExperimentBuilder, ArmType, ExperimentBuilder, StandAloneSimulationsBuilder, SweepArm
 from idmtools.core import EntityStatus
 from idmtools.managers import ExperimentManager
 from idmtools.platforms import COMPSPlatform, LocalPlatform
@@ -15,8 +15,7 @@ from idmtools_models.python import PythonExperiment, PythonSimulation
 from tests import INPUT_PATH
 from tests.utils.decorators import comps_test
 from tests.utils.ITestWithPersistence import ITestWithPersistence
-
-from tests.utils.utils import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id
+from tests.utils.utils import get_asset_collection_by_id, get_asset_collection_id_for_simulation_id
 
 
 def param_update(simulation, param, value):
@@ -40,7 +39,6 @@ class TestPythonSimulation(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
-        IdmConfigParser()
         self.platform = COMPSPlatform()
 
     def test_retrieve_extra_libraries(self):

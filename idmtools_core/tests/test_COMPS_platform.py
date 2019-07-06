@@ -1,16 +1,16 @@
 import copy
+import json
 import os
 import unittest
 
 from idmtools.builders import ExperimentBuilder
-from idmtools.config import IdmConfigParser
 from idmtools.core import EntityStatus
+from idmtools.managers import ExperimentManager
 from idmtools.platforms import COMPSPlatform
+from idmtools_models.python import PythonExperiment
 from tests import INPUT_PATH
 from tests.utils.decorators import comps_test
-
 from tests.utils.ITestWithPersistence import ITestWithPersistence
-from idmtools_models.python import PythonExperiment
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 
@@ -19,7 +19,6 @@ current_directory = os.path.dirname(os.path.realpath(__file__))
 class TestCOMPSPlatform(ITestWithPersistence):
     def setUp(self) -> None:
         super().setUp()
-        IdmConfigParser()
         self.platform = COMPSPlatform()
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
@@ -29,6 +28,39 @@ class TestCOMPSPlatform(ITestWithPersistence):
 
         self.builder = ExperimentBuilder()
         self.builder.add_sweep_definition(setP, [1, 2, 3])
+
+    def test_output_files_retrieval(self):
+        config = {"a": 1, "b": 2}
+        experiment = PythonExperiment(name=self.case_name,
+                                      model_path=os.path.join(INPUT_PATH, "compsplatform", "working_model.py"))
+        experiment.base_simulation.parameters = config
+        em = ExperimentManager(experiment=experiment, platform=self.platform)
+        em.run()
+        em.wait_till_done()
+
+        from idmtools.utils.entities import retrieve_experiment
+        experiment = retrieve_experiment(experiment.uid, platform=self.platform, with_simulations=True)
+        files_needed = ["config.json", "Assets\\working_model.py"]
+        files_retrieved = self.platform.get_assets_for_simulation(experiment.simulations[0], files_needed)
+
+        # We have the correct files?
+        self.assertEqual(len(files_needed), len(files_retrieved))
+
+        # Test the content
+        with open(os.path.join(INPUT_PATH, "compsplatform", "working_model.py"), 'rb') as m:
+            self.assertEqual(files_retrieved["Assets\\working_model.py"], m.read())
+        self.assertEqual(files_retrieved["config.json"], json.dumps(config).encode('utf-8'))
+
+        # Test different separators
+        files_needed = ["Assets/working_model.py"]
+        files_retrieved = self.platform.get_assets_for_simulation(experiment.simulations[0], files_needed)
+
+        # We have the correct files?
+        self.assertEqual(len(files_needed), len(files_retrieved))
+
+        # Test the content
+        with open(os.path.join(INPUT_PATH, "compsplatform", "working_model.py"), 'rb') as m:
+            self.assertEqual(files_retrieved["Assets/working_model.py"], m.read())
 
     def _run_and_test_experiment(self, experiment):
         experiment.builder = self.builder

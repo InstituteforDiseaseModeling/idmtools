@@ -11,23 +11,22 @@ if typing.TYPE_CHECKING:
 
 def retrieve_experiment(experiment_id:'uuid', platform: 'TPlatform' = None, with_simulations:'bool'=False) -> 'TExperiment':
     experiment = ExperimentPersistService.retrieve(experiment_id)
-    if experiment:
-        return experiment
-
-    if not platform:
-        raise ExperimentNotFound(experiment_id)
-
-    # No experiment was found in the persist service, try to retrieve from the platform
-    experiment = platform.retrieve_experiment(experiment_id)
     if not experiment:
-        raise ExperimentNotFound(experiment_id, platform)
+        # This is an unknown experiment, make sure we have a platform to ask for info
+        if not platform:
+            raise ExperimentNotFound(experiment_id)
 
-    # Restore the simulations as well?
+        # Try to retrieve it from the platform
+        experiment = platform.retrieve_experiment(experiment_id)
+        if not experiment:
+            raise ExperimentNotFound(experiment_id, platform)
+
+        # We have the experiment -> persist it for next time
+        experiment.platform_id = PlatformPersistService.save(platform)
+        ExperimentPersistService.save(experiment)
+
+    # At this point we have our experiment -> check if we need the simulations
     if with_simulations:
         platform.restore_simulations(experiment)
-
-    # We have the experiment -> persist and return
-    experiment.platform_id = PlatformPersistService.save(platform)
-    ExperimentPersistService.save(experiment)
 
     return experiment
