@@ -1,2 +1,6 @@
-dramatiq[redis, watch]==1.6.0
-gevent
+dramatiq[redis, watch]~=1.6.0
+gevent~=1.4.0
+click~=7.0
+tabulate~=0.8.3
+colorama~=0.4.1
+requests~=2.22.0
