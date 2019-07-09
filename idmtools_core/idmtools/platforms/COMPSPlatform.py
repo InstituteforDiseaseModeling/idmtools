@@ -236,12 +236,16 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             @self.cache.memoize()
             def get_file_for_collection(collection_id, file_path):
                 logger.debug(f"Cache miss for {collection_id} {file_path}")
+
+                # Normalize the separators
+                file_path = file_path.replace("/\\", os.sep)
+
                 # retrieve the collection
                 ac = AssetCollection.get(collection_id, QueryCriteria().select_children('assets'))
 
                 # Look for the asset file in the collection
                 file_name = os.path.basename(file_path)
-                path = os.path.dirname(file_path).lstrip("Assets/")
+                path = os.path.dirname(file_path).lstrip(f"Assets{os.sep}")
 
                 for asset_file in ac.assets:
                     if asset_file.file_name == file_name and (asset_file.relative_path or '') == path:
