@@ -2,10 +2,9 @@ import copy
 import typing
 import uuid
 from abc import ABC
+from itertools import chain
 from dataclasses import dataclass, field, InitVar
-
 from more_itertools import grouper
-
 from idmtools.core import EntityContainer, IAssetsEnabled, INamedEntity
 
 if typing.TYPE_CHECKING:
@@ -28,7 +27,7 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
     command: 'TCommandLine' = field(default=None)
     suite_id: uuid = field(default=None)
     base_simulation: 'TSimulation' = field(default=None)
-    builder: 'TExperimentBuilder' = field(default=None, metadata={"pickle_ignore":True})
+    builders: list = field(default=None, metadata={"pickle_ignore": True})
     simulation_type: 'InitVar[TSimulationClass]' = None
     simulations: 'EntityContainer' = field(default=None, compare=False)
 
@@ -46,16 +45,53 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
     def __repr__(self):
         return f"<Experiment: {self.uid} - {self.name} / Sim count {len(self.simulations)}>"
 
+    @property
+    def builder(self) -> 'TExperimentBuilder':
+        """
+        For back-compatibility purpose
+        Returns: the last 'TExperimentBuilder'
+        """
+        return self.builders[-1] if self.builders and len(self.builders) > 0 else None
+
+    @builder.setter
+    def builder(self, builder: 'TExperimentBuilder') -> None:
+        """
+        For back-compatibility purpose
+        Args:
+            builder: new builder to be used
+        Returns: None
+        """
+        # self.builders.clear()
+        self.add_builder(builder)
+
+    def add_builder(self, builder: 'TExperimentBuilder') -> None:
+        """
+        Add builder to builder collection
+        Args:
+            builder: a builder to be added
+        Returns: None
+        """
+        from idmtools.builders import ExperimentBuilder
+
+        if not isinstance(builder, ExperimentBuilder):
+            raise Exception("Builder ({}) must have type of ExperimentBuilder!".format(builder))
+
+        if self.builders is None:
+            self.builders = []
+
+        self.builders.append(builder)
+        self.builders = list(set(self.builders))
+
     def display(self):
         from idmtools.utils.display import display, experiment_table_display
         display(self, experiment_table_display)
 
     def batch_simulations(self, batch_size=5):
-        if not self.builder:
+        if not self.builders:
             yield (self.simulation(),)
             return
 
-        for groups in grouper(self.builder, batch_size):
+        for groups in grouper(chain(*self.builders), batch_size):
             sims = []
             for simulation_functions in filter(None, groups):
                 simulation = self.simulation()
@@ -88,9 +124,6 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
 
         # Add a tag to keep the class name
         self.tags["type"] = self.__class__.__module__
-
-    def post_setstate(self):
-        self.simulations = EntityContainer()
 
     @property
     def done(self):

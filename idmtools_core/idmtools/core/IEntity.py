@@ -1,8 +1,6 @@
-import copy
 import typing
 from abc import ABCMeta
 from dataclasses import dataclass, field, fields
-
 from idmtools.utils.hashing import hash_obj
 
 if typing.TYPE_CHECKING:
@@ -85,5 +83,13 @@ class IEntity(metaclass=ABCMeta):
         Add ignored fields back since they don't exist in the pickle
         """
         self.__dict__.update(state)
+
+        # Restore the pickle deleted fields with their default value
+        fds = fields(self)
+        field_default = {f.name: f.default for f in fds}
+
+        for field_name in self.pickle_ignore_fields:
+            setattr(self, field_name, field_default[field_name])
+
         self.post_setstate()
     # endregion
