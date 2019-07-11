@@ -1,5 +1,6 @@
 import logging
 import os
+import re
 import typing
 from dataclasses import dataclass, field
 
@@ -210,7 +211,29 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         experiment.uid = self.comps_experiment.id
         return experiment
 
+    @staticmethod
+    def _get_file_for_collection(collection_id, file_path):
+        print(f"Cache miss for {collection_id} {file_path}")
+
+        # Normalize the separators
+        file_path = re.sub(r'[\\/]', re.escape(os.sep), file_path)
+
+        # retrieve the collection
+        ac = AssetCollection.get(collection_id, QueryCriteria().select_children('assets'))
+
+        # Look for the asset file in the collection
+        file_name = os.path.basename(file_path)
+        path = os.path.dirname(file_path).lstrip(f"Assets{os.sep}")
+
+        for asset_file in ac.assets:
+            if asset_file.file_name == file_name and (asset_file.relative_path or '') == path:
+                return asset_file.retrieve()
+        return None
+
+
     def get_assets_for_simulation(self, simulation, output_files):
+        self._login()
+
         # Retrieve the simulation from COMPS
         comps_simulation = COMPSSimulation.get(simulation.uid,
                                                query_criteria=QueryCriteria().select(['id']).select_children(
@@ -233,30 +256,11 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
         # Take care of the assets
         if assets:
-            @self.cache.memoize()
-            def get_file_for_collection(collection_id, file_path):
-                logger.debug(f"Cache miss for {collection_id} {file_path}")
-
-                # Normalize the separators
-                file_path = file_path.replace("/\\", os.sep)
-
-                # retrieve the collection
-                ac = AssetCollection.get(collection_id, QueryCriteria().select_children('assets'))
-
-                # Look for the asset file in the collection
-                file_name = os.path.basename(file_path)
-                path = os.path.dirname(file_path).lstrip(f"Assets{os.sep}")
-
-                for asset_file in ac.assets:
-                    if asset_file.file_name == file_name and (asset_file.relative_path or '') == path:
-                        return asset_file.retrieve()
-                return None
-
             # Get the collection_id for the simulation
             collection_id = comps_simulation.configuration.asset_collection_id
 
             # Retrieve the files
             for file_path in assets:
-                ret[file_path] = get_file_for_collection(collection_id, file_path)
+                ret[file_path] = self.cache.memoize()(self._get_file_for_collection)(collection_id, file_path)
 
         return ret
