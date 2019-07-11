@@ -1,4 +1,3 @@
-import itertools
 import os
 import numpy as np
 from functools import partial
@@ -88,4 +87,18 @@ class TestMultipleBuilders(ITestWithPersistence):
         experiment.builder = self.yaml_builder
 
         # test if we have correct number of builders
-        self.assertEqual(len(experiment.builders), 3)
+        self.assertEqual(len(experiment.builders), 1)
+
+        # test only the last builder has been added
+        self.assertTrue(isinstance(list(experiment.builders)[0], YamlExperimentBuilder))
+
+    def test_validation(self):
+        a = TestExperiment(name="test")
+        self.assertSetEqual(a.pickle_ignore_fields, {'builders'})
+
+        with self.assertRaises(Exception):
+            a.builder = 1
+
+        # test no builder has been added
+        self.assertIsNone(a.builders)
+

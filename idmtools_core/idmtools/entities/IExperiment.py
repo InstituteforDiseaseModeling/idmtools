@@ -27,7 +27,7 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
     command: 'TCommandLine' = field(default=None)
     suite_id: uuid = field(default=None)
     base_simulation: 'TSimulation' = field(default=None)
-    builders: list = field(default=None, metadata={"pickle_ignore": True})
+    builders: set = field(default=None, metadata={"pickle_ignore": True})
     simulation_type: 'InitVar[TSimulationClass]' = None
     simulations: 'EntityContainer' = field(default=None, compare=False)
 
@@ -51,7 +51,7 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         For back-compatibility purpose
         Returns: the last 'TExperimentBuilder'
         """
-        return self.builders[-1] if self.builders and len(self.builders) > 0 else None
+        return list(self.builders)[-1] if self.builders and len(self.builders) > 0 else None
 
     @builder.setter
     def builder(self, builder: 'TExperimentBuilder') -> None:
@@ -61,7 +61,11 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
             builder: new builder to be used
         Returns: None
         """
-        # self.builders.clear()
+
+        # Make sure we only take the last builder assignment
+        if self.builders:
+            self.builders.clear()
+
         self.add_builder(builder)
 
     def add_builder(self, builder: 'TExperimentBuilder') -> None:
@@ -73,14 +77,16 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         """
         from idmtools.builders import ExperimentBuilder
 
+        # Add builder validation
         if not isinstance(builder, ExperimentBuilder):
             raise Exception("Builder ({}) must have type of ExperimentBuilder!".format(builder))
 
+        # Initialize builders the first time
         if self.builders is None:
-            self.builders = []
+            self.builders = set()
 
-        self.builders.append(builder)
-        self.builders = list(set(self.builders))
+        # Add new builder to the collection
+        self.builders.add(builder)
 
     def display(self):
         from idmtools.utils.display import display, experiment_table_display

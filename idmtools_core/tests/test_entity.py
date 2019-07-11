@@ -2,6 +2,7 @@ import copy
 import pickle
 import unittest
 from dataclasses import dataclass, field
+from idmtools.builders import ExperimentBuilder
 from idmtools.core import IEntity
 from idmtools.entities.Suite import Suite
 from tests.utils.ITestWithPersistence import ITestWithPersistence
@@ -46,12 +47,18 @@ class TestEntity(ITestWithPersistence):
         b = pickle.loads(pickle.dumps(a))
         self.assertEqual(a, b)
 
+    def test_pickle_ignore_zdu(self):
+        a = TestExperiment(name="test")
+        self.assertSetEqual(a.pickle_ignore_fields, {'builders'})
+        a.builder = ExperimentBuilder()
+
+        b = pickle.loads(pickle.dumps(a))
+        self.assertIsNone(b.builders)
+
     def test_pickle_ignore(self):
         a = TestExperiment(name="test")
         self.assertSetEqual(a.pickle_ignore_fields, {'builders'})
-
-        with self.assertRaises(Exception):
-            a.builder = 1
+        a.builder = ExperimentBuilder()
 
         b = pickle.loads(pickle.dumps(a))
         self.assertIsNone(b.builders)
