@@ -30,7 +30,7 @@ class ISimulation(IAssetsEnabled, IEntity, metaclass=ABCMeta):
         pass
 
     def __repr__(self):
-        return f"<Simulation: {self.uid} - Exp_id: {self.experiment.uid}>"
+        return f"<Simulation: {self.uid} - Exp_id: {self.experiment.uid if self.experiment else None}>"
 
     def pre_creation(self):
         self.gather_assets()

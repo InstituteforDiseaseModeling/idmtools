@@ -43,7 +43,7 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
                 raise Exception("A `base_simulation` or `simulation_type` needs to be provided to the Experiment object!")
 
     def __repr__(self):
-        return f"<Experiment: {self.uid} - {self.name} / Sim count {len(self.simulations)}>"
+        return f"<Experiment: {self.uid} - {self.name} / Sim count {len(self.simulations) if self.simulations else 0}>"
 
     @property
     def builder(self) -> 'TExperimentBuilder':
