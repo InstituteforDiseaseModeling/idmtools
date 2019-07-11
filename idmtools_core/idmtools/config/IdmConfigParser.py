@@ -1,6 +1,7 @@
 import copy
 import logging
 from logging import getLogger
+from logging.handlers import QueueHandler
 from logging.config import fileConfig
 import os
 from configparser import ConfigParser
@@ -8,6 +9,7 @@ from typing import Dict
 
 default_config = 'idmtools.ini'
 
+# this is the only logger that should not be defined using init_logger
 logger = getLogger(__name__)
 
 
@@ -106,25 +108,8 @@ class IdmConfigParser:
         cls._config = ConfigParser()
         cls._config.read(ini_file)
 
-        # load the logging config as well using the same file
-        # logging excepts the following items to exist inside the configurations file
-        # - loggers
-        # - handlers
-        # - formatters
-        try:
-            # Remove all handlers associated with the root logger object.
-            for handler in logging.root.handlers[:]:
-                logging.root.removeHandler(handler)
-            fileConfig(ini_file)
-        except KeyError as e:
-            # default to our typical config with a warning and higher
-            # written to a file
-            logging.basicConfig(filename='idmtools.log', level=logging.WARN)
-            # set the default level for comps logging to warning as well since this will be picked up in idmtools
-            # log
-            comps_logger = getLogger("COMPS")
-            comps_logger.setLevel(logging.WARN)
-            logger.warning('Using default configuration for logging since idmtools.ini contains no logging config.')
+        from idmtools.core.logging import setup_logging
+        setup_logging()
 
     @classmethod
     def _get_section(cls, section: str = None) -> Dict[str, str]:
