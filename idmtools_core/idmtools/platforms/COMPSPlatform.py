@@ -1,23 +1,25 @@
 import logging
 import os
+import re
 import typing
+from dataclasses import dataclass, field
 
 from COMPS import Client
 from COMPS.Data import AssetCollection, AssetCollectionFile, Configuration, Experiment as COMPSExperiment, \
-    QueryCriteria, Simulation as COMPSSimulation, \
-    SimulationFile
+    QueryCriteria, Simulation as COMPSSimulation, SimulationFile
 from COMPS.Data.Simulation import SimulationState
 
-from idmtools.core import EntityStatus, experiment_factory
+from idmtools.core import EntityStatus, experiment_factory, CacheEnabled
+
 from idmtools.entities import IPlatform
 from idmtools.utils.time import timestamp
-from dataclasses import dataclass, field
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TExperiment
+    import uuid
 
-logger = logging.getLogger('COMPS.Data.Simulation')
-logger.disabled = True
+logging.getLogger('COMPS.Data.Simulation').disabled = True
+logger = logging.getLogger(__name__)
 
 
 class COMPSPriority:
@@ -29,7 +31,7 @@ class COMPSPriority:
 
 
 @dataclass
-class COMPSPlatform(IPlatform):
+class COMPSPlatform(IPlatform, CacheEnabled):
     """
     Represents the platform allowing to run simulations on COMPS.
     """
@@ -45,9 +47,11 @@ class COMPSPlatform(IPlatform):
     num_cores: int = field(default=1)
     exclusive: bool = field(default=False)
 
+    # Private fields
+    _comps_experiment: 'COMPSExperiment' = field(default=None, init=False, compare=False)
+    _comps_experiment_id: 'uuid' = field(default=None, init=False, compare=False)
+
     def __post_init__(self):
-        self._comps_experiment = None
-        self._comps_experiment_id = None
         super().__post_init__()
         self._login()
 
@@ -64,7 +68,8 @@ class COMPSPlatform(IPlatform):
 
         self._login()
         self._comps_experiment = COMPSExperiment.get(id=self._comps_experiment_id,
-                                                     query_criteria=QueryCriteria().select(["id"]).select_children(["tags"]))
+                                                     query_criteria=QueryCriteria().select(["id"]).select_children(
+                                                         ["tags"]))
         return self._comps_experiment
 
     @comps_experiment.setter
@@ -206,5 +211,56 @@ class COMPSPlatform(IPlatform):
         experiment.uid = self.comps_experiment.id
         return experiment
 
+    @staticmethod
+    def _get_file_for_collection(collection_id, file_path):
+        print(f"Cache miss for {collection_id} {file_path}")
+
+        # Normalize the separators
+        file_path = re.sub(r'[\\/]', re.escape(os.sep), file_path)
+
+        # retrieve the collection
+        ac = AssetCollection.get(collection_id, QueryCriteria().select_children('assets'))
+
+        # Look for the asset file in the collection
+        file_name = os.path.basename(file_path)
+        path = os.path.dirname(file_path).lstrip(f"Assets{os.sep}")
+
+        for asset_file in ac.assets:
+            if asset_file.file_name == file_name and (asset_file.relative_path or '') == path:
+                return asset_file.retrieve()
+        return None
+
+
     def get_assets_for_simulation(self, simulation, output_files):
-        raise NotImplemented("Not implemented yet in the COMPSPlatform")
+        self._login()
+
+        # Retrieve the simulation from COMPS
+        comps_simulation = COMPSSimulation.get(simulation.uid,
+                                               query_criteria=QueryCriteria().select(['id']).select_children(
+                                                   ["files", "configuration"]))
+
+        # Separate the output files in 2 groups:
+        # - one for the transient files (retrieved through the comps simulation)
+        # - one for the asset collection files (retrieved through the asset collection)
+        all_paths = set(output_files)
+        assets = set(path for path in output_files if path.lower().startswith("assets"))
+        transients = all_paths.difference(assets)
+
+        # Create the return dict
+        ret = {}
+
+        # Retrieve the transient if any
+        if transients:
+            transients_files = comps_simulation.retrieve_output_files(paths=transients)
+            ret = dict(zip(transients, transients_files))
+
+        # Take care of the assets
+        if assets:
+            # Get the collection_id for the simulation
+            collection_id = comps_simulation.configuration.asset_collection_id
+
+            # Retrieve the files
+            for file_path in assets:
+                ret[file_path] = self.cache.memoize()(self._get_file_for_collection)(collection_id, file_path)
+
+        return ret
