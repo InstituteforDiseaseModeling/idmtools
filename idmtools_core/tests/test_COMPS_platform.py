@@ -41,6 +41,9 @@ class TestCOMPSPlatform(ITestWithPersistence):
         from idmtools.utils.entities import retrieve_experiment
         experiment = retrieve_experiment(experiment.uid, platform=self.platform, with_simulations=True)
         files_needed = ["config.json", "Assets\\working_model.py"]
+        self.platform.get_assets_for_simulation(experiment.simulations[0], files_needed)
+
+        # Call twice to see if the cache is actually leveraged
         files_retrieved = self.platform.get_assets_for_simulation(experiment.simulations[0], files_needed)
 
         # We have the correct files?
@@ -61,6 +64,11 @@ class TestCOMPSPlatform(ITestWithPersistence):
         # Test the content
         with open(os.path.join(INPUT_PATH, "compsplatform", "working_model.py"), 'rb') as m:
             self.assertEqual(files_retrieved["Assets/working_model.py"], m.read())
+
+        # Test wrong filename
+        files_needed = ["Assets/bad.py", "bad.json"]
+        with self.assertRaises(RuntimeError):
+            self.platform.get_assets_for_simulation(experiment.simulations[0], files_needed)
 
     def _run_and_test_experiment(self, experiment):
         experiment.builder = self.builder
