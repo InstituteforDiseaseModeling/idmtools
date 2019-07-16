@@ -214,9 +214,6 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     def _get_file_for_collection(collection_id, file_path):
         print(f"Cache miss for {collection_id} {file_path}")
 
-        # Normalize the separators
-        file_path = ntpath.normpath(file_path)
-
         # retrieve the collection
         ac = AssetCollection.get(collection_id, QueryCriteria().select_children('assets'))
 
@@ -260,6 +257,8 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
             # Retrieve the files
             for file_path in assets:
-                ret[file_path] = self.cache.memoize()(self._get_file_for_collection)(collection_id, file_path)
+                # Normalize the separators
+                normalized_path = ntpath.normpath(file_path)
+                ret[file_path] = self.cache.memoize()(self._get_file_for_collection)(collection_id, normalized_path)
 
         return ret
