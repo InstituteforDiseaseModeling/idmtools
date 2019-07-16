@@ -1,16 +1,15 @@
 import logging
+import ntpath
 import os
-import re
 import typing
-from dataclasses import dataclass, field
 
 from COMPS import Client
 from COMPS.Data import AssetCollection, AssetCollectionFile, Configuration, Experiment as COMPSExperiment, \
     QueryCriteria, Simulation as COMPSSimulation, SimulationFile
 from COMPS.Data.Simulation import SimulationState
+from dataclasses import dataclass, field
 
-from idmtools.core import EntityStatus, experiment_factory, CacheEnabled
-
+from idmtools.core import CacheEnabled, EntityStatus, experiment_factory
 from idmtools.entities import IPlatform
 from idmtools.utils.time import timestamp
 
@@ -216,14 +215,14 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         print(f"Cache miss for {collection_id} {file_path}")
 
         # Normalize the separators
-        file_path = re.sub(r'[\\/]', re.escape(os.sep), file_path)
+        file_path = ntpath.normpath(file_path)
 
         # retrieve the collection
         ac = AssetCollection.get(collection_id, QueryCriteria().select_children('assets'))
 
         # Look for the asset file in the collection
-        file_name = os.path.basename(file_path)
-        path = os.path.dirname(file_path).lstrip(f"Assets{os.sep}")
+        file_name = ntpath.basename(file_path)
+        path = ntpath.dirname(file_path).lstrip(f"Assets\\")
 
         for asset_file in ac.assets:
             if asset_file.file_name == file_name and (asset_file.relative_path or '') == path:
@@ -243,7 +242,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         # - one for the transient files (retrieved through the comps simulation)
         # - one for the asset collection files (retrieved through the asset collection)
         all_paths = set(output_files)
-        assets = set(path for path in output_files if path.lower().startswith("assets"))
+        assets = set(path for path in all_paths if path.lower().startswith("assets"))
         transients = all_paths.difference(assets)
 
         # Create the return dict
