@@ -57,7 +57,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     def _login(self):
         try:
             Client.auth_manager()
-        except:
+        except RuntimeError:
             Client.login(self.endpoint)
 
     @property
@@ -225,7 +225,6 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             if asset_file.file_name == file_name and (asset_file.relative_path or '') == path:
                 return asset_file.retrieve()
         return None
-
 
     def get_assets_for_simulation(self, simulation, output_files):
         self._login()
