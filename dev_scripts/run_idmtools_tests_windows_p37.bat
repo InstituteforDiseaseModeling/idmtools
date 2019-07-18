@@ -1,5 +1,5 @@
 if exist C:\idmtools_venv_37 rd /s /q C:\idmtools_venv_37
-"C:\Python37\Scripts\virtualenv.exe" -p C:\Python37\python.exe C:\idmtools_venv_37
+"C:\Program Files\Python37\Scripts\virtualenv.exe" -p C:\Program Files\Python37\python.exe C:\idmtools_venv_37
 call "C:\idmtools_venv_37\Scripts\activate"
 echo "Virtual Environment Activated"
 
