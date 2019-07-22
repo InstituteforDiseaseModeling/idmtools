@@ -24,3 +24,10 @@ class IAssetsEnabled(metaclass=ABCMeta):
         Function called at runtime to gather all assets in the collection.
         """
         pass
+
+    def add_assets(self, assets=None) -> None:
+        """
+        Add more assets to AssetCollection
+        """
+        for asset in assets:
+            self.assets.add_asset(asset)
