@@ -16,8 +16,8 @@ from tests.utils.ITestWithPersistence import ITestWithPersistence
 
 
 @unittest.skip("Skip")
-#Do not run this until few local runner bugs get fixed
-# but #236 and #220
+#Do not run this test file until few local runner bugs get fixed
+# bug: #236 and #220
 class TestLocalRunnerCLI(ITestWithPersistence):
 
     @classmethod
