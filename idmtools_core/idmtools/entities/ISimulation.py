@@ -29,7 +29,17 @@ class ISimulation(IAssetsEnabled, IEntity, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def update_params(self, params):
+    def get_parameter(self, name, default=None):
+        """
+        Get a parameter in the simulation
+        Args:
+            name: Name of the parameter
+        Returns: the Value of the parameter
+        """
+        return None
+
+    @abstractmethod
+    def update_parameters(self, params):
         """
         Bulk update parameters/config
         Args:

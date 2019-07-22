@@ -16,7 +16,16 @@ class DTKSimulation(ISimulation):
         self.config[name] = value
         return {name: value}
 
-    def update_params(self, params):
+    def get_parameter(self, name, default=None):
+        """
+        Get a parameter in the simulation
+        Args:
+            name: Name of the parameter
+        Returns: the Value of the parameter
+        """
+        return self.config.get(name, default)
+
+    def update_parameters(self, params):
         """
         Bulk update config
         Args:
