@@ -45,8 +45,8 @@ class TestMultipleBuilders(ITestWithPersistence):
 
         # create ArmExperimentBuilder
         arm = SweepArm(type=ArmType.cross)
-        arm.add_sweep_function(setA, range(2))
-        arm.add_sweep_function(setB, [1, 2, 3])
+        arm.add_sweep_definition(setA, range(2))
+        arm.add_sweep_definition(setB, [1, 2, 3])
         self.arm_builder.add_arm(arm)
 
         # add individual builders
@@ -62,8 +62,8 @@ class TestMultipleBuilders(ITestWithPersistence):
 
     def test_duplicates(self):
         arm = SweepArm(type=ArmType.cross)
-        arm.add_sweep_function(setA, range(2))
-        arm.add_sweep_function(setB, [1, 2, 3])
+        arm.add_sweep_definition(setA, range(2))
+        arm.add_sweep_definition(setB, [1, 2, 3])
         self.arm_builder.add_arm(arm)
 
         # add individual builders
@@ -76,8 +76,8 @@ class TestMultipleBuilders(ITestWithPersistence):
 
     def test_builder_property(self):
         arm = SweepArm(type=ArmType.cross)
-        arm.add_sweep_function(setA, range(2))
-        arm.add_sweep_function(setB, [1, 2, 3])
+        arm.add_sweep_definition(setA, range(2))
+        arm.add_sweep_definition(setB, [1, 2, 3])
         self.arm_builder.add_arm(arm)
 
         # add individual builders
