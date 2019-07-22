@@ -20,9 +20,9 @@ class SweepArm:
         self.type = type
 
         for func, values in funcs:
-            self.add_sweep_function(func, values)
+            self.add_sweep_definition(func, values)
 
-    def add_sweep_function(self, func: 'Callable', values: 'Iterable[Any]'):
+    def add_sweep_definition(self, func: 'Callable', values: 'Iterable[Any]'):
         self.sweep_functions.append((func, values if isinstance(values, collections.Iterable) else [values]))
 
         if self.type == ArmType.pair:

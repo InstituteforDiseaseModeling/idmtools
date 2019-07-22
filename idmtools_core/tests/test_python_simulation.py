@@ -326,13 +326,13 @@ class TestPythonSimulation(ITestWithPersistence):
 
         arm = SweepArm(type=ArmType.cross)
         builder = ArmExperimentBuilder()
-        arm.add_sweep_function(setA, 1)
-        arm.add_sweep_function(setB, [2, 3])
-        arm.add_sweep_function(setC, [4, 5])
+        arm.add_sweep_definition(setA, 1)
+        arm.add_sweep_definition(setB, [2, 3])
+        arm.add_sweep_definition(setC, [4, 5])
         builder.add_arm(arm)
         arm = SweepArm(type=ArmType.cross)
-        arm.add_sweep_function(setA, [6, 7])
-        arm.add_sweep_function(setB, [2])
+        arm.add_sweep_definition(setA, [6, 7])
+        arm.add_sweep_definition(setB, [2])
         builder.add_arm(arm)
         pe.builder = builder
         em = ExperimentManager(experiment=pe, platform=self.platform)

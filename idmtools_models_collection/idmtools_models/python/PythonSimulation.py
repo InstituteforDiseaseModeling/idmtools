@@ -63,6 +63,24 @@ class PythonSimulation(ISimulation):
         self.parameters[name] = value
         return {name: value}
 
+    def get_parameter(self, name, default=None):
+        """
+        Get a parameter in the simulation
+        Args:
+            name: Name of the parameter
+        Returns: the Value of the parameter
+        """
+        return self.parameters.get(name, default)
+
+    def update_parameters(self, params):
+        """
+        Bulk update parameters
+        Args:
+            params: dict with new values
+        Returns: None
+        """
+        self.parameters.update(params)
+
     def gather_assets(self) -> None:
         params = {self.envelope:self.parameters} if self.envelope else self.parameters
         self.assets.add_asset(Asset(filename="config.json", content=json.dumps(params)), fail_on_duplicate=False)
