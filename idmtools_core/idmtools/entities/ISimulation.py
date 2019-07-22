@@ -24,8 +24,17 @@ class ISimulation(IAssetsEnabled, IEntity, metaclass=ABCMeta):
         Args:
             name: Name of the parameter
             value: Value of the parameter
-
         Returns: Tag to record the change
+        """
+        pass
+
+    @abstractmethod
+    def update_params(self, params):
+        """
+        Bulk update parameters/config
+        Args:
+            params: dict with new values
+        Returns: None
         """
         pass
 

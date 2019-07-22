@@ -34,8 +34,8 @@ class TestArmBuilder(ITestWithPersistence):
 
     def test_simple_arm_cross(self):
         arm = SweepArm(type=ArmType.cross)
-        arm.add_sweep_function(setA, range(5))
-        arm.add_sweep_function(setB, [1, 2, 3])
+        arm.add_sweep_definition(setA, range(5))
+        arm.add_sweep_definition(setB, [1, 2, 3])
         self.builder.add_arm(arm)
 
         expected_values = list(itertools.product(range(5), [1, 2, 3]))
@@ -55,8 +55,8 @@ class TestArmBuilder(ITestWithPersistence):
 
     def test_reverse_order(self):
         arm = SweepArm(type=ArmType.cross)
-        arm.add_sweep_function(setA, range(5))
-        arm.add_sweep_function(setB, [1, 2, 3])
+        arm.add_sweep_definition(setA, range(5))
+        arm.add_sweep_definition(setB, [1, 2, 3])
         self.builder.add_arm(arm)
 
         experiment = TestExperiment("test")
@@ -67,8 +67,8 @@ class TestArmBuilder(ITestWithPersistence):
         builder2 = ArmExperimentBuilder()
 
         arm = SweepArm(type=ArmType.cross)
-        arm.add_sweep_function(setB, [1, 2, 3])
-        arm.add_sweep_function(setA, range(5))
+        arm.add_sweep_definition(setB, [1, 2, 3])
+        arm.add_sweep_definition(setA, range(5))
         builder2.add_arm(arm)
 
         experiment2 = TestExperiment("test")
@@ -80,8 +80,8 @@ class TestArmBuilder(ITestWithPersistence):
 
     def test_simple_arm_pair(self):
         arm = SweepArm(type=ArmType.pair)
-        arm.add_sweep_function(setA, range(5))
-        arm.add_sweep_function(setB, [1, 2, 3])
+        arm.add_sweep_definition(setA, range(5))
+        arm.add_sweep_definition(setB, [1, 2, 3])
         self.builder.add_arm(arm)
 
         expected_values = list(zip(range(5), [1, 2, 3]))
