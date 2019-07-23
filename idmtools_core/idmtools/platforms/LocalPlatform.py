@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from idmtools.core import EntityStatus
 from idmtools.entities import IExperiment, IPlatform
 # we have to import brokers so that the proper configuration is achieved for redis
+from idmtools.core import platform_factory
 from idmtools_local.tasks.create_assest_task import AddAssetTask
 from idmtools_local.tasks.create_experiement import CreateExperimentTask
 from idmtools_local.tasks.create_simulation import CreateSimulationTask
@@ -39,7 +40,8 @@ class LocalPlatform(IPlatform):
         messages = []
         for asset in experiment.assets:
             messages.append(
-                AddAssetTask.message(experiment.uid, asset.filename, path=asset.relative_path, contents=asset.content.decode("utf-8")))
+                AddAssetTask.message(experiment.uid, asset.filename, path=asset.relative_path,
+                                     contents=asset.content.decode("utf-8")))
         group(messages).run().wait()
 
     def send_assets_for_simulation(self, simulation):
@@ -64,3 +66,6 @@ class LocalPlatform(IPlatform):
     def run_simulations(self, experiment: IExperiment):
         for simulation in experiment.simulations:
             RunTask.send(simulation.experiment.command.cmd, simulation.experiment.uid, simulation.uid)
+
+
+platform_factory.register_type(LocalPlatform)

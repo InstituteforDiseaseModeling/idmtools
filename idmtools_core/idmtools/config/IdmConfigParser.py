@@ -43,7 +43,7 @@ class IdmConfigParser:
         cls.ensure_init()
 
         # retrieve THIS platform config settings
-        field_config = cls._get_section(section)
+        field_config = cls.get_section(section)
 
         # update field types
         field_config_updated = copy.deepcopy(field_config)
@@ -102,9 +102,9 @@ class IdmConfigParser:
         cls._config.read(ini_file)
 
     @classmethod
-    def _get_section(cls, section: str = None) -> Dict[str, str]:
+    def get_section(cls, section: str = None) -> Dict[str, str]:
         """
-        Retrieve INI section values
+        This is called from platform creation directly and retrieve INI section values
         Args:
             section: INI section name where we retrieve all fields
 
@@ -120,6 +120,26 @@ class IdmConfigParser:
             return {}
 
         section = cls._config.items(section)
+        return dict(section)
+
+    @classmethod
+    def get_block(cls, block_name: str = None) -> Dict[str, str]:
+        """
+        This is called from platform factoru and retrieve INI section values
+        Args:
+            block_name: INI section name where we retrieve all fields
+
+        Returns: all fields as a dictionary
+        """
+        cls.ensure_init()
+        if cls._config is None:
+            raise Exception(f"Config file NOT FOUND or IS Empty!")
+
+        section_dict = dict(cls._config.items())
+        if block_name not in section_dict:
+            raise Exception(f"Block '{block_name}' doesn't exist!")
+
+        section = cls._config.items(block_name)
         return dict(section)
 
     @classmethod
