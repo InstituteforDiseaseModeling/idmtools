@@ -26,8 +26,10 @@ class ExperimentsClient(BaseClient):
         args = {k: v for k, v in args.items() if v is not None}
         # collapse tags to strings
         if 'tags' in args:
+            # we need our tags in tuples then we can join properly and pass as GET array
+            # so let's convert any input dict to tuples
             if type(args['tags']) is dict:
-                args['tags'] = [(k, v) for k, v in args['tags'].items()]
+                args['tags'] = [(str(k), str(v)) for k, v in args['tags'].items()]
             args['tags'] = [','.join(tag) for tag in args['tags']]
 
         response = cls.get(id, params=args)
@@ -60,7 +62,7 @@ class ExperimentsClient(BaseClient):
     @classmethod
     def delete(cls, id: str, delete_data: bool = False, ignore_doesnt_exist: bool = True) -> bool:
         """
-        Delete an experiment. Optinally you can delete the experiment data. WARNING: Deleting the data is irreversible
+        Delete an experiment. Optionally you can delete the experiment data. WARNING: Deleting the data is irreversible
 
         Args:
             id (str): ID of the experiments

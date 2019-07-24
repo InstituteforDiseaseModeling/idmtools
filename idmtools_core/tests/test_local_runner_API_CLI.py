@@ -79,7 +79,7 @@ class TestLocalRunnerCLI(ITestWithPersistence):
             self.assertEqual(simulations[0], simulation)
 
             # Also test get_one with simulation id and tags  filters
-            simulation1 = SimulationsClient.get_one(str(s.uid), tags=s.tags.items())
+            simulation1 = SimulationsClient.get_one(str(s.uid), tags=s.tags)
             self.assertEqual(simulations[0], simulation1)
 
         # Test 2: get_all simulations with simulation id and experiment id as filters
