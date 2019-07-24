@@ -22,7 +22,7 @@ class ExperimentsClient(BaseClient):
         Returns:
             List[Dict[str, Any]]: returns list of experiments
         """
-        args = dict(tag=tags if tags is not None and len(tags) > 0 else None)
+        args = dict(tags=tags if tags is not None and len(tags) > 0 else None)
         # Filter our any parameters set to None
         args = {k: v for k, v in args.items() if v is not None}
         # collapse tags to strings
@@ -40,18 +40,18 @@ class ExperimentsClient(BaseClient):
         return result
 
     @classmethod
-    def get_one(cls, id: str, tag: Optional[List[Tuple[str, str]]] = None) -> Dict[str, Any]:
+    def get_one(cls, id: str, tags: Optional[List[Tuple[str, str]]] = None) -> Dict[str, Any]:
         """
         Convenience method to get one simulation
 
         Args:
             id (str):  ID of the experiment
-            tag (Optional[List[Tuple[str, str]]]): List of tags/values to filter experiment by
+            tags (Optional[List[Tuple[str, str]]]): List of tags/values to filter experiment by
 
         Returns:
             dict: Dictionary containing the experiment objects
         """
-        result = cls.get_all(id, tag)
+        result = cls.get_all(id, tags)
         if len(result) < 1:
             raise RuntimeError(f"Cannot find experiment with ID {id}")
         return result[0]

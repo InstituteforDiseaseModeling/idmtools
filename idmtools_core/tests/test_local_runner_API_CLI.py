@@ -56,7 +56,7 @@ class TestLocalRunnerCLI(ITestWithPersistence):
 
         # Test 2: get_one experiment with experiment id and tags
         experiment1 = ExperimentsClient.get_one(str(self.pe.uid),
-                                                tag=[('idmtools', 'idmtools-automation'), ('string_tag', 'test')])
+                                                tags=[('idmtools', 'idmtools-automation'), ('string_tag', 'test')])
         self.assertEqual(experiment1['experiment_id'], str(self.pe.uid))
         self.assertEqual(experiment1['tags'], self.pe.tags)
         self.assertEqual(experiment1['data_path'], '/data/' + str(self.pe.uid))
@@ -79,7 +79,7 @@ class TestLocalRunnerCLI(ITestWithPersistence):
             self.assertEqual(simulations[0], simulation)
 
             # Also test get_one with simulation id and tags  filters
-            simulation1 = SimulationsClient.get_one(str(s.uid), tag=s.tags.items())
+            simulation1 = SimulationsClient.get_one(str(s.uid), tags=s.tags.items())
             self.assertEqual(simulations[0], simulation1)
 
         # Test 2: get_all simulations with simulation id and experiment id as filters
