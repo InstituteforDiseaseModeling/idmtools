@@ -15,9 +15,6 @@ from tests import INPUT_PATH
 from tests.utils.ITestWithPersistence import ITestWithPersistence
 
 
-#@unittest.skip("Skip")
-# Do not run this test file until few local runner bugs get fixed
-# bug: #236 and #220
 class TestLocalRunnerCLI(ITestWithPersistence):
 
     @classmethod
@@ -38,8 +35,6 @@ class TestLocalRunnerCLI(ITestWithPersistence):
         em = ExperimentManager(experiment=cls.pe, platform=platform)
         em.run()
         em.wait_till_done()
-        import time
-        time.sleep(50)  # for workaround bug #220
 
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
