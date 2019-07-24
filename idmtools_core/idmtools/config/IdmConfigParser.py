@@ -108,6 +108,7 @@ class IdmConfigParser:
         cls._config = ConfigParser()
         cls._config.read(ini_file)
 
+        # init logging here as this is our most likely entry-point into an idm-tools "application"
         from idmtools.core.logging import setup_logging
         setup_logging()
 
