@@ -11,19 +11,24 @@ class ExperimentsClient(BaseClient):
     base_url = f'{API_PATH}/experiments'
 
     @classmethod
-    def get_all(cls, id: Optional[str] = None, tag: Optional[List[Tuple[str, str]]] = None) -> List[Dict[str, Any]]:
+    def get_all(cls, id: Optional[str] = None, tags: Optional[List[Tuple[str, str]]] = None) -> List[Dict[str, Any]]:
         """
         Get all experiments with options to filter by id or tags
 
         Args:
             id (Optional[str]):  ID of the experiment
-            tag (Optional[List[Tuple[str, str]]]): List of tags/values to filter experiment by
+            tags (Optional[List[Tuple[str, str]]]): List of tags/values to filter experiment by
 
         Returns:
             List[Dict[str, Any]]: returns list of experiments
         """
-        args = dict(tag=tag if tag is not None and len(tag) > 0 else None)
+        args = dict(tag=tags if tags is not None and len(tags) > 0 else None)
+        # Filter our any parameters set to None
         args = {k: v for k, v in args.items() if v is not None}
+        # collapse tags to strings
+        if 'tag' in args:
+            args['tag'] = [','.join(tag) for tag in args['tag']]
+
         response = cls.get(id, params=args)
         if response.status_code != 200:
             if logger.isEnabledFor(logging.DEBUG):
