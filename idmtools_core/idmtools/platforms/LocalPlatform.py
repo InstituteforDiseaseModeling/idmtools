@@ -3,10 +3,25 @@ from dataclasses import dataclass
 from idmtools.core import EntityStatus
 from idmtools.entities import IExperiment, IPlatform
 # we have to import brokers so that the proper configuration is achieved for redis
+from idmtools_local.client.experiments_client import ExperimentsClient
+from idmtools_local.client.simulations_client import SimulationsClient
 from idmtools_local.tasks.create_assest_task import AddAssetTask
 from idmtools_local.tasks.create_experiement import CreateExperimentTask
 from idmtools_local.tasks.create_simulation import CreateSimulationTask
 from idmtools_local.tasks.run import RunTask
+
+status_translate = dict(
+    created='CREATED',
+    in_progress='RUNNING',
+    canceled='canceled',
+    failed='FAILED',
+    done='SUCCEEDED'
+)
+
+
+def local_status_to_common(status):
+    return EntityStatus[status_translate[status]]
+
 
 
 @dataclass
@@ -24,9 +39,22 @@ class LocalPlatform(IPlatform):
     def restore_simulations(self, experiment):
         raise NotImplemented("Not implemented yet in the LocalPlatform")
 
-    def refresh_experiment_status(self, experiment):
+    def refresh_experiment_status(self, experiment: 'TExperiment'):
+        """
+
+        Args:
+            experiment:
+
+        Returns:
+
+        """
+        # TODO Cleanup Client to return experiment id status directly
+        status = SimulationsClient.get_all(experiment_id=experiment.uid)
         for s in experiment.simulations:
-            s.status = EntityStatus.SUCCEEDED
+            sim_status = [st for st in status if st['simulation_uid'] == s.uid]
+
+            if sim_status:
+                s.status = local_status_to_common(sim_status[0]['status'])
 
     def create_experiment(self, experiment: IExperiment):
         m = CreateExperimentTask.send(experiment.tags, experiment.simulation_type)
@@ -39,7 +67,8 @@ class LocalPlatform(IPlatform):
         messages = []
         for asset in experiment.assets:
             messages.append(
-                AddAssetTask.message(experiment.uid, asset.filename, path=asset.relative_path, contents=asset.content.decode("utf-8")))
+                AddAssetTask.message(experiment.uid, asset.filename, path=asset.relative_path,
+                                     contents=asset.content.decode("utf-8")))
         group(messages).run().wait()
 
     def send_assets_for_simulation(self, simulation):

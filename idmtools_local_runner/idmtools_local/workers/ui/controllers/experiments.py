@@ -14,13 +14,13 @@ from idmtools_local.workers.ui.controllers.utils import validate_tags
 logger = logging.getLogger(__name__)
 
 
-def experiment_filter(id: Optional[str], tag: Optional[List[Tuple[str, str]]]) -> pd.DataFrame:
+def experiment_filter(id: Optional[str], tags: Optional[List[Tuple[str, str]]]) -> pd.DataFrame:
     """
     List the status of experiment(s) with the ability to filter by experiment id and tags
 
     Args:
         id (Optional[str]): Optional ID of the experiment you want to filter by
-        tag (Optional[List[Tuple[str, str]]]): Optional list of tuples in form of tag_name tag_value to user to filter
+        tags (Optional[List[Tuple[str, str]]]): Optional list of tuples in form of tag_name tag_value to user to filter
             experiments with
     """
     session = get_session()
@@ -31,8 +31,8 @@ def experiment_filter(id: Optional[str], tag: Optional[List[Tuple[str, str]]]) -
     if id is not None:
         criteria.append(JobStatus.uuid == id)
 
-    if tag is not None:
-        for tag in tag:
+    if tags is not None:
+        for tag in tags:
             criteria.append((JobStatus.tags[tag[0]].astext.cast(String) == tag[1]))
 
     query = session.query(JobStatus).filter(*criteria).order_by(JobStatus.uuid.desc())
@@ -77,7 +77,7 @@ def experiment_filter(id: Optional[str], tag: Optional[List[Tuple[str, str]]]) -
 
 
 idx_parser = reqparse.RequestParser()
-idx_parser.add_argument('tag', action='append', default=None,
+idx_parser.add_argument('tags', action='append', default=None,
                         help="Tags tio filter by. Tags must be in format name,value")
 
 delete_args = reqparse.RequestParser()
@@ -91,7 +91,7 @@ class Experiments(Resource):
         args = idx_parser.parse_args()
         args['id'] = id
 
-        validate_tags(args['tag'])
+        validate_tags(args['tags'])
 
         return experiment_filter(**args).to_dict(orient='records')
 

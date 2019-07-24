@@ -13,22 +13,29 @@ class SimulationsClient(BaseClient):
 
     @classmethod
     def get_all(cls, id: Optional[str] = None, experiment_id: Optional[str] = None, status: Optional[Status] = None,
-                tag: Optional[List[Tuple[str, str]]] = None) -> List[Dict[str, Any]]:
+                tags: Optional[List[Tuple[str, str]]] = None) -> List[Dict[str, Any]]:
         """
 
         Args:
             id (Optional[str]):  ID of the simulation
             experiment_id (Optional[str]): ID of experiments
             status (Optional[Status]): Optional status
-            tag (Optional[List[Tuple[str, str]]]): List of tags/values to filter experiment by
+            tags (Optional[List[Tuple[str, str]]]): List of tags/values to filter experiment by
 
         Returns:
             List[Dict[str, Any]]: return list of simulations
         """
         args = dict(experiment_id=experiment_id,
                     status=str(status) + 'a' if status is not None else status,
-                    tag=tag if tag is not None and len(tag) > 0 else None)
+                    tags=tags if tags is not None and len(tags) > 0 else None)
         args = {k: v for k, v in args.items() if v is not None}
+        # collapse tags to strings
+        if 'tags' in args:
+            # we need our tags in tuples then we can join properly and pass as GET array
+            # so let's convert any input dict to tuples
+            if type(args['tags']) is dict:
+                args['tags'] = [(str(k), str(v)) for k, v in args['tags'].items()]
+            args['tags'] = [','.join(tag) for tag in args['tags']]
         response = cls.get(id, params=args)
         if response.status_code != 200:
             if logger.isEnabledFor(logging.DEBUG):
@@ -41,19 +48,19 @@ class SimulationsClient(BaseClient):
 
     @classmethod
     def get_one(cls, id: str, experiment_id: Optional[str] = None, status: Optional[Status] = None,
-                tag: Optional[List[Tuple[str, str]]] = None)\
+                tags: Optional[List[Tuple[str, str]]] = None)\
             -> Dict[str, Any]:
         """
          Args:
             id (str):  ID of the simulation
             experiment_id (Optional[str]): ID of experiments
             status (Optional[Status]): Optional status
-            tag (Optional[List[Tuple[str, str]]]): List of tags/values to filter experiment by
+            tags (Optional[List[Tuple[str, str]]]): List of tags/values to filter experiment by
 
         Returns:
             Dict[str, Any]: the simulation as a dict
         """
-        result = cls.get_all(id, experiment_id, status, tag)
+        result = cls.get_all(id, experiment_id, status, tags)
         if len(result) == 0:
             raise RuntimeError(f"Could not find Simulation with ID {id}")
         return result[0]
