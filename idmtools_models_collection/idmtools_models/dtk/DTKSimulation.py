@@ -16,6 +16,24 @@ class DTKSimulation(ISimulation):
         self.config[name] = value
         return {name: value}
 
+    def get_parameter(self, name, default=None):
+        """
+        Get a parameter in the simulation
+        Args:
+            name: Name of the parameter
+        Returns: the Value of the parameter
+        """
+        return self.config.get(name, default)
+
+    def update_parameters(self, params):
+        """
+        Bulk update config
+        Args:
+            params: dict with new values
+        Returns: None
+        """
+        self.config.update(params)
+
     def gather_assets(self):
         config = {"parameters": self.config}
         self.assets.add_asset(Asset(filename="config.json", content=json.dumps(config)), fail_on_duplicate=False)

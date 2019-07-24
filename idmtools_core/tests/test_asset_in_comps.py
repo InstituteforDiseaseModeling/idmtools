@@ -6,13 +6,12 @@ from COMPS.Data import Experiment
 
 from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import ExperimentBuilder
-from idmtools.config import IdmConfigParser
 from idmtools.core import EntityStatus
 from idmtools.platforms import COMPSPlatform
 from idmtools_models.python import PythonExperiment
 from tests import INPUT_PATH
 from tests.utils.decorators import comps_test
-from tests.utils.utils import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id
+from tests.utils.utils import get_asset_collection_by_id, get_asset_collection_id_for_simulation_id
 
 
 @comps_test
@@ -20,7 +19,6 @@ class TestAssetsInComps(unittest.TestCase):
 
     def setUp(self) -> None:
         self.base_path = os.path.abspath(os.path.join(INPUT_PATH, "assets", "collections"))
-        IdmConfigParser()
         self.platform = COMPSPlatform()
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)

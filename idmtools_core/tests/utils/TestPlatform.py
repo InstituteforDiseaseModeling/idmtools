@@ -27,7 +27,11 @@ class TestPlatform(IPlatform):
         # Close and delete the cache when finished
         self.experiments.close()
         self.simulations.close()
-        shutil.rmtree(data_path)
+        if os.path.exists(data_path):
+            try:
+                shutil.rmtree(data_path)
+            except OSError:
+                pass
 
     def __post_init__(self):
         super().__post_init__()

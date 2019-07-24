@@ -24,13 +24,32 @@ class ISimulation(IAssetsEnabled, IEntity, metaclass=ABCMeta):
         Args:
             name: Name of the parameter
             value: Value of the parameter
-
         Returns: Tag to record the change
         """
         pass
 
+    @abstractmethod
+    def get_parameter(self, name, default=None):
+        """
+        Get a parameter in the simulation
+        Args:
+            name: Name of the parameter
+        Returns: the Value of the parameter
+        """
+        return None
+
+    @abstractmethod
+    def update_parameters(self, params):
+        """
+        Bulk update parameters/config
+        Args:
+            params: dict with new values
+        Returns: None
+        """
+        pass
+
     def __repr__(self):
-        return f"<Simulation: {self.uid} - Exp_id: {self.experiment.uid}>"
+        return f"<Simulation: {self.uid} - Exp_id: {self.experiment.uid if self.experiment else None}>"
 
     def pre_creation(self):
         self.gather_assets()

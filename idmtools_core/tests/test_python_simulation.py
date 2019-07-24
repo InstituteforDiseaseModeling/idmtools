@@ -5,9 +5,9 @@ from functools import partial
 from operator import itemgetter
 
 from COMPS.Data import Experiment, QueryCriteria
+
 from idmtools.assets import Asset, AssetCollection
-from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder, SweepArm, ArmType, ArmExperimentBuilder
-from idmtools.config import IdmConfigParser
+from idmtools.builders import ArmExperimentBuilder, ArmType, ExperimentBuilder, StandAloneSimulationsBuilder, SweepArm
 from idmtools.core import EntityStatus
 from idmtools.managers import ExperimentManager
 from idmtools.platforms import COMPSPlatform, LocalPlatform
@@ -15,8 +15,7 @@ from idmtools_models.python import PythonExperiment, PythonSimulation
 from tests import INPUT_PATH
 from tests.utils.decorators import comps_test
 from tests.utils.ITestWithPersistence import ITestWithPersistence
-
-from tests.utils.utils import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id
+from tests.utils.utils import get_asset_collection_by_id, get_asset_collection_id_for_simulation_id
 
 
 def param_update(simulation, param, value):
@@ -40,7 +39,6 @@ class TestPythonSimulation(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
-        IdmConfigParser()
         self.platform = COMPSPlatform()
 
     def test_retrieve_extra_libraries(self):
@@ -49,6 +47,8 @@ class TestPythonSimulation(ITestWithPersistence):
 
     def test_add_class_tag(self):
         ps = PythonExperiment(name=self.case_name, model_path=os.path.join(INPUT_PATH, "python", "model.py"))
+        # The tag for type is added at runtime during the pre_creation event
+        ps.pre_creation()
         self.assertEqual(ps.tags.get('type'), "idmtools_models.python.PythonExperiment")
 
     def test_envelope(self):
@@ -119,8 +119,8 @@ class TestPythonSimulation(ITestWithPersistence):
         # validate experiment tags
         actual_exp_tags = experiment.get(experiment.id, QueryCriteria().select_children('tags')).tags
         expected_exp_tags = {'idmtools': 'idmtools-automation', 'number_tag': '123', 'string_tag': 'test',
-                             'KeyOnly': ''}
-        self.assertEqual(expected_exp_tags, actual_exp_tags)
+                             'KeyOnly': '', 'type': 'idmtools_models.python.PythonExperiment'}
+        self.assertDictEqual(expected_exp_tags, actual_exp_tags)
 
     # Test parameter "b" set is depending on parameter "a"
     # a=[0,1,2,3,4] <--sweep parameter
@@ -262,7 +262,6 @@ class TestPythonSimulation(ITestWithPersistence):
                              {'filename': 'functions.py', 'relative_path': 'MyExternalLibrary'}]
             self.validate_assets(assets, expected_list)
 
-
     # Test will test pythonExperiment's assets parameter which adds only specific file under
     # tests/inputs/python/Assets/MyExternalLibrary to COMPS' Assets and add relative_path MyExternalLibrary in comps
     # Comps' Assets
@@ -327,13 +326,13 @@ class TestPythonSimulation(ITestWithPersistence):
 
         arm = SweepArm(type=ArmType.cross)
         builder = ArmExperimentBuilder()
-        arm.add_sweep_function(setA, 1)
-        arm.add_sweep_function(setB, [2, 3])
-        arm.add_sweep_function(setC, [4, 5])
+        arm.add_sweep_definition(setA, 1)
+        arm.add_sweep_definition(setB, [2, 3])
+        arm.add_sweep_definition(setC, [4, 5])
         builder.add_arm(arm)
         arm = SweepArm(type=ArmType.cross)
-        arm.add_sweep_function(setA, [6, 7])
-        arm.add_sweep_function(setB, [2])
+        arm.add_sweep_definition(setA, [6, 7])
+        arm.add_sweep_definition(setB, [2])
         builder.add_arm(arm)
         pe.builder = builder
         em = ExperimentManager(experiment=pe, platform=self.platform)

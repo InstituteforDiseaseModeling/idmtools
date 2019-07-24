@@ -103,7 +103,7 @@ class IdmConfigParser:
             print("/!\\ WARNING: File '{}' Not Found!".format(file_name))
             return
 
-        print("INI File Used: {}\n".format(ini_file))
+        print("INI File Used: {}".format(ini_file))
 
         cls._config = ConfigParser()
         cls._config.read(ini_file)
