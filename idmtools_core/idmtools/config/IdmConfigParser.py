@@ -98,6 +98,10 @@ class IdmConfigParser:
 
         Returns: None
         """
+        # init logging here as this is our most likely entry-point into an idm-tools "application"
+        from idmtools.core.logging import setup_logging
+        setup_logging()
+
         ini_file = cls._find_config(dir_path, file_name)
         if ini_file is None:
             print("/!\\ WARNING: File '{}' Not Found!".format(file_name))
@@ -108,9 +112,7 @@ class IdmConfigParser:
         cls._config = ConfigParser()
         cls._config.read(ini_file)
 
-        # init logging here as this is our most likely entry-point into an idm-tools "application"
-        from idmtools.core.logging import setup_logging
-        setup_logging()
+
 
     @classmethod
     def _get_section(cls, section: str = None) -> Dict[str, str]:

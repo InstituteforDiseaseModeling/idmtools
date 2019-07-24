@@ -10,7 +10,7 @@ listener = None
 logging_queue = None
 
 
-def setup_logging(level: int = logging.WARN, log_file_name:str = 'idmtools.log') -> QueueListener:
+def setup_logging(level: int = logging.WARN, log_file_name: str = 'idmtools.log') -> QueueListener:
     """
 
     Args:
@@ -20,12 +20,12 @@ def setup_logging(level: int = logging.WARN, log_file_name:str = 'idmtools.log')
     Returns:
 
     """
+    global listener, logging_queue
 
     # get a file handler
     root = logging.getLogger()
     # allow setting the debug of logger via environment variable
     root.setLevel(logging.DEBUG if os.getenv('IDM_TOOL_DEBUG', False) else level)
-    global listener, logging_queue
 
     if logging_queue is None:
         # We only one to do this setup once per process. Having the logging_queue setup help prevent that issue
@@ -83,6 +83,7 @@ def register_stop_logger_signal_handler(listener) -> NoReturn:
     Returns:
 
     """
+
     def stop_logger():
         listener.stop()
 

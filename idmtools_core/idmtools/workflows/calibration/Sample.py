@@ -4,7 +4,7 @@ from idmtools.workflows.calibration import Parameter
 
 
 class Sample:
-    def __init__(self, index: int, parameters: List[Parameter]=None):
+    def __init__(self, index: int, parameters: List[Parameter] = None):
         self.parameters = parameters or []
         self.index = index
 

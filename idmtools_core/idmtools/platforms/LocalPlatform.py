@@ -39,7 +39,8 @@ class LocalPlatform(IPlatform):
         messages = []
         for asset in experiment.assets:
             messages.append(
-                AddAssetTask.message(experiment.uid, asset.filename, path=asset.relative_path, contents=asset.content.decode("utf-8")))
+                AddAssetTask.message(experiment.uid, asset.filename, path=asset.relative_path,
+                                     contents=asset.content.decode("utf-8")))
         group(messages).run().wait()
 
     def send_assets_for_simulation(self, simulation):

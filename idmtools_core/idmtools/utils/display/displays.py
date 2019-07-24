@@ -90,6 +90,7 @@ class TableDisplay(IDisplaySetting):
     """
     Display the object as a table.
     """
+
     def __init__(self, columns, max_rows=5, field=None):
         """
         Args:
@@ -109,7 +110,7 @@ class TableDisplay(IDisplaySetting):
         slice, remaining = cut_iterable_to(obj, self.max_rows)
 
         # Create the table
-        rows=[]
+        rows = []
         for child in slice:
             rows.append([s.display(child) for s in self.columns])
 

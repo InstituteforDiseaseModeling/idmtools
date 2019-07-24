@@ -25,7 +25,6 @@ def run_test_in_n_seconds(n: int, print_elapsed_time: bool = False) -> Callable:
     """
 
     def decorator(func):
-
         @wraps(func)
         def wrapper(*args, **kwargs):
             start = time.time()
@@ -35,5 +34,7 @@ def run_test_in_n_seconds(n: int, print_elapsed_time: bool = False) -> Callable:
                 print(f"{func.__name__} took {end - start}s to run!")
             args[0].assertLess(end - start, n, f"{func.__name__} took {end - start}s to run!")
             return ret
+
         return wrapper
+
     return decorator

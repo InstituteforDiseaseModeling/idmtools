@@ -6,7 +6,7 @@ from marshmallow import Schema, ValidationError
 
 class IWorkflowStep(metaclass=ABCMeta):
 
-    def __init__(self, name: str, inputs_schema: Schema = None, output_schema:Schema = None):
+    def __init__(self, name: str, inputs_schema: Schema = None, output_schema: Schema = None):
         self.name = name
         self.inputs_schema = inputs_schema
         self.output_schema = output_schema

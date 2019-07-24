@@ -10,6 +10,7 @@ class IAnalyzer(metaclass=ABCMeta):
     """
     An abstract base class carrying the lowest level analyzer interfaces called by BaseExperimentManager
     """
+
     @abstractmethod
     def __init__(self, uid=None, working_dir=None, parse=True, filenames=None):
         """
