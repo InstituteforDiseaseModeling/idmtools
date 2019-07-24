@@ -25,7 +25,11 @@ class PlatformFactory:
                 raise ValueError(f"The PlatformFactory could not create an platform of type {key}")
 
         builder = self._builders.get(key)
+
+        # Add a temporary Property when creating Platform
+        builder._FACTORY = property(lambda self: True)
         platform = builder(**kwargs)
+        delattr(builder, '_FACTORY')
 
         return platform
 
