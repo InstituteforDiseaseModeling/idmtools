@@ -132,7 +132,7 @@ class TestLocalRunnerCLI(ITestWithPersistence):
         # Test 3: get status for experiment with experiment  id and tag pair
         # run experiment cli:
         # python -m idmtools_local.cli.run experiment status --id {exp_id} --tag 'idmtools' 'idmtools-automation'
-        command = ['python', '-m', 'idmtools_local.cli.run', 'experiment', 'status', '--id', str(self.pe.uid), '--tag',
+        command = ['python', '-m', 'idmtools_local.cli.run', 'experiment', 'status', '--id', str(self.pe.uid), '--tags',
                    'idmtools', 'idmtools-automation']
         output_experiment = subprocess.check_output(command, stderr=subprocess.STDOUT).decode()
         print(output_experiment)

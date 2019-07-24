@@ -3,7 +3,6 @@ from typing import Optional, Tuple, List, Dict, Any
 from idmtools_local.client.base import BaseClient
 from idmtools_local.config import API_PATH
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -27,6 +26,8 @@ class ExperimentsClient(BaseClient):
         args = {k: v for k, v in args.items() if v is not None}
         # collapse tags to strings
         if 'tags' in args:
+            if type(args['tags']) is dict:
+                args['tags'] = [(k, v) for k, v in args['tags'].items()]
             args['tags'] = [','.join(tag) for tag in args['tags']]
 
         response = cls.get(id, params=args)
