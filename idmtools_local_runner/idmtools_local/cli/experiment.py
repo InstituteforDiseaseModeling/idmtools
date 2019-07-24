@@ -48,7 +48,7 @@ def status(id: Optional[str], tag: Optional[List[Tuple[str, str]]]):
             experiments with
     """
     try:
-        experiments = ExperimentsClient.get_all(id, tag=tag)
+        experiments = ExperimentsClient.get_all(id, tags=tag)
     except RuntimeError as e:
         show_error(e.args[0])
     experiments = list(map(lambda x: prettify_experiment(x), experiments))

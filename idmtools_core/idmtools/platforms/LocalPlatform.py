@@ -3,6 +3,8 @@ from dataclasses import dataclass
 from idmtools.core import EntityStatus
 from idmtools.entities import IExperiment, IPlatform
 # we have to import brokers so that the proper configuration is achieved for redis
+from idmtools_local.client.experiments_client import ExperimentsClient
+from idmtools_local.client.simulations_client import SimulationsClient
 from idmtools_local.tasks.create_assest_task import AddAssetTask
 from idmtools_local.tasks.create_experiement import CreateExperimentTask
 from idmtools_local.tasks.create_simulation import CreateSimulationTask

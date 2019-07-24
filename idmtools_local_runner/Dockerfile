@@ -38,8 +38,13 @@ WORKDIR /app
 ENV PYTHONPATH=/app:${PYTHONPATH}
 
 #TODO: Move the actual package to artifactory and install from there. It would simpify the environmetn quite a bit
-ADD idmtools_local /tmp/idmtools_local
+
 COPY README.md setup.py requirements.txt /tmp/
+# Run the setup instal before copying rest of package. This will increase cache hits during docker builds
+# as we will only rebuild if any of the docker_scripts, setup.py, readme.md, and requirements.txt change
+# which should happen infrequently(or less so than library code)
+RUN cd /tmp && pip install -e .
+ADD idmtools_local /tmp/idmtools_local
 # We install the package directly here so the source is within the final image
 # This will allow users later to download the image without needing to build it
 # Also we specially use the internal pypy for ALL packages to take advantage of package caching
