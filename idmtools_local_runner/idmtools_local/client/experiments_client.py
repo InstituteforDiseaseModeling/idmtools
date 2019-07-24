@@ -26,8 +26,8 @@ class ExperimentsClient(BaseClient):
         # Filter our any parameters set to None
         args = {k: v for k, v in args.items() if v is not None}
         # collapse tags to strings
-        if 'tag' in args:
-            args['tag'] = [','.join(tag) for tag in args['tag']]
+        if 'tags' in args:
+            args['tags'] = [','.join(tag) for tag in args['tags']]
 
         response = cls.get(id, params=args)
         if response.status_code != 200:
