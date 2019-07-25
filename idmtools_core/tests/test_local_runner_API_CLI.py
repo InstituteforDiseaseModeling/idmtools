@@ -93,6 +93,7 @@ class TestLocalRunnerCLI(ITestWithPersistence):
             self.assertTrue(any(sim['simulation_uid'] in simulation['simulation_uid'] for simulation in simulations))
             self.assertEqual(sim['experiment_id'], str(self.pe.uid))
 
+    @unittest("Skip")
     def test_local_runner_cli(self):
         current_dir_path = os.path.dirname(os.path.realpath(__file__))
         idmtools_local_runner_dir_path = os.path.join(current_dir_path, '..', '..', 'idmtools_local_runner')
