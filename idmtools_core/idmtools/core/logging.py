@@ -33,10 +33,10 @@ def setup_logging(level: int = logging.WARN, log_file_name: str = 'idmtools.log'
         root = logging.getLogger()
         if os.getenv('IDM_TOOL_DEBUG', False) or level == logging.DEBUG:
             # Enable detailed logging format
-            format_str = '%(asctime)s.%(msecs)d %(pathname)s/%(filename)s:%(lineno)d %(funcName)-s: ' \
+            format_str = '%(asctime)s.%(msecs)d %(pathname)s:%(lineno)d %(funcName)s ' \
                          '[%(levelname)s] (%(process)d,(%(thread)d) - %(message)s'
         else:
-            format_str = '%(asctime)s.%(msecs)d %(funcName)-s: [%(levelname)s] - %(message)s'
+            format_str = '%(asctime)s.%(msecs)d %(funcName)s: [%(levelname)s] - %(message)s'
         formatter = logging.Formatter(format_str)
         file_handler = RotatingFileHandler(log_file_name, maxBytes=(2 ** 20) * 10, backupCount=5)
         file_handler.setFormatter(formatter)
