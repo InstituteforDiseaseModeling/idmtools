@@ -3,6 +3,7 @@ from COMPS import Client, AuthManager
 
 __comps_client_version = 10
 
+
 class TestAuthManager(AuthManager):
     _times_prompted = 0
     _username = None
@@ -34,4 +35,3 @@ if __name__ == '__main__':
     Client._Client__auth_manager = TestAuthManager(compshost)
     Client._Client__auth_manager.clear_auth_token()
     Client.login(compshost)
-

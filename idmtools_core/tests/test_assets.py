@@ -19,8 +19,8 @@ class TestAssets(unittest.TestCase):
         b = Asset(relative_path="1", absolute_path=os.path.join(self.base_path, "1", "a.txt"))
         self.assertEqual(a, b)
 
-        a = Asset(relative_path=None, filename="test.json", content=json.dumps({"a":1, "b":2}))
-        b = Asset(relative_path=None, filename="test.json", content=json.dumps({"a":1, "b":2}))
+        a = Asset(relative_path=None, filename="test.json", content=json.dumps({"a": 1, "b": 2}))
+        b = Asset(relative_path=None, filename="test.json", content=json.dumps({"a": 1, "b": 2}))
         self.assertEqual(a, b)
 
     def test_assets_collection_from_dir(self):

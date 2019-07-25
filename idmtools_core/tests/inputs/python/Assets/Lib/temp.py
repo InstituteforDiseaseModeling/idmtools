@@ -9,11 +9,11 @@
 Methods for serialized objects (or source code) stored in temporary files
 and file-like objects.
 """
-#XXX: better instead to have functions write to any given file-like object ?
-#XXX: currently, all file-like objects are created by the function...
+# XXX: better instead to have functions write to any given file-like object ?
+# XXX: currently, all file-like objects are created by the function...
 
-__all__ = ['dump_source', 'dump', 'dumpIO_source', 'dumpIO',\
-           'load_source', 'load', 'loadIO_source', 'loadIO',\
+__all__ = ['dump_source', 'dump', 'dumpIO_source', 'dumpIO', \
+           'load_source', 'load', 'loadIO_source', 'loadIO', \
            'capture']
 
 import contextlib
@@ -44,9 +44,10 @@ def capture(stream='stdout'):
         setattr(sys, stream, orig)
 
 
-def b(x): # deal with b'foo' versus 'foo'
+def b(x):  # deal with b'foo' versus 'foo'
     import codecs
     return codecs.latin_1_encode(x)[0]
+
 
 def load_source(file, **kwds):
     """load an object that was stored with dill.temp.dump_source
@@ -63,7 +64,7 @@ def load_source(file, **kwds):
     """
     alias = kwds.pop('alias', None)
     mode = kwds.pop('mode', 'r')
-    fname = getattr(file, 'name', file) # fname=file.name or fname=file (if str)
+    fname = getattr(file, 'name', file)  # fname=file.name or fname=file (if str)
     source = open(fname, mode=mode, **kwds).read()
     if not alias:
         tag = source.strip().splitlines()[-1].split()
@@ -75,6 +76,7 @@ def load_source(file, **kwds):
     exec(source, local)
     _ = eval("%s" % alias, local)
     return _
+
 
 def dump_source(object, **kwds):
     """write object source to a NamedTemporaryFile (instead of dill.dump)
@@ -107,18 +109,19 @@ Optional kwds:
     some operating systems, this makes no difference.
 
 NOTE: Keep the return value for as long as you want your file to exist !
-    """ #XXX: write a "load_source"?
+    """  # XXX: write a "load_source"?
     from .source import importable, getname
     import tempfile
-    kwds.pop('suffix', '') # this is *always* '.py'
-    alias = kwds.pop('alias', '') #XXX: include an alias so a name is known
+    kwds.pop('suffix', '')  # this is *always* '.py'
+    alias = kwds.pop('alias', '')  # XXX: include an alias so a name is known
     name = str(alias) or getname(object)
     name = "\n#NAME: %s\n" % name
-    #XXX: assumes kwds['dir'] is writable and on $PYTHONPATH
+    # XXX: assumes kwds['dir'] is writable and on $PYTHONPATH
     file = tempfile.NamedTemporaryFile(suffix='.py', **kwds)
-    file.write(b(''.join([importable(object, alias=alias),name])))
+    file.write(b(''.join([importable(object, alias=alias), name])))
     file.flush()
     return file
+
 
 def load(file, **kwds):
     """load an object that was stored with dill.temp.dump
@@ -132,8 +135,9 @@ def load(file, **kwds):
     """
     import dill as pickle
     mode = kwds.pop('mode', 'rb')
-    name = getattr(file, 'name', file) # name=file.name or name=file (if str)
+    name = getattr(file, 'name', file)  # name=file.name or name=file (if str)
     return pickle.load(open(name, mode=mode, **kwds))
+
 
 def dump(object, **kwds):
     """dill.dump of object to a NamedTemporaryFile.
@@ -166,6 +170,7 @@ NOTE: Keep the return value for as long as you want your file to exist !
     file.flush()
     return file
 
+
 def loadIO(buffer, **kwds):
     """load an object that was stored with dill.temp.dumpIO
 
@@ -180,9 +185,10 @@ def loadIO(buffer, **kwds):
         from io import BytesIO as StringIO
     else:
         from StringIO import StringIO
-    value = getattr(buffer, 'getvalue', buffer) # value or buffer.getvalue
-    if value != buffer: value = value() # buffer.getvalue()
+    value = getattr(buffer, 'getvalue', buffer)  # value or buffer.getvalue
+    if value != buffer: value = value()  # buffer.getvalue()
     return pickle.load(StringIO(value))
+
 
 def dumpIO(object, **kwds):
     """dill.dump of object to a buffer.
@@ -202,6 +208,7 @@ Loads with "dill.temp.loadIO".  Returns the buffer object.
     file.flush()
     return file
 
+
 def loadIO_source(buffer, **kwds):
     """load an object that was stored with dill.temp.dumpIO_source
 
@@ -215,9 +222,9 @@ def loadIO_source(buffer, **kwds):
     16
     """
     alias = kwds.pop('alias', None)
-    source = getattr(buffer, 'getvalue', buffer) # source or buffer.getvalue
-    if source != buffer: source = source() # buffer.getvalue()
-    if PY3: source = source.decode() # buffer to string
+    source = getattr(buffer, 'getvalue', buffer)  # source or buffer.getvalue
+    if source != buffer: source = source()  # buffer.getvalue()
+    if PY3: source = source.decode()  # buffer to string
     if not alias:
         tag = source.strip().splitlines()[-1].split()
         if tag[0] != '#NAME:':
@@ -228,6 +235,7 @@ def loadIO_source(buffer, **kwds):
     exec(source, local)
     _ = eval("%s" % alias, local)
     return _
+
 
 def dumpIO_source(object, **kwds):
     """write object source to a buffer (instead of dill.dump)
@@ -247,12 +255,12 @@ Optional kwds:
         from io import BytesIO as StringIO
     else:
         from StringIO import StringIO
-    alias = kwds.pop('alias', '') #XXX: include an alias so a name is known
+    alias = kwds.pop('alias', '')  # XXX: include an alias so a name is known
     name = str(alias) or getname(object)
     name = "\n#NAME: %s\n" % name
-    #XXX: assumes kwds['dir'] is writable and on $PYTHONPATH
+    # XXX: assumes kwds['dir'] is writable and on $PYTHONPATH
     file = StringIO()
-    file.write(b(''.join([importable(object, alias=alias),name])))
+    file.write(b(''.join([importable(object, alias=alias), name])))
     file.flush()
     return file
 

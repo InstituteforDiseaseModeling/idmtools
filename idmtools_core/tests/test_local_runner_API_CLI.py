@@ -52,6 +52,7 @@ class TestLocalRunnerCLI(ITestWithPersistence):
         # Test 2: get_one experiment with experiment id and tags
         experiment1 = ExperimentsClient.get_one(str(self.pe.uid),
                                                 tags=[('idmtools', 'idmtools-automation'), ('string_tag', 'test')])
+
         self.assertEqual(experiment1['experiment_id'], str(self.pe.uid))
         self.assertEqual(experiment1['tags'], self.pe.tags)
         self.assertEqual(experiment1['data_path'], '/data/' + str(self.pe.uid))

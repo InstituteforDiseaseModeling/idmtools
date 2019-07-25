@@ -142,4 +142,3 @@ class AssetCollection(IEntity):
         if self.count == 0:
             return None
         return super().uid
-

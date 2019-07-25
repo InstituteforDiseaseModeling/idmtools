@@ -20,6 +20,6 @@ def create_test_suite():
 
 
 testSuite = create_test_suite()
-#text_runner = unittest.TextTestRunner().run(testSuite)
+# text_runner = unittest.TextTestRunner().run(testSuite)
 xml_runner = xmlrunner.XMLTestRunner(output="reports")
 results = xml_runner.run(testSuite)

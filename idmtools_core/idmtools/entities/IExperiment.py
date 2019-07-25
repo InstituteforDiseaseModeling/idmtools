@@ -40,7 +40,8 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
             if simulation_type:
                 self.base_simulation = simulation_type()
             else:
-                raise Exception("A `base_simulation` or `simulation_type` needs to be provided to the Experiment object!")
+                raise Exception(
+                    "A `base_simulation` or `simulation_type` needs to be provided to the Experiment object!")
 
     def __repr__(self):
         return f"<Experiment: {self.uid} - {self.name} / Sim count {len(self.simulations) if self.simulations else 0}>"
