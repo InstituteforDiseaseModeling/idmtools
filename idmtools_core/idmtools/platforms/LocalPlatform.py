@@ -1,5 +1,3 @@
-import base64
-import io
 from dramatiq import group
 from dataclasses import dataclass
 from idmtools.core import EntityStatus
@@ -68,12 +66,9 @@ class LocalPlatform(IPlatform):
         # Go through all the assets
         messages = []
         for asset in experiment.assets:
-            # we are currently using queues to send our assets. This is not the greatest idea
-            # For now, we will continue to do that until issues
-            # https://github.com/InstituteforDiseaseModeling/idmtools/issues/254 is resolved
             messages.append(
                 AddAssetTask.message(experiment.uid, asset.filename, path=asset.relative_path,
-                                     contents=base64.b64encode(asset.content).decode('utf-8')))
+                                     contents=asset.content.decode("utf-8")))
         group(messages).run().wait()
 
     def send_assets_for_simulation(self, simulation):
@@ -82,7 +77,7 @@ class LocalPlatform(IPlatform):
         for asset in simulation.assets:
             messages.append(
                 AddAssetTask.message(simulation.experiment.uid, asset.filename, path=asset.relative_path,
-                                     contents=base64.b64encode(asset.content).decode('utf-8'), simulation_id=simulation.uid))
+                                     contents=asset.content.decode("utf-8"), simulation_id=simulation.uid))
         group(messages).run().wait()
 
     def create_simulations(self, simulations_batch):

@@ -1,7 +1,7 @@
-import base64
 import logging
 import os
 from dramatiq import GenericActor
+
 from idmtools_local.config import DATA_PATH
 
 logger = logging.getLogger(__name__)
@@ -30,4 +30,4 @@ class AddAssetTask(GenericActor):
                 pass
 
         with open(path, "wb") as fp:
-            fp.write(base64.b64decode(contents))
+            fp.write(bytes(contents, 'utf-8'))
