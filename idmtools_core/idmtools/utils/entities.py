@@ -9,7 +9,8 @@ if typing.TYPE_CHECKING:
     import uuid
 
 
-def retrieve_experiment(experiment_id:'uuid', platform: 'TPlatform' = None, with_simulations:'bool'=False) -> 'TExperiment':
+def retrieve_experiment(experiment_id: 'uuid', platform: 'TPlatform' = None,
+                        with_simulations: 'bool' = False) -> 'TExperiment':
     experiment = ExperimentPersistService.retrieve(experiment_id)
     if not experiment:
         # This is an unknown experiment, make sure we have a platform to ask for info
