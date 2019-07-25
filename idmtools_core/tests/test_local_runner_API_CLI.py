@@ -15,9 +15,6 @@ from tests import INPUT_PATH
 from tests.utils.ITestWithPersistence import ITestWithPersistence
 
 
-@unittest.skip("Skip")
-# Do not run this test file until few local runner bugs get fixed
-# bug: #236 and #220
 class TestLocalRunnerCLI(ITestWithPersistence):
 
     @classmethod
@@ -48,7 +45,7 @@ class TestLocalRunnerCLI(ITestWithPersistence):
     def test_status_experimentClient_api(self):
         # Test 1: get_all experiments with experiment id and tags
         experiment = ExperimentsClient.get_all(str(self.pe.uid),
-                                               tag=[('idmtools', 'idmtools-automation'), ('string_tag', 'test')])
+                                               tags=[('idmtools', 'idmtools-automation'), ('string_tag', 'test')])
         self.assertEqual(experiment[0]['experiment_id'], str(self.pe.uid))
         self.assertEqual(experiment[0]['tags'], self.pe.tags)
         self.assertEqual(experiment[0]['data_path'], '/data/' + str(self.pe.uid))
@@ -56,7 +53,8 @@ class TestLocalRunnerCLI(ITestWithPersistence):
 
         # Test 2: get_one experiment with experiment id and tags
         experiment1 = ExperimentsClient.get_one(str(self.pe.uid),
-                                                tag=[('idmtools', 'idmtools-automation'), ('string_tag', 'test')])
+                                                tags=[('idmtools', 'idmtools-automation'), ('string_tag', 'test')])
+
         self.assertEqual(experiment1['experiment_id'], str(self.pe.uid))
         self.assertEqual(experiment1['tags'], self.pe.tags)
         self.assertEqual(experiment1['data_path'], '/data/' + str(self.pe.uid))
@@ -79,7 +77,7 @@ class TestLocalRunnerCLI(ITestWithPersistence):
             self.assertEqual(simulations[0], simulation)
 
             # Also test get_one with simulation id and tags  filters
-            simulation1 = SimulationsClient.get_one(str(s.uid), tag=s.tags.items())
+            simulation1 = SimulationsClient.get_one(str(s.uid), tags=s.tags)
             self.assertEqual(simulations[0], simulation1)
 
         # Test 2: get_all simulations with simulation id and experiment id as filters
@@ -132,7 +130,7 @@ class TestLocalRunnerCLI(ITestWithPersistence):
         # Test 3: get status for experiment with experiment  id and tag pair
         # run experiment cli:
         # python -m idmtools_local.cli.run experiment status --id {exp_id} --tag 'idmtools' 'idmtools-automation'
-        command = ['python', '-m', 'idmtools_local.cli.run', 'experiment', 'status', '--id', str(self.pe.uid), '--tag',
+        command = ['python', '-m', 'idmtools_local.cli.run', 'experiment', 'status', '--id', str(self.pe.uid), '--tags',
                    'idmtools', 'idmtools-automation']
         output_experiment = subprocess.check_output(command, stderr=subprocess.STDOUT).decode()
         print(output_experiment)

@@ -18,3 +18,5 @@ def create_or_update_status(uuid, data_path=None, tags=None, status=Status.creat
         job_status.extra_details = extra_details
     session.add(job_status)
     session.commit()
+    # close the sessions
+    session.close()

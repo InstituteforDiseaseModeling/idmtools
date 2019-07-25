@@ -37,8 +37,8 @@ def experiment():
 
 @experiment.command()
 @click.option('--id', default=None, help="Filter status by experiment ID")
-@click.option('--tag', default=None, nargs=2, multiple=True, help=tags_help)
-def status(id: Optional[str], tag: Optional[List[Tuple[str, str]]]):
+@click.option('--tags', default=None, nargs=2, multiple=True, help=tags_help)
+def status(id: Optional[str], tags: Optional[List[Tuple[str, str]]]):
     """
     List the status of experiment(s) with the ability to filter by experiment id and tags
 
@@ -48,7 +48,7 @@ def status(id: Optional[str], tag: Optional[List[Tuple[str, str]]]):
             experiments with
     """
     try:
-        experiments = ExperimentsClient.get_all(id, tag=tag)
+        experiments = ExperimentsClient.get_all(id, tags=tags)
     except RuntimeError as e:
         show_error(e.args[0])
     experiments = list(map(lambda x: prettify_experiment(x), experiments))
