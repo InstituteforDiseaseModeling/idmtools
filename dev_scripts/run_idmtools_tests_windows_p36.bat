@@ -12,6 +12,7 @@ pip install -e idmtools_models_collection[test]
 
 echo "start services..."
 cd idmtools_local_runner
+docker network create idmtools_network  nul 2> nul
 docker-compose down -v
 docker-compose build
 docker-compose up -d
