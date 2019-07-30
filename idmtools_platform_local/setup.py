@@ -34,10 +34,9 @@ setup(
                  'ckirkman@idmod.org, '
                  'braybaud@idmod.org',
     classifiers=[
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
+        'Framework:: idmtools :: Platform',
     ],
-    description="Core tools for modeling",
+    description="Provides ability to run models locally using docker containers",
     install_requires=requirements,
     long_description=readme,
     include_package_data=True,
@@ -45,6 +44,9 @@ setup(
     name='idmtools_local',
     packages=find_packages(),
     setup_requires=setup_requirements,
+    entry_points=dict(idmtools_platform=
+                      ["idmtools_platform_local = idmtools_platform_local.plugin_info:LocalPlatformSpecification"]
+                      ),
     test_suite='tests',
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
