@@ -1,4 +1,3 @@
-import os
 import copy
 import typing
 import ast
@@ -6,9 +5,6 @@ from dataclasses import fields
 
 if typing.TYPE_CHECKING:
     from idmtools.core import TPlatformClass
-
-current_directory = os.path.dirname(os.path.realpath(__file__))
-PLATFORM_ROOT = os.path.join(os.path.dirname(current_directory), "platforms")
 
 
 class PlatformFactory:
@@ -42,13 +38,7 @@ class PlatformFactory:
                 raise ValueError(f"The PlatformFactory could not create an platform of type {key}")
 
         builder = self._builders.get(key)
-
-        # Add a temporary Property when creating Platform
-        builder._FACTORY = property(lambda self: True)
-        platform = builder(**kwargs)
-        delattr(builder, '_FACTORY')
-
-        return platform
+        return builder(**kwargs)
 
     def create_from_block(self, block):
         """
@@ -61,40 +51,16 @@ class PlatformFactory:
         section = IdmConfigParser.get_block(block)
         platform_type = section.pop('type')
 
-        def dynamically_import_module(platform_type):
+        if platform_type not in self._builders:
             try:
                 # Try first to import it dynamically
                 import importlib
-                imported_module = importlib.import_module(platform_type)
-                return imported_module
+                importlib.import_module(platform_type)
             except:
-                return None
+                raise ValueError(f"The PlatformFactory could not create an platform of type {platform_type}")
 
-        def retrieve_platform_module_name(platform_type):
-            # 1 check if platform_type is module name and import form it
-            imported_module = dynamically_import_module(platform_type)
-            if imported_module:
-                return imported_module
-
-            # 2: try possible module names
-            groups = PLATFORM_ROOT.split(os.sep)
-            groups.append(platform_type)
-            length = len(groups)
-            for i in range(1, length):
-                group = groups[-i:]
-                module_name = ".".join(group)
-                imported_module = dynamically_import_module(module_name)
-                if imported_module:
-                    return imported_module
-            return None
-
-        # if platform_type not in self._builders:
-        imported_module = retrieve_platform_module_name(platform_type)
-        if not imported_module:
-            raise ValueError(f"The PlatformFactory could not create an platform of type {self.platform_type}")
-
-        # Update field type
-        platform_cls = self._builders.get(imported_module.__name__)
+        # Update fields types
+        platform_cls = self._builders.get(platform_type)
         fds = fields(platform_cls)
         field_type = {f.name: f.type for f in fds}
 
@@ -119,7 +85,12 @@ class PlatformFactory:
             kwargs.pop(f)
 
         # Now create Platform using the data with the correct data types
-        return self.create(imported_module.__name__, **kwargs)
+        # Add a temporary Property when creating Platform
+        platform_cls._FACTORY = property(lambda self: True)
+        platform = platform_cls(**kwargs)
+        delattr(platform_cls, '_FACTORY')
+
+        return platform
 
 
 platform_factory = PlatformFactory()
