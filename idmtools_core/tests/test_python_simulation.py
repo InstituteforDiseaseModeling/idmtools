@@ -10,9 +10,7 @@ from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import ArmExperimentBuilder, ArmType, ExperimentBuilder, StandAloneSimulationsBuilder, SweepArm
 from idmtools.core import EntityStatus
 from idmtools.managers import ExperimentManager
-# from idmtools.platforms import COMPSPlatform, LocalPlatform
-from idmtools.platforms.COMPSPlatform import COMPSPlatform
-from idmtools.platforms.LocalPlatform import LocalPlatform
+from idmtools.platforms import COMPSPlatform, LocalPlatform
 from idmtools_models.python import PythonExperiment, PythonSimulation
 from tests import INPUT_PATH
 from tests.utils.decorators import comps_test

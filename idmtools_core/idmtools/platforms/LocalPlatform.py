@@ -11,6 +11,7 @@ from idmtools_local.tasks.create_assest_task import AddAssetTask
 from idmtools_local.tasks.create_experiement import CreateExperimentTask
 from idmtools_local.tasks.create_simulation import CreateSimulationTask
 from idmtools_local.tasks.run import RunTask
+from idmtools.core import platform_factory
 
 status_translate = dict(
     created='CREATED',
@@ -23,7 +24,6 @@ status_translate = dict(
 
 def local_status_to_common(status):
     return EntityStatus[status_translate[status]]
-
 
 
 @dataclass
@@ -82,7 +82,8 @@ class LocalPlatform(IPlatform):
         for asset in simulation.assets:
             messages.append(
                 AddAssetTask.message(simulation.experiment.uid, asset.filename, path=asset.relative_path,
-                                     contents=base64.b64encode(asset.content).decode('utf-8'), simulation_id=simulation.uid))
+                                     contents=base64.b64encode(asset.content).decode('utf-8'),
+                                     simulation_id=simulation.uid))
         group(messages).run().wait()
 
     def create_simulations(self, simulations_batch):
@@ -98,3 +99,6 @@ class LocalPlatform(IPlatform):
     def run_simulations(self, experiment: IExperiment):
         for simulation in experiment.simulations:
             RunTask.send(simulation.experiment.command.cmd, simulation.experiment.uid, simulation.uid)
+
+
+platform_factory.register_type(LocalPlatform)

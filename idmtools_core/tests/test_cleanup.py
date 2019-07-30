@@ -3,8 +3,7 @@ import time
 import unittest
 from COMPS.Data import Experiment, QueryCriteria
 
-# from idmtools.platforms import COMPSPlatform
-from idmtools.platforms.COMPSPlatform import COMPSPlatform
+from idmtools.platforms import COMPSPlatform
 from tests.utils.decorators import comps_test
 from tests.utils.ITestWithPersistence import ITestWithPersistence
 
