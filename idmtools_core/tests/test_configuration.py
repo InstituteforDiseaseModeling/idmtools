@@ -37,7 +37,7 @@ class TestConfig(ITestWithPersistence):
     def test_idmtools_path(self):
         IdmConfigParser("./inputs/configuration/", "idmtools_test.ini")
         platform = COMPSPlatform()
-        self.assertEqual(platform.num_retires, int(IdmConfigParser.get_option('COMPSPLATFORM', 'num_retires')))
+        self.assertEqual(platform.num_retires, int(IdmConfigParser.get_option('COMPSPlatform', 'num_retires')))
 
         file_path = os.path.join("./inputs/configuration/", "idmtools_test.ini")
         self.assertEqual(IdmConfigParser.get_config_path(), os.path.abspath(file_path))

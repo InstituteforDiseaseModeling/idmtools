@@ -41,9 +41,9 @@ def simulation():
 @click.option('--id', default=None, help="Filter status by simulation ID")
 @click.option('--experiment-id', default=None, help="Filter status by experiment ID")
 @click.option('--status', default=None, type=click.Choice([e.value for e in Status]))
-@click.option('--tag', default=None, nargs=2, multiple=True, help=tags_help)
+@click.option('--tags', default=None, nargs=2, multiple=True, help=tags_help)
 def status(id: Optional[str], experiment_id: Optional[str], status: Optional[str],
-               tag: Optional[List[Tuple[str, str]]]):
+               tags: Optional[List[Tuple[str, str]]]):
     """
     List of statuses for simulation(s) with the ability to filter by id, experiment_id, status, and tags
 
@@ -58,7 +58,7 @@ def status(id: Optional[str], experiment_id: Optional[str], status: Optional[str
         None
     """
     try:
-        simulations = SimulationsClient.get_all(id, experiment_id=experiment_id, status=status, tag=tag)
+        simulations = SimulationsClient.get_all(id, experiment_id=experiment_id, status=status, tags=tags)
     except RuntimeError as e:
         show_error(e.args[0])
 

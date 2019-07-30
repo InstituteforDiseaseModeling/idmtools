@@ -3,7 +3,8 @@ import time
 import unittest
 from COMPS.Data import Experiment, QueryCriteria
 
-from idmtools.platforms import COMPSPlatform
+# from idmtools.platforms import COMPSPlatform
+from idmtools.platforms.COMPSPlatform import COMPSPlatform
 from tests.utils.decorators import comps_test
 from tests.utils.ITestWithPersistence import ITestWithPersistence
 
@@ -15,11 +16,11 @@ class TestCleanup(ITestWithPersistence):
     def test_delete_experiment_by_name_owner_date_tags(self):
         COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
         name = '%%,Owner=shchen'
-        #name = '%Test%,Owner=shchen'  # name contains Test, and Owner is shchen
+        # name = '%Test%,Owner=shchen'  # name contains Test, and Owner is shchen
         opr = '~' if '%' in name else '='
-        qc = ['name{}{}'.format(opr, name),'date_created<={}'.format(self.get_comps_start_ndays_ago(7))] #7 days ago
-        #ee = Experiment.get(query_criteria=QueryCriteria().where(qc)  #filter by name and owner
-        #filter: name contains anything, owner=shchen, AND tag key with 'idmtools'
+        qc = ['name{}{}'.format(opr, name), 'date_created<={}'.format(self.get_comps_start_ndays_ago(7))]  # 7 days ago
+        # ee = Experiment.get(query_criteria=QueryCriteria().where(qc)  #filter by name and owner
+        # filter: name contains anything, owner=shchen, AND tag key with 'idmtools'
         ee = Experiment.get(query_criteria=QueryCriteria().where(qc).select_children('tags').where_tag(['idmtools']))
         print("total experiments to delete", len(ee))
         for e in ee:
@@ -32,7 +33,7 @@ class TestCleanup(ITestWithPersistence):
         return utcdt.strftime('%Y-%m-%dT%H:%M:%S')
 
     def get_comps_start_ndays_ago(self, ndays):
-        #start_datetime = datetime.date.today()
+        # start_datetime = datetime.date.today()
         start_datetime = datetime.datetime.utcnow() - datetime.timedelta(ndays)
         utcdt = datetime.datetime.utcfromtimestamp(time.mktime(start_datetime.timetuple()))
         return utcdt.strftime('%Y-%m-%dT%H:%M:%S')
@@ -49,4 +50,3 @@ class TestCleanup(ITestWithPersistence):
         with self.assertRaises(RuntimeError) as context:
             ee = Experiment.get(id)
         self.assertTrue('404 NotFound - Failed to retrieve experiment for given id' in str(context.exception.args[0]))
-

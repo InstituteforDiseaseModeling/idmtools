@@ -5,7 +5,8 @@ from COMPS.Data import Experiment
 
 from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
 from idmtools.managers import ExperimentManager
-from idmtools.platforms import COMPSPlatform
+# from idmtools.platforms import COMPSPlatform
+from idmtools.platforms.COMPSPlatform import COMPSPlatform
 from idmtools_models.dtk import DTKExperiment
 from idmtools_models.dtk.defaults import DTKSIR
 from tests.utils.decorators import comps_test

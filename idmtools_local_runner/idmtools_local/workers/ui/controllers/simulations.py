@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 def sim_status(id: Optional[str], experiment_id: Optional[str], status: Optional[str],
-               tag: Optional[List[Tuple[str, str]]]) -> pd.DataFrame:
+               tags: Optional[List[Tuple[str, str]]]) -> pd.DataFrame:
     """
     List of statuses for simulation(s) with the ability to filter by id, experiment_id, status, and tags
 
@@ -23,7 +23,7 @@ def sim_status(id: Optional[str], experiment_id: Optional[str], status: Optional
         id (Optional[str]): Optional Id of simulation
         experiment_id (Optional[str]): Optional experiment id
         status (Optional[str]): Optional status string to filter by
-        tag (Optional[List[Tuple[str, str]]]): Optional list of tuples in form of tag_name tag_value to user to filter
+        tags (Optional[List[Tuple[str, str]]]): Optional list of tuples in form of tag_name tag_value to user to filter
             experiments with
 
     Returns:
@@ -43,8 +43,8 @@ def sim_status(id: Optional[str], experiment_id: Optional[str], status: Optional
     if status is not None:
         criteria.append(JobStatus.status == Status[status])
 
-    if tag is not None:
-        for tag in tag:
+    if tags is not None:
+        for tag in tags:
             criteria.append((JobStatus.tags[tag[0]].astext.cast(String) == tag[1]))
 
     query = session.query(JobStatus).filter(*criteria).order_by(JobStatus.uuid.desc(), JobStatus.parent_uuid.desc())
@@ -67,7 +67,7 @@ idx_parser.add_argument('status', help='Status to filter by. Should be one of th
                                        '{}'.format(','.join(status_strs)),
                         choices=status_strs,
                         default=None)
-idx_parser.add_argument('tag', action='append', default=None,
+idx_parser.add_argument('tags', action='append', default=None,
                         help="Tags tio filter by. Tags must be in format name,value")
 
 
@@ -76,7 +76,7 @@ class Simulations(Resource):
         args = idx_parser.parse_args()
         args['id'] = id
 
-        validate_tags(args['tag'])
+        validate_tags(args['tags'])
 
         return sim_status(**args).to_dict(orient='records')
 

@@ -31,12 +31,13 @@ builder = ExperimentBuilder()
 builder.add_sweep_definition(setA, range(10))
 builder.add_sweep_definition(setParam("b"), [1, 2, 3])
 
-experiment.builder = builder
+# experiment.builder = builder
+experiment.add_builder(builder)
 
 platform = LocalPlatform()
 # You can easily switch platforms by simply commenting out the previous line and then
 # uncommenting the following line
-#platform = COMPSPlatform()
+# platform = COMPSPlatform()
 
 em = ExperimentManager(experiment=experiment, platform=platform)
 em.run()

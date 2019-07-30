@@ -18,5 +18,3 @@ suite_table_display = [
     StringDisplaySetting(),
     TableDisplay(field="experiments", columns=experiment_display_settings)
 ]
-
-

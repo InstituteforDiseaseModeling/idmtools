@@ -1,3 +1,4 @@
+import glob
 import logging
 import os
 import shlex
@@ -47,6 +48,8 @@ class RunTask(GenericActor):
         # the assets using relative paths.. ie ./Assest/tmp.xt
         os.symlink(asset_dir, os.path.join(simulation_path, 'Assets'))
         sys.path.insert(0, asset_dir)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'System path: {sys.path}')
 
         # Open of Stdout and StdErr files that will be used to track input and output
         with open(os.path.join(simulation_path, "StdOut.txt"), "w") as out, \

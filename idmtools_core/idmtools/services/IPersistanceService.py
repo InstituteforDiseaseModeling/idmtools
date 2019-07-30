@@ -36,3 +36,8 @@ class IPersistenceService(metaclass=ABCMeta):
         with cls._open_cache() as cache:
             cache.delete(uid)
 
+    @classmethod
+    def get_cache_size(cls):
+        with cls._open_cache() as cache:
+            return cache.size + cache.sqlite_cache_size
+

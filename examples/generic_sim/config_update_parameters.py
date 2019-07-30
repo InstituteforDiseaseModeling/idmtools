@@ -35,16 +35,11 @@ def standard_cb_updates(sim:'DTKSimulation'=None):
 
 
 def set_species_param(sim, species, parameter, value):
-    # Uncomment following 2 lines if 'Vector_Species_Params' exists in config.
-    # sim.config['Vector_Species_Params'][species][parameter] = value
-    # return {'.'.join([species, parameter]): value}
-
-    # For original config does not have 'Vector_Species_Params' field
-    Vector_Species_Params = sim.config.get('Vector_Species_Params', {})
+    Vector_Species_Params = sim.get_parameter('Vector_Species_Params', {})
     species_dict = Vector_Species_Params.get(species, {})
     species_dict[parameter] = value
     Vector_Species_Params[species] = species_dict
-    sim.config['Vector_Species_Params'] = Vector_Species_Params
+    sim.set_parameter('Vector_Species_Params', Vector_Species_Params)
     return {'.'.join([species, parameter]): value}
 
 

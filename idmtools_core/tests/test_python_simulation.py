@@ -10,7 +10,9 @@ from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import ArmExperimentBuilder, ArmType, ExperimentBuilder, StandAloneSimulationsBuilder, SweepArm
 from idmtools.core import EntityStatus
 from idmtools.managers import ExperimentManager
-from idmtools.platforms import COMPSPlatform, LocalPlatform
+# from idmtools.platforms import COMPSPlatform, LocalPlatform
+from idmtools.platforms.COMPSPlatform import COMPSPlatform
+from idmtools.platforms.LocalPlatform import LocalPlatform
 from idmtools_models.python import PythonExperiment, PythonSimulation
 from tests import INPUT_PATH
 from tests.utils.decorators import comps_test
@@ -382,13 +384,13 @@ class TestPythonSimulation(ITestWithPersistence):
         em = ExperimentManager(experiment=pe, platform=platform)
         em.run()
         em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
+        self.assertTrue(all([s.status == EntityStatus.FAILED for s in pe.simulations]))
         # validation
         self.assertEqual(pe.name, name)
         self.assertEqual(pe.simulation_count, 5)
         self.assertIsNotNone(pe.uid)
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
-        self.assertTrue(pe.succeeded)
+        self.assertTrue(all([s.status == EntityStatus.FAILED for s in pe.simulations]))
+        self.assertFalse(pe.succeeded)
 
         # validate tags
         tags = []

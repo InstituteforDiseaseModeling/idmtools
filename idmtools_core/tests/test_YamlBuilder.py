@@ -1,6 +1,4 @@
-import itertools
 import os
-import numpy as np
 from functools import partial
 from idmtools.builders.ArmExperimentBuilder import ArmType
 from idmtools.builders.YamlExperimentBuilder import YamlExperimentBuilder
