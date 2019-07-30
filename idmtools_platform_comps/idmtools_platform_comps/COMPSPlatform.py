@@ -131,6 +131,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                             suite_id=experiment.suite_id)
 
         # Add tags if present
+        # Add tags if present
         if experiment.tags: e.set_tags(experiment.tags)
 
         # Save the experiment

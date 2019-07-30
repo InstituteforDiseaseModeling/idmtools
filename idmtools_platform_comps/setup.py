@@ -5,20 +5,16 @@
 
 from setuptools import setup, find_packages
 
-with open('README.md') as readme_file:
+with open('README.md', encoding='utf-8') as readme_file:
     readme = readme_file.read()
 
 with open('requirements.txt') as requirements_file:
     requirements = requirements_file.read().split("\n")
 
 setup_requirements = []
-test_requirements = ['pytest', 'pytest-runner', 'numpy==1.16.4', 'xmlrunner']
+test_requirements = ['pytest', 'pytest-runner']
 
-extras = {
-    'test': test_requirements,
-    '3.6': ['dataclasses'],
-    'full': ['idmtools_platform_comps', 'idmtools_platform_local', 'idmtools_cli']
-}
+extras = dict(test=test_requirements, dev=['Pympler'])
 
 setup(
     author="Clinton Collins"
@@ -34,20 +30,22 @@ setup(
                  'ckirkman@idmod.org, '
                  'braybaud@idmod.org',
     classifiers=[
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
+        'Framework:: idmtools :: Platform',
     ],
-    description="Core tools for modeling",
+    description="Comps platform for idmtools",
     install_requires=requirements,
     long_description=readme,
     include_package_data=True,
     keywords='modeling, IDM',
-    name='idmtools',
+    name='idmtools_platform_comps',
     packages=find_packages(),
     setup_requires=setup_requirements,
     test_suite='tests',
+    entry_points=dict(idmtools_platform=
+                      ["idmtools_platform_comps = idmtools_platform_comps.plugin_info:COMPSSpecification"]
+                      ),
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
     version='0.1.0',
-    zip_safe=False
+    zip_safe=False,
 )

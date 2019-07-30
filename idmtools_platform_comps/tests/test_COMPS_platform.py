@@ -1,18 +1,20 @@
 import copy
 import json
 import os
+import sys
 import unittest
+from os import path
 
 from idmtools.builders import ExperimentBuilder
 from idmtools.core import EntityStatus
 from idmtools.managers import ExperimentManager
-from idmtools.platforms import COMPSPlatform
 from idmtools_models.python import PythonExperiment
+from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
 from tests import INPUT_PATH
 from tests.utils.decorators import comps_test
 from tests.utils.ITestWithPersistence import ITestWithPersistence
 
-current_directory = os.path.dirname(os.path.realpath(__file__))
+current_directory = path.dirname(path.realpath(__file__))
 
 
 @comps_test

@@ -7,9 +7,9 @@ from operator import itemgetter
 
 from idmtools.builders import ExperimentBuilder
 from idmtools.managers import ExperimentManager
-from idmtools.platforms import LocalPlatform
-from idmtools_local.client.experiments_client import ExperimentsClient
-from idmtools_local.client.simulations_client import SimulationsClient
+from idmtools_platform_local.LocalPlatform import LocalPlatform
+from idmtools_platform_local.client.experiments_client import ExperimentsClient
+from idmtools_platform_local.client.simulations_client import SimulationsClient
 from idmtools_models.python import PythonExperiment
 from tests import INPUT_PATH
 from tests.utils.ITestWithPersistence import ITestWithPersistence
