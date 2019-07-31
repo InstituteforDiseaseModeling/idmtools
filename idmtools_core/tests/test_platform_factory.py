@@ -16,6 +16,14 @@ class TestPlatformFactory(ITestWithPersistence):
         entries = IdmConfigParser.get_block('COMPS2')
         self.assertEqual(entries['endpoint'], 'https://comps2.idmod.org')
 
+    def test_block_not_exits(self):
+        with self.assertRaises(Exception):
+            platform = platform_factory.create_from_block('NOTEXISTS')
+
+    def test_bad_type(self):
+        with self.assertRaises(Exception):
+            platform = platform_factory.create_from_block('BADTYPE')
+
     def test_create_from_block(self):
         p1 = platform_factory.create_from_block('LOCAL')
         self.assertEqual(p1.__class__.__name__, 'LocalPlatform')
@@ -68,4 +76,3 @@ class TestPlatformFactory(ITestWithPersistence):
 
         platform2 = platform_factory.create(platform.__class__.__module__, **kwargs)
         self.assertEqual(platform, platform2)
-
