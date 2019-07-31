@@ -261,3 +261,139 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                 ret[file_path] = self.cache.memoize()(self._get_file_for_collection)(collection_id, normalized_path)
 
         return ret
+
+#     # ck4, spliced in the AnalyzeManager file retrieval method here
+#     def get_assets_for_simulation(self, simulation, output_files):
+#         # raise NotImplemented("Not implemented yet in the COMPSPlatform")
+#         return self.retrieve_COMPS_AM_files(simulation=simulation, filenames=output_files)
+#
+#     # ck4, fix paths for imports
+#     from simtools.Utilities.RetryDecorator import retry
+#
+#     @retry(ConnectionError, tries=5, delay=3, backoff=2)
+#     def retrieve_COMPS_AM_files(self, simulation, filenames):
+#         from simtools.Utilities.COMPSCache import COMPSCache
+#         from simtools.Utilities.COMPSUtilities import COMPS_login, get_asset_files_for_simulation_id
+#
+#         byte_arrays = {}
+#
+#         # Login and retrieve the COMPS simulation
+#         COMPS_login(simulation.experiment.endpoint)
+#         COMPS_simulation = COMPSCache.simulation(simulation.id)
+#
+#         # Separate the files in assets (for those with Assets in the path) and transient (for the others)
+#         assets = [path for path in filenames if path.lower().startswith("assets")]
+#         transient = [path for path in filenames if not path.lower().startswith("assets")]
+#
+#         # Retrieve and store
+#         if transient:
+#             byte_arrays.update(dict(zip(transient, COMPS_simulation.retrieve_output_files(paths=transient))))
+#
+#         if assets:
+#             byte_arrays.update(get_asset_files_for_simulation_id(simulation.id, paths=assets, remove_prefix='Assets'))
+#
+#         return byte_arrays
+#
+#
+#
+#
+#
+#
+# ########################################################################################################################
+# ########################################################################################################################
+# ########################################################################################################################
+# ########################################################################################################################
+# ########################################################################################################################
+# ########################################################################################################################
+# ########################################################################################################################
+#
+#
+#
+#
+#
+#
+#
+# # From map_worker_entry.py below
+#
+# # platform specific imports
+# # import os
+#
+#
+# # ck4, move to SSMT platform-specific method OR make some variant to be used/triggered in here.
+# # def retrieve_SSMT_files(simulation, filenames, path_mapping):
+# #     byte_arrays = {}
+# #
+# #     for filename in filenames:
+# #         # Create the path by replacing the part of the path that is mounted locally
+# #         path = os.path.join(simulation.get_path(), filename).lower()
+# #         path = path.replace(path_mapping[1], path_mapping[0])
+# #         path = path.replace("\\", "/")
+# #
+# #         # Open the file
+# #         with open(path, 'rb') as output_file:
+# #             byte_arrays[filename] = output_file.read()
+# #     return byte_arrays
+#
+#
+#
+# # ck4, move the following block into platform-specific implementations of get_files()
+# #     # Retrieval for SSMT
+# #     if path_mapping:
+# #         byte_arrays = retrieve_SSMT_files(simulation, filenames, path_mapping)
+# #
+# #     # Retrieval for normal HPC Asset Management
+# #     elif simulation.experiment.location == "HPC":
+# #         byte_arrays = retrieve_COMPS_AM_files(simulation, filenames)
+# #
+# #     # Retrieval for local file
+# #     else:
+# #         for filename in filenames:
+# #             path = os.path.join(simulation.get_path(), filename)
+# #             with open(path, 'rb') as output_file:
+# #                 byte_arrays[filename] = output_file.read()
+#
+#
+#
+# # From AnalyzeManager.py, below
+#
+# # ck4, Add this to platform method: initialize_for_analysis(items)
+#
+#         # ################################################################################
+#         # # ck4, replace with platform-specific group actions call here
+#         # # Check if we are on SSMT
+#         # ssmt_path_mapping = os.environ.get('COMPS_DATA_MAPPING', None)
+#         # if ssmt_path_mapping:
+#         #     ssmt_path_mapping.lower().split(';')
+#         #
+#         # # If any of the analyzer needs the dir map, create it
+#         # # Or if we are on SSMT
+#         # if ssmt_path_mapping or any(a.need_dir_map for a in self.analyzers):
+#         #     # preload the global dir map
+#         #     from simtools.Utilities.SimulationDirectoryMap import SimulationDirectoryMap
+#         #     for experiment in self.experiments:
+#         #         SimulationDirectoryMap.preload_experiment(experiment)
+#         #
+#         # # Run the per experiment on the analyzers
+#         # for exp in self.experiments:
+#         #     for analyzer in self.analyzers:
+#         #         analyzer.per_experiment(exp)
+#         # # ck4, END replace with platform-specific group actions call here
+#         # ################################################################################
+#
+#
+#     # # ################################################################################
+#     # # ck4, replace with some group equivalent?
+#     # def add_experiment(self, experiment):
+#     #     from simtools.DataAccess.Schema import Experiment
+#     #     from simtools.Utilities.COMPSUtilities import COMPS_login
+#     #
+#     #     if not isinstance(experiment, Experiment):
+#     #         experiment = retrieve_experiment(experiment)
+#     #
+#     #     if experiment not in self.experiments:
+#     #         self.experiments.add(experiment)
+#     #         if experiment.location == 'HPC':
+#     #             COMPS_login(experiment.endpoint)
+#     #             COMPSCache.load_experiment(experiment.exp_id)
+#     #
+#     #         self.filter_simulations(experiment.simulations)

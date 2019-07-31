@@ -62,6 +62,7 @@ class IAnalyzer(metaclass=ABCMeta):
         Returns: selected data for the given simulation
         """
         return None
+    map = select_simulation_data
 
     def finalize(self, all_data: 'TAllSimulationData') -> 'Any':
         """
@@ -70,6 +71,7 @@ class IAnalyzer(metaclass=ABCMeta):
             all_data: dictionary associating simulation:selected_data
         """
         pass
+    reduce = finalize
 
     def destroy(self):
         """
