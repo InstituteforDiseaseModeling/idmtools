@@ -1,71 +1,13 @@
-import base64
 import os
-import platform
-from abc import abstractmethod, ABC
+import tarfile
+import time
+from dataclasses import dataclass
+from io import BytesIO
 from typing import Optional, Union
 
-from dramatiq import group
-from dataclasses import dataclass
-from idmtools.core import EntityStatus
-from idmtools.entities import IExperiment, IPlatform
-# we have to import brokers so that the proper configuration is achieved for redis
-from idmtools_platform_local.client.experiments_client import ExperimentsClient
-from idmtools_platform_local.client.simulations_client import SimulationsClient
-from idmtools_platform_local.tasks.create_assest_task import AddAssetTask
-from idmtools_platform_local.tasks.create_experiement import CreateExperimentTask
-from idmtools_platform_local.tasks.create_simulation import CreateSimulationTask
-from idmtools_platform_local.tasks.run import RunTask
-from pathlib import Path
 import docker
-
-status_translate = dict(
-    created='CREATED',
-    in_progress='RUNNING',
-    canceled='canceled',
-    failed='FAILED',
-    done='SUCCEEDED'
-)
-
-
-def local_status_to_common(status):
-    return EntityStatus[status_translate[status]]
-
-
-class LocalSystemInformation(ABC):
-
-    @staticmethod
-    def get_data_directory() -> Optional[str]:
-        return str(Path.home())
-
-    @abstractmethod
-    def get_user(self) -> Optional[str]:
-        pass
-
-
-class LinuxSystemInformation(LocalSystemInformation):
-
-    def get_user(self) -> Optional[str]:
-        """
-        Returns a user/group string for executing docker containers as the correct user
-
-        For example
-        '1000:1000'
-        Returns:
-            (str): Container user id and group id of the current user
-        """
-        return f'{os.getuid()}:{os.getgid()}'
-
-
-class WindowsSystemInformation(LocalSystemInformation):
-
-    def get_user(self) -> Optional[str]:
-        """
-        On the windows platform, we don't need a user for docker
-
-        Returns:
-            (None): Returns none meaning there is no user id to pass along
-        """
-        return None
+from docker.utils import create_archive
+from idmtools.core.system_information import get_system_information
 
 
 @dataclass
@@ -74,7 +16,7 @@ class LocalDockerManager:
     network: str
     redis_image: str
     redis_port: int
-    runtime: str
+    runtime: Optional[str]
     redis_mem_limit: str
     redis_mem_reservation: str
     postgres_image: str
@@ -82,12 +24,11 @@ class LocalDockerManager:
     postgres_mem_reservation: str
     postgres_port: Optional[str]
     workers_image: str
-    local_ui_port: int
+    workers_ui_port: int
 
     def __post_init__(self):
         self.timeout = 1
-        self.system_info = LinuxSystemInformation() if platform in ["linux", "linux2",
-                                                                    "darwin"] else WindowsSystemInformation()
+        self.system_info = get_system_information()
         self.client = docker.api.APIClient(timeout=self.timeout)
         self.get_network()
         self.get_redis()
@@ -123,7 +64,7 @@ class LocalDockerManager:
             networking_config = self._build_network_config('workers')
             host_config = self.client.create_host_config(auto_remove=self.auto_remove, binds=worker_volumes,
                                                          restart_policy='always',
-                                                         port_bindings={self.local_ui_port: 5000}
+                                                         port_bindings={self.workers_ui_port: 5000}
                                                          )
             environment = ['REDIS_URL=redis://redis:6379']
             if self.system_info.get_user():
@@ -131,6 +72,7 @@ class LocalDockerManager:
             workers_container = self.client.create_container(image=self.postgres_image, hostname='workers',
                                                              environment=environment, ports=[5000], detach=True,
                                                              host_config=host_config, volumes=['/data'],
+                                                             runtime=self.runtime,
                                                              networking_config=networking_config,
                                                              name='idmtools_workers'
                                                              )
@@ -187,96 +129,20 @@ class LocalDockerManager:
     def _get_optional_port_bindings(src_port: Optional[Union[str, int]], dest_port:Optional[Union[str, int]]):
         return {src_port: dest_port} if src_port is not None else None
 
+    def copy_to_container(self, container_id, artifact_file):
+        with create_archive(artifact_file) as archive:
+            self.client.put_archive(container=container_id, path='/tmp', data=archive)
 
-@dataclass
-class LocalPlatform(IPlatform):
-    auto_remove: bool = True
-    network: str = 'idmtools'
-    redis_image: str = 'redis:5.0.4-alpine'
-    redis_port: int = 6379
-    runtime: str = None
-    redis_mem_limit: str = '128m'
-    redis_mem_reservation: str = '64m'
-    postgres_image: str = 'postgres:11.4'
-    postgres_mem_limit: str = '64m'
-    postgres_mem_reservation: str = '32m'
-    postgres_port: Optional[str] = 5432
-    workers_image: str = 'idm-docker-production.packages.idmod.org:latest'
-    local_ui_port: int = 5000
-
-    def __post_init__(self):
-        dm = LocalDockerManager(**self.__dict__)
-
-
-
-    """
-    Represents the platform allowing to run simulations locally.
-    """
-
-    def retrieve_experiment(self, experiment_id):
-        pass
-
-    def get_assets_for_simulation(self, simulation, output_files):
-        raise NotImplemented("Not implemented yet in the LocalPlatform")
-
-    def restore_simulations(self, experiment):
-        raise NotImplemented("Not implemented yet in the LocalPlatform")
-
-    def refresh_experiment_status(self, experiment: 'TExperiment'):
-        """
-
-        Args:
-            experiment:
-
-        Returns:
-
-        """
-        # TODO Cleanup Client to return experiment id status directly
-        status = SimulationsClient.get_all(experiment_id=experiment.uid)
-        for s in experiment.simulations:
-            sim_status = [st for st in status if st['simulation_uid'] == s.uid]
-
-            if sim_status:
-                s.status = local_status_to_common(sim_status[0]['status'])
-
-    def create_experiment(self, experiment: IExperiment):
-        m = CreateExperimentTask.send(experiment.tags, experiment.simulation_type)
-        eid = m.get_result(block=True)
-        experiment.uid = eid
-        self.send_assets_for_experiment(experiment)
-
-    def send_assets_for_experiment(self, experiment):
-        # Go through all the assets
-        messages = []
-        for asset in experiment.assets:
-            # we are currently using queues to send our assets. This is not the greatest idea
-            # For now, we will continue to do that until issues
-            # https://github.com/InstituteforDiseaseModeling/idmtools/issues/254 is resolved
-            messages.append(
-                AddAssetTask.message(experiment.uid, asset.filename, path=asset.relative_path,
-                                     contents=base64.b64encode(asset.content).decode('utf-8')))
-        group(messages).run().wait()
-
-    def send_assets_for_simulation(self, simulation):
-        # Go through all the assets
-        messages = []
-        for asset in simulation.assets:
-            messages.append(
-                AddAssetTask.message(simulation.experiment.uid, asset.filename, path=asset.relative_path,
-                                     contents=base64.b64encode(asset.content).decode('utf-8'),
-                                     simulation_id=simulation.uid))
-        group(messages).run().wait()
-
-    def create_simulations(self, simulations_batch):
-        ids = []
-        for simulation in simulations_batch:
-            m = CreateSimulationTask.send(simulation.experiment.uid, simulation.tags)
-            sid = m.get_result(block=True)
-            simulation.uid = sid
-            self.send_assets_for_simulation(simulation)
-            ids.append(sid)
-        return ids
-
-    def run_simulations(self, experiment: IExperiment):
-        for simulation in experiment.simulations:
-            RunTask.send(simulation.experiment.command.cmd, simulation.experiment.uid, simulation.uid)
+    @staticmethod
+    def create_archive(artifact_file):
+        pw_tarstream = BytesIO()
+        pw_tar = tarfile.TarFile(fileobj=pw_tarstream, mode='w')
+        file_data = open(artifact_file, 'r').read()
+        tarinfo = tarfile.TarInfo(name=artifact_file)
+        tarinfo.size = len(file_data)
+        tarinfo.mtime = time.time()
+        # tarinfo.mode = 0600
+        pw_tar.addfile(tarinfo, BytesIO(file_data))
+        pw_tar.close()
+        pw_tarstream.seek(0)
+        return pw_tarstream

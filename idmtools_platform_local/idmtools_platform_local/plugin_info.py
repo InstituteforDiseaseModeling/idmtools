@@ -1,11 +1,14 @@
 from idmtools.entities import IPlatform
 from idmtools.entities.IPlatform import PlatformSpecification
-from idmtools_platform_local.LocalPlatform import LocalPlatform
+from idmtools_platform_local.local_platform import LocalPlatform
 
 LOCAL_PLATFORM_EXAMPLE_CONFIG = """
 [LOCAL]
-workers = max
-
+redis_image=redis:5.0.4-alpine
+redis_port=6379
+runtime=nvidia
+workers_image: str = 'idm-docker-production.packages.idmod.org:latest'
+workers_ui_port: int = 5000
 """
 
 
