@@ -16,12 +16,17 @@ Install the packages in dev mode with the `test` extra (from repository folder).
 > cd idmtools_core
 > pip install -e .[test,3.6] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
 > cd ..
-> cd idmtools_local_runner
+> cd idmtools_platform_local
+> pip install -e .[test]
+> cd ..
+> cd idmtools_platform_comps
 > pip install -e .[test]
 > cd ..
 > cd idmtools_models_collection
 > pip install -e .[test]
 ```
+
+Alternatively you can use the `setup_virtualenv.sh` in the dev_scripts folder.
 
 Create a Docker network named `idmtools_network`:
 ```bash
@@ -35,13 +40,14 @@ Navigate to the `idmtools_local_runner` folder and start the local runner:
 
 For development purpose, it is important to add the following folders as to your `PYTHONPATH` (In PyCharm, right click and `Mark Directoy as > Source Root`):
 - `idmtools/idmtools_core`
-- `idmtools/idmtools_local_runner`
+- `idmtools/idmtools_platform_local`
+- `idmtools/idmtools_platform_comps`
 - `idmtools/idmtools_models_collection`
 
 ## Running the examples in Jupyter
 Ensure that the local runner is up:
 ```bash
-> cd idmtools_local_runner
+> cd idmtools_platform_local
 > docker-compose up
 ```
 
