@@ -1,8 +1,8 @@
+click~=7.0
+colorama~=0.4.1
+docker~=4.0.1
 dramatiq[redis, watch]~=1.6.0
 gevent~=1.4.0
-click~=7.0
-tabulate~=0.8.3
-colorama~=0.4.1
-requests~=2.22.0
-docker~=4.0.1
 idmtools
+requests~=2.22.0
+tabulate~=0.8.3
