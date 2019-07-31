@@ -16,6 +16,8 @@ Install the packages in dev mode with the `test` extra (from repository folder).
 > cd idmtools_core
 > pip install -e .[test,3.6] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
 > cd ..
+> cd idmtools_cli
+> pip install -e .[test]
 > cd idmtools_platform_local
 > pip install -e .[test]
 > cd ..
@@ -24,6 +26,9 @@ Install the packages in dev mode with the `test` extra (from repository folder).
 > cd ..
 > cd idmtools_models_collection
 > pip install -e .[test]
+> cd idmtools_test
+> pip install -e .
+
 ```
 
 Alternatively you can use the `setup_virtualenv.sh` in the dev_scripts folder.
@@ -40,9 +45,11 @@ Navigate to the `idmtools_local_runner` folder and start the local runner:
 
 For development purpose, it is important to add the following folders as to your `PYTHONPATH` (In PyCharm, right click and `Mark Directoy as > Source Root`):
 - `idmtools/idmtools_core`
+- `idmtools/idmtools_cli`
 - `idmtools/idmtools_platform_local`
 - `idmtools/idmtools_platform_comps`
 - `idmtools/idmtools_models_collection`
+- `idmtools/idmtools_test`
 
 ## Running the examples in Jupyter
 Ensure that the local runner is up:
