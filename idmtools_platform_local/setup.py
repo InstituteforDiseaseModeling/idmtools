@@ -45,7 +45,9 @@ setup(
     packages=find_packages(),
     setup_requires=setup_requirements,
     entry_points=dict(idmtools_platform=
-                      ["idmtools_platform_local = idmtools_platform_local.plugin_info:LocalPlatformSpecification"]
+                      ["idmtools_platform_local = idmtools_platform_local.plugin_info:LocalPlatformSpecification"],
+                      idmtools_platform_cli=
+                      ["idmtools_platform_cli_local = idmtools_platform_local.local_cli:LocalCLISpecification"]
                       ),
     test_suite='tests',
     extras_require=extras,

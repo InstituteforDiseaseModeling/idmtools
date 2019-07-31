@@ -1,7 +1,6 @@
 from colorama import init
-
+from idmtools_cli.cli.base import cli
 from idmtools.entities.IPlatformCli import PlatformCLIPlugins
-from idmtools_platform_local.cli.base import cli
 
 
 def main():
@@ -11,6 +10,9 @@ def main():
 
 def start():
     init()
+    import idmtools_cli.cli.experiment
+    import idmtools_cli.cli.simulation
+    import idmtools_cli.cli.system_info
     platform_plugins = PlatformCLIPlugins()
     # Trigger the loading of additional cli from platforms
     [p.get_additional_commands() for p in platform_plugins.get_plugins()]

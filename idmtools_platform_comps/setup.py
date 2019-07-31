@@ -42,7 +42,9 @@ setup(
     setup_requires=setup_requirements,
     test_suite='tests',
     entry_points=dict(idmtools_platform=
-                      ["idmtools_platform_comps = idmtools_platform_comps.plugin_info:COMPSSpecification"]
+                      ["idmtools_platform_comps = idmtools_platform_comps.plugin_info:COMPSSpecification"],
+                      idmtools_platform_cli=
+                      ["idmtools_platform_cli_comps = idmtools_platform_comps.comps_cli:LocalCLISpecification"]
                       ),
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',

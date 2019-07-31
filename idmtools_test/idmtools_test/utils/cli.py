@@ -20,9 +20,9 @@ def striped_cli_output_lines(result):
 def run_command(*args, start_command=None):
     if start_command is None:
         start_command = []
-    from idmtools_cli.main import start, main
+    from idmtools_cli.main import start, cli
     start()
     runner = CliRunner()
     final_command = start_command + list(args) if len(args) else start_command
-    result = runner.invoke(main, final_command)
+    result = runner.invoke(cli, final_command)
     return result
