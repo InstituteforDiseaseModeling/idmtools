@@ -30,7 +30,7 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
     ],
-    description="Core tools for modeling",
+    description="Test and demo data for idmtools",
     install_requires=requirements,
     long_description=readme,
     include_package_data=True,
