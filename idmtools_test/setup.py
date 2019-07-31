@@ -27,8 +27,7 @@ setup(
                  'ckirkman@idmod.org, '
                  'braybaud@idmod.org',
     classifiers=[
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
+        'Framework:: idmtools :: Test',
     ],
     description="Test and demo data for idmtools",
     install_requires=requirements,
