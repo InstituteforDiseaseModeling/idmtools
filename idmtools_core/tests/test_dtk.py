@@ -12,7 +12,7 @@ from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 from idmtools_test.utils.decorators import comps_test
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
-INPUT_PATH = os.path.join(current_directory, "inputs")
+COMMON_INPUT_PATH = os.path.join(current_directory, "inputs")
 
 
 @comps_test
@@ -25,7 +25,7 @@ class TestDTK(ITestWithPersistence):
 
     def test_sir_with_StandAloneSimulationsBuilder(self):
         e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
-                                       eradication_path=os.path.join(INPUT_PATH, "dtk", "Eradication.exe"))
+                                       eradication_path=os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe"))
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         sim = e.simulation()
         sim.set_parameter("Enable_Immunity", 0)
@@ -45,7 +45,7 @@ class TestDTK(ITestWithPersistence):
 
     def test_sir_with_ExperimentBuilder(self):
         e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
-                                       eradication_path=os.path.join(INPUT_PATH, "dtk", "Eradication.exe"))
+                                       eradication_path=os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe"))
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
 
         e.base_simulation.set_parameter("Enable_Immunity", 0)
@@ -73,7 +73,7 @@ class TestDTK(ITestWithPersistence):
 
     def test_batch_simulations(self):
         e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
-                                       eradication_path=os.path.join(INPUT_PATH, "dtk", "Eradication.exe"))
+                                       eradication_path=os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe"))
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         b = StandAloneSimulationsBuilder()
 
@@ -96,7 +96,7 @@ class TestDTK(ITestWithPersistence):
 
     def test_batch_simulations1(self):
         e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
-                                       eradication_path=os.path.join(INPUT_PATH, "dtk", "Eradication.exe"))
+                                       eradication_path=os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe"))
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
 
         e.base_simulation.set_parameter("Enable_Immunity", 0)

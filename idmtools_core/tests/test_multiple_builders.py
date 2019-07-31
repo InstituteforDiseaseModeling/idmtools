@@ -6,7 +6,7 @@ from idmtools.builders import YamlExperimentBuilder
 from idmtools.builders import CsvExperimentBuilder
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 from idmtools_test.utils.TestExperiment import TestExperiment
-from . import INPUT_PATH
+from idmtools_test import COMMON_INPUT_PATH
 
 
 def param_update(simulation, param, value):
@@ -23,7 +23,7 @@ class TestMultipleBuilders(ITestWithPersistence):
 
     def setUp(self):
         super().setUp()
-        self.base_path = os.path.abspath(os.path.join(INPUT_PATH, "builder"))
+        self.base_path = os.path.abspath(os.path.join(COMMON_INPUT_PATH, "builder"))
         self.arm_builder = ArmExperimentBuilder()
         self.yaml_builder = YamlExperimentBuilder()
         self.csv_builder = CsvExperimentBuilder()

@@ -6,13 +6,13 @@ from functools import partial
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core import DuplicatedAssetError, FilterMode
 from idmtools.utils.filters.asset_filters import asset_in_directory, file_name_is
-from . import INPUT_PATH
+from idmtools_test import COMMON_INPUT_PATH
 
 
 class TestAssets(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.base_path = os.path.abspath(os.path.join(INPUT_PATH, "assets", "collections"))
+        self.base_path = os.path.abspath(os.path.join(COMMON_INPUT_PATH, "assets", "collections"))
 
     def test_hashing(self):
         a = Asset(relative_path="1", absolute_path=os.path.join(self.base_path, "1", "a.txt"))

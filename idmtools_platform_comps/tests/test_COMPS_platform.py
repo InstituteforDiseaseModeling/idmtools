@@ -11,7 +11,7 @@ from idmtools_models.python import PythonExperiment
 from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 from idmtools_test.utils.decorators import comps_test
-from . import INPUT_PATH
+from idmtools_test import COMMON_INPUT_PATH
 
 current_directory = path.dirname(path.realpath(__file__))
 
@@ -33,7 +33,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
     def test_output_files_retrieval(self):
         config = {"a": 1, "b": 2}
         experiment = PythonExperiment(name=self.case_name,
-                                      model_path=os.path.join(INPUT_PATH, "compsplatform", "working_model.py"))
+                                      model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"))
         experiment.base_simulation.parameters = config
         em = ExperimentManager(experiment=experiment, platform=self.platform)
         em.run()
@@ -51,7 +51,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
         self.assertEqual(len(files_needed), len(files_retrieved))
 
         # Test the content
-        with open(os.path.join(INPUT_PATH, "compsplatform", "working_model.py"), 'rb') as m:
+        with open(os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"), 'rb') as m:
             self.assertEqual(files_retrieved["Assets\\working_model.py"], m.read())
         self.assertEqual(files_retrieved["config.json"], json.dumps(config).encode('utf-8'))
 
@@ -63,7 +63,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
         self.assertEqual(len(files_needed), len(files_retrieved))
 
         # Test the content
-        with open(os.path.join(INPUT_PATH, "compsplatform", "working_model.py"), 'rb') as m:
+        with open(os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"), 'rb') as m:
             self.assertEqual(files_retrieved["Assets/working_model.py"], m.read())
 
         # Test wrong filename
@@ -114,20 +114,20 @@ class TestCOMPSPlatform(ITestWithPersistence):
 
     def test_status_retrieval_succeeded(self):
         experiment = PythonExperiment(name=self.case_name,
-                                      model_path=os.path.join(INPUT_PATH, "compsplatform", "working_model.py"))
+                                      model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"))
         self._run_and_test_experiment(experiment)
         self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in experiment.simulations]))
 
     def test_status_retrieval_failed(self):
         experiment = PythonExperiment(name=self.case_name,
-                                      model_path=os.path.join(INPUT_PATH, "compsplatform", "failing_model.py"))
+                                      model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "failing_model.py"))
         self._run_and_test_experiment(experiment)
         self.assertTrue(all([s.status == EntityStatus.FAILED for s in experiment.simulations]))
         self.assertFalse(experiment.succeeded)
 
     def test_status_retrieval_mixed(self):
         experiment = PythonExperiment(name=self.case_name,
-                                      model_path=os.path.join(INPUT_PATH, "compsplatform", "mixed_model.py"))
+                                      model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "mixed_model.py"))
         self._run_and_test_experiment(experiment)
         self.assertTrue(experiment.done)
         self.assertFalse(experiment.succeeded)
@@ -136,7 +136,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
 
     def test_from_experiment(self):
         experiment = PythonExperiment(name=self.case_name,
-                                      model_path=os.path.join(INPUT_PATH, "compsplatform", "working_model.py"))
+                                      model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"))
         self._run_and_test_experiment(experiment)
         experiment2 = copy.deepcopy(experiment)
         experiment2.simulations.clear()

@@ -8,14 +8,14 @@ from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 from idmtools_test.utils.TestExperiment import TestExperiment
 from idmtools_test.utils.TestPlatform import TestPlatform
 from idmtools_models.python import PythonExperiment, PythonSimulation
-from . import INPUT_PATH
+from idmtools_test import COMMON_INPUT_PATH
 
 
 class TestPersistenceServices(ITestWithPersistence):
 
     def test_fix_107(self):
         # https://github.com/InstituteforDiseaseModeling/idmtools/issues/107
-        assets_path = os.path.join(INPUT_PATH, "regression", "107", "Assets")
+        assets_path = os.path.join(COMMON_INPUT_PATH, "regression", "107", "Assets")
         pe = PythonExperiment(name="Test",
                               model_path=os.path.join(assets_path, "model.py"),
                               assets=AssetCollection.from_directory(assets_path))
@@ -27,7 +27,7 @@ class TestPersistenceServices(ITestWithPersistence):
 
     def test_fix_114(self):
         # https://github.com/InstituteforDiseaseModeling/idmtools/issues/114
-        assets_path = os.path.join(INPUT_PATH, "regression", "107", "Assets")
+        assets_path = os.path.join(COMMON_INPUT_PATH, "regression", "107", "Assets")
         s = PythonSimulation(parameters={"a": 1})
         e = PythonExperiment(name="Test",
                              model_path=os.path.join(assets_path, "model.py"),
@@ -37,12 +37,12 @@ class TestPersistenceServices(ITestWithPersistence):
     def test_fix_125(self):
         # https://github.com/InstituteforDiseaseModeling/idmtools/issues/125
         ac = AssetCollection()
-        ac.add_directory(assets_directory=os.path.join(INPUT_PATH, "regression", "125", "Assets"),
+        ac.add_directory(assets_directory=os.path.join(COMMON_INPUT_PATH, "regression", "125", "Assets"),
                          relative_path="MyExternalLibrary")
         self.assertTrue(all([a.relative_path == "MyExternalLibrary" for a in ac]))
 
         ac = AssetCollection()
-        ac.add_directory(assets_directory=os.path.join(INPUT_PATH, "regression", "125", "Assets2"),
+        ac.add_directory(assets_directory=os.path.join(COMMON_INPUT_PATH, "regression", "125", "Assets2"),
                          relative_path="MyExternalLibrary")
         self.assertTrue(all([a.relative_path.startswith("MyExternalLibrary") for a in ac]))
 

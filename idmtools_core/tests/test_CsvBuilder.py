@@ -4,7 +4,7 @@ from functools import partial
 from idmtools.builders import CsvExperimentBuilder
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 from idmtools_test.utils.TestExperiment import TestExperiment
-from tests import INPUT_PATH
+from tests import COMMON_INPUT_PATH
 
 
 def param_update(simulation, param, value):
@@ -31,7 +31,7 @@ class TestArmBuilder(ITestWithPersistence):
     def setUp(self):
         super().setUp()
         self.builder = CsvExperimentBuilder()
-        self.base_path = os.path.abspath(os.path.join(INPUT_PATH, "builder"))
+        self.base_path = os.path.abspath(os.path.join(COMMON_INPUT_PATH, "builder"))
 
     def tearDown(self):
         super().tearDown()

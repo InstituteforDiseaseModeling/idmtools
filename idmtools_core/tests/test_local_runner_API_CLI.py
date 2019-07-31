@@ -12,7 +12,7 @@ from idmtools_platform_local.client.experiments_client import ExperimentsClient
 from idmtools_platform_local.client.simulations_client import SimulationsClient
 from idmtools_models.python import PythonExperiment
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
-from . import INPUT_PATH
+from idmtools_test import COMMON_INPUT_PATH
 
 
 class TestLocalRunnerCLI(ITestWithPersistence):
@@ -20,7 +20,7 @@ class TestLocalRunnerCLI(ITestWithPersistence):
     @classmethod
     def setUpClass(cls):
         platform = LocalPlatform()
-        cls.pe = PythonExperiment(name="python experiment", model_path=os.path.join(INPUT_PATH, "python", "model1.py"))
+        cls.pe = PythonExperiment(name="python experiment", model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
 
         cls.pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
 

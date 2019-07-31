@@ -14,7 +14,7 @@ from idmtools_platform_local.local_platform import LocalPlatform
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id
 from idmtools_test.utils.decorators import comps_test
-from . import INPUT_PATH
+from idmtools_test import COMMON_INPUT_PATH
 
 
 def param_update(simulation, param, value):
@@ -41,11 +41,11 @@ class TestPythonSimulation(ITestWithPersistence):
         self.platform = COMPSPlatform()
 
     def test_retrieve_extra_libraries(self):
-        ps = PythonExperiment(name=self.case_name, model_path=os.path.join(INPUT_PATH, "python", "model.py"))
+        ps = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model.py"))
         self.assertTrue("numpy" in ps.retrieve_python_dependencies()[0])
 
     def test_add_class_tag(self):
-        ps = PythonExperiment(name=self.case_name, model_path=os.path.join(INPUT_PATH, "python", "model.py"))
+        ps = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model.py"))
         # The tag for type is added at runtime during the pre_creation event
         ps.pre_creation()
         self.assertEqual(ps.tags.get('type'), "idmtools_models.python.PythonExperiment")
@@ -83,7 +83,7 @@ class TestPythonSimulation(ITestWithPersistence):
     # has 5 parameter, total sweep parameters are 5*5=25
     @comps_test
     def test_sweeps_with_partial_comps(self):
-        pe = PythonExperiment(name=self.case_name, model_path=os.path.join(INPUT_PATH, "python", "model1.py"))
+        pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
 
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123, "KeyOnly": None}
 
@@ -126,7 +126,7 @@ class TestPythonSimulation(ITestWithPersistence):
     # b=[2,3,4,5,6]  <-- b = a + 2
     @comps_test
     def test_sweeps_2_related_parameters_comps(self):
-        pe = PythonExperiment(name=self.case_name, model_path=os.path.join(INPUT_PATH, "python", "model1.py"))
+        pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
 
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
 
@@ -160,9 +160,9 @@ class TestPythonSimulation(ITestWithPersistence):
 
     @comps_test
     def test_add_prefixed_relative_path_to_assets_comps(self):
-        model_path = os.path.join(INPUT_PATH, "python", "model.py")
+        model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
         ac = AssetCollection()
-        assets_path = os.path.join(INPUT_PATH, "python", "Assets", "MyExternalLibrary")
+        assets_path = os.path.join(COMMON_INPUT_PATH, "python", "Assets", "MyExternalLibrary")
         ac.add_directory(assets_directory=assets_path, relative_path="MyExternalLibrary")
         pe = PythonExperiment(name=self.case_name, model_path=model_path, assets=ac)
         # assets=AssetCollection.from_directory(assets_directory=assets_path, relative_path="MyExternalLibrary"))
@@ -217,9 +217,9 @@ class TestPythonSimulation(ITestWithPersistence):
     #   |--model.py
     @comps_test
     def test_add_dirs_to_assets_comps(self):
-        model_path = os.path.join(INPUT_PATH, "python", "model.py")
+        model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
         ac = AssetCollection()
-        assets_path = os.path.join(INPUT_PATH, "python", "Assets")
+        assets_path = os.path.join(COMMON_INPUT_PATH, "python", "Assets")
         ac.add_directory(assets_directory=assets_path)
         pe = PythonExperiment(name=self.case_name, model_path=model_path, assets=ac)
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
@@ -269,10 +269,10 @@ class TestPythonSimulation(ITestWithPersistence):
     #   |--model.py
     @comps_test
     def test_add_specific_files_to_assets_comps(self):
-        model_path = os.path.join(INPUT_PATH, "python", "model.py")
+        model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
         ac = AssetCollection()
         a = Asset(relative_path="MyExternalLibrary",
-                  absolute_path=os.path.join(INPUT_PATH, "python", "Assets", "MyExternalLibrary", "functions.py"))
+                  absolute_path=os.path.join(COMMON_INPUT_PATH, "python", "Assets", "MyExternalLibrary", "functions.py"))
         ac.add_asset(a)
         pe = PythonExperiment(name=self.case_name, model_path=model_path, assets=ac)
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
@@ -320,7 +320,7 @@ class TestPythonSimulation(ITestWithPersistence):
     @comps_test
     def test_sweep_in_arms_cross(self):
         pe = PythonExperiment(name=self.case_name,
-                              model_path=os.path.join(INPUT_PATH, "python", "model1.py"))
+                              model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123, "KeyOnly": None}
 
         arm = SweepArm(type=ArmType.cross)
@@ -347,10 +347,10 @@ class TestPythonSimulation(ITestWithPersistence):
     @comps_test
     def test_duplicate_asset_files_not_allowed(self):
         experiment = PythonExperiment(name=self.case_name,
-                                      model_path=os.path.join(INPUT_PATH, "python", "model1.py"))
+                                      model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
         experiment.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         experiment.assets.add_directory(
-            assets_directory=os.path.join(INPUT_PATH, "python", "folder_dup_file"))
+            assets_directory=os.path.join(COMMON_INPUT_PATH, "python", "folder_dup_file"))
         builder = ExperimentBuilder()
         experiment.builder = builder
         em = ExperimentManager(experiment=experiment, platform=self.platform)
@@ -365,7 +365,7 @@ class TestPythonSimulation(ITestWithPersistence):
     def test_direct_sweep_one_parameter_local(self):
         platform = LocalPlatform()
         name = self.case_name
-        pe = PythonExperiment(name=self.case_name, model_path=os.path.join(INPUT_PATH, "python", "model1.py"))
+        pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
 
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
 
@@ -402,11 +402,11 @@ class TestPythonSimulation(ITestWithPersistence):
     def test_add_prefixed_relative_path_to_assets_local(self):
         # platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
         platform = LocalPlatform()
-        model_path = os.path.join(INPUT_PATH, "python", "model.py")
+        model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
         ac = AssetCollection()
-        assets_path = os.path.join(INPUT_PATH, "python", "Assets", "MyExternalLibrary")
+        assets_path = os.path.join(COMMON_INPUT_PATH, "python", "Assets", "MyExternalLibrary")
         ac.add_directory(assets_directory=assets_path, relative_path="MyExternalLibrary")
-        # assets_path = os.path.join(INPUT_PATH, "python", "Assets")
+        # assets_path = os.path.join(COMMON_INPUT_PATH, "python", "Assets")
         # ac.add_directory(assets_directory=assets_path)
         pe = PythonExperiment(name=self.case_name, model_path=model_path, assets=ac)
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}

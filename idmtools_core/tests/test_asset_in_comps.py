@@ -9,16 +9,16 @@ from idmtools.builders import ExperimentBuilder
 from idmtools.core import EntityStatus
 from idmtools_models.python import PythonExperiment
 from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
+from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id
 from idmtools_test.utils.decorators import comps_test
-from . import INPUT_PATH
 
 
 @comps_test
 class TestAssetsInComps(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.base_path = os.path.abspath(os.path.join(INPUT_PATH, "assets", "collections"))
+        self.base_path = os.path.abspath(os.path.join(COMMON_INPUT_PATH, "assets", "collections"))
         self.platform = COMPSPlatform()
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
@@ -82,7 +82,7 @@ class TestAssetsInComps(unittest.TestCase):
         ac.add_asset(b)
 
         pe = PythonExperiment(name=self.case_name,
-                              model_path=os.path.join(INPUT_PATH, "compsplatform", "working_model.py"), assets=ac)
+                              model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"), assets=ac)
         pe.tags = {"idmtools": "idmtools-automation"}
         self._run_and_test_experiment(pe)
         exp_id = pe.uid

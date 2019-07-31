@@ -3,7 +3,7 @@ import json
 from idmtools_models.dtk import DTKExperiment
 from idmtools_models.dtk.defaults import DTKSIR
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
-from . import INPUT_PATH
+from idmtools_test import COMMON_INPUT_PATH
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 
@@ -20,7 +20,7 @@ class TestCustomFiles(ITestWithPersistence):
 
     def test_simulation_load_config(self):
         e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
-                                       eradication_path=os.path.join(INPUT_PATH, "dtk", "Eradication.exe"))
+                                       eradication_path=os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe"))
 
         e.base_simulation.load_files(config_path="./inputs/files/config.json")
 
@@ -42,7 +42,7 @@ class TestCustomFiles(ITestWithPersistence):
 
     def test_simulation_load_campaign(self):
         e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
-                                       eradication_path=os.path.join(INPUT_PATH, "dtk", "Eradication.exe"))
+                                       eradication_path=os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe"))
 
         e.base_simulation.load_files(campaign_path="./inputs/files/campaign.json")
 
@@ -64,7 +64,7 @@ class TestCustomFiles(ITestWithPersistence):
 
     def test_simulation_load_demographics(self):
         e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
-                                       eradication_path=os.path.join(INPUT_PATH, "dtk", "Eradication.exe"))
+                                       eradication_path=os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe"))
 
         e.base_simulation.load_files(demographics_path="./inputs/files/demographics.json")
 
@@ -86,7 +86,7 @@ class TestCustomFiles(ITestWithPersistence):
 
     def test_simulation_load_files(self):
         e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
-                                       eradication_path=os.path.join(INPUT_PATH, "dtk", "Eradication.exe"))
+                                       eradication_path=os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe"))
 
         e.base_simulation.load_files(config_path="./inputs/files/config.json",
                                      campaign_path="./inputs/files/campaign.json",
@@ -110,7 +110,7 @@ class TestCustomFiles(ITestWithPersistence):
 
     def test_experiment_load_files(self):
         e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
-                                       eradication_path=os.path.join(INPUT_PATH, "dtk", "Eradication.exe"))
+                                       eradication_path=os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe"))
 
         e.load_files(config_path="./inputs/files/config.json",
                      campaign_path="./inputs/files/campaign.json",
@@ -134,7 +134,7 @@ class TestCustomFiles(ITestWithPersistence):
 
     def test_load_from_files(self):
         e = DTKExperiment.from_files(self.case_name,
-                                     eradication_path=os.path.join(INPUT_PATH, "dtk", "Eradication.exe"),
+                                     eradication_path=os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe"),
                                      config_path="./inputs/files/config.json",
                                      campaign_path="./inputs/files/campaign.json",
                                      demographics_path="./inputs/files/demographics.json")

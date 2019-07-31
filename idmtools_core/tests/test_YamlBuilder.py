@@ -4,7 +4,7 @@ from idmtools.builders.ArmExperimentBuilder import ArmType
 from idmtools.builders.YamlExperimentBuilder import YamlExperimentBuilder
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 from idmtools_test.utils.TestExperiment import TestExperiment
-from . import INPUT_PATH
+from idmtools_test import COMMON_INPUT_PATH
 
 
 def param_update(simulation, param, value):
@@ -31,7 +31,7 @@ class TestArmBuilder(ITestWithPersistence):
     def setUp(self):
         super().setUp()
         self.builder = YamlExperimentBuilder()
-        self.base_path = os.path.abspath(os.path.join(INPUT_PATH, "builder"))
+        self.base_path = os.path.abspath(os.path.join(COMMON_INPUT_PATH, "builder"))
 
     def tearDown(self):
         super().tearDown()

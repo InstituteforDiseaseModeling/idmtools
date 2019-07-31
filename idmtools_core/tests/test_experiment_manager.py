@@ -9,7 +9,7 @@ from idmtools_models.python import PythonExperiment
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 from idmtools_test.utils.TestExperiment import TestExperiment
 from idmtools_test.utils.TestPlatform import TestPlatform
-from . import INPUT_PATH
+from idmtools_test import COMMON_INPUT_PATH
 
 
 def set_parameter_no_tags(simulation, value):
@@ -36,7 +36,7 @@ class TestExperimentManager(ITestWithPersistence):
     def test_from_experiment_unknown(self):
         c = TestPlatform()
         experiment = PythonExperiment(name="test_from_experiment",
-                                      model_path=os.path.join(INPUT_PATH, "compsplatform", "working_model.py"))
+                                      model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"))
         builder = ExperimentBuilder()
         builder.add_sweep_definition(lambda simulation, value: {"p": value}, range(0, 2))
         experiment.builder = builder
