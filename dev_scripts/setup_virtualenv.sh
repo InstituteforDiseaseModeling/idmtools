@@ -5,7 +5,7 @@ LOCAL_PATH="$(realpath $(dirname '$0')/../)"
 echo ${LOCAL_PATH}
 
 
-packages=( "idmtools_core" "idmtools_platform_local" "idmtools_platform_comps" "idmtools_models_collection" )
+packages=( "idmtools_core" "idmtools_platform_local" "idmtools_platform_comps" "idmtools_models_collection" "idmtools_test" )
 for i in "${packages[@]}"
 do
 echo "Installing local ${i}"
