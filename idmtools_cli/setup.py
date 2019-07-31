@@ -15,12 +15,7 @@ setup_requirements = []
 test_requirements = ['pytest', 'pytest-runner', 'numpy==1.16.4', 'xmlrunner']
 
 extras = {
-    'test': test_requirements,
-    '3.6': ['dataclasses'],
-    # to support notebooks we need docker
-    'notebooks': ['docker==4.0.1'],
-    # our full install include all common plugins
-    'full': ['idmtools_platform_comps', 'idmtools_platform_local', 'idmtools_cli']
+    'test': test_requirements
 }
 
 setup(
@@ -40,15 +35,16 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
     ],
-    description="Core tools for modeling",
+    description="CLI for idmtools",
     install_requires=requirements,
     long_description=readme,
     include_package_data=True,
     keywords='modeling, IDM',
-    name='idmtools',
+    name='idm_tools_cli',
     packages=find_packages(),
     setup_requires=setup_requirements,
     test_suite='tests',
+    entry_points={"console_scripts": ["idmtools_cli.main:main"]},
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
     version='0.1.0',

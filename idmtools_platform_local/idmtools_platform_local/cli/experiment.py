@@ -1,8 +1,9 @@
 from typing import Optional, Tuple, List, Any, Dict
 import click
 from tabulate import tabulate
-from idmtools_platform_local.cli.base import cli
-from idmtools_platform_local.cli.utils import parent_status_to_progress, urlize_data_path, tags_help, show_error
+from idmtools_cli.cli.experiment import experiment
+from idmtools_cli.cli.utils import show_error
+from idmtools_platform_local.cli.utils import parent_status_to_progress, urlize_data_path
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
 from idmtools_platform_local.config import API_PATH
 
@@ -27,17 +28,6 @@ def prettify_experiment(experiment: Dict[str, Any]):
     return experiment
 
 
-@cli.group(help="Commands related to experiments(top-level jobs)")
-def experiment():
-    """
-    Create the sub-command experiment under the main cli command
-    """
-    pass
-
-
-@experiment.command()
-@click.option('--id', default=None, help="Filter status by experiment ID")
-@click.option('--tags', default=None, nargs=2, multiple=True, help=tags_help)
 def status(id: Optional[str], tags: Optional[List[Tuple[str, str]]]):
     """
     List the status of experiment(s) with the ability to filter by experiment id and tags
@@ -55,34 +45,37 @@ def status(id: Optional[str], tags: Optional[List[Tuple[str, str]]]):
     print(tabulate(experiments, headers='keys', tablefmt='psql', showindex=False))
 
 
-@experiment.command()
-@click.argument('id')
-@click.option('--data/--no-data', default=False, help="Should we delete the data as well?")
-def delete(id: str, data: bool):
+def extra_commands():
+    """ This ensures our local platform specific commands are loaded
     """
-    Delete an experiment, and optionally, its data
+    @experiment.command()
+    @click.argument('id')
+    @click.option('--data/--no-data', default=False, help="Should we delete the data as well?")
+    def delete(id: str, data: bool):
+        """
+        Delete an experiment, and optionally, its data
 
-    Args:
-        id (str): ID of experiment to delete
-        data (bool): If true, specifies data folder for experiment should be deleted, otherwise it will be kept
-    """
-    print(f'Deleting Experiment: {id}')
-    experiment: Dict = None
-    try:
-        experiment = ExperimentsClient.get_all(id)
-    except RuntimeError as e:
-        show_error(e.args[0])
-
-    if not data or (data and
-                    click.confirm('Deleting experiment data is irreversible. Are you sure you want to delete all '
-                                  'experiment data?')):
-        print(f'Deleting {experiment["data_path"]}')
+        Args:
+            id (str): ID of exp to delete
+            data (bool): If true, specifies data folder for experiment should be deleted, otherwise it will be kept
+        """
+        print(f'Deleting Experiment: {id}')
+        exp: Dict = None
         try:
-            response = ExperimentsClient.delete(id, data)
-            if response:
-                print('Experiment removed successfully')
+            exp = ExperimentsClient.get_all(id)
         except RuntimeError as e:
             show_error(e.args[0])
+
+        if not data or (data and
+                        click.confirm('Deleting exp data is irreversible. Are you sure you want to delete all '
+                                      'exp data?')):
+            print(f'Deleting {exp["data_path"]}')
+            try:
+                response = ExperimentsClient.delete(id, data)
+                if response:
+                    print('Experiment removed successfully')
+            except RuntimeError as e:
+                show_error(e.args[0])
 
 
 

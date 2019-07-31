@@ -53,13 +53,17 @@ class LocalDockerManager:
         })
         return networking_config
 
-    def get_workers(self):
+    def get_workers(self) -> str:
         workers_container = self.client.containers(filters=dict(name='idmtools_worker'))
         if not workers_container:
             data_dir = os.path.join(self.system_info.get_data_directory(), 'workers')
             os.makedirs(data_dir, exist_ok=True)
+            docker_socket = '/var/run/docker.sock'
+            if os.name == 'nt':
+                docker_socket = '/' + docker_socket
             worker_volumes = [
-                f'{data_dir}:/data'
+                f'{data_dir}:/data',
+                f'{docker_socket}:/var/run/docker.sock'
             ]
             networking_config = self._build_network_config('workers')
             host_config = self.client.create_host_config(auto_remove=self.auto_remove, binds=worker_volumes,
@@ -76,9 +80,11 @@ class LocalDockerManager:
                                                              networking_config=networking_config,
                                                              name='idmtools_workers'
                                                              )
-        return workers_container
+        else:
+            workers_container = workers_container[0]
+        return workers_container['Id']
 
-    def get_redis(self):
+    def get_redis(self) -> str:
         # ensure database is running
         redis_container = self.client.containers(filters=dict(name='idmtools_redis'))
         if not redis_container:
@@ -98,9 +104,11 @@ class LocalDockerManager:
                                                            user=self.system_info.get_user(), host_config=host_config,
                                                            networking_config=networking_config,
                                                            name='idmtools_redis', volumes=['/data'], detach=True)
-        return redis_container
+        else:
+            redis_container = redis_container[0]
+        return redis_container['Id']
 
-    def get_postgres(self):
+    def get_postgres(self) -> str:
         postgres_container = self.client.containers(filters=dict(name='idmtools_postgres'))
         if not postgres_container:
             postgres_volume = self.client.volumes(filters=dict(name='idmtools_local_postgres'))
@@ -123,7 +131,9 @@ class LocalDockerManager:
                                                               ports=[5432], host_config=host_config, volumes=['/data'],
                                                               detach=True, name='idmtools_postgres',
                                                               networking_config=networking_config)
-        return postgres_container
+        else:
+            postgres_container = postgres_container[0]
+        return postgres_container['Id']
 
     @staticmethod
     def _get_optional_port_bindings(src_port: Optional[Union[str, int]], dest_port:Optional[Union[str, int]]):

@@ -1,4 +1,4 @@
-FROM python:3.7.2
+FROM python:3.7.4
 
 ARG S6_VERSION
 ENV S6_VERSION=${S6_VERSION:-v1.21.7.0} \
@@ -7,7 +7,20 @@ ENV S6_VERSION=${S6_VERSION:-v1.21.7.0} \
 
 # Install sudo. Useful in debugging/development in combination with -e ROOT=true
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends sudo \
+    # setup sudo and packages allowing us to install docker repo
+    && apt-get install -y --no-install-recommends sudo apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg2 \
+    software-properties-common \
+    # install docker-cli
+    && curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
+    && add-apt-repository \
+    "deb [arch=amd64] https://download.docker.com/linux/debian \
+    $(lsb_release -cs) \
+    stable"
+    && apt-get update
+    && apt-get install -y --no-install-recommends docker-ce-cli
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

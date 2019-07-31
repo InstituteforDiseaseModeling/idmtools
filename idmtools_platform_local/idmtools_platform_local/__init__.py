@@ -1,1 +1,1 @@
-from idmtools_platform_local.workers.brokers import *
+__version__ = "0.1.0"

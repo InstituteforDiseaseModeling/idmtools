@@ -4,3 +4,5 @@ click~=7.0
 tabulate~=0.8.3
 colorama~=0.4.1
 requests~=2.22.0
+docker~=4.0.1
+idmtools

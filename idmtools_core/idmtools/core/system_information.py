@@ -1,47 +1,45 @@
 from abc import abstractmethod, ABC
+from dataclasses import dataclass, field
 from pathlib import Path
 from sys import platform
-from typing import Optional
+from typing import Optional, List, Dict
 import os
 
 
-class SystemInformation(ABC):
-
-    @staticmethod
-    def get_data_directory() -> Optional[str]:
-        return str(Path.home())
-
-    @abstractmethod
-    def get_user(self) -> Optional[str]:
-        pass
+def get_packages_list():
+    import pip
+    installed_packages = pip.get_installed_distributions()
+    installed_packages_list = sorted(["%s==%s" % (i.key, i.version) for i in installed_packages])
+    return installed_packages_list
 
 
+@dataclass
+class SystemInformation:
+    data_directory: Optional[str] = str(Path.home())
+    user: Optional[str] = None
+    python_version: str = platform.python_version()
+    python_build: str = platform.python_build()
+    python_implementation = platform.python_implementation()
+    python_packages: List[str] = field(default_factory=get_packages_list)
+    environment_variables: Dict[str, str] = field(default_factory=lambda: os.environ)
+    os_name: str = platform.system()
+    hostname: str = platform.node()
+    system_version: str = platform.version()
+    system_architecture: str = platform.machine()
+    system_processor: str = platform.processor()
+    system_architecture_details: str = platform.architecture()
+    default_docket_socket_path: str = '/var/run/docker.sock'
+    cwd: str = os.getcwd()
+
+
+@dataclass
 class LinuxSystemInformation(SystemInformation):
-
-    def get_user(self) -> Optional[str]:
-        """
-        Returns a user/group string for executing docker containers as the correct user
-
-        For example
-        '1000:1000'
-        Returns:
-            (str): Container user id and group id of the current user
-        """
-        return f'{os.getuid()}:{os.getgid()}'
+    user: str = field(default_factory=lambda: f'{os.getuid()}:{os.getgid()}')
 
 
 class WindowsSystemInformation(SystemInformation):
-
-    def get_user(self) -> Optional[str]:
-        """
-        On the windows platform, we don't need a user for docker
-
-        Returns:
-            (None): Returns none meaning there is no user id to pass along
-        """
-        return None
+    default_docket_socket_path: str = '//var/run/docker.sock'
 
 
 def get_system_information():
-    return LinuxSystemInformation() if platform in ["linux", "linux2",
-                                             "darwin"] else WindowsSystemInformation()
+    return LinuxSystemInformation() if platform in ["linux", "linux2", "darwin"] else WindowsSystemInformation()

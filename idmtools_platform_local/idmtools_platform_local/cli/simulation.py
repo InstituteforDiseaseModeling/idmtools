@@ -1,8 +1,10 @@
 from typing import Optional, Tuple, List, Dict, Any
 import click
 from tabulate import tabulate
-from idmtools_platform_local.cli.base import cli
-from idmtools_platform_local.cli.utils import colorize_status, tags_help, urlize_data_path, show_error
+
+from idmtools_cli.cli.base import cli
+from idmtools_cli.cli.utils import show_error
+from idmtools_platform_local.cli.utils import colorize_status, tags_help, urlize_data_path
 from idmtools_platform_local.client.simulations_client import SimulationsClient
 from idmtools_platform_local.config import API_PATH
 from idmtools_platform_local.status import Status
@@ -27,7 +29,6 @@ def prettify_simulation(simulation: Dict[str, Any]):
     return simulation
 
 
-@cli.group(help="Commands related to simulations(sub-level jobs)")
 def simulation():
     """
     Defines our simulation sub-command group
