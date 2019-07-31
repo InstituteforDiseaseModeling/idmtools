@@ -26,6 +26,7 @@ Install the packages in dev mode with the `test` extra (from repository folder).
 > cd ..
 > cd idmtools_models_collection
 > pip install -e .[test]
+> cd ..
 > cd idmtools_test
 > pip install -e .
 
