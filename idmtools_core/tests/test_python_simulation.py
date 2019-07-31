@@ -3,19 +3,18 @@ import os
 import unittest
 from functools import partial
 from operator import itemgetter
-
 from COMPS.Data import Experiment, QueryCriteria
-
 from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import ArmExperimentBuilder, ArmType, ExperimentBuilder, StandAloneSimulationsBuilder, SweepArm
 from idmtools.core import EntityStatus
 from idmtools.managers import ExperimentManager
-from idmtools.platforms import COMPSPlatform, LocalPlatform
 from idmtools_models.python import PythonExperiment, PythonSimulation
-from tests import INPUT_PATH
-from tests.utils.decorators import comps_test
-from tests.utils.ITestWithPersistence import ITestWithPersistence
-from tests.utils.utils import get_asset_collection_by_id, get_asset_collection_id_for_simulation_id
+from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
+from idmtools_platform_local.local_platform import LocalPlatform
+from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id
+from idmtools_test.utils.decorators import comps_test
+from . import INPUT_PATH
 
 
 def param_update(simulation, param, value):

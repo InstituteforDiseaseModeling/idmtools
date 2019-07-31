@@ -1,10 +1,9 @@
-import itertools
 import os
 import numpy as np
 from functools import partial
 from idmtools.builders import CsvExperimentBuilder
-from tests.utils.ITestWithPersistence import ITestWithPersistence
-from tests.utils.TestExperiment import TestExperiment
+from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_test.utils.TestExperiment import TestExperiment
 from tests import INPUT_PATH
 
 

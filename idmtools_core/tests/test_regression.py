@@ -4,11 +4,11 @@ import unittest
 from idmtools.assets import AssetCollection
 from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
 from idmtools.managers import ExperimentManager
-from tests import INPUT_PATH
-from tests.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_test.utils.TestExperiment import TestExperiment
+from idmtools_test.utils.TestPlatform import TestPlatform
 from idmtools_models.python import PythonExperiment, PythonSimulation
-from tests.utils.TestExperiment import TestExperiment
-from tests.utils.TestPlatform import TestPlatform
+from . import INPUT_PATH
 
 
 class TestPersistenceServices(ITestWithPersistence):

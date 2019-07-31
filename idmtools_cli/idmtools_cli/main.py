@@ -5,11 +5,15 @@ from idmtools_platform_local.cli.base import cli
 
 
 def main():
+    start()
+    cli()
+
+
+def start():
     init()
     platform_plugins = PlatformCLIPlugins()
     # Trigger the loading of additional cli from platforms
     [p.get_additional_commands() for p in platform_plugins.get_plugins()]
-    cli()
 
 
 # our entrypoint for our cli

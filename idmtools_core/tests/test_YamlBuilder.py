@@ -1,12 +1,10 @@
-import itertools
 import os
-import numpy as np
 from functools import partial
 from idmtools.builders.ArmExperimentBuilder import ArmType
 from idmtools.builders.YamlExperimentBuilder import YamlExperimentBuilder
-from tests.utils.ITestWithPersistence import ITestWithPersistence
-from tests.utils.TestExperiment import TestExperiment
-from tests import INPUT_PATH
+from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_test.utils.TestExperiment import TestExperiment
+from . import INPUT_PATH
 
 
 def param_update(simulation, param, value):

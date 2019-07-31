@@ -1,8 +1,9 @@
 import os
 from idmtools.config import IdmConfigParser
-from idmtools.platforms import COMPSPlatform, LocalPlatform
 from idmtools.platforms.PlatformFactory import PlatformFactory, PlatformType
-from tests.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_platform_comps import COMPSPlatform
+from idmtools_platform_local.local_platform import LocalPlatform
+from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 
 
 class TestConfig(ITestWithPersistence):

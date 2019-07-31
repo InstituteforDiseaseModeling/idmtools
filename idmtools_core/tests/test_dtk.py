@@ -5,11 +5,11 @@ from COMPS.Data import Experiment
 
 from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
 from idmtools.managers import ExperimentManager
-from idmtools.platforms import COMPSPlatform
 from idmtools_models.dtk import DTKExperiment
 from idmtools_models.dtk.defaults import DTKSIR
-from tests.utils.decorators import comps_test
-from tests.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
+from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_test.utils.decorators import comps_test
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 INPUT_PATH = os.path.join(current_directory, "inputs")

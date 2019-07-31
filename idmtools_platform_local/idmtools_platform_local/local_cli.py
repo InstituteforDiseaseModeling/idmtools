@@ -11,14 +11,18 @@ class LocalCLI(IPlatformCLI):
     def get_experiment_status(self,  id: Optional[str], tags: Optional[List[Tuple[str, str]]]) -> NoReturn:
         experiment.status(id, tags)
 
-    def get_simulation_status(self, platform: LocalPlatform, id: Optional[str], tags: Optional[List[Tuple[str, str]]]) -> NoReturn:
+    def get_simulation_status(self, id: Optional[str], experiment_id: Optional[str], status: Optional[str],
+               tags: Optional[List[Tuple[str, str]]]) -> NoReturn:
         """
-        List the status of experiment(s) with the ability to filter by experiment id and tags
 
         Args:
-            id (Optional[str]): Optional ID of the experiment you want to filter by
-            tag (Optional[List[Tuple[str, str]]]): Optional list of tuples in form of tag_name tag_value to user to filter
-                experiments with
+            id:
+            experiment_id:
+            status:
+            tags:
+
+        Returns:
+
         """
         simulation.status(id, tags)
 
@@ -36,7 +40,7 @@ class LocalCLI(IPlatformCLI):
 class LocalCLISpecification(PlatformCLISpecification):
     @staticmethod
     def get(configuration: dict) -> LocalCLI:
-        pass
+        return LocalCLI()
 
     @staticmethod
     def get_additional_commands() -> NoReturn:
@@ -44,4 +48,4 @@ class LocalCLISpecification(PlatformCLISpecification):
 
     @staticmethod
     def get_description() -> str:
-        return "Provides CLI commands for the COMPS Platform"
+        return "Provides CLI commands for the Local Platform"

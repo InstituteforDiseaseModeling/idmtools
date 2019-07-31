@@ -4,9 +4,9 @@ from functools import partial
 from idmtools.builders import ArmExperimentBuilder, ArmType, SweepArm
 from idmtools.builders import YamlExperimentBuilder
 from idmtools.builders import CsvExperimentBuilder
-from tests.utils.ITestWithPersistence import ITestWithPersistence
-from tests.utils.TestExperiment import TestExperiment
-from tests import INPUT_PATH
+from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_test.utils.TestExperiment import TestExperiment
+from . import INPUT_PATH
 
 
 def param_update(simulation, param, value):

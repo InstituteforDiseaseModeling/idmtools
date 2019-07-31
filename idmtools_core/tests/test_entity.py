@@ -5,8 +5,8 @@ from dataclasses import dataclass, field
 from idmtools.builders import ExperimentBuilder
 from idmtools.core import IEntity
 from idmtools.entities.Suite import Suite
-from tests.utils.ITestWithPersistence import ITestWithPersistence
-from tests.utils.TestExperiment import TestExperiment
+from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_test.utils.TestExperiment import TestExperiment
 
 
 @dataclass

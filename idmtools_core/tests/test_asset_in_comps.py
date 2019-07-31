@@ -7,11 +7,11 @@ from COMPS.Data import Experiment
 from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import ExperimentBuilder
 from idmtools.core import EntityStatus
-from idmtools.platforms import COMPSPlatform
 from idmtools_models.python import PythonExperiment
-from tests import INPUT_PATH
-from tests.utils.decorators import comps_test
-from tests.utils.utils import get_asset_collection_by_id, get_asset_collection_id_for_simulation_id
+from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
+from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id
+from idmtools_test.utils.decorators import comps_test
+from . import INPUT_PATH
 
 
 @comps_test

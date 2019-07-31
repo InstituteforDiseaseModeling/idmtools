@@ -11,8 +11,8 @@ from idmtools_platform_local.local_platform import LocalPlatform
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
 from idmtools_platform_local.client.simulations_client import SimulationsClient
 from idmtools_models.python import PythonExperiment
-from tests import INPUT_PATH
-from tests.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
+from . import INPUT_PATH
 
 
 class TestLocalRunnerCLI(ITestWithPersistence):

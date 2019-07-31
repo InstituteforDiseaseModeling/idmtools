@@ -1,9 +1,8 @@
 
 # Define our platform specific specifications
 from abc import ABC, abstractmethod
-from typing import NoReturn, Dict, Set, cast
+from typing import NoReturn, Dict, Set, cast, Optional, List, Tuple
 import pluggy
-import typing
 
 from idmtools.core.plugin_manager import PLUGIN_REFERENCE_NAME, PluginSpecification, plugins_loader
 
@@ -14,13 +13,12 @@ get_additional_commands = pluggy.HookspecMarker(PLUGIN_REFERENCE_NAME)
 class IPlatformCLI(ABC):
 
     @abstractmethod
-    def get_experiment_status(self, *args, **kwargs) -> NoReturn:
+    def get_experiment_status(self, id: Optional[str], tags: Optional[List[Tuple[str, str]]]) -> NoReturn:
         """
-        Fetch the status based on the argument for current platform
 
         Args:
-            *args:
-            **kwargs:
+            id:
+            tags:
 
         Returns:
 
@@ -28,13 +26,15 @@ class IPlatformCLI(ABC):
         pass
 
     @abstractmethod
-    def get_simulation_status(self, *args, **kwargs) -> NoReturn:
+    def get_simulation_status(self, id: Optional[str], experiment_id: Optional[str], status: Optional[str],
+               tags: Optional[List[Tuple[str, str]]]) -> NoReturn:
         """
-        Fetch the status based on the argument for current platform
 
         Args:
-            *args:
-            **kwargs:
+            id:
+            experiment_id:
+            status:
+            tags:
 
         Returns:
 

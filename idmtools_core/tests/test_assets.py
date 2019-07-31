@@ -6,7 +6,7 @@ from functools import partial
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core import DuplicatedAssetError, FilterMode
 from idmtools.utils.filters.asset_filters import asset_in_directory, file_name_is
-from tests import INPUT_PATH
+from . import INPUT_PATH
 
 
 class TestAssets(unittest.TestCase):

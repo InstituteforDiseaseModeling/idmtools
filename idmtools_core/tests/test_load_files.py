@@ -2,10 +2,10 @@ import os
 import json
 from idmtools_models.dtk import DTKExperiment
 from idmtools_models.dtk.defaults import DTKSIR
-from tests.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
+from . import INPUT_PATH
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
-INPUT_PATH = os.path.join(current_directory, "inputs")
 
 
 class TestCustomFiles(ITestWithPersistence):

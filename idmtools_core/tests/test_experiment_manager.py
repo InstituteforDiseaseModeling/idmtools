@@ -6,10 +6,10 @@ from idmtools.managers import ExperimentManager
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.services.platforms import PlatformPersistService
 from idmtools_models.python import PythonExperiment
-from tests import INPUT_PATH
-from tests.utils.ITestWithPersistence import ITestWithPersistence
-from tests.utils.TestExperiment import TestExperiment
-from tests.utils.TestPlatform import TestPlatform
+from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_test.utils.TestExperiment import TestExperiment
+from idmtools_test.utils.TestPlatform import TestPlatform
+from . import INPUT_PATH
 
 
 def set_parameter_no_tags(simulation, value):

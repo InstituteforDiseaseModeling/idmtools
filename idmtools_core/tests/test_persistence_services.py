@@ -2,9 +2,9 @@ import unittest
 
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.services.platforms import PlatformPersistService
-from tests.utils.ITestWithPersistence import ITestWithPersistence
-from tests.utils.TestExperiment import TestExperiment
-from tests.utils.TestPlatform import TestPlatform
+from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_test.utils.TestExperiment import TestExperiment
+from idmtools_test.utils.TestPlatform import TestPlatform
 
 
 class TestPersistenceServices(ITestWithPersistence):
