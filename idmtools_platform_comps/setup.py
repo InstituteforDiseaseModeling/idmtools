@@ -16,23 +16,22 @@ test_requirements = ['pytest', 'pytest-runner']
 
 extras = dict(test=test_requirements, dev=['Pympler'])
 
+authors = [
+    ("Sharon Chen", "'schen@idmod.org"),
+    ("Clinton Collins", 'ccollins@idmod.org'),
+    ("Zhaowei Du", "zdu@idmod.org"),
+    ("Mary Fisher", 'mfisher@idmod.org'),
+    ("Clark Kirkman IV", 'ckirkman@idmod.org'),
+    ("Benoit Raybaud", "braybaud@idmod.org'")
+]
+
 setup(
-    author="Clinton Collins"
-           "Sharon Chen"
-           "Zhaowei Du"
-           "Mary Fisher"
-           "Clark Kirkman IV"
-           "Benoit Raybaud",
-    author_email='ccollins@idmod.org, '
-                 'schen@idmod.org, '
-                 'zdu@idmod.org, '
-                 'mfisher@idmod.org'
-                 'ckirkman@idmod.org, '
-                 'braybaud@idmod.org',
+    author=[author[0] for author in authors],
+    author_email=[author[1] for author in authors],
     classifiers=[
         'Framework:: idmtools :: Platform',
     ],
-    description="Comps platform for idmtools",
+    description="Comps platform for IDM-Tools",
     install_requires=requirements,
     long_description=readme,
     include_package_data=True,

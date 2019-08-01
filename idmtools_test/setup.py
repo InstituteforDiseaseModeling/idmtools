@@ -13,27 +13,26 @@ with open('requirements.txt') as requirements_file:
 
 setup_requirements = []
 
+authors = [
+    ("Sharon Chen", "'schen@idmod.org"),
+    ("Clinton Collins", 'ccollins@idmod.org'),
+    ("Zhaowei Du", "zdu@idmod.org"),
+    ("Mary Fisher", 'mfisher@idmod.org'),
+    ("Clark Kirkman IV", 'ckirkman@idmod.org'),
+    ("Benoit Raybaud", "braybaud@idmod.org'")
+]
+
 setup(
-    author="Clinton Collins"
-           "Sharon Chen"
-           "Zhaowei Du"
-           "Mary Fisher"
-           "Clark Kirkman IV"
-           "Benoit Raybaud",
-    author_email='ccollins@idmod.org, '
-                 'schen@idmod.org, '
-                 'zdu@idmod.org, '
-                 'mfisher@idmod.org'
-                 'ckirkman@idmod.org, '
-                 'braybaud@idmod.org',
+    author=[author[0] for author in authors],
+    author_email=[author[1] for author in authors],
     classifiers=[
         'Framework:: idmtools :: Test',
     ],
-    description="Test and demo data for idmtools",
+    description="Test and demo data for IDM-Tools",
     install_requires=requirements,
     long_description=readme,
     include_package_data=True,
-    keywords='modeling, IDM',
+    keywords='modeling, IDM, test, testdata, demodata',
     name='idmtools_test',
     packages=find_packages(),
     setup_requires=setup_requirements,

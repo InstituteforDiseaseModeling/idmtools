@@ -22,6 +22,8 @@ data_class_default = default_install
 if platform.python_version()[:3] == '3.6':
     data_class_default.append('3.6')
 
+idmrepo = '--index-url=https://packages.idmod.org/api/pypi/pypi-production/simple'
+
 # Our packages and the extras to install
 packages = dict(
     idmtools_core=data_class_default,
@@ -36,7 +38,4 @@ packages = dict(
 for package, extras in packages.items():
     extras_str = f"[{','.join(extras)}]" if extras else ''
     print(f'Installing {package} with extras: {extras_str if extras_str else "None"}')
-    result = subprocess.run(["pip", "install", "-e", f".{extras_str}",
-                             '--index-url=https://packages.idmod.org/api/pypi/pypi-production/simple'
-                             ],
-                            cwd=join(base_directory, package))
+    result = subprocess.run(["pip", "install", "-e", f".{extras_str}", idmrepo], cwd=join(base_directory, package))

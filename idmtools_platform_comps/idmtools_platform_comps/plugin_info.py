@@ -21,7 +21,7 @@ class COMPSSpecification(PlatformSpecification):
     @staticmethod
     @get_description_impl
     def get_description() -> str:
-        return "Provides access to the COMPS Platform to IDM Tools"
+        return "Provides access to the COMPS Platform to IDM-Tools"
 
     @staticmethod
     @get_platform_impl
