@@ -31,7 +31,6 @@ builder = ExperimentBuilder()
 builder.add_sweep_definition(setA, range(10))
 builder.add_sweep_definition(setParam("b"), [1, 2, 3])
 
-# experiment.builder = builder
 experiment.add_builder(builder)
 
 platform = LocalPlatform()
