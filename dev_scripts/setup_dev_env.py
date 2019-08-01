@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import platform
 import subprocess
 from os.path import abspath, join, dirname
@@ -15,7 +17,6 @@ from os.path import abspath, join, dirname
 
 base_directory = abspath(join(dirname(__name__), '..'))
 
-#!/usr/bin/env python
 
 default_install = ['test']
 data_class_default = default_install
