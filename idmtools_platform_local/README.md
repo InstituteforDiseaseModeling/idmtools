@@ -30,6 +30,9 @@ This will bring up 3 services
 The workers service contains the IDMTools workers that actually execut the tasks as well as containing a simplistic UI
 running at http://localhost:5000
 
+# Development
+
+The platform_local docker container requires a pypi server to get other dependencies(core, models, etc). To facilitate this in a development environment that properly reflects a true package build we must start a local pypi server and publsh the packages. We do this through pymake with the rule `publish_dev_idm`
 
 # Using the CLI
 

@@ -1,0 +1,15 @@
+version: '2'
+
+services:
+  pypi_server:
+    image: mosquito/pypi-server:latest
+    links:
+      - db
+    restart: always
+    ports:
+      - 8080:80
+    volumes:
+      - ./packages:/var/lib/pypi-server
+    environment:
+      DB: "sqlite3:////pypy.db'
+      SECRET: dev
