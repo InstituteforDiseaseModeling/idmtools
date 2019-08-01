@@ -50,6 +50,9 @@ ENV PYTHONPATH=/app:${PYTHONPATH}
 
 #TODO: Move the actual package to artifactory and install from there. It would simpify the environmetn quite a bit
 
+# make it where we can specifiy our dependent packages at build time
+ARG IDM_PYPI='https://packages.idmod.org/api/pypi/pypi-production/simple'
+
 COPY README.md setup.py requirements.txt /tmp/
 # Run the setup instal before copying rest of package. This will increase cache hits during docker builds
 # as we will only rebuild if any of the docker_scripts, setup.py, readme.md, and requirements.txt change
@@ -63,7 +66,7 @@ ADD idmtools_platform_local /tmp/idmtools_local
 RUN cd /tmp && \
     # we need install the full version of local_runner as it is both a Client and Server package
     # to do this, we specify we want the workers and the UI
-    pip install .[workers,ui] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple && \
+    pip install .[workers,ui] --index-url=$IDM_PYPI && \
     # cleanup pip cache and tmp
     rm -rf /root/.cache && \
     rm -rf /tmp/*

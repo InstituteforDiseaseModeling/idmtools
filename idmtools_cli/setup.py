@@ -11,11 +11,14 @@ with open('README.md') as readme_file:
 with open('requirements.txt') as requirements_file:
     requirements = requirements_file.read().split("\n")
 
+build_requirements = ['pymake']
 setup_requirements = []
-test_requirements = ['pytest', 'pytest-runner', 'numpy==1.16.4', 'xmlrunner']
+test_requirements = ['pytest', 'pytest-runner', 'numpy==1.16.4', 'xmlrunner'] + build_requirements
 
 extras = {
-    'test': test_requirements
+    'test': test_requirements,
+    'dev': build_requirements,
+    'packaging': build_requirements
 }
 
 authors = [
@@ -24,7 +27,7 @@ authors = [
     ("Zhaowei Du", "zdu@idmod.org"),
     ("Mary Fisher", 'mfisher@idmod.org'),
     ("Clark Kirkman IV", 'ckirkman@idmod.org'),
-    ("Benoit Raybaud", "braybaud@idmod.org'")
+    ("Benoit Raybaud", "braybaud@idmod.org")
 ]
 
 setup(

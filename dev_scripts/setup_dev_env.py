@@ -17,7 +17,6 @@ from os.path import abspath, join, dirname
 
 base_directory = abspath(join(dirname(__name__), '..'))
 
-
 default_install = ['test']
 data_class_default = default_install
 
