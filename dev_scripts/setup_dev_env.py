@@ -34,7 +34,7 @@ packages = dict(
 
 # loop through and install our packages
 for package, extras in packages.items():
-    extras_str = ','.join(extras) if extras else ''
+    extras_str = f"[{','.join(extras)}]" if extras else ''
     print(f'Installing {package} with extras: {extras_str if extras_str else "None"}')
     result = subprocess.run(["pip", "install", "-e", f".{extras_str}",
                              '--index-url=https://packages.idmod.org/api/pypi/pypi-production/simple'
