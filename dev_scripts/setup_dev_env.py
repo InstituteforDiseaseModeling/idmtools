@@ -1,3 +1,4 @@
+import platform
 import subprocess
 from os.path import abspath, join, dirname
 
@@ -15,9 +16,15 @@ from os.path import abspath, join, dirname
 base_directory = abspath(join(dirname(__name__), '..'))
 
 default_install = ['test']
+data_class_default = default_install
+
+# check for 3.6 and add the dataclass backport if needed
+if platform.python_version()[:3] == '3.6':
+    data_class_default.append('3.6')
+
 # Our packages and the extras to install
 packages = dict(
-    idmtools_core=default_install,
+    idmtools_core=data_class_default,
     idmtools_cli=default_install,
     idmtools_platform_local=default_install,
     idmtools_platform_comps=default_install,
@@ -25,6 +32,7 @@ packages = dict(
     idmtools_test=[]
 )
 
+# loop through and install our packages
 for package, extras in packages.items():
     extras_str = ','.join(extras) if extras else ''
     print(f'Installing {package} with extras: {extras_str if extras_str else "None"}')
