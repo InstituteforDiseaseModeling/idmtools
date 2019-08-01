@@ -44,7 +44,7 @@ setup(
     packages=find_packages(),
     setup_requires=setup_requirements,
     test_suite='tests',
-    entry_points={"console_scripts": ["idmtools_cli.main:main"]},
+    entry_points={"console_scripts": ["idmtools=idmtools_cli.main:main"]},
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
     version='0.1.0',
