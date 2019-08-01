@@ -100,6 +100,10 @@ class IPlatform(IEntity, metaclass=ABCMeta):
     def retrieve_experiment(self, experiment_id: 'uuid') -> 'TExperiment':
         pass
 
+    @abstractmethod
+    def initialize_for_analysis(self, items, analyzers) -> None:
+        pass
+
     def __repr__(self):
         return f"<Platform {self.__class__.__name__} - id: {self.uid}>"
 

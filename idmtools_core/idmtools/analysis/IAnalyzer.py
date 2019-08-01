@@ -34,15 +34,16 @@ class IAnalyzer(metaclass=ABCMeta):
         """
         pass
 
-    def per_experiment(self, experiment: 'TExperiment') -> None:
+    def per_group(self, items: 'Any') -> None:
         """
-        Called once per experiment before doing the apply on the simulations.
+        Called once before running the apply on the simulations.
         Args:
-            experiment: Called for each experiment
+            items: objects with 'full_id' attributes of type ItemId. Ids of one or more higher-level hierarchical
+                   objects can be obtained from these full_ids in order to perform tasks with them.
         """
         pass
 
-    def filter(self, simulation: 'TSimulation') -> bool:
+    def filter(self, item: 'Any') -> bool:
         """
         Decide whether analyzer should process a simulation
         Args:
@@ -52,7 +53,7 @@ class IAnalyzer(metaclass=ABCMeta):
         """
         return True
 
-    def select_simulation_data(self, data: 'Any', simulation: 'TSimulation') -> 'Any':
+    def select_simulation_data(self, data: 'Any', item: 'Any') -> 'Any':
         """
         In parallel for each simulation, consume raw data from filenames and emit selected data
         Args:
@@ -62,16 +63,14 @@ class IAnalyzer(metaclass=ABCMeta):
         Returns: selected data for the given simulation
         """
         return None
-    map = select_simulation_data
 
-    def finalize(self, all_data: 'TAllSimulationData') -> 'Any':
+    def finalize(self, all_data: 'Any') -> 'Any':
         """
         On a single process, get all the selected data
         Args:
             all_data: dictionary associating simulation:selected_data
         """
         pass
-    reduce = finalize
 
     def destroy(self):
         """
