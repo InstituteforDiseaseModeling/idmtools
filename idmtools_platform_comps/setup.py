@@ -15,7 +15,7 @@ setup_requirements = []
 test_requirements = ['pytest', 'pytest-runner']
 
 extras = dict(test=test_requirements, dev=['Pympler'])
-
+extras['3.6'] = ['dataclasses']
 authors = [
     ("Sharon Chen", "'schen@idmod.org"),
     ("Clinton Collins", 'ccollins@idmod.org'),

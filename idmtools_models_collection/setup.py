@@ -14,9 +14,8 @@ with open('requirements.txt') as requirements_file:
 setup_requirements = []
 test_requirements = ['pytest', 'pytest-runner']
 
-extras = {
-    'test': test_requirements,
-}
+extras = dict(test=test_requirements)
+extras['3.6'] = ['dataclasses']
 
 authors = [
     ("Sharon Chen", "'schen@idmod.org"),
