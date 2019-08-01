@@ -1,7 +1,6 @@
 import os
 from idmtools.config import IdmConfigParser
-from idmtools.platforms import COMPSPlatform, LocalPlatform
-from idmtools.platforms.PlatformFactory import PlatformFactory, PlatformType
+from idmtools.platforms import COMPSPlatform
 from tests.utils.ITestWithPersistence import ITestWithPersistence
 
 
@@ -24,16 +23,6 @@ class TestConfig(ITestWithPersistence):
         self.assertEqual(platform.endpoint, 'https://abc')
         self.assertEqual(platform.environment, 'Bayesian')
 
-    def test_platform_factory(self):
-        platform1 = PlatformFactory.get_platform(PlatformType.COMPSPlatform)
-        self.assertTrue(isinstance(platform1, COMPSPlatform))
-
-        platform2 = PlatformFactory.get_platform(PlatformType.LocalPlatform)
-        self.assertTrue(isinstance(platform2, LocalPlatform))
-
-        platform3 = PlatformFactory.get_platform("COMPSPlatform")
-        self.assertTrue(isinstance(platform3, COMPSPlatform))
-
     def test_idmtools_ini(self):
         config_file = IdmConfigParser.get_config_path()
         self.assertEqual(os.path.basename(config_file), 'idmtools.ini')
@@ -48,7 +37,14 @@ class TestConfig(ITestWithPersistence):
     def test_idmtools_path(self):
         IdmConfigParser("./inputs/configuration/", "idmtools_test.ini")
         platform = COMPSPlatform()
-        self.assertEqual(platform.num_retires, int(IdmConfigParser.get_option('COMPSPLATFORM', 'num_retires')))
+        self.assertEqual(platform.num_retires, int(IdmConfigParser.get_option('COMPSPlatform', 'num_retires')))
 
         file_path = os.path.join("./inputs/configuration/", "idmtools_test.ini")
         self.assertEqual(IdmConfigParser.get_config_path(), os.path.abspath(file_path))
+
+    def test_IdmConfigParser_singleton(self):
+        p1 = IdmConfigParser()
+        p2 = IdmConfigParser()
+
+        self.assertEqual(p1, p2)
+        self.assertEqual(id(p1), id(p2))

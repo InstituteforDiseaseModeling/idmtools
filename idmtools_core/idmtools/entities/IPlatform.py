@@ -23,7 +23,9 @@ class IPlatform(IEntity, metaclass=ABCMeta):
         """
         Got called from Platform creation
         """
-        self.update_from_config()
+        # self.update_from_config()
+        if not hasattr(self, '_FACTORY'):
+            self.update_from_config()
 
     @abstractmethod
     def create_experiment(self, experiment: 'TExperiment') -> None:
@@ -117,13 +119,13 @@ class IPlatform(IEntity, metaclass=ABCMeta):
         field_type = {f.name: f.type for f in fds}
 
         # find, load and get settings from config file. Return with the correct data types
-        field_config = IdmConfigParser.retrieve_settings(self.__class__.__name__.upper(), field_type)
+        field_config = IdmConfigParser.retrieve_settings(self.__class__.__name__, field_type)
 
         # display not used fields from config
         field_config_not_used = set(field_config.keys()) - set(field_name)
         if len(field_config_not_used) > 0:
             field_config_not_used = [" - {} = {}".format(fn, field_config[fn]) for fn in field_config_not_used]
-            print("The following Config Settings are not used:")
+            print(f"[{self.__class__.__name__}]: the following Config Settings are not used:")
             print("\n".join(field_config_not_used))
 
         # update attr based on priority: #1 Code, #2 INI, #3 Default

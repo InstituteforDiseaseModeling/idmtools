@@ -12,6 +12,7 @@ from dataclasses import dataclass, field
 from idmtools.core import CacheEnabled, EntityStatus, experiment_factory
 from idmtools.entities import IPlatform
 from idmtools.utils.time import timestamp
+from idmtools.core import platform_factory
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TExperiment
@@ -261,3 +262,6 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                 ret[file_path] = self.cache.memoize()(self._get_file_for_collection)(collection_id, normalized_path)
 
         return ret
+
+
+platform_factory.register_type(COMPSPlatform)

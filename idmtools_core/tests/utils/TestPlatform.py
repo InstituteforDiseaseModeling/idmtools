@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 import diskcache
 import numpy as np
 from idmtools.entities import IPlatform
+from idmtools.core import platform_factory
 
 if typing.TYPE_CHECKING:
     from idmtools.core import TExperiment
@@ -114,3 +115,6 @@ class TestPlatform(IPlatform):
         if not experiment_id in self.experiments:
             return None
         return self.experiments[experiment_id]
+
+
+platform_factory.register_type(TestPlatform)
