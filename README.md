@@ -32,7 +32,7 @@ Install the packages in dev mode with the `test` extra (from repository folder).
 
 ```
 
-Alternatively you can use the `setup_virtualenv.sh` in the dev_scripts folder.
+Alternatively you can use the `python setup_dev_env.py` in the dev_scripts folder.
 
 Create a Docker network named `idmtools_network`:
 ```bash
