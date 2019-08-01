@@ -18,28 +18,28 @@ extras = {
     'test': test_requirements
 }
 
+authors = [
+    ("Sharon Chen", "'schen@idmod.org"),
+    ("Clinton Collins", 'ccollins@idmod.org'),
+    ("Zhaowei Du", "zdu@idmod.org"),
+    ("Mary Fisher", 'mfisher@idmod.org'),
+    ("Clark Kirkman IV", 'ckirkman@idmod.org'),
+    ("Benoit Raybaud", "braybaud@idmod.org'")
+]
+
 setup(
-    author="Clinton Collins"
-           "Sharon Chen"
-           "Zhaowei Du"
-           "Mary Fisher"
-           "Clark Kirkman IV"
-           "Benoit Raybaud",
-    author_email='ccollins@idmod.org, '
-                 'schen@idmod.org, '
-                 'zdu@idmod.org, '
-                 'mfisher@idmod.org'
-                 'ckirkman@idmod.org, '
-                 'braybaud@idmod.org',
+    author=[author[0] for author in authors],
+    author_email=[author[1] for author in authors],
     classifiers=[
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Framework:: IDM-Tools :: CLI'
     ],
-    description="CLI for idmtools",
+    description="CLI for IDM-Tools",
     install_requires=requirements,
     long_description=readme,
     include_package_data=True,
-    keywords='modeling, IDM',
+    keywords='modeling, IDM, cli',
     name='idm_tools_cli',
     packages=find_packages(),
     setup_requires=setup_requirements,
