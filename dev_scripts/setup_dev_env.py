@@ -6,11 +6,11 @@ from os.path import abspath, join, dirname
 # defined by packages using development installs.
 #
 # It is best used
-# 1) After the create of a new virtualenv
+# 1) After the creation of a new virtualenv
 # 2) Installing new packages into an existing environment
 # 3) Updating existing environments
 #
-# To use simple run
+# To use simply run
 # python setup_dev_env.py
 
 base_directory = abspath(join(dirname(__name__), '..'))
