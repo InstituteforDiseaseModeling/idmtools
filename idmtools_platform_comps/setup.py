@@ -29,7 +29,7 @@ setup(
     author=[author[0] for author in authors],
     author_email=[author[1] for author in authors],
     classifiers=[
-        'Framework:: idmtools :: Platform',
+        'Framework:: IDM-Tools :: Platform',
     ],
     description="Comps platform for IDM-Tools",
     install_requires=requirements,

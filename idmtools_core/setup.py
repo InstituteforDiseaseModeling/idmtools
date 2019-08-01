@@ -38,6 +38,7 @@ setup(
     classifiers=[
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Framework:: IDM-Tools'
     ],
     description="Core tools for modeling",
     install_requires=requirements,

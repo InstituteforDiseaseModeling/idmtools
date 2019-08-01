@@ -26,7 +26,7 @@ setup(
     author=[author[0] for author in authors],
     author_email=[author[1] for author in authors],
     classifiers=[
-        'Framework:: idmtools :: Test',
+        'Framework:: IDM-Tools :: Test',
     ],
     description="Test and demo data for IDM-Tools",
     install_requires=requirements,
