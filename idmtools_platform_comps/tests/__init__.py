@@ -1,5 +1,4 @@
-from os.path import dirname, realpath, join, abspath
+from os.path import dirname, realpath, join
 
 current_directory = dirname(realpath(__file__))
 COMMON_INPUT_PATH = join(current_directory, "inputs")
-COMMON_COMMON_INPUT_PATH = abspath(join(current_directory, '..', 'idmtools', 'tests', 'inputs'))

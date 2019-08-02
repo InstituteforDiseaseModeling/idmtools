@@ -12,9 +12,10 @@ with open('requirements.txt') as requirements_file:
     requirements = requirements_file.read().split("\n")
 
 setup_requirements = []
-test_requirements = ['pytest', 'pytest-runner']
+build_requirements = ['flake8', 'coverage', 'py-make', 'bump2version', 'twine']
+test_requirements = ['pytest', 'pytest-runner'] + build_requirements
 
-extras = dict(test=test_requirements, dev=['Pympler'])
+extras = dict(test=test_requirements, dev=['Pympler'], packaging=build_requirements)
 extras['3.6'] = ['dataclasses']
 authors = [
     ("Sharon Chen", "'schen@idmod.org"),

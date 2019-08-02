@@ -42,7 +42,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     endpoint: str = field(default="https://comps2.idmod.org")
     environment: str = field(default="Bayesian")
     priority: str = field(default=COMPSPriority.Lowest)
-    simulation_root: str = field(default="$COMPS_PATH(USER)\output")
+    simulation_root: str = field(default="$COMPS_PATH(USER)\\output")
     node_group: str = field(default="emod_abcd")
     num_retires: int = field(default=0)
     num_cores: int = field(default=1)
@@ -133,8 +133,8 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                             suite_id=experiment.suite_id)
 
         # Add tags if present
-        # Add tags if present
-        if experiment.tags: e.set_tags(experiment.tags)
+        if experiment.tags:
+            e.set_tags(experiment.tags)
 
         # Save the experiment
         e.save()
@@ -264,4 +264,3 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                 ret[file_path] = self.cache.memoize()(self._get_file_for_collection)(collection_id, normalized_path)
 
         return ret
-

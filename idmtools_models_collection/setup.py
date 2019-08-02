@@ -11,10 +11,11 @@ with open('README.md') as readme_file:
 with open('requirements.txt') as requirements_file:
     requirements = requirements_file.read().split("\n")
 
+build_requirements = ['flake8', 'coverage', 'py-make', 'bump2version', 'twine']
 setup_requirements = []
-test_requirements = ['pytest', 'pytest-runner']
+test_requirements = ['pytest', 'pytest-runner'] + build_requirements
 
-extras = dict(test=test_requirements)
+extras = dict(test=test_requirements, packaging=build_requirements)
 extras['3.6'] = ['dataclasses']
 
 authors = [
