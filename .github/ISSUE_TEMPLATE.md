@@ -16,7 +16,7 @@ If there was a crash, please include the traceback here.
 Please populate system information by running `idmtools info system --issue`. To accomplish this, please follow these steps
 * Ensure *idmtool-cli* packages is installed. You can do this be installing it using the command
 ```bash
-> pip install idmtools-cli --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple`
+> pip install idmtools-cli --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
 ```
 * Run
 ```bash
