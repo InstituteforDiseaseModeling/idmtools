@@ -4,7 +4,7 @@ clean: ## Clean all our jobs
 	python dev_scripts/run_pymake_on_all.py clean
 
 setup-dev:  ## Setup packages in dev mode
-    python dev_scripts/setup_dev_env.py
+	python dev_scripts/setup_dev_env.py
 
 lint: ## check style with flake8
 	python dev_scripts/run_pymake_on_all.py lint
@@ -31,4 +31,4 @@ release-staging-minor-dry-run: ## perform a release to staging and bump the mino
 
 # This should be used when a pushing a "production" build to staging before being approved by test
 release-staging-minor-commit: ## perform a release to staging and commit the version.
-    python dev_scripts/run_pymake_on_all.py release-staging-minor-commit
+	python dev_scripts/run_pymake_on_all.py release-staging-minor-commit
