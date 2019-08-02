@@ -12,7 +12,7 @@ def start():
     init()
     import idmtools_cli.cli.experiment
     import idmtools_cli.cli.simulation
-    import idmtools_cli.cli.system_info
+    import idmtools_cli.cli.system_info  # noqa: F401
     platform_plugins = PlatformCLIPlugins()
     # Trigger the loading of additional cli from platforms
     [p.get_additional_commands() for p in platform_plugins.get_plugins()]

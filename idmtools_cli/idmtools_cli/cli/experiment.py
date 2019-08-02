@@ -33,9 +33,3 @@ def status(platform_cli: IPlatformCLI, id: Optional[str], tags: Optional[List[Tu
     List the status of experiment(s) with the ability to filter by experiment id and tags
     """
     platform_cli.get_experiment_status(id, tags)
-
-
-
-
-
-

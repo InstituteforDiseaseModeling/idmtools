@@ -1,6 +1,6 @@
 import sys
 import requests
-from colorama import  Fore
+from colorama import Fore
 
 tags_help = "Tag to filter by. This should be in the form name value. For example, if you have a tag type=PythonTask " \
             "you would use --tags type PythonTask. In addition, you can provide multiple tags, ie --tags a 1 " \
