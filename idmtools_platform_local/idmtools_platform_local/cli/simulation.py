@@ -2,7 +2,6 @@ from typing import Optional, Tuple, List, Dict, Any
 import click
 from tabulate import tabulate
 
-from idmtools_cli.cli.base import cli
 from idmtools_cli.cli.utils import show_error
 from idmtools_platform_local.cli.utils import colorize_status, tags_help, urlize_data_path
 from idmtools_platform_local.client.simulations_client import SimulationsClient

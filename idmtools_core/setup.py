@@ -19,6 +19,7 @@ extras = {
     '3.6': ['dataclasses'],
     # to support notebooks we need docker
     'notebooks': ['docker==4.0.1'],
+    'packaging': ['twine'],
     # our full install include all common plugins
     'full': ['idmtools_platform_comps', 'idmtools_platform_local', 'idmtools_cli']
 }

@@ -40,6 +40,7 @@ services:
       # You should only link in the library in development
       #- ./idmtools_local:/app/idmtools_local
       - ../data/workers:/data
+      - ../:/dev_build
     depends_on:
       - redis
       - postgres

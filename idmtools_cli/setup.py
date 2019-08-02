@@ -11,7 +11,7 @@ with open('README.md') as readme_file:
 with open('requirements.txt') as requirements_file:
     requirements = requirements_file.read().split("\n")
 
-build_requirements = ['pymake']
+build_requirements = ['flake8', 'coverage']
 setup_requirements = []
 test_requirements = ['pytest', 'pytest-runner', 'numpy==1.16.4', 'xmlrunner'] + build_requirements
 
@@ -51,5 +51,5 @@ setup(
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
     version='0.1.0',
-    zip_safe=False
+    zip_safe=True
 )

@@ -1,7 +1,7 @@
 from typing import Optional, Tuple, List, Any, Dict
 import click
 from tabulate import tabulate
-from idmtools_cli.cli.experiment import experiment
+
 from idmtools_cli.cli.utils import show_error
 from idmtools_platform_local.cli.utils import parent_status_to_progress, urlize_data_path
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
@@ -48,6 +48,7 @@ def status(id: Optional[str], tags: Optional[List[Tuple[str, str]]]):
 def extra_commands():
     """ This ensures our local platform specific commands are loaded
     """
+    from idmtools_cli.cli.experiment import experiment
     @experiment.command()
     @click.argument('id')
     @click.option('--data/--no-data', default=False, help="Should we delete the data as well?")

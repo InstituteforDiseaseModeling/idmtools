@@ -40,7 +40,7 @@ setup(
     long_description=readme,
     include_package_data=True,
     keywords='modeling, IDM',
-    name='idmtools_local',
+    name='idmtools_platform_local',
     packages=find_packages(),
     setup_requires=setup_requirements,
     entry_points=dict(idmtools_platform=

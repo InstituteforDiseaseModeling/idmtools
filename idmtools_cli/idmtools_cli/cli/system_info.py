@@ -2,7 +2,7 @@ from tabulate import tabulate
 
 from idmtools.core.system_information import get_system_information
 from idmtools.entities.IPlatform import PlatformPlugins
-from idmtools_cli.cli.base import cli
+from idmtools_cli.cli import cli
 from idmtools_cli.cli.experiment import supported_platforms
 
 

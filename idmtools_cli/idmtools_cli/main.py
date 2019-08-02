@@ -1,5 +1,5 @@
 from colorama import init
-from idmtools_cli.cli.base import cli
+from idmtools_cli.cli import cli
 from idmtools.entities.IPlatformCli import PlatformCLIPlugins
 
 

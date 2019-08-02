@@ -2,14 +2,12 @@ from typing import Optional, Tuple, List
 import click
 
 from idmtools.entities.IPlatformCli import PlatformCLIPlugins, IPlatformCLI
-from idmtools_cli.cli.base import cli
+from idmtools_cli.cli import cli, pass_platform_cli
 from idmtools_cli.cli.utils import tags_help
 
 
 supported_platforms = PlatformCLIPlugins().get_plugin_map()
 # Decorator for CLI functions that will require a platform object passed down to them
-
-pass_platform_cli = click.make_pass_decorator(IPlatformCLI)
 
 
 @cli.group(help="Commands related to experiments(top-level jobs)")

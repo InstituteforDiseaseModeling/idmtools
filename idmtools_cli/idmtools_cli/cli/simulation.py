@@ -2,7 +2,7 @@ from typing import Optional, Tuple, List
 import click
 
 from idmtools.entities.IPlatformCli import PlatformCLIPlugins, IPlatformCLI
-from idmtools_cli.cli.base import cli
+from idmtools_cli.cli import cli
 from idmtools_cli.cli.experiment import pass_platform_cli
 from idmtools_cli.cli.utils import tags_help
 

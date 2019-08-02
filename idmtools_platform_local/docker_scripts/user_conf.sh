@@ -13,7 +13,8 @@ ROOT=${ROOT:=FALSE}
 UMASK=${UMASK:=022}
 
 echo "$USER"
-if [ "$USERID" -ne 1000 ]
+
+if [[ "$USERID" -ne 1000 ]]
 ## Configure user with a different USERID if requested.
   then
     echo "deleting user idmtools"
@@ -23,7 +24,7 @@ if [ "$USERID" -ne 1000 ]
     mkdir /home/$USER
     chown -R $USER /home/$USER /data /app
     usermod -a -G staff $USER
-elif [ "$USER" != "idmtools" ]
+elif [[ "$USER" != "idmtools" ]]
   then
     echo "Renaming idmtools to $USER"
     ## cannot move home folder when it's a shared volume, have to copy and change permissions instead
@@ -39,7 +40,7 @@ else
     chown -R $USER:$USER /home/$USER /data /app
 fi
 
-if [ "$GROUPID" -ne 1000 ]
+if [[ "$GROUPID" -ne 1000 ]]
 ## Configure the primary GID (whether rstudio or $USER) with a different GROUPID if requested.
   then
     echo "Modifying primary group $(id $USER -g -n)"
@@ -55,4 +56,10 @@ if [[ ${ROOT,,} == "true" ]]
   then
     adduser $USER sudo && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
     echo "$USER added to sudoers"
+fi
+
+# Check for dev build. If this exists we want to install fresh copies of the packages
+if [[ -d "/dev_build" ]];
+  then
+    cd /dev_build && python dev_scripts/setup_dev_env.py
 fi

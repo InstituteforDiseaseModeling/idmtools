@@ -1,15 +1,16 @@
 version: '2'
 
+# This image provides us a local dev pypi server
+# this is useful to test packaging scripts and docker builds
+# The server is accessible via http://localhost:7171
+# Most likely you would want to point any packaging scripts to that
+
 services:
   pypi_server:
-    image: mosquito/pypi-server:latest
-    links:
-      - db
+    image: pypiserver/pypiserver:latest
     restart: always
-    ports:
-      - 8080:80
     volumes:
-      - ./packages:/var/lib/pypi-server
-    environment:
-      DB: "sqlite3:////pypy.db'
-      SECRET: dev
+        - .htpasswd:/data/auth/.htpasswd
+    command: -P /data/auth/.htpasswd -o -a update,download,list /data/packages
+    ports:
+      - 7171:8080
