@@ -16,7 +16,7 @@ To setup your environment, you can run `python dev_scripts/setup_dev_env.py`. Th
 There is a Makefile file available for most common development tasks. Here is a list of commands
 ```bash
 setup-dev   -   Setup dev environment(assumes you already have a virtualenv)
-clean       -   Clean up temproary files
+clean       -   Clean up temporary files
 lint        -   Lint package and tests
 test        -   Run All tests
 coverage    -   Run tests and generate coverage report that is shown in browser
