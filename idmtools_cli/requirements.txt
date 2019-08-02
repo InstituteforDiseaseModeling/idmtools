@@ -2,5 +2,6 @@ click~=7.0
 colorama~=0.4.1
 idmtools
 tabulate~=0.8.3
-tqdm
-yaspin
+pyperclip~=1.7
+tqdm~=4.32
+yaspin~=0.14.3

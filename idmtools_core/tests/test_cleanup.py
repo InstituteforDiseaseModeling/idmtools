@@ -40,12 +40,12 @@ class TestCleanup(ITestWithPersistence):
     def delete_experiment_by_id(self, id):
         try:
             ee = Experiment.get(id)
-        except:
+        except:  # noqa E722
             ee = None
         ee.delete()
         self.assert_experiment_not_exists(id)
 
     def assert_experiment_not_exists(self, id):
         with self.assertRaises(RuntimeError) as context:
-            ee = Experiment.get(id)
+            ee = Experiment.get(id)  # noqa F841
         self.assertTrue('404 NotFound - Failed to retrieve experiment for given id' in str(context.exception.args[0]))

@@ -9,9 +9,6 @@ from idmtools.entities import IExperiment, IPlatform
 # we have to import brokers so that the proper configuration is achieved for redis
 from idmtools_platform_local.client.simulations_client import SimulationsClient
 from idmtools_platform_local.local_docker_manager import LocalDockerManager
-from idmtools_platform_local.tasks.create_experiement import CreateExperimentTask
-from idmtools_platform_local.tasks.create_simulation import CreateSimulationTask
-from idmtools_platform_local.tasks.run import RunTask
 
 status_translate = dict(
     created='CREATED',
@@ -81,6 +78,8 @@ class LocalPlatform(IPlatform):
                 s.status = local_status_to_common(sim_status[0]['status'])
 
     def create_experiment(self, experiment: IExperiment):
+        from idmtools_platform_local.tasks.create_experiement import CreateExperimentTask
+
         m = CreateExperimentTask.send(experiment.tags, experiment.simulation_type)
         eid = m.get_result(block=True)
         experiment.uid = eid
@@ -99,6 +98,8 @@ class LocalPlatform(IPlatform):
             self.docker_manager.copy_to_container(self.docker_manager.get_workers(), path)
 
     def create_simulations(self, simulations_batch):
+        from idmtools_platform_local.tasks.create_simulation import CreateSimulationTask
+
         ids = []
         for simulation in simulations_batch:
             m = CreateSimulationTask.send(simulation.experiment.uid, simulation.tags)
@@ -109,5 +110,6 @@ class LocalPlatform(IPlatform):
         return ids
 
     def run_simulations(self, experiment: IExperiment):
+        from idmtools_platform_local.tasks.run import RunTask
         for simulation in experiment.simulations:
             RunTask.send(simulation.experiment.command.cmd, simulation.experiment.uid, simulation.uid)

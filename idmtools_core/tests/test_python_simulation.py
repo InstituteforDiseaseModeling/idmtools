@@ -357,8 +357,8 @@ class TestPythonSimulation(ITestWithPersistence):
         with self.assertRaises(RuntimeError) as context:
             em.run()
         self.assertTrue(
-            "400 Bad Request - An error was encountered while attempting to save asset collection: Cannot insert " \
-            "duplicate key row in object 'dbo.AssetCollectionFile' with unique index " \
+            "400 Bad Request - An error was encountered while attempting to save asset collection: Cannot insert "
+            "duplicate key row in object 'dbo.AssetCollectionFile' with unique index "
             "'IX_AssetCollectionFile_AssetCollectionId_NewFileName_RelativePath_Unique'." in str(
                 context.exception.args[0]))
 

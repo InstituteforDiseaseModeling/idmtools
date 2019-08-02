@@ -49,8 +49,7 @@ class TestLoggingBenchmark(TestCase):
 
     @run_test_in_n_seconds(10)
     def test_logger_processes_performance(self):
-            with ProcessPoolExecutor() as p:
-                futures = [p.submit(log_process_id) for i in range(LOG_TESTS_TO_RUN)]
-                for future in concurrent.futures.as_completed(futures):
-                    self.assertTrue(future.result())
-
+        with ProcessPoolExecutor() as p:
+            futures = [p.submit(log_process_id) for i in range(LOG_TESTS_TO_RUN)]
+            for future in concurrent.futures.as_completed(futures):
+                self.assertTrue(future.result())

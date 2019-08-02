@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from idmtools.entities import IExperiment
-from tests.utils.TestSimulation import TestSimulation
+from idmtools_test.utils.TestSimulation import TestSimulation
 
 
 @dataclass(repr=False)

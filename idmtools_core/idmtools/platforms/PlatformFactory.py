@@ -1,12 +1,13 @@
 from enum import Enum
-from idmtools.platforms import LocalPlatform, COMPSPlatform
-from tests.utils.TestPlatform import TestPlatform
+# TODO Refactor to use plugins
+from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
+from idmtools_platform_local.local_platform import LocalPlatform
 
 
 class PlatformType(Enum):
     COMPSPlatform = COMPSPlatform
     LocalPlatform = LocalPlatform
-    TestPlatform = TestPlatform
+    #TestPlatform = TestPlatform
 
 
 class PlatformFactory:

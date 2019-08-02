@@ -25,7 +25,7 @@ class TestSystemInfoBasics(unittest.TestCase):
         # Ensure we have our expected global sub-commands
         commands = get_subcommands_from_help_result(result)
         self.assertIn('plugins', commands)
-        self.assertIn('system-information', commands)
+        self.assertIn('system', commands)
 
     def test_plugins_help(self):
         """
@@ -87,24 +87,24 @@ class TestSystemInfoBasics(unittest.TestCase):
         self.assertIn('Platform Plugins', result.output)
         # TODO: Improve test by adding a mock CLI plugin and testing for its presence here
 
-    def test_system_information_help(self):
+    def test_system_help(self):
         """
         This test is to ensure:
-        a) info system_information --help is a valid command within the cli
+        a) info system --help is a valid command within the cli
         b) Help provides our expected output and options
         """
-        result = self.run_command('info', 'system-information', '--help')
+        result = self.run_command('info', 'system', '--help')
         self.assertEqual(0, result.exit_code)
         # Check for our help string
         self.assertIn('Provide an output with details about your current execution platform', result.output)
 
-    def test_system_information_cli(self):
+    def test_system_cli(self):
         """
         This test is to ensure:
-        a) info system_information is a valid command within the cli
+        a) info system is a valid command within the cli
         b) Help provides our expected output and options
         """
-        result = self.run_command('info', 'system-information')
+        result = self.run_command('info', 'system')
         self.assertEqual(0, result.exit_code)
 
         self.assertIn(f'user: {getpass.getuser()}', result.output)

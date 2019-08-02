@@ -1,5 +1,6 @@
 .PHONY: clean lint test coverage release-local dist release-staging release-staging-minor-commit release-staging-minor
 
+
 clean: ## Clean all our jobs
 	@+python -c "import os, glob; [os.remove(i) for i in glob.glob('*.py[co]', recursive=True)]"
 	@+python -c "import os, glob; [os.remove(i) for i in glob.glob('*.done', recursive=True)]"
@@ -18,7 +19,7 @@ test: ## Run our tests
 	@+python -c "import os, sys; sys.path.append(os.getcwd()); os.system('py.test')"
 
 coverage: ## Generate a code-coverage report
-	coverage run --source idmtools_cli -m pytest
+	coverage run --source idmtools -m pytest
 	coverage report -m
 	coverage html
 	python ../dev_scripts/launch_dir_in_browser.py htmlcov/index.html

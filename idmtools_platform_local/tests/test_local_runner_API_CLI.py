@@ -1,4 +1,3 @@
-import json
 import os
 import re
 import subprocess
@@ -158,8 +157,7 @@ class TestLocalRunnerCLI(ITestWithPersistence):
                 exp_id = items[2].strip()
                 status = self.escape_ansi(items[3])
                 status = status.strip()  # wait for status bug fix to add to list
-                simulation_list.append({'simulation_uid': sim_uid, 'experiment_id':
-                    exp_id, 'tags': tags})
+                simulation_list.append({'simulation_uid': sim_uid, 'experiment_id': exp_id, 'tags': tags})
             count = count + 1
         return simulation_list
 
