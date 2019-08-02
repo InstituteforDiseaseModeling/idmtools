@@ -26,7 +26,7 @@ def verify_simulation(simulation, expected_parameters, expected_values):
     return False
 
 
-class TestArmBuilder(ITestWithPersistence):
+class TestYamlBuilder(ITestWithPersistence):
 
     def setUp(self):
         super().setUp()

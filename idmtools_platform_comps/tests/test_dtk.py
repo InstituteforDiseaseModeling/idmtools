@@ -8,11 +8,11 @@ from idmtools.managers import ExperimentManager
 from idmtools_models.dtk import DTKExperiment
 from idmtools_models.dtk.defaults import DTKSIR
 from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
+from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 from idmtools_test.utils.decorators import comps_test
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
-COMMON_INPUT_PATH = os.path.join(current_directory, "inputs")
 
 
 @comps_test
