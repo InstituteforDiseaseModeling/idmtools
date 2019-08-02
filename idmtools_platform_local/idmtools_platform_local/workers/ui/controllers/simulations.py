@@ -10,7 +10,6 @@ from idmtools_platform_local.workers.database import get_session
 from idmtools_platform_local.status import Status
 from idmtools_platform_local.workers.ui.controllers.utils import validate_tags
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -31,7 +30,7 @@ def sim_status(id: Optional[str], experiment_id: Optional[str], status: Optional
     """
     session = get_session()
     # Simulations ALWAYS have a parent
-    criteria = [JobStatus.parent_uuid != None]
+    criteria = [JobStatus.parent_uuid is not None]
 
     # start building our filter criteria
     if id is not None:
@@ -84,7 +83,7 @@ class Simulations(Resource):
         data = request.json()
         # at moment, only allow status to be updated(ie canceled'
         # later, we may support resuming but we will need to include more data in the db to do this
-        data = {k:v for k,v in data.items() if k == 'status' and v in ['canceled']}
+        data = {k: v for k, v in data.items() if k == 'status' and v in ['canceled']}
         if len(data) > 0:
             s = get_session()
             current_job: JobStatus = s.query(JobStatus).filter(JobStatus.uuid == id).first()
@@ -99,6 +98,3 @@ class Simulations(Resource):
             s.commit()
         else:
             abort(400, message='Currently the only allowed simulation update is canceling a simulation')
-
-
-

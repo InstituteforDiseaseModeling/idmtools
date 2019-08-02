@@ -34,7 +34,7 @@ def get_db() -> Engine:
 
 
 def get_or_create(session: Session, model, filter_args: List[str], **model_args):
-    instance = session.query(model).filter_by(**{k:v for k, v in model_args.items() if k in filter_args}).first()
+    instance = session.query(model).filter_by(**{k: v for k, v in model_args.items() if k in filter_args}).first()
     if instance:
         return instance
     else:

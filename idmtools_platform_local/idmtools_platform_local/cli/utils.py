@@ -1,6 +1,6 @@
 from math import floor
 from typing import Dict
-from colorama import  Fore, Back
+from colorama import Fore, Back
 from idmtools_platform_local.config import DATA_PATH
 from idmtools_platform_local.status import Status
 
@@ -29,7 +29,7 @@ def colorize_status(status: Status) -> str:
     return status
 
 
-def parent_status_to_progress(status: Dict[Status, int], width: int=12) -> str:
+def parent_status_to_progress(status: Dict[Status, int], width: int = 12) -> str:
     """
     Convert a status object into a colorized progress bar for the console
 
@@ -41,14 +41,14 @@ def parent_status_to_progress(status: Dict[Status, int], width: int=12) -> str:
     Returns:
         str: Progress bar of the status
     """
-    status = {str(k):v for k,v in status.items()}
+    status = {str(k): v for k, v in status.items()}
     total = sum([v for k, v in status.items()])
 
     result = ''
     used = 0
     total_complete_or_failed = sum([v for k, v in status.items() if k in ['failed', 'done']])
 
-    status_order=['done', 'in_progress', 'failed']
+    status_order = ['done', 'in_progress', 'failed']
     for label in status_order:
         if label in status:
             w = floor(status[label] / total * width)
@@ -59,14 +59,15 @@ def parent_status_to_progress(status: Dict[Status, int], width: int=12) -> str:
 
     # add the remaining in progress
     if width - used > 0:
-        result += Back.WHITE  + (' '* (width - used))
+        result += Back.WHITE + (' ' * (width - used))
 
     result += Back.RESET
-    result = '[' + result + ']' + '{0}/{1} ({2:.1f}%)'.format(total_complete_or_failed, total, total_complete_or_failed/total * 100.0)
+    result = '[' + result + ']' + '{0}/{1} ({2:.1f}%)'.format(total_complete_or_failed, total,
+                                                              total_complete_or_failed / total * 100.0)
     return result
 
 
-def urlize_data_path(path: str) ->str:
+def urlize_data_path(path: str) -> str:
     """
     URL-ize a data-path so it can be made click-able in the console(if the console supports it)
     Args:
@@ -75,4 +76,3 @@ def urlize_data_path(path: str) ->str:
         str: Path as URL.
     """
     return path.replace(DATA_PATH, 'http://localhost:5000/data')
-

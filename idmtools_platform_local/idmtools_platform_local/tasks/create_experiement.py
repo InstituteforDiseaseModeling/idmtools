@@ -15,6 +15,7 @@ class CreateExperimentTask(GenericActor):
     - Also create the Assets folder to hold the experiments assets
     - Return the UUID of the newly created experiment
     """
+
     class Meta:
         store_results = True
         max_retries = 0
@@ -36,4 +37,3 @@ class CreateExperimentTask(GenericActor):
             logger.debug('Creating asset directory for experiment %s at %s', uuid, asset_path)
         os.makedirs(asset_path, exist_ok=True)
         return uuid
-

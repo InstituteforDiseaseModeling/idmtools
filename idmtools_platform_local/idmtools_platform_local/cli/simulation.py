@@ -43,7 +43,7 @@ def simulation():
 @click.option('--status', default=None, type=click.Choice([e.value for e in Status]))
 @click.option('--tags', default=None, nargs=2, multiple=True, help=tags_help)
 def status(id: Optional[str], experiment_id: Optional[str], status: Optional[str],
-               tags: Optional[List[Tuple[str, str]]]):
+           tags: Optional[List[Tuple[str, str]]]):
     """
     List of statuses for simulation(s) with the ability to filter by id, experiment_id, status, and tags
 
@@ -64,4 +64,3 @@ def status(id: Optional[str], experiment_id: Optional[str], status: Optional[str
 
     simulations = list(map(lambda x: prettify_simulation(x), simulations))
     print(tabulate(simulations, headers='keys', tablefmt='psql', showindex=False))
-

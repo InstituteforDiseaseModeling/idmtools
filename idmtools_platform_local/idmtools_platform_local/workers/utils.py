@@ -2,9 +2,10 @@ from idmtools_platform_local.workers.database import get_or_create, get_session
 from idmtools_platform_local.workers.data.job_status import JobStatus, Status
 
 
-def create_or_update_status(uuid, data_path=None, tags=None, status=Status.created, parent_uuid=None, extra_details=None):
+def create_or_update_status(uuid, data_path=None, tags=None, status=Status.created, parent_uuid=None,
+                            extra_details=None):
     session = get_session()
-    job_status: JobStatus = get_or_create(session, JobStatus,['uuid'],
+    job_status: JobStatus = get_or_create(session, JobStatus, ['uuid'],
                                           uuid=uuid, data_path=data_path, tags=tags, status=status,
                                           parent_uuid=parent_uuid)
     if data_path is not None:

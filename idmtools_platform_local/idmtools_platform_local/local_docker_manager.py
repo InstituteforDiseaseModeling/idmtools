@@ -136,7 +136,7 @@ class LocalDockerManager:
         return postgres_container['Id']
 
     @staticmethod
-    def _get_optional_port_bindings(src_port: Optional[Union[str, int]], dest_port:Optional[Union[str, int]]):
+    def _get_optional_port_bindings(src_port: Optional[Union[str, int]], dest_port: Optional[Union[str, int]]):
         return {src_port: dest_port} if src_port is not None else None
 
     def copy_to_container(self, container_id, artifact_file):

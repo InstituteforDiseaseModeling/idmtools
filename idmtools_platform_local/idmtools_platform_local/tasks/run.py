@@ -1,4 +1,3 @@
-import glob
 import logging
 import os
 import shlex
@@ -15,6 +14,7 @@ class RunTask(GenericActor):
     """
     Run the given `command` in the simulation folder.
     """
+
     class Meta:
         store_results = False
         max_retries = 0
@@ -76,7 +76,7 @@ class RunTask(GenericActor):
                 if current_job.status == Status.canceled:
                     status = Status.canceled
                 logger.error('Simulation %s for Experiment %s failed with a return code of %s',
-                             simulation_uuid,  experiment_uuid, p.returncode)
+                             simulation_uuid, experiment_uuid, p.returncode)
             elif logger.isEnabledFor(logging.DEBUG):
                 logging.debug('Simulation %s finished with status of %s', simulation_uuid, str(status))
 

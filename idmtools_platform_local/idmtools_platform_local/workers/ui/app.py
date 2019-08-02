@@ -24,7 +24,6 @@ def autoindex(path='.'):
 api.add_resource(Experiments, '/experiments', '/experiments/<id>')
 api.add_resource(Simulations, '/simulations', '/simulations/<id>')
 
-
 application.url_map.strict_slashes = False
 if __name__ == "__main__":
     application.run()

@@ -25,7 +25,7 @@ def experiment_filter(id: Optional[str], tags: Optional[List[Tuple[str, str]]]) 
     """
     session = get_session()
     # experiments don't have parents
-    criteria=[JobStatus.parent_uuid == None]
+    criteria = [JobStatus.parent_uuid is None]
 
     # start builder our optional criteria
     if id is not None:
@@ -42,8 +42,8 @@ def experiment_filter(id: Optional[str], tags: Optional[List[Tuple[str, str]]]) 
 
     # this will fetch the overall progress of the simulations(sub jobs) for the experiments
     subjob_status_query = session.query(JobStatus.parent_uuid, JobStatus.status,
-                                         func.count(JobStatus.status).label("total"))\
-        .filter(JobStatus.parent_uuid != None).group_by(JobStatus.parent_uuid, JobStatus.status)
+                                        func.count(JobStatus.status).label("total")) \
+        .filter(JobStatus.parent_uuid is not None).group_by(JobStatus.parent_uuid, JobStatus.status)
 
     sdf = pd.read_sql(subjob_status_query.statement, subjob_status_query.session.bind, index_col=['parent_uuid'])
 
@@ -51,7 +51,7 @@ def experiment_filter(id: Optional[str], tags: Optional[List[Tuple[str, str]]]) 
     # basically we are building the progress bar for each experiment based on the simulation statuses
     status_bars = []
     for job in df['uuid']:
-        job_status=dict()
+        job_status = dict()
         job_list = sdf.loc[job]
         # since we index by parent_uuid, if could have multiple rows. This is the general case(most experiments will
         # have simulations is different statuses at some point) so we convert any results that are a single row
@@ -64,10 +64,10 @@ def experiment_filter(id: Optional[str], tags: Optional[List[Tuple[str, str]]]) 
         # and make a pretty progress bar
 
         status_bars.append(job_status)
-        #status_bars.append(parent_status_to_progress(job_status))
+        # status_bars.append(parent_status_to_progress(job_status))
     df.insert(1, 'progress', status_bars)
-    df['data_path'] = df['data_path'].apply( lambda x: x.replace(DATA_PATH,'/data'))
-    #df['data_path'] = df['data_path'].apply(urlize_data_path)
+    df['data_path'] = df['data_path'].apply(lambda x: x.replace(DATA_PATH, '/data'))
+    # df['data_path'] = df['data_path'].apply(urlize_data_path)
 
     # we don't need status or parent_uuid or status(now that we have progress bars) for experiments. Let's drop those
     df.drop(columns=['parent_uuid', 'status'], inplace=True)
@@ -113,6 +113,3 @@ class Experiments(Resource):
         session.query(JobStatus).filter(or_(JobStatus.uuid == id, JobStatus.parent_uuid == id)).delete()
         session.commit()
         return 204, None
-
-
-

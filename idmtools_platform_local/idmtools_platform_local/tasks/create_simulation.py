@@ -14,12 +14,12 @@ class CreateSimulationTask(GenericActor):
     - Create the simulation folder in the experiment_id parent folder
     - Returns the UUID of the newly created simulation folder
     """
+
     class Meta:
         store_results = True
         max_retries = 0
 
     def perform(self, experiment_id, tags):
-
         """
         Creates our simulation task
         Args:

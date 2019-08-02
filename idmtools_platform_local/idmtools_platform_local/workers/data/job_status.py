@@ -1,4 +1,4 @@
-from sqlalchemy import  Enum, Column, String
+from sqlalchemy import Enum, Column, String
 from sqlalchemy.dialects.postgresql import JSON
 from idmtools_platform_local.workers.data import Base
 from idmtools_platform_local.status import Status
@@ -17,6 +17,3 @@ class JobStatus(Base):
     data_path = Column(String(), nullable=False)
     tags = Column(JSON, default=[])
     extra_details = Column(JSON, default={})
-
-
-

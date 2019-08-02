@@ -1,10 +1,9 @@
-
 import dataclasses
 import os
 from typing import Optional
 
 from dataclasses import dataclass
-from idmtools.core import EntityStatus
+from idmtools.core import EntityStatus, TExperiment
 from idmtools.entities import IExperiment, IPlatform
 # we have to import brokers so that the proper configuration is achieved for redis
 from idmtools_platform_local.client.simulations_client import SimulationsClient
@@ -44,7 +43,7 @@ class LocalPlatform(IPlatform):
         if self.docker_manager is None:
             # extract configuration details for the docker manager
             local_docker_options = [f.name for f in dataclasses.fields(LocalDockerManager)]
-            opts = {k:v for k, v in self.__dict__.items() if k in local_docker_options}
+            opts = {k: v for k, v in self.__dict__.items() if k in local_docker_options}
             self.docker_manager = LocalDockerManager(**opts)
 
     """
@@ -55,10 +54,10 @@ class LocalPlatform(IPlatform):
         pass
 
     def get_assets_for_simulation(self, simulation, output_files):
-        raise NotImplemented("Not implemented yet in the LocalPlatform")
+        raise NotImplementedError("Not implemented yet in the LocalPlatform")
 
     def restore_simulations(self, experiment):
-        raise NotImplemented("Not implemented yet in the LocalPlatform")
+        raise NotImplementedError("Not implemented yet in the LocalPlatform")
 
     def refresh_experiment_status(self, experiment: 'TExperiment'):
         """

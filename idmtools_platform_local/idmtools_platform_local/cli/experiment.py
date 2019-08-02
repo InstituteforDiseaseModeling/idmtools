@@ -7,7 +7,6 @@ from idmtools_platform_local.cli.utils import parent_status_to_progress, urlize_
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
 from idmtools_platform_local.config import API_PATH
 
-
 EXPERIMENTS_URL = f'{API_PATH}/experiments'
 
 
@@ -67,9 +66,8 @@ def extra_commands():
         except RuntimeError as e:
             show_error(e.args[0])
 
-        if not data or (data and
-                        click.confirm('Deleting exp data is irreversible. Are you sure you want to delete all '
-                                      'exp data?')):
+        if not data or (data and click.confirm('Deleting exp data is irreversible. '
+                                               'Are you sure you want to delete all exp data?')):
             print(f'Deleting {exp["data_path"]}')
             try:
                 response = ExperimentsClient.delete(id, data)
@@ -77,7 +75,3 @@ def extra_commands():
                     print('Experiment removed successfully')
             except RuntimeError as e:
                 show_error(e.args[0])
-
-
-
-
