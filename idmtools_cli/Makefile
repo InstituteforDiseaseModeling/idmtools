@@ -39,6 +39,14 @@ dist: ## build our package
 	python setup.py sdist
 
 release-staging: ## perform a release to staging
-	bump2version release --allow-dirty
+	bump2version --config-file .bumpversion.nightly.cfg build --allow-dirty
 	@make dist
 	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/pypi-staging/simple dist/*
+
+# Warning This is meant for package maintainers only. It will create a new commit from the build!
+#
+release-staging-minor: ## perform a release to staging
+	bump2version minor --allow-dirty
+	@make dist
+	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/pypi-staging/simple dist/*
+
