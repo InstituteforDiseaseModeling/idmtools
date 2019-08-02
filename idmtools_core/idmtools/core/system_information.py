@@ -1,21 +1,30 @@
+import getpass
 from dataclasses import dataclass, field
+from logging import getLogger
 from pathlib import Path
 import platform
 from typing import Optional, List, Dict
 import os
 
+logger = getLogger(__name__)
+
 
 def get_packages_list():
-    import pip
-    installed_packages = pip.get_installed_distributions()
-    installed_packages_list = sorted(["%s==%s" % (i.key, i.version) for i in installed_packages])
+    try:
+        from pip._internal import get_installed_distributions
+        installed_packages = get_installed_distributions()
+        installed_packages_list = sorted(["%s==%s" % (i.key, i.version) for i in installed_packages])
+    except Exception as e:
+        logger.exception(e)
+        logger.warning("Could not load the packages from pip")
+        return ["Could not load the packages from pip"]
     return installed_packages_list
 
 
 @dataclass
 class SystemInformation:
     data_directory: Optional[str] = str(Path.home())
-    user: Optional[str] = None
+    user: Optional[str] = getpass.getuser()
     python_version: str = platform.python_version()
     python_build: str = platform.python_build()
     python_implementation = platform.python_implementation()
@@ -33,12 +42,17 @@ class SystemInformation:
 
 @dataclass
 class LinuxSystemInformation(SystemInformation):
-    user: str = field(default_factory=lambda: f'{os.getuid()}:{os.getgid()}')
+    user_id: str = field(default_factory=lambda: f'{os.getuid()}:{os.getgid()}')
 
 
 class WindowsSystemInformation(SystemInformation):
     default_docket_socket_path: str = '//var/run/docker.sock'
 
 
-def get_system_information():
-    return LinuxSystemInformation() if platform in ["linux", "linux2", "darwin"] else WindowsSystemInformation()
+def get_system_information() -> SystemInformation:
+    """
+    Fetches the system appropriate information inspection object
+    Returns:
+        (SystemInformation): Returns a SystemInformation with platform specific implementation
+    """
+    return LinuxSystemInformation() if platform.system() in ["Linux", "Darwin"] else WindowsSystemInformation()

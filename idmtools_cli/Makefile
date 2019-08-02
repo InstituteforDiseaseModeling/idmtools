@@ -1,4 +1,4 @@
-.PHONY: clean clean-test clean-pyc clean-build docs help current-version next-version tag-version
+.PHONY: clean clean-test clean-pyc clean-build docs help release-local test lint
 .DEFAULT_GOAL := help
 
 define BROWSER_PYSCRIPT
@@ -67,19 +67,9 @@ coverage: ## check code coverage quickly with the default Python
 	coverage html
 	$(BROWSER) htmlcov/index.html
 
-release-local: dist ## package and upload a release
+release-local: dist ## package and upload a release to http://localhost:7171
 	twine upload --verbose --repository-url http://localhost:7171 -u admin -p admin dist/*
 
-prepare-version:
-	#TODO check for version info in HISTORY.rst and exit if not found
-	echo Version: $(VERSION)
-	sed -i -e 's|$(shell git describe --tags --abbrev=0)|$(VERSION)|g' setup.py
-	sed -i -e 's|$(shell git describe --tags --abbrev=0)|$(VERSION)|g' rse_api/__init__.py
-	git add setup.py
-	git commit -m "Increment Version from $(shell git describe --tags --abbrev=0) to $(VERSION)"
 
 dist: clean ## builds source and wheel package
 	python setup.py sdist
-
-install: clean ## install the package to the active Python's site-packages
-	python setup.py install

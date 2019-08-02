@@ -1,6 +1,5 @@
 from idmtools.entities import IPlatform
 from idmtools.entities.IPlatform import PlatformSpecification
-from idmtools_platform_local.local_platform import LocalPlatform
 
 LOCAL_PLATFORM_EXAMPLE_CONFIG = """
 [LOCAL]
@@ -20,6 +19,7 @@ class LocalPlatformSpecification(PlatformSpecification):
 
     @staticmethod
     def get(configuration: dict) -> IPlatform:
+        from idmtools_platform_local.local_platform import LocalPlatform
         return LocalPlatform()
 
     @staticmethod
