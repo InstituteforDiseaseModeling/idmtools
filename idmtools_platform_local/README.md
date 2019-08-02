@@ -34,60 +34,6 @@ running at http://localhost:5000
 
 The platform_local docker container requires a pypi server to get other dependencies(core, models, etc). To facilitate this in a development environment that properly reflects a true package build we must start a local pypi server and publsh the packages. We do this through pymake with the rule `publish_dev_idm`
 
-# Using the CLI
-
-The CLI requires the workers service to already be running.
-`python -m idmtools_local.cli.run`
-
-## Experiment commands
-
-### Status
-
-You can check the status of experiments use the follow command. It will also summarize the simulations under
-the experiment as a progress bar with green section for completed tasks, yellow for in progress, red for failed, and
-white for queued. 
-
-`python -m idmtools_local.cli.run experiment status`
-
-Alternatively, you can run from anywhere using
-`python -m idmtools_local.cli.run experiment status` 
-
-In addition, we used in conjunction with a console that supports auto-highlighting of hyperlinks, you will be able to
-easily open up the asset directories by clicking on the data path URLs.
-
-You can also perform filtering on the experiments
-`python -m idmtools_local.cli.run experiment status --tag type PythonExperiment`
-
-`python -m idmtools_local.cli.run experiment status --id 8EHU147Z`
-
-### Delete
-
-You can delete experiments and their child simulations using the following command. Optionally you can also delete
-the associated data directories as well by using the *--data* option.
-
-`python -m idmtools_local.cli.run experiment delete <experiment_id>`
-
-## Simulation Commands
-
-## Status 
-
-You can check the status of simulations use the follow command.
-
-`python -m idmtools_local.cli.run simulation status`
-
-You can also filter by a either id, experiment id, status, and tags or any combination of the aforementioned
-
-`python -m idmtools_local.cli.run simulation status --experiment-id EFX6JXBV`
-
-`python -m idmtools_local.cli.run simulation status --id XDT0VMVV`
-
-`python -m idmtools_local.cli.run simulation status --status failed`
-
-`python -m idmtools_local.cli.run simulation status --tag a 5 --tag b`
-
-`python -m idmtools_local.cli.run simulation status --experiment-id --status failed`
-
-
 # Using the UI
 
 The Web UI is available at http://localhost:5000/data. Currently it only supports displaying the data directories from
