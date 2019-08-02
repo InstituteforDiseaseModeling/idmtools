@@ -7,6 +7,8 @@ if typing.TYPE_CHECKING:
     from idmtools.core import TPlatformClass
 
 
+# TODO: Update to use plugin manager
+
 class PlatformFactory:
 
     def __init__(self):
