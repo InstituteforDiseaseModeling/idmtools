@@ -11,6 +11,8 @@ Clone the repository:
 > git clone https://github.com/InstituteforDiseaseModeling/idmtools.git
 ```
 
+To setup your environment, you can run `python dev_scripts/setup_dev_env.py`. This will install all the tools. From then on you can use `pymake` to run common development tasks.
+
 There is a Makefile file available for most common development tasks. Here is a list of commands
 ```bash
 setup-dev   -   Setup dev environment(assumes you already have a virtualenv)
@@ -21,7 +23,7 @@ coverage    -   Run tests and generate coverage report that is shown in browser
 ```
 On Windows, you can use `pymake` instead of `make`
 
-Alternatively, you can do it manually by doing the follwing. 
+Alternatively, you can install the packages manually by doing the follwing. 
 Install the packages in dev mode with the `test` extra (from repository folder).
 ```bash
 > cd idmtools_core
