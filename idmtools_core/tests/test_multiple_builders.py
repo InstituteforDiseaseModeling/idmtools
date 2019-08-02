@@ -101,3 +101,4 @@ class TestMultipleBuilders(ITestWithPersistence):
 
         # test no builder has been added
         self.assertIsNone(a.builders)
+
