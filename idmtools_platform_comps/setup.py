@@ -48,6 +48,6 @@ setup(
                       ),
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='0.1.0',
+    version='0.1.0-nightly',
     zip_safe=False,
 )
