@@ -1,3 +1,5 @@
-from idmtools.utils.imports import get_modules_from_file
-# load all the files in the current directory
-__all__ = get_modules_from_file(__file__)
+# flake8: noqa F821
+from idmtools.entities.CommandLine import CommandLine
+from idmtools.entities.IExperiment import IExperiment
+from idmtools.entities.IPlatform import IPlatform
+from idmtools.entities.ISimulation import ISimulation

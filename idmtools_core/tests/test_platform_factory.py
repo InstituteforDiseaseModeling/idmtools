@@ -1,7 +1,7 @@
 from dataclasses import fields
 from idmtools.config import IdmConfigParser
 from idmtools.core import platform_factory
-from tests.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 
 
 class TestPlatformFactory(ITestWithPersistence):
@@ -18,11 +18,11 @@ class TestPlatformFactory(ITestWithPersistence):
 
     def test_block_not_exits(self):
         with self.assertRaises(Exception):
-            platform = platform_factory.create_from_block('NOTEXISTS')
+            platform = platform_factory.create_from_block('NOTEXISTS')  # noqa:F841
 
     def test_bad_type(self):
         with self.assertRaises(Exception):
-            platform = platform_factory.create_from_block('BADTYPE')
+            platform = platform_factory.create_from_block('BADTYPE')  # noqa:F841
 
     def test_create_from_block(self):
         p1 = platform_factory.create_from_block('LOCAL')

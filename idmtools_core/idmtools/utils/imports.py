@@ -16,6 +16,8 @@ def get_modules_from_file(file: str) -> List[str]:
 
     Args:
         file(str): Where file is located. Usually you will call with *__file__*
+        assume_nested_obj(bool): Assume the filename contains an object of the same name. For example,
+        IExperiment.py contains IExperiment
 
     Returns:
         (List[str]) Modules loaded from directory

@@ -3,8 +3,10 @@ import typing
 import ast
 from dataclasses import fields
 
+
 if typing.TYPE_CHECKING:
     from idmtools.core import TPlatformClass
+    from idmtools.core.types import TPlatform
 
 
 # TODO: Update to use plugin manager
@@ -23,7 +25,7 @@ class PlatformFactory:
         """
         self._builders[platform_class.__module__] = platform_class
 
-    def create(self, key, **kwargs) -> 'TPlatformt':
+    def create(self, key, **kwargs) -> 'TPlatform':
         """
         Create Platform with type identified by key
         Args:
@@ -36,7 +38,7 @@ class PlatformFactory:
                 # Try first to import it dynamically
                 import importlib
                 importlib.import_module(key)
-            except:
+            except:  # noqa: E722
                 raise ValueError(f"The PlatformFactory could not create an platform of type {key}")
 
         builder = self._builders.get(key)
@@ -58,7 +60,7 @@ class PlatformFactory:
                 # Try first to import it dynamically
                 import importlib
                 importlib.import_module(platform_type)
-            except:
+            except:  # noqa: E722
                 raise ValueError(f"The PlatformFactory could not create an platform of type {platform_type}")
 
         # Update fields types

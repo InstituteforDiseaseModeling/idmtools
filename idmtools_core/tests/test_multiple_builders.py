@@ -1,7 +1,7 @@
 import os
 import numpy as np
 from functools import partial
-from idmtools.builders import ArmExperimentBuilder, ArmType, SweepArm
+from idmtools.builders import ArmExperimentBuilder, SweepArm, ArmType
 from idmtools.builders import YamlExperimentBuilder
 from idmtools.builders import CsvExperimentBuilder
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
@@ -101,4 +101,3 @@ class TestMultipleBuilders(ITestWithPersistence):
 
         # test no builder has been added
         self.assertIsNone(a.builders)
-
