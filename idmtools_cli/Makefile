@@ -43,10 +43,13 @@ release-staging: ## perform a release to staging
 	@make dist
 	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/pypi-staging/simple dist/*
 
-# Warning This is meant for package maintainers only. It will create a new commit from the build!
-#
+
 release-staging-minor: ## perform a release to staging
 	bump2version minor --allow-dirty
 	@make dist
 	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/pypi-staging/simple dist/*
 
+release-staging-minor-commit: ## perform a release to staging and commit the version. This should be used when a pushing a "production" build to staging before being approved by test
+	bump2version minor --commit
+	@make dist
+	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/pypi-staging/simple dist/*
