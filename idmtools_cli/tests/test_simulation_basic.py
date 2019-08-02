@@ -17,6 +17,7 @@ class TestSimulationsBasics(unittest.TestCase):
         This test is to ensure:
         a) simulation is a valid command within the cli
         b) Help provides our expected output and options
+        c) Checks for command sub-commands
         """
         result = self.run_command('simulation', '--help')
         # Check for our help string

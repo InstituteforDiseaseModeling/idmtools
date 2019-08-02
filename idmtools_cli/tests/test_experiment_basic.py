@@ -15,8 +15,9 @@ class TestExperimentBasics(unittest.TestCase):
     def test_help(self):
         """
         This test is to ensure:
-        a) experiment is a valid command within the cli
+        a) experiment --help is a valid command within the cli
         b) Help provides our expected output and options
+        c) Checks for command sub-commands
         Returns:
 
         """
