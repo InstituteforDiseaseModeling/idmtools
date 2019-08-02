@@ -1,4 +1,4 @@
-#IDM Tools Local Runner
+# IDM Tools Local Runner
 
 The IDM Tool Local Runner allows execution of tasks in a local docker container and provides a platform that is
 somewhat similar to COMPS, though much more limited
@@ -6,7 +6,7 @@ somewhat similar to COMPS, though much more limited
 ## Module Organization
 
     ├── ./docker_scripts          <- Script for use inside of docker container only. Mainly S6 service/user scripts
-    ├── idmtools_local            <- Base of the module contents
+    ├── idmtools_platform_local   <- Base of the module contents
     │   ├── cli                   <- Contains the CLI interface for the idmtools_local.
     │   ├── data                  <- Data definition for idmtool_local
     │   ├── tasks                 <- The various tasks processing methods
@@ -20,7 +20,7 @@ somewhat similar to COMPS, though much more limited
 # Running the Local Runner
 
 Generally you can do a 
-`docker-compose up -d`
+`./start.sh`
 
 This will bring up 3 services
 - postgres
@@ -30,11 +30,18 @@ This will bring up 3 services
 The workers service contains the IDMTools workers that actually execut the tasks as well as containing a simplistic UI
 running at http://localhost:5000
 
-# Development
-
-The platform_local docker container requires a pypi server to get other dependencies(core, models, etc). To facilitate this in a development environment that properly reflects a true package build we must start a local pypi server and publsh the packages. We do this through pymake with the rule `publish_dev_idm`
-
 # Using the UI
 
 The Web UI is available at http://localhost:5000/data. Currently it only supports displaying the data directories from
 experiments. It is best used in conjunction with the CLI status commands
+
+# Development Tips
+
+There is a Makefile file available for most common development tasks. Here is a list of commands
+```bash
+clean       -   Clean up temproary files
+lint        -   Lint package and tests
+test        -   Run All tests
+coverage    -   Run tests and generate coverage report that is shown in browser
+```
+On Windows, you can use `pymake` instead of `make`
