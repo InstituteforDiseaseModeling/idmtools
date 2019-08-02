@@ -14,8 +14,7 @@ class Suite(INamedEntity):
         self.experiments = EntityContainer()
 
     def display(self):
-        from idmtools.utils.display import display
-        from idmtools.utils.display.settings import suite_table_display
+        from idmtools.utils.display import display, suite_table_display
         display(self, suite_table_display)
 
     def __repr__(self):

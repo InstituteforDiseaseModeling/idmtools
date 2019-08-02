@@ -1,6 +1,5 @@
-from idmtools.utils.imports import get_modules_from_file
-# load all the files in the current directory
-__all__ = get_modules_from_file(__file__)
+from idmtools.utils.display.settings import *  # noqa: F401, F403
+from idmtools.utils.display.displays import *  # noqa: F401, F403
 
 
 def display(obj, settings):
