@@ -9,10 +9,11 @@ from COMPS.Data import AssetCollection, AssetCollectionFile, Configuration, Expe
 from COMPS.Data.Simulation import SimulationState
 from dataclasses import dataclass, field
 
-from idmtools.core import CacheEnabled, EntityStatus, experiment_factory
+from idmtools.core import CacheEnabled
+from idmtools.core.ExperimentFactory import experiment_factory
+from idmtools.core.enums import EntityStatus
 from idmtools.entities import IPlatform
 from idmtools.utils.time import timestamp
-from idmtools.core import platform_factory
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TExperiment
@@ -264,5 +265,3 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
         return ret
 
-
-platform_factory.register_type(COMPSPlatform)
