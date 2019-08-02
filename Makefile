@@ -10,7 +10,7 @@ lint: ## check style with flake8
 	python dev_scripts/run_pymake_on_all.py lint
 
 test: ## Run our tests
-    python dev_scripts/run_pymake_on_all.py test
+	python dev_scripts/run_pymake_on_all.py test
 
 coverage: ## Generate a code-coverage report
 	python dev_scripts/run_pymake_on_all.py coverage
