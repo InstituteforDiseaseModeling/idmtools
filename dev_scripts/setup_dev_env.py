@@ -15,7 +15,7 @@ from os.path import abspath, join, dirname
 # To use simply run
 # python setup_dev_env.py
 
-base_directory = abspath(join(dirname(__name__), '..'))
+base_directory = abspath(join(dirname(__file__), '..'))
 
 default_install = ['test']
 data_class_default = default_install
@@ -39,5 +39,5 @@ packages = dict(
 # loop through and install our packages
 for package, extras in packages.items():
     extras_str = f"[{','.join(extras)}]" if extras else ''
-    print(f'Installing {package} with extras: {extras_str if extras_str else "None"}')
+    print(f'Installing {package} with extras: {extras_str if extras_str else "None"} from {base_directory}')
     result = subprocess.run(["pip", "install", "-e", f".{extras_str}", idmrepo], cwd=join(base_directory, package))
