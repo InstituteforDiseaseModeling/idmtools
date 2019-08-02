@@ -3,6 +3,9 @@
 clean: ## Clean all our jobs
 	python dev_scripts/run_pymake_on_all.py clean
 
+setup-dev:  ## Setup packages in dev mode
+    python dev_scripts/setup_dev_env.py
+
 lint: ## check style with flake8
 	python dev_scripts/run_pymake_on_all.py lint
 

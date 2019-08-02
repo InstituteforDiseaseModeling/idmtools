@@ -11,6 +11,17 @@ Clone the repository:
 > git clone https://github.com/InstituteforDiseaseModeling/idmtools.git
 ```
 
+There is a Makefile file available for most common development tasks. Here is a list of commands
+```bash
+setup-dev   -   Setup dev environment(assumes you already have a virtualenv)
+clean       -   Clean up temproary files
+lint        -   Lint package and tests
+test        -   Run All tests
+coverage    -   Run tests and generate coverage report that is shown in browser
+```
+On Windows, you can use `pymake` instead of `make`
+
+Alternatively, you can do it manually by doing the follwing. 
 Install the packages in dev mode with the `test` extra (from repository folder).
 ```bash
 > cd idmtools_core
@@ -31,8 +42,6 @@ Install the packages in dev mode with the `test` extra (from repository folder).
 > pip install -e .
 
 ```
-
-Alternatively you can use the `python setup_dev_env.py` in the dev_scripts folder.
 
 Create a Docker network named `idmtools_network`:
 ```bash
