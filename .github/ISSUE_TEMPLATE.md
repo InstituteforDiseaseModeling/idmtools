@@ -11,7 +11,7 @@ Paste the command(s) you ran and the output.
 If there was a crash, please include the traceback here.
 ```
 
-## Extras
+# Extras
 
 Please populate system information by running `idmtools info system --issue`. To accomplish this, please follow these steps
 * Ensure *idmtool-cli* packages is installed. You can do this be installing it using the command
@@ -25,7 +25,3 @@ Please populate system information by running `idmtools info system --issue`. To
 This will copy the system information to your clipboard
 * Paste the data here
 
-* idmtools version:
-* Python version:
-* Operating System:
-* Any relevant input files(please be mindful of data security and only include shared data)
