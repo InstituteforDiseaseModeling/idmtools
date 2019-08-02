@@ -22,7 +22,7 @@ class SweepArm:
         for func, values in funcs:
             self.add_sweep_definition(func, values)
 
-    def add_sweep_definition(self, func: 'Callable', values: 'Iterable[Any]'):
+    def add_sweep_definition(self, func: 'Callable', values: 'Iterable[Any]'):  # noqa F821
         self.sweep_functions.append((func, values if isinstance(values, collections.Iterable) else [values]))
 
         if self.type == ArmType.pair:

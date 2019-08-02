@@ -1,7 +1,11 @@
 import typing
+from logging import getLogger
 
 if typing.TYPE_CHECKING:
     from idmtools.core import TExperimentClass, TExperiment
+
+
+logger = getLogger(__name__)
 
 
 class ExperimentFactory:
@@ -17,7 +21,8 @@ class ExperimentFactory:
                 # Try first to import it dynamically
                 import importlib
                 importlib.import_module(key)
-            except:
+            except Exception as e:
+                logger.exception(e)
                 raise ValueError(f"The ExperimentFactory could not create an experiment of type {key}")
 
         builder = self._builders.get(key)

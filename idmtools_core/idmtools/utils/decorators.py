@@ -22,6 +22,7 @@ def optional_decorator(decorator: Callable, condition: Union[bool, Callable[[], 
     def decorate_in(func):
         if condition:
             func = decorator(func)
+
         @wraps
         def wrapper(*args, **kwargs):
             func(*args, **kwargs)

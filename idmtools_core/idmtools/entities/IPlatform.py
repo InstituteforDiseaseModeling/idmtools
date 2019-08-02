@@ -1,3 +1,4 @@
+import uuid
 from abc import ABCMeta, abstractmethod, ABC
 from dataclasses import fields
 
@@ -10,7 +11,7 @@ from idmtools.core.plugin_manager import PluginSpecification, PLUGIN_REFERENCE_N
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TExperiment, TSimulation, TSimulationBatch
-    from typing import List, Dict
+    from typing import List, Dict, Any
 
 
 class IPlatform(IEntity, metaclass=ABCMeta):

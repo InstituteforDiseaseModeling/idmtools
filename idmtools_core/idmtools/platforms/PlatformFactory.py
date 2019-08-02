@@ -7,7 +7,7 @@ from idmtools_platform_local.local_platform import LocalPlatform
 class PlatformType(Enum):
     COMPSPlatform = COMPSPlatform
     LocalPlatform = LocalPlatform
-    #TestPlatform = TestPlatform
+    # TestPlatform = TestPlatform
 
 
 class PlatformFactory:

@@ -27,7 +27,7 @@ class IPlatformCLI(ABC):
 
     @abstractmethod
     def get_simulation_status(self, id: Optional[str], experiment_id: Optional[str], status: Optional[str],
-               tags: Optional[List[Tuple[str, str]]]) -> NoReturn:
+                              tags: Optional[List[Tuple[str, str]]]) -> NoReturn:
         """
 
         Args:
@@ -69,10 +69,8 @@ class PlatformCLISpecification(PluginSpecification, ABC):
 
 class PlatformCLIPlugins:
     def __init__(self) -> None:
-        self._plugins = cast(
-            Set[PlatformCLISpecification],
-            plugins_loader('idmtools_platform_cli', PlatformCLISpecification)
-        )
+        pl = plugins_loader('idmtools_platform_cli', PlatformCLISpecification)
+        self._plugins = cast(Set[PlatformCLISpecification], pl)
 
     def get_plugins(self) -> Set[PlatformCLISpecification]:
         return self._plugins

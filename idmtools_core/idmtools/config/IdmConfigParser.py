@@ -1,8 +1,5 @@
 import copy
-import logging
 from logging import getLogger
-from logging.handlers import QueueHandler
-from logging.config import fileConfig
 import os
 from configparser import ConfigParser
 from typing import Dict
@@ -111,8 +108,6 @@ class IdmConfigParser:
 
         cls._config = ConfigParser()
         cls._config.read(ini_file)
-
-
 
     @classmethod
     def _get_section(cls, section: str = None) -> Dict[str, str]:

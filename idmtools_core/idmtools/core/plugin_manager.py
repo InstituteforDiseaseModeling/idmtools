@@ -2,7 +2,6 @@ import functools
 import glob
 import importlib
 import inspect
-import sys
 from logging import getLogger, DEBUG
 from os.path import join, isfile, sep
 from typing import List, Any, Type, Optional, Set
@@ -71,8 +70,8 @@ def is_a_plugin_of_type(value, plugin_specification: Type[PluginSpecification]) 
     Returns:
         (bool) True if the plugin is of a subclass of PluginSpecification, else False
     """
-    return inspect.isclass(value) and issubclass(value, plugin_specification) and \
-           not inspect.isabstract(value) and value is not plugin_specification
+    return inspect.isclass(value) and issubclass(value, plugin_specification) \
+        and not inspect.isabstract(value) and value is not plugin_specification
 
 
 def plugins_loader(entry_points_name: str, plugin_specification: Type[PluginSpecification],

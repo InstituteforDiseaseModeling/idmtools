@@ -48,7 +48,7 @@ def setup_logging(level: int = logging.WARN, log_file_name: str = 'idmtools.log'
             # Remove all handlers associated with the root logger object.
             for handler in logging.root.handlers[:]:
                 logging.root.removeHandler(handler)
-        except KeyError as e:
+        except KeyError as e:  # noqa F841
             pass
         # set root the use send log messages to a queue by default
         queue_handler = QueueHandler(logging_queue)

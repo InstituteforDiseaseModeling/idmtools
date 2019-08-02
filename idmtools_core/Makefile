@@ -13,7 +13,7 @@ clean: ## Clean all our jobs
 
 
 lint: ## check style with flake8
-	flake8 --ignore=E501 idmtools_cli tests
+	flake8 --ignore=E501 idmtools tests
 
 test: ## Run our tests
 	@+python -c "import os, sys; sys.path.append(os.getcwd()); os.system('py.test')"
@@ -37,13 +37,12 @@ release-staging: ## perform a release to staging
 	@make dist
 	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/pypi-staging/simple dist/*
 
+# Use before release-staging-minor-commit to confirm next version.
+release-staging-minor-dry-run: ## perform a release to staging and bump the minor version.
+	bump2version minor --dy-run --allow-dirty
 
-release-staging-minor: ## perform a release to staging
-	bump2version minor --allow-dirty
-	@make dist
-	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/pypi-staging/simple dist/*
-
-release-staging-minor-commit: ## perform a release to staging and commit the version. This should be used when a pushing a "production" build to staging before being approved by test
+# This should be used when a pushing a "production" build to staging before being approved by test
+release-staging-minor-commit: ## perform a release to staging and commit the version.
 	bump2version minor --commit
 	@make dist
 	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/pypi-staging/simple dist/*
