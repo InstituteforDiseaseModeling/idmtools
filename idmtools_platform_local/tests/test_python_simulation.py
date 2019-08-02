@@ -1,7 +1,8 @@
 from operator import itemgetter
 
+from idmtools.assets import AssetCollection
 from idmtools.builders import ExperimentBuilder
-from idmtools.core import EntityStatus, AssetCollection
+from idmtools.core import EntityStatus
 from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
 from idmtools_platform_local.local_platform import LocalPlatform
