@@ -48,9 +48,13 @@ Create a Docker network named `idmtools_network`:
 > docker network create idmtools_network
 ```
 
-Navigate to the `idmtools_local_runner` folder and start the local runner:
+Navigate to the `idmtools_platform_local` folder and start the local runner:
 ```bash
-> docker-compose up
+> ./start.sh
+```
+On Windows you can use
+```bash
+> docker-compose up -d
 ```
 
 For development purpose, it is important to add the following folders as to your `PYTHONPATH` (In PyCharm, right click and `Mark Directoy as > Source Root`):
