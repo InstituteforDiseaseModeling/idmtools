@@ -6,26 +6,9 @@ import platform
 from typing import Optional, List, Dict
 import os
 
+from idmtools.utils.info import get_packages_list
+
 logger = getLogger(__name__)
-
-
-def get_packages_list() -> List[str]:
-    """
-    Returns a list of installed packages in current environment. Currently we depend on pip for this functionality
-    and since it is just used for troubleshooting, we can ignore if it errors.
-
-    Returns:
-        (List[str]): List of packages installed
-    """
-    try:
-        from pip._internal import get_installed_distributions
-        installed_packages = get_installed_distributions()
-        installed_packages_list = sorted(["%s==%s" % (i.key, i.version) for i in installed_packages])
-    except Exception as e:
-        logger.exception(e)
-        logger.warning("Could not load the packages from pip")
-        return ["Could not load the packages from pip"]
-    return installed_packages_list
 
 
 @dataclass

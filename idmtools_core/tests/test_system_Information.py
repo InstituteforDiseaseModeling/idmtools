@@ -1,6 +1,9 @@
+import unittest
+import unittest.mock
 from unittest import TestCase
 
-from idmtools.core.SystemInformation import get_system_information, SystemInformation, get_packages_list
+from idmtools.core.SystemInformation import get_system_information, SystemInformation
+from idmtools.utils.info import get_packages_list
 
 
 class TestSystemInformation(TestCase):
@@ -25,3 +28,8 @@ class TestSystemInformation(TestCase):
             self.assertIn('==', package)
             parts = package.split("==")
             self.assertIs(len(parts), 2)
+
+    @unittest.mock.patch('idmtools.utils.info.get_packages_from_pip', side_effect=lambda: None)
+    def test_get_packages_fallback(self, mock_stdout):
+        packages = get_packages_list()
+        self.assertGreater(len(packages), 1)

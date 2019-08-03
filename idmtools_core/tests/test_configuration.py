@@ -1,3 +1,8 @@
+import io
+import tempfile
+import unittest.mock
+
+
 import os
 from idmtools.config import IdmConfigParser
 from idmtools.core import PlatformFactory
@@ -14,6 +19,23 @@ class TestConfig(ITestWithPersistence):
 
     def tearDown(self):
         super().tearDown()
+
+    @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
+    def test_reports_no_file_found(self, mock_stdout):
+        fdir = tempfile.mkdtemp()
+        IdmConfigParser(fdir)
+        self.assertIn("WARNING: File 'idmtools.ini' Not Found!", mock_stdout.getvalue())
+
+    @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
+    def test_load_not_found(self, mock_stdout):
+        fdir = tempfile.mkdtemp()
+        IdmConfigParser._load_config_file(fdir, 'aaaaa')
+        self.assertIn("WARNING: File 'aaaaa' Not Found!", mock_stdout.getvalue())
+
+    @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
+    def test_section_not_found(self, mock_stdout):
+        IdmConfigParser().get_section('NotReallyASection')
+        self.assertIn("WARNING: Section 'NotReallyASection' Not Found!", mock_stdout.getvalue())
 
     def test_simple_comps_platform_use_config(self):
         platform = PlatformFactory.create("COMPS")
