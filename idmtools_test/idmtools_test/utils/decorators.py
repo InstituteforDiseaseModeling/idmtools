@@ -8,6 +8,10 @@ comps_test = unittest.skipIf(
     os.environ.get('NO_COMPS_TESTS', False), 'No COMPS testing'
 )
 
+docker_test = unittest.skipIf(
+    os.environ.get('DOCKER_TESTS', False), 'No Docker testing'
+)
+
 
 def run_test_in_n_seconds(n: int, print_elapsed_time: bool = False) -> Callable:
     """

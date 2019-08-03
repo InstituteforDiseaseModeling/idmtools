@@ -25,13 +25,13 @@ def setup_logging(level: int = logging.WARN, log_file_name: str = 'idmtools.log'
     # get a file handler
     root = logging.getLogger()
     # allow setting the debug of logger via environment variable
-    root.setLevel(logging.DEBUG if os.getenv('IDM_TOOL_DEBUG', False) else level)
+    root.setLevel(logging.DEBUG if os.getenv('IDM_TOOLS_DEBUG', False) else level)
 
     if logging_queue is None:
         # We only one to do this setup once per process. Having the logging_queue setup help prevent that issue
         # get a file handler
         root = logging.getLogger()
-        if os.getenv('IDM_TOOL_DEBUG', False) or level == logging.DEBUG:
+        if os.getenv('IDM_TOOLS_DEBUG', False) or level == logging.DEBUG:
             # Enable detailed logging format
             format_str = '%(asctime)s.%(msecs)d %(pathname)s:%(lineno)d %(funcName)s ' \
                          '[%(levelname)s] (%(process)d,(%(thread)d) - %(message)s'
@@ -41,8 +41,7 @@ def setup_logging(level: int = logging.WARN, log_file_name: str = 'idmtools.log'
         file_handler = RotatingFileHandler(log_file_name, maxBytes=(2 ** 20) * 10, backupCount=5)
         file_handler.setFormatter(formatter)
 
-        comps_logger = getLogger("COMPS")
-        comps_logger.setLevel(logging.WARN)
+        exclude_logging_classes()
         logging_queue = Queue()
         try:
             # Remove all handlers associated with the root logger object.
@@ -69,8 +68,9 @@ def setup_logging(level: int = logging.WARN, log_file_name: str = 'idmtools.log'
 
 def exclude_logging_classes():
     # remove comps by default
-    comps_logger = getLogger("COMPS")
-    comps_logger.setLevel(logging.WARN)
+    for l in ['urllib3', 'COMPS']:
+        comps_logger = getLogger(l)
+        comps_logger.setLevel(logging.WARN)
 
 
 def register_stop_logger_signal_handler(listener) -> NoReturn:

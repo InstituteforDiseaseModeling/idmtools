@@ -11,8 +11,6 @@ REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379")
 if os.getenv("UNIT_TESTS") == "1":
     redis_broker = StubBroker()
     redis_backend = StubBackend()
-    redis_backend.emit_after("process_boot")
-    redis_broker.emit_after("process_boot")
 else:
     redis_broker = RedisBroker(url=REDIS_URL)
     redis_backend = RedisBackend(url=REDIS_URL)

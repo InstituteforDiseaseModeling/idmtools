@@ -43,9 +43,9 @@ setup(
     name='idmtools_platform_local',
     packages=find_packages(),
     setup_requires=setup_requirements,
-    entry_points=dict(idmtools_platform=
+    entry_points=dict(idmtools_platform=  # noqa: E251
                       ["idmtools_platform_local = idmtools_platform_local.plugin_info:LocalPlatformSpecification"],
-                      idmtools_platform_cli=
+                      idmtools_platform_cli=  # noqa: E251
                       ["idmtools_platform_cli_local = idmtools_platform_local.local_cli:LocalCLISpecification"]
                       ),
     test_suite='tests',

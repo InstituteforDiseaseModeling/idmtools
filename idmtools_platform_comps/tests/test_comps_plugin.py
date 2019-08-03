@@ -1,6 +1,6 @@
 import unittest
 
-from idmtools.core.registry.PlatformSpecification import PlatformPlugins
+from idmtools.registry.PlatformSpecification import PlatformPlugins
 
 
 class TestCompsPlugin(unittest.TestCase):

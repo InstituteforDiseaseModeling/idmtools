@@ -40,6 +40,17 @@ class CreateSimulationTask(GenericActor):
         data_path = os.path.join(DATA_PATH, experiment_id, uuid)
         os.makedirs(data_path, exist_ok=True)
 
+        # Define our simulation path and our root asset path
+        simulation_path = os.path.join(DATA_PATH, experiment_id, uuid)
+        asset_dir = os.path.join(DATA_PATH, experiment_id, "Assets")
+
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug('Linking assets from %s to %s', asset_dir, os.path.join(simulation_path, 'Assets'))
+
+        # Link in our asset directory and then add to our system path so any executing programs can see
+        # the assets using relative paths.. ie ./Asset/tmp.txt
+        os.symlink(asset_dir, os.path.join(simulation_path, 'Assets'))
+
         # Update
         create_or_update_status(uuid, data_path, tags, parent_uuid=experiment_id)
         return uuid

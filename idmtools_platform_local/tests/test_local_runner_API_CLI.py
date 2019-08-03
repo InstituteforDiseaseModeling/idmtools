@@ -12,6 +12,7 @@ from idmtools_platform_local.client.simulations_client import SimulationsClient
 from idmtools_models.python import PythonExperiment
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 from idmtools_test import COMMON_INPUT_PATH
+from idmtools_test.utils.decorators import docker_test
 
 
 class TestLocalRunnerCLI(ITestWithPersistence):
@@ -39,6 +40,7 @@ class TestLocalRunnerCLI(ITestWithPersistence):
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
 
+    @docker_test
     def test_status_experimentClient_api(self):
         # Test 1: get_all experiments with experiment id and tags
         experiment = ExperimentsClient.get_all(str(self.pe.uid),
@@ -57,6 +59,7 @@ class TestLocalRunnerCLI(ITestWithPersistence):
         self.assertEqual(experiment1['data_path'], '/data/' + str(self.pe.uid))
         self.assertEqual(experiment1['extra_details'], {'simulation_type': None})
 
+    @docker_test
     def test_status_simulationClient_api(self):
         # Test 1: get_all simulations with simulation id only filter
         for s in self.pe.simulations:
@@ -93,6 +96,7 @@ class TestLocalRunnerCLI(ITestWithPersistence):
             self.assertEqual(sim['experiment_id'], str(self.pe.uid))
 
     @unittest.skip("Skip")
+    @docker_test
     def test_local_runner_cli(self):
         current_dir_path = os.path.dirname(os.path.realpath(__file__))
         idmtools_local_runner_dir_path = os.path.join(current_dir_path, '..', '..', 'idmtools_local_runner')

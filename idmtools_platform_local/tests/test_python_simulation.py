@@ -10,11 +10,14 @@ from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 import os
 
+from idmtools_test.utils.decorators import docker_test
+
 
 class TestPythonSimulation(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
 
+    @docker_test
     def test_direct_sweep_one_parameter_local(self):
         platform = LocalPlatform()
         name = self.case_name
@@ -52,6 +55,7 @@ class TestPythonSimulation(ITestWithPersistence):
         sorted_expected_tags = sorted(expected_tags, key=itemgetter('a'))
         self.assertEqual(sorted_tags, sorted_expected_tags)
 
+    @docker_test
     def test_add_prefixed_relative_path_to_assets_local(self):
         # platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
         platform = LocalPlatform()

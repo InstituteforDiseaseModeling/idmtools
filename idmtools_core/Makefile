@@ -4,7 +4,7 @@ IPY=python -c
 clean: ## Clean all our jobs
 	@+$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('*.py[co]', recursive=True)]"
 	@+$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('*.done', recursive=True)]"
-	@+$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('*.log', recursive=True)]"
+	@+$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.log', recursive=True)]"
 	@+$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('.coverage', recursive=True)]"
 	@+$(IPY) "import os, shutil, glob; [shutil.rmtree(i) for i in [k for k in glob.glob('*.egg-info/', recursive=True) if os.path.isdir(k)]]"
 	@+$(IPY) "import shutil; shutil.rmtree('htmlcov', True)"
