@@ -11,18 +11,24 @@ clean: ## Clean all our jobs
 	@+python -c "import shutil; shutil.rmtree('.pytest_cache', True)"
 	@+python -c "import shutil; shutil.rmtree('dist', True)"
 
+# Dev and test related rules
 
 lint: ## check style with flake8
 	flake8 --ignore=E501 idmtools tests
 
 test: ## Run our tests
-	@+python -c "import os, sys; sys.path.append(os.getcwd()); os.system('py.test')"
+	@+python -c "import os, sys; sys.path.append(os.getcwd()); os.system('py.test -p no:warnings')"
 
 coverage: ## Generate a code-coverage report
 	coverage run --source idmtools -m pytest
 	coverage report -m
 	coverage html
 	python ../dev_scripts/launch_dir_in_browser.py htmlcov/index.html
+
+watch: ## Automate running of tests and linting of this project using watchdog. Useful for development
+	watchmedo tricks-from dev.yml
+
+# Release related rules
 
 release-local: ## package and upload a release to http://localhost:7171
 	@make dist

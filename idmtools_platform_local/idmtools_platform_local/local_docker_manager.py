@@ -7,7 +7,7 @@ from typing import Optional, Union
 
 import docker
 from docker.utils import create_archive
-from idmtools.core.system_information import get_system_information
+from idmtools.core.SystemInformation import get_system_information
 
 
 @dataclass

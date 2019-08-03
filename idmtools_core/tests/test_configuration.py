@@ -1,6 +1,7 @@
 import os
 from idmtools.config import IdmConfigParser
 from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
+from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 
 
@@ -35,11 +36,12 @@ class TestConfig(ITestWithPersistence):
         self.assertEqual(int(max_threads), 16)
 
     def test_idmtools_path(self):
-        IdmConfigParser("./inputs/configuration/", "idmtools_test.ini")
+
+        IdmConfigParser(os.path.join(COMMON_INPUT_PATH, "configuration"), "idmtools_test.ini")
         platform = COMPSPlatform()
         self.assertEqual(platform.num_retires, int(IdmConfigParser.get_option('COMPSPlatform', 'num_retires')))
 
-        file_path = os.path.join("./inputs/configuration/", "idmtools_test.ini")
+        file_path = os.path.join(COMMON_INPUT_PATH, "configuration", "idmtools_test.ini")
         self.assertEqual(IdmConfigParser.get_config_path(), os.path.abspath(file_path))
 
     def test_IdmConfigParser_singleton(self):
@@ -48,3 +50,4 @@ class TestConfig(ITestWithPersistence):
 
         self.assertEqual(p1, p2)
         self.assertEqual(id(p1), id(p2))
+

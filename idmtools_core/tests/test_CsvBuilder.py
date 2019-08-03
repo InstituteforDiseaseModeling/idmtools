@@ -4,7 +4,7 @@ from functools import partial
 from idmtools.builders import CsvExperimentBuilder
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
-from idmtools_test.utils.TestExperiment import TestExperiment
+from idmtools_test.utils.TstExperiment import TstExperiment
 
 
 def param_update(simulation, param, value):
@@ -44,7 +44,7 @@ class TestCsvBuilder(ITestWithPersistence):
 
         # expected_values = list(itertools.product(range(5), [1, 2, 3]))
 
-        experiment = TestExperiment("test")
+        experiment = TstExperiment("test")
         experiment.builder = self.builder
 
         simulations = list(experiment.batch_simulations(10))[0]

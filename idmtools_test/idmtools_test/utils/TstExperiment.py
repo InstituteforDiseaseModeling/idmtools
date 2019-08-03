@@ -5,7 +5,7 @@ from idmtools_test.utils.TestSimulation import TestSimulation
 
 
 @dataclass(repr=False)
-class TestExperiment(IExperiment):
+class TstExperiment(IExperiment):
     def __post_init__(self, simulation_type):
         super().__post_init__(simulation_type=TestSimulation)
 

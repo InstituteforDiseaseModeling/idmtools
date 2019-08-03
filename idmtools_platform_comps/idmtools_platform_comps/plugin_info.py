@@ -1,4 +1,4 @@
-from idmtools.core.plugin_manager import get_description_impl
+from idmtools.core.registry.PluginSpecification import get_description_impl
 from idmtools.entities import IPlatform
 from idmtools.entities.IPlatform import PlatformSpecification, example_configuration_impl, get_platform_impl
 from idmtools_platform_comps.COMPSPlatform import COMPSPlatform

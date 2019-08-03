@@ -3,7 +3,7 @@ from functools import partial
 
 from idmtools.builders.ArmExperimentBuilder import ArmExperimentBuilder, SweepArm, ArmType
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
-from idmtools_test.utils.TestExperiment import TestExperiment
+from idmtools_test.utils.TstExperiment import TstExperiment
 
 
 def param_update(simulation, param, value):
@@ -40,7 +40,7 @@ class TestArmBuilder(ITestWithPersistence):
 
         expected_values = list(itertools.product(range(5), [1, 2, 3]))
 
-        experiment = TestExperiment("test")
+        experiment = TstExperiment("test")
         experiment.builder = self.builder
 
         simulations = list(experiment.batch_simulations(20))[0]
@@ -59,7 +59,7 @@ class TestArmBuilder(ITestWithPersistence):
         arm.add_sweep_definition(setB, [1, 2, 3])
         self.builder.add_arm(arm)
 
-        experiment = TestExperiment("test")
+        experiment = TstExperiment("test")
         experiment.builder = self.builder
 
         simulations = list(experiment.batch_simulations(20))[0]
@@ -71,7 +71,7 @@ class TestArmBuilder(ITestWithPersistence):
         arm.add_sweep_definition(setA, range(5))
         builder2.add_arm(arm)
 
-        experiment2 = TestExperiment("test")
+        experiment2 = TstExperiment("test")
         experiment2.builder = self.builder
 
         simulations2 = list(experiment.batch_simulations(20))[0]
@@ -86,7 +86,7 @@ class TestArmBuilder(ITestWithPersistence):
 
         expected_values = list(zip(range(5), [1, 2, 3]))
 
-        experiment = TestExperiment("test")
+        experiment = TstExperiment("test")
         experiment.builder = self.builder
 
         simulations = list(experiment.batch_simulations(10))[0]

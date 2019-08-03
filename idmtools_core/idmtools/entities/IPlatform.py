@@ -7,7 +7,8 @@ import typing
 
 from idmtools.core import IEntity
 from idmtools.config import IdmConfigParser
-from idmtools.core.plugin_manager import PluginSpecification, PLUGIN_REFERENCE_NAME, plugins_loader
+from idmtools.core.registry.utils import plugins_loader
+from idmtools.core.registry.PluginSpecification import PLUGIN_REFERENCE_NAME, PluginSpecification
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TExperiment, TSimulation, TSimulationBatch
