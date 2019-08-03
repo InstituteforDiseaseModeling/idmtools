@@ -3,7 +3,8 @@ import os
 from typing import Optional
 
 from dataclasses import dataclass
-from idmtools.core import EntityStatus, TExperiment
+
+
 from idmtools.entities import IExperiment, IPlatform
 # we have to import brokers so that the proper configuration is achieved for redis
 from idmtools_platform_local.client.simulations_client import SimulationsClient
@@ -19,6 +20,7 @@ status_translate = dict(
 
 
 def local_status_to_common(status):
+    from idmtools.core import EntityStatus
     return EntityStatus[status_translate[status]]
 
 

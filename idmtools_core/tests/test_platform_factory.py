@@ -35,13 +35,13 @@ class TestPlatformFactory(ITestWithPersistence):
         self.assertEqual(p3.__class__.__name__, 'TestPlatform')
 
     def test_platform_factory(self):
-        platform1 = platform_factory.create('idmtools.platforms.COMPSPlatform')
+        platform1 = platform_factory.create('COMPS')
         self.assertEqual(platform1.__class__.__name__, 'COMPSPlatform')
 
-        platform2 = platform_factory.create('idmtools.platforms.LocalPlatform')
+        platform2 = platform_factory.create('Local')
         self.assertEqual(platform2.__class__.__name__, 'LocalPlatform')
 
-        platform3 = platform_factory.create('tests.utils.TestPlatform')
+        platform3 = platform_factory.create('Test')
         self.assertEqual(platform3.__class__.__name__, 'TestPlatform')
 
     def test_COMPSPlatform(self):
@@ -52,18 +52,18 @@ class TestPlatformFactory(ITestWithPersistence):
         keys = field_name.intersection(members.keys())
         kwargs = {key: members[key] for key in keys}
 
-        platform2 = platform_factory.create(platform.__class__.__module__, **kwargs)
+        platform2 = platform_factory.create('COMPS', **kwargs)
         self.assertEqual(platform, platform2)
 
     def test_LocalPlatform(self):
-        platform = platform_factory.create_from_block('LOCAL')
+        platform = platform_factory.create_from_block('Local2')
         members = platform.__dict__
 
         field_name = {f.name for f in fields(platform)}
         keys = field_name.intersection(members.keys())
         kwargs = {key: members[key] for key in keys}
 
-        platform2 = platform_factory.create(platform.__class__.__module__, **kwargs)
+        platform2 = platform_factory.create('Local', **kwargs)
         self.assertEqual(platform, platform2)
 
     def test_TestPlatform(self):

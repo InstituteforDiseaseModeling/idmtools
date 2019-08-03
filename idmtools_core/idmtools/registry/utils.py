@@ -1,11 +1,15 @@
 import functools
 import inspect
-from logging import DEBUG
+from logging import DEBUG, getLogger
 from typing import Type, List, Any, Set
 
 import pluggy
 
-from idmtools.core.registry.PluginSpecification import PluginSpecification, PLUGIN_REFERENCE_NAME, logger, list_rindex
+from idmtools.registry import PluginSpecification
+from idmtools.registry.PluginSpecification import PLUGIN_REFERENCE_NAME
+
+
+logger = getLogger(__name__)
 
 
 def is_a_plugin_of_type(value, plugin_specification: Type[PluginSpecification]) -> bool:

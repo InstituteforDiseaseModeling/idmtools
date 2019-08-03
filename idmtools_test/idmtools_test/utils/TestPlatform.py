@@ -116,5 +116,3 @@ class TestPlatform(IPlatform):
             return None
         return self.experiments[experiment_id]
 
-
-platform_factory.register_type(TestPlatform)

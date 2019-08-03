@@ -3,9 +3,9 @@ import typing
 import ast
 from dataclasses import fields
 
+from idmtools.registry.PlatformSpecification import PlatformPlugins
 
 if typing.TYPE_CHECKING:
-    from idmtools.core import TPlatformClass
     from idmtools.core.types import TPlatform
 
 
@@ -14,16 +14,7 @@ if typing.TYPE_CHECKING:
 class PlatformFactory:
 
     def __init__(self):
-        self._builders = {}
-
-    def register_type(self, platform_class: 'TPlatformClass'):
-        """
-        Register a platform to make it available for platform factory
-        Args:
-            platform_class: The definition of the platform class
-        Returns: None
-        """
-        self._builders[platform_class.__module__] = platform_class
+        self._platforms = PlatformPlugins().get_plugin_map()
 
     def create(self, key, **kwargs) -> 'TPlatform':
         """
@@ -33,16 +24,14 @@ class PlatformFactory:
             **kwargs: inputs for Platform constructor
         Returns: created Platform
         """
-        if key not in self._builders:
-            try:
-                # Try first to import it dynamically
-                import importlib
-                importlib.import_module(key)
-            except:  # noqa: E722
-                raise ValueError(f"The PlatformFactory could not create an platform of type {key}")
+        self._validate_platform_type(key)
+        builder = self._platforms.get(key)
+        return builder.get(kwargs)
 
-        builder = self._builders.get(key)
-        return builder(**kwargs)
+    def _validate_platform_type(self, name):
+        if name not in self._platforms:
+            raise ValueError(f"{name} is an unknown Platform Type."
+                             f"Supported platforms are {','.join(self._platforms.keys())}")
 
     def create_from_block(self, block):
         """
@@ -54,17 +43,11 @@ class PlatformFactory:
         from idmtools.config import IdmConfigParser
         section = IdmConfigParser.get_block(block)
         platform_type = section.pop('type')
-
-        if platform_type not in self._builders:
-            try:
-                # Try first to import it dynamically
-                import importlib
-                importlib.import_module(platform_type)
-            except:  # noqa: E722
-                raise ValueError(f"The PlatformFactory could not create an platform of type {platform_type}")
+        self._validate_platform_type(platform_type)
+        platform_spec = self._platforms.get(platform_type)
 
         # Update fields types
-        platform_cls = self._builders.get(platform_type)
+        platform_cls = platform_spec.get_type()
         fds = fields(platform_cls)
         field_type = {f.name: f.type for f in fds}
 

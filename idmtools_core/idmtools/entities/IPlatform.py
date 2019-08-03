@@ -1,14 +1,11 @@
 import uuid
-from abc import ABCMeta, abstractmethod, ABC
+from abc import ABCMeta, abstractmethod
 from dataclasses import fields
 
-import pluggy
 import typing
 
 from idmtools.core import IEntity
 from idmtools.config import IdmConfigParser
-from idmtools.core.registry.utils import plugins_loader
-from idmtools.core.registry.PluginSpecification import PLUGIN_REFERENCE_NAME, PluginSpecification
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TExperiment, TSimulation, TSimulationBatch
@@ -140,55 +137,3 @@ class IPlatform(IEntity, metaclass=ABCMeta):
                 setattr(self, fn, field_value[fn])
             elif field_config[fn] != field_value[fn]:
                 setattr(self, fn, field_config[fn])
-
-
-# Define our platform specific specifications
-example_configuration_spec = pluggy.HookspecMarker(PLUGIN_REFERENCE_NAME)
-get_platform_spec = pluggy.HookspecMarker(PLUGIN_REFERENCE_NAME)
-
-example_configuration_impl = pluggy.HookimplMarker(PLUGIN_REFERENCE_NAME)
-get_platform_impl = pluggy.HookimplMarker(PLUGIN_REFERENCE_NAME)
-
-
-class PlatformSpecification(PluginSpecification, ABC):
-
-    @classmethod
-    def get_name(cls) -> str:
-        return cls.__name__.replace('Platform', '').replace('Specification', '')
-
-    @staticmethod
-    @example_configuration_spec
-    def example_configuration():
-        """
-        Example configuration for platform. This is useful in help or error messages
-        Returns:
-
-        """
-        raise NotImplementedError("Plugin did not implement example_configuration")
-
-    @staticmethod
-    @get_platform_spec
-    def get(configuration: dict) -> IPlatform:
-        """
-        Factor that should return a new platform using the passed in configuration
-        Args:
-            configuration:
-
-        Returns:
-
-        """
-        raise NotImplementedError("Plugin did not implement get")
-
-
-class PlatformPlugins:
-    def __init__(self) -> None:
-        self._plugins = typing.cast(
-            typing.Set[PlatformSpecification],
-            plugins_loader('idmtools_platform', PlatformSpecification)
-        )
-
-    def get_plugins(self) -> typing.Set[PlatformSpecification]:
-        return self._plugins
-
-    def get_plugin_map(self) -> typing.Dict[str, PlatformSpecification]:
-        return {plugin.get_name(): plugin for plugin in self._plugins}

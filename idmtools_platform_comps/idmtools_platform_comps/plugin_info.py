@@ -1,6 +1,9 @@
-from idmtools.core.registry.PluginSpecification import get_description_impl
+from typing import Type
+
 from idmtools.entities import IPlatform
-from idmtools.entities.IPlatform import PlatformSpecification, example_configuration_impl, get_platform_impl
+from idmtools.registry.PlatformSpecification import PlatformSpecification, get_platform_impl, \
+    example_configuration_impl, get_platform_type_impl
+from idmtools.registry.PluginSpecification import get_description_impl
 from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
 
 COMPS_EXAMPLE_CONFIG = """
@@ -26,9 +29,14 @@ class COMPSSpecification(PlatformSpecification):
     @staticmethod
     @get_platform_impl
     def get(configuration: dict) -> IPlatform:
-        return COMPSPlatform()
+        return COMPSPlatform(**configuration)
 
     @staticmethod
     @example_configuration_impl
     def example_configuration():
         return COMPS_EXAMPLE_CONFIG
+
+    @staticmethod
+    @get_platform_type_impl
+    def get_type() -> Type[COMPSPlatform]:
+        return COMPSPlatform
