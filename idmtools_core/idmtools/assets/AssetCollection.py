@@ -2,7 +2,7 @@ import os
 import typing
 
 from idmtools.assets import Asset
-from idmtools.core.IEntity import IEntity
+from idmtools.core.interfaces.IEntity import IEntity
 from idmtools.utils.file import scan_directory
 from idmtools.utils.filters.asset_filters import default_asset_file_filter
 from idmtools.core import FilterMode, DuplicatedAssetError

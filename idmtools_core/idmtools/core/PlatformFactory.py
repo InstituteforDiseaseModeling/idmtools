@@ -3,13 +3,11 @@ import typing
 import ast
 from dataclasses import fields
 
-from idmtools.utils.decorators import SingletonDecorator, LoadOnCallSingletonDecorator
+from idmtools.utils.decorators import LoadOnCallSingletonDecorator
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TPlatform
 
-
-# TODO: Update to use plugin manager
 
 class PlatformFactory:
 
@@ -81,4 +79,4 @@ class PlatformFactory:
         return platform
 
 
-PlatformFactory = LoadOnCallSingletonDecorator(PlatformFactory)
+PlatformFactory = typing.cast(PlatformFactory, LoadOnCallSingletonDecorator(PlatformFactory))

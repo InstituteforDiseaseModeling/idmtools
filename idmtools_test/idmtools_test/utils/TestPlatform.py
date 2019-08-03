@@ -125,7 +125,7 @@ class TestPlatform(IPlatform):
         return self.experiments[experiment_id]
 
 
-LOCAL_PLATFORM_EXAMPLE_CONFIG = """
+TEST_PLATFORM_EXAMPLE_CONFIG = """
 [LOCAL]
 redis_image=redis:5.0.4-alpine
 redis_port=6379
@@ -157,7 +157,7 @@ class TestPlatformSpecification(PlatformSpecification):
 
     @example_configuration_impl
     def example_configuration(self):
-        return LOCAL_PLATFORM_EXAMPLE_CONFIG
+        return TEST_PLATFORM_EXAMPLE_CONFIG
 
     @get_platform_type_impl
     def get_type(self) -> Type[TestPlatform]:

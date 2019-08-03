@@ -3,7 +3,7 @@ import pickle
 import unittest
 from dataclasses import dataclass, field
 from idmtools.builders import ExperimentBuilder
-from idmtools.core import IEntity
+from idmtools.core.interfaces.IEntity import IEntity
 from idmtools.entities.Suite import Suite
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 from idmtools_test.utils.TstExperiment import TstExperiment

@@ -122,7 +122,7 @@ class IPlatform(IEntity, metaclass=ABCMeta):
         field_type = {f.name: f.type for f in fds}
 
         # find, load and get settings from config file. Return with the correct data types
-        field_config = IdmConfigParser.retrieve_settings(self.__class__.__name__, field_type)
+        field_config = IdmConfigParser.retrieve_settings(self.__class__.__name__.replace("Platform", ""), field_type)
 
         # display not used fields from config
         field_config_not_used = set(field_config.keys()) - set(field_name)
@@ -137,5 +137,3 @@ class IPlatform(IEntity, metaclass=ABCMeta):
                 setattr(self, fn, field_value[fn])
             elif field_config[fn] != field_value[fn]:
                 setattr(self, fn, field_config[fn])
-
-

@@ -47,7 +47,7 @@ class PlatformSpecification(PluginSpecification, ABC):
         raise NotImplementedError("Plugin did not implement get")
 
     @get_platform_type_spec
-    def get_type(self) -> 'Type[IPlatform]':
+    def get_type(self) -> typing.Type[IPlatform]:
         pass
 
 

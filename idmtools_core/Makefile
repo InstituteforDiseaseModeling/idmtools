@@ -14,13 +14,13 @@ clean: ## Clean all our jobs
 # Dev and test related rules
 
 lint: ## check style with flake8
-	flake8 --ignore=E501 idmtools tests
+	@+python -c "import os; os.chdir('..'); os.system('flake8 --ignore=E501 idmtools_core')"
 
 test: ## Run our tests
-	@+python -c "import os, sys; sys.path.append(os.getcwd()); os.system('py.test -p no:warnings')"
+	@+python -c "import os; os.chdir('tests'); os.system('py.test -p no:warnings')"
 
 coverage: ## Generate a code-coverage report
-	coverage run --source idmtools -m pytest
+	@+python -c "import os; os.chdir('tests'); os.system('coverage run --source idmtools -m pytest')"
 	coverage report -m
 	coverage html
 	python ../dev_scripts/launch_dir_in_browser.py htmlcov/index.html
