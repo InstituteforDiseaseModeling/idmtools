@@ -22,9 +22,8 @@ class PluginSpecification:
         """
         return cls.__name__
 
-    @staticmethod
     @get_description_spec
-    def get_description() -> str:
+    def get_description(self) -> str:
         """
         A brief description of the plugin and its functionality
 

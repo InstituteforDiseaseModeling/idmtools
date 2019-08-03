@@ -141,11 +141,11 @@ class IdmConfigParser:
         """
         cls.ensure_init()
         if cls._config is None:
-            raise Exception(f"Config file NOT FOUND or IS Empty!")
+            raise ValueError(f"Config file NOT FOUND or IS Empty!")
 
         section_dict = dict(cls._config.items())
         if block_name not in section_dict:
-            raise Exception(f"Block '{block_name}' doesn't exist!")
+            raise ValueError(f"Block '{block_name}' doesn't exist!")
 
         section = cls._config.items(block_name)
         return dict(section)

@@ -46,7 +46,7 @@ class LocalPlatform(IPlatform):
             # extract configuration details for the docker manager
             local_docker_options = [f.name for f in dataclasses.fields(LocalDockerManager)]
             opts = {k: v for k, v in self.__dict__.items() if k in local_docker_options}
-            self.docker_manager = LocalDockerManager(**opts)
+            #self.docker_manager = LocalDockerManager(**opts)
 
     """
     Represents the platform allowing to run simulations locally.

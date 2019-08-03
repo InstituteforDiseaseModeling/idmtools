@@ -1,15 +1,22 @@
 import uuid
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta, abstractmethod, ABC
 from dataclasses import fields
 
 import typing
+from logging import getLogger
 
-from idmtools.core import IEntity
+import pluggy
+
+
 from idmtools.config import IdmConfigParser
+from idmtools.core.interfaces.IEntity import IEntity
+from idmtools.registry import PluginSpecification
+from idmtools.registry.PluginSpecification import PLUGIN_REFERENCE_NAME
+from idmtools.registry.utils import load_plugin_map
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TExperiment, TSimulation, TSimulationBatch
-    from typing import List, Dict, Any
+    from typing import List, Dict, Any, Type, cast, Set, Type
 
 
 class IPlatform(IEntity, metaclass=ABCMeta):
@@ -137,3 +144,56 @@ class IPlatform(IEntity, metaclass=ABCMeta):
                 setattr(self, fn, field_value[fn])
             elif field_config[fn] != field_value[fn]:
                 setattr(self, fn, field_config[fn])
+
+
+example_configuration_spec = pluggy.HookspecMarker(PLUGIN_REFERENCE_NAME)
+get_platform_spec = pluggy.HookspecMarker(PLUGIN_REFERENCE_NAME)
+get_platform_type_spec = pluggy.HookspecMarker(PLUGIN_REFERENCE_NAME)
+example_configuration_impl = pluggy.HookimplMarker(PLUGIN_REFERENCE_NAME)
+get_platform_impl = pluggy.HookimplMarker(PLUGIN_REFERENCE_NAME)
+get_platform_type_impl = pluggy.HookimplMarker(PLUGIN_REFERENCE_NAME)
+logger = getLogger(__name__)
+
+
+class PlatformSpecification(PluginSpecification, ABC):
+
+    @classmethod
+    def get_name(cls) -> str:
+        return cls.__name__.replace('Platform', '').replace('Specification', '')
+
+    @example_configuration_spec
+    def example_configuration(self):
+        """
+        Example configuration for platform. This is useful in help or error messages
+        Returns:
+
+        """
+        raise NotImplementedError("Plugin did not implement example_configuration")
+
+    @get_platform_spec
+    def get(self, configuration: dict) -> IPlatform:
+        """
+        Factor that should return a new platform using the passed in configuration
+        Args:
+            configuration:
+
+        Returns:
+
+        """
+        raise NotImplementedError("Plugin did not implement get")
+
+    @get_platform_type_spec
+    def get_type(self) -> 'Type[IPlatform]':
+        pass
+
+
+class PlatformPlugins:
+    def __init__(self) -> None:
+        self._plugins = typing.cast(typing.Dict[str, PlatformSpecification],
+                                    load_plugin_map('idmtools_platform', PlatformSpecification))
+
+    def get_plugins(self) -> typing.Set[PlatformSpecification]:
+        return set(self._plugins.values())
+
+    def get_plugin_map(self) -> typing.Dict[str, PlatformSpecification]:
+        return self._plugins

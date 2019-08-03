@@ -1,8 +1,9 @@
+from logging import getLogger
 from typing import Type
 
 from idmtools.entities import IPlatform
-from idmtools.registry.PlatformSpecification import PlatformSpecification, get_platform_impl, \
-    example_configuration_impl, get_platform_type_impl
+from idmtools.entities.IPlatform import example_configuration_impl, get_platform_impl, get_platform_type_impl, \
+    PlatformSpecification
 from idmtools.registry.PluginSpecification import get_description_impl
 from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
 
@@ -18,25 +19,26 @@ num_cores = 1
 exclusive = False
 """
 
+logger = getLogger(__name__)
+
 
 class COMPSSpecification(PlatformSpecification):
 
-    @staticmethod
+    def __init__(self):
+        logger.debug("Initializing COMPS Specification")
+
     @get_description_impl
-    def get_description() -> str:
+    def get_description(self) -> str:
         return "Provides access to the COMPS Platform to IDM-Tools"
 
-    @staticmethod
     @get_platform_impl
-    def get(configuration: dict) -> IPlatform:
+    def get(self, configuration: dict) -> IPlatform:
         return COMPSPlatform(**configuration)
 
-    @staticmethod
     @example_configuration_impl
-    def example_configuration():
+    def example_configuration(self):
         return COMPS_EXAMPLE_CONFIG
 
-    @staticmethod
     @get_platform_type_impl
-    def get_type() -> Type[COMPSPlatform]:
+    def get_type(self) -> Type[COMPSPlatform]:
         return COMPSPlatform

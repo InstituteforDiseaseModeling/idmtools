@@ -3,7 +3,7 @@ import typing
 import ast
 from dataclasses import fields
 
-from idmtools.registry.PlatformSpecification import PlatformPlugins
+from idmtools.utils.decorators import SingletonDecorator, LoadOnCallSingletonDecorator
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TPlatform
@@ -14,6 +14,7 @@ if typing.TYPE_CHECKING:
 class PlatformFactory:
 
     def __init__(self):
+        from idmtools.entities.IPlatform import PlatformPlugins
         self._platforms = PlatformPlugins().get_plugin_map()
 
     def create(self, key, **kwargs) -> 'TPlatform':
@@ -80,4 +81,4 @@ class PlatformFactory:
         return platform
 
 
-platform_factory = PlatformFactory()
+PlatformFactory = LoadOnCallSingletonDecorator(PlatformFactory)

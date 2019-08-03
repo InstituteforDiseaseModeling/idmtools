@@ -1,7 +1,7 @@
 from typing import Type
 
-from idmtools.registry.PlatformSpecification import PlatformSpecification, get_platform_impl, \
-    example_configuration_impl, get_platform_type_impl
+from idmtools.entities.IPlatform import example_configuration_impl, get_platform_impl, get_platform_type_impl, \
+    PlatformSpecification
 from idmtools.registry.PluginSpecification import get_description_impl
 
 
@@ -20,14 +20,12 @@ workers_ui_port: int = 5000
 
 class LocalPlatformSpecification(PlatformSpecification):
 
-    @staticmethod
     @get_description_impl
-    def get_description() -> str:
+    def get_description(self) -> str:
         return "Provides access to the Local Platform to IDM Tools"
 
-    @staticmethod
     @get_platform_impl
-    def get(configuration: dict) -> IPlatform:
+    def get(self, configuration: dict) -> IPlatform:
         """
         Build our local platform from the passed in configuration object
 
@@ -41,13 +39,11 @@ class LocalPlatformSpecification(PlatformSpecification):
         from idmtools_platform_local.local_platform import LocalPlatform
         return LocalPlatform()
 
-    @staticmethod
     @example_configuration_impl
-    def example_configuration():
+    def example_configuration(self):
         return LOCAL_PLATFORM_EXAMPLE_CONFIG
 
-    @staticmethod
     @get_platform_type_impl
-    def get_type() -> Type['LocalPlatform']:
+    def get_type(self) -> Type['LocalPlatform']:
         from idmtools_platform_local.local_platform import LocalPlatform
         return LocalPlatform

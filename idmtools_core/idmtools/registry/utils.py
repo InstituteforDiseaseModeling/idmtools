@@ -1,7 +1,7 @@
 import functools
 import inspect
 from logging import DEBUG, getLogger
-from typing import Type, List, Any, Set
+from typing import Type, List, Any, Set, Dict
 
 import pluggy
 
@@ -25,6 +25,27 @@ def is_a_plugin_of_type(value, plugin_specification: Type[PluginSpecification]) 
     """
     return inspect.isclass(value) and issubclass(value, plugin_specification) \
         and not inspect.isabstract(value) and value is not plugin_specification
+
+
+def load_plugin_map(entrypoint: str, spec_type: Type[PluginSpecification]) -> Dict[str, Type[PluginSpecification]]:
+    """
+    Loads plugins from entrypoint with type of spec into a map. This could cause name collisions
+
+    if plugins of the same name are installed
+    Args:
+        entrypoint: Name of entryrpoint
+        spec_type: Type of plugin spec
+
+    Returns:
+        (Dict[str, Type[PluginSpecification]]): Returns a dict of name -> PluginSpecification
+    """
+    plugins = plugins_loader(entrypoint, spec_type)
+    # create instances of the plugins
+    _plugin_map = dict()
+    for plugin in plugins:
+        logger.debug("Loading {str(plugin)} as {plugin.get_name()}")
+        _plugin_map[plugin.get_name()] = plugin()
+    return _plugin_map
 
 
 def plugins_loader(entry_points_name: str, plugin_specification: Type[PluginSpecification]) -> Set[PluginSpecification]:
