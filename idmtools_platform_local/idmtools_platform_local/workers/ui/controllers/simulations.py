@@ -30,7 +30,7 @@ def sim_status(id: Optional[str], experiment_id: Optional[str], status: Optional
     """
     session = get_session()
     # Simulations ALWAYS have a parent
-    criteria = [JobStatus.parent_uuid is not None]
+    criteria = [JobStatus.parent_uuid != None]
 
     # start building our filter criteria
     if id is not None:
@@ -77,7 +77,13 @@ class Simulations(Resource):
 
         validate_tags(args['tags'])
 
-        return sim_status(**args).to_dict(orient='records')
+        result = sim_status(**args).to_dict(orient='records')
+
+        if id:
+            if not result:
+                abort(404, message=f"Could not find simulation with id {id}")
+            return result[0]
+        return result
 
     def put(self, id):
         data = request.json()

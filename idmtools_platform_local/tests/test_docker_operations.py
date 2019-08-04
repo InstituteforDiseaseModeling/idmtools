@@ -59,7 +59,7 @@ class TestDockerOperations(unittest.TestCase):
             self.assertEqual(0, os.system('docker exec idmtools_workers python /tmp/hello_world.py'))
             print(std_capture.getvalue())
 
-        #dm.stop_services()
+        dm.stop_services()
 
     def test_port_taken(self):
         self.fail()
