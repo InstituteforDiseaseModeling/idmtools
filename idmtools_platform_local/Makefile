@@ -33,7 +33,16 @@ docker-local: ## Build our docker image using the local pypi
 	# ensure pypi local is up
 	@+$(IPY) "import os; os.chdir('../dev_scripts/local_pypi'); os.system('docker-compose up -d')"
 	@+$(IPY) "import os; os.chdir('../'); os.system('pymake release-local')"
+
 	docker-compose build --build-arg PYPIURL=http://172.17.0.1:7171/ --build-arg PYPIHOST=172.17.0.1 workers
+
+docker-staging: ## Build our docker image using staging pypi
+	@+$(IPY) "import os; os.environ['REGISTRY'] = 'idm-docker-staging.packages.idmod.org'; \
+		os.system(f'docker-compose build --build-arg PYPIURL=https://packages.idmod.org/api/pypi/pypi-staging/simple workers')"
+
+docker-release-staging:
+	@make docker-staging
+	docker-compose push workers
 
 coverage: ## Generate a code-coverage report
 	@make clean
@@ -62,6 +71,7 @@ release-staging: ## perform a release to staging
 	bump2version --config-file .bumpversion.nightly.cfg build --allow-dirty
 	@make dist
 	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/pypi-staging/simple dist/*
+	@make docker-release-staging
 
 # Use before release-staging-minor-commit to confirm next version.
 release-staging-minor-dry-run: ## perform a release to staging and bump the minor version.
@@ -72,3 +82,4 @@ release-staging-minor-commit: ## perform a release to staging and commit the ver
 	bump2version minor --commit
 	@make dist
 	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/pypi-staging/simple dist/*
+	@make docker-release-staging

@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from idmtools.entities import IExperiment, IPlatform
 # we have to import brokers so that the proper configuration is achieved for redis
 from idmtools_platform_local.client.simulations_client import SimulationsClient
-from idmtools_platform_local.local_docker_manager import LocalDockerManager
+from idmtools_platform_local.docker import DockerOperations
 
 status_translate = dict(
     created='CREATED',
@@ -39,14 +39,15 @@ class LocalPlatform(IPlatform):
     postgres_port: Optional[str] = 5432
     workers_image: str = 'idm-docker-production.packages.idmod.org:latest'
     workers_ui_port: int = 5000
-    docker_manager: Optional[LocalDockerManager] = None
+    docker_operations: Optional[DockerOperations] = None
 
     def __post_init__(self):
-        if self.docker_manager is None:
+        if self.docker_operations is None:
             # extract configuration details for the docker manager
-            local_docker_options = [f.name for f in dataclasses.fields(LocalDockerManager)]
+            local_docker_options = [f.name for f in dataclasses.fields(DockerOperations)]
             opts = {k: v for k, v in self.__dict__.items() if k in local_docker_options}
-            # self.docker_manager = LocalDockerManager(**opts)
+            # self.docker_operations = DockerOperations(**opts)
+            # self.docker_operations.create_services()
 
     """
     Represents the platform allowing to run simulations locally.
@@ -90,13 +91,13 @@ class LocalPlatform(IPlatform):
         # Go through all the assets
         for asset in experiment.assets:
             path = os.path.join("/data", experiment.uid, "Assets", asset.filename)
-            self.docker_manager.copy_to_container(self.docker_manager.get_workers(), path)
+            self.docker_operations.copy_to_container(self.docker_operations.get_workers(), path)
 
     def send_assets_for_simulation(self, simulation):
         # Go through all the assets
         for asset in simulation.assets:
             path = os.path.join("/data", simulation.experiment.uid, simulation.uid, asset.filename)
-            self.docker_manager.copy_to_container(self.docker_manager.get_workers(), path)
+            self.docker_operations.copy_to_container(self.docker_operations.get_workers(), path)
 
     def create_simulations(self, simulations_batch):
         from idmtools_platform_local.tasks.create_simulation import CreateSimulationTask
