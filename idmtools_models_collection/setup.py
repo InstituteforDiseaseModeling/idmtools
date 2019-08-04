@@ -16,7 +16,6 @@ setup_requirements = []
 test_requirements = ['pytest', 'pytest-runner'] + build_requirements
 
 extras = dict(test=test_requirements, packaging=build_requirements)
-extras['3.6'] = ['dataclasses']
 
 authors = [
     ("Sharon Chen", "'schen@idmod.org"),
@@ -46,6 +45,6 @@ setup(
     test_suite='tests',
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='0.1.0-nightly',
+    version='0.1.0+nightly',
     zip_safe=False,
 )

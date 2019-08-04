@@ -11,6 +11,6 @@ services:
     restart: always
     volumes:
         - .htpasswd:/data/auth/.htpasswd
-    command: -P /data/auth/.htpasswd -o -a update,download,list /data/packages
+    command: -P /data/auth/.htpasswd -o -a update /data/packages
     ports:
       - 7171:8080

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """The setup script."""
+import sys
 
 from setuptools import setup, find_packages
 
@@ -19,7 +20,11 @@ extras = dict(test=test_requirements, dev=['Pympler'],
               workers=['pandas~=0.24.2', 'sqlalchemy~=1.3.5', 'psycopg2-binary~=2.8.3'],
               # these are only needed when not running UI
               ui=['flask~=1.0.3', 'Flask-AutoIndex~=0.6.4', 'flask_restful~=0.3.7'])
-extras['3.6'] = ['dataclasses']
+
+# check for python 3.6
+if sys.version_info[1] == 6:
+    requirements.append('dataclasses')
+
 authors = [
     ("Sharon Chen", "'schen@idmod.org"),
     ("Clinton Collins", 'ccollins@idmod.org'),
@@ -51,6 +56,6 @@ setup(
     test_suite='tests',
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='0.1.0-nightly',
+    version='0.1.0+nightly',
     zip_safe=False,
 )

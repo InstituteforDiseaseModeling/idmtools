@@ -16,8 +16,7 @@ coverage: ## Generate a code-coverage report
 	python dev_scripts/run_pymake_on_all.py coverage
 
 release-local: ## package and upload a release to http://localhost:7171
-	@make dist
-	twine upload --verbose --repository-url http://localhost:7171 -u admin -p admin dist/*
+	python dev_scripts/run_pymake_on_all.py release-local
 
 dist: ## build our package
 	python dev_scripts/run_pymake_on_all.py dist

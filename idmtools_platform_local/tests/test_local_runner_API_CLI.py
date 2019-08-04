@@ -1,3 +1,6 @@
+# flake8: noqa E402
+from idmtools_test.utils.confg_local_runner_test import config_local_test
+local_path = config_local_test()
 import os
 import re
 import subprocess
@@ -15,6 +18,7 @@ from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.decorators import docker_test
 
 
+@docker_test
 class TestLocalRunnerCLI(ITestWithPersistence):
 
     @classmethod

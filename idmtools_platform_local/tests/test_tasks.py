@@ -1,8 +1,8 @@
 # flake8: noqa E402
-from idmtools_platform_local.status import Status
-from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.confg_local_runner_test import config_local_test
 local_path = config_local_test()
+from idmtools_platform_local.status import Status
+from idmtools_test import COMMON_INPUT_PATH
 import os
 import shutil
 
@@ -49,7 +49,7 @@ class TestTasks(TestCase):
         # Check for simulation id
         self.assertTrue(os.path.exists(os.path.join(local_path, "data", exp_id, new_simulation_id)))
 
-    def test_create_task(self):
+    def test_run_task(self):
         """
 
         Returns:

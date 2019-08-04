@@ -18,6 +18,23 @@ lint: ## check style with flake8
 test: ## Run our tests
 	@+$(IPY) "import os; os.chdir('tests'); os.system('py.test -p no:warnings')"
 
+test-docker: ## Run our  docker tests as well
+	@+$(IPY) "import os; os.environ['DOCKER_TESTS'] = '1'; os.chdir('tests'); os.system('py.test -p no:warnings')"
+
+
+docker-cleanup:
+	docker stop  idmtools_workers idmtools_postgres idmtools_redis
+	docker rm  idmtools_workers idmtools_postgres idmtools_redis
+
+docker-local: ## Build our docker image using the local pypi
+	# This job is most useful when actively developing changes to the local_platform internals(tasks, api, cli) or
+	# upstream changes that effect those areas(models and core). Otherwise, installing from latest in the nightly
+	# should suffice for development
+	# ensure pypi local is up
+	@+$(IPY) "import os; os.chdir('../dev_scripts/local_pypi'); os.system('docker-compose up -d')"
+	@+$(IPY) "import os; os.chdir('../'); os.system('pymake release-local')"
+	docker-compose build --build-arg PYPIURL=http://172.17.0.1:7171/ --build-arg PYPIHOST=172.17.0.1 workers
+
 coverage: ## Generate a code-coverage report
 	@make clean
 	# We have to run in our tests folder to use the proper config

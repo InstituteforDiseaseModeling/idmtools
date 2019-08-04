@@ -1,5 +1,4 @@
 FROM python:3.7.4
-
 ARG S6_VERSION
 ENV S6_VERSION=${S6_VERSION:-v1.21.7.0} \
     S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
@@ -51,14 +50,15 @@ ENV PYTHONPATH=/app:${PYTHONPATH}
 #TODO: Move the actual package to artifactory and install from there. It would simpify the environmetn quite a bit
 
 # make it where we can specifiy our dependent packages at build time
-ARG IDM_PYPI='https://packages.idmod.org/api/pypi/pypi-production/simple'
-
+ARG PYPIURL=https://packages.idmod.org/api/pypi/pypi-production/simple
+ARG PYPIHOST=packages.idmod.org
+RUN echo ${PYPIURL}
 COPY README.md setup.py requirements.txt /tmp/
 # Run the setup instal before copying rest of package. This will increase cache hits during docker builds
 # as we will only rebuild if any of the docker_scripts, setup.py, readme.md, and requirements.txt change
 # which should happen infrequently(or less so than library code)
-RUN cd /tmp && pip install -e .[workers,ui]
-ADD idmtools_platform_local /tmp/idmtools_local
+RUN cd /tmp && pip install -r requirements.txt --extra-index-url=${PYPIURL} --trusted-host ${PYPIHOST}
+ADD idmtools_platform_local /tmp/idmtools_platform_local
 # We install the package directly here so the source is within the final image
 # This will allow users later to download the image without needing to build it
 # Also we specially use the internal pypy for ALL packages to take advantage of package caching
@@ -66,7 +66,7 @@ ADD idmtools_platform_local /tmp/idmtools_local
 RUN cd /tmp && \
     # we need install the full version of local_runner as it is both a Client and Server package
     # to do this, we specify we want the workers and the UI
-    pip install .[workers,ui] --index-url=$IDM_PYPI && \
+    pip install .[workers,ui] --extra-index-url=$PYPIURL --trusted-host ${PYPIHOST} && \
     # cleanup pip cache and tmp
     rm -rf /root/.cache && \
     rm -rf /tmp/*

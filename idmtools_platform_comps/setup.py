@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """The setup script."""
+import sys
 
 from setuptools import setup, find_packages
 
@@ -16,7 +17,11 @@ build_requirements = ['flake8', 'coverage', 'py-make', 'bump2version', 'twine']
 test_requirements = ['pytest', 'pytest-runner'] + build_requirements
 
 extras = dict(test=test_requirements, dev=['Pympler'], packaging=build_requirements)
-extras['3.6'] = ['dataclasses']
+
+# check for python 3.6
+if sys.version_info[1] == 6:
+    requirements.append('dataclasses')
+
 authors = [
     ("Sharon Chen", "'schen@idmod.org"),
     ("Clinton Collins", 'ccollins@idmod.org'),
@@ -48,6 +53,6 @@ setup(
                       ),
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='0.1.0-nightly',
+    version='0.1.0+nightly',
     zip_safe=False,
 )

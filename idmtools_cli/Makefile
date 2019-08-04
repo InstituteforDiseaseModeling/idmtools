@@ -29,7 +29,7 @@ release-local: ## package and upload a release to http://localhost:7171
 
 dist: ## build our package
 	@make clean
-	python setup.py sdist
+	python setup.py sdist bdist
 
 release-staging: ## perform a release to staging
 	bump2version --config-file .bumpversion.nightly.cfg build --allow-dirty

@@ -44,12 +44,12 @@ setup(
     include_package_data=True,
     keywords='modeling, IDM, cli',
     name='idm_tools_cli',
-    packages=find_packages(),
+    packages=find_packages(exclude=["tests"]),
     setup_requires=setup_requirements,
     test_suite='tests',
     entry_points={"console_scripts": ["idmtools=idmtools_cli.main:main"]},
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='0.1.0-nightly',
+    version='0.1.0+nightly',
     zip_safe=False
 )

@@ -9,7 +9,7 @@ comps_test = unittest.skipIf(
 )
 
 docker_test = unittest.skipIf(
-    os.environ.get('DOCKER_TESTS', False), 'No Docker testing'
+    not os.environ.get('DOCKER_TESTS', False), 'No Docker testing'
 )
 
 

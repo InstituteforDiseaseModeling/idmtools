@@ -32,7 +32,7 @@ class SystemInformation:
 
 @dataclass
 class LinuxSystemInformation(SystemInformation):
-    user_id: str = field(default_factory=lambda: f'{os.getuid()}:{os.getgid()}')
+    user_group_str: str = field(default_factory=lambda: f'{os.getuid()}:{os.getgid()}')
 
 
 class WindowsSystemInformation(SystemInformation):
