@@ -6,6 +6,7 @@ from dramatiq import GenericActor
 from idmtools_platform_local.config import DATA_PATH
 
 logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG)
 
 
 class CreateExperimentTask(GenericActor):
