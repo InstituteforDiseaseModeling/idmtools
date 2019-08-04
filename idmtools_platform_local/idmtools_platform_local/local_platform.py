@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from idmtools.entities import IExperiment, IPlatform
 # we have to import brokers so that the proper configuration is achieved for redis
 from idmtools_platform_local.client.simulations_client import SimulationsClient
-from idmtools_platform_local.docker import DockerOperations
+from idmtools_platform_local.docker.DockerOperations import DockerOperations
 
 status_translate = dict(
     created='CREATED',

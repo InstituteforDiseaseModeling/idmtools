@@ -16,7 +16,10 @@ lint: ## check style with flake8
 	@+$(IPY) "import os; os.chdir('..'); os.system('flake8 --ignore=E501 idmtools_platform_local')"
 
 test: ## Run our tests
-	@+$(IPY) "import os; os.chdir('tests'); os.system('py.test -p no:warnings')"
+	@+$(IPY) "import os; os.environ['SQLALCHEMY_DATABASE_URI']='sqlite://'; \
+		os.environ['UNIT_TESTS']='1'; \
+		os.environ['DATA_PATH'] = os.path.join(os.getcwd(), 'test_data'); \
+		os.chdir('tests'); os.system('py.test -p no:warnings')"
 
 test-docker: ## Run our  docker tests as well
 	@+$(IPY) "import os; os.environ['DOCKER_TESTS'] = '1'; os.chdir('tests'); os.system('py.test -p no:warnings')"

@@ -25,7 +25,7 @@ def experiment_filter(id: Optional[str], tags: Optional[List[Tuple[str, str]]]) 
     """
     session = get_session()
     # experiments don't have parents
-    criteria = [JobStatus.parent_uuid is None]
+    criteria = [JobStatus.parent_uuid == None]
 
     # start builder our optional criteria
     if id is not None:
@@ -43,31 +43,34 @@ def experiment_filter(id: Optional[str], tags: Optional[List[Tuple[str, str]]]) 
     # this will fetch the overall progress of the simulations(sub jobs) for the experiments
     subjob_status_query = session.query(JobStatus.parent_uuid, JobStatus.status,
                                         func.count(JobStatus.status).label("total")) \
-        .filter(JobStatus.parent_uuid is not None).group_by(JobStatus.parent_uuid, JobStatus.status)
+        .filter(JobStatus.parent_uuid != None).group_by(JobStatus.parent_uuid, JobStatus.status)
 
     sdf = pd.read_sql(subjob_status_query.statement, subjob_status_query.session.bind, index_col=['parent_uuid'])
 
     # There may be a better way to do this merge of data. For now the loop works
     # basically we are building the progress bar for each experiment based on the simulation statuses
-    status_bars = []
-    for job in df['uuid']:
+    df['progress'] = ''
+    for index, row in df.iterrows():
+        job = row['uuid']
+        status_bars = []
         job_status = dict()
-        job_list = sdf.loc[job]
-        # since we index by parent_uuid, if could have multiple rows. This is the general case(most experiments will
-        # have simulations is different statuses at some point) so we convert any results that are a single row
-        # from their series form to the transposed dataframe that we get in the general case
-        if type(job_list) is pd.Series:
-            job_list = job_list.to_frame().transpose()
-        # now build our status object
-        for idx, row in job_list.iterrows():
-            job_status[str(row['status'])] = int(row['total'])
-        # and make a pretty progress bar
+        if job in sdf.index.values:
+            job_list = sdf.loc[job]
+            # since we index by parent_uuid, if could have multiple rows. This is the general case(most experiments will
+            # have simulations is different statuses at some point) so we convert any results that are a single row
+            # from their series form to the transposed dataframe that we get in the general case
+            if type(job_list) is pd.Series:
+                job_list = job_list.to_frame().transpose()
+            # now build our status object
+            for sidx, srow in job_list.iterrows():
+                job_status[str(srow['status'])] = int(srow['total'])
+            # and make a pretty progress bar
 
-        status_bars.append(job_status)
-        # status_bars.append(parent_status_to_progress(job_status))
-    df.insert(1, 'progress', status_bars)
+            status_bars.append(job_status)
+            # status_bars.append(parent_status_to_progress(job_status))
+        row['progress'] = status_bars
     df['data_path'] = df['data_path'].apply(lambda x: x.replace(DATA_PATH, '/data'))
-    # df['data_path'] = df['data_path'].apply(urlize_data_path)
+        # df['data_path'] = df['data_path'].apply(urlize_data_path)
 
     # we don't need status or parent_uuid or status(now that we have progress bars) for experiments. Let's drop those
     df.drop(columns=['parent_uuid', 'status'], inplace=True)
@@ -93,7 +96,12 @@ class Experiments(Resource):
 
         validate_tags(args['tags'])
 
-        return experiment_filter(**args).to_dict(orient='records')
+        result = experiment_filter(**args).to_dict(orient='records')
+        if id:
+            if not result:
+                abort(404, message=f"Could not find experiment with id {id}")
+            return result[0]
+        return result
 
     def delete(self, id):
         args = delete_args.parse_args()

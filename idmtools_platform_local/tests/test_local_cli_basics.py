@@ -1,5 +1,7 @@
+# flake8: noqa E402
+from idmtools_test.utils.confg_local_runner_test import config_local_test
+local_path = config_local_test()
 import unittest
-
 from idmtools_test.utils.cli import get_subcommands_from_help_result, run_command
 
 

@@ -1,14 +1,11 @@
 import os
 import platform
-import sys
 import tarfile
 import time
 from dataclasses import dataclass
 from io import BytesIO
 from logging import getLogger
 from typing import Optional, Union
-
-import typing
 
 import docker
 from docker.models.containers import Container
@@ -92,7 +89,7 @@ class DockerOperations:
             docker_socket: dict(bind='/var/run/docker.sock', mode='rw')
         }
         environment = ['REDIS_URL=redis://redis:6379']
-        if self.system_info.user_group_str:
+        if platform.system() in ["Linux", "Darwin"]:
             environment.append(f'CURRENT_UID={self.system_info.user_group_str}')
         port_bindings = self._get_optional_port_bindings(self.workers_ui_port, 5000)
         container_config = dict(name='idmtools_workers', hostname='idmtools',

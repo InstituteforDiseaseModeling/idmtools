@@ -1,5 +1,8 @@
-from operator import itemgetter
+# flake8: noqa E402
+from idmtools_test.utils.confg_local_runner_test import config_local_test
+local_path = config_local_test()
 
+from operator import itemgetter
 from idmtools.assets import AssetCollection
 from idmtools.builders import ExperimentBuilder
 from idmtools.core import EntityStatus

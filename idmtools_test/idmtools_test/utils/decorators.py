@@ -1,4 +1,5 @@
 import os
+import platform
 import time
 import unittest
 from functools import wraps
@@ -10,6 +11,10 @@ comps_test = unittest.skipIf(
 
 docker_test = unittest.skipIf(
     not os.environ.get('DOCKER_TESTS', False), 'No Docker testing'
+)
+
+linux_only = unittest.skipIf(
+    not platform.system() in ["Linux", "Darwin"], 'No Tests that are meant for linux'
 )
 
 

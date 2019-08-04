@@ -4,8 +4,8 @@ from abc import ABC, abstractmethod
 from typing import NoReturn, Dict, Set, cast, Optional, List, Tuple
 import pluggy
 
-from idmtools.core.registry.utils import plugins_loader
-from idmtools.core.registry.PluginSpecification import PLUGIN_REFERENCE_NAME, PluginSpecification
+from idmtools.registry.PluginSpecification import PLUGIN_REFERENCE_NAME, PluginSpecification
+from idmtools.registry.utils import plugins_loader
 
 get_platform_cli_spec = pluggy.HookspecMarker(PLUGIN_REFERENCE_NAME)
 get_additional_commands = pluggy.HookspecMarker(PLUGIN_REFERENCE_NAME)

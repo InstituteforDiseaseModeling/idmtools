@@ -1,15 +1,16 @@
+# flake8: noqa E402
+from idmtools_test.utils.confg_local_runner_test import config_local_test
+local_path = config_local_test()
 import io
 import os
 import socket
 import unittest.mock
-from unittest import TestCase
 
-
-#@docker_test
 from idmtools_platform_local.docker.DockerOperations import DockerOperations
 from idmtools_test import COMMON_INPUT_PATH
+from idmtools_test.utils.decorators import docker_test
 
-LDM_PATH='idmtools_platform_local.docker.DockerOperations.DockerOperations'
+LDM_PATH = 'idmtools_platform_local.docker.DockerOperations.DockerOperations'
 
 
 def check_port_is_open(port):
@@ -19,6 +20,7 @@ def check_port_is_open(port):
     return result == 0
 
 
+@docker_test
 class TestDockerOperations(unittest.TestCase):
 
     def test_create_redis_starts(self):
