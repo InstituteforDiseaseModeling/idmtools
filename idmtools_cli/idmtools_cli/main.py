@@ -6,7 +6,6 @@ from idmtools_cli.IPlatformCli import PlatformCLIPlugins
 from idmtools_cli.cli import cli
 
 
-
 def main() -> NoReturn:
     """
     This is our main run function for the CLI. It basically calls start(load cli including the plugins) and then

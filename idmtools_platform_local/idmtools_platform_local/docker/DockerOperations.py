@@ -93,7 +93,7 @@ class DockerOperations:
         if not network:
             logger.debug(f'Creating network {self.network}')
             network = self.client.networks.create(self.network, driver='bridge', internal=False,
-                                                          attachable=False, ingress=False, scope='local')
+                                                  attachable=False, ingress=False, scope='local')
         else:
             network = network[0]
         return network

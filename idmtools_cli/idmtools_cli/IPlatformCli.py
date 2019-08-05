@@ -74,7 +74,7 @@ class PlatformCLISpecification(PluginSpecification, ABC):
 class PlatformCLIPlugins:
     def __init__(self) -> None:
         self._plugins = cast(Dict[str, PlatformCLISpecification],
-                                    load_plugin_map('idmtools_platform_cli', PlatformCLISpecification))
+                             load_plugin_map('idmtools_platform_cli', PlatformCLISpecification))
 
     def get_plugins(self) -> Set[PlatformCLISpecification]:
         return set(self._plugins.values())

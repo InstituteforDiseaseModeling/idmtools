@@ -30,7 +30,7 @@ def sim_status(id: Optional[str], experiment_id: Optional[str], status: Optional
     """
     session = get_session()
     # Simulations ALWAYS have a parent
-    criteria = [JobStatus.parent_uuid != None]
+    criteria = [JobStatus.parent_uuid != None]  # noqa: E711
 
     # start building our filter criteria
     if id is not None:
