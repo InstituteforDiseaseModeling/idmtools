@@ -55,7 +55,8 @@ def sim_status(id: Optional[str], experiment_id: Optional[str], status: Optional
     df.rename(index=str, columns=dict(uuid='simulation_uid', parent_uuid='experiment_id'), inplace=True)
 
     df['status'] = df['status'].apply(lambda x: str(x))
-
+    df['created'] = df['created'].astype(str)
+    df['updated'] = df['updated'].astype(str)
     return df
 
 

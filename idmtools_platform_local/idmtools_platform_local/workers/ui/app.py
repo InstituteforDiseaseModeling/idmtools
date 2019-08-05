@@ -4,8 +4,10 @@ from flask_restful import Api
 
 from idmtools_platform_local.workers.ui.controllers.experiments import Experiments
 from idmtools_platform_local.workers.ui.controllers.simulations import Simulations
+from idmtools_platform_local.workers.ui.utils import DateTimeEncoder
 
 application = Flask(__name__)
+application.json_encoder = DateTimeEncoder
 api = Api(application, prefix='/api')
 
 # We setup a simple data folder browser

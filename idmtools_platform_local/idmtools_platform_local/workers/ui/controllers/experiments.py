@@ -3,6 +3,7 @@ import shutil
 from typing import Optional, List, Tuple
 
 import pandas as pd
+from flask import current_app
 from flask_restful import Resource, reqparse, abort
 from sqlalchemy import String, func, or_
 
@@ -76,6 +77,8 @@ def experiment_filter(id: Optional[str], tags: Optional[List[Tuple[str, str]]]) 
     df.drop(columns=['parent_uuid', 'status'], inplace=True)
     # and let's rename columns to make it more clear fo user what they are looking at
     df.rename(index=str, columns=dict(uuid='experiment_id'), inplace=True)
+    df['created'] = df['created'].astype(str)
+    df['updated'] = df['updated'].astype(str)
     return df
 
 
@@ -95,8 +98,9 @@ class Experiments(Resource):
         args['id'] = id
 
         validate_tags(args['tags'])
-
-        result = experiment_filter(**args).to_dict(orient='records')
+        df = experiment_filter(**args)
+        current_app.logger.error(df.head())
+        result = df.to_dict(orient='records')
         if id:
             if not result:
                 abort(404, message=f"Could not find experiment with id {id}")

@@ -41,29 +41,31 @@ def parent_status_to_progress(status: Dict[Status, int], width: int = 12) -> str
     Returns:
         str: Progress bar of the status
     """
-    status = {str(k): v for k, v in status.items()}
-    total = sum([v for k, v in status.items()])
-
     result = ''
-    used = 0
-    total_complete_or_failed = sum([v for k, v in status.items() if k in ['failed', 'done']])
+    if status:
+        status = {str(k): v for k, v in status.items()}
+        total = sum([v for k, v in status.items()])
 
-    status_order = ['done', 'in_progress', 'failed']
-    for label in status_order:
-        if label in status:
-            w = floor(status[label] / total * width)
-            if w > 0:
-                color = status_progress_color_map[label]
-                result += color + (' ' * w)
-                used += w
+        result = ''
+        used = 0
+        total_complete_or_failed = sum([v for k, v in status.items() if k in ['failed', 'done']])
 
-    # add the remaining in progress
-    if width - used > 0:
-        result += Back.WHITE + (' ' * (width - used))
+        status_order = ['done', 'in_progress', 'failed']
+        for label in status_order:
+            if label in status:
+                w = floor(status[label] / total * width)
+                if w > 0:
+                    color = status_progress_color_map[label]
+                    result += color + (' ' * w)
+                    used += w
 
-    result += Back.RESET
-    result = '[' + result + ']' + '{0}/{1} ({2:.1f}%)'.format(total_complete_or_failed, total,
-                                                              total_complete_or_failed / total * 100.0)
+        # add the remaining in progress
+        if width - used > 0:
+            result += Back.WHITE + (' ' * (width - used))
+
+        result += Back.RESET
+        result = '[' + result + ']' + '{0}/{1} ({2:.1f}%)'.format(total_complete_or_failed, total,
+                                                                  total_complete_or_failed / total * 100.0)
     return result
 
 

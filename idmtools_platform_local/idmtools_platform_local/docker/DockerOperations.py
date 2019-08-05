@@ -1,5 +1,6 @@
 import os
 import platform
+import shutil
 import tarfile
 import time
 from dataclasses import dataclass
@@ -18,7 +19,7 @@ logger = getLogger(__name__)
 
 @dataclass
 class DockerOperations:
-    host_data_directory: str = os.getcwd()
+    host_data_directory: str = os.path.join(os.getcwd(), '.local_data')
     network: str = 'idmtools'
     redis_image: str = 'redis:5.0.4-alpine'
     redis_port: int = 6379
@@ -33,6 +34,8 @@ class DockerOperations:
     workers_ui_port: int = 5000
 
     def __post_init__(self):
+        if not os.path.exists(self.host_data_directory):
+            os.makedirs(self.host_data_directory)
         self.timeout = 1
         self.system_info = get_system_information()
         self.client = docker.from_env()
@@ -55,13 +58,28 @@ class DockerOperations:
                 logger.debug(f'Removing container {name}')
                 container.remove()
 
+    def cleanup(self):
+        self.stop_services()
+        try:
+            shutil.rmtree(self.host_data_directory, True)
+        except PermissionError:
+            logger.warning(f"Cannot cleanup directory {self.host_data_directory} because it is still in use")
+            pass
+        postgres_volume = self.client.volumes.list(filters=dict(name='idmtools_local_postgres'))
+        if postgres_volume:
+            postgres_volume[0].remove(True)
+
+        network = self.get_network()
+        if network:
+            network.remove()
+
     def get_network(self):
         # check that the network exists
         network = self.client.networks.list([self.network])
         if not network:
             logger.debug(f'Creating network {self.network}')
-            network = self.client.networks.create_network(self.network, driver='bridge', internal=False, attachable=False,
-                                                 ingress=False, scope='local')
+            network = self.client.networks.create(self.network, driver='bridge', internal=False,
+                                                          attachable=False, ingress=False, scope='local')
         else:
             network = network[0]
         return network
