@@ -23,7 +23,7 @@ def down(delete_data):
 def start():
     """Start the local execution platform"""
     do = DockerOperations()
-    do.restart_all()
+    do.create_services()
 
 
 @local.command()
