@@ -22,7 +22,7 @@ exclusive = False
 logger = getLogger(__name__)
 
 
-class COMPSSpecification(PlatformSpecification):
+class COMPSPlatformSpecification(PlatformSpecification):
 
     def __init__(self):
         logger.debug("Initializing COMPS Specification")

@@ -1,26 +1,26 @@
 .PHONY: clean lint test coverage release-local dist release-staging release-staging-minor-commit release-staging-minor
 
 clean: ## Clean all our jobs
-	python dev_scripts/run_pymake_on_all.py clean
+	python dev_scripts/run_pymake_on_all.py clean p
 
 setup-dev:  ## Setup packages in dev mode
 	python dev_scripts/setup_dev_env.py
 	@python -c "import os; os.chdir('idmtools_platform_local'); os.system('pymake docker-local')"
 
 lint: ## check style with flake8
-	python dev_scripts/run_pymake_on_all.py lint
+	python dev_scripts/run_pymake_on_all.py lint p
 
 test: ## Run our tests
-	python dev_scripts/run_pymake_on_all.py test
+	python dev_scripts/run_pymake_on_all.py test p
 
 coverage: ## Generate a code-coverage report
 	python dev_scripts/run_pymake_on_all.py coverage
 
 release-local: ## package and upload a release to http://localhost:7171
-	python dev_scripts/run_pymake_on_all.py release-local
+	python dev_scripts/run_pymake_on_all.py release-local p
 
 dist: ## build our package
-	python dev_scripts/run_pymake_on_all.py dist
+	python dev_scripts/run_pymake_on_all.py dist p
 
 release-staging: ## perform a release to staging
 	python dev_scripts/run_pymake_on_all.py release-staging
