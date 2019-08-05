@@ -5,10 +5,12 @@ from typing import NoReturn, Dict, Set, cast, Optional, List, Tuple
 import pluggy
 
 from idmtools.registry.PluginSpecification import PLUGIN_REFERENCE_NAME, PluginSpecification
-from idmtools.registry.utils import plugins_loader
+from idmtools.registry.utils import load_plugin_map
 
 get_platform_cli_spec = pluggy.HookspecMarker(PLUGIN_REFERENCE_NAME)
-get_additional_commands = pluggy.HookspecMarker(PLUGIN_REFERENCE_NAME)
+get_additional_commands_spec = pluggy.HookspecMarker(PLUGIN_REFERENCE_NAME)
+get_platform_cli_impl = pluggy.HookimplMarker(PLUGIN_REFERENCE_NAME)
+get_additional_commands_impl = pluggy.HookimplMarker(PLUGIN_REFERENCE_NAME)
 
 
 class IPlatformCLI(ABC):
@@ -48,8 +50,10 @@ class IPlatformCLI(ABC):
 
 
 class PlatformCLISpecification(PluginSpecification, ABC):
+    @classmethod
+    def get_name(cls) -> str:
+        return cls.__name__.replace("CLISpecification", "")
 
-    @staticmethod
     @get_platform_cli_spec
     def get(configuration: dict) -> IPlatformCLI:
         """
@@ -62,19 +66,18 @@ class PlatformCLISpecification(PluginSpecification, ABC):
         """
         raise NotImplementedError("Plugin did not implement get")
 
-    @staticmethod
-    @get_additional_commands
-    def get_additional_commands() -> NoReturn:
+    @get_additional_commands_spec
+    def get_additional_commands(self) -> NoReturn:
         raise NotImplementedError("Plugin did not implement get_additional_commands")
 
 
 class PlatformCLIPlugins:
     def __init__(self) -> None:
-        pl = plugins_loader('idmtools_platform_cli', PlatformCLISpecification)
-        self._plugins = cast(Set[PlatformCLISpecification], pl)
+        self._plugins = cast(Dict[str, PlatformCLISpecification],
+                                    load_plugin_map('idmtools_platform_cli', PlatformCLISpecification))
 
     def get_plugins(self) -> Set[PlatformCLISpecification]:
-        return self._plugins
+        return set(self._plugins.values())
 
     def get_plugin_map(self) -> Dict[str, PlatformCLISpecification]:
-        return {plugin.get_name(): plugin for plugin in self._plugins}
+        return self._plugins

@@ -1,26 +1,24 @@
 from typing import Optional, Tuple, List
 import click
 
-from idmtools.entities.IPlatformCli import PlatformCLIPlugins, IPlatformCLI
-from idmtools_cli.cli import cli, pass_platform_cli
-from idmtools_cli.cli.utils import tags_help
+from idmtools_cli.IPlatformCli import IPlatformCLI
 
-supported_platforms = PlatformCLIPlugins().get_plugin_map()
-# Decorator for CLI functions that will require a platform object passed down to them
+from idmtools_cli.cli import cli, pass_platform_cli
+from idmtools_cli.cli.utils import tags_help, get_platform_from_config_or_name, supported_platforms
 
 
 @cli.group(help="Commands related to experiments(top-level jobs)")
-@click.option('--platform', type=click.Choice(supported_platforms.keys()))
-@click.option('--config-name', default=None, type=str, help='Name of platform section in our idmtools.ini to use as '
-                                                            'configuration')
+@click.option('--platform', default=None, type=click.Choice(supported_platforms.keys()))
+@click.option('--config-block', default=None, type=str, help='Name of platform section in our idmtools.ini to use as '
+                                                             'configuration')
 @click.pass_context
-def experiment(ctx, platform, config_name):
+def experiment(ctx, platform, config_block):
     """
     Contains commands related to experiments
     """
-    config = dict() if config_name is None else config_name
+    platform_obj = get_platform_from_config_or_name(config_block, platform)
     # create our platform object and pass it along through the context to any sub-commands
-    ctx.obj = supported_platforms[platform].get(config)
+    ctx.obj = platform_obj
 
 
 @experiment.command()

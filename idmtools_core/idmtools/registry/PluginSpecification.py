@@ -20,7 +20,7 @@ class PluginSpecification:
         Returns:
             (str) Name of Plugin
         """
-        return cls.__name__
+        return cls.__name__.replace("Specification", "")
 
     @get_description_spec
     def get_description(self) -> str:

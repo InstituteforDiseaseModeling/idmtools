@@ -15,8 +15,11 @@ class TestLocalCLIBasic(unittest.TestCase):
         return run_command(*args, start_command=start_command)
 
     def test_load(self):
-        result = self.run_command('experiment', '--help')
-        result = self.run_command('experiment', '--platform', 'local', '--help', base_command='')
+        result = self.run_command('experiment', '--platform', 'Local', '--help', base_command='')
         lines = get_subcommands_from_help_result(result)
         # ensure our command is in the options
-        self.assertIn('list_datasets', lines)
+        self.assertIn('status', lines)
+
+    def test_status(self):
+        result = self.run_command('experiment', '--platform', 'Local', 'status', base_command='')
+        print(result)

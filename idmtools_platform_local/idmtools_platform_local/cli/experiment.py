@@ -2,7 +2,7 @@ from typing import Optional, Tuple, List, Any, Dict
 import click
 from tabulate import tabulate
 
-from idmtools_cli.cli.utils import show_error
+
 from idmtools_platform_local.cli.utils import parent_status_to_progress, urlize_data_path
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
 from idmtools_platform_local.config import API_PATH
@@ -28,6 +28,7 @@ def prettify_experiment(experiment: Dict[str, Any]):
 
 
 def status(id: Optional[str], tags: Optional[List[Tuple[str, str]]]):
+    from idmtools_cli.cli.utils import show_error
     """
     List the status of experiment(s) with the ability to filter by experiment id and tags
 

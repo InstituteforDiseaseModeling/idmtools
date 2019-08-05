@@ -29,6 +29,9 @@ class TestPlatform(IPlatform):
     """
     Test platform simulating a working platform to use in the test suites.
     """
+
+    __test__ = False  # Hide from test discovery
+
     experiments: 'diskcache.Cache' = field(default=None, compare=False, metadata={"pickle_ignore": True})
     simulations: 'diskcache.Cache' = field(default=None, compare=False, metadata={"pickle_ignore": True})
 

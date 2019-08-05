@@ -2,7 +2,7 @@ from dataclasses import fields
 from idmtools.config import IdmConfigParser
 from idmtools.core import PlatformFactory
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
-from idmtools_test.utils.decorators import docker_test
+from idmtools_test.utils.decorators import docker_test, comps_test
 
 
 class TestPlatformFactory(ITestWithPersistence):
@@ -13,6 +13,7 @@ class TestPlatformFactory(ITestWithPersistence):
     def tearDown(self):
         super().tearDown()
 
+    @comps_test
     def test_get_block(self):
         entries = IdmConfigParser.get_block('COMPS2')
         self.assertEqual(entries['endpoint'], 'https://comps2.idmod.org')
@@ -47,6 +48,7 @@ class TestPlatformFactory(ITestWithPersistence):
         platform3 = PlatformFactory.create('Test')
         self.assertEqual(platform3.__class__.__name__, 'TestPlatform')
 
+    @comps_test
     def test_COMPSPlatform(self):
         platform = PlatformFactory.create_from_block('COMPS2')
         members = platform.__dict__

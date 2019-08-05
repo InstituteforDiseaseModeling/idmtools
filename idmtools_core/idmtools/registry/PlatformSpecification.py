@@ -23,7 +23,7 @@ class PlatformSpecification(PluginSpecification, ABC):
 
     @classmethod
     def get_name(cls) -> str:
-        return cls.__name__.replace('Platform', '').replace('Specification', '')
+        return cls.__name__.replace('PlatformSpecification', '')
 
     @example_configuration_spec
     def example_configuration(self):

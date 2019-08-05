@@ -3,7 +3,7 @@ import sys
 from concurrent.futures.process import ProcessPoolExecutor
 from concurrent.futures.thread import ThreadPoolExecutor
 from logging import DEBUG, getLogger
-from unittest import TestCase
+from unittest import TestCase, skip
 import threading
 import os
 from idmtools.core.logging import setup_logging
@@ -21,7 +21,7 @@ def log_process_id():
 # portions since that is quite slow in debugger
 LOG_TESTS_TO_RUN = 50000 if getattr(sys, 'gettrace', None) is None else 5000
 
-
+@skip
 class TestLoggingBenchmark(TestCase):
     @classmethod
     def setUpClass(cls) -> None:

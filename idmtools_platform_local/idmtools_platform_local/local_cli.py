@@ -1,11 +1,13 @@
 from typing import NoReturn, Optional, List, Tuple
-from idmtools.entities.IPlatformCli import PlatformCLISpecification, IPlatformCLI
+from idmtools.registry.PluginSpecification import get_description_impl
+from idmtools_cli.IPlatformCli import IPlatformCLI, PlatformCLISpecification, get_platform_cli_impl, \
+    get_additional_commands_impl
+from idmtools_platform_local.cli import experiment
 
 
 class LocalCLI(IPlatformCLI):
 
     def get_experiment_status(self, id: Optional[str], tags: Optional[List[Tuple[str, str]]]) -> NoReturn:
-        from idmtools_cli.cli import experiment
         experiment.status(id, tags)
 
     def get_simulation_status(self, id: Optional[str], experiment_id: Optional[str], status: Optional[str],
@@ -38,14 +40,14 @@ class LocalCLI(IPlatformCLI):
 
 
 class LocalCLISpecification(PlatformCLISpecification):
-    @staticmethod
-    def get(configuration: dict) -> LocalCLI:
+    @get_platform_cli_impl
+    def get(self, configuration: dict) -> LocalCLI:
         return LocalCLI()
 
-    @staticmethod
-    def get_additional_commands() -> NoReturn:
+    @get_additional_commands_impl
+    def get_additional_commands(self) -> NoReturn:
         pass
 
-    @staticmethod
-    def get_description() -> str:
+    @get_description_impl
+    def get_description(self) -> str:
         return "Provides CLI commands for the Local Platform"

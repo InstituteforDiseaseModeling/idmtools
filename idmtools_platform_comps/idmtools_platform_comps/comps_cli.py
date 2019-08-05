@@ -1,5 +1,8 @@
 from typing import NoReturn
-from idmtools.entities.IPlatformCli import PlatformCLISpecification, IPlatformCLI
+
+from idmtools.registry.PluginSpecification import get_description_impl
+from idmtools_cli.IPlatformCli import IPlatformCLI, PlatformCLISpecification, get_platform_cli_impl, \
+    get_additional_commands_impl
 
 
 class CompsCLI(IPlatformCLI):
@@ -14,15 +17,16 @@ class CompsCLI(IPlatformCLI):
         pass
 
 
-class CompsCLISpecification(PlatformCLISpecification):
-    @staticmethod
-    def get(configuration: dict) -> CompsCLI:
+class COMPSCLISpecification(PlatformCLISpecification):
+
+    @get_platform_cli_impl
+    def get(self, configuration: dict) -> CompsCLI:
+        return CompsCLI(**configuration)
+
+    @get_additional_commands_impl
+    def get_additional_commands(self) -> NoReturn:
         pass
 
-    @staticmethod
-    def get_additional_commands() -> NoReturn:
-        pass
-
-    @staticmethod
-    def get_description() -> str:
+    @get_description_impl
+    def get_description(self) -> str:
         return "Provides CLI commands for the COMPS Platform"
