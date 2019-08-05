@@ -1,12 +1,10 @@
 from typing import Optional, Tuple, List, Dict, Any
-import click
 from tabulate import tabulate
 
-from idmtools_cli.cli.utils import show_error
-from idmtools_platform_local.cli.utils import colorize_status, tags_help, urlize_data_path
+
+from idmtools_platform_local.cli.utils import colorize_status, urlize_data_path
 from idmtools_platform_local.client.simulations_client import SimulationsClient
 from idmtools_platform_local.config import API_PATH
-from idmtools_platform_local.status import Status
 
 SIMULATIONS_URL = f'{API_PATH}/simulations'
 
@@ -28,20 +26,6 @@ def prettify_simulation(simulation: Dict[str, Any]):
     return simulation
 
 
-def simulation():
-    """
-    Defines our simulation sub-command group
-    Returns:
-
-    """
-    pass
-
-
-@simulation.command()
-@click.option('--id', default=None, help="Filter status by simulation ID")
-@click.option('--experiment-id', default=None, help="Filter status by experiment ID")
-@click.option('--status', default=None, type=click.Choice([e.value for e in Status]))
-@click.option('--tags', default=None, nargs=2, multiple=True, help=tags_help)
 def status(id: Optional[str], experiment_id: Optional[str], status: Optional[str],
            tags: Optional[List[Tuple[str, str]]]):
     """
@@ -57,6 +41,7 @@ def status(id: Optional[str], experiment_id: Optional[str], status: Optional[str
     Returns:
         None
     """
+    from idmtools_cli.cli.utils import show_error
     try:
         simulations = SimulationsClient.get_all(id, experiment_id=experiment_id, status=status, tags=tags)
     except RuntimeError as e:

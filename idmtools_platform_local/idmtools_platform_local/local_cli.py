@@ -2,7 +2,7 @@ from typing import NoReturn, Optional, List, Tuple
 from idmtools.registry.PluginSpecification import get_description_impl
 from idmtools_cli.IPlatformCli import IPlatformCLI, PlatformCLISpecification, get_platform_cli_impl, \
     get_additional_commands_impl
-from idmtools_platform_local.cli import experiment
+from idmtools_platform_local.cli import experiment, simulation
 
 
 class LocalCLI(IPlatformCLI):
@@ -23,8 +23,8 @@ class LocalCLI(IPlatformCLI):
         Returns:
 
         """
-        from idmtools_cli.cli import simulation
-        simulation.status(id, tags)
+
+        simulation.status(id, experiment_id, status, tags)
 
     def get_platform_information(self, platform: 'LocalPlatform') -> dict:  # noqa: F821
         pass
