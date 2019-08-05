@@ -46,7 +46,8 @@ class LocalCLISpecification(PlatformCLISpecification):
 
     @get_additional_commands_impl
     def get_additional_commands(self) -> NoReturn:
-        pass
+        from idmtools_platform_local.cli.experiment import extra_commands
+        extra_commands()
 
     @get_description_impl
     def get_description(self) -> str:

@@ -48,6 +48,19 @@ class DockerOperations:
         self.get_postgres()
         self.get_workers()
 
+    def restart_all(self):
+        redis = self.get_redis()
+        if redis:
+            redis.restart()
+
+        postgres = self.get_postgres()
+        if postgres:
+            postgres.restart()
+
+        workers = self.get_workers()
+        if workers:
+            workers.restart()
+
     def stop_services(self):
         for service in ['redis', 'postgres', 'workers']:
             container = getattr(self, f'get_{service}')()
@@ -58,10 +71,11 @@ class DockerOperations:
                 logger.debug(f'Removing container {name}')
                 container.remove()
 
-    def cleanup(self):
+    def cleanup(self, delete_data=True):
         self.stop_services()
         try:
-            shutil.rmtree(self.host_data_directory, True)
+            if delete_data:
+                shutil.rmtree(self.host_data_directory, True)
         except PermissionError:
             logger.warning(f"Cannot cleanup directory {self.host_data_directory} because it is still in use")
             pass
