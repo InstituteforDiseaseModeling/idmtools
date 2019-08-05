@@ -2,6 +2,8 @@
 import re
 import time
 
+from click._compat import strip_ansi
+
 from idmtools_platform_local.status import Status
 from idmtools_test.utils.confg_local_runner_test import config_local_test
 local_path = config_local_test()
@@ -87,6 +89,7 @@ class TestLocalCLIBasic(unittest.TestCase):
             @unittest.mock.patch('idmtools_platform_local.workers.utils.get_session', side_effect=test_db_factory)
             def do_test(*mocks):
                 self.create_test_data()
+                time.sleep(1)
 
                 result = self.run_command('experiment', '--platform', 'Local', 'status', base_command='')
                 self.assertEqual(result.exit_code, 0)
@@ -102,20 +105,22 @@ class TestLocalCLIBasic(unittest.TestCase):
         with self.subTest("test_simulation_status"):
             # Now patch our areas that use our session
             def do_test(*mocks):
-                self.create_test_data()
 
                 result = self.run_command('simulation', '--platform', 'Local', 'status', base_command='')
                 self.assertEqual(result.exit_code, 0)
-                output = re.sub(r'[\+\-]+', '', result.output).split("\n")
+                output = re.sub(r'[\+\-]+', '', strip_ansi(result.output)).split("\n")
                 output = [o for o in output if o]
                 self.assertEqual(len(output), 5)
                 rows = list(map(lambda x: list(map(str.strip, x)), [s.split('|') for s in output]))[2:]
                 self.assertEqual(rows[0][1], "FFFFF")
-                self.assertEqual(rows[0][2], "done")
+                self.assertEqual(rows[0][2], "DDDDD")
+                self.assertEqual(rows[0][3], "done")
                 self.assertEqual(rows[1][1], "EEEEE")
-                self.assertEqual(rows[1][2], "done")
+                self.assertEqual(rows[0][2], "DDDDD")
+                self.assertEqual(rows[1][3], "done")
                 self.assertEqual(rows[2][1], "CCCCC")
-                self.assertEqual(rows[1][2], "created")
+                self.assertEqual(rows[0][2], "BBBBB")
+                self.assertEqual(rows[1][3], "created")
             do_test()
 
         dm.cleanup()
