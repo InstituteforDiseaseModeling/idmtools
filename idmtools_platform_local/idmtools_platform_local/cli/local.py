@@ -1,4 +1,5 @@
 import click
+import stringcase as stringcase
 from colorama import Fore
 from idmtools_cli.cli import cli
 from idmtools_platform_local.docker.DockerOperations import DockerOperations
@@ -38,20 +39,14 @@ def status():
     Check the status of the local execution platform
     """
     do = DockerOperations()
-    redis = do.get_redis()
-    if redis:
-        click.echo(f'Redis:      [{Fore.GREEN}{redis.status}{Fore.RESET}] [{redis.id}] ')
-    else:
-        click.echo(f'Redis:      [{Fore.RED}down{Fore.RESET}]')
+    for c in ['redis', 'postgres', 'workers']:
+        container = getattr(do, f'get_{c}')()
+        container_status_text(stringcase.titlecase(c), container)
 
-    postgres = do.get_postgres()
-    if postgres:
-        click.echo(f'Postgres    [{Fore.GREEN}{postgres.status}{Fore.RESET}] [{postgres.id}] ')
-    else:
-        click.echo(f'Postgres:   [{Fore.RED}down{Fore.RESET}]')
 
-    workers = do.get_workers()
-    if workers:
-        click.echo(f'Workers:    [{Fore.GREEN}{workers.status}{Fore.RESET}] [{workers.id}] ')
+def container_status_text(name, container):
+    if container:
+        click.echo(
+            f'{name: >10}: [{Fore.GREEN}{container.status}{Fore.RESET}] [{container.name: >17}] [{container.short_id}] [{container.labels}]')
     else:
-        click.echo(f'Workers:    [{Fore.RED}down{Fore.RESET}]')
+        click.echo(f'{name: >10}: [{Fore.RED}down{Fore.RESET}]')
