@@ -18,6 +18,10 @@ lint: ## check style with flake8
 test: ## Run our tests
 	@+python -c "import os, sys; sys.path.append(os.getcwd()); os.system('py.test')"
 
+test-all: ## Run our  docker tests as well
+	@+$(IPY) "import os; os.environ['DOCKER_TESTS'] = '1'; \
+	os.environ['COMPS_TESTS'] = '1'; os.chdir('tests'); os.system('py.test -p no:warnings')"
+
 coverage: ## Generate a code-coverage report
 	coverage run --source idmtools_models_collection -m pytest
 	coverage report -m

@@ -27,9 +27,9 @@ def simulation(ctx, platform, config_block):
 @click.option('--experiment-id', default=None, help="Filter status by experiment ID")
 # @click.option('--status', default=None, type=click.Choice([e.value for e in Status]))
 @click.option('--tags', default=None, nargs=2, multiple=True, help=tags_help)
-def status(platform_cli: IPlatformCLI, id: Optional[str], experiment_id: Optional[str], status: Optional[str],
+def status(platform_cli: IPlatformCLI, id: Optional[str], experiment_id: Optional[str],
            tags: Optional[List[Tuple[str, str]]]):
     """
     List of statuses for simulation(s) with the ability to filter by id, experiment_id, status, and tags
     """
-    platform_cli.get_simulation_status(id, experiment_id, status, tags)
+    platform_cli.get_simulation_status(id, experiment_id, None, tags)

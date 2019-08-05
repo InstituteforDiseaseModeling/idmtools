@@ -18,6 +18,10 @@ lint: ## check style with flake8
 test: ## Run our tests
 	@+$(IPY) "import os; os.chdir('tests'); os.system('py.test -p no:warnings')"
 
+test-all: ## Run our  docker tests as well
+	@+$(IPY) "import os; os.environ['DOCKER_TESTS'] = '1'; \
+	os.environ['COMPS_TESTS'] = '1'; os.chdir('tests'); os.system('py.test -p no:warnings')"
+
 coverage: ## Generate a code-coverage report
 	@make clean
 	# We have to run in our tests folder to use the proper config

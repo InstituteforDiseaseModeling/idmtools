@@ -24,6 +24,10 @@ test: ## Run our tests
 test-docker: ## Run our  docker tests as well
 	@+$(IPY) "import os; os.environ['DOCKER_TESTS'] = '1'; os.chdir('tests'); os.system('py.test -p no:warnings')"
 
+test-all: ## Run our  docker tests as well
+	@+$(IPY) "import os; os.environ['DOCKER_TESTS'] = '1'; \
+	os.environ['COMPS_TESTS'] = '1'; os.chdir('tests'); os.system('py.test -p no:warnings')"
+
 
 docker-cleanup:
 	docker stop  idmtools_workers idmtools_postgres idmtools_redis

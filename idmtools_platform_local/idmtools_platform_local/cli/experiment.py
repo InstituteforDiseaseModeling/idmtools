@@ -28,7 +28,7 @@ def prettify_experiment(experiment: Dict[str, Any]):
 
 
 def status(id: Optional[str], tags: Optional[List[Tuple[str, str]]]):
-    from idmtools_cli.cli.utils import show_error
+
     """
     List the status of experiment(s) with the ability to filter by experiment id and tags
 
@@ -37,6 +37,7 @@ def status(id: Optional[str], tags: Optional[List[Tuple[str, str]]]):
         tag (Optional[List[Tuple[str, str]]]): Optional list of tuples in form of tag_name tag_value to user to filter
             experiments with
     """
+    from idmtools_cli.cli.utils import show_error
     try:
         experiments = ExperimentsClient.get_all(id, tags=tags)
     except RuntimeError as e:
@@ -49,6 +50,7 @@ def extra_commands():
     """ This ensures our local platform specific commands are loaded
     """
     from idmtools_cli.cli.experiment import experiment
+    from idmtools_cli.cli.utils import show_error
     @experiment.command()
     @click.argument('id')
     @click.option('--data/--no-data', default=False, help="Should we delete the data as well?")
