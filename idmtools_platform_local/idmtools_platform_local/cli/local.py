@@ -46,12 +46,12 @@ def status():
 
     postgres = do.get_postgres()
     if postgres:
-        click.echo(f'Postgres    [{Fore.GREEN}{postgres.status}{Fore.RESET}] [{redis.id}] ')
+        click.echo(f'Postgres    [{Fore.GREEN}{postgres.status}{Fore.RESET}] [{postgres.id}] ')
     else:
         click.echo(f'Postgres:   [{Fore.RED}down{Fore.RESET}]')
 
     workers = do.get_workers()
     if workers:
-        click.echo(f'Workers:    [{Fore.GREEN}{workers.status}{Fore.RESET}] [{redis.id}] ')
+        click.echo(f'Workers:    [{Fore.GREEN}{workers.status}{Fore.RESET}] [{workers.id}] ')
     else:
         click.echo(f'Workers:    [{Fore.RED}down{Fore.RESET}]')
