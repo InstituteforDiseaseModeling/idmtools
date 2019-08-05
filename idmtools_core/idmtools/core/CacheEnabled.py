@@ -2,6 +2,7 @@ import os
 import shutil
 import tempfile
 from dataclasses import dataclass, field
+from logging import getLogger
 
 from diskcache import Cache, DEFAULT_SETTINGS
 
@@ -9,6 +10,7 @@ MAX_CACHE_SIZE = int(2 ** 33)  # 8GB
 DEFAULT_SETTINGS["size_limit"] = MAX_CACHE_SIZE
 DEFAULT_SETTINGS["sqlite_mmap_size"] = 2 ** 28
 DEFAULT_SETTINGS["sqlite_cache_size"] = 2 ** 15
+logger = getLogger(__name__)
 
 
 @dataclass(init=False, repr=False)
@@ -24,7 +26,11 @@ class CacheEnabled:
             self._cache.close()
 
         if self._cache_directory and os.path.exists(self._cache_directory):
-            shutil.rmtree(self._cache_directory)
+            try:
+                shutil.rmtree(self._cache_directory)
+            except PermissionError as e:
+                logger.exception(e)
+                pass
 
     @property
     def cache(self):

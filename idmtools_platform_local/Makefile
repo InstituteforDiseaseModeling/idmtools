@@ -35,7 +35,7 @@ docker-local: ## Build our docker image using the local pypi
 	# should suffice for development
 	# ensure pypi local is up
 	@+$(IPY) "import os; os.chdir('../dev_scripts/local_pypi'); os.system('docker-compose up -d')"
-	@+$(IPY) "import os; os.chdir('../'); os.system('pymake release-local')"
+	@+$(IPY) "import os; os.chdir('../idmtools_core'); os.system('pymake release-local')"
 
 	docker-compose build --build-arg PYPIURL=http://172.17.0.1:7171/ --build-arg PYPIHOST=172.17.0.1 workers
 

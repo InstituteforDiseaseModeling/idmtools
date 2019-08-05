@@ -2,6 +2,7 @@ from dataclasses import fields
 from idmtools.config import IdmConfigParser
 from idmtools.core import PlatformFactory
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_test.utils.decorators import docker_test
 
 
 class TestPlatformFactory(ITestWithPersistence):
@@ -24,6 +25,7 @@ class TestPlatformFactory(ITestWithPersistence):
         with self.assertRaises(Exception):
             platform = PlatformFactory.create_from_block('BADTYPE')  # noqa:F841
 
+    @docker_test
     def test_create_from_block(self):
         p1 = PlatformFactory.create_from_block('Local')
         self.assertEqual(p1.__class__.__name__, 'LocalPlatform')
@@ -34,6 +36,7 @@ class TestPlatformFactory(ITestWithPersistence):
         p3 = PlatformFactory.create_from_block('Test')
         self.assertEqual(p3.__class__.__name__, 'TestPlatform')
 
+    @docker_test
     def test_platform_factory(self):
         platform1 = PlatformFactory.create('COMPS')
         self.assertEqual(platform1.__class__.__name__, 'COMPSPlatform')
@@ -55,6 +58,7 @@ class TestPlatformFactory(ITestWithPersistence):
         platform2 = PlatformFactory.create('COMPS', **kwargs)
         self.assertEqual(platform, platform2)
 
+    @docker_test
     def test_LocalPlatform(self):
         platform = PlatformFactory.create_from_block('Local')
         members = platform.__dict__

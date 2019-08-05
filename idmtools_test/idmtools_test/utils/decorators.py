@@ -5,8 +5,18 @@ import unittest
 from functools import wraps
 from typing import Callable
 
+# The following decorators are used to control test
+# To allow for different use cases(dev, test, packaging, etc)
+# We have switches that should allow a rich set of possible
+# test combinations
+#
+# The default tests run with all the optional tests set to off(except Linux since that is auto-detected)
+# For test-external runs any tests that require external communication
+# This currently is any comps related test
+# test-docker run any tests that depend on docker locally(Mostly local runn)
+# test-all runs all tests
 comps_test = unittest.skipIf(
-    os.environ.get('NO_COMPS_TESTS', False), 'No COMPS testing'
+    not os.environ.get('COMPS_TESTS', False), 'No COMPS testing'
 )
 
 docker_test = unittest.skipIf(
