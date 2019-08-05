@@ -1,21 +1,22 @@
 .PHONY: clean lint test coverage release-local dist release-staging release-staging-minor-commit release-staging-minor
+IPY=python -c
 
 clean: ## Clean all our jobs
-	@+python -c "import os, glob; [os.remove(i) for i in glob.glob('*.py[co]', recursive=True)]"
-	@+python -c "import os, glob; [os.remove(i) for i in glob.glob('*.done', recursive=True)]"
-	@+python -c "import os, glob; [os.remove(i) for i in glob.glob('*.log', recursive=True)]"
-	@+python -c "import os, glob; [os.remove(i) for i in glob.glob('*.coverage', recursive=True)]"
-	@+python -c "import os, shutil, glob; [shutil.rmtree(i) for i in [k for k in glob.glob('*.egg-info/', recursive=True) if os.path.isdir(k)]]"
-	@+python -c "import shutil; shutil.rmtree('htmlcov', True)"
-	@+python -c "import shutil; shutil.rmtree('.pytest_cache', True)"
-	@+python -c "import shutil; shutil.rmtree('dist', True)"
+	@$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('*.py[co]', recursive=True)]"
+	@$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('*.done', recursive=True)]"
+	@$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('*.log', recursive=True)]"
+	@$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('*.coverage', recursive=True)]"
+	@$(IPY) "import os, shutil, glob; [shutil.rmtree(i) for i in [k for k in glob.glob('*.egg-info/', recursive=True) if os.path.isdir(k)]]"
+	@$(IPY) "import shutil; shutil.rmtree('htmlcov', True)"
+	@$(IPY) "import shutil; shutil.rmtree('.pytest_cache', True)"
+	@$(IPY) "import shutil; shutil.rmtree('dist', True)"
 
 
 lint: ## check style with flake8
 	flake8 --ignore=E501 idmtools_cli tests
 
 test: ## Run our tests
-	@+python -c "import os, sys; sys.path.append(os.getcwd()); os.system('py.test')"
+	@$(IPY) "import os, sys; sys.path.append(os.getcwd()); os.system('py.test')"
 
 test-all: ## Run our  docker tests as well
 	@+$(IPY) "import os; os.environ['DOCKER_TESTS'] = '1'; \
