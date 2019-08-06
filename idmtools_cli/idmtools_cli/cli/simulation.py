@@ -7,14 +7,20 @@ from idmtools_cli.cli.experiment import pass_platform_cli
 from idmtools_cli.cli.utils import tags_help, get_platform_from_config_or_name, supported_platforms
 
 
-@cli.group(help="Commands related to simulations(lower-level jobs)")
+@cli.group()
 @click.option('--platform', default=None, type=click.Choice(supported_platforms.keys()))
 @click.option('--config-block', default=None, type=str, help='Name of platform section in our idmtools.ini to use as '
                                                              'configuration')
 @click.pass_context
 def simulation(ctx, platform, config_block):
     """
-    Commands related to simulations
+    Contains commands related to simulations
+
+    Some useful examples are
+
+    Get the status of simulations for the platform using the local platform defaults, you would run
+    idmtools simulation --platform Local status --help
+
     """
     platform_obj = get_platform_from_config_or_name(config_block, platform)
     # create our platform object and pass it along through the context to any sub-commands
@@ -32,7 +38,14 @@ def status(platform_cli: IPlatformCLI, id: Optional[str], experiment_id: Optiona
     """
     List of statuses for simulation(s) with the ability to filter by id, experiment_id, status, and tags
 
-    Some example:
-    idmtools experiments --platform Local status
+    For Example
+    Get the status of simulations for the platform using the local platform defaults, you would run
+    idmtools simulation --platform Local status
+
+    Another example would be to use a platform defined in a configuration block while also filtering tags where a == 0
+    idmtools simulation --config-block COMPS2 status --tags a 0
+
+    Multiple tags
+    idmtools simulation --config-block COMPS2 status --tags a 0 --tags a 3
     """
     platform_cli.get_simulation_status(id, experiment_id, None, tags)

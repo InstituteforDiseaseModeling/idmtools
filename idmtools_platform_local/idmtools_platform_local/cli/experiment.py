@@ -39,7 +39,7 @@ def status(id: Optional[str], tags: Optional[List[Tuple[str, str]]]):
     """
     from idmtools_cli.cli.utils import show_error
     try:
-        experiments = ExperimentsClient.get_all(id, tags=tags)
+        experiments = ExperimentsClient.get_all(tags=tags) if id is None else ExperimentsClient.get_one(id, tags=tags)
     except RuntimeError as e:
         show_error(e.args[0])
     experiments = list(map(lambda x: prettify_experiment(x), experiments))

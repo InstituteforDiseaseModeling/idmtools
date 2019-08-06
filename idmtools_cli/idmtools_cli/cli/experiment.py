@@ -7,7 +7,7 @@ from idmtools_cli.cli import cli, pass_platform_cli
 from idmtools_cli.cli.utils import tags_help, get_platform_from_config_or_name, supported_platforms
 
 
-@cli.group(help="Commands related to experiments(top-level jobs)")
+@cli.group()
 @click.option('--platform', default=None, type=click.Choice(supported_platforms.keys()))
 @click.option('--config-block', default=None, type=str, help='Name of platform section in our idmtools.ini to use as '
                                                              'configuration')
@@ -15,6 +15,14 @@ from idmtools_cli.cli.utils import tags_help, get_platform_from_config_or_name, 
 def experiment(ctx, platform, config_block):
     """
     Contains commands related to experiments
+
+    Some useful examples are
+
+    Get the status of experiments for the platform defined by the "Local" configuration block
+
+    Get the usage details of the status command:
+    idmtools experiment --platform Local status --help
+
     """
     platform_obj = get_platform_from_config_or_name(config_block, platform)
     # create our platform object and pass it along through the context to any sub-commands
@@ -28,5 +36,15 @@ def experiment(ctx, platform, config_block):
 def status(platform_cli: IPlatformCLI, id: Optional[str], tags: Optional[List[Tuple[str, str]]]):
     """
     List the status of experiment(s) with the ability to filter by experiment id and tags
+
+    Some examples:
+    Get the status of simulations for the platform using the local platform defaults, you would run\n
+    idmtools simulation --platform Local status
+
+    Another example would be to use a platform defined in a configuration block while also filtering tags where a == 0\n
+    idmtools experiment --config-block COMPS2 status --tags a 0
+
+    Multiple tags:\n
+    idmtools experiment --config-block COMPS2 status --tags a 0 --tags a 3
     """
     platform_cli.get_experiment_status(id, tags)
