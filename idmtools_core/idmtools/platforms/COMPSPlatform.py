@@ -16,7 +16,7 @@ from idmtools.utils.time import timestamp
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TExperiment
     import uuid
-from idmtools.analysis.item_id import ItemId
+from idmtools.core.item_id import ItemId
 
 logging.getLogger('COMPS.Data.Simulation').disabled = True
 logger = logging.getLogger(__name__)
@@ -194,25 +194,29 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                     s.status = COMPSPlatform._convert_COMPS_status(comps_simulation.state)
                     break
 
-    def restore_simulations(self, experiment: 'TExperiment') -> None:
+    def retrieve_simulations(self, experiment: 'TExperiment') -> list:
         self._comps_experiment_id = experiment.uid
 
+        simulations = []
         for s in self.comps_experiment.get_simulations(
                 query_criteria=QueryCriteria().select(["id", "state"]).select_children(["tags"])):
             sim = experiment.simulation()
             sim.uid = s.id
             sim.tags = s.tags
             sim.status = COMPSPlatform._convert_COMPS_status(s.state)
-            hierarchy = [('suite_id', experiment.suite_id),
+            hierarchy = [('simulation_id', sim.uid),
                          ('experiment_id', experiment.uid),
-                         ('simulation_id', sim.uid)]
+                         ('suite_id', experiment.suite_id)]
             sim.full_id = ItemId(group_tuples=hierarchy)
-            experiment.simulations.append(sim)
+            simulations.append(sim)
+            sim.level = 0
+        return simulations
 
     def retrieve_experiment(self, experiment_id: 'uuid') -> 'TExperiment':
         self._comps_experiment_id = experiment_id
         experiment = experiment_factory.create(self.comps_experiment.tags.get("type"), tags=self.comps_experiment.tags)
         experiment.uid = self.comps_experiment.id
+        experiment.level = 1
         return experiment
 
     @staticmethod
@@ -231,18 +235,18 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                 return asset_file.retrieve()
         return None
 
-    def get_assets_for_simulation(self, simulation, output_files):
+    def get_files(self, item, files):
         self._login()
 
         # Retrieve the simulation from COMPS
-        comps_simulation = COMPSSimulation.get(simulation.uid,
+        comps_simulation = COMPSSimulation.get(item.uid,
                                                query_criteria=QueryCriteria().select(['id']).select_children(
                                                    ["files", "configuration"]))
 
         # Separate the output files in 2 groups:
         # - one for the transient files (retrieved through the comps simulation)
         # - one for the asset collection files (retrieved through the asset collection)
-        all_paths = set(output_files)
+        all_paths = set(files)
         assets = set(path for path in all_paths if path.lower().startswith("assets"))
         transients = all_paths.difference(assets)
 
@@ -251,8 +255,8 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
         # Retrieve the transient if any
         if transients:
-            transients_files = comps_simulation.retrieve_output_files(paths=transients)
-            ret = dict(zip(transients, transients_files))
+            transient_files = comps_simulation.retrieve_output_files(paths=transients)
+            ret = dict(zip(transients, transient_files))
 
         # Take care of the assets
         if assets:
@@ -266,11 +270,60 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                 ret[file_path] = self.cache.memoize()(self._get_file_for_collection)(collection_id, normalized_path)
 
         return ret
-    get_files = get_assets_for_simulation  # ck4, move this rename/alias into the IPlatform after review
 
-    # ck4, get feedback on this approach. Other platforms may not have 'experiments', so we instead have a
-    # 'per_group' method in analyzers, where potentially multi-hierarchy level things are done.
     def initialize_for_analysis(self, items, analyzers):
-        # Run the per experiment on the analyzers
+        # run any necessary analysis prep steps on groups of items (hierarchy level > 0)
         for analyzer in analyzers:
             analyzer.per_group(items=items)
+
+    def get_object(self, id, level):
+        # Returned objects must have .level set to an integer (e.g. 0, 1, 2, ...)
+        if level == 0:
+            raise Exception(f'Unknown id hierarchy level {level} for platform: {self.__class__.__name__}')
+        elif level == 1:
+            obj = self.retrieve_experiment(experiment_id=id)
+        elif level == 2:
+            raise Exception(f'Unknown id hierarchy level {level} for platform: {self.__class__.__name__}')
+        else:
+            raise Exception(f'Unknown id hierarchy level {level} for platform: {self.__class__.__name__}')
+        return obj
+
+    def get_objects_by_relationship(self, obj, relationship):
+        target_level = obj.level + relationship
+        if target_level == 0:
+            target_objs = self.retrieve_simulations(experiment=obj)  # self.restore_simulations(experiment=obj)
+        elif target_level == 1:
+            raise Exception(f'Unknown how to retrieve relative objects for hierarchy level {obj.level} '
+                            f'for platform: {self.__class__.__name__}')
+        elif target_level == 2:
+            raise Exception(f'Unknown how to retrieve relative objects for hierarchy level {obj.level} '
+                            f'for platform: {self.__class__.__name__}')
+        else:
+            raise Exception(f'No relative objects for hierarchy level {obj.level} '
+                            f'for platform: {self.__class__.__name__}')
+        return target_objs
+
+    #
+    # platform-specific convenience methods for dealing with domain-specific terminology
+    #
+
+    def get_simulation(self, sim_id):
+        return self.get_object(id=sim_id, level=0)
+
+    def get_experiment(self, exp_id):
+        return self.get_object(id=exp_id, level=1)
+
+    def get_suite(self, suite_id=id):
+        return self.get_object(id=suite_id, level=2)
+
+    def get_simulations_in_experiment(self, experiment):
+        return self.get_objects_by_relationship(obj=experiment, relationship=self.CHILD)
+
+    def get_experiments_in_suite(self, suite):
+        return self.get_objects_by_relationship(obj=suite, relationship=self.CHILD)
+
+    def get_experiment_for_simulation(self, simulation):
+        return self.get_objects_by_relationship(obj=simulation, relationship=self.PARENT)
+
+    def get_suite_for_experiment(self, experiment):
+        return self.get_objects_by_relationship(obj=experiment, relationship=self.PARENT)

@@ -18,7 +18,7 @@ class IAnalyzer(metaclass=ABCMeta):
         Args:
             uid: The unique id identifying this analyzer
             working_dir: A working directory to dump files
-            parse: Do we want to leverage the OutputParser or just get the raw data in the select_simulation_data()
+            parse: Do we want to leverage the OutputParser or just get the raw data in the map()
             filenames: Which files the analyzer needs to download
         """
         self.filenames = filenames or []
@@ -53,7 +53,7 @@ class IAnalyzer(metaclass=ABCMeta):
         """
         return True
 
-    def select_simulation_data(self, data: 'Any', item: 'Any') -> 'Any':
+    def map(self, data: 'Any', item: 'Any') -> 'Any':
         """
         In parallel for each simulation, consume raw data from filenames and emit selected data
         Args:
@@ -64,7 +64,7 @@ class IAnalyzer(metaclass=ABCMeta):
         """
         return None
 
-    def finalize(self, all_data: 'Any') -> 'Any':
+    def reduce(self, all_data: 'Any') -> 'Any':
         """
         On a single process, get all the selected data
         Args:

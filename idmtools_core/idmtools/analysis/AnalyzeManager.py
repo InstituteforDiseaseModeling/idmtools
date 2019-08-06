@@ -183,7 +183,7 @@ class AnalyzeManager(CacheEnabled):
         return True
 
     def _run_and_wait_for_reducing(self, worker_pool):
-        # the keys in self.cache from select_simulation_data() calls are expected to be item ids. Each keyed value
+        # the keys in self.cache from map() calls are expected to be item ids. Each keyed value
         # contains analyzer_id: item_results_for_analyzer entries.
         finalize_results = {}
         for analyzer in self.analyzers:

@@ -19,6 +19,10 @@ class IPlatform(IEntity, metaclass=ABCMeta):
     - File handling
     """
 
+    SELF = 0
+    PARENT = 1
+    CHILD = -1
+
     def __post_init__(self) -> None:
         """
         Got called from Platform creation
@@ -84,16 +88,15 @@ class IPlatform(IEntity, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def restore_simulations(self, experiment: 'TExperiment') -> None:
-        """
-        Populate the experiment with the associated simulations.
-        Args:
-            experiment: The experiment to populate
-        """
+    def get_object(self, id, level):
         pass
 
     @abstractmethod
-    def get_assets_for_simulation(self, simulation: 'TSimulation', output_files: 'List[str]') -> 'Dict[str, bytearray]':
+    def get_objects_by_relationship(self, obj, relationship):
+        pass
+
+    @abstractmethod
+    def get_files(self, item, files: 'List[str]') -> 'Dict[str, bytearray]':
         pass
 
     @abstractmethod

@@ -5,7 +5,7 @@ class ItemId:
 
     GROUP_DELIMITER = ':'
 
-    # expects an ordered set of tuples, e.g. [('suite_id', 'abc'), ('experiment_id', 'def'), ('simulation_id', 'ghi')]
+    # expects an ordered set of tuples, e.g. [('simulation_id', 'ghi'), ('experiment_id', 'def'), ('suite_id', 'abc')]
     def __init__(self, group_tuples):
         self.groups = OrderedDict(group_tuples)
         for group_name, group_value in self.groups.items():

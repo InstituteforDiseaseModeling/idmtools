@@ -3,7 +3,7 @@ import os
 from idmtools.analysis.IAnalyzer import IAnalyzer
 
 
-class DownloadAnalyzer(IAnalyzer):
+class AddAnalyzer(IAnalyzer):
     """
     Download Analyzer
     A simple base class that will download the files specified in filenames without further treatment.
@@ -28,7 +28,7 @@ class DownloadAnalyzer(IAnalyzer):
         self.filenames = filenames or []
 
         # We only want the raw files -> disable parsing
-        self.parse = False
+        self.parse = True
 
     def filter(self, item):
         return True  # download them all!
@@ -37,25 +37,16 @@ class DownloadAnalyzer(IAnalyzer):
         self.output_path = os.path.join(self.working_dir, self.output_path)
         os.makedirs(self.output_path, exist_ok=True)
 
-    def get_sim_folder(self, item):
-        """
-        Concatenate the specified top-level output folder with the simulation ID
-        :param parser: A simulation output parsing thread
-        :return: The name of the folder to download this simulation's output to
-        """
-        return os.path.join(self.output_path, str(item.uid))
-
     def map(self, data, item):
-        # Create a folder for the current simulation/item
-        sim_folder = self.get_sim_folder(item)
-        os.makedirs(sim_folder, exist_ok=True)
+        number = int(list(data.values())[0].split()[0])
+        result = number + 100
+        return result
 
-        # Create the requested files
-        for filename in self.filenames:
-            file_path = os.path.join(sim_folder, os.path.basename(filename))
-            print('writing to path: %s' % file_path)
-            with open(file_path, 'wb') as outfile:
-                outfile.write(data[filename])
+    # ck4, should we pass objects as the keys? e.g. Item-type, not just their id
+    def reduce(self, data):
+        # data is currently a dict with item_id: value  entries
+        value = sum(data.values())
+        return value
 
 
 if __name__ == '__main__':
@@ -64,7 +55,7 @@ if __name__ == '__main__':
     platform = PlatformFactory.get_platform(platform_type=PlatformType.COMPSPlatform)
 
     filenames = ['StdOut.txt']
-    analyzers = [DownloadAnalyzer(filenames=filenames, output_path='download')]
+    analyzers = [AddAnalyzer(filenames=filenames)]
 
     obj_id = '31d83b39-85b4-e911-a2bb-f0921c167866'
 

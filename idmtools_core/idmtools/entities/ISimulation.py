@@ -2,20 +2,19 @@ import typing
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
 
-from idmtools.core import EntityStatus, IAssetsEnabled, IEntity
+from idmtools.core import EntityStatus, IAssetsEnabled, IItem
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TExperiment
 
 
 @dataclass
-class ISimulation(IAssetsEnabled, IEntity, metaclass=ABCMeta):
+class ISimulation(IAssetsEnabled, IItem, metaclass=ABCMeta):
     """
     Represents a generic Simulation.
     This class needs to be implemented for each model type with specifics.
     """
     experiment: 'TExperiment' = field(default=None, compare=False, metadata={"md": True})
-    status: 'EntityStatus' = field(default=None, compare=False)
 
     @abstractmethod
     def set_parameter(self, name: str, value: any) -> dict:
@@ -60,11 +59,3 @@ class ISimulation(IAssetsEnabled, IEntity, metaclass=ABCMeta):
         Gather all the assets for the simulation.
         """
         pass
-
-    @property
-    def done(self):
-        return self.status in (EntityStatus.SUCCEEDED, EntityStatus.FAILED)
-
-    @property
-    def succeeded(self):
-        return self.status == EntityStatus.SUCCEEDED
