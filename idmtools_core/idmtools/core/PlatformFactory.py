@@ -41,7 +41,11 @@ class PlatformFactory:
         """
         from idmtools.config import IdmConfigParser
         section = IdmConfigParser.get_block(block)
-        platform_type = section.pop('type')
+        try:
+            platform_type = section.pop('type')
+        except KeyError:
+            raise ValueError("When loading a Platform from a configuration block you must specify the type in the "
+                             "block. For example:\ntype = COMPS")
         self._validate_platform_type(platform_type)
         platform_spec = self._platforms.get(platform_type)
 

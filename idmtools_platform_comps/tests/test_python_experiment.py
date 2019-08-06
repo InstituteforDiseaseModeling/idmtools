@@ -171,7 +171,7 @@ class TestPythonExperiment(ITestWithPersistence):
     # Test will test pythonExperiment's assets parameter which adds all files under tests/inputs/python/Assets to
     # COMPS' Assets folder and also test using StandAloneSimulationsBuilder builder to build simulations
     # Comps' Assets
-    #   |--Lib
+    #   |--AnotherLib
     #       |--temp.py
     #   |--MyExternalLibrary
     #       |--__init__.py
@@ -220,7 +220,7 @@ class TestPythonExperiment(ITestWithPersistence):
             expected_list = [{'filename': '__init__.py', 'relative_path': 'MyExternalLibrary'},
                              {'filename': '__init__.py', 'relative_path': ''},
                              {'filename': 'model.py', 'relative_path': ''},
-                             {'filename': 'temp.py', 'relative_path': 'Lib'},
+                             {'filename': 'temp.py', 'relative_path': 'AnotherLib'},
                              {'filename': 'functions.py', 'relative_path': 'MyExternalLibrary'}]
             self.validate_assets(assets, expected_list)
 

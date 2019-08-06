@@ -25,25 +25,10 @@ class SimulationsClient(BaseClient):
         Returns:
             List[Dict[str, Any]]: return list of simulations
         """
-        args = dict(experiment_id=experiment_id,
-                    status=str(status) + 'a' if status is not None else status,
-                    tags=tags if tags is not None and len(tags) > 0 else None)
-        args = {k: v for k, v in args.items() if v is not None}
-        # collapse tags to strings
-        if 'tags' in args:
-            # we need our tags in tuples then we can join properly and pass as GET array
-            # so let's convert any input dict to tuples
-            if type(args['tags']) is dict:
-                args['tags'] = [(str(k), str(v)) for k, v in args['tags'].items()]
-            args['tags'] = [','.join(tag) for tag in args['tags']]
-        response = cls.get(id, params=args)
-        if response.status_code != 200:
-            if logger.isEnabledFor(logging.DEBUG):
-                logging.debug(f'Error fetching simulations {cls.base_url if id is None else cls.base_url + "/" + id}'
-                              f'Response Status Code: {response.status_code}. Response Content: {response.text}')
-            data = response.json()
-            raise RuntimeError(data['message'])
-        result = response.json()
+        args = cls._get_arguments(tags)
+        args.update(dict(experiment_id=experiment_id))
+        response = cls.get(None, params=args)
+        result = cls._validate_response(response, 'Simulations')
         return result
 
     @classmethod
@@ -60,10 +45,11 @@ class SimulationsClient(BaseClient):
         Returns:
             Dict[str, Any]: the simulation as a dict
         """
-        result = cls.get_all(id, experiment_id, status, tags)
-        if len(result) == 0:
-            raise RuntimeError(f"Could not find Simulation with ID {id}")
-        return result[0]
+        args = cls._get_arguments(tags)
+        args.update(dict(experiment_id=experiment_id))
+        response = cls.get(id, params=args)
+        result = cls._validate_response(response, 'Simulations')
+        return result
 
     @classmethod
     def cancel(cls, id: str) -> Dict[str, Any]:

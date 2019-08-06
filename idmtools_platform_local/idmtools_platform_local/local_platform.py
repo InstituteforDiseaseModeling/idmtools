@@ -1,10 +1,12 @@
 import dataclasses
+import functools
 import os
+import tempfile
 from typing import Optional
 
 from dataclasses import dataclass
 
-
+from idmtools.assets import Asset
 from idmtools.entities import IExperiment, IPlatform
 # we have to import brokers so that the proper configuration is achieved for redis
 from idmtools_platform_local.client.simulations_client import SimulationsClient
@@ -39,9 +41,11 @@ class LocalPlatform(IPlatform):
     postgres_port: Optional[str] = 5432
     workers_image: str = 'idm-docker-production.packages.idmod.org:latest'
     workers_ui_port: int = 5000
-    docker_operations: Optional[DockerOperations] = None
+    docker_operations: Optional[DockerOperations] = dataclasses.field(default=None, metadata={"pickle_ignore": True})
 
     def __post_init__(self):
+        # ensure our brokers are started
+        import idmtools_platform_local.workers.brokers
         if self.docker_operations is None:
             # extract configuration details for the docker manager
             local_docker_options = [f.name for f in dataclasses.fields(DockerOperations)]
@@ -89,15 +93,36 @@ class LocalPlatform(IPlatform):
 
     def send_assets_for_experiment(self, experiment):
         # Go through all the assets
-        for asset in experiment.assets:
-            path = os.path.join("/data", experiment.uid, "Assets", asset.filename)
-            self.docker_operations.copy_to_container(self.docker_operations.get_workers(), path)
+        path = os.path.join("/data", experiment.uid, "Assets")
+        list(map(functools.partial(self.send_asset_to_docker, path=path), experiment.assets))
 
     def send_assets_for_simulation(self, simulation):
         # Go through all the assets
-        for asset in simulation.assets:
-            path = os.path.join("/data", simulation.experiment.uid, simulation.uid, asset.filename)
-            self.docker_operations.copy_to_container(self.docker_operations.get_workers(), path)
+        path = os.path.join("/data", simulation.experiment.uid, simulation.uid)
+        list(map(functools.partial(self.send_asset_to_docker, path=path), simulation.assets))
+
+    def send_asset_to_docker(self, asset: Asset, path:str):
+        """
+
+        Args:
+            asset:
+            path:
+
+        Returns:
+
+        """
+        file_path = asset.absolute_path
+        if not file_path:
+            # Write file to temporary file from content
+            if asset.content is None:
+                raise IOError("Cannot determine the source of the assets. The Local Platform requires either the "
+                              "absolute path or content to be set on the Asset object")
+            with tempfile.NamedTemporaryFile(mode='wb') as tmpfile:
+                tmpfile.write(asset.content)
+                tmpfile.flush()
+                self.docker_operations.copy_to_container(self.docker_operations.get_workers(), tmpfile.name, path)
+        else:
+            self.docker_operations.copy_to_container(self.docker_operations.get_workers(), file_path, path)
 
     def create_simulations(self, simulations_batch):
         from idmtools_platform_local.tasks.create_simulation import CreateSimulationTask

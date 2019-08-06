@@ -1,6 +1,4 @@
-# flake8: noqa E402
-from idmtools_test.utils.confg_local_runner_test import config_local_test
-local_path = config_local_test()
+from idmtools.core import PlatformFactory
 import os
 import re
 import subprocess
@@ -9,21 +7,19 @@ from operator import itemgetter
 
 from idmtools.builders import ExperimentBuilder
 from idmtools.managers import ExperimentManager
-from idmtools_platform_local.local_platform import LocalPlatform
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
 from idmtools_platform_local.client.simulations_client import SimulationsClient
 from idmtools_models.python import PythonExperiment
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools_test.utils.decorators import docker_test
 
 
-@docker_test
+#@docker_test
 class TestLocalRunnerCLI(ITestWithPersistence):
 
     @classmethod
     def setUpClass(cls):
-        platform = LocalPlatform()
+        platform = PlatformFactory.create_from_block('Local_Staging')
         cls.pe = PythonExperiment(name="python experiment", model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
 
         cls.pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
@@ -44,15 +40,14 @@ class TestLocalRunnerCLI(ITestWithPersistence):
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
 
-    @docker_test
     def test_status_experimentClient_api(self):
         # Test 1: get_all experiments with experiment id and tags
-        experiment = ExperimentsClient.get_all(str(self.pe.uid),
+        experiment = ExperimentsClient.get_one(str(self.pe.uid),
                                                tags=[('idmtools', 'idmtools-automation'), ('string_tag', 'test')])
-        self.assertEqual(experiment[0]['experiment_id'], str(self.pe.uid))
-        self.assertEqual(experiment[0]['tags'], self.pe.tags)
-        self.assertEqual(experiment[0]['data_path'], '/data/' + str(self.pe.uid))
-        self.assertEqual(experiment[0]['extra_details'], {'simulation_type': None})
+        self.assertEqual(experiment['experiment_id'], str(self.pe.uid))
+        self.assertEqual(experiment['tags'], self.pe.tags)
+        self.assertEqual(experiment['data_path'], '/data/' + str(self.pe.uid))
+        self.assertEqual(experiment['extra_details'], {'simulation_type': None})
 
         # Test 2: get_one experiment with experiment id and tags
         experiment1 = ExperimentsClient.get_one(str(self.pe.uid),
@@ -63,35 +58,34 @@ class TestLocalRunnerCLI(ITestWithPersistence):
         self.assertEqual(experiment1['data_path'], '/data/' + str(self.pe.uid))
         self.assertEqual(experiment1['extra_details'], {'simulation_type': None})
 
-    @docker_test
     def test_status_simulationClient_api(self):
         # Test 1: get_all simulations with simulation id only filter
         for s in self.pe.simulations:
-            simulations = SimulationsClient.get_all(str(s.uid))
-            self.assertEqual(simulations[0]['simulation_uid'], str(s.uid))
-            self.assertEqual(simulations[0]['experiment_id'], str(self.pe.uid))
-            print(simulations[0]['status'])
+            simulations = SimulationsClient.get_one(str(s.uid))
+            self.assertEqual(simulations['simulation_uid'], str(s.uid))
+            self.assertEqual(simulations['experiment_id'], str(self.pe.uid))
+            print(simulations['status'])
             # self.assertEqual(simulations[0]['status'], s.status.value) # wait for bug fix
-            self.assertEqual(simulations[0]['tags'], s.tags)
-            self.assertEqual(simulations[0]['data_path'], '/data/' + str(self.pe.uid) + '/' + str(s.uid))
-            self.assertEqual(simulations[0]['extra_details'], {'command': 'python ./Assets/model1.py config.json'})
+            self.assertEqual(simulations['tags'], s.tags)
+            self.assertEqual(simulations['data_path'], '/data/' + str(self.pe.uid) + '/' + str(s.uid))
+            self.assertEqual(simulations['extra_details']['command'], 'python ./Assets/model1.py config.json')
 
             # Also test get_one with simulation id filter
             simulation = SimulationsClient.get_one(str(s.uid))
-            self.assertEqual(simulations[0], simulation)
+            self.assertEqual(simulations, simulation)
 
             # Also test get_one with simulation id and tags  filters
             simulation1 = SimulationsClient.get_one(str(s.uid), tags=s.tags)
-            self.assertEqual(simulations[0], simulation1)
+            self.assertEqual(simulations, simulation1)
 
         # Test 2: get_all simulations with simulation id and experiment id as filters
         for s in self.pe.simulations:
-            simulations = SimulationsClient.get_all(str(s.uid), experiment_id=str(self.pe.uid))
-            self.assertEqual(simulations[0]['simulation_uid'], str(s.uid))
-            self.assertEqual(simulations[0]['experiment_id'], str(self.pe.uid))
-            self.assertEqual(simulations[0]['tags'], s.tags)
-            self.assertEqual(simulations[0]['data_path'], '/data/' + str(self.pe.uid) + '/' + str(s.uid))
-            self.assertEqual(simulations[0]['extra_details'], {'command': 'python ./Assets/model1.py config.json'})
+            simulations = SimulationsClient.get_one(str(s.uid), experiment_id=str(self.pe.uid))
+            self.assertEqual(simulations['simulation_uid'], str(s.uid))
+            self.assertEqual(simulations['experiment_id'], str(self.pe.uid))
+            self.assertEqual(simulations['tags'], s.tags)
+            self.assertEqual(simulations['data_path'], '/data/' + str(self.pe.uid) + '/' + str(s.uid))
+            self.assertEqual(simulations['extra_details']['command'], 'python ./Assets/model1.py config.json')
 
         # Test 3: get_all simulations with experiment id as only filter
         simulations = SimulationsClient.get_all(experiment_id=str(self.pe.uid))
@@ -100,7 +94,6 @@ class TestLocalRunnerCLI(ITestWithPersistence):
             self.assertEqual(sim['experiment_id'], str(self.pe.uid))
 
     @unittest.skip("Skip")
-    @docker_test
     def test_local_runner_cli(self):
         current_dir_path = os.path.dirname(os.path.realpath(__file__))
         idmtools_local_runner_dir_path = os.path.join(current_dir_path, '..', '..', 'idmtools_local_runner')

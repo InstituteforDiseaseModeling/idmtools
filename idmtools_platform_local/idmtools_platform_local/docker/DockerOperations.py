@@ -1,3 +1,4 @@
+import logging
 import os
 import platform
 import shutil
@@ -203,7 +204,7 @@ class DockerOperations:
         return {src_port: dest_port} if src_port is not None else None
 
     def copy_to_container(self, container: Container, file, destination_path):
-        logger.debug(f'Copying {file} to docker container {container.id}')
+        logger.debug(f'Copying {file} to docker container {container.id}:{destination_path}')
         with self.create_archive(file) as archive:
             return container.put_archive(path=destination_path, data=archive.read())
 
@@ -211,6 +212,8 @@ class DockerOperations:
     def create_archive(file_to_copy):
         pw_tarstream = BytesIO()
         pw_tar = tarfile.TarFile(fileobj=pw_tarstream, mode='w')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f"Copying {file_to_copy} to tar stream")
         file_data = open(file_to_copy, 'rb').read()
         tarinfo = tarfile.TarInfo(name=os.path.basename(file_to_copy))
         tarinfo.size = len(file_data)
