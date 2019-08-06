@@ -13,7 +13,7 @@ LOCAL_PLATFORM_EXAMPLE_CONFIG = """
 redis_image=redis:5.0.4-alpine
 redis_port=6379
 runtime=nvidia
-workers_image: str = 'idm-docker-production.packages.idmod.org:latest'
+workers_image: str = 'idm-docker-staging.packages.idmod.org:latest'
 workers_ui_port: int = 5000
 """
 

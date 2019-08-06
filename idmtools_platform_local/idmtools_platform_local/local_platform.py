@@ -39,7 +39,7 @@ class LocalPlatform(IPlatform):
     postgres_mem_limit: str = '64m'
     postgres_mem_reservation: str = '32m'
     postgres_port: Optional[str] = 5432
-    workers_image: str = 'idm-docker-production.packages.idmod.org:latest'
+    workers_image: str = 'idm-docker-staging.packages.idmod.org:latest'
     workers_ui_port: int = 5000
     docker_operations: Optional[DockerOperations] = dataclasses.field(default=None, metadata={"pickle_ignore": True})
 

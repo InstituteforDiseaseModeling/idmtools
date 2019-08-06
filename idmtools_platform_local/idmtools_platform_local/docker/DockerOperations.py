@@ -31,7 +31,7 @@ class DockerOperations:
     postgres_mem_limit: str = '64m'
     postgres_mem_reservation: str = '32m'
     postgres_port: Optional[str] = 5432
-    workers_image: str = 'idm-docker-production.packages.idmod.org/idmtools_local_workers:latest'
+    workers_image: str = 'idm-docker-staging.packages.idmod.org/idmtools_local_workers:latest'
     workers_ui_port: int = 5000
 
     def __post_init__(self):
