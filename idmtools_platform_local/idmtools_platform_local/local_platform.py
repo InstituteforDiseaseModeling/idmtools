@@ -27,6 +27,7 @@ def local_status_to_common(status):
     from idmtools.core import EntityStatus
     return EntityStatus[status_translate[status]]
 
+
 logger = getLogger(__name__)
 
 
@@ -50,7 +51,7 @@ class LocalPlatform(IPlatform):
 
     def __post_init__(self):
         # ensure our brokers are started
-        import idmtools_platform_local.workers.brokers
+        import idmtools_platform_local.workers.brokers  # noqa: F401
         if self.docker_operations is None:
             # extract configuration details for the docker manager
             local_docker_options = [f.name for f in dataclasses.fields(DockerOperations)]
@@ -92,7 +93,7 @@ class LocalPlatform(IPlatform):
         from idmtools_platform_local.tasks.create_experiement import CreateExperimentTask
 
         m = CreateExperimentTask.send(experiment.tags, experiment.simulation_type)
-        eid = m.get_result(block=True, timeout=self.default_timeout*1000)
+        eid = m.get_result(block=True, timeout=self.default_timeout * 1000)
         experiment.uid = eid
         path = os.path.join("/data", experiment.uid, "Assets")
         self.create_dir(path)
@@ -108,7 +109,7 @@ class LocalPlatform(IPlatform):
         path = os.path.join("/data", simulation.experiment.uid, simulation.uid)
         list(map(functools.partial(self.send_asset_to_docker, path=path), simulation.assets))
 
-    def send_asset_to_docker(self, asset: Asset, path:str):
+    def send_asset_to_docker(self, asset: Asset, path: str):
         """
 
         Args:
@@ -135,13 +136,13 @@ class LocalPlatform(IPlatform):
                 self.docker_operations.copy_to_container(self.docker_operations.get_workers(), tmpfile.name,
                                                          remote_path, dest_name=asset.filename)
         else:
-             self.docker_operations.copy_to_container(self.docker_operations.get_workers(), file_path,
+            self.docker_operations.copy_to_container(self.docker_operations.get_workers(), file_path,
                                                      remote_path)
 
     def create_dir(self, dir):
         worker = self.docker_operations.get_workers()
         user_str = self.docker_operations.system_info.user_group_str
-        if not user_str: # on windows, use default user
+        if not user_str:  # on windows, use default user
             user_str = "1000:1000"
         return worker.exec_run(f'mkdir -p "{dir}"', user=user_str)
 
@@ -151,7 +152,7 @@ class LocalPlatform(IPlatform):
         ids = []
         for simulation in simulations_batch:
             m = CreateSimulationTask.send(simulation.experiment.uid, simulation.tags)
-            sid = m.get_result(block=True, timeout=self.default_timeout*1000)
+            sid = m.get_result(block=True, timeout=self.default_timeout * 1000)
             simulation.uid = sid
             self.send_assets_for_simulation(simulation)
             ids.append(sid)
