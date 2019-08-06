@@ -4,7 +4,7 @@ clean: ## Clean all our jobs
 	python dev_scripts/run_pymake_on_all.py clean p
 
 setup-dev:  ## Setup packages in dev mode
-	python dev_scripts/setup_dev_env.py
+	python dev_scripts/bootstrap.py
 	@python -c "import os; os.chdir('idmtools_platform_local'); os.system('pymake docker-local')"
 
 

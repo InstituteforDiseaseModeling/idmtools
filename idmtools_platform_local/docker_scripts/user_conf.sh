@@ -61,5 +61,5 @@ fi
 # Check for dev build. If this exists we want to install fresh copies of the packages
 if [[ -d "/dev_build" ]];
   then
-    cd /dev_build && python dev_scripts/setup_dev_env.py
+    cd /dev_build && python dev_scripts/bootstrap.py
 fi

@@ -13,7 +13,7 @@ from os.path import abspath, join, dirname
 # 3) Updating existing environments
 #
 # To use simply run
-# python setup_dev_env.py
+# python bootstrap.py
 
 base_directory = abspath(join(dirname(__file__), '..'))
 
