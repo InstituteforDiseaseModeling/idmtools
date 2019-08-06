@@ -3,8 +3,10 @@ from functools import partial
 
 from idmtools.builders import ExperimentBuilder
 from idmtools.managers import ExperimentManager
-from idmtools.platforms import LocalPlatform, COMPSPlatform
+
 from idmtools_models.python.PythonExperiment import PythonExperiment
+from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
+from idmtools_platform_local.local_platform import LocalPlatform
 
 
 def param_update(simulation, param, value):
