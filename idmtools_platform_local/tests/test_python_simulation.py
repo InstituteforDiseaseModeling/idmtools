@@ -1,14 +1,10 @@
-# flake8: noqa E402
-from idmtools_test.utils.confg_local_runner_test import config_local_test
-local_path = config_local_test()
-
+from idmtools_platform_local.docker.DockerOperations import DockerOperations
 from operator import itemgetter
 from idmtools.assets import AssetCollection
 from idmtools.builders import ExperimentBuilder
-from idmtools.core import EntityStatus
+from idmtools.core import EntityStatus, PlatformFactory
 from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
-from idmtools_platform_local.local_platform import LocalPlatform
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 import os
@@ -16,13 +12,18 @@ import os
 from idmtools_test.utils.decorators import docker_test
 
 
+@docker_test
 class TestPythonSimulation(ITestWithPersistence):
+    @classmethod
+    def setUpClass(cls) -> None:
+        dm = DockerOperations()
+        dm.cleanup(True)
+
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
 
-    @docker_test
     def test_direct_sweep_one_parameter_local(self):
-        platform = LocalPlatform()
+        platform = PlatformFactory.create_from_block('Local_Staging')
         name = self.case_name
         pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
 
@@ -58,10 +59,9 @@ class TestPythonSimulation(ITestWithPersistence):
         sorted_expected_tags = sorted(expected_tags, key=itemgetter('a'))
         self.assertEqual(sorted_tags, sorted_expected_tags)
 
-    @docker_test
     def test_add_prefixed_relative_path_to_assets_local(self):
         # platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
-        platform = LocalPlatform()
+        platform = PlatformFactory.create_from_block('Local_Staging')
         model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
         ac = AssetCollection()
         assets_path = os.path.join(COMMON_INPUT_PATH, "python", "Assets", "MyExternalLibrary")

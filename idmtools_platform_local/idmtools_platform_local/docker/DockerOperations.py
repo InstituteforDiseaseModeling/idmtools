@@ -1,3 +1,4 @@
+import importlib
 import logging
 import os
 import platform
@@ -5,17 +6,38 @@ import shutil
 import tarfile
 import time
 from dataclasses import dataclass
+from functools import wraps
 from io import BytesIO
 from logging import getLogger
 from typing import Optional, Union
 
 import docker
 from docker.models.containers import Container
+from yaspin import yaspin
 
 from idmtools.core.SystemInformation import get_system_information
 from idmtools_platform_local import __version__
 
 logger = getLogger(__name__)
+
+
+def optional_yaspin_load(*yargs, **ykwargs):
+    has_yaspin = importlib.util.find_spec("yaspin")
+    spinner = None
+    if has_yaspin:
+        spinner = yaspin(*yargs, **ykwargs)
+
+    def decorate(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            if spinner:
+                spinner.start()
+            result = func(*args, **kwargs)
+            if spinner:
+                spinner.stop()
+            return result
+        return wrapper
+    return decorate
 
 
 @dataclass
@@ -40,13 +62,14 @@ class DockerOperations:
         self.timeout = 1
         self.system_info = get_system_information()
         self.client = docker.from_env()
-        self.create_services()
 
+    @optional_yaspin_load(text="Ensure IDM Tools Local Platform services are loaded")
     def create_services(self):
 
         self.get_network()
         self.get_redis()
         self.get_postgres()
+        time.sleep(5)
         self.get_workers()
 
     def restart_all(self):
@@ -62,9 +85,10 @@ class DockerOperations:
         if workers:
             workers.restart()
 
+    @optional_yaspin_load(text="Stopping IDM Tools Local Platform services")
     def stop_services(self):
         for service in ['redis', 'postgres', 'workers']:
-            container = getattr(self, f'get_{service}')()
+            container = getattr(self, f'get_{service}')(False)
             if container:
                 name = container.name
                 logger.debug(f'Stopping container {name}')
@@ -99,14 +123,14 @@ class DockerOperations:
             network = network[0]
         return network
 
-    def get_workers(self) -> str:
+    def get_workers(self, create=True) -> str:
         logger.debug('Ensuring worker is running')
-        workers_container = self.client.containers.list(filters=dict(name='idmtools_worker'))
-        if not workers_container:
+        workers_container = self.client.containers.list(filters=dict(name='idmtools_worker'), all=True)
+        if not workers_container and create:
             container_config = self.create_worker_config()
             logger.debug(f'Worker Container Config {str(container_config)}')
             workers_container = self.client.containers.run(**container_config)
-        else:
+        elif type(workers_container) is list and len(workers_container):
             workers_container = workers_container[0]
         return workers_container
 
@@ -129,10 +153,13 @@ class DockerOperations:
                                 image=self.workers_image, ports=port_bindings,
                                 links=dict(idmtools_redis='redis', idmtools_postgres='postgres'),
                                 volumes=worker_volumes, runtime=self.runtime, environment=environment)
+
         container_config.update(
             self.get_common_config(
                 mem_limit=self.redis_mem_limit, mem_reservation=self.redis_mem_reservation
             ))
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f"Worker Config: {container_config}")
         return container_config
 
     @staticmethod
@@ -145,14 +172,14 @@ class DockerOperations:
             config['mem_reservation'] = mem_reservation
         return config
 
-    def get_redis(self) -> str:
+    def get_redis(self, create=True) -> str:
         logger.debug('Ensuring redis is running')
-        redis_container = self.client.containers.list(filters=dict(name='idmtools_redis'))
-        if not redis_container:
+        redis_container = self.client.containers.list(filters=dict(name='idmtools_redis'), all=True)
+        if not redis_container and create:
             container_config = self.create_redis_config()
             logger.debug(f'Redis Container Config {str(container_config)}')
             redis_container = self.client.containers.run(**container_config)
-        else:
+        elif type(redis_container) is list and len(redis_container):
             redis_container = redis_container[0]
         return redis_container
 
@@ -169,16 +196,18 @@ class DockerOperations:
             container_config['user'] = self.system_info.user_group_str
         container_config.update(self.get_common_config(mem_limit=self.redis_mem_limit,
                                                        mem_reservation=self.redis_mem_reservation))
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f"Redis Config: {container_config}")
         return container_config
 
-    def get_postgres(self) -> str:
+    def get_postgres(self, create=True) -> str:
         logger.debug('Ensuring postgres is running')
-        postgres_container = self.client.containers.list(filters=dict(name='idmtools_postgres'))
-        if not postgres_container:
+        postgres_container = self.client.containers.list(filters=dict(name='idmtools_postgres'), all=True)
+        if not postgres_container and create:
             container_config = self.create_postgres_config()
             logger.debug(f'Postgres Container Config {str(container_config)}')
             postgres_container = self.client.containers.run(**container_config)
-        else:
+        elif type(postgres_container) is list and len(postgres_container):
             postgres_container = postgres_container[0]
         return postgres_container
 
@@ -197,25 +226,29 @@ class DockerOperations:
             self.get_common_config(
                 mem_limit=self.postgres_mem_limit, mem_reservation=self.postgres_mem_reservation)
         )
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f"Postgres Config: {container_config}")
         return container_config
 
     @staticmethod
     def _get_optional_port_bindings(src_port: Optional[Union[str, int]], dest_port: Optional[Union[str, int]]):
         return {src_port: dest_port} if src_port is not None else None
 
-    def copy_to_container(self, container: Container, file, destination_path):
+    def copy_to_container(self, container: Container, file, destination_path, dest_name=None):
         logger.debug(f'Copying {file} to docker container {container.id}:{destination_path}')
-        with self.create_archive(file) as archive:
+        with self.create_archive(file, dest_name=dest_name) as archive:
             return container.put_archive(path=destination_path, data=archive.read())
 
     @staticmethod
-    def create_archive(file_to_copy):
+    def create_archive(file_to_copy, dest_name=None):
         pw_tarstream = BytesIO()
         pw_tar = tarfile.TarFile(fileobj=pw_tarstream, mode='w')
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f"Copying {file_to_copy} to tar stream")
-        file_data = open(file_to_copy, 'rb').read()
-        tarinfo = tarfile.TarInfo(name=os.path.basename(file_to_copy))
+        with open(file_to_copy, 'rb') as in_file:
+            file_data = in_file.read()
+        name = dest_name if dest_name else os.path.basename(file_to_copy)
+        tarinfo = tarfile.TarInfo(name=name)
         tarinfo.size = len(file_data)
         tarinfo.mtime = time.time()
         # tarinfo.mode = 0600

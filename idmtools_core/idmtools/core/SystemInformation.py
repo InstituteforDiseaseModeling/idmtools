@@ -28,6 +28,7 @@ class SystemInformation:
     system_architecture_details: str = platform.architecture()
     default_docket_socket_path: str = '/var/run/docker.sock'
     cwd: str = os.getcwd()
+    user_group_str: str = None
 
 
 @dataclass

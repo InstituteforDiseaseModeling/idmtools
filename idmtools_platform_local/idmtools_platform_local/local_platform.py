@@ -1,7 +1,9 @@
 import dataclasses
 import functools
+import logging
 import os
 import tempfile
+from logging import getLogger
 from typing import Optional
 
 from dataclasses import dataclass
@@ -25,6 +27,8 @@ def local_status_to_common(status):
     from idmtools.core import EntityStatus
     return EntityStatus[status_translate[status]]
 
+logger = getLogger(__name__)
+
 
 @dataclass
 class LocalPlatform(IPlatform):
@@ -41,6 +45,7 @@ class LocalPlatform(IPlatform):
     postgres_port: Optional[str] = 5432
     workers_image: str = 'idm-docker-staging.packages.idmod.org:latest'
     workers_ui_port: int = 5000
+    default_timeout: int = 30
     docker_operations: Optional[DockerOperations] = dataclasses.field(default=None, metadata={"pickle_ignore": True})
 
     def __post_init__(self):
@@ -87,8 +92,10 @@ class LocalPlatform(IPlatform):
         from idmtools_platform_local.tasks.create_experiement import CreateExperimentTask
 
         m = CreateExperimentTask.send(experiment.tags, experiment.simulation_type)
-        eid = m.get_result(block=True)
+        eid = m.get_result(block=True, timeout=self.default_timeout*1000)
         experiment.uid = eid
+        path = os.path.join("/data", experiment.uid, "Assets")
+        self.create_dir(path)
         self.send_assets_for_experiment(experiment)
 
     def send_assets_for_experiment(self, experiment):
@@ -112,6 +119,10 @@ class LocalPlatform(IPlatform):
 
         """
         file_path = asset.absolute_path
+        remote_path = os.path.join(path, asset.relative_path) if asset.relative_path else path
+        result = self.create_dir(remote_path)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f"Creating directory {remote_path} result: {str(result)}")
         if not file_path:
             # Write file to temporary file from content
             if asset.content is None:
@@ -120,9 +131,19 @@ class LocalPlatform(IPlatform):
             with tempfile.NamedTemporaryFile(mode='wb') as tmpfile:
                 tmpfile.write(asset.content)
                 tmpfile.flush()
-                self.docker_operations.copy_to_container(self.docker_operations.get_workers(), tmpfile.name, path)
+
+                self.docker_operations.copy_to_container(self.docker_operations.get_workers(), tmpfile.name,
+                                                         remote_path, dest_name=asset.filename)
         else:
-            self.docker_operations.copy_to_container(self.docker_operations.get_workers(), file_path, path)
+             self.docker_operations.copy_to_container(self.docker_operations.get_workers(), file_path,
+                                                     remote_path)
+
+    def create_dir(self, dir):
+        worker = self.docker_operations.get_workers()
+        user_str = self.docker_operations.system_info.user_group_str
+        if not user_str: # on windows, use default user
+            user_str = "1000:1000"
+        return worker.exec_run(f'mkdir -p "{dir}"', user=user_str)
 
     def create_simulations(self, simulations_batch):
         from idmtools_platform_local.tasks.create_simulation import CreateSimulationTask
@@ -130,7 +151,7 @@ class LocalPlatform(IPlatform):
         ids = []
         for simulation in simulations_batch:
             m = CreateSimulationTask.send(simulation.experiment.uid, simulation.tags)
-            sid = m.get_result(block=True)
+            sid = m.get_result(block=True, timeout=self.default_timeout*1000)
             simulation.uid = sid
             self.send_assets_for_simulation(simulation)
             ids.append(sid)

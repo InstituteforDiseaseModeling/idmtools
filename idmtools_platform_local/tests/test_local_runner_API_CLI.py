@@ -12,9 +12,10 @@ from idmtools_platform_local.client.simulations_client import SimulationsClient
 from idmtools_models.python import PythonExperiment
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 from idmtools_test import COMMON_INPUT_PATH
+from idmtools_test.utils.decorators import docker_test
 
 
-#@docker_test
+@docker_test
 class TestLocalRunnerCLI(ITestWithPersistence):
 
     @classmethod
