@@ -7,7 +7,7 @@ import time
 from dataclasses import dataclass
 from io import BytesIO
 from logging import getLogger
-from typing import Optional, Union
+from typing import Optional, Union, NoReturn
 
 import docker
 from docker.models.containers import Container
@@ -43,15 +43,52 @@ class DockerOperations:
         self.client = docker.from_env()
 
     @optional_yaspin_load(text="Ensure IDM Tools Local Platform services are loaded")
-    def create_services(self):
+    def create_services(self) -> NoReturn:
+        """
+        Create all the components of our
+
+        Our architecture is as depicted in the diagram below
+
+        @startuml
+
+        database "Postgres" as db
+        node "Redis"as redis
+        node "Workers" {
+            [UI] -> db
+            rectangle "Python Workers" {
+                rectangle "Worker ..." as w2
+                rectangle "Worker 1" as w1
+                w1 --> db
+                w1 --> redis
+                w2 --> db
+                w2 --> redis
+            }
+        }
+        file "User Python Script" as u
+        u ..> redis
+        @enduml
+
+        Returns:
+            (NoReturn)
+        """
 
         self.get_network()
         self.get_redis()
         self.get_postgres()
+        # wait on services to start
+        # in the future this could be improved with service detection
         time.sleep(5)
         self.get_workers()
 
-    def restart_all(self):
+    @optional_yaspin_load(text="Restarting IDM-Tools services")
+    def restart_all(self) -> NoReturn:
+        """
+        Restart all the services IDM-Tools services
+
+        Returns:
+            (NoReturn)
+        """
+
         redis = self.get_redis()
         if redis:
             redis.restart()
@@ -65,7 +102,13 @@ class DockerOperations:
             workers.restart()
 
     @optional_yaspin_load(text="Stopping IDM Tools Local Platform services")
-    def stop_services(self):
+    def stop_services(self) -> NoReturn:
+        """
+        Stops all running IDM Tools services
+
+        Returns:
+            (NoReturn)
+        """
         for service in ['redis', 'postgres', 'workers']:
             container = getattr(self, f'get_{service}')(False)
             if container:
@@ -75,7 +118,17 @@ class DockerOperations:
                 logger.debug(f'Removing container {name}')
                 container.remove()
 
-    def cleanup(self, delete_data=True):
+    def cleanup(self, delete_data: bool=True) -> NoReturn:
+        """
+        Stops the running services, removes local data, and removes network. You can optionally disable the deleting
+        of local data
+
+        Args:
+            delete_data: When true, deletes local data
+
+        Returns:
+            (NoReturn)
+        """
         self.stop_services()
         try:
             if delete_data:
@@ -83,9 +136,10 @@ class DockerOperations:
         except PermissionError:
             logger.warning(f"Cannot cleanup directory {self.host_data_directory} because it is still in use")
             pass
-        postgres_volume = self.client.volumes.list(filters=dict(name='idmtools_local_postgres'))
-        if postgres_volume:
-            postgres_volume[0].remove(True)
+        if delete_data:
+            postgres_volume = self.client.volumes.list(filters=dict(name='idmtools_local_postgres'))
+            if postgres_volume:
+                postgres_volume[0].remove(True)
 
         network = self.get_network()
         if network:
@@ -102,7 +156,7 @@ class DockerOperations:
             network = network[0]
         return network
 
-    def get_workers(self, create=True) -> str:
+    def get_workers(self, create=True) -> Container:
         logger.debug('Ensuring worker is running')
         workers_container = self.client.containers.list(filters=dict(name='idmtools_worker'), all=True)
         if not workers_container and create:
@@ -151,7 +205,7 @@ class DockerOperations:
             config['mem_reservation'] = mem_reservation
         return config
 
-    def get_redis(self, create=True) -> str:
+    def get_redis(self, create=True) -> Container:
         logger.debug('Ensuring redis is running')
         redis_container = self.client.containers.list(filters=dict(name='idmtools_redis'), all=True)
         if not redis_container and create:
@@ -179,7 +233,7 @@ class DockerOperations:
             logger.debug(f"Redis Config: {container_config}")
         return container_config
 
-    def get_postgres(self, create=True) -> str:
+    def get_postgres(self, create=True) -> Container:
         logger.debug('Ensuring postgres is running')
         postgres_container = self.client.containers.list(filters=dict(name='idmtools_postgres'), all=True)
         if not postgres_container and create:

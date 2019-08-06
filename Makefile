@@ -14,8 +14,8 @@ lint: ## check style with flake8
 test: ## Run our tests
 	python dev_scripts/run_pymake_on_all.py test p
 
-test-all: ## Run our tests
-	python dev_scripts/run_pymake_on_all.py test-all p
+test-all: ## Run our tests. We cannot run in parallel
+	python dev_scripts/run_pymake_on_all.py test-all
 
 coverage: ## Generate a code-coverage report
 	python dev_scripts/run_pymake_on_all.py coverage

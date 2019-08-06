@@ -84,7 +84,7 @@ def register_stop_logger_signal_handler(listener) -> NoReturn:
 
     """
 
-    def stop_logger():
+    def stop_logger(*args, **kwargs):
         listener.stop()
 
     for s in [SIGINT, SIGTERM]:

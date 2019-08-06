@@ -18,7 +18,8 @@ There is a Makefile file available for most common development tasks. Here is a 
 setup-dev   -   Setup dev environment(assumes you already have a virtualenv)
 clean       -   Clean up temporary files
 lint        -   Lint package and tests
-test        -   Run All tests
+test        -   Run Unit tests
+test-all    -   Run Tests that require docker and external systems
 coverage    -   Run tests and generate coverage report that is shown in browser
 ```
 On Windows, you can use `pymake` instead of `make`
@@ -45,20 +46,6 @@ Install the packages in dev mode with the `test` extra (from repository folder).
 
 ```
 
-Create a Docker network named `idmtools_network`:
-```bash
-> docker network create idmtools_network
-```
-
-Navigate to the `idmtools_platform_local` folder and start the local runner:
-```bash
-> ./start.sh
-```
-On Windows you can use
-```bash
-> docker-compose up -d
-```
-
 For development purpose, it is important to add the following folders as to your `PYTHONPATH` (In PyCharm, right click and `Mark Directoy as > Source Root`):
 - `idmtools/idmtools_core`
 - `idmtools/idmtools_cli`
@@ -68,11 +55,6 @@ For development purpose, it is important to add the following folders as to your
 - `idmtools/idmtools_test`
 
 ## Running the examples in Jupyter
-Ensure that the local runner is up:
-```bash
-> cd idmtools_platform_local
-> docker-compose up
-```
 
 Navigate to the `examples` folder and run:
 ```bash

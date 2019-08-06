@@ -1,4 +1,6 @@
 # flake8: noqa E402
+import time
+
 from idmtools_test.utils.confg_local_runner_test import config_local_test
 from idmtools_test.utils.decorators import docker_test
 
@@ -114,6 +116,8 @@ class TestAPI(unittest.TestCase):
         # start up postgres
         dm = DockerOperations()
         dm.get_postgres()
+        # give postgres 5 seconds to start
+        time.slepp(5)
         # ensure we are connecting to proper db
         url = 'postgresql+psycopg2://idmtools:idmtools@localhost/idmtools'
         engine = create_engine(url, echo=True, pool_size=32)

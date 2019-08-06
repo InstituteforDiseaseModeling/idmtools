@@ -19,4 +19,4 @@ def run_command_on_all(command, parallel = False):
         print('Waiting to finish')
         [p.wait() for p in processes]
 
-run_command_on_all(sys.argv[1], len(sys.argv) > 1 and sys.argv[2] == "p")
+run_command_on_all(sys.argv[1], len(sys.argv) > 2 and sys.argv[2] == "p")

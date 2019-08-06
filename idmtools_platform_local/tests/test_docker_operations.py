@@ -61,8 +61,10 @@ class TestDockerOperations(unittest.TestCase):
 
         dm.stop_services()
 
-    def test_port_taken(self):
-        self.fail()
+    # def test_port_taken(self):
+    #    self.fail()
+    # we need a test where we start a service on a port used by our container(5000)
+    # and test the error messaging of item
 
 
 

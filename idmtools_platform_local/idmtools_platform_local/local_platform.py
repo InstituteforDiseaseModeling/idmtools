@@ -4,7 +4,7 @@ import logging
 import os
 import tempfile
 from logging import getLogger
-from typing import Optional
+from typing import Optional, NoReturn
 
 from dataclasses import dataclass
 
@@ -57,6 +57,7 @@ class LocalPlatform(IPlatform):
             local_docker_options = [f.name for f in dataclasses.fields(DockerOperations)]
             opts = {k: v for k, v in self.__dict__.items() if k in local_docker_options}
             self.docker_operations = DockerOperations(**opts)
+            # start the services
             self.docker_operations.create_services()
 
     """
@@ -109,21 +110,23 @@ class LocalPlatform(IPlatform):
         path = os.path.join("/data", simulation.experiment.uid, simulation.uid)
         list(map(functools.partial(self.send_asset_to_docker, path=path), simulation.assets))
 
-    def send_asset_to_docker(self, asset: Asset, path: str):
+    def send_asset_to_docker(self, asset: Asset, path: str) -> NoReturn:
         """
-
+        Handles sending an asset to docker.
         Args:
-            asset:
-            path:
+            asset: Asset object to send
+            path: Path to send find to within docker container
 
         Returns:
-
+            (NoReturn): Nada
         """
         file_path = asset.absolute_path
         remote_path = os.path.join(path, asset.relative_path) if asset.relative_path else path
+        # ensure remote directory exists
         result = self.create_dir(remote_path)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f"Creating directory {remote_path} result: {str(result)}")
+        # is it a real file?
         if not file_path:
             # Write file to temporary file from content
             if asset.content is None:

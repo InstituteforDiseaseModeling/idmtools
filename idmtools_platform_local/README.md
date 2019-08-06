@@ -19,13 +19,30 @@ somewhat similar to COMPS, though much more limited
 
 # Running the Local Runner
 
-Generally you can do a 
-`./start.sh`
+The local runner will start on it's own using when you select it as the platform. For example, from your code you can
+ do the following with this example idmtools.ini file
+ ```ini
+[Local_Staging]
+type = Local
+ ```
+ In your code, you could then get then use as would any other platform
+```python
+from idmtools.core import PlatformFactory
 
-This will bring up 3 services
-- postgres
-- redis
-- workers
+platform = PlatformFactory.create_from_block('Local')
+p1 = PlatformFactory.create_from_block('Local')
+...
+em = ExperimentManager(experiment=experiment, platform=platform)
+em.run()
+em.wait_till_done()
+
+```
+
+You can manage the Local platform using cli commands
+* `idmtools local down`    - Shutdown the local platform. You can also add the `--delete-data` flag to delete the local data as well
+* `idmtools local restart` - Restart the local platform
+* `idmtools local start`   - Start the local platform
+* `idmtools local status`  - Check local platform status
 
 The workers service contains the IDMTools workers that actually execut the tasks as well as containing a simplistic UI
 running at http://localhost:5000
@@ -41,7 +58,11 @@ There is a Makefile file available for most common development tasks. Here is a 
 ```bash
 clean       -   Clean up temproary files
 lint        -   Lint package and tests
-test        -   Run All tests
+test        -   Run Unit tests
+test-all    -   Run all tests including integration and docker test
+docker-cleanup - Manually cleanup
+docker-local - Build docker image using local pypi server for packaging
+
 coverage    -   Run tests and generate coverage report that is shown in browser
 ```
 On Windows, you can use `pymake` instead of `make`
