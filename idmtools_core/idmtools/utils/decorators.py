@@ -4,7 +4,6 @@ import os
 from functools import wraps
 from typing import Callable, Union
 
-from yaspin import yaspin
 
 
 class abstractstatic(staticmethod):
@@ -116,7 +115,7 @@ def optional_yaspin_load(*yargs, **ykwargs) -> Callable:
 
     Examples:
         ```
-        optional_yaspin_load(text="Loading test", color="yellow")
+        @optional_yaspin_load(text="Loading test", color="yellow")
         def test():
             time.sleep(100)
         ```
@@ -126,6 +125,7 @@ def optional_yaspin_load(*yargs, **ykwargs) -> Callable:
     has_yaspin = importlib.util.find_spec("yaspin")
     spinner = None
     if has_yaspin and not os.get.env('NO_SPINNER', False):
+        from yaspin import yaspin
         spinner = yaspin(*yargs, **ykwargs)
 
     def decorate(func):
