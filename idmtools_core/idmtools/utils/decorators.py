@@ -1,4 +1,5 @@
 import importlib
+import os
 from functools import wraps
 from typing import Callable, Union
 
@@ -105,7 +106,7 @@ class LoadOnCallSingletonDecorator:
 def optional_yaspin_load(*yargs, **ykwargs):
     has_yaspin = importlib.util.find_spec("yaspin")
     spinner = None
-    if has_yaspin:
+    if has_yaspin and not os.get.env('NO_SPINNER', False):
         spinner = yaspin(*yargs, **ykwargs)
 
     def decorate(func):
