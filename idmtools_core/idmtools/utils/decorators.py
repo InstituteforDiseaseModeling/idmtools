@@ -1,4 +1,5 @@
 import importlib
+import importlib.util
 import os
 from functools import wraps
 from typing import Callable, Union
@@ -103,7 +104,25 @@ class LoadOnCallSingletonDecorator:
             self.created = True
 
 
-def optional_yaspin_load(*yargs, **ykwargs):
+def optional_yaspin_load(*yargs, **ykwargs) -> Callable:
+    """
+    Adds a CLI spinner to a function if
+
+    * yaspin package is present
+    * NO_SPINNER environment variable is not defined
+    Args:
+        *yargs: Arguments to pass to yaspin constructor
+        **ykwargs: Keyword arguments to pass to yaspin constructor
+
+    Examples:
+        ```
+        optional_yaspin_load(text="Loading test", color="yellow")
+        def test():
+            time.sleep(100)
+        ```
+    Returns:
+        (Callable): Wrapper function
+    """
     has_yaspin = importlib.util.find_spec("yaspin")
     spinner = None
     if has_yaspin and not os.get.env('NO_SPINNER', False):
