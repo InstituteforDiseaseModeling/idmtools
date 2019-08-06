@@ -124,7 +124,7 @@ def optional_yaspin_load(*yargs, **ykwargs) -> Callable:
     """
     has_yaspin = importlib.util.find_spec("yaspin")
     spinner = None
-    if has_yaspin and not os.get.env('NO_SPINNER', False):
+    if has_yaspin and not os.getenv('NO_SPINNER', False):
         from yaspin import yaspin
         spinner = yaspin(*yargs, **ykwargs)
 

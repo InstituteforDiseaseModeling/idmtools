@@ -31,5 +31,8 @@ def status(platform_cli: IPlatformCLI, id: Optional[str], experiment_id: Optiona
            tags: Optional[List[Tuple[str, str]]]):
     """
     List of statuses for simulation(s) with the ability to filter by id, experiment_id, status, and tags
+
+    Some example:
+    idmtools experiments --platform Local status
     """
     platform_cli.get_simulation_status(id, experiment_id, None, tags)
