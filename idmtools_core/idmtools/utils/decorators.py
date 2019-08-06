@@ -1,5 +1,8 @@
+import importlib
 from functools import wraps
 from typing import Callable, Union
+
+from yaspin import yaspin
 
 
 class abstractstatic(staticmethod):
@@ -97,3 +100,22 @@ class LoadOnCallSingletonDecorator:
         if not self.created:
             self.instance = self.instance()
             self.created = True
+
+
+def optional_yaspin_load(*yargs, **ykwargs):
+    has_yaspin = importlib.util.find_spec("yaspin")
+    spinner = None
+    if has_yaspin:
+        spinner = yaspin(*yargs, **ykwargs)
+
+    def decorate(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            if spinner:
+                spinner.start()
+            result = func(*args, **kwargs)
+            if spinner:
+                spinner.stop()
+            return result
+        return wrapper
+    return decorate

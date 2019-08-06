@@ -1,4 +1,3 @@
-import importlib
 import logging
 import os
 import platform
@@ -6,38 +5,18 @@ import shutil
 import tarfile
 import time
 from dataclasses import dataclass
-from functools import wraps
 from io import BytesIO
 from logging import getLogger
 from typing import Optional, Union
 
 import docker
 from docker.models.containers import Container
-from yaspin import yaspin
 
 from idmtools.core.SystemInformation import get_system_information
+from idmtools.utils.decorators import optional_yaspin_load
 from idmtools_platform_local import __version__
 
 logger = getLogger(__name__)
-
-
-def optional_yaspin_load(*yargs, **ykwargs):
-    has_yaspin = importlib.util.find_spec("yaspin")
-    spinner = None
-    if has_yaspin:
-        spinner = yaspin(*yargs, **ykwargs)
-
-    def decorate(func):
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            if spinner:
-                spinner.start()
-            result = func(*args, **kwargs)
-            if spinner:
-                spinner.stop()
-            return result
-        return wrapper
-    return decorate
 
 
 @dataclass
