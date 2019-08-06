@@ -21,7 +21,7 @@ class TestSimulationsBasics(unittest.TestCase):
         """
         result = self.run_command('simulation', '--help')
         # Check for our help string
-        self.assertIn('Commands related to simulations', result.output)
+        self.assertIn('Contains commands related to simulations', result.output)
         # Check that there is a --platform option
         self.assertIn('--platform', result.output)
         # Ensure we have our expected global sub-commands

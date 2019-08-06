@@ -48,6 +48,7 @@ def experiment_filter(id: Optional[str], tags: Optional[List[Tuple[str, str]]]) 
 
     sdf = pd.read_sql(subjob_status_query.statement, subjob_status_query.session.bind, index_col=['parent_uuid'])
 
+
     # There may be a better way to do this merge of data. For now the loop works
     # basically we are building the progress bar for each experiment based on the simulation statuses
     df['progress'] = ''
@@ -69,7 +70,8 @@ def experiment_filter(id: Optional[str], tags: Optional[List[Tuple[str, str]]]) 
 
             status_bars.append(job_status)
             # status_bars.append(parent_status_to_progress(job_status))
-        row['progress'] = status_bars
+        df.at[index, 'progress'] = status_bars
+
     df['data_path'] = df['data_path'].apply(lambda x: x.replace(DATA_PATH, '/data'))
     # df['data_path'] = df['data_path'].apply(urlize_data_path)
 

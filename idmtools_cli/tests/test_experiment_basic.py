@@ -23,7 +23,7 @@ class TestExperimentBasics(unittest.TestCase):
         """
         result = self.run_command('experiment', '--help')
         # Check for our help string
-        self.assertIn('Commands related to experiments', result.output)
+        self.assertIn('Contains commands related to experiments', result.output)
         # Check that there is a --platform option
         self.assertIn('--platform', result.output)
         # Ensure we have our expected global sub-commands
