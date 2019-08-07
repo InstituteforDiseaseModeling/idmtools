@@ -1,11 +1,13 @@
 import logging
 import os
+import typing
 from dramatiq import GenericActor
-
-from idmtools.core import TTags
 from idmtools_platform_local.config import DATA_PATH
 import random
 import string
+
+if typing.TYPE_CHECKING:
+    from idmtools.core import TTags
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +23,7 @@ class CreateSimulationTask(GenericActor):
         store_results = True
         max_retries = 0
 
-    def perform(self, experiment_id: str, tags: TTags) -> str:
+    def perform(self, experiment_id: str, tags: 'TTags') -> str:
         """
         Creates our simulation task
 

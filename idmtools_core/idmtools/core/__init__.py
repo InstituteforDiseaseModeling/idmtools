@@ -6,5 +6,4 @@ from idmtools.core.exceptions import *
 from idmtools.core.ExperimentFactory import experiment_factory
 from idmtools.core.PlatformFactory import PlatformFactory
 from idmtools.core.SystemInformation import SystemInformation
-from idmtools.utils.info import get_packages_from_pip
 from idmtools.core.types import *

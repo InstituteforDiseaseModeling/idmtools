@@ -1,5 +1,6 @@
 from typing import Optional, Tuple, List, Any, Dict
 import click
+import requests
 from tabulate import tabulate
 
 
@@ -42,6 +43,8 @@ def status(id: Optional[str], tags: Optional[List[Tuple[str, str]]]):
         experiments = ExperimentsClient.get_all(tags=tags) if id is None else ExperimentsClient.get_one(id, tags=tags)
     except RuntimeError as e:
         show_error(e.args[0])
+    except requests.exceptions.ConnectionError as e:
+        show_error(f"Could not connect to the local platform: {e.request.url}. Is the local platform running?")
     experiments = list(map(lambda x: prettify_experiment(x), experiments))
     print(tabulate(experiments, headers='keys', tablefmt='psql', showindex=False))
 

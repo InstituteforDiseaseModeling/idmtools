@@ -3,11 +3,11 @@ import os
 import random
 import string
 from dataclasses import InitVar
-
+import typing as typing
 from dramatiq import GenericActor
-
-from idmtools.core import TTags, TSimulationClass
 from idmtools_platform_local.config import DATA_PATH
+if typing.TYPE_CHECKING:
+    from idmtools.core import TTags, TSimulationClass, typing
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
@@ -19,7 +19,7 @@ class CreateExperimentTask(GenericActor):
         store_results = True
         max_retries = 0
 
-    def perform(self, tags: TTags, simulation_type: InitVar[TSimulationClass]) -> str:
+    def perform(self, tags: 'TTags', simulation_type: InitVar['TSimulationClass']) -> str:
         """
         Creates an experiment.
             - Create the folder

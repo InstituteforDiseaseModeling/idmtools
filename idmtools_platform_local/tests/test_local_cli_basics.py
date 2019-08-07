@@ -107,7 +107,7 @@ class TestLocalCLIBasic(unittest.TestCase):
             def do_test(*mocks):
 
                 result = self.run_command('simulation', '--platform', 'Local', 'status', base_command='')
-                self.assertEqual(result.exit_code, 0)
+                self.assertEqual(result.exit_code, 0, f'{result.exit_code} - {result.output}')
                 output = re.sub(r'[\+\-]+', '', strip_ansi(result.output)).split("\n")
                 output = [o for o in output if o]
                 self.assertEqual(len(output), 5)

@@ -1,4 +1,6 @@
 from typing import Optional, Tuple, List, Dict, Any
+
+import requests
 from tabulate import tabulate
 
 
@@ -43,9 +45,14 @@ def status(id: Optional[str], experiment_id: Optional[str], status: Optional[str
     """
     from idmtools_cli.cli.utils import show_error
     try:
-        simulations = SimulationsClient.get_all(id, experiment_id=experiment_id, status=status, tags=tags)
+        if id is None:
+            simulations = SimulationsClient.get_all(status=status, tags=tags)
+        else:
+            simulations = SimulationsClient.get_one(id, status=status, tags=tags)
     except RuntimeError as e:
         show_error(e.args[0])
+    except requests.exceptions.ConnectionError as e:
+        show_error(f"Could not connect to the local platform: {e.request.url}. Is the local platform running?")
 
     simulations = list(map(lambda x: prettify_simulation(x), simulations))
     print(tabulate(simulations, headers='keys', tablefmt='psql', showindex=False))
