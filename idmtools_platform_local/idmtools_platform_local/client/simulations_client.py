@@ -12,7 +12,7 @@ class SimulationsClient(BaseClient):
     base_url = f'{API_PATH}/simulations'
 
     @classmethod
-    def get_all(cls, id: Optional[str] = None, experiment_id: Optional[str] = None, status: Optional[Status] = None,
+    def get_all(cls, experiment_id: Optional[str] = None, status: Optional[Status] = None,
                 tags: Optional[List[Tuple[str, str]]] = None) -> List[Dict[str, Any]]:
         """
 

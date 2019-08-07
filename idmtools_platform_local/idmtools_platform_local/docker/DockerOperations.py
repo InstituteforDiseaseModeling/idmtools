@@ -10,7 +10,7 @@ from logging import getLogger
 from typing import Optional, Union, NoReturn
 
 import docker
-from docker.models.containers import Container
+from docker.models.containers import Container, ExecResult
 from docker.models.networks import Network
 
 from idmtools.core.SystemInformation import get_system_information
@@ -412,3 +412,21 @@ class DockerOperations:
         pw_tar.close()
         pw_tarstream.seek(0)
         return pw_tarstream
+
+    def create_directory(self, dir: str, container: Optional[Container] = None) -> ExecResult:
+        """
+        Create a directory in a container
+
+        Args:
+            dir: Path to directory to create
+            container: Container to create directory in. Default to worker container
+
+        Returns:
+            (ExecResult) Result of the mkdir operation
+        """
+        if container is None:
+            container = self.get_workers()
+        user_str = self.system_info.user_group_str
+        if not user_str:  # on windows, use default user
+            user_str = "1000:1000"
+        return container.exec_run(f'mkdir -p "{dir}"', user=user_str)

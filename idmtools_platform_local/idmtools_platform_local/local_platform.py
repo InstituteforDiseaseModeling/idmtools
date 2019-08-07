@@ -33,7 +33,6 @@ logger = getLogger(__name__)
 
 @dataclass
 class LocalPlatform(IPlatform):
-    auto_remove: bool = True
     network: str = 'idmtools'
     redis_image: str = 'redis:5.0.4-alpine'
     redis_port: int = 6379
@@ -97,7 +96,7 @@ class LocalPlatform(IPlatform):
         eid = m.get_result(block=True, timeout=self.default_timeout * 1000)
         experiment.uid = eid
         path = os.path.join("/data", experiment.uid, "Assets")
-        self.create_dir(path)
+        self.docker_operations.create_directory(path)
         self.send_assets_for_experiment(experiment)
 
     def send_assets_for_experiment(self, experiment):
@@ -113,6 +112,7 @@ class LocalPlatform(IPlatform):
     def send_asset_to_docker(self, asset: Asset, path: str) -> NoReturn:
         """
         Handles sending an asset to docker.
+
         Args:
             asset: Asset object to send
             path: Path to send find to within docker container
@@ -123,15 +123,18 @@ class LocalPlatform(IPlatform):
         file_path = asset.absolute_path
         remote_path = os.path.join(path, asset.relative_path) if asset.relative_path else path
         # ensure remote directory exists
-        result = self.create_dir(remote_path)
+        result = self.docker_operations.create_directory(remote_path)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f"Creating directory {remote_path} result: {str(result)}")
         # is it a real file?
         if not file_path:
-            # Write file to temporary file from content
+
             if asset.content is None:
                 raise IOError("Cannot determine the source of the assets. The Local Platform requires either the "
                               "absolute path or content to be set on the Asset object")
+            # this should be refactored to use stream of data directly to tar file. This means we need a new method
+            # in our docker operations to allow this mode
+            # for now let's write file to temporary file from content
             with tempfile.NamedTemporaryFile(mode='wb') as tmpfile:
                 tmpfile.write(asset.content)
                 tmpfile.flush()
@@ -141,13 +144,6 @@ class LocalPlatform(IPlatform):
         else:
             self.docker_operations.copy_to_container(self.docker_operations.get_workers(), file_path,
                                                      remote_path)
-
-    def create_dir(self, dir):
-        worker = self.docker_operations.get_workers()
-        user_str = self.docker_operations.system_info.user_group_str
-        if not user_str:  # on windows, use default user
-            user_str = "1000:1000"
-        return worker.exec_run(f'mkdir -p "{dir}"', user=user_str)
 
     def create_simulations(self, simulations_batch):
         from idmtools_platform_local.tasks.create_simulation import CreateSimulationTask
