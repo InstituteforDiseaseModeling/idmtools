@@ -7,10 +7,10 @@ true_options = ['y', 't', 'true', 'yes', '1']
 
 # Where we store data within our workers container
 DATA_PATH = os.getenv("DATA_PATH", "/data")
-# Our path to our API. This is used mainly by the client side apps(python code) so it is refering to how they would
+# Our path to our API. This is used mainly by the client side apps(python code) so it is referring to how they would
 # access it
 API_PATH = os.getenv("API_PATH", 'http://localhost:5000/api')
 # Database configuration for our workers
-SQLALCHEMY_ECHO = (os.getenv('SQLALCHEMY_ECHO', '0').lower() in true_options)
+SQLALCHEMY_ECHO = os.getenv('SQLALCHEMY_ECHO', '0').lower() in true_options
 SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI',
                                     "postgresql+psycopg2://idmtools:idmtools@postgres/idmtools")

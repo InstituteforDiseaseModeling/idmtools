@@ -1,5 +1,6 @@
 import os
 import tempfile
+from importlib import reload
 from os.path import join
 
 
@@ -15,7 +16,7 @@ def config_local_test():
     return os.environ['DATA_PATH']
 
 
-def config_local_rest():
+def reset_local_broker():
     if 'UNIT_TESTS' in os.environ:
         del os.environ['UNIT_TESTS']
     if 'SQLALCHEMY_DATABASE_URI' in os.environ:
