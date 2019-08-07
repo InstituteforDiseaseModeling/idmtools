@@ -1,6 +1,8 @@
 import logging
 import os
 from dramatiq import GenericActor
+
+from idmtools.core import TTags
 from idmtools_platform_local.config import DATA_PATH
 import random
 import string
@@ -19,15 +21,16 @@ class CreateSimulationTask(GenericActor):
         store_results = True
         max_retries = 0
 
-    def perform(self, experiment_id, tags):
+    def perform(self, experiment_id: str, tags: TTags) -> str:
         """
         Creates our simulation task
+
         Args:
-            experiment_id: experiment id which the simulation belongs too
-            tags: Tags for the simulation
+            experiment_id(str): experiment id which the simulation belongs too
+            tags(TTags): Tags for the simulation
 
         Returns:
-            The generated simulation uuid
+            (str) The generated simulation uuid
         """
         # we only want to import this here so that clients don't need postgres/sqlalchemy packages
         from idmtools_platform_local.workers.utils import create_or_update_status

@@ -2,7 +2,11 @@ import logging
 import os
 import random
 import string
+from dataclasses import InitVar
+
 from dramatiq import GenericActor
+
+from idmtools.core import TTags, TSimulationClass
 from idmtools_platform_local.config import DATA_PATH
 
 logger = logging.getLogger(__name__)
@@ -10,18 +14,24 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 class CreateExperimentTask(GenericActor):
-    """
-    Creates an experiment.
-    - Create the folder
-    - Also create the Assets folder to hold the experiments assets
-    - Return the UUID of the newly created experiment
-    """
 
     class Meta:
         store_results = True
         max_retries = 0
 
-    def perform(self, tags, simulation_type):
+    def perform(self, tags: TTags, simulation_type: InitVar[TSimulationClass]) -> str:
+        """
+        Creates an experiment.
+            - Create the folder
+            - Also create the Assets folder to hold the experiments assets
+            - Return the UUID of the newly created experiment
+        Args:
+            tags (TTags): Tags for the experiment to be created
+            simulation_type(InitVar[TSimulationClass]): Type of simulation we are creating
+
+        Returns:
+            (str) Id of created experiment
+        """
         # we only want to import this here so that clients don't need postgres/sqlalchemy packages
         from idmtools_platform_local.workers.utils import create_or_update_status
         uuid = ''.join(random.choice(string.digits + string.ascii_uppercase) for _ in range(8))

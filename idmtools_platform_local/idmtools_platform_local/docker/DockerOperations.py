@@ -11,6 +11,7 @@ from typing import Optional, Union, NoReturn
 
 import docker
 from docker.models.containers import Container
+from docker.models.networks import Network
 
 from idmtools.core.SystemInformation import get_system_information
 from idmtools.utils.decorators import optional_yaspin_load
@@ -36,6 +37,12 @@ class DockerOperations:
     workers_ui_port: int = 5000
 
     def __post_init__(self):
+        """
+        Acts like our constructor after dataclasses has populated our fields. Currently we use it to initialize our
+        docker client and get local system information
+        Returns:
+
+        """
         if not os.path.exists(self.host_data_directory):
             os.makedirs(self.host_data_directory)
         self.timeout = 1
@@ -47,7 +54,7 @@ class DockerOperations:
         """
         Create all the components of our
 
-        Our architecture is as depicted in the diagram below
+        Our architecture is as depicted in the UML diagram below
 
         @startuml
 
@@ -145,7 +152,13 @@ class DockerOperations:
         if network:
             network.remove()
 
-    def get_network(self):
+    def get_network(self) -> Network:
+        """
+        Fetches the IDM Tools network
+
+        Returns:
+            (Network) Return Docker network object
+        """
         # check that the network exists
         network = self.client.networks.list([self.network])
         if not network:
@@ -156,7 +169,17 @@ class DockerOperations:
             network = network[0]
         return network
 
-    def get_workers(self, create=True) -> Container:
+    def get_workers(self, create: bool = True) -> Optional[Container]:
+        """
+        Gets the workers container
+
+        Args:
+            create: When set to true, container is created if it is not found
+
+        Returns:
+            (Optional[Container]): A Container object is always returned When used with *create=True*. It is possible
+            that *None* is returned when *create=False*
+        """
         logger.debug('Ensuring worker is running')
         workers_container = self.client.containers.list(filters=dict(name='idmtools_worker'), all=True)
         if not workers_container and create:
@@ -167,7 +190,13 @@ class DockerOperations:
             workers_container = workers_container[0]
         return workers_container
 
-    def create_worker_config(self):
+    def create_worker_config(self) -> dict:
+        """
+        Returns the docker config for the workers container
+
+        Returns:
+            (dict) Dictionary representing the docker config for the workers container
+        """
         logger.debug(f'Creating working container')
         data_dir = os.path.join(self.host_data_directory, 'workers')
         os.makedirs(data_dir, exist_ok=True)
@@ -196,7 +225,21 @@ class DockerOperations:
         return container_config
 
     @staticmethod
-    def get_common_config(mem_limit=None, mem_reservation=None):
+    def get_common_config(mem_limit: Optional[str] = None, mem_reservation: Optional[str] = None) -> dict:
+        """
+        Returns portions of docker container configs that are common between all the different containers used within
+        our platform
+
+        Args:
+            mem_limit (Optional[str]): Limit memory
+            mem_reservation (Optional[str]): Reserve memory
+
+        Returns:
+
+        Notes:
+            Memory strings should match those used by docker. See --memory details at
+            https://docs.docker.com/engine/reference/run/#runtime-constraints-on-resources
+        """
         config = dict(restart_policy=dict(MaximumRetryCount=15, name='on-failure'), detach=True,
                       labels=dict(idmtools_version=__version__))
         if mem_limit:
@@ -206,6 +249,16 @@ class DockerOperations:
         return config
 
     def get_redis(self, create=True) -> Container:
+        """
+        Gets the redis container
+
+        Args:
+            create: When set to true, container is created if it is not found
+
+        Returns:
+            (Optional[Container]): A Container object is always returned When used with *create=True*. It is possible
+            that *None* is returned when *create=False*
+        """
         logger.debug('Ensuring redis is running')
         redis_container = self.client.containers.list(filters=dict(name='idmtools_redis'), all=True)
         if not redis_container and create:
@@ -217,6 +270,12 @@ class DockerOperations:
         return redis_container
 
     def create_redis_config(self):
+        """
+        Returns the docker config for the redis container
+
+        Returns:
+            (dict) Dictionary representing the docker config for the redis container
+        """
         data_dir = os.path.join(self.host_data_directory, 'redis-data')
         os.makedirs(data_dir, exist_ok=True)
         redis_volumes = {
@@ -234,20 +293,37 @@ class DockerOperations:
         return container_config
 
     def get_postgres(self, create=True) -> Container:
+        """
+        Gets the postgres container
+
+        Args:
+            create: When set to true, container is created if it is not found
+
+        Returns:
+            (Optional[Container]): A Container object is always returned When used with *create=True*. It is possible
+            that *None* is returned when *create=False*
+        """
         logger.debug('Ensuring postgres is running')
         postgres_container = self.client.containers.list(filters=dict(name='idmtools_postgres'), all=True)
         if not postgres_container and create:
             container_config = self.create_postgres_config()
             logger.debug(f'Postgres Container Config {str(container_config)}')
+            # Create our data volume
+            self.create_postgres_volume()
+            # Create our container
             postgres_container = self.client.containers.run(**container_config)
         elif type(postgres_container) is list and len(postgres_container):
             postgres_container = postgres_container[0]
         return postgres_container
 
     def create_postgres_config(self):
-        postgres_volume = self.client.volumes.list(filters=dict(name='idmtools_local_postgres'))
-        if not postgres_volume:
-            self.client.volumes.create(name='idmtools_local_postgres')
+        """
+        Returns the docker config for the postgres container
+
+        Returns:
+            (dict) Dictionary representing the docker config for the postgres container
+        """
+
         postgres_volumes = dict(
             idmtools_local_postgres=dict(bind='/var/lib/postgresql/data', mode='rw')
         )
@@ -263,17 +339,64 @@ class DockerOperations:
             logger.debug(f"Postgres Config: {container_config}")
         return container_config
 
-    @staticmethod
-    def _get_optional_port_bindings(src_port: Optional[Union[str, int]], dest_port: Optional[Union[str, int]]):
-        return {src_port: dest_port} if src_port is not None else None
+    def create_postgres_volume(self) -> NoReturn:
+        """
+        Creates our postgres volume
+        Returns:
 
-    def copy_to_container(self, container: Container, file, destination_path, dest_name=None):
+        """
+        postgres_volume = self.client.volumes.list(filters=dict(name='idmtools_local_postgres'))
+        if not postgres_volume:
+            self.client.volumes.create(name='idmtools_local_postgres')
+
+    @staticmethod
+    def _get_optional_port_bindings(src_port: Optional[Union[str, int]], dest_port: Optional[Union[str, int]]) ->\
+            Optional[dict]:
+        """
+        Used to generate port bindings configurations if the inputs are not set to none
+
+        Args:
+            src_port: Host Port
+            dest_port:  Container Port
+
+        Returns:
+            (Optional[dict]) Dictionary representing the docker port bindings configuration for port if all inputs have
+            values
+        """
+        return {src_port: dest_port} if src_port is not None and dest_port is not None else None
+
+    def copy_to_container(self, container: Container, file: str, destination_path: str,
+                          dest_name: Optional[str]  = None) -> bool:
+        """
+        Copies a physical file to a container. You can also choose a different name for the destination file by using
+        the dest_name option
+
+        Args:
+            container: Container to copy the file to
+            file:  Path to the file to copy
+            destination_path: Path within the container to copy the file to(should be a directory)
+            dest_name: Optional parameter for destination filename. By default the source filename is used
+
+        Returns:
+            (bool) True if the copy suceeds, False otherwise
+        """
         logger.debug(f'Copying {file} to docker container {container.id}:{destination_path}')
         with self.create_archive(file, dest_name=dest_name) as archive:
             return container.put_archive(path=destination_path, data=archive.read())
 
     @staticmethod
-    def create_archive(file_to_copy, dest_name=None):
+    def create_archive(file_to_copy: str, dest_name: Optional[str] = None) -> BytesIO:
+        """
+        Creates a tar archive in memory. This is required when copying file to a container as docker only understands
+        tar archives as sources
+
+        Args:
+            file_to_copy: Path to file to cope
+            dest_name: Optional destination file name. This is the name the file will have within the tar archive
+
+        Returns:
+            (BytesIO): BytesIO object representing the tar of files to be copied
+        """
         pw_tarstream = BytesIO()
         pw_tar = tarfile.TarFile(fileobj=pw_tarstream, mode='w')
         if logger.isEnabledFor(logging.DEBUG):
