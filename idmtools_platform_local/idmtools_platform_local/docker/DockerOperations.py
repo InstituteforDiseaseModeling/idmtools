@@ -35,6 +35,7 @@ class DockerOperations:
     postgres_port: Optional[str] = 5432
     workers_image: str = 'idm-docker-staging.packages.idmod.org/idmtools_local_workers:latest'
     workers_ui_port: int = 5000
+    run_as: Optional[str] = None
 
     def __post_init__(self):
         """
@@ -47,6 +48,8 @@ class DockerOperations:
             os.makedirs(self.host_data_directory)
         self.timeout = 1
         self.system_info = get_system_information()
+        if self.run_as is None:
+            self.run_as = self.run_as
         self.client = docker.from_env()
 
     @optional_yaspin_load(text="Ensure IDM Tools Local Platform services are loaded")
@@ -209,7 +212,7 @@ class DockerOperations:
         }
         environment = ['REDIS_URL=redis://redis:6379']
         if platform.system() in ["Linux", "Darwin"]:
-            environment.append(f'CURRENT_UID={self.system_info.user_group_str}')
+            environment.append(f'CURRENT_UID={self.run_as}')
         port_bindings = self._get_optional_port_bindings(self.workers_ui_port, 5000)
         container_config = dict(name='idmtools_workers', hostname='idmtools',
                                 image=self.workers_image, ports=port_bindings,
@@ -285,7 +288,7 @@ class DockerOperations:
         container_config = dict(name='idmtools_redis', hostname='redis', image=self.redis_image, ports=port_bindings,
                                 volumes=redis_volumes)
         if platform.system() in ["Linux", "Darwin"]:
-            container_config['user'] = self.system_info.user_group_str
+            container_config['user'] = self.run_as
         container_config.update(self.get_common_config(mem_limit=self.redis_mem_limit,
                                                        mem_reservation=self.redis_mem_reservation))
         if logger.isEnabledFor(logging.DEBUG):
@@ -426,7 +429,5 @@ class DockerOperations:
         """
         if container is None:
             container = self.get_workers()
-        user_str = self.system_info.user_group_str
-        if not user_str:  # on windows, use default user
-            user_str = "1000:1000"
+        user_str = self.run_as
         return container.exec_run(f'mkdir -p "{dir}"', user=user_str)

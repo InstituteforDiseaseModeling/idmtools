@@ -46,6 +46,7 @@ class LocalPlatform(IPlatform):
     workers_image: str = 'idm-docker-staging.packages.idmod.org:latest'
     workers_ui_port: int = 5000
     default_timeout: int = 30
+    run_as: Optional[str] = None
     docker_operations: Optional[DockerOperations] = dataclasses.field(default=None, metadata={"pickle_ignore": True})
 
     def __post_init__(self):

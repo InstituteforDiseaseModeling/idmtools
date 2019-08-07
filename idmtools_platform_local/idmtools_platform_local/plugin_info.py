@@ -31,7 +31,11 @@ redis_mem_reservation: str = '64m'
 postgres_image = 'postgres:11.4'
 postgres_mem_limit = '64m'
 postgres_mem_reservation = '32m'
-postgres_port: Optional[str] = 5432
+postgres_port = 5432
+# Only set this in environments where you need to run as another user. For example, in linux systems
+# where you must sudo to run as root you would want to do use this setting to run the container as 
+# you by getting your user id and group id id -u, id -g and replacing 1000 in the below with the values
+# run_as = "1000:1000"
 """
 
 
