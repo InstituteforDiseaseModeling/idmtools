@@ -10,7 +10,6 @@ if typing.TYPE_CHECKING:
     from idmtools.core import TTags, TSimulationClass, typing
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.DEBUG)
 
 
 class CreateExperimentTask(GenericActor):
