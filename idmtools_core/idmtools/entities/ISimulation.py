@@ -1,47 +1,67 @@
-import json
 import typing
+from abc import ABCMeta, abstractmethod
+from dataclasses import dataclass, field
 
-from idmtools.assets import AssetCollection, Asset
-from idmtools.core import IEntity, EntityStatus
+from idmtools.core import EntityStatus
+from idmtools.core.interfaces.IAssetsEnabled import IAssetsEnabled
+from idmtools.core.interfaces.IEntity import IEntity
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TExperiment
 
 
-class ISimulation(IEntity):
+@dataclass
+class ISimulation(IAssetsEnabled, IEntity, metaclass=ABCMeta):
     """
     Represents a generic Simulation.
     This class needs to be implemented for each model type with specifics.
     """
+    experiment: 'TExperiment' = field(default=None, compare=False, metadata={"md": True})
+    status: 'EntityStatus' = field(default=None, compare=False)
 
-    def __init__(self, parameters: dict = None, assets: 'AssetCollection' = None, experiment: 'TExperiment' = None):
-        super().__init__()
-        self.assets = assets or AssetCollection()
-        self.parameters = parameters or {"parameters": {}}
-        self.experiment = experiment
-        self.status = None
-
+    @abstractmethod
     def set_parameter(self, name: str, value: any) -> dict:
         """
         Set a parameter in the simulation
         Args:
             name: Name of the parameter
             value: Value of the parameter
-
         Returns: Tag to record the change
         """
-        self.parameters["parameters"][name] = value
-        return {name: value}
+        pass
+
+    @abstractmethod
+    def get_parameter(self, name, default=None):
+        """
+        Get a parameter in the simulation
+        Args:
+            name: Name of the parameter
+        Returns: the Value of the parameter
+        """
+        return None
+
+    @abstractmethod
+    def update_parameters(self, params):
+        """
+        Bulk update parameters/config
+        Args:
+            params: dict with new values
+        Returns: None
+        """
+        pass
 
     def __repr__(self):
-        return f"<Simulation: {self.uid} - Exp_id: {self.experiment.uid}>"
+        return f"<Simulation: {self.uid} - Exp_id: {self.experiment.uid if self.experiment else None}>"
 
+    def pre_creation(self):
+        self.gather_assets()
+
+    @abstractmethod
     def gather_assets(self):
         """
         Gather all the assets for the simulation.
-        By default, only create a config.json containing the parameters
         """
-        self.assets.add_asset(Asset(filename="config.json", content=json.dumps(self.parameters)))
+        pass
 
     @property
     def done(self):

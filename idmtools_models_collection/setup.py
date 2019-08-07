@@ -11,29 +11,28 @@ with open('README.md') as readme_file:
 with open('requirements.txt') as requirements_file:
     requirements = requirements_file.read().split("\n")
 
+build_requirements = ['flake8', 'coverage', 'py-make', 'bump2version', 'twine']
 setup_requirements = []
-test_requirements = ['pytest', 'pytest-runner']
+test_requirements = ['pytest', 'pytest-runner'] + build_requirements
 
-extras = {
-    'test': test_requirements,
-}
+extras = dict(test=test_requirements, packaging=build_requirements)
+
+authors = [
+    ("Sharon Chen", "'schen@idmod.org"),
+    ("Clinton Collins", 'ccollins@idmod.org'),
+    ("Zhaowei Du", "zdu@idmod.org"),
+    ("Mary Fisher", 'mfisher@idmod.org'),
+    ("Clark Kirkman IV", 'ckirkman@idmod.org'),
+    ("Benoit Raybaud", "braybaud@idmod.org")
+]
 
 setup(
-    author="Clinton Collins"
-           "Sharon Chen"
-           "Zhaowei Du"
-           "Mary Fisher"
-           "Clark Kirkman IV"
-           "Benoit Raybaud",
-    author_email='ccollins@idmod.org, '
-                 'schen@idmod.org, '
-                 'zdu@idmod.org, '
-                 'mfisher@idmod.org'
-                 'ckirkman@idmod.org, '
-                 'braybaud@idmod.org',
+    author=[author[0] for author in authors],
+    author_email=[author[1] for author in authors],
     classifiers=[
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Framework:: IDM-Tools :: models'
     ],
     description="Core tools for modeling",
     install_requires=requirements,
@@ -46,6 +45,6 @@ setup(
     test_suite='tests',
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='0.1.0',
+    version='0.1.0+nightly',
     zip_safe=False,
 )

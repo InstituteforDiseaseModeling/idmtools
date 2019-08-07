@@ -1,4 +1,5 @@
 import os
+from typing import Union
 
 
 class Asset:
@@ -9,7 +10,7 @@ class Asset:
     """
 
     def __init__(self, absolute_path: 'str' = None, relative_path: 'str' = None,
-                 filename: 'str' = None, content: 'bytes' = None):
+                 filename: 'str' = None, content: 'Union[bytes,str]' = None):
         """
         Constructor.
         Args:
@@ -28,7 +29,15 @@ class Asset:
         self._content = content
 
     def __repr__(self):
-        return f"<Asset: {os.path.join(self.relative_path or '', self.filename)} from {self.absolute_path}>"
+        return f"<Asset: {os.path.join(self.relative_path, self.filename)} from {self.absolute_path}>"
+
+    @property
+    def relative_path(self):
+        return self._relative_path or ""
+
+    @relative_path.setter
+    def relative_path(self, relative_path):
+        self._relative_path = relative_path.strip(" \\/") if relative_path else None
 
     @property
     def content(self) -> bytes:
@@ -46,7 +55,7 @@ class Asset:
         return self.__key() == other.__key()
 
     def __key(self):
-        return self.absolute_path, self.relative_path, self.filename
+        return self.absolute_path, self.relative_path, self.filename, self._content
 
     def __hash__(self):
         return hash(self.__key())

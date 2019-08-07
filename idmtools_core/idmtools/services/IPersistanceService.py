@@ -1,28 +1,37 @@
 import os
-import shelve
+import logging
+import diskcache
 from abc import ABCMeta
+
+logger = logging.getLogger(__name__)
 
 
 class IPersistenceService(metaclass=ABCMeta):
-    shelve_directory = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data")
-    shelf_name = None
+    cache_directory = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data")
+    cache_name = None
 
     @classmethod
-    def _open_shelf(cls):
-        os.makedirs(cls.shelve_directory, exist_ok=True)
-        return shelve.open(os.path.join(cls.shelve_directory, cls.shelf_name))
+    def _open_cache(cls):
+        cache_directory = os.path.join(cls.cache_directory, 'disk_cache', cls.cache_name)
+        os.makedirs(cache_directory, exist_ok=True)
+        return diskcache.Cache(os.path.join(cls.cache_directory, 'disk_cache', cls.cache_name), timeout=-1)
 
     @classmethod
     def retrieve(cls, uid):
-        shelf = cls._open_shelf()
-        obj = shelf[str(uid)]
-        shelf.close()
-        return obj
+        with cls._open_cache() as cache:
+            obj = cache.get(uid)
+            return obj
 
     @classmethod
     def save(cls, obj):
-        shelf = cls._open_shelf()
-        shelf[str(obj.uid)] = obj
-        shelf.close()
+        with cls._open_cache() as cache:
+            if logger.isEnabledFor(logging.DEBUG):
+                logging.debug('Saving %s to %s', obj.uid, cls.cache_name)
+            cache.set(obj.uid, obj)
+
         return obj.uid
 
+    @classmethod
+    def delete(cls, uid):
+        with cls._open_cache() as cache:
+            cache.delete(uid)

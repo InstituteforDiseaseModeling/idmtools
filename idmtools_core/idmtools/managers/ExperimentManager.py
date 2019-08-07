@@ -1,7 +1,9 @@
 import typing
 
+from idmtools.core import EntityStatus
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.services.platforms import PlatformPersistService
+from idmtools.utils.entities import retrieve_experiment
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TExperiment, TPlatform
@@ -22,42 +24,61 @@ class ExperimentManager:
         self.experiment = experiment
 
     @classmethod
-    def from_experiment_id(cls, experiment_id):
-        experiment = ExperimentPersistService.retrieve(experiment_id)
+    def from_experiment_id(cls, experiment_id, platform):
+        experiment = retrieve_experiment(experiment_id, platform)
         platform = PlatformPersistService.retrieve(experiment.platform_id)
-        return cls(experiment, platform)
+        em = cls(experiment, platform)
+        em.restore_simulations()
+        return em
+
+    def restore_simulations(self):
+        self.platform.restore_simulations(self.experiment)
 
     def create_experiment(self):
+        self.experiment.pre_creation()
+
         # Create experiment
         self.platform.create_experiment(self.experiment)
+
         # Persist the platform
         PlatformPersistService.save(self.platform)
         self.experiment.platform_id = self.platform.uid
-        ExperimentPersistService.save(self.experiment)
+
+        self.experiment.post_creation()
+
+        # Save the experiment
+        ExperimentPersistService.save(self.experiment.metadata)
+
+    def simulation_batch_worker_thread(self, simulation_batch):
+        for simulation in simulation_batch:
+            simulation.pre_creation()
+
+        ids = self.platform.create_simulations(simulation_batch)
+
+        for uid, simulation in zip(ids, simulation_batch):
+            simulation.uid = uid
+            simulation.post_creation()
+
+        return simulation_batch
 
     def create_simulations(self):
         """
         Create all the simulations contained in the experiment on the platform.
         """
-        # Execute the builder if present
-        if self.experiment.builder:
-            self.experiment.execute_builder()
-        elif not self.experiment.simulations:
-            self.experiment.simulations = [self.experiment.simulation()]
+        from concurrent.futures.thread import ThreadPoolExecutor
 
-        # Gather the assets
-        for simulation in self.experiment.simulations:
-            simulation.gather_assets()
+        with ThreadPoolExecutor(max_workers=16) as executor:
+            results = executor.map(self.simulation_batch_worker_thread,
+                                   self.experiment.batch_simulations(batch_size=10))
 
-        # Send the experiment to the platform
-        self.platform.create_simulations(self.experiment)
-
-        # Refresh experiment status
-        self.refresh_status()
+        for sim_batch in results:
+            for simulation in sim_batch:
+                self.experiment.simulations.append(simulation.metadata)
+                self.experiment.simulations.set_status(EntityStatus.CREATED)
 
     def start_experiment(self):
         self.platform.run_simulations(self.experiment)
-        self.refresh_status()
+        self.experiment.simulations.set_status(EntityStatus.RUNNING)
 
     def run(self):
         """
@@ -73,14 +94,11 @@ class ExperimentManager:
         # Create the simulations the platform
         self.create_simulations()
 
-        print(self.experiment)
+        # Display the experiment contents
+        self.experiment.display()
 
         # Run
         self.start_experiment()
-
-        for simulation in self.experiment.simulations:
-            print(simulation)
-            print(simulation.tags)
 
     def wait_till_done(self, timeout: 'int' = 60 * 60 * 24, refresh_interval: 'int' = 5):
         """
@@ -100,4 +118,4 @@ class ExperimentManager:
 
     def refresh_status(self):
         self.platform.refresh_experiment_status(self.experiment)
-        ExperimentPersistService.save(self.experiment)
+        ExperimentPersistService.save(self.experiment.metadata)

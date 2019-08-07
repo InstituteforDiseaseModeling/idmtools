@@ -1,18 +1,19 @@
 import os
 from functools import partial
 
-from idmtools.entities import ExperimentBuilder
+from idmtools.builders import ExperimentBuilder
 from idmtools.managers import ExperimentManager
-from idmtools.platforms import COMPSPlatform
-from idmtools.platforms import LocalPlatform
+
 from idmtools_models.python.PythonExperiment import PythonExperiment
+from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
+from idmtools_platform_local.local_platform import LocalPlatform
 
 
 def param_update(simulation, param, value):
     return simulation.set_parameter(param, value)
 
 
-experiment = PythonExperiment(name="My First experiment", model_path=os.path.join("work", "inputs", "python_model_with_deps", "model.py"))
+experiment = PythonExperiment(name="My First experiment", model_path=os.path.join("work", "inputs", "python_model_with_deps", "Assets", "model.py"))
 experiment.tags["tag1"] = 1
 experiment.base_simulation.set_parameter("c", 0)
 experiment.assets.add_directory(assets_directory=os.path.join("work", "inputs", "python_model_with_deps", "Assets"))
@@ -29,12 +30,16 @@ class setParam:
 
 
 builder = ExperimentBuilder()
-builder.add_sweep_definition(setA, range(5))
+builder.add_sweep_definition(setA, range(10))
 builder.add_sweep_definition(setParam("b"), [1, 2, 3])
 
-experiment.builder = builder
+experiment.add_builder(builder)
 
 platform = LocalPlatform()
+# You can easily switch platforms by simply commenting out the previous line and then
+# uncommenting the following line
+# platform = COMPSPlatform()
 
 em = ExperimentManager(experiment=experiment, platform=platform)
 em.run()
+em.wait_till_done()

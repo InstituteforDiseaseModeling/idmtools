@@ -1,30 +1,31 @@
-import os
 import unittest
 
-from idmtools.entities import IExperiment
-from idmtools.platforms import LocalPlatform
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.services.platforms import PlatformPersistService
-from tests.ITestWithPersistence import ITestWithPersistence
-
-current_directory = os.path.dirname(os.path.realpath(__file__))
+from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_test.utils.TstExperiment import TstExperiment
+from idmtools_test.utils.TestPlatform import TestPlatform
 
 
 class TestPersistenceServices(ITestWithPersistence):
 
     def test_persist_retrieve_platform(self):
-        p = LocalPlatform()
+        p = TestPlatform()
         PlatformPersistService.save(p)
         p2 = PlatformPersistService.retrieve(p.uid)
         self.assertEqual(p, p2)
 
     def test_persist_retrieve_experiment(self):
-        e = IExperiment("test")
-        e.simulation()
+        e = TstExperiment("test")
         e.simulation()
         ExperimentPersistService.save(e)
         e2 = ExperimentPersistService.retrieve(e.uid)
         self.assertEqual(e, e2)
+        # Simulations should not be persisted
+        self.assertEqual(e2.simulations, [])
+
+        e3 = ExperimentPersistService.retrieve("Missing")
+        self.assertIsNone(e3)
 
 
 if __name__ == '__main__':
