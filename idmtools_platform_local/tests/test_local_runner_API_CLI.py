@@ -1,9 +1,14 @@
+# flake8: noqa E402
+from idmtools_test.utils.confg_local_runner_test import config_local_rest
+# ensure our config is correct for this test. This is to do with brokers and redis
+config_local_rest()
 from idmtools.core import PlatformFactory
 import os
 import re
 import subprocess
 import unittest
 from operator import itemgetter
+
 
 from idmtools.builders import ExperimentBuilder
 from idmtools.managers import ExperimentManager

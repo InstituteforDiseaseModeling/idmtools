@@ -14,3 +14,12 @@ def config_local_test():
     import idmtools_platform_local.workers.brokers
     return os.environ['DATA_PATH']
 
+
+def config_local_rest():
+    if 'UNIT_TESTS' in os.environ:
+        del os.environ['UNIT_TESTS']
+    if 'SQLALCHEMY_DATABASE_URI' in os.environ:
+        del os.environ['SQLALCHEMY_DATABASE_URI']
+
+    if 'DATA_PATH' in os.environ:
+        del os.environ['DATA_PATH']

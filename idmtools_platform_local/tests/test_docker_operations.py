@@ -1,4 +1,6 @@
-# flake8: noqa E402
+# flake8: noqa E402p
+from unittest import skip
+
 from idmtools_test.utils.confg_local_runner_test import config_local_test
 local_path = config_local_test()
 import io
@@ -61,10 +63,22 @@ class TestDockerOperations(unittest.TestCase):
 
         dm.stop_services()
 
-    # def test_port_taken(self):
-    #    self.fail()
-    # we need a test where we start a service on a port used by our container(5000)
-    # and test the error messaging of item
+    @skip
+    def test_port_taken(self):
+        # create dummy port for listening
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server_address = ('localhost', 10000)
+        try:
+            sock.bind(server_address)
+            sock.listen(1)
+            pl = DockerOperations(workers_ui_port=10000)
+            pl.cleanup(True)
+            pl.get_workers()
+        except Exception as e:
+            print(e)
+            pass
+        finally:
+            sock.close()
 
 
 

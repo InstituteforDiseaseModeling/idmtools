@@ -54,6 +54,24 @@ For development purpose, it is important to add the following folders as to your
 - `idmtools/idmtools_models_collection`
 - `idmtools/idmtools_test`
 
+### Running specific tests from the command line
+
+From within a project directory such a local data
+`python -m unittest tests.test_docker_operations.TestDockerOperations.test_create_stack_starts`
+
+To enable docker tests and comps test you can do the following on Linux 
+`export DOCKER_TESTS=1
+python -m unittest tests.test_docker_operations.TestDockerOperations.test_create_stack_starts
+`
+or on Windows
+`
+set DOCKER_TESTS=1
+python -m unittest tests.test_docker_operations.TestDockerOperations.test_create_stack_starts
+`
+
+Lastly, you can do also run the tests without setting the environment variables directly like so
+`DOCKER_TESTS=1 python -m unittest tests.test_docker_operations.TestDockerOperations.test_create_stack_starts`
+
 ## Running the examples in Jupyter
 
 Navigate to the `examples` folder and run:

@@ -1,3 +1,7 @@
+# flake8: noqa E402
+from idmtools_test.utils.confg_local_runner_test import config_local_rest
+# ensure our config is correct for this test. This is to do with brokers and redis
+config_local_rest()
 from idmtools_platform_local.docker.DockerOperations import DockerOperations
 from operator import itemgetter
 from idmtools.assets import AssetCollection
