@@ -117,7 +117,7 @@ class TestAPI(unittest.TestCase):
         dm = DockerOperations()
         dm.get_postgres()
         # give postgres 5 seconds to start
-        time.slepp(5)
+        time.sleep(5)
         # ensure we are connecting to proper db
         url = 'postgresql+psycopg2://idmtools:idmtools@localhost/idmtools'
         engine = create_engine(url, echo=True, pool_size=32)
