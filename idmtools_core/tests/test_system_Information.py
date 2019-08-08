@@ -1,5 +1,4 @@
 import subprocess
-import unittest
 import unittest.mock
 from unittest import TestCase
 
