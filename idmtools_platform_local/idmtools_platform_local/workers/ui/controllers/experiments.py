@@ -69,6 +69,9 @@ def experiment_filter(id: Optional[str], tags: Optional[List[Tuple[str, str]]]) 
 
             status_bars.append(job_status)
             # status_bars.append(parent_status_to_progress(job_status))
+        # convert list to dict
+        sb_dict = {}
+        [sb_dict.update(v) for v in status_bars]
         df.at[index, 'progress'] = status_bars
 
     df['data_path'] = df['data_path'].apply(lambda x: x.replace(DATA_PATH, '/data'))
@@ -94,7 +97,7 @@ delete_args.add_argument('data', help='Should the data for the experiment and al
 
 
 class Experiments(Resource):
-    def get(self, id=None):
+    def get(self, id = None):
         args = idx_parser.parse_args()
         args['id'] = id
 
