@@ -45,10 +45,12 @@ class TestConfig(ITestWithPersistence):
         self.assertEqual(platform.environment, 'Bayesian')
 
     @comps_test
-    def test_simple_comps_platform_use_code(self):
-        platform = PlatformFactory.create("COMPS", endpoint='https://abc', environment='Bayesian', autologin=False)
+    @unittest.mock.patch('idmtools_platform_comps.COMPSPlatform.COMPSPlatform._login', side_effect=lambda: True)
+    def test_simple_comps_platform_use_code(self, mock_login):
+        platform = PlatformFactory.create("COMPS", endpoint='https://abc', environment='Bayesian')
         self.assertEqual(platform.endpoint, 'https://abc')
         self.assertEqual(platform.environment, 'Bayesian')
+        self.assertEqual(mock_login.call_count, 1)
 
     def test_idmtools_ini(self):
         config_file = IdmConfigParser.get_config_path()

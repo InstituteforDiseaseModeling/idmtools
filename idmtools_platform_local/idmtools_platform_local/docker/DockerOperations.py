@@ -137,7 +137,7 @@ class DockerOperations:
                 logger.debug(f'Removing container {name}')
                 container.remove()
 
-    def cleanup(self, delete_data: bool=True) -> NoReturn:
+    def cleanup(self, delete_data: bool = True) -> NoReturn:
         """
         Stops the running services, removes local data, and removes network. You can optionally disable the deleting
         of local data
@@ -385,7 +385,7 @@ class DockerOperations:
         return {dest_port: src_port} if src_port is not None and dest_port is not None else None
 
     def copy_to_container(self, container: Container, file: str, destination_path: str,
-                          dest_name: Optional[str]  = None) -> bool:
+                          dest_name: Optional[str] = None) -> bool:
         """
         Copies a physical file to a container. You can also choose a different name for the destination file by using
         the dest_name option

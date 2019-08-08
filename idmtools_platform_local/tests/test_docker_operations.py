@@ -75,5 +75,4 @@ class TestDockerOperations(unittest.TestCase):
         with self.assertRaises(ValueError) as mock:
             dm = DockerOperations(run_as="0:0")
             self.assertIn('You cannot run the containers as the root user!', mock.exception.args[0])
-
-
+            dm.stop_services()

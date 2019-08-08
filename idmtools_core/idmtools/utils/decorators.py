@@ -5,7 +5,6 @@ from functools import wraps
 from typing import Callable, Union
 
 
-
 class abstractstatic(staticmethod):
     """
     Decorator for defining a method both as static and abstract

@@ -1,7 +1,5 @@
 import sys
 from typing import NoReturn, Union
-
-import click
 import requests
 from click import UsageError
 from colorama import Fore

@@ -1,32 +1,41 @@
 .PHONY: clean lint test coverage release-local dist release-staging release-staging-minor-commit release-staging-minor
-
+IPY=python -c
 
 clean: ## Clean all our jobs
-	@+python -c "import os, glob; [os.remove(i) for i in glob.glob('*.py[co]', recursive=True)]"
-	@+python -c "import os, glob; [os.remove(i) for i in glob.glob('*.done', recursive=True)]"
-	@+python -c "import os, glob; [os.remove(i) for i in glob.glob('*.log', recursive=True)]"
-	@+python -c "import os, glob; [os.remove(i) for i in glob.glob('*.coverage', recursive=True)]"
-	@+python -c "import os, shutil, glob; [shutil.rmtree(i) for i in [k for k in glob.glob('*.egg-info/', recursive=True) if os.path.isdir(k)]]"
-	@+python -c "import shutil; shutil.rmtree('htmlcov', True)"
-	@+python -c "import shutil; shutil.rmtree('.pytest_cache', True)"
-	@+python -c "import shutil; shutil.rmtree('dist', True)"
+	@+$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.py[co]', recursive=True)]"
+	@+$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.log', recursive=True)]"
+	@+$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
+	@+$(IPY) "import os, shutil, glob; [shutil.rmtree(i) for i in [k for k in glob.glob('**/*.egg-info/', recursive=True) if os.path.isdir(k)]]"
+	@+$(IPY) "import shutil; shutil.rmtree('**/htmlcov', True)"
+	@+$(IPY) "import shutil; shutil.rmtree('**/.pytest_cache', True)"
+	@+$(IPY) "import shutil; shutil.rmtree('**/dist', True)"
 
+# Dev and test related rules
 
 lint: ## check style with flake8
-	flake8 --ignore=E501 idmtools_models_collection tests
+	@+$(IPY) "import os; os.chdir('..'); os.system('flake8 --ignore=E501 idmtools_models')"
 
 test: ## Run our tests
-	@+python -c "import os, sys; sys.path.append(os.getcwd()); os.system('py.test')"
+	@+$(IPY) "import os; os.chdir('tests'); os.system('py.test -p no:warnings')"
 
 test-all: ## Run our  docker tests as well
 	@+$(IPY) "import os; os.environ['DOCKER_TESTS'] = '1'; \
 	os.environ['COMPS_TESTS'] = '1'; os.chdir('tests'); os.system('py.test -p no:warnings')"
 
 coverage: ## Generate a code-coverage report
-	coverage run --source idmtools_models_collection -m pytest
+	@make clean
+	# We have to run in our tests folder to use the proper config
+	@+$(IPY) "import os; os.chdir('tests'); os.system('coverage run --source ../idmtools_models -m pytest')"
+	# move our stuff back to the top
+	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
 	coverage report -m
-	coverage html
+	coverage html -i
 	python ../dev_scripts/launch_dir_in_browser.py htmlcov/index.html
+
+watch: ## Automate running of tests and linting of this project using watchdog. Useful for development
+	watchmedo tricks-from dev.yml
+
+# Release related rules
 
 release-local: ## package and upload a release to http://localhost:7171
 	@make dist

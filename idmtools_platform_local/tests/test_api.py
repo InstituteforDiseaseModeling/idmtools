@@ -20,7 +20,7 @@ class TestAPI(unittest.TestCase):
     @patch_broker
     @patch_db
     def setUp(self, mock_broker, mock_db):
-        local_path = config_local_test()
+        local_path = config_local_test()  # noqa: F841
         config_local_test()
         from idmtools_platform_local.workers.ui.app import application
         self.app = application.test_client()
@@ -77,7 +77,7 @@ class TestAPI(unittest.TestCase):
         data = result.json
         self.assertIsInstance(data, dict)
         self.assertEqual(data['experiment_id'], 'AAAAA')
-        self.assertDictEqual(data['tags'],  dict(a='b', c='d'))
+        self.assertDictEqual(data['tags'], dict(a='b', c='d'))
         self.assertEqual(data['data_path'], '/data/AAAAA')
 
     def test_fetch_simulations(self):
@@ -111,7 +111,7 @@ class TestAPI(unittest.TestCase):
         self.assertIsInstance(data, dict)
         self.assertEqual(data['simulation_uid'], 'CCCCC')
         self.assertEqual(data['experiment_id'], 'BBBBB')
-        self.assertDictEqual(data['tags'],  dict(i='j', k='l'))
+        self.assertDictEqual(data['tags'], dict(i='j', k='l'))
         self.assertEqual(data['data_path'], '/data/CCCCC')
 
     @docker_test

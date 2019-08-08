@@ -13,7 +13,7 @@ logging_queue = None
 
 
 def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'idmtools.log',
-                  console: Union[str,bool] = False) -> QueueListener:
+                  console: Union[str, bool] = False) -> QueueListener:
     """
 
     Args:

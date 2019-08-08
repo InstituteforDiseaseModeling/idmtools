@@ -37,8 +37,7 @@ class TestPythonSimulation(ITestWithPersistence):
 
         platform = PlatformFactory.create_from_block('Local_Staging')
 
-
-        #CreateSimulationTask.broker =
+        # CreateSimulationTask.broker =
 
         name = self.case_name
         pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))

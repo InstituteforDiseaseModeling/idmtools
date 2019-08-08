@@ -13,7 +13,7 @@ cd ${LOCAL_PATH}/idmtools_core && \
     pip install -e .\[test\] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
 cd ${LOCAL_PATH}/idmtools_local_runner && \
     pip install -e .\[test\]
-cd ${LOCAL_PATH}/idmtools_models_collection && \
+cd ${LOCAL_PATH}/idmtools_models && \
     pip install -e .\[test\]
 # ensure we don't have a copy running and previous instances have been stopped
 cd ${LOCAL_PATH}/idmtools_local_runner && \

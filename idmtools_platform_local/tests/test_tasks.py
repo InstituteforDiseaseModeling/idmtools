@@ -51,7 +51,7 @@ class TestTasks(TestCase):
         # Check that the data directory
         self.assertTrue(os.path.exists(os.path.join(self.local_path, exp_id)))
         # Check for assets
-        self.assertTrue(os.path.exists(os.path.join(self.local_path,  exp_id, "Assets")))
+        self.assertTrue(os.path.exists(os.path.join(self.local_path, exp_id, "Assets")))
         # Check for simulation id
         self.assertTrue(os.path.exists(os.path.join(self.local_path, exp_id, new_simulation_id)))
 
@@ -76,4 +76,3 @@ class TestTasks(TestCase):
 
         status = RunTask.perform("python hello_world.py", exp_id, new_simulation_id)
         self.assertEqual(status, Status.done)
-
