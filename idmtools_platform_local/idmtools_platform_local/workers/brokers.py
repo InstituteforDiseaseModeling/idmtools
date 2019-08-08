@@ -18,6 +18,7 @@ def setup_broker():
         redis_backend = RedisBackend(url=REDIS_URL)
     redis_broker.add_middleware(Results(backend=redis_backend))
     dramatiq.set_broker(redis_broker)
+    return redis_broker
 
 
 setup_broker()

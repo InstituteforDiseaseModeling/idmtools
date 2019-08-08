@@ -192,7 +192,7 @@ class DockerOperations:
             (Optional[Container]): A Container object is always returned When used with *create=True*. It is possible
             that *None* is returned when *create=False*
         """
-        logger.debug('Ensuring worker is running')
+        logger.debug('Checking if worker is running')
         workers_container = self.client.containers.list(filters=dict(name='idmtools_worker'), all=True)
         if not workers_container and create:
             container_config = self.create_worker_config()
@@ -278,7 +278,7 @@ class DockerOperations:
             (Optional[Container]): A Container object is always returned When used with *create=True*. It is possible
             that *None* is returned when *create=False*
         """
-        logger.debug('Ensuring redis is running')
+        logger.debug('Checking if redis is running')
         redis_container = self.client.containers.list(filters=dict(name='idmtools_redis'), all=True)
         if not redis_container and create:
             container_config = self.create_redis_config()
@@ -322,7 +322,7 @@ class DockerOperations:
             (Optional[Container]): A Container object is always returned When used with *create=True*. It is possible
             that *None* is returned when *create=False*
         """
-        logger.debug('Ensuring postgres is running')
+        logger.debug('Checking postgres is running')
         postgres_container = self.client.containers.list(filters=dict(name='idmtools_postgres'), all=True)
         if not postgres_container and create:
             container_config = self.create_postgres_config()

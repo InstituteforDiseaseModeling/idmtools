@@ -1,9 +1,12 @@
+from importlib import reload
+
 from idmtools_platform_local.docker.DockerOperations import DockerOperations
 from operator import itemgetter
 from idmtools.assets import AssetCollection
 from idmtools.builders import ExperimentBuilder
 from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
+from idmtools.core import EntityStatus, PlatformFactory
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 import os
@@ -24,10 +27,19 @@ class TestPythonSimulation(ITestWithPersistence):
         dm = DockerOperations()
         dm.cleanup(True)
 
+        import idmtools_platform_local.tasks.create_experiement
+        import idmtools_platform_local.tasks.create_simulation
+        reload(idmtools_platform_local.tasks.create_experiement)
+        reload(idmtools_platform_local.tasks.create_simulation)
+
     @restart_local_platform(silent=True)
     def test_direct_sweep_one_parameter_local(self):
-        from idmtools.core import EntityStatus, PlatformFactory
+
         platform = PlatformFactory.create_from_block('Local_Staging')
+
+
+        #CreateSimulationTask.broker =
+
         name = self.case_name
         pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
 
