@@ -44,7 +44,7 @@ class LocalPlatform(IPlatform):
     postgres_mem_limit: str = '64m'
     postgres_mem_reservation: str = '32m'
     postgres_port: Optional[str] = 5432
-    workers_image: str = 'idm-docker-staging.packages.idmod.org:latest'
+    workers_image: str = 'idm-docker-staging.packages.idmod.org/idmtools_local_workers:latest'
     workers_ui_port: int = 5000
     default_timeout: int = 30
     run_as: Optional[str] = None
