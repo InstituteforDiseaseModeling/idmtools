@@ -6,8 +6,13 @@ from dramatiq.brokers.stub import StubBroker
 from dramatiq.results import Results
 from dramatiq.results.backends import RedisBackend, StubBackend
 
+redis_broker = None
+redis_backend = None
+
 
 def setup_broker():
+    global redis_broker
+    global redis_backend
     REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379")
 
     if os.getenv("UNIT_TESTS") == "1":
@@ -21,4 +26,4 @@ def setup_broker():
     return redis_broker
 
 
-setup_broker()
+redis_broker = setup_broker()
