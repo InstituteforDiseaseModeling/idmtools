@@ -43,6 +43,16 @@ docker-local: ## Build our docker image using the local pypi
 
 	docker-compose build --build-arg PYPIURL=http://172.17.0.1:7171/ --build-arg PYPIHOST=172.17.0.1 workers
 
+docker-local-no-cache: ## Build our docker image using the local pypi
+	# This job is most useful when actively developing changes to the local_platform internals(tasks, api, cli) or
+	# upstream changes that effect those areas(models and core). Otherwise, installing from latest in the nightly
+	# should suffice for development
+	# ensure pypi local is up
+	@+$(IPY) "import os; os.chdir('../dev_scripts/local_pypi'); os.system('docker-compose up -d')"
+	@+$(IPY) "import os; os.chdir('../idmtools_core'); os.system('pymake release-local')"
+
+	docker-compose build --no-cache --build-arg PYPIURL=http://172.17.0.1:7171/ --build-arg PYPIHOST=172.17.0.1 workers
+
 docker-staging: ## Build our docker image using staging pypi
 	@+$(IPY) "import os; os.environ['REGISTRY'] = 'idm-docker-staging.packages.idmod.org'; \
 		os.system(f'docker-compose build --build-arg PYPIURL=https://packages.idmod.org/api/pypi/pypi-staging/simple workers')"

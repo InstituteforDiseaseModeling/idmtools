@@ -98,18 +98,18 @@ class LocalPlatform(IPlatform):
         m = CreateExperimentTask.send(experiment.tags, experiment.simulation_type)
         eid = m.get_result(block=True, timeout=self.default_timeout * 1000)
         experiment.uid = eid
-        path = os.path.join("/data", experiment.uid, "Assets")
+        path = "/".join(["/data", experiment.uid, "Assets"])
         self._docker_operations.create_directory(path)
         self.send_assets_for_experiment(experiment)
 
     def send_assets_for_experiment(self, experiment):
         # Go through all the assets
-        path = os.path.join("/data", experiment.uid, "Assets")
+        path = "/".join(["/data", experiment.uid, "Assets"])
         list(map(functools.partial(self.send_asset_to_docker, path=path), experiment.assets))
 
     def send_assets_for_simulation(self, simulation):
         # Go through all the assets
-        path = os.path.join("/data", simulation.experiment.uid, simulation.uid)
+        path = "/".join(["/data", simulation.experiment.uid, simulation.uid])
         list(map(functools.partial(self.send_asset_to_docker, path=path), simulation.assets))
 
     def send_asset_to_docker(self, asset: Asset, path: str) -> NoReturn:
@@ -124,7 +124,7 @@ class LocalPlatform(IPlatform):
             (NoReturn): Nada
         """
         file_path = asset.absolute_path
-        remote_path = os.path.join(path, asset.relative_path) if asset.relative_path else path
+        remote_path = "/".join([path, asset.relative_path]) if asset.relative_path else path
         # ensure remote directory exists
         result = self._docker_operations.create_directory(remote_path)
         if logger.isEnabledFor(logging.DEBUG):

@@ -29,6 +29,10 @@ linux_only = unittest.skipIf(
     not platform.system() in ["Linux", "Darwin"], 'No Tests that are meant for linux'
 )
 
+windows_only = unittest.skipIf(
+    platform.system() in ["Linux", "Darwin"], 'No Tests that are meant for Windows'
+)
+
 
 def run_test_in_n_seconds(n: int, print_elapsed_time: bool = False) -> Callable:
     """

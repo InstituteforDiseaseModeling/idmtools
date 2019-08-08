@@ -4,7 +4,7 @@ from unittest import TestCase
 
 from idmtools.core.SystemInformation import get_system_information, SystemInformation
 from idmtools.utils.info import get_packages_list
-from idmtools_test.utils.decorators import linux_only
+from idmtools_test.utils.decorators import linux_only, windows_only
 
 
 class TestSystemInformation(TestCase):
@@ -41,3 +41,8 @@ class TestSystemInformation(TestCase):
         id_output = subprocess.run(['id', '-u'], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
         group_output = subprocess.run(['id', '-g'], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
         self.assertEqual(instance.user_group_str, f"{id_output}:{group_output}")
+
+    @windows_only
+    def test_windows_is_user_1000(self):
+        instance = get_system_information()
+        self.assertEqual(instance.user_group_str, "1000:1000")
