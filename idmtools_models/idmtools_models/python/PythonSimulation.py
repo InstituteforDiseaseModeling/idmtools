@@ -48,7 +48,7 @@ class PythonSimulation(ISimulation):
     }
     ```
     """
-    parameters: dict = field(default_factory=lambda:{})
+    parameters: dict = field(default_factory=lambda: {})
     envelope: str = field(default=None)
 
     def __post_init__(self):
@@ -82,5 +82,5 @@ class PythonSimulation(ISimulation):
         self.parameters.update(params)
 
     def gather_assets(self) -> None:
-        params = {self.envelope:self.parameters} if self.envelope else self.parameters
+        params = {self.envelope: self.parameters} if self.envelope else self.parameters
         self.assets.add_asset(Asset(filename="config.json", content=json.dumps(params)), fail_on_duplicate=False)
