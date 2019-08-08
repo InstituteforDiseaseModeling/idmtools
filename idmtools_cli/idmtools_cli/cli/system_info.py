@@ -25,7 +25,8 @@ def info():
 def system(copy_to_clipboard, no_format_for_gh, issue):
     system_info = get_system_information()
     lines = ['System Information']
-    [lines.append(f'{k}: {v}') for k, v in system_info.__dict__.items()]
+    ordered_fields = sorted(system_info.__dict__.keys())
+    [lines.append(f'{k}: {system_info.__dict__[k]}') for k in ordered_fields]
     if copy_to_clipboard:
         output = '\n'.join(lines)
         if not no_format_for_gh or issue:
