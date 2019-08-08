@@ -1,7 +1,5 @@
-# flake8: noqa E402
-from idmtools_test.utils.confg_local_runner_test import config_local_rest
-# ensure our config is correct for this test. This is to do with brokers and redis
-config_local_rest()
+
+from idmtools_test.utils.confg_local_runner_test import reset_local_broker
 from idmtools.core import PlatformFactory
 import os
 import re
@@ -25,6 +23,9 @@ class TestLocalRunnerCLI(ITestWithPersistence):
 
     @classmethod
     def setUpClass(cls):
+        reset_local_broker()
+        from idmtools_platform_local.workers.brokers import setup_broker
+        setup_broker()
         platform = PlatformFactory.create_from_block('Local_Staging')
         cls.pe = PythonExperiment(name="python experiment", model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
 

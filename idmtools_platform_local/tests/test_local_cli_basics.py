@@ -1,12 +1,8 @@
-# flake8: noqa E402
+
 import re
 import time
-
 from click._compat import strip_ansi
-
 from idmtools_platform_local.status import Status
-from idmtools_test.utils.confg_local_runner_test import config_local_test
-local_path = config_local_test()
 import unittest
 import unittest.mock
 from idmtools_platform_local.workers.utils import create_or_update_status

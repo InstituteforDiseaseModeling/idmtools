@@ -4,7 +4,6 @@ import shlex
 import sys
 import subprocess
 from dramatiq import GenericActor
-from idmtools_platform_local.config import DATA_PATH
 from idmtools_platform_local.status import Status
 from idmtools_platform_local.workers.data.job_status import JobStatus
 from idmtools_platform_local.workers.database import get_session
@@ -52,7 +51,7 @@ class RunTask(GenericActor):
             return current_job.status
 
         # Define our simulation path and our root asset path
-        simulation_path = os.path.join(DATA_PATH, experiment_uuid, simulation_uuid)
+        simulation_path = os.path.join(os.getenv("DATA_PATH", "/data"), experiment_uuid, simulation_uuid)
         asset_dir = os.path.join(simulation_path, "Assets")
 
         # Add items to our system path

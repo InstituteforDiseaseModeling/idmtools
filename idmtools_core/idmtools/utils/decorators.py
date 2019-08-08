@@ -131,7 +131,7 @@ def optional_yaspin_load(*yargs, **ykwargs) -> Callable:
     def decorate(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            if spinner:
+            if spinner and not os.getenv('NO_SPINNER', False):
                 spinner.start()
             result = func(*args, **kwargs)
             if spinner:

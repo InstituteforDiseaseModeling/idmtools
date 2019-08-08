@@ -10,6 +10,7 @@ from logging import getLogger
 from typing import Optional, Union, NoReturn
 
 import docker
+from docker.errors import APIError
 from docker.models.containers import Container, ExecResult
 from docker.models.networks import Network
 
@@ -49,7 +50,15 @@ class DockerOperations:
         self.timeout = 1
         self.system_info = get_system_information()
         if self.run_as is None:
-            self.run_as = self.run_as
+            self.run_as = self.system_info.user_group_str
+
+        if self.run_as == "0:0":
+            message = "You cannot run the containers as the root user!. Please select another value for 'run_as'. "
+            if self.system_info.user_group_str == "0:0":
+                message += " It appears you executed a script/command as the local root user or use sudo to start the" \
+                           " Local Platform. If that is the case, use the 'run_as' configuration option in your " \
+                           "idmtools.ini Local Platform configuration block or initializing the Local Platform object"
+            raise ValueError(message)
         self.client = docker.from_env()
 
     @optional_yaspin_load(text="Ensure IDM Tools Local Platform services are loaded")
@@ -183,12 +192,19 @@ class DockerOperations:
             (Optional[Container]): A Container object is always returned When used with *create=True*. It is possible
             that *None* is returned when *create=False*
         """
-        logger.debug('Ensuring worker is running')
+        logger.debug('Checking if worker is running')
         workers_container = self.client.containers.list(filters=dict(name='idmtools_worker'), all=True)
         if not workers_container and create:
             container_config = self.create_worker_config()
             logger.debug(f'Worker Container Config {str(container_config)}')
-            workers_container = self.client.containers.run(**container_config)
+            try:
+                workers_container = self.client.containers.run(**container_config)
+            except APIError as e:
+                if 'address already in use' in e.response:
+                    raise EnvironmentError(f"Port {self.workers_ui_port} already in use. Please configure another port "
+                                           f"for the Local Platform UI") from e
+                else:  # we don't know what the issue is so kick it down the road
+                    raise e
         elif type(workers_container) is list and len(workers_container):
             workers_container = workers_container[0]
         return workers_container
@@ -262,7 +278,7 @@ class DockerOperations:
             (Optional[Container]): A Container object is always returned When used with *create=True*. It is possible
             that *None* is returned when *create=False*
         """
-        logger.debug('Ensuring redis is running')
+        logger.debug('Checking if redis is running')
         redis_container = self.client.containers.list(filters=dict(name='idmtools_redis'), all=True)
         if not redis_container and create:
             container_config = self.create_redis_config()
@@ -306,7 +322,7 @@ class DockerOperations:
             (Optional[Container]): A Container object is always returned When used with *create=True*. It is possible
             that *None* is returned when *create=False*
         """
-        logger.debug('Ensuring postgres is running')
+        logger.debug('Checking postgres is running')
         postgres_container = self.client.containers.list(filters=dict(name='idmtools_postgres'), all=True)
         if not postgres_container and create:
             container_config = self.create_postgres_config()
@@ -366,7 +382,7 @@ class DockerOperations:
             (Optional[dict]) Dictionary representing the docker port bindings configuration for port if all inputs have
             values
         """
-        return {src_port: dest_port} if src_port is not None and dest_port is not None else None
+        return {dest_port: src_port} if src_port is not None and dest_port is not None else None
 
     def copy_to_container(self, container: Container, file: str, destination_path: str,
                           dest_name: Optional[str]  = None) -> bool:

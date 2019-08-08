@@ -1,5 +1,6 @@
 import functools
 import inspect
+import logging
 from logging import DEBUG, getLogger
 from typing import Type, List, Any, Set, Dict
 
@@ -43,8 +44,13 @@ def load_plugin_map(entrypoint: str, spec_type: Type[PluginSpecification]) -> Di
     # create instances of the plugins
     _plugin_map = dict()
     for plugin in plugins:
-        logger.debug("Loading {str(plugin)} as {plugin.get_name()}")
-        _plugin_map[plugin.get_name()] = plugin()
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f"Loading {str(plugin)} as {plugin.get_name()}")
+        try:
+            _plugin_map[plugin.get_name()] = plugin()
+        except Exception as e:
+            logger.exception(e)
+            print(f'Problem loading plugin: {plugin.get_name()}')
     return _plugin_map
 
 
