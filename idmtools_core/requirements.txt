@@ -1,3 +1,4 @@
+coloredlogs~=10.0
 diskcache==4.0.0
 marshmallow==3.0.0rc6
 more-itertools==7.0.0

@@ -13,6 +13,7 @@ from idmtools.entities import IExperiment, IPlatform
 # we have to import brokers so that the proper configuration is achieved for redis
 from idmtools_platform_local.client.simulations_client import SimulationsClient
 from idmtools_platform_local.docker.DockerOperations import DockerOperations
+from idmtools_platform_local.workers.brokers import setup_broker
 
 status_translate = dict(
     created='CREATED',
@@ -51,7 +52,7 @@ class LocalPlatform(IPlatform):
 
     def __post_init__(self):
         # ensure our brokers are started
-        import idmtools_platform_local.workers.brokers  # noqa: F401
+        setup_broker()
         if self.docker_operations is None:
             # extract configuration details for the docker manager
             local_docker_options = [f.name for f in dataclasses.fields(DockerOperations)]

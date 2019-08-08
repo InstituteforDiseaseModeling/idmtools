@@ -15,6 +15,8 @@ from typing import Callable
 # This currently is any comps related test
 # test-docker run any tests that depend on docker locally(Mostly local runn)
 # test-all runs all tests
+
+
 comps_test = unittest.skipIf(
     not os.environ.get('COMPS_TESTS', False), 'No COMPS testing'
 )
@@ -57,3 +59,22 @@ def run_test_in_n_seconds(n: int, print_elapsed_time: bool = False) -> Callable:
         return wrapper
 
     return decorator
+
+
+def restart_local_platform(silent=True, *args, **kwargs):
+    from idmtools_platform_local.docker.DockerOperations import DockerOperations
+    # disable spinner
+    if silent:
+        os.environ['NO_SPINNER'] = '1'
+    do = DockerOperations(*args, **kwargs)
+
+    def decorate(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            do.cleanup()
+            do.create_services()
+            result = func(*args, **kwargs)
+            do.cleanup()
+            return result
+        return wrapper
+    return decorate

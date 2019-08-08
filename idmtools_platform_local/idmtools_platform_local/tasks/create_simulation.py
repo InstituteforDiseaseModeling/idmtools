@@ -2,7 +2,6 @@ import logging
 import os
 import typing
 from dramatiq import GenericActor
-from idmtools_platform_local.config import DATA_PATH
 import random
 import string
 
@@ -42,12 +41,12 @@ class CreateSimulationTask(GenericActor):
             logger.debug('Creating simulation %s for experiment %s', uuid, experiment_id)
 
         # Ensure data directories exist
-        data_path = os.path.join(DATA_PATH, experiment_id, uuid)
+        data_path = os.path.join(os.getenv("DATA_PATH", "/data"), experiment_id, uuid)
         os.makedirs(data_path, exist_ok=True)
 
         # Define our simulation path and our root asset path
-        simulation_path = os.path.join(DATA_PATH, experiment_id, uuid)
-        asset_dir = os.path.join(DATA_PATH, experiment_id, "Assets")
+        simulation_path = os.path.join(os.getenv("DATA_PATH", "/data"), experiment_id, uuid)
+        asset_dir = os.path.join(os.getenv("DATA_PATH", "/data"), experiment_id, "Assets")
 
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug('Linking assets from %s to %s', asset_dir, os.path.join(simulation_path, 'Assets'))
