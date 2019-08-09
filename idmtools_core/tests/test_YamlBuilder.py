@@ -1,12 +1,10 @@
-import itertools
 import os
-import numpy as np
 from functools import partial
 from idmtools.builders.ArmExperimentBuilder import ArmType
 from idmtools.builders.YamlExperimentBuilder import YamlExperimentBuilder
-from tests.utils.ITestWithPersistence import ITestWithPersistence
-from tests.utils.TestExperiment import TestExperiment
-from tests import INPUT_PATH
+from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_test.utils.TstExperiment import TstExperiment
+from idmtools_test import COMMON_INPUT_PATH
 
 
 def param_update(simulation, param, value):
@@ -28,12 +26,12 @@ def verify_simulation(simulation, expected_parameters, expected_values):
     return False
 
 
-class TestArmBuilder(ITestWithPersistence):
+class TestYamlBuilder(ITestWithPersistence):
 
     def setUp(self):
         super().setUp()
         self.builder = YamlExperimentBuilder()
-        self.base_path = os.path.abspath(os.path.join(INPUT_PATH, "builder"))
+        self.base_path = os.path.abspath(os.path.join(COMMON_INPUT_PATH, "builder"))
 
     def tearDown(self):
         super().tearDown()
@@ -45,7 +43,7 @@ class TestArmBuilder(ITestWithPersistence):
 
         # expected_values = list(itertools.product(range(5), [1, 2, 3]))
 
-        experiment = TestExperiment("test")
+        experiment = TstExperiment("test")
         experiment.builder = self.builder
 
         simulations = list(experiment.batch_simulations(20))[0]
@@ -65,7 +63,7 @@ class TestArmBuilder(ITestWithPersistence):
 
         # expected_values = list(itertools.product(range(5), [1, 2, 3]))
 
-        experiment = TestExperiment("test")
+        experiment = TstExperiment("test")
         experiment.builder = self.builder
 
         simulations = list(experiment.batch_simulations(10))[0]

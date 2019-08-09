@@ -2,10 +2,15 @@ import os
 import json
 from idmtools_models.dtk import DTKExperiment
 from idmtools_models.dtk.defaults import DTKSIR
-from tests.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_test import COMMON_INPUT_PATH
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
-INPUT_PATH = os.path.join(current_directory, "inputs")
+
+DEFAULT_CAMPAIGN_JSON = os.path.join(COMMON_INPUT_PATH, "files", "campaign.json")
+DEFAULT_DEMOGRAPHICS_JSON = os.path.join(COMMON_INPUT_PATH, "files", "demographics.json")
+DEFAULT_CONFIG_PATH = os.path.join(COMMON_INPUT_PATH, "files", "config.json")
+DEFAULT_ERADICATION_PATH = os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe")
 
 
 class TestCustomFiles(ITestWithPersistence):
@@ -20,12 +25,12 @@ class TestCustomFiles(ITestWithPersistence):
 
     def test_simulation_load_config(self):
         e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
-                                       eradication_path=os.path.join(INPUT_PATH, "dtk", "Eradication.exe"))
+                                       eradication_path=DEFAULT_ERADICATION_PATH)
 
-        e.base_simulation.load_files(config_path="./inputs/files/config.json")
+        e.base_simulation.load_files(config_path=DEFAULT_CONFIG_PATH)
 
         # Test the content
-        with open("./inputs/files/config.json", 'r') as m:
+        with open(DEFAULT_CONFIG_PATH, 'r') as m:
             jt1 = e.base_simulation.config
             jt2 = json.load(m)
             self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
@@ -42,12 +47,12 @@ class TestCustomFiles(ITestWithPersistence):
 
     def test_simulation_load_campaign(self):
         e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
-                                       eradication_path=os.path.join(INPUT_PATH, "dtk", "Eradication.exe"))
+                                       eradication_path=DEFAULT_ERADICATION_PATH)
 
-        e.base_simulation.load_files(campaign_path="./inputs/files/campaign.json")
+        e.base_simulation.load_files(campaign_path=DEFAULT_CAMPAIGN_JSON)
 
         # Test the content
-        with open("./inputs/files/campaign.json", 'r') as m:
+        with open(DEFAULT_CAMPAIGN_JSON, 'r') as m:
             jt1 = e.base_simulation.campaign
             jt2 = json.load(m)
             self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
@@ -63,13 +68,12 @@ class TestCustomFiles(ITestWithPersistence):
         self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
 
     def test_simulation_load_demographics(self):
-        e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
-                                       eradication_path=os.path.join(INPUT_PATH, "dtk", "Eradication.exe"))
+        e = DTKExperiment.from_default(self.case_name, default=DTKSIR, eradication_path=DEFAULT_ERADICATION_PATH)
 
-        e.base_simulation.load_files(demographics_path="./inputs/files/demographics.json")
+        e.base_simulation.load_files(demographics_path=DEFAULT_DEMOGRAPHICS_JSON)
 
         # Test the content
-        with open("./inputs/files/demographics.json", 'r') as m:
+        with open(DEFAULT_DEMOGRAPHICS_JSON, 'r') as m:
             jt1 = e.base_simulation.demographics
             jt2 = json.load(m)
             self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
@@ -86,71 +90,70 @@ class TestCustomFiles(ITestWithPersistence):
 
     def test_simulation_load_files(self):
         e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
-                                       eradication_path=os.path.join(INPUT_PATH, "dtk", "Eradication.exe"))
+                                       eradication_path=DEFAULT_ERADICATION_PATH)
 
-        e.base_simulation.load_files(config_path="./inputs/files/config.json",
-                                     campaign_path="./inputs/files/campaign.json",
-                                     demographics_path="./inputs/files/demographics.json")
+        e.base_simulation.load_files(config_path=DEFAULT_CONFIG_PATH, campaign_path=DEFAULT_CAMPAIGN_JSON,
+                                     demographics_path=DEFAULT_DEMOGRAPHICS_JSON)
 
         # Test the contents
-        with open("./inputs/files/config.json", 'r') as m:
+        with open(DEFAULT_CONFIG_PATH, 'r') as m:
             jt1 = e.base_simulation.config
             jt2 = json.load(m)
-            self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
+        self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
 
-        with open("./inputs/files/campaign.json", 'r') as m:
+        with open(DEFAULT_CAMPAIGN_JSON, 'r') as m:
             jt1 = e.base_simulation.campaign
             jt2 = json.load(m)
-            self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
+        self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
 
-        with open("./inputs/files/demographics.json", 'r') as m:
+        with open(DEFAULT_DEMOGRAPHICS_JSON, 'r') as m:
             jt1 = e.base_simulation.demographics
             jt2 = json.load(m)
-            self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
+        self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
 
     def test_experiment_load_files(self):
         e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
-                                       eradication_path=os.path.join(INPUT_PATH, "dtk", "Eradication.exe"))
+                                       eradication_path=DEFAULT_ERADICATION_PATH)
 
-        e.load_files(config_path="./inputs/files/config.json",
-                     campaign_path="./inputs/files/campaign.json",
-                     demographics_path="./inputs/files/demographics.json")
+        e.load_files(config_path=DEFAULT_CONFIG_PATH, campaign_path=DEFAULT_CAMPAIGN_JSON,
+                     demographics_path=DEFAULT_DEMOGRAPHICS_JSON)
 
         # Test the contents
-        with open("./inputs/files/config.json", 'r') as m:
+        with open(DEFAULT_CONFIG_PATH, 'r') as m:
             jt1 = e.base_simulation.config
             jt2 = json.load(m)
             self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
 
-        with open("./inputs/files/campaign.json", 'r') as m:
+        with open(DEFAULT_CAMPAIGN_JSON, 'r') as m:
             jt1 = e.base_simulation.campaign
             jt2 = json.load(m)
             self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
 
-        with open("./inputs/files/demographics.json", 'r') as m:
+        with open(DEFAULT_DEMOGRAPHICS_JSON, 'r') as m:
             jt1 = e.base_simulation.demographics
             jt2 = json.load(m)
             self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
 
     def test_load_from_files(self):
         e = DTKExperiment.from_files(self.case_name,
-                                     eradication_path=os.path.join(INPUT_PATH, "dtk", "Eradication.exe"),
-                                     config_path="./inputs/files/config.json",
-                                     campaign_path="./inputs/files/campaign.json",
-                                     demographics_path="./inputs/files/demographics.json")
+                                     eradication_path=DEFAULT_ERADICATION_PATH,
+                                     config_path=DEFAULT_CONFIG_PATH,
+                                     campaign_path=DEFAULT_CAMPAIGN_JSON,
+                                     demographics_path=os.path.join(COMMON_INPUT_PATH, "files/demographics.json")
+                                     )
 
         # Test the contents
-        with open("./inputs/files/config.json", 'r') as m:
+        with open(DEFAULT_CONFIG_PATH, 'r') as m:
             jt1 = e.base_simulation.config
             jt2 = json.load(m)
             self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
 
-        with open("./inputs/files/campaign.json", 'r') as m:
+        with open(DEFAULT_CAMPAIGN_JSON, 'r') as m:
             jt1 = e.base_simulation.campaign
             jt2 = json.load(m)
             self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
 
-        with open("./inputs/files/demographics.json", 'r') as m:
+        with open(DEFAULT_DEMOGRAPHICS_JSON, 'r') as m:
             jt1 = e.base_simulation.demographics
             jt2 = json.load(m)
             self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))

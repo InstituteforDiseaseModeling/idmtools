@@ -20,6 +20,7 @@ if TYPE_CHECKING:
     TTags = Dict[str, str]
     TSimulationBatch = List[TSimulation]
 
+    TPlatformClass = Type[TPlatform]
     TSimulationClass = Type[TSimulation]
     TExperimentClass = Type[TExperiment]
 

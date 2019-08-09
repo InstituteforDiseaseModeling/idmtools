@@ -14,7 +14,6 @@ class CsvExperimentBuilder(ExperimentBuilder):
 
     def add_sweeps_from_file(self, file_path, func_map={}, type_map={}, sep=","):
         df_sweeps = pd.read_csv(file_path, sep=sep)
-        # print(df_sweeps)
 
         row_count = df_sweeps.shape[0]
         for k in range(row_count):

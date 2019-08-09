@@ -1,8 +1,5 @@
 import copy
-import logging
 from logging import getLogger
-from logging.handlers import QueueHandler
-from logging.config import fileConfig
 import os
 from configparser import ConfigParser
 from typing import Dict
@@ -50,7 +47,7 @@ class IdmConfigParser:
         cls.ensure_init()
 
         # retrieve THIS platform config settings
-        field_config = cls._get_section(section)
+        field_config = cls.get_section(section)
 
         # update field types
         field_config_updated = copy.deepcopy(field_config)
@@ -100,7 +97,6 @@ class IdmConfigParser:
         """
         # init logging here as this is our most likely entry-point into an idm-tools "application"
         from idmtools.core.logging import setup_logging
-        setup_logging()
 
         ini_file = cls._find_config(dir_path, file_name)
         if ini_file is None:
@@ -111,13 +107,14 @@ class IdmConfigParser:
 
         cls._config = ConfigParser()
         cls._config.read(ini_file)
-
-
+        log_config = cls.get_section('Logging')
+        valid_options = ['level', 'log_filename', 'console']
+        setup_logging(**{k: v for k, v in log_config.items() if k in valid_options})
 
     @classmethod
-    def _get_section(cls, section: str = None) -> Dict[str, str]:
+    def get_section(cls, section: str = None) -> Dict[str, str]:
         """
-        Retrieve INI section values
+        This is called from platform creation directly and retrieve INI section values
         Args:
             section: INI section name where we retrieve all fields
 
@@ -133,6 +130,26 @@ class IdmConfigParser:
             return {}
 
         section = cls._config.items(section)
+        return dict(section)
+
+    @classmethod
+    def get_block(cls, block_name: str = None) -> Dict[str, str]:
+        """
+        This is called from platform factoru and retrieve INI section values
+        Args:
+            block_name: INI section name where we retrieve all fields
+
+        Returns: all fields as a dictionary
+        """
+        cls.ensure_init()
+        if cls._config is None:
+            raise ValueError(f"Config file NOT FOUND or IS Empty!")
+
+        section_dict = dict(cls._config.items())
+        if block_name not in section_dict:
+            raise ValueError(f"Block '{block_name}' doesn't exist!")
+
+        section = cls._config.items(block_name)
         return dict(section)
 
     @classmethod
@@ -177,7 +194,7 @@ class IdmConfigParser:
         Returns: config value as string
         """
         cls.ensure_init()
-        return cls._config.get(section.upper(), option)
+        return cls._config.get(section, option)
 
     @classmethod
     def ensure_init(cls, dir_path: str = '.', file_name: str = default_config) -> None:

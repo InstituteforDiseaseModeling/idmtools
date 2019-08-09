@@ -1,12 +1,19 @@
-import typing
+import uuid
 from abc import ABCMeta, abstractmethod
 from dataclasses import fields
-from idmtools.core import IEntity
+
+import typing
+from logging import getLogger, DEBUG
+
 from idmtools.config import IdmConfigParser
+from idmtools.core.interfaces.IEntity import IEntity
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TExperiment, TSimulation, TSimulationBatch
-    from typing import List, Dict
+    from typing import List, Dict, Any
+
+
+logger = getLogger(__name__)
 
 
 class IPlatform(IEntity, metaclass=ABCMeta):
@@ -28,7 +35,9 @@ class IPlatform(IEntity, metaclass=ABCMeta):
         """
         Got called from Platform creation
         """
-        self.update_from_config()
+        # self.update_from_config()
+        if not hasattr(self, '_FACTORY'):
+            self.update_from_config()
 
     @abstractmethod
     def create_objects(self, objects) -> 'List[Any]':
@@ -102,13 +111,17 @@ class IPlatform(IEntity, metaclass=ABCMeta):
         field_type = {f.name: f.type for f in fds}
 
         # find, load and get settings from config file. Return with the correct data types
-        field_config = IdmConfigParser.retrieve_settings(self.__class__.__name__.upper(), field_type)
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f'Loading Platform config from {self.__class__.__name__.replace("Platform", "")}')
+        field_config = IdmConfigParser.retrieve_settings(self.__class__.__name__.replace("Platform", ""), field_type)
 
         # display not used fields from config
         field_config_not_used = set(field_config.keys()) - set(field_name)
         if len(field_config_not_used) > 0:
             field_config_not_used = [" - {} = {}".format(fn, field_config[fn]) for fn in field_config_not_used]
-            print("The following Config Settings are not used:")
+            logger.warning(f"[{self.__class__.__name__}]: the following Config Settings are not used:")
+            logger.warning("\n".join(field_config_not_used))
+            print(f"[{self.__class__.__name__}]: the following Config Settings are not used:")
             print("\n".join(field_config_not_used))
 
         # update attr based on priority: #1 Code, #2 INI, #3 Default

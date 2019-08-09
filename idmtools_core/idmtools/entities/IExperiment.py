@@ -5,7 +5,9 @@ from abc import ABC
 from itertools import chain
 from dataclasses import dataclass, field, InitVar
 from more_itertools import grouper
-from idmtools.core import EntityContainer, IAssetsEnabled, INamedEntity
+from idmtools.core import EntityContainer
+from idmtools.core.interfaces.IAssetsEnabled import IAssetsEnabled
+from idmtools.core.interfaces.INamedEntity import INamedEntity
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TSimulation, TSimulationClass, TCommandLine, TExperimentBuilder

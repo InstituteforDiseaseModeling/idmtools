@@ -8,7 +8,7 @@ mkdir data\redis-data
 echo "install idmtools ..."
 pip install -e idmtools_core.[test,3.6] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
 pip install -e idmtools_local_runner[test]
-pip install -e idmtools_models_collection[test]
+pip install -e idmtools_models[test]
 
 echo "start services..."
 cd idmtools_local_runner
