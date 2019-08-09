@@ -64,10 +64,7 @@ class TestLocalCLIBasic(unittest.TestCase):
         # start up postgres
         dm = DockerOperations()
         dm.cleanup()
-        dm.get_postgres()
-        dm.get_redis()
-        time.sleep(3)
-        dm.get_workers()
+        dm.create_services()
         time.sleep(3)
         # ensure we are connecting to proper db
         url = 'postgresql+psycopg2://idmtools:idmtools@localhost/idmtools'

@@ -1,11 +1,13 @@
+import http.server
 import io
 import os
 import socket
+import socketserver
 import subprocess
 import unittest.mock
 from idmtools_platform_local.docker.DockerOperations import DockerOperations
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools_test.utils.decorators import docker_test, restart_local_platform
+from idmtools_test.utils.decorators import docker_test, restart_local_platform, linux_only
 
 
 def check_port_is_open(port):
@@ -56,21 +58,21 @@ class TestDockerOperations(unittest.TestCase):
             self.assertEqual(0, result.returncode)
             self.assertIn('Hello World!', result.stdout.decode('utf-8'))
 
+    @linux_only
     def test_port_taken_has_coherent_error(self):
         pl = DockerOperations(workers_ui_port=10000)
         pl.cleanup(True)
-        # create dummy port for listening
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server_address = ('0.0.0.0', 10000)
 
-        sock.bind(server_address)
-        sock.listen(1)
+        Handler = http.server.SimpleHTTPRequestHandler
 
-        with self.assertRaises(EnvironmentError) as e:
-            pl.create_services()
-            self.assertIn('Port 10000 is already taken', e.exception.args)
+        # run a http server that should use port 10000
+        with socketserver.TCPServer(("", 10000), Handler) as httpd:
+            httpd.server_activate()
 
-        sock.close()
+            with self.assertRaises(EnvironmentError) as e:
+                pl.create_services()
+                self.assertIn('Port 10000 is already taken', e.exception.args)
+            httpd.server_close()
 
     def test_error_if_try_to_run_as_root(self):
         with self.assertRaises(ValueError) as mock:
