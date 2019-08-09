@@ -5,11 +5,13 @@ clean: ## Clean all our jobs
 	@+$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.py[co]', recursive=True)]"
 	@+$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.log', recursive=True)]"
 	@+$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
-	@+$(IPY) "import os, shutil, glob; [shutil.rmtree(i) for i in [k for k in glob.glob('**/*.egg-info/', recursive=True) if os.path.isdir(k)]]"
 	@+$(IPY) "import shutil; shutil.rmtree('**/htmlcov', True)"
 	@+$(IPY) "import shutil; shutil.rmtree('**/.pytest_cache', True)"
 	@+$(IPY) "import shutil; shutil.rmtree('**/dist', True)"
 
+clean-all:  ## Deleting package info hides plugins so we only want to do that for packaging
+	@make clean
+	@+$(IPY) "import os, shutil, glob; [shutil.rmtree(i) for i in [k for k in glob.glob('**/*.egg-info/', recursive=True) if os.path.isdir(k)]]"
 # Dev and test related rules
 
 lint: ## check style with flake8
