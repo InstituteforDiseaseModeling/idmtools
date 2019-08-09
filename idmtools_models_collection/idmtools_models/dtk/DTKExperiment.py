@@ -16,7 +16,8 @@ class DTKExperiment(IExperiment):
 
     def __post_init__(self, simulation_type):
         super().__post_init__(simulation_type=DTKSimulation)
-        self.eradication_path = os.path.abspath(self.eradication_path)
+        if self.eradication_path is not None:
+            self.eradication_path = os.path.abspath(self.eradication_path)
 
     @classmethod
     def from_default(cls, name, default: 'IDTKDefault', eradication_path=None):

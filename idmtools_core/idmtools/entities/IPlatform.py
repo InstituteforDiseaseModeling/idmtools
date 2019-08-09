@@ -12,6 +12,7 @@ if typing.TYPE_CHECKING:
 class IPlatform(IEntity, metaclass=ABCMeta):
     """
     Interface defining a platform.
+    Interface defining a platform.
     A platform needs to implement basic operation such as:
     - Creating experiment
     - Creating simulation
@@ -30,60 +31,41 @@ class IPlatform(IEntity, metaclass=ABCMeta):
         self.update_from_config()
 
     @abstractmethod
-    def create_experiment(self, experiment: 'TExperiment') -> None:
+    def create_objects(self, objects) -> 'List[Any]':
         """
-        Function creating an experiment on the platform.
+        Function creating e.g. sims/exps/suites on the platform
         Args:
-            experiment: The experiment to create
-        """
-        pass
-
-    @abstractmethod
-    def create_simulations(self, simulation_batch: 'TSimulationBatch') -> 'List[Any]':
-        """
-        Function creating experiments simulations on the platform for a given experiment.
-        Args:
-            simulation_batch: The batch of simulations to create
+            objects: The batch of objects to create
         Returns:
             List of ids created
         """
         pass
 
     @abstractmethod
-    def run_simulations(self, experiment: 'TExperiment') -> None:
+    def run_objects(self, objects):
         """
-        Run the simulations for a given experiment on the platform
+        Run the objects (sims, exps, suites) on the platform
         Args:
-            experiment: The experiment to run
+            objects: The objects to run
         """
         pass
 
     @abstractmethod
-    def send_assets_for_experiment(self, experiment: 'TExperiment', **kwargs) -> None:
+    def send_assets(self, object, **kwargs) -> None:
         """
-        Send the assets for a given experiment to the platform.
+        Send the assets for a given object (sim, experiment, suite, etc) to the platform.
         Args:
-            experiment: The experiment to process. Expected to have an `assets` attribute containing the collection.
+            object: The object to process. Expected to have an `assets` attribute containing the collection.
             **kwargs: Extra parameters used by the platform
         """
         pass
 
     @abstractmethod
-    def send_assets_for_simulation(self, simulation: 'TSimulation', **kwargs) -> None:
+    def refresh_status(self, object) -> None:
         """
-        Send the assets for a given simulation to the platform.
+        Populate the platform object and any child objects with status.
         Args:
-            simulation: The simulation to process. Expected to have an `assets` attribute containing the collection.
-            **kwargs: Extra parameters used by the platform
-        """
-        pass
-
-    @abstractmethod
-    def refresh_experiment_status(self, experiment: 'TExperiment') -> None:
-        """
-        Populate the experiment and its simulations with status.
-        Args:
-            experiment: The experiment to check status for
+            obj: The object (Item) to check status for
         """
         pass
 
@@ -92,15 +74,11 @@ class IPlatform(IEntity, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def get_objects_by_relationship(self, obj, relationship):
+    def get_objects_by_relationship(self, object, relationship):
         pass
 
     @abstractmethod
     def get_files(self, item, files: 'List[str]') -> 'Dict[str, bytearray]':
-        pass
-
-    @abstractmethod
-    def retrieve_experiment(self, experiment_id: 'uuid') -> 'TExperiment':
         pass
 
     @abstractmethod

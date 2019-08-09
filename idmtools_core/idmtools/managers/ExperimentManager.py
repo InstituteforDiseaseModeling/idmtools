@@ -38,7 +38,7 @@ class ExperimentManager:
         self.experiment.pre_creation()
 
         # Create experiment
-        self.platform.create_experiment(self.experiment)
+        self.platform.create_objects(objects=[self.experiment])
 
         # Persist the platform
         PlatformPersistService.save(self.platform)
@@ -53,7 +53,7 @@ class ExperimentManager:
         for simulation in simulation_batch:
             simulation.pre_creation()
 
-        ids = self.platform.create_simulations(simulation_batch)
+        ids = self.platform.create_objects(objects=simulation_batch)
 
         for uid, simulation in zip(ids, simulation_batch):
             simulation.uid = uid
@@ -77,7 +77,7 @@ class ExperimentManager:
                 self.experiment.simulations.set_status(EntityStatus.CREATED)
 
     def start_experiment(self):
-        self.platform.run_simulations(self.experiment)
+        self.platform.run_objects([self.experiment])
         self.experiment.simulations.set_status(EntityStatus.RUNNING)
 
     def run(self):
@@ -117,5 +117,5 @@ class ExperimentManager:
         raise TimeoutError(f"Timeout of {timeout} seconds exceeded when monitoring experiment {self.experiment}")
 
     def refresh_status(self):
-        self.platform.refresh_experiment_status(self.experiment)
+        self.platform.refresh_status(object=self.experiment)
         ExperimentPersistService.save(self.experiment.metadata)

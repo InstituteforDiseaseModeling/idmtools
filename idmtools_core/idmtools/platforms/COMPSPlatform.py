@@ -77,7 +77,20 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         self._comps_experiment = comps_experiment
         self._comps_experiment_id = comps_experiment.id
 
-    def send_assets_for_experiment(self, experiment: 'TExperiment', **kwargs):
+    def send_assets(self, object, **kwargs):
+        level = object.level
+        if level == 0:
+            self._send_assets_for_simulation(simulation=object, **kwargs)
+        elif level == 1:
+            self._send_assets_for_experiment(experiment=object, **kwargs)
+        elif level == 2:
+            raise Exception(f'Unknown how to send assets for object level: {level} '
+                            f'for platform: {self.__class__.__name__}')
+        else:
+            raise Exception(f'Unknown object level: {level} for platform: {self.__class__.__name__}')
+
+    @staticmethod
+    def _send_assets_for_experiment(experiment: 'TExperiment', **kwargs):
         if experiment.assets.count == 0:
             return
 
@@ -89,7 +102,8 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         experiment.assets.uid = ac.id
         print("Asset collection for experiment: {}".format(ac.id))
 
-    def send_assets_for_simulation(self, simulation, comps_simulation):
+    @staticmethod
+    def _send_assets_for_simulation(simulation, comps_simulation):
         for asset in simulation.assets:
             comps_simulation.add_file(simulationfile=SimulationFile(asset.filename, 'input'), data=asset.content)
 
@@ -105,7 +119,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             experiment_name = experiment_name.replace(c, '_')
         return experiment_name
 
-    def create_experiment(self, experiment: 'TExperiment'):
+    def _create_experiment(self, experiment: 'TExperiment'):
         self._login()
 
         # Cleanup the name
@@ -139,9 +153,26 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         self.comps_experiment = e
 
         experiment.uid = e.id
-        self.send_assets_for_experiment(experiment)
+        self.send_assets(object=experiment)
+        return experiment.uid
 
-    def create_simulations(self, simulation_batch):
+    def create_objects(self, objects):
+        levels = list({object.level for object in objects})
+        if len(levels) != 1:
+            raise Exception('create_objects only works with objects of a single level at a time.')
+        level = levels[0]
+        if level == 0:
+            ids = self._create_simulations(simulation_batch=objects)
+        elif level == 1:
+            ids = [self._create_experiment(experiment=object) for object in objects]
+        elif level == 2:
+            raise Exception(f'Unknown how to create objects for hierarchy level {level} '
+                            f'for platform: {self.__class__.__name__}')
+        else:
+            raise Exception(f'Unknown level: {level} for platform: {self.__class__.__name__}')
+        return ids
+
+    def _create_simulations(self, simulation_batch):
         self._login()
         created_simulations = []
 
@@ -149,7 +180,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             s = COMPSSimulation(name=simulation.experiment.name, experiment_id=simulation.experiment.uid,
                                 configuration=Configuration(asset_collection_id=simulation.experiment.assets.uid))
 
-            self.send_assets_for_simulation(simulation, s)
+            self.send_assets(object=simulation, comps_simulation=s)
             s.set_tags(simulation.tags)
             created_simulations.append(s)
 
@@ -158,7 +189,22 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         # Register the IDs
         return [s.id for s in created_simulations]
 
-    def run_simulations(self, experiment: 'TExperiment'):
+    def run_objects(self, objects):
+        for object in objects:
+            level = object.level
+            if level == 0:
+                raise Exception(f'Unknown how to run objects for hierarchy level {object.level} '
+                                f'for platform: {self.__class__.__name__}')
+
+            elif level == 1:
+                self._run_simulations(experiment=object)
+            elif level == 2:
+                raise Exception(f'Unknown how to refresh objects for hierarchy level {object.level} '
+                                f'for platform: {self.__class__.__name__}')
+            else:
+                raise Exception(f'Unknown object hierarchy level {level} for platform: {self.__class__.__name__}')
+
+    def _run_simulations(self, experiment: 'TExperiment'):
         self._login()
         self._comps_experiment_id = experiment.uid
         self.comps_experiment.commission()
@@ -174,7 +220,19 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         else:
             return EntityStatus.RUNNING
 
-    def refresh_experiment_status(self, experiment):
+    def refresh_status(self, object):
+        if object.level == 0:
+            raise Exception(f'Unknown how to refresh objects for hierarchy level {object.level} '
+                            f'for platform: {self.__class__.__name__}')
+        elif object.level == 1:
+            return self._refresh_experiment_status(experiment=object)
+        elif object.level == 2:
+            raise Exception(f'Unknown how to refresh objects for hierarchy level {object.level} '
+                            f'for platform: {self.__class__.__name__}')
+        else:
+            raise Exception(f'Unknown object hierarchy level {level} for platform: {self.__class__.__name__}')
+
+    def _refresh_experiment_status(self, experiment):
         # Do nothing if we are already done
         if experiment.done:
             return
@@ -194,7 +252,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                     s.status = COMPSPlatform._convert_COMPS_status(comps_simulation.state)
                     break
 
-    def retrieve_simulations(self, experiment: 'TExperiment') -> list:
+    def _retrieve_simulations(self, experiment: 'TExperiment') -> list:
         self._comps_experiment_id = experiment.uid
 
         simulations = []
@@ -209,14 +267,14 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                          ('suite_id', experiment.suite_id)]
             sim.full_id = ItemId(group_tuples=hierarchy)
             simulations.append(sim)
-            sim.level = 0
+            # sim.level = 0
         return simulations
 
-    def retrieve_experiment(self, experiment_id: 'uuid') -> 'TExperiment':
+    def _retrieve_experiment(self, experiment_id: 'uuid') -> 'TExperiment':
         self._comps_experiment_id = experiment_id
         experiment = experiment_factory.create(self.comps_experiment.tags.get("type"), tags=self.comps_experiment.tags)
         experiment.uid = self.comps_experiment.id
-        experiment.level = 1
+        # experiment.level = 1
         return experiment
 
     @staticmethod
@@ -281,30 +339,31 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         if level == 0:
             raise Exception(f'Unknown id hierarchy level {level} for platform: {self.__class__.__name__}')
         elif level == 1:
-            obj = self.retrieve_experiment(experiment_id=id)
+            object = self._retrieve_experiment(experiment_id=id)
         elif level == 2:
             raise Exception(f'Unknown id hierarchy level {level} for platform: {self.__class__.__name__}')
         else:
             raise Exception(f'Unknown id hierarchy level {level} for platform: {self.__class__.__name__}')
-        return obj
+        return object
 
-    def get_objects_by_relationship(self, obj, relationship):
-        target_level = obj.level + relationship
+    def get_objects_by_relationship(self, object, relationship):
+        target_level = object.level + relationship
         if target_level == 0:
-            target_objs = self.retrieve_simulations(experiment=obj)  # self.restore_simulations(experiment=obj)
+            target_objects = self._retrieve_simulations(experiment=object)
         elif target_level == 1:
-            raise Exception(f'Unknown how to retrieve relative objects for hierarchy level {obj.level} '
+            raise Exception(f'Unknown how to retrieve relative objects for hierarchy level {object.level} '
                             f'for platform: {self.__class__.__name__}')
         elif target_level == 2:
-            raise Exception(f'Unknown how to retrieve relative objects for hierarchy level {obj.level} '
+            raise Exception(f'Unknown how to retrieve relative objects for hierarchy level {object.level} '
                             f'for platform: {self.__class__.__name__}')
         else:
-            raise Exception(f'No relative objects for hierarchy level {obj.level} '
+            raise Exception(f'No relative objects for hierarchy level {object.level} '
                             f'for platform: {self.__class__.__name__}')
-        return target_objs
+        return target_objects
 
     #
-    # platform-specific convenience methods for dealing with domain-specific terminology
+    # platform-specific convenience methods for dealing with domain-specific terminology.
+    # possibly move out to a multi-inherited interface (for internal IDM platforms)
     #
 
     def get_simulation(self, sim_id):
@@ -317,13 +376,13 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         return self.get_object(id=suite_id, level=2)
 
     def get_simulations_in_experiment(self, experiment):
-        return self.get_objects_by_relationship(obj=experiment, relationship=self.CHILD)
+        return self.get_objects_by_relationship(object=experiment, relationship=self.CHILD)
 
     def get_experiments_in_suite(self, suite):
-        return self.get_objects_by_relationship(obj=suite, relationship=self.CHILD)
+        return self.get_objects_by_relationship(object=suite, relationship=self.CHILD)
 
     def get_experiment_for_simulation(self, simulation):
-        return self.get_objects_by_relationship(obj=simulation, relationship=self.PARENT)
+        return self.get_objects_by_relationship(object=simulation, relationship=self.PARENT)
 
     def get_suite_for_experiment(self, experiment):
-        return self.get_objects_by_relationship(obj=experiment, relationship=self.PARENT)
+        return self.get_objects_by_relationship(object=experiment, relationship=self.PARENT)

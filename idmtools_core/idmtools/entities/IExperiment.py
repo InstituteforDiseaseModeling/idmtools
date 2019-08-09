@@ -24,6 +24,7 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         base_simulation: Optional a simulation that will be the base for all simulations created for this experiment
         command: Command to run on simulations
     """
+    level = 1
     command: 'TCommandLine' = field(default=None)
     suite_id: uuid = field(default=None)
     base_simulation: 'TSimulation' = field(default=None)

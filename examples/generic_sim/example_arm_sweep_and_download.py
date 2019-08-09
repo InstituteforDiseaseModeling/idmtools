@@ -58,3 +58,21 @@ if __name__ == "__main__":
     em = ExperimentManager(experiment=e, platform=platform)
     em.run()
     em.wait_till_done()
+
+    ###
+    # Download analysis
+    ###
+
+    from idmtools.analysis.AnalyzeManager import AnalyzeManager
+    from idmtools.platforms.PlatformFactory import PlatformFactory, PlatformType
+    from idmtools.analysis.DownloadAnalyzer import DownloadAnalyzer
+
+    filenames = ['output\\InsetChart.json']
+    analyzers = [DownloadAnalyzer(filenames=filenames, output_path='download-e2eB')]
+
+    platform = PlatformFactory.get_platform(platform_type=PlatformType.COMPSPlatform)
+    obj = platform.get_object(id=em.experiment.uid, level=1)
+    obj.children = platform.get_objects_by_relationship(object=obj, relationship=platform.CHILD)
+
+    manager = AnalyzeManager(configuration={}, platform=platform, items=obj.children, analyzers=analyzers)
+    manager.analyze()
