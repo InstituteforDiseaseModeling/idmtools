@@ -17,14 +17,6 @@ from typing import Callable
 # test-all runs all tests
 
 
-comps_test = unittest.skipIf(
-    not os.environ.get('COMPS_TESTS', False), 'No COMPS testing'
-)
-
-docker_test = unittest.skipIf(
-    not os.environ.get('DOCKER_TESTS', False), 'No Docker testing'
-)
-
 linux_only = unittest.skipIf(
     not platform.system() in ["Linux", "Darwin"], 'No Tests that are meant for linux'
 )
