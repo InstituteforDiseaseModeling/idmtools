@@ -34,11 +34,16 @@ def restart():
 
 
 @local.command()
-def status():
+@click.option('--run-as', default=None, help="Change the default user you run docker containers as. "
+                                             "Useful is situations where you need to access docker with sudo")
+def status(run_as):
     """
     Check the status of the local execution platform
     """
-    do = DockerOperations()
+    config = dict()
+    if run_as:
+        config['run_as'] = run_as
+    do = DockerOperations(**config)
     for c in ['redis', 'postgres', 'workers']:
         container = getattr(do, f'get_{c}')()
         container_status_text(stringcase.titlecase(c), container)
