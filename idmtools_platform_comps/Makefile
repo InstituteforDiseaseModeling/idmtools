@@ -16,11 +16,11 @@ lint: ## check style with flake8
 	@+$(IPY) "import os; os.chdir('..'); os.system('flake8 --ignore=E501 idmtools_platform_comps')"
 
 test: ## Run our tests
-	@+$(IPY) "import os; os.chdir('tests'); os.system('py.test -p no:warnings')"
+	@+$(IPY) "import os; os.chdir('tests'); os.system('py.test -p no:warnings --junitxml=test_results.xml')"
 
 test-all: ## Run our  docker tests as well
 	@+$(IPY) "import os; os.environ['DOCKER_TESTS'] = '1'; \
-	os.environ['COMPS_TESTS'] = '1'; os.chdir('tests'); os.system('py.test -p no:warnings')"
+	os.environ['COMPS_TESTS'] = '1'; os.chdir('tests'); os.system('py.test -p no:warnings --junitxml=test_results.xml')"
 
 coverage: ## Generate a code-coverage report
 	@make clean
@@ -32,9 +32,15 @@ coverage: ## Generate a code-coverage report
 	coverage html -i
 	python ../dev_scripts/launch_dir_in_browser.py htmlcov/index.html
 
-watch: ## Automate running of tests and linting of this project using watchdog. Useful for development
-	watchmedo tricks-from dev.yml
-
+coverage-all: ## Generate a code-coverage report
+	@make clean
+	# We have to run in our tests folder to use the proper config
+	@+$(IPY) "import os; os.environ['DOCKER_TESTS'] = '1'; \
+	os.environ['COMPS_TESTS'] = '1'; \
+	os.chdir('tests'); os.system('coverage run --source ../idmtools_platform_comps -m pytest')"
+	# move our stuff back to the top
+	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
+	
 # Release related rules
 
 release-local: ## package and upload a release to http://localhost:7171

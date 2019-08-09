@@ -3,6 +3,8 @@ import os
 import unittest
 from functools import partial
 from operator import itemgetter
+
+import pytest
 from COMPS.Data import Experiment, QueryCriteria
 from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import ArmExperimentBuilder, ArmType, ExperimentBuilder, StandAloneSimulationsBuilder, SweepArm
@@ -12,7 +14,6 @@ from idmtools_models.python import PythonExperiment
 from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id
-from idmtools_test.utils.decorators import comps_test
 from idmtools_test import COMMON_INPUT_PATH
 
 
@@ -33,6 +34,7 @@ class setParam:
         return param_update(simulation, self.param, value)
 
 
+@pytest.mark.comps
 class TestPythonExperiment(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
@@ -44,7 +46,7 @@ class TestPythonExperiment(ITestWithPersistence):
     # Second way: define a setParam class and __call__ method
     # Also current add_sweep_definition will do product of each call. if first call has 5 parameters, second call also
     # has 5 parameter, total sweep parameters are 5*5=25
-    @comps_test
+
     def test_sweeps_with_partial_comps(self):
         pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
 
@@ -87,7 +89,6 @@ class TestPythonExperiment(ITestWithPersistence):
     # Test parameter "b" set is depending on parameter "a"
     # a=[0,1,2,3,4] <--sweep parameter
     # b=[2,3,4,5,6]  <-- b = a + 2
-    @comps_test
     def test_sweeps_2_related_parameters_comps(self):
         pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
 
@@ -121,7 +122,7 @@ class TestPythonExperiment(ITestWithPersistence):
         expected_tags = [{'a': '0'}, {'a': '1'}, {'a': '2'}, {'a': '3'}, {'a': '4'}]
         self.validate_sim_tags(exp_id, expected_tags)
 
-    @comps_test
+    @pytest.mark.comps
     def test_add_prefixed_relative_path_to_assets_comps(self):
         model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
         ac = AssetCollection()
@@ -178,7 +179,7 @@ class TestPythonExperiment(ITestWithPersistence):
     #       |--functions.py
     #   |--__init__.py
     #   |--model.py
-    @comps_test
+    @pytest.mark.comps
     def test_add_dirs_to_assets_comps(self):
         model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
         ac = AssetCollection()
@@ -230,7 +231,7 @@ class TestPythonExperiment(ITestWithPersistence):
     #   |--MyExternalLibrary
     #       |--functions.py
     #   |--model.py
-    @comps_test
+    @pytest.mark.comps
     def test_add_specific_files_to_assets_comps(self):
         model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
         ac = AssetCollection()
@@ -280,7 +281,7 @@ class TestPythonExperiment(ITestWithPersistence):
     # {1,3,5}
     # {6,2}
     # {7,2}
-    @comps_test
+    @pytest.mark.comps
     def test_sweep_in_arms_cross(self):
         pe = PythonExperiment(name=self.case_name,
                               model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
@@ -307,7 +308,7 @@ class TestPythonExperiment(ITestWithPersistence):
                          {'a': '1', 'b': '3', 'c': '5'}, {'a': '6', 'b': '2'}, {'a': '7', 'b': '2'}]
         self.validate_sim_tags(exp_id, expected_tags)
 
-    @comps_test
+    @pytest.mark.comps
     def test_duplicate_asset_files_not_allowed(self):
         experiment = PythonExperiment(name=self.case_name,
                                       model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))

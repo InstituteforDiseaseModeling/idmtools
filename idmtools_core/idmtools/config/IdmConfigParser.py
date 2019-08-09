@@ -98,7 +98,6 @@ class IdmConfigParser:
         # init logging here as this is our most likely entry-point into an idm-tools "application"
         from idmtools.core.logging import setup_logging
 
-
         ini_file = cls._find_config(dir_path, file_name)
         if ini_file is None:
             print("/!\\ WARNING: File '{}' Not Found!".format(file_name))

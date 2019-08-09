@@ -2,17 +2,18 @@ import datetime
 import os
 import time
 import unittest
+
+import pytest
 from COMPS.Data import Experiment, QueryCriteria
 
 from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
-from idmtools_test.utils.decorators import comps_test
 
 
 class TestCleanup(ITestWithPersistence):
 
     # Enable this test by setting the environment variable CLEANUP_COMPS_TESTS to 1
-    @comps_test
+    @pytest.mark.comps
     @unittest.skipIf(not os.getenv('CLEANUP_COMPS_TESTS', '0') == '1', reason="CLEANUP_COMPS_TESTS set to false")
     def test_delete_experiment_by_name_owner_date_tags(self):
         COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")

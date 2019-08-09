@@ -47,7 +47,6 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     num_retires: int = field(default=0)
     num_cores: int = field(default=1)
     exclusive: bool = field(default=False)
-    autologin: bool = field(default=True)
 
     # Private fields
     _comps_experiment: 'COMPSExperiment' = field(default=None, init=False, compare=False)
@@ -55,9 +54,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
     def __post_init__(self):
         super().__post_init__()
-        # This is mostly useful in testing when you want to test basic creation without requiring logging in
-        if self.autologin:
-            self._login()
+        self._login()
 
     def _login(self):
         try:

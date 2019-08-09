@@ -13,7 +13,7 @@ with open('requirements.txt') as requirements_file:
     requirements = requirements_file.read().split("\n")
 
 build_requirements = ['flake8', 'coverage', 'py-make', 'bump2version', 'twine']
-test_requirements = ['pytest', 'pytest-runner', 'numpy==1.16.4', 'xmlrunner'] + build_requirements
+test_requirements = ['pytest', 'pytest-runner', 'numpy==1.16.4', 'xmlrunner', 'pytest-xdist'] + build_requirements
 
 # check for python 3.6
 if sys.version_info[1] == 6:

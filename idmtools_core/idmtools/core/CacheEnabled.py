@@ -28,9 +28,8 @@ class CacheEnabled:
         if self._cache_directory and os.path.exists(self._cache_directory):
             try:
                 shutil.rmtree(self._cache_directory)
-            except PermissionError as e:
+            except IOError as e:
                 logger.exception(e)
-                pass
 
     @property
     def cache(self):

@@ -34,6 +34,13 @@ def setup_test_broker():
     pass
 
 
+def get_test_local_env_overrides():
+    overrides = dict()
+    if 'run_as' in os.environ:
+        overrides['run_as'] = os.environ['run_as']
+    return overrides
+
+
 engine = None
 
 

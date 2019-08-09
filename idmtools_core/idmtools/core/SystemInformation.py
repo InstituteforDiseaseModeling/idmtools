@@ -5,7 +5,7 @@ from pathlib import Path
 import platform
 from typing import Optional, List, Dict
 import os
-
+from idmtools import __version__
 from idmtools.utils.info import get_packages_list
 
 logger = getLogger(__name__)
@@ -29,6 +29,7 @@ class SystemInformation:
     default_docket_socket_path: str = '/var/run/docker.sock'
     cwd: str = os.getcwd()
     user_group_str: str = "1000:1000"
+    version: str = __version__
 
 
 @dataclass

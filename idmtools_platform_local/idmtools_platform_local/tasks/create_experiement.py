@@ -6,7 +6,7 @@ from dataclasses import InitVar
 import typing as typing
 from dramatiq import GenericActor
 if typing.TYPE_CHECKING:
-    from idmtools.core import TTags, TSimulationClass, typing
+    from idmtools.core import TTags, TSimulationClass, typing  # noqa: F401
 
 logger = logging.getLogger(__name__)
 

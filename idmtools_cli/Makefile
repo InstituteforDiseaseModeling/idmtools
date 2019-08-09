@@ -20,13 +20,22 @@ test: ## Run our tests
 
 test-all: ## Run our  docker tests as well
 	@+$(IPY) "import os; os.environ['DOCKER_TESTS'] = '1'; \
-	os.environ['COMPS_TESTS'] = '1'; os.chdir('tests'); os.system('py.test -p no:warnings')"
+	os.environ['COMPS_TESTS'] = '1'; os.chdir('tests'); os.system('py.test -p no:warnings --junitxml=test_results.xml')"
 
 coverage: ## Generate a code-coverage report
 	coverage run --source idmtools_cli -m pytest
 	coverage report -m
 	coverage html
 	python ../dev_scripts/launch_dir_in_browser.py htmlcov/index.html
+
+coverage-all: ## Generate a code-coverage report
+	@make clean
+	# We have to run in our tests folder to use the proper config
+	@+$(IPY) "import os; os.environ['DOCKER_TESTS'] = '1'; \
+	os.environ['COMPS_TESTS'] = '1'; \
+	os.chdir('tests'); os.system('coverage run --source ../idmtools_cli -m pytest')"
+	# move our stuff back to the top
+	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
 
 release-local: ## package and upload a release to http://localhost:7171
 	@make dist
