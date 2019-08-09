@@ -1,3 +1,4 @@
+import io
 import logging
 import os
 import platform
@@ -7,7 +8,7 @@ import time
 from dataclasses import dataclass
 from io import BytesIO
 from logging import getLogger
-from typing import Optional, Union, NoReturn
+from typing import Optional, Union, NoReturn, BinaryIO
 
 import docker
 from docker.errors import APIError
@@ -384,7 +385,7 @@ class DockerOperations:
         """
         return {dest_port: src_port} if src_port is not None and dest_port is not None else None
 
-    def copy_to_container(self, container: Container, file: str, destination_path: str,
+    def copy_to_container(self, container: Container, file: Union[str, bytes], destination_path: str,
                           dest_name: Optional[str] = None) -> bool:
         """
         Copies a physical file to a container. You can also choose a different name for the destination file by using
@@ -399,35 +400,43 @@ class DockerOperations:
         Returns:
             (bool) True if the copy suceeds, False otherwise
         """
-        logger.debug(f'Copying {file} to docker container {container.id}:{destination_path}')
-        with self.create_archive(file, dest_name=dest_name) as archive:
-            return container.put_archive(path=destination_path, data=archive.read())
+        if isinstance(file, bytes):
+            file = BytesIO(file)
+        if type(file) is str:
+            logger.debug(f'Copying {file} to docker container {container.id}:{destination_path}')
+            with open(file, 'rb') as in_file:
+                name = dest_name if dest_name else os.path.basename(file)
+                result = DockerOperations.create_archive_from_bytes(in_file, name)
+                return container.put_archive(path=destination_path, data=result.read())
+        elif isinstance(file, BytesIO):
+            logger.debug(f'Copying {dest_name} to docker container {container.id}:{destination_path}')
+            with self.create_archive_from_bytes(file, dest_name) as archive:
+                return container.put_archive(path=destination_path, data=archive.read())
 
     @staticmethod
-    def create_archive(file_to_copy: str, dest_name: Optional[str] = None) -> BytesIO:
+    def create_archive_from_bytes(content: Union[bytes, BytesIO, BinaryIO], name: str) -> BytesIO:
         """
-        Creates a tar archive in memory. This is required when copying file to a container as docker only understands
-        tar archives as sources
+        Create a tar archive from bytes. Used to copy to docker
 
         Args:
-            file_to_copy: Path to file to cope
-            dest_name: Optional destination file name. This is the name the file will have within the tar archive
+            content: Content to copy into tar
+            name: Name for file in archive
 
         Returns:
-            (BytesIO): BytesIO object representing the tar of files to be copied
+            (BytesIO) Return bytesIO object
         """
+        if type(content) is bytes:
+            content = BytesIO(content)
+        content.seek(0, io.SEEK_END)
+        file_length = content.tell()
+        content.seek(0)
         pw_tarstream = BytesIO()
         pw_tar = tarfile.TarFile(fileobj=pw_tarstream, mode='w')
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f"Copying {file_to_copy} to tar stream")
-        with open(file_to_copy, 'rb') as in_file:
-            file_data = in_file.read()
-        name = dest_name if dest_name else os.path.basename(file_to_copy)
         tarinfo = tarfile.TarInfo(name=name)
-        tarinfo.size = len(file_data)
+        tarinfo.size = file_length
         tarinfo.mtime = time.time()
         # tarinfo.mode = 0600
-        pw_tar.addfile(tarinfo, BytesIO(file_data))
+        pw_tar.addfile(tarinfo, content)
         pw_tar.close()
         pw_tarstream.seek(0)
         return pw_tarstream

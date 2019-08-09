@@ -57,14 +57,15 @@ class TestDockerOperations(unittest.TestCase):
             self.assertIn('Hello World!', result.stdout.decode('utf-8'))
 
     def test_port_taken_has_coherent_error(self):
+        pl = DockerOperations(workers_ui_port=10000)
+        pl.cleanup(True)
         # create dummy port for listening
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server_address = ('localhost', 10000)
+        server_address = ('0.0.0.0', 10000)
 
         sock.bind(server_address)
         sock.listen(1)
-        pl = DockerOperations(workers_ui_port=10000)
-        pl.cleanup(True)
+
         with self.assertRaises(EnvironmentError) as e:
             pl.create_services()
             self.assertIn('Port 10000 is already taken', e.exception.args)

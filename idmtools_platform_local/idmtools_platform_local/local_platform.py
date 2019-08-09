@@ -130,23 +130,9 @@ class LocalPlatform(IPlatform):
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f"Creating directory {remote_path} result: {str(result)}")
         # is it a real file?
-        if not file_path:
-
-            if asset.content is None:
-                raise IOError("Cannot determine the source of the assets. The Local Platform requires either the "
-                              "absolute path or content to be set on the Asset object")
-            # this should be refactored to use stream of data directly to tar file. This means we need a new method
-            # in our docker operations to allow this mode
-            # for now let's write file to temporary file from content
-            with tempfile.NamedTemporaryFile(mode='wb') as tmpfile:
-                tmpfile.write(asset.content)
-                tmpfile.flush()
-
-                self._docker_operations.copy_to_container(self._docker_operations.get_workers(), tmpfile.name,
-                                                          remote_path, dest_name=asset.filename)
-        else:
-            self._docker_operations.copy_to_container(self._docker_operations.get_workers(), file_path,
-                                                      remote_path)
+        worker = self._docker_operations.get_workers()
+        self._docker_operations.copy_to_container(worker, file_path if file_path else asset.content, remote_path,
+                                                  asset.filename if not file_path else None)
 
     def create_simulations(self, simulations_batch):
         from idmtools_platform_local.tasks.create_simulation import CreateSimulationTask
