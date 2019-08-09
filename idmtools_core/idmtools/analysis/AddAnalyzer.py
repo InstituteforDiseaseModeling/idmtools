@@ -51,8 +51,9 @@ class AddAnalyzer(IAnalyzer):
 
 if __name__ == '__main__':
     from idmtools.analysis.AnalyzeManager import AnalyzeManager
-    from idmtools.platforms.PlatformFactory import PlatformFactory, PlatformType
-    platform = PlatformFactory.get_platform(platform_type=PlatformType.COMPSPlatform)
+    from idmtools.core.PlatformFactory import PlatformFactory
+
+    platform = PlatformFactory.create(key='COMPS')
 
     filenames = ['StdOut.txt']
     analyzers = [AddAnalyzer(filenames=filenames)]

@@ -1,7 +1,8 @@
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
 
-from idmtools.core import EntityStatus, IEntity
+from idmtools.core import EntityStatus
+from idmtools.core.interfaces.IEntity import IEntity
 from idmtools.core.item_id import ItemId
 
 

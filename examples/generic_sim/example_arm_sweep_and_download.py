@@ -3,12 +3,12 @@ import os
 from functools import partial
 
 from idmtools.assets import AssetCollection, Asset
-from idmtools.builders import StandAloneSimulationsBuilder, SweepArm, ArmType, ArmExperimentBuilder, ExperimentBuilder
+from idmtools.builders import SweepArm, ArmType, ArmExperimentBuilder
 from idmtools.managers import ExperimentManager
-from idmtools.platforms import COMPSPlatform
-from idmtools_models.dtk import DTKExperiment
-from idmtools_models.dtk.defaults import DTKSIR
+from idmtools_models.dtk.defaults.DTKSIR import DTKSIR
 from config_update_parameters import config_update_params
+from idmtools_models.dtk import DTKExperiment
+from idmtools.core.PlatformFactory import PlatformFactory
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 BIN_PATH = os.path.join(current_directory, "bin")
@@ -24,7 +24,7 @@ def param_update(simulation, param, value):
     return simulation.set_parameter(param, value)
 
 if __name__ == "__main__":
-    platform = COMPSPlatform()
+    platform = PlatformFactory.create(key='COMPS')
 
     ac = AssetCollection()
     a = Asset(absolute_path=os.path.join(INPUT_PATH, "single_node_demographics.json"))
@@ -64,14 +64,12 @@ if __name__ == "__main__":
     ###
 
     from idmtools.analysis.AnalyzeManager import AnalyzeManager
-    from idmtools.platforms.PlatformFactory import PlatformFactory, PlatformType
     from idmtools.analysis.DownloadAnalyzer import DownloadAnalyzer
 
     filenames = ['output\\InsetChart.json']
     analyzers = [DownloadAnalyzer(filenames=filenames, output_path='download-e2eB')]
 
-    platform = PlatformFactory.get_platform(platform_type=PlatformType.COMPSPlatform)
-    obj = platform.get_object(id=em.experiment.uid, level=1)
+    obj = platform.get_object(id=em.experiment.uid, level=1)  # level 1 is an 'experiment' (a grouping of run items)
     obj.children = platform.get_objects_by_relationship(object=obj, relationship=platform.CHILD)
 
     manager = AnalyzeManager(configuration={}, platform=platform, items=obj.children, analyzers=analyzers)
