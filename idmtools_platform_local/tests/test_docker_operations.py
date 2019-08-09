@@ -5,8 +5,12 @@ import socket
 import socketserver
 import subprocess
 import unittest.mock
+
+import pytest
+
 from idmtools_platform_local.docker.DockerOperations import DockerOperations
 from idmtools_test import COMMON_INPUT_PATH
+from idmtools_test.utils.confg_local_runner_test import get_test_local_env_overrides
 from idmtools_test.utils.decorators import docker_test, restart_local_platform, linux_only
 
 
@@ -17,11 +21,11 @@ def check_port_is_open(port):
     return result == 0
 
 
-@docker_test
+@pytest.mark.docker
 class TestDockerOperations(unittest.TestCase):
 
     def test_create_redis_starts(self):
-        dm = DockerOperations()
+        dm = DockerOperations(**get_test_local_env_overrides())
         dm.get_redis()
         check_port_is_open(6379)
         dm.stop_services()
@@ -31,7 +35,7 @@ class TestDockerOperations(unittest.TestCase):
         This test is mostly scaffolding but could be useful in future for troubleshooting
         We mock out all b
         """
-        dm = DockerOperations()
+        dm = DockerOperations(**get_test_local_env_overrides())
         dm.get_postgres()
         check_port_is_open(5432)
         dm.stop_services()
@@ -39,7 +43,7 @@ class TestDockerOperations(unittest.TestCase):
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     @restart_local_platform(silent=True)
     def test_create_stack_starts(self, std_capture):
-        dm = DockerOperations()
+        dm = DockerOperations(**get_test_local_env_overrides())
         check_port_is_open(5432)
         check_port_is_open(5432)
         check_port_is_open(6379)
@@ -60,7 +64,8 @@ class TestDockerOperations(unittest.TestCase):
 
     @linux_only
     def test_port_taken_has_coherent_error(self):
-        pl = DockerOperations(workers_ui_port=10000)
+
+        pl = DockerOperations(workers_ui_port=10000, **get_test_local_env_overrides())
         pl.cleanup(True)
 
         Handler = http.server.SimpleHTTPRequestHandler

@@ -17,16 +17,14 @@ lint: ## check style with flake8
 
 test: ## Run our tests
 	@+$(IPY) "import os; os.environ['SQLALCHEMY_DATABASE_URI']='sqlite://'; \
-		os.environ['UNIT_TESTS']='1'; \
 		os.environ['DATA_PATH'] = os.path.join(os.getcwd(), 'test_data'); \
-		os.chdir('tests'); os.system('py.test -p no:warnings --junitxml=test_results.xml')"
+		os.chdir('tests'); os.system('py.test -p no:warnings -m \"not comps\" -m \"not docker\" --junitxml=test_results.xml')"
 
 test-docker: ## Run our  docker tests as well
-	@+$(IPY) "import os; os.environ['DOCKER_TESTS'] = '1'; os.chdir('tests'); os.system('py.test -p no:warnings --junitxml=test_results.xml')"
+	@+$(IPY) "import os; os.chdir('tests'); os.system('py.test -m \"docker\" --junitxml=test_results.xml')"
 
 test-all: ## Run our  docker tests as well
-	@+$(IPY) "import os; os.environ['DOCKER_TESTS'] = '1'; \
-	os.environ['COMPS_TESTS'] = '1'; os.chdir('tests'); os.system('py.test -p no:warnings --junitxml=test_results.xml')"
+	@+$(IPY) "import os; os.chdir('tests'); os.system('py.test --junitxml=test_results.xml')"
 
 docker-cleanup:
 	docker stop  idmtools_workers idmtools_postgres idmtools_redis
@@ -63,7 +61,8 @@ docker-release-staging:
 coverage: ## Generate a code-coverage report
 	@make clean
 	# We have to run in our tests folder to use the proper config
-	@+$(IPY) "import os; os.chdir('tests'); os.system('coverage run --source ../idmtools_platform_local -m pytest')"
+	@+$(IPY) "import os; os.chdir('tests'); \
+	os.system('coverage run --source ../idmtools_platform_local -m pytest -m \"not comps\" -m \"not docker\" ')"
 	# move our stuff back to the top
 	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
 	coverage report -m
@@ -73,14 +72,15 @@ coverage: ## Generate a code-coverage report
 coverage-all: ## Generate a code-coverage report
 	@make clean
 	# We have to run in our tests folder to use the proper config
-	@+$(IPY) "import os; os.environ['DOCKER_TESTS'] = '1'; \
-	os.environ['COMPS_TESTS'] = '1'; \
-	os.chdir('tests'); os.system('coverage run --source ../idmtools_platform_local -m pytest')"
+	@+$(IPY) "import os, sys; root_idmtools = os.path.abspath(os.path.join(os.getcwd(), '..', '..'));\
+	os.chdir('tests');  \
+	sys.path.insert(0, os.path.abspath(os.path.join(root_idmtools, 'idmtools_platform_local')));\
+	sys.path.insert(0, os.path.abspath(os.path.join(root_idmtools, 'idmtools_models')));\
+	sys.path.insert(0, os.path.abspath(os.path.join(root_idmtools, 'idmtools_core')));\
+	os.system('coverage run --source ../idmtools_models/idmtools_models --source ../../idmtools_core/idmtools \
+	--source ../idmtools_platform_local -m pytest -p no:warnings ')"
 	# move our stuff back to the top
 	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
-
-watch: ## Automate running of tests and linting of this project using watchdog. Useful for development
-	watchmedo tricks-from dev.yml
 
 # Release related rules
 

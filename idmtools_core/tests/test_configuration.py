@@ -4,6 +4,9 @@ import unittest.mock
 
 
 import os
+
+import pytest
+
 from idmtools.config import IdmConfigParser
 from idmtools.core import PlatformFactory
 from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
@@ -38,13 +41,13 @@ class TestConfig(ITestWithPersistence):
         IdmConfigParser().get_section('NotReallyASection')
         self.assertIn("WARNING: Section 'NotReallyASection' Not Found!", mock_stdout.getvalue())
 
-    @comps_test
+    @pytest.mark.comps
     def test_simple_comps_platform_use_config(self):
         platform = PlatformFactory.create("COMPS")
         self.assertEqual(platform.endpoint, 'https://comps2.idmod.org')
         self.assertEqual(platform.environment, 'Bayesian')
 
-    @comps_test
+    @pytest.mark.comps
     @unittest.mock.patch('idmtools_platform_comps.COMPSPlatform.COMPSPlatform._login', side_effect=lambda: True)
     def test_simple_comps_platform_use_code(self, mock_login):
         platform = PlatformFactory.create("COMPS", endpoint='https://abc', environment='Bayesian')
@@ -63,7 +66,7 @@ class TestConfig(ITestWithPersistence):
         max_threads = idm.get_option("COMMON", 'max_threads')
         self.assertEqual(int(max_threads), 16)
 
-    @comps_test
+    @pytest.mark.comps
     def test_idmtools_path(self):
 
         IdmConfigParser(os.path.join(COMMON_INPUT_PATH, "configuration"), "idmtools_test.ini")

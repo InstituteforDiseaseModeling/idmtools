@@ -1,9 +1,9 @@
 
 import time
 
+import pytest
 
 from idmtools_test.utils.confg_local_runner_test import config_local_test, patch_broker, patch_db
-from idmtools_test.utils.decorators import docker_test
 import unittest
 import unittest.mock
 
@@ -114,7 +114,7 @@ class TestAPI(unittest.TestCase):
         self.assertDictEqual(data['tags'], dict(i='j', k='l'))
         self.assertEqual(data['data_path'], '/data/CCCCC')
 
-    @docker_test
+    @pytest.mark.docker
     def test_experiment_filtering(self):
         """
         Filtering depends on a few postgres filtering method so we have to

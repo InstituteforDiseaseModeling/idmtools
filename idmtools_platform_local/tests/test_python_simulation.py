@@ -1,5 +1,7 @@
 from importlib import reload
 
+import pytest
+
 from idmtools_platform_local.docker.DockerOperations import DockerOperations
 from operator import itemgetter
 from idmtools.assets import AssetCollection
@@ -11,11 +13,11 @@ from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 import os
 
-from idmtools_test.utils.confg_local_runner_test import reset_local_broker
-from idmtools_test.utils.decorators import docker_test, restart_local_platform
+from idmtools_test.utils.confg_local_runner_test import reset_local_broker, get_test_local_env_overrides
+from idmtools_test.utils.decorators import restart_local_platform
 
 
-@docker_test
+@pytest.mark.docker
 class TestPythonSimulation(ITestWithPersistence):
 
     def setUp(self) -> None:
@@ -32,7 +34,7 @@ class TestPythonSimulation(ITestWithPersistence):
         reload(idmtools_platform_local.tasks.create_experiement)
         reload(idmtools_platform_local.tasks.create_simulation)
 
-    @restart_local_platform(silent=True)
+    @restart_local_platform(silent=True, **get_test_local_env_overrides())
     def test_direct_sweep_one_parameter_local(self):
 
         platform = PlatformFactory.create_from_block('Local_Staging')

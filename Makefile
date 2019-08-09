@@ -2,7 +2,7 @@
 
 
 clean: ## Clean all our jobs
-    python -c "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
+	python -c "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
 	python dev_scripts/run_pymake_on_all.py clean p
 
 setup-dev:  ## Setup packages in dev mode
@@ -24,9 +24,6 @@ coverage: ## Generate a code-coverage report
 	coverage report -m
 	coverage html -i
 	python dev_scripts/launch_dir_in_browser.py htmlcov/index.html
-
-linux-3.6:
-    @make setup-dev
 
 release-local: ## package and upload a release to http://localhost:7171
 	python dev_scripts/run_pymake_on_all.py release-local p

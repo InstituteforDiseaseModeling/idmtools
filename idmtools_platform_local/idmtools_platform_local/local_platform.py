@@ -1,8 +1,6 @@
 import dataclasses
 import functools
 import logging
-import os
-import tempfile
 from logging import getLogger
 from typing import Optional, NoReturn
 
