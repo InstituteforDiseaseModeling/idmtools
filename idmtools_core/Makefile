@@ -17,11 +17,11 @@ lint: ## check style with flake8
 	@+$(IPY) "import os; os.chdir('..'); os.system('flake8 --ignore=E501 idmtools_core')"
 
 test: ## Run our tests
-	@+$(IPY) "import os; os.chdir('tests'); os.system('py.test -p no:warnings')"
+	@+$(IPY) "import os; os.chdir('tests'); os.system('py.test -p no:warnings --junitxml=test_results.xml')"
 
 test-all: ## Run our  docker tests as well
 	@+$(IPY) "import os; os.environ['DOCKER_TESTS'] = '1'; \
-	os.environ['COMPS_TESTS'] = '1'; os.chdir('tests'); os.system('py.test -p no:warnings')"
+	os.environ['COMPS_TESTS'] = '1'; os.chdir('tests'); os.system('py.test -p no:warnings --junitxml=test_results.xml')"
 
 coverage: ## Generate a code-coverage report
 	@make clean

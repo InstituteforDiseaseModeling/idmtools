@@ -19,15 +19,18 @@ test: ## Run our tests
 	@+$(IPY) "import os; os.environ['SQLALCHEMY_DATABASE_URI']='sqlite://'; \
 		os.environ['UNIT_TESTS']='1'; \
 		os.environ['DATA_PATH'] = os.path.join(os.getcwd(), 'test_data'); \
-		os.chdir('tests'); os.system('py.test -p no:warnings')"
+		os.chdir('tests'); os.system('py.test -p no:warnings --junitxml=test_results.xml')"
 
 test-docker: ## Run our  docker tests as well
-	@+$(IPY) "import os; os.environ['DOCKER_TESTS'] = '1'; os.chdir('tests'); os.system('py.test -p no:warnings')"
+	@+$(IPY) "import os; os.environ['DOCKER_TESTS'] = '1'; os.chdir('tests'); os.system('py.test -p no:warnings --junitxml=test_results.xml')"
 
 test-all: ## Run our  docker tests as well
 	@+$(IPY) "import os; os.environ['DOCKER_TESTS'] = '1'; \
-	os.environ['COMPS_TESTS'] = '1'; os.chdir('tests'); os.system('py.test -p no:warnings')"
+	os.environ['COMPS_TESTS'] = '1'; os.chdir('tests'); os.system('py.test -p no:warnings --junitxml=test_results.xml')"
 
+test-all-report: ## Run our  docker tests as well
+	@+$(IPY) "import os; os.environ['DOCKER_TESTS'] = '1'; \
+	os.environ['COMPS_TESTS'] = '1'; os.chdir('tests'); os.system('py.test -p no:warnings --junitxml=test_results.xml')"
 
 docker-cleanup:
 	docker stop  idmtools_workers idmtools_postgres idmtools_redis
