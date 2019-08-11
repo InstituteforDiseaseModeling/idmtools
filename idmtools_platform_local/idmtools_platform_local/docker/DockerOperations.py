@@ -69,24 +69,25 @@ class DockerOperations:
 
         Our architecture is as depicted in the UML diagram below
 
-        @startuml
+        .. uml::
 
-        database "Postgres" as db
-        node "Redis"as redis
-        node "Workers" {
-            [UI] -> db
-            rectangle "Python Workers" {
-                rectangle "Worker ..." as w2
-                rectangle "Worker 1" as w1
-                w1 --> db
-                w1 --> redis
-                w2 --> db
-                w2 --> redis
+            @startuml
+            database "Postgres" as db
+            node "Redis"as redis
+            node "Workers" {
+                [UI] -> db
+                rectangle "Python Workers" {
+                    rectangle "Worker ..." as w2
+                    rectangle "Worker 1" as w1
+                    w1 --> db
+                    w1 --> redis
+                    w2 --> db
+                    w2 --> redis
+                }
             }
-        }
-        file "User Python Script" as u
-        u ..> redis
-        @enduml
+            file "User Python Script" as u
+            u ..> redis
+            @enduml
 
         Returns:
             (NoReturn)

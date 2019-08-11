@@ -102,9 +102,7 @@ def hash_obj(obj, hash_name='md5'):
     """ Quick calculation of a hash to identify uniquely Python objects
 
         Args:
-        hash_name: 'md5' or 'sha1'
-            Hashing algorithm used. sha1 is supposedly safer, but md5 is
-            faster.
+        hash_name: 'md5' or 'sha1'. Hashing algorithm used. sha1 is supposedly safer, but md5 is faster.
     """
     hasher = Hasher(hash_name=hash_name)
     return hasher.hash(obj)

@@ -12,41 +12,41 @@ class PythonSimulation(ISimulation):
     This type of simulations have parameters and an eventual envelope.
 
     The envelope is just the name of the key wrapping the parameters.
-    For example:
-    ```python
-    p = PythonSimulation(parameters={"a":1}, envelope="config")
-    ```
-    will allow you to access the parameters directly like:
-    ```python
-    p.parameters["a"] = 2
-    # or
-    p.set_parameter("a",2)
-    ```
-    but will generate the following config.json file:
-    ```json
-    { "config": {
-      "a":2
-      }
-    }
-    ```
+    For example::
 
-    It is also possible to pass parameters already including an enveloppe:
-    ```python
+        p = PythonSimulation(parameters={"a":1}, envelope="config")
+
+    will allow you to access the parameters directly like::
+
+        p.parameters["a"] = 2
+        # or
+        p.set_parameter("a",2)
+
+    but will generate the following config.json file::
+
+        { "config": {
+          "a":2
+          }
+        }
+
+
+    It is also possible to pass parameters already including an envelope::
+
         p = PythonSimulation(parameters={"config":{"a":1}}, envelope="config")
-    ```
-    The access of the parameters will work the same:
-    ```python
-    p.parameters["a"] = 2
-    # or
-    p.set_parameter("a",2)
-    ```
-    And the generation will work as expected, including the envelope:
-    ```json
-    { "config": {
-      "a":2
-      }
-    }
-    ```
+
+    The access of the parameters will work the same::
+
+        p.parameters["a"] = 2
+        # or
+        p.set_parameter("a",2)
+
+    And the generation will work as expected, including the envelope::
+
+        { "config": {
+          "a":2
+          }
+        }
+
     """
     parameters: dict = field(default_factory=lambda: {})
     envelope: str = field(default=None)
