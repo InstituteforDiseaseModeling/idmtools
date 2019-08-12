@@ -19,6 +19,11 @@ lint: ## check style with flake8
 test: ## Run our tests
 	python dev_scripts/run_pymake_on_all.py test p
 
+
+test-all-with-login:
+	python create_auth_token_args.py --comps_url "https://comps2.idmod.org" --username "shchen" --password "Password123"
+	python dev_scripts/run_pymake_on_all.py test-all
+
 test-all: ## Run our tests. We cannot run in parallel
 	python dev_scripts/run_pymake_on_all.py test-all
 
