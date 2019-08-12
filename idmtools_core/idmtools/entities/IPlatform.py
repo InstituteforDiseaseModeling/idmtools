@@ -9,7 +9,8 @@ from logging import getLogger, DEBUG
 from typing import Any, Dict, List, NoReturn
 
 if typing.TYPE_CHECKING:
-    from idmtools.core.types import TAnalyzerList, TItemList
+    from idmtools.core.types import TAnalyzerList, TItem, TItemList
+    import uuid
 
 logger = getLogger(__name__)
 
@@ -39,18 +40,17 @@ class IPlatform(IEntity, metaclass=ABCMeta):
             self.update_from_config()
 
     @abstractmethod
-    def create_objects(self, objects) -> 'List[Any]':
+    def create_objects(self, objects) -> 'List[uuid]':
         """
         Function creating e.g. sims/exps/suites on the platform
         Args:
             objects: The batch of objects to create
-        Returns:
-            List of ids created
+        Returns: List of ids created
         """
         pass
 
     @abstractmethod
-    def run_objects(self, objects):
+    def run_objects(self, objects) -> NoReturn:
         """
         Run the objects (sims, exps, suites) on the platform
         Args:
@@ -71,26 +71,63 @@ class IPlatform(IEntity, metaclass=ABCMeta):
     @abstractmethod
     def refresh_status(self, object) -> NoReturn:
         """
-        Populate the platform object and any child objects with status.
+        Populate the platform object and specified object with its status.
         Args:
-            obj: The object (Item) to check status for
+            object: The object to check status for
         """
         pass
 
     @abstractmethod
-    def get_object(self, id, level) -> 'Any':
+    def get_object(self, id: 'uuid', level: int) -> Any:
+        """
+        Get an object by its id and specified hierarchy level
+        Args:
+            id: the id of the object to obtain
+            level: 0 for a base object, > 0 for hierarchical groupings of base objects
+
+        Returns: the specified object
+
+        """
         pass
 
     @abstractmethod
-    def get_objects_by_relationship(self, object, relationship: int) -> 'Any':
+    def get_objects_by_relationship(self, object, relationship: int) -> list:
+        """
+        Obtain objects by parent/child relationships relative to another object
+        Args:
+            object: the reference object
+            relationship: The desired object(s) are of this relationship to the provided object
+
+        Returns: a list of objects related to 'object' in the specified way
+
+        """
         pass
 
     @abstractmethod
     def get_files(self, item: 'TItem', files: 'List[str]') -> 'Dict[str, bytearray]':
+        """
+        Obtain specified files related to the given object (an Item, a base object)
+        Args:
+            item: object to retrieve file data for
+            files: relative-path files to obtain
+
+        Returns: a dict of file-path-keyed file data
+
+        """
         pass
 
     @abstractmethod
     def initialize_for_analysis(self, items: 'TItemList', analyzers: 'TAnalyzerList') -> NoReturn:
+        """
+        Perform any pre-analysis steps needed before performing analysis on the given items with
+        the provided analyzers
+        Args:
+            items: a list of items to initialize (base objects)
+            analyzers: analyzers to be applied to the items during analysis
+
+        Returns:
+
+        """
         pass
 
     def __repr__(self):
