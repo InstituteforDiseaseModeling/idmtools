@@ -1,36 +1,52 @@
 import itertools
 import traceback
+import typing
 
-from idmtools_core.idmtools.analysis.file_parser import FileParser
+from idmtools.utils.file_parser import FileParser
+from typing import NoReturn
+
+if typing.TYPE_CHECKING:
+    from idmtools.core.types import TAnalyzerList, TItem, TPlatform
+    from diskcache import Cache
 
 
-def map_item(item) -> None:
+def map_item(item: 'TItem') -> NoReturn:
     """
-    A wrapper to bootstrap a process running the analyzer item-mapping driver with cross-process global values
+    A worker process entry point for analyzer item-mapping that initializes some worker-global values
 
     Args:
         item: The item (often simulation) to process
 
-    Returns: Nothing
+    Returns:
     """
     # Retrieve the global variables coming from the pool initialization
     analyzers = map_item.analyzers
     cache = map_item.cache
     platform = map_item.platform
 
-    get_mapped_data_for_item(item, analyzers, cache, platform)
+    _get_mapped_data_for_item(item, analyzers, cache, platform)
 
 
-def get_mapped_data_for_item(item, analyzers, cache, platform):
+def _get_mapped_data_for_item(item: 'TItem', analyzers: 'TAnalyzerList', cache: 'Cache', platform: 'TPlatform') -> bool:
+    """
+
+    Args:
+        item: the IItem object to call analyzer map() methods on
+        analyzers: IAnalyzer items with map() methods to call on the provided items
+        cache: The diskcache Cache object to store item map() results in
+        platform: a platform object to query for information
+
+    Returns: False if an exception occurred, else True (succeeded)
+
+    """
     # determine which analyzers (and by extension, which filenames) are applicable to this item
-
     try:
         analyzers_to_use = [a for a in analyzers if a.filter(item)]
     except Exception:
         analyzer_uids = [a.uid for a in analyzers]
-        set_exception(step="Item filtering",
-                      info={"Item": item, "Analyzers": ", ".join(analyzer_uids)},
-                      cache=cache)
+        _set_exception(step="Item filtering",
+                       info={"Item": item, "Analyzers": ", ".join(analyzer_uids)},
+                       cache=cache)
 
     filenames = set(itertools.chain(*(a.filenames for a in analyzers_to_use)))
 
@@ -40,9 +56,9 @@ def get_mapped_data_for_item(item, analyzers, cache, platform):
     except Exception:
         # an error has occurred
         analyzer_uids = [a.uid for a in analyzers]
-        set_exception(step="data retrieval",
-                      info={"Item": item, "Analyzers": ", ".join(analyzer_uids), "Files": ", ".join(filenames)},
-                      cache=cache)
+        _set_exception(step="data retrieval",
+                       info={"Item": item, "Analyzers": ", ".join(analyzer_uids), "Files": ", ".join(filenames)},
+                       cache=cache)
         return False
 
     # Selected data will be a dict with analyzer.uid: data  entries
@@ -54,9 +70,9 @@ def get_mapped_data_for_item(item, analyzers, cache, platform):
                 data = {filename: FileParser.parse(filename, content)
                         for filename, content in file_data.items()}
             except Exception:
-                set_exception(step="data parsing",
-                              info={"Item": item, "Analyzer": analyzer.uid},
-                              cache=cache)
+                _set_exception(step="data parsing",
+                               info={"Item": item, "Analyzer": analyzer.uid},
+                               cache=cache)
                 return False
         else:
             # If the analyzer doesnt wish to parse, give the raw data
@@ -66,8 +82,8 @@ def get_mapped_data_for_item(item, analyzers, cache, platform):
         try:
             selected_data[analyzer.uid] = analyzer.map(data, item)
         except Exception:
-            set_exception(step="data processing", info={"Item": item, "Analyzer": analyzer.uid},
-                          cache=cache)
+            _set_exception(step="data processing", info={"Item": item, "Analyzer": analyzer.uid},
+                           cache=cache)
             return False
 
     # Store all analyzer results for this item in the result cache
@@ -75,16 +91,16 @@ def get_mapped_data_for_item(item, analyzers, cache, platform):
     return True
 
 
-def set_exception(step: str, info: dict, cache: any) -> None:
+def _set_exception(step: str, info: dict, cache: 'Cache') -> NoReturn:
     """
-    Helper to quickly set an exception in the cache.
+    Sets an exception in the cache in a standardized way.
 
     Args:
         step: Which step encountered an error
         info: Dictionary for additional information to add to the message
         cache: The cache object in which to set the exception
 
-    Returns: Nothing
+    Returns:
 
     """
     from idmtools_core.idmtools.analysis.AnalyzeManager import EXCEPTION_KEY
