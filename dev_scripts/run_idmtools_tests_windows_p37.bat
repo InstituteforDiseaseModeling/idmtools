@@ -9,7 +9,7 @@ echo "install idmtools ..."
 python dev_scripts/bootstrap.py
 
 echo "start testing..."
-python idmtools_core\tests\create_auth_token_args.py --comps_url %1 --username %2 --password %3
+python dev_scripts\create_auth_token_args.py --comps_url %1 --username %2 --password %3
 REM python idmtools_core\tests\create_auth_token_args.py --comps_url https://comps2.idmod.org --username shchen --password Password123
 
 cd idmtools_core\tests\
