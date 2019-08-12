@@ -72,21 +72,22 @@ class DockerOperations:
         .. uml::
 
             @startuml
-            database "Postgres" as db
-            node "Redis"as redis
-            node "Workers" {
+            database "Postgres Container" as db
+            node "Redis Container"as redis
+            node "Workers Container" {
                 [UI] -> db
                 rectangle "Python Workers" {
                     rectangle "Worker ..." as w2
                     rectangle "Worker 1" as w1
-                    w1 --> db
-                    w1 --> redis
-                    w2 --> db
-                    w2 --> redis
+                    w1 <---> db : Get/Update Status
+                    w1 <---> redis : Get task/Add Task
+                    w2 <---> db
+                    w2 <---> redis
                 }
             }
             file "User Python Script" as u
-            u ..> redis
+            u ...> redis : Submit task
+            u <... redis : Get result
             @enduml
 
         Returns:

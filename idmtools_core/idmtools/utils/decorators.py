@@ -38,8 +38,7 @@ class SingletonDecorator:
     Wraps a class in a Singleton Decorator.
 
     Example:
-        In the below example, we would print out *99* since *z* is referring to the same object as *x*
-        literal blocks::
+        In the below example, we would print out *99* since *z* is referring to the same object as *x*::
 
             class Thing:
                 y = 14
@@ -69,7 +68,7 @@ class LoadOnCallSingletonDecorator:
     declaration
 
     Examples:
-        literal blocks::
+        ::
 
             import time
             class ExpensiveFactory:
@@ -108,7 +107,7 @@ def optional_yaspin_load(*yargs, **ykwargs) -> Callable:
         **ykwargs: Keyword arguments to pass to yaspin constructor
 
     Examples:
-        literal blocks::
+        ::
 
             @optional_yaspin_load(text="Loading test", color="yellow")
             def test():
