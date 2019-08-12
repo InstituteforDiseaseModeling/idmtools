@@ -3,13 +3,14 @@ from typing import Any, Callable, List, Mapping, Type, TYPE_CHECKING, TypeVar, U
 
 if TYPE_CHECKING:
     from idmtools.analysis import IAnalyzer
-    from idmtools.entities import CommandLine, IExperiment, IPlatform, ISimulation
+    from idmtools.entities import CommandLine, IExperiment, IPlatform, ISimulation, IItem
     from idmtools.assets import Asset, AssetCollection
     from idmtools.builders import ExperimentBuilder
 
     # Base Types
     TExperiment = TypeVar("TExperiment", bound=IExperiment)
     TSimulation = TypeVar("TSimulation", bound=ISimulation)
+    TItem = TypeVar("TItem", bount=IItem)
     TCommandLine = TypeVar("TCommandLine", bound=CommandLine)
     TAnalyzer = TypeVar("TAnalyzer", bound=IAnalyzer)
     TPlatform = TypeVar("TPlatform", bound=IPlatform)

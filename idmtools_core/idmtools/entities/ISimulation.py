@@ -2,9 +2,9 @@ import typing
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
 
-from idmtools.core import EntityStatus, IItem
+from idmtools.core import EntityStatus
 from idmtools.core.interfaces.IAssetsEnabled import IAssetsEnabled
-from idmtools.core.interfaces.IEntity import IEntity
+from idmtools.entities.IItem import IItem
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TExperiment
