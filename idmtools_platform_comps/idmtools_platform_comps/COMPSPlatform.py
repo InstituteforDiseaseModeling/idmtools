@@ -18,7 +18,7 @@ from idmtools.utils.time import timestamp
 from typing import Any, List, NoReturn
 
 if typing.TYPE_CHECKING:
-    from idmtools.core.types import TAnalyzerList, TExperiment, TItem, TItemList, TSimulation, TSimulationBatch
+    from idmtools.core.types import TAnalyzerList, TExperiment, TItem, TItemList, TSimulation, TSimulationList
     import uuid
 
 logging.getLogger('COMPS.Data.Simulation').disabled = True
@@ -176,7 +176,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             raise Exception(f'Unknown level: {level} for platform: {self.__class__.__name__}')
         return ids
 
-    def _create_simulations(self, simulation_batch: 'TSimulationBatch') -> 'List[uuid]':
+    def _create_simulations(self, simulation_batch: 'TSimulationList') -> 'List[uuid]':
         self._login()
         created_simulations = []
 
@@ -256,7 +256,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                     s.status = COMPSPlatform._convert_COMPS_status(comps_simulation.state)
                     break
 
-    def _retrieve_simulations(self, experiment: 'TExperiment') -> 'TSimulationBatch':
+    def _retrieve_simulations(self, experiment: 'TExperiment') -> 'TSimulationList':
         self._comps_experiment_id = experiment.uid
 
         simulations = []
@@ -377,7 +377,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     def get_suite(self, suite_id: 'uuid') -> Any:
         return self.get_object(id=suite_id, level=2)
 
-    def get_simulations_in_experiment(self, experiment: 'TExperiment') -> 'TSimulationBatch':
+    def get_simulations_in_experiment(self, experiment: 'TExperiment') -> 'TSimulationList':
         return self.get_objects_by_relationship(object=experiment, relationship=self.CHILD)
 
     def get_experiments_in_suite(self, suite) -> 'List[TExperiment]':

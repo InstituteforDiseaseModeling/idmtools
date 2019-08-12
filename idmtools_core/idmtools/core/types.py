@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     TExperimentBuilder = TypeVar("TExperimentBuilder", bound=ExperimentBuilder)
 
     TTags = Dict[str, str]
-    TSimulationBatch = List[TSimulation]
+    TSimulationList = List[TSimulation]
     TItemList = List[TItem]
 
     TPlatformClass = Type[TPlatform]
