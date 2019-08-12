@@ -10,15 +10,16 @@ from COMPS.Data.Simulation import SimulationState
 from dataclasses import dataclass, field
 
 from idmtools.core import CacheEnabled
-from idmtools.core.ExperimentFactory import experiment_factory
 from idmtools.core.enums import EntityStatus
+from idmtools.core.ExperimentFactory import experiment_factory
+from idmtools.core.item_id import ItemId
 from idmtools.entities import IPlatform
 from idmtools.utils.time import timestamp
+from typing import Any, List, NoReturn
 
 if typing.TYPE_CHECKING:
-    from idmtools.core.types import TExperiment
+    from idmtools.core.types import TAnalyzerList, TExperiment, TItem, TItemList, TSimulation, TSimulationBatch
     import uuid
-from idmtools.core.item_id import ItemId
 
 logging.getLogger('COMPS.Data.Simulation').disabled = True
 logger = logging.getLogger(__name__)
@@ -79,7 +80,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         self._comps_experiment = comps_experiment
         self._comps_experiment_id = comps_experiment.id
 
-    def send_assets(self, object, **kwargs):
+    def send_assets(self, object, **kwargs) -> NoReturn:
         level = object.level
         if level == 0:
             self._send_assets_for_simulation(simulation=object, **kwargs)
@@ -92,7 +93,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             raise Exception(f'Unknown object level: {level} for platform: {self.__class__.__name__}')
 
     @staticmethod
-    def _send_assets_for_experiment(experiment: 'TExperiment', **kwargs):
+    def _send_assets_for_experiment(experiment: 'TExperiment', **kwargs) -> NoReturn:
         if experiment.assets.count == 0:
             return
 
@@ -105,7 +106,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         print("Asset collection for experiment: {}".format(ac.id))
 
     @staticmethod
-    def _send_assets_for_simulation(simulation, comps_simulation):
+    def _send_assets_for_simulation(simulation, comps_simulation) -> NoReturn:
         for asset in simulation.assets:
             comps_simulation.add_file(simulationfile=SimulationFile(asset.filename, 'input'), data=asset.content)
 
@@ -121,7 +122,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             experiment_name = experiment_name.replace(c, '_')
         return experiment_name
 
-    def _create_experiment(self, experiment: 'TExperiment'):
+    def _create_experiment(self, experiment: 'TExperiment') -> 'uuid':
         self._login()
 
         # Cleanup the name
@@ -159,7 +160,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         self.send_assets(object=experiment)
         return experiment.uid
 
-    def create_objects(self, objects):
+    def create_objects(self, objects) -> 'List[uuid]':
         levels = list({object.level for object in objects})
         if len(levels) != 1:
             raise Exception('create_objects only works with objects of a single level at a time.')
@@ -175,7 +176,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             raise Exception(f'Unknown level: {level} for platform: {self.__class__.__name__}')
         return ids
 
-    def _create_simulations(self, simulation_batch):
+    def _create_simulations(self, simulation_batch: 'TSimulationBatch') -> 'List[uuid]':
         self._login()
         created_simulations = []
 
@@ -192,7 +193,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         # Register the IDs
         return [s.id for s in created_simulations]
 
-    def run_objects(self, objects):
+    def run_objects(self, objects) -> NoReturn:
         for object in objects:
             level = object.level
             if level == 0:
@@ -207,7 +208,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             else:
                 raise Exception(f'Unknown object hierarchy level {level} for platform: {self.__class__.__name__}')
 
-    def _run_simulations(self, experiment: 'TExperiment'):
+    def _run_simulations(self, experiment: 'TExperiment') -> NoReturn:
         self._login()
         self._comps_experiment_id = experiment.uid
         self.comps_experiment.commission()
@@ -223,7 +224,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         else:
             return EntityStatus.RUNNING
 
-    def refresh_status(self, object):
+    def refresh_status(self, object) -> NoReturn:
         if object.level == 0:
             raise Exception(f'Unknown how to refresh objects for hierarchy level {object.level} '
                             f'for platform: {self.__class__.__name__}')
@@ -235,7 +236,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         else:
             raise Exception(f'Unknown object hierarchy level {level} for platform: {self.__class__.__name__}')
 
-    def _refresh_experiment_status(self, experiment):
+    def _refresh_experiment_status(self, experiment) -> NoReturn:
         # Do nothing if we are already done
         if experiment.done:
             return
@@ -255,7 +256,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                     s.status = COMPSPlatform._convert_COMPS_status(comps_simulation.state)
                     break
 
-    def _retrieve_simulations(self, experiment: 'TExperiment') -> list:
+    def _retrieve_simulations(self, experiment: 'TExperiment') -> 'TSimulationBatch':
         self._comps_experiment_id = experiment.uid
 
         simulations = []
@@ -270,18 +271,16 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                          ('suite_id', experiment.suite_id)]
             sim.full_id = ItemId(group_tuples=hierarchy)
             simulations.append(sim)
-            # sim.level = 0
         return simulations
 
     def _retrieve_experiment(self, experiment_id: 'uuid') -> 'TExperiment':
         self._comps_experiment_id = experiment_id
         experiment = experiment_factory.create(self.comps_experiment.tags.get("type"), tags=self.comps_experiment.tags)
         experiment.uid = self.comps_experiment.id
-        # experiment.level = 1
         return experiment
 
     @staticmethod
-    def _get_file_for_collection(collection_id, file_path):
+    def _get_file_for_collection(collection_id: 'uuid', file_path: str):
         print(f"Cache miss for {collection_id} {file_path}")
 
         # retrieve the collection
@@ -296,7 +295,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                 return asset_file.retrieve()
         return None
 
-    def get_files(self, item, files):
+    def get_files(self, item: 'TItem', files: 'List[str]') -> dict:
         self._login()
 
         # Retrieve the simulation from COMPS
@@ -332,12 +331,12 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
         return ret
 
-    def initialize_for_analysis(self, items, analyzers):
+    def initialize_for_analysis(self, items: 'TItemList', analyzers: 'TAnalyzerList') -> NoReturn:
         # run any necessary analysis prep steps on groups of items (hierarchy level > 0)
         for analyzer in analyzers:
             analyzer.per_group(items=items)
 
-    def get_object(self, id, level):
+    def get_object(self, id: 'uuid', level: int) -> Any:
         # Returned objects must have .level set to an integer (e.g. 0, 1, 2, ...)
         if level == 0:
             raise Exception(f'Unknown id hierarchy level {level} for platform: {self.__class__.__name__}')
@@ -349,7 +348,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             raise Exception(f'Unknown id hierarchy level {level} for platform: {self.__class__.__name__}')
         return object
 
-    def get_objects_by_relationship(self, object, relationship):
+    def get_objects_by_relationship(self, object, relationship: int) -> list:
         target_level = object.level + relationship
         if target_level == 0:
             target_objects = self._retrieve_simulations(experiment=object)
@@ -369,23 +368,23 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     # possibly move out to a multi-inherited interface (for internal IDM platforms)
     #
 
-    def get_simulation(self, sim_id):
+    def get_simulation(self, sim_id: 'uuid') -> Any:
         return self.get_object(id=sim_id, level=0)
 
-    def get_experiment(self, exp_id):
+    def get_experiment(self, exp_id: 'uuid') -> 'TExperiment':
         return self.get_object(id=exp_id, level=1)
 
-    def get_suite(self, suite_id=id):
+    def get_suite(self, suite_id: 'uuid') -> Any:
         return self.get_object(id=suite_id, level=2)
 
-    def get_simulations_in_experiment(self, experiment):
+    def get_simulations_in_experiment(self, experiment: 'TExperiment') -> 'TSimulationBatch':
         return self.get_objects_by_relationship(object=experiment, relationship=self.CHILD)
 
-    def get_experiments_in_suite(self, suite):
+    def get_experiments_in_suite(self, suite) -> 'List[TExperiment]':
         return self.get_objects_by_relationship(object=suite, relationship=self.CHILD)
 
-    def get_experiment_for_simulation(self, simulation):
-        return self.get_objects_by_relationship(object=simulation, relationship=self.PARENT)
+    def get_experiment_for_simulation(self, simulation: 'TSimulation') -> 'TExperiment':
+        return self.get_objects_by_relationship(object=simulation, relationship=self.PARENT)[0]
 
-    def get_suite_for_experiment(self, experiment):
+    def get_suite_for_experiment(self, experiment: 'TExperiment') -> Any:
         return self.get_objects_by_relationship(object=experiment, relationship=self.PARENT)
