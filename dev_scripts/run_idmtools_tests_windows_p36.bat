@@ -8,12 +8,6 @@ mkdir data\redis-data
 echo "install idmtools ..."
 python dev_scripts/bootstrap.py
 
-echo "start services..."
-docker network create idmtools_network  nul 2> nul
-"C:\Program Files\Docker\Docker\Resources\bin\docker-compose.exe" down -v
-"C:\Program Files\Docker\Docker\Resources\bin\docker-compose.exe" build
-"C:\Program Files\Docker\Docker\Resources\bin\docker-compose.exe" up -d
-
 echo "start testing..."
 python idmtools_platform_comps\tests\create_auth_token_args.py --comps_url %1 --username %2 --password %3
 
