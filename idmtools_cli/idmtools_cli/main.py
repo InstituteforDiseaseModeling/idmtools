@@ -28,6 +28,7 @@ def start() -> NoReturn:
     2) Loading built-in commands
     3) Loading Platform CLI items
     4) Loading custom CLI from platform plugins
+
     Returns:
         None
     """

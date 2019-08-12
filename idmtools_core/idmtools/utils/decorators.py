@@ -37,21 +37,18 @@ class SingletonDecorator:
     """
     Wraps a class in a Singleton Decorator.
 
+    Example:
+        In the below example, we would print out *99* since *z* is referring to the same object as *x*::
 
-    Examples:
-        ```
-        class Thing:
-            y = 14
-        Thing = SingletonDecorator(Thing)
-
-        x = Thing()
-        x.y = 99
-        z = Thing()
-        print(z.y)
-
-        ```
-        The above example should print out 99 since z ends up being the same object as X
-
+            class Thing:
+                y = 14
+            Thing = SingletonDecorator(Thing)
+            x = Thing()
+            x.y = 99
+            z = Thing()
+            print(z.y)
+    Notes:
+        Should be used on Classes
     """
     def __init__(self, klass):
         self.klass = klass
@@ -71,22 +68,18 @@ class LoadOnCallSingletonDecorator:
     declaration
 
     Examples:
-        ```
-        import time
-        class ExpensiveFactory:
-            def __init__():
-                time.sleep(1000)
-                self.items = ['a', 'b', 'c']
+        ::
 
-            def get_items():
-                return self.items
+            import time
+            class ExpensiveFactory:
+                def __init__():
+                    time.sleep(1000)
+                    self.items = ['a', 'b', 'c']
+                def get_items():
+                    return self.items
 
-
-
-        ExpensiveFactory = LoadOnCallSingletonDecorator(ExpensiveFactory)
-        ExpensiveFactory.get_items()
-        ```
-
+            ExpensiveFactory = LoadOnCallSingletonDecorator(ExpensiveFactory)
+            ExpensiveFactory.get_items()
     """
     def __init__(self, klass):
         self.instance = SingletonDecorator(klass)
@@ -108,16 +101,18 @@ def optional_yaspin_load(*yargs, **ykwargs) -> Callable:
 
     * yaspin package is present
     * NO_SPINNER environment variable is not defined
+
     Args:
         *yargs: Arguments to pass to yaspin constructor
         **ykwargs: Keyword arguments to pass to yaspin constructor
 
     Examples:
-        ```
-        @optional_yaspin_load(text="Loading test", color="yellow")
-        def test():
-            time.sleep(100)
-        ```
+        ::
+
+            @optional_yaspin_load(text="Loading test", color="yellow")
+            def test():
+                time.sleep(100)
+
     Returns:
         (Callable): Wrapper function
     """

@@ -5,10 +5,13 @@ clean: ## Clean all our jobs
 	@+$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.py[co]', recursive=True)]"
 	@+$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.log', recursive=True)]"
 	@+$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
-	@+$(IPY) "import os, shutil, glob; [shutil.rmtree(i) for i in [k for k in glob.glob('**/*.egg-info/', recursive=True) if os.path.isdir(k)]]"
 	@+$(IPY) "import shutil; shutil.rmtree('**/htmlcov', True)"
 	@+$(IPY) "import shutil; shutil.rmtree('**/.pytest_cache', True)"
 	@+$(IPY) "import shutil; shutil.rmtree('**/dist', True)"
+
+clean-all:  ## Deleting package info hides plugins so we only want to do that for packaging
+	@make clean
+	@+$(IPY) "import os, shutil, glob; [shutil.rmtree(i) for i in [k for k in glob.glob('**/*.egg-info/', recursive=True) if os.path.isdir(k)]]"
 
 # Dev and test related rules
 
@@ -16,16 +19,19 @@ lint: ## check style with flake8
 	@+$(IPY) "import os; os.chdir('..'); os.system('flake8 --ignore=E501 idmtools_platform_comps')"
 
 test: ## Run our tests
-	@+$(IPY) "import os; os.chdir('tests'); os.system('py.test -p no:warnings --junitxml=test_results.xml')"
+	@+$(IPY) "import os; os.chdir('tests'); os.system('py.test -p no:warnings -m \"not comps\" -m \"not docker\" --junitxml=test_results.xml')"
 
 test-all: ## Run our  docker tests as well
-	@+$(IPY) "import os; os.environ['DOCKER_TESTS'] = '1'; \
-	os.environ['COMPS_TESTS'] = '1'; os.chdir('tests'); os.system('py.test -p no:warnings --junitxml=test_results.xml')"
+	@+$(IPY) "import os; os.chdir('tests'); os.system('py.test -p no:warnings --junitxml=test_results.xml')"
+
+test-all-with-login:
+	python ../dev_scripts/create_auth_token_args.py --comps_url "https://comps2.idmod.org" --username "shchen" --password "Password123"
+	@pymake test-all
 
 coverage: ## Generate a code-coverage report
 	@make clean
 	# We have to run in our tests folder to use the proper config
-	@+$(IPY) "import os; os.chdir('tests'); os.system('coverage run --source ../idmtools_platform_comps -m pytest')"
+	@+$(IPY) "import os; os.chdir('tests'); os.system('coverage run --source ../idmtools_platform_comps -m pytest -m \"not comps\" -m \"not docker\" ')"
 	# move our stuff back to the top
 	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
 	coverage report -m
@@ -35,9 +41,7 @@ coverage: ## Generate a code-coverage report
 coverage-all: ## Generate a code-coverage report
 	@make clean
 	# We have to run in our tests folder to use the proper config
-	@+$(IPY) "import os; os.environ['DOCKER_TESTS'] = '1'; \
-	os.environ['COMPS_TESTS'] = '1'; \
-	os.chdir('tests'); os.system('coverage run --source ../idmtools_platform_comps -m pytest')"
+	@+$(IPY) "import os; os.chdir('tests'); os.system('coverage run --source ../idmtools_platform_comps -m pytest')"
 	# move our stuff back to the top
 	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
 	
@@ -58,7 +62,7 @@ release-staging: ## perform a release to staging
 
 # Use before release-staging-minor-commit to confirm next version.
 release-staging-minor-dry-run: ## perform a release to staging and bump the minor version.
-	bump2version minor --dy-run --allow-dirty
+	bump2version minor --dry-run --allow-dirty --verbose
 
 # This should be used when a pushing a "production" build to staging before being approved by test
 release-staging-minor-commit: ## perform a release to staging and commit the version.
