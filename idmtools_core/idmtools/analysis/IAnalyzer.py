@@ -1,9 +1,10 @@
-from abc import ABCMeta, abstractmethod
 import typing
 
+from abc import ABCMeta, abstractmethod
+from typing import Any, NoReturn
+
 if typing.TYPE_CHECKING:
-    from idmtools.core.types import TExperiment, TSimulation, TAllSimulationData
-    from typing import Any
+    from idmtools.core.types import TItem, TItemList  # , TAllSimulationData
 
 
 class IAnalyzer(metaclass=ABCMeta):
@@ -27,14 +28,14 @@ class IAnalyzer(metaclass=ABCMeta):
         self.uid = uid or self.__class__.__name__
         self.results = None  # Store what finalize() is returning
 
-    def initialize(self):
+    def initialize(self) -> NoReturn:
         """
         Called once after the analyzer has been added to the AnalyzeManager.
         Everything depending on the working directory or uid should be here instead of in __init__
         """
         pass
 
-    def per_group(self, items: 'Any') -> None:
+    def per_group(self, items: 'TItemList') -> NoReturn:
         """
         Called once before running the apply on the simulations.
         Args:
@@ -43,36 +44,36 @@ class IAnalyzer(metaclass=ABCMeta):
         """
         pass
 
-    def filter(self, item: 'Any') -> bool:
+    def filter(self, item: 'TItem') -> bool:
         """
         Decide whether analyzer should process a simulation
         Args:
-            simulation: simulation object
+            item: an IItem to be considered for processing with this analyzer
 
-        Returns:Boolean whether simulation should be analyzed by this analyzer
+        Returns: Boolean (True/False) whether the item should be analyzed by this analyzer
         """
         return True
 
-    def map(self, data: 'Any', item: 'Any') -> 'Any':
+    def map(self, data: 'Any', item: 'TItem') -> 'Any':
         """
         In parallel for each simulation, consume raw data from filenames and emit selected data
         Args:
             data: simulation data. Dictionary associating filename with content
-            simulation: object representing the simulation for which the data is passed
+            item: IItem object that the passed data is associated with
 
-        Returns: selected data for the given simulation
+        Returns: selected data for the given item
         """
         return None
 
-    def reduce(self, all_data: 'Any') -> 'Any':
+    def reduce(self, all_data: dict) -> 'Any':
         """
-        On a single process, get all the selected data
+        Combine the map() data for a set of items into an aggregate result.
         Args:
-            all_data: dictionary associating simulation:selected_data
+            all_data: dictionary with entries:    item_id: selected_data
         """
         pass
 
-    def destroy(self):
+    def destroy(self) -> NoReturn:
         """
         Called after the analysis is done
         """

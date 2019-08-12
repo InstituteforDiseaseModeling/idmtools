@@ -12,7 +12,7 @@ from multiprocessing.pool import Pool
 from typing import NoReturn
 
 if typing.TYPE_CHECKING:
-    from idmtools.core.types import TAnalyzer, TItem
+    from idmtools.core.types import TAnalyzer, TItem, TItemList
 
 ANALYZE_TIMEOUT = 3600 * 8  # Maximum seconds before timing out - set to 8 hours
 WAIT_TIME = 1.15  # How much time to wait between check if the analysis is done
@@ -95,7 +95,7 @@ class AnalyzeManager(CacheEnabled):
         """
         return item.status.name == EntityStatus.SUCCEEDED.name
 
-    def _get_items_to_analyze(self) -> list:
+    def _get_items_to_analyze(self) -> 'TItemList':
         """
         Returns a list of items derived from self.items that are available to analyze
         Returns: a list of IItem objects

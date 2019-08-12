@@ -20,6 +20,7 @@ if TYPE_CHECKING:
 
     TTags = Dict[str, str]
     TSimulationBatch = List[TSimulation]
+    TItemList = List[TItem]
 
     TPlatformClass = Type[TPlatform]
     TSimulationClass = Type[TSimulation]
@@ -30,7 +31,7 @@ if TYPE_CHECKING:
 
     # Analysis types
     TAllSimulationData = Mapping[TSimulation, Any]
-    TAnalyzerList = List[IAnalyzer]
+    TAnalyzerList = List[TAnalyzer]
 
     # Assets types
     TAssetList = List[TAsset]
