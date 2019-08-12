@@ -31,7 +31,7 @@ class TestPlatformFactory(ITestWithPersistence):
 
     @pytest.mark.docker
     def test_create_from_block(self):
-        p1 = PlatformFactory.create_from_block('Local', **get_test_local_env_overrides())
+        p1 = PlatformFactory.create_from_block('Custom_Local', **get_test_local_env_overrides())
         self.assertEqual(p1.__class__.__name__, 'LocalPlatform')
 
         p2 = PlatformFactory.create_from_block('COMPS2')
@@ -65,7 +65,7 @@ class TestPlatformFactory(ITestWithPersistence):
 
     @pytest.mark.docker
     def test_LocalPlatform(self):
-        platform = PlatformFactory.create_from_block('Local', **get_test_local_env_overrides())
+        platform = PlatformFactory.create_from_block('Custom_Local', **get_test_local_env_overrides())
         members = platform.__dict__
 
         field_name = {f.name for f in fields(platform)}

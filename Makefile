@@ -5,6 +5,10 @@ clean: ## Clean all our jobs
 	python -c "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
 	python dev_scripts/run_pymake_on_all.py clean p
 
+clean-all: ## Clean all our jobs
+	python -c "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
+	python dev_scripts/run_pymake_on_all.py clean-all p
+
 setup-dev:  ## Setup packages in dev mode
 	python dev_scripts/bootstrap.py
 	@python -c "import os; os.chdir('idmtools_platform_local'); os.system('pymake docker-local')"
@@ -14,6 +18,11 @@ lint: ## check style with flake8
 
 test: ## Run our tests
 	python dev_scripts/run_pymake_on_all.py test p
+
+
+test-all-with-login:
+	python dev_scripts/create_auth_token_args.py --comps_url "https://comps2.idmod.org" --username "shchen" --password "Password123"
+	python dev_scripts/run_pymake_on_all.py test-all
 
 test-all: ## Run our tests. We cannot run in parallel
 	python dev_scripts/run_pymake_on_all.py test-all
@@ -32,6 +41,7 @@ dist: ## build our package
 	python dev_scripts/run_pymake_on_all.py dist p
 
 release-staging: ## perform a release to staging
+	@make clean-all
 	python dev_scripts/run_pymake_on_all.py release-staging
 
 # Use before release-staging-minor-commit to confirm next version.

@@ -5,40 +5,51 @@ from idmtools_cli.cli import cli
 from idmtools_platform_local.docker.DockerOperations import DockerOperations
 
 
+pass_do = click.make_pass_decorator(DockerOperations)
+
+
 @cli.group(help="Commands related to managing the local platform")
-def local():
-    pass
+@click.option('--run-as', default=None, help="Change the default user you run docker containers as. "
+                                             "Useful is situations where you need to access docker with sudo. "
+                                             "Example values are \"1000:1000\"")
+@click.pass_context
+def local(ctx, run_as):
+    config = dict()
+    if run_as:
+        config['run_as'] = run_as
+    do = DockerOperations(**config)
+    ctx.obj = do
 
 
 @local.command()
 @click.option("--delete-data/--no-delete-data", default=False)
-def down(delete_data):
+@pass_do
+def down(do: DockerOperations, delete_data):
     """Shutdown the local execution platform(and optionally delete data"""
-    do = DockerOperations()
     click.confirm(f'Do you want to remove all data associated with the local platform?({do.host_data_directory})', abort=True)
     do.cleanup(delete_data)
 
 
 @local.command()
-def start():
+@pass_do
+def start(do: DockerOperations):
     """Start the local execution platform"""
-    do = DockerOperations()
     do.create_services()
 
 
 @local.command()
-def restart():
+@pass_do
+def restart(do: DockerOperations):
     """Restart the local execution platform"""
-    do = DockerOperations()
     do.restart_all()
 
 
 @local.command()
-def status():
+@pass_do
+def status(do: DockerOperations):
     """
     Check the status of the local execution platform
     """
-    do = DockerOperations()
     for c in ['redis', 'postgres', 'workers']:
         container = getattr(do, f'get_{c}')()
         container_status_text(stringcase.titlecase(c), container)
