@@ -15,9 +15,9 @@ class IItem(IEntity, metaclass=ABCMeta):
     full_id: ItemId = field(default=None, metadata={"md": True})
 
     @property
-    def done(self):
+    def done(self) -> bool:
         return self.status in (EntityStatus.SUCCEEDED, EntityStatus.FAILED)
 
     @property
-    def succeeded(self):
+    def succeeded(self) -> bool:
         return self.status == EntityStatus.SUCCEEDED
