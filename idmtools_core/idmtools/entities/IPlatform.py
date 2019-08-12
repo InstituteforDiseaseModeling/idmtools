@@ -100,7 +100,10 @@ class IPlatform(IEntity, metaclass=ABCMeta):
     def update_from_config(self) -> None:
         """
         Get INI config values and update platform values by the priority rules:
-            #1 Code, #2 INI config, #2 default
+        #1 Code
+        #2 INI config
+        #2 default
+
         Returns: None
         """
         # retrieve field values, default values and types

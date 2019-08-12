@@ -42,7 +42,7 @@ class TestConfig(ITestWithPersistence):
 
     @pytest.mark.comps
     @unittest.mock.patch('idmtools_platform_comps.COMPSPlatform.COMPSPlatform._login', side_effect=lambda: True)
-    def test_simple_comps_platform_use_config(self):
+    def test_simple_comps_platform_use_config(self, mock_login):
         platform = PlatformFactory.create("COMPS")
         self.assertEqual(platform.endpoint, 'https://comps2.idmod.org')
         self.assertEqual(platform.environment, 'Bayesian')
@@ -68,7 +68,7 @@ class TestConfig(ITestWithPersistence):
 
     @pytest.mark.comps
     @unittest.mock.patch('idmtools_platform_comps.COMPSPlatform.COMPSPlatform._login', side_effect=lambda: True)
-    def test_idmtools_path(self):
+    def test_idmtools_path(self, login_mock):
         IdmConfigParser(os.path.join(COMMON_INPUT_PATH, "configuration"), "idmtools_test.ini")
         platform = COMPSPlatform()
         self.assertEqual(platform.num_retires, int(IdmConfigParser.get_option('COMPS', 'num_retires')))
