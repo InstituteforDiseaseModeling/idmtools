@@ -1,19 +1,17 @@
-# flake8: noqa E402
+
 import re
 import time
 
+import pytest
 from click._compat import strip_ansi
-
 from idmtools_platform_local.status import Status
-from idmtools_test.utils.confg_local_runner_test import config_local_test
-local_path = config_local_test()
 import unittest
 import unittest.mock
 from idmtools_platform_local.workers.utils import create_or_update_status
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from idmtools_platform_local.docker.DockerOperations import DockerOperations
-from idmtools_test.utils.decorators import docker_test
+from idmtools_test.utils.confg_local_runner_test import get_test_local_env_overrides
 from idmtools_test.utils.cli import get_subcommands_from_help_result, run_command
 
 
@@ -59,20 +57,18 @@ class TestLocalCLIBasic(unittest.TestCase):
         result = self.run_command('experiment', '--platform', 'Local', 'status', base_command='')
         print(result)
 
-    @docker_test
+    @pytest.mark.docker
     def test_docker(self):
         """
         Filtering depends on a few postgres filtering method so we have to
         setup a connection to postgres and then test querying
         """
         # start up postgres
-        dm = DockerOperations()
+        dm = DockerOperations(**get_test_local_env_overrides())
         dm.cleanup()
-        dm.get_postgres()
-        dm.get_redis()
-        time.sleep(3)
-        dm.get_workers()
-        time.sleep(3)
+        dm.create_services()
+        # give services some time to start
+        time.sleep(5)
         # ensure we are connecting to proper db
         url = 'postgresql+psycopg2://idmtools:idmtools@localhost/idmtools'
         engine = create_engine(url, echo=True, pool_size=32)
@@ -92,7 +88,7 @@ class TestLocalCLIBasic(unittest.TestCase):
                 time.sleep(1)
 
                 result = self.run_command('experiment', '--platform', 'Local', 'status', base_command='')
-                self.assertEqual(result.exit_code, 0)
+                self.assertEqual(result.exit_code, 0,  f'{result.exit_code} - {result.output}')
                 output = re.sub(r'[\+\-]+', '', result.output).split("\n")
                 output = [o for o in output if o]
                 self.assertEqual(len(output), 5)

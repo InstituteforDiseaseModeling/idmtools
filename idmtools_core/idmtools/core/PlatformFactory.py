@@ -32,14 +32,17 @@ class PlatformFactory:
             raise ValueError(f"{name} is an unknown Platform Type."
                              f"Supported platforms are {','.join(self._platforms.keys())}")
 
-    def create_from_block(self, block):
+    def create_from_block(self, block: str, overrides: typing.Optional[dict] = None):
         """
         Retrieve section entries from config file by giving block
         Args:
             block: the section name in config file
+            overrides: Optional override of parameters from config.
         Returns: dict with entries from the block
         """
         from idmtools.config import IdmConfigParser
+        if overrides is None:
+            overrides = dict()
         section = IdmConfigParser.get_block(block)
         try:
             platform_type = section.pop('type')
@@ -74,6 +77,7 @@ class PlatformFactory:
         for f in field_not_used:
             kwargs.pop(f)
 
+        kwargs.update(overrides)
         # Now create Platform using the data with the correct data types
         # Add a temporary Property when creating Platform
         platform_cls._FACTORY = property(lambda self: True)

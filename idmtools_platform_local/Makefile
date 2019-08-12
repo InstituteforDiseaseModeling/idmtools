@@ -17,17 +17,14 @@ lint: ## check style with flake8
 
 test: ## Run our tests
 	@+$(IPY) "import os; os.environ['SQLALCHEMY_DATABASE_URI']='sqlite://'; \
-		os.environ['UNIT_TESTS']='1'; \
 		os.environ['DATA_PATH'] = os.path.join(os.getcwd(), 'test_data'); \
-		os.chdir('tests'); os.system('py.test -p no:warnings')"
+		os.chdir('tests'); os.system('py.test -p no:warnings -m \"not comps\" -m \"not docker\" --junitxml=test_results.xml')"
 
 test-docker: ## Run our  docker tests as well
-	@+$(IPY) "import os; os.environ['DOCKER_TESTS'] = '1'; os.chdir('tests'); os.system('py.test -p no:warnings')"
+	@+$(IPY) "import os; os.chdir('tests'); os.system('py.test -m \"docker\" --junitxml=test_results.xml')"
 
 test-all: ## Run our  docker tests as well
-	@+$(IPY) "import os; os.environ['DOCKER_TESTS'] = '1'; \
-	os.environ['COMPS_TESTS'] = '1'; os.chdir('tests'); os.system('py.test -p no:warnings')"
-
+	@+$(IPY) "import os; os.chdir('tests'); os.system('py.test --junitxml=test_results.xml')"
 
 docker-cleanup:
 	docker stop  idmtools_workers idmtools_postgres idmtools_redis
@@ -43,6 +40,16 @@ docker-local: ## Build our docker image using the local pypi
 
 	docker-compose build --build-arg PYPIURL=http://172.17.0.1:7171/ --build-arg PYPIHOST=172.17.0.1 workers
 
+docker-local-no-cache: ## Build our docker image using the local pypi
+	# This job is most useful when actively developing changes to the local_platform internals(tasks, api, cli) or
+	# upstream changes that effect those areas(models and core). Otherwise, installing from latest in the nightly
+	# should suffice for development
+	# ensure pypi local is up
+	@+$(IPY) "import os; os.chdir('../dev_scripts/local_pypi'); os.system('docker-compose up -d')"
+	@+$(IPY) "import os; os.chdir('../idmtools_core'); os.system('pymake release-local')"
+
+	docker-compose build --no-cache --build-arg PYPIURL=http://172.17.0.1:7171/ --build-arg PYPIHOST=172.17.0.1 workers
+
 docker-staging: ## Build our docker image using staging pypi
 	@+$(IPY) "import os; os.environ['REGISTRY'] = 'idm-docker-staging.packages.idmod.org'; \
 		os.system(f'docker-compose build --build-arg PYPIURL=https://packages.idmod.org/api/pypi/pypi-staging/simple workers')"
@@ -54,15 +61,26 @@ docker-release-staging:
 coverage: ## Generate a code-coverage report
 	@make clean
 	# We have to run in our tests folder to use the proper config
-	@+$(IPY) "import os; os.chdir('tests'); os.system('coverage run --source ../idmtools_platform_local -m pytest')"
+	@+$(IPY) "import os; os.chdir('tests'); \
+	os.system('coverage run --source ../idmtools_platform_local -m pytest -m \"not comps\" -m \"not docker\" ')"
 	# move our stuff back to the top
 	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
 	coverage report -m
 	coverage html -i
 	python ../dev_scripts/launch_dir_in_browser.py htmlcov/index.html
 
-watch: ## Automate running of tests and linting of this project using watchdog. Useful for development
-	watchmedo tricks-from dev.yml
+coverage-all: ## Generate a code-coverage report
+	@make clean
+	# We have to run in our tests folder to use the proper config
+	@+$(IPY) "import os, sys; root_idmtools = os.path.abspath(os.path.join(os.getcwd(), '..', '..'));\
+	os.chdir('tests');  \
+	sys.path.insert(0, os.path.abspath(os.path.join(root_idmtools, 'idmtools_platform_local')));\
+	sys.path.insert(0, os.path.abspath(os.path.join(root_idmtools, 'idmtools_models')));\
+	sys.path.insert(0, os.path.abspath(os.path.join(root_idmtools, 'idmtools_core')));\
+	os.system('coverage run --source ../idmtools_models/idmtools_models --source ../../idmtools_core/idmtools \
+	--source ../idmtools_platform_local -m pytest -p no:warnings ')"
+	# move our stuff back to the top
+	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
 
 # Release related rules
 

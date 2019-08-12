@@ -4,19 +4,20 @@ import os
 import unittest
 from os import path
 
+import pytest
+
 from idmtools.builders import ExperimentBuilder
 from idmtools.core import EntityStatus
 from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
 from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
-from idmtools_test.utils.decorators import comps_test
 from idmtools_test import COMMON_INPUT_PATH
 
 current_directory = path.dirname(path.realpath(__file__))
 
 
-#@comps_test
+@pytest.mark.comps
 class TestCOMPSPlatform(ITestWithPersistence):
     def setUp(self) -> None:
         super().setUp()

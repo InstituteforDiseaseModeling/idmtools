@@ -4,23 +4,32 @@ import logging
 from logging.handlers import QueueHandler, RotatingFileHandler, QueueListener
 from multiprocessing import Queue
 import os
-from typing import NoReturn
+from typing import NoReturn, Union
+
+import coloredlogs as coloredlogs
 
 listener = None
 logging_queue = None
 
 
-def setup_logging(level: int = logging.WARN, log_file_name: str = 'idmtools.log') -> QueueListener:
+def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'idmtools.log',
+                  console: Union[str, bool] = False) -> QueueListener:
     """
 
     Args:
-        level:
-        log_file_name:
-
+        level(Union[int, str]): Log level. Default to warning. This should be either a string that matches a log level
+        from logging or an int that represent that level
+        log_filename(str): Name of file to log messages too
+        console(Union[str, bool]): When set to True or the strings 1, y, yes, or on, console logging will be enabled
     Returns:
-
+        (QueueListener) Returns the QueueListener created that writes the log messages. In advanced scenarios with
+        multi-processing you may need to manually stop the logger
     """
     global listener, logging_queue
+    if type(level) is str:
+        level = logging.getLevelName(level)
+    if type(console) is str:
+        console = console.lower() in ['1', 'y', 'yes', 'on']
 
     # get a file handler
     root = logging.getLogger()
@@ -38,7 +47,7 @@ def setup_logging(level: int = logging.WARN, log_file_name: str = 'idmtools.log'
         else:
             format_str = '%(asctime)s.%(msecs)d %(funcName)s: [%(levelname)s] - %(message)s'
         formatter = logging.Formatter(format_str)
-        file_handler = RotatingFileHandler(log_file_name, maxBytes=(2 ** 20) * 10, backupCount=5)
+        file_handler = RotatingFileHandler(log_filename, maxBytes=(2 ** 20) * 10, backupCount=5)
         file_handler.setFormatter(formatter)
 
         exclude_logging_classes()
@@ -52,6 +61,9 @@ def setup_logging(level: int = logging.WARN, log_file_name: str = 'idmtools.log'
         # set root the use send log messages to a queue by default
         queue_handler = QueueHandler(logging_queue)
         root.addHandler(queue_handler)
+
+        if console:
+            coloredlogs.install(level='DEBUG')
 
         # see https://docs.python.org/3/library/logging.handlers.html#queuelistener
         # setup file logger handler that rotates after 10 mb of logging and keeps 5 copies

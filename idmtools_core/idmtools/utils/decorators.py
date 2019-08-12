@@ -5,7 +5,6 @@ from functools import wraps
 from typing import Callable, Union
 
 
-
 class abstractstatic(staticmethod):
     """
     Decorator for defining a method both as static and abstract
@@ -131,7 +130,7 @@ def optional_yaspin_load(*yargs, **ykwargs) -> Callable:
     def decorate(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            if spinner:
+            if spinner and not os.getenv('NO_SPINNER', False):
                 spinner.start()
             result = func(*args, **kwargs)
             if spinner:

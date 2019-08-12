@@ -11,9 +11,9 @@ python dev_scripts/bootstrap.py
 echo "start services..."
 cd idmtools_local_runner
 docker network create idmtools_network  nul 2> nul
-docker-compose down -v
-docker-compose build
-docker-compose up -d
+"C:\Program Files\Docker\Docker\Resources\bin\docker-compose.exe" down -v
+"C:\Program Files\Docker\Docker\Resources\bin\docker-compose.exe" build
+"C:\Program Files\Docker\Docker\Resources\bin\docker-compose.exe" up -d
 
 echo "start testing..."
 cd ..

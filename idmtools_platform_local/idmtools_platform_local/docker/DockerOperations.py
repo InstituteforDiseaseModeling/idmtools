@@ -1,3 +1,4 @@
+import io
 import logging
 import os
 import platform
@@ -7,9 +8,10 @@ import time
 from dataclasses import dataclass
 from io import BytesIO
 from logging import getLogger
-from typing import Optional, Union, NoReturn
+from typing import Optional, Union, NoReturn, BinaryIO
 
 import docker
+from docker.errors import APIError
 from docker.models.containers import Container, ExecResult
 from docker.models.networks import Network
 
@@ -49,7 +51,15 @@ class DockerOperations:
         self.timeout = 1
         self.system_info = get_system_information()
         if self.run_as is None:
-            self.run_as = self.run_as
+            self.run_as = self.system_info.user_group_str
+
+        if self.run_as == "0:0":
+            message = "You cannot run the containers as the root user!. Please select another value for 'run_as'. "
+            if self.system_info.user_group_str == "0:0":
+                message += " It appears you executed a script/command as the local root user or use sudo to start the" \
+                           " Local Platform. If that is the case, use the 'run_as' configuration option in your " \
+                           "idmtools.ini Local Platform configuration block or initializing the Local Platform object"
+            raise ValueError(message)
         self.client = docker.from_env()
 
     @optional_yaspin_load(text="Ensure IDM Tools Local Platform services are loaded")
@@ -128,7 +138,7 @@ class DockerOperations:
                 logger.debug(f'Removing container {name}')
                 container.remove()
 
-    def cleanup(self, delete_data: bool=True) -> NoReturn:
+    def cleanup(self, delete_data: bool = True) -> NoReturn:
         """
         Stops the running services, removes local data, and removes network. You can optionally disable the deleting
         of local data
@@ -183,12 +193,19 @@ class DockerOperations:
             (Optional[Container]): A Container object is always returned When used with *create=True*. It is possible
             that *None* is returned when *create=False*
         """
-        logger.debug('Ensuring worker is running')
+        logger.debug('Checking if worker is running')
         workers_container = self.client.containers.list(filters=dict(name='idmtools_worker'), all=True)
         if not workers_container and create:
             container_config = self.create_worker_config()
             logger.debug(f'Worker Container Config {str(container_config)}')
-            workers_container = self.client.containers.run(**container_config)
+            try:
+                workers_container = self.client.containers.run(**container_config)
+            except APIError as e:
+                if 'address already in use' in e.response:
+                    raise EnvironmentError(f"Port {self.workers_ui_port} already in use. Please configure another port "
+                                           f"for the Local Platform UI") from e
+                else:  # we don't know what the issue is so kick it down the road
+                    raise e
         elif type(workers_container) is list and len(workers_container):
             workers_container = workers_container[0]
         return workers_container
@@ -262,7 +279,7 @@ class DockerOperations:
             (Optional[Container]): A Container object is always returned When used with *create=True*. It is possible
             that *None* is returned when *create=False*
         """
-        logger.debug('Ensuring redis is running')
+        logger.debug('Checking if redis is running')
         redis_container = self.client.containers.list(filters=dict(name='idmtools_redis'), all=True)
         if not redis_container and create:
             container_config = self.create_redis_config()
@@ -306,7 +323,7 @@ class DockerOperations:
             (Optional[Container]): A Container object is always returned When used with *create=True*. It is possible
             that *None* is returned when *create=False*
         """
-        logger.debug('Ensuring postgres is running')
+        logger.debug('Checking postgres is running')
         postgres_container = self.client.containers.list(filters=dict(name='idmtools_postgres'), all=True)
         if not postgres_container and create:
             container_config = self.create_postgres_config()
@@ -366,10 +383,10 @@ class DockerOperations:
             (Optional[dict]) Dictionary representing the docker port bindings configuration for port if all inputs have
             values
         """
-        return {src_port: dest_port} if src_port is not None and dest_port is not None else None
+        return {dest_port: src_port} if src_port is not None and dest_port is not None else None
 
-    def copy_to_container(self, container: Container, file: str, destination_path: str,
-                          dest_name: Optional[str]  = None) -> bool:
+    def copy_to_container(self, container: Container, file: Union[str, bytes], destination_path: str,
+                          dest_name: Optional[str] = None) -> bool:
         """
         Copies a physical file to a container. You can also choose a different name for the destination file by using
         the dest_name option
@@ -383,35 +400,43 @@ class DockerOperations:
         Returns:
             (bool) True if the copy suceeds, False otherwise
         """
-        logger.debug(f'Copying {file} to docker container {container.id}:{destination_path}')
-        with self.create_archive(file, dest_name=dest_name) as archive:
-            return container.put_archive(path=destination_path, data=archive.read())
+        if isinstance(file, bytes):
+            file = BytesIO(file)
+        if type(file) is str:
+            logger.debug(f'Copying {file} to docker container {container.id}:{destination_path}')
+            with open(file, 'rb') as in_file:
+                name = dest_name if dest_name else os.path.basename(file)
+                result = DockerOperations.create_archive_from_bytes(in_file, name)
+                return container.put_archive(path=destination_path, data=result.read())
+        elif isinstance(file, BytesIO):
+            logger.debug(f'Copying {dest_name} to docker container {container.id}:{destination_path}')
+            with self.create_archive_from_bytes(file, dest_name) as archive:
+                return container.put_archive(path=destination_path, data=archive.read())
 
     @staticmethod
-    def create_archive(file_to_copy: str, dest_name: Optional[str] = None) -> BytesIO:
+    def create_archive_from_bytes(content: Union[bytes, BytesIO, BinaryIO], name: str) -> BytesIO:
         """
-        Creates a tar archive in memory. This is required when copying file to a container as docker only understands
-        tar archives as sources
+        Create a tar archive from bytes. Used to copy to docker
 
         Args:
-            file_to_copy: Path to file to cope
-            dest_name: Optional destination file name. This is the name the file will have within the tar archive
+            content: Content to copy into tar
+            name: Name for file in archive
 
         Returns:
-            (BytesIO): BytesIO object representing the tar of files to be copied
+            (BytesIO) Return bytesIO object
         """
+        if type(content) is bytes:
+            content = BytesIO(content)
+        content.seek(0, io.SEEK_END)
+        file_length = content.tell()
+        content.seek(0)
         pw_tarstream = BytesIO()
         pw_tar = tarfile.TarFile(fileobj=pw_tarstream, mode='w')
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f"Copying {file_to_copy} to tar stream")
-        with open(file_to_copy, 'rb') as in_file:
-            file_data = in_file.read()
-        name = dest_name if dest_name else os.path.basename(file_to_copy)
         tarinfo = tarfile.TarInfo(name=name)
-        tarinfo.size = len(file_data)
+        tarinfo.size = file_length
         tarinfo.mtime = time.time()
         # tarinfo.mode = 0600
-        pw_tar.addfile(tarinfo, BytesIO(file_data))
+        pw_tar.addfile(tarinfo, content)
         pw_tar.close()
         pw_tarstream.seek(0)
         return pw_tarstream

@@ -38,7 +38,7 @@ Install the packages in dev mode with the `test` extra (from repository folder).
 > cd idmtools_platform_comps
 > pip install -e .[test]
 > cd ..
-> cd idmtools_models_collection
+> cd idmtools_models
 > pip install -e .[test]
 > cd ..
 > cd idmtools_test
@@ -51,7 +51,7 @@ For development purpose, it is important to add the following folders as to your
 - `idmtools/idmtools_cli`
 - `idmtools/idmtools_platform_local`
 - `idmtools/idmtools_platform_comps`
-- `idmtools/idmtools_models_collection`
+- `idmtools/idmtools_models`
 - `idmtools/idmtools_test`
 
 ### Running specific tests from the command line

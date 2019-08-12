@@ -58,7 +58,7 @@ class ArmExperimentBuilder(ExperimentBuilder):
         self.sweep_definitions = []
 
     def add_arm(self, arm):
-        arm_list = arm if isinstance(arm, collections.Iterable) else [arm]
+        arm_list = arm if isinstance(arm, collections.abc.Iterable) else [arm]
         for a in arm_list:
             self.arms.append(a)
             self._apply(a)

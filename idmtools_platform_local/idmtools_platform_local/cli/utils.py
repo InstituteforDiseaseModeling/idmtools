@@ -43,6 +43,10 @@ def parent_status_to_progress(status: Dict[Status, int], width: int = 12) -> str
     """
     result = ''
     if status:
+        if type(status) is list: # assume a list is a dict of statuses
+            status_dict = dict()
+            [status_dict.update(v) for v in status]
+            status = status_dict
         status = {str(k): v for k, v in status.items()}
         total = sum([v for k, v in status.items()])
 

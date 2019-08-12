@@ -1,12 +1,13 @@
 .PHONY: clean lint test coverage release-local dist release-staging release-staging-minor-commit release-staging-minor
 
+
 clean: ## Clean all our jobs
+	python -c "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
 	python dev_scripts/run_pymake_on_all.py clean p
 
 setup-dev:  ## Setup packages in dev mode
 	python dev_scripts/bootstrap.py
 	@python -c "import os; os.chdir('idmtools_platform_local'); os.system('pymake docker-local')"
-
 
 lint: ## check style with flake8
 	python dev_scripts/run_pymake_on_all.py lint p
@@ -18,7 +19,11 @@ test-all: ## Run our tests. We cannot run in parallel
 	python dev_scripts/run_pymake_on_all.py test-all
 
 coverage: ## Generate a code-coverage report
-	python dev_scripts/run_pymake_on_all.py coverage
+	python dev_scripts/run_pymake_on_all.py coverage-all
+	coverage combine idmtools_cli/.coverage idmtools_core/.coverage idmtools_models/.coverage idmtools_platform_comps/.coverage idmtools_platform_local/.coverage
+	coverage report -m
+	coverage html -i
+	python dev_scripts/launch_dir_in_browser.py htmlcov/index.html
 
 release-local: ## package and upload a release to http://localhost:7171
 	python dev_scripts/run_pymake_on_all.py release-local p

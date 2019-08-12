@@ -1,11 +1,9 @@
-# flake8: noqa E402
+
 import time
 
-from idmtools_test.utils.confg_local_runner_test import config_local_test
-from idmtools_test.utils.decorators import docker_test
+import pytest
 
-local_path = config_local_test()
-
+from idmtools_test.utils.confg_local_runner_test import config_local_test, patch_broker, patch_db
 import unittest
 import unittest.mock
 
@@ -13,18 +11,27 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from idmtools_platform_local.docker.DockerOperations import DockerOperations
 from operator import itemgetter
-from idmtools_platform_local.workers.ui.app import application
+
 from idmtools_platform_local.workers.utils import create_or_update_status
 
 
 class TestAPI(unittest.TestCase):
 
-    def setUp(self):
+    @patch_broker
+    @patch_db
+    def setUp(self, mock_broker, mock_db):
+        local_path = config_local_test()  # noqa: F841
+        config_local_test()
+        from idmtools_platform_local.workers.ui.app import application
         self.app = application.test_client()
         self.create_test_data()
 
     @staticmethod
     def create_test_data():
+        from idmtools_platform_local.workers.database import get_session
+        from idmtools_platform_local.workers.data.job_status import JobStatus
+        # delete any previous data
+        get_session().query(JobStatus).delete()
         # this experiment has no children
         create_or_update_status('AAAAA', '/data/AAAAA', dict(a='b', c='d'),
                                 extra_details=dict(simulation_type='Python'))
@@ -70,7 +77,7 @@ class TestAPI(unittest.TestCase):
         data = result.json
         self.assertIsInstance(data, dict)
         self.assertEqual(data['experiment_id'], 'AAAAA')
-        self.assertDictEqual(data['tags'],  dict(a='b', c='d'))
+        self.assertDictEqual(data['tags'], dict(a='b', c='d'))
         self.assertEqual(data['data_path'], '/data/AAAAA')
 
     def test_fetch_simulations(self):
@@ -104,10 +111,10 @@ class TestAPI(unittest.TestCase):
         self.assertIsInstance(data, dict)
         self.assertEqual(data['simulation_uid'], 'CCCCC')
         self.assertEqual(data['experiment_id'], 'BBBBB')
-        self.assertDictEqual(data['tags'],  dict(i='j', k='l'))
+        self.assertDictEqual(data['tags'], dict(i='j', k='l'))
         self.assertEqual(data['data_path'], '/data/CCCCC')
 
-    @docker_test
+    @pytest.mark.docker
     def test_experiment_filtering(self):
         """
         Filtering depends on a few postgres filtering method so we have to
@@ -133,14 +140,16 @@ class TestAPI(unittest.TestCase):
         @unittest.mock.patch('idmtools_platform_local.workers.utils.get_session', side_effect=test_db_factory)
         def do_test(*mocks):
             self.create_test_data()
-            self.app = application.test_client()
-            result = self.app.get('/api/experiments', query_string=dict(tags='a,b'))
+            # reset our config to default. This should connect to the postgres db as well
+            from idmtools_platform_local.workers.ui.app import application
+            other_app = application.test_client()
+            result = other_app.get('/api/experiments', query_string=dict(tags='a,b'))
             self.assertEqual(200, result.status_code)
             data = result.json
             self.assertIsInstance(data, list)
             self.assertEqual(len(result.json), 1)
 
-            result = self.app.get('/api/experiments', query_string=dict(tags='a,c'))
+            result = other_app.get('/api/experiments', query_string=dict(tags='a,c'))
             self.assertEqual(200, result.status_code)
             data = result.json
             self.assertIsInstance(data, list)

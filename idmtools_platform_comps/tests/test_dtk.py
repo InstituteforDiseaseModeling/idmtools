@@ -1,6 +1,7 @@
 import json
 import os
 
+import pytest
 from COMPS.Data import Experiment
 
 from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
@@ -10,12 +11,11 @@ from idmtools_models.dtk.defaults import DTKSIR
 from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
-from idmtools_test.utils.decorators import comps_test
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 
 
-@comps_test
+@pytest.mark.comps
 class TestDTK(ITestWithPersistence):
 
     def setUp(self) -> None:
