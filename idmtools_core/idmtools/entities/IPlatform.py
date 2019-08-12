@@ -1,17 +1,15 @@
-import uuid
+import typing
+
 from abc import ABCMeta, abstractmethod
 from dataclasses import fields
 
-import typing
-from logging import getLogger, DEBUG
-
 from idmtools.config import IdmConfigParser
 from idmtools.core.interfaces.IEntity import IEntity
+from logging import getLogger, DEBUG
+from typing import Any, Dict, List, NoReturn
 
 if typing.TYPE_CHECKING:
-    from idmtools.core.types import TExperiment, TSimulation, TSimulationBatch
-    from typing import List, Dict, Any
-
+    from idmtools.core.types import TAnalyzerList, TItemList
 
 logger = getLogger(__name__)
 
@@ -27,6 +25,7 @@ class IPlatform(IEntity, metaclass=ABCMeta):
     - File handling
     """
 
+    # Relative item hierarchy offsets (for relationship arguments)
     SELF = 0
     PARENT = 1
     CHILD = -1
@@ -60,7 +59,7 @@ class IPlatform(IEntity, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def send_assets(self, object, **kwargs) -> None:
+    def send_assets(self, object, **kwargs) -> NoReturn:
         """
         Send the assets for a given object (sim, experiment, suite, etc) to the platform.
         Args:
@@ -70,7 +69,7 @@ class IPlatform(IEntity, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def refresh_status(self, object) -> None:
+    def refresh_status(self, object) -> NoReturn:
         """
         Populate the platform object and any child objects with status.
         Args:
@@ -79,19 +78,19 @@ class IPlatform(IEntity, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def get_object(self, id, level):
+    def get_object(self, id, level) -> 'Any':
         pass
 
     @abstractmethod
-    def get_objects_by_relationship(self, object, relationship):
+    def get_objects_by_relationship(self, object, relationship: int) -> 'Any':
         pass
 
     @abstractmethod
-    def get_files(self, item, files: 'List[str]') -> 'Dict[str, bytearray]':
+    def get_files(self, item: 'TItem', files: 'List[str]') -> 'Dict[str, bytearray]':
         pass
 
     @abstractmethod
-    def initialize_for_analysis(self, items, analyzers) -> None:
+    def initialize_for_analysis(self, items: 'TItemList', analyzers: 'TAnalyzerList') -> NoReturn:
         pass
 
     def __repr__(self):
