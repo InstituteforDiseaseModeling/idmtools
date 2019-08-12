@@ -8,18 +8,20 @@ from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import ExperimentBuilder
 from idmtools.core import EntityStatus
 from idmtools_models.python import PythonExperiment
+from idmtools.core import PlatformFactory
 from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id
 from idmtools_test.utils.decorators import comps_test
 
 
-@comps_test
+#@comps_test
 class TestAssetsInComps(unittest.TestCase):
 
     def setUp(self) -> None:
         self.base_path = os.path.abspath(os.path.join(COMMON_INPUT_PATH, "assets", "collections"))
         self.platform = COMPSPlatform()
+       # self.platform = PlatformFactory.create_from_block('COMPS_dev')
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
 
@@ -80,6 +82,7 @@ class TestAssetsInComps(unittest.TestCase):
         ac = AssetCollection()
         ac.add_asset(a)
         ac.add_asset(b)
+        ac.tags = {"idmtools": "idmtools-automation", "string_tag": "testACtag", "number_tag": 123, "KeyOnly": None}
 
         pe = PythonExperiment(name=self.case_name,
                               model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"), assets=ac)
@@ -93,6 +96,15 @@ class TestAssetsInComps(unittest.TestCase):
             self.assertEqual(asset_collection.assets[0]._md5_checksum, asset_collection.assets[1]._md5_checksum)
             self.assertEqual(asset_collection.assets[0]._file_name, 'test.json')
             self.assertEqual(asset_collection.assets[1]._file_name, 'test1.json')
+
+    def test_create_asset_collection(self):
+        ac = AssetCollection()
+        assets_dir = os.path.join(COMMON_INPUT_PATH, "assets", "collections")
+        ac.assets_from_directory(assets_dir)
+        # can't currently do this
+        ac.tags = {"idmtools": "idmtools-automation", "string_tag": "testACtag", "number_tag": 123, "KeyOnly": None}
+
+        self.assertSetEqual(set(ac.assets), set(AssetCollection.tags))
 
 
 if __name__ == '__main__':

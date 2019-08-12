@@ -16,7 +16,7 @@ from idmtools_test import COMMON_INPUT_PATH
 current_directory = path.dirname(path.realpath(__file__))
 
 
-@comps_test
+#@comps_test
 class TestCOMPSPlatform(ITestWithPersistence):
     def setUp(self) -> None:
         super().setUp()

@@ -6,9 +6,7 @@ echo "Virtual Environment Activated"
 if exist data\redis-data rd /s /q data\redis-data
 mkdir data\redis-data
 echo "install idmtools ..."
-pip install -e idmtools_core.[test] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
-pip install -e idmtools_local_runner[test]
-pip install -e idmtools_models_collection[test]
+python dev_scripts/bootstrap.py
 
 echo "start services..."
 cd idmtools_local_runner
