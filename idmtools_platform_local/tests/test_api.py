@@ -122,6 +122,7 @@ class TestAPI(unittest.TestCase):
         """
         # start up postgres
         dm = DockerOperations()
+        dm.cleanup(True)
         dm.get_postgres()
         # give postgres 5 seconds to start
         time.sleep(5)
