@@ -1,12 +1,8 @@
 import io
 import tempfile
 import unittest.mock
-
-
 import os
-
 import pytest
-
 from idmtools.config import IdmConfigParser
 from idmtools.core import PlatformFactory
 from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
