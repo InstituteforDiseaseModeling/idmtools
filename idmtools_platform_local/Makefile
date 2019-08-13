@@ -21,7 +21,7 @@ lint: ## check style with flake8
 test: ## Run our tests
 	@+$(IPY) "import os; os.environ['SQLALCHEMY_DATABASE_URI']='sqlite://'; \
 		os.environ['DATA_PATH'] = os.path.join(os.getcwd(), 'test_data'); \
-		os.chdir('tests'); os.system('py.test -p no:warnings -m \"not comps\" -m \"not docker\" --junitxml=test_results.xml')"
+		os.chdir('tests'); os.system('py.test -p no:warnings -m \"not comps and not docker\" --junitxml=test_results.xml')"
 
 test-docker: ## Run our  docker tests as well
 	@+$(IPY) "import os; os.chdir('tests'); os.system('py.test -m \"docker\" --junitxml=test_results.xml')"
@@ -65,7 +65,7 @@ coverage: ## Generate a code-coverage report
 	@make clean
 	# We have to run in our tests folder to use the proper config
 	@+$(IPY) "import os; os.chdir('tests'); \
-	os.system('coverage run --source ../idmtools_platform_local -m pytest -m \"not comps\" -m \"not docker\" ')"
+	os.system('coverage run --source ../idmtools_platform_local -m pytest -m \"not comps and not docker\" ')"
 	# move our stuff back to the top
 	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
 	coverage report -m
