@@ -42,7 +42,7 @@ def get_packages_list() -> List[str]:
     if packages is None:  # fall back to sys modules
         packages = []
         # for name, module in sys.modules:
-        modules = sys.modules.items()
+        modules = list(sys.modules.items())
         for name, mod in modules:
             version = ''
             if hasattr(mod, 'version'):
