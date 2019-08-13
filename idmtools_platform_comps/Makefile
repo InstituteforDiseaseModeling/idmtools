@@ -24,6 +24,10 @@ test: ## Run our tests
 test-all: ## Run our  docker tests as well
 	@+$(IPY) "import os; os.chdir('tests'); os.system('py.test -p no:warnings --junitxml=test_results.xml')"
 
+test-all-with-login:
+	python ../dev_scripts/create_auth_token_args.py --comps_url "https://comps2.idmod.org" --username "shchen" --password "Password123"
+	@pymake test-all
+
 coverage: ## Generate a code-coverage report
 	@make clean
 	# We have to run in our tests folder to use the proper config
@@ -58,7 +62,7 @@ release-staging: ## perform a release to staging
 
 # Use before release-staging-minor-commit to confirm next version.
 release-staging-minor-dry-run: ## perform a release to staging and bump the minor version.
-	bump2version minor --dy-run --allow-dirty
+	bump2version minor --dry-run --allow-dirty --verbose
 
 # This should be used when a pushing a "production" build to staging before being approved by test
 release-staging-minor-commit: ## perform a release to staging and commit the version.
