@@ -24,6 +24,7 @@ class CacheEnabled:
     def __del__(self):
         if self._cache:
             self._cache.close()
+        del self._cache
 
         if self._cache_directory and os.path.exists(self._cache_directory):
             try:
