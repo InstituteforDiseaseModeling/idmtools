@@ -15,12 +15,9 @@ class TestPlatformFactory(ITestWithPersistence):
     def tearDown(self):
         super().tearDown()
 
-    @pytest.mark.comps
-    @unittest.mock.patch('idmtools_platform_comps.COMPSPlatform.COMPSPlatform._login', side_effect=lambda: True)
-    def test_get_block(self, mock_login):
+    def test_get_block(self):
         entries = IdmConfigParser.get_block('COMPS2')
         self.assertEqual(entries['endpoint'], 'https://comps2.idmod.org')
-        self.assertEqual(mock_login.call_count, 1)
 
     def test_block_not_exits(self):
         with self.assertRaises(Exception):
