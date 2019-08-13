@@ -31,6 +31,7 @@ class TestPlatformFactory(ITestWithPersistence):
             platform = PlatformFactory.create_from_block('BADTYPE')  # noqa:F841
 
     @pytest.mark.docker
+    @pytest.mark.comps
     @unittest.mock.patch('idmtools_platform_comps.COMPSPlatform.COMPSPlatform._login', side_effect=lambda: True)
     def test_create_from_block(self, mock_login):
         p1 = PlatformFactory.create_from_block('Custom_Local', **get_test_local_env_overrides())
@@ -44,9 +45,12 @@ class TestPlatformFactory(ITestWithPersistence):
         self.assertEqual(p3.__class__.__name__, 'TestPlatform')
 
     @pytest.mark.docker
-    def test_platform_factory(self):
+    @pytest.mark.comps
+    @unittest.mock.patch('idmtools_platform_comps.COMPSPlatform.COMPSPlatform._login', side_effect=lambda: True)
+    def test_platform_factory(self, mock_login):
         platform1 = PlatformFactory.create('COMPS')
         self.assertEqual(platform1.__class__.__name__, 'COMPSPlatform')
+        self.assertEqual(mock_login.call_count, 1)
 
         platform2 = PlatformFactory.create('Local', **get_test_local_env_overrides())
         self.assertEqual(platform2.__class__.__name__, 'LocalPlatform')
