@@ -22,15 +22,15 @@ class CacheEnabled:
     _cache_directory: 'str' = field(default=None, init=False, compare=False)
 
     def __del__(self):
-        if self._cache:
+        if self._cache is not None:
             self._cache.close()
-        del self._cache
+            del self._cache
 
-        if self._cache_directory and os.path.exists(self._cache_directory):
-            try:
-                shutil.rmtree(self._cache_directory)
-            except IOError as e:
-                logger.exception(e)
+            if self._cache_directory and os.path.exists(self._cache_directory):
+                try:
+                    shutil.rmtree(self._cache_directory)
+                except IOError as e:
+                    logger.exception(e)
 
     @property
     def cache(self):

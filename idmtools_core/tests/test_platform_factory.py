@@ -1,5 +1,4 @@
-import os
-
+import unittest.mock
 import pytest
 from dataclasses import fields
 from idmtools.config import IdmConfigParser
@@ -17,6 +16,7 @@ class TestPlatformFactory(ITestWithPersistence):
         super().tearDown()
 
     @pytest.mark.comps
+    @unittest.mock.patch('idmtools_platform_comps.COMPSPlatform.COMPSPlatform._login', side_effect=lambda: True)
     def test_get_block(self):
         entries = IdmConfigParser.get_block('COMPS2')
         self.assertEqual(entries['endpoint'], 'https://comps2.idmod.org')
@@ -52,6 +52,7 @@ class TestPlatformFactory(ITestWithPersistence):
         self.assertEqual(platform3.__class__.__name__, 'TestPlatform')
 
     @pytest.mark.comps
+    @unittest.mock.patch('idmtools_platform_comps.COMPSPlatform.COMPSPlatform._login', side_effect=lambda: True)
     def test_COMPSPlatform(self):
         platform = PlatformFactory.create_from_block('COMPS2')
         members = platform.__dict__
