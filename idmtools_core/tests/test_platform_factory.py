@@ -17,9 +17,10 @@ class TestPlatformFactory(ITestWithPersistence):
 
     @pytest.mark.comps
     @unittest.mock.patch('idmtools_platform_comps.COMPSPlatform.COMPSPlatform._login', side_effect=lambda: True)
-    def test_get_block(self):
+    def test_get_block(self, mock_login):
         entries = IdmConfigParser.get_block('COMPS2')
         self.assertEqual(entries['endpoint'], 'https://comps2.idmod.org')
+        self.assertEqual(mock_login.call_count, 1)
 
     def test_block_not_exits(self):
         with self.assertRaises(Exception):
@@ -30,12 +31,14 @@ class TestPlatformFactory(ITestWithPersistence):
             platform = PlatformFactory.create_from_block('BADTYPE')  # noqa:F841
 
     @pytest.mark.docker
-    def test_create_from_block(self):
+    @unittest.mock.patch('idmtools_platform_comps.COMPSPlatform.COMPSPlatform._login', side_effect=lambda: True)
+    def test_create_from_block(self, mock_login):
         p1 = PlatformFactory.create_from_block('Custom_Local', **get_test_local_env_overrides())
         self.assertEqual(p1.__class__.__name__, 'LocalPlatform')
 
         p2 = PlatformFactory.create_from_block('COMPS2')
         self.assertEqual(p2.__class__.__name__, 'COMPSPlatform')
+        self.assertEqual(mock_login.call_count, 1)
 
         p3 = PlatformFactory.create_from_block('Test')
         self.assertEqual(p3.__class__.__name__, 'TestPlatform')
@@ -53,8 +56,9 @@ class TestPlatformFactory(ITestWithPersistence):
 
     @pytest.mark.comps
     @unittest.mock.patch('idmtools_platform_comps.COMPSPlatform.COMPSPlatform._login', side_effect=lambda: True)
-    def test_COMPSPlatform(self):
+    def test_COMPSPlatform(self, mock_login):
         platform = PlatformFactory.create_from_block('COMPS2')
+        self.assertEqual(mock_login.call_count, 1)
         members = platform.__dict__
 
         field_name = {f.name for f in fields(platform)}
@@ -62,6 +66,7 @@ class TestPlatformFactory(ITestWithPersistence):
         kwargs = {key: members[key] for key in keys}
 
         platform2 = PlatformFactory.create('COMPS', **kwargs)
+        self.assertEqual(mock_login.call_count, 2)
         self.assertEqual(platform, platform2)
 
     @pytest.mark.docker
