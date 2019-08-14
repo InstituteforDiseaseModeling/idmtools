@@ -3,6 +3,8 @@ import tempfile
 from random import random
 from unittest import TestCase
 
+import gc
+
 from idmtools.core import CacheEnabled
 
 
@@ -25,4 +27,5 @@ class TestCacheEnabled(TestCase):
         c.cache
         path = c._cache_directory
         del c
+        gc.collect()
         self.assertTrue(not os.path.exists(path))
