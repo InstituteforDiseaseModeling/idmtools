@@ -156,6 +156,7 @@ class DockerOperations:
             if delete_data:
                 shutil.rmtree(self.host_data_directory, True)
         except PermissionError:
+            print(f"Cannot cleanup directory {self.host_data_directory} because it is still in use")
             logger.warning(f"Cannot cleanup directory {self.host_data_directory} because it is still in use")
             pass
         if delete_data:
