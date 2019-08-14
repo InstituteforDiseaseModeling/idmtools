@@ -5,6 +5,7 @@ clean: ## Clean all our jobs
 	@+$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.py[co]', recursive=True)]"
 	@+$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.log', recursive=True)]"
 	@+$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
+	@+$(IPY) "import shutil; shutil.rmtree('__pycache__', True)"
 	@+$(IPY) "import shutil; shutil.rmtree('**/htmlcov', True)"
 	@+$(IPY) "import shutil; shutil.rmtree('**/.pytest_cache', True)"
 	@+$(IPY) "import shutil; shutil.rmtree('**/dist', True)"
