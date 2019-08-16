@@ -4,6 +4,7 @@ import os
 import pytest
 from COMPS.Data import Experiment
 
+from idmtools.config import IdmConfigParser
 from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
 from idmtools.managers import ExperimentManager
 from idmtools_models.dtk import DTKExperiment
@@ -108,6 +109,29 @@ class TestDTK(ITestWithPersistence):
         builder = ExperimentBuilder()
         # Sweep parameter "Run_Number"
         builder.add_sweep_definition(param_a_update, range(0, 20))
+        e.builder = builder
+        em = ExperimentManager(platform=self.p, experiment=e)
+        em.run()
+        em.wait_till_done()
+        self.assertTrue(e.succeeded)
+
+    #TODO: need working Eradication.exe and where to load from
+    def test_simulations_with_config_exe(self):
+        idm = IdmConfigParser()
+        exe_path = idm.get_option("Custom_Local", 'exe_path')
+
+        e = DTKExperiment.from_default(self.case_name, default=DTKSIR, eradication_path=exe_path)
+        e.tags = {"idmtools": "idmtools-automation", "local_config": "exe_path"}
+
+        e.base_simulation.set_parameter("Enable_Immunity", 0)
+
+        def param_a_update(simulation, value):
+            simulation.set_parameter("Run_Number", value)
+            return {"Run_Number": value}
+
+        builder = ExperimentBuilder()
+        # Sweep parameter "Run_Number"
+        builder.add_sweep_definition(param_a_update, range(0, 2))
         e.builder = builder
         em = ExperimentManager(platform=self.p, experiment=e)
         em.run()

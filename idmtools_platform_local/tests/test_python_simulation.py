@@ -29,9 +29,9 @@ class TestPythonSimulation(ITestWithPersistence):
         dm = DockerOperations()
         dm.cleanup(True)
 
-        import idmtools_platform_local.tasks.create_experiement
+        import idmtools_platform_local.tasks.create_experiment
         import idmtools_platform_local.tasks.create_simulation
-        reload(idmtools_platform_local.tasks.create_experiement)
+        reload(idmtools_platform_local.tasks.create_experiment)
         reload(idmtools_platform_local.tasks.create_simulation)
 
     @restart_local_platform(silent=True, **get_test_local_env_overrides())
