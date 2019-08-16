@@ -57,7 +57,6 @@ class TestLocalCLIBasic(unittest.TestCase):
         result = self.run_command('experiment', '--platform', 'Local', 'status', base_command='')
         print(result)
 
-    @unittest.skip("Skip until we can resolve the first run issue")
     @pytest.mark.docker
     def test_docker(self):
         """
