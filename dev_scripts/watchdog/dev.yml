@@ -1,0 +1,8 @@
+# See https://github.com/gorakhargosh/watchdog
+tricks:
+- watchdog.tricks.LoggerTrick:
+    patterns: ["*"]
+- watchdog.tricks.ShellCommandTrick:
+    patterns: ["*.py"]
+    shell_command: "pymake lint"
+    wait_for_process: true

@@ -1,10 +1,10 @@
 import os
 
-from idmtools.platforms import LocalPlatform
 from idmtools.workflows.calibration import Parameter
 from idmtools.workflows.calibration.CalibrationWorkflow import CalibrationWorkflow
 from idmtools.workflows.calibration.algorithms.DummyNPA import DummyNPA
 from idmtools_models.python import PythonExperiment
+from idmtools_platform_local.local_platform import LocalPlatform
 
 
 def sample_to_simulation(simulation, sample):

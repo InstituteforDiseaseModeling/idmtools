@@ -1,6 +1,6 @@
 import unittest
 
-from tests.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 
 
 class TestAnalyzeManager(ITestWithPersistence):

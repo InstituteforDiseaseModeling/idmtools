@@ -1,6 +1,6 @@
 import inspect
 import typing
-from functools import partial, reduce
+from functools import partial
 from inspect import signature
 from itertools import product
 
