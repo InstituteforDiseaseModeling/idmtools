@@ -25,10 +25,6 @@ test: ## Run our tests
 test-all: ## Run our  docker tests as well
 	@+$(IPY) "import os; os.chdir('tests'); os.system('py.test -p no:warnings --junitxml=test_results.xml')"
 
-test-all-with-login:
-	python ../dev_scripts/create_auth_token_args.py --comps_url "https://comps2.idmod.org" --username "shchen" --password "Password123"
-	@pymake test-all
-
 coverage: ## Generate a code-coverage report
 	@make clean
 	# We have to run in our tests folder to use the proper config

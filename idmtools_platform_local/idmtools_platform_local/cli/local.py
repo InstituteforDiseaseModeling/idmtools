@@ -26,7 +26,8 @@ def local(ctx, run_as):
 @pass_do
 def down(do: DockerOperations, delete_data):
     """Shutdown the local execution platform(and optionally delete data"""
-    click.confirm(f'Do you want to remove all data associated with the local platform?({do.host_data_directory})', abort=True)
+    if delete_data:
+        delete_data = click.confirm(f'Do you want to remove all data associated with the local platform?({do.host_data_directory})', abort=True)
     do.cleanup(delete_data)
 
 
