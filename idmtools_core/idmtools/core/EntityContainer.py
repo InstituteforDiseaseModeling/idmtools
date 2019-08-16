@@ -2,6 +2,7 @@ import typing
 
 if typing.TYPE_CHECKING:
     from idmtools.core import IEntity
+    from typing import List
 
 
 class EntityContainer(list):

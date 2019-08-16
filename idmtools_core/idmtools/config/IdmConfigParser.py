@@ -1,8 +1,5 @@
 import copy
-import logging
 from logging import getLogger
-from logging.handlers import QueueHandler
-from logging.config import fileConfig
 import os
 from configparser import ConfigParser
 from typing import Dict
@@ -100,7 +97,6 @@ class IdmConfigParser:
         """
         # init logging here as this is our most likely entry-point into an idm-tools "application"
         from idmtools.core.logging import setup_logging
-        setup_logging()
 
         ini_file = cls._find_config(dir_path, file_name)
         if ini_file is None:
@@ -111,8 +107,9 @@ class IdmConfigParser:
 
         cls._config = ConfigParser()
         cls._config.read(ini_file)
-
-
+        log_config = cls.get_section('Logging')
+        valid_options = ['level', 'log_filename', 'console']
+        setup_logging(**{k: v for k, v in log_config.items() if k in valid_options})
 
     @classmethod
     def get_section(cls, section: str = None) -> Dict[str, str]:
@@ -146,11 +143,11 @@ class IdmConfigParser:
         """
         cls.ensure_init()
         if cls._config is None:
-            raise Exception(f"Config file NOT FOUND or IS Empty!")
+            raise ValueError(f"Config file NOT FOUND or IS Empty!")
 
         section_dict = dict(cls._config.items())
         if block_name not in section_dict:
-            raise Exception(f"Block '{block_name}' doesn't exist!")
+            raise ValueError(f"Block '{block_name}' doesn't exist!")
 
         section = cls._config.items(block_name)
         return dict(section)

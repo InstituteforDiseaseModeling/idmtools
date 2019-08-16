@@ -3,25 +3,19 @@ import typing
 import ast
 from dataclasses import fields
 
+from idmtools.utils.decorators import LoadOnCallSingletonDecorator
+
 if typing.TYPE_CHECKING:
-    from idmtools.core import TPlatformClass
+    from idmtools.core.types import TPlatform
 
 
 class PlatformFactory:
 
     def __init__(self):
-        self._builders = {}
+        from idmtools.registry.PlatformSpecification import PlatformPlugins
+        self._platforms = PlatformPlugins().get_plugin_map()
 
-    def register_type(self, platform_class: 'TPlatformClass'):
-        """
-        Register a platform to make it available for platform factory
-        Args:
-            platform_class: The definition of the platform class
-        Returns: None
-        """
-        self._builders[platform_class.__module__] = platform_class
-
-    def create(self, key, **kwargs) -> 'TPlatformt':
+    def create(self, key, **kwargs) -> 'TPlatform':
         """
         Create Platform with type identified by key
         Args:
@@ -29,38 +23,37 @@ class PlatformFactory:
             **kwargs: inputs for Platform constructor
         Returns: created Platform
         """
-        if key not in self._builders:
-            try:
-                # Try first to import it dynamically
-                import importlib
-                importlib.import_module(key)
-            except:
-                raise ValueError(f"The PlatformFactory could not create an platform of type {key}")
+        self._validate_platform_type(key)
+        builder = self._platforms.get(key)
+        return builder.get(kwargs)
 
-        builder = self._builders.get(key)
-        return builder(**kwargs)
+    def _validate_platform_type(self, name):
+        if name not in self._platforms:
+            raise ValueError(f"{name} is an unknown Platform Type."
+                             f"Supported platforms are {','.join(self._platforms.keys())}")
 
-    def create_from_block(self, block):
+    def create_from_block(self, block: str, overrides: typing.Optional[dict] = None):
         """
         Retrieve section entries from config file by giving block
         Args:
             block: the section name in config file
+            overrides: Optional override of parameters from config.
         Returns: dict with entries from the block
         """
         from idmtools.config import IdmConfigParser
+        if overrides is None:
+            overrides = dict()
         section = IdmConfigParser.get_block(block)
-        platform_type = section.pop('type')
-
-        if platform_type not in self._builders:
-            try:
-                # Try first to import it dynamically
-                import importlib
-                importlib.import_module(platform_type)
-            except:
-                raise ValueError(f"The PlatformFactory could not create an platform of type {platform_type}")
+        try:
+            platform_type = section.pop('type')
+        except KeyError:
+            raise ValueError("When loading a Platform from a configuration block you must specify the type in the "
+                             "block. For example:\ntype = COMPS")
+        self._validate_platform_type(platform_type)
+        platform_spec = self._platforms.get(platform_type)
 
         # Update fields types
-        platform_cls = self._builders.get(platform_type)
+        platform_cls = platform_spec.get_type()
         fds = fields(platform_cls)
         field_type = {f.name: f.type for f in fds}
 
@@ -84,6 +77,7 @@ class PlatformFactory:
         for f in field_not_used:
             kwargs.pop(f)
 
+        kwargs.update(overrides)
         # Now create Platform using the data with the correct data types
         # Add a temporary Property when creating Platform
         platform_cls._FACTORY = property(lambda self: True)
@@ -93,4 +87,4 @@ class PlatformFactory:
         return platform
 
 
-platform_factory = PlatformFactory()
+PlatformFactory = typing.cast(PlatformFactory, LoadOnCallSingletonDecorator(PlatformFactory))
