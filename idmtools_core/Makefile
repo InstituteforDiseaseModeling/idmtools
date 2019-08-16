@@ -5,9 +5,10 @@ clean: ## Clean all our jobs
 	@+$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('*.py[co]', recursive=True)]"
 	@+$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('*.done', recursive=True)]"
 	@+$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.log', recursive=True)]"
-	@+$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('.coverage', recursive=True)]"
+	@+$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('*.coverage', recursive=True)]"
 	@+$(IPY) "import shutil; shutil.rmtree('htmlcov', True)"
 	@+$(IPY) "import shutil; shutil.rmtree('.pytest_cache', True)"
+	@+$(IPY) "import shutil; shutil.rmtree('__pycache__', True)"
 	@+$(IPY) "import shutil; shutil.rmtree('dist', True)"
 
 clean-all:  ## Deleting package info hides plugins so we only want to do that for packaging
@@ -19,14 +20,10 @@ lint: ## check style with flake8
 	@+$(IPY) "import os; os.chdir('..'); os.system('flake8 --ignore=E501 idmtools_core')"
 
 test: ## Run our tests
-	@+$(IPY) "import os; os.chdir('tests'); os.system('py.test -p no:warnings -m \"not comps\" -m \"not docker\" --junitxml=test_results.xml')"
+	@+$(IPY) "import os; os.chdir('tests'); os.system('py.test -p no:warnings -m \"not comps and not docker\" --junitxml=test_results.xml')"
 
 test-all: ## Run our  docker tests as well
 	@+$(IPY) "import os; os.chdir('tests'); os.system('py.test -p no:warnings --junitxml=test_results.xml')"
-
-test-all-with-login:
-	python ../dev_scripts/create_auth_token_args.py --comps_url "https://comps2.idmod.org" --username "shchen" --password "Password123"
-	@pymake test-all
 
 coverage: ## Generate a code-coverage report
 	@make clean
@@ -41,7 +38,7 @@ coverage: ## Generate a code-coverage report
 coverage-all: ## Generate a code-coverage report
 	@make clean
 	# We have to run in our tests folder to use the proper config
-	os.chdir('tests'); os.system('coverage run -p no:warnings --source ../idmtools -m pytest -m \"not comps\" -m \"not docker\" ')"
+	os.chdir('tests'); os.system('coverage run -p no:warnings --source ../idmtools -m pytest -m \"not comps and not docker\" ')"
 	# move our stuff back to the top
 	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
 

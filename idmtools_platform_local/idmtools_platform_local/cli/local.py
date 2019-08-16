@@ -26,7 +26,8 @@ def local(ctx, run_as):
 @pass_do
 def down(do: DockerOperations, delete_data):
     """Shutdown the local execution platform(and optionally delete data"""
-    click.confirm(f'Do you want to remove all data associated with the local platform?({do.host_data_directory})', abort=True)
+    if delete_data:
+        delete_data = click.confirm(f'Do you want to remove all data associated with the local platform?({do.host_data_directory})', abort=True)
     do.cleanup(delete_data)
 
 
@@ -51,7 +52,7 @@ def status(do: DockerOperations):
     Check the status of the local execution platform
     """
     for c in ['redis', 'postgres', 'workers']:
-        container = getattr(do, f'get_{c}')()
+        container = getattr(do, f'get_{c}')(False)
         container_status_text(stringcase.titlecase(c), container)
 
 
