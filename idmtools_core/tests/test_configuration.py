@@ -1,12 +1,8 @@
 import io
 import tempfile
 import unittest.mock
-
-
 import os
-
 import pytest
-
 from idmtools.config import IdmConfigParser
 from idmtools.core import PlatformFactory
 from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
@@ -46,6 +42,7 @@ class TestConfig(ITestWithPersistence):
         platform = PlatformFactory.create("COMPS")
         self.assertEqual(platform.endpoint, 'https://comps2.idmod.org')
         self.assertEqual(platform.environment, 'Bayesian')
+        self.assertEqual(mock_login.call_count, 1)
 
     @pytest.mark.comps
     @unittest.mock.patch('idmtools_platform_comps.COMPSPlatform.COMPSPlatform._login', side_effect=lambda: True)

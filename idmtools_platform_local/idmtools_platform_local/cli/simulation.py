@@ -48,11 +48,10 @@ def status(id: Optional[str], experiment_id: Optional[str], status: Optional[str
         if id is None:
             simulations = SimulationsClient.get_all(status=status, tags=tags)
         else:
-            simulations = SimulationsClient.get_one(id, status=status, tags=tags)
+            simulations = [SimulationsClient.get_one(id, status=status, tags=tags)]
+        simulations = list(map(lambda x: prettify_simulation(x), simulations))
+        print(tabulate(simulations, headers='keys', tablefmt='psql', showindex=False))
     except RuntimeError as e:
         show_error(e.args[0])
     except requests.exceptions.ConnectionError as e:
         show_error(f"Could not connect to the local platform: {e.request.url}. Is the local platform running?")
-
-    simulations = list(map(lambda x: prettify_simulation(x), simulations))
-    print(tabulate(simulations, headers='keys', tablefmt='psql', showindex=False))

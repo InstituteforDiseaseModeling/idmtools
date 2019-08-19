@@ -5,10 +5,12 @@ clean: ## Clean all our jobs
 	@$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('*.py[co]', recursive=True)]"
 	@$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('*.done', recursive=True)]"
 	@$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('*.log', recursive=True)]"
-	@$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('*.coverage', recursive=True)]"
-	@$(IPY) "import shutil; shutil.rmtree('htmlcov', True)"
-	@$(IPY) "import shutil; shutil.rmtree('.pytest_cache', True)"
+	@$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/.coverage', recursive=True)]"
+	@$(IPY) "import os, glob, shutil; [shutil.rmtree(i) for i in glob.glob('**/__pycache__', recursive=True)]"
+	@$(IPY) "import os, glob, shutil; [shutil.rmtree(i) for i in glob.glob('**/htmlcov', recursive=True)]"
+	@$(IPY) "import os, glob, shutil; [shutil.rmtree(i) for i in glob.glob('**/.pytest_cache', recursive=True)]"
 	@$(IPY) "import shutil; shutil.rmtree('dist', True)"
+	@$(IPY) "import shutil; shutil.rmtree('build', True)"
 
 clean-all:  ## Deleting package info hides plugins so we only want to do that for packaging
 	@make clean
@@ -54,7 +56,7 @@ release-staging: ## perform a release to staging
 
 # Use before release-staging-minor-commit to confirm next version.
 release-staging-minor-dry-run: ## perform a release to staging and bump the minor version.
-	bump2version minor --dy-run --allow-dirty
+	bump2version minor --dry-run --allow-dirty --verbose
 
 # This should be used when a pushing a "production" build to staging before being approved by test
 release-staging-minor-commit: ## perform a release to staging and commit the version.

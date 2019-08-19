@@ -9,26 +9,15 @@ source "${VIRTUALENV_DIR}/bin/activate"
 echo "install idmtools ..."
 LOCAL_PATH="$(realpath $(dirname '$0')/)"
 echo ${LOCAL_PATH}
-cd ${LOCAL_PATH}/idmtools_core && \
-    pip install -e .\[test,3.6\] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
-cd ${LOCAL_PATH}/idmtools_local_runner && \
-    pip install -e .\[test\]
-cd ${LOCAL_PATH}/idmtools_models && \
-    pip install -e .\[test\]
-# ensure we don't have a copy running and previous instances have been stopped
-cd ${LOCAL_PATH}/idmtools_local_runner && \
-	docker-compose down -v && \
-	docker-compose build && \
-	./start.sh
+python dev_scripts/bootstrap.py
+
 
 echo "auto login..."
-cd ${LOCAL_PATH}/idmtools_core/tests && \
-   python create_auth_token_args.py --comps_url "$1" --username "$2" --password "$3"
-   #python create_auth_token_args.py --comps_url "https://comps2.idmod.org" --username "shchen" --password "Password123"
+python dev_scripts/create_auth_token_args.py --comps_url "$1" --username "$2" --password "$3"
+#python dev_scripts/create_auth_token_args.py --comps_url "https://comps2.idmod.org" --username "shchen" --password "Password123"
 
 echo "run all tests..."
-cd ${LOCAL_PATH}/idmtools_core/tests
-python run_tests.py
+pymake test-all
 
 echo "deactivate..."
 deactivate
