@@ -156,3 +156,106 @@ class TestCustomFiles(ITestWithPersistence):
             jt1 = list(e.demographics.values())[0]
             jt2 = json.load(m)
             self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
+
+    def test_experiment_load_multiple_demographics_files_1(self):
+        e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
+                                       eradication_path=DEFAULT_ERADICATION_PATH)
+        e.load_files(demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)
+
+        # test number of files
+        self.assertEqual(len(e.base_simulation.demographics), 0)
+        self.assertEqual(len(e.demographics), 2)
+
+        # test the order of files
+        demographics_list = list(e.demographics.keys())
+        self.assertEqual(demographics_list[1], 'demographics.json')
+
+    def test_experiment_load_multiple_demographics_files_2(self):
+        e = DTKExperiment.from_files(self.case_name,
+                                     eradication_path=DEFAULT_ERADICATION_PATH,
+                                     demographics_paths=[DEFAULT_DEMOGRAPHICS_JSON])
+
+        # test number of files
+        self.assertEqual(len(e.base_simulation.demographics), 0)
+        self.assertEqual(len(e.demographics), 1)
+
+        # test the order of files
+        demographics_list = list(e.demographics.keys())
+        self.assertEqual(demographics_list[0], 'demographics.json')
+
+    def test_simulation_load_multiple_demographics_files(self):
+        e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
+                                       eradication_path=DEFAULT_ERADICATION_PATH)
+
+        e.base_simulation.load_files(demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)
+        e.base_simulation.load_files(demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)
+
+        # test number of files
+        self.assertEqual(len(e.base_simulation.demographics), 1)
+        self.assertEqual(len(e.demographics), 1)
+
+        # test the order of files
+        demographics_list = list(e.base_simulation.demographics.keys())
+        self.assertEqual(demographics_list[0], 'demographics.json')
+
+    def test_real_example_1(self):
+        from COMPS.Data import Experiment
+        from idmtools.builders import StandAloneSimulationsBuilder
+        from idmtools.managers import ExperimentManager
+        from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
+
+        e = DTKExperiment.from_files(self.case_name,
+                                     eradication_path=DEFAULT_ERADICATION_PATH,
+                                     config_path=DEFAULT_CONFIG_PATH,
+                                     campaign_path=DEFAULT_CAMPAIGN_JSON,
+                                     demographics_paths=DEFAULT_DEMOGRAPHICS_JSON
+                                     )
+
+        e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
+        sim = e.simulation()
+        sim.set_parameter("Enable_Immunity", 0)
+        b = StandAloneSimulationsBuilder()
+        b.add_simulation(sim)
+        e.builder = b
+
+        p = COMPSPlatform()
+        em = ExperimentManager(platform=p, experiment=e)
+        em.run()
+        em.wait_till_done()
+        self.assertTrue(e.succeeded)
+
+        exp_id = em.experiment.uid
+        for simulation in Experiment.get(exp_id).get_simulations():
+            configString = simulation.retrieve_output_files(paths=["config.json"])
+            config_parameters = json.loads(configString[0].decode('utf-8'))["parameters"]
+            self.assertEqual(config_parameters["Enable_Immunity"], 0)
+
+    def test_real_example_2(self):
+        from COMPS.Data import Experiment
+        from idmtools.builders import StandAloneSimulationsBuilder
+        from idmtools.managers import ExperimentManager
+        from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
+
+        e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
+                                       eradication_path=DEFAULT_ERADICATION_PATH)
+
+        e.base_simulation.load_files(demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)
+
+        e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
+        sim = e.simulation()
+        sim.set_parameter("Enable_Immunity", 0)
+        b = StandAloneSimulationsBuilder()
+        b.add_simulation(sim)
+        e.builder = b
+
+        p = COMPSPlatform()
+        em = ExperimentManager(platform=p, experiment=e)
+        em.run()
+        em.wait_till_done()
+        self.assertTrue(e.succeeded)
+
+        exp_id = em.experiment.uid
+        for simulation in Experiment.get(exp_id).get_simulations():
+            configString = simulation.retrieve_output_files(paths=["config.json"])
+            config_parameters = json.loads(configString[0].decode('utf-8'))["parameters"]
+            self.assertEqual(config_parameters["Enable_Immunity"], 0)
