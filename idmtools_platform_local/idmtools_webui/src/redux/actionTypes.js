@@ -1,0 +1,17 @@
+/* EXPERIEMENT */
+export const GET_EXPERIMENTS = 'GET_EXPERIMENTS';
+
+/* SIMULATION */
+export const GET_SIMULATIONS = 'GET_SIMULATIONS';
+
+/* GENERAL */
+export const SHOW_WARNING ='SHOW_WARNING';
+export const SHOW_ERROR ='SHOW_ERROR';
+export const SHOW_INFO ='SHOW_INFO';
+export const SHOW_STOP ='SHOW_STOP';
+export const SHOW_SUCCESS ='SHOW_SUCCESS';
+
+/* VIEWS */
+export const DASHBOARD_VIEW = "DASHBOARD_VIEW"
+export const EXPERIMENT_VIEW = "EXPERIMENT_VIEW"
+export const SIMULATION_VIEW = "SIMULATION_VIEW"

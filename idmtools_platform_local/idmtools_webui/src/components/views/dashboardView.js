@@ -1,0 +1,132 @@
+
+import React from "react";
+import { withStyles } from '@material-ui/core/styles';
+import { connect } from "react-redux";
+import { fetchExperiments } from "../../redux/action/experiment"
+import { fetchSimulations } from "../../redux/action/simulation"
+
+import {Card, CardContent, Typography, Divider, List, ListItem, ListItemText, Paper}  from "@material-ui/core";
+
+
+const styles = theme => ({
+    card : {
+        maxWidth: 400,
+        width:200,
+        margin:10,
+        height:300
+       
+    },
+    paper : {
+        display:'flex',
+        height:'100%'
+    },
+    cardTitle:{
+        padding:10,
+        color:'#6f9a37'  //green
+    }
+})
+
+class Dashboard extends React.Component {
+
+    handleCardClick(target) {
+        return ()=> {      
+            window.location.href = "/" + target;
+          }      
+    }
+
+
+    componentDidMount() {
+        const { dispatch } = this.props;
+        dispatch(fetchSimulations());
+
+        dispatch(fetchExperiments());
+    }
+    render() {
+        const {classes, simulations, experiments} = this.props;
+
+        const simCount = simulations.simulations ? simulations.simulations.length : 0;
+        const expCount = experiments.experiments ? experiments.experiments.length : 0 ;
+
+        return (
+            <Paper className = {classes.paper}>
+                <Card className = {classes.card} onClick={this.handleCardClick("experiment")}>
+                    <CardContent>
+                        
+                        <Typography variant="h5" className={classes.cardTitle}>Local Experiments</Typography>
+                        <Divider/>
+                        <List>
+                            <ListItem>
+                                <ListItemText>Completed:{expCount}</ListItemText>
+                            </ListItem>
+                            <ListItem>
+                                <ListItemText>Running:</ListItemText>
+                            </ListItem>
+
+                        </List>
+                    </CardContent>
+                </Card>
+                
+                <Card className = {classes.card} onClick={this.handleCardClick("simulation")}>
+                    <CardContent>
+                        
+                        <Typography variant="h5" className={classes.cardTitle}>Local Simulations</Typography>
+                        <Divider/>
+                        <List>
+                            <ListItem>
+                                <ListItemText>Completed:{simCount}</ListItemText>
+                            </ListItem>
+                            <ListItem>
+                                <ListItemText>Running:</ListItemText>
+                            </ListItem>
+                        </List>
+                    </CardContent>
+                </Card>
+                <Card className = {classes.card} onClick={this.handleCardClick("experiment")}>
+                    <CardContent>
+                        
+                        <Typography variant="h5" className={classes.cardTitle}>COMPS Experiments</Typography>
+                        <Divider/>
+                        <List>
+                            <ListItem>
+                                <ListItemText>Completed:???</ListItemText>
+                            </ListItem>
+                            <ListItem>
+                                <ListItemText>Running:</ListItemText>
+                            </ListItem>
+
+                        </List>
+                    </CardContent>
+                </Card>
+                
+                <Card className = {classes.card} onClick={this.handleCardClick("simulation")}>
+                    <CardContent>
+                        
+                        <Typography variant="h5" className={classes.cardTitle}>COMPS Simulations</Typography>
+                        <Divider/>
+                        <List>
+                            <ListItem>
+                                <ListItemText>Completed:???</ListItemText>
+                            </ListItem>
+                            <ListItem>
+                                <ListItemText>Running:</ListItemText>
+                            </ListItem>
+                        </List>
+                    </CardContent>
+                </Card>
+                
+
+            </Paper>
+        )
+    }
+
+}
+
+function mapStateToProps(state) {
+    return ({
+      simulations: state.simulations,
+      experiments: state.experiments
+    })
+  
+}
+
+export default connect(mapStateToProps)(withStyles(styles, { withTheme: true })(Dashboard));
