@@ -97,6 +97,12 @@ class DTKExperiment(IExperiment):
     def gather_assets(self) -> None:
         self.assets.add_asset(Asset(absolute_path=self.eradication_path))
 
+        # Clean up existing demographics files
+        demo_files = self.base_simulation.config["Demographics_Filenames"]
+        for filename in self.demographics.keys():
+            if filename not in demo_files:
+                self.demographics.pop(filename)
+
         for filename, content in self.demographics.items():
             self.assets.add_asset(Asset(filename=filename, content=json.dumps(content)), fail_on_duplicate=False)
 

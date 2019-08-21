@@ -40,11 +40,6 @@ class DTKSimulation(ISimulation):
         config = {"parameters": self.config}
         demo_files = config["parameters"]["Demographics_Filenames"]
 
-        # Update config from experiment demographics files
-        for filename in self.experiment.demographics.keys():
-            if filename not in demo_files:
-                demo_files.append(filename)
-
         # Update config from simulation demographics files
         for filename in self.demographics.keys():
             if filename not in demo_files:
