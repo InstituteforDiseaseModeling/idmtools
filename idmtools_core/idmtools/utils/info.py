@@ -5,12 +5,40 @@ from typing import List
 logger = getLogger(__name__)
 
 
+def get_pip_packages_10_to_6():
+    """
+    Load packages for versions 1.0-6 of pip
+    Returns:
+
+    Raises:
+        ImportError if pip version differing
+    """
+    from pip.util import get_installed_distributions
+    return get_installed_distributions()
+
+
 def get_pip_packages_6_to_9():
+    """
+    Get packages for pip versions 6 through 9
+
+    Returns:
+
+    Raises:
+        ImportError if pip version differing
+    """
     from pip.utils import get_installed_distributions
     return get_installed_distributions()
 
 
 def get_pip_packages_10_to_current():
+    """
+    Get packages for pip versions 10 to current
+
+    Returns:
+
+    Raises:
+        ImportError if pip version differing
+    """
     from pip._internal.utils.misc import get_installed_distributions
     return get_installed_distributions()
 
@@ -21,8 +49,8 @@ def get_packages_from_pip():
         Returns:
             (List[str]): List of packages installed
         """
-    load_pip_versions = [get_pip_packages_10_to_current, get_pip_packages_6_to_9]
-    installed_packages_list = []
+    load_pip_versions = [get_pip_packages_10_to_current, get_pip_packages_6_to_9, get_pip_packages_10_to_6]
+    installed_packages_list = None
 
     for load_pip in load_pip_versions:
         try:
