@@ -1,6 +1,7 @@
 import io
 import logging
 import os
+from pathlib import Path
 import platform
 import shutil
 import tarfile
@@ -24,7 +25,7 @@ logger = getLogger(__name__)
 
 @dataclass
 class DockerOperations:
-    host_data_directory: str = os.path.join(os.getcwd(), '.local_data')
+    host_data_directory: str = os.path.join(str(Path.home()), '.local_data')
     network: str = 'idmtools'
     redis_image: str = 'redis:5.0.4-alpine'
     redis_port: int = 6379
