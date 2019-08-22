@@ -34,12 +34,12 @@ if __name__ == "__main__":
     #                              demographics_paths=demo_files)
 
     # Succeeded with this exe
-    # e = DTKExperiment.from_default(expname, default=DTKSIR,
-    #                                eradication_path=os.path.join(INPUT_PATH, "Eradication.exe"))
+    e = DTKExperiment.from_default(expname, default=DTKSIR,
+                                   eradication_path=os.path.join(INPUT_PATH, "Eradication.exe"))
 
     # Failed with this exe
-    e = DTKExperiment.from_default(expname, default=DTKSIR,
-                                   eradication_path=os.path.join(BIN_PATH, "Eradication.exe"))
+    # e = DTKExperiment.from_default(expname, default=DTKSIR,
+    #                                eradication_path=os.path.join(BIN_PATH, "Eradication.exe"))
 
     # Case: load demographics from experiment
     e.load_files(config_path=os.path.join(INPUT_PATH, "config.json"),
