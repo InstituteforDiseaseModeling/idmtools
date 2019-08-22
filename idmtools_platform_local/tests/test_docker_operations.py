@@ -27,6 +27,7 @@ class TestDockerOperations(unittest.TestCase):
 
     def test_create_redis_starts(self):
         dm = DockerOperations(**get_test_local_env_overrides())
+        dm.cleanup(True)
         dm.get_redis()
         check_port_is_open(6379)
         dm.stop_services()
@@ -37,6 +38,7 @@ class TestDockerOperations(unittest.TestCase):
         We mock out all b
         """
         dm = DockerOperations(**get_test_local_env_overrides())
+        dm.cleanup(True)
         dm.get_postgres()
         check_port_is_open(5432)
         dm.stop_services()
@@ -45,6 +47,8 @@ class TestDockerOperations(unittest.TestCase):
     @restart_local_platform(silent=True)
     def test_create_stack_starts(self, std_capture):
         dm = DockerOperations(**get_test_local_env_overrides())
+        dm.cleanup(True)
+        dm.create_services()
         check_port_is_open(5432)
         check_port_is_open(5432)
         check_port_is_open(6379)
@@ -66,6 +70,7 @@ class TestDockerOperations(unittest.TestCase):
     def test_start_stopped_container(self):
         # create first
         dm = DockerOperations(**get_test_local_env_overrides())
+        dm.cleanup(True)
         dm.create_services()
 
         # stop workers
@@ -75,6 +80,7 @@ class TestDockerOperations(unittest.TestCase):
         # get container again and make sure it is started
         worker_container = dm.get_workers()
         self.assertEqual(worker_container.status, 'running')
+        dm.cleanup(True)
 
     @linux_only
     def test_port_taken_has_coherent_error(self):

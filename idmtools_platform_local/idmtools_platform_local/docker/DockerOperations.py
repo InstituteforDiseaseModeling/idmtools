@@ -213,11 +213,11 @@ class DockerOperations:
         elif type(workers_container) is list and len(workers_container):
             workers_container = workers_container[0]
             if create:
-                self.ensure_container_running(workers_container)
+                workers_container = self.ensure_container_running(workers_container)
         return workers_container
 
     @staticmethod
-    def ensure_container_running(container: Container,) -> NoReturn:
+    def ensure_container_running(container: Container) -> Container:
         """
         Ensures the container is running. If not, it will be started
 
@@ -228,6 +228,8 @@ class DockerOperations:
         """
         if container.status in ['exited', 'created']:
             container.start()
+            container.reload()
+        return container
 
     def create_worker_config(self) -> dict:
         """
@@ -307,7 +309,7 @@ class DockerOperations:
         elif type(redis_container) is list and len(redis_container):
             redis_container = redis_container[0]
             if create:
-                self.ensure_container_running(redis_container)
+                redis_container = self.ensure_container_running(redis_container)
         return redis_container
 
     def create_redis_config(self):
@@ -356,7 +358,7 @@ class DockerOperations:
         elif type(postgres_container) is list and len(postgres_container):
             postgres_container = postgres_container[0]
             if create:
-                self.ensure_container_running(postgres_container)
+                postgres_container = self.ensure_container_running(postgres_container)
         return postgres_container
 
     def create_postgres_config(self):
