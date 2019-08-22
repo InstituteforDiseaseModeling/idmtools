@@ -217,7 +217,7 @@ class DockerOperations:
 
     @staticmethod
     def ensure_container_running(container):
-        if container.staus in ['exited', 'created']:
+        if container.status in ['exited', 'created']:
             container.start()
 
     def create_worker_config(self) -> dict:
