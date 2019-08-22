@@ -11,7 +11,7 @@ BIN_PATH = os.path.join(CURRENT_DIRECTORY, "bin")
 sim_duration = 10  # in years
 num_seeds = 5
 
-expname = 'example_multiple_demographics_4_1'
+expname = 'example_multiple_demographics'
 
 
 def param_update(simulation, param, value):
