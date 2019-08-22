@@ -4,7 +4,6 @@ import os
 import socket
 import socketserver
 import subprocess
-import time
 import unittest.mock
 
 import pytest
