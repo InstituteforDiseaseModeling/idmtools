@@ -76,6 +76,7 @@ class TestPythonSimulation(ITestWithPersistence):
         sorted_expected_tags = sorted(expected_tags, key=itemgetter('a'))
         self.assertEqual(sorted_tags, sorted_expected_tags)
 
+    @restart_local_platform(silent=True, **get_test_local_env_overrides())
     def test_add_prefixed_relative_path_to_assets_local(self):
         from idmtools.core import PlatformFactory, EntityStatus
         # platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
