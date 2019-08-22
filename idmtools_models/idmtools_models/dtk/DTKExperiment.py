@@ -93,16 +93,20 @@ class DTKExperiment(IExperiment):
                 jn = load_file(demographics_path)
                 if jn:
                     self.demographics.update({os.path.basename(demographics_path): jn})
+                    self.base_simulation.update_config_demographics_filenames(os.path.basename(demographics_path))
 
     def gather_assets(self) -> None:
+        # Add Eradication.exe to assets
         self.assets.add_asset(Asset(absolute_path=self.eradication_path))
 
-        # Clean up existing demographics files
-        demo_files = self.base_simulation.config["Demographics_Filenames"]
-        for filename in self.demographics.keys():
-            if filename not in demo_files:
-                self.demographics.pop(filename)
+        # Clean up existing demographics files in case config got replaced
+        config_demo_files = self.base_simulation.config["Demographics_Filenames"]
+        exp_demo_files = list(self.demographics.keys())
+        for f in exp_demo_files:
+            if f not in config_demo_files:
+                self.demographics.pop(f)
 
+        # Add demographics to assets
         for filename, content in self.demographics.items():
             self.assets.add_asset(Asset(filename=filename, content=json.dumps(content)), fail_on_duplicate=False)
 

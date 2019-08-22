@@ -38,12 +38,6 @@ class DTKSimulation(ISimulation):
     def gather_assets(self):
 
         config = {"parameters": self.config}
-        demo_files = config["parameters"]["Demographics_Filenames"]
-
-        # Update config from simulation demographics files
-        for filename in self.demographics.keys():
-            if filename not in demo_files:
-                demo_files.append(filename)
 
         # Add config and campaign to assets
         self.assets.add_asset(Asset(filename="config.json", content=json.dumps(config)), fail_on_duplicate=False)
@@ -83,6 +77,9 @@ class DTKSimulation(ISimulation):
                 else:
                     self.config = jn
 
+                # Refresh demographics file names for new config file
+                self.update_config_demographics_filenames(self.demographics.keys())
+
         if campaign_path:
             jn = load_file(campaign_path)
             if jn:
@@ -96,3 +93,21 @@ class DTKSimulation(ISimulation):
                 jn = load_file(demographics_path)
                 if jn:
                     self.demographics.update({os.path.basename(demographics_path): jn})
+                    self.update_config_demographics_filenames(os.path.basename(demographics_path))
+
+    def update_config_demographics_filenames(self, demographics_files):
+        """
+        Update demographics filenames parameter
+        Args:
+            demographics_files: single file or a list
+        Returns: None
+        """
+        demographics_files = demographics_files if isinstance(demographics_files, collections.Iterable) \
+                                                   and not isinstance(demographics_files, str) else [demographics_files]
+
+        demo_files = self.config["Demographics_Filenames"]
+
+        # Update config from simulation demographics files
+        for filename in demographics_files:
+            if filename not in demo_files:
+                demo_files.append(filename)
