@@ -4,6 +4,7 @@ import os
 import socket
 import socketserver
 import subprocess
+import time
 import unittest.mock
 
 import pytest
@@ -61,6 +62,19 @@ class TestDockerOperations(unittest.TestCase):
                                     stdout=subprocess.PIPE)
             self.assertEqual(0, result.returncode)
             self.assertIn('Hello World!', result.stdout.decode('utf-8'))
+
+    def test_start_stopped_container(self):
+        # create first
+        dm = DockerOperations(**get_test_local_env_overrides())
+        dm.create_services()
+
+        # stop workers
+        worker_container = dm.get_workers()
+        worker_container.stop()
+
+        # get container again and make sure it is started
+        worker_container = dm.get_workers()
+        self.assertEqual(worker_container.status, 'running')
 
     @linux_only
     def test_port_taken_has_coherent_error(self):
