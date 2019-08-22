@@ -105,7 +105,7 @@ class DTKSimulation(ISimulation):
         demographics_files = demographics_files if isinstance(demographics_files, collections.Iterable) \
                                                    and not isinstance(demographics_files, str) else [demographics_files]
 
-        demo_files = self.config["Demographics_Filenames"]
+        demo_files = self.config.get("Demographics_Filenames", [])
 
         # Update config from simulation demographics files
         for filename in demographics_files:

@@ -80,6 +80,8 @@ class TestCustomFiles(ITestWithPersistence):
         # Test: no changes to default config
         jt1 = e.base_simulation.config
         jt2 = DTKSIR.config()
+        jt1.pop("Demographics_Filenames")
+        jt2.pop("Demographics_Filenames")
         self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
 
         # Test: no changes to default campaign
@@ -98,6 +100,8 @@ class TestCustomFiles(ITestWithPersistence):
         with open(DEFAULT_CONFIG_PATH, 'r') as m:
             jt1 = e.base_simulation.config
             jt2 = json.load(m)
+            jt1.pop("Demographics_Filenames")
+            jt2['parameters'].pop("Demographics_Filenames")
             self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2['parameters'], sort_keys=True))
 
         with open(DEFAULT_CAMPAIGN_JSON, 'r') as m:
@@ -121,6 +125,8 @@ class TestCustomFiles(ITestWithPersistence):
         with open(DEFAULT_CONFIG_PATH, 'r') as m:
             jt1 = e.base_simulation.config
             jt2 = json.load(m)
+            jt1.pop("Demographics_Filenames")
+            jt2['parameters'].pop("Demographics_Filenames")
             self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2['parameters'], sort_keys=True))
 
         with open(DEFAULT_CAMPAIGN_JSON, 'r') as m:
@@ -145,6 +151,8 @@ class TestCustomFiles(ITestWithPersistence):
         with open(DEFAULT_CONFIG_PATH, 'r') as m:
             jt1 = e.base_simulation.config
             jt2 = json.load(m)
+            jt1.pop("Demographics_Filenames")
+            jt2['parameters'].pop("Demographics_Filenames")
             self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2['parameters'], sort_keys=True))
 
         with open(DEFAULT_CAMPAIGN_JSON, 'r') as m:
