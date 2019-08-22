@@ -88,7 +88,7 @@ class TestLocalCLIBasic(unittest.TestCase):
                 time.sleep(1)
 
                 result = self.run_command('experiment', '--platform', 'Local', 'status', base_command='')
-                self.assertEqual(result.exit_code, 0,  f'{result.exit_code} - {result.output}')
+                self.assertEqual(result.exit_code, 0, f'{result.exit_code} - {result.output}')
                 output = re.sub(r'[\+\-]+', '', result.output).split("\n")
                 output = [o for o in output if o]
                 self.assertEqual(len(output), 5)
