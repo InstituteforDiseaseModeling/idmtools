@@ -127,7 +127,12 @@ def optional_yaspin_load(*yargs, **ykwargs) -> Callable:
         def wrapper(*args, **kwargs):
             if spinner and not os.getenv('NO_SPINNER', False):
                 spinner.start()
-            result = func(*args, **kwargs)
+            try:
+                result = func(*args, **kwargs)
+            except Exception as e:
+                if spinner:
+                    spinner.stop()
+                raise e
             if spinner:
                 spinner.stop()
             return result
