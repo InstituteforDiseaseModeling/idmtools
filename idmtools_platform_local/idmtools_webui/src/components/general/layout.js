@@ -2,7 +2,7 @@ import React from "react";
 
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from "react-redux";
-import { AppBar, Toolbar, Typography, IconButton, Button, List, ListItemIcon, ListItem, ListItemText } from "@material-ui/core";
+import { AppBar, Toolbar, Typography, IconButton, Button, List, ListItemIcon, ListItem, ListItemText, Snackbar } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 import MailIcon from '@material-ui/icons/Mail';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
@@ -17,6 +17,8 @@ import DashboardView from "../views/dashboardView"
 import ExperimentView from "../views/experimentView"
 import SimulationView from "../views/simulationView"
 import 'react-splitter-layout/lib/index.css';
+import SnackbarContentWrapper from "./SnackBarContentWrapper";
+import {showStop} from "../../redux/action/messaging";
 
 
 const drawerWidth = 192;
@@ -51,7 +53,7 @@ const styles = theme => ({
     backgroundColor: '#585454',
     marginLeft:`${drawerWidth}px`,
     position:'relative',
-    height:'100%'
+    height: `calc(100% - 64px)`
     //padding: theme.spacing(3),
   },
   appBar: {
@@ -63,7 +65,12 @@ const styles = theme => ({
   toolbar: theme.mixins.toolbar,
   nav: {
     position:'fixed'
+  },
+  snackbar: {
+    zIndex:10001,
+    top:4
   }
+
 
 
 });
@@ -80,8 +87,14 @@ class Layout extends React.Component {
     }
   }
 
+  handleSnackBarClose = (event) => {
+      
+    this.props.dispatch(showStop());
+  };
+
+
   render() {
-    const { classes, simulations, selectedView } = this.props;
+    const { classes, simulations, selectedView, variant } = this.props;
 
 
     
@@ -131,6 +144,23 @@ class Layout extends React.Component {
         <main className={classes.content}>
           <div className={classes.toolbar} />
           {view}
+          <Snackbar
+                    
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'center',
+            }}
+            open={this.props.showMsg}
+            autoHideDuration={variant == "error" ? null : 6000}
+              onClose={this.handleSnackBarClose}
+            className={classes.snackbar}
+          >
+            <SnackbarContentWrapper
+                onClose={this.handleSnackBarClose}
+              variant={this.props.variant}
+              message={this.props.infoMsg}
+            />
+          </Snackbar>
         </main>
 
       </div>
@@ -142,9 +172,15 @@ class Layout extends React.Component {
 
 function mapStateToProps(state) {
 
+  const {  changeView, showMsg } = state;
+
   return ({
     simulations: state.simulations,
-    selectedView: state.changeView
+    selectedView: changeView,
+    showMsg: showMsg.open,
+    infoMsg: showMsg.msg,
+    variant: showMsg.variant
+
   })
 
 }

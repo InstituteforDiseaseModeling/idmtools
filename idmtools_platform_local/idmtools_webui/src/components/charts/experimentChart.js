@@ -11,7 +11,7 @@ import * as moment from "moment";
 const styles = theme => ({
 
     chartContainer: {
-        height:'95%'
+        height:'100%'
     }
 
 });
@@ -99,7 +99,9 @@ class ExperimentChart extends React.Component {
 
             var countMap = {};
 
-            for (var i=0;i<totalHR; ++i) {
+            countMap[startHour.toString()] = 0;
+
+            for (var i=0;i<(totalHR); ++i) {
                 countMap[startHour.add(1, 'hours').toString()] =0;
             }
 

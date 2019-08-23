@@ -11,7 +11,7 @@ import * as moment from "moment";
 const styles = theme => ({
 
     chartContainer: {
-        height:'95%'
+      height:'100%'
     }
 
 });
@@ -82,14 +82,13 @@ class SimulationChart extends React.Component {
     generateChartData() {
         let chartData = [];
 
-        let visits = 0;
-
-        
+        let visits = 0;        
 
         if (this.props.simulations.simulations) {
             let sortedByCreateDT = _.sortBy(this.props.simulations.simulations, (o) => {
                 return o.created;
             });
+
 
             var totalHR = Math.round((moment(sortedByCreateDT[sortedByCreateDT.length-1].created) - moment(sortedByCreateDT[0].created)) / 1000 / 3600);
 
@@ -99,7 +98,9 @@ class SimulationChart extends React.Component {
 
             var countMap = {};
 
-            for (var i=0;i<totalHR; ++i) {
+            countMap[startHour.toString()] = 0;
+
+            for (var i=0;i<(totalHR); ++i) {
                 countMap[startHour.add(1, 'hours').toString()] =0;
             }
 

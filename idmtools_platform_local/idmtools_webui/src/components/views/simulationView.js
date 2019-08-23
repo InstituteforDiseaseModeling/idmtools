@@ -2,7 +2,7 @@
 import React from "react";
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from "react-redux";
-import { fetchSimulations } from "../../redux/action/simulation"
+import { fetchSimulations, cancelSimulation } from "../../redux/action/simulation"
 import { Table, TableHead, TableCell, TableRow, TableBody, Paper, Button, Typography, Divider,
         Card, CardContent, List, ListItem, ListItemText, TextField } from "@material-ui/core";
 import FolderIcon from "@material-ui/icons/Folder";
@@ -19,13 +19,10 @@ const styles = theme => ({
     },
     splitter: {
         
-        height: `calc(100% - 64px)`,
+        height: '100%', 
         '& .layout-pane-primary': {
-            height:`calc(100% - 64px)`,
+            height:'100%', 
             backgroundColor:'#424242'
-        },
-        '& .splitter-layout': {
-            height: `calc(100% - 64px)`,
         },
         backgroundColor: '#424242'
         
@@ -67,14 +64,24 @@ class SimulationView extends React.Component {
             selectedSim : null
         }
         this.rowClick = this.rowClick.bind(this);
+        this.cancelSim = this.cancelSim.bind(this);
     }
-
-
 
     componentDidMount() {
         const { dispatch } = this.props;
 
         dispatch(fetchSimulations());
+    }
+
+    cancelSim(e) {
+        e.stopPropagation();
+        e.preventDefault();
+
+        const { dispatch } = this.props;
+
+        dispatch(cancelSimulation(e.currentTarget.getAttribute("sim_id")));
+        
+        return false;
     }
 
     rowClick(e) {
@@ -144,7 +151,7 @@ class SimulationView extends React.Component {
                                             </a>
                                         </TableCell>
                                         <TableCell align="center">
-                                            <Button className={classes.cancel} color="secondary">Cancel</Button>
+                                            <Button className={classes.cancel} color="secondary" sim_id={sim.simulation_uid} onClick={this.cancelSim}>Cancel</Button>
 
                                         </TableCell>
                                         <TableCell align="right">{formatDateString(sim.created)}</TableCell>

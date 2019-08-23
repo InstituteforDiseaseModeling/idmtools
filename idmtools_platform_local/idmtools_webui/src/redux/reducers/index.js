@@ -3,7 +3,9 @@ import {simulations} from "./simulation";
 import {experiments} from "./experiment";
 
 import {changeView} from "./view";
+import {showMsg} from "./messaging";
 
 
 
-export default combineReducers({simulations, experiments, changeView});
+
+export default combineReducers({simulations, experiments, changeView,showMsg});

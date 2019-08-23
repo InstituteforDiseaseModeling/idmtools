@@ -2,7 +2,7 @@
 import React from "react";
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from "react-redux";
-import { fetchExperiments } from "../../redux/action/experiment"
+import { fetchExperiments, deleteExperiment } from "../../redux/action/experiment"
 import { Table, TableHead, TableCell, TableRow, TableBody, Paper, Button, Typography, Divider,
     Card, CardContent, List, ListItem, ListItemText, TextField } from "@material-ui/core";
 
@@ -21,13 +21,10 @@ const styles = theme => ({
     },
     splitter: {
 
-        height: `calc(100% - 64px)`,
+        height: '100%', 
         '& .layout-pane-primary': {
-            height:`calc(100% - 64px)`,
+            height:'100%', 
             backgroundColor:'#424242'
-        },
-        '& .splitter-layout': {
-            height: `calc(100% - 64px)`,
         },
         backgroundColor: '#424242'
 
@@ -72,6 +69,7 @@ class ExperimentView extends React.Component {
             selectedExp : null
         }
         this.rowClick = this.rowClick.bind(this);
+        this.deleteExp = this.deleteExp.bind(this);
     }
 
     componentDidMount() {
@@ -85,6 +83,18 @@ class ExperimentView extends React.Component {
             selectedExp : e.currentTarget.getAttribute("exp_id") == this.state.selectedExp ? null : e.currentTarget.getAttribute("exp_id")
         });
     }
+
+    deleteExp(e) {
+        e.stopPropagation();
+        e.preventDefault();
+
+        const { dispatch } = this.props;
+
+        dispatch(deleteExperiment(e.currentTarget.getAttribute("exp_id")));
+        
+        return false;
+    }
+
 
 
     render() {
@@ -133,7 +143,6 @@ class ExperimentView extends React.Component {
                         <Table className={classes.table}>
                             <TableHead>
                                 <TableRow>
-
                                     <TableCell align="right">Experiment ID</TableCell>
                                     <TableCell align="right">Status</TableCell>
                                     <TableCell align="right">Folder</TableCell>
@@ -154,7 +163,7 @@ class ExperimentView extends React.Component {
                                             </a>
                                         </TableCell>
                                         <TableCell align="center">
-                                            <Button className={classes.cancel} color="secondary">Cancel</Button>
+                                            <Button className={classes.cancel} color="secondary" exp_id={exp.experiment_id} onClick={this.deleteExp}>Delete</Button>
 
                                         </TableCell>
                                         <TableCell align="right">{formatDateString(exp.created)}</TableCell>

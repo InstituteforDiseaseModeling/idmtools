@@ -18,11 +18,21 @@ const theme = createMuiTheme({
 
   palette: {
     primary: {
-      main: '#2a2a2a'
+      main: '#2a2a2a',
+      light: '#00bcd4'
     },
     type: 'dark',
     background: {
       default: "#4c4c4c"
+    },
+    error: {
+      main: '#ef5350'
+    },
+    warning: {
+      main: '#ffc107',  //yellow
+    },
+    info: {
+      main: '#66bb6a'  //green
     }
   },
   app: {
