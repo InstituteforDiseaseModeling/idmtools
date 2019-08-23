@@ -1,11 +1,11 @@
 import dataclasses
 import functools
 import logging
+import os
 from logging import getLogger
 from typing import Optional, NoReturn
-
 from dataclasses import dataclass
-
+from pathlib import Path
 from idmtools.assets import Asset
 from idmtools.entities import IExperiment, IPlatform
 # we have to import brokers so that the proper configuration is achieved for redis
@@ -32,6 +32,7 @@ logger = getLogger(__name__)
 
 @dataclass
 class LocalPlatform(IPlatform):
+    host_data_directory: str = os.path.join(str(Path.home()), '.local_data')
     network: str = 'idmtools'
     redis_image: str = 'redis:5.0.4-alpine'
     redis_port: int = 6379

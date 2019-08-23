@@ -370,3 +370,4 @@ examples/**/__pycache__/
 idmtools_core/tests/reports/
 .local_data
 **/.local_data
+**/test_results.xml

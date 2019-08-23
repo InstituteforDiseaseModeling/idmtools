@@ -97,7 +97,7 @@ delete_args.add_argument('data', help='Should the data for the experiment and al
 
 
 class Experiments(Resource):
-    def get(self, id = None):
+    def get(self, id=None):
         args = idx_parser.parse_args()
         args['id'] = id
 
