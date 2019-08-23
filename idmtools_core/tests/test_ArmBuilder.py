@@ -2,8 +2,8 @@ import itertools
 from functools import partial
 
 from idmtools.builders.ArmExperimentBuilder import ArmExperimentBuilder, SweepArm, ArmType
-from tests.utils.ITestWithPersistence import ITestWithPersistence
-from tests.utils.TestExperiment import TestExperiment
+from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_test.utils.TstExperiment import TstExperiment
 
 
 def param_update(simulation, param, value):
@@ -34,13 +34,13 @@ class TestArmBuilder(ITestWithPersistence):
 
     def test_simple_arm_cross(self):
         arm = SweepArm(type=ArmType.cross)
-        arm.add_sweep_function(setA, range(5))
-        arm.add_sweep_function(setB, [1, 2, 3])
+        arm.add_sweep_definition(setA, range(5))
+        arm.add_sweep_definition(setB, [1, 2, 3])
         self.builder.add_arm(arm)
 
         expected_values = list(itertools.product(range(5), [1, 2, 3]))
 
-        experiment = TestExperiment("test")
+        experiment = TstExperiment("test")
         experiment.builder = self.builder
 
         simulations = list(experiment.batch_simulations(20))[0]
@@ -55,11 +55,11 @@ class TestArmBuilder(ITestWithPersistence):
 
     def test_reverse_order(self):
         arm = SweepArm(type=ArmType.cross)
-        arm.add_sweep_function(setA, range(5))
-        arm.add_sweep_function(setB, [1, 2, 3])
+        arm.add_sweep_definition(setA, range(5))
+        arm.add_sweep_definition(setB, [1, 2, 3])
         self.builder.add_arm(arm)
 
-        experiment = TestExperiment("test")
+        experiment = TstExperiment("test")
         experiment.builder = self.builder
 
         simulations = list(experiment.batch_simulations(20))[0]
@@ -67,11 +67,11 @@ class TestArmBuilder(ITestWithPersistence):
         builder2 = ArmExperimentBuilder()
 
         arm = SweepArm(type=ArmType.cross)
-        arm.add_sweep_function(setB, [1, 2, 3])
-        arm.add_sweep_function(setA, range(5))
+        arm.add_sweep_definition(setB, [1, 2, 3])
+        arm.add_sweep_definition(setA, range(5))
         builder2.add_arm(arm)
 
-        experiment2 = TestExperiment("test")
+        experiment2 = TstExperiment("test")
         experiment2.builder = self.builder
 
         simulations2 = list(experiment.batch_simulations(20))[0]
@@ -80,13 +80,13 @@ class TestArmBuilder(ITestWithPersistence):
 
     def test_simple_arm_pair(self):
         arm = SweepArm(type=ArmType.pair)
-        arm.add_sweep_function(setA, range(5))
-        arm.add_sweep_function(setB, [1, 2, 3])
+        arm.add_sweep_definition(setA, range(5))
+        arm.add_sweep_definition(setB, [1, 2, 3])
         self.builder.add_arm(arm)
 
         expected_values = list(zip(range(5), [1, 2, 3]))
 
-        experiment = TestExperiment("test")
+        experiment = TstExperiment("test")
         experiment.builder = self.builder
 
         simulations = list(experiment.batch_simulations(10))[0]

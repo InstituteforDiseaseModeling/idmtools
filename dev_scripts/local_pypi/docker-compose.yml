@@ -1,0 +1,16 @@
+version: '2'
+
+# This image provides us a local dev pypi server
+# this is useful to test packaging scripts and docker builds
+# The server is accessible via http://localhost:7171
+# Most likely you would want to point any packaging scripts to that
+
+services:
+  pypi_server:
+    image: pypiserver/pypiserver:latest
+    restart: always
+    volumes:
+        - .htpasswd:/data/auth/.htpasswd
+    command: -P /data/auth/.htpasswd -o -a update /data/packages
+    ports:
+      - 7171:8080

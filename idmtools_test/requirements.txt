@@ -1,0 +1,5 @@
+idmtools
+pytest
+pytest-runner
+numpy==1.16.4
+xmlrunner

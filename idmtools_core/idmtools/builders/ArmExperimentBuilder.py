@@ -20,10 +20,10 @@ class SweepArm:
         self.type = type
 
         for func, values in funcs:
-            self.add_sweep_function(func, values)
+            self.add_sweep_definition(func, values)
 
-    def add_sweep_function(self, func: 'Callable', values: 'Iterable[Any]'):
-        self.sweep_functions.append((func, values if isinstance(values, collections.Iterable) else [values]))
+    def add_sweep_definition(self, func: 'Callable', values: 'Iterable[Any]'):  # noqa F821
+        self.sweep_functions.append((func, values if isinstance(values, collections.abc.Iterable) else [values]))
 
         if self.type == ArmType.pair:
             self.adjust_values_length()
@@ -58,7 +58,7 @@ class ArmExperimentBuilder(ExperimentBuilder):
         self.sweep_definitions = []
 
     def add_arm(self, arm):
-        arm_list = arm if isinstance(arm, collections.Iterable) else [arm]
+        arm_list = arm if isinstance(arm, collections.abc.Iterable) else [arm]
         for a in arm_list:
             self.arms.append(a)
             self._apply(a)

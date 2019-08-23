@@ -35,4 +35,3 @@ class IPersistenceService(metaclass=ABCMeta):
     def delete(cls, uid):
         with cls._open_cache() as cache:
             cache.delete(uid)
-

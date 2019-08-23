@@ -5,7 +5,9 @@ from abc import ABC
 from itertools import chain
 from dataclasses import dataclass, field, InitVar
 from more_itertools import grouper
-from idmtools.core import EntityContainer, IAssetsEnabled, INamedEntity
+from idmtools.core import EntityContainer
+from idmtools.core.interfaces.IAssetsEnabled import IAssetsEnabled
+from idmtools.core.interfaces.INamedEntity import INamedEntity
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TSimulation, TSimulationClass, TCommandLine, TExperimentBuilder
@@ -40,7 +42,8 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
             if simulation_type:
                 self.base_simulation = simulation_type()
             else:
-                raise Exception("A `base_simulation` or `simulation_type` needs to be provided to the Experiment object!")
+                raise Exception(
+                    "A `base_simulation` or `simulation_type` needs to be provided to the Experiment object!")
 
     def __repr__(self):
         return f"<Experiment: {self.uid} - {self.name} / Sim count {len(self.simulations) if self.simulations else 0}>"

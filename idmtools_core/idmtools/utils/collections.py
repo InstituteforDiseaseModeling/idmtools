@@ -20,3 +20,18 @@ def cut_iterable_to(obj: Iterable, to: int) -> Tuple[Union[List, Mapping], int]:
     remaining = len(obj) - to
     remaining = 0 if remaining < 0 else remaining
     return slice, remaining
+
+
+def list_rindex(lst, item):
+    """
+    Find first place item occurs in list, but starting at end of list.
+    Return index of item in list, or -1 if item not found in the list.
+    """
+    i_max = len(lst)
+    i_limit = -i_max
+    i = -1
+    while i > i_limit:
+        if lst[i] == item:
+            return i_max + i
+        i -= 1
+    return -1
