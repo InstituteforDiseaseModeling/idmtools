@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 
 from idmtools.core import EntityStatus
 from idmtools.core.interfaces.IEntity import IEntity
-from idmtools.core.item_id import ItemId
+from idmtools.core.ItemId import ItemId
 
 
 @dataclass

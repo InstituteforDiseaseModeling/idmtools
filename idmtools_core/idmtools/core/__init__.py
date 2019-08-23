@@ -5,7 +5,7 @@ from idmtools.core.enums import *
 from idmtools.core.exceptions import *
 from idmtools.core.ExperimentFactory import experiment_factory
 from idmtools.core.CacheEnabled import CacheEnabled
-from idmtools.core.item_id import ItemId
+from idmtools.core.ItemId import ItemId
 from idmtools.core.PlatformFactory import PlatformFactory
 from idmtools.core.SystemInformation import SystemInformation
 from idmtools.core.types import *

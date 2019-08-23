@@ -12,7 +12,7 @@ from dataclasses import dataclass, field
 from idmtools.core import CacheEnabled
 from idmtools.core.enums import EntityStatus
 from idmtools.core.ExperimentFactory import experiment_factory
-from idmtools.core.item_id import ItemId
+from idmtools.core.ItemId import ItemId
 from idmtools.entities import IPlatform
 from idmtools.utils.time import timestamp
 from typing import Any, List, NoReturn

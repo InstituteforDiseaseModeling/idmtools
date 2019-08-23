@@ -33,7 +33,7 @@ class IEntity(metaclass=ABCMeta):
 
     @property
     def uid(self):
-        return self._uid or hash_obj(self)
+        return hash_obj(self) if self._uid is None else self._uid
 
     @uid.setter
     def uid(self, uid):

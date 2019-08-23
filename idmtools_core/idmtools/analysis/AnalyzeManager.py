@@ -14,9 +14,6 @@ from typing import NoReturn
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TAnalyzer, TItem, TItemList
 
-ANALYZE_TIMEOUT = 3600 * 8  # Maximum seconds before timing out - set to 8 hours
-WAIT_TIME = 1.15  # How much time to wait between check if the analysis is done
-EXCEPTION_KEY = '__EXCEPTION__'
 
 
 def pool_worker_initializer(func, analyzers, cache, platform) -> None:
@@ -40,6 +37,10 @@ def pool_worker_initializer(func, analyzers, cache, platform) -> None:
 
 
 class AnalyzeManager(CacheEnabled):
+
+    ANALYZE_TIMEOUT = 3600 * 8  # Maximum seconds before timing out - set to 8 hours
+    WAIT_TIME = 1.15  # How much time to wait between check if the analysis is done
+    EXCEPTION_KEY = '__EXCEPTION__'
 
     class TimeOutException(Exception):
         pass
@@ -66,7 +67,7 @@ class AnalyzeManager(CacheEnabled):
         self.force_wd = force_manager_working_directory
 
         self.potential_items = items or list()
-        self.items = dict()  # filled in later by _get_items_to_analyze
+        self._items = dict()  # filled in later by _get_items_to_analyze
 
         self.analyzers = analyzers or list()
 
@@ -93,11 +94,11 @@ class AnalyzeManager(CacheEnabled):
         Returns: True/False
 
         """
-        return item.status.name == EntityStatus.SUCCEEDED.name
+        return item.status == EntityStatus.SUCCEEDED
 
     def _get_items_to_analyze(self) -> 'TItemList':
         """
-        Returns a list of items derived from self.items that are available to analyze
+        Returns a list of items derived from self._items that are available to analyze
         Returns: a list of IItem objects
 
         """
@@ -164,8 +165,8 @@ class AnalyzeManager(CacheEnabled):
 
             analyzer.initialize()
 
-            # make sure each analyzer in self.analyzers has a unique uid
-            self._update_analyzer_uids()
+        # make sure each analyzer in self.analyzers has a unique uid
+        self._update_analyzer_uids()
 
     def _check_exception(self) -> bool:
         """
@@ -173,7 +174,7 @@ class AnalyzeManager(CacheEnabled):
         Returns: True/False, has an exception occurred?
 
         """
-        exception = self.cache.get(EXCEPTION_KEY, default=None)
+        exception = self.cache.get(self.EXCEPTION_KEY, default=None)
         if exception:
             print('\n' + exception)
             sys.stdout.flush()
@@ -217,8 +218,8 @@ class AnalyzeManager(CacheEnabled):
 
         """
         # add items to process (map)
-        n_items = len(self.items)
-        results = worker_pool.map_async(map_item, self.items.values())
+        n_items = len(self._items)
+        results = worker_pool.map_async(map_item, self._items.values())
 
         # Wait for the item map-results to be ready
         while not results.ready():
@@ -233,10 +234,10 @@ class AnalyzeManager(CacheEnabled):
                                  .format(next(animation), len(self.cache), n_items, verbose_timedelta(time_elapsed)))
                 sys.stdout.flush()
 
-            if time_elapsed > ANALYZE_TIMEOUT:
+            if time_elapsed > self.ANALYZE_TIMEOUT:
                 raise self.TimeOutException('Timeout while waiting the analysis to complete...')
 
-            time.sleep(WAIT_TIME)
+            time.sleep(self.WAIT_TIME)
 
         # Verify that no simulation failed to process properly one last time.
         # ck4, should we error out if there is a failure rather than printing and continuing?? Ask Benoit.
@@ -260,7 +261,7 @@ class AnalyzeManager(CacheEnabled):
         for analyzer in self.analyzers:
             item_data_for_analyzer = {}
             for item_id in self.cache:
-                # item = self.items[item_id]
+                # item = self._items[item_id]
                 item_result = self.cache.get(item_id)
                 item_data_for_analyzer[item_id] = item_result.get(analyzer.uid, None)  # item is currently unhashable if PythonSimulation, so temporarily using item_id, ck4
             finalize_results[analyzer.uid] = worker_pool.apply_async(analyzer.reduce, (item_data_for_analyzer,))
@@ -289,19 +290,19 @@ class AnalyzeManager(CacheEnabled):
             print('No items were provided; cannot run analysis.')
             return False
         # trim processing to those items that are ready and match requested limits
-        self.items = self._get_items_to_analyze()
+        self._items = self._get_items_to_analyze()
 
-        if len(self.items) == 0:
+        if len(self._items) == 0:
             print('No items are ready; cannot run analysis.')
             return False
 
         # initialize mapping results cache/storage
-        n_items = len(self.items)
+        n_items = len(self._items)
         n_processes = min(self.max_processes, max(n_items, 1))
         # self.initialize_cache(shards=n_processes, eviction_policy='none')  # ck4, restore if CacheEnabled is refactored
 
         # do any platform-specific initializations
-        self.platform.initialize_for_analysis(self.items, self.analyzers)
+        self.platform.initialize_for_analysis(self._items, self.analyzers)
 
         if self.verbose:
             self._print_configuration(n_items, n_processes)

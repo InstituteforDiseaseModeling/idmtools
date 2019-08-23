@@ -103,7 +103,7 @@ def _set_exception(step: str, info: dict, cache: 'Cache') -> NoReturn:
     Returns:
 
     """
-    from idmtools_core.idmtools.analysis.AnalyzeManager import EXCEPTION_KEY
+    from idmtools_core.idmtools.analysis.AnalyzeManager import AnalyzeManager
 
     # construct exception message including traceback
     message = f'\nAn exception has been raised during {step}.\n'
@@ -111,4 +111,4 @@ def _set_exception(step: str, info: dict, cache: 'Cache') -> NoReturn:
         message += f'- {key}: {value}\n'
     message += f'\n{traceback.format_exc()}\n'
 
-    cache.set(EXCEPTION_KEY, message)
+    cache.set(AnalyzeManager.EXCEPTION_KEY, message)
