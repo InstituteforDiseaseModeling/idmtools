@@ -50,6 +50,7 @@ class LocalPlatform(IPlatform):
     _docker_operations: Optional[DockerOperations] = dataclasses.field(default=None, metadata={"pickle_ignore": True})
 
     def __post_init__(self):
+        super().__post_init__()
         # ensure our brokers are started
         setup_broker()
         if self._docker_operations is None:

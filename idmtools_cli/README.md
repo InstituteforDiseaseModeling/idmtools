@@ -36,8 +36,8 @@ easily open up the asset directories by clicking on the data path URLs.
 
 You can also perform filtering on the experiments
 ```bash
-> idmtools experiment status --tag type PythonExperiment
-> idmtools experiment status --id 8EHU147Z
+> idmtools experiment --platform Local status --tag type PythonExperiment
+> idmtools experiment --platform Local status --id 8EHU147Z
 ```
 
 ### Delete
@@ -62,8 +62,8 @@ You can check the status of simulations use the follow command.
 You can also filter by a either id, experiment id, status, and tags or any combination of the aforementioned
 
 ```bash
-> idmtools simulation status --experiment-id EFX6JXBV
-> idmtools simulation status --id XDT0VMVV
-> idmtools simulation status --tag a 5 --tag b
-> idmtools simulation status --experiment-id --status failed
+> idmtools simulation --platform Local status --experiment-id EFX6JXBV
+> idmtools simulation --platform Local status --id XDT0VMVV
+> idmtools simulation --platform Local status --tag a 5 --tag b
+> idmtools simulation --platform Local status --experiment-id --status failed
 ```

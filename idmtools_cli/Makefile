@@ -5,11 +5,12 @@ clean: ## Clean all our jobs
 	@$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('*.py[co]', recursive=True)]"
 	@$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('*.done', recursive=True)]"
 	@$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('*.log', recursive=True)]"
-	@$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('*.coverage', recursive=True)]"
-	@+$(IPY) "import shutil; shutil.rmtree('__pycache__', True)"
-	@$(IPY) "import shutil; shutil.rmtree('htmlcov', True)"
-	@$(IPY) "import shutil; shutil.rmtree('.pytest_cache', True)"
+	@$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/.coverage', recursive=True)]"
+	@$(IPY) "import os, glob, shutil; [shutil.rmtree(i) for i in glob.glob('**/__pycache__', recursive=True)]"
+	@$(IPY) "import os, glob, shutil; [shutil.rmtree(i) for i in glob.glob('**/htmlcov', recursive=True)]"
+	@$(IPY) "import os, glob, shutil; [shutil.rmtree(i) for i in glob.glob('**/.pytest_cache', recursive=True)]"
 	@$(IPY) "import shutil; shutil.rmtree('dist', True)"
+	@$(IPY) "import shutil; shutil.rmtree('build', True)"
 
 clean-all:  ## Deleting package info hides plugins so we only want to do that for packaging
 	@make clean
