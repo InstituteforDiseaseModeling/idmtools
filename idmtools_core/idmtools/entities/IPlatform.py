@@ -149,18 +149,22 @@ class IPlatform(IEntity, metaclass=ABCMeta):
         field_value = {f.name: getattr(self, f.name) for f in fds}
         field_type = {f.name: f.type for f in fds}
 
+        block = self.__class__.__name__.replace("Platform", "")
+
         # find, load and get settings from config file. Return with the correct data types
         if logger.isEnabledFor(DEBUG):
-            logger.debug(f'Loading Platform config from {self.__class__.__name__.replace("Platform", "")}')
-        field_config = IdmConfigParser.retrieve_settings(self.__class__.__name__.replace("Platform", ""), field_type)
+            logger.debug(f'Loading Platform config from {block}')
+        field_config = IdmConfigParser.retrieve_settings(block, field_type)
 
         # display not used fields from config
         field_config_not_used = set(field_config.keys()) - set(field_name)
+        if 'type' in field_config_not_used:
+            field_config_not_used.remove('type')
         if len(field_config_not_used) > 0:
             field_config_not_used = [" - {} = {}".format(fn, field_config[fn]) for fn in field_config_not_used]
-            logger.warning(f"[{self.__class__.__name__}]: the following Config Settings are not used:")
+            logger.warning(f"[{block}]: the following Config Settings are not used:")
             logger.warning("\n".join(field_config_not_used))
-            print(f"[{self.__class__.__name__}]: the following Config Settings are not used:")
+            print(f"[{block}]: the following Config Settings are not used:")
             print("\n".join(field_config_not_used))
 
         # update attr based on priority: #1 Code, #2 INI, #3 Default
@@ -169,3 +173,5 @@ class IPlatform(IEntity, metaclass=ABCMeta):
                 setattr(self, fn, field_value[fn])
             elif field_config[fn] != field_value[fn]:
                 setattr(self, fn, field_config[fn])
+
+        IdmConfigParser.display_config_block_details(block)
