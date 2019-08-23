@@ -42,8 +42,6 @@ export function fetchExperiments() {
   
     let url = "/api/experiments/"+id;
 
-    debugger
-  
     
     return (dispatch) => {
         
@@ -58,8 +56,9 @@ export function fetchExperiments() {
   
               handleResponse(response,
                 (subjects)=>{ /*success handler*/                
-                    debugger
+                  
                   dispatch(showInfo("Delete operation is complete"))
+                  dispatch(fetchExperiments());
                 },
                 (data)=> { /* failure handler */
                   dispatch(showError(data));

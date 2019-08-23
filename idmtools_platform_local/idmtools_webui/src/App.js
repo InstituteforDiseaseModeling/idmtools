@@ -33,8 +33,12 @@ const theme = createMuiTheme({
     },
     info: {
       main: '#66bb6a'  //green
+    },
+  button: {
+    background: {
+      default : '#ef5350'  //red
     }
-  },
+  }},
   app: {
     //height:'100%'
   },

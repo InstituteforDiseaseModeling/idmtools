@@ -78,7 +78,6 @@ class ExperimentView extends React.Component {
 
     }
     rowClick(e) {
-        //debugger
         this.setState( {
             selectedExp : e.currentTarget.getAttribute("exp_id") == this.state.selectedExp ? null : e.currentTarget.getAttribute("exp_id")
         });
@@ -110,7 +109,6 @@ class ExperimentView extends React.Component {
             }));
 
         var progressStr = (progressObj) => {
-            //debugger
             if (progressObj && progressObj.length > 0) {
                 let progress = progressObj[0]
                 return ("Done:" + (progress["done"] ? progress["done"] : "0") + " " + 
@@ -125,9 +123,12 @@ class ExperimentView extends React.Component {
             
             let index = _.findIndex(this.props.experiments.experiments, {experiment_id: this.state.selectedExp});
             let exps = this.props.experiments.experiments
-            status = JSON.stringify(exps[index].progress);
-            command =  ""; //exps[index].extra_details.command;
-            tags = JSON.stringify( exps[index].tags);
+
+            if (index>=0) {
+                status = JSON.stringify(exps[index].progress);
+                command =  ""; //exps[index].extra_details.command;
+                tags = JSON.stringify( exps[index].tags);
+            }
         }
 
         return (

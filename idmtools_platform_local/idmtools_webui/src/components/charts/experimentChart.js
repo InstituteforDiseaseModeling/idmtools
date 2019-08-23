@@ -69,6 +69,13 @@ class ExperimentChart extends React.Component {
         series.tooltip.background.fillOpacity = 0.5;
         series.tooltip.label.padding(12,12,12,12)
 
+        // Make bullets grow on hover
+        var bullet = series.bullets.push(new am4charts.CircleBullet());
+        bullet.circle.strokeWidth = 2;
+        bullet.circle.radius = 4;
+        bullet.circle.fill = am4core.color("#fff");
+        
+        
         // Add scrollbar
         chart.scrollbarX = new am4charts.XYChartScrollbar();
         chart.scrollbarX.series.push(series);
@@ -85,40 +92,42 @@ class ExperimentChart extends React.Component {
         let visits = 0;
 
         
-//debugger
         if (this.props.experiments.experiments) {
             let sortedByCreateDT = _.sortBy(this.props.experiments.experiments, (o) => {
                 return o.created;
             });
 
-            var totalHR = Math.round((moment(sortedByCreateDT[sortedByCreateDT.length-1].created) - moment(sortedByCreateDT[0].created)) / 1000 / 3600);
+            if (sortedByCreateDT.length > 0) {
 
-            console.log (totalHR);
+                var totalHR = Math.round((moment(sortedByCreateDT[sortedByCreateDT.length-1].created) - moment(sortedByCreateDT[0].created)) / 1000 / 3600);
 
-            var startHour = moment(sortedByCreateDT[0].created).startOf('hour');
+                console.log (totalHR);
 
-            var countMap = {};
+                var startHour = moment(sortedByCreateDT[0].created).startOf('hour');
 
-            countMap[startHour.toString()] = 0;
+                var countMap = {};
 
-            for (var i=0;i<(totalHR); ++i) {
-                countMap[startHour.add(1, 'hours').toString()] =0;
-            }
+                countMap[startHour.toString()] = 0;
 
-            sortedByCreateDT.forEach(o=> {
-                let startTime = moment(o.created).startOf('hour').toString();
+                for (var i=0;i<(totalHR); ++i) {
+                    countMap[startHour.add(1, 'hours').toString()] =0;
+                }
 
-                if (countMap[startTime] != null)
+                sortedByCreateDT.forEach(o=> {
+                    let startTime = moment(o.created).startOf('hour').toString();
 
-                    countMap[startTime] += 1 ;
+                    if (countMap[startTime] != null)
 
-            });
-            
-            for (var expDate in countMap) {
-                chartData.push({
-                    date: new Date(expDate),
-                    visits: countMap[expDate]
-                })
+                        countMap[startTime] += 1 ;
+
+                });
+                
+                for (var expDate in countMap) {
+                    chartData.push({
+                        date: new Date(expDate),
+                        visits: countMap[expDate]
+                    })
+                }
             }
 
             

@@ -69,6 +69,15 @@ class SimulationChart extends React.Component {
         series.tooltip.background.fillOpacity = 0.5;
         series.tooltip.label.padding(12,12,12,12)
 
+        // Make bullets grow on hover
+        var bullet = series.bullets.push(new am4charts.CircleBullet());
+        bullet.circle.strokeWidth = 2;
+        bullet.circle.radius = 4;
+        bullet.circle.fill = am4core.color("#fff");
+
+        var bullethover = bullet.states.create("hover");
+        bullethover.properties.scale = 1.3;
+
         // Add scrollbar
         chart.scrollbarX = new am4charts.XYChartScrollbar();
         chart.scrollbarX.series.push(series);
@@ -84,8 +93,10 @@ class SimulationChart extends React.Component {
 
         let visits = 0;        
 
-        if (this.props.simulations.simulations) {
-            let sortedByCreateDT = _.sortBy(this.props.simulations.simulations, (o) => {
+        let simulations = this.props.simulations.simulations;
+
+        if (simulations && simulations.length > 0  ) {
+            let sortedByCreateDT = _.sortBy(simulations, (o) => {
                 return o.created;
             });
 
