@@ -90,7 +90,7 @@ class TestLocalCLIBasic(unittest.TestCase):
                 result = self.run_command('experiment', '--platform', 'Local', 'status', base_command='')
                 self.assertEqual(result.exit_code, 0, f'{result.exit_code} - {result.output}')
                 output = re.sub(r'[\+\-]+', '', result.output).split("\n")
-                output = [o for o in output if o]
+                output = [o for o in output if o and len(o) > 3]
                 self.assertEqual(len(output), 5)
                 rows = list(map(lambda x: list(map(str.strip, x)), [s.split('|') for s in output]))[2:]
                 self.assertEqual(rows[0][1], "DDDDD")
