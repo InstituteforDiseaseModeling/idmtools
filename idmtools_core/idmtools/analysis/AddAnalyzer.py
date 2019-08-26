@@ -60,7 +60,7 @@ if __name__ == '__main__':
 
     obj_id = '31d83b39-85b4-e911-a2bb-f0921c167866'
 
-    obj = platform.get_object(id=obj_id, level=1)
+    obj = platform.get_item(id=obj_id, level=1)
     obj.children = platform.get_objects_by_relationship(object=obj, relationship=platform.CHILD)
 
     manager = AnalyzeManager(configuration={}, platform=platform, items=obj.children, analyzers=analyzers)

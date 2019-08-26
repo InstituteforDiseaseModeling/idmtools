@@ -78,7 +78,7 @@ class IPlatform(IEntity, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def get_object(self, id: 'uuid', level: int) -> Any:
+    def get_item(self, id: 'uuid', level: int) -> Any:
         """
         Get an object by its id and specified hierarchy level
         Args:

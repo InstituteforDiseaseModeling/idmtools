@@ -339,17 +339,17 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         for analyzer in analyzers:
             analyzer.per_group(items=items)
 
-    def get_object(self, id: 'uuid', level: int) -> Any:
+    def get_item(self, id: 'uuid', level: int) -> Any:
         # Returned objects must have .level set to an integer (e.g. 0, 1, 2, ...)
         if level == 0:
             raise Exception(f'Unknown id hierarchy level {level} for platform: {self.__class__.__name__}')
         elif level == 1:
-            object = self._retrieve_experiment(experiment_id=id)
+            item = self._retrieve_experiment(experiment_id=id)
         elif level == 2:
             raise Exception(f'Unknown id hierarchy level {level} for platform: {self.__class__.__name__}')
         else:
             raise Exception(f'Unknown id hierarchy level {level} for platform: {self.__class__.__name__}')
-        return object
+        return item
 
     def get_objects_by_relationship(self, object, relationship: int) -> list:
         target_level = object.level + relationship
@@ -372,13 +372,13 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     #
 
     def get_simulation(self, sim_id: 'uuid') -> Any:
-        return self.get_object(id=sim_id, level=0)
+        return self.get_item(id=sim_id, level=0)
 
     def get_experiment(self, exp_id: 'uuid') -> 'TExperiment':
-        return self.get_object(id=exp_id, level=1)
+        return self.get_item(id=exp_id, level=1)
 
     def get_suite(self, suite_id: 'uuid') -> Any:
-        return self.get_object(id=suite_id, level=2)
+        return self.get_item(id=suite_id, level=2)
 
     def get_simulations_in_experiment(self, experiment: 'TExperiment') -> 'TSimulationList':
         return self.get_objects_by_relationship(object=experiment, relationship=self.CHILD)
