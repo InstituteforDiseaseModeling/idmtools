@@ -105,4 +105,6 @@ class TestPythonSimulation(ITestWithPersistence):
         em = ExperimentManager(experiment=pe, platform=platform)
         em.run()
         em.wait_till_done()
+
+        pe_updated = platform.refresh_experiment_status(pe)
         self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))

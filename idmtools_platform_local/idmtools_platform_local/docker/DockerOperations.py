@@ -17,7 +17,7 @@ from docker.models.containers import Container, ExecResult
 from docker.models.networks import Network
 
 from idmtools.core.SystemInformation import get_system_information
-from idmtools.utils.decorators import optional_yaspin_load
+from idmtools.utils.decorators import optional_yaspin_load, cache_for
 from idmtools_platform_local import __version__
 
 logger = getLogger(__name__)
@@ -186,6 +186,7 @@ class DockerOperations:
             network = network[0]
         return network
 
+    @cache_for()
     def get_workers(self, create: bool = True) -> Optional[Container]:
         """
         Gets the workers container

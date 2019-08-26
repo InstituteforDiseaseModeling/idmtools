@@ -1,3 +1,4 @@
+import datetime
 import importlib
 import importlib.util
 import os
@@ -93,6 +94,26 @@ class LoadOnCallSingletonDecorator:
         if not self.created:
             self.instance = self.instance()
             self.created = True
+
+
+def cache_for(ttl=datetime.timedelta(minutes=1)):
+    def wrap(func):
+        time, value = None, None
+        @wraps(func)
+        def wrapped(*args, **kw):
+            # if we are testing, disable caching of functions as it complicates test-all setups
+            if os.getenv('TESTING', '0') .lower() in ['1', 'y', 'true', 'yes', 'on']:
+                return func(*args, **kw)
+
+            nonlocal time
+            nonlocal value
+            now = datetime.datetime.now()
+            if not time or now - time > ttl:
+                value = func(*args, **kw)
+                time = now
+            return value
+        return wrapped
+    return wrap
 
 
 def optional_yaspin_load(*yargs, **ykwargs) -> Callable:
