@@ -4,7 +4,7 @@ const proxy = require('http-proxy-middleware');
 
 module.exports = function(app) {
 
-    const serviceName =  process.env.REACT_APP_SERVICE  || "idmppwks096"
+    const serviceName =  process.env.REACT_APP_SERVICE  || "localhost"
 
     app.use(proxy('/api',
         {
