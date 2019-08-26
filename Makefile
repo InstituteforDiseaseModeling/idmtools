@@ -48,4 +48,4 @@ release-staging-minor-commit: ## perform a release to staging and commit the ver
 	python dev_scripts/run_pymake_on_all.py release-staging-minor-commit
 
 start-webui: ## start the webserver
-	python -c "import os; os.chdir(os.path.join('idmtools_platform_local', 'idmtools_webui')); os.system('yarn start')"
+	python -c "import os; os.chdir(os.path.join('idmtools_platform_local', 'idmtools_webui')); os.system('yarn'); os.system('yarn start')"
