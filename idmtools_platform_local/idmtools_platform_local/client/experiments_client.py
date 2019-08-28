@@ -55,7 +55,10 @@ class ExperimentsClient(BaseClient):
         Returns:
             True if deletion is succeeded
         """
-        response = super().delete(id, params=dict(data=delete_data))
+        params = dict()
+        if delete_data:
+            params['data'] = True
+        response = super().delete(id, params=params)
 
         if response.status_code != 204 and (response.status_code != 404 and ignore_doesnt_exist):
             return False
