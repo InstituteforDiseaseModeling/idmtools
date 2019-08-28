@@ -3,10 +3,8 @@ import {GET_SIMULATIONS, SET_SIMULATION_FILTER} from "../actionTypes";
 const initialState = {
 
     simulations:[],
-    filters: {
-        start:null,
-        end:null
-    }
+    start:null,
+    end:null
 
 };
 

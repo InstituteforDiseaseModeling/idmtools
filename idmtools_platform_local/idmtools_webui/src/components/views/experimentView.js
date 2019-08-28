@@ -11,7 +11,8 @@ import FolderIcon from "@material-ui/icons/Folder";
 import SplitterLayout from 'react-splitter-layout';
 import ExperimentChart from '../charts/experimentChart';
 import * as _ from "lodash";
-
+import {setFilter} from "../../redux/action/experiment";
+import {getExperimentsByFilter} from "../../redux/selectors/experiments";
 
 
 
@@ -70,6 +71,7 @@ class ExperimentView extends React.Component {
         }
         this.rowClick = this.rowClick.bind(this);
         this.deleteExp = this.deleteExp.bind(this);
+        this.dragEnd = this.dragEnd.bind(this);
     }
 
     componentDidMount() {
@@ -95,6 +97,13 @@ class ExperimentView extends React.Component {
     }
 
 
+    dragEnd() {
+
+        this.setState({update:true})
+        //reset filter when splitter resize
+        this.props.dispatch(this.props.dispatch(setFilter(null, null)));
+    }
+
 
     render() {
         const { experiments, classes } = this.props;
@@ -103,8 +112,8 @@ class ExperimentView extends React.Component {
 
         let status, command, tags
         
-        if (this.props.experiments.experiments) 
-            sorted = _.reverse(_.sortBy(this.props.experiments.simulatexperimentsions, (o) => {
+        if (this.props.experiments) 
+            sorted = _.reverse(_.sortBy(this.props.experiments, (o) => {
                 return o.created;
             }));
 
@@ -121,8 +130,8 @@ class ExperimentView extends React.Component {
         
         if (this.state.selectedExp) {
             
-            let index = _.findIndex(this.props.experiments.experiments, {experiment_id: this.state.selectedExp});
-            let exps = this.props.experiments.experiments
+            let index = _.findIndex(this.props.experiments, {experiment_id: this.state.selectedExp});
+            let exps = this.props.experiments
 
             if (index>=0) {
                 status = JSON.stringify(exps[index].progress);
@@ -133,7 +142,7 @@ class ExperimentView extends React.Component {
 
         return (
             <div className={classes.splitter} ref={(ref) => this.scrollParentRef = ref}>
-            <SplitterLayout vertical="false" className={classes.splitter} percentage="true" secondaryInitialSize="60">
+            <SplitterLayout vertical="false" className={classes.splitter} percentage="true" secondaryInitialSize="60" onDragEnd={this.dragEnd} ref={(ref) => this.splitterLayout = ref}>
                 <Paper className={classes.root}>
                     <ExperimentChart/>
                 </Paper>
@@ -153,7 +162,7 @@ class ExperimentView extends React.Component {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {experiments && experiments.experiments && experiments.experiments.map(exp => (
+                                {experiments && experiments.map(exp => (
                                     <TableRow key={exp.experiment_id} onClick={this.rowClick} exp_id={exp.experiment_id} className={exp.experiment_id == this.state.selectedExp ? classes.highlight: null}>
 
                                         <TableCell align="right">{exp.experiment_id}</TableCell>
@@ -216,8 +225,10 @@ class ExperimentView extends React.Component {
 function mapStateToProps(state) {
     
     return ({
+        start: state.experiments.start,
+        end: state.experiments.end,
 
-        experiments: state.experiments
+        experiments: getExperimentsByFilter(state.experiments, state.start, state.end),      
     })
 
 }

@@ -7,6 +7,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { connect } from "react-redux";
 import * as _ from "lodash";
 import * as moment from "moment";
+import {setFilter} from "../../redux/action/experiment";
 
 const styles = theme => ({
 
@@ -37,6 +38,12 @@ class ExperimentChart extends React.Component {
         this.setState({
             mounted: true
         })
+
+        window.onresize = ()=> {
+            this.drawChart();
+            this.props.dispatch(setFilter(null, null));
+        }
+
     }
 
     drawChart() {
@@ -55,15 +62,25 @@ class ExperimentChart extends React.Component {
         let dateAxis = chart.xAxes.push(new am4charts.DateAxis());
         dateAxis.renderer.minGridDistance = 50;
 
+        dateAxis.events.on("rangechangeended" ,function (event) {
+            //when the chart is zoomed in, filtering will apply to simulations
+            if (event.target && event.target.minZoomed) {
+                let start = moment(event.target.minZoomed).startOf('hour'); //new Date(event.target.minZoomed)
+                let end = moment(event.target.maxZoomed).endOf('hour')
+                this.props.dispatch(setFilter(start,end));
+            }
+
+        }.bind(this));
+
         let valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
 
         // Create series
         let series = chart.series.push(new am4charts.LineSeries());
-        series.dataFields.valueY = "visits";
+        series.dataFields.valueY = "exps";
         series.dataFields.dateX = "date";
         series.strokeWidth = 2;
         series.minBulletDistance = 10;
-        series.tooltipText = "{dateX} : {valueY}";
+        series.tooltipText = "{dateX} : {valueY} exp";
         series.tooltip.pointerOrientation = "vertical";
         series.tooltip.background.cornerRadius = 20;
         series.tooltip.background.fillOpacity = 0.5;
@@ -89,11 +106,11 @@ class ExperimentChart extends React.Component {
     generateChartData() {
         let chartData = [];
 
-        let visits = 0;
+        let experiments = this.props.experiments;
 
         
-        if (this.props.experiments.experiments) {
-            let sortedByCreateDT = _.sortBy(this.props.experiments.experiments, (o) => {
+        if (experiments && experiments.length > 0) {
+            let sortedByCreateDT = _.sortBy(experiments, (o) => {
                 return o.created;
             });
 
@@ -125,7 +142,7 @@ class ExperimentChart extends React.Component {
                 for (var expDate in countMap) {
                     chartData.push({
                         date: new Date(expDate),
-                        visits: countMap[expDate]
+                        exps: countMap[expDate]
                     })
                 }
             }
@@ -155,7 +172,7 @@ class ExperimentChart extends React.Component {
 function mapStateToProps(state) {
 
     return ({
-      experiments: state.experiments,      
+      experiments: state.experiments.experiments   
     })
   
   }

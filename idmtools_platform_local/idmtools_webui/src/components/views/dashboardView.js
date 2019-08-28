@@ -81,7 +81,7 @@ class Dashboard extends React.Component {
                         </List>
                     </CardContent>
                 </Card>
-                <Card className = {classes.card} onClick={this.handleCardClick("experiment")}>
+                {/* <Card className = {classes.card} onClick={this.handleCardClick("experiment")}>
                     <CardContent>
                         
                         <Typography variant="h5" className={classes.cardTitle}>COMPS Experiments</Typography>
@@ -112,7 +112,7 @@ class Dashboard extends React.Component {
                             </ListItem>
                         </List>
                     </CardContent>
-                </Card>
+                </Card> */}
                 
 
             </Paper>

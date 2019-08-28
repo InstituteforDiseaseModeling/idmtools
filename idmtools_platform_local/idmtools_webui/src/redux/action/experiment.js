@@ -1,6 +1,6 @@
 
 
-import {GET_EXPERIMENTS, SHOW_ERROR} from "../actionTypes";
+import {GET_EXPERIMENTS, SET_EXPERIMENT_FILTER} from "../actionTypes";
 import {handleResponse} from "../../utils/utils";
 import {showError, showInfo} from "./messaging";
 
@@ -66,4 +66,12 @@ export function fetchExperiments() {
   
             });
     };
+  }
+
+
+  export function setFilter(start, end) {
+    return {
+      type: SET_EXPERIMENT_FILTER,
+      start, end
+    }
   }

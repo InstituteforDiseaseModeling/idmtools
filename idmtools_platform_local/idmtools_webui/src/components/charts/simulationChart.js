@@ -93,10 +93,6 @@ class SimulationChart extends React.Component {
         series.tooltip.label.padding(12,12,12,12)
 
 
-        series.propertychanged = function(fasdf) {
-            debugger
-        }
-
         // Make bullets grow on hover
         var bullet = series.bullets.push(new am4charts.CircleBullet());
         bullet.circle.strokeWidth = 2;
@@ -119,8 +115,6 @@ class SimulationChart extends React.Component {
 
     generateChartData() {
         let chartData = [];
-
-        let visits = 0;        
 
         let simulations = this.props.simulations;
 
@@ -186,8 +180,6 @@ class SimulationChart extends React.Component {
 function mapStateToProps(state) {
 
     return ({
-        // start: state.start,
-        // end: state.end,
       simulations: state.simulations.simulations
     })
   

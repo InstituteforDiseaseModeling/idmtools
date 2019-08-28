@@ -69,8 +69,10 @@ const styles = theme => ({
   snackbar: {
     zIndex:10001,
     top:4
+  },
+  title : {
+    paddingLeft: theme.spacing(1)
   }
-
 
 
 });
@@ -107,14 +109,18 @@ class Layout extends React.Component {
     }
 
 
+
+    let title = selectedView ? selectedView.selectedTitle : 'Dashboard';
+
     return (
       <div className={classes.root}>
 
         <AppBar position="fixed" className={classes.appBar}>
           <Toolbar>
             <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
-              <MenuIcon />
+              <MenuIcon />              
             </IconButton>
+            <Typography variant="h5" className={classes.title}>{title}</Typography>
             
           </Toolbar>
 
@@ -125,7 +131,7 @@ class Layout extends React.Component {
 
                 <div className={classes.logo}>
                   <img src={idmlogo} title="Institute for Disease Modeling" alt={"IDMlogo"} className={classes.idmlogo}></img>
-                  <Typography variant="h5" className={classes.heading} >IDM Tools</Typography>
+                  <Typography variant="h5" className={classes.heading}>IDM Tools</Typography>
                 </div>
               
             </div>

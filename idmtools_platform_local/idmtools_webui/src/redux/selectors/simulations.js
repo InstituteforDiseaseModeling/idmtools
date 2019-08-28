@@ -5,15 +5,8 @@ const startDate = state => state.start;
 const endDate = state => state.end;
 const simulations = state => state.simulations;
 
-// export const getSelectedSubjectId = createSelector(
-//     [getSelectedSubjectId, getSubjects],
-//     (id, subjects) => {
-//         return id;  //_.find(subjects, {"sid":id});
-//     }
-// );
-
  /**
- * Returns only the subjects satisfying the filters
+ * Returns only the simulations satisfying the filters
  */
 export const getSimulationsByFilter = createSelector(
     [simulations, startDate, endDate],
@@ -22,8 +15,7 @@ export const getSimulationsByFilter = createSelector(
         var result =  _.compact(simulations.map(sim => {
 
             let created = new Date(sim.created);
-            if (created <= end && created >= start)
-            //todo: if (filters.showOnlyConsensus & ...
+            if (created <= end && created >= start)            
                 return sim;
             else 
                 return null;
