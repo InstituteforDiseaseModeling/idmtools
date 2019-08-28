@@ -7,6 +7,8 @@ import { withStyles } from '@material-ui/core/styles';
 import { connect } from "react-redux";
 import * as _ from "lodash";
 import * as moment from "moment";
+import {setFilter} from "../../redux/action/simulation";
+
 
 const styles = theme => ({
 
@@ -37,6 +39,12 @@ class SimulationChart extends React.Component {
         this.setState({
             mounted: true
         })
+
+        window.onresize = ()=> {
+            this.drawChart();
+            this.props.dispatch(setFilter(null, null));
+        }
+
     }
 
     drawChart() {
@@ -52,22 +60,42 @@ class SimulationChart extends React.Component {
         // Add data
         chart.data = this.generateChartData();
 
+
         let dateAxis = chart.xAxes.push(new am4charts.DateAxis());
         dateAxis.renderer.minGridDistance = 50;
+
+
+
+        dateAxis.events.on("rangechangeended" ,function (event) {
+            //when the chart is zoomed in, filtering will apply to simulations
+            if (event.target && event.target.minZoomed) {
+                let start = new Date(event.target.minZoomed)
+                let end = new Date(event.target.maxZoomed)
+                this.props.dispatch(setFilter(start,end));
+            }
+
+        }.bind(this));
+
+
 
         let valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
 
         // Create series
         let series = chart.series.push(new am4charts.LineSeries());
-        series.dataFields.valueY = "visits";
+        series.dataFields.valueY = "sims";
         series.dataFields.dateX = "date";
         series.strokeWidth = 2;
         series.minBulletDistance = 10;
-        series.tooltipText = "{dateX} : {valueY}";
+        series.tooltipText = "{dateX} : {valueY} sims";
         series.tooltip.pointerOrientation = "vertical";
         series.tooltip.background.cornerRadius = 20;
         series.tooltip.background.fillOpacity = 0.5;
         series.tooltip.label.padding(12,12,12,12)
+
+
+        series.propertychanged = function(fasdf) {
+            debugger
+        }
 
         // Make bullets grow on hover
         var bullet = series.bullets.push(new am4charts.CircleBullet());
@@ -88,12 +116,13 @@ class SimulationChart extends React.Component {
         chart.cursor.snapToSeries = series;
     }
 
+
     generateChartData() {
         let chartData = [];
 
         let visits = 0;        
 
-        let simulations = this.props.simulations.simulations;
+        let simulations = this.props.simulations;
 
         if (simulations && simulations.length > 0  ) {
             let sortedByCreateDT = _.sortBy(simulations, (o) => {
@@ -127,7 +156,7 @@ class SimulationChart extends React.Component {
             for (var simDate in countMap) {
                 chartData.push({
                     date: new Date(simDate),
-                    visits: countMap[simDate]
+                    sims: countMap[simDate]
                 })
             }
 
@@ -143,8 +172,9 @@ class SimulationChart extends React.Component {
         const {classes} = this.props;
 
 
-        if (this.state.mounted)
+        if (this.state.mounted) {
             this.drawChart();
+        }
 
         return (
             <div id="chartdiv" className={classes.chartContainer}/>
@@ -156,7 +186,9 @@ class SimulationChart extends React.Component {
 function mapStateToProps(state) {
 
     return ({
-      simulations: state.simulations,      
+        // start: state.start,
+        // end: state.end,
+      simulations: state.simulations.simulations
     })
   
   }

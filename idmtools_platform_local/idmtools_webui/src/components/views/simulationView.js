@@ -10,8 +10,8 @@ import {formatDateString} from  "../../utils/utils";
 import SplitterLayout from 'react-splitter-layout';
 import SimulationChart from '../charts/simulationChart';
 import * as _ from "lodash";
-import { callbackify } from "util";
-
+import {setFilter} from "../../redux/action/simulation";
+import {getSimulationsByFilter} from "../../redux/selectors/simulations";
 
 const styles = theme => ({
     folder: {
@@ -65,6 +65,7 @@ class SimulationView extends React.Component {
         }
         this.rowClick = this.rowClick.bind(this);
         this.cancelSim = this.cancelSim.bind(this);
+        this.dragEnd = this.dragEnd.bind(this);
     }
 
     componentDidMount() {
@@ -90,6 +91,13 @@ class SimulationView extends React.Component {
         });
     }
 
+    dragEnd() {
+
+        this.setState({update:true})
+        //reset filter when splitter resize
+        this.props.dispatch(this.props.dispatch(setFilter(null, null)));
+    }
+
 
     render() {
 
@@ -99,26 +107,33 @@ class SimulationView extends React.Component {
 
         let status, command, tags
         
-        if (this.props.simulations.simulations) 
-            sorted = _.reverse(_.sortBy(this.props.simulations.simulations, (o) => {
+        if (this.props.simulations) 
+            sorted = _.reverse(_.sortBy(this.props.simulations, (o) => {
                 return o.created;
             }));
 
         if (this.state.selectedSim) {
             
-            let index = _.findIndex(this.props.simulations.simulations, {simulation_uid: this.state.selectedSim});
-            let sims = this.props.simulations.simulations
-            status = sims[index].status;
-            command =  sims[index].extra_details.command;
-            tags = JSON.stringify( sims[index].tags);
+            let index = _.findIndex(this.props.simulations, {simulation_uid: this.state.selectedSim});
+
+            if (index >= 0) {
+                let sims = this.props.simulations
+                status = sims[index].status;
+                command =  sims[index].extra_details.command;
+                tags = JSON.stringify( sims[index].tags);                
+            } else {
+                this.state.selectedSim = null;
+            }
+
         }
 
+        let splitterKey = this.splitterLayout ? this.splitterLayout.state.secondaryPaneSize : 0;
 
         return (
             <div className={classes.splitter} ref={(ref) => this.scrollParentRef = ref}>
-            <SplitterLayout vertical="false" className={classes.splitter} percentage="true" secondaryInitialSize="60">
+            <SplitterLayout vertical="false" className={classes.splitter} percentage="true" secondaryInitialSize="60" onDragEnd={this.dragEnd} ref={(ref) => this.splitterLayout = ref}>
                 <Paper className={classes.root}>
-                    <SimulationChart/>
+                    <SimulationChart key={splitterKey}/>
                 </Paper>
                 
                 <SplitterLayout vertical="false" percentage="true" secondaryInitialSize="50">
@@ -202,9 +217,12 @@ class SimulationView extends React.Component {
 }
 
 function mapStateToProps(state) {
-    
+
+
     return ({
-        simulations: state.simulations
+        start: state.start,
+        end: state.end,
+        simulations: getSimulationsByFilter(state.simulations, state.start, state.end),      
     })
 
 }

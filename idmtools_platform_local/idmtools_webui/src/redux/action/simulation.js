@@ -1,4 +1,4 @@
-import {GET_SIMULATIONS, SHOW_ERROR} from "../actionTypes";
+import {GET_SIMULATIONS, SET_SIMULATION_FILTER} from "../actionTypes";
 import {handleResponse} from "../../utils/utils";
 import {showError, showInfo} from "./messaging";
 
@@ -65,4 +65,12 @@ export function cancelSimulation(id) {
   
             });
     };
+  }
+
+
+  export function setFilter(start, end) {
+    return {
+      type: SET_SIMULATION_FILTER,
+      start, end
+    }
   }

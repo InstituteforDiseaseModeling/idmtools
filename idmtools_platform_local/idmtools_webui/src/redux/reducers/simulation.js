@@ -1,8 +1,12 @@
-import {GET_SIMULATIONS} from "../actionTypes";
+import {GET_SIMULATIONS, SET_SIMULATION_FILTER} from "../actionTypes";
 
 const initialState = {
 
-    
+    simulations:[],
+    filters: {
+        start:null,
+        end:null
+    }
 
 };
 
@@ -14,6 +18,11 @@ export function simulations(state=initialState, action) {
         case GET_SIMULATIONS:
             return {...state, 
                 simulations: action.data};
+        case SET_SIMULATION_FILTER:
+            return {...state,
+                start: action.start, 
+                end:action.end
+            }
         default:
             return state;
     }
