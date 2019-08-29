@@ -4,8 +4,9 @@ import { withStyles } from '@material-ui/core/styles';
 import { connect } from "react-redux";
 import { fetchSimulations, cancelSimulation } from "../../redux/action/simulation"
 import { Table, TableHead, TableCell, TableRow, TableBody, Paper, Button, Typography, Divider,
-        Card, CardContent, List, ListItem, ListItemText, TextField } from "@material-ui/core";
+        Card, CardContent, List, ListItem, ListItemText, Grid, IconButton } from "@material-ui/core";
 import FolderIcon from "@material-ui/icons/Folder";
+import ClearIcon from "@material-ui/icons/Clear";
 import {formatDateString} from  "../../utils/utils";
 import SplitterLayout from 'react-splitter-layout';
 import SimulationChart from '../charts/simulationChart';
@@ -53,6 +54,10 @@ const styles = theme => ({
      },
      highlight:{
          backgroundColor:'#43a047'
+     },
+     clearIcon: {
+         color:'red',
+         
      }
 })
 
@@ -66,6 +71,7 @@ class SimulationView extends React.Component {
         this.rowClick = this.rowClick.bind(this);
         this.cancelSim = this.cancelSim.bind(this);
         this.dragEnd = this.dragEnd.bind(this);
+        this.closeDetails = this.closeDetails.bind(this);
     }
 
     componentDidMount() {
@@ -96,6 +102,12 @@ class SimulationView extends React.Component {
         this.setState({update:true})
         //reset filter when splitter resize
         this.props.dispatch(this.props.dispatch(setFilter(null, null)));
+    }
+
+    closeDetails() {
+        this.setState( {
+            selectedSim: null
+        });
     }
 
 
@@ -162,7 +174,9 @@ class SimulationView extends React.Component {
                                         <TableCell align="right">{sim.experiment_id}</TableCell>
                                         <TableCell align="right">
                                             <a target="_blank" href={'http://' + window.location.hostname + ':5000' + sim.data_path}>
-                                            <FolderIcon className={classes.folder}/>
+                                                <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
+                                                    <FolderIcon className={classes.folder}/>
+                                                </IconButton>
                                             </a>
                                         </TableCell>
                                         <TableCell align="center">
@@ -180,8 +194,16 @@ class SimulationView extends React.Component {
                         <Paper className={classes.details}>
                             <Card className = {classes.card}>
                                 <CardContent>
-                                    
-                                    <Typography variant="h5" className={classes.cardTitle}>Details</Typography>
+                                    <Grid container justify="space-between">
+                                        <Grid item>
+                                            <Typography variant="h5" className={classes.cardTitle}>Details</Typography>
+                                        </Grid>
+                                        <Grid item>
+                                            <IconButton edge="start" onClick={this.closeDetails} className={classes.menuButton} color="inherit" aria-label="menu">
+                                                <ClearIcon className={classes.clearIcon}/>
+                                            </IconButton>
+                                        </Grid>
+                                    </Grid>
                                     <Divider/>
                                     <List>
                                         <ListItem>

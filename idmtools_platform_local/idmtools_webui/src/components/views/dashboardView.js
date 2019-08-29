@@ -13,7 +13,8 @@ const styles = theme => ({
         maxWidth: 400,
         width:200,
         margin:10,
-        height:300
+        height:300,
+        cursor:'pointer'
        
     },
     paper : {
@@ -44,8 +45,26 @@ class Dashboard extends React.Component {
     render() {
         const {classes, simulations, experiments} = this.props;
 
-        const simCount = simulations.simulations ? simulations.simulations.length : 0;
-        const expCount = experiments.experiments ? experiments.experiments.length : 0 ;
+        
+        let simStatus = { done:0, 'in progress':0, created:0 };
+
+        let expCount = 0;
+
+        if (simulations.simulations) {
+            simulations.simulations.map((sim)=> {
+                simStatus[sim.status] += 1;
+            })
+        }
+
+        if (experiments.experiments) {
+            expCount = experiments.experiments.length;
+            // experiments.experiments.map((exp)=> {
+            //     expStatus["done"] += exp.progress[0].done ? exp.progress[0].done : 0;
+            //     expStatus["in progress"] += exp.progress[0].inProgress ? exp.progress[0].inProgress : 0;
+            //     expStatus["created"] += exp.progress[0].created ? exp.progress[0].created : 0;
+            // })
+        }
+
 
         return (
             <Paper className = {classes.paper}>
@@ -56,29 +75,29 @@ class Dashboard extends React.Component {
                         <Divider/>
                         <List>
                             <ListItem>
-                                <ListItemText>Completed:{expCount}</ListItemText>
+                                <ListItemText>Count:{expCount}</ListItemText>
                             </ListItem>
-                            <ListItem>
-                                <ListItemText>Running:</ListItemText>
-                            </ListItem>
-
                         </List>
                     </CardContent>
                 </Card>
                 
                 <Card className = {classes.card} onClick={this.handleCardClick("simulation")}>
-                    <CardContent>
-                        
+                    <CardContent>                        
                         <Typography variant="h5" className={classes.cardTitle}>Local Simulations</Typography>
                         <Divider/>
+                        
                         <List>
                             <ListItem>
-                                <ListItemText>Completed:{simCount}</ListItemText>
+                                <ListItemText>Done:{simStatus.done}</ListItemText>
                             </ListItem>
                             <ListItem>
-                                <ListItemText>Running:</ListItemText>
+                                <ListItemText>In progress:{simStatus['in progress']}</ListItemText>
+                            </ListItem>
+                            <ListItem>
+                                <ListItemText>Created:{simStatus.created}</ListItemText>
                             </ListItem>
                         </List>
+                        
                     </CardContent>
                 </Card>
                 {/* <Card className = {classes.card} onClick={this.handleCardClick("experiment")}>

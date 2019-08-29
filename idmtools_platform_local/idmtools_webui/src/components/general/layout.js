@@ -34,7 +34,7 @@ const styles = theme => ({
     display:'flex',
     padding: '10px 20px'
   },
-  idmlogo: {
+  idmlogo: { 
     //position: 'absolute',
     //clip: 'rect(0px, 45px, 100px,0px)',
     marginTop:5,

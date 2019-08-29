@@ -4,10 +4,11 @@ import { withStyles } from '@material-ui/core/styles';
 import { connect } from "react-redux";
 import { fetchExperiments, deleteExperiment } from "../../redux/action/experiment"
 import { Table, TableHead, TableCell, TableRow, TableBody, Paper, Button, Typography, Divider,
-    Card, CardContent, List, ListItem, ListItemText, TextField } from "@material-ui/core";
+    Card, CardContent, List, ListItem, ListItemText, Grid, IconButton } from "@material-ui/core";
 
 import {formatDateString} from  "../../utils/utils";
 import FolderIcon from "@material-ui/icons/Folder";
+import ClearIcon from "@material-ui/icons/Clear";
 import SplitterLayout from 'react-splitter-layout';
 import ExperimentChart from '../charts/experimentChart';
 import * as _ from "lodash";
@@ -58,7 +59,12 @@ const styles = theme => ({
      },
      highlight:{
          backgroundColor:'#43a047'
-     }
+     }, 
+     clearIcon: {
+        color:'red',
+        
+    }
+
 })
 
 class ExperimentView extends React.Component {
@@ -72,6 +78,7 @@ class ExperimentView extends React.Component {
         this.rowClick = this.rowClick.bind(this);
         this.deleteExp = this.deleteExp.bind(this);
         this.dragEnd = this.dragEnd.bind(this);
+        this.closeDetails = this.closeDetails.bind(this);
     }
 
     componentDidMount() {
@@ -105,6 +112,13 @@ class ExperimentView extends React.Component {
     }
 
 
+    closeDetails() {
+        this.setState( {
+            selectedExp: null
+        });
+    }
+
+
     render() {
         const { experiments, classes } = this.props;
 
@@ -114,7 +128,7 @@ class ExperimentView extends React.Component {
         
         if (this.props.experiments) 
             sorted = _.reverse(_.sortBy(this.props.experiments, (o) => {
-                return o.created;
+                return new Date(o.created);
             }));
 
         var progressStr = (progressObj) => {
@@ -140,11 +154,13 @@ class ExperimentView extends React.Component {
             }
         }
 
+        let splitterKey = this.splitterLayout ? this.splitterLayout.state.secondaryPaneSize : 0;
+
         return (
             <div className={classes.splitter} ref={(ref) => this.scrollParentRef = ref}>
             <SplitterLayout vertical="false" className={classes.splitter} percentage="true" secondaryInitialSize="60" onDragEnd={this.dragEnd} ref={(ref) => this.splitterLayout = ref}>
                 <Paper className={classes.root}>
-                    <ExperimentChart/>
+                    <ExperimentChart key={splitterKey}/>
                 </Paper>
                 
                 <SplitterLayout vertical="false" percentage="true" secondaryInitialSize="50">
@@ -162,7 +178,7 @@ class ExperimentView extends React.Component {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {experiments && experiments.map(exp => (
+                                {sorted && sorted.map(exp => (
                                     <TableRow key={exp.experiment_id} onClick={this.rowClick} exp_id={exp.experiment_id} className={exp.experiment_id == this.state.selectedExp ? classes.highlight: null}>
 
                                         <TableCell align="right">{exp.experiment_id}</TableCell>
@@ -189,7 +205,16 @@ class ExperimentView extends React.Component {
                             <Card className = {classes.card}>
                                 <CardContent>
                                     
-                                    <Typography variant="h5" className={classes.cardTitle}>Details</Typography>
+                                    <Grid container justify="space-between">
+                                        <Grid item>
+                                            <Typography variant="h5" className={classes.cardTitle}>Details</Typography>
+                                        </Grid>
+                                        <Grid item>
+                                            <IconButton edge="start" onClick={this.closeDetails} className={classes.menuButton} color="inherit" aria-label="menu">
+                                                <ClearIcon className={classes.clearIcon}/>
+                                            </IconButton>
+                                        </Grid>
+                                    </Grid>
                                     <Divider/>
                                     <List>
                                         <ListItem>

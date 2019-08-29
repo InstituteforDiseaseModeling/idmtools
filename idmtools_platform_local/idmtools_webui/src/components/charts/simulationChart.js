@@ -124,7 +124,7 @@ class SimulationChart extends React.Component {
             });
 
 
-            var totalHR = Math.round((moment(sortedByCreateDT[sortedByCreateDT.length-1].created) - moment(sortedByCreateDT[0].created)) / 1000 / 3600);
+            var totalHR = Math.round((moment(sortedByCreateDT[sortedByCreateDT.length-1].created).endOf('hour') - moment(sortedByCreateDT[0].created).startOf('hour')) / 1000 / 3600);
 
             console.log (totalHR);
 

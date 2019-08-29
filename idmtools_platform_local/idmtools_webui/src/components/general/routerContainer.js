@@ -33,7 +33,7 @@ class RouterContainer extends Component {
            <article style={{height:'100%'}}>
              <Route exact path="/" render={this.renderContent(DASHBOARD_VIEW, 'Dashboard')} />
              <Route exact path="/dashboard" render={this.renderContent(DASHBOARD_VIEW, 'Dashboard')} />
-             <Route exact path="/experiment" render={this.renderContent(EXPERIMENT_VIEW, 'Experiement')} />
+             <Route exact path="/experiment" render={this.renderContent(EXPERIMENT_VIEW, 'Experiment')} />
              <Route exact path="/simulation" render={this.renderContent(SIMULATION_VIEW, 'Simulation')} />
            </article>
          </Router>
