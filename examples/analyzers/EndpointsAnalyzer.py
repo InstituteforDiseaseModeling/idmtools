@@ -1,8 +1,8 @@
 import sys
 import numpy as np
 import pandas as pd
-#from idmtools.analysis.AnalyzeManager import AnalyzeManager
-from idmtools.managers import AnalyzeManager
+from idmtools.analysis.AnalyzeManager import AnalyzeManager
+#from idmtools.managers import AnalyzeManager
 from idmtools.analysis.AddAnalyzer import AddAnalyzer
 from idmtools.entities import IAnalyzer
 from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
@@ -88,5 +88,6 @@ if __name__ == "__main__":
                         analyzers=[EndpointsAnalyzer(save_file="endpoints_{}.csv".format(exp_id))],
                         platform=p)
     # am.add_analyzer(EndpointsAnalyzer(save_file="endpoints_{}.csv".format(expid)))
-    exp = retrieve_experiment(exp_id)
+    # exp = retrieve_experiment(exp_id) #TODO: this doesn't work; will it be fixed?
+    obj = p.get_item(id=exp_id, level=1)  # level 1 is an 'experiment' (a grouping of run items)
     am.analyze()
