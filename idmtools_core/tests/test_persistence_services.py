@@ -2,9 +2,9 @@ import unittest
 
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.services.platforms import PlatformPersistService
-from tests.utils.ITestWithPersistence import ITestWithPersistence
-from tests.utils.TestExperiment import TestExperiment
-from tests.utils.TestPlatform import TestPlatform
+from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_test.utils.TstExperiment import TstExperiment
+from idmtools_test.utils.TestPlatform import TestPlatform
 
 
 class TestPersistenceServices(ITestWithPersistence):
@@ -16,7 +16,7 @@ class TestPersistenceServices(ITestWithPersistence):
         self.assertEqual(p, p2)
 
     def test_persist_retrieve_experiment(self):
-        e = TestExperiment("test")
+        e = TstExperiment("test")
         e.simulation()
         ExperimentPersistService.save(e)
         e2 = ExperimentPersistService.retrieve(e.uid)

@@ -6,13 +6,13 @@ from functools import partial
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core import DuplicatedAssetError, FilterMode
 from idmtools.utils.filters.asset_filters import asset_in_directory, file_name_is
-from tests import INPUT_PATH
+from idmtools_test import COMMON_INPUT_PATH
 
 
 class TestAssets(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.base_path = os.path.abspath(os.path.join(INPUT_PATH, "assets", "collections"))
+        self.base_path = os.path.abspath(os.path.join(COMMON_INPUT_PATH, "assets", "collections"))
 
     def test_hashing(self):
         a = Asset(relative_path="1", absolute_path=os.path.join(self.base_path, "1", "a.txt"))
@@ -90,6 +90,38 @@ class TestAssets(unittest.TestCase):
         ac.uid = 3
         self.assertEqual(ac.uid, 3)
 
+    def test_bad_asset_path_empty_file(self):
+        ac = AssetCollection()
+        self.assertEqual(ac.count, 0)
+        self.assertIsNone(ac.uid)
+
+        with self.assertRaises(ValueError) as context:
+            ac.add_asset(Asset())
+        self.assertTrue('Impossible to create the asset without either absolute path or filename and content!' in str(
+            context.exception.args[0]))
+
+    def test_assets_collection_from_dir_flatten(self):
+        assets_to_find = [
+            Asset(absolute_path=os.path.join(self.base_path, "d.txt")),
+            Asset(relative_path='', absolute_path=os.path.join(self.base_path, "1", "a.txt")),
+            Asset(relative_path='', absolute_path=os.path.join(self.base_path, "1", "b.txt")),
+            Asset(relative_path='', absolute_path=os.path.join(self.base_path, "2", "c.txt"))
+        ]
+        ac = AssetCollection.from_directory(assets_directory=self.base_path, flatten=True)
+
+        self.assertSetEqual(set(ac.assets), set(assets_to_find))
+
+    @unittest.skip("wait until fix issue #306")
+    def test_assets_collection_from_dir_flatten_forced_relative_path(self):
+        assets_to_find = [
+            Asset(absolute_path=os.path.join(self.base_path, "d.txt")),
+            Asset(relative_path='assets_dir', absolute_path=os.path.join(self.base_path, "1", "a.txt")),
+            Asset(relative_path='assets_dir', absolute_path=os.path.join(self.base_path, "1", "b.txt")),
+            Asset(relative_path='assets_dir', absolute_path=os.path.join(self.base_path, "2", "c.txt"))
+        ]
+        ac = AssetCollection.from_directory(assets_directory=self.base_path, flatten=True, relative_path="assets_dir")
+
+        self.assertSetEqual(set(ac.assets), set(assets_to_find))
 
 if __name__ == '__main__':
     unittest.main()

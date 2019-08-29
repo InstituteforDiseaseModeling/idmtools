@@ -1,12 +1,12 @@
 import os
 import numpy as np
 from functools import partial
-from idmtools.builders import ArmExperimentBuilder, ArmType, SweepArm
+from idmtools.builders import ArmExperimentBuilder, SweepArm, ArmType
 from idmtools.builders import YamlExperimentBuilder
 from idmtools.builders import CsvExperimentBuilder
-from tests.utils.ITestWithPersistence import ITestWithPersistence
-from tests.utils.TestExperiment import TestExperiment
-from tests import INPUT_PATH
+from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_test.utils.TstExperiment import TstExperiment
+from idmtools_test import COMMON_INPUT_PATH
 
 
 def param_update(simulation, param, value):
@@ -23,7 +23,7 @@ class TestMultipleBuilders(ITestWithPersistence):
 
     def setUp(self):
         super().setUp()
-        self.base_path = os.path.abspath(os.path.join(INPUT_PATH, "builder"))
+        self.base_path = os.path.abspath(os.path.join(COMMON_INPUT_PATH, "builder"))
         self.arm_builder = ArmExperimentBuilder()
         self.yaml_builder = YamlExperimentBuilder()
         self.csv_builder = CsvExperimentBuilder()
@@ -50,7 +50,7 @@ class TestMultipleBuilders(ITestWithPersistence):
         self.arm_builder.add_arm(arm)
 
         # add individual builders
-        experiment = TestExperiment("test")
+        experiment = TstExperiment("test")
         experiment.add_builder(self.yaml_builder)
         experiment.add_builder(self.csv_builder)
         experiment.add_builder(self.arm_builder)
@@ -67,7 +67,7 @@ class TestMultipleBuilders(ITestWithPersistence):
         self.arm_builder.add_arm(arm)
 
         # add individual builders
-        experiment = TestExperiment("test")
+        experiment = TstExperiment("test")
         experiment.add_builder(self.arm_builder)
         experiment.add_builder(self.arm_builder)
 
@@ -81,7 +81,7 @@ class TestMultipleBuilders(ITestWithPersistence):
         self.arm_builder.add_arm(arm)
 
         # add individual builders
-        experiment = TestExperiment("test")
+        experiment = TstExperiment("test")
         experiment.builder = self.arm_builder
         experiment.builder = self.csv_builder
         experiment.builder = self.yaml_builder
@@ -93,7 +93,7 @@ class TestMultipleBuilders(ITestWithPersistence):
         self.assertTrue(isinstance(list(experiment.builders)[0], YamlExperimentBuilder))
 
     def test_validation(self):
-        a = TestExperiment(name="test")
+        a = TstExperiment(name="test")
         self.assertSetEqual(a.pickle_ignore_fields, {'builders'})
 
         with self.assertRaises(Exception):
