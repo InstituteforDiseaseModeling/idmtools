@@ -5,21 +5,8 @@ from idmtools.entities.IAnalyzer import IAnalyzer
 
 class AddAnalyzer(IAnalyzer):
     """
-    Download Analyzer
-    A simple base class that will download the files specified in filenames without further treatment.
-
-    Can be used by creating a child class:
-
-    .. code-block:: python
-
-        class InsetDownloader(DownloadAnalyzer):
-            filenames = ['output/InsetChart.json']
-
-    Or by directly calling it:
-
-    .. code-block:: python
-
-        analyzer = DownloadAnalyzer(filenames=['output/InsetChart.json'])
+    Add Analyzer
+    A simple base class to add analyzers.
 
     """
     def __init__(self, filenames=None, output_path='output'):

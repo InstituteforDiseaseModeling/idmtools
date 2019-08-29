@@ -115,13 +115,38 @@ class TestDTK(ITestWithPersistence):
         em.wait_till_done()
         self.assertTrue(e.succeeded)
 
-    #TODO: need working Eradication.exe and where to load from
     def test_simulations_with_config_exe(self):
         idm = IdmConfigParser()
         exe_path = idm.get_option("Custom_Local", 'exe_path')
 
         e = DTKExperiment.from_default(self.case_name, default=DTKSIR, eradication_path=exe_path)
         e.tags = {"idmtools": "idmtools-automation", "local_config": "exe_path"}
+
+        e.base_simulation.set_parameter("Enable_Immunity", 0)
+
+        def param_a_update(simulation, value):
+            simulation.set_parameter("Run_Number", value)
+            return {"Run_Number": value}
+
+        builder = ExperimentBuilder()
+        # Sweep parameter "Run_Number"
+        builder.add_sweep_definition(param_a_update, range(0, 2))
+        e.builder = builder
+        em = ExperimentManager(platform=self.p, experiment=e)
+        em.run()
+        em.wait_till_done()
+        self.assertTrue(e.succeeded)
+
+    def test_simulations_from_files(self):
+        DEFAULT_CONFIG_PATH = os.path.join(COMMON_INPUT_PATH, "files", "config.json")
+        DEFAULT_CAMPAIGN_JSON = os.path.join(COMMON_INPUT_PATH, "files", "campaign.json")
+        DEFAULT_DEMOGRAPHICS_JSON = os.path.join(COMMON_INPUT_PATH, "files", "demographics.json")
+        DEFAULT_ERADICATION_PATH = os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe")
+
+        e = DTKExperiment.from_files(self.case_name, eradication_path=DEFAULT_ERADICATION_PATH,
+                                     config_path=DEFAULT_CONFIG_PATH, campaign_path=DEFAULT_CAMPAIGN_JSON,
+                                     demographics_paths=DEFAULT_DEMOGRAPHICS_JSON, )
+        e.tags = {"idmtools": "idmtools-automation", "from_files": "exe_config_campaign_demo"}
 
         e.base_simulation.set_parameter("Enable_Immunity", 0)
 
