@@ -4,8 +4,7 @@ from functools import partial
 from typing import Any, Callable, List, Mapping, Type, TYPE_CHECKING, TypeVar, Union, Dict
 
 if TYPE_CHECKING:
-    from idmtools.analysis import IAnalyzer
-    from idmtools.entities import CommandLine, IExperiment, IPlatform, ISimulation, ISuite, IItem
+    from idmtools.entities import CommandLine, IExperiment, IPlatform, ISimulation, ISuite, IItem, IAnalyzer
     from idmtools.assets import Asset, AssetCollection
     from idmtools.builders import ExperimentBuilder
 
