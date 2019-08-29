@@ -1,4 +1,4 @@
-from idmtools.analysis import IAnalyzer
+from idmtools.entities import IAnalyzer
 from idmtools.managers import AnalyzeManager
 from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
 

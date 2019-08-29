@@ -7,3 +7,5 @@ from idmtools.entities.ISuite import ISuite
 from idmtools.entities.IItem import IItem
 from idmtools.entities.IRootItem import IRootItem
 from idmtools.entities.IContainerItem import IContainerItem
+from idmtools.entities.IAnalyzer import IAnalyzer
+
