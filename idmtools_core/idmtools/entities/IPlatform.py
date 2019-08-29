@@ -40,75 +40,70 @@ class IPlatform(IEntity, metaclass=ABCMeta):
             self.update_from_config()
 
     @abstractmethod
-    def create_objects(self, objects) -> 'List[uuid]':
+    def create_items(self, items: 'TItem') -> 'List[uuid]':
         """
         Function creating e.g. sims/exps/suites on the platform
         Args:
-            objects: The batch of objects to create
+            items: The batch of items to create
         Returns: List of ids created
         """
         pass
 
     @abstractmethod
-    def run_objects(self, objects) -> NoReturn:
+    def run_items(self, items: 'TItem') -> NoReturn:
         """
-        Run the objects (sims, exps, suites) on the platform
+        Run the items (sims, exps, suites) on the platform
         Args:
-            objects: The objects to run
+            items: The items to run
         """
         pass
 
     @abstractmethod
-    def send_assets(self, object, **kwargs) -> NoReturn:
+    def send_assets(self, item: 'TItem', **kwargs) -> NoReturn:
         """
-        Send the assets for a given object (sim, experiment, suite, etc) to the platform.
+        Send the assets for a given item (sim, experiment, suite, etc) to the platform.
         Args:
-            object: The object to process. Expected to have an `assets` attribute containing the collection.
+            item: The item to process. Expected to have an `assets` attribute containing the collection.
             **kwargs: Extra parameters used by the platform
         """
         pass
 
     @abstractmethod
-    def refresh_status(self, object) -> NoReturn:
+    def refresh_status(self, item) -> NoReturn:
         """
-        Populate the platform object and specified object with its status.
+        Populate the platform item and specified item with its status.
         Args:
-            object: The object to check status for
+            item: The item to check status for
         """
         pass
 
     @abstractmethod
-    def get_item(self, id: 'uuid', level: int) -> Any:
+    def get_item(self, id: 'uuid') -> Any:
         """
-        Get an object by its id and specified hierarchy level
+        Get an item by its id. The implementing classes must know how to distinguish
+        items of different levels (e.g. simulation, experiment, ...)
         Args:
-            id: the id of the object to obtain
-            level: 0 for a base object, > 0 for hierarchical groupings of base objects
+            id: the id of the item to obtain
 
-        Returns: the specified object
-
+        Returns: the specified item
         """
         pass
 
+    # TODO: add doc comments to get_prent/children methods
     @abstractmethod
-    def get_objects_by_relationship(self, object, relationship: int) -> list:
-        """
-        Obtain objects by parent/child relationships relative to another object
-        Args:
-            object: the reference object
-            relationship: The desired object(s) are of this relationship to the provided object
+    def get_parent(self, item: 'TItem') -> 'TItem':
+        pass
 
-        Returns: a list of objects related to 'object' in the specified way
-
-        """
+    @abstractmethod
+    def get_children(self, item: 'TItem') -> 'TItemList':
         pass
 
     @abstractmethod
     def get_files(self, item: 'TItem', files: 'List[str]') -> 'Dict[str, bytearray]':
         """
-        Obtain specified files related to the given object (an Item, a base object)
+        Obtain specified files related to the given item (an Item, a base item)
         Args:
-            item: object to retrieve file data for
+            item: item to retrieve file data for
             files: relative-path files to obtain
 
         Returns: a dict of file-path-keyed file data
