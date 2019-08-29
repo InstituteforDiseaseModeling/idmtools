@@ -8,13 +8,14 @@ from more_itertools import grouper
 from idmtools.core import EntityContainer
 from idmtools.core.interfaces.IAssetsEnabled import IAssetsEnabled
 from idmtools.core.interfaces.INamedEntity import INamedEntity
+from idmtools.entities.IContainerItem import IContainerItem
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TSimulation, TSimulationClass, TCommandLine, TExperimentBuilder
 
 
 @dataclass(repr=False)
-class IExperiment(IAssetsEnabled, INamedEntity, ABC):
+class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
     """
     Represents a generic Experiment.
     This class needs to be implemented for each model type with specifics.

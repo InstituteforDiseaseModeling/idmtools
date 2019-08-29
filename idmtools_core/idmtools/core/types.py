@@ -1,16 +1,19 @@
+import uuid
+
 from functools import partial
 from typing import Any, Callable, List, Mapping, Type, TYPE_CHECKING, TypeVar, Union, Dict
 
 if TYPE_CHECKING:
     from idmtools.analysis import IAnalyzer
-    from idmtools.entities import CommandLine, IExperiment, IPlatform, ISimulation, IItem
+    from idmtools.entities import CommandLine, IExperiment, IPlatform, ISimulation, ISuite, IItem
     from idmtools.assets import Asset, AssetCollection
     from idmtools.builders import ExperimentBuilder
 
     # Base Types
     TExperiment = TypeVar("TExperiment", bound=IExperiment)
     TSimulation = TypeVar("TSimulation", bound=ISimulation)
-    TItem = TypeVar("TItem", bount=IItem)
+    TSuite = TypeVar("TSuite", bound=ISuite)
+    TItem = TypeVar("TItem", bound=IItem)
     TCommandLine = TypeVar("TCommandLine", bound=CommandLine)
     TAnalyzer = TypeVar("TAnalyzer", bound=IAnalyzer)
     TPlatform = TypeVar("TPlatform", bound=IPlatform)
@@ -20,8 +23,9 @@ if TYPE_CHECKING:
 
     TTags = Dict[str, str]
     TSimulationList = List[TSimulation]
+    TExperimentList = List[TExperiment]
     TItemList = List[TItem]
-
+    TIdList = List[uuid]
     TPlatformClass = Type[TPlatform]
     TSimulationClass = Type[TSimulation]
     TExperimentClass = Type[TExperiment]

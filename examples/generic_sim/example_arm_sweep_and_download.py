@@ -69,8 +69,7 @@ if __name__ == "__main__":
     filenames = ['output\\InsetChart.json']
     analyzers = [DownloadAnalyzer(filenames=filenames, output_path='download-e2eB')]
 
-    obj = platform.get_item(id=em.experiment.uid, level=1)  # level 1 is an 'experiment' (a grouping of run items)
-    obj.children = platform.get_objects_by_relationship(object=obj, relationship=platform.CHILD)
+    experiment = platform.get_item(id=em.experiment.uid)
 
-    manager = AnalyzeManager(configuration={}, platform=platform, items=obj.children, analyzers=analyzers)
+    manager = AnalyzeManager(configuration={}, platform=platform, items=experiment.children(), analyzers=analyzers)
     manager.analyze()
