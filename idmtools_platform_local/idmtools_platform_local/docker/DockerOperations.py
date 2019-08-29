@@ -1,6 +1,7 @@
 import io
 import logging
 import os
+from pathlib import Path
 import platform
 import shutil
 import tarfile
@@ -24,7 +25,7 @@ logger = getLogger(__name__)
 
 @dataclass
 class DockerOperations:
-    host_data_directory: str = os.path.join(os.getcwd(), '.local_data')
+    host_data_directory: str = os.path.join(str(Path.home()), '.local_data')
     network: str = 'idmtools'
     redis_image: str = 'redis:5.0.4-alpine'
     redis_port: int = 6379
@@ -211,7 +212,24 @@ class DockerOperations:
                     raise e
         elif type(workers_container) is list and len(workers_container):
             workers_container = workers_container[0]
+            if create:
+                workers_container = self.ensure_container_running(workers_container)
         return workers_container
+
+    @staticmethod
+    def ensure_container_running(container: Container) -> Container:
+        """
+        Ensures the container is running. If not, it will be started
+
+        Args:
+            container(Container):  Container to check if running
+        Returns:
+
+        """
+        if container.status in ['exited', 'created']:
+            container.start()
+            container.reload()
+        return container
 
     def create_worker_config(self) -> dict:
         """
@@ -290,6 +308,8 @@ class DockerOperations:
             redis_container = self.client.containers.run(**container_config)
         elif type(redis_container) is list and len(redis_container):
             redis_container = redis_container[0]
+            if create:
+                redis_container = self.ensure_container_running(redis_container)
         return redis_container
 
     def create_redis_config(self):
@@ -337,6 +357,8 @@ class DockerOperations:
             postgres_container = self.client.containers.run(**container_config)
         elif type(postgres_container) is list and len(postgres_container):
             postgres_container = postgres_container[0]
+            if create:
+                postgres_container = self.ensure_container_running(postgres_container)
         return postgres_container
 
     def create_postgres_config(self):

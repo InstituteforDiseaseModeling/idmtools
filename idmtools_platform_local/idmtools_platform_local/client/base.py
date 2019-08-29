@@ -45,14 +45,14 @@ class BaseClient:
     @classmethod
     def post(cls, path, **kwargs) -> requests.Response:
         url = f'{cls.base_url}/{path}' if path is not None else cls.base_url
-        return requests.get(url, **kwargs)
+        return requests.post(url, **kwargs)
 
     @classmethod
     def put(cls, path, **kwargs) -> requests.Response:
         url = f'{cls.base_url}/{path}' if path is not None else cls.base_url
-        return requests.get(url, **kwargs)
+        return requests.put(url, **kwargs)
 
     @classmethod
     def delete(cls, path, **kwargs) -> requests.Response:
         url = f'{cls.base_url}/{path}' if path is not None else cls.base_url
-        return requests.get(url, **kwargs)
+        return requests.delete(url, **kwargs)
