@@ -25,5 +25,6 @@ class IDTKDefault(metaclass=ABCMeta):
         if cls.config:
             simulation.config = cls.config()
 
-        if cls.demographics:
-            simulation.demographics = cls.demographics()
+        # # The default demographics will be added to Experiment instead
+        # if cls.demographics:
+        #     simulation.demographics = cls.demographics()

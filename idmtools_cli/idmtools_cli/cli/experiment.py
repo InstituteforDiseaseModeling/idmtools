@@ -21,6 +21,7 @@ def experiment(ctx, platform, config_block):
     Get the status of experiments for the platform defined by the "Local" configuration block
 
     Get the usage details of the status command:
+
     idmtools experiment --platform Local status --help
 
     """

@@ -90,24 +90,24 @@ class TestLocalCLIBasic(unittest.TestCase):
                 result = self.run_command('experiment', '--platform', 'Local', 'status', base_command='')
                 self.assertEqual(result.exit_code, 0, f'{result.exit_code} - {result.output}')
                 output = re.sub(r'[\+\-]+', '', result.output).split("\n")
-                output = [o for o in output if o]
-                self.assertEqual(len(output), 5)
-                rows = list(map(lambda x: list(map(str.strip, x)), [s.split('|') for s in output]))[2:]
+                output = [o for o in output if o and len(o) > 3 and 'experiment_id' not in o]
+                self.assertEqual(len(output), 3)
+                rows = list(map(lambda x: list(map(str.strip, x)), [s.split('|') for s in output]))
                 self.assertEqual(rows[0][1], "DDDDD")
                 self.assertEqual(rows[1][1], "BBBBB")
                 self.assertEqual(rows[2][1], "AAAAA")
+
             do_test()
 
         with self.subTest("test_simulation_status"):
             # Now patch our areas that use our session
             def do_test(*mocks):
-
                 result = self.run_command('simulation', '--platform', 'Local', 'status', base_command='')
                 self.assertEqual(result.exit_code, 0, f'{result.exit_code} - {result.output}')
                 output = re.sub(r'[\+\-]+', '', strip_ansi(result.output)).split("\n")
-                output = [o for o in output if o]
-                self.assertEqual(len(output), 5)
-                rows = list(map(lambda x: list(map(str.strip, x)), [s.split('|') for s in output]))[2:]
+                output = [o for o in output if o and len(o) > 3 and 'simulation_uid' not in o]
+                self.assertEqual(len(output), 3)
+                rows = list(map(lambda x: list(map(str.strip, x)), [s.split('|') for s in output]))
                 self.assertEqual(rows[0][1], "FFFFF")
                 self.assertEqual(rows[0][2], "DDDDD")
                 self.assertEqual(rows[0][3], "done")
@@ -117,6 +117,8 @@ class TestLocalCLIBasic(unittest.TestCase):
                 self.assertEqual(rows[2][1], "CCCCC")
                 self.assertEqual(rows[2][2], "BBBBB")
                 self.assertEqual(rows[2][3], "created")
+
             do_test()
 
         dm.cleanup()
+

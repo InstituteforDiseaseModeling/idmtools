@@ -155,7 +155,7 @@ class DTKSIR(IDTKDefault):
                 "DateCreated": "Sun Sep 25 23:19:55 2011",
                 "Tool": "convertdemog.py",
                 "Author": "jsteinkraus",
-                "IdReference": "SampleContent",
+                "IdReference": "0",
                 "NodeCount": 1,
                 "Resolution": 150
             },
