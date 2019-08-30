@@ -7,6 +7,7 @@ from typing import Optional, NoReturn
 from dataclasses import dataclass
 from pathlib import Path
 from idmtools.assets import Asset
+from idmtools.core import EntityStatus
 from idmtools.entities import IExperiment, IPlatform
 # we have to import brokers so that the proper configuration is achieved for redis
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
@@ -68,7 +69,7 @@ class LocalPlatform(IPlatform):
     Represents the platform allowing to run simulations locally.
     """
 
-    def retrieve_experiment(self, experiment_id: str) -> 'TExperiment':
+    def retrieve_experiment(self, experiment_id: str) -> IExperiment:
         """
         Restore experiment from local platform
 
@@ -80,7 +81,7 @@ class LocalPlatform(IPlatform):
         """
         experiment_dict = ExperimentsClient.get_one(experiment_id)
         experiment = experiment_factory.create(experiment_dict['tags'].get("type"), tags=experiment_dict['tags'])
-        experiment.uid = experiment['uuid']
+        experiment.uid = experiment_dict['experiment_id']
         return experiment
 
     def get_assets_for_simulation(self, simulation: 'TSimulation', output_files):
@@ -111,9 +112,9 @@ class LocalPlatform(IPlatform):
 
         for sim_info in simulation_dict:
             sim = experiment.simulation()
-            sim.uid = sim_info['uuid']
+            sim.uid = sim_info['simulation_uid']
             sim.tags = sim_info['tags']
-            sim.status = sim_info['status']
+            sim.status = local_status_to_common(sim_info['status'])
             experiment.simulations.append(sim)
 
     def refresh_experiment_status(self, experiment: 'TExperiment'):  # noqa: F821

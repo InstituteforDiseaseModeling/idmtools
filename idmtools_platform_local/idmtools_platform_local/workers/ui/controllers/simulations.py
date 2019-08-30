@@ -29,34 +29,40 @@ def sim_status(id: Optional[str], experiment_id: Optional[str], status: Optional
         None
     """
     session = get_session()
-    # Simulations ALWAYS have a parent
-    criteria = [JobStatus.parent_uuid != None]  # noqa: E711
+    try:
+        # Simulations ALWAYS have a parent
+        criteria = [JobStatus.parent_uuid != None]  # noqa: E711
 
-    # start building our filter criteria
-    if id is not None:
-        criteria.append(JobStatus.uuid == id)
+        # start building our filter criteria
+        if id is not None:
+            criteria.append(JobStatus.uuid == id)
 
-    if experiment_id is not None:
-        criteria.append(JobStatus.parent_uuid == experiment_id)
+        if experiment_id is not None:
+            criteria.append(JobStatus.parent_uuid == experiment_id)
 
-    if status is not None:
-        criteria.append(JobStatus.status == Status[status])
+        if status is not None:
+            criteria.append(JobStatus.status == Status[status])
 
-    if tags is not None:
-        for tag in tags:
-            criteria.append((JobStatus.tags[tag[0]].astext.cast(String) == tag[1]))
+        if tags is not None:
+            for tag in tags:
+                criteria.append((JobStatus.tags[tag[0]].astext.cast(String) == tag[1]))
 
-    query = session.query(JobStatus).filter(*criteria).order_by(JobStatus.uuid.desc(), JobStatus.parent_uuid.desc())
+        query = session.query(JobStatus).filter(*criteria).order_by(JobStatus.uuid.desc(), JobStatus.parent_uuid.desc())
 
-    # convert the result to data-frame
-    df = pd.read_sql(query.statement, query.session.bind, columns=['uuid', 'status', 'data_path', 'tags'])
+        # convert the result to data-frame
+        df = pd.read_sql(query.statement, query.session.bind, columns=['uuid', 'status', 'data_path', 'tags'])
 
-    # rename columns to be a bit clearer what the user is looking at
-    df.rename(index=str, columns=dict(uuid='simulation_uid', parent_uuid='experiment_id'), inplace=True)
+        # rename columns to be a bit clearer what the user is looking at
+        df.rename(index=str, columns=dict(uuid='simulation_uid', parent_uuid='experiment_id'), inplace=True)
 
-    df['status'] = df['status'].apply(lambda x: str(x))
-    df['created'] = df['created'].astype(str)
-    df['updated'] = df['updated'].astype(str)
+        df['status'] = df['status'].apply(lambda x: str(x))
+        df['created'] = df['created'].astype(str)
+        df['updated'] = df['updated'].astype(str)
+    except Exception as e:
+        logger.exception(e)
+        raise e
+    finally:
+        session.close()
     return df
 
 

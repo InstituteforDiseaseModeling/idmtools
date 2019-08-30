@@ -186,7 +186,6 @@ class DockerOperations:
             network = network[0]
         return network
 
-    @cache_for()
     def get_workers(self, create: bool = True) -> Optional[Container]:
         """
         Gets the workers container
