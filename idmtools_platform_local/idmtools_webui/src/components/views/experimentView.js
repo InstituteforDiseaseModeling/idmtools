@@ -3,7 +3,7 @@ import React from "react";
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from "react-redux";
 import { fetchExperiments, deleteExperiment } from "../../redux/action/experiment"
-import { Table, TableHead, TableCell, TableRow, TableBody, Paper, Button, Typography, Divider,
+import { Table, TableHead, TableCell, TableRow, TableSortLabel, TableBody, Paper, Button, Typography, Divider,
     Card, CardContent, List, ListItem, ListItemText, Grid, IconButton } from "@material-ui/core";
 
 import {formatDateString} from  "../../utils/utils";
@@ -73,12 +73,21 @@ class ExperimentView extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedExp : null
+            selectedExp : null,
+            columns: [
+                {name: "experiment_id" , sortOrder:  'asc', active: false, title: 'Experiment Id' },
+                {name: "status" , sortOrder:  'asc', active: false, title:'Status'},
+                {name: "folder" , sortOrder:  '', active: false, title: 'Folder' },
+                {name: "action" , sortOrder:  '', active: false, title: "Action" },
+                {name: "created" , sortOrder:  'desc', active: true, title: "Created" },
+                {name: "updated" , sortOrder:  'desc', active: false, title:"Updated" }
+            ]
         }
         this.rowClick = this.rowClick.bind(this);
         this.deleteExp = this.deleteExp.bind(this);
         this.dragEnd = this.dragEnd.bind(this);
         this.closeDetails = this.closeDetails.bind(this);
+
     }
 
     componentDidMount() {
@@ -118,6 +127,24 @@ class ExperimentView extends React.Component {
         });
     }
 
+    sortHandler(col) {
+
+        return () => {
+
+            this.state.columns.map(c=>{
+                c.active = false;
+                return c;
+            });
+
+            let activeCol =_.find(this.state.columns, {name:col})
+            activeCol.active = true;
+            activeCol.sortOrder = activeCol.sortOrder == "asc" ? "desc" : "asc";
+            
+            this.setState({
+                update: true
+            })
+        }
+    }
 
     render() {
         const { experiments, classes } = this.props;
@@ -126,10 +153,15 @@ class ExperimentView extends React.Component {
 
         let status, command, tags
         
-        if (this.props.experiments) 
-            sorted = _.reverse(_.sortBy(this.props.experiments, (o) => {
-                return new Date(o.created);
-            }));
+        if (this.props.experiments)  {
+            let activeCol  =_.find(this.state.columns, {active:true});
+            sorted = _.sortBy(this.props.experiments, (o) => {
+                return o[activeCol.name];
+            });
+            if (activeCol.sortOrder == "desc") {
+                _.reverse(sorted);
+            }
+        }
 
         var progressStr = (progressObj) => {
             if (progressObj && progressObj.length > 0) {
@@ -168,13 +200,25 @@ class ExperimentView extends React.Component {
                     <Paper className={classes.root}>
                         <Table className={classes.table}>
                             <TableHead>
-                                <TableRow>
-                                    <TableCell align="right">Experiment ID</TableCell>
-                                    <TableCell align="right">Status</TableCell>
-                                    <TableCell align="right">Folder</TableCell>
-                                    <TableCell align="center">Action</TableCell>
-                                    <TableCell align="right">Created</TableCell>
-                                    <TableCell align="right">Updated</TableCell>
+                            <TableRow>
+                                    {
+                                        this.state.columns.map(col=> {
+                                            if (col.sortOrder == "")
+                                                return (
+                                                    <TableCell align="right">
+                                                        {col.title}
+                                                    </TableCell>
+                                                )
+                                            else 
+                                                return(
+                                                    <TableCell align="right">
+                                                        <TableSortLabel onClick={this.sortHandler(col.name)} active={col.active} direction={col.sortOrder}>{col.title}</TableSortLabel>                                        
+                                                    </TableCell>
+                                            )
+                                        })
+                                    }
+
+
                                 </TableRow>
                             </TableHead>
                             <TableBody>

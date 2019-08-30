@@ -3,7 +3,7 @@ import React from "react";
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from "react-redux";
 import { fetchSimulations, cancelSimulation } from "../../redux/action/simulation"
-import { Table, TableHead, TableCell, TableRow, TableBody, Paper, Button, Typography, Divider,
+import { Table, TableHead, TableCell, TableSortLabel, TableRow, TableBody, Paper, Button, Typography, Divider,
         Card, CardContent, List, ListItem, ListItemText, Grid, IconButton } from "@material-ui/core";
 import FolderIcon from "@material-ui/icons/Folder";
 import ClearIcon from "@material-ui/icons/Clear";
@@ -58,6 +58,10 @@ const styles = theme => ({
      clearIcon: {
          color:'red',
          
+     },
+     tableHeader: {
+         position:'sticky',
+         top:200
      }
 })
 
@@ -66,12 +70,22 @@ class SimulationView extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedSim : null
+            selectedSim : null,            
+            columns: [
+                {name: "simulation_uid", sortOrder:  'asc', active: false, title: 'Simulation Id' },
+                {name: "status" , sortOrder:  'asc', active: false, title:'Status'},
+                {name: "experiment_id" , sortOrder:  'asc', active: false, title: 'Experiment Id' },
+                {name: "folder" , sortOrder:  '', active: false, title: 'Folder' },
+                {name: "action" , sortOrder:  '', active: false, title: "Action" },
+                {name: "created" , sortOrder:  'desc', active: true, title: "Created" },
+                {name: "updated" , sortOrder:  'desc', active: false, title:"Updated" }
+            ]
         }
         this.rowClick = this.rowClick.bind(this);
         this.cancelSim = this.cancelSim.bind(this);
         this.dragEnd = this.dragEnd.bind(this);
         this.closeDetails = this.closeDetails.bind(this);
+        this.sortHandler = this.sortHandler.bind(this);
     }
 
     componentDidMount() {
@@ -110,6 +124,24 @@ class SimulationView extends React.Component {
         });
     }
 
+    sortHandler(col) {
+
+        return () => {
+
+            this.state.columns.map(c=>{
+                c.active = false;
+                return c;
+            });
+
+            let activeCol =_.find(this.state.columns, {name:col})
+            activeCol.active = true;
+            activeCol.sortOrder = activeCol.sortOrder == "asc" ? "desc" : "asc";
+            
+            this.setState({
+                update: true
+            })
+        }
+    }
 
     render() {
 
@@ -119,10 +151,20 @@ class SimulationView extends React.Component {
 
         let status, command, tags
         
-        if (this.props.simulations) 
-            sorted = _.reverse(_.sortBy(this.props.simulations, (o) => {
-                return o.created;
-            }));
+        if (this.props.simulations) {
+
+            let activeCol  =_.find(this.state.columns, {active:true});
+
+
+            sorted = _.sortBy(this.props.simulations, (o) => {
+                return o[activeCol.name];
+            });
+
+            if (activeCol.sortOrder == "desc") {
+                _.reverse(sorted);
+            }
+        }
+
 
         if (this.state.selectedSim) {
             
@@ -141,6 +183,7 @@ class SimulationView extends React.Component {
 
         let splitterKey = this.splitterLayout ? this.splitterLayout.state.secondaryPaneSize : 0;
 
+
         return (
             <div className={classes.splitter} ref={(ref) => this.scrollParentRef = ref}>
             <SplitterLayout vertical="false" className={classes.splitter} percentage="true" secondaryInitialSize="60" onDragEnd={this.dragEnd} ref={(ref) => this.splitterLayout = ref}>
@@ -152,16 +195,25 @@ class SimulationView extends React.Component {
                 
                     <Paper className={classes.root}>
                         <Table className={classes.table}>
-                            <TableHead>
+                            <TableHead className={classes.tableHeader}>
                                 <TableRow>
-                                    
-                                    <TableCell align="right">Simulation ID</TableCell>
-                                    <TableCell align="right">Status</TableCell>
-                                    <TableCell align="right">Experiment Id</TableCell>
-                                    <TableCell align="right">Folder</TableCell>
-                                    <TableCell align="center">Action</TableCell>
-                                    <TableCell align="right">Created</TableCell>
-                                    <TableCell align="right">Updated</TableCell>
+                                    {
+                                        this.state.columns.map(col=> {
+                                            if (col.sortOrder == "")
+                                                return (
+                                                    <TableCell align="right">
+                                                        {col.title}
+                                                    </TableCell>
+                                                )
+                                            else 
+                                                return(
+                                                    <TableCell align="right">
+                                                        <TableSortLabel onClick={this.sortHandler(col.name)} active={col.active} direction={col.sortOrder}>{col.title}</TableSortLabel>                                        
+                                                    </TableCell>
+                                            )
+                                        })
+                                    }
+
 
                                 </TableRow>
                             </TableHead>
