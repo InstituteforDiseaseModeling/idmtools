@@ -4,6 +4,6 @@ from idmtools.core.EntityContainer import EntityContainer
 from idmtools.core.enums import *
 from idmtools.core.exceptions import *
 from idmtools.core.ExperimentFactory import experiment_factory
-from idmtools.core.PlatformFactory import PlatformFactory
+from idmtools.core.PlatformFactory import Platform
 from idmtools.core.SystemInformation import SystemInformation
 from idmtools.core.types import *

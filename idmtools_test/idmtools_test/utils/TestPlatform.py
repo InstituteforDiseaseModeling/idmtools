@@ -37,8 +37,10 @@ class TestPlatform(IPlatform):
 
     def __del__(self):
         # Close and delete the cache when finished
-        self.experiments.close()
-        self.simulations.close()
+        if self.experiments:
+            self.experiments.close()
+        if self.simulations:
+            self.simulations.close()
         if os.path.exists(data_path):
             try:
                 shutil.rmtree(data_path)

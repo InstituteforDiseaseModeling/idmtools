@@ -1,9 +1,7 @@
 import uuid
-from abc import ABCMeta, abstractmethod
-from dataclasses import fields
-
 import typing
-from logging import getLogger, DEBUG
+from abc import ABCMeta, abstractmethod
+from logging import getLogger
 
 from idmtools.config import IdmConfigParser
 from idmtools.core.interfaces.IEntity import IEntity
@@ -11,7 +9,6 @@ from idmtools.core.interfaces.IEntity import IEntity
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TExperiment, TSimulation, TSimulationBatch
     from typing import List, Dict, Any
-
 
 logger = getLogger(__name__)
 
@@ -26,13 +23,27 @@ class IPlatform(IEntity, metaclass=ABCMeta):
     - File handling
     """
 
+    def __new__(cls, *args, **kwargs):
+        """
+        Here is the code to create a new object!
+        Args:
+            *args: user inputs
+            **kwargs: user inputs
+        Returns: object created
+        """
+        if hasattr(cls, '_FACTORY'):
+            # '_FACTORY' indicates that the platform creation is through Platform Factory
+            return super().__new__(cls)
+        else:
+            raise ValueError(
+                f"Please use Factory to create Platform! For example: platform = Platform('COMPS', **kwargs)")
+
     def __post_init__(self) -> None:
         """
-        Got called from Platform creation
+        Work to be done after object creation
+        Returns: None
         """
-        # self.update_from_config()
-        if not hasattr(self, '_FACTORY'):
-            self.update_from_config()
+        pass
 
     @abstractmethod
     def create_experiment(self, experiment: 'TExperiment') -> None:
@@ -111,46 +122,3 @@ class IPlatform(IEntity, metaclass=ABCMeta):
 
     def __repr__(self):
         return f"<Platform {self.__class__.__name__} - id: {self.uid}>"
-
-    def update_from_config(self) -> None:
-        """
-        Get INI config values and update platform values by the priority rules:
-        #1 Code
-        #2 INI config
-        #2 default
-
-        Returns: None
-        """
-        # retrieve field values, default values and types
-        fds = fields(self)
-        field_name = [f.name for f in fields(self)]
-        field_default = {f.name: f.default for f in fds}
-        field_value = {f.name: getattr(self, f.name) for f in fds}
-        field_type = {f.name: f.type for f in fds}
-
-        block = self.__class__.__name__.replace("Platform", "")
-
-        # find, load and get settings from config file. Return with the correct data types
-        if logger.isEnabledFor(DEBUG):
-            logger.debug(f'Loading Platform config from {block}')
-        field_config = IdmConfigParser.retrieve_settings(block, field_type)
-
-        # display not used fields from config
-        field_config_not_used = set(field_config.keys()) - set(field_name)
-        if 'type' in field_config_not_used:
-            field_config_not_used.remove('type')
-        if len(field_config_not_used) > 0:
-            field_config_not_used = [" - {} = {}".format(fn, field_config[fn]) for fn in field_config_not_used]
-            logger.warning(f"[{block}]: the following Config Settings are not used:")
-            logger.warning("\n".join(field_config_not_used))
-            print(f"[{block}]: the following Config Settings are not used:")
-            print("\n".join(field_config_not_used))
-
-        # update attr based on priority: #1 Code, #2 INI, #3 Default
-        for fn in set(field_config.keys()).intersection(set(field_name)):
-            if field_value[fn] != field_default[fn]:
-                setattr(self, fn, field_value[fn])
-            elif field_config[fn] != field_value[fn]:
-                setattr(self, fn, field_config[fn])
-
-        IdmConfigParser.display_config_block_details(block)
