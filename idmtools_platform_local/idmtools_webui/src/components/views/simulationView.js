@@ -4,7 +4,8 @@ import { withStyles } from '@material-ui/core/styles';
 import { connect } from "react-redux";
 import { fetchSimulations, cancelSimulation } from "../../redux/action/simulation"
 import { Table, TableHead, TableCell, TableSortLabel, TableRow, TableBody, Paper, Button, Typography, Divider,
-        Card, CardContent, List, ListItem, ListItemText, Grid, IconButton } from "@material-ui/core";
+        Card, CardContent, List, ListItem, ListItemText, Grid, IconButton,
+        Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@material-ui/core";
 import FolderIcon from "@material-ui/icons/Folder";
 import ClearIcon from "@material-ui/icons/Clear";
 import {formatDateString} from  "../../utils/utils";
@@ -79,13 +80,18 @@ class SimulationView extends React.Component {
                 {name: "action" , sortOrder:  '', active: false, title: "Action" },
                 {name: "created" , sortOrder:  'desc', active: true, title: "Created" },
                 {name: "updated" , sortOrder:  'desc', active: false, title:"Updated" }
-            ]
+            ],
+            dialogOpen: false,
+            simIdForCancel: null
         }
         this.rowClick = this.rowClick.bind(this);
         this.cancelSim = this.cancelSim.bind(this);
+        this.cancelClick = this.cancelClick.bind(this);
         this.dragEnd = this.dragEnd.bind(this);
         this.closeDetails = this.closeDetails.bind(this);
         this.sortHandler = this.sortHandler.bind(this);
+        this.handleClose = this.handleClose.bind(this);
+        this.handleDialogYesClick = this.handleDialogYesClick.bind(this);
     }
 
     componentDidMount() {
@@ -94,15 +100,23 @@ class SimulationView extends React.Component {
         dispatch(fetchSimulations());
     }
 
-    cancelSim(e) {
-        e.stopPropagation();
-        e.preventDefault();
+    cancelClick(cb) {
+        return (e)=> {
+            e.stopPropagation();
+            e.preventDefault();
+
+            this.setState({dialogOpen:true, cb: cb, simIdForCancel:e.currentTarget.getAttribute("sim_id") });
+
+            return false;
+          }      
+    }
+
+    cancelSim() {
 
         const { dispatch } = this.props;
 
-        dispatch(cancelSimulation(e.currentTarget.getAttribute("sim_id")));
-        
-        return false;
+        dispatch(cancelSimulation(this.state.simIdForCancel)); 
+                
     }
 
     rowClick(e) {
@@ -142,6 +156,22 @@ class SimulationView extends React.Component {
             })
         }
     }
+
+    handleClose() {
+        this.setState({
+          dialogOpen:false
+        })
+    }
+
+    handleDialogYesClick() {
+
+        if (this.state.cb)
+          this.state.cb();
+    
+        this.setState({dialogOpen:false});
+    
+      }
+    
 
     render() {
 
@@ -186,103 +216,126 @@ class SimulationView extends React.Component {
 
         return (
             <div className={classes.splitter} ref={(ref) => this.scrollParentRef = ref}>
-            <SplitterLayout vertical="false" className={classes.splitter} percentage="true" secondaryInitialSize="60" onDragEnd={this.dragEnd} ref={(ref) => this.splitterLayout = ref}>
-                <Paper className={classes.root}>
-                    <SimulationChart key={splitterKey}/>
-                </Paper>
-                
-                <SplitterLayout vertical="false" percentage="true" secondaryInitialSize="50">
-                
+                <SplitterLayout vertical="false" className={classes.splitter} percentage="true" secondaryInitialSize="60" onDragEnd={this.dragEnd} ref={(ref) => this.splitterLayout = ref}>
                     <Paper className={classes.root}>
-                        <Table className={classes.table}>
-                            <TableHead className={classes.tableHeader}>
-                                <TableRow>
-                                    {
-                                        this.state.columns.map(col=> {
-                                            if (col.sortOrder == "")
-                                                return (
-                                                    <TableCell align="right">
-                                                        {col.title}
-                                                    </TableCell>
-                                                )
-                                            else 
-                                                return(
-                                                    <TableCell align="right">
-                                                        <TableSortLabel onClick={this.sortHandler(col.name)} active={col.active} direction={col.sortOrder}>{col.title}</TableSortLabel>                                        
-                                                    </TableCell>
-                                            )
-                                        })
-                                    }
-
-
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {sorted.map(sim => (
-                                    <TableRow key={sim.simulation_uid} onClick={this.rowClick} sim_id={sim.simulation_uid} className={sim.simulation_uid == this.state.selectedSim ? classes.highlight: null}>
-
-                                        <TableCell align="right">{sim.simulation_uid}</TableCell>
-                                        <TableCell align="right">{sim.status}</TableCell>
-                                        <TableCell align="right">{sim.experiment_id}</TableCell>
-                                        <TableCell align="right">
-                                            <a target="_blank" href={'http://' + window.location.hostname + ':5000' + sim.data_path}>
-                                                <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
-                                                    <FolderIcon className={classes.folder}/>
-                                                </IconButton>
-                                            </a>
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            <Button className={classes.cancel} color="secondary" sim_id={sim.simulation_uid} onClick={this.cancelSim}>Cancel</Button>
-
-                                        </TableCell>
-                                        <TableCell align="right">{formatDateString(sim.created)}</TableCell>
-                                        <TableCell align="right">{formatDateString(sim.updated)}</TableCell>                                
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
+                        <SimulationChart key={splitterKey}/>
                     </Paper>
-                    { this.state.selectedSim &&
-                        <Paper className={classes.details}>
-                            <Card className = {classes.card}>
-                                <CardContent>
-                                    <Grid container justify="space-between">
-                                        <Grid item>
-                                            <Typography variant="h5" className={classes.cardTitle}>Details</Typography>
-                                        </Grid>
-                                        <Grid item>
-                                            <IconButton edge="start" onClick={this.closeDetails} className={classes.menuButton} color="inherit" aria-label="menu">
-                                                <ClearIcon className={classes.clearIcon}/>
-                                            </IconButton>
-                                        </Grid>
-                                    </Grid>
-                                    <Divider/>
-                                    <List>
-                                        <ListItem>
-                                            <ListItemText className={classes.itemText}>Id:</ListItemText>
-                                            <ListItemText className={classes.itemValue}>{this.state.selectedSim}</ListItemText>
-                                        </ListItem>
-                                        <ListItem >
-                                            <ListItemText className={classes.itemText}>Status</ListItemText>
-                                            <ListItemText className={classes.itemValue}>{status}</ListItemText>
-                                        </ListItem>
-                                        <ListItem >
-                                            <ListItemText className={classes.itemText}>Command</ListItemText>
-                                            <ListItemText className={classes.itemValue}>{command}</ListItemText>
-                                        </ListItem>
-                                        <ListItem >
-                                            <ListItemText className={classes.itemText}>Tags</ListItemText>
-                                            <ListItemText className={classes.itemValue}>{tags}</ListItemText>
-                                        </ListItem>
+                    
+                    <SplitterLayout vertical="false" percentage="true" secondaryInitialSize="50">
+                    
+                        <Paper className={classes.root}>
+                            <Table className={classes.table}>
+                                <TableHead className={classes.tableHeader}>
+                                    <TableRow>
+                                        {
+                                            this.state.columns.map(col=> {
+                                                if (col.sortOrder == "")
+                                                    return (
+                                                        <TableCell align="right">
+                                                            {col.title}
+                                                        </TableCell>
+                                                    )
+                                                else 
+                                                    return(
+                                                        <TableCell align="right">
+                                                            <TableSortLabel onClick={this.sortHandler(col.name)} active={col.active} direction={col.sortOrder}>{col.title}</TableSortLabel>                                        
+                                                        </TableCell>
+                                                )
+                                            })
+                                        }
 
-                                    </List>
-                                </CardContent>
-                            </Card>
+
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {sorted.map(sim => (
+                                        <TableRow key={sim.simulation_uid} onClick={this.rowClick} sim_id={sim.simulation_uid} className={sim.simulation_uid == this.state.selectedSim ? classes.highlight: null}>
+
+                                            <TableCell align="right">{sim.simulation_uid}</TableCell>
+                                            <TableCell align="right">{sim.status}</TableCell>
+                                            <TableCell align="right">{sim.experiment_id}</TableCell>
+                                            <TableCell align="right">
+                                                <a target="_blank" href={'http://' + window.location.hostname + ':5000' + sim.data_path}>
+                                                    <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
+                                                        <FolderIcon className={classes.folder}/>
+                                                    </IconButton>
+                                                </a>
+                                            </TableCell>
+                                            <TableCell align="center">
+                                                <Button className={classes.cancel} color="secondary" sim_id={sim.simulation_uid} onClick={this.cancelClick(this.cancelSim)}>Cancel</Button>
+
+                                            </TableCell>
+                                            <TableCell align="right">{formatDateString(sim.created)}</TableCell>
+                                            <TableCell align="right">{formatDateString(sim.updated)}</TableCell>                                
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
                         </Paper>
-                    }
-                </SplitterLayout> 
-                
-            </SplitterLayout>
+                        { this.state.selectedSim &&
+                            <Paper className={classes.details}>
+                                <Card className = {classes.card}>
+                                    <CardContent>
+                                        <Grid container justify="space-between">
+                                            <Grid item>
+                                                <Typography variant="h5" className={classes.cardTitle}>Details</Typography>
+                                            </Grid>
+                                            <Grid item>
+                                                <IconButton edge="start" onClick={this.closeDetails} className={classes.menuButton} color="inherit" aria-label="menu">
+                                                    <ClearIcon className={classes.clearIcon}/>
+                                                </IconButton>
+                                            </Grid>
+                                        </Grid>
+                                        <Divider/>
+                                        <List>
+                                            <ListItem>
+                                                <ListItemText className={classes.itemText}>Id:</ListItemText>
+                                                <ListItemText className={classes.itemValue}>{this.state.selectedSim}</ListItemText>
+                                            </ListItem>
+                                            <ListItem >
+                                                <ListItemText className={classes.itemText}>Status</ListItemText>
+                                                <ListItemText className={classes.itemValue}>{status}</ListItemText>
+                                            </ListItem>
+                                            <ListItem >
+                                                <ListItemText className={classes.itemText}>Command</ListItemText>
+                                                <ListItemText className={classes.itemValue}>{command}</ListItemText>
+                                            </ListItem>
+                                            <ListItem >
+                                                <ListItemText className={classes.itemText}>Tags</ListItemText>
+                                                <ListItemText className={classes.itemValue}>{tags}</ListItemText>
+                                            </ListItem>
+
+                                        </List>
+                                    </CardContent>
+                                </Card>
+                            </Paper>
+                        }
+                    </SplitterLayout> 
+                    
+                </SplitterLayout>
+                <Dialog
+                    open={this.state.dialogOpen}
+                    /*TransitionComponent={Transition}*/
+                    keepMounted
+                    onClose={this.handleClose}
+                    aria-labelledby="dialogCoD"
+                    aria-describedby="dialogCoDDesc"
+                    >
+                    <DialogTitle id="dialogCancel">Cancel Simulation</DialogTitle>
+                    <DialogContent dividers>
+                        <DialogContentText id="dialogCoDDesc">
+                        Proceed to cancel simulation '{this.state.simIdForCancel}'?
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={this.handleClose} color="default">
+                        No
+                        </Button>
+                        <Button onClick={this.handleDialogYesClick} color="default">
+                        Yes
+                        </Button>
+                    </DialogActions>
+                </Dialog>
             </div>
 
         )
