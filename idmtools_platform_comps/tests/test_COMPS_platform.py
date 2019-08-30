@@ -3,14 +3,12 @@ import json
 import os
 import unittest
 from os import path
-
 import pytest
-
+from idmtools.core import Platform
 from idmtools.builders import ExperimentBuilder
 from idmtools.core import EntityStatus
 from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
-from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 from idmtools_test import COMMON_INPUT_PATH
 
@@ -21,7 +19,7 @@ current_directory = path.dirname(path.realpath(__file__))
 class TestCOMPSPlatform(ITestWithPersistence):
     def setUp(self) -> None:
         super().setUp()
-        self.platform = COMPSPlatform()
+        self.platform = Platform('COMPS2')
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
 
@@ -161,11 +159,10 @@ class TestCOMPSPlatform(ITestWithPersistence):
         self.assertEqual(em.experiment.tags, experiment.tags)
         self.assertEqual(em.platform, self.platform)
         for i in range(len(em.experiment.simulations)):
-            self.assertEqual(em.experiment.simulations[i].uid,experiment.simulations[i].uid)
-            self.assertEqual(em.experiment.simulations[i].tags["P"], str(i+1))
-            #self.assertDictEqual(em.experiment.simulations[i].tags, experiment.simulations[i].tags)
+            self.assertEqual(em.experiment.simulations[i].uid, experiment.simulations[i].uid)
+            self.assertEqual(em.experiment.simulations[i].tags["P"], str(i + 1))
+            # self.assertDictEqual(em.experiment.simulations[i].tags, experiment.simulations[i].tags)
             self.assertEqual(em.experiment.simulations[i].status, experiment.simulations[i].status)
-
 
 
 if __name__ == '__main__':
