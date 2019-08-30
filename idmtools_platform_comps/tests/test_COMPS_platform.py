@@ -161,11 +161,10 @@ class TestCOMPSPlatform(ITestWithPersistence):
         self.assertEqual(em.experiment.tags, experiment.tags)
         self.assertEqual(em.platform, self.platform)
         for i in range(len(em.experiment.simulations)):
-            self.assertEqual(em.experiment.simulations[i].uid,experiment.simulations[i].uid)
-            self.assertEqual(em.experiment.simulations[i].tags["P"], str(i+1))
-            #self.assertDictEqual(em.experiment.simulations[i].tags, experiment.simulations[i].tags)
+            self.assertEqual(em.experiment.simulations[i].uid, experiment.simulations[i].uid)
+            self.assertEqual(em.experiment.simulations[i].tags["P"], str(i + 1))
+            # self.assertDictEqual(em.experiment.simulations[i].tags, experiment.simulations[i].tags)
             self.assertEqual(em.experiment.simulations[i].status, experiment.simulations[i].status)
-
 
 
 if __name__ == '__main__':

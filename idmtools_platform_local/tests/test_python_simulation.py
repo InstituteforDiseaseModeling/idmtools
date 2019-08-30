@@ -130,5 +130,3 @@ class TestPythonSimulation(ITestWithPersistence):
                 osim = [o for o in oe.simulations if o.uid == sim.uid][0]
                 self.assertDictEqual(sim.tags, osim.tags)
                 self.assertEqual(sim.succeeded, osim.succeeded)
-
-
