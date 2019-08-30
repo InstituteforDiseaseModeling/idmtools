@@ -79,3 +79,8 @@ class TestConfig(ITestWithPersistence):
 
         self.assertEqual(p1, p2)
         self.assertEqual(id(p1), id(p2))
+
+    def test_no_idmtools(self):
+        IdmConfigParser(file_name="idmtools_NotExist.ini")
+        IdmConfigParser.view_config_file()
+        self.assertTrue(IdmConfigParser.get_config_path() is None)
