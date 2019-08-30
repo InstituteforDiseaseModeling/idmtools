@@ -43,4 +43,14 @@ class TestPlatformSimulations(ITestWithPersistence):
         em.run()
         em.wait_till_done()
 
-        self.assertTrue(all([s.status == EntityStatus.FAILED for s in pe.simulations]))
+        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
+
+        file_to_preview = 'StdOut.txt'
+        files = platform.get_assets_for_simulation(pe.simulations[0], [file_to_preview])
+        self.assertIn(file_to_preview, files)
+        self.assertEqual(len(files), 1)
+        self.assertEqual(files[file_to_preview].decode('utf-8').strip(), f'/data/{pe.uid}/Assets')
+
+        # TODO attempt to unify the content of this file across platforms
+        # On Comps, this will return the path to the Simulation Assests directory, but on Local, it returns the REAL
+        # path since it is a symlink

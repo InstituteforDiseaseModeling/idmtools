@@ -207,7 +207,7 @@ class LocalPlatform(IPlatform):
         byte_arrs = []
 
         for path in paths:
-            full_path = os.path.join(self.host_data_directory, job_id_path, path)
+            full_path = os.path.join(self.host_data_directory, 'workers', job_id_path, path)
             with open(full_path, 'rb') as fin:
                 byte_arrs.append(fin.read())
         return byte_arrs

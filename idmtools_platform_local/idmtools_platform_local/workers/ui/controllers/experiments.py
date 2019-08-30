@@ -120,18 +120,20 @@ class Experiments(Resource):
     def delete(self, id):
         args = delete_args.parse_args()
         session = get_session()
+        try:
+            job: JobStatus = session.query(JobStatus).filter(JobStatus.uuid == id).first()
+            if job is None:
+                abort(400, message=f'Error: No experiment with id of {id}')
 
-        job: JobStatus = session.query(JobStatus).filter(JobStatus.uuid == id).first()
-        if job is None:
-            abort(400, message=f'Error: No experiment with id of {id}')
-
-        if args['data']:
-            print(f'Deleting {job.data_path}')
-            try:
-                shutil.rmtree(job.data_path)
-            except FileNotFoundError:
-                # we will assume it has been cleaned up manually
-                pass
-        session.query(JobStatus).filter(or_(JobStatus.uuid == id, JobStatus.parent_uuid == id)).delete()
-        session.commit()
+            if args['data']:
+                print(f'Deleting {job.data_path}')
+                try:
+                    shutil.rmtree(job.data_path)
+                except FileNotFoundError:
+                    # we will assume it has been cleaned up manually
+                    pass
+            session.query(JobStatus).filter(or_(JobStatus.uuid == id, JobStatus.parent_uuid == id)).delete()
+            session.commit()
+        finally:
+            session.close()
         return 204, None
