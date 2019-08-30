@@ -1,15 +1,12 @@
 import json
 import os
-
 import pytest
 from COMPS.Data import Experiment
-
 from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
-from idmtools.entities.Suite import Suite
+from idmtools.core import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_models.dtk import DTKExperiment
 from idmtools_models.dtk.defaults import DTKSIR
-from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 
@@ -19,13 +16,14 @@ DEFAULT_CAMPAIGN_JSON = os.path.join(COMMON_INPUT_PATH, "files", "campaign.json"
 DEFAULT_DEMOGRAPHICS_JSON = os.path.join(COMMON_INPUT_PATH, "files", "demographics.json")
 DEFAULT_ERADICATION_PATH = os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe")
 
+
 @pytest.mark.comps
 class TestDTK(ITestWithPersistence):
 
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
-        self.p = COMPSPlatform()
+        self.p = Platform('COMPS2')
 
     def test_sir_with_StandAloneSimulationsBuilder(self):
         e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
@@ -99,12 +97,11 @@ class TestDTK(ITestWithPersistence):
             self.assertEqual(config_parameters["Enable_Immunity"], 0)
 
     def test_batch_simulations1(self):
-
         e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
                                        eradication_path=os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe"))
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         # s = Suite(name="test suite")
-        #s.experiments.append(e)
+        # s.experiments.append(e)
         e.base_simulation.set_parameter("Enable_Immunity", 0)
 
         def param_a_update(simulation, value):
@@ -121,11 +118,6 @@ class TestDTK(ITestWithPersistence):
         self.assertTrue(e.succeeded)
 
     def test_load_files(self):
-        from COMPS.Data import Experiment
-        from idmtools.builders import StandAloneSimulationsBuilder
-        from idmtools.managers import ExperimentManager
-        from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
-
         e = DTKExperiment.from_files(self.case_name,
                                      eradication_path=DEFAULT_ERADICATION_PATH,
                                      config_path=DEFAULT_CONFIG_PATH,
@@ -140,8 +132,7 @@ class TestDTK(ITestWithPersistence):
         b.add_simulation(sim)
         e.builder = b
 
-        p = COMPSPlatform()
-        em = ExperimentManager(platform=p, experiment=e)
+        em = ExperimentManager(platform=self.p, experiment=e)
         em.run()
         em.wait_till_done()
         self.assertTrue(e.succeeded)
@@ -153,11 +144,6 @@ class TestDTK(ITestWithPersistence):
             self.assertEqual(config_parameters["Enable_Immunity"], 0)
 
     def test_load_files_2(self):
-        from COMPS.Data import Experiment
-        from idmtools.builders import StandAloneSimulationsBuilder
-        from idmtools.managers import ExperimentManager
-        from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
-
         e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
                                        eradication_path=DEFAULT_ERADICATION_PATH)
 
@@ -170,8 +156,7 @@ class TestDTK(ITestWithPersistence):
         b.add_simulation(sim)
         e.builder = b
 
-        p = COMPSPlatform()
-        em = ExperimentManager(platform=p, experiment=e)
+        em = ExperimentManager(platform=self.p, experiment=e)
         em.run()
         em.wait_till_done()
         self.assertTrue(e.succeeded)
