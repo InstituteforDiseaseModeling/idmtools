@@ -116,7 +116,7 @@ class TestPythonSimulation(ITestWithPersistence):
             self.assertEqual(pe.simulation_type, oe.simulation_type)
             self.assertEqual(len(pe.simulations), len(oe.simulations))
             sim_ids_pe = set([s.uid for s in pe.simulations])
-            sim_ids_oe = set([s.uid for s in pe.simulations])
+            sim_ids_oe = set([s.uid for s in oe.simulations])
             # get difference. There should be none so we should get an empty array
             self.assertEqual(len(sim_ids_oe.difference(sim_ids_pe)), 0)
             # intersection should be 100% of array

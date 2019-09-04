@@ -36,13 +36,9 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
     def __post_init__(self, simulation_type):
         super().__post_init__()
         self.simulations = EntityContainer()
-        # add the simulation type as a string to the object for future reference
-        if simulation_type and isinstance(simulation_type, (type)) and hasattr(simulation_type, '__module__'):
-            self.simulation_type = f'{simulation_type.__module__}.{simulation_type.__name__}'
-
         # Take care of the base simulation
         if not self.base_simulation:
-            if simulation_type:
+            if simulation_type and callable(simulation_type):
                 self.base_simulation = simulation_type()
             else:
                 raise Exception(
