@@ -8,12 +8,25 @@ import { connect } from "react-redux";
 import * as _ from "lodash";
 import * as moment from "moment";
 import {setFilter} from "../../redux/action/experiment";
+import {Grid, CircularProgress}  from '@material-ui/core';
+
 
 const styles = theme => ({
 
     chartContainer: {
         height:'100%'
+    },
+    progress: {
+        color: 'white',
+        
+    },
+    grid: {
+        height:'100%'
+    },
+    container: {
+        height:'100%'
     }
+
 
 });
 
@@ -160,10 +173,25 @@ class ExperimentChart extends React.Component {
 
 
         if (this.state.mounted)
-            this.drawChart();
+            setTimeout( ()=> {
+                this.drawChart();
+            }, 0);
+
+
+
+        let displayChart = this.props.loading ? "none" : "";
+        let displayProgress = this.props.loading ? "" : "none";
+    
 
         return (
-            <div id="chartdiv" className={classes.chartContainer}/>
+            <div className={classes.container}>
+                <div id="chartdiv" className={classes.chartContainer} style={{'display': displayChart }}/>                
+                <Grid container justify="center" alignItems="center" className = {classes.grid}  style={{'display': displayProgress }} >
+                    <Grid item>
+                        <CircularProgress className={classes.progress} variant="indeterminate" value='50' disableShrink={true}/>
+                    </Grid>
+                </Grid>
+            </div>
         )
     }
 }
@@ -172,7 +200,8 @@ class ExperimentChart extends React.Component {
 function mapStateToProps(state) {
 
     return ({
-      experiments: state.experiments.experiments   
+      experiments: state.experiments.experiments   ,
+      loading: state.experiments.loading
     })
   
   }

@@ -1,4 +1,4 @@
-import {GET_SIMULATIONS, SET_SIMULATION_FILTER} from "../actionTypes";
+import {GET_SIMULATIONS, SET_SIMULATION_FILTER, LOADING_SIMULATION} from "../actionTypes";
 import {handleResponse} from "../../utils/utils";
 import {showError, showInfo} from "./messaging";
 
@@ -7,9 +7,17 @@ import {showError, showInfo} from "./messaging";
 function receiveSimulations(data) {
     return {
         type:GET_SIMULATIONS,
-        data
+        data,
+        complete:true
     }
 
+}
+
+export function loading(loading) {
+  return {
+    type:LOADING_SIMULATION,
+    loading
+  }
 }
 
 
@@ -17,16 +25,20 @@ export function fetchSimulations() {
 
   
     let url = "/api/simulations";
-  
+
+    
     
     return (dispatch) => {
+
+        dispatch(loading(true));
         
         return fetch(url)
             .then(response => {
   
               handleResponse(response,
                 (subjects)=>{ /*success handler*/                
-                  dispatch(receiveSimulations(subjects))
+                  dispatch(receiveSimulations(subjects));
+                  dispatch(loading(false));
                 },
                 (data)=> { /* failure handler */
                   dispatch(showError(data));

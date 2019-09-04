@@ -1,6 +1,6 @@
 
 
-import {GET_EXPERIMENTS, SET_EXPERIMENT_FILTER} from "../actionTypes";
+import {GET_EXPERIMENTS, SET_EXPERIMENT_FILTER, LOADING_EXPERIMENTS} from "../actionTypes";
 import {handleResponse} from "../../utils/utils";
 import {showError, showInfo} from "./messaging";
 
@@ -13,6 +13,12 @@ function receiveExperiments(data) {
 
 }
 
+export function loading(loading) {
+  return {
+    type:LOADING_EXPERIMENTS,
+    loading
+  }
+}
 
 export function fetchExperiments() { 
 
@@ -20,7 +26,10 @@ export function fetchExperiments() {
     let url = "/api/experiments";
   
     
+    
     return (dispatch) => {
+
+      dispatch(loading(true));
         
         return fetch(url)
             .then(response => {
@@ -28,9 +37,11 @@ export function fetchExperiments() {
               handleResponse(response,
                 (subjects)=>{ /*success handler*/                
                   dispatch(receiveExperiments(subjects))
+                  dispatch(loading(false));
                 },
                 (data)=> { /* failure handler */
                   dispatch(showError(data));
+                  dispatch(loading(false));
                 })
   
             });

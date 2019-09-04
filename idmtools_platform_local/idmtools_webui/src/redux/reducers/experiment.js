@@ -1,10 +1,11 @@
-import {GET_EXPERIMENTS, SET_EXPERIMENT_FILTER} from "../actionTypes";
+import {GET_EXPERIMENTS, SET_EXPERIMENT_FILTER, LOADING_EXPERIMENTS} from "../actionTypes";
 
 const initialState = {
 
     experiments:[],
     start:null,
-    end:null
+    end:null,
+    loading:true
 
 };
 
@@ -21,6 +22,11 @@ export function experiments(state=initialState, action) {
                 start: action.start, 
                 end:action.end
             }
+        case LOADING_EXPERIMENTS:
+            return {...state,
+                loading: action.loading         
+            };
+
         default:
             return state;
     }
