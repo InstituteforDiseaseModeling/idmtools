@@ -10,6 +10,8 @@ from idmtools.entities import IPlatform
 
 LOCAL_PLATFORM_EXAMPLE_CONFIG = """
 [LOCAL]
+# The host data directory. Optional. Defaults to {HOME}/.local_data
+# host_data_directory = /home/ccollins/.local_data
 # Timeout of tasks submissions to local platform
 default_timeout: int = 30
 # Items related to internals of the local platform. Most likely you want to use the defaults
