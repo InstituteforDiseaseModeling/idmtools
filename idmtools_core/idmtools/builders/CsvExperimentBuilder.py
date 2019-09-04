@@ -1,4 +1,6 @@
 import pandas as pd
+import numpy as np
+from numbers import Number
 from itertools import product
 from idmtools.builders import ExperimentBuilder
 
@@ -13,11 +15,26 @@ class CsvExperimentBuilder(ExperimentBuilder):
         self.SweepFunctions = []
 
     def add_sweeps_from_file(self, file_path, func_map={}, type_map={}, sep=","):
-        df_sweeps = pd.read_csv(file_path, sep=sep)
+        def strip_column(x):
+            """
+            strip white spaces for Number type column
+            """
+            y = x.strip() if not isinstance(x, Number) else x
+            return np.nan if y == '' else y
 
+        # make up our column converter
+        convert_map = {c: strip_column for c, v in type_map.items() if v in (np.int, np.float, np.int64, np.float64)}
+
+        # load csv with our converter
+        # df_sweeps = pd.read_csv(file_path, sep=sep)
+        df_sweeps = pd.read_csv(file_path, sep=sep, converters=convert_map)
+
+        # go through each of rows
         row_count = df_sweeps.shape[0]
         for k in range(row_count):
             self.sweeps = []
+
+            # get the current row as DataFrame
             df = df_sweeps.iloc[[k]]
 
             # drop columns with nan

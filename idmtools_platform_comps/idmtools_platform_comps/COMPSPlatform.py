@@ -1,6 +1,7 @@
 import logging
 import ntpath
 import os
+import json
 import typing
 
 from COMPS import Client
@@ -54,6 +55,8 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
     def __post_init__(self):
         super().__post_init__()
+        print("\nUser Login:")
+        print(json.dumps({"endpoint": self.endpoint, "environment": self.environment}, indent=3))
         self._login()
 
     def _login(self):

@@ -1,4 +1,5 @@
 import copy
+import json
 from logging import getLogger
 import os
 from configparser import ConfigParser
@@ -177,6 +178,9 @@ class IdmConfigParser:
         Returns: None
         """
         cls.ensure_init()
+        if cls._config_path is None:
+            return
+
         print("View Config INI: \n{}".format(cls._config_path))
         print('-' * len(cls._config_path), '\n')
         with open(cls._config_path) as f:
@@ -208,6 +212,14 @@ class IdmConfigParser:
         """
         if cls._instance is None:
             cls(dir_path, file_name)
+
+    @classmethod
+    def display_config_block_details(cls, block):
+        if cls._config_path:
+            block_details = cls.get_section(block)
+            # print('\nConfig_info:')
+            print(f"\n[{block}]")
+            print(json.dumps(block_details, indent=3))
 
     @classmethod
     def clear_instance(cls) -> None:
