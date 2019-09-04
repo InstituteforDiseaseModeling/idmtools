@@ -9,9 +9,11 @@ from pathlib import Path
 from idmtools.assets import Asset
 from idmtools.entities import IExperiment, IPlatform
 # we have to import brokers so that the proper configuration is achieved for redis
+from idmtools_platform_local.client.experiments_client import ExperimentsClient
 from idmtools_platform_local.client.simulations_client import SimulationsClient
 from idmtools_platform_local.docker.DockerOperations import DockerOperations
 from idmtools_platform_local.workers.brokers import setup_broker
+from idmtools.core.ExperimentFactory import experiment_factory
 
 status_translate = dict(
     created='CREATED',
@@ -66,14 +68,53 @@ class LocalPlatform(IPlatform):
     Represents the platform allowing to run simulations locally.
     """
 
-    def retrieve_experiment(self, experiment_id):
-        pass
+    def retrieve_experiment(self, experiment_id: str) -> 'IExperiment':
+        """
+        Restore experiment from local platform
 
-    def get_assets_for_simulation(self, simulation, output_files):
-        raise NotImplementedError("Not implemented yet in the LocalPlatform")
+        Args:
+            experiment_id: Id of experiment to restore
 
-    def restore_simulations(self, experiment):
-        raise NotImplementedError("Not implemented yet in the LocalPlatform")
+        Returns:
+
+        """
+        experiment_dict = ExperimentsClient.get_one(experiment_id)
+        experiment = experiment_factory.create(experiment_dict['tags'].get("type"), tags=experiment_dict['tags'])
+        experiment.uid = experiment_dict['experiment_id']
+        return experiment
+
+    def get_assets_for_simulation(self, simulation: 'TSimulation', output_files):  # noqa: F821
+        all_paths = set(output_files)
+
+        assets = set(path for path in all_paths if path.lower().startswith("assets"))
+        transients = all_paths.difference(assets)
+
+        # Create the return dict
+        ret = {}
+
+        # Retrieve the transient if any
+        if transients:
+            sim_path = f'{simulation.experiment.uid}/{simulation.uid}'
+            transients_files = self.retrieve_output_files(job_id_path=sim_path, paths=transients)
+            ret = dict(zip(transients, transients_files))
+
+        # Take care of the assets
+        if assets:
+            asset_path = f'{simulation.experiment.uid}'
+            common_files = self.retrieve_output_files(job_id_path=asset_path, paths=assets)
+            ret.update(dict(zip(assets, common_files)))
+
+        return ret
+
+    def restore_simulations(self, experiment: 'TExperiment'):  # noqa: F821
+        simulation_dict = SimulationsClient.get_all(experiment_id=experiment.uid)
+
+        for sim_info in simulation_dict:
+            sim = experiment.simulation()
+            sim.uid = sim_info['simulation_uid']
+            sim.tags = sim_info['tags']
+            sim.status = local_status_to_common(sim_info['status'])
+            experiment.simulations.append(sim)
 
     def refresh_experiment_status(self, experiment: 'TExperiment'):  # noqa: F821
         """
@@ -150,3 +191,23 @@ class LocalPlatform(IPlatform):
         from idmtools_platform_local.tasks.run import RunTask
         for simulation in experiment.simulations:
             RunTask.send(simulation.experiment.command.cmd, simulation.experiment.uid, simulation.uid)
+
+    def retrieve_output_files(self, job_id_path, paths):
+        """
+        Retrieves output files
+        Args:
+            job_id_path: For experiments, this should just be the id. For simulations, the path should be
+            experiment_id/simulation id
+            paths:
+
+        Returns:
+
+        """
+
+        byte_arrs = []
+
+        for path in paths:
+            full_path = os.path.join(self.host_data_directory, 'workers', job_id_path, path)
+            with open(full_path, 'rb') as fin:
+                byte_arrs.append(fin.read())
+        return byte_arrs

@@ -147,6 +147,25 @@ class TestCOMPSPlatform(ITestWithPersistence):
         self.assertTrue(experiment2.done)
         self.assertTrue(experiment2.succeeded)
 
+    def test_experiment_manager(self):
+        experiment = PythonExperiment(name=self.case_name,
+                                      model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"))
+        self._run_and_test_experiment(experiment)
+        em = ExperimentManager.from_experiment_id(experiment.uid, self.platform)
+
+        # Verify new ExperimentManager contains correct info
+        # For experiment in newly created em, it only restore same experiment id ro pythonexperiment
+        # For simulations in newly created em, simulation id/tags/status should be retrieved to pythonsimulation
+        self.assertEqual(em.experiment.base_simulation, experiment.base_simulation)
+        self.assertEqual(em.experiment.uid, experiment.uid)
+        self.assertEqual(em.experiment.tags, experiment.tags)
+        self.assertEqual(em.platform, self.platform)
+        for i in range(len(em.experiment.simulations)):
+            self.assertEqual(em.experiment.simulations[i].uid, experiment.simulations[i].uid)
+            self.assertEqual(em.experiment.simulations[i].tags["P"], str(i + 1))
+            # self.assertDictEqual(em.experiment.simulations[i].tags, experiment.simulations[i].tags)
+            self.assertEqual(em.experiment.simulations[i].status, experiment.simulations[i].status)
+
 
 if __name__ == '__main__':
     unittest.main()

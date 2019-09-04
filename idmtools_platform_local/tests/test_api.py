@@ -125,7 +125,7 @@ class TestAPI(unittest.TestCase):
         dm.cleanup(True)
         dm.get_postgres()
         # give postgres 5 seconds to start
-        time.sleep(5)
+        time.sleep(8)
         # ensure we are connecting to proper db
         url = 'postgresql+psycopg2://idmtools:idmtools@localhost/idmtools'
         engine = create_engine(url, echo=True, pool_size=32)

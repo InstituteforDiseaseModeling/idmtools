@@ -55,6 +55,22 @@ class TestExperimentManager(ITestWithPersistence):
         self.assertDictEqual(em2.experiment.tags, experiment.tags)
         self.assertEqual(em2.experiment.platform_id, c.uid)
 
+    def test_bad_experiment_builder(self):
+        builder = ExperimentBuilder()
+        with self.assertRaises(ValueError) as context:
+            # test 'sim' (should be 'simulation') is bad parameter for add_sweep_definition()
+            builder.add_sweep_definition(lambda sim, value: {"p": value}, range(0, 2))
+        self.assertTrue('passed to SweepBuilder.add_sweep_definition needs to take a simulation argument!' in str(
+            context.exception.args[0]))
+
+    def test_bad_experiment_builder1(self):
+        builder = ExperimentBuilder()
+        with self.assertRaises(ValueError) as context:
+            # test 'sim' is bad extra parameter for add_sweep_definition()
+            builder.add_sweep_definition(lambda simulation, sim, value: {"p": value}, range(0, 2))
+        self.assertTrue('passed to SweepBuilder.add_sweep_definition needs to only have simulation and exactly one free parameter.' in str(
+            context.exception.args[0]))
+
 
 if __name__ == '__main__':
     unittest.main()
