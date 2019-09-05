@@ -12,7 +12,7 @@ from idmtools_test.utils.TstExperiment import TstExperiment
 class TestExperimentFactory(ITestWithPersistence):
 
     def test_build_python_experiment_from_factory(self):
-        experiment = experiment_factory.create("idmtools_models.python.PythonExperiment", tags={"a": "1", "b": 2})
+        experiment = experiment_factory.create("PythonExperiment", tags={"a": "1", "b": 2})
         experiment.model_path = os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py")
         test_platform = TestPlatform()
         builder = ExperimentBuilder()
@@ -27,7 +27,7 @@ class TestExperimentFactory(ITestWithPersistence):
         self.assertEqual(em.experiment.simulations[1].tags, {'p': 1})
 
     def test_build_dtk_experiment_from_factory(self):
-        experiment = experiment_factory.create("idmtools_models.dtk.DTKExperiment", tags={"a": "1", "b": 2},
+        experiment = experiment_factory.create("DTKExperiment", tags={"a": "1", "b": 2},
                                                eradication_path=os.path.join(COMMON_INPUT_PATH, "dtk"))
         experiment.load_files(config_path=os.path.join(COMMON_INPUT_PATH, "files", "config.json"),
                               campaign_path=os.path.join(COMMON_INPUT_PATH, "files", "campaign.json"),
@@ -46,7 +46,7 @@ class TestExperimentFactory(ITestWithPersistence):
 
         em.run()
         self.assertEqual(len(em.experiment.simulations), 20)
-        self.assertEqual(em.experiment.tags, {'a': '1', 'b': 2, 'type': 'idmtools_models.dtk.DTKExperiment'})
+        self.assertEqual(em.experiment.tags, {'a': '1', 'b': 2, 'type': 'DTKExperiment'})
 
     def test_build_test_experiment_from_factory(self):
         test_experiment = TstExperiment()
@@ -56,4 +56,4 @@ class TestExperimentFactory(ITestWithPersistence):
         experiment_factory.register_type(TstExperiment)
         experiment = experiment_factory.create(test_experiment.tags.get("type"), tags=test_experiment.tags)
         self.assertIsNotNone(experiment.uid)
-        self.assertEqual(experiment.tags, {'a': '1', 'b': 2, 'type': 'idmtools_test.utils.TstExperiment'})
+        self.assertEqual(experiment.tags, {'a': '1', 'b': 2, 'type': 'TstExperiment'})

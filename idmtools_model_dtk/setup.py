@@ -40,6 +40,9 @@ setup(
     include_package_data=True,
     keywords='modeling, IDM',
     name='idmtools_model_dtk',
+    entry_points=dict(idmtools_model=  # noqa: E251
+                      ["idmtools_model_dtk = idmtools_model_dtk.DTKExperimentSpec:DTKExperimentSpec"]
+                      ),
     packages=find_packages(),
     setup_requires=setup_requirements,
     test_suite='tests',
