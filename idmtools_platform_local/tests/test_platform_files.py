@@ -54,7 +54,7 @@ class TestPlatformSimulations(ITestWithPersistence):
                 self.assertEqual(files[filename].decode('utf-8').strip(), f'/data/{pe.uid}/Assets')
             else:  # default compare the content of the files
                 with open(os.path.join(COMMON_INPUT_PATH, "python", "realpath_verify.py"), 'r') as rpin:
-                    self.assertEqual(files[filename].decode("utf-8"), rpin.read().replace("\r\n", "\n"))
+                    self.assertEqual(files[filename].decode("utf-8").replace("\r\n", "\n"), rpin.read().replace("\r\n", "\n"))
 
         # TODO attempt to unify the content of this file across platforms
         # On Comps, this will return the path to the Simulation Assets directory, but on Local, it returns the REAL
