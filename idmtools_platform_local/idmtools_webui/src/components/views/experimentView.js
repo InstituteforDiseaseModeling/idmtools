@@ -254,24 +254,32 @@ class ExperimentView extends React.Component {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {sorted && sorted.map(exp => (
-                                        <TableRow key={exp.experiment_id} onClick={this.rowClick} exp_id={exp.experiment_id} className={exp.experiment_id == this.state.selectedExp ? classes.highlight: null}>
+                                    {sorted && sorted.map(exp => {
 
-                                            <TableCell align="right">{exp.experiment_id}</TableCell>
-                                            <TableCell align="right">{progressStr(exp.progress)}</TableCell>
-                                            <TableCell align="right">
-                                                <a target="_blank" href={'http://' + window.location.hostname + ':5000' + exp.data_path}>
-                                                <FolderIcon className={classes.folder}/>
-                                                </a>
-                                            </TableCell>
-                                            <TableCell align="center">
-                                                <Button className={classes.cancel} color="secondary" exp_id={exp.experiment_id} onClick={this.deleteClick(this.deleteExp)}>Delete</Button>
+                                        let disable = exp.progress && exp.progress.length > 0 && exp.progress[0].created && exp.progress[0].created > 0 
 
-                                            </TableCell>
-                                            <TableCell align="right">{formatDateString(exp.created)}</TableCell>
-                                            <TableCell align="right">{formatDateString(exp.updated)}</TableCell>
-                                        </TableRow>
-                                    ))}
+                                        disable = disable || exp.progress && exp.progress.length > 0 && exp.progress[0].in_progress && exp.progress[0].in_progress > 0 
+
+                                        return (
+
+                                            <TableRow key={exp.experiment_id} onClick={this.rowClick} exp_id={exp.experiment_id} className={exp.experiment_id == this.state.selectedExp ? classes.highlight: null}>
+
+                                                <TableCell align="right">{exp.experiment_id}</TableCell>
+                                                <TableCell align="right">{progressStr(exp.progress)}</TableCell>
+                                                <TableCell align="right">
+                                                    <a target="_blank" href={'http://' + window.location.hostname + ':5000' + exp.data_path}>
+                                                    <FolderIcon className={classes.folder}/>
+                                                    </a>
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    <Button className={classes.cancel} color="secondary" exp_id={exp.experiment_id} disabled={disable} onClick={this.deleteClick(this.deleteExp)}>Delete</Button>
+
+                                                </TableCell>
+                                                <TableCell align="right">{formatDateString(exp.created)}</TableCell>
+                                                <TableCell align="right">{formatDateString(exp.updated)}</TableCell>
+                                            </TableRow>
+                                        )}
+                                    )}
                                 </TableBody>
                             </Table>
                         </Paper>

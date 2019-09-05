@@ -248,27 +248,31 @@ class SimulationView extends React.Component {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {sorted.map(sim => (
-                                        <TableRow key={sim.simulation_uid} onClick={this.rowClick} sim_id={sim.simulation_uid} className={sim.simulation_uid == this.state.selectedSim ? classes.highlight: null}>
+                                    {sorted.map(sim => {
+                                        let disable = (sim.status == "done");
 
-                                            <TableCell align="right">{sim.simulation_uid}</TableCell>
-                                            <TableCell align="right">{sim.status}</TableCell>
-                                            <TableCell align="right">{sim.experiment_id}</TableCell>
-                                            <TableCell align="right">
-                                                <a target="_blank" href={'http://' + window.location.hostname + ':5000' + sim.data_path}>
-                                                    <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
-                                                        <FolderIcon className={classes.folder}/>
-                                                    </IconButton>
-                                                </a>
-                                            </TableCell>
-                                            <TableCell align="center">
-                                                <Button className={classes.cancel} color="secondary" sim_id={sim.simulation_uid} onClick={this.cancelClick(this.cancelSim)}>Cancel</Button>
+                                        debugger
+                                        return (
+                                            <TableRow key={sim.simulation_uid} onClick={this.rowClick} sim_id={sim.simulation_uid} className={sim.simulation_uid == this.state.selectedSim ? classes.highlight: null}>
 
-                                            </TableCell>
-                                            <TableCell align="right">{formatDateString(sim.created)}</TableCell>
-                                            <TableCell align="right">{formatDateString(sim.updated)}</TableCell>                                
-                                        </TableRow>
-                                    ))}
+                                                <TableCell align="right">{sim.simulation_uid}</TableCell>
+                                                <TableCell align="right">{sim.status}</TableCell>
+                                                <TableCell align="right">{sim.experiment_id}</TableCell>
+                                                <TableCell align="right">
+                                                    <a target="_blank" href={'http://' + window.location.hostname + ':5000' + sim.data_path}>
+                                                        <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
+                                                            <FolderIcon className={classes.folder}/>
+                                                        </IconButton>
+                                                    </a>
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    <Button className={classes.cancel} color="secondary" disabled={disable} sim_id={sim.simulation_uid} onClick={this.cancelClick(this.cancelSim)}>Cancel</Button>
+
+                                                </TableCell>
+                                                <TableCell align="right">{formatDateString(sim.created)}</TableCell>
+                                                <TableCell align="right">{formatDateString(sim.updated)}</TableCell>                                
+                                            </TableRow>
+                                    )})}
                                 </TableBody>
                             </Table>
                         </Paper>

@@ -7,8 +7,8 @@ import {showError, showInfo} from "./messaging";
 function receiveSimulations(data) {
     return {
         type:GET_SIMULATIONS,
-        data,
-        complete:true
+        data
+        
     }
 
 }
@@ -42,6 +42,7 @@ export function fetchSimulations() {
                 },
                 (data)=> { /* failure handler */
                   dispatch(showError(data));
+                  dispatch(loading(false));
                 })
   
             });
