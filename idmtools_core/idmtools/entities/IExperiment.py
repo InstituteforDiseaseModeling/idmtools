@@ -38,10 +38,9 @@ class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
     def __post_init__(self, simulation_type):
         super().__post_init__()
         self.simulations = EntityContainer()
-
         # Take care of the base simulation
         if not self.base_simulation:
-            if simulation_type:
+            if simulation_type and callable(simulation_type):
                 self.base_simulation = simulation_type()
             else:
                 raise Exception(

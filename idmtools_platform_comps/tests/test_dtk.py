@@ -5,7 +5,6 @@ import pytest
 from COMPS.Data import Experiment
 
 from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
-from idmtools.entities.Suite import Suite
 from idmtools.managers import ExperimentManager
 from idmtools_models.dtk import DTKExperiment
 from idmtools_models.dtk.defaults import DTKSIR
@@ -18,6 +17,7 @@ DEFAULT_CONFIG_PATH = os.path.join(COMMON_INPUT_PATH, "files", "config.json")
 DEFAULT_CAMPAIGN_JSON = os.path.join(COMMON_INPUT_PATH, "files", "campaign.json")
 DEFAULT_DEMOGRAPHICS_JSON = os.path.join(COMMON_INPUT_PATH, "files", "demographics.json")
 DEFAULT_ERADICATION_PATH = os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe")
+
 
 @pytest.mark.comps
 class TestDTK(ITestWithPersistence):
@@ -104,7 +104,7 @@ class TestDTK(ITestWithPersistence):
                                        eradication_path=os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe"))
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         # s = Suite(name="test suite")
-        #s.experiments.append(e)
+        # s.experiments.append(e)
         e.base_simulation.set_parameter("Enable_Immunity", 0)
 
         def param_a_update(simulation, value):

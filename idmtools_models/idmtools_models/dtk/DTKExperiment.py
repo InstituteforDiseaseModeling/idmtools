@@ -88,8 +88,12 @@ class DTKExperiment(IExperiment):
                     return None
 
         if demographics_paths:
-            demographics_paths = demographics_paths if isinstance(demographics_paths, collections.Iterable) \
-                                    and not isinstance(demographics_paths, str) else [demographics_paths]
+            if isinstance(demographics_paths, collections.Iterable) \
+                    and not isinstance(demographics_paths, str):
+                demographics_paths = demographics_paths
+            else:
+                demographics_paths = [demographics_paths]
+
             for demographics_path in demographics_paths:
                 jn = load_file(demographics_path)
                 if jn:
