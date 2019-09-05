@@ -205,4 +205,3 @@ class TestCustomFiles(ITestWithPersistence):
         # test the order of files
         demographics_list = list(e.base_simulation.demographics.keys())
         self.assertEqual(demographics_list[0], 'demographics.json')
-
