@@ -89,19 +89,18 @@ class TestCOMPSPlatform(ITestWithPersistence):
             for uid, simulation in zip(ids, simulation_batch):
                 simulation.uid = uid
                 simulation.post_creation()
-                experiment.simulations.append(simulation)
 
         self.platform.refresh_status(item=experiment)
 
         # Test if we have all simulations at status CREATED
         self.assertFalse(experiment.done)
-        self.assertTrue(all([s.status == EntityStatus.CREATED for s in experiment.simulations]))
+        self.assertTrue(all([s.status == EntityStatus.CREATED for s in experiment.children()]))
 
         # Start experiment
         self.platform.run_items(items=[experiment])
         self.platform.refresh_status(item=experiment)
         self.assertFalse(experiment.done)
-        self.assertTrue(all([s.status == EntityStatus.RUNNING for s in experiment.simulations]))
+        self.assertTrue(all([s.status == EntityStatus.RUNNING for s in experiment.children()]))
 
         # Wait till done
         import time
@@ -117,13 +116,14 @@ class TestCOMPSPlatform(ITestWithPersistence):
         experiment = PythonExperiment(name=self.case_name,
                                       model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"))
         self._run_and_test_experiment(experiment)
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in experiment.simulations]))
+        print([s.status for s in experiment.children()])
+        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in experiment.children()]))
 
     def test_status_retrieval_failed(self):
         experiment = PythonExperiment(name=self.case_name,
                                       model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "failing_model.py"))
         self._run_and_test_experiment(experiment)
-        self.assertTrue(all([s.status == EntityStatus.FAILED for s in experiment.simulations]))
+        self.assertTrue(all([s.status == EntityStatus.FAILED for s in experiment.children()]))
         self.assertFalse(experiment.succeeded)
 
     def test_status_retrieval_mixed(self):
@@ -132,21 +132,26 @@ class TestCOMPSPlatform(ITestWithPersistence):
         self._run_and_test_experiment(experiment)
         self.assertTrue(experiment.done)
         self.assertFalse(experiment.succeeded)
-        for s in experiment.simulations:
-            self.assertTrue(s.tags["P"] == 2 and s.status == EntityStatus.FAILED or s.status == EntityStatus.SUCCEEDED)
+
+        if len(experiment.children()) == 0:
+            raise Exception('NO CHILDREN')
+
+        for s in experiment.children():
+            self.assertTrue((s.tags["P"] == '2' and s.status == EntityStatus.FAILED) or
+                            s.status == EntityStatus.SUCCEEDED)
 
     def test_from_experiment(self):
         experiment = PythonExperiment(name=self.case_name,
                                       model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"))
         self._run_and_test_experiment(experiment)
         experiment2 = copy.deepcopy(experiment)
-        experiment2.simulations.clear()
 
-        # TODO: really should make sure the platform is added to the experiment at creation time
-        experiment2.platform = self.platform
-        experiment2.simulations = experiment2.children()
+        # very explicitly clearing the stored children and re-querying
+        experiment2._children = None
+        experiment2.children(refresh=True)
 
-        self.assertEqual(len(experiment.simulations), len(experiment2.simulations))
+        self.assertTrue(len(experiment.children()) > 0)
+        self.assertEqual(len(experiment.children()), len(experiment2.children()))
         self.assertTrue(experiment2.done)
         self.assertTrue(experiment2.succeeded)
 

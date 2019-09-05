@@ -165,7 +165,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         self.send_assets(item=experiment)
         return experiment.uid
 
-    def create_items(self, items) -> 'List[uuid]':
+    def create_items(self, items: 'TItemList') -> 'List[uuid]':
         # TODO: add ability to create suites
         types = list({type(item) for item in items})
         if len(types) != 1:
@@ -178,6 +178,8 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         else:
             raise Exception(f'Unable to create items of type: {type(sample_item)} '
                             f'for platform: {self.__class__.__name__}')
+        for item in items:
+            item.platform = self
         return ids
 
     def _create_simulations(self, simulation_batch: 'TSimulationList') -> 'List[uuid]':
@@ -197,13 +199,15 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         # Register the IDs
         return [s.id for s in created_simulations]
 
-    def run_items(self, items) -> NoReturn:
+    def run_items(self, items: 'TItemList') -> NoReturn:
         # TODO: add ability to run experiments and suites
         for item in items:
             try:
                 self._run_simulations_for_experiment(experiment=item)
             except:
                 raise Exception(f'Unable to run item id: {item.uid} of type: {type(item)} ')
+        for item in items:
+            item.platform = self
 
     def _run_simulations_for_experiment(self, experiment: 'TExperiment') -> NoReturn:
         self._login()
@@ -221,15 +225,17 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         else:
             return EntityStatus.RUNNING
 
-    def refresh_status(self, item) -> NoReturn:
+    def refresh_status(self, item: 'TItem') -> NoReturn:
         if isinstance(item, ISimulation):
             raise Exception(f'Unknown how to refresh items of type {type(item)} '
                             f'for platform: {self.__class__.__name__}')
         elif isinstance(item, IExperiment):
-            return self._refresh_experiment_status(experiment=item)
+            return_value = self._refresh_experiment_status(experiment=item)
         elif isinstance(item, ISuite):
             raise Exception(f'Unknown how to refresh items of type {type(item)} '
                             f'for platform: {self.__class__.__name__}')
+        item.platform = self
+        return return_value
 
     def _refresh_experiment_status(self, experiment) -> NoReturn:
         # Do nothing if we are already done
@@ -242,7 +248,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         comps_simulations = self.comps_experiment.get_simulations(
             query_criteria=QueryCriteria().select(["id", "state"]))
 
-        for s in experiment.simulations:
+        for s in experiment.children(refresh=True):
             if s.done:
                 continue
 
@@ -291,6 +297,8 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         if not successful:
             raise self.UnknownItemException(f'Unable to retrieve children for unknown item '
                                             f'id: {item.uid} of type: {type(item)}')
+        for child in children:
+            child.platform = self
         return children
 
     # TODO: This method is a total hack for now. It doesn't actually look for and attach ALL experiments for the suite
@@ -306,9 +314,9 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
     def _retrieve_experiment(self, experiment_id: 'uuid') -> 'TExperiment':
         self._comps_experiment_id = experiment_id
-        experiment = experiment_factory.create(self.comps_experiment.tags.get("type"), tags=self.comps_experiment.tags)
+        experiment = experiment_factory.create(key=self.comps_experiment.tags.get("type"), platform=self,
+                                               tags=self.comps_experiment.tags)
         experiment.uid = self.comps_experiment.id
-        experiment.platform = self  # TODO move this into the factory?
         return experiment
 
     def _retrieve_simulation(self, simulation_id: 'uuid') -> 'TSimulation':
@@ -334,6 +342,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         if not successful:
             raise self.UnknownItemException(f'Unable to retrieve parent for unknown item '
                                             f'id: {item.uid} of type: {type(item)}')
+        parent.platform = self
         return parent
 
     @staticmethod
@@ -400,6 +409,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             item = self._retrieve_experiment(experiment_id=id)
         except:
             raise Exception(f'Unable to load item id: {id} from platform: {self.__class__.__name__}')
+        item.platform = self
         return item
 
     #

@@ -15,7 +15,7 @@ class ExperimentFactory:
     def register_type(self, experiment_class: 'TExperimentClass'):
         self._builders[experiment_class.__module__] = experiment_class
 
-    def create(self, key, **kwargs) -> 'TExperiment':
+    def create(self, key, platform, **kwargs) -> 'TExperiment':
         if key not in self._builders:
             try:
                 # Try first to import it dynamically
@@ -26,7 +26,9 @@ class ExperimentFactory:
                 raise ValueError(f"The ExperimentFactory could not create an experiment of type {key}")
 
         builder = self._builders.get(key)
-        return builder(**kwargs)
+        experiment = builder(**kwargs)
+        experiment.platform = platform
+        return experiment
 
 
 experiment_factory = ExperimentFactory()

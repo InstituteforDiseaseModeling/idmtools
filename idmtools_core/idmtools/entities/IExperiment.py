@@ -27,7 +27,6 @@ class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
         base_simulation: Optional a simulation that will be the base for all simulations created for this experiment
         command: Command to run on simulations
     """
-    level = 1
     command: 'TCommandLine' = field(default=None)
     suite_id: uuid = field(default=None)
     base_simulation: 'TSimulation' = field(default=None)
@@ -138,12 +137,12 @@ class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
 
     @property
     def done(self):
-        return all([s.done for s in self.simulations])
+        return all([s.done for s in self.children()])
 
     @property
     def succeeded(self):
-        return all([s.succeeded for s in self.simulations])
+        return all([s.succeeded for s in self.children()])
 
     @property
     def simulation_count(self):
-        return len(self.simulations)
+        return len(self.children())
