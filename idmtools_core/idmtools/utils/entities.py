@@ -18,7 +18,7 @@ def retrieve_experiment(experiment_id: 'uuid', platform: 'TPlatform' = None,
             raise ExperimentNotFound(experiment_id)
 
         # Try to retrieve it from the platform
-        experiment = platform.retrieve_experiment(experiment_id)
+        experiment = platform.get_item(id=experiment_id)
         if not experiment:
             raise ExperimentNotFound(experiment_id, platform)
 
@@ -28,6 +28,9 @@ def retrieve_experiment(experiment_id: 'uuid', platform: 'TPlatform' = None,
 
     # At this point we have our experiment -> check if we need the simulations
     if with_simulations:
-        platform.restore_simulations(experiment)
+        # TODO: experiment object should have already been created with a platform object attached. E.g., Fix PythonExperiment
+        # this should be refactored to lazy load the simulations via the children property
+        experiment.platform = platform
+        experiment.simulations = experiment.children()
 
     return experiment

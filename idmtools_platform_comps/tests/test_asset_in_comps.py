@@ -34,14 +34,14 @@ class TestAssetsInComps(unittest.TestCase):
 
         # Create experiment on platform
         experiment.pre_creation()
-        self.platform.create_experiment(experiment)
+        self.platform.create_items(items=[experiment])
 
         for simulation_batch in experiment.batch_simulations(batch_size=10):
             # Create the simulations on the platform
             for simulation in simulation_batch:
                 simulation.pre_creation()
 
-            ids = self.platform.create_simulations(simulation_batch)
+            ids = self.platform.create_items(items=simulation_batch)
 
             for uid, simulation in zip(ids, simulation_batch):
                 simulation.uid = uid
@@ -51,15 +51,15 @@ class TestAssetsInComps(unittest.TestCase):
                 simulation.__class__ = ISimulation
                 experiment.simulations.append(simulation)
 
-        self.platform.refresh_experiment_status(experiment)
+        self.platform.refresh_status(item=experiment)
 
         # Test if we have all simulations at status CREATED
         self.assertFalse(experiment.done)
         self.assertTrue(all([s.status == EntityStatus.CREATED for s in experiment.simulations]))
 
         # Start experiment
-        self.platform.run_simulations(experiment)
-        self.platform.refresh_experiment_status(experiment)
+        self.platform.run_items(items=[experiment])
+        self.platform.refresh_status(item=experiment)
         self.assertFalse(experiment.done)
         self.assertTrue(all([s.status == EntityStatus.RUNNING for s in experiment.simulations]))
 
@@ -67,7 +67,7 @@ class TestAssetsInComps(unittest.TestCase):
         import time
         start_time = time.time()
         while time.time() - start_time < 180:
-            self.platform.refresh_experiment_status(experiment)
+            self.platform.refresh_status(item=experiment)
             if experiment.done:
                 break
             time.sleep(3)
