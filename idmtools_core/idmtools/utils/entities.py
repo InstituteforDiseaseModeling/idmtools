@@ -12,7 +12,10 @@ if typing.TYPE_CHECKING:
 def retrieve_experiment(experiment_id: 'uuid', platform: 'TPlatform' = None,
                         with_simulations: 'bool' = False) -> 'TExperiment':
     experiment = ExperimentPersistService.retrieve(experiment_id)
-    if not experiment:
+
+    if experiment:
+        experiment.platform = platform  # Not really the best form, but...
+    else:
         # This is an unknown experiment, make sure we have a platform to ask for info
         if not platform:
             raise ExperimentNotFound(experiment_id)
@@ -28,9 +31,6 @@ def retrieve_experiment(experiment_id: 'uuid', platform: 'TPlatform' = None,
 
     # At this point we have our experiment -> check if we need the simulations
     if with_simulations:
-        # TODO: experiment object should have already been created with a platform object attached. E.g., Fix PythonExperiment
-        # this should be refactored to lazy load the simulations via the children property
-        experiment.platform = platform
         experiment.simulations = experiment.children()
 
     return experiment

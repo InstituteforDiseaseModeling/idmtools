@@ -16,7 +16,6 @@ class ISimulation(IAssetsEnabled, IItem, metaclass=ABCMeta):
     Represents a generic Simulation.
     This class needs to be implemented for each model type with specifics.
     """
-    level = 0
     experiment: 'TExperiment' = field(default=None, compare=False, metadata={"md": True})
 
     @abstractmethod
