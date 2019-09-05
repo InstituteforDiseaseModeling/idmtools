@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 """The setup script."""
-import sys
 
 from setuptools import setup, find_packages
 
@@ -13,21 +12,10 @@ with open('requirements.txt') as requirements_file:
     requirements = requirements_file.read().split("\n")
 
 build_requirements = ['flake8', 'coverage', 'py-make', 'bump2version', 'twine']
-test_requirements = ['pytest', 'pytest-runner', 'numpy==1.16.4', 'xmlrunner', 'pytest-xdist'] + build_requirements
+setup_requirements = []
+test_requirements = ['pytest', 'pytest-runner'] + build_requirements
 
-# check for python 3.6
-if sys.version_info[1] == 6:
-    requirements.append('dataclasses')
-
-extras = {
-    'test': test_requirements,
-    # to support notebooks we need docker
-    'notebooks': ['docker==4.0.1'],
-    'packaging': build_requirements,
-    # our full install include all common plugins
-    'full': ['idmtools_platform_comps', 'idmtools_platform_local', 'idmtools_cli', 'idmtools_model_dtk',
-             'idmtools_models']
-}
+extras = dict(test=test_requirements, packaging=build_requirements)
 
 authors = [
     ("Sharon Chen", "'schen@idmod.org"),
@@ -44,18 +32,19 @@ setup(
     classifiers=[
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
-        'Framework:: IDM-Tools'
+        'Framework:: IDM-Tools :: models'
     ],
     description="Core tools for modeling",
     install_requires=requirements,
     long_description=readme,
     include_package_data=True,
     keywords='modeling, IDM',
-    name='idmtools',
-    packages=find_packages(exclude=["tests"]),
+    name='idmtools_model_dtk',
+    packages=find_packages(),
+    setup_requires=setup_requirements,
     test_suite='tests',
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
     version='0.1.0+nightly',
-    zip_safe=False
+    zip_safe=False,
 )

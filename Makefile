@@ -24,7 +24,7 @@ test-all: ## Run our tests. We cannot run in parallel
 
 coverage: ## Generate a code-coverage report
 	python dev_scripts/run_pymake_on_all.py coverage-all
-	coverage combine idmtools_cli/.coverage idmtools_core/.coverage idmtools_models/.coverage idmtools_platform_comps/.coverage idmtools_platform_local/.coverage
+	coverage combine idmtools_cli/.coverage idmtools_core/.coverage idmtools_model_dtk/.coverage idmtools_models/.coverage idmtools_platform_comps/.coverage idmtools_platform_local/.coverage
 	coverage report -m
 	coverage html -i
 	python dev_scripts/launch_dir_in_browser.py htmlcov/index.html

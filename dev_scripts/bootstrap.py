@@ -28,6 +28,7 @@ packages = dict(
     idmtools_cli=default_install,
     idmtools_platform_local=data_class_default + ['workers', 'ui'],
     idmtools_platform_comps=data_class_default,
+    idmtools_model_dtk=data_class_default,
     idmtools_models=data_class_default,
     idmtools_test=[]
 )

@@ -7,7 +7,7 @@ from COMPS.Data import Experiment
 from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
 from idmtools.managers import ExperimentManager
 from idmtools_models.dtk import DTKExperiment
-from idmtools_models.dtk.defaults import DTKSIR
+from idmtools_model_dtk.defaults import DTKSIR
 from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
