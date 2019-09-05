@@ -123,5 +123,6 @@ class TestAssets(unittest.TestCase):
 
         self.assertSetEqual(set(ac.assets), set(assets_to_find))
 
+
 if __name__ == '__main__':
     unittest.main()

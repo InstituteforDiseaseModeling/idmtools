@@ -121,4 +121,3 @@ class TestLocalCLIBasic(unittest.TestCase):
             do_test()
 
         dm.cleanup()
-

@@ -1,5 +1,4 @@
 import os
-import unittest
 from functools import partial
 
 from idmtools.assets import AssetCollection, Asset
@@ -8,6 +7,7 @@ from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 import io
 import unittest.mock
+
 
 def param_update(simulation, param, value):
     return simulation.set_parameter(param, value)
@@ -110,6 +110,7 @@ class TestPythonSimulation(ITestWithPersistence):
             assets_in_pythonexperiment.append(Asset(relative_path=asset.relative_path, filename=asset.filename))
 
         self.assertSetEqual(set(assets_in_pythonexperiment), set(assets_to_find))
+
 
 if __name__ == '__main__':
     unittest.main()
