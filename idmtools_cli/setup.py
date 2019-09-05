@@ -43,7 +43,7 @@ setup(
     long_description=readme,
     include_package_data=True,
     keywords='modeling, IDM, cli',
-    name='idm_tools_cli',
+    name='idmtools_cli',
     packages=find_packages(exclude=["tests"]),
     setup_requires=setup_requirements,
     test_suite='tests',
