@@ -6,9 +6,9 @@ from idmtools.core.PlatformFactory import PlatformFactory
 
 
 class PopulationAnalyzer(IAnalyzer):
-    def __init__(self):
-        filenames = ['output/InsetChart.json']
-        super().__init__(filenames=filenames)
+    def __init__(self, filenames=None):
+        super().__init__()
+        self.filenames = filenames or []
 
     def map(self, data, simulation):
         # Apply is called for every simulations included into the experiment
@@ -30,11 +30,14 @@ class PopulationAnalyzer(IAnalyzer):
 
 if __name__ == "__main__":
 
+    from idmtools.core.PlatformFactory import PlatformFactory
+
     platform = PlatformFactory.create(key='COMPS')
 
-    exp_id = '31d83b39-85b4-e911-a2bb-f0921c167866' #'86099829-6ecb-e911-a2bb-f0921c167866'
+    exp_id = 'a5421d87-5ece-e911-a2bb-f0921c167866' #'86099829-6ecb-e911-a2bb-f0921c167866'
 
-    analyzers = [PopulationAnalyzer()]
+    filenames = ['output/InsetChart.json']
+    analyzers = [PopulationAnalyzer(filenames=filenames)]
 
     experiment = platform.get_item(id=exp_id)
 

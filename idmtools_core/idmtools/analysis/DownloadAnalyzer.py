@@ -22,9 +22,10 @@ class DownloadAnalyzer(IAnalyzer):
         analyzer = DownloadAnalyzer(filenames=['output/InsetChart.json'])
 
     """
-    def __init__(self, filenames=None, output_path='output'):
-        super().__init__()
-        self.output_path = output_path
+    def __init__(self, filenames=None, output_path=None, **kwargs):
+        super(DownloadAnalyzer, self).__init__(**kwargs)
+
+        self.output_path = output_path or "output"
         self.filenames = filenames or []
 
         # We only want the raw files -> disable parsing
