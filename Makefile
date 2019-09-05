@@ -46,3 +46,6 @@ release-staging-minor-dry-run: ## perform a release to staging and bump the mino
 # This should be used when a pushing a "production" build to staging before being approved by test
 release-staging-minor-commit: ## perform a release to staging and commit the version.
 	python dev_scripts/run_pymake_on_all.py release-staging-minor-commit
+
+start-webui: ## start the webserver
+	python -c "import os; os.chdir(os.path.join('idmtools_platform_local', 'idmtools_webui')); os.system('yarn'); os.system('yarn start')"
