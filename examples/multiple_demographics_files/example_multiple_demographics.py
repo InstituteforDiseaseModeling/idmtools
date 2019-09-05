@@ -1,7 +1,7 @@
 import os
 from idmtools.core import PlatformFactory
 from idmtools.managers import ExperimentManager
-from idmtools_models.dtk import DTKExperiment
+from idmtools_model_dtk import DTKExperiment
 from idmtools_model_dtk.defaults import DTKSIR
 
 CURRENT_DIRECTORY = os.path.dirname(os.path.realpath(__file__))

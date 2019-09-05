@@ -6,7 +6,7 @@ from idmtools.assets import AssetCollection, Asset
 from idmtools.builders import ExperimentBuilder
 from idmtools.managers import ExperimentManager
 from idmtools.platforms import COMPSPlatform
-from idmtools_models.dtk import DTKExperiment
+from idmtools_model_dtk import DTKExperiment
 from idmtools_model_dtk.defaults import DTKSIR
 from config_update_parameters import config_update_params
 

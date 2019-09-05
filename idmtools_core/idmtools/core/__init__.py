@@ -1,6 +1,6 @@
 # flake8: noqa F821
 from idmtools.core.CacheEnabled import CacheEnabled
-from idmtools.core.EntityContainer import EntityContainer
+from idmtools.core.interfaces.EntityContainer import EntityContainer
 from idmtools.core.enums import *
 from idmtools.core.exceptions import *
 from idmtools.core.ExperimentFactory import experiment_factory

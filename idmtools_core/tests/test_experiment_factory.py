@@ -46,14 +46,13 @@ class TestExperimentFactory(ITestWithPersistence):
 
         em.run()
         self.assertEqual(len(em.experiment.simulations), 20)
-        self.assertEqual(em.experiment.tags, {'a': '1', 'b': 2, 'type': 'DTKExperiment'})
+        self.assertEqual(em.experiment.tags, {'a': '1', 'b': 2, 'type': 'idmtools_model_dtk.DTKExperiment'})
 
     def test_build_test_experiment_from_factory(self):
         test_experiment = TstExperiment()
         test_experiment.tags = {"a": "1", "b": 2}
         test_experiment.pre_creation()
 
-        experiment_factory.register_type(TstExperiment)
         experiment = experiment_factory.create(test_experiment.tags.get("type"), tags=test_experiment.tags)
         self.assertIsNotNone(experiment.uid)
-        self.assertEqual(experiment.tags, {'a': '1', 'b': 2, 'type': 'TstExperiment'})
+        self.assertEqual(experiment.tags, {'a': '1', 'b': 2, 'type': 'idmtools_test.utils.TstExperiment'})

@@ -4,8 +4,6 @@ from abc import ABC
 from logging import getLogger
 
 import pluggy
-
-from idmtools.entities.IExperiment import IExperiment
 from idmtools.registry import PluginSpecification
 from idmtools.registry.PluginSpecification import PLUGIN_REFERENCE_NAME
 from idmtools.registry.utils import load_plugin_map
@@ -26,7 +24,7 @@ class ModelSpecification(PluginSpecification, ABC):
         return cls.__name__.replace('ModelSpecification', '').replace("ModelSpec", '').replace('Spec', '')
 
     @get_model_spec
-    def get(self, configuration: dict) -> IExperiment:
+    def get(self, configuration: dict) -> 'IExperiment':
         """
         Factor that should return a new platform using the passed in configuration
         Args:
@@ -38,7 +36,7 @@ class ModelSpecification(PluginSpecification, ABC):
         raise NotImplementedError("Plugin did not implement get")
 
     @get_model_type_spec
-    def get_type(self) -> typing.Type[IExperiment]:
+    def get_type(self) -> typing.Type['IExperiment']:
         pass
 
 
