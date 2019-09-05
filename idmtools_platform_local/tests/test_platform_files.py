@@ -45,12 +45,17 @@ class TestPlatformSimulations(ITestWithPersistence):
 
         self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
 
-        file_to_preview = 'StdOut.txt'
-        files = platform.get_assets_for_simulation(pe.simulations[0], [file_to_preview])
-        self.assertIn(file_to_preview, files)
-        self.assertEqual(len(files), 1)
-        self.assertEqual(files[file_to_preview].decode('utf-8').strip(), f'/data/{pe.uid}/Assets')
+        files_to_preview = ['StdOut.txt', 'Assets/realpath_verify.py']
+        files = platform.get_assets_for_simulation(pe.simulations[0], files_to_preview)
+        self.assertEqual(len(files), len(files_to_preview))
+        for filename in files_to_preview:
+            self.assertIn(filename, files)
+            if filename == "StdOut.txt":  # variable output
+                self.assertEqual(files[filename].decode('utf-8').strip(), f'/data/{pe.uid}/Assets')
+            else:  # default compare the content of the files
+                with open(os.path.join(COMMON_INPUT_PATH, "python", "realpath_verify.py"), 'r') as rpin:
+                    self.assertEqual(files[filename].decode("utf-8"), rpin.read())
 
         # TODO attempt to unify the content of this file across platforms
-        # On Comps, this will return the path to the Simulation Assests directory, but on Local, it returns the REAL
+        # On Comps, this will return the path to the Simulation Assets directory, but on Local, it returns the REAL
         # path since it is a symlink
