@@ -56,19 +56,3 @@ class DownloadAnalyzer(IAnalyzer):
             print('writing to path: %s' % file_path)
             with open(file_path, 'wb') as outfile:
                 outfile.write(data[filename])
-
-
-if __name__ == '__main__':
-    from idmtools.analysis.AnalyzeManager import AnalyzeManager
-    from idmtools.core.PlatformFactory import PlatformFactory
-
-    platform = PlatformFactory.create(key='COMPS')
-
-    filenames = ['StdOut.txt']
-    analyzers = [DownloadAnalyzer(filenames=filenames, output_path='download')]
-
-    experiment_id = '31d83b39-85b4-e911-a2bb-f0921c167866'
-    # experiment_id = 'cce1770b-5e98-e911-a2bb-f0921c167866'  # This is a legacy experiment; should break things until fixed
-
-    manager = AnalyzeManager(configuration={}, platform=platform, ids=[experiment_id], analyzers=analyzers)
-    manager.analyze()
