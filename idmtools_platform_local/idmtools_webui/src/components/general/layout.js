@@ -84,7 +84,7 @@ class Layout extends React.Component {
   navigate(target) {
     return ()=> {
       
-      window.location.href = "/" + target;
+      window.location.href = "/#/" + target;
     }
   }
 

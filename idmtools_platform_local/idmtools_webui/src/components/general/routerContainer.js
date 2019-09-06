@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { HashRouter, Route } from "react-router-dom";
 import {connect} from "react-redux";  
 
 import React, {Component} from "react";
@@ -29,14 +29,14 @@ class RouterContainer extends Component {
 
     render() {
         return (
-          <Router>
-           <article style={{height:'100%'}}>
+          <HashRouter>
+           <div style={{height:'100%'}}>
              <Route path="/" render={this.renderContent(DASHBOARD_VIEW, 'Dashboard')} />
              <Route path="/dashboard" render={this.renderContent(DASHBOARD_VIEW, 'Dashboard')} />
              <Route path="/experiment" render={this.renderContent(EXPERIMENT_VIEW, 'Experiment')} />
              <Route path="/simulation" render={this.renderContent(SIMULATION_VIEW, 'Simulation')} />
-           </article>
-         </Router>
+           </div>
+         </HashRouter>
         )
       }
 }

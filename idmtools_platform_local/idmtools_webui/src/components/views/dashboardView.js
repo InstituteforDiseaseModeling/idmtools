@@ -31,7 +31,7 @@ class Dashboard extends React.Component {
 
     handleCardClick(target) {
         return ()=> {      
-            window.location.href = "/" + target;
+            window.location.href = "/#/" + target;
           }      
     }
 
