@@ -25,7 +25,8 @@ extras = {
     'notebooks': ['docker==4.0.1'],
     'packaging': build_requirements,
     # our full install include all common plugins
-    'full': ['idmtools_platform_comps', 'idmtools_platform_local', 'idmtools_cli']
+    'full': ['idmtools_platform_comps', 'idmtools_platform_local', 'idmtools_cli', 'idmtools_model_dtk',
+             'idmtools_models']
 }
 
 authors = [

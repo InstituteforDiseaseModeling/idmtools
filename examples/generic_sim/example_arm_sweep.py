@@ -3,11 +3,11 @@ import os
 from functools import partial
 
 from idmtools.assets import AssetCollection, Asset
-from idmtools.builders import StandAloneSimulationsBuilder, SweepArm, ArmType, ArmExperimentBuilder, ExperimentBuilder
+from idmtools.builders import SweepArm, ArmType, ArmExperimentBuilder
+from idmtools.core.PlatformFactory import PlatformFactory
 from idmtools.managers import ExperimentManager
-from idmtools.platforms import COMPSPlatform
-from idmtools_models.dtk import DTKExperiment
-from idmtools_models.dtk.defaults import DTKSIR
+from idmtools_model_dtk import DTKExperiment
+from idmtools_model_dtk.defaults import DTKSIR
 from config_update_parameters import config_update_params
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
@@ -24,7 +24,7 @@ def param_update(simulation, param, value):
     return simulation.set_parameter(param, value)
 
 if __name__ == "__main__":
-    platform = COMPSPlatform()
+    platform = PlatformFactory.create_from_block('COMPS')
 
     ac = AssetCollection()
     a = Asset(absolute_path=os.path.join(INPUT_PATH, "single_node_demographics.json"))

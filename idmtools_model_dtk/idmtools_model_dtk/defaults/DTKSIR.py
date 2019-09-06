@@ -1,6 +1,6 @@
 from typing import Dict
 
-from idmtools_models.dtk.defaults.IDTKDefault import IDTKDefault
+from idmtools_model_dtk.defaults.IDTKDefault import IDTKDefault
 
 
 class DTKSIR(IDTKDefault):

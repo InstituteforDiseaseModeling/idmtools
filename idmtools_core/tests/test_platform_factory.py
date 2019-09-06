@@ -2,7 +2,7 @@ import unittest.mock
 import pytest
 from dataclasses import fields
 from idmtools.config import IdmConfigParser
-from idmtools.core import PlatformFactory
+from idmtools.core.PlatformFactory import PlatformFactory
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 from idmtools_test.utils.confg_local_runner_test import get_test_local_env_overrides
 

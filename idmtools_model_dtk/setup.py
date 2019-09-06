@@ -11,7 +11,11 @@ with open('README.md') as readme_file:
 with open('requirements.txt') as requirements_file:
     requirements = requirements_file.read().split("\n")
 
+build_requirements = ['flake8', 'coverage', 'py-make', 'bump2version', 'twine']
 setup_requirements = []
+test_requirements = ['pytest', 'pytest-runner'] + build_requirements
+
+extras = dict(test=test_requirements, packaging=build_requirements)
 
 authors = [
     ("Sharon Chen", "'schen@idmod.org"),
@@ -26,23 +30,24 @@ setup(
     author=[author[0] for author in authors],
     author_email=[author[1] for author in authors],
     classifiers=[
-        'Framework:: IDM-Tools :: Test',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Framework:: IDM-Tools :: models'
     ],
-    description="Test and demo data for IDM-Tools",
+    description="Core tools for modeling",
     install_requires=requirements,
     long_description=readme,
     include_package_data=True,
-    keywords='modeling, IDM, test, testdata, demodata',
-    name='idmtools_test',
+    keywords='modeling, IDM',
+    name='idmtools_model_dtk',
+    entry_points=dict(idmtools_model=  # noqa: E251
+                      ["idmtools_model_dtk = idmtools_model_dtk.DTKExperimentSpec:DTKExperimentSpec"]
+                      ),
     packages=find_packages(),
     setup_requires=setup_requirements,
-    entry_points=dict(idmtools_platform=
-                      ["idmtools_platform_test = idmtools_test.utils.TestPlatform:TestPlatformSpecification"],
-                      idmtools_model=
-                      ["idmtools_model_test = idmtools_test.utils.TstExperimentSpec:TstExperimentSpec"]
-                      ),
     test_suite='tests',
+    extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
     version='0.1.0+nightly',
-    zip_safe=False
+    zip_safe=False,
 )
