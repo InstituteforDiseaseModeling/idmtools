@@ -52,7 +52,18 @@ class TestExperimentFactory(ITestWithPersistence):
         test_experiment = TstExperiment()
         test_experiment.tags = {"a": "1", "b": 2}
         test_experiment.pre_creation()
-
+        # Test create experiment with full model name
         experiment = experiment_factory.create(test_experiment.tags.get("type"), tags=test_experiment.tags)
         self.assertIsNotNone(experiment.uid)
         self.assertEqual(experiment.tags, {'a': '1', 'b': 2, 'type': 'idmtools_test.utils.TstExperiment'})
+
+        # Test create experiment with sample model name
+        experiment1 = experiment_factory.create("TstExperiment")
+        self.assertIsNotNone(experiment1.uid)
+
+        # Test create experiment with non-existing model name
+        with self.assertRaises(ValueError) as context:
+            experiment_factory.create("SomeExperiment")
+        self.assertTrue("The ExperimentFactory could not create an experiment of type SomeExperiment" in
+                        str(context.exception.args[0]))
+
