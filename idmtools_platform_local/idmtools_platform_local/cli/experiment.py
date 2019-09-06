@@ -79,7 +79,7 @@ def extra_commands():
 
         # Check with user they really want to delete data
         if (data and click.confirm('Deleting exp data is irreversible. '
-                                               'Are you sure you want to delete all exp data?')):
+                                   'Are you sure you want to delete all exp data?')):
             data = True
             print(f'Deleting {exp["data_path"]}')
         elif data:
@@ -91,4 +91,3 @@ def extra_commands():
                 print('Experiment removed successfully')
         except RuntimeError as e:
             show_error(e.args[0])
-

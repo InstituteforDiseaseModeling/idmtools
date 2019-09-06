@@ -57,4 +57,3 @@ class TestExperimentFactory(ITestWithPersistence):
         experiment = experiment_factory.create(test_experiment.tags.get("type"), tags=test_experiment.tags)
         self.assertIsNotNone(experiment.uid)
         self.assertEqual(experiment.tags, {'a': '1', 'b': 2, 'type': 'idmtools_test.utils.TstExperiment'})
-

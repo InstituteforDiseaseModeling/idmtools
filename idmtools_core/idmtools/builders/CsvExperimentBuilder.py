@@ -14,7 +14,12 @@ class CsvExperimentBuilder(ExperimentBuilder):
         super().__init__()
         self.SweepFunctions = []
 
-    def add_sweeps_from_file(self, file_path, func_map={}, type_map={}, sep=","):
+    def add_sweeps_from_file(self, file_path, func_map=None, type_map=None, sep=","):
+        if type_map is None:
+            type_map = {}
+        if func_map is None:
+            func_map = {}
+
         def strip_column(x):
             """
             strip white spaces for Number type column
