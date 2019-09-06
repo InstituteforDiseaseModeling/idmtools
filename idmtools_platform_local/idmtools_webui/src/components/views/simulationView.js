@@ -251,7 +251,7 @@ class SimulationView extends React.Component {
                                     {sorted.map(sim => {
                                         let disable = (sim.status == "done");
 
-                                        debugger
+                                        
                                         return (
                                             <TableRow key={sim.simulation_uid} onClick={this.rowClick} sim_id={sim.simulation_uid} className={sim.simulation_uid == this.state.selectedSim ? classes.highlight: null}>
 

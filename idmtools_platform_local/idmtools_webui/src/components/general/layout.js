@@ -4,8 +4,9 @@ import { withStyles } from '@material-ui/core/styles';
 import { connect } from "react-redux";
 import { AppBar, Toolbar, Typography, IconButton, Button, List, ListItemIcon, ListItem, ListItemText, Snackbar } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
-import MailIcon from '@material-ui/icons/Mail';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
+import DashboardIcon from '@material-ui/icons/Dashboard';
+import SimulationIcon from '@material-ui/icons/SimCard';
+import ExperimentIcon from '@material-ui/icons/Explicit';
 
 import Divider from '@material-ui/core/Divider';
 import idmlogo from '../../images/idmlogo55.png';
@@ -133,17 +134,24 @@ class Layout extends React.Component {
                   <img src={idmlogo} title="Institute for Disease Modeling" alt={"IDMlogo"} className={classes.idmlogo}></img>
                   <Typography variant="h5" className={classes.heading}>IDM Tools</Typography>
                 </div>
-              
+                <Divider />
+                <List>
+                  {['Dashboard','Simulation', 'Experiment'].map((text, index) => {
+                    
+                    let icons = [];
+                    icons.push( ()=> (<DashboardIcon/>));
+                    icons.push( ()=> (<SimulationIcon/>));
+                    icons.push( ()=> (<ExperimentIcon/>));
+
+                    return (
+                      <ListItem button key={text} onClick={this.navigate(text)} >
+                        <ListItemIcon>{icons[index]()}</ListItemIcon>
+                        <ListItemText primary={text} />
+                      </ListItem>)
+                  })}
+                </List>              
             </div>
-            <Divider />
-            <List>
-              {['Dashboard','Simulation', 'Experiment'].map((text, index) => (
-                <ListItem button key={text} onClick={this.navigate(text)} >
-                  <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-                  <ListItemText primary={text} />
-                </ListItem>
-              ))}
-            </List>
+
           </div>
         </nav>
 
