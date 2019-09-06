@@ -48,7 +48,7 @@ class AnalyzeManager(CacheEnabled):
     class ItemsNotReady(Exception):
         pass
 
-    def __init__(self, configuration, platform, items=None, analyzers=None, working_dir=os.getcwd(),
+    def __init__(self, configuration, platform, ids=None, analyzers=None, working_dir=os.getcwd(),
                  partial_analyze_ok=False, max_items=None, verbose=True, force_manager_working_directory=False):
         super().__init__()
         self.configuration = configuration
@@ -66,7 +66,10 @@ class AnalyzeManager(CacheEnabled):
         self.working_dir = working_dir
         self.force_wd = force_manager_working_directory
 
-        self.potential_items = items or list()
+        # Take the provided ids and determine the full set of unique root items (e.g. simulations) in them to analyze
+        ids = list(set(ids or list()))  # uniquify
+        items = [platform.get_item(id=id) for id in ids]
+        self.potential_items = platform.get_root_items(items=items)
         self._items = dict()  # filled in later by _get_items_to_analyze
 
         self.analyzers = analyzers or list()

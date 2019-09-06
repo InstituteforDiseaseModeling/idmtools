@@ -26,11 +26,6 @@ class IPlatform(IEntity, metaclass=ABCMeta):
     - File handling
     """
 
-    # Relative item hierarchy offsets (for relationship arguments)
-    SELF = 0
-    PARENT = 1
-    CHILD = -1
-
     def __post_init__(self) -> None:
         """
         Got called from Platform creation
@@ -97,6 +92,23 @@ class IPlatform(IEntity, metaclass=ABCMeta):
     @abstractmethod
     def get_children(self, item: 'TItem') -> 'TItemList':
         pass
+
+    def _get_root_items_for_item(self, item: 'TItem') -> 'TItemList':
+        children = item.children(refresh=True)
+        if children is None:
+            items = [item]
+        else:
+            items = list()
+            for child in children:
+                items += self._get_root_items_for_item(item=child)
+        return items
+
+    def get_root_items(self, items: 'TItemList') -> 'TItemList':
+        root_items = []
+        for item in items:
+            root_items += self._get_root_items_for_item(item=item)
+        root_items = list({item.uid: item for item in root_items}.values())  # uniquify
+        return root_items
 
     @abstractmethod
     def get_files(self, item: 'TItem', files: 'List[str]') -> 'Dict[str, bytearray]':

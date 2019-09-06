@@ -4,14 +4,14 @@ from dataclasses import dataclass, field
 
 from idmtools.core import EntityStatus
 from idmtools.core.interfaces.IAssetsEnabled import IAssetsEnabled
-from idmtools.entities.IItem import IItem
+from idmtools.entities.IRootItem import IRootItem
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TExperiment
 
 
 @dataclass
-class ISimulation(IAssetsEnabled, IItem, metaclass=ABCMeta):
+class ISimulation(IAssetsEnabled, IRootItem, metaclass=ABCMeta):
     """
     Represents a generic Simulation.
     This class needs to be implemented for each model type with specifics.
