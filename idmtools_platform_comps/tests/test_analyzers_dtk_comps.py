@@ -34,7 +34,7 @@ setC = partial(param_update, param="c")
 setD = partial(param_update, param="d")
 
 
-class TestAnalyzeManager(ITestWithPersistence):
+class TestAnalyzeManagerDtkComps(ITestWithPersistence):
 
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
@@ -64,7 +64,6 @@ class TestAnalyzeManager(ITestWithPersistence):
         # Uncomment out if you do not want to regenerate exp and sims
         # self.exp_id = '9eacbb9a-5ecf-e911-a2bb-f0921c167866' #comps2 staging
 
-    @pytest.mark.skip("Do not run - this is broken")
     def test_AddAnalyzer(self):
 
         analyzers = [AddAnalyzer()]
@@ -84,8 +83,6 @@ class TestAnalyzeManager(ITestWithPersistence):
         analyzers = [DownloadAnalyzer(filenames=filenames, output_path='output')]
         platform = PlatformFactory.create(key='COMPS')
 
-       # exp_id = '9eacbb9a-5ecf-e911-a2bb-f0921c167866'
-
         am = AnalyzeManager(configuration={}, platform=platform, ids=[self.exp_id], analyzers=analyzers)
         am.analyze()
 
@@ -93,6 +90,22 @@ class TestAnalyzeManager(ITestWithPersistence):
             s = simulation.get(id=simulation.id)
             self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "config.json")))
             self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "insetChart.json")))
+
+    def test_analyzer_multiple_experiments(self):
+        #delete output from previous run
+        del_folder("output")
+
+        # create a new empty 'output' dir
+        os.mkdir("output")
+
+        filenames = ['output\\InsetChart.json', 'config.json']
+        analyzers = [DownloadAnalyzer(filenames=filenames, output_path='output')]
+        platform = PlatformFactory.create(key='COMPS')
+
+        exp_list = ['76080194-0bc5-e911-a2bb-f0921c167866', 'b99307dd-aeca-e911-a2bb-f0921c167866'] #comps2 staging
+
+        am = AnalyzeManager(configuration={}, platform=platform, ids=exp_list, analyzers=analyzers)
+        am.analyze()
 
     def test_PopulationAnalyzer(self):
         # del_file(os.path.join(COMMON_INPUT_PATH, 'analyzers', 'population.csv'))
@@ -125,3 +138,25 @@ class TestAnalyzeManager(ITestWithPersistence):
             for i in range(0, len(population_data), 1):
                 self.assertEqual(str(population_data[i]), df[2:].iloc[i, sim_count])
             sim_count = sim_count + 1
+
+    # bug #323 - idmtools is not retro-compatible with pre-idmtools experiments
+    def test_analyzer_preidmtools_exp(self):
+        # delete output from previous run
+        del_folder("output")
+
+        # create a new empty 'output' dir
+        os.mkdir("output")
+
+        filenames = ['output\\InsetChart.json', 'config.json']
+        analyzers = [DownloadAnalyzer(filenames=filenames, output_path='output')]
+        platform = PlatformFactory.create(key='COMPS')
+
+        exp_id = '76080194-0bc5-e911-a2bb-f0921c167866' #comps2 experiment id created pre-idmtools
+
+        am = AnalyzeManager(configuration={}, platform=platform, ids=[exp_id], analyzers=analyzers)
+        am.analyze()
+
+        for simulation in Experiment.get(exp_id).get_simulations():
+            s = simulation.get(id=simulation.id)
+            self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "config.json")))
+            self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "insetChart.json")))
