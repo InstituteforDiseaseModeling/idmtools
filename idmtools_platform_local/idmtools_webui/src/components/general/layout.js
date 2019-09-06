@@ -2,7 +2,7 @@ import React from "react";
 
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from "react-redux";
-import { AppBar, Toolbar, Typography, IconButton, Button, List, ListItemIcon, ListItem, ListItemText, Snackbar } from "@material-ui/core";
+import { AppBar, Toolbar, Typography, IconButton, List, ListItemIcon, ListItem, ListItemText, Snackbar } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 import MailIcon from '@material-ui/icons/Mail';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
@@ -11,9 +11,8 @@ import Divider from '@material-ui/core/Divider';
 import idmlogo from '../../images/idmlogo55.png';
 import Dashboard from "../views/dashboardView";
 
-import {DASHBOARD_VIEW, EXPERIMENT_VIEW, SIMULATION_VIEW} from "../../redux/actionTypes"
+import {EXPERIMENT_VIEW, SIMULATION_VIEW} from "../../redux/actionTypes"
 
-import DashboardView from "../views/dashboardView"
 import ExperimentView from "../views/experimentView"
 import SimulationView from "../views/simulationView"
 import 'react-splitter-layout/lib/index.css';
@@ -96,15 +95,15 @@ class Layout extends React.Component {
 
 
   render() {
-    const { classes, simulations, selectedView, variant } = this.props;
+    const { classes, simulations, selectedView, variant } = this.props; // eslint-disable-line no-unused-vars
 
 
     
     let view = <Dashboard/>;
 
-    if (selectedView && selectedView.selectedView == EXPERIMENT_VIEW) {
+    if (selectedView && selectedView.selectedView === EXPERIMENT_VIEW) {
       view = <ExperimentView/>
-    } else if (selectedView && selectedView.selectedView == SIMULATION_VIEW) {
+    } else if (selectedView && selectedView.selectedView === SIMULATION_VIEW) {
       view = <SimulationView/>
     }
 
@@ -157,7 +156,7 @@ class Layout extends React.Component {
               horizontal: 'center',
             }}
             open={this.props.showMsg}
-            autoHideDuration={variant == "error" ? null : 6000}
+            autoHideDuration={variant === "error" ? null : 6000}
               onClose={this.handleSnackBarClose}
             className={classes.snackbar}
           >
