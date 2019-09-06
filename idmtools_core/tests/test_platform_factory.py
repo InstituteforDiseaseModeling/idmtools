@@ -2,7 +2,7 @@ import unittest.mock
 import pytest
 from dataclasses import fields
 from idmtools.config import IdmConfigParser
-from idmtools.core import PlatformFactory
+from idmtools.core.PlatformFactory import PlatformFactory
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 from idmtools_test.utils.confg_local_runner_test import get_test_local_env_overrides
 
@@ -20,12 +20,14 @@ class TestPlatformFactory(ITestWithPersistence):
         self.assertEqual(entries['endpoint'], 'https://comps2.idmod.org')
 
     def test_block_not_exits(self):
-        with self.assertRaises(Exception):
-            platform = PlatformFactory.create_from_block('NOTEXISTS')  # noqa:F841
+        with self.assertRaises(ValueError) as context:
+            PlatformFactory.create_from_block('NOTEXISTS')  # noqa:F841
+        self.assertEqual("Block 'NOTEXISTS' doesn't exist!", str(context.exception.args[0]))
 
     def test_bad_type(self):
-        with self.assertRaises(Exception):
-            platform = PlatformFactory.create_from_block('BADTYPE')  # noqa:F841
+        with self.assertRaises(ValueError) as context:
+            PlatformFactory.create_from_block('BADTYPE')  # noqa:F841
+        self.assertTrue("Bad is an unknown Platform Type.Supported platforms are" in str(context.exception.args[0]))
 
     @pytest.mark.docker
     @pytest.mark.comps

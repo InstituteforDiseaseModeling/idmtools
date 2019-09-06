@@ -59,30 +59,35 @@ def extra_commands():
     from idmtools_cli.cli.experiment import experiment
     from idmtools_cli.cli.utils import show_error
     import idmtools_platform_local.cli.local  # noqa: 40F1
-    @experiment.command()
-    @click.argument('id')
+    @experiment.command(help="Delete an experiment, and optionally, its data")
+    @click.argument('experiment_id')
     @click.option('--data/--no-data', default=False, help="Should we delete the data as well?")
-    def delete(id: str, data: bool):
+    def delete(experiment_id: str, data: bool):
         """
         Delete an experiment, and optionally, its data
 
         Args:
-            id (str): ID of exp to delete
+            experiment_id (str): ID of exp to delete
             data (bool): If true, specifies data folder for experiment should be deleted, otherwise it will be kept
         """
-        print(f'Deleting Experiment: {id}')
+        print(f'Deleting Experiment: {experiment_id}')
         exp: Dict = None
         try:
-            exp = ExperimentsClient.get_all(id)
+            exp = ExperimentsClient.get_one(experiment_id)
         except RuntimeError as e:
             show_error(e.args[0])
 
-        if not data or (data and click.confirm('Deleting exp data is irreversible. '
-                                               'Are you sure you want to delete all exp data?')):
+        # Check with user they really want to delete data
+        if (data and click.confirm('Deleting exp data is irreversible. '
+                                   'Are you sure you want to delete all exp data?')):
+            data = True
             print(f'Deleting {exp["data_path"]}')
-            try:
-                response = ExperimentsClient.delete(id, data)
-                if response:
-                    print('Experiment removed successfully')
-            except RuntimeError as e:
-                show_error(e.args[0])
+        elif data:
+            data = False
+
+        try:
+            response = ExperimentsClient.delete(experiment_id, data)
+            if response:
+                print('Experiment removed successfully')
+        except RuntimeError as e:
+            show_error(e.args[0])

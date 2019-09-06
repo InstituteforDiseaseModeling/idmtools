@@ -1,7 +1,7 @@
 import pytest
 
 from idmtools_test.utils.confg_local_runner_test import reset_local_broker, get_test_local_env_overrides
-from idmtools.core import PlatformFactory
+from idmtools.core.PlatformFactory import PlatformFactory
 import os
 import re
 import subprocess
@@ -54,7 +54,7 @@ class TestLocalRunnerCLI(ITestWithPersistence):
         self.assertEqual(experiment['experiment_id'], str(self.pe.uid))
         self.assertEqual(experiment['tags'], self.pe.tags)
         self.assertEqual(experiment['data_path'], '/data/' + str(self.pe.uid))
-        self.assertEqual(experiment['extra_details'], {'simulation_type': None})
+        self.assertEqual(experiment['extra_details'], {'simulation_type': self.pe.simulation_type})
 
         # Test 2: get_one experiment with experiment id and tags
         experiment1 = ExperimentsClient.get_one(str(self.pe.uid),
@@ -63,7 +63,7 @@ class TestLocalRunnerCLI(ITestWithPersistence):
         self.assertEqual(experiment1['experiment_id'], str(self.pe.uid))
         self.assertEqual(experiment1['tags'], self.pe.tags)
         self.assertEqual(experiment1['data_path'], '/data/' + str(self.pe.uid))
-        self.assertEqual(experiment1['extra_details'], {'simulation_type': None})
+        self.assertEqual(experiment1['extra_details'], {'simulation_type': self.pe.simulation_type})
 
     def test_status_simulationClient_api(self):
         # Test 1: get_all simulations with simulation id only filter

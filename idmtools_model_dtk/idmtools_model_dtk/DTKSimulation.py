@@ -2,9 +2,11 @@ import os
 import json
 import collections
 from dataclasses import dataclass, field
+from typing import Optional, Any
+
 from idmtools.assets import Asset
 from idmtools.entities import ISimulation
-from idmtools_models.dtk.interventions.DTKEmptyCampaign import DTKEmptyCampaign
+from idmtools_model_dtk.interventions import DTKEmptyCampaign
 
 
 @dataclass(repr=False)
@@ -17,11 +19,12 @@ class DTKSimulation(ISimulation):
         self.config[name] = value
         return {name: value}
 
-    def get_parameter(self, name, default=None):
+    def get_parameter(self, name: str, default: Optional[Any] = None):
         """
         Get a parameter in the simulation
         Args:
             name: Name of the parameter
+            default: Optional default value for parameter
         Returns: the Value of the parameter
         """
         return self.config.get(name, default)
@@ -86,9 +89,12 @@ class DTKSimulation(ISimulation):
                 self.campaign = jn
 
         if demographics_paths:
-            demographics_paths = demographics_paths if isinstance(demographics_paths, collections.Iterable) \
-                                                       and not isinstance(demographics_paths, str) else [
-                demographics_paths]
+            if isinstance(demographics_paths, collections.Iterable) \
+                    and not isinstance(demographics_paths, str):
+                demographics_paths = demographics_paths
+            else:
+                demographics_paths = [demographics_paths]
+
             for demographics_path in demographics_paths:
                 jn = load_file(demographics_path)
                 if jn:
@@ -102,8 +108,10 @@ class DTKSimulation(ISimulation):
             demographics_files: single file or a list
         Returns: None
         """
-        demographics_files = demographics_files if isinstance(demographics_files, collections.Iterable) \
-                                                   and not isinstance(demographics_files, str) else [demographics_files]
+        if isinstance(demographics_files, collections.Iterable) and not isinstance(demographics_files, str):
+            demographics_files = demographics_files
+        else:
+            demographics_files = [demographics_files]
 
         demo_files = self.config.get("Demographics_Filenames", [])
 

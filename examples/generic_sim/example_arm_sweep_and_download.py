@@ -4,8 +4,15 @@ from functools import partial
 
 from idmtools.assets import AssetCollection, Asset
 from idmtools.builders import SweepArm, ArmType, ArmExperimentBuilder
+<<<<<<< HEAD:examples/generic_sim/example_arm_sweep_and_download.py
 from idmtools.managers import ExperimentManager
 from idmtools_models.dtk.defaults.DTKSIR import DTKSIR
+=======
+from idmtools.core.PlatformFactory import PlatformFactory
+from idmtools.managers import ExperimentManager
+from idmtools_model_dtk import DTKExperiment
+from idmtools_model_dtk.defaults import DTKSIR
+>>>>>>> dev:examples/generic_sim/example_arm_sweep.py
 from config_update_parameters import config_update_params
 from idmtools_models.dtk import DTKExperiment
 from idmtools.core.PlatformFactory import PlatformFactory
@@ -24,7 +31,7 @@ def param_update(simulation, param, value):
     return simulation.set_parameter(param, value)
 
 if __name__ == "__main__":
-    platform = PlatformFactory.create(key='COMPS')
+    platform = PlatformFactory.create_from_block('COMPS')
 
     ac = AssetCollection()
     a = Asset(absolute_path=os.path.join(INPUT_PATH, "single_node_demographics.json"))

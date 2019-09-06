@@ -2,13 +2,15 @@ from importlib import reload
 
 import pytest
 
+from idmtools.core import EntityStatus
 from idmtools_platform_local.docker.DockerOperations import DockerOperations
 from operator import itemgetter
 from idmtools.assets import AssetCollection
 from idmtools.builders import ExperimentBuilder
 from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
-from idmtools.core import EntityStatus, PlatformFactory
+from idmtools.core.PlatformFactory import PlatformFactory
+from idmtools_platform_local.local_platform import LocalPlatform
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 import os
@@ -76,10 +78,10 @@ class TestPythonSimulation(ITestWithPersistence):
         sorted_expected_tags = sorted(expected_tags, key=itemgetter('a'))
         self.assertEqual(sorted_tags, sorted_expected_tags)
 
+    @restart_local_platform(silent=True, **get_test_local_env_overrides())
     def test_add_prefixed_relative_path_to_assets_local(self):
-        from idmtools.core import PlatformFactory, EntityStatus
         # platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
-        platform = PlatformFactory.create_from_block('Local_Staging')
+        platform: LocalPlatform = PlatformFactory.create_from_block('Local_Staging')
         model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
         ac = AssetCollection()
         assets_path = os.path.join(COMMON_INPUT_PATH, "python", "Assets", "MyExternalLibrary")
@@ -105,3 +107,26 @@ class TestPythonSimulation(ITestWithPersistence):
         em.run()
         em.wait_till_done()
         self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
+
+        with self.subTest('test_retrieve_experiment_restore_sims'):
+            # test we can fetch the experiment as well
+            oe = platform.retrieve_experiment(pe.uid)
+            platform.restore_simulations(oe)
+            self.assertEqual(pe.uid, oe.uid)
+            self.assertEqual(pe.simulation_type, oe.simulation_type)
+            self.assertEqual(len(pe.simulations), len(oe.simulations))
+            sim_ids_pe = set([s.uid for s in pe.simulations])
+            sim_ids_oe = set([s.uid for s in oe.simulations])
+            # get difference. There should be none so we should get an empty array
+            self.assertEqual(len(sim_ids_oe.difference(sim_ids_pe)), 0)
+            # intersection should be 100% of array
+            self.assertEqual(len(sim_ids_oe.intersection(sim_ids_pe)), len(sim_ids_oe))
+
+            self.assertDictEqual(oe.tags, pe.tags)
+
+            # test simulations have all tags
+            for sim in pe.simulations:
+                # get our sim
+                osim = [o for o in oe.simulations if o.uid == sim.uid][0]
+                self.assertDictEqual(sim.tags, osim.tags)
+                self.assertEqual(sim.succeeded, osim.succeeded)

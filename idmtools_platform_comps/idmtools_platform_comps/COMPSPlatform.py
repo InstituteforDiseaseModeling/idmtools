@@ -312,8 +312,9 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
     def _retrieve_experiment(self, experiment_id: 'uuid') -> 'TExperiment':
         self._comps_experiment_id = experiment_id
-        experiment = experiment_factory.create(key=self.comps_experiment.tags.get('type', None), platform=self,
+        experiment = experiment_factory.create(key=self.comps_experiment.tags.get('type', None),
                                                tags=self.comps_experiment.tags)
+        experiment.platform = self
         experiment.uid = self.comps_experiment.id
         return experiment
 
