@@ -3,7 +3,6 @@ import copy
 import typing
 from dataclasses import fields
 from idmtools.config import IdmConfigParser
-from idmtools.registry.PlatformSpecification import PlatformPlugins
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TPlatform
@@ -20,6 +19,8 @@ class Platform:
             **kwargs: user inputs may overwrite the entries in the block
         Returns: requested Platform
         """
+        from idmtools.registry.PlatformSpecification import PlatformPlugins
+
         if block is None:
             raise ValueError("Must have a valid Block name to create a Platform!")
 
@@ -90,7 +91,7 @@ class Platform:
         for fn in fs_kwargs:
             ft = field_type[fn]
             if ft in (int, float, str):
-                kwargs[fn] = ft(kwargs[fn])
+                kwargs[fn] = ft(kwargs[fn]) if kwargs[fn] is not None else kwargs[fn]
             elif ft is bool:
                 kwargs[fn] = ast.literal_eval(kwargs[fn])
 
