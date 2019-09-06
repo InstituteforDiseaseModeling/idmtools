@@ -43,10 +43,10 @@ class TestCOMPSPlatform(ITestWithPersistence):
         from idmtools.utils.entities import retrieve_experiment
         experiment = retrieve_experiment(experiment.uid, platform=self.platform, with_simulations=True)
         files_needed = ["config.json", "Assets\\working_model.py"]
-        self.platform.get_files(item=experiment.simulations[0], files=files_needed)
+        self.platform.get_files(item=experiment.children()[0], files=files_needed)
 
         # Call twice to see if the cache is actually leveraged
-        files_retrieved = self.platform.get_files(item=experiment.simulations[0], files=files_needed)
+        files_retrieved = self.platform.get_files(item=experiment.children()[0], files=files_needed)
 
         # We have the correct files?
         self.assertEqual(len(files_needed), len(files_retrieved))
@@ -58,7 +58,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
 
         # Test different separators
         files_needed = ["Assets/working_model.py"]
-        files_retrieved = self.platform.get_files(item=experiment.simulations[0], files=files_needed)
+        files_retrieved = self.platform.get_files(item=experiment.children()[0], files=files_needed)
 
         # We have the correct files?
         self.assertEqual(len(files_needed), len(files_retrieved))
@@ -70,7 +70,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
         # Test wrong filename
         files_needed = ["Assets/bad.py", "bad.json"]
         with self.assertRaises(RuntimeError):
-            self.platform.get_files(item=experiment.simulations[0], files=files_needed)
+            self.platform.get_files(item=experiment.children()[0], files=files_needed)
 
     def _run_and_test_experiment(self, experiment):
         experiment.builder = self.builder
