@@ -39,4 +39,4 @@ class IRootItem(IItem, metaclass=ABCMeta):
         return self._parent
 
     def children(self, refresh: bool=False, full_load: bool=False) -> 'TItemList':
-        raise self.FamilyException('Root items cannot have children items.')
+        return None

@@ -271,10 +271,6 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             sim.uid = s.id
             sim.tags = s.tags
             sim.status = COMPSPlatform._convert_COMPS_status(s.state)
-            hierarchy = [('simulation_id', sim.uid),
-                         ('experiment_id', experiment.uid),
-                         ('suite_id', experiment.suite_id)]
-            # sim.full_id = ItemId(group_tuples=hierarchy)
             simulations.append(sim)
         return simulations
 
@@ -405,10 +401,28 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
     def get_item(self, id: 'uuid') -> Any:
         # TODO: no options currently for loading a simulation or suite directly yet
-        try:
-            item = self._retrieve_experiment(experiment_id=id)
-        except:
-            raise Exception(f'Unable to load item id: {id} from platform: {self.__class__.__name__}')
+        successful = False
+        if not successful:
+            try:
+                item = self._retrieve_suite(suite_id=id)
+                successful = True
+            except:
+                pass
+        if not successful:
+            try:
+                item = self._retrieve_experiment(experiment_id=id)
+                successful = True
+            except:
+                pass
+        if not successful:
+            try:
+                item = self._retrieve_simulation(simulation_id=id)
+                successful = True
+            except:
+                pass
+        if not successful:
+            raise self.UnknownItemException(f'Unable to load item id: {id} from platform: {self.__class__.__name__}')
+
         item.platform = self
         return item
 

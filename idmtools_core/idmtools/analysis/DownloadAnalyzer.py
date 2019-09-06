@@ -69,8 +69,7 @@ if __name__ == '__main__':
     analyzers = [DownloadAnalyzer(filenames=filenames, output_path='download')]
 
     experiment_id = '31d83b39-85b4-e911-a2bb-f0921c167866'
+    # experiment_id = 'cce1770b-5e98-e911-a2bb-f0921c167866'  # This is a legacy experiment; should break things until fixed
 
-    experiment = platform.get_item(id=experiment_id)
-
-    manager = AnalyzeManager(configuration={}, platform=platform, items=experiment.children(), analyzers=analyzers)
+    manager = AnalyzeManager(configuration={}, platform=platform, ids=[experiment_id], analyzers=analyzers)
     manager.analyze()
