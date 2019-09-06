@@ -68,7 +68,7 @@ class TestPythonExperiment(ITestWithPersistence):
         em = ExperimentManager(experiment=pe, platform=self.platform)
         em.run()
         em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
+        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.children()]))
         experiment = Experiment.get(em.experiment.uid)
         print(experiment.id)
         exp_id = experiment.id
@@ -112,7 +112,7 @@ class TestPythonExperiment(ITestWithPersistence):
         em = ExperimentManager(experiment=pe, platform=self.platform)
         em.run()
         em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
+        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.children()]))
         experiment = Experiment.get(em.experiment.uid)
         print(experiment.id)
         exp_id = experiment.id
@@ -146,7 +146,7 @@ class TestPythonExperiment(ITestWithPersistence):
         em = ExperimentManager(experiment=pe, platform=self.platform)
         em.run()
         em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
+        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.children()]))
         exp_id = em.experiment.uid
         # exp_id ='ef8e7f2f-a793-e911-a2bb-f0921c167866'
         count = 0
@@ -198,7 +198,7 @@ class TestPythonExperiment(ITestWithPersistence):
         em = ExperimentManager(experiment=pe, platform=self.platform)
         em.run()
         em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
+        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.children()]))
         exp_id = em.experiment.uid
         # validate results from comps
         # exp_id ='eb7ce224-9993-e911-a2bb-f0921c167866'
@@ -246,7 +246,7 @@ class TestPythonExperiment(ITestWithPersistence):
         em = ExperimentManager(experiment=pe, platform=self.platform)
         em.run()
         em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
+        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.children()]))
         exp_id = em.experiment.uid
         # validate results from comps
         # exp_id ='a98090dc-ea92-e911-a2bb-f0921c167866'
@@ -302,7 +302,7 @@ class TestPythonExperiment(ITestWithPersistence):
         em.run()
         em.wait_till_done()
         exp_id = em.experiment.uid
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
+        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.children()]))
         self.validate_output(exp_id, 6)
         expected_tags = [{'a': '1', 'b': '2', 'c': '4'}, {'a': '1', 'b': '2', 'c': '5'}, {'a': '1', 'b': '3', 'c': '4'},
                          {'a': '1', 'b': '3', 'c': '5'}, {'a': '6', 'b': '2'}, {'a': '7', 'b': '2'}]

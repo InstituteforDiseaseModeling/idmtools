@@ -31,6 +31,5 @@ def retrieve_experiment(experiment_id: 'uuid', platform: 'TPlatform' = None,
 
     # At this point we have our experiment -> check if we need the simulations
     if with_simulations:
-        experiment.simulations = experiment.children()
-
+        experiment.children(refresh=True)  # children are lazy loaded; go ahead and load them anew
     return experiment
