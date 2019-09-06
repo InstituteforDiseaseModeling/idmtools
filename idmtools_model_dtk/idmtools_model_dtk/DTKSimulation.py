@@ -6,7 +6,7 @@ from typing import Optional, Any
 
 from idmtools.assets import Asset
 from idmtools.entities import ISimulation
-from idmtools_models.dtk.interventions.DTKEmptyCampaign import DTKEmptyCampaign
+from idmtools_model_dtk.interventions import DTKEmptyCampaign
 
 
 @dataclass(repr=False)
