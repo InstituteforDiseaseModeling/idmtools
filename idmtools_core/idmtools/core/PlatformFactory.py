@@ -73,7 +73,6 @@ class Platform:
         # Collect fields types
         fds = fields(platform_cls)
         field_name = [f.name for f in fds]
-        field_default = {f.name: f.default for f in fds}
         field_type = {f.name: f.type for f in fds}
 
         # Make data to the requested type
@@ -120,9 +119,4 @@ class Platform:
             inputs.pop(f)
 
         # Now create Platform using the data with the correct data types
-        # Add a temporary Property when creating Platform
-        platform_cls._FACTORY = property(lambda self: True)
-        platform = platform_cls(**inputs)
-        delattr(platform_cls, '_FACTORY')
-
-        return platform
+        return platform_cls(**inputs)

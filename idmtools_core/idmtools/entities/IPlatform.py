@@ -2,8 +2,6 @@ import uuid
 import typing
 from abc import ABCMeta, abstractmethod
 from logging import getLogger
-
-from idmtools.config import IdmConfigParser
 from idmtools.core.interfaces.IEntity import IEntity
 
 if typing.TYPE_CHECKING:
@@ -11,6 +9,8 @@ if typing.TYPE_CHECKING:
     from typing import List, Dict, Any
 
 logger = getLogger(__name__)
+
+CALLER_LIST = ['_create_from_block', 'fetch']
 
 
 class IPlatform(IEntity, metaclass=ABCMeta):
@@ -23,6 +23,13 @@ class IPlatform(IEntity, metaclass=ABCMeta):
     - File handling
     """
 
+    @staticmethod
+    def get_caller():
+        import inspect
+
+        s = inspect.stack()
+        return s[2][3]
+
     def __new__(cls, *args, **kwargs):
         """
         Here is the code to create a new object!
@@ -31,8 +38,12 @@ class IPlatform(IEntity, metaclass=ABCMeta):
             **kwargs: user inputs
         Returns: object created
         """
-        if hasattr(cls, '_FACTORY'):
-            # '_FACTORY' indicates that the platform creation is through Platform Factory
+
+        # Check the caller
+        caller = cls.get_caller()
+
+        # Action based on the called
+        if caller in CALLER_LIST:
             return super().__new__(cls)
         else:
             raise ValueError(
