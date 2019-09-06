@@ -9,6 +9,9 @@ logger = getLogger(__name__)
 
 
 class ExperimentFactory:
+
+    DEFAULT_KEY = 'idmtools_models.dtk.DTKExperiment'
+
     def __init__(self):
         self._builders = {}
 
@@ -16,6 +19,10 @@ class ExperimentFactory:
         self._builders[experiment_class.__module__] = experiment_class
 
     def create(self, key, platform, **kwargs) -> 'TExperiment':
+        if key is None:
+            key = self.DEFAULT_KEY
+            logger.warning(f'No experiment type tag found, assuming type: {key}')
+
         if key not in self._builders:
             try:
                 # Try first to import it dynamically
