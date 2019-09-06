@@ -24,7 +24,7 @@ class ModelSpecification(PluginSpecification, ABC):
         return cls.__name__.replace('ModelSpecification', '').replace("ModelSpec", '').replace('Spec', '')
 
     @get_model_spec
-    def get(self, configuration: dict) -> 'IExperiment':
+    def get(self, configuration: dict) -> 'IExperiment':  # noqa: F821
         """
         Factor that should return a new platform using the passed in configuration
         Args:
@@ -36,7 +36,7 @@ class ModelSpecification(PluginSpecification, ABC):
         raise NotImplementedError("Plugin did not implement get")
 
     @get_model_type_spec
-    def get_type(self) -> typing.Type['IExperiment']:
+    def get_type(self) -> typing.Type['IExperiment']:  # noqa: F821
         pass
 
 

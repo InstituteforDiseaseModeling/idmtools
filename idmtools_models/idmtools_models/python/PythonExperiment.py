@@ -49,5 +49,3 @@ class PythonExperiment(IExperiment):
 
         # Create the command line according to the location of the model
         self.command = CommandLine("python", f"./Assets/{os.path.basename(self.model_path)}", "config.json")
-
-

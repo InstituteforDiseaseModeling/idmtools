@@ -15,7 +15,7 @@ class ExperimentFactory:
             aliases[spec.get_type().__module__] = spec
         self._builders.update(aliases)
 
-    def create(self, key, **kwargs) -> 'TExperiment':
+    def create(self, key, **kwargs) -> 'TExperiment':  # noqa: F821
         if key not in self._builders:
             raise ValueError(f"The ExperimentFactory could not create an experiment of type {key}")
 
