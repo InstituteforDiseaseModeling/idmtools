@@ -70,9 +70,7 @@ class TestAnalyzeManager(ITestWithPersistence):
         analyzers = [AddAnalyzer()]
         platform = PlatformFactory.create(key='COMPS')
 
-        experiment = platform.get_item(id=self.exp_id)
-
-        am = AnalyzeManager(configuration={}, platform=platform, items=experiment.children, analyzers=analyzers)
+        am = AnalyzeManager(configuration={}, platform=platform, ids=[self.exp_id], analyzers=analyzers)
         am.analyze()
 
     def test_DownloadAnalyzer(self):
@@ -86,9 +84,9 @@ class TestAnalyzeManager(ITestWithPersistence):
         analyzers = [DownloadAnalyzer(filenames=filenames, output_path='output')]
         platform = PlatformFactory.create(key='COMPS')
 
-        experiment = platform.get_item(id=self.exp_id)
+       # exp_id = '9eacbb9a-5ecf-e911-a2bb-f0921c167866'
 
-        am = AnalyzeManager(configuration={}, platform=platform, items=experiment.children, analyzers=analyzers)
+        am = AnalyzeManager(configuration={}, platform=platform, ids=[self.exp_id], analyzers=analyzers)
         am.analyze()
 
         for simulation in Experiment.get(self.exp_id).get_simulations():
@@ -103,8 +101,7 @@ class TestAnalyzeManager(ITestWithPersistence):
         analyzers = [PopulationAnalyzer()]
         platform = PlatformFactory.create(key='COMPS')
 
-        experiment = platform.get_item(id=self.exp_id)
-        am = AnalyzeManager(configuration={}, platform=platform, items=experiment.children, analyzers=analyzers)
+        am = AnalyzeManager(configuration={}, platform=platform, ids=self.exp_id, analyzers=analyzers)
         am.analyze()
 
         # -----------------------------------------------------------------------------------------------------
