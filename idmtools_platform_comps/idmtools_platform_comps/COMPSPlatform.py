@@ -4,6 +4,7 @@ import os
 import json
 import typing
 
+
 from COMPS import Client
 from COMPS.Data import AssetCollection, AssetCollectionFile, Configuration, Experiment as COMPSExperiment, \
     QueryCriteria, Simulation as COMPSSimulation, SimulationFile
@@ -15,6 +16,7 @@ from idmtools.core.enums import EntityStatus
 from idmtools.core.ExperimentFactory import experiment_factory
 from idmtools.core.ItemId import ItemId
 from idmtools.entities import IPlatform, ISimulation, IExperiment, ISuite
+from idmtools.utils.decorators import retry_function
 from idmtools.utils.time import timestamp
 from typing import Any, List, NoReturn
 
@@ -315,9 +317,11 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         experiment.uid = self.comps_experiment.id
         return experiment
 
+    # @retry_function
     def _retrieve_simulation(self, simulation_id: 'uuid') -> 'TSimulation':
         raise NotImplementedError('Method for retrieving a simulation by id is not complete')
-        return simulation
+        # simulation = COMPSSimulation.get(id=simulation_id)
+        # return simulation
 
     # TODO: verify the retrieve methods called here actually error when they fail to retrieve anything
     def get_parent(self, item: 'TItem') -> 'TItem':
