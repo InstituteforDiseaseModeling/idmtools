@@ -35,7 +35,7 @@ class RouterContainer extends Component {
              <Route path="/dashboard" render={this.renderContent(DASHBOARD_VIEW, 'Dashboard')} />
              <Route path="/experiment" render={this.renderContent(EXPERIMENT_VIEW, 'Experiment')} />
              <Route path="/simulation" render={this.renderContent(SIMULATION_VIEW, 'Simulation')} />
-           </div>
+           </article>
          </HashRouter>
         )
       }
