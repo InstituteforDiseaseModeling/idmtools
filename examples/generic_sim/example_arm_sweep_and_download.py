@@ -1,21 +1,13 @@
 import os
-
 from functools import partial
 
 from idmtools.assets import AssetCollection, Asset
 from idmtools.builders import SweepArm, ArmType, ArmExperimentBuilder
-<<<<<<< HEAD:examples/generic_sim/example_arm_sweep_and_download.py
-from idmtools.managers import ExperimentManager
-from idmtools_models.dtk.defaults.DTKSIR import DTKSIR
-=======
 from idmtools.core.PlatformFactory import PlatformFactory
 from idmtools.managers import ExperimentManager
-from idmtools_model_dtk import DTKExperiment
+from idmtools_model_dtk.DTKExperiment import DTKExperiment
 from idmtools_model_dtk.defaults import DTKSIR
->>>>>>> dev:examples/generic_sim/example_arm_sweep.py
 from config_update_parameters import config_update_params
-from idmtools_models.dtk import DTKExperiment
-from idmtools.core.PlatformFactory import PlatformFactory
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 BIN_PATH = os.path.join(current_directory, "bin")
@@ -29,6 +21,7 @@ expname = 'example_arm_sweep_serialization'
 
 def param_update(simulation, param, value):
     return simulation.set_parameter(param, value)
+
 
 if __name__ == "__main__":
     platform = PlatformFactory.create_from_block('COMPS')
@@ -76,7 +69,5 @@ if __name__ == "__main__":
     filenames = ['output\\InsetChart.json']
     analyzers = [DownloadAnalyzer(filenames=filenames, output_path='download-e2eB')]
 
-    experiment = platform.get_item(id=em.experiment.uid)
-
-    manager = AnalyzeManager(configuration={}, platform=platform, items=experiment.children(), analyzers=analyzers)
+    manager = AnalyzeManager(configuration={}, platform=platform, ids=[em.experiment.uid], analyzers=analyzers)
     manager.analyze()
