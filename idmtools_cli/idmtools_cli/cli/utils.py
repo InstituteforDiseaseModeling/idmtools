@@ -4,7 +4,7 @@ import requests
 from click import UsageError
 from colorama import Fore
 
-from idmtools.core import PlatformFactory
+from idmtools.core.PlatformFactory import PlatformFactory
 from idmtools_cli.IPlatformCli import PlatformCLIPlugins
 
 supported_platforms = PlatformCLIPlugins().get_plugin_map()

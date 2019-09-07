@@ -37,7 +37,9 @@ setup(
     packages=find_packages(),
     setup_requires=setup_requirements,
     entry_points=dict(idmtools_platform=
-                      ["idmtools_platform_test = idmtools_test.utils.TestPlatform:TestPlatformSpecification"]
+                      ["idmtools_platform_test = idmtools_test.utils.TestPlatform:TestPlatformSpecification"],
+                      idmtools_model=
+                      ["idmtools_model_test = idmtools_test.utils.TstExperimentSpec:TstExperimentSpec"]
                       ),
     test_suite='tests',
     url='https://github.com/InstituteforDiseaseModeling/idmtools',

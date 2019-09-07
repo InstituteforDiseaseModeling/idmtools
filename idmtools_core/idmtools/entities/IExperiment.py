@@ -5,7 +5,7 @@ from abc import ABC
 from itertools import chain
 from dataclasses import dataclass, field, InitVar
 from more_itertools import grouper
-from idmtools.core import EntityContainer
+from idmtools.core.interfaces.EntityContainer import EntityContainer
 from idmtools.core.interfaces.IAssetsEnabled import IAssetsEnabled
 from idmtools.core.interfaces.INamedEntity import INamedEntity
 from idmtools.entities.IContainerItem import IContainerItem

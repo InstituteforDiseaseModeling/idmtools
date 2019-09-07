@@ -24,7 +24,7 @@ test-all: ## Run our tests. We cannot run in parallel
 
 coverage: ## Generate a code-coverage report
 	python dev_scripts/run_pymake_on_all.py coverage-all
-	coverage combine idmtools_cli/.coverage idmtools_core/.coverage idmtools_models/.coverage idmtools_platform_comps/.coverage idmtools_platform_local/.coverage
+	coverage combine idmtools_cli/.coverage idmtools_core/.coverage idmtools_model_dtk/.coverage idmtools_models/.coverage idmtools_platform_comps/.coverage idmtools_platform_local/.coverage
 	coverage report -m
 	coverage html -i
 	python dev_scripts/launch_dir_in_browser.py htmlcov/index.html
@@ -46,3 +46,6 @@ release-staging-minor-dry-run: ## perform a release to staging and bump the mino
 # This should be used when a pushing a "production" build to staging before being approved by test
 release-staging-minor-commit: ## perform a release to staging and commit the version.
 	python dev_scripts/run_pymake_on_all.py release-staging-minor-commit
+
+start-webui: ## start the webserver
+	python -c "import os; os.chdir(os.path.join('idmtools_platform_local', 'idmtools_webui')); os.system('yarn'); os.system('yarn start')"

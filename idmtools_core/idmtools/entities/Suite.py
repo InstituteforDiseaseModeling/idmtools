@@ -1,5 +1,5 @@
 from dataclasses import field, dataclass
-from idmtools.core import EntityContainer
+from idmtools.core.interfaces.EntityContainer import EntityContainer
 from idmtools.core.interfaces.INamedEntity import INamedEntity
 
 

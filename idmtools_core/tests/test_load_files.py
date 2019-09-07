@@ -1,7 +1,7 @@
 import os
 import json
-from idmtools_models.dtk import DTKExperiment
-from idmtools_models.dtk.defaults import DTKSIR
+from idmtools_model_dtk import DTKExperiment
+from idmtools_model_dtk.defaults import DTKSIR
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 from idmtools_test import COMMON_INPUT_PATH
 

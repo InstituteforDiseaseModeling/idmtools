@@ -4,12 +4,11 @@ import collections
 import typing
 from dataclasses import dataclass, field
 from idmtools.assets import Asset
-from idmtools.core import experiment_factory
 from idmtools.entities import IExperiment, CommandLine
-from idmtools_models.dtk.DTKSimulation import DTKSimulation
+from idmtools_model_dtk.DTKSimulation import DTKSimulation
 
 if typing.TYPE_CHECKING:
-    from idmtools_models.dtk.defaults import IDTKDefault
+    from idmtools_model_dtk.defaults import IDTKDefault
 
 
 @dataclass(repr=False)
@@ -120,6 +119,3 @@ class DTKExperiment(IExperiment):
 
         # Create the command line according to the location of the model
         self.command = CommandLine("Assets/Eradication.exe", "--config config.json", "--input-path ./Assets;.")
-
-
-experiment_factory.register_type(DTKExperiment)
