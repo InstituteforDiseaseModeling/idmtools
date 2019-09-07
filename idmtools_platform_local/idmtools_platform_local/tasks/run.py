@@ -20,6 +20,7 @@ class RunTask(GenericActor):
     class Meta:
         store_results = False
         max_retries = 0
+        queue_name = "cpu-work"
 
     def perform(self, command: str, experiment_uuid: str, simulation_uuid: str) -> Status:
         """
@@ -126,3 +127,10 @@ class RunTask(GenericActor):
         elif logger.isEnabledFor(logging.DEBUG):
             logging.debug('Simulation %s finished with status of %s', simulation_uuid, str(status))
         return status
+
+
+class GPURunTask(RunTask):
+    class Meta:
+        store_results = False
+        max_retries = 0
+        queue_name = "gpu-work"

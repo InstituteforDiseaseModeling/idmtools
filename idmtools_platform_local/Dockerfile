@@ -40,7 +40,9 @@ RUN apt-get update \
 # Our script that does smart user mapping
 COPY docker_scripts/user_conf.sh /etc/cont-init.d/01-user_conf.sh
 # Our service scripts
-COPY docker_scripts/start_workers.sh /etc/services.d/idmtools_workers/run
+COPY docker_scripts/start_general_workers.sh /etc/services.d/idmtools_general_workers/run
+COPY docker_scripts/start_cpu_workers.sh /etc/services.d/idmtools_cpu_workers/run
+COPY docker_scripts/start_gpu_workers.sh /etc/services.d/idmtools_gpu_workers/run
 COPY docker_scripts/start_ui.sh /etc/services.d/idmtools_ui/run
 
 # Define a workdirectory
