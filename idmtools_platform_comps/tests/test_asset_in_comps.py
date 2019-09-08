@@ -79,6 +79,7 @@ class TestAssetsInComps(unittest.TestCase):
         ac = AssetCollection()
         ac.add_asset(a)
         ac.add_asset(b)
+        ac.tags = {"idmtools": "idmtools-automation", "string_tag": "testACtag", "number_tag": 123, "KeyOnly": None}
 
         pe = PythonExperiment(name=self.case_name,
                               model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"), assets=ac)
@@ -92,6 +93,15 @@ class TestAssetsInComps(unittest.TestCase):
             self.assertEqual(asset_collection.assets[0]._md5_checksum, asset_collection.assets[1]._md5_checksum)
             self.assertEqual(asset_collection.assets[0]._file_name, 'test.json')
             self.assertEqual(asset_collection.assets[1]._file_name, 'test1.json')
+
+    def test_create_asset_collection(self):
+        ac = AssetCollection()
+        assets_dir = os.path.join(COMMON_INPUT_PATH, "assets", "collections")
+        ac.assets_from_directory(assets_dir)
+        # add tags to ACs - can't currently do this
+        ac.tags = {"idmtools": "idmtools-automation", "string_tag": "testACtag", "number_tag": 123, "KeyOnly": None}
+
+        self.assertSetEqual(set(ac.assets), set(AssetCollection.tags))
 
 
 if __name__ == '__main__':

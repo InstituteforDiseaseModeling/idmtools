@@ -134,7 +134,7 @@ class LocalPlatform(IPlatform):
                 s.status = local_status_to_common(sim_status[0]['status'])
 
     def create_experiment(self, experiment: IExperiment):
-        from idmtools_platform_local.tasks.create_experiement import CreateExperimentTask
+        from idmtools_platform_local.tasks.create_experiment import CreateExperimentTask
 
         m = CreateExperimentTask.send(experiment.tags, experiment.simulation_type)
         eid = m.get_result(block=True, timeout=self.default_timeout * 1000)

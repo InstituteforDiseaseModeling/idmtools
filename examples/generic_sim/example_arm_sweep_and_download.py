@@ -7,7 +7,7 @@ from idmtools.core.PlatformFactory import PlatformFactory
 from idmtools.managers import ExperimentManager
 from idmtools_model_dtk.DTKExperiment import DTKExperiment
 from idmtools_model_dtk.defaults import DTKSIR
-from config_update_parameters import config_update_params
+from config_update_parameters import config_update_para
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 BIN_PATH = os.path.join(current_directory, "bin")

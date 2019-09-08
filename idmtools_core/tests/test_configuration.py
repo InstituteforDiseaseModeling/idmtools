@@ -79,3 +79,12 @@ class TestConfig(ITestWithPersistence):
 
         self.assertEqual(p1, p2)
         self.assertEqual(id(p1), id(p2))
+
+    def test_idmtools_ini_local(self):
+        config_file = IdmConfigParser.get_config_path()
+        self.assertEqual(os.path.basename(config_file), 'idmtools.ini')
+
+        idm = IdmConfigParser()
+        local_type = idm.get_option("Custom_Local", 'type')
+        self.assertEqual(str(local_type), "Local")
+

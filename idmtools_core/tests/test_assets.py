@@ -31,8 +31,10 @@ class TestAssets(unittest.TestCase):
             Asset(relative_path="2", absolute_path=os.path.join(self.base_path, "2", "c.txt"))
         ]
         ac = AssetCollection.from_directory(assets_directory=self.base_path)
+        AssetCollection.tags = {"idmtools": "idmtools-automation", "string_tag": "testACtag", "number_tag": 123, "KeyOnly": None}
+        print(AssetCollection.uid)
 
-        self.assertSetEqual(set(ac.assets), set(assets_to_find))
+        self.assertSetEqual(set(ac.assets), set(assets_to_find), set(AssetCollection.tags))
 
     def test_assets_collection_duplicate(self):
         a = Asset(relative_path="1", absolute_path=os.path.join(self.base_path, "1", "a.txt"))
