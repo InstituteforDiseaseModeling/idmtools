@@ -3,7 +3,6 @@ from importlib import reload
 
 import pytest
 
-from idmtools.core import PlatformFactory, EntityStatus
 from idmtools.core import EntityStatus
 from idmtools.core.PlatformFactory import PlatformFactory
 from idmtools.managers import ExperimentManager
@@ -27,9 +26,9 @@ class TestPlatformSimulations(ITestWithPersistence):
         dm = DockerOperations()
         dm.cleanup(True)
 
-        import idmtools_platform_local.tasks.create_experiment
+        import idmtools_platform_local.tasks.create_experiement
         import idmtools_platform_local.tasks.create_simulation
-        reload(idmtools_platform_local.tasks.create_experiment)
+        reload(idmtools_platform_local.tasks.create_experiement)
         reload(idmtools_platform_local.tasks.create_simulation)
 
     @restart_local_platform(silent=True, **get_test_local_env_overrides())
@@ -56,8 +55,7 @@ class TestPlatformSimulations(ITestWithPersistence):
                 self.assertEqual(files[filename].decode('utf-8').strip(), f'/data/{pe.uid}/Assets')
             else:  # default compare the content of the files
                 with open(os.path.join(COMMON_INPUT_PATH, "python", "realpath_verify.py"), 'r') as rpin:
-                    self.assertEqual(files[filename].decode("utf-8").replace("\r\n", "\n"),
-                                     rpin.read().replace("\r\n", "\n"))
+                    self.assertEqual(files[filename].decode("utf-8").replace("\r\n", "\n"), rpin.read().replace("\r\n", "\n"))
 
         # TODO attempt to unify the content of this file across platforms
         # On Comps, this will return the path to the Simulation Assets directory, but on Local, it returns the REAL
