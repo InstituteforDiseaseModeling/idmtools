@@ -1,11 +1,10 @@
 import unittest
 
-from idmtools.core import ExperimentNotFound
+from idmtools.core import ExperimentNotFound, Platform
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.utils.entities import retrieve_experiment
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 from idmtools_test.utils.TstExperiment import TstExperiment
-from idmtools_test.utils.TestPlatform import TestPlatform
 
 
 class TestUtils(ITestWithPersistence):
@@ -13,7 +12,7 @@ class TestUtils(ITestWithPersistence):
     def test_retrieve_experiment(self):
         # Test missing
         with self.assertRaises(ExperimentNotFound):
-            retrieve_experiment("Missing", TestPlatform())
+            retrieve_experiment("Missing", Platform('Test'))
 
         # Test correct retrieval
         e = TstExperiment("test")
@@ -24,7 +23,7 @@ class TestUtils(ITestWithPersistence):
 
         # test correct retrieval with platform
         e = TstExperiment("test2")
-        p = TestPlatform()
+        p = Platform('Test')
         p.create_experiment(e)
         e.platform_id = p.uid
         with self.assertRaises(ExperimentNotFound):

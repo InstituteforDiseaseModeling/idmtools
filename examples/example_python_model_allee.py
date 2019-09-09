@@ -2,6 +2,7 @@ import os
 from functools import partial
 
 from idmtools.builders import ExperimentBuilder
+from idmtools.core import Platform
 from idmtools.managers import ExperimentManager
 
 from idmtools_models.python.PythonExperiment import PythonExperiment
@@ -42,8 +43,8 @@ pe.base_simulation.set_parameter("nsims", 100)
 
 pe.builder = builder
 
-# platform = LocalPlatform()
-platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
+# platform = Platform('Local')
+platform = Platform('COMPS2', endpoint="https://comps2.idmod.org", environment="Bayesian")
 
 em = ExperimentManager(experiment=pe, platform=platform)
 em.run()

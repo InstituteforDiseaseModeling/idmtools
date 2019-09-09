@@ -1,19 +1,16 @@
-from importlib import reload
-
+import os
 import pytest
-
+from importlib import reload
+from idmtools.core import EntityStatus
 from idmtools_platform_local.docker.DockerOperations import DockerOperations
 from operator import itemgetter
 from idmtools.assets import AssetCollection
 from idmtools.builders import ExperimentBuilder
 from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
-from idmtools.core import EntityStatus, PlatformFactory
-from idmtools_platform_local.local_platform import LocalPlatform
+from idmtools.core.PlatformFactory import Platform
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
-import os
-
 from idmtools_test.utils.confg_local_runner_test import reset_local_broker, get_test_local_env_overrides
 from idmtools_test.utils.decorators import restart_local_platform
 
@@ -38,7 +35,7 @@ class TestPythonSimulation(ITestWithPersistence):
     @restart_local_platform(silent=True, **get_test_local_env_overrides())
     def test_direct_sweep_one_parameter_local(self):
 
-        platform = PlatformFactory.create_from_block('Local_Staging')
+        platform = Platform('Local_Staging')
 
         # CreateSimulationTask.broker =
 
@@ -79,9 +76,8 @@ class TestPythonSimulation(ITestWithPersistence):
 
     @restart_local_platform(silent=True, **get_test_local_env_overrides())
     def test_add_prefixed_relative_path_to_assets_local(self):
-        from idmtools.core import PlatformFactory, EntityStatus
         # platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
-        platform: LocalPlatform = PlatformFactory.create_from_block('Local_Staging')
+        platform = Platform('Local_Staging')
         model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
         ac = AssetCollection()
         assets_path = os.path.join(COMMON_INPUT_PATH, "python", "Assets", "MyExternalLibrary")

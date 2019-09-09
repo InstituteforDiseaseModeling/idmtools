@@ -4,7 +4,7 @@ import unittest.mock
 import os
 import pytest
 from idmtools.config import IdmConfigParser
-from idmtools.core import PlatformFactory
+from idmtools.core.PlatformFactory import Platform
 from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
@@ -39,7 +39,7 @@ class TestConfig(ITestWithPersistence):
     @pytest.mark.comps
     @unittest.mock.patch('idmtools_platform_comps.COMPSPlatform.COMPSPlatform._login', side_effect=lambda: True)
     def test_simple_comps_platform_use_config(self, mock_login):
-        platform = PlatformFactory.create("COMPS")
+        platform = Platform("COMPS")
         self.assertEqual(platform.endpoint, 'https://comps2.idmod.org')
         self.assertEqual(platform.environment, 'Bayesian')
         self.assertEqual(mock_login.call_count, 1)
@@ -47,7 +47,7 @@ class TestConfig(ITestWithPersistence):
     @pytest.mark.comps
     @unittest.mock.patch('idmtools_platform_comps.COMPSPlatform.COMPSPlatform._login', side_effect=lambda: True)
     def test_simple_comps_platform_use_code(self, mock_login):
-        platform = PlatformFactory.create("COMPS", endpoint='https://abc', environment='Bayesian')
+        platform = Platform("COMPS", endpoint='https://abc', environment='Bayesian')
         self.assertEqual(platform.endpoint, 'https://abc')
         self.assertEqual(platform.environment, 'Bayesian')
         self.assertEqual(mock_login.call_count, 1)
