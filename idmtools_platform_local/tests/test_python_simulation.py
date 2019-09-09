@@ -2,13 +2,14 @@ from importlib import reload
 
 import pytest
 
+from idmtools.core import EntityStatus
 from idmtools_platform_local.docker.DockerOperations import DockerOperations
 from operator import itemgetter
 from idmtools.assets import AssetCollection
 from idmtools.builders import ExperimentBuilder
 from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
-from idmtools.core import EntityStatus, PlatformFactory
+from idmtools.core.PlatformFactory import PlatformFactory
 from idmtools_platform_local.local_platform import LocalPlatform
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
@@ -79,7 +80,6 @@ class TestPythonSimulation(ITestWithPersistence):
 
     @restart_local_platform(silent=True, **get_test_local_env_overrides())
     def test_add_prefixed_relative_path_to_assets_local(self):
-        from idmtools.core import PlatformFactory, EntityStatus
         # platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
         platform: LocalPlatform = PlatformFactory.create_from_block('Local_Staging')
         model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
@@ -116,7 +116,7 @@ class TestPythonSimulation(ITestWithPersistence):
             self.assertEqual(pe.simulation_type, oe.simulation_type)
             self.assertEqual(len(pe.simulations), len(oe.simulations))
             sim_ids_pe = set([s.uid for s in pe.simulations])
-            sim_ids_oe = set([s.uid for s in pe.simulations])
+            sim_ids_oe = set([s.uid for s in oe.simulations])
             # get difference. There should be none so we should get an empty array
             self.assertEqual(len(sim_ids_oe.difference(sim_ids_pe)), 0)
             # intersection should be 100% of array

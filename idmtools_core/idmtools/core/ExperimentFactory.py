@@ -1,32 +1,26 @@
-import typing
 from logging import getLogger
 
-if typing.TYPE_CHECKING:
-    from idmtools.core import TExperimentClass, TExperiment
-
+from idmtools.registry import ModelSpecification
 
 logger = getLogger(__name__)
 
 
 class ExperimentFactory:
     def __init__(self):
-        self._builders = {}
+        from idmtools.registry.ModelSpecification import ModelPlugins
+        self._builders = ModelPlugins().get_plugin_map()
+        aliases = dict()
+        # register types as full paths as well
+        for model, spec in self._builders.items():
+            aliases[spec.get_type().__module__] = spec
+        self._builders.update(aliases)
 
-    def register_type(self, experiment_class: 'TExperimentClass'):
-        self._builders[experiment_class.__module__] = experiment_class
-
-    def create(self, key, **kwargs) -> 'TExperiment':
+    def create(self, key, **kwargs) -> 'TExperiment':  # noqa: F821
         if key not in self._builders:
-            try:
-                # Try first to import it dynamically
-                import importlib
-                importlib.import_module(key)
-            except Exception as e:
-                logger.exception(e)
-                raise ValueError(f"The ExperimentFactory could not create an experiment of type {key}")
+            raise ValueError(f"The ExperimentFactory could not create an experiment of type {key}")
 
-        builder = self._builders.get(key)
-        return builder(**kwargs)
+        model_spec: ModelSpecification = self._builders.get(key)
+        return model_spec.get(kwargs)
 
 
 experiment_factory = ExperimentFactory()

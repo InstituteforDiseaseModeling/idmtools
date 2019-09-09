@@ -2,7 +2,7 @@ import os
 from functools import partial
 
 from idmtools.builders import ExperimentBuilder
-from idmtools.core import PlatformFactory
+from idmtools.core.PlatformFactory import PlatformFactory
 from idmtools.managers import ExperimentManager
 
 from idmtools_models.python.PythonExperiment import PythonExperiment

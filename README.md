@@ -24,11 +24,21 @@ coverage    -   Run tests and generate coverage report that is shown in browser
 ```
 On Windows, you can use `pymake` instead of `make`
 
-Alternatively, you can install the packages manually by doing the follwing. 
-Install the packages in dev mode with the `test` extra (from repository folder).
+### IDE/Runtime Setup
+For development purpose, it is important to add the following folders as to your `PYTHONPATH` (In PyCharm, right click and `Mark Directoy as > Source Root`):
+- `idmtools/idmtools_core`
+- `idmtools/idmtools_cli`
+- `idmtools/idmtools_platform_local`
+- `idmtools/idmtools_platform_comps`
+- `idmtools/idmtools_models`
+- `idmtools/idmtools_test`
+
+### Manual Install
+
+Alternatively, you can install the packages manually by doing the following. 
 ```bash
 > cd idmtools_core
-> pip install -e .[test,3.6] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+> pip install -e .[test] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
 > cd ..
 > cd idmtools_cli
 > pip install -e .[test]
@@ -45,14 +55,6 @@ Install the packages in dev mode with the `test` extra (from repository folder).
 > pip install -e .
 
 ```
-
-For development purpose, it is important to add the following folders as to your `PYTHONPATH` (In PyCharm, right click and `Mark Directoy as > Source Root`):
-- `idmtools/idmtools_core`
-- `idmtools/idmtools_cli`
-- `idmtools/idmtools_platform_local`
-- `idmtools/idmtools_platform_comps`
-- `idmtools/idmtools_models`
-- `idmtools/idmtools_test`
 
 ### Running specific tests from the command line
 

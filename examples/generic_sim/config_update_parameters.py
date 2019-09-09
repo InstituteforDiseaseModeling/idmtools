@@ -1,4 +1,4 @@
-from idmtools_models.dtk import DTKSimulation
+from idmtools_model_dtk import DTKSimulation
 
 
 def standard_cb_updates(sim:'DTKSimulation'=None):

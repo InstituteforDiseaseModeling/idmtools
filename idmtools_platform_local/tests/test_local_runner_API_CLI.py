@@ -1,7 +1,7 @@
 import pytest
 
 from idmtools_test.utils.confg_local_runner_test import reset_local_broker, get_test_local_env_overrides
-from idmtools.core import PlatformFactory
+from idmtools.core.PlatformFactory import PlatformFactory
 import os
 import re
 import subprocess
