@@ -3,7 +3,8 @@ from importlib import reload
 
 import pytest
 
-from idmtools.core import PlatformFactory, EntityStatus
+from idmtools.core import EntityStatus
+from idmtools.core.PlatformFactory import PlatformFactory
 from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
 from idmtools_platform_local.docker.DockerOperations import DockerOperations

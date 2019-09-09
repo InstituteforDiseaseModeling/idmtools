@@ -56,6 +56,7 @@ RUN echo ${PYPIURL}
 # Run the setup instal before copying rest of package. This will increase cache hits during docker builds
 # as we will only rebuild if any of the docker_scripts, setup.py, readme.md, and requirements.txt change
 # which should happen infrequently(or less so than library code)
-RUN cd /tmp && pip install idmtools_platform_local[workers,ui] --extra-index-url=${PYPIURL} --trusted-host ${PYPIHOST}
+COPY dist/idmtools_platform_local*.tar.gz /tmp/
+RUN find /tmp -name idmtools_platform_local*.tar.gz -exec pip install {}[workers,ui] --extra-index-url=${PYPIURL} --trusted-host ${PYPIHOST} \;
 
 CMD ["/init"]
