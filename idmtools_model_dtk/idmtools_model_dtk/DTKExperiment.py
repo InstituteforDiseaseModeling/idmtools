@@ -6,9 +6,11 @@ from dataclasses import dataclass, field
 from idmtools.assets import Asset
 from idmtools.entities import IExperiment, CommandLine
 from idmtools_model_dtk.DTKSimulation import DTKSimulation
+# from idmtools_model_dtk.idmtools_model_dtk.DTKSimulation import DTKSimulation
 
 if typing.TYPE_CHECKING:
-    from idmtools_model_dtk.defaults import IDTKDefault
+    # from idmtools_model_dtk.defaults import IDTKDefault
+    from idmtools_model_dtk.idmtools_model_dtk.defaults.IDTKDefault import IDTKDefault
 
 
 @dataclass(repr=False)
