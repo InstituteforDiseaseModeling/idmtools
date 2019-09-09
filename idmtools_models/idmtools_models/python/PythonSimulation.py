@@ -2,7 +2,7 @@ import json
 from dataclasses import dataclass, field
 
 from idmtools.assets import Asset
-from idmtools.entities import ISimulation
+from idmtools.entities.ISimulation import ISimulation
 
 
 @dataclass(repr=False)

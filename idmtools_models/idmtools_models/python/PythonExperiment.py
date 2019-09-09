@@ -4,7 +4,9 @@ import tempfile
 from dataclasses import dataclass, field
 
 from idmtools.assets.Asset import Asset
-from idmtools.entities import CommandLine, IExperiment
+from idmtools.entities import IExperiment
+from idmtools.entities.CommandLine import CommandLine
+
 from idmtools_models.python.PythonSimulation import PythonSimulation
 
 

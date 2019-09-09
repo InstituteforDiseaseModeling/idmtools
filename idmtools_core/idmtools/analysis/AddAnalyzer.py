@@ -34,20 +34,3 @@ class AddAnalyzer(IAnalyzer):
         # data is currently a dict with item_id: value  entries
         value = sum(data.values())
         return value
-
-
-if __name__ == '__main__':
-    from idmtools.analysis.AnalyzeManager import AnalyzeManager
-    from idmtools.core.PlatformFactory import PlatformFactory
-
-    platform = PlatformFactory.create(key='COMPS')
-
-    filenames = ['StdOut.txt']
-    analyzers = [AddAnalyzer(filenames=filenames)]
-
-    experiment_id = '31d83b39-85b4-e911-a2bb-f0921c167866'
-
-    experiment = platform.get_item(id=experiment_id)
-
-    manager = AnalyzeManager(configuration={}, platform=platform, items=experiment.children(), analyzers=analyzers)
-    manager.analyze()
