@@ -60,7 +60,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.children()]))
         experiment = Experiment.get(em.experiment.uid)
         print(experiment.id)
-        self.exp_id = experiment
+        self.exp_id = experiment.id  # COMPS Experiment object, so .id
 
         # Uncomment out if you do not want to regenerate exp and sims
         # self.exp_id = '9eacbb9a-5ecf-e911-a2bb-f0921c167866' #comps2 staging
@@ -72,7 +72,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         # create a new empty 'output' dir
         os.mkdir("output")
 
-        filenames = ['output\\InsetChart.json', 'config.json']
+        filenames = ['output\\result.json', 'config.json']
         analyzers = [DownloadAnalyzer(filenames=filenames, output_path='output')]
         platform = PlatformFactory.create(key='COMPS')
 
@@ -82,7 +82,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         for simulation in Experiment.get(self.exp_id).get_simulations():
             s = simulation.get(id=simulation.id)
             self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "config.json")))
-            self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "insetChart.json")))
+            self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "result.json")))
 
     def test_analyzer_multiple_experiments(self):
         #delete output from previous run

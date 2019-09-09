@@ -25,14 +25,15 @@ class ExperimentManager:
 
     @classmethod
     def from_experiment_id(cls, experiment_id, platform):
-        experiment = retrieve_experiment(experiment_id, platform)
-        platform = PlatformPersistService.retrieve(experiment.platform_id)
+        experiment = platform.get_item(id=experiment_id)
+        platform = PlatformPersistService.retrieve(experiment.platform.uid)
         em = cls(experiment, platform)
         em.restore_simulations()
         return em
 
     def restore_simulations(self):
-        self.platform.restore_simulations(self.experiment)
+        # self.platform.get_children(self.experiment)
+        self.experiment.children(refresh=True)
 
     def create_experiment(self):
         self.experiment.pre_creation()
@@ -71,14 +72,11 @@ class ExperimentManager:
             results = executor.map(self.simulation_batch_worker_thread,
                                    self.experiment.batch_simulations(batch_size=10))
 
-        for sim_batch in results:
-            for simulation in sim_batch:
-                self.experiment.simulations.append(simulation.metadata)
-                self.experiment.simulations.set_status(EntityStatus.CREATED)
+        self.experiment.children().set_status(EntityStatus.CREATED)  # TODO: needed?
 
     def start_experiment(self):
         self.platform.run_items([self.experiment])
-        self.experiment.simulations.set_status(EntityStatus.RUNNING)
+        self.experiment.children().set_status(EntityStatus.RUNNING)
 
     def run(self):
         """
