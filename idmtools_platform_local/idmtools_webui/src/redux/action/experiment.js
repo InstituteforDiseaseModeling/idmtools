@@ -36,7 +36,7 @@ export function fetchExperiments() {
   
               handleResponse(response,
                 (subjects)=>{ /*success handler*/                
-                  dispatch(receiveExperiments(subjects))
+                  dispatch(receiveExperiments(subjects));
                   dispatch(loading(false));
                 },
                 (data)=> { /* failure handler */
@@ -66,9 +66,8 @@ export function fetchExperiments() {
             .then(response => {
   
               handleResponse(response,
-                (subjects)=>{ /*success handler*/                
-                  
-                  dispatch(showInfo("Delete operation is complete"))
+                (subjects)=>{ /*success handler*/
+                  dispatch(showInfo("Delete operation is complete"));
                   dispatch(fetchExperiments());
                 },
                 (data)=> { /* failure handler */

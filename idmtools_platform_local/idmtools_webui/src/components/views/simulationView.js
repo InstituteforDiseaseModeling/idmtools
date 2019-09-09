@@ -17,61 +17,59 @@ import {getSimulationsByFilter} from "../../redux/selectors/simulations";
 
 const styles = theme => ({
     folder: {
-        color:'yellow'
+        color: 'yellow'
     },
     splitter: {
-        
-        height: '100%', 
+
+        height: '100%',
         '& .layout-pane-primary': {
-            height:'100%', 
-            backgroundColor:'#424242'
+            height: '100%',
+            backgroundColor: '#424242'
         },
         backgroundColor: '#424242'
-        
+
     },
     details: {
-        height:'100%',  
+        height: '100%',
+        margin: 30
     },
     root: {
-        height:'100%',  
+        height: '100%',
     },
     cardTitle: {
-       color: '#2196f3',
-       padding: 10
+        color: '#2196f3',
+        padding: 10
     },
     textField: {
         marginLeft: theme.spacing(1),
         marginRight: theme.spacing(1),
         width: 200,
-      },
+    },
     itemText: {
-        maxWidth:200
+        maxWidth: 200
     },
     itemValue: {
-        maxWidth:400
+        maxWidth: 400
     },
-     details: {
-         margin:30
-     },
-     highlight:{
-         backgroundColor:'#43a047'
-     },
-     clearIcon: {
-         color:'red',
-         
-     },
-     tableHeader: {
-         position:'sticky',
-         top:200
-     }
-})
+    highlight: {
+        backgroundColor: '#43a047'
+    },
+    clearIcon: {
+        color: 'red',
+
+    },
+    tableHeader: {
+        position: 'sticky',
+        top: 200
+    }
+});
 
 class SimulationView extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            selectedSim : null,            
+            selectedSim : null,
             columns: [
                 {name: "simulation_uid", sortOrder:  'asc', active: false, title: 'Simulation Id' },
                 {name: "status" , sortOrder:  'asc', active: false, title:'Status'},
@@ -83,7 +81,7 @@ class SimulationView extends React.Component {
             ],
             dialogOpen: false,
             simIdForCancel: null
-        }
+        };
         this.rowClick = this.rowClick.bind(this);
         this.cancelSim = this.cancelSim.bind(this);
         this.cancelClick = this.cancelClick.bind(this);
@@ -108,20 +106,20 @@ class SimulationView extends React.Component {
             this.setState({dialogOpen:true, cb: cb, simIdForCancel:e.currentTarget.getAttribute("sim_id") });
 
             return false;
-          }      
+          }
     }
 
     cancelSim() {
 
         const { dispatch } = this.props;
 
-        dispatch(cancelSimulation(this.state.simIdForCancel)); 
-                
+        dispatch(cancelSimulation(this.state.simIdForCancel));
+
     }
 
     rowClick(e) {
         this.setState( {
-            selectedSim : e.currentTarget.getAttribute("sim_id") == this.state.selectedSim ? null : e.currentTarget.getAttribute("sim_id")
+            selectedSim : e.currentTarget.getAttribute("sim_id") === this.state.selectedSim ? null : e.currentTarget.getAttribute("sim_id")
         });
     }
 
@@ -147,10 +145,10 @@ class SimulationView extends React.Component {
                 return c;
             });
 
-            let activeCol =_.find(this.state.columns, {name:col})
+            let activeCol =_.find(this.state.columns, {name:col});
             activeCol.active = true;
-            activeCol.sortOrder = activeCol.sortOrder == "asc" ? "desc" : "asc";
-            
+            activeCol.sortOrder = activeCol.sortOrder === "asc" ? "desc" : "asc";
+
             this.setState({
                 update: true
             })
@@ -167,20 +165,20 @@ class SimulationView extends React.Component {
 
         if (this.state.cb)
           this.state.cb();
-    
+
         this.setState({dialogOpen:false});
-    
+
       }
-    
+
 
     render() {
 
-        const { simulations , classes} = this.props;
+        const { simulations , classes} = this.props; // eslint-disable-line no-unused-vars
 
         let sorted = [];
 
-        let status, command, tags
-        
+        let status, command, tags;
+
         if (this.props.simulations) {
 
             let activeCol  =_.find(this.state.columns, {active:true});
@@ -190,21 +188,21 @@ class SimulationView extends React.Component {
                 return o[activeCol.name];
             });
 
-            if (activeCol.sortOrder == "desc") {
+            if (activeCol.sortOrder === "desc") {
                 _.reverse(sorted);
             }
         }
 
 
         if (this.state.selectedSim) {
-            
+
             let index = _.findIndex(this.props.simulations, {simulation_uid: this.state.selectedSim});
 
             if (index >= 0) {
-                let sims = this.props.simulations
-                status = sims[index].status;
-                command =  sims[index].extra_details.command;
-                tags = JSON.stringify( sims[index].tags);                
+                let sims = this.props.simulations;
+                status = sims[index].status; // eslint-disable-line no-unused-vars
+                command =  sims[index].extra_details.command; // eslint-disable-line no-unused-vars
+                tags = JSON.stringify( sims[index].tags); // eslint-disable-line no-unused-vars
             } else {
                 this.state.selectedSim = null;
             }
@@ -220,25 +218,25 @@ class SimulationView extends React.Component {
                     <Paper className={classes.root}>
                         <SimulationChart key={splitterKey}/>
                     </Paper>
-                    
+
                     <SplitterLayout vertical="false" percentage="true" secondaryInitialSize="50">
-                    
+
                         <Paper className={classes.root}>
                             <Table className={classes.table}>
                                 <TableHead className={classes.tableHeader}>
                                     <TableRow>
                                         {
                                             this.state.columns.map(col=> {
-                                                if (col.sortOrder == "")
+                                                if (col.sortOrder === "")
                                                     return (
                                                         <TableCell align="right">
                                                             {col.title}
                                                         </TableCell>
                                                     )
-                                                else 
+                                                else
                                                     return(
                                                         <TableCell align="right">
-                                                            <TableSortLabel onClick={this.sortHandler(col.name)} active={col.active} direction={col.sortOrder}>{col.title}</TableSortLabel>                                        
+                                                            <TableSortLabel onClick={this.sortHandler(col.name)} active={col.active} direction={col.sortOrder}>{col.title}</TableSortLabel>
                                                         </TableCell>
                                                 )
                                             })
@@ -249,17 +247,15 @@ class SimulationView extends React.Component {
                                 </TableHead>
                                 <TableBody>
                                     {sorted.map(sim => {
-                                        let disable = (sim.status == "done");
-
-                                        
+                                        let disable = (sim.status === "done");
                                         return (
-                                            <TableRow key={sim.simulation_uid} onClick={this.rowClick} sim_id={sim.simulation_uid} className={sim.simulation_uid == this.state.selectedSim ? classes.highlight: null}>
+                                            <TableRow key={sim.simulation_uid} onClick={this.rowClick} sim_id={sim.simulation_uid} className={sim.simulation_uid === this.state.selectedSim ? classes.highlight: null}>
 
                                                 <TableCell align="right">{sim.simulation_uid}</TableCell>
                                                 <TableCell align="right">{sim.status}</TableCell>
                                                 <TableCell align="right">{sim.experiment_id}</TableCell>
                                                 <TableCell align="right">
-                                                    <a target="_blank" href={'http://' + window.location.hostname + ':5000' + sim.data_path}>
+                                                    <a target="_blank" rel="noopener noreferrer" href={'http://' + window.location.hostname + ':5000' + sim.data_path}>
                                                         <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
                                                             <FolderIcon className={classes.folder}/>
                                                         </IconButton>
@@ -270,7 +266,7 @@ class SimulationView extends React.Component {
 
                                                 </TableCell>
                                                 <TableCell align="right">{formatDateString(sim.created)}</TableCell>
-                                                <TableCell align="right">{formatDateString(sim.updated)}</TableCell>                                
+                                                <TableCell align="right">{formatDateString(sim.updated)}</TableCell>
                                             </TableRow>
                                     )})}
                                 </TableBody>
@@ -314,8 +310,8 @@ class SimulationView extends React.Component {
                                 </Card>
                             </Paper>
                         }
-                    </SplitterLayout> 
-                    
+                    </SplitterLayout>
+
                 </SplitterLayout>
                 <Dialog
                     open={this.state.dialogOpen}
@@ -353,7 +349,7 @@ function mapStateToProps(state) {
     return ({
         start: state.start,
         end: state.end,
-        simulations: getSimulationsByFilter(state.simulations, state.start, state.end),      
+        simulations: getSimulationsByFilter(state.simulations, state.start, state.end),
     })
 
 }

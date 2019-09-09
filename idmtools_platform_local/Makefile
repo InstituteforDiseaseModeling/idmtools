@@ -11,6 +11,7 @@ clean: ## Clean all our jobs
 	@$(IPY) "import os, glob, shutil; [shutil.rmtree(i) for i in glob.glob('**/.pytest_cache', recursive=True)]"
 	@$(IPY) "import shutil; shutil.rmtree('dist', True)"
 	@$(IPY) "import shutil; shutil.rmtree('build', True)"
+	@$(IPY) "import shutil; shutil.rmtree('idmtools_webui/build', True)"
 
 clean-all:  ## Deleting package info hides plugins so we only want to do that for packaging
 	@make clean
@@ -43,17 +44,17 @@ docker-local: ## Build our docker image using the local pypi
 	# ensure pypi local is up
 	@+$(IPY) "import os; os.chdir('../dev_scripts/local_pypi'); os.system('docker-compose up -d')"
 	@+$(IPY) "import os; os.chdir('../idmtools_core'); os.system('pymake release-local')"
-
+	@pymake release-local
 	docker-compose build --build-arg PYPIURL=http://172.17.0.1:7171/ --build-arg PYPIHOST=172.17.0.1 workers
 
-docker-local-no-cache: ## Build our docker image using the local pypi
+docker-local-no-cache:## Build our docker image using the local pypi
 	# This job is most useful when actively developing changes to the local_platform internals(tasks, api, cli) or
 	# upstream changes that effect those areas(models and core). Otherwise, installing from latest in the nightly
 	# should suffice for development
 	# ensure pypi local is up
 	@+$(IPY) "import os; os.chdir('../dev_scripts/local_pypi'); os.system('docker-compose up -d')"
 	@+$(IPY) "import os; os.chdir('../idmtools_core'); os.system('pymake release-local')"
-
+	@pymake release-local
 	docker-compose build --no-cache --build-arg PYPIURL=http://172.17.0.1:7171/ --build-arg PYPIHOST=172.17.0.1 workers
 
 docker-staging: ## Build our docker image using staging pypi
@@ -91,7 +92,8 @@ coverage-all: ## Generate a code-coverage report
 # Release related rules
 
 release-local: ## package and upload a release to http://localhost:7171
-	@make dist
+	@pymake build-ui
+	@pymake dist
 	twine upload --verbose --repository-url http://localhost:7171 -u admin -p admin dist/*
 
 dist: ## build our package
@@ -100,7 +102,8 @@ dist: ## build our package
 
 release-staging: ## perform a release to staging
 	bump2version --config-file .bumpversion.nightly.cfg build --allow-dirty
-	@make dist
+	@pymake build-ui
+	@pymake dist
 	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/pypi-staging/simple dist/*
 	@make docker-release-staging
 
@@ -114,3 +117,9 @@ release-staging-minor-commit: ## perform a release to staging and commit the ver
 	@make dist
 	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/pypi-staging/simple dist/*
 	@make docker-release-staging
+
+build-ui:
+	@$(IPY) "import shutil; shutil.rmtree('idmtools_platform_local/workers/ui/static', True)"
+	@$(IPY) "import shutil; shutil.rmtree('idmtools_webui/build', True)"
+	@+$(IPY) "import os; os.chdir('idmtools_webui'); os.system('python build.py')"
+	@$(IPY) "import shutil; shutil.copytree('idmtools_webui/build', 'idmtools_platform_local/workers/ui/static')"

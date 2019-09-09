@@ -2,9 +2,8 @@
 
 import React from 'react';
 import IconButton from '@material-ui/core/IconButton';
-import Snackbar from '@material-ui/core/Snackbar';
 import SnackbarContent from '@material-ui/core/SnackbarContent';
-import { amber, green } from '@material-ui/core/colors';
+import { green } from '@material-ui/core/colors';
 import { withStyles } from '@material-ui/core/styles';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import ErrorIcon from '@material-ui/icons/Error';
@@ -19,7 +18,7 @@ const variantIcon = {
     warning: WarningIcon,
     error: ErrorIcon,
     info: InfoIcon,
-}
+};
 
 const styles = theme => ({
     success: {
