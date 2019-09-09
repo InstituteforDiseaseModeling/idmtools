@@ -2,6 +2,7 @@ import uuid
 
 from abc import ABCMeta, abstractmethod
 from idmtools.entities.IItem import IItem
+from idmtools.core.interfaces.EntityContainer import EntityContainer
 from dataclasses import dataclass, field
 
 import typing
@@ -47,4 +48,4 @@ class IContainerItem(IItem, metaclass=ABCMeta):
                 self._children = self.platform.get_children(self)  # TODO implement full_load, full_load=full_load)
         else:
             raise self.NoPlatformException('Items require a platform object to resolve their children ids to objects.')
-        return self._children
+        return EntityContainer(self._children)

@@ -15,7 +15,6 @@ if typing.TYPE_CHECKING:
     from idmtools.core.types import TAnalyzer, TItem, TItemList
 
 
-
 def pool_worker_initializer(func, analyzers, cache, platform) -> None:
     """
     Initializer function for the process pool.
