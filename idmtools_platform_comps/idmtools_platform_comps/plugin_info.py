@@ -32,7 +32,7 @@ class COMPSPlatformSpecification(PlatformSpecification):
         return "Provides access to the COMPS Platform to IDM-Tools"
 
     @get_platform_impl
-    def get(self, configuration: dict) -> IPlatform:
+    def get(self, **configuration) -> IPlatform:
         return COMPSPlatform(**configuration)
 
     @example_configuration_impl

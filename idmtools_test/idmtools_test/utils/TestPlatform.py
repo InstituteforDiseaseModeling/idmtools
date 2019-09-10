@@ -147,7 +147,7 @@ class TestPlatformSpecification(PlatformSpecification):
         return "Provides access to the Test Platform to IDM Tools"
 
     @get_platform_impl
-    def get(self, configuration: dict) -> IPlatform:
+    def get(self, **configuration) -> IPlatform:
         """
         Build our test platform from the passed in configuration object
 
