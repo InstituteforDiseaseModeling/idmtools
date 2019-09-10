@@ -14,9 +14,9 @@ import {DASHBOARD_VIEW,
       case DASHBOARD_VIEW:
         return {...state, selectedView:action.type, selectedTitle: action.title};
       case EXPERIMENT_VIEW:
-        return {...state, selectedView:action.type, selectedTitle: action.title}
+        return {...state, selectedView:action.type, selectedTitle: action.title};
       case SIMULATION_VIEW:
-        return {...state, selectedView:action.type, selectedTitle: action.title}
+        return {...state, selectedView:action.type, selectedTitle: action.title};
       
       default:
         return state;

@@ -1,3 +1,5 @@
+import os
+
 from flask_autoindex import AutoIndex, Flask
 from idmtools_platform_local.config import DATA_PATH
 from flask_restful import Api
@@ -6,7 +8,8 @@ from idmtools_platform_local.workers.ui.controllers.experiments import Experimen
 from idmtools_platform_local.workers.ui.controllers.simulations import Simulations
 from idmtools_platform_local.workers.ui.utils import DateTimeEncoder
 
-application = Flask(__name__)
+static_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'static')
+application = Flask(__name__, static_url_path="")
 application.json_encoder = DateTimeEncoder
 api = Api(application, prefix='/api')
 
@@ -21,6 +24,11 @@ ai = AutoIndex(application, browse_root=DATA_PATH, add_url_rules=False)
 @application.route('/data/<path:path>')
 def autoindex(path='.'):
     return ai.render_autoindex(path, sort_by='name', order=1)
+
+
+@application.route('/')
+def index():
+    return application.send_static_file('index.html')
 
 
 api.add_resource(Experiments, '/experiments', '/experiments/<id>')

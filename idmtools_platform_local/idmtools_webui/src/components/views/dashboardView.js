@@ -25,13 +25,13 @@ const styles = theme => ({
         padding:10,
         color:'#6f9a37'  //green
     }
-})
+});
 
 class Dashboard extends React.Component {
 
     handleCardClick(target) {
         return ()=> {      
-            window.location.href = "/" + target;
+            window.location.href = "/#/" + target;
           }      
     }
 

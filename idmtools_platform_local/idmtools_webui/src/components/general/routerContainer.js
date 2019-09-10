@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { HashRouter, Route } from "react-router-dom";
 import {connect} from "react-redux";  
 
 import React, {Component} from "react";
@@ -19,7 +19,7 @@ class RouterContainer extends Component {
             this.props.dispatch( {
                 type: view,
                 title: title
-            })
+            });
 
             return (
                 this.props.children
@@ -29,14 +29,14 @@ class RouterContainer extends Component {
 
     render() {
         return (
-          <Router>
-           <article style={{height:'100%'}}>
-             <Route exact path="/" render={this.renderContent(DASHBOARD_VIEW, 'Dashboard')} />
-             <Route exact path="/dashboard" render={this.renderContent(DASHBOARD_VIEW, 'Dashboard')} />
-             <Route exact path="/experiment" render={this.renderContent(EXPERIMENT_VIEW, 'Experiment')} />
-             <Route exact path="/simulation" render={this.renderContent(SIMULATION_VIEW, 'Simulation')} />
-           </article>
-         </Router>
+          <HashRouter>
+            <div style={{height:'100%'}}>
+                <Route exact path="/" render={this.renderContent(DASHBOARD_VIEW, 'Dashboard')} />
+                <Route exact path="/dashboard" render={this.renderContent(DASHBOARD_VIEW, 'Dashboard')} />
+                <Route exact path="/experiment" render={this.renderContent(EXPERIMENT_VIEW, 'Experiment')} />
+                <Route exact path="/simulation" render={this.renderContent(SIMULATION_VIEW, 'Simulation')} />
+            </div>
+         </HashRouter>
         )
       }
 }

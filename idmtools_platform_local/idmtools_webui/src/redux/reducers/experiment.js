@@ -21,7 +21,7 @@ export function experiments(state=initialState, action) {
             return {...state,
                 start: action.start, 
                 end:action.end
-            }
+            };
         case LOADING_EXPERIMENTS:
             return {...state,
                 loading: action.loading         
