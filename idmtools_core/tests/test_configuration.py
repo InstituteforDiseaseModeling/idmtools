@@ -67,7 +67,7 @@ class TestConfig(ITestWithPersistence):
     @unittest.mock.patch('idmtools_platform_comps.COMPSPlatform.COMPSPlatform._login', side_effect=lambda: True)
     def test_idmtools_path(self, login_mock):
         IdmConfigParser(os.path.join(COMMON_INPUT_PATH, "configuration"), "idmtools_test.ini")
-        platform = COMPSPlatform()
+        platform = Platform('COMPS')
         self.assertEqual(platform.num_retires, int(IdmConfigParser.get_option('COMPS', 'num_retires')))
 
         file_path = os.path.join(COMMON_INPUT_PATH, "configuration", "idmtools_test.ini")

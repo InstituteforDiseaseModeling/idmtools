@@ -1,8 +1,6 @@
 import os
 from importlib import reload
-
 import pytest
-
 from idmtools.core import EntityStatus
 from idmtools.core.PlatformFactory import Platform
 from idmtools.managers import ExperimentManager

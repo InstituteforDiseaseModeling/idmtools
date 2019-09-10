@@ -9,8 +9,6 @@ from idmtools.core.PlatformFactory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_model_dtk import DTKExperiment
 from idmtools_model_dtk.defaults import DTKSIR
-# from idmtools_model_dtk.idmtools_model_dtk import DTKExperiment
-# from idmtools_model_dtk.idmtools_model_dtk.defaults import DTKSIR
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 

@@ -76,7 +76,7 @@ class TestPythonSimulation(ITestWithPersistence):
 
     @restart_local_platform(silent=True, **get_test_local_env_overrides())
     def test_add_prefixed_relative_path_to_assets_local(self):
-        # platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
+        # platform = Platform('COMPS2', endpoint="https://comps2.idmod.org", environment="Bayesian")
         platform = Platform('Local_Staging')
         model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
         ac = AssetCollection()
