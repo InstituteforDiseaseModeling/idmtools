@@ -1,5 +1,5 @@
 import unittest
-from idmtools.core import Platform
+from idmtools.core.PlatformFactory import Platform
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.services.platforms import PlatformPersistService
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence

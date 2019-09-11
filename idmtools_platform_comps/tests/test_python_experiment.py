@@ -7,7 +7,8 @@ from operator import itemgetter
 from COMPS.Data import Experiment, QueryCriteria
 from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import ArmExperimentBuilder, ArmType, ExperimentBuilder, StandAloneSimulationsBuilder, SweepArm
-from idmtools.core import EntityStatus, Platform
+from idmtools.core import EntityStatus
+from idmtools.core.PlatformFactory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence

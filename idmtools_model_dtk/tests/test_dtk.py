@@ -1,9 +1,7 @@
 import json
 import os
-
 import pytest
 from COMPS.Data import Experiment
-
 from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
 from idmtools.core.PlatformFactory import Platform
 from idmtools.managers import ExperimentManager

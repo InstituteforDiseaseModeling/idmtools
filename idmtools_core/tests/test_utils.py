@@ -1,6 +1,6 @@
 import unittest
-
-from idmtools.core import ExperimentNotFound, Platform
+from idmtools.core import ExperimentNotFound
+from idmtools.core.PlatformFactory import Platform
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.utils.entities import retrieve_experiment
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence

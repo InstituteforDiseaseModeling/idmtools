@@ -52,7 +52,7 @@ class TestPlatformFactory(ITestWithPersistence):
         p1 = Platform('Custom_Local', **get_test_local_env_overrides())
         self.assertEqual(p1.__class__.__name__, 'LocalPlatform')
 
-        p2 = Platform('COMPS2')
+        p2 = Platform('COMPS')
         self.assertEqual(p2.__class__.__name__, 'COMPSPlatform')
         self.assertEqual(mock_login.call_count, 1)
 
@@ -76,7 +76,7 @@ class TestPlatformFactory(ITestWithPersistence):
     @pytest.mark.comps
     @unittest.mock.patch('idmtools_platform_comps.COMPSPlatform.COMPSPlatform._login', side_effect=lambda: True)
     def test_COMPSPlatform(self, mock_login):
-        platform = Platform('COMPS2')
+        platform = Platform('COMPS')
         self.assertEqual(mock_login.call_count, 1)
         members = platform.__dict__
 

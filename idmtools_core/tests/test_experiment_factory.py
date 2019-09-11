@@ -1,7 +1,6 @@
 import os
-
 from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
-from idmtools.core import Platform
+from idmtools.core.PlatformFactory import Platform
 from idmtools.core.ExperimentFactory import experiment_factory
 from idmtools.managers import ExperimentManager
 from idmtools_test import COMMON_INPUT_PATH

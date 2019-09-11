@@ -1,7 +1,7 @@
 import os
 import unittest
 from idmtools.builders import ExperimentBuilder
-from idmtools.core import Platform
+from idmtools.core.PlatformFactory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.services.platforms import PlatformPersistService

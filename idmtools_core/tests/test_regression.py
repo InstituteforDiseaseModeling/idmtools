@@ -2,7 +2,7 @@ import os
 import unittest
 from idmtools.assets import AssetCollection
 from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
-from idmtools.core import Platform
+from idmtools.core.PlatformFactory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 from idmtools_test.utils.TstExperiment import TstExperiment

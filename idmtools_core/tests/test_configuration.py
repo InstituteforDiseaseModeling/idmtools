@@ -5,7 +5,6 @@ import os
 import pytest
 from idmtools.config import IdmConfigParser
 from idmtools.core.PlatformFactory import Platform
-from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 

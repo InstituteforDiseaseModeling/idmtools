@@ -4,7 +4,7 @@ import time
 import pytest
 import unittest
 from COMPS.Data import Experiment, QueryCriteria
-from idmtools.core import Platform
+from idmtools.core.PlatformFactory import Platform
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 
 
