@@ -58,8 +58,7 @@ docker-local-no-cache:## Build our docker image using the local pypi
 	docker-compose build --no-cache --build-arg PYPIURL=http://172.17.0.1:7171/ --build-arg PYPIHOST=172.17.0.1 workers
 
 docker-staging: ## Build our docker image using staging pypi
-	@+$(IPY) "import os; os.environ['REGISTRY'] = 'idm-docker-staging.packages.idmod.org'; \
-		os.system(f'docker-compose build --build-arg PYPIURL=https://packages.idmod.org/api/pypi/pypi-staging/simple workers')"
+	pymake docker-local
 
 docker-release-staging:
 	@make docker-staging
