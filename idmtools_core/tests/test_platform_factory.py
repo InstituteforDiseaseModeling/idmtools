@@ -27,7 +27,23 @@ class TestPlatformFactory(ITestWithPersistence):
     def test_bad_type(self):
         with self.assertRaises(ValueError) as context:
             Platform('BADTYPE')  # noqa:F841
-        self.assertTrue("Bad is an unknown Platform Type.Supported platforms are" in str(context.exception.args[0]))
+        self.assertTrue("Bad is an unknown Platform Type. Supported platforms are" in str(context.exception.args[0]))
+
+    def test_no_type(self):
+        with self.assertRaises(ValueError) as context:
+            Platform('NOTYPE')
+        self.assertIn('When creating a Platform you must specify the type in the block', context.exception.args[0])
+
+    def test_block_is_none(self):
+        with self.assertRaises(ValueError) as context:
+            Platform(None)
+        self.assertIn('Must have a valid Block name to create a Platform!', context.exception.args[0])
+
+    def test_no_block(self):
+        try:
+            Platform()
+        except Exception as ex:
+            self.assertIn("__new__() missing 1 required positional argument: 'block'", ex.args[0])
 
     @pytest.mark.docker
     @pytest.mark.comps
