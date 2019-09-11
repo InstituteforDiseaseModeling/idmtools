@@ -41,7 +41,7 @@ release-staging: ## perform a release to staging
 
 # Use before release-staging-minor-commit to confirm next version.
 release-staging-minor-dry-run: ## perform a release to staging and bump the minor version.
-	python dev_scripts/run_pymake_on_all.py release-staging-dry-run
+	python dev_scripts/run_pymake_on_all.py release-staging-minor-dry-run
 
 # This should be used when a pushing a "production" build to staging before being approved by test
 release-staging-minor-commit: ## perform a release to staging and commit the version.
