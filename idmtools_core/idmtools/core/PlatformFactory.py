@@ -59,8 +59,8 @@ class Platform:
             # Make sure block has type entry
             platform_type = section.pop('type')
         except KeyError:
-            raise ValueError("When loading a Platform from a configuration block you must specify the type in the "
-                             "block. For example:\ntype = COMPS")
+            raise ValueError(
+                "When creating a Platform you must specify the type in the block. For example:\n    type = COMPS")
 
         # Make sure we support platform_type
         cls._validate_platform_type(platform_type)
