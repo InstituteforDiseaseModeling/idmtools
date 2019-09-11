@@ -36,7 +36,7 @@ class Platform:
         Check if requested platform exists
         Args:
             name: Platform type
-        Returns: True/False
+        Returns: None
         """
         if name not in cls._platforms:
             raise ValueError(f"{name} is an unknown Platform Type. "
