@@ -10,8 +10,8 @@ from idmtools.entities.IAnalyzer import IAnalyzer
 
 
 class TestItem(IItem):
-    def __init__(self, uid=None, full_id=None):
-        super().__init__(_uid=uid, full_id=full_id)
+    def __init__(self, uid=None):
+        super().__init__(_uid=uid)
 
 
 class TestAnalyzer(IAnalyzer):
@@ -25,19 +25,22 @@ class TestAnalyzer(IAnalyzer):
 
 class TestAnalyzeManager(unittest.TestCase):
 
-    def _get_analyze_manager(self, items=None, analyzers=None, working_dir=None, force_wd=False,
-                             partial_analyze_ok=False, max_items=None):
-        return AnalyzeManager(configuration=self.configuration, platform=self.platform,
-                              items=items, analyzers=analyzers,
-                              working_dir=working_dir, force_manager_working_directory=force_wd, verbose=False,
-                              partial_analyze_ok=partial_analyze_ok, max_items=max_items)
+    def _get_analyze_manager(self, ids=None, analyzers=None, working_dir=None, force_wd=False,
+                             partial_analyze_ok=False, max_items=None, potential_items=None):
+        am = AnalyzeManager(configuration=self.configuration, platform=self.platform,
+                            ids=ids, analyzers=analyzers,
+                            working_dir=working_dir, force_manager_working_directory=force_wd, verbose=False,
+                            partial_analyze_ok=partial_analyze_ok, max_items=max_items)
+        if potential_items is not None:  # for use with items that are not real; not in a platform for actual retrieval
+            am.potential_items = potential_items
+        return am
 
     def setUp(self) -> None:
         self.configuration = {'max_processes': 2}
         self.platform = PlatformFactory.create(key='COMPS')
         self.analyze_manager = self._get_analyze_manager()
         item_id = ItemId([('simulation_id', '123'), ('experiment_id', '456')])
-        self.sample_item = TestItem(full_id=item_id)
+        self.sample_item = TestItem(uid='abc')
         self.sample_analyzer = SampleAnalyzer()
 
     # verify add_item() works
@@ -100,21 +103,23 @@ class TestAnalyzeManager(unittest.TestCase):
 
         test = all_ready
         item_set = item_sets[test]
+        # We will be tricking the asset manager by self-supplying the objects for analyzing; they don't exist in a
+        # platform for real retrieval.
 
         # test partial_ok True
-        am = self._get_analyze_manager(items=item_set, partial_analyze_ok=True)
+        am = self._get_analyze_manager(ids=None, partial_analyze_ok=True, potential_items=item_set)
         items_to_analyze = am._get_items_to_analyze()
         self.assertEqual(len(items_to_analyze), 2)
         self.assertEqual(set(items_to_analyze.keys()), {item.uid for item in item_set if item.status == EntityStatus.SUCCEEDED})
 
         # test partial_ok False
-        am = self._get_analyze_manager(items=item_set, partial_analyze_ok=False)
+        am = self._get_analyze_manager(ids=None, partial_analyze_ok=False, potential_items=item_set)
         items_to_analyze = am._get_items_to_analyze()
         self.assertEqual(len(items_to_analyze), 2)
         self.assertEqual(set(items_to_analyze.keys()), {item.uid for item in item_set if item.status == EntityStatus.SUCCEEDED})
 
         # test max_items 1
-        am = self._get_analyze_manager(items=item_set, max_items=1)
+        am = self._get_analyze_manager(ids=None, max_items=1, potential_items=item_set)
         items_to_analyze = am._get_items_to_analyze()
         self.assertEqual(len(items_to_analyze), 1)
         # we don't know which successful items were actually returned
@@ -130,17 +135,17 @@ class TestAnalyzeManager(unittest.TestCase):
         item_set = item_sets[test]
 
         # test partial_ok True
-        am = self._get_analyze_manager(items=item_set, partial_analyze_ok=True)
+        am = self._get_analyze_manager(ids=None, partial_analyze_ok=True, potential_items=item_set)
         items_to_analyze = am._get_items_to_analyze()
         self.assertEqual(len(items_to_analyze), 0)
         self.assertEqual(set(items_to_analyze.keys()), {item.uid for item in item_set if item.status == EntityStatus.SUCCEEDED})
 
         # test partial_ok False
-        am = self._get_analyze_manager(items=item_set, partial_analyze_ok=False)
+        am = self._get_analyze_manager(ids=None, partial_analyze_ok=False, potential_items=item_set)
         self.assertRaises(AnalyzeManager.ItemsNotReady, am._get_items_to_analyze)
 
         # test max_items 1
-        am = self._get_analyze_manager(items=item_set, max_items=1)
+        am = self._get_analyze_manager(ids=None, max_items=1, potential_items=item_set)
         items_to_analyze = am._get_items_to_analyze()
         self.assertEqual(len(items_to_analyze), 0)
 
@@ -152,17 +157,17 @@ class TestAnalyzeManager(unittest.TestCase):
         item_set = item_sets[test]
 
         # test partial_ok True
-        am = self._get_analyze_manager(items=item_set, partial_analyze_ok=True)
+        am = self._get_analyze_manager(ids=None, partial_analyze_ok=True, potential_items=item_set)
         items_to_analyze = am._get_items_to_analyze()
         self.assertEqual(len(items_to_analyze), 1)
         self.assertEqual(set(items_to_analyze.keys()), {item.uid for item in item_set if item.status == EntityStatus.SUCCEEDED})
 
         # test partial_ok False
-        am = self._get_analyze_manager(items=item_set, partial_analyze_ok=False)
+        am = self._get_analyze_manager(ids=None, partial_analyze_ok=False, potential_items=item_set)
         self.assertRaises(AnalyzeManager.ItemsNotReady, am._get_items_to_analyze)
 
         # test max_items 1
-        am = self._get_analyze_manager(items=item_set, max_items=1)
+        am = self._get_analyze_manager(ids=None, max_items=1, potential_items=item_set)
         items_to_analyze = am._get_items_to_analyze()
         self.assertEqual(len(items_to_analyze), 1)
         # we don't know which successful items were actually returned, if we had a larger test sample than this
