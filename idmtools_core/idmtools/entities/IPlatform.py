@@ -30,6 +30,10 @@ class IPlatform(IEntity, metaclass=ABCMeta):
 
     @staticmethod
     def get_caller():
+        """
+        Trace the stack and find the caller
+        Returns: the direct caller
+        """
         import inspect
 
         s = inspect.stack()
