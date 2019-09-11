@@ -82,7 +82,7 @@ class TestPlatformFactory(ITestWithPersistence):
 
         field_name = {f.name for f in fields(platform)}
         keys = field_name.intersection(members.keys())
-        kwargs = {key: members[key] for key in keys}
+        kwargs = {key: members[key] for key in keys if not key.startswith('_')}
 
         platform2 = Platform('COMPS', **kwargs)
         self.assertEqual(mock_login.call_count, 2)
@@ -95,7 +95,7 @@ class TestPlatformFactory(ITestWithPersistence):
 
         field_name = {f.name for f in fields(platform)}
         keys = field_name.intersection(members.keys())
-        kwargs = {key: members[key] for key in keys}
+        kwargs = {key: members[key] for key in keys if not key.startswith('_')}
 
         platform2 = Platform('Local', **kwargs)
         self.assertEqual(platform, platform2)
@@ -106,7 +106,7 @@ class TestPlatformFactory(ITestWithPersistence):
 
         field_name = {f.name for f in fields(platform)}
         keys = field_name.intersection(members.keys())
-        kwargs = {key: members[key] for key in keys}
+        kwargs = {key: members[key] for key in keys if not key.startswith('_')}
 
         platform2 = Platform('Test', **kwargs)
         self.assertEqual(platform, platform2)
