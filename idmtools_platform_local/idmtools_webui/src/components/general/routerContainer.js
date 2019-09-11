@@ -30,12 +30,12 @@ class RouterContainer extends Component {
     render() {
         return (
           <HashRouter>
-           <article style={{height:'100%'}}>
-             <Route path="/" render={this.renderContent(DASHBOARD_VIEW, 'Dashboard')} />
-             <Route path="/dashboard" render={this.renderContent(DASHBOARD_VIEW, 'Dashboard')} />
-             <Route path="/experiment" render={this.renderContent(EXPERIMENT_VIEW, 'Experiment')} />
-             <Route path="/simulation" render={this.renderContent(SIMULATION_VIEW, 'Simulation')} />
-           </article>
+            <div style={{height:'100%'}}>
+                <Route exact path="/" render={this.renderContent(DASHBOARD_VIEW, 'Dashboard')} />
+                <Route exact path="/dashboard" render={this.renderContent(DASHBOARD_VIEW, 'Dashboard')} />
+                <Route exact path="/experiment" render={this.renderContent(EXPERIMENT_VIEW, 'Experiment')} />
+                <Route exact path="/simulation" render={this.renderContent(SIMULATION_VIEW, 'Simulation')} />
+            </div>
          </HashRouter>
         )
       }
