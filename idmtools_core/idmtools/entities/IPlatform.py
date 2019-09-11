@@ -39,20 +39,20 @@ class IPlatform(IEntity, metaclass=ABCMeta):
         """
         Here is the code to create a new object!
         Args:
-            *args: user inputs
-            **kwargs: user inputs
+            args: user inputs
+            kwargs: user inputs
         Returns: object created
         """
 
         # Check the caller
         caller = cls.get_caller()
 
-        # Action based on the called
+        # Action based on the caller
         if caller in CALLER_LIST:
             return super().__new__(cls)
         else:
             raise ValueError(
-                f"Please use Factory to create Platform! For example: platform = Platform('COMPS', **kwargs)")
+                f"Please use Factory to create Platform! For example: \n    platform = Platform('COMPS', **kwargs)")
 
     def __post_init__(self) -> None:
         """
@@ -157,7 +157,7 @@ class IPlatform(IEntity, metaclass=ABCMeta):
                 field_value[fn] = ft(field_value[fn]) if field_value[fn] is not None else field_value[fn]
             elif ft is bool:
                 field_value[fn] = ast.literal_eval(field_value[fn]) if isinstance(field_value[fn], str) else \
-                field_value[fn]
+                    field_value[fn]
 
         # Update attr with validated data types
         for fn in fs_kwargs:
