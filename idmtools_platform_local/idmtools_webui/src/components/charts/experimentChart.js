@@ -50,7 +50,7 @@ class ExperimentChart extends React.Component {
 
         this.setState({
             mounted: true
-        })
+        });
 
         window.onresize = ()=> {
             this.drawChart();
@@ -85,7 +85,7 @@ class ExperimentChart extends React.Component {
 
         }.bind(this));
 
-        let valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+        let valueAxis = chart.yAxes.push(new am4charts.ValueAxis()); // eslint-disable-line no-unused-vars
 
         // Create series
         let series = chart.series.push(new am4charts.LineSeries());
@@ -97,7 +97,7 @@ class ExperimentChart extends React.Component {
         series.tooltip.pointerOrientation = "vertical";
         series.tooltip.background.cornerRadius = 20;
         series.tooltip.background.fillOpacity = 0.5;
-        series.tooltip.label.padding(12,12,12,12)
+        series.tooltip.label.padding(12,12,12,12);
 
         // Make bullets grow on hover
         var bullet = series.bullets.push(new am4charts.CircleBullet());

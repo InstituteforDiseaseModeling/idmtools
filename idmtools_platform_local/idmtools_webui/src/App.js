@@ -1,15 +1,11 @@
-import React from 'react';
-import logo from './logo.svg';
+import React from 'react'; // eslint-disable-line no-unused-vars
+import logo from './logo.svg'; // eslint-disable-line no-unused-vars
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
-import Hidden from '@material-ui/core/Hidden';
 import CssBaseline from '@material-ui/core/CssBaseline';
-
-
 import './App.css';
 import Layout from "./components/general/layout"
 import configureStore from "./redux/store";
 import { Provider } from "react-redux";
-import blue from '@material-ui/core/colors/blue';
 import RouterContainer from './components/general/routerContainer';
 
 const store = configureStore();
@@ -59,7 +55,7 @@ const theme = createMuiTheme({
     color:'#6f9a37'
   }
 
-})
+});
 
 
 function App() {
