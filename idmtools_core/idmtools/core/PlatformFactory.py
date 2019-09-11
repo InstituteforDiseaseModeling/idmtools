@@ -93,7 +93,7 @@ class Platform:
             if ft in (int, float, str):
                 kwargs[fn] = ft(kwargs[fn]) if kwargs[fn] is not None else kwargs[fn]
             elif ft is bool:
-                kwargs[fn] = ast.literal_eval(kwargs[fn])
+                kwargs[fn] = ast.literal_eval(kwargs[fn]) if isinstance(kwargs[fn], str) else kwargs[fn]
 
         # Update attr based on priority: #1 Code, #2 INI, #3 Default
         for fn in set(kwargs.keys()).intersection(set(field_name)):
