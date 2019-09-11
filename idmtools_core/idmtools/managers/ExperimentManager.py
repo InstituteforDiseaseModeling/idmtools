@@ -27,12 +27,15 @@ class ExperimentManager:
     def from_experiment_id(cls, experiment_id, platform):
         experiment = platform.get_item(id=experiment_id)
         platform = PlatformPersistService.retrieve(experiment.platform.uid)
+        # cache miss, add the platform
+        if platform is None:
+            PlatformPersistService.save(obj=experiment.platform)
+            platform = PlatformPersistService.retrieve(experiment.platform.uid)
         em = cls(experiment, platform)
         em.restore_simulations()
         return em
 
     def restore_simulations(self):
-        # self.platform.get_children(self.experiment)
         self.experiment.children(refresh=True)
 
     def create_experiment(self):
