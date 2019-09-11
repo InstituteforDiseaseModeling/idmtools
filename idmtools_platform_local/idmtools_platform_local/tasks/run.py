@@ -12,59 +12,7 @@ from idmtools_platform_local.workers.utils import create_or_update_status
 logger = logging.getLogger(__name__)
 
 
-class RunTask(GenericActor):
-    """
-    Run the given `command` in the simulation folder.
-    """
-
-    class Meta:
-        store_results = False
-        max_retries = 0
-        queue_name = "cpu-work"
-
-    def perform(self, command: str, experiment_uuid: str, simulation_uuid: str) -> Status:
-        """
-        Runs our task and updates status
-
-        Args:
-            command: Command string to execute
-            experiment_uuid: Experiment id of task
-            simulation_uuid: Simulation id of task
-
-        Returns:
-
-        """
-        # we only want to import this here so that clients don't need postgres/sqlalchemy packages
-        from idmtools_platform_local.workers.utils import create_or_update_status
-        from idmtools_platform_local.workers.data.job_status import JobStatus
-        from idmtools_platform_local.workers.database import get_session
-
-        # Get the current job
-        current_job: JobStatus = get_session().query(JobStatus). \
-            filter(JobStatus.uuid == simulation_uuid, JobStatus.parent_uuid == experiment_uuid).first()
-
-        current_job.extra_details['command'] = command
-
-        if current_job.status == Status.canceled:
-            logger.info(f'Job {current_job.uuid} has been canceled')
-            # update command extra_details. Useful in future for deletion
-            create_or_update_status(simulation_uuid, extra_details=current_job.extra_details)
-            return current_job.status
-
-        # Define our simulation path and our root asset path
-        simulation_path = os.path.join(os.getenv("DATA_PATH", "/data"), experiment_uuid, simulation_uuid)
-        asset_dir = os.path.join(simulation_path, "Assets")
-
-        # Add items to our system path
-        sys.path.insert(0, simulation_path)
-        sys.path.insert(0, asset_dir)
-        # add to our details so it can be used for traceability downstream
-        current_job.extra_details['system_path'] = sys.path
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'System path: {sys.path}')
-
-        return self.run_task(command, current_job, experiment_uuid, simulation_path, simulation_uuid)
-
+class BaseTask:
     @staticmethod
     def run_task(command: str, current_job: JobStatus, experiment_uuid: str, simulation_path: str,
                  simulation_uuid: str) -> Status:
@@ -128,9 +76,65 @@ class RunTask(GenericActor):
             logging.debug('Simulation %s finished with status of %s', simulation_uuid, str(status))
         return status
 
+    def execute_simulation(self, command, experiment_uuid, simulation_uuid):
+        """
+            Runs our task and updates status
 
-class GPURunTask(RunTask):
+            Args:
+                command: Command string to execute
+                experiment_uuid: Experiment id of task
+                simulation_uuid: Simulation id of task
+
+            Returns:
+
+            """
+        # we only want to import this here so that clients don't need postgres/sqlalchemy packages
+        from idmtools_platform_local.workers.utils import create_or_update_status
+        from idmtools_platform_local.workers.data.job_status import JobStatus
+        from idmtools_platform_local.workers.database import get_session
+        # Get the current job
+        current_job: JobStatus = get_session().query(JobStatus). \
+            filter(JobStatus.uuid == simulation_uuid, JobStatus.parent_uuid == experiment_uuid).first()
+        current_job.extra_details['command'] = command
+        if current_job.status == Status.canceled:
+            logger.info(f'Job {current_job.uuid} has been canceled')
+            # update command extra_details. Useful in future for deletion
+            create_or_update_status(simulation_uuid, extra_details=current_job.extra_details)
+            return current_job.status
+        # Define our simulation path and our root asset path
+        simulation_path = os.path.join(os.getenv("DATA_PATH", "/data"), experiment_uuid, simulation_uuid)
+        asset_dir = os.path.join(simulation_path, "Assets")
+        # Add items to our system path
+        sys.path.insert(0, simulation_path)
+        sys.path.insert(0, asset_dir)
+        # add to our details so it can be used for traceability downstream
+        current_job.extra_details['system_path'] = sys.path
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'System path: {sys.path}')
+        return self.run_task(command, current_job, experiment_uuid, simulation_path, simulation_uuid)
+
+
+class RunTask(GenericActor, BaseTask):
+    """
+    Run the given `command` in the simulation folder.
+    """
+
     class Meta:
         store_results = False
         max_retries = 0
-        queue_name = "gpu-work"
+        queue_name = "cpu"
+
+    def perform(self, command: str, experiment_uuid: str, simulation_uuid: str) -> Status:
+        return self.execute_simulation(command, experiment_uuid, simulation_uuid)
+
+
+# it would be great we could just derive from RunTask and change the meta but that doesn't seem to work with
+# GenericActors for some reason. Using BaseTask and these few lines of redundant code are our compromise
+class GPURunTask(GenericActor, BaseTask):
+    class Meta:
+        store_results = False
+        max_retries = 0
+        queue_name = "gpu"
+
+    def perform(self, command: str, experiment_uuid: str, simulation_uuid: str) -> Status:
+        return self.execute_simulation(command, experiment_uuid, simulation_uuid)

@@ -1,6 +1,7 @@
 import io
 import logging
 import os
+from concurrent.futures.thread import ThreadPoolExecutor
 from pathlib import Path
 import platform
 import shutil
@@ -17,10 +18,12 @@ from docker.models.containers import Container, ExecResult
 from docker.models.networks import Network
 
 from idmtools.core.SystemInformation import get_system_information
-from idmtools.utils.decorators import optional_yaspin_load
+from idmtools.utils.decorators import optional_yaspin_load, parallelize
 from idmtools_platform_local import __version__
 
 logger = getLogger(__name__)
+# thread queue for docker copy operations
+io_queue = ThreadPoolExecutor()
 
 
 @dataclass
@@ -39,6 +42,7 @@ class DockerOperations:
     workers_image: str = 'idm-docker-staging.packages.idmod.org/idmtools_local_workers:latest'
     workers_ui_port: int = 5000
     run_as: Optional[str] = None
+    _fileio_pool = ThreadPoolExecutor()
 
     def __post_init__(self):
         """
@@ -410,6 +414,7 @@ class DockerOperations:
         """
         return {dest_port: src_port} if src_port is not None and dest_port is not None else None
 
+    @parallelize(queue=io_queue)
     def copy_to_container(self, container: Container, file: Union[str, bytes], destination_path: str,
                           dest_name: Optional[str] = None) -> bool:
         """
@@ -429,14 +434,21 @@ class DockerOperations:
             file = BytesIO(file)
         if type(file) is str:
             logger.debug(f'Copying {file} to docker container {container.id}:{destination_path}')
-            with open(file, 'rb') as in_file:
-                name = dest_name if dest_name else os.path.basename(file)
-                result = DockerOperations.create_archive_from_bytes(in_file, name)
-                return container.put_archive(path=destination_path, data=result.read())
+            name = dest_name if dest_name else os.path.basename(file)
+            target_file = os.path.join(self.host_data_directory, destination_path.replace('/data', '/workers')[1:], name)
+
+            shutil.copy(file, target_file)
+            return True
         elif isinstance(file, BytesIO):
+            target_file = os.path.join(self.host_data_directory, destination_path.replace('/data', '/workers')[1:],
+                                       dest_name)
             logger.debug(f'Copying {dest_name} to docker container {container.id}:{destination_path}')
-            with self.create_archive_from_bytes(file, dest_name) as archive:
-                return container.put_archive(path=destination_path, data=archive.read())
+            with open(target_file, 'wb') as of:
+                of.write(file.read())
+
+
+            #with self.create_archive_from_bytes(file, dest_name) as archive:
+            #    return container.put_archive(path=destination_path, data=archive.read())
 
     @staticmethod
     def create_archive_from_bytes(content: Union[bytes, BytesIO, BinaryIO], name: str) -> BytesIO:
@@ -466,7 +478,7 @@ class DockerOperations:
         pw_tarstream.seek(0)
         return pw_tarstream
 
-    def create_directory(self, dir: str, container: Optional[Container] = None) -> ExecResult:
+    def create_directory(self, dir: str) -> ExecResult:
         """
         Create a directory in a container
 
@@ -477,7 +489,5 @@ class DockerOperations:
         Returns:
             (ExecResult) Result of the mkdir operation
         """
-        if container is None:
-            container = self.get_workers()
-        user_str = self.run_as
-        return container.exec_run(f'mkdir -p "{dir}"', user=user_str)
+        os.makedirs(os.path.join(self.host_data_directory, dir.replace('/data', '/workers')[1:]), exist_ok=True)
+        return True

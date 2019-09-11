@@ -15,7 +15,7 @@ from idmtools_platform_local.workers.ui.controllers.utils import validate_tags
 logger = logging.getLogger(__name__)
 
 
-def experiment_filter(id: Optional[str], tags: Optional[List[Tuple[str, str]]]) -> pd.DataFrame:
+def experiment_filter(id: Optional[str], tags: Optional[List[Tuple[str, str]]], page:int = 1, per_page:int = 10) -> pd.DataFrame:
     """
     List the status of experiment(s) with the ability to filter by experiment id and tags
 
@@ -37,7 +37,7 @@ def experiment_filter(id: Optional[str], tags: Optional[List[Tuple[str, str]]]) 
             for tag in tags:
                 criteria.append((JobStatus.tags[tag[0]].astext.cast(String) == tag[1]))
 
-        query = session.query(JobStatus).filter(*criteria).order_by(JobStatus.uuid.desc())
+        query = session.query(JobStatus).filter(*criteria).order_by(JobStatus.uuid.desc()).paginate(page, per_page)
 
         # Pull our experiment status into a dataframe
         df = pd.read_sql(query.statement, query.session.bind, columns=['uuid', 'status', 'data_path', 'tags'])
@@ -95,7 +95,8 @@ def experiment_filter(id: Optional[str], tags: Optional[List[Tuple[str, str]]]) 
 idx_parser = reqparse.RequestParser()
 idx_parser.add_argument('tags', action='append', default=None,
                         help="Tags tio filter by. Tags must be in format name,value")
-
+idx_parser.add_argument('page', type=int, default=1, help="Page")
+idx_parser.add_argument('per_page', type=int, default=10, help="Per Page")
 delete_args = reqparse.RequestParser()
 delete_args.add_argument('data', help='Should the data for the experiment and all simulations be deleted as well?',
                          type=bool,

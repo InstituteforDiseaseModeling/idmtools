@@ -1,11 +1,16 @@
 import dataclasses
 import functools
 import logging
+import multiprocessing
 import os
+from concurrent.futures.process import ProcessPoolExecutor
 from logging import getLogger
 from typing import Optional, NoReturn
 from dataclasses import dataclass
 from pathlib import Path
+
+from docker.models.containers import Container
+
 from idmtools.assets import Asset
 from idmtools.entities import IExperiment, IPlatform
 # we have to import brokers so that the proper configuration is achieved for redis
@@ -146,20 +151,24 @@ class LocalPlatform(IPlatform):
     def send_assets_for_experiment(self, experiment):
         # Go through all the assets
         path = "/".join(["/data", experiment.uid, "Assets"])
-        list(map(functools.partial(self.send_asset_to_docker, path=path), experiment.assets))
+        worker = self._docker_operations.get_workers()
+        list(map(functools.partial(self.send_asset_to_docker, path=path, worker=worker), experiment.assets))
 
-    def send_assets_for_simulation(self, simulation):
+    def send_assets_for_simulation(self, simulation, worker: Container = None):
         # Go through all the assets
         path = "/".join(["/data", simulation.experiment.uid, simulation.uid])
-        list(map(functools.partial(self.send_asset_to_docker, path=path), simulation.assets))
+        if worker is None:
+            worker = self._docker_operations.get_workers()
+        list(map(functools.partial(self.send_asset_to_docker, path=path, worker=worker), simulation.assets))
 
-    def send_asset_to_docker(self, asset: Asset, path: str) -> NoReturn:
+    def send_asset_to_docker(self, asset: Asset, path: str, worker: Container = None) -> NoReturn:
         """
         Handles sending an asset to docker.
 
         Args:
             asset: Asset object to send
             path: Path to send find to within docker container
+            worker: Optional worker to reduce docker calls
 
         Returns:
             (NoReturn): Nada
@@ -171,20 +180,22 @@ class LocalPlatform(IPlatform):
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f"Creating directory {remote_path} result: {str(result)}")
         # is it a real file?
-        worker = self._docker_operations.get_workers()
+        if worker is None:
+            worker = self._docker_operations.get_workers()
         self._docker_operations.copy_to_container(worker, file_path if file_path else asset.content, remote_path,
                                                   asset.filename if not file_path else None)
 
     def create_simulations(self, simulations_batch):
-        from idmtools_platform_local.tasks.create_simulation import CreateSimulationTask
+        from idmtools_platform_local.tasks.create_simulation import CreateSimulationsTask
 
-        ids = []
-        for simulation in simulations_batch:
-            m = CreateSimulationTask.send(simulation.experiment.uid, simulation.tags)
-            sid = m.get_result(block=True, timeout=self.default_timeout * 1000)
-            simulation.uid = sid
-            self.send_assets_for_simulation(simulation)
-            ids.append(sid)
+        worker = self._docker_operations.get_workers()
+
+        m = CreateSimulationsTask.send(simulations_batch[0].experiment.uid, [s.tags for s in simulations_batch])
+        ids = m.get_result(block=True, timeout=self.default_timeout * 1000)
+
+        for i, simulation in enumerate(simulations_batch):
+            simulation.uid = ids[i]
+            self.send_assets_for_simulation(simulation, worker=worker)
         return ids
 
     def run_simulations(self, experiment: IExperiment):
@@ -211,3 +222,8 @@ class LocalPlatform(IPlatform):
             with open(full_path, 'rb') as fin:
                 byte_arrs.append(fin.read())
         return byte_arrs
+
+
+def run_parallel(fn, lst, workers=multiprocessing.cpu_count()):
+    with ProcessPoolExecutor(max_workers=workers) as executor:
+        return list(executor.map(fn, lst))
