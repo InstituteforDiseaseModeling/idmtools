@@ -1,6 +1,7 @@
 import datetime
 
-from sqlalchemy import Enum, Column, String, DateTime, func
+import sqlalchemy
+from sqlalchemy import Enum, Column, String, DateTime, func, Index
 from sqlalchemy.dialects.postgresql import JSON
 from idmtools_platform_local.workers.data import Base
 from idmtools_platform_local.status import Status
@@ -21,3 +22,13 @@ class JobStatus(Base):
     extra_details = Column(JSON, default={})
     created = Column(DateTime(timezone=True), default=datetime.datetime.utcnow, server_default=func.now())
     updated = Column(DateTime(timezone=True), onupdate=func.now())
+
+
+# add indexes to accelerate common ops
+Index('parent_status_idx', JobStatus.parent_uuid.desc(), JobStatus.status.desc())
+Index('created_idx', JobStatus.created.desc())
+# add a javascript index
+Index(
+    'ix_sample',
+    sqlalchemy.text("(jsoncol->'values') jsonb_path_ops"),
+    postgresql_using="gin")

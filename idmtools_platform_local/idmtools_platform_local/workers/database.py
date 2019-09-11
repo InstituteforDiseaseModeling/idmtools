@@ -29,7 +29,7 @@ def get_session() -> Session:
 def get_db() -> Engine:
     global engine
     if engine is None:
-        engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=SQLALCHEMY_ECHO, pool_size=32)
+        engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=SQLALCHEMY_ECHO, pool_size=8)
     return engine
 
 

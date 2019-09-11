@@ -2,6 +2,7 @@ import datetime
 import importlib
 import importlib.util
 import os
+from concurrent.futures.thread import ThreadPoolExecutor
 from functools import wraps
 from typing import Callable, Union
 
@@ -157,5 +158,18 @@ def optional_yaspin_load(*yargs, **ykwargs) -> Callable:
             if spinner:
                 spinner.stop()
             return result
+        return wrapper
+    return decorate
+
+
+def parallelize(queue=None):
+    if queue is None:
+        queue = ThreadPoolExecutor()
+
+    def decorate(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            future = queue.submit(func, *args, **kwargs)
+            return future
         return wrapper
     return decorate
