@@ -104,7 +104,7 @@ release-staging: ## perform a release to staging
 	bump2version --config-file .bumpversion.nightly.cfg build --allow-dirty
 	@pymake build-ui
 	@pymake dist
-	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/pypi-staging/simple dist/*
+	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/idm-pypi-staging/ dist/*
 	@make docker-release-staging
 
 # Use before release-staging-minor-commit to confirm next version.
@@ -115,7 +115,7 @@ release-staging-minor-dry-run: ## perform a release to staging and bump the mino
 release-staging-minor-commit: ## perform a release to staging and commit the version.
 	bump2version minor --commit
 	@make dist
-	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/pypi-staging/simple dist/*
+	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/idm-pypi-staging/ dist/*
 	@make docker-release-staging
 
 build-ui:
