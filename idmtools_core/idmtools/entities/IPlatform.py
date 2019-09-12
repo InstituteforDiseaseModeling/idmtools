@@ -26,6 +26,9 @@ class IPlatform(IEntity, metaclass=ABCMeta):
     - File handling
     """
 
+    class UnknownItemException(Exception):
+        pass
+
     def __post_init__(self) -> None:
         """
         Got called from Platform creation
