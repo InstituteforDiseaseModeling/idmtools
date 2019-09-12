@@ -4,7 +4,9 @@ import pandas as pd
 from idmtools.analysis.AnalyzeManager import AnalyzeManager
 from idmtools.entities import IAnalyzer
 from idmtools.core.PlatformFactory import PlatformFactory
+from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
 from idmtools_test.utils.group import default_select_fn, default_group_fn
+from COMPS.Data import Experiment, QueryCriteria
 
 
 class PopulationAnalyzer(IAnalyzer):
@@ -34,11 +36,21 @@ class PopulationAnalyzer(IAnalyzer):
 
         selected = []
         for sim, data in all_data.items():
-            # TODO: AttributeError: 'UUID' object has no attribute 'id'
+            # TODO: #238 Simulations AttributeError: 'UUID' object has no attribute 'id'
             # Enrich the data with info
-            data.group = default_group_fn(sim.id, sim.tags)
-            data.sim_id = sim.id
+            data.group = default_group_fn(sim, sim.tags)
+            data.sim_id = sim
             selected.append(data)
+
+        # selected = []
+        # exp_id = 'eba5b47b-f7d3-e911-a2bb-f0921c167866'  # comps2 staging
+        # #platform = PlatformFactory.create(key='COMPS')
+        # for s in Experiment.get(exp_id).get_simulations(query_criteria=QueryCriteria().select(["id", "state"]).select_children(["tags"])):
+        #     sim = experiment.simulation()
+        #     sim.uid = s.id
+        #     sim.tags = s.tags
+        #     s.group = default_group_fn(s.id, s.tags)
+        #     selected.append(sim)
 
         if len(selected) == 0:
             print("No data have been returned... Exiting...")

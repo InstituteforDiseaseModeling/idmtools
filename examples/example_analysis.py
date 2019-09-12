@@ -1,11 +1,12 @@
-from idmtools.entities import IAnalyzer
+from idmtools.entities.IAnalyzer import IAnalyzer
 from idmtools.analysis.AnalyzeManager import AnalyzeManager
 from idmtools.core.PlatformFactory import PlatformFactory
 
 
 class ExampleAnalyzer(IAnalyzer):
+    #TODO: Fix this example
     def __init__(self, uid=None, working_dir=None, parse=True):
-        super().__init__(uid, working_dir, parse, filenames=["output.json"])
+        super().__init__(uid, working_dir, parse, filenames=["output/result.json"])
 
     def map(self, data, simulation):
         result = data["result"]
@@ -20,7 +21,7 @@ class ExampleAnalyzer(IAnalyzer):
 
 class ExampleAnalyzer2(IAnalyzer):
     def __init__(self, uid=None, working_dir=None, parse=True):
-        super().__init__(uid, working_dir, parse, filenames=["config.json"])
+        super(ExampleAnalyzer2, self).__init__(uid, working_dir, parse, filenames=["config.json"])
 
     def filter(self, simulation: 'TSimulation') -> bool:
         return int(simulation.tags.get("a")) > 5
@@ -40,13 +41,11 @@ if __name__ == "__main__":
 
     platform = PlatformFactory.create(key='COMPS')
 
-    analyzers = [ExampleAnalyzer(), ExampleAnalyzer2()]
-    # analyzers = [ExampleAnalyzer2()]
+    #analyzers = [ExampleAnalyzer(), ExampleAnalyzer2()]
+    analyzers = [ExampleAnalyzer2()]
 
     experiment_id = "91ec1e91-9fca-e911-a2bb-f0921c167866"  # "185eb7fa-8f97-e911-a2bb-f0921c167866"  # comps2 staging
 
-    experiment = platform.get_item(id=experiment_id)
-
-    manager = AnalyzeManager(configuration={}, platform=platform, items=experiment.children(), analyzers=analyzers)
+    manager = AnalyzeManager(configuration={}, platform=platform, ids=[experiment_id], analyzers=analyzers)
 
     manager.analyze()
