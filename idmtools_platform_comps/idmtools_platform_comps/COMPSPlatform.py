@@ -58,9 +58,6 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     _comps_experiment: 'COMPSExperiment' = field(default=None, init=False, compare=False)
     _comps_experiment_id: 'uuid' = field(default=None, init=False, compare=False)
 
-    class UnknownItemException(Exception):
-        pass
-
     def __post_init__(self):
         super().__post_init__()
         print("\nUser Login:")

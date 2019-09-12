@@ -12,13 +12,12 @@ from idmtools.registry.PlatformSpecification import example_configuration_impl, 
     get_platform_type_impl, PlatformSpecification
 from idmtools.registry.PluginSpecification import get_description_impl
 
-
 from idmtools.entities import IPlatform
-
-
+from idmtools.entities.IExperiment import IExperiment
+from idmtools.entities.ISimulation import ISimulation
 
 if typing.TYPE_CHECKING:
-    from idmtools.core import TExperiment
+    from idmtools.core.types import TExperiment, TItem, TItemList, TAnalyzerList
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 data_path = os.path.abspath(os.path.join(current_directory, "..", "data"))
@@ -57,13 +56,30 @@ class TestPlatform(IPlatform):
         self.experiments = diskcache.Cache(os.path.join(data_path, 'experiments_test'))
         self.simulations = diskcache.Cache(os.path.join(data_path, 'simulations_test'))
 
-    def restore_simulations(self, experiment: 'TExperiment') -> None:
-        for sim in self.simulations.get(experiment.uid):
+    def get_children(self, item: 'TItem') -> 'TItemList':
+        children = None
+        successful = False
+        if not successful:
+            try:
+                children = self._restore_simulations(experiment=item)
+                successful = True
+            except:
+                pass
+        if not successful:
+            raise self.UnknownItemException(f'Unable to retrieve children for unknown item '
+                                            f'id: {item.uid} of type: {type(item)}')
+        for child in children:
+            child.platform = self
+        return children
+
+    def _restore_simulations(self, experiment: 'TExperiment') -> None:
+        simulations = self.simulations.get(experiment.uid)
+        for sim in simulations:
             s = experiment.simulation()
             s.uid = sim.uid
             s.status = sim.status
             s.tags = sim.tags
-            experiment.simulations.append(s)
+        return simulations
 
     def cleanup(self):
         for cache in [self.experiments, self.simulations]:
@@ -73,15 +89,32 @@ class TestPlatform(IPlatform):
     def post_setstate(self):
         self.initialize_test_cache()
 
-    def create_experiment(self, experiment: 'TExperiment') -> None:
+    def create_items(self, items: 'TItemList') -> 'List[uuid]':
+        # TODO: add ability to create suites
+        types = list({type(item) for item in items})
+        if len(types) != 1:
+            raise Exception('create_items only works with items of a single type at a time.')
+        sample_item = items[0]
+        if isinstance(sample_item, ISimulation):
+            ids = self._create_simulations(simulation_batch=items)
+        elif isinstance(sample_item, IExperiment):
+            ids = [self._create_experiment(experiment=item) for item in items]
+        else:
+            raise Exception(f'Unable to create items of type: {type(sample_item)} '
+                            f'for platform: {self.__class__.__name__}')
+        for item in items:
+            item.platform = self
+        return ids
+
+    def _create_experiment(self, experiment: 'TExperiment') -> None:
         uid = uuid.uuid4()
         experiment.uid = uid
         self.experiments.set(uid, experiment)
 
-    def create_simulations(self, batch):
+    def _create_simulations(self, simulation_batch):
         simulations = []
         experiment_id = None
-        for simulation in batch:
+        for simulation in simulation_batch:
             experiment_id = simulation.experiment.uid
             simulation.uid = uuid.uuid4()
             simulations.append(simulation)
@@ -114,7 +147,7 @@ class TestPlatform(IPlatform):
 
     def refresh_experiment_status(self, experiment: 'TExperiment') -> None:
         for simulation in self.simulations.get(experiment.uid):
-            for esim in experiment.simulations:
+            for esim in experiment.children():
                 if esim == simulation:
                     esim.status = simulation.status
                     break
@@ -122,11 +155,46 @@ class TestPlatform(IPlatform):
     def get_assets_for_simulation(self, simulation, output_files):
         pass
 
-    def retrieve_experiment(self, experiment_id: 'uuid') -> 'TExperiment':
+    def get_item(self, id: 'uuid'):
+        successful = False
+        if not successful:
+            try:
+                item = self._retrieve_experiment(experiment_id=id)
+                successful = True
+            except:
+                pass
+        if not successful:
+            raise self.UnknownItemException(f'Unable to load item id: {id} from platform: {self.__class__.__name__}')
+
+        item.platform = self
+        return item
+
+    def _retrieve_experiment(self, experiment_id: 'uuid') -> 'TExperiment':
         if not experiment_id in self.experiments:
-            return None
+            raise Exception('No experiment id found: %s' % experiment_id)
         return self.experiments[experiment_id]
 
+    #
+    # do we need any details for these methods for TestPlatform???
+    #
+
+    def get_parent(self, item: 'TItem') -> 'TItem':
+        pass
+
+    def initialize_for_analysis(self, items: 'TItemList', analyzers: 'TAnalyzerList'):
+        pass
+
+    def run_items(self, items: 'TItem'):
+        pass
+
+    def send_assets(self, item: 'TItem', **kwargs):
+        pass
+
+    def refresh_status(self, item):
+        pass
+
+    def get_files(self, item: 'TItem', files: 'List[str]') -> 'Dict[str, bytearray]':
+        pass
 
 TEST_PLATFORM_EXAMPLE_CONFIG = """
 [LOCAL]
