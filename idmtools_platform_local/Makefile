@@ -100,7 +100,7 @@ dist: ## build our package
 	python setup.py sdist
 
 release-staging: ## perform a release to staging
-	bump2version --config-file .bumpversion.nightly.cfg build --allow-dirty
+	bump2version build --allow-dirty
 	@pymake build-ui
 	@pymake dist
 	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/idm-pypi-staging/ dist/*
