@@ -1,4 +1,4 @@
-.PHONY: clean lint test coverage release-local dist release-staging release-staging-minor-commit release-staging-minor
+.PHONY: clean lint test coverage release-local dist release-staging release-staging-release-commit release-staging-minor
 
 
 clean: ## Clean all our jobs
@@ -39,13 +39,13 @@ release-staging: ## perform a release to staging
 	@make clean-all
 	python dev_scripts/run_pymake_on_all.py release-staging
 
-# Use before release-staging-minor-commit to confirm next version.
-release-staging-minor-dry-run: ## perform a release to staging and bump the minor version.
-	python dev_scripts/run_pymake_on_all.py release-staging-minor-dry-run
+# Use before release-staging-release-commit to confirm next version.
+release-staging-release-dry-run: ## perform a release to staging and bump the minor version.
+	python dev_scripts/run_pymake_on_all.py release-staging-release-dry-run
 
 # This should be used when a pushing a "production" build to staging before being approved by test
-release-staging-minor-commit: ## perform a release to staging and commit the version.
-	python dev_scripts/run_pymake_on_all.py release-staging-minor-commit
+release-staging-release-commit: ## perform a release to staging and commit the version.
+	python dev_scripts/run_pymake_on_all.py release-staging-release-commit
 
 start-webui: ## start the webserver
 	python -c "import os; os.chdir(os.path.join('idmtools_platform_local', 'idmtools_webui')); os.system('yarn'); os.system('yarn start')"
