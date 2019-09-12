@@ -108,7 +108,7 @@ release-staging: ## perform a release to staging
 
 # Use before release-staging-minor-commit to confirm next version.
 release-staging-minor-dry-run: ## perform a release to staging and bump the minor version.
-	bump2version minor --dry-run --allow-dirty --verbose
+	bump2version release --dry-run --allow-dirty --verbose
 
 # This should be used when a pushing a "production" build to staging before being approved by test
 release-staging-minor-commit: ## perform a release to staging and commit the version.
