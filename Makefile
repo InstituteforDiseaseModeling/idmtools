@@ -49,3 +49,6 @@ release-staging-release-commit: ## perform a release to staging and commit the v
 
 start-webui: ## start the webserver
 	python -c "import os; os.chdir(os.path.join('idmtools_platform_local', 'idmtools_webui')); os.system('yarn'); os.system('yarn start')"
+
+bump-patch:
+	python dev_scripts/run_pymake_on_all.py bump-patch
