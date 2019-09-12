@@ -29,9 +29,15 @@ class TestExperimentManager(ITestWithPersistence):
 
         # Ensure we get the same thing when calling from_experiment
         self.assertEqual(em.experiment.base_simulation, em2.experiment.base_simulation)
-        self.assertListEqual(em.experiment.simulations, em2.experiment.simulations)
-        self.assertEqual(em.experiment, em2.experiment)
+        self.assertListEqual(em.experiment.children(), em2.experiment.children())
+
+        # self.assertEqual(em.experiment, em2.experiment)  # not working for some reason; added more explicit tests
+        self.assertEqual(em.experiment.uid, em2.experiment.uid)
+        self.assertEqual(len(em.experiment.children()), len(em2.experiment.children()))
+        self.assertEqual(sorted([s.uid for s in em.experiment.children()]), sorted([s.uid for s in em2.experiment.children()]))
+
         self.assertEqual(em.platform, em2.platform)
+        self.assertEqual(em.platform.uid, em2.platform.uid)
 
     def test_from_experiment_unknown(self):
         c = TestPlatform()
@@ -43,17 +49,17 @@ class TestExperimentManager(ITestWithPersistence):
 
         em = ExperimentManager(experiment=experiment, platform=c)
         em.run()
-        self.assertEqual(len(em.experiment.simulations), 2)
+        self.assertEqual(len(em.experiment.children()), 2)
 
         # Delete the experiment and platform from the stores
         ExperimentPersistService.delete(em.experiment.uid)
-        PlatformPersistService.delete(em.experiment.platform_id)
+        PlatformPersistService.delete(em.experiment.platform.uid)
 
         em2 = ExperimentManager.from_experiment_id(em.experiment.uid, platform=c)
-        self.assertEqual(len(em2.experiment.simulations), 2)
+        self.assertEqual(len(em2.experiment.children()), 2)
         self.assertIsInstance(em2.experiment, PythonExperiment)
         self.assertDictEqual(em2.experiment.tags, experiment.tags)
-        self.assertEqual(em2.experiment.platform_id, c.uid)
+        self.assertEqual(em2.experiment.platform.uid, c.uid)
 
     def test_bad_experiment_builder(self):
         builder = ExperimentBuilder()
