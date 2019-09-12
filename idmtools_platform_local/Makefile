@@ -122,3 +122,6 @@ build-ui:
 	@$(IPY) "import shutil; shutil.rmtree('idmtools_webui/build', True)"
 	@+$(IPY) "import os; os.chdir('idmtools_webui'); os.system('python build.py')"
 	@$(IPY) "import shutil; shutil.copytree('idmtools_webui/build', 'idmtools_platform_local/workers/ui/static')"
+
+bump-patch:
+	bump2version patch --commit
