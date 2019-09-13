@@ -12,7 +12,7 @@ class ExperimentFactory:
         aliases = dict()
         # register types as full paths as well
         for model, spec in self._builders.items():
-            aliases[spec.get_type().__module__] = spec
+            aliases[f'{spec.get_type().__module__}.{spec.get_type().__name__}'] = spec
         self._builders.update(aliases)
 
     def create(self, key, **kwargs) -> 'TExperiment':  # noqa: F821

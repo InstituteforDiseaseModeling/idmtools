@@ -37,7 +37,7 @@ class TestConfig(ITestWithPersistence):
         self.assertIn("WARNING: Section 'NotReallyASection' Not Found!", mock_stdout.getvalue())
 
     @pytest.mark.comps
-    @unittest.mock.patch('idmtools_platform_comps.COMPSPlatform.COMPSPlatform._login', side_effect=lambda: True)
+    @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
     def test_simple_comps_platform_use_config(self, mock_login):
         platform = PlatformFactory.create("COMPS")
         self.assertEqual(platform.endpoint, 'https://comps2.idmod.org')
@@ -45,7 +45,7 @@ class TestConfig(ITestWithPersistence):
         self.assertEqual(mock_login.call_count, 1)
 
     @pytest.mark.comps
-    @unittest.mock.patch('idmtools_platform_comps.COMPSPlatform.COMPSPlatform._login', side_effect=lambda: True)
+    @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
     def test_simple_comps_platform_use_code(self, mock_login):
         platform = PlatformFactory.create("COMPS", endpoint='https://abc', environment='Bayesian')
         self.assertEqual(platform.endpoint, 'https://abc')
@@ -64,7 +64,7 @@ class TestConfig(ITestWithPersistence):
         self.assertEqual(int(max_threads), 16)
 
     @pytest.mark.comps
-    @unittest.mock.patch('idmtools_platform_comps.COMPSPlatform.COMPSPlatform._login', side_effect=lambda: True)
+    @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
     def test_idmtools_path(self, login_mock):
         IdmConfigParser(os.path.join(COMMON_INPUT_PATH, "configuration"), "idmtools_test.ini")
         platform = COMPSPlatform()

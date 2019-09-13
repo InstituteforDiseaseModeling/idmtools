@@ -9,6 +9,8 @@ from pathlib import Path
 from idmtools.assets import Asset
 from idmtools.entities import IExperiment, IPlatform
 # we have to import brokers so that the proper configuration is achieved for redis
+from idmtools.entities.iexperiment import TExperiment
+from idmtools.entities.isimulation import TSimulation
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
 from idmtools_platform_local.client.simulations_client import SimulationsClient
 from idmtools_platform_local.docker.docker_operations import DockerOperations
@@ -68,7 +70,7 @@ class LocalPlatform(IPlatform):
     Represents the platform allowing to run simulations locally.
     """
 
-    def retrieve_experiment(self, experiment_id: str) -> 'IExperiment':
+    def retrieve_experiment(self, experiment_id: str) -> IExperiment:
         """
         Restore experiment from local platform
 
@@ -83,7 +85,7 @@ class LocalPlatform(IPlatform):
         experiment.uid = experiment_dict['experiment_id']
         return experiment
 
-    def get_assets_for_simulation(self, simulation: 'TSimulation', output_files):  # noqa: F821
+    def get_assets_for_simulation(self, simulation: TSimulation, output_files):  # noqa: F821
         all_paths = set(output_files)
 
         assets = set(path for path in all_paths if path.lower().startswith("assets"))
@@ -106,7 +108,7 @@ class LocalPlatform(IPlatform):
 
         return ret
 
-    def restore_simulations(self, experiment: 'TExperiment'):  # noqa: F821
+    def restore_simulations(self, experiment: TExperiment):  # noqa: F821
         simulation_dict = SimulationsClient.get_all(experiment_id=experiment.uid)
 
         for sim_info in simulation_dict:
@@ -116,7 +118,7 @@ class LocalPlatform(IPlatform):
             sim.status = local_status_to_common(sim_info['status'])
             experiment.simulations.append(sim)
 
-    def refresh_experiment_status(self, experiment: 'TExperiment'):  # noqa: F821
+    def refresh_experiment_status(self, experiment: TExperiment):  # noqa: F821
         """
 
         Args:

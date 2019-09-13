@@ -70,3 +70,9 @@ class ISimulation(IAssetsEnabled, IEntity, metaclass=ABCMeta):
     @property
     def succeeded(self):
         return self.status == EntityStatus.SUCCEEDED
+
+
+TSimulation = typing.TypeVar("TSimulation", bound=ISimulation)
+TSimulationClass = typing.Type[TSimulation]
+TSimulationBatch = typing.List[TSimulation]
+TAllSimulationData = typing.Mapping[TSimulation, typing.Any]

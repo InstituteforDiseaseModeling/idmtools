@@ -31,7 +31,7 @@ class TestPlatformFactory(ITestWithPersistence):
 
     @pytest.mark.docker
     @pytest.mark.comps
-    @unittest.mock.patch('idmtools_platform_comps.COMPSPlatform.COMPSPlatform._login', side_effect=lambda: True)
+    @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
     def test_create_from_block(self, mock_login):
         p1 = PlatformFactory.create_from_block('Custom_Local', **get_test_local_env_overrides())
         self.assertEqual(p1.__class__.__name__, 'LocalPlatform')
@@ -45,7 +45,7 @@ class TestPlatformFactory(ITestWithPersistence):
 
     @pytest.mark.docker
     @pytest.mark.comps
-    @unittest.mock.patch('idmtools_platform_comps.COMPSPlatform.COMPSPlatform._login', side_effect=lambda: True)
+    @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
     def test_platform_factory(self, mock_login):
         platform1 = PlatformFactory.create('COMPS')
         self.assertEqual(platform1.__class__.__name__, 'COMPSPlatform')
@@ -58,7 +58,7 @@ class TestPlatformFactory(ITestWithPersistence):
         self.assertEqual(platform3.__class__.__name__, 'TestPlatform')
 
     @pytest.mark.comps
-    @unittest.mock.patch('idmtools_platform_comps.COMPSPlatform.COMPSPlatform._login', side_effect=lambda: True)
+    @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
     def test_COMPSPlatform(self, mock_login):
         platform = PlatformFactory.create_from_block('COMPS2')
         self.assertEqual(mock_login.call_count, 1)

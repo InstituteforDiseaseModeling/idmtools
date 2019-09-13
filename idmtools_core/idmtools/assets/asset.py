@@ -1,5 +1,5 @@
 import os
-from typing import Union
+from typing import Union, TypeVar, List, Callable
 
 
 class Asset:
@@ -60,3 +60,12 @@ class Asset:
     def __hash__(self):
         return hash(self.__key())
     # endregion
+
+
+TAsset = TypeVar("TAsset", bound=Asset)
+# Assets types
+TAssetList = List[TAsset]
+
+# Filters types
+TAssetFilter = Union[Callable[[TAsset], bool], Callable]
+TAssetFilterList = List[TAssetFilter]

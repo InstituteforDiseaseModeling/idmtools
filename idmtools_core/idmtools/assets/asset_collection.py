@@ -5,10 +5,8 @@ from idmtools.assets import Asset
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.utils.file import scan_directory
 from idmtools.utils.filters.asset_filters import default_asset_file_filter
-from idmtools.core import FilterMode, DuplicatedAssetError
-
-if typing.TYPE_CHECKING:
-    from idmtools.core import TAssetList, TAssetFilterList, TAsset, TAssetCollection
+from idmtools.core import FilterMode
+from idmtools.assets.errors import DuplicatedAssetError
 
 
 class AssetCollection(IEntity):
@@ -142,3 +140,6 @@ class AssetCollection(IEntity):
         if self.count == 0:
             return None
         return super().uid
+
+
+TAssetCollection = typing.TypeVar("TAssetCollection", bound=AssetCollection)

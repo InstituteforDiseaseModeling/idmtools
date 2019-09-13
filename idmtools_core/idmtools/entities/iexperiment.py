@@ -131,7 +131,7 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         self.gather_assets()
 
         # Add a tag to keep the class name
-        self.tags["type"] = self.__class__.__module__
+        self.tags["type"] = f'{self.__class__.__module__}.{self.__class__.__name__}'
 
     @property
     def done(self):
@@ -144,3 +144,9 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
     @property
     def simulation_count(self):
         return len(self.simulations)
+
+
+TExperiment = typing.TypeVar("TExperiment", bound=IExperiment)
+TExperimentClass = typing.Type[TExperiment]
+# Composed types
+TExperimentsList = typing.List[typing.Union[TExperiment, str]]

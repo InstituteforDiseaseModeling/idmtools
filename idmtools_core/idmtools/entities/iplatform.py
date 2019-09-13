@@ -154,3 +154,7 @@ class IPlatform(IEntity, metaclass=ABCMeta):
                 setattr(self, fn, field_config[fn])
 
         IdmConfigParser.display_config_block_details(block)
+
+
+TPlatform = typing.TypeVar("TPlatform", bound=IPlatform)
+TPlatformClass = typing.Type[TPlatform]

@@ -2,7 +2,6 @@ import logging
 import ntpath
 import os
 import json
-import typing
 
 from COMPS import Client
 from COMPS.Data import AssetCollection, AssetCollectionFile, Configuration, Experiment as COMPSExperiment, \
@@ -14,11 +13,9 @@ from idmtools.core import CacheEnabled
 from idmtools.core.experiment_factory import experiment_factory
 from idmtools.core.enums import EntityStatus
 from idmtools.entities import IPlatform
+from idmtools.entities.iexperiment import TExperiment
 from idmtools.utils.time import timestamp
-
-if typing.TYPE_CHECKING:
-    from idmtools.core.types import TExperiment
-    import uuid
+import uuid
 
 logging.getLogger('COMPS.Data.Simulation').disabled = True
 logger = logging.getLogger(__name__)
@@ -81,7 +78,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         self._comps_experiment = comps_experiment
         self._comps_experiment_id = comps_experiment.id
 
-    def send_assets_for_experiment(self, experiment: 'TExperiment', **kwargs):
+    def send_assets_for_experiment(self, experiment: TExperiment, **kwargs):
         if experiment.assets.count == 0:
             return
 
@@ -163,7 +160,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         # Register the IDs
         return [s.id for s in created_simulations]
 
-    def run_simulations(self, experiment: 'TExperiment'):
+    def run_simulations(self, experiment: TExperiment):
         self._login()
         self._comps_experiment_id = experiment.uid
         self.comps_experiment.commission()
@@ -199,7 +196,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                     s.status = COMPSPlatform._convert_COMPS_status(comps_simulation.state)
                     break
 
-    def restore_simulations(self, experiment: 'TExperiment') -> None:
+    def restore_simulations(self, experiment: TExperiment) -> None:
         self._comps_experiment_id = experiment.uid
 
         for s in self.comps_experiment.get_simulations(
@@ -210,7 +207,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             sim.status = COMPSPlatform._convert_COMPS_status(s.state)
             experiment.simulations.append(sim)
 
-    def retrieve_experiment(self, experiment_id: 'uuid') -> 'TExperiment':
+    def retrieve_experiment(self, experiment_id: uuid) -> TExperiment:
         self._comps_experiment_id = experiment_id
         experiment = experiment_factory.create(self.comps_experiment.tags.get("type"), tags=self.comps_experiment.tags)
         experiment.uid = self.comps_experiment.id

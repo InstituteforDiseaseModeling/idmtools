@@ -46,7 +46,8 @@ class TestExperimentFactory(ITestWithPersistence):
 
         em.run()
         self.assertEqual(len(em.experiment.simulations), 20)
-        self.assertEqual(em.experiment.tags, {'a': '1', 'b': 2, 'type': 'idmtools_model_dtk.DTKExperiment'})
+        self.assertEqual(em.experiment.tags, {'a': '1', 'b': 2,
+                                              'type': 'idmtools_model_dtk.dtk_experiment.DTKExperiment'})
 
     def test_build_test_experiment_from_factory(self):
         test_experiment = TstExperiment()
@@ -55,7 +56,8 @@ class TestExperimentFactory(ITestWithPersistence):
         # Test create experiment with full model name
         experiment = experiment_factory.create(test_experiment.tags.get("type"), tags=test_experiment.tags)
         self.assertIsNotNone(experiment.uid)
-        self.assertEqual(experiment.tags, {'a': '1', 'b': 2, 'type': 'idmtools_test.utils.TstExperiment'})
+        self.assertEqual(experiment.tags, {'a': '1', 'b': 2,
+                                           'type': 'idmtools_test.utils.tst_experiment.TstExperiment'})
 
         # Test create experiment with sample model name
         experiment1 = experiment_factory.create("TstExperiment")
@@ -66,4 +68,3 @@ class TestExperimentFactory(ITestWithPersistence):
             experiment_factory.create("SomeExperiment")
         self.assertTrue("The ExperimentFactory could not create an experiment of type SomeExperiment" in
                         str(context.exception.args[0]))
-

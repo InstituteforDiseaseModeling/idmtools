@@ -107,7 +107,7 @@ class TestPersistenceServices(ITestWithPersistence):
         e = TstExperiment("Experiment")
         e.tags = {"test": 1}
         e.pre_creation()
-        self.assertEqual(e.tags.get("type"), "idmtools_test.utils.TstExperiment")
+        self.assertEqual(e.tags.get("type"), "idmtools_test.utils.tst_experiment.TstExperiment")
         self.assertEqual(e.tags.get("test"), 1)
 
 
