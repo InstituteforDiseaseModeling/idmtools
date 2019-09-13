@@ -25,6 +25,7 @@ def prettify_experiment(experiment: Dict[str, Any]):
     """
     experiment['progress'] = parent_status_to_progress(experiment['progress'])
     experiment['data_path'] = urlize_data_path(experiment['data_path'])
+    del experiment['status']
     return experiment
 
 
@@ -35,7 +36,7 @@ def status(id: Optional[str], tags: Optional[List[Tuple[str, str]]]):
 
     Args:
         id (Optional[str]): Optional ID of the experiment you want to filter by
-        tag (Optional[List[Tuple[str, str]]]): Optional list of tuples in form of tag_name tag_value to user to filter
+        tags (Optional[List[Tuple[str, str]]]): Optional list of tuples in form of tag_name tag_value to user to filter
             experiments with
     """
     from idmtools_cli.cli.utils import show_error
