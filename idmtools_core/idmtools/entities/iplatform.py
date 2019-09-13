@@ -6,7 +6,7 @@ import typing
 from logging import getLogger, DEBUG
 
 from idmtools.config import IdmConfigParser
-from idmtools.core.interfaces.IEntity import IEntity
+from idmtools.core.interfaces.ientity import IEntity
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TExperiment, TSimulation, TSimulationBatch

@@ -1,7 +1,7 @@
 from abc import ABCMeta
 from dataclasses import dataclass, field
 
-from idmtools.core.interfaces.IEntity import IEntity
+from idmtools.core.interfaces.ientity import IEntity
 
 
 @dataclass

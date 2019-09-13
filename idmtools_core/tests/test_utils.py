@@ -3,9 +3,9 @@ import unittest
 from idmtools.core import ExperimentNotFound
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.utils.entities import retrieve_experiment
-from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
-from idmtools_test.utils.TstExperiment import TstExperiment
-from idmtools_test.utils.TestPlatform import TestPlatform
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+from idmtools_test.utils.tst_experiment import TstExperiment
+from idmtools_test.utils.test_platform import TestPlatform
 
 
 class TestUtils(ITestWithPersistence):

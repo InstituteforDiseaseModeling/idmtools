@@ -1,6 +1,6 @@
 from idmtools.analysis import IAnalyzer
 from idmtools.managers import AnalyzeManager
-from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
+from idmtools_platform_comps.comps_platform import COMPSPlatform
 
 
 class ExampleAnalyzer(IAnalyzer):

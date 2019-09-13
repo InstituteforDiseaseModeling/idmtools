@@ -11,8 +11,8 @@ from idmtools.builders import ArmExperimentBuilder, ArmType, ExperimentBuilder, 
 from idmtools.core import EntityStatus
 from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
-from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
-from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_platform_comps.comps_platform import COMPSPlatform
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id
 from idmtools_test import COMMON_INPUT_PATH
 

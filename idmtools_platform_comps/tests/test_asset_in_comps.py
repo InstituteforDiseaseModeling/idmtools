@@ -9,7 +9,7 @@ from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import ExperimentBuilder
 from idmtools.core import EntityStatus
 from idmtools_models.python import PythonExperiment
-from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
+from idmtools_platform_comps.comps_platform import COMPSPlatform
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id
 

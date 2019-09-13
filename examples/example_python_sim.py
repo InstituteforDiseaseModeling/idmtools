@@ -2,10 +2,10 @@ import os
 from functools import partial
 
 from idmtools.builders import ExperimentBuilder
-from idmtools.core.PlatformFactory import PlatformFactory
+from idmtools.core.platform_factory import PlatformFactory
 from idmtools.managers import ExperimentManager
 
-from idmtools_models.python.PythonExperiment import PythonExperiment
+from idmtools_models.python.python_experiment import PythonExperiment
 
 
 def param_update(simulation, param, value):

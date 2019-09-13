@@ -4,7 +4,7 @@ from functools import partial
 from idmtools.assets import AssetCollection, Asset
 from idmtools_models.python import PythonExperiment, PythonSimulation
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 import io
 import unittest.mock
 

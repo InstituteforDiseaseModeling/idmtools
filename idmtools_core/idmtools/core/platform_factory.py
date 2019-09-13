@@ -12,7 +12,7 @@ if typing.TYPE_CHECKING:
 class PlatformFactory:
 
     def __init__(self):
-        from idmtools.registry.PlatformSpecification import PlatformPlugins
+        from idmtools.registry.platform_specification import PlatformPlugins
         self._platforms = PlatformPlugins().get_plugin_map()
 
     def create(self, key, **kwargs) -> 'TPlatform':

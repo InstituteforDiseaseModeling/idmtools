@@ -6,8 +6,8 @@ import unittest
 import pytest
 from COMPS.Data import Experiment, QueryCriteria
 
-from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
-from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_platform_comps.comps_platform import COMPSPlatform
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 
 class TestCleanup(ITestWithPersistence):

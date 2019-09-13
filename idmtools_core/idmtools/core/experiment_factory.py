@@ -1,13 +1,13 @@
 from logging import getLogger
 
-from idmtools.registry import ModelSpecification
+from idmtools.registry import model_specification
 
 logger = getLogger(__name__)
 
 
 class ExperimentFactory:
     def __init__(self):
-        from idmtools.registry.ModelSpecification import ModelPlugins
+        from idmtools.registry.model_specification import ModelPlugins
         self._builders = ModelPlugins().get_plugin_map()
         aliases = dict()
         # register types as full paths as well
@@ -19,7 +19,7 @@ class ExperimentFactory:
         if key not in self._builders:
             raise ValueError(f"The ExperimentFactory could not create an experiment of type {key}")
 
-        model_spec: ModelSpecification = self._builders.get(key)
+        model_spec: model_specification = self._builders.get(key)
         return model_spec.get(kwargs)
 
 

@@ -5,9 +5,9 @@ from abc import ABC
 from itertools import chain
 from dataclasses import dataclass, field, InitVar
 from more_itertools import grouper
-from idmtools.core.interfaces.EntityContainer import EntityContainer
-from idmtools.core.interfaces.IAssetsEnabled import IAssetsEnabled
-from idmtools.core.interfaces.INamedEntity import INamedEntity
+from idmtools.core.interfaces.entity_container import EntityContainer
+from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
+from idmtools.core.interfaces.inamed_entity import INamedEntity
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TSimulation, TSimulationClass, TCommandLine, TExperimentBuilder
