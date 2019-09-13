@@ -1,92 +1,117 @@
-import copy
-import typing
 import ast
+import copy
 from dataclasses import fields
-
-from idmtools.utils.decorators import LoadOnCallSingletonDecorator
-
-if typing.TYPE_CHECKING:
-    from idmtools.core.types import TPlatform
+from idmtools.config import IdmConfigParser
 
 
-class PlatformFactory:
+class Platform:
 
-    def __init__(self):
-        from idmtools.registry.platform_specification import PlatformPlugins
-        self._platforms = PlatformPlugins().get_plugin_map()
-
-    def create(self, key, **kwargs) -> 'TPlatform':
+    def __new__(cls, block, **kwargs):
         """
-        Create Platform with type identified by key
+        Create a platform based on the block and all other inputs
         Args:
-            key: Platform module name
-            **kwargs: inputs for Platform constructor
-        Returns: created Platform
+            block: idmtools.ini block name
+            kwargs: user inputs may overwrite the entries in the block
+        Returns: requested Platform
         """
-        self._validate_platform_type(key)
-        builder = self._platforms.get(key)
-        return builder.get(kwargs)
+        from idmtools.registry.platform_specification import PlatformPlugins
 
-    def _validate_platform_type(self, name):
-        if name not in self._platforms:
-            raise ValueError(f"{name} is an unknown Platform Type."
-                             f"Supported platforms are {','.join(self._platforms.keys())}")
+        if block is None:
+            raise ValueError("Must have a valid Block name to create a Platform!")
 
-    def create_from_block(self, block: str, overrides: typing.Optional[dict] = None):
+        # Load all Platform plugins
+        cls._platforms = PlatformPlugins().get_plugin_map()
+
+        # Create Platform based on the given block
+        platform = cls._create_from_block(block, **kwargs)
+        return platform
+
+    @classmethod
+    def _validate_platform_type(cls, name):
+        """
+        Check if requested platform exists
+        Args:
+            name: Platform type
+        Returns: None
+        """
+        if name not in cls._platforms:
+            raise ValueError(f"{name} is an unknown Platform Type. "
+                             f"Supported platforms are {', '.join(cls._platforms.keys())}")
+
+    @classmethod
+    def _create_from_block(cls, block: str, **kwargs):
         """
         Retrieve section entries from config file by giving block
         Args:
             block: the section name in config file
-            overrides: Optional override of parameters from config.
-        Returns: dict with entries from the block
+            kwargs: inputs may override block values
+        Returns: platform with the type provided in the block
         """
-        from idmtools.config import IdmConfigParser
-        if overrides is None:
-            overrides = dict()
+
+        # Read block details
         section = IdmConfigParser.get_block(block)
+
         try:
+            # Make sure block has type entry
             platform_type = section.pop('type')
         except KeyError:
-            raise ValueError("When loading a Platform from a configuration block you must specify the type in the "
-                             "block. For example:\ntype = COMPS")
-        self._validate_platform_type(platform_type)
-        platform_spec = self._platforms.get(platform_type)
+            raise ValueError(
+                "When creating a Platform you must specify the type in the block. For example:\n    type = COMPS")
 
-        # Update fields types
+        # Make sure we support platform_type
+        cls._validate_platform_type(platform_type)
+
+        # Find the correct Platform type
+        platform_spec = cls._platforms.get(platform_type)
         platform_cls = platform_spec.get_type()
+
+        # Collect fields types
         fds = fields(platform_cls)
+        field_name = [f.name for f in fds]
         field_type = {f.name: f.type for f in fds}
 
-        kwargs = copy.deepcopy(section)
+        # Make data to the requested type
+        inputs = copy.deepcopy(section)
         fs = set(field_type.keys()).intersection(set(section.keys()))
         for fn in fs:
             ft = field_type[fn]
             if ft in (int, float, str):
-                kwargs[fn] = ft(section[fn])
+                inputs[fn] = ft(section[fn])
             elif ft is bool:
-                kwargs[fn] = ast.literal_eval(section[fn])
+                inputs[fn] = ast.literal_eval(section[fn])
 
-        # Display not used fields from config
-        field_not_used = set(kwargs.keys()) - set(field_type.keys())
+        # Make sure the user values have the requested type
+        fs_kwargs = set(field_type.keys()).intersection(set(kwargs.keys()))
+        for fn in fs_kwargs:
+            ft = field_type[fn]
+            if ft in (int, float, str):
+                kwargs[fn] = ft(kwargs[fn]) if kwargs[fn] is not None else kwargs[fn]
+            elif ft is bool:
+                kwargs[fn] = ast.literal_eval(kwargs[fn]) if isinstance(kwargs[fn], str) else kwargs[fn]
+
+        # Update attr based on priority: #1 Code, #2 INI, #3 Default
+        for fn in set(kwargs.keys()).intersection(set(field_name)):
+            inputs[fn] = kwargs[fn]
+
+        extra_kwargs = set(kwargs.keys()) - set(field_name)
+        if len(extra_kwargs) > 0:
+            field_not_used_display = [" - {} = {}".format(fn, kwargs[fn]) for fn in extra_kwargs]
+            print(f"\n/!\\ WARNING: The following User Inputs are not used:")
+            print("\n".join(field_not_used_display))
+
+        # Display block info
+        IdmConfigParser.display_config_block_details(block)
+
+        # Display not used fields of the block
+        field_not_used = set(inputs.keys()) - set(field_type.keys())
         if len(field_not_used) > 0:
-            field_not_used_display = [" - {} = {}".format(fn, kwargs[fn]) for fn in field_not_used]
-            print(f"[{block}]: the following Config Settings are not used:")
+            field_not_used_display = [" - {} = {}".format(fn, inputs[fn]) for fn in field_not_used]
+            print(f"\n[{block}]: /!\\ WARNING: the following Config Settings are not used:")
             print("\n".join(field_not_used_display))
 
         # Remove extra fields
         for f in field_not_used:
-            kwargs.pop(f)
+            inputs.pop(f)
 
-        kwargs.update(overrides)
         # Now create Platform using the data with the correct data types
-        # Add a temporary Property when creating Platform
-        platform_cls._FACTORY = property(lambda self: True)
-        platform = platform_cls(**kwargs)
-        delattr(platform_cls, '_FACTORY')
-
-        IdmConfigParser.display_config_block_details(block)
-
-        return platform
-
-
-PlatformFactory = typing.cast(PlatformFactory, LoadOnCallSingletonDecorator(PlatformFactory))
+        return platform_cls(**inputs)

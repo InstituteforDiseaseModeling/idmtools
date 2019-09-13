@@ -1,6 +1,5 @@
 import dataclasses
 import unittest
-
 from idmtools.entities import IPlatform
 from idmtools.registry.platform_specification import PlatformPlugins
 from idmtools_platform_local.local_platform import LocalPlatform

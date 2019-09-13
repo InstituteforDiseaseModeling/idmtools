@@ -1,17 +1,16 @@
 import json
 import os
+import pytest
 import unittest
 from functools import partial
 from operator import itemgetter
-
-import pytest
 from COMPS.Data import Experiment, QueryCriteria
 from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import ArmExperimentBuilder, ArmType, ExperimentBuilder, StandAloneSimulationsBuilder, SweepArm
 from idmtools.core import EntityStatus
+from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
-from idmtools_platform_comps.comps_platform import COMPSPlatform
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id
 from idmtools_test import COMMON_INPUT_PATH
@@ -39,7 +38,7 @@ class TestPythonExperiment(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
-        self.platform = COMPSPlatform()
+        self.platform = Platform('COMPS2')
 
     # Test 2 ways to sweep parameters
     # First way: use partial function

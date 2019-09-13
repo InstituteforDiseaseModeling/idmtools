@@ -46,7 +46,7 @@ class LocalPlatformSpecification(PlatformSpecification):
         return "Provides access to the Local Platform to IDM Tools"
 
     @get_platform_impl
-    def get(self, configuration: dict) -> IPlatform:
+    def get(self, **configuration) -> IPlatform:
         """
         Build our local platform from the passed in configuration object
 
@@ -58,7 +58,7 @@ class LocalPlatformSpecification(PlatformSpecification):
 
         """
         from idmtools_platform_local.local_platform import LocalPlatform
-        return LocalPlatform()
+        return LocalPlatform(**configuration)
 
     @example_configuration_impl
     def example_configuration(self):

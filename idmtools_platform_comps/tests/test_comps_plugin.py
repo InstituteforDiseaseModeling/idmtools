@@ -1,11 +1,10 @@
 import unittest
-
+import dataclasses
 from idmtools.core import CacheEnabled
 from idmtools.entities import IPlatform
 from idmtools.registry.platform_specification import PlatformPlugins
 from idmtools_platform_comps.comps_platform import COMPSPlatform
 from idmtools_platform_comps.plugin_info import COMPSPlatformSpecification
-import dataclasses
 
 
 class TestCompsPlugin(unittest.TestCase):

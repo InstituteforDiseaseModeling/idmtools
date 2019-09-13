@@ -1,10 +1,8 @@
 import os
 from importlib import reload
-
 import pytest
-
 from idmtools.core import EntityStatus
-from idmtools.core.platform_factory import PlatformFactory
+from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
 from idmtools_platform_local.docker.docker_operations import DockerOperations
@@ -33,7 +31,7 @@ class TestPlatformSimulations(ITestWithPersistence):
 
     @restart_local_platform(silent=True, **get_test_local_env_overrides())
     def test_fetch_simulation_files(self):
-        platform = PlatformFactory.create_from_block('Local_Staging')
+        platform = Platform('Local_Staging')
 
         pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python",
                                                                            "realpath_verify.py"))
