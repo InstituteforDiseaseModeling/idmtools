@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 def sim_status(id: Optional[str], experiment_id: Optional[str], status: Optional[str],
-               tags: Optional[List[Tuple[str, str]]], page: int = 1, per_page: int = 50) -> Tuple[Dict, int]:
+               tags: Optional[List[Tuple[str, str]]], page: int = 1, per_page: int = 20) -> Tuple[Dict, int]:
     """
     List of statuses for simulation(s) with the ability to filter by id, experiment_id, status, and tags
 
@@ -62,7 +62,7 @@ idx_parser.add_argument('status', help='Status to filter by. Should be one of th
                         choices=status_strs,
                         default=None)
 idx_parser.add_argument('page', type=int, default=1, help="Page")
-idx_parser.add_argument('per_page', type=int, default=50, help="Per Page")
+idx_parser.add_argument('per_page', type=int, default=20, help="Per Page")
 idx_parser.add_argument('tags', action='append', default=None,
                         help="Tags tio filter by. Tags must be in format name,value")
 

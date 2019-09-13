@@ -19,10 +19,10 @@ def progress_to_status_str(progress):
         return 'failed'
     elif str(Status.canceled) in progress and progress[str(Status.canceled)] > 0:
         return 'canceled'
-    elif str(Status.created) in progress and progress[str(Status.created)] > 0:
-        return 'created'
     elif str(Status.in_progress) in progress and progress[str(Status.in_progress)] > 0:
         return 'in_progress'
+    elif str(Status.created) in progress and progress[str(Status.created)] > 0:
+        return 'created'
     else:
         return 'done'
 
