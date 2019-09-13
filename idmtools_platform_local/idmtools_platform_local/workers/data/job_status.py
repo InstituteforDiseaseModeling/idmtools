@@ -23,6 +23,25 @@ class JobStatus(Base):
     created = Column(DateTime(timezone=True), default=datetime.datetime.utcnow, server_default=func.now())
     updated = Column(DateTime(timezone=True), onupdate=func.now())
 
+    def to_dict(self, as_experiment=True):
+        result = {k: v for k, v in self.__dict__.items() if k[0] != "_"}
+        result['created'] = str(result['created'])
+        result['updated'] = str(result['updated'])
+        if as_experiment:
+            result['experiment_id'] = result['uuid']
+            del result['uuid']
+            del result['parent_uuid']
+        else:
+            result['simulation_uid'] = result['uuid']
+            del result['uuid']
+            result['experiment_id'] = result['parent_uuid']
+            del result['parent_uuid']
+            result['status'] = str(result['status'])
+        return result
+
+    def __str__(self):
+        return str(self.to_dict())
+
 
 # add indexes to accelerate common ops
 Index('parent_status_idx', JobStatus.parent_uuid.desc(), JobStatus.status.desc())

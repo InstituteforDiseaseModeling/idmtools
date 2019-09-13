@@ -3,6 +3,7 @@ import functools
 import logging
 import multiprocessing
 import os
+from collections import defaultdict
 from concurrent.futures.process import ProcessPoolExecutor
 from logging import getLogger
 from typing import Optional, NoReturn
@@ -159,7 +160,19 @@ class LocalPlatform(IPlatform):
         path = "/".join(["/data", simulation.experiment.uid, simulation.uid])
         if worker is None:
             worker = self._docker_operations.get_workers()
-        list(map(functools.partial(self.send_asset_to_docker, path=path, worker=worker), simulation.assets))
+
+        items = self.assets_to_copy_multiple_list(path, simulation.assests)
+        self._docker_operations.copy_multiple_to_container(worker, items)
+
+    def assets_to_copy_multiple_list(self, path, assets):
+        items = defaultdict(list)
+        for asset in assets:
+            file_path = asset.absolute_path
+            remote_path = "/".join([path, asset.relative_path]) if asset.relative_path else path
+            self._docker_operations.create_directory(remote_path)
+            items[remote_path].append(
+                (file_path if file_path else asset.content, asset.filename if not file_path else None))
+        return items
 
     def send_asset_to_docker(self, asset: Asset, path: str, worker: Container = None) -> NoReturn:
         """
@@ -193,9 +206,15 @@ class LocalPlatform(IPlatform):
         m = CreateSimulationsTask.send(simulations_batch[0].experiment.uid, [s.tags for s in simulations_batch])
         ids = m.get_result(block=True, timeout=self.default_timeout * 1000)
 
+        items = dict()
+        # update our uids and then build a list of files to copy
         for i, simulation in enumerate(simulations_batch):
             simulation.uid = ids[i]
-            self.send_assets_for_simulation(simulation, worker=worker)
+            path = "/".join(["/data", simulation.experiment.uid, simulation.uid])
+            items.update(self.assets_to_copy_multiple_list(path, simulation.assets))
+        result = self._docker_operations.copy_multiple_to_container(worker, items)
+        if not result:
+            raise IOError("Coping of data for simulations failed.")
         return ids
 
     def run_simulations(self, experiment: IExperiment):

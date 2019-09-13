@@ -5,14 +5,29 @@ from typing import Optional, List, Tuple
 import pandas as pd
 from flask import current_app
 from flask_restful import Resource, reqparse, abort
-from sqlalchemy import String, func, or_
+from sqlalchemy import String, func, or_, and_
 
 from idmtools_platform_local.config import DATA_PATH
+from idmtools_platform_local.status import Status
 from idmtools_platform_local.workers.data.job_status import JobStatus
 from idmtools_platform_local.workers.database import get_session
+from idmtools_platform_local.workers.ui.config import db
 from idmtools_platform_local.workers.ui.controllers.utils import validate_tags
 
 logger = logging.getLogger(__name__)
+
+
+def progress_to_status_str(progress):
+    if str(Status.failed) in progress and progress[str(Status.failed)] > 0:
+        return 'failed'
+    elif str(Status.canceled) in progress and progress[str(Status.canceled)] > 0:
+        return 'canceled'
+    elif str(Status.created) in progress and progress[str(Status.created)] > 0:
+        return 'created'
+    elif str(Status.in_progress) in progress and progress[str(Status.in_progress)] > 0:
+        return 'in_progress'
+    else:
+        return 'done'
 
 
 def experiment_filter(id: Optional[str], tags: Optional[List[Tuple[str, str]]], page:int = 1, per_page:int = 10) -> pd.DataFrame:
@@ -24,72 +39,43 @@ def experiment_filter(id: Optional[str], tags: Optional[List[Tuple[str, str]]], 
         tags (Optional[List[Tuple[str, str]]]): Optional list of tuples in form of tag_name tag_value to user to filter
             experiments with
     """
-    session = get_session()
-    try:
-        # experiments don't have parents
-        criteria = [JobStatus.parent_uuid == None]  # noqa: E711
+    session = db.session
+    # experiments don't have parents
+    criteria = [JobStatus.parent_uuid == None]  # noqa: E711
 
-        # start builder our optional criteria
-        if id is not None:
-            criteria.append(JobStatus.uuid == id)
+    # start builder our optional criteria
+    if id is not None:
+        criteria.append(JobStatus.uuid == id)
 
-        if tags is not None:
-            for tag in tags:
-                criteria.append((JobStatus.tags[tag[0]].astext.cast(String) == tag[1]))
+    if tags is not None:
+        for tag in tags:
+            criteria.append((JobStatus.tags[tag[0]].astext.cast(String) == tag[1]))
 
-        query = session.query(JobStatus).filter(*criteria).order_by(JobStatus.uuid.desc()).paginate(page, per_page)
+    query = session.query(JobStatus).filter(*criteria).order_by(JobStatus.uuid.desc()).paginate(page, per_page)
+    items = query.items
+    total = query.total
 
-        # Pull our experiment status into a dataframe
-        df = pd.read_sql(query.statement, query.session.bind, columns=['uuid', 'status', 'data_path', 'tags'])
+    # this will fetch the overall progress of the simulations(sub jobs) for the experiments
+    subjob_status_query = session.query(JobStatus.parent_uuid, JobStatus.status,
+                                        func.count(JobStatus.status).label("total")) \
+        .filter(and_(JobStatus.parent_uuid != None,JobStatus.parent_uuid.in_([i.uuid for i in items])))\
+        .group_by(JobStatus.parent_uuid, JobStatus.status)  # noqa: E711
 
-        # this will fetch the overall progress of the simulations(sub jobs) for the experiments
-        subjob_status_query = session.query(JobStatus.parent_uuid, JobStatus.status,
-                                            func.count(JobStatus.status).label("total")) \
-            .filter(JobStatus.parent_uuid != None).group_by(JobStatus.parent_uuid, JobStatus.status)  # noqa: E711
+    sdf = subjob_status_query.all()
 
-        sdf = pd.read_sql(subjob_status_query.statement, subjob_status_query.session.bind, index_col=['parent_uuid'])
+    # build lookup index
+    li = {i.uuid: i for i in items}
 
-        # There may be a better way to do this merge of data. For now the loop works
-        # basically we are building the progress bar for each experiment based on the simulation statuses
-        df['progress'] = ''
-        for index, row in df.iterrows():
-            job = row['uuid']
-            status_bars = []
-            job_status = dict()
-            if job in sdf.index.values:
-                job_list = sdf.loc[job]
-                # since we index by parent_uuid, if could have multiple rows. This is the general case(most experiments will
-                # have simulations is different statuses at some point) so we convert any results that are a single row
-                # from their series form to the transposed dataframe that we get in the general case
-                if type(job_list) is pd.Series:
-                    job_list = job_list.to_frame().transpose()
-                # now build our status object
-                for sidx, srow in job_list.iterrows():
-                    job_status[str(srow['status'])] = int(srow['total'])
-                # and make a pretty progress bar
+    for row in sdf:
+        if not hasattr(li[row.parent_uuid], 'progress'):
+            li[row.parent_uuid].progress = dict()
+        li[row.parent_uuid].progress[str(row.status)] = row.total
 
-                status_bars.append(job_status)
-                # status_bars.append(parent_status_to_progress(job_status))
-            # convert list to dict
-            sb_dict = {}
-            [sb_dict.update(v) for v in status_bars]
-            df.at[index, 'progress'] = status_bars
+    for row in items:
+        row.status = progress_to_status_str(row.progress)
+        row.data_path = row.data_path.replace(DATA_PATH, '/data')
 
-        df['data_path'] = df['data_path'].apply(lambda x: x.replace(DATA_PATH, '/data'))
-        # df['data_path'] = df['data_path'].apply(urlize_data_path)
-
-        # we don't need status or parent_uuid or status(now that we have progress bars) for experiments. Let's drop those
-        df.drop(columns=['parent_uuid', 'status'], inplace=True)
-        # and let's rename columns to make it more clear fo user what they are looking at
-        df.rename(index=str, columns=dict(uuid='experiment_id'), inplace=True)
-        df['created'] = df['created'].astype(str)
-        df['updated'] = df['updated'].astype(str)
-    except Exception as e:
-        logger.exception(e)
-        raise e
-    finally:
-        session.close()
-    return df
+    return items, total
 
 
 idx_parser = reqparse.RequestParser()
@@ -109,14 +95,14 @@ class Experiments(Resource):
         args['id'] = id
 
         validate_tags(args['tags'])
-        df = experiment_filter(**args)
-        current_app.logger.error(df.head())
-        result = df.to_dict(orient='records')
+        result, total = experiment_filter(**args)
+        result = list(map(lambda x: x.to_dict(), result))
         if id:
             if not result:
                 abort(404, message=f"Could not find experiment with id {id}")
             return result[0]
-        return result
+
+        return result, 200, {'X-Total': total, 'X-Per-Page': args.per_page}
 
     def delete(self, id):
         args = delete_args.parse_args()

@@ -22,7 +22,7 @@ class TestAPI(unittest.TestCase):
     def setUp(self, mock_broker, mock_db):
         local_path = config_local_test()  # noqa: F841
         config_local_test()
-        from idmtools_platform_local.workers.ui.app import application
+        from idmtools_platform_local.workers.ui.config import application
         self.app = application.test_client()
         self.create_test_data()
 
@@ -142,7 +142,7 @@ class TestAPI(unittest.TestCase):
         def do_test(*mocks):
             self.create_test_data()
             # reset our config to default. This should connect to the postgres db as well
-            from idmtools_platform_local.workers.ui.app import application
+            from idmtools_platform_local.workers.ui.config import application
             other_app = application.test_client()
             result = other_app.get('/api/experiments', query_string=dict(tags='a,b'))
             self.assertEqual(200, result.status_code)

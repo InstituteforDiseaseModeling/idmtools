@@ -1,6 +1,7 @@
 import io
 import logging
 import os
+from concurrent.futures import as_completed
 from concurrent.futures.thread import ThreadPoolExecutor
 from pathlib import Path
 import platform
@@ -10,7 +11,7 @@ import time
 from dataclasses import dataclass
 from io import BytesIO
 from logging import getLogger
-from typing import Optional, Union, NoReturn, BinaryIO
+from typing import Optional, Union, NoReturn, BinaryIO, Tuple, Dict, List
 
 import docker
 from docker.errors import APIError
@@ -18,12 +19,13 @@ from docker.models.containers import Container, ExecResult
 from docker.models.networks import Network
 
 from idmtools.core.SystemInformation import get_system_information
-from idmtools.utils.decorators import optional_yaspin_load, parallelize
+from idmtools.utils.decorators import optional_yaspin_load, ParallelizeDecorator
 from idmtools_platform_local import __version__
 
 logger = getLogger(__name__)
 # thread queue for docker copy operations
-io_queue = ThreadPoolExecutor()
+io_queue = ParallelizeDecorator()
+
 
 
 @dataclass
@@ -202,23 +204,24 @@ class DockerOperations:
             that *None* is returned when *create=False*
         """
         logger.debug('Checking if worker is running')
-        workers_container = self.client.containers.list(filters=dict(name='idmtools_worker'), all=True)
-        if not workers_container and create:
-            container_config = self.create_worker_config()
-            logger.debug(f'Worker Container Config {str(container_config)}')
-            try:
+        try:
+            workers_container = self.client.containers.list(filters=dict(name='idmtools_worker'), all=True)
+            if not workers_container and create:
+                container_config = self.create_worker_config()
+                logger.debug(f'Worker Container Config {str(container_config)}')
                 workers_container = self.client.containers.run(**container_config)
-            except APIError as e:
-                if 'address already in use' in e.response:
-                    raise EnvironmentError(f"Port {self.workers_ui_port} already in use. Please configure another port "
-                                           f"for the Local Platform UI") from e
-                else:  # we don't know what the issue is so kick it down the road
-                    raise e
-        elif type(workers_container) is list and len(workers_container):
-            workers_container = workers_container[0]
-            if create:
-                workers_container = self.ensure_container_running(workers_container)
-        return workers_container
+            elif type(workers_container) is list and len(workers_container):
+                workers_container = workers_container[0]
+                if create:
+                    workers_container = self.ensure_container_running(workers_container)
+            return workers_container
+        except APIError as e:
+            if 'address already in use' in e.response:
+                raise EnvironmentError(f"Port {self.workers_ui_port} already in use. Please configure another port or "
+                                       f"stop the service/application using port {self.workers_ui_port}"
+                                       f"for the Local Platform UI") from e
+            else:  # we don't know what the issue is so kick it down the road
+                raise e
 
     @staticmethod
     def ensure_container_running(container: Container) -> Container:
@@ -414,7 +417,7 @@ class DockerOperations:
         """
         return {dest_port: src_port} if src_port is not None and dest_port is not None else None
 
-    @parallelize(queue=io_queue)
+    @io_queue.parallelize
     def copy_to_container(self, container: Container, file: Union[str, bytes], destination_path: str,
                           dest_name: Optional[str] = None) -> bool:
         """
@@ -428,7 +431,7 @@ class DockerOperations:
             dest_name: Optional parameter for destination filename. By default the source filename is used
 
         Returns:
-            (bool) True if the copy suceeds, False otherwise
+            (bool) True if the copy succeeds, False otherwise
         """
         if isinstance(file, bytes):
             file = BytesIO(file)
@@ -445,10 +448,21 @@ class DockerOperations:
             logger.debug(f'Copying {dest_name} to docker container {container.id}:{destination_path}')
             with open(target_file, 'wb') as of:
                 of.write(file.read())
+            return True
 
+    def copy_multiple_to_container(self, container: Container,
+                                   files: Dict[str, List[Tuple[Union[str, bytes], Optional[str]]]],
+                                   join_on_copy: bool = True):
+        results = []
+        for dest_path, sub_files in files.items():
+            for fn in sub_files:
+                results.append(self.copy_to_container(container, fn[0], dest_path, fn[1]))
 
-            #with self.create_archive_from_bytes(file, dest_name) as archive:
-            #    return container.put_archive(path=destination_path, data=archive.read())
+        if join_on_copy:
+            return all(io_queue.get_results(results))
+        # If we don't join, we assume the copy succeeds for now. This really means somewhere else should be handling the
+        # data join for this
+        return True
 
     @staticmethod
     def create_archive_from_bytes(content: Union[bytes, BytesIO, BinaryIO], name: str) -> BytesIO:
@@ -478,7 +492,7 @@ class DockerOperations:
         pw_tarstream.seek(0)
         return pw_tarstream
 
-    def create_directory(self, dir: str) -> ExecResult:
+    def create_directory(self, dir: str) -> bool:
         """
         Create a directory in a container
 

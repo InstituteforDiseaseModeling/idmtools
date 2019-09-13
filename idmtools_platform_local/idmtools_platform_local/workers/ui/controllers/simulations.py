@@ -8,13 +8,14 @@ from sqlalchemy import String
 from idmtools_platform_local.workers.data.job_status import JobStatus
 from idmtools_platform_local.workers.database import get_session
 from idmtools_platform_local.status import Status
+from idmtools_platform_local.workers.ui.config import db
 from idmtools_platform_local.workers.ui.controllers.utils import validate_tags
 
 logger = logging.getLogger(__name__)
 
 
 def sim_status(id: Optional[str], experiment_id: Optional[str], status: Optional[str],
-               tags: Optional[List[Tuple[str, str]]], page:int = 1, per_page:int = 100) -> pd.DataFrame:
+               tags: Optional[List[Tuple[str, str]]], page:int = 1, per_page:int = 50) -> pd.DataFrame:
     """
     List of statuses for simulation(s) with the ability to filter by id, experiment_id, status, and tags
 
@@ -28,43 +29,29 @@ def sim_status(id: Optional[str], experiment_id: Optional[str], status: Optional
     Returns:
         None
     """
-    session = get_session()
-    try:
-        # Simulations ALWAYS have a parent
-        criteria = [JobStatus.parent_uuid != None]  # noqa: E711
+    session = db.session
+    # Simulations ALWAYS have a parent
+    criteria = [JobStatus.parent_uuid != None]  # noqa: E711
 
-        # start building our filter criteria
-        if id is not None:
-            criteria.append(JobStatus.uuid == id)
+    # start building our filter criteria
+    if id is not None:
+        criteria.append(JobStatus.uuid == id)
 
-        if experiment_id is not None:
-            criteria.append(JobStatus.parent_uuid == experiment_id)
+    if experiment_id is not None:
+        criteria.append(JobStatus.parent_uuid == experiment_id)
 
-        if status is not None:
-            criteria.append(JobStatus.status == Status[status])
+    if status is not None:
+        criteria.append(JobStatus.status == Status[status])
 
-        if tags is not None:
-            for tag in tags:
-                criteria.append((JobStatus.tags[tag[0]].astext.cast(String) == tag[1]))
+    if tags is not None:
+        for tag in tags:
+            criteria.append((JobStatus.tags[tag[0]].astext.cast(String) == tag[1]))
 
-        query = session.query(JobStatus).filter(*criteria)\
-            .order_by(JobStatus.uuid.desc(), JobStatus.parent_uuid.desc()).paginate(page, per_page)
+    query = session.query(JobStatus).filter(*criteria)\
+        .order_by(JobStatus.uuid.desc(), JobStatus.parent_uuid.desc()).paginate(page, per_page)
+    total = query.total
 
-        # convert the result to data-frame
-        df = pd.read_sql(query.statement, query.session.bind, columns=['uuid', 'status', 'data_path', 'tags'])
-
-        # rename columns to be a bit clearer what the user is looking at
-        df.rename(index=str, columns=dict(uuid='simulation_uid', parent_uuid='experiment_id'), inplace=True)
-
-        df['status'] = df['status'].apply(lambda x: str(x))
-        df['created'] = df['created'].astype(str)
-        df['updated'] = df['updated'].astype(str)
-    except Exception as e:
-        logger.exception(e)
-        raise e
-    finally:
-        session.close()
-    return df
+    return list(map(lambda x: x.to_dict(False), query.items)), total
 
 
 status_strs = [str(status) for status in Status]
@@ -75,7 +62,7 @@ idx_parser.add_argument('status', help='Status to filter by. Should be one of th
                         choices=status_strs,
                         default=None)
 idx_parser.add_argument('page', type=int, default=1, help="Page")
-idx_parser.add_argument('per_page', type=int, default=100, help="Per Page")
+idx_parser.add_argument('per_page', type=int, default=50, help="Per Page")
 idx_parser.add_argument('tags', action='append', default=None,
                         help="Tags tio filter by. Tags must be in format name,value")
 
@@ -87,13 +74,13 @@ class Simulations(Resource):
 
         validate_tags(args['tags'])
 
-        result = sim_status(**args).to_dict(orient='records')
+        result, total = sim_status(**args)
 
         if id:
             if not result:
                 abort(404, message=f"Could not find simulation with id {id}")
             return result[0]
-        return result
+        return result, 200, {'X-Total': total, 'X-Per-Page': args.per_page}
 
     def put(self, id):
         data = request.json()
