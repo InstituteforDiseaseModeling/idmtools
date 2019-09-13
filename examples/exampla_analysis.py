@@ -1,6 +1,6 @@
 from idmtools.analysis import IAnalyzer
+from idmtools.core.PlatformFactory import Platform
 from idmtools.managers import AnalyzeManager
-from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
 
 
 class ExampleAnalyzer(IAnalyzer):
@@ -36,7 +36,7 @@ class ExampleAnalyzer2(IAnalyzer):
             print("---")
 
 
-p = COMPSPlatform()
+p = Platform('COMPS2')
 am = AnalyzeManager(experiments=["185eb7fa-8f97-e911-a2bb-f0921c167866"],
                     analyzers=[ExampleAnalyzer(), ExampleAnalyzer2()],
                     platform=p)

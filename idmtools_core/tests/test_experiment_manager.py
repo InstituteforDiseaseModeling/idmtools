@@ -1,14 +1,13 @@
 import os
 import unittest
-
 from idmtools.builders import ExperimentBuilder
+from idmtools.core.PlatformFactory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.services.platforms import PlatformPersistService
 from idmtools_models.python import PythonExperiment
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 from idmtools_test.utils.TstExperiment import TstExperiment
-from idmtools_test.utils.TestPlatform import TestPlatform
 from idmtools_test import COMMON_INPUT_PATH
 
 
@@ -20,7 +19,7 @@ class TestExperimentManager(ITestWithPersistence):
 
     def test_from_experiment(self):
         e = TstExperiment("My experiment")
-        p = TestPlatform()
+        p = Platform('Test')
 
         em = ExperimentManager(experiment=e, platform=p)
         em.run()
@@ -34,7 +33,7 @@ class TestExperimentManager(ITestWithPersistence):
         self.assertEqual(em.platform, em2.platform)
 
     def test_from_experiment_unknown(self):
-        c = TestPlatform()
+        c = Platform('Test')
         experiment = PythonExperiment(name="test_from_experiment",
                                       model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"))
         builder = ExperimentBuilder()

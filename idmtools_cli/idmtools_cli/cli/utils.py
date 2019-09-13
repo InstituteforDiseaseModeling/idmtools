@@ -4,7 +4,7 @@ import requests
 from click import UsageError
 from colorama import Fore
 
-from idmtools.core.PlatformFactory import PlatformFactory
+from idmtools.core.PlatformFactory import Platform
 from idmtools_cli.IPlatformCli import PlatformCLIPlugins
 
 supported_platforms = PlatformCLIPlugins().get_plugin_map()
@@ -33,7 +33,7 @@ def get_platform_from_config_or_name(config_block, platform):
     if platform is None and config_block is None:
         raise UsageError("You must specify a platform or a configuration block")
     if config_block:
-        platform_obj = PlatformFactory.create_from_block(config_block)
+        platform_obj = Platform(config_block)
     else:
         platform_obj = supported_platforms[platform].get({})
     return platform_obj

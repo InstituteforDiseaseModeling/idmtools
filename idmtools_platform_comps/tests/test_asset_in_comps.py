@@ -1,15 +1,13 @@
 import json
 import os
-import unittest
-
 import pytest
+import unittest
 from COMPS.Data import Experiment
-
 from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import ExperimentBuilder
 from idmtools.core import EntityStatus
+from idmtools.core.PlatformFactory import Platform
 from idmtools_models.python import PythonExperiment
-from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id
 
@@ -19,7 +17,7 @@ class TestAssetsInComps(unittest.TestCase):
 
     def setUp(self) -> None:
         self.base_path = os.path.abspath(os.path.join(COMMON_INPUT_PATH, "assets", "collections"))
-        self.platform = COMPSPlatform()
+        self.platform = Platform('COMPS2')
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
 

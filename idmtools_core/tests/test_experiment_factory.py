@@ -1,11 +1,10 @@
 import os
-
 from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
+from idmtools.core.PlatformFactory import Platform
 from idmtools.core.ExperimentFactory import experiment_factory
 from idmtools.managers import ExperimentManager
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
-from idmtools_test.utils.TestPlatform import TestPlatform
 from idmtools_test.utils.TstExperiment import TstExperiment
 
 
@@ -14,7 +13,7 @@ class TestExperimentFactory(ITestWithPersistence):
     def test_build_python_experiment_from_factory(self):
         experiment = experiment_factory.create("PythonExperiment", tags={"a": "1", "b": 2})
         experiment.model_path = os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py")
-        test_platform = TestPlatform()
+        test_platform = Platform('Test')
         builder = ExperimentBuilder()
         builder.add_sweep_definition(lambda simulation, value: {"p": value}, range(0, 2))
         experiment.builder = builder
@@ -33,7 +32,7 @@ class TestExperimentFactory(ITestWithPersistence):
                               campaign_path=os.path.join(COMMON_INPUT_PATH, "files", "campaign.json"),
                               demographics_paths=os.path.join(COMMON_INPUT_PATH, "files", "demographics.json"))
 
-        test_platform = TestPlatform()
+        test_platform = Platform('Test')
         b = StandAloneSimulationsBuilder()
 
         for i in range(20):

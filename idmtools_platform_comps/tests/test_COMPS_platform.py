@@ -3,14 +3,12 @@ import json
 import os
 import unittest
 from os import path
-
 import pytest
-
+from idmtools.core.PlatformFactory import Platform
 from idmtools.builders import ExperimentBuilder
 from idmtools.core import EntityStatus
 from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
-from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 from idmtools_test import COMMON_INPUT_PATH
 
@@ -21,7 +19,7 @@ current_directory = path.dirname(path.realpath(__file__))
 class TestCOMPSPlatform(ITestWithPersistence):
     def setUp(self) -> None:
         super().setUp()
-        self.platform = COMPSPlatform()
+        self.platform = Platform('COMPS2')
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
 

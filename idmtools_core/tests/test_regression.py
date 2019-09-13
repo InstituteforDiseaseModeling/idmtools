@@ -1,12 +1,11 @@
 import os
 import unittest
-
 from idmtools.assets import AssetCollection
 from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
+from idmtools.core.PlatformFactory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 from idmtools_test.utils.TstExperiment import TstExperiment
-from idmtools_test.utils.TestPlatform import TestPlatform
 from idmtools_models.python import PythonExperiment, PythonSimulation
 from idmtools_test import COMMON_INPUT_PATH
 
@@ -71,7 +70,7 @@ class TestPersistenceServices(ITestWithPersistence):
     def test_fix_138(self):
         # https://github.com/InstituteforDiseaseModeling/idmtools/issues/138
         e = TstExperiment(name="test")
-        p = TestPlatform()
+        p = Platform('Test')
 
         # Set a parameter in the base simulation
         e.base_simulation.set_parameter("test", 0)

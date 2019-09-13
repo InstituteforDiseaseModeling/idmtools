@@ -4,8 +4,7 @@ import unittest.mock
 import os
 import pytest
 from idmtools.config import IdmConfigParser
-from idmtools.core.PlatformFactory import PlatformFactory
-from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
+from idmtools.core.PlatformFactory import Platform
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 
@@ -39,7 +38,7 @@ class TestConfig(ITestWithPersistence):
     @pytest.mark.comps
     @unittest.mock.patch('idmtools_platform_comps.COMPSPlatform.COMPSPlatform._login', side_effect=lambda: True)
     def test_simple_comps_platform_use_config(self, mock_login):
-        platform = PlatformFactory.create("COMPS")
+        platform = Platform("COMPS")
         self.assertEqual(platform.endpoint, 'https://comps2.idmod.org')
         self.assertEqual(platform.environment, 'Bayesian')
         self.assertEqual(mock_login.call_count, 1)
@@ -47,7 +46,7 @@ class TestConfig(ITestWithPersistence):
     @pytest.mark.comps
     @unittest.mock.patch('idmtools_platform_comps.COMPSPlatform.COMPSPlatform._login', side_effect=lambda: True)
     def test_simple_comps_platform_use_code(self, mock_login):
-        platform = PlatformFactory.create("COMPS", endpoint='https://abc', environment='Bayesian')
+        platform = Platform("COMPS", endpoint='https://abc', environment='Bayesian')
         self.assertEqual(platform.endpoint, 'https://abc')
         self.assertEqual(platform.environment, 'Bayesian')
         self.assertEqual(mock_login.call_count, 1)
@@ -67,7 +66,7 @@ class TestConfig(ITestWithPersistence):
     @unittest.mock.patch('idmtools_platform_comps.COMPSPlatform.COMPSPlatform._login', side_effect=lambda: True)
     def test_idmtools_path(self, login_mock):
         IdmConfigParser(os.path.join(COMMON_INPUT_PATH, "configuration"), "idmtools_test.ini")
-        platform = COMPSPlatform()
+        platform = Platform('COMPS')
         self.assertEqual(platform.num_retires, int(IdmConfigParser.get_option('COMPS', 'num_retires')))
 
         file_path = os.path.join(COMMON_INPUT_PATH, "configuration", "idmtools_test.ini")
@@ -79,3 +78,8 @@ class TestConfig(ITestWithPersistence):
 
         self.assertEqual(p1, p2)
         self.assertEqual(id(p1), id(p2))
+
+    def test_no_idmtools(self):
+        IdmConfigParser(file_name="idmtools_NotExist.ini")
+        IdmConfigParser.view_config_file()
+        self.assertTrue(IdmConfigParser.get_config_path() is None)

@@ -4,8 +4,6 @@ from idmtools_platform_local.status import Status
 from idmtools_test import COMMON_INPUT_PATH
 import os
 import shutil
-
-
 from unittest import TestCase
 from idmtools_platform_local.tasks.create_experiement import CreateExperimentTask
 from idmtools_platform_local.tasks.run import RunTask
