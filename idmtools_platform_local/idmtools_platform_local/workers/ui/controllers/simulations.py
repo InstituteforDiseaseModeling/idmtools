@@ -1,7 +1,6 @@
 import logging
 import os
-from typing import Optional, List, Tuple
-import pandas as pd
+from typing import Optional, List, Tuple, Dict
 from flask import request
 from flask_restful import Resource, reqparse, abort
 from sqlalchemy import String
@@ -15,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 def sim_status(id: Optional[str], experiment_id: Optional[str], status: Optional[str],
-               tags: Optional[List[Tuple[str, str]]], page:int = 1, per_page:int = 50) -> pd.DataFrame:
+               tags: Optional[List[Tuple[str, str]]], page: int = 1, per_page: int = 50) -> Tuple[Dict, int]:
     """
     List of statuses for simulation(s) with the ability to filter by id, experiment_id, status, and tags
 
@@ -25,7 +24,8 @@ def sim_status(id: Optional[str], experiment_id: Optional[str], status: Optional
         status (Optional[str]): Optional status string to filter by
         tags (Optional[List[Tuple[str, str]]]): Optional list of tuples in form of tag_name tag_value to user to filter
             experiments with
-
+        page(int): Which page to load. Defaults to 1
+        per_page(int): Simulations per page. Defaults to 50
     Returns:
         None
     """

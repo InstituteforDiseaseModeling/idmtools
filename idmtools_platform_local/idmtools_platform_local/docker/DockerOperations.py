@@ -1,7 +1,6 @@
 import io
 import logging
 import os
-from concurrent.futures import as_completed
 from concurrent.futures.thread import ThreadPoolExecutor
 from pathlib import Path
 import platform
@@ -15,7 +14,7 @@ from typing import Optional, Union, NoReturn, BinaryIO, Tuple, Dict, List
 
 import docker
 from docker.errors import APIError
-from docker.models.containers import Container, ExecResult
+from docker.models.containers import Container
 from docker.models.networks import Network
 
 from idmtools.core.SystemInformation import get_system_information
@@ -25,7 +24,6 @@ from idmtools_platform_local import __version__
 logger = getLogger(__name__)
 # thread queue for docker copy operations
 io_queue = ParallelizeDecorator()
-
 
 
 @dataclass
@@ -438,7 +436,8 @@ class DockerOperations:
         if type(file) is str:
             logger.debug(f'Copying {file} to docker container {container.id}:{destination_path}')
             name = dest_name if dest_name else os.path.basename(file)
-            target_file = os.path.join(self.host_data_directory, destination_path.replace('/data', '/workers')[1:], name)
+            target_file = os.path.join(self.host_data_directory,
+                                       destination_path.replace('/data', '/workers')[1:], name)
 
             shutil.copy(file, target_file)
             return True

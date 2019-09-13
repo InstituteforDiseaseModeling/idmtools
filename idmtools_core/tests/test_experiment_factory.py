@@ -66,4 +66,3 @@ class TestExperimentFactory(ITestWithPersistence):
             experiment_factory.create("SomeExperiment")
         self.assertTrue("The ExperimentFactory could not create an experiment of type SomeExperiment" in
                         str(context.exception.args[0]))
-

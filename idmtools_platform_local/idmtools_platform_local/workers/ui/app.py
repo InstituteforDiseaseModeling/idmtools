@@ -1,4 +1,3 @@
-import os
 
 from idmtools_platform_local.workers.ui.config import application, api, ai
 from idmtools_platform_local.workers.ui.controllers.experiments import Experiments

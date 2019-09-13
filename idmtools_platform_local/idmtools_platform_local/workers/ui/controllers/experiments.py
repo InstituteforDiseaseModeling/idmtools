@@ -1,9 +1,6 @@
 import logging
 import shutil
-from typing import Optional, List, Tuple
-
-import pandas as pd
-from flask import current_app
+from typing import Optional, List, Tuple, Dict
 from flask_restful import Resource, reqparse, abort
 from sqlalchemy import String, func, or_, and_
 
@@ -30,7 +27,8 @@ def progress_to_status_str(progress):
         return 'done'
 
 
-def experiment_filter(id: Optional[str], tags: Optional[List[Tuple[str, str]]], page:int = 1, per_page:int = 10) -> pd.DataFrame:
+def experiment_filter(id: Optional[str], tags: Optional[List[Tuple[str, str]]], page: int = 1, per_page: int = 10) -> \
+        Tuple[Dict, int]:
     """
     List the status of experiment(s) with the ability to filter by experiment id and tags
 
@@ -38,6 +36,8 @@ def experiment_filter(id: Optional[str], tags: Optional[List[Tuple[str, str]]], 
         id (Optional[str]): Optional ID of the experiment you want to filter by
         tags (Optional[List[Tuple[str, str]]]): Optional list of tuples in form of tag_name tag_value to user to filter
             experiments with
+        page(int): Which page to load. Defaults to 1
+        per_page(int): Experiments per page. Defaults to 50
     """
     session = db.session
     # experiments don't have parents
@@ -58,7 +58,7 @@ def experiment_filter(id: Optional[str], tags: Optional[List[Tuple[str, str]]], 
     # this will fetch the overall progress of the simulations(sub jobs) for the experiments
     subjob_status_query = session.query(JobStatus.parent_uuid, JobStatus.status,
                                         func.count(JobStatus.status).label("total")) \
-        .filter(and_(JobStatus.parent_uuid != None,JobStatus.parent_uuid.in_([i.uuid for i in items])))\
+        .filter(and_(JobStatus.parent_uuid != None, JobStatus.parent_uuid.in_([i.uuid for i in items])))\
         .group_by(JobStatus.parent_uuid, JobStatus.status)  # noqa: E711
 
     sdf = subjob_status_query.all()

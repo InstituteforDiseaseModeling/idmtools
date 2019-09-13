@@ -208,4 +208,3 @@ class ParallelizeDecorator:
                 results.append(f.result())
 
         return results
-

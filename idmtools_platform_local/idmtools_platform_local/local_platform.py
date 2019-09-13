@@ -1,10 +1,8 @@
 import dataclasses
 import functools
 import logging
-import multiprocessing
 import os
 from collections import defaultdict
-from concurrent.futures.process import ProcessPoolExecutor
 from logging import getLogger
 from typing import Optional, NoReturn
 from dataclasses import dataclass
@@ -241,8 +239,3 @@ class LocalPlatform(IPlatform):
             with open(full_path, 'rb') as fin:
                 byte_arrs.append(fin.read())
         return byte_arrs
-
-
-def run_parallel(fn, lst, workers=multiprocessing.cpu_count()):
-    with ProcessPoolExecutor(max_workers=workers) as executor:
-        return list(executor.map(fn, lst))

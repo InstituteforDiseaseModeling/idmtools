@@ -10,7 +10,7 @@ class DTKExperimentSpec(ModelSpecification):
         return "Provides access to the Local Platform to IDM Tools"
 
     @get_model_impl
-    def get(self, configuration: dict) -> 'DTKExperiment':
+    def get(self, configuration: dict) -> 'DTKExperiment':  # noqa: F821
         """
         Build our local platform from the passed in configuration object
 
@@ -25,6 +25,6 @@ class DTKExperimentSpec(ModelSpecification):
         return DTKExperiment(**configuration)
 
     @get_model_type_impl
-    def get_type(self) -> Type['LocalPlatform']:
+    def get_type(self) -> Type['DTKExperiment']:  # noqa: F821
         from idmtools_model_dtk.DTKExperiment import DTKExperiment
         return DTKExperiment
