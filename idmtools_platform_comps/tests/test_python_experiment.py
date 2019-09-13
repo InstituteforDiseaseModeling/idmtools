@@ -83,7 +83,7 @@ class TestPythonExperiment(ITestWithPersistence):
         # validate experiment tags
         actual_exp_tags = experiment.get(experiment.id, QueryCriteria().select_children('tags')).tags
         expected_exp_tags = {'idmtools': 'idmtools-automation', 'number_tag': '123', 'string_tag': 'test',
-                             'KeyOnly': '', 'type': 'idmtools_models.python.PythonExperiment'}
+                             'KeyOnly': '', 'type': 'idmtools_models.python.python_experiment.PythonExperiment'}
         self.assertDictEqual(expected_exp_tags, actual_exp_tags)
 
     # Test parameter "b" set is depending on parameter "a"
