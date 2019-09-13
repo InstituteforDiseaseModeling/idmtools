@@ -28,6 +28,7 @@ type = Local
  In your code, you could then get then use as would any other platform
 ```python
 from idmtools.core.platform_factory import Platform
+from idmtools.managers.experiment_manager import ExperimentManager
 
 platform = Platform('Local')
 ...
