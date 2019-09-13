@@ -2,10 +2,10 @@ from logging import getLogger
 from typing import Type
 
 from idmtools.entities import IPlatform
-from idmtools.registry.PlatformSpecification import example_configuration_impl, get_platform_impl, \
+from idmtools.registry.platform_specification import example_configuration_impl, get_platform_impl, \
     get_platform_type_impl, PlatformSpecification
-from idmtools.registry.PluginSpecification import get_description_impl
-from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
+from idmtools.registry.plugin_specification import get_description_impl
+from idmtools_platform_comps.comps_platform import COMPSPlatform
 
 COMPS_EXAMPLE_CONFIG = """
 [COMPSPLATFORM]

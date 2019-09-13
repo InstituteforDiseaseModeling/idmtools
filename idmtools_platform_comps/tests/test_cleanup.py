@@ -4,8 +4,8 @@ import time
 import pytest
 import unittest
 from COMPS.Data import Experiment, QueryCriteria
-from idmtools.core.PlatformFactory import Platform
-from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools.core.platform_factory import Platform
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 
 class TestCleanup(ITestWithPersistence):

@@ -3,12 +3,12 @@ import os
 import pytest
 from COMPS.Data import Experiment
 from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
-from idmtools.core.PlatformFactory import Platform
+from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_model_dtk import DTKExperiment
 from idmtools_model_dtk.defaults import DTKSIR
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 DEFAULT_CONFIG_PATH = os.path.join(COMMON_INPUT_PATH, "files", "config.json")

@@ -9,7 +9,7 @@ import unittest.mock
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from idmtools_platform_local.docker.DockerOperations import DockerOperations
+from idmtools_platform_local.docker.docker_operations import DockerOperations
 from operator import itemgetter
 
 from idmtools_platform_local.workers.utils import create_or_update_status

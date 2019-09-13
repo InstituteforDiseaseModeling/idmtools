@@ -2,15 +2,15 @@ import os
 import pytest
 from importlib import reload
 from idmtools.core import EntityStatus
-from idmtools_platform_local.docker.DockerOperations import DockerOperations
+from idmtools_platform_local.docker.docker_operations import DockerOperations
 from operator import itemgetter
 from idmtools.assets import AssetCollection
 from idmtools.builders import ExperimentBuilder
 from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
-from idmtools.core.PlatformFactory import Platform
+from idmtools.core.platform_factory import Platform
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.confg_local_runner_test import reset_local_broker, get_test_local_env_overrides
 from idmtools_test.utils.decorators import restart_local_platform
 

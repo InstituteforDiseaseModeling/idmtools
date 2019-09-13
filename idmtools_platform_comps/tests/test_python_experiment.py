@@ -8,10 +8,10 @@ from COMPS.Data import Experiment, QueryCriteria
 from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import ArmExperimentBuilder, ArmType, ExperimentBuilder, StandAloneSimulationsBuilder, SweepArm
 from idmtools.core import EntityStatus
-from idmtools.core.PlatformFactory import Platform
+from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
-from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id
 from idmtools_test import COMMON_INPUT_PATH
 
@@ -82,7 +82,7 @@ class TestPythonExperiment(ITestWithPersistence):
         # validate experiment tags
         actual_exp_tags = experiment.get(experiment.id, QueryCriteria().select_children('tags')).tags
         expected_exp_tags = {'idmtools': 'idmtools-automation', 'number_tag': '123', 'string_tag': 'test',
-                             'KeyOnly': '', 'type': 'idmtools_models.python.PythonExperiment'}
+                             'KeyOnly': '', 'type': 'idmtools_models.python.python_experiment.PythonExperiment'}
         self.assertDictEqual(expected_exp_tags, actual_exp_tags)
 
     # Test parameter "b" set is depending on parameter "a"

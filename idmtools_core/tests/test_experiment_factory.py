@@ -1,11 +1,11 @@
 import os
 from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
-from idmtools.core.PlatformFactory import Platform
-from idmtools.core.ExperimentFactory import experiment_factory
+from idmtools.core.platform_factory import Platform
+from idmtools.core.experiment_factory import experiment_factory
 from idmtools.managers import ExperimentManager
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
-from idmtools_test.utils.TstExperiment import TstExperiment
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+from idmtools_test.utils.tst_experiment import TstExperiment
 
 
 class TestExperimentFactory(ITestWithPersistence):
@@ -45,7 +45,8 @@ class TestExperimentFactory(ITestWithPersistence):
 
         em.run()
         self.assertEqual(len(em.experiment.simulations), 20)
-        self.assertEqual(em.experiment.tags, {'a': '1', 'b': 2, 'type': 'idmtools_model_dtk.DTKExperiment'})
+        self.assertEqual(em.experiment.tags, {'a': '1', 'b': 2,
+                                              'type': 'idmtools_model_dtk.dtk_experiment.DTKExperiment'})
 
     def test_build_test_experiment_from_factory(self):
         test_experiment = TstExperiment()
@@ -54,7 +55,8 @@ class TestExperimentFactory(ITestWithPersistence):
         # Test create experiment with full model name
         experiment = experiment_factory.create(test_experiment.tags.get("type"), tags=test_experiment.tags)
         self.assertIsNotNone(experiment.uid)
-        self.assertEqual(experiment.tags, {'a': '1', 'b': 2, 'type': 'idmtools_test.utils.TstExperiment'})
+        self.assertEqual(experiment.tags, {'a': '1', 'b': 2,
+                                           'type': 'idmtools_test.utils.tst_experiment.TstExperiment'})
 
         # Test create experiment with sample model name
         experiment1 = experiment_factory.create("TstExperiment")
@@ -65,4 +67,3 @@ class TestExperimentFactory(ITestWithPersistence):
             experiment_factory.create("SomeExperiment")
         self.assertTrue("The ExperimentFactory could not create an experiment of type SomeExperiment" in
                         str(context.exception.args[0]))
-

@@ -2,13 +2,9 @@ import ast
 import uuid
 import typing
 from abc import ABCMeta, abstractmethod
+from idmtools.core.interfaces.ientity import IEntity
 from logging import getLogger
-from idmtools.core.interfaces.IEntity import IEntity
 from dataclasses import fields
-
-if typing.TYPE_CHECKING:
-    from idmtools.core.types import TExperiment, TSimulation, TSimulationBatch
-    from typing import List, Dict, Any
 
 logger = getLogger(__name__)
 
@@ -166,3 +162,7 @@ class IPlatform(IEntity, metaclass=ABCMeta):
         # Update attr with validated data types
         for fn in fs_kwargs:
             setattr(self, fn, field_value[fn])
+
+
+TPlatform = typing.TypeVar("TPlatform", bound=IPlatform)
+TPlatformClass = typing.Type[TPlatform]

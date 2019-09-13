@@ -1,5 +1,5 @@
 import os
-from idmtools.core.PlatformFactory import Platform
+from idmtools.core.platform_factory import Platform
 from idmtools.workflows.calibration import Parameter
 from idmtools.workflows.calibration.CalibrationWorkflow import CalibrationWorkflow
 from idmtools.workflows.calibration.algorithms.DummyNPA import DummyNPA

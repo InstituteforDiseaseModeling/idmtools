@@ -1,11 +1,7 @@
 import ast
 import copy
-import typing
 from dataclasses import fields
 from idmtools.config import IdmConfigParser
-
-if typing.TYPE_CHECKING:
-    from idmtools.core.types import TPlatform
 
 
 class Platform:
@@ -18,7 +14,7 @@ class Platform:
             kwargs: user inputs may overwrite the entries in the block
         Returns: requested Platform
         """
-        from idmtools.registry.PlatformSpecification import PlatformPlugins
+        from idmtools.registry.platform_specification import PlatformPlugins
 
         if block is None:
             raise ValueError("Must have a valid Block name to create a Platform!")

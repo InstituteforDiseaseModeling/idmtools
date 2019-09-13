@@ -2,8 +2,8 @@ import unittest.mock
 import pytest
 from dataclasses import fields
 from idmtools.config import IdmConfigParser
-from idmtools.core.PlatformFactory import Platform
-from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools.core.platform_factory import Platform
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.confg_local_runner_test import get_test_local_env_overrides
 
 
@@ -47,7 +47,7 @@ class TestPlatformFactory(ITestWithPersistence):
 
     @pytest.mark.docker
     @pytest.mark.comps
-    @unittest.mock.patch('idmtools_platform_comps.COMPSPlatform.COMPSPlatform._login', side_effect=lambda: True)
+    @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
     def test_create_from_block(self, mock_login):
         p1 = Platform('Custom_Local', **get_test_local_env_overrides())
         self.assertEqual(p1.__class__.__name__, 'LocalPlatform')
@@ -61,7 +61,7 @@ class TestPlatformFactory(ITestWithPersistence):
 
     @pytest.mark.docker
     @pytest.mark.comps
-    @unittest.mock.patch('idmtools_platform_comps.COMPSPlatform.COMPSPlatform._login', side_effect=lambda: True)
+    @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
     def test_platform_factory(self, mock_login):
         platform1 = Platform('COMPS')
         self.assertEqual(platform1.__class__.__name__, 'COMPSPlatform')
@@ -74,7 +74,7 @@ class TestPlatformFactory(ITestWithPersistence):
         self.assertEqual(platform3.__class__.__name__, 'TestPlatform')
 
     @pytest.mark.comps
-    @unittest.mock.patch('idmtools_platform_comps.COMPSPlatform.COMPSPlatform._login', side_effect=lambda: True)
+    @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
     def test_COMPSPlatform(self, mock_login):
         platform = Platform('COMPS')
         self.assertEqual(mock_login.call_count, 1)

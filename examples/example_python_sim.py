@@ -2,10 +2,10 @@ import os
 from functools import partial
 
 from idmtools.builders import ExperimentBuilder
-from idmtools.core.PlatformFactory import Platform
+from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 
-from idmtools_models.python.PythonExperiment import PythonExperiment
+from idmtools_models.python.python_experiment import PythonExperiment
 
 
 def param_update(simulation, param, value):
@@ -37,7 +37,7 @@ experiment.add_builder(builder)
 platform = Platform('Local')
 # You can easily switch platforms by simply commenting out the previous line and then
 # uncommenting the following line
-#platform = Platform('COMPS')
+# platform = Platform('COMPS')
 
 em = ExperimentManager(experiment=experiment, platform=platform)
 em.run()

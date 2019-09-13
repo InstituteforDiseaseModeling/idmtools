@@ -8,7 +8,7 @@ import unittest.mock
 
 import pytest
 
-from idmtools_platform_local.docker.DockerOperations import DockerOperations
+from idmtools_platform_local.docker.docker_operations import DockerOperations
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.confg_local_runner_test import get_test_local_env_overrides
 from idmtools_test.utils.decorators import restart_local_platform, linux_only

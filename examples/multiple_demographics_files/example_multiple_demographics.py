@@ -1,5 +1,5 @@
 import os
-from idmtools.core.PlatformFactory import Platform
+from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_model_dtk import DTKExperiment
 from idmtools_model_dtk.defaults import DTKSIR

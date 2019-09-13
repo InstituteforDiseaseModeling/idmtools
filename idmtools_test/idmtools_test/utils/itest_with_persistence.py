@@ -2,7 +2,7 @@ import os
 import shutil
 import unittest
 
-from idmtools.services.IPersistanceService import IPersistenceService
+from idmtools.services.ipersistance_service import IPersistenceService
 
 
 class ITestWithPersistence(unittest.TestCase):

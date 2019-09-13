@@ -1,13 +1,13 @@
 import os
 import unittest
 from idmtools.builders import ExperimentBuilder
-from idmtools.core.PlatformFactory import Platform
+from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.services.platforms import PlatformPersistService
 from idmtools_models.python import PythonExperiment
-from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
-from idmtools_test.utils.TstExperiment import TstExperiment
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+from idmtools_test.utils.tst_experiment import TstExperiment
 from idmtools_test import COMMON_INPUT_PATH
 
 
