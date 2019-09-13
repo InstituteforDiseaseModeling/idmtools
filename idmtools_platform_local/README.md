@@ -27,7 +27,7 @@ type = Local
  ```
  In your code, you could then get then use as would any other platform
 ```python
-from idmtools.core.PlatformFactory import Platform
+from idmtools.core.platform_factory import Platform
 
 platform = Platform('Local')
 ...
