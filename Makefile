@@ -52,3 +52,6 @@ start-webui: ## start the webserver
 
 bump-patch:
 	python dev_scripts/run_pymake_on_all.py bump-patch
+
+packages-changes-since-last-verison:
+	git diff --name-only $(shell git tag -l --sort=-v:refname | grep -w '[0-9]\.[0-9]\.[0-9]' | head -n 1) HEAD | grep idmtools | cut -d "/" -f 1  | sort | uniq | grep -v ini | grep -v examples | grep -v dev_scripts
