@@ -53,5 +53,8 @@ start-webui: ## start the webserver
 bump-patch:
 	python dev_scripts/run_pymake_on_all.py bump-patch
 
-packages-changes-since-last-verison:
+packages-changes-since-last-verison: ## Get list of versions since last release that have changes
 	git diff --name-only $(shell git tag -l --sort=-v:refname | grep -w '[0-9]\.[0-9]\.[0-9]' | head -n 1) HEAD | grep idmtools | cut -d "/" -f 1  | sort | uniq | grep -v ini | grep -v examples | grep -v dev_scripts
+
+draft-change-log:
+	git log $(shell git tag -l --sort=-v:refname | grep -w '[0-9]\.[0-9]\.[0-9]' | head -n 1) HEAD --pretty=format:'%s' --reverse | uniq
