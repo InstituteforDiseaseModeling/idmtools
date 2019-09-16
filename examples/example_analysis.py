@@ -46,5 +46,5 @@ if __name__ == "__main__":
     experiment_id = "91ec1e91-9fca-e911-a2bb-f0921c167866"  ## comps2 staging
 
     manager = AnalyzeManager(configuration={}, platform=platform, ids=[experiment_id], analyzers=analyzers)
-
     manager.analyze()
+    
