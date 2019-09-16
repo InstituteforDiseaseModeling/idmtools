@@ -1,4 +1,3 @@
-# from idmtools.entities.IAnalyzer import IAnalyzer
 from idmtools.analysis.AnalyzeManager import AnalyzeManager
 from idmtools.core.PlatformFactory import PlatformFactory
 from idmtools.entities import IAnalyzer
@@ -41,10 +40,8 @@ if __name__ == "__main__":
     platform = PlatformFactory.create(key='COMPS')
 
     analyzers = [ExampleAnalyzer(), ExampleAnalyzer2()]
-    # analyzers = [ExampleAnalyzer2()]
 
     experiment_id = "91ec1e91-9fca-e911-a2bb-f0921c167866"  ## comps2 staging
 
     manager = AnalyzeManager(configuration={}, platform=platform, ids=[experiment_id], analyzers=analyzers)
     manager.analyze()
-    
