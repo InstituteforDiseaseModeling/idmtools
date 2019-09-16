@@ -72,6 +72,9 @@ Alternatively, you can install the packages manually by doing the following.
 > cd idmtools_platform_comps
 > pip install -e .[test]
 > cd ..
+> cd idmtools_model_dtk
+> pip install -e .[test]
+> cd ..
 > cd idmtools_models
 > pip install -e .[test]
 > cd ..
