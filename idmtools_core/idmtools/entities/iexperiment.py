@@ -5,9 +5,9 @@ from abc import ABC
 from itertools import chain
 from dataclasses import dataclass, field, InitVar
 from more_itertools import grouper
-from idmtools.core.interfaces.EntityContainer import EntityContainer
-from idmtools.core.interfaces.IAssetsEnabled import IAssetsEnabled
-from idmtools.core.interfaces.INamedEntity import INamedEntity
+from idmtools.core.interfaces.entity_container import EntityContainer
+from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
+from idmtools.core.interfaces.inamed_entity import INamedEntity
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TSimulation, TSimulationClass, TCommandLine, TExperimentBuilder
@@ -131,7 +131,7 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         self.gather_assets()
 
         # Add a tag to keep the class name
-        self.tags["type"] = self.__class__.__module__
+        self.tags["type"] = f'{self.__class__.__module__}.{self.__class__.__name__}'
 
     @property
     def done(self):
@@ -144,3 +144,9 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
     @property
     def simulation_count(self):
         return len(self.simulations)
+
+
+TExperiment = typing.TypeVar("TExperiment", bound=IExperiment)
+TExperimentClass = typing.Type[TExperiment]
+# Composed types
+TExperimentsList = typing.List[typing.Union[TExperiment, str]]

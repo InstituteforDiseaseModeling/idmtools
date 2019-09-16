@@ -1,10 +1,9 @@
 import os
 from functools import partial
-
 from idmtools.assets import AssetCollection, Asset
 from idmtools_models.python import PythonExperiment, PythonSimulation
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 import io
 import unittest.mock
 
@@ -39,7 +38,7 @@ class TestPythonSimulation(ITestWithPersistence):
         ps = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model.py"))
         # The tag for type is added at runtime during the pre_creation event
         ps.pre_creation()
-        self.assertEqual(ps.tags.get('type'), "idmtools_models.python.PythonExperiment")
+        self.assertEqual(ps.tags.get('type'), "idmtools_models.python.python_experiment.PythonExperiment")
 
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     def test_envelope(self, mock_stdout):

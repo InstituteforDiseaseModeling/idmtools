@@ -1,12 +1,11 @@
 import os
-
 from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
-from idmtools.core.ExperimentFactory import experiment_factory
+from idmtools.core.platform_factory import Platform
+from idmtools.core.experiment_factory import experiment_factory
 from idmtools.managers import ExperimentManager
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
-from idmtools_test.utils.TestPlatform import TestPlatform
-from idmtools_test.utils.TstExperiment import TstExperiment
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+from idmtools_test.utils.tst_experiment import TstExperiment
 
 
 class TestExperimentFactory(ITestWithPersistence):
@@ -14,7 +13,7 @@ class TestExperimentFactory(ITestWithPersistence):
     def test_build_python_experiment_from_factory(self):
         experiment = experiment_factory.create("PythonExperiment", tags={"a": "1", "b": 2})
         experiment.model_path = os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py")
-        test_platform = TestPlatform()
+        test_platform = Platform('Test')
         builder = ExperimentBuilder()
         builder.add_sweep_definition(lambda simulation, value: {"p": value}, range(0, 2))
         experiment.builder = builder
@@ -33,7 +32,7 @@ class TestExperimentFactory(ITestWithPersistence):
                               campaign_path=os.path.join(COMMON_INPUT_PATH, "files", "campaign.json"),
                               demographics_paths=os.path.join(COMMON_INPUT_PATH, "files", "demographics.json"))
 
-        test_platform = TestPlatform()
+        test_platform = Platform('Test')
         b = StandAloneSimulationsBuilder()
 
         for i in range(20):
@@ -46,7 +45,8 @@ class TestExperimentFactory(ITestWithPersistence):
 
         em.run()
         self.assertEqual(len(em.experiment.simulations), 20)
-        self.assertEqual(em.experiment.tags, {'a': '1', 'b': 2, 'type': 'idmtools_model_dtk.DTKExperiment'})
+        self.assertEqual(em.experiment.tags, {'a': '1', 'b': 2,
+                                              'type': 'idmtools_model_dtk.dtk_experiment.DTKExperiment'})
 
     def test_build_test_experiment_from_factory(self):
         test_experiment = TstExperiment()
@@ -55,7 +55,8 @@ class TestExperimentFactory(ITestWithPersistence):
         # Test create experiment with full model name
         experiment = experiment_factory.create(test_experiment.tags.get("type"), tags=test_experiment.tags)
         self.assertIsNotNone(experiment.uid)
-        self.assertEqual(experiment.tags, {'a': '1', 'b': 2, 'type': 'idmtools_test.utils.TstExperiment'})
+        self.assertEqual(experiment.tags, {'a': '1', 'b': 2,
+                                           'type': 'idmtools_test.utils.tst_experiment.TstExperiment'})
 
         # Test create experiment with sample model name
         experiment1 = experiment_factory.create("TstExperiment")
@@ -66,4 +67,3 @@ class TestExperimentFactory(ITestWithPersistence):
             experiment_factory.create("SomeExperiment")
         self.assertTrue("The ExperimentFactory could not create an experiment of type SomeExperiment" in
                         str(context.exception.args[0]))
-

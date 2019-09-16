@@ -1,7 +1,7 @@
 from typing import Type
 
-from idmtools.registry.ModelSpecification import ModelSpecification, get_model_impl, get_model_type_impl
-from idmtools.registry.PluginSpecification import get_description_impl
+from idmtools.registry.model_specification import ModelSpecification, get_model_impl, get_model_type_impl
+from idmtools.registry.plugin_specification import get_description_impl
 
 
 class TstExperimentSpec(ModelSpecification):
@@ -22,10 +22,10 @@ class TstExperimentSpec(ModelSpecification):
         Returns:
 
         """
-        from idmtools_test.utils.TstExperiment import TstExperiment
+        from idmtools_test.utils.tst_experiment import TstExperiment
         return TstExperiment(**configuration)
 
     @get_model_type_impl
     def get_type(self) -> Type['TstExperiment']:
-        from idmtools_test.utils.TstExperiment import TstExperiment
+        from idmtools_test.utils.tst_experiment import TstExperiment
         return TstExperiment

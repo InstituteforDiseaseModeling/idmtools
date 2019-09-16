@@ -1,2 +1,2 @@
 # flake8: noqa F821
-from idmtools.analysis.IAnalyzer import IAnalyzer
+from idmtools.analysis.ianalyzer import IAnalyzer

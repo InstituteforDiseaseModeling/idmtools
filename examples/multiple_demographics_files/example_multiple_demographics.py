@@ -1,5 +1,5 @@
 import os
-from idmtools.core.PlatformFactory import PlatformFactory
+from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_model_dtk import DTKExperiment
 from idmtools_model_dtk.defaults import DTKSIR
@@ -19,7 +19,7 @@ def param_update(simulation, param, value):
 
 
 if __name__ == "__main__":
-    platform = PlatformFactory.create('COMPS')
+    platform = Platform('COMPS')
 
     demo_files = [os.path.join(INPUT_PATH, "PFA_rates_overlay.json"),
                   os.path.join(INPUT_PATH, "pfa_simple.json"),

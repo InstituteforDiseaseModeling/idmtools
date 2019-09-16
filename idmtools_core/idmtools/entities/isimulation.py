@@ -3,8 +3,8 @@ from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
 
 from idmtools.core import EntityStatus
-from idmtools.core.interfaces.IAssetsEnabled import IAssetsEnabled
-from idmtools.core.interfaces.IEntity import IEntity
+from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
+from idmtools.core.interfaces.ientity import IEntity
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TExperiment
@@ -70,3 +70,9 @@ class ISimulation(IAssetsEnabled, IEntity, metaclass=ABCMeta):
     @property
     def succeeded(self):
         return self.status == EntityStatus.SUCCEEDED
+
+
+TSimulation = typing.TypeVar("TSimulation", bound=ISimulation)
+TSimulationClass = typing.Type[TSimulation]
+TSimulationBatch = typing.List[TSimulation]
+TAllSimulationData = typing.Mapping[TSimulation, typing.Any]

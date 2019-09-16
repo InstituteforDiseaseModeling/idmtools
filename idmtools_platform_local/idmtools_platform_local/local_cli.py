@@ -1,6 +1,6 @@
 from typing import NoReturn, Optional, List, Tuple
-from idmtools.registry.PluginSpecification import get_description_impl
-from idmtools_cli.IPlatformCli import IPlatformCLI, PlatformCLISpecification, get_platform_cli_impl, \
+from idmtools.registry.plugin_specification import get_description_impl
+from idmtools_cli.iplatform_cli import IPlatformCLI, PlatformCLISpecification, get_platform_cli_impl, \
     get_additional_commands_impl
 from idmtools_platform_local.cli import experiment, simulation
 
