@@ -14,14 +14,14 @@ class ExperimentManager:
     Manages an experiment.
     """
 
-    def __init__(self, experiment: 'TExperiment', platform: 'TPlatform'):
+    def __init__(self, experiment: 'TExperiment'):
         """
         Constructor
         Args:
             experiment: The experiment to manage
         """
-        self.platform = platform
         self.experiment = experiment
+        self.platform = self.experiment.platform
 
     @classmethod
     def from_experiment_id(cls, experiment_id, platform):
@@ -42,7 +42,7 @@ class ExperimentManager:
         self.experiment.pre_creation()
 
         # Create experiment
-        self.platform.create_items(items=[self.experiment])
+        experiment_id = self.platform.create_items(items=[self.experiment])[0]
 
         # Persist the platform
         PlatformPersistService.save(self.platform)
@@ -74,8 +74,7 @@ class ExperimentManager:
         with ThreadPoolExecutor(max_workers=16) as executor:
             results = executor.map(self.simulation_batch_worker_thread,
                                    self.experiment.batch_simulations(batch_size=10))
-
-        self.experiment.children().set_status(EntityStatus.CREATED)  # TODO: needed?
+        self.experiment.children().set_status(EntityStatus.CREATED)
 
     def start_experiment(self):
         self.platform.run_items([self.experiment])

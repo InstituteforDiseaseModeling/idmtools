@@ -34,6 +34,10 @@ class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
     simulation_type: 'InitVar[TSimulationClass]' = None
     simulations: 'EntityContainer' = field(default=None, compare=False)
 
+    # @property
+    # def simulations(self):
+    #     return self.children(refresh=False)
+
     def __post_init__(self, simulation_type):
         super().__post_init__()
         self.simulations = EntityContainer()
@@ -113,7 +117,7 @@ class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
 
                 simulation.tags = tags
                 sims.append(simulation)
-
+                
             yield sims
 
     def simulation(self):
@@ -123,8 +127,11 @@ class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
         Returns: The created simulation
         """
         sim = copy.deepcopy(self.base_simulation)
-        sim.experiment = self
         sim.assets = copy.deepcopy(self.base_simulation.assets)
+
+        sim.platform = self.platform
+        sim.parent_id = self.uid
+
         return sim
 
     def pre_creation(self):

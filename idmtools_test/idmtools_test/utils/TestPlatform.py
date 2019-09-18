@@ -38,11 +38,10 @@ class TestPlatform(IPlatform):
         # Close and delete the cache when finished
         self.experiments.close()
         self.simulations.close()
-        if os.path.exists(data_path):
-            try:
-                shutil.rmtree(data_path)
-            except OSError:
-                pass
+        try:
+            shutil.rmtree(data_path)
+        except OSError:
+            pass
 
     def __post_init__(self):
         super().__post_init__()
@@ -60,11 +59,8 @@ class TestPlatform(IPlatform):
         children = None
         successful = False
         if not successful:
-            try:
-                children = self._restore_simulations(experiment=item)
-                successful = True
-            except:
-                pass
+            children = self._restore_simulations(experiment=item)
+            successful = True
         if not successful:
             raise self.UnknownItemException(f'Unable to retrieve children for unknown item '
                                             f'id: {item.uid} of type: {type(item)}')
@@ -73,12 +69,15 @@ class TestPlatform(IPlatform):
         return children
 
     def _restore_simulations(self, experiment: 'TExperiment') -> None:
+
         simulations = self.simulations.get(experiment.uid)
         for sim in simulations:
             s = experiment.simulation()
             s.uid = sim.uid
             s.status = sim.status
             s.tags = sim.tags
+            s.parent_id = experiment.uid
+            s.platform = self
         return simulations
 
     def cleanup(self):
@@ -106,20 +105,27 @@ class TestPlatform(IPlatform):
             item.platform = self
         return ids
 
-    def _create_experiment(self, experiment: 'TExperiment') -> None:
+    def _create_experiment(self, experiment: 'TExperiment') -> uuid.UUID:
         uid = uuid.uuid4()
         experiment.uid = uid
         self.experiments.set(uid, experiment)
+        lock = diskcache.Lock(self.simulations, 'simulations-lock')
+        with lock:
+            self.simulations.set(uid, list())
+        return experiment.uid
 
     def _create_simulations(self, simulation_batch):
         simulations = []
         experiment_id = None
         for simulation in simulation_batch:
-            experiment_id = simulation.experiment.uid
+            experiment_id = experiment_id or simulation.parent().uid
             simulation.uid = uuid.uuid4()
             simulations.append(simulation)
 
-        self.simulations.set(experiment_id, simulations)
+        lock = diskcache.Lock(self.simulations, 'simulations-lock')
+        with lock:
+            existing_simulations = self.simulations.pop(experiment_id)
+            self.simulations[experiment_id] = existing_simulations + simulations
         return [s.uid for s in simulations]
 
     def set_simulation_status(self, experiment_uid, status):
@@ -174,12 +180,41 @@ class TestPlatform(IPlatform):
             raise Exception('No experiment id found: %s' % experiment_id)
         return self.experiments[experiment_id]
 
+    # not currently used, but if we ever need to retrieve a single simulation instead of an experiment...
+    def _retrieve_simulation(self, simulation_id: 'uuid') -> 'TSimulation':
+        found = False
+        for experiment_id in self.simulations.iterkeys():
+            simulations = self.simulations[experiment_id]
+            matches = [sim for sim in simulations if sim.uid == simulation_id]
+            if len(matches) == 1:
+                simulation = matches[0]
+                found = experiment_id
+                break
+            elif len(matches) > 1:
+                raise Exception('Duplicate simulations found for id: %s' % simulation_id)
+        if not found:
+            raise Exception('Simulation not found: %s' % simulation_id)
+        simulation.experiment_id = experiment_id
+        return simulation
+
     #
     # do we need any details for these methods for TestPlatform???
     #
 
     def get_parent(self, item: 'TItem') -> 'TItem':
-        pass
+        parent = None
+        successful = False
+        if not successful:
+            try:
+                parent = self._retrieve_experiment(experiment_id=item.parent_id)
+                successful = True
+            except:
+                pass
+        if not successful:
+            raise self.UnknownItemException(f'Unable to retrieve parent for unknown item '
+                                            f'id: {item.uid} of type: {type(item)}')
+        parent.platform = self
+        return parent
 
     def initialize_for_analysis(self, items: 'TItemList', analyzers: 'TAnalyzerList'):
         pass
