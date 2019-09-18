@@ -27,13 +27,6 @@ class IContainerItem(IItem, metaclass=ABCMeta):
     _children: 'TItemList' = field(default=None)
     platform: 'TPlatform' = field(default=None)
 
-    # def __init__(self, id: 'uuid', status: 'EntityStatus', parent_id: uuid=None, children_ids: 'TIdList'=None) -> NoReturn:
-    #     super().__init__(id=id, status=status)
-    #     self.parent_id = parent_id
-    #     self.children_ids = children_ids or list()
-    #     self._parent = None
-    #     self._children = None
-
     def parent(self, platform: 'TPlatform'=None, refresh: bool=False, full_load: bool=False) -> 'TItemList':
         if self.platform is not None:
             if self._parent is None or refresh:
