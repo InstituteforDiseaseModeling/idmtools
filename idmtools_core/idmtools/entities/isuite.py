@@ -1,8 +1,8 @@
 import typing
 from abc import ABC
 from dataclasses import dataclass, field
-from idmtools.core.interfaces.IAssetsEnabled import IAssetsEnabled
-from idmtools.core.interfaces.INamedEntity import INamedEntity
+from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
+from idmtools.core.interfaces.inamed_entity import INamedEntity
 from idmtools.entities.icontainer_item import IContainerItem
 
 if typing.TYPE_CHECKING:

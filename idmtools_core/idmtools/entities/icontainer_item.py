@@ -2,7 +2,7 @@ import uuid
 
 from abc import ABCMeta, abstractmethod
 from idmtools.entities.iitem import IItem
-from idmtools.core.interfaces.EntityContainer import EntityContainer
+from idmtools.core.interfaces.entity_container import EntityContainer
 from dataclasses import dataclass, field
 
 import typing

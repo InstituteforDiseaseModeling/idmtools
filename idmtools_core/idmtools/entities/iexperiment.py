@@ -8,7 +8,7 @@ from more_itertools import grouper
 from idmtools.core.interfaces.entity_container import EntityContainer
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.core.interfaces.inamed_entity import INamedEntity
-from idmtools.entities import IContainerItem
+from idmtools.entities.icontainer_item import IContainerItem
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TSimulation, TSimulationClass, TCommandLine, TExperimentBuilder
