@@ -1,6 +1,6 @@
 # flake8: noqa F821
-from idmtools.builders.ExperimentBuilder import ExperimentBuilder
-from idmtools.builders.StandAloneSimulationsBuilder import StandAloneSimulationsBuilder
-from idmtools.builders.ArmExperimentBuilder import ArmExperimentBuilder, SweepArm, ArmType
-from idmtools.builders.CsvExperimentBuilder import CsvExperimentBuilder
-from idmtools.builders.YamlExperimentBuilder import YamlExperimentBuilder
+from idmtools.builders.experiment_builder import ExperimentBuilder
+from idmtools.builders.stand_alone_simulations_builder import StandAloneSimulationsBuilder
+from idmtools.builders.arm_experiment_builder import ArmExperimentBuilder, SweepArm, ArmType
+from idmtools.builders.csv_experiment_builder import CsvExperimentBuilder
+from idmtools.builders.yaml_experiment_builder import YamlExperimentBuilder

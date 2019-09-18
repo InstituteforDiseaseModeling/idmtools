@@ -1,6 +1,6 @@
 import os
 
-from idmtools.entities.IAnalyzer import IAnalyzer
+from idmtools.entities.ianalyzer import IAnalyzer
 
 
 class DownloadAnalyzer(IAnalyzer):

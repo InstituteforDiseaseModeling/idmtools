@@ -7,7 +7,7 @@ from typing import Type, List, Any, Set, Dict
 import pluggy
 
 from idmtools.registry import PluginSpecification
-from idmtools.registry.PluginSpecification import PLUGIN_REFERENCE_NAME
+from idmtools.registry.plugin_specification import PLUGIN_REFERENCE_NAME
 
 
 logger = getLogger(__name__)

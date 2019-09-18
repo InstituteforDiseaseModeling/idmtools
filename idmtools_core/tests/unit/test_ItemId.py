@@ -1,6 +1,6 @@
 import unittest
 
-from idmtools.core.ItemId import ItemId
+from idmtools.core.item_id import ItemId
 
 
 class TestItemId(unittest.TestCase):

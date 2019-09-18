@@ -3,10 +3,10 @@ import unittest
 from idmtools.analysis.AnalyzeManager import AnalyzeManager
 from idmtools.analysis.DownloadAnalyzer import DownloadAnalyzer as SampleAnalyzer
 from idmtools.core.enums import EntityStatus
-from idmtools.core.ItemId import ItemId
+from idmtools.core.item_id import ItemId
 from idmtools.core.PlatformFactory import PlatformFactory
-from idmtools.entities.IItem import IItem
-from idmtools.entities.IAnalyzer import IAnalyzer
+from idmtools.entities.iitem import IItem
+from idmtools.entities.ianalyzer import IAnalyzer
 
 
 class TestItem(IItem):

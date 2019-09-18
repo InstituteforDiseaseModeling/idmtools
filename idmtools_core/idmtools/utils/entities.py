@@ -5,7 +5,8 @@ from idmtools.core import ExperimentNotFound
 from idmtools.services.platforms import PlatformPersistService
 
 if typing.TYPE_CHECKING:
-    from idmtools.core import TPlatform, TExperiment
+    from idmtools.entities.iplatform import TPlatform
+    from idmtools.entities.iexperiment import TExperiment
     import uuid
 
 

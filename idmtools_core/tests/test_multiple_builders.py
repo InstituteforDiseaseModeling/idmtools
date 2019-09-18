@@ -4,8 +4,8 @@ from functools import partial
 from idmtools.builders import ArmExperimentBuilder, SweepArm, ArmType
 from idmtools.builders import YamlExperimentBuilder
 from idmtools.builders import CsvExperimentBuilder
-from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
-from idmtools_test.utils.TstExperiment import TstExperiment
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+from idmtools_test.utils.tst_experiment import TstExperiment
 from idmtools_test import COMMON_INPUT_PATH
 
 

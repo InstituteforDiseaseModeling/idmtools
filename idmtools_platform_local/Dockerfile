@@ -53,22 +53,10 @@ ENV PYTHONPATH=/app:${PYTHONPATH}
 ARG PYPIURL=https://packages.idmod.org/api/pypi/pypi-production/simple
 ARG PYPIHOST=packages.idmod.org
 RUN echo ${PYPIURL}
-COPY README.md setup.py requirements.txt /tmp/
 # Run the setup instal before copying rest of package. This will increase cache hits during docker builds
 # as we will only rebuild if any of the docker_scripts, setup.py, readme.md, and requirements.txt change
 # which should happen infrequently(or less so than library code)
-RUN cd /tmp && pip install -r requirements.txt --extra-index-url=${PYPIURL} --trusted-host ${PYPIHOST}
-ADD idmtools_platform_local /tmp/idmtools_platform_local
-# We install the package directly here so the source is within the final image
-# This will allow users later to download the image without needing to build it
-# Also we specially use the internal pypy for ALL packages to take advantage of package caching
-
-RUN cd /tmp && \
-    # we need install the full version of local_runner as it is both a Client and Server package
-    # to do this, we specify we want the workers and the UI
-    pip install .[workers,ui] --extra-index-url=$PYPIURL --trusted-host ${PYPIHOST} && \
-    # cleanup pip cache and tmp
-    rm -rf /root/.cache && \
-    rm -rf /tmp/*
+COPY dist/idmtools_platform_local*.tar.gz /tmp/
+RUN find /tmp -name idmtools_platform_local*.tar.gz -exec pip install {}[workers,ui] --extra-index-url=${PYPIURL} --trusted-host ${PYPIHOST} \;
 
 CMD ["/init"]

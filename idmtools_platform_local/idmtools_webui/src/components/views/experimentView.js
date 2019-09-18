@@ -17,56 +17,52 @@ import {setFilter} from "../../redux/action/experiment";
 import {getExperimentsByFilter} from "../../redux/selectors/experiments";
 
 
-
 const styles = theme => ({
     folder: {
-        color:'yellow'
+        color: 'yellow'
     },
     splitter: {
 
-        height: '100%', 
+        height: '100%',
         '& .layout-pane-primary': {
-            height:'100%', 
-            backgroundColor:'#424242'
+            height: '100%',
+            backgroundColor: '#424242'
         },
         backgroundColor: '#424242'
-
-
-        
     },
     details: {
-        height:'100%'
+        height: '100%',
+        margin: 30
     },
     root: {
-        height:'100%'
+        height: '100%'
     },
     cardTitle: {
-       color: '#2196f3',
-       padding: 10
+        color: '#2196f3',
+        padding: 10
     },
     textField: {
         marginLeft: theme.spacing(1),
         marginRight: theme.spacing(1),
         width: 200,
-      },
+    },
+
     itemText: {
-        maxWidth:200
+        maxWidth: 200
     },
     itemValue: {
-        maxWidth:400
+        maxWidth: 400
     },
-     details: {
-         margin:30
-     },
-     highlight:{
-         backgroundColor:'#43a047'
-     }, 
-     clearIcon: {
-        color:'red',
-        
+
+    highlight: {
+        backgroundColor: '#43a047'
+    },
+    clearIcon: {
+        color: 'red',
+
     }
 
-})
+});
 
 class ExperimentView extends React.Component {
 
@@ -86,15 +82,13 @@ class ExperimentView extends React.Component {
             dialogOpen: false,
             expIdForCancel: null
 
-        }
+        };
         this.rowClick = this.rowClick.bind(this);
         this.deleteExp = this.deleteExp.bind(this);
         this.dragEnd = this.dragEnd.bind(this);
         this.closeDetails = this.closeDetails.bind(this);
         this.handleClose = this.handleClose.bind(this);
         this.handleDialogYesClick = this.handleDialogYesClick.bind(this);
-
-
     }
 
     componentDidMount() {
@@ -104,7 +98,7 @@ class ExperimentView extends React.Component {
     }
     rowClick(e) {
         this.setState( {
-            selectedExp : e.currentTarget.getAttribute("exp_id") == this.state.selectedExp ? null : e.currentTarget.getAttribute("exp_id")
+            selectedExp : e.currentTarget.getAttribute("exp_id") === this.state.selectedExp ? null : e.currentTarget.getAttribute("exp_id")
         });
     }
 
@@ -130,8 +124,7 @@ class ExperimentView extends React.Component {
 
 
     dragEnd() {
-
-        this.setState({update:true})
+        this.setState({update:true});
         //reset filter when splitter resize
         this.props.dispatch(this.props.dispatch(setFilter(null, null)));
     }
@@ -154,7 +147,7 @@ class ExperimentView extends React.Component {
 
             let activeCol =_.find(this.state.columns, {name:col})
             activeCol.active = true;
-            activeCol.sortOrder = activeCol.sortOrder == "asc" ? "desc" : "asc";
+            activeCol.sortOrder = activeCol.sortOrder === "asc" ? "desc" : "asc";
             
             this.setState({
                 update: true
@@ -166,7 +159,7 @@ class ExperimentView extends React.Component {
     handleClose() {
         this.setState({
           dialogOpen:false
-        })
+        });
     }
 
     handleDialogYesClick() {
@@ -179,23 +172,23 @@ class ExperimentView extends React.Component {
       }
 
     render() {
-        const { experiments, classes } = this.props;
+        const { experiments, classes } = this.props; // eslint-disable-line no-unused-vars
 
         let sorted = [];
 
-        let status, command, tags
+        let status, command, tags;
         
         if (this.props.experiments)  {
             let activeCol  =_.find(this.state.columns, {active:true});
             sorted = _.sortBy(this.props.experiments, (o) => {
                 return o[activeCol.name];
             });
-            if (activeCol.sortOrder == "desc") {
+            if (activeCol.sortOrder === "desc") {
                 _.reverse(sorted);
             }
         }
 
-        var progressStr = (progressObj) => {
+        let progressStr = (progressObj) => {
             if (progressObj && progressObj.length > 0) {
                 let progress = progressObj[0]
                 return ("Done:" + (progress["done"] ? progress["done"] : "0") + " " + 
@@ -204,12 +197,12 @@ class ExperimentView extends React.Component {
             } else
                 return ""
 
-        }
+        };
         
         if (this.state.selectedExp) {
             
             let index = _.findIndex(this.props.experiments, {experiment_id: this.state.selectedExp});
-            let exps = this.props.experiments
+            let exps = this.props.experiments;
 
             if (index>=0) {
                 status = JSON.stringify(exps[index].progress);
@@ -235,7 +228,7 @@ class ExperimentView extends React.Component {
                                 <TableRow>
                                         {
                                             this.state.columns.map(col=> {
-                                                if (col.sortOrder == "")
+                                                if (col.sortOrder === "")
                                                     return (
                                                         <TableCell align="right">
                                                             {col.title}
@@ -256,18 +249,17 @@ class ExperimentView extends React.Component {
                                 <TableBody>
                                     {sorted && sorted.map(exp => {
 
-                                        let disable = exp.progress && exp.progress.length > 0 && exp.progress[0].created && exp.progress[0].created > 0 
-
-                                        disable = disable || exp.progress && exp.progress.length > 0 && exp.progress[0].in_progress && exp.progress[0].in_progress > 0 
+                                        let disable = exp.progress && exp.progress.length > 0 && exp.progress[0].created && exp.progress[0].created > 0;
+                                        disable = disable || (exp.progress && exp.progress.length > 0 && exp.progress[0].in_progress && exp.progress[0].in_progress > 0); // eslint-disable-line no-unused-vars
 
                                         return (
 
-                                            <TableRow key={exp.experiment_id} onClick={this.rowClick} exp_id={exp.experiment_id} className={exp.experiment_id == this.state.selectedExp ? classes.highlight: null}>
+                                            <TableRow key={exp.experiment_id} onClick={this.rowClick} exp_id={exp.experiment_id} className={exp.experiment_id === this.state.selectedExp ? classes.highlight: null}>
 
                                                 <TableCell align="right">{exp.experiment_id}</TableCell>
                                                 <TableCell align="right">{progressStr(exp.progress)}</TableCell>
                                                 <TableCell align="right">
-                                                    <a target="_blank" href={'http://' + window.location.hostname + ':5000' + exp.data_path}>
+                                                    <a target="_blank" rel="noopener noreferrer" href={'http://' + window.location.hostname + ':5000' + exp.data_path}>
                                                     <FolderIcon className={classes.folder}/>
                                                     </a>
                                                 </TableCell>

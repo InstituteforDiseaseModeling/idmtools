@@ -3,7 +3,7 @@ from functools import partial
 
 from idmtools.assets import AssetCollection, Asset
 from idmtools.builders import SweepArm, ArmType, ArmExperimentBuilder
-from idmtools.core.PlatformFactory import PlatformFactory
+from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_model_dtk.DTKExperiment import DTKExperiment
 from idmtools_model_dtk.defaults import DTKSIR
@@ -24,7 +24,7 @@ def param_update(simulation, param, value):
 
 
 if __name__ == "__main__":
-    platform = PlatformFactory.create_from_block('COMPS')
+    platform = Platform('COMPS')
 
     ac = AssetCollection()
     a = Asset(absolute_path=os.path.join(INPUT_PATH, "single_node_demographics.json"))

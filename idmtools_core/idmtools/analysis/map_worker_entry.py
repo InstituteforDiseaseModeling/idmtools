@@ -6,7 +6,9 @@ from idmtools.utils.file_parser import FileParser
 from typing import NoReturn
 
 if typing.TYPE_CHECKING:
-    from idmtools.core.types import TAnalyzerList, TItem, TPlatform
+    from idmtools.entities.iplatform import TPlatform
+    from idmtools.entities.iitem import TItem
+    from idmtools.entities.ianalyzer import TAnalyzerList
     from diskcache import Cache
 
 

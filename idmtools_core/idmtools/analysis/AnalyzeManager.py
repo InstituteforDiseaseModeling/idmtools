@@ -12,7 +12,8 @@ from multiprocessing.pool import Pool
 from typing import NoReturn
 
 if typing.TYPE_CHECKING:
-    from idmtools.core.types import TAnalyzer, TItem, TItemList
+    from idmtools.entities.ianalyzer import TAnalyzer
+    from idmtools.entities.iitem import TItem, TItemList
 
 
 def pool_worker_initializer(func, analyzers, cache, platform) -> None:
