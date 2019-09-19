@@ -4,8 +4,6 @@ import unittest
 
 import pytest
 import json
-import shutil
-import numpy as np
 from functools import partial
 
 from COMPS.Data import Experiment
@@ -21,7 +19,6 @@ from idmtools.analysis.AnalyzeManager import AnalyzeManager
 from idmtools.analysis.AddAnalyzer import AddAnalyzer
 from idmtools.analysis.DownloadAnalyzer import DownloadAnalyzer
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-#from idmtools.utils.file_parser import FileParser
 from idmtools_test.utils.utils import del_file, del_folder
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
@@ -155,7 +152,6 @@ class TestAnalyzeManagerDtkComps(ITestWithPersistence):
                 self.assertEqual(str(population_data[i]), df[2:].iloc[i, sim_count])
             sim_count = sim_count + 1
 
-    @unittest.skipIf(not os.getenv('WAIT_FOR_BUG_323', '0') == '1', reason="pre idmtools experiment does not working")
     def test_analyzer_preidmtools_exp(self):
         # delete output from previous run
         del_folder("output")
@@ -166,7 +162,7 @@ class TestAnalyzeManagerDtkComps(ITestWithPersistence):
         filenames = ['output\\InsetChart.json', 'config.json']
         analyzers = [DownloadAnalyzer(filenames=filenames, output_path='output')]
 
-        exp_id = 'f48e09d4-acd9-e911-a2be-f0921c167861' #comps2 experiment id created pre-idmtools
+        exp_id = 'f48e09d4-acd9-e911-a2be-f0921c167861' # comps2
 
         am = AnalyzeManager(platform=self.p, ids=[exp_id], analyzers=analyzers)
         am.analyze()

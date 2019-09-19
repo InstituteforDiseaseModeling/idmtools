@@ -10,7 +10,7 @@ from COMPS.Data import AssetCollection, AssetCollectionFile, Configuration, Expe
 from COMPS.Data.Simulation import SimulationState
 from dataclasses import dataclass, field
 
-from idmtools.core import CacheEnabled, TypeVar, typing
+from idmtools.core import CacheEnabled, typing
 from idmtools.core.experiment_factory import experiment_factory
 from idmtools.core.enums import EntityStatus
 from idmtools.entities import IPlatform, ISuite
@@ -19,7 +19,7 @@ from idmtools.entities.iexperiment import TExperiment, TExperimentList, IExperim
 from idmtools.entities.iitem import TItemList, TItem
 from idmtools.entities.isimulation import TSimulationList, ISimulation
 from idmtools.utils.time import timestamp
-from typing import NoReturn
+from typing import NoReturn, List
 import uuid
 
 logging.getLogger('COMPS.Data.Simulation').disabled = True

@@ -85,7 +85,6 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
             self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "config.json")))
             self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "result.json")))
 
-    @unittest.skipIf(not os.getenv('WAIT_FOR_BUG_323', '0') == '1', reason="pre idmtools experiment does not working")
     def test_analyzer_multiple_experiments(self):
         #delete output from previous run
         del_folder("output")
@@ -93,11 +92,16 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         # create a new empty 'output' dir
         os.mkdir("output")
 
-        filenames = ['output\\InsetChart.json', 'config.json']
+        filenames = ['output/result.json', 'config.json']
         analyzers = [DownloadAnalyzer(filenames=filenames, output_path='output')]
 
-        exp_list = ['76080194-0bc5-e911-a2bb-f0921c167866', 'b99307dd-aeca-e911-a2bb-f0921c167866'] #comps2 staging
+        exp_list = ['3ca4491a-0edb-e911-a2be-f0921c167861', '4dcd7149-4eda-e911-a2be-f0921c167861']
 
         am = AnalyzeManager(platform=self.p, ids=exp_list, analyzers=analyzers)
         am.analyze()
+        for exp_id in exp_list:
+            for simulation in Experiment.get(exp_id).get_simulations():
+                s = simulation.get(id=simulation.id)
+                self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "config.json")))
+                self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "result.json")))
 
