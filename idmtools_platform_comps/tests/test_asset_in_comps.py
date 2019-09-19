@@ -82,6 +82,7 @@ class TestAssetsInComps(unittest.TestCase):
         pe = PythonExperiment(name=self.case_name,
                               model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"), assets=ac)
         pe.tags = {"idmtools": "idmtools-automation"}
+        pe.platform = self.platform
         self._run_and_test_experiment(pe)
         exp_id = pe.uid
         # exp_id = 'ae077ddd-668d-e911-a2bb-f0921c167866'

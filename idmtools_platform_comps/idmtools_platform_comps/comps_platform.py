@@ -3,27 +3,24 @@ import logging
 import ntpath
 import os
 
+
 from COMPS import Client
 from COMPS.Data import AssetCollection, AssetCollectionFile, Configuration, Experiment as COMPSExperiment, \
     QueryCriteria, Simulation as COMPSSimulation, SimulationFile
 from COMPS.Data.Simulation import SimulationState
 from dataclasses import dataclass, field
 
-from idmtools.core import CacheEnabled
-from idmtools.core.enums import EntityStatus
+from idmtools.core import CacheEnabled, TypeVar, typing
 from idmtools.core.experiment_factory import experiment_factory
-from idmtools.entities import IPlatform, ISimulation, IExperiment, ISuite
+from idmtools.core.enums import EntityStatus
+from idmtools.entities import IPlatform, ISuite
+from idmtools.entities.ianalyzer import TAnalyzerList
+from idmtools.entities.iexperiment import TExperiment, TExperimentList, IExperiment
+from idmtools.entities.iitem import TItemList, TItem
+from idmtools.entities.isimulation import TSimulationList, ISimulation
 from idmtools.utils.time import timestamp
-
-import typing
-from typing import List, NoReturn
-if typing.TYPE_CHECKING:
-    import uuid
-    from idmtools.entities.ianalyzer import TAnalyzerList
-    from idmtools.entities.iexperiment import TExperiment, TExperimentList
-    from idmtools.entities.iitem import TItem, TItemList
-    from idmtools.entities.isimulation import TSimulation, TSimulationList
-
+from typing import NoReturn
+import uuid
 
 logging.getLogger('COMPS.Data.Simulation').disabled = True
 logger = logging.getLogger(__name__)
@@ -165,7 +162,8 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         self.send_assets(item=experiment)
         return experiment.uid
 
-    def create_items(self, items: TItemList) -> List[uuid]:
+
+    def create_items(self, items: TItemList) -> 'List[uuid]':
         # TODO: add ability to create suites
         types = list({type(item) for item in items})
         if len(types) != 1:
@@ -359,7 +357,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             if asset_file.file_name == file_name and (asset_file.relative_path or '') == path:
                 return asset_file.retrieve()
 
-    def get_files(self, item: TItem, files: List[str]) -> dict:
+    def get_files(self, item: TItem, files: typing.List[str]) -> dict:
         self._login()
 
         # Retrieve the simulation from COMPS

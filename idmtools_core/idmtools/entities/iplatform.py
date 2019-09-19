@@ -18,8 +18,9 @@ logger = getLogger(__name__)
 
 CALLER_LIST = ['_create_from_block',    # create platform through Platform Factory
                'fetch',                 # create platform through un-pickle
-               'get'                    # create platform through platform spec' get method
-               ]
+               'get',                    # create platform through platform spec' get method
+               '_main',
+               '__newobj__']
 
 
 class IPlatform(IEntity, metaclass=ABCMeta):

@@ -4,7 +4,7 @@ import time
 import typing
 
 from idmtools.analysis.map_worker_entry import map_item
-from idmtools.core.CacheEnabled import CacheEnabled
+from idmtools.core import CacheEnabled
 from idmtools.core.enums import EntityStatus
 from idmtools.utils.command_line import animation
 from idmtools.utils.language import on_off, verbose_timedelta

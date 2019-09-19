@@ -20,8 +20,8 @@ class TestExperimentManager(ITestWithPersistence):
     def test_from_experiment(self):
         e = TstExperiment("My experiment")
         p = Platform('Test')
-
-        em = ExperimentManager(experiment=e, platform=p)
+        e.platform = p
+        em = ExperimentManager(experiment=e)
         em.run()
 
         em2 = ExperimentManager.from_experiment_id(e.uid, p)
@@ -42,11 +42,12 @@ class TestExperimentManager(ITestWithPersistence):
         c = Platform('Test')
         experiment = PythonExperiment(name="test_from_experiment",
                                       model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"))
+        experiment.platform = c
         builder = ExperimentBuilder()
         builder.add_sweep_definition(lambda simulation, value: {"p": value}, range(0, 2))
         experiment.builder = builder
 
-        em = ExperimentManager(experiment=experiment, platform=c)
+        em = ExperimentManager(experiment=experiment)
         em.run()
         self.assertEqual(len(em.experiment.children()), 2)
 

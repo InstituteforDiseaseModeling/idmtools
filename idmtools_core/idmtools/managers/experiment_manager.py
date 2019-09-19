@@ -31,7 +31,7 @@ class ExperimentManager:
         if platform is None:
             PlatformPersistService.save(obj=experiment.platform)
             platform = PlatformPersistService.retrieve(experiment.platform.uid)
-        em = cls(experiment, platform)
+        em = cls(experiment)
         em.restore_simulations()
         return em
 

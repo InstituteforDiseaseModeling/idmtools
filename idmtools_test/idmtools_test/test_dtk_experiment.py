@@ -4,15 +4,13 @@ import pytest
 
 from COMPS.Data import Experiment
 
-from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
-from idmtools.core import PlatformFactory
+from idmtools.builders import StandAloneSimulationsBuilder
+from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
-from idmtools_models.dtk import DTKExperiment
-from idmtools_models.dtk.defaults import DTKSIR
-from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
+from idmtools_model_dtk import DTKExperiment
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
-from idmtools.assets import AssetCollection, Asset
+from idmtools.assets import AssetCollection
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 
 @pytest.mark.comps
@@ -21,7 +19,7 @@ class TestExperiments(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
-        self.p = COMPSPlatform()
+        self.p = Platform("COMPS")
 
     def test_dtk_experiment_endpointsanalyzer_example(self):
         DEFAULT_CONFIG_PATH = os.path.join(COMMON_INPUT_PATH, "custom", "config.json")
@@ -37,7 +35,7 @@ class TestExperiments(ITestWithPersistence):
                                      )
         e.tags = {"idmtools": "idmtools-automation", "catch": "sianyoola", "rcd": "false"}
         e.name = 'malaria_sianyoola_interventions'
-
+        e.platform = self.p
         # additional dtk custom assets including custom_reports, climate files, migration files
         ac = AssetCollection()
         ac.add_directory(assets_directory=os.path.join(COMMON_INPUT_PATH, "custom"))
@@ -53,7 +51,7 @@ class TestExperiments(ITestWithPersistence):
 
         e.builder = b
 
-        em = ExperimentManager(platform=self.p, experiment=e)
+        em = ExperimentManager(experiment=e)
         em.run()
         em.wait_till_done()
         self.assertTrue(e.succeeded)

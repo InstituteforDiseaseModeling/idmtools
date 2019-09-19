@@ -65,3 +65,4 @@ TSimulation = typing.TypeVar("TSimulation", bound=ISimulation)
 TSimulationClass = typing.Type[TSimulation]
 TSimulationBatch = typing.List[TSimulation]
 TAllSimulationData = typing.Mapping[TSimulation, typing.Any]
+TSimulationList = typing.List[typing.Union[TSimulation, str]]

@@ -128,7 +128,7 @@ class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
         """
         sim = copy.deepcopy(self.base_simulation)
         sim.assets = copy.deepcopy(self.base_simulation.assets)
-
+        sim.experiment = self
         sim.platform = self.platform
         sim.parent_id = self.uid
 

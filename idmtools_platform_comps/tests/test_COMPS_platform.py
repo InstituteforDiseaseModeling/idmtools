@@ -33,8 +33,9 @@ class TestCOMPSPlatform(ITestWithPersistence):
         config = {"a": 1, "b": 2}
         experiment = PythonExperiment(name=self.case_name,
                                       model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"))
+        experiment.platform = self.platform
         experiment.base_simulation.parameters = config
-        em = ExperimentManager(experiment=experiment, platform=self.platform)
+        em = ExperimentManager(experiment)
         em.run()
         em.wait_till_done()
 
@@ -113,6 +114,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
     def test_status_retrieval_succeeded(self):
         experiment = PythonExperiment(name=self.case_name,
                                       model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"))
+        experiment.platform = self.platform
         self._run_and_test_experiment(experiment)
         print([s.status for s in experiment.children()])
         self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in experiment.children()]))
@@ -141,6 +143,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
     def test_from_experiment(self):
         experiment = PythonExperiment(name=self.case_name,
                                       model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"))
+        experiment.platform = self.platform
         self._run_and_test_experiment(experiment)
         experiment2 = copy.deepcopy(experiment)
 
@@ -156,6 +159,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
     def test_experiment_manager(self):
         experiment = PythonExperiment(name=self.case_name,
                                       model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"))
+        experiment.platform = self.platform
         self._run_and_test_experiment(experiment)
         em = ExperimentManager.from_experiment_id(experiment.uid, self.platform)
 

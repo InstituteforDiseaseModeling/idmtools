@@ -1,8 +1,8 @@
 import os
 
 from idmtools.analysis.AnalyzeManager import AnalyzeManager
+from idmtools.core.platform_factory import Platform
 from idmtools.entities import IAnalyzer
-from idmtools.core.PlatformFactory import PlatformFactory
 
 
 class PopulationAnalyzer(IAnalyzer):
@@ -30,16 +30,12 @@ class PopulationAnalyzer(IAnalyzer):
 
 if __name__ == "__main__":
 
-    from idmtools.core.PlatformFactory import PlatformFactory
+    platform = Platform('COMPS2')
 
-    platform = PlatformFactory.create(key='COMPS')
-
-    exp_id = 'a5421d87-5ece-e911-a2bb-f0921c167866' #'86099829-6ecb-e911-a2bb-f0921c167866'
+    exp_id = '65a93d51-04db-e911-a2be-f0921c167861' # comps2 exp_id
 
     filenames = ['output/InsetChart.json']
     analyzers = [PopulationAnalyzer(filenames=filenames)]
 
-    experiment = platform.get_item(id=exp_id)
-
-    manager = AnalyzeManager(configuration={}, platform=platform, items=experiment.children(), analyzers=analyzers)
+    manager = AnalyzeManager(configuration={}, platform=platform, ids=[exp_id], analyzers=analyzers)
     manager.analyze()

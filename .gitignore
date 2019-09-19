@@ -372,3 +372,5 @@ idmtools_core/tests/reports/
 **/.local_data
 **/test_results.xml
 idmtools_platform_local/idmtools_webui/build
+examples/download/
+idmtools_platform_comps/tests/output/
