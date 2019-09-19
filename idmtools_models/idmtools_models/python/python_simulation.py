@@ -4,7 +4,6 @@ from dataclasses import dataclass, field
 from idmtools.assets import Asset
 from idmtools.entities import ISimulation
 
-
 @dataclass(repr=False)
 class PythonSimulation(ISimulation):
     """
