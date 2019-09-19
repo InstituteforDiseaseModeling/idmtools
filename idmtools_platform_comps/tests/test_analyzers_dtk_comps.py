@@ -76,7 +76,7 @@ class TestAnalyzeManagerDtkComps(ITestWithPersistence):
 
         analyzers = [AddAnalyzer()]
 
-        am = AnalyzeManager(configuration={}, platform=self.p, ids=[self.exp_id], analyzers=analyzers)
+        am = AnalyzeManager(platform=self.p, ids=[self.exp_id], analyzers=analyzers)
         am.analyze()
 
     def test_DownloadAnalyzer(self):
@@ -91,7 +91,7 @@ class TestAnalyzeManagerDtkComps(ITestWithPersistence):
         filenames = ['output\\InsetChart.json', 'config.json']
         analyzers = [DownloadAnalyzer(filenames=filenames, output_path='output')]
 
-        am = AnalyzeManager(configuration={}, platform=self.p, ids=[self.exp_id], analyzers=analyzers)
+        am = AnalyzeManager(platform=self.p, ids=[self.exp_id], analyzers=analyzers)
         am.analyze()
 
         for simulation in Experiment.get(self.exp_id).get_simulations():
@@ -111,7 +111,7 @@ class TestAnalyzeManagerDtkComps(ITestWithPersistence):
 
         exp_list = ['b109bf3c-ffda-e911-a2be-f0921c167861', '18861829-ffda-e911-a2be-f0921c167861'] #comps2 staging
 
-        am = AnalyzeManager(configuration={}, platform=self.p, ids=exp_list, analyzers=analyzers)
+        am = AnalyzeManager(platform=self.p, ids=exp_list, analyzers=analyzers)
         am.analyze()
 
     @unittest.skipIf(not os.getenv('WAIT_FOR_BUG_351', '0') == '1', reason="BUG 351")
@@ -130,7 +130,7 @@ class TestAnalyzeManagerDtkComps(ITestWithPersistence):
         analyzers = [PopulationAnalyzer(filenames=filenames)]
         #platform = PlatformFactory.create(key='COMPS')
 
-        am = AnalyzeManager(configuration={}, platform=self.p, ids=[self.exp_id], analyzers=analyzers)
+        am = AnalyzeManager(platform=self.p, ids=[self.exp_id], analyzers=analyzers)
         am.analyze()
 
         # -----------------------------------------------------------------------------------------------------
@@ -168,7 +168,7 @@ class TestAnalyzeManagerDtkComps(ITestWithPersistence):
 
         exp_id = 'f48e09d4-acd9-e911-a2be-f0921c167861' #comps2 experiment id created pre-idmtools
 
-        am = AnalyzeManager(configuration={}, platform=self.p, ids=[exp_id], analyzers=analyzers)
+        am = AnalyzeManager(platform=self.p, ids=[exp_id], analyzers=analyzers)
         am.analyze()
 
         for simulation in Experiment.get(exp_id).get_simulations():

@@ -37,5 +37,5 @@ if __name__ == "__main__":
     filenames = ['output/InsetChart.json']
     analyzers = [PopulationAnalyzer(filenames=filenames)]
 
-    manager = AnalyzeManager(configuration={}, platform=platform, ids=[exp_id], analyzers=analyzers)
+    manager = AnalyzeManager( platform=platform, ids=[exp_id], analyzers=analyzers)
     manager.analyze()

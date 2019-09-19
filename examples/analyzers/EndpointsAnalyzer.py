@@ -86,5 +86,5 @@ if __name__ == "__main__":
 
     #experiment = platform.get_item(id=exp_id)
 
-    manager = AnalyzeManager(configuration={}, platform=platform, ids=[exp_id], analyzers=analyzers)
+    manager = AnalyzeManager(platform=platform, ids=[exp_id], analyzers=analyzers)
     manager.analyze()

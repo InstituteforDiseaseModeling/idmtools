@@ -77,7 +77,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         filenames = ['output\\result.json', 'config.json']
         analyzers = [DownloadAnalyzer(filenames=filenames, output_path='output')]
 
-        am = AnalyzeManager(configuration={}, platform=self.p, ids=[self.exp_id], analyzers=analyzers)
+        am = AnalyzeManager(platform=self.p, ids=[self.exp_id], analyzers=analyzers)
         am.analyze()
 
         for simulation in Experiment.get(self.exp_id).get_simulations():
@@ -98,6 +98,6 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
 
         exp_list = ['76080194-0bc5-e911-a2bb-f0921c167866', 'b99307dd-aeca-e911-a2bb-f0921c167866'] #comps2 staging
 
-        am = AnalyzeManager(configuration={}, platform=self.p, ids=exp_list, analyzers=analyzers)
+        am = AnalyzeManager(platform=self.p, ids=exp_list, analyzers=analyzers)
         am.analyze()
 

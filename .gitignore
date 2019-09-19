@@ -374,3 +374,4 @@ idmtools_core/tests/reports/
 idmtools_platform_local/idmtools_webui/build
 examples/download/
 idmtools_platform_comps/tests/output/
+examples/generic_sim/download-e2eB/

@@ -46,28 +46,28 @@ if __name__ == "__main__":
     experiment = platform.get_item(id=experiment_id)
 
     # case #0: normal case with experiment id list. --OK
-    manager = AnalyzeManager(configuration={}, platform=platform, ids=[experiment_id], analyzers=analyzers)
+    manager = AnalyzeManager(platform=platform, ids=[experiment_id], analyzers=analyzers)
     manager.analyze()
 
     # case #1: test add_analyzer() --OK
-    manager1 = AnalyzeManager(configuration={}, platform=platform, ids=[experiment_id])
+    manager1 = AnalyzeManager(platform=platform, ids=[experiment_id])
     manager1.add_analyzer(ExampleAnalyzer())
     manager1.add_analyzer(ExampleAnalyzer2())
     manager1.analyze()
 
     # case #2: test add_item(experiment) --failed at  manager.add_item(experiment)
-    manager2 = AnalyzeManager(configuration={}, platform=platform, analyzers=analyzers)
+    manager2 = AnalyzeManager(platform=platform, analyzers=analyzers)
     manager2.add_item(experiment)
     manager2.analyze()
 
     # case #3: test add_item(simulation) --failed at platform.get_item
     simulation_id = "a042c9a2-60d6-e911-a2bb-f0921c167866"  ## comps2 staging sim id
     simulation = platform.get_item(id=simulation_id)
-    manager3 = AnalyzeManager(configuration={}, platform=platform, analyzers=analyzers)
+    manager3 = AnalyzeManager(platform=platform, analyzers=analyzers)
     manager3.add_item(simulation)
     manager3.analyze()
 
     # case #4: old experiment_id
-    manager4 = AnalyzeManager(configuration={}, platform=platform, ids=["f36ffd16-19da-e911-a2be-f0921c167861"],
+    manager4 = AnalyzeManager(platform=platform, ids=["f36ffd16-19da-e911-a2be-f0921c167861"],
                               analyzers=[ExampleAnalyzer()])
     manager4.analyze()

@@ -1,5 +1,7 @@
 import json
 import os
+import unittest
+
 import pytest
 
 from COMPS.Data import Experiment
@@ -21,6 +23,7 @@ class TestExperiments(ITestWithPersistence):
         print(self.case_name)
         self.p = Platform("COMPS")
 
+    @unittest.skipIf(not os.getenv('WAIT_FOR_BUG_FIX', '0') == '1', reason="eradication load 2 times")
     def test_dtk_experiment_endpointsanalyzer_example(self):
         DEFAULT_CONFIG_PATH = os.path.join(COMMON_INPUT_PATH, "custom", "config.json")
         DEFAULT_CAMPAIGN_JSON = os.path.join(COMMON_INPUT_PATH, "custom", "campaign.json")

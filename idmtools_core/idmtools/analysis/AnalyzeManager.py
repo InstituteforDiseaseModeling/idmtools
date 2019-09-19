@@ -48,10 +48,10 @@ class AnalyzeManager(CacheEnabled):
     class ItemsNotReady(Exception):
         pass
 
-    def __init__(self, configuration, platform, ids=None, analyzers=None, working_dir=os.getcwd(),
+    def __init__(self, platform, configuration=None, ids=None, analyzers=None, working_dir=os.getcwd(),
                  partial_analyze_ok=False, max_items=None, verbose=True, force_manager_working_directory=False):
         super().__init__()
-        self.configuration = configuration
+        self.configuration = configuration or {}
         self.platform = platform
         self.max_processes = min(os.cpu_count(), self.configuration.get('max_processes', 32))
 

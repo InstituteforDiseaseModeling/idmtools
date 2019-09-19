@@ -5,7 +5,7 @@ from idmtools.assets import AssetCollection, Asset
 from idmtools.builders import SweepArm, ArmType, ArmExperimentBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
-from idmtools_model_dtk.DTKExperiment import DTKExperiment
+from idmtools_model_dtk import DTKExperiment
 from idmtools_model_dtk.defaults import DTKSIR
 from config_update_parameters import config_update_params
 
@@ -30,6 +30,7 @@ if __name__ == "__main__":
     a = Asset(absolute_path=os.path.join(INPUT_PATH, "single_node_demographics.json"))
     ac.add_asset(a)
     e = DTKExperiment.from_default(expname, default=DTKSIR, eradication_path=os.path.join(BIN_PATH, "Eradication.exe"))
+    e.platform = platform
     e.add_assets(ac)
     simulation = e.simulation()
     sim = config_update_params(simulation)
@@ -55,7 +56,7 @@ if __name__ == "__main__":
     builder = ArmExperimentBuilder()
     builder.add_arm(arm)
     e.builder = builder
-    em = ExperimentManager(experiment=e, platform=platform)
+    em = ExperimentManager(experiment=e)
     em.run()
     em.wait_till_done()
 
@@ -69,5 +70,5 @@ if __name__ == "__main__":
     filenames = ['output\\InsetChart.json']
     analyzers = [DownloadAnalyzer(filenames=filenames, output_path='download-e2eB')]
 
-    manager = AnalyzeManager(configuration={}, platform=platform, ids=[em.experiment.uid], analyzers=analyzers)
+    manager = AnalyzeManager(platform=platform, ids=[em.experiment.uid], analyzers=analyzers)
     manager.analyze()
