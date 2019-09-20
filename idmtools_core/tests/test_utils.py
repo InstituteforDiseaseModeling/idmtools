@@ -1,5 +1,5 @@
 import unittest
-from idmtools.core import ExperimentNotFound
+from idmtools.core import ExperimentNotFound, UnknownItemException
 from idmtools.core.platform_factory import Platform
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.utils.entities import retrieve_experiment
@@ -11,7 +11,7 @@ class TestUtils(ITestWithPersistence):
 
     def test_retrieve_experiment(self):
         # Test missing
-        with self.assertRaises(Exception) as context:
+        with self.assertRaises(UnknownItemException) as context:
             retrieve_experiment("Missing", Platform('Test'))
         self.assertTrue("Unable to load item id: Missing from platform: TestPlatform" in
                         str(context.exception.args[0]))

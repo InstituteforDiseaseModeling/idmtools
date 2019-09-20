@@ -10,7 +10,7 @@ from COMPS.Data import AssetCollection, AssetCollectionFile, Configuration, Expe
 from COMPS.Data.Simulation import SimulationState
 from dataclasses import dataclass, field
 
-from idmtools.core import CacheEnabled, typing
+from idmtools.core import CacheEnabled, typing, UnknownItemException
 from idmtools.core.experiment_factory import experiment_factory
 from idmtools.core.enums import EntityStatus
 from idmtools.entities import IPlatform, ISuite
@@ -289,7 +289,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             except:
                 pass
         if not successful:
-            raise self.UnknownItemException(f'Unable to retrieve children for unknown item '
+            raise UnknownItemException(f'Unable to retrieve children for unknown item '
                                             f'id: {item.uid} of type: {type(item)}')
         for child in children:
             child.platform = self
@@ -337,7 +337,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             except:
                 pass
         if not successful:
-            raise self.UnknownItemException(f'Unable to retrieve parent for unknown item '
+            raise UnknownItemException(f'Unable to retrieve parent for unknown item '
                                             f'id: {item.uid} of type: {type(item)}')
         parent.platform = self
         return parent
@@ -421,7 +421,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             except:
                 pass
         if not successful:
-            raise self.UnknownItemException(f'Unable to load item id: {id} from platform: {self.__class__.__name__}')
+            raise UnknownItemException(f'Unable to load item id: {id} from platform: {self.__class__.__name__}')
 
         item.platform = self
         return item

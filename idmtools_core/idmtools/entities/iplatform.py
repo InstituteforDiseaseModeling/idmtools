@@ -34,9 +34,6 @@ class IPlatform(IEntity, metaclass=ABCMeta):
     - File handling
     """
 
-    class UnknownItemException(Exception):
-        pass
-
     @staticmethod
     def get_caller():
         """
