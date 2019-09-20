@@ -145,6 +145,14 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
     def simulation_count(self):
         return len(self.simulations)
 
+    def post_setstate(self):
+        """
+        Function called after restoring the state if additional initialization is required
+        """
+        from idmtools.core import EntityContainer
+        if self.simulations is None:
+            self.simulations = EntityContainer()
+
 
 TExperiment = typing.TypeVar("TExperiment", bound=IExperiment)
 TExperimentClass = typing.Type[TExperiment]
