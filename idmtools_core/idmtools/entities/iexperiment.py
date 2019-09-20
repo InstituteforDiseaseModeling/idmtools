@@ -149,7 +149,6 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         """
         Function called after restoring the state if additional initialization is required
         """
-        from idmtools.core import EntityContainer
         if self.simulations is None:
             self.simulations = EntityContainer()
 
