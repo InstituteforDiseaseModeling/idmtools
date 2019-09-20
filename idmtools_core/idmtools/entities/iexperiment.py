@@ -29,9 +29,9 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
     command: 'TCommandLine' = field(default=None)
     suite_id: uuid = field(default=None)
     base_simulation: 'TSimulation' = field(default=None)
-    builders: set = field(default=None, metadata={"pickle_ignore": True})
     simulation_type: 'InitVar[TSimulationClass]' = None
-    simulations: 'EntityContainer' = field(default=None, compare=False)
+    builders: set = field(default=None, compare=False, metadata={"pickle_ignore": True})
+    simulations: 'EntityContainer' = field(default=None, compare=False, metadata={"pickle_ignore": True})
 
     def __post_init__(self, simulation_type):
         super().__post_init__()
