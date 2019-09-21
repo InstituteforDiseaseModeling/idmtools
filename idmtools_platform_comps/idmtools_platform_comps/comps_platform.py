@@ -10,7 +10,7 @@ from COMPS.Data import AssetCollection, AssetCollectionFile, Configuration, Expe
 from COMPS.Data.Simulation import SimulationState
 from dataclasses import dataclass, field
 
-from idmtools.core import CacheEnabled, typing, UnknownItemException
+from idmtools.core import CacheEnabled, UnknownItemException
 from idmtools.core.experiment_factory import experiment_factory
 from idmtools.core.enums import EntityStatus
 from idmtools.entities import IPlatform, ISuite
@@ -328,8 +328,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             parent = self._retrieve_suite(suite_id=item.parent_id)
             successful = True
         except NotImplementedError:  # TODO: temporary for development debugging ONLY (breaks some functionality). We need to implement retrieve_suite rather than kludge this eventually.
-            parent = None
-            successful = True
+            pass
         if not successful:
             try:
                 parent = self._retrieve_experiment(experiment_id=item.parent_id)
@@ -357,7 +356,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             if asset_file.file_name == file_name and (asset_file.relative_path or '') == path:
                 return asset_file.retrieve()
 
-    def get_files(self, item: TItem, files: typing.List[str]) -> dict:
+    def get_files(self, item: TItem, files: List[str]) -> dict:
         self._login()
 
         # Retrieve the simulation from COMPS

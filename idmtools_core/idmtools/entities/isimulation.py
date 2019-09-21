@@ -61,6 +61,11 @@ class ISimulation(IAssetsEnabled, IRootItem, metaclass=ABCMeta):
         """
         pass
 
+    # @property
+    # def experiment(self):
+    #     return self.parent(refresh=False)
+
+
 TSimulation = typing.TypeVar("TSimulation", bound=ISimulation)
 TSimulationClass = typing.Type[TSimulation]
 TSimulationBatch = typing.List[TSimulation]
