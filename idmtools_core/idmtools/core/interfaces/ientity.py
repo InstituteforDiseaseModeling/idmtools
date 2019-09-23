@@ -61,6 +61,12 @@ class IEntity(metaclass=ABCMeta):
         """
         pass
 
+    def pre_getstate(self):
+        """
+        Function called before picking and return default values for "pickle-ignore" fields
+        """
+        pass
+
     # endregion
 
     # region State management
@@ -71,10 +77,19 @@ class IEntity(metaclass=ABCMeta):
         state = self.__dict__.copy()
         attrs = set(vars(self).keys())
 
-        # Don't pickle ignore_pickle fields
+        # Retrieve fields default values
+        fds = fields(self)
+        field_default = {f.name: f.default for f in fds}
+
+        # Update default with parent's pre-populated values
+        pre_state = self.pre_getstate()
+        pre_state = pre_state or {}
+        field_default.update(pre_state)
+
+        # Don't pickle ignore_pickle fields: set values to default
         for field_name in attrs.intersection(self.pickle_ignore_fields):
             if field_name in state:
-                del state[field_name]
+                state[field_name] = field_default[field_name]
 
         return state
 
@@ -84,12 +99,6 @@ class IEntity(metaclass=ABCMeta):
         """
         self.__dict__.update(state)
 
-        # Restore the pickle deleted fields with their default value
-        fds = fields(self)
-        field_default = {f.name: f.default for f in fds}
-
-        for field_name in self.pickle_ignore_fields:
-            setattr(self, field_name, field_default[field_name])
-
+        # Restore the pickle fields with values requested
         self.post_setstate()
     # endregion

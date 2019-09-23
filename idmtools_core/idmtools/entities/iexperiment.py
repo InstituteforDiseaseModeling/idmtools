@@ -145,19 +145,13 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
     def simulation_count(self):
         return len(self.simulations)
 
-    def post_setstate(self):
+    def pre_getstate(self):
         """
-        Function called after restoring the state if additional initialization is required
+        Function called before picking
+        Return default values for "pickle-ignore" fields
         """
         from idmtools.assets import AssetCollection
-
-        # Restore default
-        if self.simulations is None:
-            self.simulations = EntityContainer()
-
-        # Restore default
-        if self.assets is None:
-            self.assets = AssetCollection()
+        return {"assets": AssetCollection(), "simulations": EntityContainer(), "builders": set()}
 
 
 TExperiment = typing.TypeVar("TExperiment", bound=IExperiment)
