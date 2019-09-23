@@ -149,8 +149,15 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         """
         Function called after restoring the state if additional initialization is required
         """
+        from idmtools.assets import AssetCollection
+
+        # Restore default
         if self.simulations is None:
             self.simulations = EntityContainer()
+
+        # Restore default
+        if self.assets is None:
+            self.assets = AssetCollection()
 
 
 TExperiment = typing.TypeVar("TExperiment", bound=IExperiment)
