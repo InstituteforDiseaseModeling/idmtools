@@ -1,6 +1,6 @@
 from dataclasses import field, dataclass
-from idmtools.core.interfaces.EntityContainer import EntityContainer
-from idmtools.core.interfaces.INamedEntity import INamedEntity
+from idmtools.core.interfaces.entity_container import EntityContainer
+from idmtools.core.interfaces.inamed_entity import INamedEntity
 
 
 def default_experiments():

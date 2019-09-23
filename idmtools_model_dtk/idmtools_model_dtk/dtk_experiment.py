@@ -5,10 +5,10 @@ import typing
 from dataclasses import dataclass, field
 from idmtools.assets import Asset
 from idmtools.entities import IExperiment, CommandLine
-from idmtools_model_dtk.DTKSimulation import DTKSimulation
+from idmtools_model_dtk.dtk_simulation import DTKSimulation
 
 if typing.TYPE_CHECKING:
-    from idmtools_model_dtk.defaults import IDTKDefault
+    from idmtools_model_dtk.defaults import idtk_default
 
 
 @dataclass(repr=False)
@@ -22,7 +22,7 @@ class DTKExperiment(IExperiment):
             self.eradication_path = os.path.abspath(self.eradication_path)
 
     @classmethod
-    def from_default(cls, name, default: 'IDTKDefault', eradication_path=None):
+    def from_default(cls, name, default: 'idtk_default', eradication_path=None):
         base_simulation = DTKSimulation()
         default.process_simulation(base_simulation)
 

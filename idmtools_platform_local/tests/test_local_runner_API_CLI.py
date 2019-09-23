@@ -1,7 +1,7 @@
 import pytest
 
 from idmtools_test.utils.confg_local_runner_test import reset_local_broker, get_test_local_env_overrides
-from idmtools.core.PlatformFactory import PlatformFactory
+from idmtools.core.platform_factory import Platform
 import os
 import re
 import subprocess
@@ -14,7 +14,7 @@ from idmtools.managers import ExperimentManager
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
 from idmtools_platform_local.client.simulations_client import SimulationsClient
 from idmtools_models.python import PythonExperiment
-from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test import COMMON_INPUT_PATH
 
 
@@ -26,7 +26,7 @@ class TestLocalRunnerCLI(ITestWithPersistence):
         reset_local_broker()
         from idmtools_platform_local.workers.brokers import setup_broker
         setup_broker()
-        platform = PlatformFactory.create_from_block('Local_Staging', **get_test_local_env_overrides())
+        platform = Platform('Local_Staging', **get_test_local_env_overrides())
         cls.pe = PythonExperiment(name="python experiment", model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
 
         cls.pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}

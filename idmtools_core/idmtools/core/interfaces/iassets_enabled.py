@@ -1,9 +1,5 @@
-import typing
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
-
-if typing.TYPE_CHECKING:
-    from idmtools.core import TAssetCollection
 
 
 @dataclass

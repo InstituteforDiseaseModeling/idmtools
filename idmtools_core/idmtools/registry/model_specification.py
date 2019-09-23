@@ -5,7 +5,7 @@ from logging import getLogger
 
 import pluggy
 from idmtools.registry import PluginSpecification
-from idmtools.registry.PluginSpecification import PLUGIN_REFERENCE_NAME
+from idmtools.registry.plugin_specification import PLUGIN_REFERENCE_NAME
 from idmtools.registry.utils import load_plugin_map
 
 example_configuration_spec = pluggy.HookspecMarker(PLUGIN_REFERENCE_NAME)

@@ -1,6 +1,6 @@
 import yaml
 from idmtools.builders import ArmExperimentBuilder
-from idmtools.builders.ArmExperimentBuilder import SweepArm, ArmType
+from idmtools.builders.arm_experiment_builder import SweepArm, ArmType
 
 
 class YamlExperimentBuilder(ArmExperimentBuilder):

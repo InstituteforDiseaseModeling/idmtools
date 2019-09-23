@@ -8,9 +8,9 @@ import diskcache
 import numpy as np
 from typing import Type
 
-from idmtools.registry.PlatformSpecification import example_configuration_impl, get_platform_impl, \
+from idmtools.registry.platform_specification import example_configuration_impl, get_platform_impl, \
     get_platform_type_impl, PlatformSpecification
-from idmtools.registry.PluginSpecification import get_description_impl
+from idmtools.registry.plugin_specification import get_description_impl
 
 
 from idmtools.entities import IPlatform
@@ -37,8 +37,10 @@ class TestPlatform(IPlatform):
 
     def __del__(self):
         # Close and delete the cache when finished
-        self.experiments.close()
-        self.simulations.close()
+        if self.experiments:
+            self.experiments.close()
+        if self.simulations:
+            self.simulations.close()
         if os.path.exists(data_path):
             try:
                 shutil.rmtree(data_path)
@@ -145,7 +147,7 @@ class TestPlatformSpecification(PlatformSpecification):
         return "Provides access to the Test Platform to IDM Tools"
 
     @get_platform_impl
-    def get(self, configuration: dict) -> IPlatform:
+    def get(self, **configuration) -> IPlatform:
         """
         Build our test platform from the passed in configuration object
 

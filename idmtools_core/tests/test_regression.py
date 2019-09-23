@@ -1,12 +1,11 @@
 import os
 import unittest
-
 from idmtools.assets import AssetCollection
 from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
+from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
-from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
-from idmtools_test.utils.TstExperiment import TstExperiment
-from idmtools_test.utils.TestPlatform import TestPlatform
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+from idmtools_test.utils.tst_experiment import TstExperiment
 from idmtools_models.python import PythonExperiment, PythonSimulation
 from idmtools_test import COMMON_INPUT_PATH
 
@@ -71,7 +70,7 @@ class TestPersistenceServices(ITestWithPersistence):
     def test_fix_138(self):
         # https://github.com/InstituteforDiseaseModeling/idmtools/issues/138
         e = TstExperiment(name="test")
-        p = TestPlatform()
+        p = Platform('Test')
 
         # Set a parameter in the base simulation
         e.base_simulation.set_parameter("test", 0)
@@ -107,7 +106,7 @@ class TestPersistenceServices(ITestWithPersistence):
         e = TstExperiment("Experiment")
         e.tags = {"test": 1}
         e.pre_creation()
-        self.assertEqual(e.tags.get("type"), "idmtools_test.utils.TstExperiment")
+        self.assertEqual(e.tags.get("type"), "idmtools_test.utils.tst_experiment.TstExperiment")
         self.assertEqual(e.tags.get("test"), 1)
 
 
