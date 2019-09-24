@@ -30,12 +30,11 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
     suite_id: uuid = field(default=None)
     base_simulation: 'TSimulation' = field(default=None)
     simulation_type: 'InitVar[TSimulationClass]' = None
-    builders: set = field(default=None, compare=False, metadata={"pickle_ignore": True})
-    simulations: 'EntityContainer' = field(default=None, compare=False, metadata={"pickle_ignore": True})
+    builders: set = field(default_factory=lambda: set(), compare=False, metadata={"pickle_ignore": True})
+    simulations: 'EntityContainer' = field(default_factory=lambda: EntityContainer(), compare=False, metadata={"pickle_ignore": True})
 
     def __post_init__(self, simulation_type):
         super().__post_init__()
-        self.simulations = EntityContainer()
         # Take care of the base simulation
         if not self.base_simulation:
             if simulation_type and callable(simulation_type):
