@@ -3,4 +3,4 @@ from idmtools_model_dtk.dtk_experiment import DTKExperiment
 from idmtools_model_dtk.dtk_simulation import DTKSimulation
 from idmtools_model_dtk.defaults.idtk_default import IDTKDefault
 
-__version__ = "0.1.0+nightly.0"
+__version__ = "0.2.0+nightly.0"

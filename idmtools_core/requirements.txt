@@ -1,8 +1,9 @@
 coloredlogs~=10.0
 diskcache==4.0.0
-marshmallow==3.0.0rc6
-more-itertools==7.0.0
+marshmallow~=3.0.0rc6
+more-itertools~=7.0.0
 pandas==0.24.2
 pipreqs==0.4.9
 pluggy~=0.12
+PyYaml~=5.1
 tabulate~=0.8.3
