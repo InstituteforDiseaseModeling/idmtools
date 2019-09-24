@@ -1,6 +1,6 @@
 import typing
 from abc import ABCMeta
-from dataclasses import dataclass, field, fields
+from dataclasses import dataclass, field, fields, _MISSING_TYPE
 from idmtools.utils.hashing import hash_obj
 
 if typing.TYPE_CHECKING:
@@ -89,7 +89,10 @@ class IEntity(metaclass=ABCMeta):
         # Don't pickle ignore_pickle fields: set values to default
         for field_name in attrs.intersection(self.pickle_ignore_fields):
             if field_name in state:
-                state[field_name] = field_default[field_name]
+                if isinstance(field_default[field_name], _MISSING_TYPE):
+                    state[field_name] = None
+                else:
+                    state[field_name] = field_default[field_name]
 
         return state
 
