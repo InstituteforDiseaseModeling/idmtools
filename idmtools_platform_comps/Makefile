@@ -1,4 +1,4 @@
-.PHONY: clean lint test coverage release-local dist release-staging release-staging-minor-commit release-staging-minor
+.PHONY: clean lint test coverage release-local dist release-staging release-staging-release-commit release-staging-minor
 IPY=python -c
 
 clean: ## Clean all our jobs
@@ -55,16 +55,19 @@ dist: ## build our package
 	python setup.py sdist
 
 release-staging: ## perform a release to staging
-	bump2version --config-file .bumpversion.nightly.cfg build --allow-dirty
+	bump2version build --allow-dirty
 	@make dist
-	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/pypi-staging/simple dist/*
+	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/idm-pypi-staging/ dist/*
 
-# Use before release-staging-minor-commit to confirm next version.
-release-staging-minor-dry-run: ## perform a release to staging and bump the minor version.
-	bump2version minor --dry-run --allow-dirty --verbose
+# Use before release-staging-release-commit to confirm next version.
+release-staging-release-dry-run: ## perform a release to staging and bump the minor version.
+	bump2version release --dry-run --allow-dirty --verbose
 
 # This should be used when a pushing a "production" build to staging before being approved by test
-release-staging-minor-commit: ## perform a release to staging and commit the version.
-	bump2version minor --commit
+release-staging-release-commit: ## perform a release to staging and commit the version.
+	bump2version release --commit
 	@make dist
-	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/pypi-staging/simple dist/*
+	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/idm-pypi-staging/ dist/*
+
+bump-patch:
+	bump2version patch --commit
