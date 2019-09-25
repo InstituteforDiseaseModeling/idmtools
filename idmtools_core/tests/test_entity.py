@@ -52,7 +52,7 @@ class TestEntity(ITestWithPersistence):
         from idmtools.core import EntityContainer
 
         a = TstExperiment(name="test")
-        self.assertSetEqual(a.pickle_ignore_fields, {'assets', 'simulations', 'builders'})
+        self.assertSetEqual(a.pickle_ignore_fields, {'assets', 'simulations', 'builders', 'base_simulation'})
         a.builder = ExperimentBuilder()
 
         b = pickle.loads(pickle.dumps(a))

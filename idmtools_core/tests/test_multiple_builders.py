@@ -94,10 +94,10 @@ class TestMultipleBuilders(ITestWithPersistence):
 
     def test_validation(self):
         a = TstExperiment(name="test")
-        self.assertSetEqual(a.pickle_ignore_fields, {'assets', 'simulations', 'builders'})
+        self.assertSetEqual(a.pickle_ignore_fields, {'assets', 'simulations', 'builders', 'base_simulation'})
 
         with self.assertRaises(Exception):
             a.builder = 1
 
         # test no builder has been added
-        self.assertIsNone(a.builders)
+        self.assertSetEqual(a.builders, set())
