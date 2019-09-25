@@ -5,6 +5,7 @@ from idmtools.services.platforms import PlatformPersistService
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.tst_experiment import TstExperiment
 
+
 class TestPersistenceServices(ITestWithPersistence):
 
     def test_persist_retrieve_platform(self):
@@ -24,6 +25,18 @@ class TestPersistenceServices(ITestWithPersistence):
 
         e3 = ExperimentPersistService.retrieve("Missing")
         self.assertIsNone(e3)
+
+    def test_pickle_experiment(self):
+        import pickle
+
+        e = TstExperiment("test")
+        e.simulation()
+
+        self.assertIsNotNone(e.base_simulation)
+
+        ep = pickle.loads(pickle.dumps(e))
+
+        self.assertIsNone(ep.base_simulation)
 
 
 if __name__ == '__main__':
