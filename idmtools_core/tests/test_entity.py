@@ -48,15 +48,16 @@ class TestEntity(ITestWithPersistence):
         self.assertEqual(a, b)
 
     def test_pickle_ignore(self):
+        from idmtools.assets import AssetCollection
+        from idmtools.core import EntityContainer
+
         a = TstExperiment(name="test")
         self.assertSetEqual(a.pickle_ignore_fields, {'assets', 'simulations', 'builders'})
         a.builder = ExperimentBuilder()
 
         b = pickle.loads(pickle.dumps(a))
         self.assertSetEqual(b.builders, set())
-        from idmtools.assets import AssetCollection
         self.assertEqual(b.assets, AssetCollection())
-        from idmtools.core import EntityContainer
         self.assertEqual(b.simulations, EntityContainer())
 
         s = Suite(name="test")
