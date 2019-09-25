@@ -28,10 +28,10 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
     """
     command: 'TCommandLine' = field(default=None)
     suite_id: uuid = field(default=None)
-    base_simulation: 'TSimulation' = field(default=None)
-    simulation_type: 'InitVar[TSimulationClass]' = None
+    base_simulation: 'TSimulation' = field(default=None, compare=False, metadata={"pickle_ignore": True})
     builders: set = field(default_factory=lambda: set(), compare=False, metadata={"pickle_ignore": True})
     simulations: 'EntityContainer' = field(default_factory=lambda: EntityContainer(), compare=False, metadata={"pickle_ignore": True})
+    simulation_type: 'InitVar[TSimulationClass]' = None
 
     def __post_init__(self, simulation_type):
         super().__post_init__()
