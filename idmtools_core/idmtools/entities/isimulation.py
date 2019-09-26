@@ -15,7 +15,6 @@ class ISimulation(IAssetsEnabled, IRootItem, metaclass=ABCMeta):
     Represents a generic Simulation.
     This class needs to be implemented for each model type with specifics.
     """
-    experiment: 'TExperiment' = field(default=None, compare=False, metadata={"md": True})
 
     @abstractmethod
     def set_parameter(self, name: str, value: any) -> dict:
@@ -61,9 +60,9 @@ class ISimulation(IAssetsEnabled, IRootItem, metaclass=ABCMeta):
         """
         pass
 
-    # @property
-    # def experiment(self):
-    #     return self.parent(refresh=False)
+    @property
+    def experiment(self):
+        return self.parent(refresh=False)
 
 
 TSimulation = typing.TypeVar("TSimulation", bound=ISimulation)
