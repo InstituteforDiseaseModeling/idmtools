@@ -20,23 +20,26 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
     This class needs to be implemented for each model type with specifics.
 
     Args:
-        name: The experiment name.
-        simulation_type: A class to initialize the simulations that will be created for this experiment
-        assets: The asset collection for assets global to this experiment
+        command: The command to run for experiment
+        suite_id: Suite Id for the experiment
+        simulation_type: A typpe of simulation
         base_simulation: Optional a simulation that will be the base for all simulations created for this experiment
-        command: Command to run on simulations
+        builders: A set of Experiment Builders to be used to generate simulations
+        simulations: Optional a user input simulations
     """
     command: 'TCommandLine' = field(default=None)
     suite_id: uuid = field(default=None)
+    simulation_type: 'InitVar[TSimulationClass]' = None
     base_simulation: 'TSimulation' = field(default=None, compare=False, metadata={"pickle_ignore": True})
     builders: set = field(default_factory=lambda: set(), compare=False, metadata={"pickle_ignore": True})
-    simulations: 'EntityContainer' = field(default_factory=lambda: EntityContainer(), compare=False, metadata={"pickle_ignore": True})
-    simulation_type: 'InitVar[TSimulationClass]' = None
+    simulations: EntityContainer = field(default_factory=lambda: EntityContainer(), compare=False,
+                                           metadata={"pickle_ignore": True})
 
     def __post_init__(self, simulation_type):
         super().__post_init__()
         self.simulations = self.simulations or EntityContainer()
         # Take care of the base simulation
+        self.simulation_type = simulation_type
         if not self.base_simulation:
             if simulation_type and callable(simulation_type):
                 self.base_simulation = simulation_type()
@@ -151,7 +154,8 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         Return default values for "pickle-ignore" fields
         """
         from idmtools.assets import AssetCollection
-        return {"assets": AssetCollection(), "simulations": EntityContainer(), "builders": set()}
+        return {"assets": AssetCollection(), "simulations": EntityContainer(), "builders": set(),
+                "base_simulation": self.simulation_type()}
 
 
 TExperiment = typing.TypeVar("TExperiment", bound=IExperiment)
