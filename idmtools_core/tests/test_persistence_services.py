@@ -27,6 +27,7 @@ class TestPersistenceServices(ITestWithPersistence):
         self.assertIsNone(e3)
 
     def test_pickle_experiment(self):
+        from idmtools_test.utils.test_simulation import TestSimulation
         import pickle
 
         e = TstExperiment("test")
@@ -36,7 +37,7 @@ class TestPersistenceServices(ITestWithPersistence):
 
         ep = pickle.loads(pickle.dumps(e))
 
-        self.assertIsNone(ep.base_simulation)
+        self.assertEqual(ep.base_simulation, TestSimulation())
 
 
 if __name__ == '__main__':
