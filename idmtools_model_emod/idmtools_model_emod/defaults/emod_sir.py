@@ -1,9 +1,9 @@
 from typing import Dict
 
-from idmtools_model_dtk.defaults.idtk_default import IDTKDefault
+from idmtools_model_emod.defaults.iemod_default import IEMODDefault
 
 
-class DTKSIR(IDTKDefault):
+class EMODSir(IEMODDefault):
     @staticmethod
     def config() -> Dict:
         return {

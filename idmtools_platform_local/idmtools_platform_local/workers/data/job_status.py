@@ -9,7 +9,7 @@ from idmtools_platform_local.status import Status
 class JobStatus(Base):
     """
     Generic status table. At moment we only have one which contains both experiments and simulations
-    We do it this way to allow for more flexible support in future for non-dtk-ish workflows(ie a bunch of single jobs
+    We do it this way to allow for more flexible support in future for non-emod-ish workflows(ie a bunch of single jobs
     instead of an experiment with sub simulations
     """
     __tablename__ = 'job_status'
