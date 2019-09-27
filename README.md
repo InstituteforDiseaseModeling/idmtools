@@ -5,13 +5,13 @@ The recommended install is to use
 ```bash
 pip install idmtools[full] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
 ```
-This will install the core tools, the cli, the comps and local platforms, support for dtk models, and python models
+This will install the core tools, the cli, the comps and local platforms, support for EMOD models, and python models
 
 If you do not need the local platform, you can use the following command
 ```bash
 pip install idmtools[idm] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
 ```
-This will install the core tools, the cli, the comps, support for dtk models, and python models
+This will install the core tools, the cli, the comps, support for EMOD models, and python models
 
 You can also install just the individual packages to create minimal environments
 
@@ -20,7 +20,7 @@ You can also install just the individual packages to create minimal environments
 - `pip install idmtools-platform-comps --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Support for COMPS
 - `pip install idmtools-platform-local --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Support for Local Platform
 - `pip install idmtools-models --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Python and generic models
-- `pip install idmtools-model-dtk --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - DTK Model support
+- `pip install idmtools-model-dtk --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - EMOD Model support
 
 ## Pre-requisites
 - Python 3.6/3.7 x64

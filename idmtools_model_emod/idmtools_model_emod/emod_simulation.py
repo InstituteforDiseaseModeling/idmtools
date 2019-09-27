@@ -6,14 +6,14 @@ from typing import Optional, Any
 
 from idmtools.assets import Asset
 from idmtools.entities import ISimulation
-from idmtools_model_emod.interventions import DTKEmptyCampaign
-# from idmtools_model_emod.idmtools_model_emod.interventions import DTKEmptyCampaign
+from idmtools_model_emod.interventions import EMODEmptyCampaign
+# from idmtools_model_emod.idmtools_model_emod.interventions import EMODEmptyCampaign
 
 
 @dataclass(repr=False)
 class EMODSimulation(ISimulation):
     config: dict = field(default_factory=lambda: {})
-    campaign: dict = field(default_factory=lambda: DTKEmptyCampaign.campaign())
+    campaign: dict = field(default_factory=lambda: EMODEmptyCampaign.campaign())
     demographics: collections.OrderedDict = field(default_factory=lambda: collections.OrderedDict())
 
     def set_parameter(self, name: str, value: any) -> dict:

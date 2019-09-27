@@ -8,7 +8,7 @@ from idmtools.entities import IExperiment, CommandLine
 from idmtools_model_emod.emod_simulation import EMODSimulation
 
 if typing.TYPE_CHECKING:
-    from idmtools_model_emod.defaults import idtk_default
+    from idmtools_model_emod.defaults import iemod_default
 
 
 @dataclass(repr=False)
@@ -22,7 +22,7 @@ class EMODExperiment(IExperiment):
             self.eradication_path = os.path.abspath(self.eradication_path)
 
     @classmethod
-    def from_default(cls, name, default: 'idtk_default', eradication_path=None):
+    def from_default(cls, name, default: 'iemod_default', eradication_path=None):
         base_simulation = EMODSimulation()
         default.process_simulation(base_simulation)
 
