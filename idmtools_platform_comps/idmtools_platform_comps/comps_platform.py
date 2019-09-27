@@ -363,9 +363,27 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         self._login()
 
         # Retrieve the simulation from COMPS
-        comps_simulation = COMPSSimulation.get(item.uid,
-                                               query_criteria=QueryCriteria().select(['id']).select_children(
-                                                   ["files", "configuration"]))
+        # TODO: revert back to this once pycomps is fixed with 'rollup' configurations.
+        # comps_simulation = COMPSSimulation.get(item.uid,
+        #                                        query_criteria=QueryCriteria().select(['id', 'experiment_id']).select_children(
+        #                                            ["files", "configuration"]))
+
+        # Temporary stand-in for pycomps fix; code below from Jeff S.
+        class QueryCriteriaExt(QueryCriteria):
+            _ep_dict = None
+
+            def add_extra_params(self, ep_dict):
+                self._ep_dict = ep_dict
+                return self
+
+            def to_param_dict(self, ent_type):
+                pd = super(QueryCriteriaExt, self).to_param_dict(ent_type)
+                if self._ep_dict:
+                    pd = {**pd, **self._ep_dict}
+                return pd
+        comps_simulation = COMPSSimulation.get(item.uid, query_criteria=QueryCriteriaExt().select(
+            ['id', 'experiment_id']).select_children(
+            ["files", "configuration"]).add_extra_params({'coalesceconfig': True}))
 
         # Separate the output files in 2 groups:
         # - one for the transient files (retrieved through the comps simulation)
