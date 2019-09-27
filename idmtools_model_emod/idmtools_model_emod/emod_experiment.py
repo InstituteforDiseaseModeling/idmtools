@@ -4,25 +4,25 @@ import collections
 import typing
 from dataclasses import dataclass, field
 from idmtools.entities import IExperiment, CommandLine
-from idmtools_model_dtk.dtk_simulation import DTKSimulation
+from idmtools_model_emod.emod_simulation import EMODSimulation
 
 if typing.TYPE_CHECKING:
-    from idmtools_model_dtk.defaults import idtk_default
+    from idmtools_model_emod.defaults import iemod_default
 
 
 @dataclass(repr=False)
-class DTKExperiment(IExperiment):
+class EMODExperiment(IExperiment):
     eradication_path: str = field(default=None, compare=False, metadata={"md": True})
     demographics: collections.OrderedDict = field(default_factory=lambda: collections.OrderedDict())
 
     def __post_init__(self, simulation_type):
-        super().__post_init__(simulation_type=DTKSimulation)
+        super().__post_init__(simulation_type=EMODSimulation)
         if self.eradication_path:
             self.eradication_path = os.path.abspath(self.eradication_path)
 
     @classmethod
-    def from_default(cls, name, default: 'idtk_default', eradication_path=None):
-        base_simulation = DTKSimulation()
+    def from_default(cls, name, default: 'iemod_default', eradication_path=None):
+        base_simulation = EMODSimulation()
         default.process_simulation(base_simulation)
 
         exp = cls(name=name, base_simulation=base_simulation, eradication_path=eradication_path)
@@ -34,7 +34,7 @@ class DTKExperiment(IExperiment):
     def from_files(cls, name, eradication_path=None, config_path=None, campaign_path=None, demographics_paths=None,
                    force=False):
         """
-        Provide a way to load custom files when creating DTKExperiment
+        Provide a way to load custom files when creating EMODExperiment
         Args:
             name: experiment name
             eradication_path: eradication.exe path
@@ -44,7 +44,7 @@ class DTKExperiment(IExperiment):
             force: always return if True, else throw exception if something wrong
         Returns: None
         """
-        base_simulation = DTKSimulation()
+        base_simulation = EMODSimulation()
         base_simulation.load_files(config_path, campaign_path, force)
 
         exp = cls(name=name, base_simulation=base_simulation, eradication_path=eradication_path)
@@ -54,7 +54,7 @@ class DTKExperiment(IExperiment):
 
     def load_files(self, config_path=None, campaign_path=None, demographics_paths=None, force=False):
         """
-        Provide a way to load custom files from DTKExperiment
+        Provide a way to load custom files from EMODExperiment
         Args:
             config_path: custom config file
             campaign_path: custom campaign file

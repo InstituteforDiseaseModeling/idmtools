@@ -18,7 +18,7 @@ clean-all:  ## Deleting package info hides plugins so we only want to do that fo
 # Dev and test related rules
 
 lint: ## check style with flake8
-	@+$(IPY) "import os; os.chdir('..'); os.system('flake8 --ignore=E501 idmtools_model_dtk')"
+	@+$(IPY) "import os; os.chdir('..'); os.system('flake8 --ignore=E501 idmtools_model_emod')"
 
 test: ## Run our tests
 	@+$(IPY) "import os; os.chdir('tests'); os.system('py.test -p no:warnings --junitxml=test_results.xml')"
@@ -42,7 +42,7 @@ coverage-all: ## Generate a code-coverage report
 	# We have to run in our tests folder to use the proper config
 	@+$(IPY) "import os; os.environ['DOCKER_TESTS'] = '1'; \
 	os.environ['COMPS_TESTS'] = '1'; \
-	os.chdir('tests'); os.system('coverage run --source ../idmtools_model_dtk -m pytest')"
+	os.chdir('tests'); os.system('coverage run --source ../idmtools_model_emod -m pytest')"
 	# move our stuff back to the top
 	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
 

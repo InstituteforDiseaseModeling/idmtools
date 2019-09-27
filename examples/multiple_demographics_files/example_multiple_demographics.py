@@ -1,8 +1,8 @@
 import os
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
-from idmtools_model_dtk import DTKExperiment
-from idmtools_model_dtk.defaults import DTKSIR
+from idmtools_model_emod import EMODExperiment
+from idmtools_model_emod.defaults import EMODSir
 
 CURRENT_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
 INPUT_PATH = os.path.join(CURRENT_DIRECTORY, "inputs")
@@ -27,18 +27,18 @@ if __name__ == "__main__":
                   os.path.join(INPUT_PATH, "demographics.json")]
 
     # Case: from_files
-    # e = DTKExperiment.from_files(expname,
+    # e = EMODExperiment.from_files(expname,
     #                              eradication_path=os.path.join(INPUT_PATH, "Eradication.exe"),
     #                              config_path=os.path.join(INPUT_PATH, "config.json"),
     #                              campaign_path=os.path.join(INPUT_PATH, "campaign.json"),
     #                              demographics_paths=demo_files)
 
     # Succeeded with this exe
-    e = DTKExperiment.from_default(expname, default=DTKSIR,
-                                   eradication_path=os.path.join(INPUT_PATH, "Eradication.exe"))
+    e = EMODExperiment.from_default(expname, default=EMODSir,
+                                    eradication_path=os.path.join(INPUT_PATH, "Eradication.exe"))
 
-    # Failed with this exe
-    # e = DTKExperiment.from_default(expname, default=DTKSIR,
+    # Failed EMODExperiment this exe
+    # e = EMODExperiment.from_default(expname, default=EMODSir,
     #                                eradication_path=os.path.join(BIN_PATH, "Eradication.exe"))
 
     # Case: load demographics from experiment
