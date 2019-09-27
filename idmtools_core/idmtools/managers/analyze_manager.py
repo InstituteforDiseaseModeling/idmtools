@@ -9,7 +9,7 @@ if typing.TYPE_CHECKING:
 
 class AnalyzeManager:
 
-    def __init__(self, experiments: 'TExperimentList', analyzers: 'TAnalyzerList', platform):
+    def __init__(self, experiments: 'TExperimentList', analyzers: 'TAnalyzerList', platform: 'TPlatform'):
         self.experiments = [retrieve_experiment(e, platform, True) for e in experiments]
         self.analyzers = analyzers
         self.platform = platform

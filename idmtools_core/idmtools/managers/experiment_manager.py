@@ -14,14 +14,15 @@ class ExperimentManager:
     Manages an experiment.
     """
 
-    def __init__(self, experiment: 'TExperiment'):
+    def __init__(self, experiment: 'TExperiment', platform: 'TPlatform'):
         """
         Constructor
         Args:
             experiment: The experiment to manage
         """
         self.experiment = experiment
-        self.platform = self.experiment.platform
+        self.platform = platform
+
 
     @classmethod
     def from_experiment_id(cls, experiment_id, platform):
@@ -31,7 +32,7 @@ class ExperimentManager:
         if platform is None:
             PlatformPersistService.save(obj=experiment.platform)
             platform = PlatformPersistService.retrieve(experiment.platform.uid)
-        em = cls(experiment)
+        em = cls(experiment, platform)
         em.restore_simulations()
         return em
 

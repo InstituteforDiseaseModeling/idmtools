@@ -45,7 +45,6 @@ class TestAnalyzeManagerDtkComps(ITestWithPersistence):
 
         e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
                                        eradication_path=os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe"))
-        e.platform = self.p
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
 
         e.base_simulation.set_parameter("Enable_Immunity", 0)
@@ -58,7 +57,7 @@ class TestAnalyzeManagerDtkComps(ITestWithPersistence):
         # Sweep parameter "Run_Number"
         self.builder.add_sweep_definition(param_a_update, range(0, 2))
         e.builder = self.builder
-        em = ExperimentManager(experiment=e)
+        em = ExperimentManager(experiment=e, platform=self.p)
         em.run()
         em.wait_till_done()
         self.assertTrue(e.succeeded)

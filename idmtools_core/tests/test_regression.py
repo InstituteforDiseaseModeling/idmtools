@@ -92,7 +92,7 @@ class TestPersistenceServices(ITestWithPersistence):
 
         # Run the experiment
 
-        em = ExperimentManager(e)
+        em = ExperimentManager(e,platform=p)
         em.run()
 
         # Make sure the base simulation was left untouched

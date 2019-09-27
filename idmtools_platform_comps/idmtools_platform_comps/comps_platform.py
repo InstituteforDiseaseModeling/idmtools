@@ -330,6 +330,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         successful = False
         try:
             parent = self._retrieve_suite(suite_id=item.parent_id)
+            successful = True
         except NotImplementedError:  # TODO
             pass
         if not successful:

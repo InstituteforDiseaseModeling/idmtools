@@ -38,7 +38,6 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
 
     def create_experiment(self):
         pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
-        pe.platform = self.p
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
 
         pe.base_simulation.set_parameter("c", "c-value")
@@ -56,7 +55,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         # Sweep parameter "a" and make "b" depends on "a"
         builder.add_sweep_definition(setAB, range(0, 2))
         pe.builder = builder
-        em = ExperimentManager(experiment=pe)
+        em = ExperimentManager(experiment=pe, platform=self.p)
         em.run()
         em.wait_till_done()
         self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.children()]))

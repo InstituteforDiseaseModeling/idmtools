@@ -31,7 +31,6 @@ class TestDTK(ITestWithPersistence):
     def test_sir_with_StandAloneSimulationsBuilder(self):
         e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
                                        eradication_path=os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe"))
-        e.platform = self.platform
 
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         sim = e.simulation()
@@ -40,7 +39,7 @@ class TestDTK(ITestWithPersistence):
         b.add_simulation(sim)
         e.builder = b
 
-        em = ExperimentManager(experiment=e)
+        em = ExperimentManager(experiment=e, platform=self.platform)
         em.run()
         em.wait_till_done()
         self.assertTrue(e.succeeded)
@@ -53,8 +52,6 @@ class TestDTK(ITestWithPersistence):
     def test_sir_with_ExperimentBuilder(self):
         e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
                                        eradication_path=os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe"))
-        e.platform = self.platform
-
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
 
         e.base_simulation.set_parameter("Enable_Immunity", 0)
@@ -67,7 +64,7 @@ class TestDTK(ITestWithPersistence):
         # Sweep parameter "Run_Number"
         builder.add_sweep_definition(param_a_update, range(0, 2))
         e.builder = builder
-        em = ExperimentManager(experiment=e)
+        em = ExperimentManager(experiment=e, platform=self.platform)
         em.run()
         em.wait_till_done()
         self.assertTrue(e.succeeded)
@@ -83,7 +80,6 @@ class TestDTK(ITestWithPersistence):
     def test_batch_simulations_StandAloneSimulationsBuilder(self):
         e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
                                        eradication_path=os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe"))
-        e.platform = self.platform
 
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         b = StandAloneSimulationsBuilder()
@@ -95,7 +91,7 @@ class TestDTK(ITestWithPersistence):
 
         e.builder = b
 
-        em = ExperimentManager(experiment=e)
+        em = ExperimentManager(experiment=e, platform=self.platform)
         em.run()
         em.wait_till_done()
         self.assertTrue(e.succeeded)
@@ -109,7 +105,6 @@ class TestDTK(ITestWithPersistence):
 
         e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
                                        eradication_path=os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe"))
-        e.platform = self.platform
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         # s = Suite(name="test suite")
         # s.experiments.append(e)
@@ -123,7 +118,7 @@ class TestDTK(ITestWithPersistence):
         # Sweep parameter "Run_Number"
         builder.add_sweep_definition(param_a_update, range(0, 20))
         e.builder = builder
-        em = ExperimentManager(experiment=e)
+        em = ExperimentManager(experiment=e, platform=self.platform)
         em.run()
         em.wait_till_done()
         self.assertTrue(e.succeeded)
@@ -135,7 +130,6 @@ class TestDTK(ITestWithPersistence):
                                      campaign_path=DEFAULT_CAMPAIGN_JSON,
                                      demographics_paths=DEFAULT_DEMOGRAPHICS_JSON
                                      )
-        e.platform = self.platform
 
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         sim = e.simulation()
@@ -144,7 +138,7 @@ class TestDTK(ITestWithPersistence):
         b.add_simulation(sim)
         e.builder = b
 
-        em = ExperimentManager(experiment=e)
+        em = ExperimentManager(experiment=e, platform=self.platform)
         em.run()
         em.wait_till_done()
         self.assertTrue(e.succeeded)
@@ -159,7 +153,6 @@ class TestDTK(ITestWithPersistence):
 
         e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
                                        eradication_path=DEFAULT_ERADICATION_PATH)
-        e.platform = self.platform
 
         e.base_simulation.load_files(demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)
 
@@ -170,7 +163,7 @@ class TestDTK(ITestWithPersistence):
         b.add_simulation(sim)
         e.builder = b
 
-        em = ExperimentManager(experiment=e)
+        em = ExperimentManager(experiment=e, platform=self.platform)
         em.run()
         em.wait_till_done()
         self.assertTrue(e.succeeded)

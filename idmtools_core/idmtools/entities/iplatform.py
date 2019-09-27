@@ -82,7 +82,7 @@ class IPlatform(IEntity, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def run_items(self, items: 'TItem') -> NoReturn:
+    def run_items(self, items: 'TItemList') -> NoReturn:
         """
         Run the items (sims, exps, suites) on the platform
         Args:

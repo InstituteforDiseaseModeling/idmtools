@@ -50,7 +50,6 @@ class TestPythonExperiment(ITestWithPersistence):
         pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
 
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123, "KeyOnly": None}
-        pe.platform = self.platform
         pe.base_simulation.set_parameter("c", "c-value")
         builder = ExperimentBuilder()
         # ------------------------------------------------------
@@ -64,7 +63,7 @@ class TestPythonExperiment(ITestWithPersistence):
 
         pe.builder = builder
 
-        em = ExperimentManager(experiment=pe)
+        em = ExperimentManager(experiment=pe, platform=self.platform)
         em.run()
         em.wait_till_done()
         self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.children()]))
@@ -90,7 +89,6 @@ class TestPythonExperiment(ITestWithPersistence):
     # b=[2,3,4,5,6]  <-- b = a + 2
     def test_sweeps_2_related_parameters_comps(self):
         pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
-        pe.platform = self.platform
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
 
         pe.base_simulation.set_parameter("c", "c-value")
@@ -108,7 +106,7 @@ class TestPythonExperiment(ITestWithPersistence):
         # Sweep parameter "a" and make "b" depends on "a"
         builder.add_sweep_definition(setAB, range(0, 5))
         pe.builder = builder
-        em = ExperimentManager(experiment=pe)
+        em = ExperimentManager(experiment=pe, platform=self.platform)
         em.run()
         em.wait_till_done()
         self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.children()]))
@@ -128,7 +126,6 @@ class TestPythonExperiment(ITestWithPersistence):
         assets_path = os.path.join(COMMON_INPUT_PATH, "python", "Assets", "MyExternalLibrary")
         ac.add_directory(assets_directory=assets_path, relative_path="MyExternalLibrary")
         pe = PythonExperiment(name=self.case_name, model_path=model_path, assets=ac)
-        pe.platform = self.platform
         # assets=AssetCollection.from_directory(assets_directory=assets_path, relative_path="MyExternalLibrary"))
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         pe.base_simulation.envelope = "parameters"
@@ -143,7 +140,7 @@ class TestPythonExperiment(ITestWithPersistence):
         # Sweep parameter "a"
         builder.add_sweep_definition(param_a_update, range(0, 2))
         pe.builder = builder
-        em = ExperimentManager(experiment=pe)
+        em = ExperimentManager(experiment=pe, platform=self.platform)
         em.run()
         em.wait_till_done()
         self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.children()]))
@@ -186,7 +183,6 @@ class TestPythonExperiment(ITestWithPersistence):
         assets_path = os.path.join(COMMON_INPUT_PATH, "python", "Assets")
         ac.add_directory(assets_directory=assets_path)
         pe = PythonExperiment(name=self.case_name, model_path=model_path, assets=ac)
-        pe.platform = self.platform
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         pe.base_simulation.envelope = "parameters"
         # sim = pe.simulation() # uncomment this line when issue #138 gets fixed
@@ -196,7 +192,7 @@ class TestPythonExperiment(ITestWithPersistence):
         builder = StandAloneSimulationsBuilder()
         builder.add_simulation(sim)
         pe.builder = builder
-        em = ExperimentManager(experiment=pe)
+        em = ExperimentManager(experiment=pe, platform=self.platform)
         em.run()
         em.wait_till_done()
         self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.children()]))
@@ -240,12 +236,11 @@ class TestPythonExperiment(ITestWithPersistence):
                   absolute_path=os.path.join(COMMON_INPUT_PATH, "python", "Assets", "MyExternalLibrary", "functions.py"))
         ac.add_asset(a)
         pe = PythonExperiment(name=self.case_name, model_path=model_path, assets=ac)
-        pe.platform = self.platform
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         pe.base_simulation.set_parameter("a", 1)
         pe.base_simulation.set_parameter("b", 10)
         pe.base_simulation.envelope = "parameters"
-        em = ExperimentManager(experiment=pe)
+        em = ExperimentManager(experiment=pe, platform=self.platform)
         em.run()
         em.wait_till_done()
         self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.children()]))
@@ -287,7 +282,6 @@ class TestPythonExperiment(ITestWithPersistence):
     def test_sweep_in_arms_cross(self):
         pe = PythonExperiment(name=self.case_name,
                               model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
-        pe.platform = self.platform
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123, "KeyOnly": None}
 
         arm = SweepArm(type=ArmType.cross)
@@ -301,7 +295,7 @@ class TestPythonExperiment(ITestWithPersistence):
         arm.add_sweep_definition(setB, [2])
         builder.add_arm(arm)
         pe.builder = builder
-        em = ExperimentManager(experiment=pe)
+        em = ExperimentManager(experiment=pe, platform=self.platform)
         em.run()
         em.wait_till_done()
         exp_id = em.experiment.uid
@@ -315,13 +309,12 @@ class TestPythonExperiment(ITestWithPersistence):
     def test_duplicate_asset_files_not_allowed(self):
         experiment = PythonExperiment(name=self.case_name,
                                       model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
-        experiment.platform = self.platform
         experiment.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         experiment.assets.add_directory(
             assets_directory=os.path.join(COMMON_INPUT_PATH, "python", "folder_dup_file"))
         builder = ExperimentBuilder()
         experiment.builder = builder
-        em = ExperimentManager(experiment=experiment)
+        em = ExperimentManager(experiment=experiment, platform=self.platform)
         with self.assertRaises(RuntimeError) as context:
             em.run()
         self.assertTrue(

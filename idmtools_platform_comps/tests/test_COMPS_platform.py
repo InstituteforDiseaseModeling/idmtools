@@ -33,9 +33,8 @@ class TestCOMPSPlatform(ITestWithPersistence):
         config = {"a": 1, "b": 2}
         experiment = PythonExperiment(name=self.case_name,
                                       model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"))
-        experiment.platform = self.platform
         experiment.base_simulation.parameters = config
-        em = ExperimentManager(experiment)
+        em = ExperimentManager(experiment, platform=self.platform)
         em.run()
         em.wait_till_done()
 
@@ -143,7 +142,6 @@ class TestCOMPSPlatform(ITestWithPersistence):
     def test_from_experiment(self):
         experiment = PythonExperiment(name=self.case_name,
                                       model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"))
-        experiment.platform = self.platform
         self._run_and_test_experiment(experiment)
         experiment2 = copy.deepcopy(experiment)
 
