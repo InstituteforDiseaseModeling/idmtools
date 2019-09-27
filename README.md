@@ -52,7 +52,7 @@ For development purpose, it is important to add the following folders as to your
 - `idmtools/idmtools_cli`
 - `idmtools/idmtools_platform_local`
 - `idmtools/idmtools_platform_comps`
-- `idmtools/idmtools_model_dtk`
+- `idmtools/idmtools_model_emod`
 - `idmtools/idmtools_models`
 - `idmtools/idmtools_test`
 
@@ -71,8 +71,7 @@ Alternatively, you can install the packages manually by doing the following.
 > cd idmtools_platform_comps
 > pip install -e .[test]
 > cd ..
-> cd idmtools_model_dtk
-> pip install -e .[test]
+> cd idmtools_model_emod
 > cd ..
 > cd idmtools_models
 > pip install -e .[test]

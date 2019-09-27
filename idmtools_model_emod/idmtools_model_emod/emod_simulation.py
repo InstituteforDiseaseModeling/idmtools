@@ -6,12 +6,12 @@ from typing import Optional, Any
 
 from idmtools.assets import Asset
 from idmtools.entities import ISimulation
-from idmtools_model_dtk.interventions import DTKEmptyCampaign
-# from idmtools_model_dtk.idmtools_model_dtk.interventions import DTKEmptyCampaign
+from idmtools_model_emod.interventions import DTKEmptyCampaign
+# from idmtools_model_emod.idmtools_model_emod.interventions import DTKEmptyCampaign
 
 
 @dataclass(repr=False)
-class DTKSimulation(ISimulation):
+class EMODSimulation(ISimulation):
     config: dict = field(default_factory=lambda: {})
     campaign: dict = field(default_factory=lambda: DTKEmptyCampaign.campaign())
     demographics: collections.OrderedDict = field(default_factory=lambda: collections.OrderedDict())

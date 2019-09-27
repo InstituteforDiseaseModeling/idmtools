@@ -26,7 +26,7 @@ class TestExperimentFactory(ITestWithPersistence):
         self.assertEqual(em.experiment.simulations[1].tags, {'p': 1})
 
     def test_build_dtk_experiment_from_factory(self):
-        experiment = experiment_factory.create("DTKExperiment", tags={"a": "1", "b": 2},
+        experiment = experiment_factory.create("EMODExperiment", tags={"a": "1", "b": 2},
                                                eradication_path=os.path.join(COMMON_INPUT_PATH, "dtk"))
         experiment.load_files(config_path=os.path.join(COMMON_INPUT_PATH, "files", "config.json"),
                               campaign_path=os.path.join(COMMON_INPUT_PATH, "files", "campaign.json"),
@@ -46,7 +46,7 @@ class TestExperimentFactory(ITestWithPersistence):
         em.run()
         self.assertEqual(len(em.experiment.simulations), 20)
         self.assertEqual(em.experiment.tags, {'a': '1', 'b': 2,
-                                              'type': 'idmtools_model_dtk.dtk_experiment.DTKExperiment'})
+                                              'type': 'idmtools_model_emod.emod_experiment.EMODExperiment'})
 
     def test_build_test_experiment_from_factory(self):
         test_experiment = TstExperiment()
