@@ -130,7 +130,7 @@ class LocalPlatform(IPlatform):
 
         """
         # TODO Cleanup Client to return experiment id status directly
-        status = SimulationsClient.get_all(experiment_id=experiment.uid)
+        status = SimulationsClient.get_all(experiment_id=experiment.uid, per_page=99999)
         for s in experiment.simulations:
             sim_status = [st for st in status if st['simulation_uid'] == s.uid]
 

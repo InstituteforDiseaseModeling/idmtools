@@ -208,3 +208,6 @@ class ParallelizeDecorator:
                 results.append(f.result())
 
         return results
+
+    def __del__(self):
+        del self.queue

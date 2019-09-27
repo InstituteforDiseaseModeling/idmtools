@@ -13,7 +13,7 @@ class SimulationsClient(BaseClient):
 
     @classmethod
     def get_all(cls, experiment_id: Optional[str] = None, status: Optional[Status] = None,
-                tags: Optional[List[Tuple[str, str]]] = None) -> List[Dict[str, Any]]:
+                tags: Optional[List[Tuple[str, str]]] = None, page: Optional[int] = None, per_page: Optional[int] = None) -> List[Dict[str, Any]]:
         """
 
         Args:
@@ -27,6 +27,11 @@ class SimulationsClient(BaseClient):
         """
         args = cls._get_arguments(tags)
         args.update(dict(experiment_id=experiment_id))
+        if page:
+            args[page] = page
+
+        if per_page:
+            args[per_page] = per_page
         response = cls.get(None, params=args)
         result = cls._validate_response(response, 'Simulations')
         return result
