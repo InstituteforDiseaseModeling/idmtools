@@ -16,10 +16,6 @@ def get_asset_collection_id_for_simulation_id(sim_id):
                 pd = {**pd, **self._ep_dict}
             return pd
 
-    # comps_simulation = COMPSSimulation.get(item.uid, query_criteria=QueryCriteriaExt().select(
-    #     ['id', 'experiment_id']).select_children(
-    #     ["files", "configuration"]).add_extra_params({'coalesceconfig': True}))
-
     query_criteria = QueryCriteriaExt().select_children('configuration').add_extra_params({'coalesceconfig': True})
     simulation = Simulation.get(id=sim_id, query_criteria=query_criteria)
     collection_id = simulation.configuration.asset_collection_id
