@@ -67,7 +67,7 @@ RUN /usr/bin/ssh-keygen -A \
     && groupadd -r --gid=995 slurm \
     && useradd -r -g slurm --uid=995 slurm \
     && groupadd -r --gid=1005 test \
-    && useradd -r -g test -G slurm --uid=1005 test \
+    && useradd -r -g slurm -G test --uid=1005 test \
     && echo "test:test" | chpasswd \
     && mkdir -p /home/test/.ssh \
     && mkdir /etc/sysconfig/slurm \
