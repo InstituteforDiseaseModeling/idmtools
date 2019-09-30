@@ -1,9 +1,9 @@
 import itertools
 from functools import partial
 
-from idmtools.builders.ArmExperimentBuilder import ArmExperimentBuilder, SweepArm, ArmType
-from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
-from idmtools_test.utils.TstExperiment import TstExperiment
+from idmtools.builders.arm_experiment_builder import ArmExperimentBuilder, SweepArm, ArmType
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+from idmtools_test.utils.tst_experiment import TstExperiment
 
 
 def param_update(simulation, param, value):

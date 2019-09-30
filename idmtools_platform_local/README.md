@@ -27,10 +27,10 @@ type = Local
  ```
  In your code, you could then get then use as would any other platform
 ```python
-from idmtools.core import PlatformFactory
+from idmtools.core.platform_factory import Platform
+from idmtools.managers.experiment_manager import ExperimentManager
 
-platform = PlatformFactory.create_from_block('Local')
-p1 = PlatformFactory.create_from_block('Local')
+platform = Platform('Local')
 ...
 em = ExperimentManager(experiment=experiment, platform=platform)
 em.run()

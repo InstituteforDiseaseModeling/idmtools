@@ -4,10 +4,10 @@ from functools import partial
 
 from idmtools.assets import AssetCollection, Asset
 from idmtools.builders import SweepArm, ArmType, ArmExperimentBuilder
-from idmtools.core.PlatformFactory import PlatformFactory
+from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
-from idmtools_model_dtk import DTKExperiment
-from idmtools_model_dtk.defaults import DTKSIR
+from idmtools_model_emod import EMODExperiment
+from idmtools_model_emod.defaults import EMODSir
 from config_update_parameters import config_update_params
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
@@ -24,12 +24,12 @@ def param_update(simulation, param, value):
     return simulation.set_parameter(param, value)
 
 if __name__ == "__main__":
-    platform = PlatformFactory.create_from_block('Local')
+    platform = Platform('Local')
 
     ac = AssetCollection()
     a = Asset(absolute_path=os.path.join(INPUT_PATH, "single_node_demographics.json"))
     ac.add_asset(a)
-    e = DTKExperiment.from_default(expname, default=DTKSIR, eradication_path=os.path.join(BIN_PATH, "Eradication"))
+    e = EMODExperiment.from_default(expname, default=EMODSir, eradication_path=os.path.join(BIN_PATH, "Eradication"))
     e.add_assets(ac)
     simulation = e.simulation()
     sim = config_update_params(simulation)

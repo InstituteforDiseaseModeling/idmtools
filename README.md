@@ -1,8 +1,30 @@
 # IDM Modeling Tools
 
+# Installation 
+The recommended install is to use
+```bash
+pip install idmtools[full] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+```
+This will install the core tools, the cli, the comps and local platforms, support for EMOD models, and python models
+
+If you do not need the local platform, you can use the following command
+```bash
+pip install idmtools[idm] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+```
+This will install the core tools, the cli, the comps, support for EMOD models, and python models
+
+You can also install just the individual packages to create minimal environments
+
+- `pip install idmtools --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Core package
+- `pip install idmtools-cli --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Adds the idmtools cli commands
+- `pip install idmtools-platform-comps --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Support for COMPS
+- `pip install idmtools-platform-local --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Support for Local Platform
+- `pip install idmtools-models --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Python and generic models
+- `pip install idmtools-model-dtk --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - EMOD Model support
+
 ## Pre-requisites
 - Python 3.6/3.7 x64
-- Docker
+- Docker(Required for the local platform)
 
 ## Development Environment Setup
 
@@ -30,7 +52,7 @@ For development purpose, it is important to add the following folders as to your
 - `idmtools/idmtools_cli`
 - `idmtools/idmtools_platform_local`
 - `idmtools/idmtools_platform_comps`
-- `idmtools/idmtools_model_dtk`
+- `idmtools/idmtools_model_emod`
 - `idmtools/idmtools_models`
 - `idmtools/idmtools_test`
 
@@ -49,8 +71,7 @@ Alternatively, you can install the packages manually by doing the following.
 > cd idmtools_platform_comps
 > pip install -e .[test]
 > cd ..
-> cd idmtools_model_dtk
-> pip install -e .[test]
+> cd idmtools_model_emod
 > cd ..
 > cd idmtools_models
 > pip install -e .[test]

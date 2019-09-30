@@ -1,7 +1,7 @@
 from typing import Optional, Tuple, List
 import click
 
-from idmtools_cli.IPlatformCli import IPlatformCLI
+from idmtools_cli.iplatform_cli import IPlatformCLI
 
 from idmtools_cli.cli import cli, pass_platform_cli
 from idmtools_cli.cli.utils import tags_help, get_platform_from_config_or_name, supported_platforms

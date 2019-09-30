@@ -1,9 +1,9 @@
 import os
 from functools import partial
-from idmtools.builders.ArmExperimentBuilder import ArmType
-from idmtools.builders.YamlExperimentBuilder import YamlExperimentBuilder
-from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
-from idmtools_test.utils.TstExperiment import TstExperiment
+from idmtools.builders.arm_experiment_builder import ArmType
+from idmtools.builders.yaml_experiment_builder import YamlExperimentBuilder
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+from idmtools_test.utils.tst_experiment import TstExperiment
 from idmtools_test import COMMON_INPUT_PATH
 
 
