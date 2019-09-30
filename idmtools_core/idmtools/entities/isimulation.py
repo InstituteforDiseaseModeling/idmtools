@@ -56,6 +56,15 @@ class ISimulation(IAssetsEnabled, IEntity, metaclass=ABCMeta):
     def pre_creation(self):
         self.gather_assets()
 
+    def pre_getstate(self):
+        """
+        Function called before picking
+        Return default values for "pickle-ignore" fields
+        """
+        from idmtools.assets import AssetCollection
+        from idmtools.core.interfaces.entity_container import EntityContainer
+        return {"assets": AssetCollection(), "simulations": EntityContainer()}
+
     @abstractmethod
     def gather_assets(self):
         """

@@ -3,7 +3,6 @@ import json
 import collections
 import typing
 from dataclasses import dataclass, field
-from idmtools.assets import Asset
 from idmtools.entities import IExperiment, CommandLine
 from idmtools_model_emod.emod_simulation import EMODSimulation
 
@@ -100,6 +99,8 @@ class EMODExperiment(IExperiment):
                     self.base_simulation.update_config_demographics_filenames(os.path.basename(demographics_path))
 
     def gather_assets(self) -> None:
+        from idmtools.assets import Asset
+
         # Add Eradication.exe to assets
         self.assets.add_asset(Asset(absolute_path=self.eradication_path))
 
