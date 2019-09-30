@@ -39,13 +39,14 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         super().__post_init__()
         self.simulations = self.simulations or EntityContainer()
         # Take care of the base simulation
-        self.simulation_type = simulation_type
         if not self.base_simulation:
             if simulation_type and callable(simulation_type):
                 self.base_simulation = simulation_type()
             else:
                 raise Exception(
                     "A `base_simulation` or `simulation_type` needs to be provided to the Experiment object!")
+
+        self._simulation_default = self.base_simulation.__class__()
 
     def __repr__(self):
         return f"<Experiment: {self.uid} - {self.name} / Sim count {len(self.simulations) if self.simulations else 0}>"
@@ -155,7 +156,7 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         """
         from idmtools.assets import AssetCollection
         return {"assets": AssetCollection(), "simulations": EntityContainer(), "builders": set(),
-                "base_simulation": self.simulation_type()}
+                "base_simulation": self._simulation_default}
 
 
 TExperiment = typing.TypeVar("TExperiment", bound=IExperiment)
