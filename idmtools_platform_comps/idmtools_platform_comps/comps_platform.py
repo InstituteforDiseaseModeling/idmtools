@@ -3,6 +3,7 @@ import logging
 import ntpath
 import os
 import uuid
+import typing
 from dataclasses import dataclass, field
 
 from COMPS import Client
@@ -14,9 +15,12 @@ from idmtools.core import CacheEnabled
 from idmtools.core.enums import EntityStatus, ObjectType
 from idmtools.core.experiment_factory import experiment_factory
 from idmtools.entities import IPlatform
-from idmtools.entities.iexperiment import TExperiment
 from idmtools.entities.suite import Suite
 from idmtools.utils.time import timestamp
+
+if typing.TYPE_CHECKING:
+    from idmtools.entities.iexperiment import TExperiment
+    from idmtools.entities.isimulation import TSimulation
 
 logging.getLogger('COMPS.Data.Simulation').disabled = True
 logger = logging.getLogger(__name__)
@@ -58,7 +62,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         except RuntimeError:
             Client.login(self.endpoint)
 
-    def send_assets_for_experiment(self, experiment: TExperiment, **kwargs):
+    def send_assets_for_experiment(self, experiment: 'TExperiment', **kwargs):
         if experiment.assets.count == 0:
             return
 
@@ -167,6 +171,15 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             experiment.simulations.append(s)
 
     def _get_experiment(self, experiment_id: 'uuid', query_criteria=None) -> 'COMPSExperiment':
+        """
+        Get the given experiment from COMPS
+        Args:
+            experiment_id: id of the experiment to retrieve
+            query_criteria:  custom query criteria if needed
+
+        Returns: The COMPSExperiment or None if not found
+
+        """
         self._login()
         try:
             return COMPSExperiment.get(id=experiment_id,
@@ -176,6 +189,15 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             return
 
     def _get_simulation(self, simulation_id: 'uuid', query_criteria=None) -> 'COMPSSimulation':
+        """
+        Get the given simulation from COMPS
+        Args:
+            simulation_id: id of the simulation to retrieve
+            query_criteria:  custom query criteria if needed
+
+        Returns: The COMPSSimulation or None if not found
+
+        """
         self._login()
         try:
             return COMPSSimulation.get(id=simulation_id,
@@ -185,6 +207,15 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             return
 
     def _get_suite(self, suite_id: 'uuid', query_criteria=None) -> 'COMPSSuite':
+        """
+       Get the given suite from COMPS
+       Args:
+           suite_id: id of the simulation to retrieve
+           query_criteria:  custom query criteria if needed
+
+       Returns: The COMPSSuite or None if not found
+
+       """
         self._login()
         try:
             return COMPSSuite.get(id=suite_id, query_criteria=query_criteria or QueryCriteria().select(
@@ -192,25 +223,56 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         except RuntimeError:
             return
 
-    def _create_simulation(self, platform_simulation, experiment=None):
+    def _create_simulation(self, platform_simulation: 'COMPSSimulation',
+                           experiment: 'TExperiment' = None) -> 'TSimulation':
+        """
+        Create a idmtools simulation based on a given platform simulation.
+        The user can optionally pass an experiment for base simulation
+        Args:
+            platform_simulation: the COMPSSimulation to transform
+            experiment: An optional experiment allowing to bypass the retrieval of experiment to access the base simulation
+
+        Returns: the idmtools simulation with correct type and info
+
+        """
         # Recreate the experiment if needed
         experiment = experiment or self.get_object(platform_simulation.experiment_id)
+        # Get a simulation
         sim = experiment.simulation()
+        # Set its correct attributes
         sim.uid = platform_simulation.id
         sim.tags = platform_simulation.tags
         sim.platform_id = self.uid
         sim.status = COMPSPlatform._convert_COMPS_status(platform_simulation.state)
         return sim
 
-    def _create_experiment(self, platform_experiment):
+    def _create_experiment(self, platform_experiment: 'COMPSExperiment') -> 'TExperiment':
+        """
+        Create a idmtools experiment based on a given platform experiment.
+        Args:
+            platform_experiment: the COMPSExperiment to transform
+
+        Returns: the idmtools experiment with correct type and info
+
+        """
+        # Create an experiment
         experiment = experiment_factory.create(platform_experiment.tags.get("type"), tags=platform_experiment.tags,
                                                name=platform_experiment.name)
+        # Set the correct attributes
         experiment.uid = platform_experiment.id
         experiment.platform_id = self.uid
         experiment.comps_experiment = platform_experiment
         return experiment
 
-    def _create_suite(self, platform_suite):
+    def _create_suite(self, platform_suite: 'COMPSSuite') -> 'Suite':
+        """
+        Create a idmtools suite based on a given platform experiment.
+        Args:
+            platform_suite: the COMPSSuite to transform
+
+        Returns: the idmtools suite with correct type and info
+
+        """
         suite = Suite(name=platform_suite.name)
         suite.uid = platform_suite.id
         experiments = self.get_children(suite.uid, object_type=ObjectType.SUITE)
@@ -218,11 +280,29 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             suite.experiments.append(self._create_experiment(ce))
         return suite
 
-    def get_object(self, object_id, force=False, raw=False, object_type=None, query_criteria=None) -> any:
+    def get_object(self, object_id: 'uuid', force: 'bool' = False, raw: 'bool' = False,
+                   object_type: 'ObjectType' = None, query_criteria: 'QueryCriteria' = None) -> any:
+        """
+        Retrieve an object from the platform.
+        This function is cached, force allows to force the refresh of the cache.
+
+        If no object_type passed: the function will try all the types (experiment, suite, simulation)
+        Args:
+            object_id: id of the object to retrieve
+            force: Force the object fetching from the platform
+            raw: Return either an idmtools object or a platform object
+            object_type: Pass the type of the object for quicker retrieval
+            query_criteria: custom query criteria
+
+        Returns: The object found on the platform or None
+
+        """
         cache_key = f"o_{object_id}_" + ('r' if raw else 'o')
+        # If force -> delete in the cache
         if force:
             self.cache.delete(cache_key)
 
+        # If we cannot find the object in the cache -> retrieve depending on the type
         if cache_key not in self.cache:
             if object_type == ObjectType.EXPERIMENT:
                 ce = self._get_experiment(object_id, query_criteria=query_criteria)
@@ -231,13 +311,16 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             elif object_type == ObjectType.SUITE:
                 ce = self._get_suite(object_id, query_criteria=query_criteria)
             else:
+                # No type specified, try all
                 ce = self._get_experiment(object_id, query_criteria=query_criteria) \
                      or self._get_simulation(object_id, query_criteria=query_criteria) \
                      or self._get_suite(object_id, query_criteria=query_criteria)
 
+            # Nothing was found on the platform
             if not ce:
                 raise Exception("Object not found on the platform")
 
+            # Create the object if we do not want it raw
             if raw:
                 self.cache.set(cache_key, ce, expire=60)
             else:
@@ -250,7 +333,20 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
         return self.cache.get(cache_key)
 
-    def get_parent(self, object_id, force=False, object_type=None, raw=False):
+    def get_parent(self, object_id: 'uuid', force: 'bool' = False, object_type: 'ObjectType' = None,
+                   raw: 'bool' = False):
+        """
+        Get the parent of a given object.
+
+        Args:
+            object_id: id of the object for which we want the parent
+            force: Force the object fetching from the platform
+            raw: Return either an idmtools object or a platform object
+            object_type: Pass the type of the object for quicker retrieval
+
+        Returns: Parent of the object or None
+
+        """
         cache_key = f'p_{object_id}' + ('r' if raw else 'o')
         if force:
             self.cache.delete(cache_key)
@@ -259,10 +355,13 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             ce = self.get_object(object_id, raw=True, object_type=object_type)
 
             if isinstance(ce, COMPSExperiment):
+                # For experiment -> find the suite
                 obj = self.get_object(ce.suite_id, object_type=ObjectType.SUITE, raw=raw) if ce.suite_id else None
             elif isinstance(ce, COMPSSuite):
+                # Suite has no parent
                 obj = None
             elif isinstance(ce, COMPSSimulation):
+                # For a simulation, find the experiment
                 obj = self.get_object(ce.experiment_id, object_type=ObjectType.EXPERIMENT,
                                       raw=raw) if ce.experiment_id else None
 
@@ -270,7 +369,20 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
         return self.cache.get(cache_key)
 
-    def get_children(self, object_id, force=False, object_type=None, raw=False):
+    def get_children(self, object_id: 'uuid', force: 'bool' = False, object_type: 'ObjectType' = None,
+                     raw: 'bool' = False) -> 'any':
+        """
+        Get the children of a given object.
+
+        Args:
+            object_id: id of the object for which we want the children
+            force: Force the object fetching from the platform
+            raw: Return either an idmtools object or a platform object
+            object_type: Pass the type of the object for quicker retrieval
+
+        Returns: Children of the object or None
+
+        """
         cache_key = f"c_{object_id}" + ('r' if raw else 'o')
         if force:
             self.cache.delete(cache_key)
