@@ -1,19 +1,26 @@
 import ast
-import uuid
 import typing
+import uuid
 from abc import ABCMeta, abstractmethod
-from idmtools.core.interfaces.ientity import IEntity
+from dataclasses import dataclass, fields, field
 from logging import getLogger
-from dataclasses import fields
+
+from idmtools.core.interfaces.ientity import IEntity
+
+if typing.TYPE_CHECKING:
+    from idmtools.entities.iexperiment import TExperiment
+    from idmtools.entities.isimulation import TSimulationBatch, TSimulation
+    from typing import List, Any
 
 logger = getLogger(__name__)
 
-CALLER_LIST = ['_create_from_block',    # create platform through Platform Factory
-               'fetch',                 # create platform through un-pickle
-               'get'                    # create platform through platform spec' get method
+CALLER_LIST = ['_create_from_block',  # create platform through Platform Factory
+               'fetch',  # create platform through un-pickle
+               'get'  # create platform through platform spec' get method
                ]
 
 
+@dataclass(repr=False)
 class IPlatform(IEntity, metaclass=ABCMeta):
     """
     Interface defining a platform.
@@ -132,10 +139,6 @@ class IPlatform(IEntity, metaclass=ABCMeta):
     def get_assets_for_simulation(self, simulation: 'TSimulation', output_files: 'List[str]') -> 'Dict[str, bytearray]':
         pass
 
-    @abstractmethod
-    def retrieve_experiment(self, experiment_id: 'uuid') -> 'TExperiment':
-        pass
-
     def __repr__(self):
         return f"<Platform {self.__class__.__name__} - id: {self.uid}>"
 
@@ -162,6 +165,10 @@ class IPlatform(IEntity, metaclass=ABCMeta):
         # Update attr with validated data types
         for fn in fs_kwargs:
             setattr(self, fn, field_value[fn])
+
+    @abstractmethod
+    def get_object(self, object_id) -> any:
+        pass
 
 
 TPlatform = typing.TypeVar("TPlatform", bound=IPlatform)

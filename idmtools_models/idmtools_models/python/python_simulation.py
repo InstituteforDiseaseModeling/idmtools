@@ -48,8 +48,8 @@ class PythonSimulation(ISimulation):
         }
 
     """
-    parameters: dict = field(default_factory=lambda: {})
-    envelope: str = field(default=None)
+    parameters: dict = field(default_factory=lambda: {}, compare=False)
+    envelope: str = field(default=None, compare=False)
 
     def __post_init__(self):
         super().__post_init__()

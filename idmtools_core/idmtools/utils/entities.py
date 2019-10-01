@@ -18,7 +18,7 @@ def retrieve_experiment(experiment_id: 'uuid', platform: 'TPlatform' = None,
             raise ExperimentNotFound(experiment_id)
 
         # Try to retrieve it from the platform
-        experiment = platform.retrieve_experiment(experiment_id)
+        experiment = platform.get_object(experiment_id)
         if not experiment:
             raise ExperimentNotFound(experiment_id, platform)
 

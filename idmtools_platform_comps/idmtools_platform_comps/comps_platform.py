@@ -1,21 +1,22 @@
+import json
 import logging
 import ntpath
 import os
-import json
+import uuid
+from dataclasses import dataclass, field
 
 from COMPS import Client
 from COMPS.Data import AssetCollection, AssetCollectionFile, Configuration, Experiment as COMPSExperiment, \
-    QueryCriteria, Simulation as COMPSSimulation, SimulationFile
+    QueryCriteria, Simulation as COMPSSimulation, SimulationFile, Suite as COMPSSuite
 from COMPS.Data.Simulation import SimulationState
-from dataclasses import dataclass, field
 
 from idmtools.core import CacheEnabled
+from idmtools.core.enums import EntityStatus, ObjectType
 from idmtools.core.experiment_factory import experiment_factory
-from idmtools.core.enums import EntityStatus
 from idmtools.entities import IPlatform
 from idmtools.entities.iexperiment import TExperiment
+from idmtools.entities.suite import Suite
 from idmtools.utils.time import timestamp
-import uuid
 
 logging.getLogger('COMPS.Data.Simulation').disabled = True
 logger = logging.getLogger(__name__)
@@ -34,7 +35,6 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     """
     Represents the platform allowing to run simulations on COMPS.
     """
-
     MAX_SUBDIRECTORY_LENGTH = 35  # avoid maxpath issues on COMPS
 
     endpoint: str = field(default="https://comps2.idmod.org")
@@ -45,10 +45,6 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     num_retires: int = field(default=0)
     num_cores: int = field(default=1)
     exclusive: bool = field(default=False)
-
-    # Private fields
-    _comps_experiment: 'COMPSExperiment' = field(default=None, init=False, compare=False)
-    _comps_experiment_id: 'uuid' = field(default=None, init=False, compare=False)
 
     def __post_init__(self):
         super().__post_init__()
@@ -61,22 +57,6 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             Client.auth_manager()
         except RuntimeError:
             Client.login(self.endpoint)
-
-    @property
-    def comps_experiment(self):
-        if self._comps_experiment and self._comps_experiment.id == self._comps_experiment_id:
-            return self._comps_experiment
-
-        self._login()
-        self._comps_experiment = COMPSExperiment.get(id=self._comps_experiment_id,
-                                                     query_criteria=QueryCriteria().select(["id"]).select_children(
-                                                         ["tags"]))
-        return self._comps_experiment
-
-    @comps_experiment.setter
-    def comps_experiment(self, comps_experiment):
-        self._comps_experiment = comps_experiment
-        self._comps_experiment_id = comps_experiment.id
 
     def send_assets_for_experiment(self, experiment: TExperiment, **kwargs):
         if experiment.assets.count == 0:
@@ -138,7 +118,6 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
         # Save the experiment
         e.save()
-        self.comps_experiment = e
 
         experiment.uid = e.id
         self.send_assets_for_experiment(experiment)
@@ -161,9 +140,8 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         return [s.id for s in created_simulations]
 
     def run_simulations(self, experiment: TExperiment):
-        self._login()
-        self._comps_experiment_id = experiment.uid
-        self.comps_experiment.commission()
+        comps_experiment = self.get_object(experiment.uid, raw=True, object_type=ObjectType.EXPERIMENT)
+        comps_experiment.commission()
 
     @staticmethod
     def _convert_COMPS_status(comps_status):
@@ -181,37 +159,140 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         if experiment.done:
             return
 
-        self._comps_experiment_id = experiment.uid
-        self._login()
-
-        comps_simulations = self.comps_experiment.get_simulations(
-            query_criteria=QueryCriteria().select(["id", "state"]))
-
-        for s in experiment.simulations:
-            if s.done:
-                continue
-
-            for comps_simulation in comps_simulations:
-                if comps_simulation.id == s.uid:
-                    s.status = COMPSPlatform._convert_COMPS_status(comps_simulation.state)
-                    break
+        experiment.simulations.clear()
+        self.restore_simulations(experiment)
 
     def restore_simulations(self, experiment: TExperiment) -> None:
-        self._comps_experiment_id = experiment.uid
+        for s in self.get_children(experiment.uid, force=True, object_type=ObjectType.EXPERIMENT):
+            experiment.simulations.append(s)
 
-        for s in self.comps_experiment.get_simulations(
-                query_criteria=QueryCriteria().select(["id", "state"]).select_children(["tags"])):
-            sim = experiment.simulation()
-            sim.uid = s.id
-            sim.tags = s.tags
-            sim.status = COMPSPlatform._convert_COMPS_status(s.state)
-            experiment.simulations.append(sim)
+    def _get_experiment(self, experiment_id: 'uuid', query_criteria=None) -> 'COMPSExperiment':
+        self._login()
+        try:
+            return COMPSExperiment.get(id=experiment_id,
+                                       query_criteria=query_criteria or QueryCriteria().select(
+                                           ["id", "name"]).select_children(["tags"]))
+        except RuntimeError:
+            return
 
-    def retrieve_experiment(self, experiment_id: uuid) -> TExperiment:
-        self._comps_experiment_id = experiment_id
-        experiment = experiment_factory.create(self.comps_experiment.tags.get("type"), tags=self.comps_experiment.tags)
-        experiment.uid = self.comps_experiment.id
+    def _get_simulation(self, simulation_id: 'uuid', query_criteria=None) -> 'COMPSSimulation':
+        self._login()
+        try:
+            return COMPSSimulation.get(id=simulation_id,
+                                       query_criteria=query_criteria or QueryCriteria().select(
+                                           ["id", "name", "experiment_id"]).select_children(["tags"]))
+        except RuntimeError:
+            return
+
+    def _get_suite(self, suite_id: 'uuid', query_criteria=None) -> 'COMPSSuite':
+        self._login()
+        try:
+            return COMPSSuite.get(id=suite_id, query_criteria=query_criteria or QueryCriteria().select(
+                ["id", "name"]).select_children(["tags"]))
+        except RuntimeError:
+            return
+
+    def _create_simulation(self, platform_simulation, experiment=None):
+        # Recreate the experiment if needed
+        experiment = experiment or self.get_object(platform_simulation.experiment_id)
+        sim = experiment.simulation()
+        sim.uid = platform_simulation.id
+        sim.tags = platform_simulation.tags
+        sim.platform_id = self.uid
+        sim.status = COMPSPlatform._convert_COMPS_status(platform_simulation.state)
+        return sim
+
+    def _create_experiment(self, platform_experiment):
+        experiment = experiment_factory.create(platform_experiment.tags.get("type"), tags=platform_experiment.tags,
+                                               name=platform_experiment.name)
+        experiment.uid = platform_experiment.id
+        experiment.platform_id = self.uid
+        experiment.comps_experiment = platform_experiment
         return experiment
+
+    def _create_suite(self, platform_suite):
+        suite = Suite(name=platform_suite.name)
+        suite.uid = platform_suite.id
+        experiments = self.get_children(suite.uid, object_type=ObjectType.SUITE)
+        for ce in experiments:
+            suite.experiments.append(self._create_experiment(ce))
+        return suite
+
+    def get_object(self, object_id, force=False, raw=False, object_type=None, query_criteria=None) -> any:
+        cache_key = f"o_{object_id}_" + ('r' if raw else 'o')
+        if force:
+            self.cache.delete(cache_key)
+
+        if cache_key not in self.cache:
+            if object_type == ObjectType.EXPERIMENT:
+                ce = self._get_experiment(object_id, query_criteria=query_criteria)
+            elif object_type == ObjectType.SIMULATION:
+                ce = self._get_simulation(object_id, query_criteria=query_criteria)
+            elif object_type == ObjectType.SUITE:
+                ce = self._get_suite(object_id, query_criteria=query_criteria)
+            else:
+                ce = self._get_experiment(object_id, query_criteria=query_criteria) \
+                     or self._get_simulation(object_id, query_criteria=query_criteria) \
+                     or self._get_suite(object_id, query_criteria=query_criteria)
+
+            if not ce:
+                raise Exception("Object not found on the platform")
+
+            if raw:
+                self.cache.set(cache_key, ce, expire=60)
+            else:
+                if isinstance(ce, COMPSExperiment):
+                    self.cache.set(cache_key, self._create_experiment(ce), expire=60)
+                elif isinstance(ce, COMPSSimulation):
+                    self.cache.set(cache_key, self._create_simulation(ce), expire=60)
+                elif isinstance(ce, COMPSSuite):
+                    self.cache.set(cache_key, self._create_suite(ce), expire=60)
+
+        return self.cache.get(cache_key)
+
+    def get_parent(self, object_id, force=False, object_type=None, raw=False):
+        cache_key = f'p_{object_id}' + ('r' if raw else 'o')
+        if force:
+            self.cache.delete(cache_key)
+
+        if cache_key not in self.cache:
+            ce = self.get_object(object_id, raw=True, object_type=object_type)
+
+            if isinstance(ce, COMPSExperiment):
+                obj = self.get_object(ce.suite_id, object_type=ObjectType.SUITE, raw=raw) if ce.suite_id else None
+            elif isinstance(ce, COMPSSuite):
+                obj = None
+            elif isinstance(ce, COMPSSimulation):
+                obj = self.get_object(ce.experiment_id, object_type=ObjectType.EXPERIMENT,
+                                      raw=raw) if ce.experiment_id else None
+
+            self.cache.set(cache_key, obj, expire=60)
+
+        return self.cache.get(cache_key)
+
+    def get_children(self, object_id, force=False, object_type=None, raw=False):
+        cache_key = f"c_{object_id}" + ('r' if raw else 'o')
+        if force:
+            self.cache.delete(cache_key)
+
+        if cache_key not in self.cache:
+            ce = self.get_object(object_id, raw=True, object_type=object_type)
+
+            if isinstance(ce, COMPSExperiment):
+                children = ce.get_simulations(
+                    query_criteria=QueryCriteria().select(["id", "state"]).select_children(["tags"]))
+                if not raw:
+                    experiment = self._create_experiment(ce)
+                    children = [self._create_simulation(s, experiment) for s in children]
+            elif isinstance(ce, COMPSSuite):
+                children = [self.get_object(e.id, object_type=ObjectType.EXPERIMENT, raw=raw) for e in
+                            COMPSExperiment.get(query_criteria=QueryCriteria().where("suite_id={}".format(ce.id)))]
+            elif isinstance(ce, COMPSSimulation):
+                children = None
+
+            self.cache.set(cache_key, children, expire=60)
+
+        return self.cache.get(cache_key)
 
     @staticmethod
     def _get_file_for_collection(collection_id, file_path):

@@ -27,13 +27,13 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         builders: A set of Experiment Builders to be used to generate simulations
         simulations: Optional a user input simulations
     """
-    command: 'TCommandLine' = field(default=None)
+    command: 'TCommandLine' = field(default=None, compare=False)
     suite_id: uuid = field(default=None)
     simulation_type: 'InitVar[TSimulationClass]' = None
     base_simulation: 'TSimulation' = field(default=None, compare=False, metadata={"pickle_ignore": True})
     builders: set = field(default_factory=lambda: set(), compare=False, metadata={"pickle_ignore": True})
     simulations: EntityContainer = field(default_factory=lambda: EntityContainer(), compare=False,
-                                           metadata={"pickle_ignore": True})
+                                         metadata={"pickle_ignore": True})
 
     def __post_init__(self, simulation_type):
         super().__post_init__()
