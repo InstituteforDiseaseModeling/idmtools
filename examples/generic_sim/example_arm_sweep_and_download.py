@@ -30,9 +30,8 @@ if __name__ == "__main__":
     a = Asset(absolute_path=os.path.join(INPUT_PATH, "single_node_demographics.json"))
     ac.add_asset(a)
     e = DTKExperiment.from_default(expname, default=DTKSIR, eradication_path=os.path.join(BIN_PATH, "Eradication.exe"))
-    e.platform = platform
     e.add_assets(ac)
-    simulation = e.simulation()
+    simulation = e.base_simulation
     sim = config_update_params(simulation)
     sim.set_parameter("Config_Name", "serializing sim")
 
@@ -45,7 +44,6 @@ if __name__ == "__main__":
     end_day = start_day + last_serialization_day
     sim.set_parameter("Simulation_Duration", end_day)
 
-    e.base_simulation = sim
     arm = SweepArm(type=ArmType.cross)
     set_Run_Number = partial(param_update, param="Run_Number")
     arm.add_sweep_definition(set_Run_Number, range(num_seeds))
@@ -56,7 +54,7 @@ if __name__ == "__main__":
     builder = ArmExperimentBuilder()
     builder.add_arm(arm)
     e.builder = builder
-    em = ExperimentManager(experiment=e)
+    em = ExperimentManager(experiment=e, platform=platform)
     em.run()
     em.wait_till_done()
 

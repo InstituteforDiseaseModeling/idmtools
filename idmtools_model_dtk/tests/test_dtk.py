@@ -33,7 +33,7 @@ class TestDTK(ITestWithPersistence):
                                        eradication_path=os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe"))
 
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
-        sim = e.simulation()
+        sim = e.base_simulation
         sim.set_parameter("Enable_Immunity", 0)
         b = StandAloneSimulationsBuilder()
         b.add_simulation(sim)
@@ -85,7 +85,7 @@ class TestDTK(ITestWithPersistence):
         b = StandAloneSimulationsBuilder()
 
         for i in range(20):
-            sim = e.simulation()
+            sim = e.base_simulation
             sim.set_parameter("Enable_Immunity", 0)
             b.add_simulation(sim)
 

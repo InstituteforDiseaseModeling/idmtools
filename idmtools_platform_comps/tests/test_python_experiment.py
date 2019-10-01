@@ -186,7 +186,7 @@ class TestPythonExperiment(ITestWithPersistence):
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         pe.base_simulation.envelope = "parameters"
         # sim = pe.simulation() # uncomment this line when issue #138 gets fixed
-        sim = pe.simulation()
+        sim = pe.base_simulation
         sim.set_parameter("a", 1)
         sim.set_parameter("b", 10)
         builder = StandAloneSimulationsBuilder()
