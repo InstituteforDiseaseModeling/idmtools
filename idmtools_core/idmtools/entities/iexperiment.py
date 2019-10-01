@@ -116,6 +116,7 @@ class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
                         tags.update(new_tags)
 
                 simulation.tags = tags
+                simulation.platform = self.platform
                 sims.append(simulation)
                 
             yield sims
