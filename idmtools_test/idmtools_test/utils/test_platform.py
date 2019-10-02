@@ -121,7 +121,7 @@ class TestPlatform(IPlatform):
         simulations = []
         experiment_id = None
         for simulation in simulation_batch:
-            experiment_id = experiment_id or self.simulation.parent.uid
+            experiment_id = experiment_id or simulation.parent.uid
             simulation.uid = uuid.uuid4()
             simulations.append(simulation)
 
