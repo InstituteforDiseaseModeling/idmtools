@@ -37,6 +37,20 @@ class ExampleAnalyzer2(IAnalyzer):
             print("ExampleAnalyzer2---")
 
 
+class ExampleAnalyzer3(IAnalyzer):
+    def __init__(self, uid=None, working_dir=None, parse=True, filenames=None):
+        super().__init__(uid, working_dir, parse, filenames=filenames)
+
+    def map(self, data, simulation):
+        result = data[self.filenames[0]]
+        return result
+
+    def reduce(self, all_data):
+        for simulation, result in all_data.items():
+            print(simulation)
+            print(result)
+            print("ExampleAnalyzer---")
+
 if __name__ == "__main__":
     platform = Platform('COMPS')
 
@@ -68,6 +82,12 @@ if __name__ == "__main__":
     manager3.analyze()
 
     # case #4: old experiment_id
+    filenames = ['output/InsetChart.json']
+    analyzer3 = [ExampleAnalyzer3(filenames=filenames)]
     manager4 = AnalyzeManager(platform=platform, ids=["f36ffd16-19da-e911-a2be-f0921c167861"],
-                              analyzers=[ExampleAnalyzer()])
+                              analyzers=analyzer3)
     manager4.analyze()
+
+    #case #5: analyzer with simulation
+    manager5 = AnalyzeManager(platform=platform, ids=['a042c9a2-60d6-e911-a2bb-f0921c167866'], analyzers=analyzers)
+    manager5.analyze()
