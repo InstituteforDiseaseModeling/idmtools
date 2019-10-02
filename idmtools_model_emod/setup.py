@@ -39,15 +39,15 @@ setup(
     long_description=readme,
     include_package_data=True,
     keywords='modeling, IDM',
-    name='idmtools_model_dtk',
+    name='idmtools_model_emod',
     entry_points=dict(idmtools_model=  # noqa: E251
-                      ["idmtools_model_dtk = idmtools_model_dtk.dtk_experiment_spec:DTKExperimentSpec"]
+                      ["idmtools_model_emod = idmtools_model_emod.emod_experiment_spec:EMODExperimentSpec"]
                       ),
     packages=find_packages(),
     setup_requires=setup_requirements,
     test_suite='tests',
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='0.1.0+nightly',
+    version='0.2.0+nightly',
     zip_safe=False,
 )

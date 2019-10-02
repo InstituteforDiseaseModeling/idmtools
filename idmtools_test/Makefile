@@ -1,4 +1,4 @@
-.PHONY: clean lint test coverage release-local dist release-staging release-staging-minor-commit release-staging-minor
+.PHONY: clean lint test coverage release-local dist release-staging release-staging-release-commit release-staging-minor
 IPY=python -c
 
 clean: ## Clean all our jobs
@@ -18,19 +18,18 @@ clean-all:  ## Deleting package info hides plugins so we only want to do that fo
 # Dev and test related rules
 
 lint: ## check style with flake8
-	@+$(IPY) "import os; os.chdir('..'); os.system('flake8 --ignore=E501 idmtools_model_dtk')"
+	@+$(IPY) "import os; os.chdir('..'); os.system('flake8 --ignore=E501 idmtools_test')"
 
 test: ## Run our tests
 	@+$(IPY) "import os; os.chdir('tests'); os.system('py.test -p no:warnings --junitxml=test_results.xml')"
 
 test-all: ## Run our  docker tests as well
-	@+$(IPY) "import os; os.environ['DOCKER_TESTS'] = '1'; \
-	os.environ['COMPS_TESTS'] = '1'; os.chdir('tests'); os.system('py.test -p no:warnings --junitxml=test_results.xml')"
+	@+$(IPY) "import os; os.chdir('tests'); os.system('py.test -p no:warnings --junitxml=test_results.xml')"
 
 coverage: ## Generate a code-coverage report
 	@make clean
 	# We have to run in our tests folder to use the proper config
-	@+$(IPY) "import os; os.chdir('tests'); os.system('coverage run --source ../idmtools_models -m pytest')"
+	@+$(IPY) "import os; os.chdir('tests'); os.system('coverage run --source ../idmtools_test -m pytest')"
 	# move our stuff back to the top
 	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
 	coverage report -m
@@ -42,7 +41,7 @@ coverage-all: ## Generate a code-coverage report
 	# We have to run in our tests folder to use the proper config
 	@+$(IPY) "import os; os.environ['DOCKER_TESTS'] = '1'; \
 	os.environ['COMPS_TESTS'] = '1'; \
-	os.chdir('tests'); os.system('coverage run --source ../idmtools_model_dtk -m pytest')"
+	os.chdir('tests'); os.system('coverage run --source ../idmtools_test -m pytest')"
 	# move our stuff back to the top
 	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
 
@@ -57,17 +56,19 @@ dist: ## build our package
 	python setup.py sdist
 
 release-staging: ## perform a release to staging
-	bump2version --config-file .bumpversion.nightly.cfg build --allow-dirty
+	bump2version build --allow-dirty
 	@make dist
-	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/pypi-staging/simple dist/*
+	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/idm-pypi-staging/ dist/*
 
-# Use before release-staging-minor-commit to confirm next version.
-release-staging-minor-dry-run: ## perform a release to staging and bump the minor version.
+# Use before release-staging-release-commit to confirm next version.
+release-staging-release-dry-run: ## perform a release to staging and bump the minor version.
 	bump2version patch --dry-run --allow-dirty
 
 # This should be used when a pushing a "production" build to staging before being approved by test
-release-staging-minor-commit: ## perform a release to staging and commit the version.
-	bump2version minor --commit
+release-staging-release-commit: ## perform a release to staging and commit the version.
+	bump2version release --commit
 	@make dist
-	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/pypi-staging/simple dist/*
+	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/idm-pypi-staging/ dist/*
 
+bump-patch:
+	bump2version patch --commit

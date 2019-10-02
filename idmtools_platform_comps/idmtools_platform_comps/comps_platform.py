@@ -257,6 +257,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                 if comps_simulation.id == s.uid:
                     s.status = COMPSPlatform._convert_COMPS_status(comps_simulation.state)
                     break
+        return experiment
 
     def _retrieve_experiments(self, suite: 'TSuite') -> TExperimentList:
         raise NotImplementedError('No method for retrieving experiments for a suite object implemented yet.')

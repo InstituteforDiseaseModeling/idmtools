@@ -5,8 +5,8 @@ from COMPS.Data import Experiment
 from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
-from idmtools_model_dtk import DTKExperiment
-from idmtools_model_dtk.defaults import DTKSIR
+from idmtools_model_emod.emod_experiment import EMODExperiment
+from idmtools_model_emod.defaults import EMODSir
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
@@ -29,7 +29,7 @@ class TestDTK(ITestWithPersistence):
         print(self.case_name)
 
     def test_sir_with_StandAloneSimulationsBuilder(self):
-        e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
+        e = EMODExperiment.from_default(self.case_name, default=EMODSir,
                                        eradication_path=os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe"))
 
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
@@ -50,7 +50,7 @@ class TestDTK(ITestWithPersistence):
             self.assertEqual(config_parameters["Enable_Immunity"], 0)
 
     def test_sir_with_ExperimentBuilder(self):
-        e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
+        e = EMODExperiment.from_default(self.case_name, default=EMODSir,
                                        eradication_path=os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe"))
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
 
@@ -78,7 +78,7 @@ class TestDTK(ITestWithPersistence):
             run_number = run_number + 1
 
     def test_batch_simulations_StandAloneSimulationsBuilder(self):
-        e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
+        e = EMODExperiment.from_default(self.case_name, default=EMODSir,
                                        eradication_path=os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe"))
 
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
@@ -103,7 +103,7 @@ class TestDTK(ITestWithPersistence):
 
     def test_batch_simulations_ExperimentBuilder(self):
 
-        e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
+        e = EMODExperiment.from_default(self.case_name, default=EMODSir,
                                        eradication_path=os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe"))
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         # s = Suite(name="test suite")
@@ -124,7 +124,7 @@ class TestDTK(ITestWithPersistence):
         self.assertTrue(e.succeeded)
 
     def test_load_files(self):
-        e = DTKExperiment.from_files(self.case_name,
+        e = EMODExperiment.from_files(self.case_name,
                                      eradication_path=DEFAULT_ERADICATION_PATH,
                                      config_path=DEFAULT_CONFIG_PATH,
                                      campaign_path=DEFAULT_CAMPAIGN_JSON,
@@ -151,7 +151,7 @@ class TestDTK(ITestWithPersistence):
 
     def test_load_files_2(self):
 
-        e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
+        e = EMODExperiment.from_default(self.case_name, default=EMODSir,
                                        eradication_path=DEFAULT_ERADICATION_PATH)
 
         e.base_simulation.load_files(demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)

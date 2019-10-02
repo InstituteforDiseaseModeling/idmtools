@@ -1,7 +1,7 @@
 import os
 import json
-from idmtools_model_dtk import DTKExperiment
-from idmtools_model_dtk.defaults import DTKSIR
+from idmtools_model_emod import EMODExperiment
+from idmtools_model_emod.defaults import EMODSir
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test import COMMON_INPUT_PATH
 
@@ -22,8 +22,8 @@ class TestCustomFiles(ITestWithPersistence):
         super().tearDown()
 
     def test_simulation_load_config(self):
-        e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
-                                       eradication_path=DEFAULT_ERADICATION_PATH)
+        e = EMODExperiment.from_default(self.case_name, default=EMODSir,
+                                        eradication_path=DEFAULT_ERADICATION_PATH)
 
         e.base_simulation.load_files(config_path=DEFAULT_CONFIG_PATH)
 
@@ -35,18 +35,18 @@ class TestCustomFiles(ITestWithPersistence):
 
         # Test: no changes to default campaign
         jt1 = e.base_simulation.campaign
-        jt2 = DTKSIR.campaign()
+        jt2 = EMODSir.campaign()
         self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
 
         # Test: no changes to default demographics
         jt1 = e.demographics
-        jt2 = DTKSIR.demographics()
+        jt2 = EMODSir.demographics()
         self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
         self.assertEqual(e.base_simulation.demographics, {})
 
     def test_simulation_load_campaign(self):
-        e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
-                                       eradication_path=DEFAULT_ERADICATION_PATH)
+        e = EMODExperiment.from_default(self.case_name, default=EMODSir,
+                                        eradication_path=DEFAULT_ERADICATION_PATH)
 
         e.base_simulation.load_files(campaign_path=DEFAULT_CAMPAIGN_JSON)
 
@@ -58,16 +58,16 @@ class TestCustomFiles(ITestWithPersistence):
 
         # Test: no changes to default config
         jt1 = e.base_simulation.config
-        jt2 = DTKSIR.config()
+        jt2 = EMODSir.config()
         self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
 
         # Test: no changes to default demographics
         jt1 = e.demographics
-        jt2 = DTKSIR.demographics()
+        jt2 = EMODSir.demographics()
         self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
 
     def test_simulation_load_demographics(self):
-        e = DTKExperiment.from_default(self.case_name, default=DTKSIR, eradication_path=DEFAULT_ERADICATION_PATH)
+        e = EMODExperiment.from_default(self.case_name, default=EMODSir, eradication_path=DEFAULT_ERADICATION_PATH)
 
         e.base_simulation.load_files(demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)
 
@@ -79,19 +79,19 @@ class TestCustomFiles(ITestWithPersistence):
 
         # Test: no changes to default config
         jt1 = e.base_simulation.config
-        jt2 = DTKSIR.config()
+        jt2 = EMODSir.config()
         jt1.pop("Demographics_Filenames")
         jt2.pop("Demographics_Filenames")
         self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
 
         # Test: no changes to default campaign
         jt1 = e.base_simulation.campaign
-        jt2 = DTKSIR.campaign()
+        jt2 = EMODSir.campaign()
         self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
 
     def test_simulation_load_files(self):
-        e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
-                                       eradication_path=DEFAULT_ERADICATION_PATH)
+        e = EMODExperiment.from_default(self.case_name, default=EMODSir,
+                                        eradication_path=DEFAULT_ERADICATION_PATH)
 
         e.base_simulation.load_files(config_path=DEFAULT_CONFIG_PATH, campaign_path=DEFAULT_CAMPAIGN_JSON,
                                      demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)
@@ -115,8 +115,8 @@ class TestCustomFiles(ITestWithPersistence):
             self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
 
     def test_experiment_load_files(self):
-        e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
-                                       eradication_path=DEFAULT_ERADICATION_PATH)
+        e = EMODExperiment.from_default(self.case_name, default=EMODSir,
+                                        eradication_path=DEFAULT_ERADICATION_PATH)
 
         e.load_files(config_path=DEFAULT_CONFIG_PATH, campaign_path=DEFAULT_CAMPAIGN_JSON,
                      demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)
@@ -140,7 +140,7 @@ class TestCustomFiles(ITestWithPersistence):
             self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
 
     def test_load_from_files(self):
-        e = DTKExperiment.from_files(self.case_name,
+        e = EMODExperiment.from_files(self.case_name,
                                      eradication_path=DEFAULT_ERADICATION_PATH,
                                      config_path=DEFAULT_CONFIG_PATH,
                                      campaign_path=DEFAULT_CAMPAIGN_JSON,
@@ -166,8 +166,8 @@ class TestCustomFiles(ITestWithPersistence):
             self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
 
     def test_experiment_load_multiple_demographics_files_1(self):
-        e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
-                                       eradication_path=DEFAULT_ERADICATION_PATH)
+        e = EMODExperiment.from_default(self.case_name, default=EMODSir,
+                                        eradication_path=DEFAULT_ERADICATION_PATH)
         e.load_files(demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)
 
         # test number of files
@@ -179,7 +179,7 @@ class TestCustomFiles(ITestWithPersistence):
         self.assertEqual(demographics_list[1], 'demographics.json')
 
     def test_experiment_load_multiple_demographics_files_2(self):
-        e = DTKExperiment.from_files(self.case_name,
+        e = EMODExperiment.from_files(self.case_name,
                                      eradication_path=DEFAULT_ERADICATION_PATH,
                                      demographics_paths=[DEFAULT_DEMOGRAPHICS_JSON])
 
@@ -192,8 +192,8 @@ class TestCustomFiles(ITestWithPersistence):
         self.assertEqual(demographics_list[0], 'demographics.json')
 
     def test_simulation_load_multiple_demographics_files(self):
-        e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
-                                       eradication_path=DEFAULT_ERADICATION_PATH)
+        e = EMODExperiment.from_default(self.case_name, default=EMODSir,
+                                        eradication_path=DEFAULT_ERADICATION_PATH)
 
         e.base_simulation.load_files(demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)
         e.base_simulation.load_files(demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)

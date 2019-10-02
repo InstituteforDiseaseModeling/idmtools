@@ -1,5 +1,4 @@
 import typing
-
 from idmtools.core import EntityStatus
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.services.platforms import PlatformPersistService
@@ -52,7 +51,7 @@ class ExperimentManager:
         self.experiment.post_creation()
 
         # Save the experiment
-        ExperimentPersistService.save(self.experiment.metadata)
+        ExperimentPersistService.save(self.experiment)
 
     def simulation_batch_worker_thread(self, simulation_batch):
         for simulation in simulation_batch:
@@ -92,7 +91,7 @@ class ExperimentManager:
         # Create experiment on the platform
         self.create_experiment()
 
-        # Create the simulations the platform
+        # Create the simulations on the platform
         self.create_simulations()
 
         # Display the experiment contents
@@ -118,5 +117,5 @@ class ExperimentManager:
         raise TimeoutError(f"Timeout of {timeout} seconds exceeded when monitoring experiment {self.experiment}")
 
     def refresh_status(self):
-        self.platform.refresh_status(item=self.experiment)
-        ExperimentPersistService.save(self.experiment.metadata)
+        self.experiment = self.platform.refresh_status(item=self.experiment)
+        ExperimentPersistService.save(self.experiment)

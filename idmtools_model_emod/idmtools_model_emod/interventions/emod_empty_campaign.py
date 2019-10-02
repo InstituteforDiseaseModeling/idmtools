@@ -1,9 +1,9 @@
 from typing import Dict
 
-from idmtools_model_dtk.defaults.idtk_default import IDTKDefault
+from idmtools_model_emod.defaults.iemod_default import IEMODDefault
 
 
-class DTKEmptyCampaign(IDTKDefault):
+class EMODEmptyCampaign(IEMODDefault):
     @staticmethod
     def campaign() -> Dict:
         return {

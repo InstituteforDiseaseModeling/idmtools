@@ -1,7 +1,7 @@
-from idmtools_model_dtk import DTKSimulation
+from idmtools_model_emod import EMODSimulation
 
 
-def standard_cb_updates(sim:'DTKSimulation'=None):
+def standard_cb_updates(sim: 'EMODSimulation' =None):
     sim.update_parameters({
         'x_Temporary_Larval_Habitat': 0.2,
         'Base_Population_Scale_Factor': 0.1,

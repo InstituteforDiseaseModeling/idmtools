@@ -4,7 +4,7 @@ from typing import Dict
 from idmtools.utils.decorators import abstractstatic
 
 
-class IDTKDefault(metaclass=ABCMeta):
+class IEMODDefault(metaclass=ABCMeta):
     @abstractstatic
     def config() -> Dict:
         return {}
