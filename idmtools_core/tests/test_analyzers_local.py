@@ -2,22 +2,20 @@ import os
 import pytest
 import json
 
-from COMPS.Data import Experiment
 from idmtools.builders import ExperimentBuilder
+from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
 from idmtools.core import EntityStatus
-from idmtools.core.PlatformFactory import PlatformFactory
+from idmtools_platform_local.docker.docker_operations import DockerOperations
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 from idmtools.analysis.AnalyzeManager import AnalyzeManager
 from idmtools.analysis.AddAnalyzer import AddAnalyzer
-from idmtools.analysis.DownloadAnalyzer import DownloadAnalyzer
-from idmtools.utils.file_parser import FileParser
+
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import del_folder
 
 from importlib import reload
-from idmtools_platform_local.docker.DockerOperations import DockerOperations
 from operator import itemgetter
 from idmtools_test.utils.confg_local_runner_test import reset_local_broker, get_test_local_env_overrides
 from idmtools_test.utils.decorators import restart_local_platform
@@ -42,7 +40,7 @@ class TestAnalyzeManager(ITestWithPersistence):
         reload(idmtools_platform_local.tasks.create_experiment)
         reload(idmtools_platform_local.tasks.create_simulation)
 
-        platform = PlatformFactory.create_from_block('Local_Staging')
+        platform = Platform('Local_Staging')
 
         # CreateSimulationTask.broker =
 
@@ -88,7 +86,7 @@ class TestAnalyzeManager(ITestWithPersistence):
     def test_AddAnalyzer(self):
 
         analyzers = [AddAnalyzer()]
-        platform = PlatformFactory.create(key='Local')
+        platform = Platform(key='Local')
 
         am = AnalyzeManager(configuration={}, platform=platform, ids=[self.exp_id], analyzers=analyzers)
         am.analyze()
