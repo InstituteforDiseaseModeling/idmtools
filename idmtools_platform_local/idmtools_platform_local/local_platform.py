@@ -69,7 +69,6 @@ class LocalPlatform(IPlatform):
     """
     Represents the platform allowing to run simulations locally.
     """
-
     def retrieve_experiment(self, experiment_id: str) -> IExperiment:
         """
         Restore experiment from local platform
@@ -213,3 +212,15 @@ class LocalPlatform(IPlatform):
             with open(full_path, 'rb') as fin:
                 byte_arrs.append(fin.read())
         return byte_arrs
+
+    def get_object(self, object_id: 'uuid', force: 'bool' = False, raw: 'bool' = False,
+                   object_type: 'ObjectType' = None, **kwargs) -> any:
+        pass
+
+    def get_parent(self, object_id: 'uuid', force: 'bool' = False, object_type: 'ObjectType' = None,
+                   raw: 'bool' = False):
+        pass
+
+    def get_children(self, object_id: 'uuid', force: 'bool' = False, object_type: 'ObjectType' = None,
+                     raw: 'bool' = False) -> 'any':
+        pass

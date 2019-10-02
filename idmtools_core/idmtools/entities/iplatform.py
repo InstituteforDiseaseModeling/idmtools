@@ -2,7 +2,7 @@ import ast
 import typing
 import uuid
 from abc import ABCMeta, abstractmethod
-from dataclasses import dataclass, fields, field
+from dataclasses import dataclass, fields
 from logging import getLogger
 
 from idmtools.core.interfaces.ientity import IEntity
@@ -11,6 +11,7 @@ if typing.TYPE_CHECKING:
     from idmtools.entities.iexperiment import TExperiment
     from idmtools.entities.isimulation import TSimulationBatch, TSimulation
     from typing import List, Any
+    from idmtools.core import ObjectType
 
 logger = getLogger(__name__)
 
@@ -167,7 +168,68 @@ class IPlatform(IEntity, metaclass=ABCMeta):
             setattr(self, fn, field_value[fn])
 
     @abstractmethod
-    def get_object(self, object_id) -> any:
+    def get_object(self, object_id: 'uuid', force: 'bool' = False, raw: 'bool' = False, object_type: 'ObjectType' = None, **kwargs) -> any:
+        """
+        Get an object from the platform.
+        This object can get anything from Experiment, Suite, Simulations.
+
+        The object can either be returned raw (meaning in the platform format) or as an idmtools entity.
+
+        If no `object_type` is provided, the function will sequentially ask the platform for all available object type.
+        If no object is found, an exception is raised.
+
+        This function is memoizing the return value in order to save time when the same object is retrieved.
+        The `force` parameter allows to force bypassing the cache and fetching a fresh object from the platform.
+        The objects cached have a 60 seconds timeout.
+
+        Args:
+            object_id: ID of the object on the platform
+            force: bypass the cache if True
+            raw: if True, returns a platform object, else returns an idmtools entity
+            object_type: Specify the type of object for faster retrieval
+            **kwargs:
+
+        Returns: idmtools/platform object with the given id
+        Raises: RuntimeError if not found
+
+        """
+        pass
+
+    @abstractmethod
+    def get_parent(self, object_id: 'uuid', force: 'bool' = False, object_type: 'ObjectType' = None,
+                   raw: 'bool' = False):
+        """
+        Get the parent of the object identified by `object_id`.
+        Similarly to `IPlatform.get_object`, this function accepts `force`, `object_type` and `raw`.
+
+        Args:
+            object_id: ID of the object we want the parent
+            force: Bypass the cache if True
+            object_type: Type of the object identified by `object_id` for faster retrieval
+            raw: if True platform object, else idmtools entity
+
+        Returns: parent if exists, None if not
+        Raises: RuntimeError if `object_id` does not exist on the platform
+        """
+        pass
+
+    @abstractmethod
+    def get_children(self, object_id: 'uuid', force: 'bool' = False, object_type: 'ObjectType' = None,
+                     raw: 'bool' = False) -> 'any':
+        """
+        Get the children of the object identified by `object_id`.
+        Similarly to `IPlatform.get_object`, this function accepts `force`, `object_type` and `raw`.
+
+        Args:
+            object_id: ID of the object we want children from
+            force: Bypass the cache if True
+            object_type: Type of the object identified by `object_id` for faster retrieval
+            raw: if True platform object, else idmtools entity
+
+        Returns: children if exists, None if not
+        Raises: RuntimeError if `object_id` does not exist on the platform
+
+        """
         pass
 
 
