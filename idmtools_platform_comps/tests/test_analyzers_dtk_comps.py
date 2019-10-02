@@ -1,4 +1,5 @@
 import os
+import sys
 import pytest
 import json
 import shutil
@@ -108,37 +109,40 @@ class TestAnalyzeManagerDtkComps(ITestWithPersistence):
         am.analyze()
 
     # TODO: test is incomplete
-    # def test_PopulationAnalyzer(self):
-    #     # del_file(os.path.join(COMMON_INPUT_PATH, 'analyzers', 'population.csv'))
-    #     # del_file(os.path.join(COMMON_INPUT_PATH, 'analyzers', 'population.png'))
-    #
-    #     analyzers = [PopulationAnalyzer()]
-    #     platform = PlatformFactory.create(key='COMPS')
-    #
-    #     am = AnalyzeManager(configuration={}, platform=platform, ids=[self.exp_id], analyzers=analyzers)
-    #     am.analyze()
-    #
-    #     # -----------------------------------------------------------------------------------------------------
-    #     # Compare "Statistical Population" values in PopulationAnalyzer's output file: 'population.csv'
-    #     # with COMPS's out\InsetChart.json for each simulation
-    #     # -----------------------------------------------------------------------------------------------------
-    #
-    #     df = FileParser.load_csv_file(os.path.join(COMMON_INPUT_PATH, 'analyzers', 'population.csv'))
-    #     sim_count = 1
-    #
-    #     for simulation in Experiment.get(self.exp_id).get_simulations():
-    #         s = simulation.get(id=simulation.id)
-    #         print(simulation.id)
-    #         # Validate simulation ids are the same between population.csv and insetchart.json
-    #         self.assertEqual(str(s.id), df[1:2].iat[0, sim_count])
-    #
-    #         insetchartFileString = s.retrieve_output_files(paths=['output/InsetChart.json'])
-    #         insetchartDict = json.loads(insetchartFileString[0].decode('utf-8'))
-    #         population_data = insetchartDict['Channels']['Statistical Population']['Data']
-    #         # Validate every single Statistical Population' from insetChart.json are equals to population.csv file
-    #         for i in range(0, len(population_data), 1):
-    #             self.assertEqual(str(population_data[i]), df[2:].iloc[i, sim_count])
-    #         sim_count = sim_count + 1
+    def test_PopulationAnalyzer(self):
+        # del_file(os.path.join(COMMON_INPUT_PATH, 'analyzers', 'population.csv'))
+        # del_file(os.path.join(COMMON_INPUT_PATH, 'analyzers', 'population.png'))
+
+        analyzers = [PopulationAnalyzer()]
+        platform = PlatformFactory.create(key='COMPS')
+
+        am = AnalyzeManager(configuration={}, platform=platform, ids=[self.exp_id], analyzers=analyzers)
+        am.analyze()
+
+        # TODO: #238 Simulations AttributeError: 'UUID' object has no attribute 'id'
+        self.assertRaises(AttributeError, getattr, sys, "'UUID' object has no attribute 'id'")
+        self.assertRaises(PermissionError)
+        # -----------------------------------------------------------------------------------------------------
+        # Compare "Statistical Population" values in PopulationAnalyzer's output file: 'population.csv'
+        # with COMPS's out\InsetChart.json for each simulation
+        # -----------------------------------------------------------------------------------------------------
+        #
+        # df = FileParser.load_csv_file(os.path.join(COMMON_INPUT_PATH, 'analyzers', 'population.csv'))
+        # sim_count = 1
+        #
+        # for simulation in Experiment.get(self.exp_id).get_simulations():
+        #     s = simulation.get(id=simulation.id)
+        #     print(simulation.id)
+        #     Validate simulation ids are the same between population.csv and insetchart.json
+        #     self.assertEqual(str(s.id), df[1:2].iat[0, sim_count])
+        #
+        #     insetchartFileString = s.retrieve_output_files(paths=['output/InsetChart.json'])
+        #     insetchartDict = json.loads(insetchartFileString[0].decode('utf-8'))
+        #     population_data = insetchartDict['Channels']['Statistical Population']['Data']
+        #     # Validate every single Statistical Population' from insetChart.json are equals to population.csv file
+        #     for i in range(0, len(population_data), 1):
+        #         self.assertEqual(str(population_data[i]), df[2:].iloc[i, sim_count])
+        #     sim_count = sim_count + 1
 
     # bug #323 - idmtools is not retro-compatible with pre-idmtools experiments
     def test_analyzer_preidmtools_exp(self):

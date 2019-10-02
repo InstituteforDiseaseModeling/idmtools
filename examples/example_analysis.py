@@ -4,6 +4,7 @@ from idmtools.entities import IAnalyzer
 
 
 class ExampleAnalyzer(IAnalyzer):
+    #TODO: Fix this example
     def __init__(self, uid=None, working_dir=None, parse=True):
         super().__init__(uid, working_dir, parse, filenames=["output/result.json"])
 
@@ -20,7 +21,7 @@ class ExampleAnalyzer(IAnalyzer):
 
 class ExampleAnalyzer2(IAnalyzer):
     def __init__(self, uid=None, working_dir=None, parse=True):
-        super().__init__(uid, working_dir, parse, filenames=["config.json"])
+        super(ExampleAnalyzer2, self).__init__(uid, working_dir, parse, filenames=["config.json"])
 
     def filter(self, simulation: 'TSimulation') -> bool:
         return int(simulation.tags.get("b")) > 5

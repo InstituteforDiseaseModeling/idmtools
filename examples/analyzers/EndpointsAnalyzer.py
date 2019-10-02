@@ -84,7 +84,6 @@ if __name__ == "__main__":
 
     analyzers = [EndpointsAnalyzer(save_file="endpoints_{}.csv".format(exp_id))]
 
-    experiment = platform.get_item(id=exp_id)
-
-    manager = AnalyzeManager(configuration={}, platform=platform, items=experiment.children(), analyzers=analyzers)
+    manager = AnalyzeManager(configuration={}, platform=platform, ids=[exp_id], analyzers=analyzers)
     manager.analyze()
+
