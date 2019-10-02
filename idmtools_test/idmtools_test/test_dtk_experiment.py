@@ -22,7 +22,7 @@ class TestExperiments(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
-        self.p = Platform("COMPS")
+        self.platform = Platform("COMPS")
 
     @unittest.skipIf(not os.getenv('WAIT_FOR_BUG_FIX', '0') == '1', reason="eradication load 2 times")
     def test_dtk_experiment_endpointsanalyzer_example(self):
@@ -31,34 +31,30 @@ class TestExperiments(ITestWithPersistence):
         DEFAULT_DEMOGRAPHICS_JSON = os.path.join(COMMON_INPUT_PATH, "custom", "demo.json")
         DEFAULT_ERADICATION_PATH = os.path.join(COMMON_INPUT_PATH, "custom", "Eradication.exe")
 
-        e = DTKExperiment.from_files(self.case_name,
-                                     eradication_path=DEFAULT_ERADICATION_PATH,
-                                     config_path=DEFAULT_CONFIG_PATH,
-                                     campaign_path=DEFAULT_CAMPAIGN_JSON,
-                                     demographics_paths=DEFAULT_DEMOGRAPHICS_JSON
-                                     )
-        e.tags = {"idmtools": "idmtools-automation", "catch": "sianyoola", "rcd": "false"}
-        e.name = 'malaria_sianyoola_interventions'
-        e.platform = self.p
+        experiment = DTKExperiment.from_files(self.case_name,
+                                              eradication_path=DEFAULT_ERADICATION_PATH,
+                                              config_path=DEFAULT_CONFIG_PATH,
+                                              campaign_path=DEFAULT_CAMPAIGN_JSON,
+                                              demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)
+        experiment.tags = {"idmtools": "idmtools-automation", "catch": "sianyoola", "rcd": "false"}
+        experiment.name = 'malaria_sianyoola_interventions'
+
         # additional dtk custom assets including custom_reports, climate files, migration files
-        ac = AssetCollection()
-        ac.add_directory(assets_directory=os.path.join(COMMON_INPUT_PATH, "custom"))
+        asset_collection = AssetCollection()
+        asset_collection.add_directory(assets_directory=os.path.join(COMMON_INPUT_PATH, "custom"))
+        experiment.add_assets(asset_collection)
 
-        e.add_assets(ac)
-
-        b = StandAloneSimulationsBuilder()
-
+        builder = StandAloneSimulationsBuilder()
         for i in range(2):
-            sim = e.simulation()
-            sim.set_parameter("Enable_Immunity", 0)
-            b.add_simulation(sim)
+            simulation = experiment.simulation()
+            simulation.set_parameter("Enable_Immunity", 0)
+            builder.add_simulation(simulation)
+        experiment.builder = builder
 
-        e.builder = b
-
-        em = ExperimentManager(experiment=e)
+        em = ExperimentManager(experiment=experiment, platform=self.platform)
         em.run()
         em.wait_till_done()
-        self.assertTrue(e.succeeded)
+        self.assertTrue(experiment.succeeded)
         exp_id = em.experiment.uid
         for simulation in Experiment.get(exp_id).get_simulations():
             config_string = simulation.retrieve_output_files(paths=["config.json"])
