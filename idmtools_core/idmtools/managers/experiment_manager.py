@@ -21,7 +21,8 @@ class ExperimentManager:
             experiment: The experiment to manage
         """
         self.experiment = experiment
-        self.platform = self.experiment.platform
+        self.platform = platform
+        self.experiment.platform = platform
 
     @classmethod
     def from_experiment_id(cls, experiment_id, platform):
