@@ -64,8 +64,8 @@ class TimeseriesAnalyzer(IAnalyzer):
         selected = []
         for sim, data in all_data.items():
             # Enrich the data with info
-            data.group = self.default_group_fn(sim.id, sim.tags)
-            data.sim_id = sim.id
+            data.group = self.default_group_fn(sim.uid, sim.tags)
+            data.sim_id = sim.uid
             selected.append(data)
 
         if len(selected) == 0:
@@ -80,8 +80,7 @@ class TimeseriesAnalyzer(IAnalyzer):
         # Re-ordering multi-index levels...
         data = combined.reorder_levels(self.ordered_levels, axis=1).sort_index(axis=1)
 
-        analyzer_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "inputs", "analyzers"))
-        #analyzer_path = os.path.abspath(os.path.dirname(__file__))
+        analyzer_path = os.path.dirname(__file__)
 
         if self.save_output:
             data.to_csv(os.path.join(analyzer_path, self.output_file))

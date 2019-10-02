@@ -7,6 +7,9 @@ from idmtools.entities import IAnalyzer
 
 
 class PopulationAnalyzer(IAnalyzer):
+    data_group_names = ['group', 'sim_id', 'channel']
+    ordered_levels = ['channel', 'group', 'sim_id']
+
     def __init__(self, filenames=None, channels=(['Statistical Population']), save_output=True):
         super().__init__()
         self.filenames = filenames or []
@@ -36,7 +39,7 @@ class PopulationAnalyzer(IAnalyzer):
         matplotlib.use("Agg")
         import matplotlib.pyplot as plt
 
-        analyzer_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "inputs", "analyzers"))
+        analyzer_path = os.path.dirname(__file__)
         selected = []
         for sim, data in all_data.items():
             # Enrich the data with info
@@ -58,11 +61,13 @@ class PopulationAnalyzer(IAnalyzer):
 
         if self.save_output:
             data.to_csv(os.path.join(analyzer_path, 'population.csv'))
+            #data.to_csv('population.csv')
 
         fig = plt.figure()
         for pop in list(all_data.values()):
             plt.plot(pop)
-        plt.legend([s.id for s in all_data.keys()])
+        plt.legend([s.uid for s in all_data.keys()])
+        #plt.show()
         plt.savefig(os.path.join(analyzer_path, 'population.png'))
         plt.close(fig)
 

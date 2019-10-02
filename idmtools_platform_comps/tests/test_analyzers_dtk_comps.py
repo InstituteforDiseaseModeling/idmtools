@@ -20,7 +20,7 @@ from idmtools.analysis.AnalyzeManager import AnalyzeManager
 from idmtools.analysis.AddAnalyzer import AddAnalyzer
 from idmtools.analysis.DownloadAnalyzer import DownloadAnalyzer
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-from idmtools_test.utils.utils import del_file, del_folder
+from idmtools_test.utils.utils import del_file, del_folder, load_csv_file
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 
@@ -112,21 +112,19 @@ class TestAnalyzeManagerDtkComps(ITestWithPersistence):
         am.analyze()
 
 
-    @unittest.skipIf(not os.getenv('WAIT_FOR_BUG_351', '0') == '1', reason="BUG 351")
     def test_population_analyzer(self):
-        del_file(os.path.join(COMMON_INPUT_PATH, 'analyzers', 'population.csv'))
-        del_file(os.path.join(COMMON_INPUT_PATH, 'analyzers', 'population.png'))
+        analyzer_path = os.path.join(os.path.dirname(__file__), "inputs", "analyzers")
+        del_file(os.path.join(analyzer_path, 'population.csv'))
+        del_file(os.path.join(analyzer_path, 'population.png'))
         self.create_experiment()
         #self.exp_id = "fc59240c-07db-e911-a2be-f0921c167861"
         filenames = ['output/InsetChart.json']
 
-        analyzer_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "inputs", "analyzers"))
 
         sys.path.insert(0, analyzer_path)
         from PopulationAnalyzer import PopulationAnalyzer
 
         analyzers = [PopulationAnalyzer(filenames=filenames)]
-        #platform = PlatformFactory.create(key='COMPS')
 
         am = AnalyzeManager(platform=self.p, ids=[self.exp_id], analyzers=analyzers)
         am.analyze()
@@ -135,8 +133,7 @@ class TestAnalyzeManagerDtkComps(ITestWithPersistence):
         # Compare "Statistical Population" values in PopulationAnalyzer's output file: 'population.csv'
         # with COMPS's out\InsetChart.json for each simulation
         # -----------------------------------------------------------------------------------------------------
-
-        df = FileParser.load_csv_file(os.path.join(COMMON_INPUT_PATH, 'analyzers', 'population.csv'))
+        df = load_csv_file(os.path.join(analyzer_path, 'population.csv'))
         sim_count = 1
 
         for simulation in Experiment.get(self.exp_id).get_simulations():

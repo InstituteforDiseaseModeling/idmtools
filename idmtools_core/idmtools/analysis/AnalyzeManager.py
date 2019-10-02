@@ -264,9 +264,9 @@ class AnalyzeManager(CacheEnabled):
         for analyzer in self.analyzers:
             item_data_for_analyzer = {}
             for item_id in self.cache:
-                # item = self._items[item_id]
+                item = self._items[item_id]
                 item_result = self.cache.get(item_id)
-                item_data_for_analyzer[item_id] = item_result.get(analyzer.uid, None)  # item is currently unhashable if PythonSimulation, so temporarily using item_id, ck4
+                item_data_for_analyzer[item] = item_result.get(analyzer.uid, None)
             finalize_results[analyzer.uid] = worker_pool.apply_async(analyzer.reduce, (item_data_for_analyzer,))
 
         # wait for results and clean up multiprocessing

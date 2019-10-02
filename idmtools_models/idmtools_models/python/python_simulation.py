@@ -83,3 +83,6 @@ class PythonSimulation(ISimulation):
     def gather_assets(self) -> None:
         params = {self.envelope: self.parameters} if self.envelope else self.parameters
         self.assets.add_asset(Asset(filename="config.json", content=json.dumps(params)), fail_on_duplicate=False)
+
+    def __hash__(self):
+        return id(self.uid)
