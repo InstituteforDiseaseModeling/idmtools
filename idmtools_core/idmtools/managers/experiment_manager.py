@@ -22,7 +22,7 @@ class ExperimentManager:
         """
         self.experiment = experiment
         self.platform = platform
-
+        self.experiment.platform = platform
 
     @classmethod
     def from_experiment_id(cls, experiment_id, platform):
