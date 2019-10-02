@@ -143,7 +143,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         # Register the IDs
         return [s.id for s in created_simulations]
 
-    def run_simulations(self, experiment: TExperiment):
+    def run_simulations(self, experiment: 'TExperiment'):
         comps_experiment = self.get_object(experiment.uid, raw=True, object_type=ObjectType.EXPERIMENT)
         comps_experiment.commission()
 
@@ -166,7 +166,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         experiment.simulations.clear()
         self.restore_simulations(experiment)
 
-    def restore_simulations(self, experiment: TExperiment) -> None:
+    def restore_simulations(self, experiment: 'TExperiment') -> None:
         for s in self.get_children(experiment.uid, force=True, object_type=ObjectType.EXPERIMENT):
             experiment.simulations.append(s)
 
