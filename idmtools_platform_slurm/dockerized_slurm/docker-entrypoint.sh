@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-chown -R slurm:slurm /data
+chown -R slurm:slurm-data /data
 chmod 0775 /data
 
 if [ "$1" = "slurmdbd" ]

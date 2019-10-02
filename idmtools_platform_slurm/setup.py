@@ -36,7 +36,7 @@ setup(
     classifiers=[
         'Framework:: IDM-Tools :: Platform',
     ],
-    description="Provides ability to run models locally using docker containers to IDM-Tools",
+    description="Provides ability to run against Slurm",
     install_requires=requirements,
     long_description=readme,
     include_package_data=True,

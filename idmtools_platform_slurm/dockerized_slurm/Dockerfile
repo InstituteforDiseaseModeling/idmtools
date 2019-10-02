@@ -64,12 +64,14 @@ RUN set -x \
     && popd \
     && rm -rf slurm
 RUN /usr/bin/ssh-keygen -A \
+    && groupadd -r --gid=996 slurm-data \
     && groupadd -r --gid=995 slurm \
-    && useradd -r -g slurm --uid=995 slurm \
+    && useradd -r -g slurm -G slurm-data --uid=995 slurm \
     && groupadd -r --gid=1005 test \
-    && useradd -r -g test -G slurm --uid=1005 test \
+    && useradd -r -g test -G slurm-data --uid=1005 test \
     && echo "test:test" | chpasswd \
     && mkdir -p /home/test/.ssh \
+    && chown -R test:test /home/test \
     && mkdir /etc/sysconfig/slurm \
         /var/spool/slurmd \
         /var/run/slurmd \
