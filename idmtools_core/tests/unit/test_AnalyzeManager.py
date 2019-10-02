@@ -4,7 +4,7 @@ from idmtools.analysis.AnalyzeManager import AnalyzeManager
 from idmtools.analysis.DownloadAnalyzer import DownloadAnalyzer as SampleAnalyzer
 from idmtools.core.enums import EntityStatus
 from idmtools.core.item_id import ItemId
-from idmtools.core.PlatformFactory import PlatformFactory
+from idmtools.core.platform_factory import Platform
 from idmtools.entities.iitem import IItem
 from idmtools.entities.ianalyzer import IAnalyzer
 
@@ -37,7 +37,7 @@ class TestAnalyzeManager(unittest.TestCase):
 
     def setUp(self) -> None:
         self.configuration = {'max_processes': 2}
-        self.platform = PlatformFactory.create(key='COMPS')
+        self.platform = Platform('COMPS')
         self.analyze_manager = self._get_analyze_manager()
         item_id = ItemId([('simulation_id', '123'), ('experiment_id', '456')])
         self.sample_item = TestItem(uid='abc')

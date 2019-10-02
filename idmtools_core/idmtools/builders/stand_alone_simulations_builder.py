@@ -16,11 +16,13 @@ class StandAloneSimulationsBuilder(ExperimentBuilder):
         # make sure these not overridden
         parent_id = getattr(simulation, 'parent_id')
         children_ids = getattr(simulation, 'children_ids')
+        platform = getattr(simulation, 'platform')
 
         simulation.__dict__ = simulation_to_set.__dict__
 
         simulation.parent_id = parent_id
         simulation.children_ids = children_ids
+        simulation.platform = platform
         return {}
 
     def __iter__(self):

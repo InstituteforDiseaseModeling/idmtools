@@ -3,27 +3,24 @@ import logging
 import ntpath
 import os
 
+
 from COMPS import Client
 from COMPS.Data import AssetCollection, AssetCollectionFile, Configuration, Experiment as COMPSExperiment, \
     QueryCriteria, Simulation as COMPSSimulation, SimulationFile
 from COMPS.Data.Simulation import SimulationState
 from dataclasses import dataclass, field
 
-from idmtools.core import CacheEnabled
-from idmtools.core.enums import EntityStatus
+from idmtools.core import CacheEnabled, UnknownItemException
 from idmtools.core.experiment_factory import experiment_factory
-from idmtools.entities import IPlatform, ISimulation, IExperiment, ISuite
+from idmtools.core.enums import EntityStatus
+from idmtools.entities import IPlatform, ISuite
+from idmtools.entities.ianalyzer import TAnalyzerList
+from idmtools.entities.iexperiment import TExperiment, TExperimentList, IExperiment
+from idmtools.entities.iitem import TItemList, TItem
+from idmtools.entities.isimulation import TSimulationList, ISimulation
 from idmtools.utils.time import timestamp
-
-import typing
-from typing import List, NoReturn
-if typing.TYPE_CHECKING:
-    import uuid
-    from idmtools.entities.ianalyzer import TAnalyzerList
-    from idmtools.entities.iexperiment import TExperiment, TExperimentList
-    from idmtools.entities.iitem import TItem, TItemList
-    from idmtools.entities.isimulation import TSimulation, TSimulationList
-
+from typing import NoReturn, List
+import uuid
 
 logging.getLogger('COMPS.Data.Simulation').disabled = True
 logger = logging.getLogger(__name__)
@@ -78,7 +75,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         self._login()
         self._comps_experiment = COMPSExperiment.get(id=self._comps_experiment_id,
                                                      query_criteria=QueryCriteria().select(["id"]).select_children(
-                                                         ["tags"]))
+                                                         ["tags", "configuration"]))
         return self._comps_experiment
 
     @comps_experiment.setter
@@ -109,6 +106,11 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         ac.save()
         experiment.assets.uid = ac.id
         print("Asset collection for experiment: {}".format(ac.id))
+
+        # associate the assets with the experiment in COMPS
+        e = COMPSExperiment.get(id=experiment.uid)
+        e.configuration = Configuration(asset_collection_id=ac.id)
+        e.save()
 
     @staticmethod
     def _send_assets_for_simulation(simulation, comps_simulation) -> NoReturn:
@@ -165,7 +167,8 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         self.send_assets(item=experiment)
         return experiment.uid
 
-    def create_items(self, items: TItemList) -> List[uuid]:
+
+    def create_items(self, items: TItemList) -> 'List[uuid]':
         # TODO: add ability to create suites
         types = list({type(item) for item in items})
         if len(types) != 1:
@@ -187,9 +190,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         created_simulations = []
 
         for simulation in simulation_batch:
-            s = COMPSSimulation(name=simulation.experiment.name, experiment_id=simulation.experiment.uid,
-                                configuration=Configuration(asset_collection_id=simulation.experiment.assets.uid))
-
+            s = COMPSSimulation(name=simulation.experiment.name, experiment_id=simulation.experiment.uid)
             self.send_assets(item=simulation, comps_simulation=s)
             s.set_tags(simulation.tags)
             created_simulations.append(s)
@@ -291,7 +292,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             except:
                 pass
         if not successful:
-            raise self.UnknownItemException(f'Unable to retrieve children for unknown item '
+            raise UnknownItemException(f'Unable to retrieve children for unknown item '
                                             f'id: {item.uid} of type: {type(item)}')
         for child in children:
             child.platform = self
@@ -314,6 +315,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                                                tags=self.comps_experiment.tags)
         experiment.platform = self
         experiment.uid = self.comps_experiment.id
+        experiment.name = self.comps_experiment.name
         return experiment
 
     # @retry_function
@@ -329,9 +331,8 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         try:
             parent = self._retrieve_suite(suite_id=item.parent_id)
             successful = True
-        except NotImplementedError:  # TODO: temporary for development debugging ONLY (breaks some functionality). We need to implement retrieve_suite rather than kludge this eventually.
-            parent = None
-            successful = True
+        except NotImplementedError:  # TODO
+            pass
         if not successful:
             try:
                 parent = self._retrieve_experiment(experiment_id=item.parent_id)
@@ -339,7 +340,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             except:
                 pass
         if not successful:
-            raise self.UnknownItemException(f'Unable to retrieve parent for unknown item '
+            raise UnknownItemException(f'Unable to retrieve parent for unknown item '
                                             f'id: {item.uid} of type: {type(item)}')
         parent.platform = self
         return parent
@@ -363,9 +364,27 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         self._login()
 
         # Retrieve the simulation from COMPS
-        comps_simulation = COMPSSimulation.get(item.uid,
-                                               query_criteria=QueryCriteria().select(['id']).select_children(
-                                                   ["files", "configuration"]))
+        # TODO: revert back to this once pycomps is fixed with 'rollup' configurations.
+        # comps_simulation = COMPSSimulation.get(item.uid,
+        #                                        query_criteria=QueryCriteria().select(['id', 'experiment_id']).select_children(
+        #                                            ["files", "configuration"]))
+
+        # Temporary stand-in for pycomps fix; code below from Jeff S.
+        class QueryCriteriaExt(QueryCriteria):
+            _ep_dict = None
+
+            def add_extra_params(self, ep_dict):
+                self._ep_dict = ep_dict
+                return self
+
+            def to_param_dict(self, ent_type):
+                pd = super(QueryCriteriaExt, self).to_param_dict(ent_type)
+                if self._ep_dict:
+                    pd = {**pd, **self._ep_dict}
+                return pd
+        comps_simulation = COMPSSimulation.get(item.uid, query_criteria=QueryCriteriaExt().select(
+            ['id', 'experiment_id']).select_children(
+            ["files", "configuration"]).add_extra_params({'coalesceconfig': True}))
 
         # Separate the output files in 2 groups:
         # - one for the transient files (retrieved through the comps simulation)
@@ -423,7 +442,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             except:
                 pass
         if not successful:
-            raise self.UnknownItemException(f'Unable to load item id: {id} from platform: {self.__class__.__name__}')
+            raise UnknownItemException(f'Unable to load item id: {id} from platform: {self.__class__.__name__}')
 
         item.platform = self
         return item

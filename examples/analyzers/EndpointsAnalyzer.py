@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
 from idmtools.analysis.AnalyzeManager import AnalyzeManager
+from idmtools.core.platform_factory import Platform
 from idmtools.entities import IAnalyzer
-from idmtools.core.PlatformFactory import PlatformFactory
 
 
 class EndpointsAnalyzer(IAnalyzer):
@@ -78,12 +78,13 @@ class EndpointsAnalyzer(IAnalyzer):
 
 if __name__ == "__main__":
 
-    platform = PlatformFactory.create(key='COMPS')
+    platform = Platform('COMPS')
 
     exp_id = '8deacaaf-30c9-e911-a2bb-f0921c167866' #'719de048-64cb-e911-a2bb-f0921c167866' #comps2 staging exp id #'8deacaaf-30c9-e911-a2bb-f0921c167866'
 
     analyzers = [EndpointsAnalyzer(save_file="endpoints_{}.csv".format(exp_id))]
 
-    manager = AnalyzeManager(configuration={}, platform=platform, ids=[exp_id], analyzers=analyzers)
-    manager.analyze()
+    #experiment = platform.get_item(id=exp_id)
 
+    manager = AnalyzeManager(platform=platform, ids=[exp_id], analyzers=analyzers)
+    manager.analyze()

@@ -14,7 +14,7 @@ class ExperimentManager:
     Manages an experiment.
     """
 
-    def __init__(self, experiment: 'TExperiment'):
+    def __init__(self, experiment: 'TExperiment', platform: 'TPlatform'):
         """
         Constructor
         Args:

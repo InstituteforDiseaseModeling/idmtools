@@ -15,7 +15,6 @@ class ISimulation(IAssetsEnabled, IRootItem, metaclass=ABCMeta):
     Represents a generic Simulation.
     This class needs to be implemented for each model type with specifics.
     """
-    experiment: 'TExperiment' = field(default=None, compare=False, metadata={"md": True})
 
     @abstractmethod
     def set_parameter(self, name: str, value: any) -> dict:
@@ -49,7 +48,11 @@ class ISimulation(IAssetsEnabled, IRootItem, metaclass=ABCMeta):
         pass
 
     def __repr__(self):
-        return f"<Simulation: {self.uid} - Exp_id: {self.experiment.uid if self.experiment else None}>"
+        try:
+            exp_id = self.experiment.uid
+        except IRootItem.NoPlatformException:
+            exp_id = 'NoPlatformSet'
+        return f"<Simulation: {self.uid} - Exp_id: {exp_id}>"
 
     def pre_creation(self):
         self.gather_assets()
@@ -61,7 +64,13 @@ class ISimulation(IAssetsEnabled, IRootItem, metaclass=ABCMeta):
         """
         pass
 
+    @property
+    def experiment(self):
+        return self.parent(refresh=False)
+
+
 TSimulation = typing.TypeVar("TSimulation", bound=ISimulation)
 TSimulationClass = typing.Type[TSimulation]
 TSimulationBatch = typing.List[TSimulation]
 TAllSimulationData = typing.Mapping[TSimulation, typing.Any]
+TSimulationList = typing.List[typing.Union[TSimulation, str]]

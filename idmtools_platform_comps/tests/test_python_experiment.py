@@ -50,7 +50,6 @@ class TestPythonExperiment(ITestWithPersistence):
         pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
 
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123, "KeyOnly": None}
-
         pe.base_simulation.set_parameter("c", "c-value")
         builder = ExperimentBuilder()
         # ------------------------------------------------------
@@ -90,7 +89,6 @@ class TestPythonExperiment(ITestWithPersistence):
     # b=[2,3,4,5,6]  <-- b = a + 2
     def test_sweeps_2_related_parameters_comps(self):
         pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
-
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
 
         pe.base_simulation.set_parameter("c", "c-value")
@@ -188,7 +186,7 @@ class TestPythonExperiment(ITestWithPersistence):
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         pe.base_simulation.envelope = "parameters"
         # sim = pe.simulation() # uncomment this line when issue #138 gets fixed
-        sim = pe.simulation()
+        sim = pe.base_simulation
         sim.set_parameter("a", 1)
         sim.set_parameter("b", 10)
         builder = StandAloneSimulationsBuilder()

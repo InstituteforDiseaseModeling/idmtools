@@ -14,13 +14,11 @@ class TestExperimentFactory(ITestWithPersistence):
         test_platform = Platform('Test')
         experiment = experiment_factory.create("PythonExperiment", tags={"a": "1", "b": 2})
         experiment.model_path = os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py")
-        experiment.platform = test_platform
-
         builder = ExperimentBuilder()
         builder.add_sweep_definition(lambda simulation, value: {"p": value}, range(0, 2))
         experiment.builder = builder
 
-        em = ExperimentManager(experiment=experiment)
+        em = ExperimentManager(experiment=experiment, platform=test_platform)
         em.run()
 
         self.assertEqual(len(em.experiment.children()), 2)
@@ -32,7 +30,6 @@ class TestExperimentFactory(ITestWithPersistence):
         test_platform = Platform('Test')
         experiment = experiment_factory.create("DTKExperiment", tags={"a": "1", "b": 2},
                                                eradication_path=os.path.join(COMMON_INPUT_PATH, "dtk"))
-        experiment.platform = test_platform
         experiment.load_files(config_path=os.path.join(COMMON_INPUT_PATH, "files", "config.json"),
                               campaign_path=os.path.join(COMMON_INPUT_PATH, "files", "campaign.json"),
                               demographics_paths=os.path.join(COMMON_INPUT_PATH, "files", "demographics.json"))
@@ -44,7 +41,7 @@ class TestExperimentFactory(ITestWithPersistence):
             b.add_simulation(sim)
         experiment.builder = b
 
-        em = ExperimentManager(experiment=experiment)
+        em = ExperimentManager(experiment=experiment, platform=test_platform)
         em.run()
 
         self.assertEqual(len(em.experiment.children(refresh=True)), 20)

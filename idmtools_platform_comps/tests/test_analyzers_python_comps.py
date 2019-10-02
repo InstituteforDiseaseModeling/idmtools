@@ -1,18 +1,18 @@
 import os
-import pytest
+import unittest
+
 from functools import partial
 
 from COMPS.Data import Experiment
 from idmtools.builders import ExperimentBuilder
+from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools.core import EntityStatus
 from idmtools_models.python import PythonExperiment
-from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
-from idmtools.core.PlatformFactory import PlatformFactory
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
 from idmtools.analysis.AnalyzeManager import AnalyzeManager
 from idmtools.analysis.DownloadAnalyzer import DownloadAnalyzer
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import del_folder
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
@@ -30,13 +30,14 @@ setD = partial(param_update, param="d")
 
 class TestAnalyzeManagerPythonComps(ITestWithPersistence):
 
+
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
-        self.p = COMPSPlatform()
+        self.p = Platform('COMPS2')
 
+    def create_experiment(self):
         pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
-
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
 
         pe.base_simulation.set_parameter("c", "c-value")
@@ -71,12 +72,11 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
 
         # create a new empty 'output' dir
         os.mkdir("output")
-
+        self.create_experiment()
         filenames = ['output\\result.json', 'config.json']
         analyzers = [DownloadAnalyzer(filenames=filenames, output_path='output')]
-        platform = PlatformFactory.create(key='COMPS')
 
-        am = AnalyzeManager(configuration={}, platform=platform, ids=[self.exp_id], analyzers=analyzers)
+        am = AnalyzeManager(platform=self.p, ids=[self.exp_id], analyzers=analyzers)
         am.analyze()
 
         for simulation in Experiment.get(self.exp_id).get_simulations():
@@ -91,12 +91,16 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         # create a new empty 'output' dir
         os.mkdir("output")
 
-        filenames = ['output\\InsetChart.json', 'config.json']
+        filenames = ['output/result.json', 'config.json']
         analyzers = [DownloadAnalyzer(filenames=filenames, output_path='output')]
-        platform = PlatformFactory.create(key='COMPS')
 
-        exp_list = ['76080194-0bc5-e911-a2bb-f0921c167866', 'b99307dd-aeca-e911-a2bb-f0921c167866'] #comps2 staging
+        exp_list = ['3ca4491a-0edb-e911-a2be-f0921c167861', '4dcd7149-4eda-e911-a2be-f0921c167861']
 
-        am = AnalyzeManager(configuration={}, platform=platform, ids=exp_list, analyzers=analyzers)
+        am = AnalyzeManager(platform=self.p, ids=exp_list, analyzers=analyzers)
         am.analyze()
+        for exp_id in exp_list:
+            for simulation in Experiment.get(exp_id).get_simulations():
+                s = simulation.get(id=simulation.id)
+                self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "config.json")))
+                self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "result.json")))
 

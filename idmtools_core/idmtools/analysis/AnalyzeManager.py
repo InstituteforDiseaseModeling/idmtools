@@ -4,7 +4,7 @@ import time
 import typing
 
 from idmtools.analysis.map_worker_entry import map_item
-from idmtools.core.CacheEnabled import CacheEnabled
+from idmtools.core import CacheEnabled
 from idmtools.core.enums import EntityStatus
 from idmtools.utils.command_line import animation
 from idmtools.utils.language import on_off, verbose_timedelta
@@ -48,10 +48,10 @@ class AnalyzeManager(CacheEnabled):
     class ItemsNotReady(Exception):
         pass
 
-    def __init__(self, configuration, platform, ids=None, analyzers=None, working_dir=os.getcwd(),
+    def __init__(self, platform, configuration=None, ids=None, analyzers=None, working_dir=os.getcwd(),
                  partial_analyze_ok=False, max_items=None, verbose=True, force_manager_working_directory=False):
         super().__init__()
-        self.configuration = configuration
+        self.configuration = configuration or {}
         self.platform = platform
         self.max_processes = min(os.cpu_count(), self.configuration.get('max_processes', 32))
 
@@ -264,9 +264,9 @@ class AnalyzeManager(CacheEnabled):
         for analyzer in self.analyzers:
             item_data_for_analyzer = {}
             for item_id in self.cache:
-                # item = self._items[item_id]
+                item = self._items[item_id]
                 item_result = self.cache.get(item_id)
-                item_data_for_analyzer[item_id] = item_result.get(analyzer.uid, None)  # item is currently unhashable if PythonSimulation, so temporarily using item_id, ck4
+                item_data_for_analyzer[item] = item_result.get(analyzer.uid, None)
             finalize_results[analyzer.uid] = worker_pool.apply_async(analyzer.reduce, (item_data_for_analyzer,))
 
         # wait for results and clean up multiprocessing

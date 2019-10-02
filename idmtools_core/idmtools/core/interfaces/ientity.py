@@ -8,7 +8,7 @@ if typing.TYPE_CHECKING:
     from idmtools.core import TTags
 
 
-@dataclass
+@dataclass(unsafe_hash=True)
 class IEntity(metaclass=ABCMeta):
     """
     Interface for all entities in the system.

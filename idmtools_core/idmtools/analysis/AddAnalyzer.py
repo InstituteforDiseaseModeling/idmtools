@@ -25,7 +25,7 @@ class AddAnalyzer(IAnalyzer):
         os.makedirs(self.output_path, exist_ok=True)
 
     def map(self, data, item):
-        number = int(list(data.values())[0].split()[0])
+        number = int(list(data.values())[0].split()[10])
         result = number + 100
         return result
 

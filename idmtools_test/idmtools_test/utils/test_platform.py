@@ -8,6 +8,7 @@ import diskcache
 import numpy as np
 from typing import Type
 
+from idmtools.core import UnknownItemException
 from idmtools.registry.platform_specification import example_configuration_impl, get_platform_impl, \
     get_platform_type_impl, PlatformSpecification
 from idmtools.registry.plugin_specification import get_description_impl
@@ -64,7 +65,7 @@ class TestPlatform(IPlatform):
             children = self._restore_simulations(experiment=item)
             successful = True
         if not successful:
-            raise self.UnknownItemException(f'Unable to retrieve children for unknown item '
+            raise UnknownItemException(f'Unable to retrieve children for unknown item '
                                             f'id: {item.uid} of type: {type(item)}')
         for child in children:
             child.platform = self
@@ -120,7 +121,7 @@ class TestPlatform(IPlatform):
         simulations = []
         experiment_id = None
         for simulation in simulation_batch:
-            experiment_id = experiment_id or simulation.parent().uid
+            experiment_id = experiment_id or self.get_parent(simulation).uid
             simulation.uid = uuid.uuid4()
             simulations.append(simulation)
 
@@ -172,7 +173,7 @@ class TestPlatform(IPlatform):
             except:
                 pass
         if not successful:
-            raise self.UnknownItemException(f'Unable to load item id: {id} from platform: {self.__class__.__name__}')
+            raise UnknownItemException(f'Unable to load item id: {id} from platform: {self.__class__.__name__}')
 
         item.platform = self
         return item
@@ -213,7 +214,7 @@ class TestPlatform(IPlatform):
             except:
                 pass
         if not successful:
-            raise self.UnknownItemException(f'Unable to retrieve parent for unknown item '
+            raise UnknownItemException(f'Unable to retrieve parent for unknown item '
                                             f'id: {item.uid} of type: {type(item)}')
         parent.platform = self
         return parent

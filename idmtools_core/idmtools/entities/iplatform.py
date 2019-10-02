@@ -18,8 +18,9 @@ logger = getLogger(__name__)
 
 CALLER_LIST = ['_create_from_block',    # create platform through Platform Factory
                'fetch',                 # create platform through un-pickle
-               'get'                    # create platform through platform spec' get method
-               ]
+               'get',                    # create platform through platform spec' get method
+               '_main',
+               '__newobj__']
 
 
 class IPlatform(IEntity, metaclass=ABCMeta):
@@ -32,9 +33,6 @@ class IPlatform(IEntity, metaclass=ABCMeta):
     - Commissioning
     - File handling
     """
-
-    class UnknownItemException(Exception):
-        pass
 
     @staticmethod
     def get_caller():
@@ -84,7 +82,7 @@ class IPlatform(IEntity, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def run_items(self, items: 'TItem') -> NoReturn:
+    def run_items(self, items: 'TItemList') -> NoReturn:
         """
         Run the items (sims, exps, suites) on the platform
         Args:

@@ -116,7 +116,6 @@ class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
                         tags.update(new_tags)
 
                 simulation.tags = tags
-                simulation.platform = self.platform
                 sims.append(simulation)
                 
             yield sims
@@ -129,10 +128,8 @@ class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
         """
         sim = copy.deepcopy(self.base_simulation)
         sim.assets = copy.deepcopy(self.base_simulation.assets)
-
         sim.platform = self.platform
         sim.parent_id = self.uid
-
         return sim
 
     def pre_creation(self):
