@@ -6,10 +6,11 @@ import pytest
 
 from COMPS.Data import Experiment
 
-from idmtools.builders import StandAloneSimulationsBuilder
 from idmtools.core.platform_factory import Platform
+from idmtools.builders import StandAloneSimulationsBuilder
 from idmtools.managers import ExperimentManager
 from idmtools_model_dtk import DTKExperiment
+
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools.assets import AssetCollection
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence

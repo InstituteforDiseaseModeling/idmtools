@@ -1,5 +1,6 @@
 import os
 import sys
+
 import unittest
 
 import pytest
@@ -110,6 +111,7 @@ class TestAnalyzeManagerDtkComps(ITestWithPersistence):
         am = AnalyzeManager(platform=self.p, ids=exp_list, analyzers=analyzers)
         am.analyze()
 
+
     @unittest.skipIf(not os.getenv('WAIT_FOR_BUG_351', '0') == '1', reason="BUG 351")
     def test_population_analyzer(self):
         del_file(os.path.join(COMMON_INPUT_PATH, 'analyzers', 'population.csv'))
@@ -150,6 +152,7 @@ class TestAnalyzeManagerDtkComps(ITestWithPersistence):
             for i in range(0, len(population_data), 1):
                 self.assertEqual(str(population_data[i]), df[2:].iloc[i, sim_count])
             sim_count = sim_count + 1
+
 
     def test_analyzer_preidmtools_exp(self):
         # delete output from previous run

@@ -45,7 +45,7 @@ class PopulationAnalyzer(IAnalyzer):
             selected.append(data)
 
 
-        if len(selected) == 0:
+         if len(selected) == 0:
             print("No data have been returned... Exiting...")
             return
 
@@ -60,6 +60,8 @@ class PopulationAnalyzer(IAnalyzer):
         if self.save_output:
             data.to_csv(os.path.join(analyzer_path, 'population.csv'))
 
+
+
         fig = plt.figure()
         for pop in list(all_data.values()):
             plt.plot(pop)
@@ -72,10 +74,9 @@ if __name__ == "__main__":
 
     platform = Platform('COMPS2')
 
-    exp_id = '65a93d51-04db-e911-a2be-f0921c167861' # comps2 exp_id
-
     filenames = ['output/InsetChart.json']
     analyzers = [PopulationAnalyzer(filenames=filenames)]
 
+    exp_id = '65a93d51-04db-e911-a2be-f0921c167861' # comps2 exp_id
     manager = AnalyzeManager( platform=platform, ids=[exp_id], analyzers=analyzers)
     manager.analyze()
