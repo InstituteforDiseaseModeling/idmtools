@@ -99,8 +99,23 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         display(self, experiment_table_display)
 
     def batch_simulations(self, batch_size=5):
+        # make sure each simulation has experiment
+        if self.simulations:
+            for sim in self.simulations:
+                sim.experiment = self
+
+        # Consider simulations first
+        for groups in grouper(self.simulations, batch_size):
+            sims = []
+            for sim in filter(None, groups):
+                sims.append(sim)
+
+            yield sims
+
+        # Consider builders next
         if not self.builders:
-            yield (self.simulation(),)
+            if not self.simulations:
+                yield (self.simulation(),)
             return
 
         for groups in grouper(chain(*self.builders), batch_size):
