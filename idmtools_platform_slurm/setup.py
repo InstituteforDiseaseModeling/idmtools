@@ -45,7 +45,7 @@ setup(
     packages=find_packages(),
     setup_requires=setup_requirements,
     entry_points=dict(idmtools_platform=  # noqa: E251
-                      ["idmtools_platform_slurm = idmtools_platform_slurm.plugin_info:LocalPlatformSpecification"]
+                      ["idmtools_platform_slurm = idmtools_platform_slurm.plugin_info:SlurmPlatformSpecification"]
                       ),
     test_suite='tests',
     extras_require=extras,

@@ -38,13 +38,13 @@ class TestPythonSimulation(ITestWithPersistence):
         em = ExperimentManager(experiment=pe, platform=platform)
         em.run()
         em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.FAILED for s in pe.simulations]))
+        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
         # validation
         self.assertEqual(pe.name, name)
         self.assertEqual(pe.simulation_count, 5)
         self.assertIsNotNone(pe.uid)
-        self.assertTrue(all([s.status == EntityStatus.FAILED for s in pe.simulations]))
-        self.assertFalse(pe.succeeded)
+        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
+        self.assertTrue(pe.succeeded)
 
         # validate tags
         tags = []

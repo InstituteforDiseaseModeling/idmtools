@@ -39,7 +39,7 @@ class SlurmPlatformSpecification(PlatformSpecification):
         Returns:
 
         """
-        from idmtools_platform_slurm.idmtools_platform_slurm.slurm_platform import SlurmPlatform
+        from idmtools_platform_slurm.slurm_platform import SlurmPlatform
         return SlurmPlatform(**configuration)
 
     @example_configuration_impl
@@ -48,5 +48,5 @@ class SlurmPlatformSpecification(PlatformSpecification):
 
     @get_platform_type_impl
     def get_type(self) -> Type['SlurmPlatform']:
-        from idmtools_platform_slurm.idmtools_platform_slurm.slurm_platform import SlurmPlatform
+        from idmtools_platform_slurm.slurm_platform import SlurmPlatform
         return SlurmPlatform

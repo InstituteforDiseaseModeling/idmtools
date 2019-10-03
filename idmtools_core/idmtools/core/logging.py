@@ -80,7 +80,7 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
 
 def exclude_logging_classes():
     # remove comps by default
-    for l in ['urllib3', 'COMPS']:
+    for l in ['urllib3', 'COMPS', 'paramiko']:
         comps_logger = getLogger(l)
         comps_logger.setLevel(logging.WARN)
 

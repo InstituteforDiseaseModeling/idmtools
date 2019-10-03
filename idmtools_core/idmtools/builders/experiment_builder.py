@@ -1,23 +1,27 @@
 import inspect
 import typing
+from dataclasses import dataclass, field
 from functools import partial
 from inspect import signature
 from itertools import product
+from typing import List, Any
 
 if typing.TYPE_CHECKING:
     from typing import Callable, Any, List, Iterable, Union
 
 
+@dataclass
 class ExperimentBuilder:
     """
     Represents an experiment builder
     """
     # The keyword searched in the function used for sweeps
     SIMULATION_ATTR = 'simulation'
+    sweeps: List[Any] = field(default_factory=list)
+    count: int = 1
 
-    def __init__(self):
-        self.sweeps = []
-        self.count = 1
+    def __hash__(self):
+        return hash((self.SIMULATION_ATTR, str(self.sweeps), self.count))
 
     def add_sweep_definition(self, function: 'Callable', values: 'Union[List[Any], Iterable]'):
         """
