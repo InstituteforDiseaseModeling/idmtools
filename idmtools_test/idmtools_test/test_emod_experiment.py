@@ -9,7 +9,7 @@ from COMPS.Data import Experiment
 from idmtools.core.platform_factory import Platform
 from idmtools.builders import StandAloneSimulationsBuilder
 from idmtools.managers import ExperimentManager
-from idmtools_model_dtk import DTKExperiment
+from idmtools_model_emod import EMODExperiment
 
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools.assets import AssetCollection
@@ -31,7 +31,7 @@ class TestExperiments(ITestWithPersistence):
         DEFAULT_DEMOGRAPHICS_JSON = os.path.join(COMMON_INPUT_PATH, "custom", "demo.json")
         DEFAULT_ERADICATION_PATH = os.path.join(COMMON_INPUT_PATH, "custom", "Eradication.exe")
 
-        experiment = DTKExperiment.from_files(self.case_name,
+        experiment = EMODExperiment.from_files(self.case_name,
                                               eradication_path=DEFAULT_ERADICATION_PATH,
                                               config_path=DEFAULT_CONFIG_PATH,
                                               campaign_path=DEFAULT_CAMPAIGN_JSON,

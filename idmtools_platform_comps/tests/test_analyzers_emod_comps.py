@@ -11,9 +11,8 @@ from COMPS.Data import Experiment
 from idmtools.builders import ExperimentBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
-from idmtools.utils.file_parser import FileParser
-from idmtools_model_dtk import DTKExperiment
-from idmtools_model_dtk.defaults import DTKSIR
+from idmtools_model_emod.defaults import EMODSir
+from idmtools_model_emod.emod_experiment import EMODExperiment
 
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools.analysis.AnalyzeManager import AnalyzeManager
@@ -35,7 +34,7 @@ setC = partial(param_update, param="c")
 setD = partial(param_update, param="d")
 
 @pytest.mark.comps
-class TestAnalyzeManagerDtkComps(ITestWithPersistence):
+class TestAnalyzeManagerEmodComps(ITestWithPersistence):
 
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
@@ -44,8 +43,8 @@ class TestAnalyzeManagerDtkComps(ITestWithPersistence):
 
     def create_experiment(self):
 
-        e = DTKExperiment.from_default(self.case_name, default=DTKSIR,
-                                       eradication_path=os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe"))
+        e = EMODExperiment.from_default(self.case_name, default=EMODSir,
+                                       eradication_path=os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe"))
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
 
         e.base_simulation.set_parameter("Enable_Immunity", 0)
@@ -106,8 +105,7 @@ class TestAnalyzeManagerDtkComps(ITestWithPersistence):
         filenames = ['output\\InsetChart.json', 'config.json']
         analyzers = [DownloadAnalyzer(filenames=filenames, output_path='output')]
 
-        exp_list = ['b109bf3c-ffda-e911-a2be-f0921c167861', '18861829-ffda-e911-a2be-f0921c167861'] #comps2 staging
-
+        exp_list = ['6f693627-6de5-e911-a2be-f0921c167861', '1991ec0d-6ce5-e911-a2be-f0921c167861'] #comps2 staging
         am = AnalyzeManager(platform=self.p, ids=exp_list, analyzers=analyzers)
         am.analyze()
 
