@@ -25,7 +25,7 @@ class TestExperiments(ITestWithPersistence):
         self.platform = Platform("COMPS")
 
     @unittest.skipIf(not os.getenv('WAIT_FOR_BUG_FIX', '0') == '1', reason="eradication load 2 times")
-    def test_dtk_experiment_endpointsanalyzer_example(self):
+    def test_emod_experiment_endpointsanalyzer_example(self):
         DEFAULT_CONFIG_PATH = os.path.join(COMMON_INPUT_PATH, "custom", "config.json")
         DEFAULT_CAMPAIGN_JSON = os.path.join(COMMON_INPUT_PATH, "custom", "campaign.json")
         DEFAULT_DEMOGRAPHICS_JSON = os.path.join(COMMON_INPUT_PATH, "custom", "demo.json")
@@ -39,7 +39,7 @@ class TestExperiments(ITestWithPersistence):
         experiment.tags = {"idmtools": "idmtools-automation", "catch": "sianyoola", "rcd": "false"}
         experiment.name = 'malaria_sianyoola_interventions'
 
-        # additional dtk custom assets including custom_reports, climate files, migration files
+        # additional emod custom assets including custom_reports, climate files, migration files
         asset_collection = AssetCollection()
         asset_collection.add_directory(assets_directory=os.path.join(COMMON_INPUT_PATH, "custom"))
         experiment.add_assets(asset_collection)
