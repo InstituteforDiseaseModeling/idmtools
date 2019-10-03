@@ -34,7 +34,7 @@ class TestAnalyzeManager(unittest.TestCase):
 
     def setUp(self) -> None:
         self.configuration = {'max_processes': 2}
-        self.platform = Platform('COMPS')
+        self.platform = Platform('COMPS2')
         self.analyze_manager = self._get_analyze_manager()
         item_id = ItemId([('simulation_id', '123'), ('experiment_id', '456')])
         self.sample_item = self.TestItem(uid='abc')
