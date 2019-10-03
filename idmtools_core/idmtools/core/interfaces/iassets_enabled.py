@@ -1,7 +1,7 @@
 import typing
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
-from idmtools.assets import AssetCollection
+from idmtools.assets.asset_collection import AssetCollection
 
 if typing.TYPE_CHECKING:
     from idmtools.assets import TAssetCollection

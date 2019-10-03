@@ -11,8 +11,8 @@ from idmtools.core.interfaces.inamed_entity import INamedEntity
 from idmtools.entities.icontainer_item import IContainerItem
 
 if typing.TYPE_CHECKING:
-    from idmtools.core.types import TSimulation, TSimulationClass, TCommandLine, TExperimentBuilder
-
+    from idmtools.core.types import TSimulation, TSimulationClass, TExperimentBuilder
+    from idmtools.entities.command_line import TCommandLine
 
 @dataclass(repr=False)
 class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
