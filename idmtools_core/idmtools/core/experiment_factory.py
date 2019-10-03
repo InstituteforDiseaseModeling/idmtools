@@ -7,7 +7,7 @@ logger = getLogger(__name__)
 
 class ExperimentFactory:
 
-    DEFAULT_KEY = 'idmtools_model_dtk.dtk_experiment.DTKExperiment'
+    DEFAULT_KEY = 'idmtools_model_emod.emod_experiment.EMODExperiment'
 
     def __init__(self):
         from idmtools.registry.model_specification import ModelPlugins
