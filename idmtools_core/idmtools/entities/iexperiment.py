@@ -8,13 +8,14 @@ from more_itertools import grouper
 from idmtools.core.interfaces.entity_container import EntityContainer
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.core.interfaces.inamed_entity import INamedEntity
+from idmtools.entities.icontainer_item import IContainerItem
 
 if typing.TYPE_CHECKING:
-    from idmtools.core.types import TSimulation, TSimulationClass, TCommandLine, TExperimentBuilder
-
+    from idmtools.core.types import TSimulation, TSimulationClass, TExperimentBuilder
+    from idmtools.entities.command_line import TCommandLine
 
 @dataclass(repr=False)
-class IExperiment(IAssetsEnabled, INamedEntity, ABC):
+class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
     """
     Represents a generic Experiment.
     This class needs to be implemented for each model type with specifics.
@@ -34,6 +35,10 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
     builders: set = field(default_factory=lambda: set(), compare=False, metadata={"pickle_ignore": True})
     simulations: EntityContainer = field(default_factory=lambda: EntityContainer(), compare=False,
                                            metadata={"pickle_ignore": True})
+
+    # @property
+    # def simulations(self):
+    #     return self.children(refresh=False)
 
     def __post_init__(self, simulation_type):
         super().__post_init__()
@@ -116,7 +121,7 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
 
                 simulation.tags = tags
                 sims.append(simulation)
-
+                
             yield sims
 
     def simulation(self):
@@ -126,8 +131,9 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         Returns: The created simulation
         """
         sim = copy.deepcopy(self.base_simulation)
-        sim.experiment = self
         sim.assets = copy.deepcopy(self.base_simulation.assets)
+        sim.platform = self.platform
+        sim.parent_id = self.uid
         return sim
 
     def pre_creation(self):
@@ -139,15 +145,15 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
 
     @property
     def done(self):
-        return all([s.done for s in self.simulations])
+        return all([s.done for s in self.children()])
 
     @property
     def succeeded(self):
-        return all([s.succeeded for s in self.simulations])
+        return all([s.succeeded for s in self.children()])
 
     @property
     def simulation_count(self):
-        return len(self.simulations)
+        return len(self.children())
 
     def pre_getstate(self):
         """
@@ -162,4 +168,4 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
 TExperiment = typing.TypeVar("TExperiment", bound=IExperiment)
 TExperimentClass = typing.Type[TExperiment]
 # Composed types
-TExperimentsList = typing.List[typing.Union[TExperiment, str]]
+TExperimentList = typing.List[typing.Union[TExperiment, str]]

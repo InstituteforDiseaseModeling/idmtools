@@ -120,3 +120,6 @@ class EMODSimulation(ISimulation):
         for filename in demographics_files:
             if filename not in demo_files:
                 demo_files.append(filename)
+
+    def __hash__(self):
+        return id(self.uid)

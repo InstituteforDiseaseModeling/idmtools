@@ -34,17 +34,17 @@ class TestCOMPSPlatform(ITestWithPersistence):
         experiment = PythonExperiment(name=self.case_name,
                                       model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"))
         experiment.base_simulation.parameters = config
-        em = ExperimentManager(experiment=experiment, platform=self.platform)
+        em = ExperimentManager(experiment, platform=self.platform)
         em.run()
         em.wait_till_done()
 
         from idmtools.utils.entities import retrieve_experiment
         experiment = retrieve_experiment(experiment.uid, platform=self.platform, with_simulations=True)
         files_needed = ["config.json", "Assets\\working_model.py"]
-        self.platform.get_assets_for_simulation(experiment.simulations[0], files_needed)
+        self.platform.get_files(item=experiment.children()[0], files=files_needed)
 
         # Call twice to see if the cache is actually leveraged
-        files_retrieved = self.platform.get_assets_for_simulation(experiment.simulations[0], files_needed)
+        files_retrieved = self.platform.get_files(item=experiment.children()[0], files=files_needed)
 
         # We have the correct files?
         self.assertEqual(len(files_needed), len(files_retrieved))
@@ -56,7 +56,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
 
         # Test different separators
         files_needed = ["Assets/working_model.py"]
-        files_retrieved = self.platform.get_assets_for_simulation(experiment.simulations[0], files_needed)
+        files_retrieved = self.platform.get_files(item=experiment.children()[0], files=files_needed)
 
         # We have the correct files?
         self.assertEqual(len(files_needed), len(files_retrieved))
@@ -68,44 +68,43 @@ class TestCOMPSPlatform(ITestWithPersistence):
         # Test wrong filename
         files_needed = ["Assets/bad.py", "bad.json"]
         with self.assertRaises(RuntimeError):
-            self.platform.get_assets_for_simulation(experiment.simulations[0], files_needed)
+            self.platform.get_files(item=experiment.children()[0], files=files_needed)
 
     def _run_and_test_experiment(self, experiment):
         experiment.builder = self.builder
 
         # Create experiment on platform
         experiment.pre_creation()
-        self.platform.create_experiment(experiment)
+        self.platform.create_items(items=[experiment])
 
         for simulation_batch in experiment.batch_simulations(batch_size=10):
             # Create the simulations on the platform
             for simulation in simulation_batch:
                 simulation.pre_creation()
 
-            ids = self.platform.create_simulations(simulation_batch)
+            ids = self.platform.create_items(items=simulation_batch)
 
             for uid, simulation in zip(ids, simulation_batch):
                 simulation.uid = uid
                 simulation.post_creation()
-                experiment.simulations.append(simulation)
 
-        self.platform.refresh_experiment_status(experiment)
+        self.platform.refresh_status(item=experiment)
 
         # Test if we have all simulations at status CREATED
         self.assertFalse(experiment.done)
-        self.assertTrue(all([s.status == EntityStatus.CREATED for s in experiment.simulations]))
+        self.assertTrue(all([s.status == EntityStatus.CREATED for s in experiment.children()]))
 
         # Start experiment
-        self.platform.run_simulations(experiment)
-        self.platform.refresh_experiment_status(experiment)
+        self.platform.run_items(items=[experiment])
+        self.platform.refresh_status(item=experiment)
         self.assertFalse(experiment.done)
-        self.assertTrue(all([s.status == EntityStatus.RUNNING for s in experiment.simulations]))
+        self.assertTrue(all([s.status == EntityStatus.RUNNING for s in experiment.children()]))
 
         # Wait till done
         import time
         start_time = time.time()
         while time.time() - start_time < 180:
-            self.platform.refresh_experiment_status(experiment)
+            self.platform.refresh_status(item=experiment)
             if experiment.done:
                 break
             time.sleep(3)
@@ -114,14 +113,16 @@ class TestCOMPSPlatform(ITestWithPersistence):
     def test_status_retrieval_succeeded(self):
         experiment = PythonExperiment(name=self.case_name,
                                       model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"))
+        experiment.platform = self.platform
         self._run_and_test_experiment(experiment)
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in experiment.simulations]))
+        print([s.status for s in experiment.children()])
+        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in experiment.children()]))
 
     def test_status_retrieval_failed(self):
         experiment = PythonExperiment(name=self.case_name,
                                       model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "failing_model.py"))
         self._run_and_test_experiment(experiment)
-        self.assertTrue(all([s.status == EntityStatus.FAILED for s in experiment.simulations]))
+        self.assertTrue(all([s.status == EntityStatus.FAILED for s in experiment.children()]))
         self.assertFalse(experiment.succeeded)
 
     def test_status_retrieval_mixed(self):
@@ -130,24 +131,33 @@ class TestCOMPSPlatform(ITestWithPersistence):
         self._run_and_test_experiment(experiment)
         self.assertTrue(experiment.done)
         self.assertFalse(experiment.succeeded)
-        for s in experiment.simulations:
-            self.assertTrue(s.tags["P"] == 2 and s.status == EntityStatus.FAILED or s.status == EntityStatus.SUCCEEDED)
+
+        if len(experiment.children()) == 0:
+            raise Exception('NO CHILDREN')
+
+        for s in experiment.children():
+            self.assertTrue((s.tags["P"] == '2' and s.status == EntityStatus.FAILED) or
+                            s.status == EntityStatus.SUCCEEDED)
 
     def test_from_experiment(self):
         experiment = PythonExperiment(name=self.case_name,
                                       model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"))
         self._run_and_test_experiment(experiment)
         experiment2 = copy.deepcopy(experiment)
-        experiment2.simulations.clear()
-        self.platform.restore_simulations(experiment2)
 
-        self.assertEqual(len(experiment.simulations), len(experiment2.simulations))
+        # very explicitly clearing the stored children and re-querying
+        experiment2._children = None
+        experiment2.children(refresh=True)
+
+        self.assertTrue(len(experiment.children()) > 0)
+        self.assertEqual(len(experiment.children()), len(experiment2.children()))
         self.assertTrue(experiment2.done)
         self.assertTrue(experiment2.succeeded)
 
     def test_experiment_manager(self):
         experiment = PythonExperiment(name=self.case_name,
                                       model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"))
+        experiment.platform = self.platform
         self._run_and_test_experiment(experiment)
         em = ExperimentManager.from_experiment_id(experiment.uid, self.platform)
 

@@ -1,7 +1,8 @@
+import json
 import logging
 import ntpath
 import os
-import json
+
 
 from COMPS import Client
 from COMPS.Data import AssetCollection, AssetCollectionFile, Configuration, Experiment as COMPSExperiment, \
@@ -9,12 +10,16 @@ from COMPS.Data import AssetCollection, AssetCollectionFile, Configuration, Expe
 from COMPS.Data.Simulation import SimulationState
 from dataclasses import dataclass, field
 
-from idmtools.core import CacheEnabled
+from idmtools.core import CacheEnabled, UnknownItemException
 from idmtools.core.experiment_factory import experiment_factory
 from idmtools.core.enums import EntityStatus
-from idmtools.entities import IPlatform
-from idmtools.entities.iexperiment import TExperiment
+from idmtools.entities import IPlatform, ISuite
+from idmtools.entities.ianalyzer import TAnalyzerList
+from idmtools.entities.iexperiment import TExperiment, TExperimentList, IExperiment
+from idmtools.entities.iitem import TItemList, TItem
+from idmtools.entities.isimulation import TSimulationList, ISimulation
 from idmtools.utils.time import timestamp
+from typing import NoReturn, List
 import uuid
 
 logging.getLogger('COMPS.Data.Simulation').disabled = True
@@ -70,7 +75,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         self._login()
         self._comps_experiment = COMPSExperiment.get(id=self._comps_experiment_id,
                                                      query_criteria=QueryCriteria().select(["id"]).select_children(
-                                                         ["tags"]))
+                                                         ["tags", "configuration"]))
         return self._comps_experiment
 
     @comps_experiment.setter
@@ -78,7 +83,19 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         self._comps_experiment = comps_experiment
         self._comps_experiment_id = comps_experiment.id
 
-    def send_assets_for_experiment(self, experiment: TExperiment, **kwargs):
+    def send_assets(self, item, **kwargs) -> NoReturn:
+        # TODO: add asset sending for suites if needed
+        if isinstance(item, ISimulation):
+            self._send_assets_for_simulation(simulation=item, **kwargs)
+        elif isinstance(item, IExperiment):
+            self._send_assets_for_experiment(experiment=item, **kwargs)
+        else:
+            raise Exception(f'Unknown how to send assets for item type: {type(item)} '
+                            f'for platform: {self.__class__.__name__}')
+
+    @staticmethod
+    def _send_assets_for_experiment(experiment: TExperiment, **kwargs) -> NoReturn:
+
         if experiment.assets.count == 0:
             return
 
@@ -90,12 +107,18 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         experiment.assets.uid = ac.id
         print("Asset collection for experiment: {}".format(ac.id))
 
-    def send_assets_for_simulation(self, simulation, comps_simulation):
+        # associate the assets with the experiment in COMPS
+        e = COMPSExperiment.get(id=experiment.uid)
+        e.configuration = Configuration(asset_collection_id=ac.id)
+        e.save()
+
+    @staticmethod
+    def _send_assets_for_simulation(simulation, comps_simulation) -> NoReturn:
         for asset in simulation.assets:
             comps_simulation.add_file(simulationfile=SimulationFile(asset.filename, 'input'), data=asset.content)
 
     @staticmethod
-    def _clean_experiment_name(experiment_name: 'str') -> 'str':
+    def _clean_experiment_name(experiment_name: str) -> str:
         """
         Enforce any COMPS-specific demands on experiment names.
         Args:
@@ -106,7 +129,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             experiment_name = experiment_name.replace(c, '_')
         return experiment_name
 
-    def create_experiment(self, experiment: 'TExperiment'):
+    def _create_experiment(self, experiment: TExperiment) -> uuid:
         self._login()
 
         # Cleanup the name
@@ -141,17 +164,34 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         self.comps_experiment = e
 
         experiment.uid = e.id
-        self.send_assets_for_experiment(experiment)
+        self.send_assets(item=experiment)
+        return experiment.uid
 
-    def create_simulations(self, simulation_batch):
+
+    def create_items(self, items: TItemList) -> 'List[uuid]':
+        # TODO: add ability to create suites
+        types = list({type(item) for item in items})
+        if len(types) != 1:
+            raise Exception('create_items only works with items of a single type at a time.')
+        sample_item = items[0]
+        if isinstance(sample_item, ISimulation):
+            ids = self._create_simulations(simulation_batch=items)
+        elif isinstance(sample_item, IExperiment):
+            ids = [self._create_experiment(experiment=item) for item in items]
+        else:
+            raise Exception(f'Unable to create items of type: {type(sample_item)} '
+                            f'for platform: {self.__class__.__name__}')
+        for item in items:
+            item.platform = self
+        return ids
+
+    def _create_simulations(self, simulation_batch: 'TSimulationList') -> 'List[uuid]':
         self._login()
         created_simulations = []
 
         for simulation in simulation_batch:
-            s = COMPSSimulation(name=simulation.experiment.name, experiment_id=simulation.experiment.uid,
-                                configuration=Configuration(asset_collection_id=simulation.experiment.assets.uid))
-
-            self.send_assets_for_simulation(simulation, s)
+            s = COMPSSimulation(name=simulation.experiment.name, experiment_id=simulation.experiment.uid)
+            self.send_assets(item=simulation, comps_simulation=s)
             s.set_tags(simulation.tags)
             created_simulations.append(s)
 
@@ -160,7 +200,17 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         # Register the IDs
         return [s.id for s in created_simulations]
 
-    def run_simulations(self, experiment: TExperiment):
+    def run_items(self, items: TItemList) -> NoReturn:
+        # TODO: add ability to run experiments and suites
+        for item in items:
+            try:
+                self._run_simulations_for_experiment(experiment=item)
+            except:
+                raise Exception(f'Unable to run item id: {item.uid} of type: {type(item)} ')
+        for item in items:
+            item.platform = self
+
+    def _run_simulations_for_experiment(self, experiment: 'TExperiment') -> NoReturn:
         self._login()
         self._comps_experiment_id = experiment.uid
         self.comps_experiment.commission()
@@ -176,7 +226,19 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         else:
             return EntityStatus.RUNNING
 
-    def refresh_experiment_status(self, experiment):
+    def refresh_status(self, item: TItem) -> NoReturn:
+        if isinstance(item, ISimulation):
+            raise Exception(f'Unknown how to refresh items of type {type(item)} '
+                            f'for platform: {self.__class__.__name__}')
+        elif isinstance(item, IExperiment):
+            return_value = self._refresh_experiment_status(experiment=item)
+        elif isinstance(item, ISuite):
+            raise Exception(f'Unknown how to refresh items of type {type(item)} '
+                            f'for platform: {self.__class__.__name__}')
+        item.platform = self
+        return return_value
+
+    def _refresh_experiment_status(self, experiment: TExperiment) -> NoReturn:
         # Do nothing if we are already done
         if experiment.done:
             return
@@ -187,7 +249,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         comps_simulations = self.comps_experiment.get_simulations(
             query_criteria=QueryCriteria().select(["id", "state"]))
 
-        for s in experiment.simulations:
+        for s in experiment.children(refresh=True):
             if s.done:
                 continue
 
@@ -195,26 +257,97 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                 if comps_simulation.id == s.uid:
                     s.status = COMPSPlatform._convert_COMPS_status(comps_simulation.state)
                     break
+        return experiment
 
-    def restore_simulations(self, experiment: TExperiment) -> None:
+    def _retrieve_experiments(self, suite: 'TSuite') -> TExperimentList:
+        raise NotImplementedError('No method for retrieving experiments for a suite object implemented yet.')
+        return experiments
+
+    def _retrieve_simulations(self, experiment: TExperiment) -> TSimulationList:
         self._comps_experiment_id = experiment.uid
 
+        simulations = []
         for s in self.comps_experiment.get_simulations(
                 query_criteria=QueryCriteria().select(["id", "state"]).select_children(["tags"])):
             sim = experiment.simulation()
             sim.uid = s.id
             sim.tags = s.tags
             sim.status = COMPSPlatform._convert_COMPS_status(s.state)
-            experiment.simulations.append(sim)
+            simulations.append(sim)
+        return simulations
 
-    def retrieve_experiment(self, experiment_id: uuid) -> TExperiment:
+    # TODO: try to get rid of blanket except clauses
+    # TODO: verify the retrieve methods called here actually error when they fail to retrieve anything
+    def get_children(self, item: TItem) -> TItemList:
+        children = None
+        successful = False
+        try:
+            children = self._retrieve_experiments(suite=item)
+            successful = True
+        except:
+            pass
+        if not successful:
+            try:
+                children = self._retrieve_simulations(experiment=item)
+                successful = True
+            except:
+                pass
+        if not successful:
+            raise UnknownItemException(f'Unable to retrieve children for unknown item '
+                                            f'id: {item.uid} of type: {type(item)}')
+        for child in children:
+            child.platform = self
+        return children
+
+    # TODO: This method is a total hack for now. It doesn't actually look for and attach ALL experiments for the suite
+    # as it needs to.
+    def _retrieve_suite(self, suite_id: uuid) -> 'TSuite':
+        raise NotImplementedError('Method for retrieving a suite by id is not complete')
+        # from idmtools_models.dtk.DTKSuite import DTKSuite
+        # experiments = [experiment]
+        # suite = DTKSuite(experiments=experiments)
+        # suite.children = experiments
+        # suite.parent = None
+        # return suite
+
+    def _retrieve_experiment(self, experiment_id: uuid) -> TExperiment:
         self._comps_experiment_id = experiment_id
-        experiment = experiment_factory.create(self.comps_experiment.tags.get("type"), tags=self.comps_experiment.tags)
+        experiment = experiment_factory.create(key=self.comps_experiment.tags.get('type', None),
+                                               tags=self.comps_experiment.tags)
+        experiment.platform = self
         experiment.uid = self.comps_experiment.id
+        experiment.name = self.comps_experiment.name
         return experiment
 
+    # @retry_function
+    def _retrieve_simulation(self, simulation_id: 'uuid') -> 'TSimulation':
+        raise NotImplementedError('Method for retrieving a simulation by id is not complete')
+        # simulation = COMPSSimulation.get(id=simulation_id)
+        # return simulation
+
+    # TODO: verify the retrieve methods called here actually error when they fail to retrieve anything
+    def get_parent(self, item: TItem) -> TItem:
+        parent = None
+        successful = False
+        try:
+            parent = self._retrieve_suite(suite_id=item.parent_id)
+            successful = True
+        except NotImplementedError:  # TODO
+            pass
+        if not successful:
+            try:
+                parent = self._retrieve_experiment(experiment_id=item.parent_id)
+                successful = True
+            except:
+                pass
+        if not successful:
+            raise UnknownItemException(f'Unable to retrieve parent for unknown item '
+                                            f'id: {item.uid} of type: {type(item)}')
+        parent.platform = self
+        return parent
+
     @staticmethod
-    def _get_file_for_collection(collection_id, file_path):
+    def _get_file_for_collection(collection_id: uuid, file_path: str) -> NoReturn:
         print(f"Cache miss for {collection_id} {file_path}")
 
         # retrieve the collection
@@ -227,20 +360,37 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         for asset_file in ac.assets:
             if asset_file.file_name == file_name and (asset_file.relative_path or '') == path:
                 return asset_file.retrieve()
-        return None
 
-    def get_assets_for_simulation(self, simulation, output_files):
+    def get_files(self, item: TItem, files: List[str]) -> dict:
         self._login()
 
         # Retrieve the simulation from COMPS
-        comps_simulation = COMPSSimulation.get(simulation.uid,
-                                               query_criteria=QueryCriteria().select(['id']).select_children(
-                                                   ["files", "configuration"]))
+        # TODO: revert back to this once pycomps is fixed with 'rollup' configurations.
+        # comps_simulation = COMPSSimulation.get(item.uid,
+        #                                        query_criteria=QueryCriteria().select(['id', 'experiment_id']).select_children(
+        #                                            ["files", "configuration"]))
+
+        # Temporary stand-in for pycomps fix; code below from Jeff S.
+        class QueryCriteriaExt(QueryCriteria):
+            _ep_dict = None
+
+            def add_extra_params(self, ep_dict):
+                self._ep_dict = ep_dict
+                return self
+
+            def to_param_dict(self, ent_type):
+                pd = super(QueryCriteriaExt, self).to_param_dict(ent_type)
+                if self._ep_dict:
+                    pd = {**pd, **self._ep_dict}
+                return pd
+        comps_simulation = COMPSSimulation.get(item.uid, query_criteria=QueryCriteriaExt().select(
+            ['id', 'experiment_id']).select_children(
+            ["files", "configuration"]).add_extra_params({'coalesceconfig': True}))
 
         # Separate the output files in 2 groups:
         # - one for the transient files (retrieved through the comps simulation)
         # - one for the asset collection files (retrieved through the asset collection)
-        all_paths = set(output_files)
+        all_paths = set(files)
         assets = set(path for path in all_paths if path.lower().startswith("assets"))
         transients = all_paths.difference(assets)
 
@@ -249,8 +399,8 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
         # Retrieve the transient if any
         if transients:
-            transients_files = comps_simulation.retrieve_output_files(paths=transients)
-            ret = dict(zip(transients, transients_files))
+            transient_files = comps_simulation.retrieve_output_files(paths=transients)
+            ret = dict(zip(transients, transient_files))
 
         # Take care of the assets
         if assets:
@@ -264,3 +414,62 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                 ret[file_path] = self.cache.memoize()(self._get_file_for_collection)(collection_id, normalized_path)
 
         return ret
+
+    # TODO move into analyze manager?
+    def initialize_for_analysis(self, items: TItemList, analyzers: TAnalyzerList) -> NoReturn:
+        # run any necessary analysis prep steps on groups of items (hierarchy level > 0)
+        for analyzer in analyzers:
+            analyzer.per_group(items=items)
+
+    def get_item(self, id: uuid) -> TItem:
+        # TODO: no options currently for loading a simulation or suite directly yet
+        successful = False
+        if not successful:
+            try:
+                item = self._retrieve_suite(suite_id=id)
+                successful = True
+            except:
+                pass
+        if not successful:
+            try:
+                item = self._retrieve_experiment(experiment_id=id)
+                successful = True
+            except:
+                pass
+        if not successful:
+            try:
+                item = self._retrieve_simulation(simulation_id=id)
+                successful = True
+            except:
+                pass
+        if not successful:
+            raise UnknownItemException(f'Unable to load item id: {id} from platform: {self.__class__.__name__}')
+
+        item.platform = self
+        return item
+
+    #
+    # platform-specific convenience methods for dealing with domain-specific terminology.
+    # possibly move out to a multi-inherited interface (for internal IDM platforms)
+    #
+
+    # def get_simulation(self, sim_id: 'uuid') -> Any:
+    #     return self.get_item(id=sim_id, level=0)
+    #
+    # def get_experiment(self, exp_id: 'uuid') -> 'TExperiment':
+    #     return self.get_item(id=exp_id, level=1)
+    #
+    # def get_suite(self, suite_id: 'uuid') -> Any:
+    #     return self.get_item(id=suite_id, level=2)
+
+    # def get_simulations_in_experiment(self, experiment: 'TExperiment') -> 'TSimulationList':
+    #     return self.get_objects_by_relationship(object=experiment, relationship=self.CHILD)
+    #
+    # def get_experiments_in_suite(self, suite) -> 'List[TExperiment]':
+    #     return self.get_objects_by_relationship(object=suite, relationship=self.CHILD)
+    #
+    # def get_experiment_for_simulation(self, simulation: 'TSimulation') -> 'TExperiment':
+    #     return self.get_objects_by_relationship(object=simulation, relationship=self.PARENT)[0]
+    #
+    # def get_suite_for_experiment(self, experiment: 'TExperiment') -> Any:
+    #     return self.get_objects_by_relationship(object=experiment, relationship=self.PARENT)

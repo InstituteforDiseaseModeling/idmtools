@@ -5,7 +5,7 @@ from idmtools.services.platforms import PlatformPersistService
 from idmtools.utils.entities import retrieve_experiment
 
 if typing.TYPE_CHECKING:
-    from idmtools.core.types import TExperiment, TPlatform
+    from idmtools.entities.iexperiment import TExperiment
 
 
 class ExperimentManager:
@@ -19,25 +19,30 @@ class ExperimentManager:
         Args:
             experiment: The experiment to manage
         """
-        self.platform = platform
         self.experiment = experiment
+        self.platform = platform
+        self.experiment.platform = platform
 
     @classmethod
     def from_experiment_id(cls, experiment_id, platform):
-        experiment = retrieve_experiment(experiment_id, platform)
-        platform = PlatformPersistService.retrieve(experiment.platform_id)
+        experiment = platform.get_item(id=experiment_id)
+        platform = PlatformPersistService.retrieve(experiment.platform.uid)
+        # cache miss, add the platform
+        if platform is None:
+            PlatformPersistService.save(obj=experiment.platform)
+            platform = PlatformPersistService.retrieve(experiment.platform.uid)
         em = cls(experiment, platform)
         em.restore_simulations()
         return em
 
     def restore_simulations(self):
-        self.platform.restore_simulations(self.experiment)
+        self.experiment.children(refresh=True)
 
     def create_experiment(self):
         self.experiment.pre_creation()
 
         # Create experiment
-        self.platform.create_experiment(self.experiment)
+        experiment_id = self.platform.create_items(items=[self.experiment])[0]
 
         # Persist the platform
         PlatformPersistService.save(self.platform)
@@ -52,7 +57,7 @@ class ExperimentManager:
         for simulation in simulation_batch:
             simulation.pre_creation()
 
-        ids = self.platform.create_simulations(simulation_batch)
+        ids = self.platform.create_items(items=simulation_batch)
 
         for uid, simulation in zip(ids, simulation_batch):
             simulation.uid = uid
@@ -69,15 +74,11 @@ class ExperimentManager:
         with ThreadPoolExecutor(max_workers=16) as executor:
             results = executor.map(self.simulation_batch_worker_thread,
                                    self.experiment.batch_simulations(batch_size=10))
-
-        for sim_batch in results:
-            for simulation in sim_batch:
-                self.experiment.simulations.append(simulation.metadata)
-                self.experiment.simulations.set_status(EntityStatus.CREATED)
+        self.experiment.children().set_status(EntityStatus.CREATED)
 
     def start_experiment(self):
-        self.platform.run_simulations(self.experiment)
-        self.experiment.simulations.set_status(EntityStatus.RUNNING)
+        self.platform.run_items([self.experiment])
+        self.experiment.children().set_status(EntityStatus.RUNNING)
 
     def run(self):
         """
@@ -116,5 +117,5 @@ class ExperimentManager:
         raise TimeoutError(f"Timeout of {timeout} seconds exceeded when monitoring experiment {self.experiment}")
 
     def refresh_status(self):
-        self.platform.refresh_experiment_status(self.experiment)
+        self.experiment = self.platform.refresh_status(item=self.experiment)
         ExperimentPersistService.save(self.experiment)

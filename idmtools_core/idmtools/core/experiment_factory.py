@@ -6,6 +6,9 @@ logger = getLogger(__name__)
 
 
 class ExperimentFactory:
+
+    DEFAULT_KEY = 'idmtools_model_emod.emod_experiment.EMODExperiment'
+
     def __init__(self):
         from idmtools.registry.model_specification import ModelPlugins
         self._builders = ModelPlugins().get_plugin_map()
@@ -16,6 +19,10 @@ class ExperimentFactory:
         self._builders.update(aliases)
 
     def create(self, key, **kwargs) -> 'TExperiment':  # noqa: F821
+        if key is None:
+            key = self.DEFAULT_KEY
+            logger.warning(f'No experiment type tag found, assuming type: {key}')
+
         if key not in self._builders:
             raise ValueError(f"The ExperimentFactory could not create an experiment of type {key}")
 
