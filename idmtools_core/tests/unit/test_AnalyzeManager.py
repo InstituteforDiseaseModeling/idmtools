@@ -9,21 +9,18 @@ from idmtools.entities.iitem import IItem
 from idmtools.entities.ianalyzer import IAnalyzer
 
 
-class TestItem(IItem):
-    def __init__(self, uid=None):
-        super().__init__(_uid=uid)
-
-
-class TestAnalyzer(IAnalyzer):
-    def __init__(self, working_dir=None):
-        super().__init__(working_dir=working_dir)
-        self.initialize_was_called = False
-
-    def initialize(self):
-        self.initialize_was_called = True
-
-
 class TestAnalyzeManager(unittest.TestCase):
+    class TestItem(IItem):
+        def __init__(self, uid=None):
+            super().__init__(_uid=uid)
+
+    class TestAnalyzer(IAnalyzer):
+        def __init__(self, working_dir=None):
+            super().__init__(working_dir=working_dir)
+            self.initialize_was_called = False
+
+        def initialize(self):
+            self.initialize_was_called = True
 
     def _get_analyze_manager(self, ids=None, analyzers=None, working_dir=None, force_wd=False,
                              partial_analyze_ok=False, max_items=None, potential_items=None):
@@ -40,7 +37,7 @@ class TestAnalyzeManager(unittest.TestCase):
         self.platform = Platform('COMPS')
         self.analyze_manager = self._get_analyze_manager()
         item_id = ItemId([('simulation_id', '123'), ('experiment_id', '456')])
-        self.sample_item = TestItem(uid='abc')
+        self.sample_item = self.TestItem(uid='abc')
         self.sample_analyzer = SampleAnalyzer()
 
     # verify add_item() works
@@ -80,19 +77,19 @@ class TestAnalyzeManager(unittest.TestCase):
         some_ready = 'some'
 
         # all ready
-        items = [TestItem(uid=i) for i in range(2)]
+        items = [self.TestItem(uid=i) for i in range(2)]
         for item in items:
             item.status = EntityStatus.SUCCEEDED
         item_sets[all_ready] = items
 
         # none ready
-        items = [TestItem(uid=i) for i in range(2)]
+        items = [self.TestItem(uid=i) for i in range(2)]
         for item in items:
             item.status = EntityStatus.FAILED
         item_sets[none_ready] = items
 
         # some ready
-        items = [TestItem(uid=i) for i in range(2)]
+        items = [self.TestItem(uid=i) for i in range(2)]
         items[0].status = EntityStatus.RUNNING
         items[1].status = EntityStatus.SUCCEEDED
         item_sets[some_ready] = items
@@ -192,7 +189,7 @@ class TestAnalyzeManager(unittest.TestCase):
     # tests of _initialize_analyzers, mostly working_dir setup. Brief check on uid uniqueness by calling the guts of
     # the prior test
     def test_initialize_analyzers(self):
-        analyzers = [TestAnalyzer() for i in range(3)]
+        analyzers = [self.TestAnalyzer() for i in range(3)]
         for analyzer in analyzers:
             self.analyze_manager.add_analyzer(analyzer=analyzer)
         self.analyze_manager._initialize_analyzers()
@@ -215,8 +212,8 @@ class TestAnalyzeManager(unittest.TestCase):
         }
         for force_wd in [True, False]:
             analyzers = [
-                TestAnalyzer(),
-                TestAnalyzer(working_dir=analyzer_wd)
+                self.TestAnalyzer(),
+                self.TestAnalyzer(working_dir=analyzer_wd)
             ]
             am = self._get_analyze_manager(analyzers=analyzers, working_dir=analyze_manager_wd, force_wd=force_wd)
             am._initialize_analyzers()
