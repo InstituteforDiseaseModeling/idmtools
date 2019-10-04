@@ -7,9 +7,10 @@ logger = getLogger(__name__)
 
 def get_packages_from_pip():
     """
-        Attempts to load pacakges from pip
+        Attempt to load pacakges from pip.
+
         Returns:
-            (List[str]): List of packages installed
+            (List[str]): A list of packages installed.
         """
     try:
 
@@ -31,11 +32,11 @@ def get_packages_from_pip():
 
 def get_packages_list() -> List[str]:
     """
-    Returns a list of installed packages in current environment. Currently we depend on pip for this functionality
-    and since it is just used for troubleshooting, we can ignore if it errors.
+    Return a list of installed packages in the current environment. Currently |IT_s| depends on pip for this 
+    functionality and since it is just used for troubleshooting, errors can be ignored.
 
     Returns:
-        (List[str]): List of packages installed
+        (List[str]): A list of packages installed.
     """
 
     packages = get_packages_from_pip()

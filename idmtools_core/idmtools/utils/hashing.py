@@ -1,5 +1,5 @@
 """
-Fast  hash of Python objects
+Fast  hash of Python objects.
 """
 
 import decimal
@@ -13,12 +13,12 @@ Pickler = pickle._Pickler
 
 class _ConsistentSet(object):
     """
-    Class used to ensure the hash of Sets is preserved whatever the order of its items.
+    Class used to ensure the hash of sets is preserved whatever the order of its items.
     """
 
     def __init__(self, set_sequence):
         """
-        Forces order of elements in set to ensure consistent hash.
+        Force order of elements in set to ensure consistent hash.
         """
         try:
             # Trying first to order the set using sorted
@@ -36,7 +36,7 @@ class _MyHash(object):
 
 
 class Hasher(Pickler):
-    """ A subclass of pickler, to do hashing, rather than pickling. """
+    """ A subclass of pickler to do hashing, rather than pickling. """
 
     def __init__(self, hash_name='md5'):
         self.stream = io.BytesIO()
@@ -76,7 +76,7 @@ class Hasher(Pickler):
 
     def memoize(self, obj):
         """
-        We want hashing to happen on value and not reference so we disable memoization for strings
+        Disable memoization for strings so hashing happens on value and not reference.
         """
         if isinstance(obj, (str, bytes)):
             return
@@ -84,7 +84,7 @@ class Hasher(Pickler):
 
     def _batch_setitems(self, items):
         """
-        Force the order of keys in dict to ensure consistent hashing
+        Force the order of keys in dictionary to ensure consistent hashing.
         """
         try:
             # First try quick way of sorting keys if possible
@@ -99,10 +99,10 @@ class Hasher(Pickler):
 
 
 def hash_obj(obj, hash_name='md5'):
-    """ Quick calculation of a hash to identify uniquely Python objects
+    """ Quick calculation of a hash to identify uniquely Python objects.
 
         Args:
-        hash_name: 'md5' or 'sha1'. Hashing algorithm used. sha1 is supposedly safer, but md5 is faster.
+            hash_name: The hashing algorithm to use. 'md5' is faster; 'sha1' is considered safer. 
     """
     hasher = Hasher(hash_name=hash_name)
     return hasher.hash(obj)

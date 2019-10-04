@@ -5,12 +5,15 @@ from more_itertools import take
 
 def cut_iterable_to(obj: Iterable, to: int) -> Tuple[Union[List, Mapping], int]:
     """
-    Cut an iterable to a certain length
-    Args:
-        obj: The iterable to cut
-        to: How many elements to return
+    Cut an iterable to a certain length.
 
-    Returns: A list/dict (depending on the type of object) of elements and the remaining elements in the original list/dict
+    Args:
+        obj: The iterable to cut.
+        to: The number of elements to return.
+
+    Returns: 
+        A list or dictionary (depending on the type of object) of elements and the remaining elements 
+        in the original list or dictionary.
     """
     if isinstance(obj, dict):
         slice = {k: v for (k, v) in take(to, obj.items())}
@@ -24,8 +27,10 @@ def cut_iterable_to(obj: Iterable, to: int) -> Tuple[Union[List, Mapping], int]:
 
 def list_rindex(lst, item):
     """
-    Find first place item occurs in list, but starting at end of list.
-    Return index of item in list, or -1 if item not found in the list.
+    Find the first place item occurs in a list, starting from the end of the list.
+    
+    Returns:
+        The index of the item in the list, or -1 if item not found in the list.
     """
     i_max = len(lst)
     i_limit = -i_max

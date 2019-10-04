@@ -22,12 +22,14 @@ class PythonExperiment(IExperiment):
     def retrieve_python_dependencies(self):
         """
         Retrieve the Pypi libraries associated with the given model script.
-        Notes:
-            This function scan recursively through the whole  directory where the model file is contained.
-            This function relies on pipreqs being installed on the system to provide dependencies list.
+
+        .. note::
+
+            This function scans recursively through the whole directory where the model file is contained.
+            This function relies on pipreqs being installed on the system to provide a dependencies list.
 
         Returns:
-            List of libraries required by the script
+            A list of libraries required by the script.
         """
         model_folder = os.path.dirname(self.model_path)
 

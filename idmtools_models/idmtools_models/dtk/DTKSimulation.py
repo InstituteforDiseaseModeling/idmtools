@@ -19,19 +19,25 @@ class DTKSimulation(ISimulation):
 
     def get_parameter(self, name, default=None):
         """
-        Get a parameter in the simulation
+        Get a parameter in the simulation.
+
         Args:
-            name: Name of the parameter
-        Returns: the Value of the parameter
+            name: The name of the parameter.
+
+        Returns: 
+            The value of the parameter.
         """
         return self.config.get(name, default)
 
     def update_parameters(self, params):
         """
-        Bulk update config
+        Bulk update the configuration parameter values.
+
         Args:
-            params: dict with new values
-        Returns: None
+            params: A dictionary with new values.
+
+        Returns: 
+            None
         """
         self.config.update(params)
 
@@ -50,13 +56,16 @@ class DTKSimulation(ISimulation):
 
     def load_files(self, config_path=None, campaign_path=None, demographics_paths=None, force=False):
         """
-        Provide a way to load custom files
+        Load custom |EMOD_s| files.
+
         Args:
-            config_path: custom config file
-            campaign_path: custom campaign file
-            demographics_paths: custom demographics files (single file or a list)
-            force: always return if True, else throw exception is something wrong
-        Returns: None
+            config_path: The custom configuration file.
+            campaign_path: The custom campaign file.
+            demographics_paths: The custom demographics files (single file or a list).
+            force: True to always return, else throw an exception if something goes wrong.
+
+        Returns: 
+            None
         """
 
         def load_file(file_path):
@@ -97,10 +106,13 @@ class DTKSimulation(ISimulation):
 
     def update_config_demographics_filenames(self, demographics_files):
         """
-        Update demographics filenames parameter
+        Update demographics files.
+
         Args:
-            demographics_files: single file or a list
-        Returns: None
+            demographics_files: The demographics files to update (single file or a list).
+
+        Returns: 
+            None
         """
         demographics_files = demographics_files if isinstance(demographics_files, collections.Iterable) \
                                                    and not isinstance(demographics_files, str) else [demographics_files]

@@ -20,6 +20,7 @@ class IPlatform(IEntity, metaclass=ABCMeta):
     """
     Interface defining a platform.
     A platform needs to implement basic operation such as:
+
     - Creating experiment
     - Creating simulation
     - Commissioning
@@ -28,7 +29,7 @@ class IPlatform(IEntity, metaclass=ABCMeta):
 
     def __post_init__(self) -> None:
         """
-        Got called from Platform creation
+        Called from Platform creation.
         """
         # self.update_from_config()
         if not hasattr(self, '_FACTORY'):
@@ -38,8 +39,9 @@ class IPlatform(IEntity, metaclass=ABCMeta):
     def create_experiment(self, experiment: 'TExperiment') -> None:
         """
         Function creating an experiment on the platform.
+
         Args:
-            experiment: The experiment to create
+            experiment: The experiment to create.
         """
         pass
 
@@ -47,19 +49,22 @@ class IPlatform(IEntity, metaclass=ABCMeta):
     def create_simulations(self, simulation_batch: 'TSimulationBatch') -> 'List[Any]':
         """
         Function creating experiments simulations on the platform for a given experiment.
+
         Args:
-            simulation_batch: The batch of simulations to create
+            simulation_batch: The batch of simulations to create.
+
         Returns:
-            List of ids created
+            List of IDs created.
         """
         pass
 
     @abstractmethod
     def run_simulations(self, experiment: 'TExperiment') -> None:
         """
-        Run the simulations for a given experiment on the platform
+        Run the simulations for a given experiment on the platform.
+
         Args:
-            experiment: The experiment to run
+            experiment: The experiment to run.
         """
         pass
 
@@ -67,9 +72,10 @@ class IPlatform(IEntity, metaclass=ABCMeta):
     def send_assets_for_experiment(self, experiment: 'TExperiment', **kwargs) -> None:
         """
         Send the assets for a given experiment to the platform.
+
         Args:
-            experiment: The experiment to process. Expected to have an `assets` attribute containing the collection.
-            **kwargs: Extra parameters used by the platform
+            experiment: The experiment to process. Expected to have an **assets** attribute containing the collection.
+            **kwargs: Extra parameters used by the platform.
         """
         pass
 
@@ -77,9 +83,10 @@ class IPlatform(IEntity, metaclass=ABCMeta):
     def send_assets_for_simulation(self, simulation: 'TSimulation', **kwargs) -> None:
         """
         Send the assets for a given simulation to the platform.
+
         Args:
-            simulation: The simulation to process. Expected to have an `assets` attribute containing the collection.
-            **kwargs: Extra parameters used by the platform
+            simulation: The simulation to process. Expected to have an **assets** attribute containing the collection.
+            **kwargs: Extra parameters used by the platform.
         """
         pass
 
@@ -87,8 +94,9 @@ class IPlatform(IEntity, metaclass=ABCMeta):
     def refresh_experiment_status(self, experiment: 'TExperiment') -> None:
         """
         Populate the experiment and its simulations with status.
+
         Args:
-            experiment: The experiment to check status for
+            experiment: The experiment to check status for.
         """
         pass
 
@@ -96,8 +104,9 @@ class IPlatform(IEntity, metaclass=ABCMeta):
     def restore_simulations(self, experiment: 'TExperiment') -> None:
         """
         Populate the experiment with the associated simulations.
+
         Args:
-            experiment: The experiment to populate
+            experiment: The experiment to populate.
         """
         pass
 
@@ -114,12 +123,14 @@ class IPlatform(IEntity, metaclass=ABCMeta):
 
     def update_from_config(self) -> None:
         """
-        Get INI config values and update platform values by the priority rules:
-        #1 Code
-        #2 INI config
-        #2 default
+        Get INI configuration values and update platform values by the priority rules:
 
-        Returns: None
+        #. Code
+        #. INI configuration
+        #. default
+
+        Returns: 
+            None
         """
         # retrieve field values, default values and types
         fds = fields(self)

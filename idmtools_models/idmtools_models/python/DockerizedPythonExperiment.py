@@ -7,7 +7,7 @@ from idmtools_models.python import PythonExperiment, PythonSimulation
 @dataclass(repr=False)
 class DockerizedPythonExperiment(PythonExperiment):
     """
-    Dockerized Python Experiment. Currently planned for Comps/Local platform
+    Dockerized Python experiment. Currently planned for COMPS and local platforms.
     """
     docker_image: str = field(default=None)
     #extra_volume_mounts: str = field(default=None)

@@ -1,6 +1,6 @@
 class CommandLine:
     """
-    A class to construct command line strings from executable, options, and params
+    A class to construct command line strings from executable, options, and parameters.
     """
 
     def __init__(self, executable=None, *args, **kwargs):

@@ -1,9 +1,12 @@
 def timestamp(time=None):
     """
-    Args:
-        time:  a time object; if None provided, use now.
+    Return a timestamp.
 
-    Returns: A str timestamp in UTC, format: YYYYMMDD_HHmmSS
+    Args:
+        time: A time object; if None provided, use now.
+
+    Returns: 
+        A string timestamp in UTC, format YYYYMMDD_HHmmSS.
 
     """
     import datetime

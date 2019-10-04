@@ -13,7 +13,7 @@ if typing.TYPE_CHECKING:
 @dataclass
 class ISimulation(IAssetsEnabled, IEntity, metaclass=ABCMeta):
     """
-    Represents a generic Simulation.
+    Represents a generic simulation.
     This class needs to be implemented for each model type with specifics.
     """
     experiment: 'TExperiment' = field(default=None, compare=False, metadata={"md": True})
@@ -22,31 +22,40 @@ class ISimulation(IAssetsEnabled, IEntity, metaclass=ABCMeta):
     @abstractmethod
     def set_parameter(self, name: str, value: any) -> dict:
         """
-        Set a parameter in the simulation
+        Set a parameter in the simulation.
+
         Args:
-            name: Name of the parameter
-            value: Value of the parameter
-        Returns: Tag to record the change
+            name: The name of the parameter.
+            value: The value of the parameter.
+
+        Returns: 
+            The tag to record the change.
         """
         pass
 
     @abstractmethod
     def get_parameter(self, name, default=None):
         """
-        Get a parameter in the simulation
+        Get a parameter in the simulation.
+
         Args:
-            name: Name of the parameter
-        Returns: the Value of the parameter
+            name: The name of the parameter.
+
+        Returns: 
+            The value of the parameter.
         """
         return None
 
     @abstractmethod
     def update_parameters(self, params):
         """
-        Bulk update parameters/config
+        Bulk update parameters/configuration.
+
         Args:
-            params: dict with new values
-        Returns: None
+            params: A dictionary with new values.
+
+        Returns: 
+            None
         """
         pass
 

@@ -8,8 +8,8 @@ from idmtools.entities import ISimulation
 @dataclass(repr=False)
 class PythonSimulation(ISimulation):
     """
-    Represents a Python Simulation.
-    This type of simulations have parameters and an eventual envelope.
+    Represents a Python simulation.
+    This type of simulation has parameters and an eventual envelope.
 
     The envelope is just the name of the key wrapping the parameters.
     For example::
@@ -65,19 +65,25 @@ class PythonSimulation(ISimulation):
 
     def get_parameter(self, name, default=None):
         """
-        Get a parameter in the simulation
+        Get a parameter in the simulation.
+
         Args:
-            name: Name of the parameter
-        Returns: the Value of the parameter
+            name: The name of the parameter.
+
+        Returns: 
+            The value of the parameter.
         """
         return self.parameters.get(name, default)
 
     def update_parameters(self, params):
         """
-        Bulk update parameters
+        Bulk update parameters.
+
         Args:
-            params: dict with new values
-        Returns: None
+            params: A dictionary with the new values.
+
+        Returns: 
+            None
         """
         self.parameters.update(params)
 

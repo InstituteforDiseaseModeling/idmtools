@@ -16,9 +16,10 @@ class ExperimentManager:
 
     def __init__(self, experiment: 'TExperiment', platform: 'TPlatform'):
         """
-        Constructor
+        A constructor.
+
         Args:
-            experiment: The experiment to manage
+            experiment: The experiment to manage.
         """
         self.platform = platform
         self.experiment = experiment
@@ -82,7 +83,8 @@ class ExperimentManager:
 
     def run(self):
         """
-        Main entry point of the manager.
+        Main entry point of the manager:
+
         - Create the experiment
         - Execute the builder (if any) to generate all the simulations
         - Create the simulations on the platform
@@ -102,10 +104,11 @@ class ExperimentManager:
 
     def wait_till_done(self, timeout: 'int' = 60 * 60 * 24, refresh_interval: 'int' = 5):
         """
-        Wait for the experiment to be done
+        Wait for the experiment to be done.
+
         Args:
-            refresh_interval: How long in between polling
-            timeout: How long to wait before failing
+            refresh_interval: How long to wait between polling. 
+            timeout: How long to wait before failing.
         """
         import time
         start_time = time.time()

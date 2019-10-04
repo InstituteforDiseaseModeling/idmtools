@@ -16,7 +16,7 @@ logger = getLogger(__name__)
 @dataclass(init=False, repr=False)
 class CacheEnabled:
     """
-    Allows a class to leverage Diskcache and expose a cache property.
+    Allows a class to leverage disk cache and expose a cache property.
     """
     _cache: 'Cache' = field(default=None, init=False, compare=False)
     _cache_directory: 'str' = field(default=None, init=False, compare=False)

@@ -10,7 +10,7 @@ if typing.TYPE_CHECKING:
 
 class ExperimentBuilder:
     """
-    Represents an experiment builder
+    Represents an experiment builder.
     """
     # The keyword searched in the function used for sweeps
     SIMULATION_ATTR = 'simulation'
@@ -25,40 +25,43 @@ class ExperimentBuilder:
         A sweep definition is composed of a function and a list of values to call the function with.
 
         Args:
-            function: The function HAS to include a `simulation` parameter (or whatever is specified in `IExperimentBuilder.SIMULATION_ATTR`).
-            The function also HAS to include EXACTLY ONE free parameter, which the values will be passed to.
-            Function can also be a partial: any Callable type will work.
-            values:
+            function: The sweep function, which must include a **simulation** parameter (or 
+                whatever is specified in :attr:`~idmtools.builders.ExperimentBuilder.SIMULATION_ATTR`).
+                The function also must include EXACTLY ONE free parameter, which the values will be passed to.
+                The function can also be a partial--any Callable type will work.
+            values: The list of values to call the function with.
 
         Examples:
-            Examples of valid function:
-            def myFunction(simulation, parameter):
-                pass
+            Examples of valid function::
+
+                def myFunction(simulation, parameter):
+                    pass
 
             How to deal with functions requiring more than one parameter?
-            Consider, the following function:
-            ```python
-            def myFunction(simulation, a, b):
-                pass
-            ```
-            - Partial solution:
-            ```python
-            from functools import partial
-            func = partial(myFunction, a=3)
-            eb.add_sweep_definition(func, [1,2,3])
-            ```
+            Consider the following function::
 
-            - Callable class solution:
-            ```
-            class setP:
-                def __init__(self, a):
-                    self.a = a
+                python
+                def myFunction(simulation, a, b):
+                    pass
+                
+            Partial solution::
 
-                def __call__(self, simulation, b):
-                    return param_update(simulation, self.a, b)
+                python
+                from functools import partial
+                func = partial(myFunction, a=3)
+                eb.add_sweep_definition(func, [1,2,3])
+                
 
-            eb.add_sweep_definition(setP(3), [1,2,3])
-            ```
+            Callable class solution::
+            
+                class setP:
+                    def __init__(self, a):
+                        self.a = a
+
+                    def __call__(self, simulation, b):
+                        return param_update(simulation, self.a, b)
+
+                eb.add_sweep_definition(setP(3), [1,2,3])
 
         """
         # Retrieve all the parameters in the signature of the function

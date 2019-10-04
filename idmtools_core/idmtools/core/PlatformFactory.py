@@ -17,11 +17,14 @@ class PlatformFactory:
 
     def create(self, key, **kwargs) -> 'TPlatform':
         """
-        Create Platform with type identified by key
+        Create a platform with the type identified by key.
+
         Args:
-            key: Platform module name
-            **kwargs: inputs for Platform constructor
-        Returns: created Platform
+            key: The name of the platform module.
+            **kwargs: Inputs for platform constructor.
+
+        Returns: 
+            The created platform.
         """
         self._validate_platform_type(key)
         builder = self._platforms.get(key)
@@ -34,11 +37,14 @@ class PlatformFactory:
 
     def create_from_block(self, block: str, overrides: typing.Optional[dict] = None):
         """
-        Retrieve section entries from config file by giving block
+        Retrieve section entries from the configuration file by giving block.
+
         Args:
-            block: the section name in config file
-            overrides: Optional override of parameters from config.
-        Returns: dict with entries from the block
+            block: The section name in the configuration file.
+            overrides: Optional override of parameters from the configuration file.
+
+        Returns: 
+            A dictionary with entries from the block.
         """
         from idmtools.config import IdmConfigParser
         if overrides is None:

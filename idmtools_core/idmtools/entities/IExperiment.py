@@ -16,15 +16,15 @@ if typing.TYPE_CHECKING:
 @dataclass(repr=False)
 class IExperiment(IAssetsEnabled, INamedEntity, ABC):
     """
-    Represents a generic Experiment.
+    Represents a generic experiment.
     This class needs to be implemented for each model type with specifics.
 
     Args:
         name: The experiment name.
-        simulation_type: A class to initialize the simulations that will be created for this experiment
-        assets: The asset collection for assets global to this experiment
-        base_simulation: Optional a simulation that will be the base for all simulations created for this experiment
-        command: Command to run on simulations
+        simulation_type: A class to initialize the simulations that will be created for this experiment.
+        assets: The asset collection for assets global to this experiment.
+        base_simulation: Optional, a simulation that will be the base for all simulations created for this experiment.
+        command: Command to run on simulations.
     """
     command: 'TCommandLine' = field(default=None)
     suite_id: uuid = field(default=None)
@@ -51,18 +51,23 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
     @property
     def builder(self) -> 'TExperimentBuilder':
         """
-        For back-compatibility purpose
-        Returns: the last 'TExperimentBuilder'
+        For backward-compatibility purposes.
+
+        Returns: 
+            The last :class:`TExperimentBuilder`.
         """
         return list(self.builders)[-1] if self.builders and len(self.builders) > 0 else None
 
     @builder.setter
     def builder(self, builder: 'TExperimentBuilder') -> None:
         """
-        For back-compatibility purpose
+        For backward-compatibility purposes.
+
         Args:
-            builder: new builder to be used
-        Returns: None
+            builder: The new builder to be used.
+
+        Returns: 
+            None
         """
 
         # Make sure we only take the last builder assignment
@@ -73,10 +78,13 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
 
     def add_builder(self, builder: 'TExperimentBuilder') -> None:
         """
-        Add builder to builder collection
+        Add builder to builder collection.
+
         Args:
-            builder: a builder to be added
-        Returns: None
+            builder: A builder to be added.
+
+        Returns: 
+            None
         """
         from idmtools.builders import ExperimentBuilder
 
@@ -118,9 +126,11 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
 
     def simulation(self):
         """
-        Returns a new simulation object.
+        Return a new simulation object.
         The simulation will be copied from the base simulation of the experiment.
-        Returns: The created simulation
+
+        Returns: 
+            The created simulation.
         """
         sim = copy.deepcopy(self.base_simulation)
         sim.experiment = self

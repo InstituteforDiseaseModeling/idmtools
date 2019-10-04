@@ -5,7 +5,7 @@ from idmtools.builders.ArmExperimentBuilder import SweepArm, ArmType
 
 class YamlExperimentBuilder(ArmExperimentBuilder):
     """
-    Represents an experiment builder
+    Represents an experiment builder.
     """
 
     def __init__(self):

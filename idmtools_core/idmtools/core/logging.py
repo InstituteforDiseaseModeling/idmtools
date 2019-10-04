@@ -15,15 +15,17 @@ logging_queue = None
 def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'idmtools.log',
                   console: Union[str, bool] = False) -> QueueListener:
     """
+    Set up logging.
 
     Args:
         level(Union[int, str]): Log level. Default to warning. This should be either a string that matches a log level
-        from logging or an int that represent that level
-        log_filename(str): Name of file to log messages too
-        console(Union[str, bool]): When set to True or the strings 1, y, yes, or on, console logging will be enabled
+        from logging or an int that represent that level.
+        log_filename(str): Name of file to log messages to.
+        console(Union[str, bool]): When set to True or the strings 1, y, yes, or on, console logging will be enabled.
+
     Returns:
         (QueueListener) Returns the QueueListener created that writes the log messages. In advanced scenarios with
-        multi-processing you may need to manually stop the logger
+        multi-processing, you may need to manually stop the logger.
     """
     global listener, logging_queue
     if type(level) is str:
@@ -87,13 +89,13 @@ def exclude_logging_classes():
 
 def register_stop_logger_signal_handler(listener) -> NoReturn:
     """
-    Register a signal watcher that will stop our logging gracefully in the case of queue based logging
+    Register a signal watcher that will stop our logging gracefully in the case of queue-based logging.
 
     Args:
-        listener: Log listener object
+        listener: The log listener object.
 
     Returns:
-
+        None
     """
 
     def stop_logger(*args, **kwargs):
