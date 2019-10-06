@@ -5,6 +5,7 @@ from idmtools.config import IdmConfigParser
 from idmtools.core.platform_factory import Platform
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.confg_local_runner_test import get_test_local_env_overrides
+from idmtools_test.utils.test_platform import cleanup_test_data
 
 
 class TestPlatformFactory(ITestWithPersistence):
@@ -58,6 +59,7 @@ class TestPlatformFactory(ITestWithPersistence):
 
         p3 = Platform('Test')
         self.assertEqual(p3.__class__.__name__, 'TestPlatform')
+        cleanup_test_data()
 
     @pytest.mark.docker
     @pytest.mark.comps
@@ -72,6 +74,7 @@ class TestPlatformFactory(ITestWithPersistence):
 
         platform3 = Platform('Test')
         self.assertEqual(platform3.__class__.__name__, 'TestPlatform')
+        cleanup_test_data()
 
     @pytest.mark.comps
     @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
@@ -110,3 +113,4 @@ class TestPlatformFactory(ITestWithPersistence):
 
         platform2 = Platform('Test', **kwargs)
         self.assertEqual(platform, platform2)
+        cleanup_test_data()

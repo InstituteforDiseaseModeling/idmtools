@@ -6,6 +6,7 @@ from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+from idmtools_test.utils.test_platform import cleanup_test_data
 from idmtools_test.utils.tst_experiment import TstExperiment
 from idmtools_models.python import PythonExperiment, PythonSimulation
 from idmtools_test import COMMON_INPUT_PATH
@@ -93,7 +94,7 @@ class TestPersistenceServices(ITestWithPersistence):
 
         # Run the experiment
 
-        em = ExperimentManager(e,platform=p)
+        em = ExperimentManager(e,  platform=p)
         em.run()
 
         # Make sure the base simulation was left untouched
@@ -101,7 +102,9 @@ class TestPersistenceServices(ITestWithPersistence):
         self.assertEqual(s.parameters["test"], 10)
 
         # Ensure that we actually ran with the correct parameter
+        print(p.simulations[em.experiment.uid])
         self.assertEqual(p.simulations[em.experiment.uid][0].parameters["test"], 10, "Parameter in platform")
+        cleanup_test_data()
 
     def test_fix_170(self):
         # https://github.com/InstituteforDiseaseModeling/idmtools/issues/170

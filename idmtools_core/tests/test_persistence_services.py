@@ -3,6 +3,7 @@ from idmtools.core.platform_factory import Platform
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.services.platforms import PlatformPersistService
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+from idmtools_test.utils.test_platform import cleanup_test_data
 from idmtools_test.utils.tst_experiment import TstExperiment
 
 
@@ -13,6 +14,7 @@ class TestPersistenceServices(ITestWithPersistence):
         PlatformPersistService.save(p)
         p2 = PlatformPersistService.retrieve(p.uid)
         self.assertEqual(p, p2)
+        cleanup_test_data()
 
     def test_persist_retrieve_experiment(self):
         e = TstExperiment("test")

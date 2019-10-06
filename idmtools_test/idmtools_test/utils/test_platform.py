@@ -4,6 +4,7 @@ import tempfile
 import uuid
 import typing
 from dataclasses import dataclass, field
+from logging import getLogger
 
 import diskcache
 import numpy as np
@@ -24,6 +25,15 @@ if typing.TYPE_CHECKING:
     from idmtools.entities.iitem import TItem, TItemList
 
 data_path = tempfile.mkdtemp()
+logger = getLogger(__name__)
+
+
+def cleanup_test_data():
+    try:
+        logger.debug(f"Cleanup test data from {data_path}")
+        shutil.rmtree(data_path)
+    except OSError:
+        pass
 
 
 @dataclass(repr=False)
@@ -37,21 +47,12 @@ class TestPlatform(IPlatform):
     experiments: 'diskcache.Cache' = field(default=None, compare=False, metadata={"pickle_ignore": True})
     simulations: 'diskcache.Cache' = field(default=None, compare=False, metadata={"pickle_ignore": True})
 
-    def __del__(self):
-        # Close and delete the cache when finished
-        if self.experiments:
-            self.experiments.close()
-        if self.simulations:
-            self.simulations.close()
-        try:
-            shutil.rmtree(data_path)
-        except OSError:
-            pass
-
     def __post_init__(self):
         super().__post_init__()
         os.makedirs(data_path, exist_ok=True)
-        self.initialize_test_cache()
+        # in multi-threaded environments, the cache has been initialized already
+        if self.experiments is None or self.simulations is None:
+            self.initialize_test_cache()
 
     def initialize_test_cache(self):
         """
@@ -61,8 +62,9 @@ class TestPlatform(IPlatform):
             os.makedirs(os.path.join(data_path, 'experiments_test'), 0o755, exist_ok=True)
         if not os.path.exists(os.path.join(data_path, 'simulations_test')):
             os.makedirs(os.path.join(data_path, 'simulations_test'), 0o755, exist_ok=True)
-        self.experiments = diskcache.Cache(os.path.join(data_path, 'experiments_test'))
-        self.simulations = diskcache.Cache(os.path.join(data_path, 'simulations_test'))
+        logger.debug(f"Test platform using {data_path}")
+        self.experiments = diskcache.FanoutCache(os.path.join(data_path, 'experiments_test'), shards=16)
+        self.simulations = diskcache.FanoutCache(os.path.join(data_path, 'simulations_test'), shards=16)
 
     def get_children(self, item: 'TItem') -> 'TItemList':
         children = None
@@ -72,7 +74,7 @@ class TestPlatform(IPlatform):
             successful = True
         if not successful:
             raise UnknownItemException(f'Unable to retrieve children for unknown item '
-                                            f'id: {item.uid} of type: {type(item)}')
+                                       f'id: {item.uid} of type: {type(item)}')
         for child in children:
             child.platform = self
         return children
@@ -103,7 +105,9 @@ class TestPlatform(IPlatform):
         if len(types) != 1:
             raise Exception('create_items only works with items of a single type at a time.')
         sample_item = items[0]
+        logger.debug(f"Create item type: {type(sample_item)}")
         if isinstance(sample_item, ISimulation):
+            logger.debug(f"Creating {len(items)} sims")
             ids = self._create_simulations(simulation_batch=items)
         elif isinstance(sample_item, IExperiment):
             ids = [self._create_experiment(experiment=item) for item in items]
@@ -121,20 +125,25 @@ class TestPlatform(IPlatform):
         lock = diskcache.Lock(self.simulations, 'simulations-lock')
         with lock:
             self.simulations.set(uid, list())
+        logger.debug(f"Created Experiment {experiment.uid}")
         return experiment.uid
 
     def _create_simulations(self, simulation_batch):
+
         simulations = []
         experiment_id = None
         for simulation in simulation_batch:
             experiment_id = experiment_id or self.get_parent(simulation).uid
             simulation.uid = uuid.uuid4()
             simulations.append(simulation)
-
         lock = diskcache.Lock(self.simulations, 'simulations-lock')
         with lock:
             existing_simulations = self.simulations.pop(experiment_id)
             self.simulations[experiment_id] = existing_simulations + simulations
+        ids = [s.uid for s in simulations]
+        print(simulations)
+        print(ids)
+        logger.debug(f"Created simulations: {ids} for Experiment {experiment_id}")
         return [s.uid for s in simulations]
 
     def set_simulation_status(self, experiment_uid, status):

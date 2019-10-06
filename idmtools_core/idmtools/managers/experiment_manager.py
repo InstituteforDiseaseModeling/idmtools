@@ -1,4 +1,7 @@
+import concurrent
 import typing
+from logging import getLogger
+
 from idmtools.core import EntityStatus
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.services.platforms import PlatformPersistService
@@ -6,6 +9,9 @@ from idmtools.utils.entities import retrieve_experiment
 
 if typing.TYPE_CHECKING:
     from idmtools.entities.iexperiment import TExperiment
+
+
+logger = getLogger(__name__)
 
 
 class ExperimentManager:
@@ -54,6 +60,7 @@ class ExperimentManager:
         ExperimentPersistService.save(self.experiment)
 
     def simulation_batch_worker_thread(self, simulation_batch):
+        logger.debug(f'Create {len(simulation_batch)} simulations')
         for simulation in simulation_batch:
             simulation.pre_creation()
 
@@ -71,7 +78,7 @@ class ExperimentManager:
         """
         from concurrent.futures.thread import ThreadPoolExecutor
 
-        with ThreadPoolExecutor(max_workers=16) as executor:
+        with ThreadPoolExecutor(max_workers=6) as executor:
             results = executor.map(self.simulation_batch_worker_thread,
                                    self.experiment.batch_simulations(batch_size=10))
         self.experiment.children().set_status(EntityStatus.CREATED)
