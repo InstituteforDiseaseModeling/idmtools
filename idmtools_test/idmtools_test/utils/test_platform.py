@@ -1,5 +1,6 @@
 import os
 import shutil
+import tempfile
 import uuid
 import typing
 from dataclasses import dataclass, field
@@ -22,8 +23,7 @@ if typing.TYPE_CHECKING:
     from idmtools.entities.iexperiment import TExperiment
     from idmtools.entities.iitem import TItem, TItemList
 
-current_directory = os.path.dirname(os.path.realpath(__file__))
-data_path = os.path.abspath(os.path.join(current_directory, "..", "data"))
+data_path = tempfile.mkdtemp()
 
 
 @dataclass(repr=False)
@@ -39,8 +39,10 @@ class TestPlatform(IPlatform):
 
     def __del__(self):
         # Close and delete the cache when finished
-        self.experiments.close()
-        self.simulations.close()
+        if self.experiments:
+            self.experiments.close()
+        if self.simulations:
+            self.simulations.close()
         try:
             shutil.rmtree(data_path)
         except OSError:
@@ -55,6 +57,10 @@ class TestPlatform(IPlatform):
         """
         Create a cache experiments/simulations that will only exist during test
         """
+        if not os.path.exists(os.path.join(data_path, 'experiments_test')):
+            os.makedirs(os.path.join(data_path, 'experiments_test'), 0o755, exist_ok=True)
+        if not os.path.exists(os.path.join(data_path, 'simulations_test')):
+            os.makedirs(os.path.join(data_path, 'simulations_test'), 0o755, exist_ok=True)
         self.experiments = diskcache.Cache(os.path.join(data_path, 'experiments_test'))
         self.simulations = diskcache.Cache(os.path.join(data_path, 'simulations_test'))
 
