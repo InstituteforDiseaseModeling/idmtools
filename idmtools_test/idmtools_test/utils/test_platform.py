@@ -141,8 +141,6 @@ class TestPlatform(IPlatform):
             existing_simulations = self.simulations.pop(experiment_id)
             self.simulations[experiment_id] = existing_simulations + simulations
         ids = [s.uid for s in simulations]
-        print(simulations)
-        print(ids)
         logger.debug(f"Created simulations: {ids} for Experiment {experiment_id}")
         return [s.uid for s in simulations]
 
