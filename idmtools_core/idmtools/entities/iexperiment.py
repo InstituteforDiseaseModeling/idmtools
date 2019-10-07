@@ -14,6 +14,7 @@ if typing.TYPE_CHECKING:
     from idmtools.core.types import TSimulation, TSimulationClass, TExperimentBuilder
     from idmtools.entities.command_line import TCommandLine
 
+
 @dataclass(repr=False)
 class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
     """
@@ -34,7 +35,7 @@ class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
     base_simulation: 'TSimulation' = field(default=None, compare=False, metadata={"pickle_ignore": True})
     builders: set = field(default_factory=lambda: set(), compare=False, metadata={"pickle_ignore": True})
     simulations: EntityContainer = field(default_factory=lambda: EntityContainer(), compare=False,
-                                           metadata={"pickle_ignore": True})
+                                         metadata={"pickle_ignore": True})
 
     # @property
     # def simulations(self):

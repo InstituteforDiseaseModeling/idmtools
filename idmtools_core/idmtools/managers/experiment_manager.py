@@ -78,7 +78,7 @@ class ExperimentManager:
         """
         from concurrent.futures.thread import ThreadPoolExecutor
 
-        with ThreadPoolExecutor(max_workers=6) as executor:
+        with ThreadPoolExecutor(max_workers=16) as executor:
             results = executor.map(self.simulation_batch_worker_thread,
                                    self.experiment.batch_simulations(batch_size=10))
         self.experiment.children().set_status(EntityStatus.CREATED)
