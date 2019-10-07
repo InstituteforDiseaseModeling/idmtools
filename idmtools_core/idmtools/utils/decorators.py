@@ -211,3 +211,42 @@ class ParallelizeDecorator:
 
     def __del__(self):
         del self.queue
+
+
+def retry_function(func, wait=1.5, max_retries=5):
+    """
+    Decorator allowing to retry the call to a function with some time in between.
+    Usage::
+
+        @retry_function
+        def my_func():
+            pass
+
+        @retry_function(max_retries=10, wait=2)
+        def my_func():
+            pass
+
+    :param func:
+    :param time_between_tries:
+    :param max_retries:
+
+    :return:
+    """
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        retExc = None
+        for i in range(max_retries):
+            try:
+                return func(*args, **kwargs)
+            except RuntimeError as r:
+                # Immediately raise if this is an error.
+                # COMPS is reachable so let's be clever and trust COMPS
+                if str(r) == "404 NotFound - Failed to retrieve experiment for given id":
+                    raise r
+            except Exception as e:
+                retExc = e
+                time.sleep(wait)
+        raise retExc if retExc else Exception()
+
+    return wrapper

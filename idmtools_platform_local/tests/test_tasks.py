@@ -5,7 +5,7 @@ from idmtools_test import COMMON_INPUT_PATH
 import os
 import shutil
 from unittest import TestCase
-from idmtools_platform_local.tasks.create_experiement import CreateExperimentTask
+from idmtools_platform_local.tasks.create_experiment import CreateExperimentTask
 from idmtools_platform_local.tasks.run import RunTask
 
 # These tests are simulating behaviours that normally would occur within the local worker container
@@ -28,7 +28,7 @@ class TestTasks(TestCase):
         """
         Test Create experiment actor
         """
-        from idmtools_platform_local.tasks.create_experiement import CreateExperimentTask
+        from idmtools_platform_local.tasks.create_experiment import CreateExperimentTask
         new_task_id = CreateExperimentTask.perform(dict(a='b', c='d'), "s")
         print(os.environ["DATA_PATH"])
         self.assertIsInstance(new_task_id, str)

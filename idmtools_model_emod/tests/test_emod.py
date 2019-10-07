@@ -14,11 +14,11 @@ current_directory = os.path.dirname(os.path.realpath(__file__))
 DEFAULT_CONFIG_PATH = os.path.join(COMMON_INPUT_PATH, "files", "config.json")
 DEFAULT_CAMPAIGN_JSON = os.path.join(COMMON_INPUT_PATH, "files", "campaign.json")
 DEFAULT_DEMOGRAPHICS_JSON = os.path.join(COMMON_INPUT_PATH, "files", "demographics.json")
-DEFAULT_ERADICATION_PATH = os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe")
+DEFAULT_ERADICATION_PATH = os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe")
 
 
 @pytest.mark.comps
-class TestDTK(ITestWithPersistence):
+class TestEMOD(ITestWithPersistence):
 
     @classmethod
     def setUpClass(cls):
@@ -30,15 +30,16 @@ class TestDTK(ITestWithPersistence):
 
     def test_sir_with_StandAloneSimulationsBuilder(self):
         e = EMODExperiment.from_default(self.case_name, default=EMODSir,
-                                       eradication_path=os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe"))
+                                       eradication_path=os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe"))
+
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
-        sim = e.simulation()
+        sim = e.base_simulation
         sim.set_parameter("Enable_Immunity", 0)
         b = StandAloneSimulationsBuilder()
         b.add_simulation(sim)
         e.builder = b
 
-        em = ExperimentManager(platform=self.platform, experiment=e)
+        em = ExperimentManager(experiment=e, platform=self.platform)
         em.run()
         em.wait_till_done()
         self.assertTrue(e.succeeded)
@@ -50,7 +51,7 @@ class TestDTK(ITestWithPersistence):
 
     def test_sir_with_ExperimentBuilder(self):
         e = EMODExperiment.from_default(self.case_name, default=EMODSir,
-                                       eradication_path=os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe"))
+                                       eradication_path=os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe"))
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
 
         e.base_simulation.set_parameter("Enable_Immunity", 0)
@@ -63,7 +64,7 @@ class TestDTK(ITestWithPersistence):
         # Sweep parameter "Run_Number"
         builder.add_sweep_definition(param_a_update, range(0, 2))
         e.builder = builder
-        em = ExperimentManager(platform=self.platform, experiment=e)
+        em = ExperimentManager(experiment=e, platform=self.platform)
         em.run()
         em.wait_till_done()
         self.assertTrue(e.succeeded)
@@ -78,18 +79,19 @@ class TestDTK(ITestWithPersistence):
 
     def test_batch_simulations_StandAloneSimulationsBuilder(self):
         e = EMODExperiment.from_default(self.case_name, default=EMODSir,
-                                       eradication_path=os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe"))
+                                       eradication_path=os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe"))
+
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         b = StandAloneSimulationsBuilder()
 
         for i in range(20):
-            sim = e.simulation()
+            sim = e.base_simulation
             sim.set_parameter("Enable_Immunity", 0)
             b.add_simulation(sim)
 
         e.builder = b
 
-        em = ExperimentManager(platform=self.platform, experiment=e)
+        em = ExperimentManager(experiment=e, platform=self.platform)
         em.run()
         em.wait_till_done()
         self.assertTrue(e.succeeded)
@@ -102,7 +104,7 @@ class TestDTK(ITestWithPersistence):
     def test_batch_simulations_ExperimentBuilder(self):
 
         e = EMODExperiment.from_default(self.case_name, default=EMODSir,
-                                       eradication_path=os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe"))
+                                       eradication_path=os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe"))
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         # s = Suite(name="test suite")
         # s.experiments.append(e)
@@ -116,7 +118,7 @@ class TestDTK(ITestWithPersistence):
         # Sweep parameter "Run_Number"
         builder.add_sweep_definition(param_a_update, range(0, 20))
         e.builder = builder
-        em = ExperimentManager(platform=self.platform, experiment=e)
+        em = ExperimentManager(experiment=e, platform=self.platform)
         em.run()
         em.wait_till_done()
         self.assertTrue(e.succeeded)
@@ -136,7 +138,7 @@ class TestDTK(ITestWithPersistence):
         b.add_simulation(sim)
         e.builder = b
 
-        em = ExperimentManager(platform=self.platform, experiment=e)
+        em = ExperimentManager(experiment=e, platform=self.platform)
         em.run()
         em.wait_till_done()
         self.assertTrue(e.succeeded)
@@ -161,7 +163,7 @@ class TestDTK(ITestWithPersistence):
         b.add_simulation(sim)
         e.builder = b
 
-        em = ExperimentManager(platform=self.platform, experiment=e)
+        em = ExperimentManager(experiment=e, platform=self.platform)
         em.run()
         em.wait_till_done()
         self.assertTrue(e.succeeded)

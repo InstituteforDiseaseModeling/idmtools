@@ -1,0 +1,1258 @@
+{
+    "Nodes": [
+        {
+            "NodeID": 5540,
+            "NodeAttributes": {
+                "Latitude": -16.4702806422,
+                "Longitude": 28.181354809499997,
+                "InitialPopulation": 31,
+                "FacilityName": "5540",
+                "BirthRate": 0.003238523287671233,
+                "LarvalHabitatMultiplier": 0.031
+            }
+        },
+        {
+            "NodeID": 5548,
+            "NodeAttributes": {
+                "Latitude": -16.4882469478,
+                "Longitude": 28.1908052558,
+                "InitialPopulation": 36,
+                "FacilityName": "5548",
+                "BirthRate": 0.0037608657534246573,
+                "LarvalHabitatMultiplier": 0.036
+            }
+        },
+        {
+            "NodeID": 5549,
+            "NodeAttributes": {
+                "Latitude": -16.479263795,
+                "Longitude": 28.1908052558,
+                "InitialPopulation": 5,
+                "FacilityName": "5549",
+                "BirthRate": 0.0005223424657534247,
+                "LarvalHabitatMultiplier": 0.005
+            }
+        },
+        {
+            "NodeID": 5550,
+            "NodeAttributes": {
+                "Latitude": -16.4702806422,
+                "Longitude": 28.1908052558,
+                "InitialPopulation": 157,
+                "FacilityName": "5550",
+                "BirthRate": 0.016401553424657534,
+                "LarvalHabitatMultiplier": 0.157
+            }
+        },
+        {
+            "NodeID": 5559,
+            "NodeAttributes": {
+                "Latitude": -16.4612974893,
+                "Longitude": 28.200255702199996,
+                "InitialPopulation": 290,
+                "FacilityName": "5559",
+                "BirthRate": 0.030295863013698625,
+                "LarvalHabitatMultiplier": 0.29
+            }
+        },
+        {
+            "NodeID": 5598,
+            "NodeAttributes": {
+                "Latitude": -16.479263795,
+                "Longitude": 28.2286070412,
+                "InitialPopulation": 13,
+                "FacilityName": "5598",
+                "BirthRate": 0.0013580904109589042,
+                "LarvalHabitatMultiplier": 0.013
+            }
+        },
+        {
+            "NodeID": 5599,
+            "NodeAttributes": {
+                "Latitude": -16.443331183599998,
+                "Longitude": 28.2286070412,
+                "InitialPopulation": 19,
+                "FacilityName": "5599",
+                "BirthRate": 0.0019849013698630133,
+                "LarvalHabitatMultiplier": 0.019
+            }
+        },
+        {
+            "NodeID": 5600,
+            "NodeAttributes": {
+                "Latitude": -16.4343480308,
+                "Longitude": 28.2286070412,
+                "InitialPopulation": 28,
+                "FacilityName": "5600",
+                "BirthRate": 0.0029251178082191783,
+                "LarvalHabitatMultiplier": 0.028
+            }
+        },
+        {
+            "NodeID": 5601,
+            "NodeAttributes": {
+                "Latitude": -16.3445165024,
+                "Longitude": 28.2286070412,
+                "InitialPopulation": 23,
+                "FacilityName": "5601",
+                "BirthRate": 0.0024027753424657535,
+                "LarvalHabitatMultiplier": 0.023
+            }
+        },
+        {
+            "NodeID": 5611,
+            "NodeAttributes": {
+                "Latitude": -16.4882469478,
+                "Longitude": 28.238057487600003,
+                "InitialPopulation": 69,
+                "FacilityName": "5611",
+                "BirthRate": 0.007208326027397261,
+                "LarvalHabitatMultiplier": 0.069
+            }
+        },
+        {
+            "NodeID": 5612,
+            "NodeAttributes": {
+                "Latitude": -16.479263795,
+                "Longitude": 28.238057487600003,
+                "InitialPopulation": 152,
+                "FacilityName": "5612",
+                "BirthRate": 0.015879210958904107,
+                "LarvalHabitatMultiplier": 0.152
+            }
+        },
+        {
+            "NodeID": 5613,
+            "NodeAttributes": {
+                "Latitude": -16.452314336500002,
+                "Longitude": 28.238057487600003,
+                "InitialPopulation": 4,
+                "FacilityName": "5613",
+                "BirthRate": 0.0004178739726027397,
+                "LarvalHabitatMultiplier": 0.004
+            }
+        },
+        {
+            "NodeID": 5614,
+            "NodeAttributes": {
+                "Latitude": -16.443331183599998,
+                "Longitude": 28.238057487600003,
+                "InitialPopulation": 40,
+                "FacilityName": "5614",
+                "BirthRate": 0.004178739726027398,
+                "LarvalHabitatMultiplier": 0.04
+            }
+        },
+        {
+            "NodeID": 5615,
+            "NodeAttributes": {
+                "Latitude": -16.4343480308,
+                "Longitude": 28.238057487600003,
+                "InitialPopulation": 103,
+                "FacilityName": "5615",
+                "BirthRate": 0.010760254794520547,
+                "LarvalHabitatMultiplier": 0.103
+            }
+        },
+        {
+            "NodeID": 5616,
+            "NodeAttributes": {
+                "Latitude": -16.3355333495,
+                "Longitude": 28.238057487600003,
+                "InitialPopulation": 153,
+                "FacilityName": "5616",
+                "BirthRate": 0.015983679452054797,
+                "LarvalHabitatMultiplier": 0.153
+            }
+        },
+        {
+            "NodeID": 5624,
+            "NodeAttributes": {
+                "Latitude": -16.497230100699998,
+                "Longitude": 28.247507934,
+                "InitialPopulation": 77,
+                "FacilityName": "5624",
+                "BirthRate": 0.00804407397260274,
+                "LarvalHabitatMultiplier": 0.077
+            }
+        },
+        {
+            "NodeID": 5625,
+            "NodeAttributes": {
+                "Latitude": -16.4882469478,
+                "Longitude": 28.247507934,
+                "InitialPopulation": 125,
+                "FacilityName": "5625",
+                "BirthRate": 0.013058561643835617,
+                "LarvalHabitatMultiplier": 0.125
+            }
+        },
+        {
+            "NodeID": 5626,
+            "NodeAttributes": {
+                "Latitude": -16.479263795,
+                "Longitude": 28.247507934,
+                "InitialPopulation": 40,
+                "FacilityName": "5626",
+                "BirthRate": 0.004178739726027398,
+                "LarvalHabitatMultiplier": 0.04
+            }
+        },
+        {
+            "NodeID": 5627,
+            "NodeAttributes": {
+                "Latitude": -16.3984154194,
+                "Longitude": 28.247507934,
+                "InitialPopulation": 22,
+                "FacilityName": "5627",
+                "BirthRate": 0.0022983068493150683,
+                "LarvalHabitatMultiplier": 0.022
+            }
+        },
+        {
+            "NodeID": 5628,
+            "NodeAttributes": {
+                "Latitude": -16.3445165024,
+                "Longitude": 28.247507934,
+                "InitialPopulation": 4,
+                "FacilityName": "5628",
+                "BirthRate": 0.0004178739726027397,
+                "LarvalHabitatMultiplier": 0.004
+            }
+        },
+        {
+            "NodeID": 5629,
+            "NodeAttributes": {
+                "Latitude": -16.3355333495,
+                "Longitude": 28.247507934,
+                "InitialPopulation": 131,
+                "FacilityName": "5629",
+                "BirthRate": 0.013685372602739727,
+                "LarvalHabitatMultiplier": 0.131
+            }
+        },
+        {
+            "NodeID": 5630,
+            "NodeAttributes": {
+                "Latitude": -16.3265501967,
+                "Longitude": 28.247507934,
+                "InitialPopulation": 48,
+                "FacilityName": "5630",
+                "BirthRate": 0.005014487671232877,
+                "LarvalHabitatMultiplier": 0.048
+            }
+        },
+        {
+            "NodeID": 5636,
+            "NodeAttributes": {
+                "Latitude": -16.5062132535,
+                "Longitude": 28.256958380300002,
+                "InitialPopulation": 9,
+                "FacilityName": "5636",
+                "BirthRate": 0.0009402164383561643,
+                "LarvalHabitatMultiplier": 0.009
+            }
+        },
+        {
+            "NodeID": 5637,
+            "NodeAttributes": {
+                "Latitude": -16.497230100699998,
+                "Longitude": 28.256958380300002,
+                "InitialPopulation": 43,
+                "FacilityName": "5637",
+                "BirthRate": 0.0044921452054794515,
+                "LarvalHabitatMultiplier": 0.043
+            }
+        },
+        {
+            "NodeID": 5638,
+            "NodeAttributes": {
+                "Latitude": -16.4882469478,
+                "Longitude": 28.256958380300002,
+                "InitialPopulation": 65,
+                "FacilityName": "5638",
+                "BirthRate": 0.006790452054794521,
+                "LarvalHabitatMultiplier": 0.065
+            }
+        },
+        {
+            "NodeID": 5639,
+            "NodeAttributes": {
+                "Latitude": -16.4702806422,
+                "Longitude": 28.256958380300002,
+                "InitialPopulation": 60,
+                "FacilityName": "5639",
+                "BirthRate": 0.006268109589041095,
+                "LarvalHabitatMultiplier": 0.06
+            }
+        },
+        {
+            "NodeID": 5640,
+            "NodeAttributes": {
+                "Latitude": -16.4612974893,
+                "Longitude": 28.256958380300002,
+                "InitialPopulation": 40,
+                "FacilityName": "5640",
+                "BirthRate": 0.004178739726027398,
+                "LarvalHabitatMultiplier": 0.04
+            }
+        },
+        {
+            "NodeID": 5641,
+            "NodeAttributes": {
+                "Latitude": -16.452314336500002,
+                "Longitude": 28.256958380300002,
+                "InitialPopulation": 27,
+                "FacilityName": "5641",
+                "BirthRate": 0.002820649315068493,
+                "LarvalHabitatMultiplier": 0.027
+            }
+        },
+        {
+            "NodeID": 5642,
+            "NodeAttributes": {
+                "Latitude": -16.4163817251,
+                "Longitude": 28.256958380300002,
+                "InitialPopulation": 25,
+                "FacilityName": "5642",
+                "BirthRate": 0.0026117123287671237,
+                "LarvalHabitatMultiplier": 0.025
+            }
+        },
+        {
+            "NodeID": 5643,
+            "NodeAttributes": {
+                "Latitude": -16.4073985723,
+                "Longitude": 28.256958380300002,
+                "InitialPopulation": 45,
+                "FacilityName": "5643",
+                "BirthRate": 0.004701082191780822,
+                "LarvalHabitatMultiplier": 0.045
+            }
+        },
+        {
+            "NodeID": 5644,
+            "NodeAttributes": {
+                "Latitude": -16.3984154194,
+                "Longitude": 28.256958380300002,
+                "InitialPopulation": 22,
+                "FacilityName": "5644",
+                "BirthRate": 0.0022983068493150683,
+                "LarvalHabitatMultiplier": 0.022
+            }
+        },
+        {
+            "NodeID": 5645,
+            "NodeAttributes": {
+                "Latitude": -16.3894322666,
+                "Longitude": 28.256958380300002,
+                "InitialPopulation": 57,
+                "FacilityName": "5645",
+                "BirthRate": 0.005954704109589041,
+                "LarvalHabitatMultiplier": 0.057
+            }
+        },
+        {
+            "NodeID": 5658,
+            "NodeAttributes": {
+                "Latitude": -16.5151964064,
+                "Longitude": 28.2664088267,
+                "InitialPopulation": 11,
+                "FacilityName": "5658",
+                "BirthRate": 0.0011491534246575342,
+                "LarvalHabitatMultiplier": 0.011
+            }
+        },
+        {
+            "NodeID": 5659,
+            "NodeAttributes": {
+                "Latitude": -16.5062132535,
+                "Longitude": 28.2664088267,
+                "InitialPopulation": 7,
+                "FacilityName": "5659",
+                "BirthRate": 0.0007312794520547946,
+                "LarvalHabitatMultiplier": 0.007
+            }
+        },
+        {
+            "NodeID": 5660,
+            "NodeAttributes": {
+                "Latitude": -16.479263795,
+                "Longitude": 28.2664088267,
+                "InitialPopulation": 6,
+                "FacilityName": "5660",
+                "BirthRate": 0.0006268109589041097,
+                "LarvalHabitatMultiplier": 0.006
+            }
+        },
+        {
+            "NodeID": 5661,
+            "NodeAttributes": {
+                "Latitude": -16.4612974893,
+                "Longitude": 28.2664088267,
+                "InitialPopulation": 10,
+                "FacilityName": "5661",
+                "BirthRate": 0.0010446849315068495,
+                "LarvalHabitatMultiplier": 0.01
+            }
+        },
+        {
+            "NodeID": 5662,
+            "NodeAttributes": {
+                "Latitude": -16.452314336500002,
+                "Longitude": 28.2664088267,
+                "InitialPopulation": 55,
+                "FacilityName": "5662",
+                "BirthRate": 0.0057457671232876715,
+                "LarvalHabitatMultiplier": 0.055
+            }
+        },
+        {
+            "NodeID": 5663,
+            "NodeAttributes": {
+                "Latitude": -16.3984154194,
+                "Longitude": 28.2664088267,
+                "InitialPopulation": 37,
+                "FacilityName": "5663",
+                "BirthRate": 0.0038653342465753424,
+                "LarvalHabitatMultiplier": 0.037
+            }
+        },
+        {
+            "NodeID": 5664,
+            "NodeAttributes": {
+                "Latitude": -16.3894322666,
+                "Longitude": 28.2664088267,
+                "InitialPopulation": 61,
+                "FacilityName": "5664",
+                "BirthRate": 0.006372578082191781,
+                "LarvalHabitatMultiplier": 0.061
+            }
+        },
+        {
+            "NodeID": 5665,
+            "NodeAttributes": {
+                "Latitude": -16.3355333495,
+                "Longitude": 28.2664088267,
+                "InitialPopulation": 122,
+                "FacilityName": "5665",
+                "BirthRate": 0.012745156164383563,
+                "LarvalHabitatMultiplier": 0.122
+            }
+        },
+        {
+            "NodeID": 5666,
+            "NodeAttributes": {
+                "Latitude": -16.3265501967,
+                "Longitude": 28.2664088267,
+                "InitialPopulation": 83,
+                "FacilityName": "5666",
+                "BirthRate": 0.00867088493150685,
+                "LarvalHabitatMultiplier": 0.083
+            }
+        },
+        {
+            "NodeID": 5667,
+            "NodeAttributes": {
+                "Latitude": -16.317567043900002,
+                "Longitude": 28.2664088267,
+                "InitialPopulation": 36,
+                "FacilityName": "5667",
+                "BirthRate": 0.0037608657534246573,
+                "LarvalHabitatMultiplier": 0.036
+            }
+        },
+        {
+            "NodeID": 5677,
+            "NodeAttributes": {
+                "Latitude": -16.5151964064,
+                "Longitude": 28.275859273000002,
+                "InitialPopulation": 56,
+                "FacilityName": "5677",
+                "BirthRate": 0.005850235616438357,
+                "LarvalHabitatMultiplier": 0.056
+            }
+        },
+        {
+            "NodeID": 5678,
+            "NodeAttributes": {
+                "Latitude": -16.5062132535,
+                "Longitude": 28.275859273000002,
+                "InitialPopulation": 4,
+                "FacilityName": "5678",
+                "BirthRate": 0.0004178739726027397,
+                "LarvalHabitatMultiplier": 0.004
+            }
+        },
+        {
+            "NodeID": 5679,
+            "NodeAttributes": {
+                "Latitude": -16.452314336500002,
+                "Longitude": 28.275859273000002,
+                "InitialPopulation": 2,
+                "FacilityName": "5679",
+                "BirthRate": 0.00020893698630136985,
+                "LarvalHabitatMultiplier": 0.002
+            }
+        },
+        {
+            "NodeID": 5680,
+            "NodeAttributes": {
+                "Latitude": -16.443331183599998,
+                "Longitude": 28.275859273000002,
+                "InitialPopulation": 90,
+                "FacilityName": "5680",
+                "BirthRate": 0.009402164383561644,
+                "LarvalHabitatMultiplier": 0.09
+            }
+        },
+        {
+            "NodeID": 5681,
+            "NodeAttributes": {
+                "Latitude": -16.4343480308,
+                "Longitude": 28.275859273000002,
+                "InitialPopulation": 17,
+                "FacilityName": "5681",
+                "BirthRate": 0.001775964383561644,
+                "LarvalHabitatMultiplier": 0.017
+            }
+        },
+        {
+            "NodeID": 5682,
+            "NodeAttributes": {
+                "Latitude": -16.3355333495,
+                "Longitude": 28.275859273000002,
+                "InitialPopulation": 193,
+                "FacilityName": "5682",
+                "BirthRate": 0.020162419178082192,
+                "LarvalHabitatMultiplier": 0.193
+            }
+        },
+        {
+            "NodeID": 5683,
+            "NodeAttributes": {
+                "Latitude": -16.3265501967,
+                "Longitude": 28.275859273000002,
+                "InitialPopulation": 101,
+                "FacilityName": "5683",
+                "BirthRate": 0.010551317808219178,
+                "LarvalHabitatMultiplier": 0.101
+            }
+        },
+        {
+            "NodeID": 5684,
+            "NodeAttributes": {
+                "Latitude": -16.317567043900002,
+                "Longitude": 28.275859273000002,
+                "InitialPopulation": 41,
+                "FacilityName": "5684",
+                "BirthRate": 0.004283208219178082,
+                "LarvalHabitatMultiplier": 0.041
+            }
+        },
+        {
+            "NodeID": 5695,
+            "NodeAttributes": {
+                "Latitude": -16.5151964064,
+                "Longitude": 28.2853097194,
+                "InitialPopulation": 8,
+                "FacilityName": "5695",
+                "BirthRate": 0.0008357479452054794,
+                "LarvalHabitatMultiplier": 0.008
+            }
+        },
+        {
+            "NodeID": 5696,
+            "NodeAttributes": {
+                "Latitude": -16.443331183599998,
+                "Longitude": 28.2853097194,
+                "InitialPopulation": 13,
+                "FacilityName": "5696",
+                "BirthRate": 0.0013580904109589042,
+                "LarvalHabitatMultiplier": 0.013
+            }
+        },
+        {
+            "NodeID": 5697,
+            "NodeAttributes": {
+                "Latitude": -16.4343480308,
+                "Longitude": 28.2853097194,
+                "InitialPopulation": 69,
+                "FacilityName": "5697",
+                "BirthRate": 0.007208326027397261,
+                "LarvalHabitatMultiplier": 0.069
+            }
+        },
+        {
+            "NodeID": 5698,
+            "NodeAttributes": {
+                "Latitude": -16.3445165024,
+                "Longitude": 28.2853097194,
+                "InitialPopulation": 15,
+                "FacilityName": "5698",
+                "BirthRate": 0.0015670273972602739,
+                "LarvalHabitatMultiplier": 0.015
+            }
+        },
+        {
+            "NodeID": 5699,
+            "NodeAttributes": {
+                "Latitude": -16.3355333495,
+                "Longitude": 28.2853097194,
+                "InitialPopulation": 28,
+                "FacilityName": "5699",
+                "BirthRate": 0.0029251178082191783,
+                "LarvalHabitatMultiplier": 0.028
+            }
+        },
+        {
+            "NodeID": 5700,
+            "NodeAttributes": {
+                "Latitude": -16.3265501967,
+                "Longitude": 28.2853097194,
+                "InitialPopulation": 92,
+                "FacilityName": "5700",
+                "BirthRate": 0.009611101369863014,
+                "LarvalHabitatMultiplier": 0.092
+            }
+        },
+        {
+            "NodeID": 5701,
+            "NodeAttributes": {
+                "Latitude": -16.317567043900002,
+                "Longitude": 28.2853097194,
+                "InitialPopulation": 13,
+                "FacilityName": "5701",
+                "BirthRate": 0.0013580904109589042,
+                "LarvalHabitatMultiplier": 0.013
+            }
+        },
+        {
+            "NodeID": 5702,
+            "NodeAttributes": {
+                "Latitude": -16.308583890999998,
+                "Longitude": 28.2853097194,
+                "InitialPopulation": 15,
+                "FacilityName": "5702",
+                "BirthRate": 0.0015670273972602739,
+                "LarvalHabitatMultiplier": 0.015
+            }
+        },
+        {
+            "NodeID": 5716,
+            "NodeAttributes": {
+                "Latitude": -16.443331183599998,
+                "Longitude": 28.2947601658,
+                "InitialPopulation": 40,
+                "FacilityName": "5716",
+                "BirthRate": 0.004178739726027398,
+                "LarvalHabitatMultiplier": 0.04
+            }
+        },
+        {
+            "NodeID": 5717,
+            "NodeAttributes": {
+                "Latitude": -16.4343480308,
+                "Longitude": 28.2947601658,
+                "InitialPopulation": 14,
+                "FacilityName": "5717",
+                "BirthRate": 0.0014625589041095891,
+                "LarvalHabitatMultiplier": 0.014
+            }
+        },
+        {
+            "NodeID": 5718,
+            "NodeAttributes": {
+                "Latitude": -16.425364878,
+                "Longitude": 28.2947601658,
+                "InitialPopulation": 49,
+                "FacilityName": "5718",
+                "BirthRate": 0.0051189561643835615,
+                "LarvalHabitatMultiplier": 0.049
+            }
+        },
+        {
+            "NodeID": 5719,
+            "NodeAttributes": {
+                "Latitude": -16.4163817251,
+                "Longitude": 28.2947601658,
+                "InitialPopulation": 259,
+                "FacilityName": "5719",
+                "BirthRate": 0.0270573397260274,
+                "LarvalHabitatMultiplier": 0.259
+            }
+        },
+        {
+            "NodeID": 5720,
+            "NodeAttributes": {
+                "Latitude": -16.4073985723,
+                "Longitude": 28.2947601658,
+                "InitialPopulation": 60,
+                "FacilityName": "5720",
+                "BirthRate": 0.006268109589041095,
+                "LarvalHabitatMultiplier": 0.06
+            }
+        },
+        {
+            "NodeID": 5721,
+            "NodeAttributes": {
+                "Latitude": -16.3894322666,
+                "Longitude": 28.2947601658,
+                "InitialPopulation": 291,
+                "FacilityName": "5721",
+                "BirthRate": 0.030400331506849315,
+                "LarvalHabitatMultiplier": 0.291
+            }
+        },
+        {
+            "NodeID": 5722,
+            "NodeAttributes": {
+                "Latitude": -16.3804491138,
+                "Longitude": 28.2947601658,
+                "InitialPopulation": 120,
+                "FacilityName": "5722",
+                "BirthRate": 0.01253621917808219,
+                "LarvalHabitatMultiplier": 0.12
+            }
+        },
+        {
+            "NodeID": 5723,
+            "NodeAttributes": {
+                "Latitude": -16.3714659609,
+                "Longitude": 28.2947601658,
+                "InitialPopulation": 23,
+                "FacilityName": "5723",
+                "BirthRate": 0.0024027753424657535,
+                "LarvalHabitatMultiplier": 0.023
+            }
+        },
+        {
+            "NodeID": 5724,
+            "NodeAttributes": {
+                "Latitude": -16.3445165024,
+                "Longitude": 28.2947601658,
+                "InitialPopulation": 65,
+                "FacilityName": "5724",
+                "BirthRate": 0.006790452054794521,
+                "LarvalHabitatMultiplier": 0.065
+            }
+        },
+        {
+            "NodeID": 5725,
+            "NodeAttributes": {
+                "Latitude": -16.3355333495,
+                "Longitude": 28.2947601658,
+                "InitialPopulation": 87,
+                "FacilityName": "5725",
+                "BirthRate": 0.009088758904109588,
+                "LarvalHabitatMultiplier": 0.087
+            }
+        },
+        {
+            "NodeID": 5726,
+            "NodeAttributes": {
+                "Latitude": -16.3265501967,
+                "Longitude": 28.2947601658,
+                "InitialPopulation": 66,
+                "FacilityName": "5726",
+                "BirthRate": 0.006894920547945206,
+                "LarvalHabitatMultiplier": 0.066
+            }
+        },
+        {
+            "NodeID": 5727,
+            "NodeAttributes": {
+                "Latitude": -16.317567043900002,
+                "Longitude": 28.2947601658,
+                "InitialPopulation": 23,
+                "FacilityName": "5727",
+                "BirthRate": 0.0024027753424657535,
+                "LarvalHabitatMultiplier": 0.023
+            }
+        },
+        {
+            "NodeID": 5728,
+            "NodeAttributes": {
+                "Latitude": -16.308583890999998,
+                "Longitude": 28.2947601658,
+                "InitialPopulation": 42,
+                "FacilityName": "5728",
+                "BirthRate": 0.004387676712328768,
+                "LarvalHabitatMultiplier": 0.042
+            }
+        },
+        {
+            "NodeID": 5729,
+            "NodeAttributes": {
+                "Latitude": -16.2996007382,
+                "Longitude": 28.2947601658,
+                "InitialPopulation": 4,
+                "FacilityName": "5729",
+                "BirthRate": 0.0004178739726027397,
+                "LarvalHabitatMultiplier": 0.004
+            }
+        },
+        {
+            "NodeID": 5744,
+            "NodeAttributes": {
+                "Latitude": -16.425364878,
+                "Longitude": 28.3042106121,
+                "InitialPopulation": 11,
+                "FacilityName": "5744",
+                "BirthRate": 0.0011491534246575342,
+                "LarvalHabitatMultiplier": 0.011
+            }
+        },
+        {
+            "NodeID": 5745,
+            "NodeAttributes": {
+                "Latitude": -16.4163817251,
+                "Longitude": 28.3042106121,
+                "InitialPopulation": 90,
+                "FacilityName": "5745",
+                "BirthRate": 0.009402164383561644,
+                "LarvalHabitatMultiplier": 0.09
+            }
+        },
+        {
+            "NodeID": 5746,
+            "NodeAttributes": {
+                "Latitude": -16.4073985723,
+                "Longitude": 28.3042106121,
+                "InitialPopulation": 40,
+                "FacilityName": "5746",
+                "BirthRate": 0.004178739726027398,
+                "LarvalHabitatMultiplier": 0.04
+            }
+        },
+        {
+            "NodeID": 5747,
+            "NodeAttributes": {
+                "Latitude": -16.3984154194,
+                "Longitude": 28.3042106121,
+                "InitialPopulation": 275,
+                "FacilityName": "5747",
+                "BirthRate": 0.02872883561643836,
+                "LarvalHabitatMultiplier": 0.275
+            }
+        },
+        {
+            "NodeID": 5748,
+            "NodeAttributes": {
+                "Latitude": -16.3894322666,
+                "Longitude": 28.3042106121,
+                "InitialPopulation": 251,
+                "FacilityName": "5748",
+                "BirthRate": 0.026221591780821916,
+                "LarvalHabitatMultiplier": 0.251
+            }
+        },
+        {
+            "NodeID": 5749,
+            "NodeAttributes": {
+                "Latitude": -16.3804491138,
+                "Longitude": 28.3042106121,
+                "InitialPopulation": 99,
+                "FacilityName": "5749",
+                "BirthRate": 0.010342380821917808,
+                "LarvalHabitatMultiplier": 0.099
+            }
+        },
+        {
+            "NodeID": 5750,
+            "NodeAttributes": {
+                "Latitude": -16.3714659609,
+                "Longitude": 28.3042106121,
+                "InitialPopulation": 30,
+                "FacilityName": "5750",
+                "BirthRate": 0.0031340547945205477,
+                "LarvalHabitatMultiplier": 0.03
+            }
+        },
+        {
+            "NodeID": 5751,
+            "NodeAttributes": {
+                "Latitude": -16.3624828081,
+                "Longitude": 28.3042106121,
+                "InitialPopulation": 16,
+                "FacilityName": "5751",
+                "BirthRate": 0.0016714958904109588,
+                "LarvalHabitatMultiplier": 0.016
+            }
+        },
+        {
+            "NodeID": 5752,
+            "NodeAttributes": {
+                "Latitude": -16.308583890999998,
+                "Longitude": 28.3042106121,
+                "InitialPopulation": 25,
+                "FacilityName": "5752",
+                "BirthRate": 0.0026117123287671237,
+                "LarvalHabitatMultiplier": 0.025
+            }
+        },
+        {
+            "NodeID": 5753,
+            "NodeAttributes": {
+                "Latitude": -16.2996007382,
+                "Longitude": 28.3042106121,
+                "InitialPopulation": 52,
+                "FacilityName": "5753",
+                "BirthRate": 0.005432361643835617,
+                "LarvalHabitatMultiplier": 0.052
+            }
+        },
+        {
+            "NodeID": 5754,
+            "NodeAttributes": {
+                "Latitude": -16.2906175853,
+                "Longitude": 28.3042106121,
+                "InitialPopulation": 36,
+                "FacilityName": "5754",
+                "BirthRate": 0.0037608657534246573,
+                "LarvalHabitatMultiplier": 0.036
+            }
+        },
+        {
+            "NodeID": 5764,
+            "NodeAttributes": {
+                "Latitude": -16.4612974893,
+                "Longitude": 28.3136610585,
+                "InitialPopulation": 42,
+                "FacilityName": "5764",
+                "BirthRate": 0.004387676712328768,
+                "LarvalHabitatMultiplier": 0.042
+            }
+        },
+        {
+            "NodeID": 5765,
+            "NodeAttributes": {
+                "Latitude": -16.452314336500002,
+                "Longitude": 28.3136610585,
+                "InitialPopulation": 20,
+                "FacilityName": "5765",
+                "BirthRate": 0.002089369863013699,
+                "LarvalHabitatMultiplier": 0.02
+            }
+        },
+        {
+            "NodeID": 5766,
+            "NodeAttributes": {
+                "Latitude": -16.4163817251,
+                "Longitude": 28.3136610585,
+                "InitialPopulation": 67,
+                "FacilityName": "5766",
+                "BirthRate": 0.0069993890410958905,
+                "LarvalHabitatMultiplier": 0.067
+            }
+        },
+        {
+            "NodeID": 5767,
+            "NodeAttributes": {
+                "Latitude": -16.3984154194,
+                "Longitude": 28.3136610585,
+                "InitialPopulation": 59,
+                "FacilityName": "5767",
+                "BirthRate": 0.00616364109589041,
+                "LarvalHabitatMultiplier": 0.059
+            }
+        },
+        {
+            "NodeID": 5768,
+            "NodeAttributes": {
+                "Latitude": -16.3894322666,
+                "Longitude": 28.3136610585,
+                "InitialPopulation": 171,
+                "FacilityName": "5768",
+                "BirthRate": 0.017864112328767126,
+                "LarvalHabitatMultiplier": 0.171
+            }
+        },
+        {
+            "NodeID": 5769,
+            "NodeAttributes": {
+                "Latitude": -16.3714659609,
+                "Longitude": 28.3136610585,
+                "InitialPopulation": 41,
+                "FacilityName": "5769",
+                "BirthRate": 0.004283208219178082,
+                "LarvalHabitatMultiplier": 0.041
+            }
+        },
+        {
+            "NodeID": 5770,
+            "NodeAttributes": {
+                "Latitude": -16.3624828081,
+                "Longitude": 28.3136610585,
+                "InitialPopulation": 123,
+                "FacilityName": "5770",
+                "BirthRate": 0.012849624657534246,
+                "LarvalHabitatMultiplier": 0.123
+            }
+        },
+        {
+            "NodeID": 5778,
+            "NodeAttributes": {
+                "Latitude": -16.4612974893,
+                "Longitude": 28.3231115048,
+                "InitialPopulation": 14,
+                "FacilityName": "5778",
+                "BirthRate": 0.0014625589041095891,
+                "LarvalHabitatMultiplier": 0.014
+            }
+        },
+        {
+            "NodeID": 5779,
+            "NodeAttributes": {
+                "Latitude": -16.4073985723,
+                "Longitude": 28.3231115048,
+                "InitialPopulation": 11,
+                "FacilityName": "5779",
+                "BirthRate": 0.0011491534246575342,
+                "LarvalHabitatMultiplier": 0.011
+            }
+        },
+        {
+            "NodeID": 5780,
+            "NodeAttributes": {
+                "Latitude": -16.3894322666,
+                "Longitude": 28.3231115048,
+                "InitialPopulation": 69,
+                "FacilityName": "5780",
+                "BirthRate": 0.007208326027397261,
+                "LarvalHabitatMultiplier": 0.069
+            }
+        },
+        {
+            "NodeID": 5788,
+            "NodeAttributes": {
+                "Latitude": -16.4073985723,
+                "Longitude": 28.3325619512,
+                "InitialPopulation": 160,
+                "FacilityName": "5788",
+                "BirthRate": 0.01671495890410959,
+                "LarvalHabitatMultiplier": 0.16
+            }
+        },
+        {
+            "NodeID": 5799,
+            "NodeAttributes": {
+                "Latitude": -16.4073985723,
+                "Longitude": 28.3420123975,
+                "InitialPopulation": 7,
+                "FacilityName": "5799",
+                "BirthRate": 0.0007312794520547946,
+                "LarvalHabitatMultiplier": 0.007
+            }
+        },
+        {
+            "NodeID": 5809,
+            "NodeAttributes": {
+                "Latitude": -16.443331183599998,
+                "Longitude": 28.3514628439,
+                "InitialPopulation": 3,
+                "FacilityName": "5809",
+                "BirthRate": 0.0003134054794520548,
+                "LarvalHabitatMultiplier": 0.003
+            }
+        },
+        {
+            "NodeID": 5823,
+            "NodeAttributes": {
+                "Latitude": -16.425364878,
+                "Longitude": 28.3609132903,
+                "InitialPopulation": 21,
+                "FacilityName": "5823",
+                "BirthRate": 0.002193838356164384,
+                "LarvalHabitatMultiplier": 0.021
+            }
+        },
+        {
+            "NodeID": 5824,
+            "NodeAttributes": {
+                "Latitude": -16.4163817251,
+                "Longitude": 28.3609132903,
+                "InitialPopulation": 51,
+                "FacilityName": "5824",
+                "BirthRate": 0.005327893150684931,
+                "LarvalHabitatMultiplier": 0.051
+            }
+        },
+        {
+            "NodeID": 5841,
+            "NodeAttributes": {
+                "Latitude": -16.4343480308,
+                "Longitude": 28.370363736599998,
+                "InitialPopulation": 53,
+                "FacilityName": "5841",
+                "BirthRate": 0.005536830136986301,
+                "LarvalHabitatMultiplier": 0.053
+            }
+        },
+        {
+            "NodeID": 5842,
+            "NodeAttributes": {
+                "Latitude": -16.4163817251,
+                "Longitude": 28.370363736599998,
+                "InitialPopulation": 78,
+                "FacilityName": "5842",
+                "BirthRate": 0.008148542465753425,
+                "LarvalHabitatMultiplier": 0.078
+            }
+        },
+        {
+            "NodeID": 5850,
+            "NodeAttributes": {
+                "Latitude": -16.443331183599998,
+                "Longitude": 28.379814183,
+                "InitialPopulation": 52,
+                "FacilityName": "5850",
+                "BirthRate": 0.005432361643835617,
+                "LarvalHabitatMultiplier": 0.052
+            }
+        },
+        {
+            "NodeID": 5851,
+            "NodeAttributes": {
+                "Latitude": -16.425364878,
+                "Longitude": 28.379814183,
+                "InitialPopulation": 147,
+                "FacilityName": "5851",
+                "BirthRate": 0.015356868493150684,
+                "LarvalHabitatMultiplier": 0.147
+            }
+        },
+        {
+            "NodeID": 5852,
+            "NodeAttributes": {
+                "Latitude": -16.4163817251,
+                "Longitude": 28.379814183,
+                "InitialPopulation": 93,
+                "FacilityName": "5852",
+                "BirthRate": 0.009715569863013699,
+                "LarvalHabitatMultiplier": 0.093
+            }
+        },
+        {
+            "NodeID": 5860,
+            "NodeAttributes": {
+                "Latitude": -16.425364878,
+                "Longitude": 28.389264629299998,
+                "InitialPopulation": 60,
+                "FacilityName": "5860",
+                "BirthRate": 0.006268109589041095,
+                "LarvalHabitatMultiplier": 0.06
+            }
+        },
+        {
+            "NodeID": 5861,
+            "NodeAttributes": {
+                "Latitude": -16.4163817251,
+                "Longitude": 28.389264629299998,
+                "InitialPopulation": 13,
+                "FacilityName": "5861",
+                "BirthRate": 0.0013580904109589042,
+                "LarvalHabitatMultiplier": 0.013
+            }
+        },
+        {
+            "NodeID": 100000,
+            "NodeAttributes": {
+                "Latitude": -16.841238,
+                "Longitude": 28.036068,
+                "InitialPopulation": 0,
+                "FacilityName": "100000",
+                "BirthRate": 0.0,
+                "LarvalHabitatMultiplier": 0.0
+            }
+        }
+    ],
+    "Defaults": {
+        "IndividualAttributes": {
+            "MortalityDistribution": {
+                "NumDistributionAxes": 2,
+                "AxisNames": [
+                    "gender",
+                    "age"
+                ],
+                "AxisUnits": [
+                    "male=0,female=1",
+                    "years"
+                ],
+                "AxisScaleFactors": [
+                    1,
+                    365
+                ],
+                "NumPopulationGroups": [
+                    2,
+                    1
+                ],
+                "PopulationGroups": [
+                    [
+                        0,
+                        1
+                    ],
+                    [
+                        0
+                    ]
+                ],
+                "ResultUnits": "annual deaths per 1000 individuals",
+                "ResultScaleFactor": 2.74e-06,
+                "ResultValues": [
+                    [
+                        38.131
+                    ],
+                    [
+                        38.131
+                    ]
+                ]
+            },
+            "AgeDistributionFlag": 3,
+            "AgeDistribution1": 0.0001068,
+            "RiskDistribution1": 1,
+            "PrevalenceDistributionFlag": 1,
+            "AgeDistribution2": 0,
+            "PrevalenceDistribution1": 0.13,
+            "PrevalenceDistribution2": 0.15,
+            "RiskDistributionFlag": 0,
+            "RiskDistribution2": 0,
+            "MigrationHeterogeneityDistribution1": 1,
+            "ImmunityDistributionFlag": 0,
+            "MigrationHeterogeneityDistributionFlag": 0,
+            "ImmunityDistribution1": 1,
+            "MigrationHeterogeneityDistribution2": 0,
+            "ImmunityDistribution2": 0
+        },
+        "NodeAttributes": {
+            "Urban": 0,
+            "AbovePoverty": 0.5,
+            "Region": 1,
+            "Seaport": 0,
+            "Airport": 0,
+            "Altitude": 0,
+            "InitialPopulation": 1000
+        },
+        "IndividualProperties": [
+            {
+                "Property": "TravelerStatus",
+                "Values": [
+                    "IsTraveler",
+                    "NotTraveler"
+                ],
+                "Initial_Distribution": [
+                    0.07,
+                    0.93
+                ],
+                "Transitions": []
+            }
+        ]
+    },
+    "Metadata": {
+        "Author": "idm",
+        "Tool": "dtk-tools",
+        "IdReference": "Custom user",
+        "DateCreated": "2018-08-17 18:18:46.966740",
+        "NodeCount": 106,
+        "Resolution": 30
+    }
+}

@@ -1,3 +1,5 @@
+from typing import TypeVar
+
 class CommandLine:
     """
     A class to construct command line strings from executable, options, and params
@@ -32,3 +34,6 @@ class CommandLine:
     @property
     def cmd(self):
         return ' '.join(filter(None, [self.executable, self.options, self.arguments]))
+
+
+TCommandLine = TypeVar("TCommandLine", bound=CommandLine)

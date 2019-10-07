@@ -5,20 +5,24 @@ from idmtools.core import ExperimentNotFound
 from idmtools.services.platforms import PlatformPersistService
 
 if typing.TYPE_CHECKING:
-    from idmtools.core import TPlatform, TExperiment
+    from idmtools.entities.iplatform import TPlatform
+    from idmtools.entities.iexperiment import TExperiment
     import uuid
 
 
 def retrieve_experiment(experiment_id: 'uuid', platform: 'TPlatform' = None,
                         with_simulations: 'bool' = False) -> 'TExperiment':
     experiment = ExperimentPersistService.retrieve(experiment_id)
-    if not experiment:
+
+    if experiment:
+        experiment.platform = platform  # Not really the best form, but...
+    else:
         # This is an unknown experiment, make sure we have a platform to ask for info
         if not platform:
             raise ExperimentNotFound(experiment_id)
 
         # Try to retrieve it from the platform
-        experiment = platform.retrieve_experiment(experiment_id)
+        experiment = platform.get_item(id=experiment_id)
         if not experiment:
             raise ExperimentNotFound(experiment_id, platform)
 
@@ -28,6 +32,5 @@ def retrieve_experiment(experiment_id: 'uuid', platform: 'TPlatform' = None,
 
     # At this point we have our experiment -> check if we need the simulations
     if with_simulations:
-        platform.restore_simulations(experiment)
-
+        experiment.children(refresh=True)  # children are lazy loaded; go ahead and load them anew
     return experiment

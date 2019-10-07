@@ -8,34 +8,41 @@ from more_itertools import grouper
 from idmtools.core.interfaces.entity_container import EntityContainer
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.core.interfaces.inamed_entity import INamedEntity
+from idmtools.entities.icontainer_item import IContainerItem
 
 if typing.TYPE_CHECKING:
-    from idmtools.core.types import TSimulation, TSimulationClass, TCommandLine, TExperimentBuilder
-
+    from idmtools.core.types import TSimulation, TSimulationClass, TExperimentBuilder
+    from idmtools.entities.command_line import TCommandLine
 
 @dataclass(repr=False)
-class IExperiment(IAssetsEnabled, INamedEntity, ABC):
+class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
     """
     Represents a generic Experiment.
     This class needs to be implemented for each model type with specifics.
 
     Args:
-        name: The experiment name.
-        simulation_type: A class to initialize the simulations that will be created for this experiment
-        assets: The asset collection for assets global to this experiment
+        command: The command to run for experiment
+        suite_id: Suite Id for the experiment
+        simulation_type: A typpe of simulation
         base_simulation: Optional a simulation that will be the base for all simulations created for this experiment
-        command: Command to run on simulations
+        builders: A set of Experiment Builders to be used to generate simulations
+        simulations: Optional a user input simulations
     """
     command: 'TCommandLine' = field(default=None)
     suite_id: uuid = field(default=None)
-    base_simulation: 'TSimulation' = field(default=None)
-    builders: set = field(default=None, metadata={"pickle_ignore": True})
     simulation_type: 'InitVar[TSimulationClass]' = None
-    simulations: 'EntityContainer' = field(default=None, compare=False)
+    base_simulation: 'TSimulation' = field(default=None, compare=False, metadata={"pickle_ignore": True})
+    builders: set = field(default_factory=lambda: set(), compare=False, metadata={"pickle_ignore": True})
+    simulations: EntityContainer = field(default_factory=lambda: EntityContainer(), compare=False,
+                                           metadata={"pickle_ignore": True})
+
+    # @property
+    # def simulations(self):
+    #     return self.children(refresh=False)
 
     def __post_init__(self, simulation_type):
         super().__post_init__()
-        self.simulations = EntityContainer()
+        self.simulations = self.simulations or EntityContainer()
         # Take care of the base simulation
         if not self.base_simulation:
             if simulation_type and callable(simulation_type):
@@ -43,6 +50,8 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
             else:
                 raise Exception(
                     "A `base_simulation` or `simulation_type` needs to be provided to the Experiment object!")
+
+        self._simulation_default = self.base_simulation.__class__()
 
     def __repr__(self):
         return f"<Experiment: {self.uid} - {self.name} / Sim count {len(self.simulations) if self.simulations else 0}>"
@@ -112,7 +121,7 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
 
                 simulation.tags = tags
                 sims.append(simulation)
-
+                
             yield sims
 
     def simulation(self):
@@ -122,8 +131,9 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         Returns: The created simulation
         """
         sim = copy.deepcopy(self.base_simulation)
-        sim.experiment = self
         sim.assets = copy.deepcopy(self.base_simulation.assets)
+        sim.platform = self.platform
+        sim.parent_id = self.uid
         return sim
 
     def pre_creation(self):
@@ -135,18 +145,27 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
 
     @property
     def done(self):
-        return all([s.done for s in self.simulations])
+        return all([s.done for s in self.children()])
 
     @property
     def succeeded(self):
-        return all([s.succeeded for s in self.simulations])
+        return all([s.succeeded for s in self.children()])
 
     @property
     def simulation_count(self):
-        return len(self.simulations)
+        return len(self.children())
+
+    def pre_getstate(self):
+        """
+        Function called before picking
+        Return default values for "pickle-ignore" fields
+        """
+        from idmtools.assets import AssetCollection
+        return {"assets": AssetCollection(), "simulations": EntityContainer(), "builders": set(),
+                "base_simulation": self._simulation_default}
 
 
 TExperiment = typing.TypeVar("TExperiment", bound=IExperiment)
 TExperimentClass = typing.Type[TExperiment]
 # Composed types
-TExperimentsList = typing.List[typing.Union[TExperiment, str]]
+TExperimentList = typing.List[typing.Union[TExperiment, str]]

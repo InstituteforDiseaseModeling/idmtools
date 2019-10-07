@@ -17,6 +17,7 @@ python dev_scripts/create_auth_token_args.py --comps_url "$1" --username "$2" --
 #python dev_scripts/create_auth_token_args.py --comps_url "https://comps2.idmod.org" --username "shchen" --password "Password123"
 
 echo "run all tests..."
+pip install py-make
 pymake test-all
 
 echo "deactivate..."

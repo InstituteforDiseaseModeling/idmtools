@@ -1,21 +1,31 @@
 import ast
 import uuid
 import typing
+
 from abc import ABCMeta, abstractmethod
-from idmtools.core.interfaces.ientity import IEntity
-from logging import getLogger
 from dataclasses import fields
+from logging import getLogger
+from typing import Any, Dict, List, NoReturn
+
+from idmtools.core.interfaces.ientity import IEntity
+
+if typing.TYPE_CHECKING:
+    from idmtools.entities.ianalyzer import TAnalyzerList
+    from idmtools.entities.iitem import TItem, TItemList
+    import uuid
 
 logger = getLogger(__name__)
 
 CALLER_LIST = ['_create_from_block',    # create platform through Platform Factory
                'fetch',                 # create platform through un-pickle
-               'get'                    # create platform through platform spec' get method
-               ]
+               'get',                    # create platform through platform spec' get method
+               '_main',
+               '__newobj__']
 
 
 class IPlatform(IEntity, metaclass=ABCMeta):
     """
+    Interface defining a platform.
     Interface defining a platform.
     A platform needs to implement basic operation such as:
     - Creating experiment
@@ -62,78 +72,106 @@ class IPlatform(IEntity, metaclass=ABCMeta):
         self.validate_inputs_types()
 
     @abstractmethod
-    def create_experiment(self, experiment: 'TExperiment') -> None:
+    def create_items(self, items: 'TItem') -> 'List[uuid]':
         """
-        Function creating an experiment on the platform.
+        Function creating e.g. sims/exps/suites on the platform
         Args:
-            experiment: The experiment to create
+            items: The batch of items to create
+        Returns: List of ids created
         """
         pass
 
     @abstractmethod
-    def create_simulations(self, simulation_batch: 'TSimulationBatch') -> 'List[Any]':
+    def run_items(self, items: 'TItemList') -> NoReturn:
         """
-        Function creating experiments simulations on the platform for a given experiment.
+        Run the items (sims, exps, suites) on the platform
         Args:
-            simulation_batch: The batch of simulations to create
+            items: The items to run
+        """
+        pass
+
+    @abstractmethod
+    def send_assets(self, item: 'TItem', **kwargs) -> NoReturn:
+        """
+        Send the assets for a given item (sim, experiment, suite, etc) to the platform.
+        Args:
+            item: The item to process. Expected to have an `assets` attribute containing the collection.
+            **kwargs: Extra parameters used by the platform
+        """
+        pass
+
+    @abstractmethod
+    def refresh_status(self, item) -> NoReturn:
+        """
+        Populate the platform item and specified item with its status.
+        Args:
+            item: The item to check status for
+        """
+        pass
+
+    @abstractmethod
+    def get_item(self, id: 'uuid') -> Any:
+        """
+        Get an item by its id. The implementing classes must know how to distinguish
+        items of different levels (e.g. simulation, experiment, ...)
+        Args:
+            id: the id of the item to obtain
+
+        Returns: the specified item
+        """
+        pass
+
+    # TODO: add doc comments to get_prent/children methods
+    @abstractmethod
+    def get_parent(self, item: 'TItem') -> 'TItem':
+        pass
+
+    @abstractmethod
+    def get_children(self, item: 'TItem') -> 'TItemList':
+        pass
+
+    def _get_root_items_for_item(self, item: 'TItem') -> 'TItemList':
+        children = item.children(refresh=True)
+        if children is None:
+            items = [item]
+        else:
+            items = list()
+            for child in children:
+                items += self._get_root_items_for_item(item=child)
+        return items
+
+    def get_root_items(self, items: 'TItemList') -> 'TItemList':
+        root_items = []
+        for item in items:
+            root_items += self._get_root_items_for_item(item=item)
+        root_items = list({item.uid: item for item in root_items}.values())  # uniquify
+        return root_items
+
+    @abstractmethod
+    def get_files(self, item: 'TItem', files: 'List[str]') -> 'Dict[str, bytearray]':
+        """
+        Obtain specified files related to the given item (an Item, a base item)
+        Args:
+            item: item to retrieve file data for
+            files: relative-path files to obtain
+
+        Returns: a dict of file-path-keyed file data
+
+        """
+        pass
+
+    @abstractmethod
+    def initialize_for_analysis(self, items: 'TItemList', analyzers: 'TAnalyzerList') -> NoReturn:
+        """
+        Perform any pre-analysis steps needed before performing analysis on the given items with
+        the provided analyzers
+        Args:
+            items: a list of items to initialize (base objects)
+            analyzers: analyzers to be applied to the items during analysis
+
         Returns:
-            List of ids created
-        """
-        pass
 
-    @abstractmethod
-    def run_simulations(self, experiment: 'TExperiment') -> None:
         """
-        Run the simulations for a given experiment on the platform
-        Args:
-            experiment: The experiment to run
-        """
-        pass
-
-    @abstractmethod
-    def send_assets_for_experiment(self, experiment: 'TExperiment', **kwargs) -> None:
-        """
-        Send the assets for a given experiment to the platform.
-        Args:
-            experiment: The experiment to process. Expected to have an `assets` attribute containing the collection.
-            **kwargs: Extra parameters used by the platform
-        """
-        pass
-
-    @abstractmethod
-    def send_assets_for_simulation(self, simulation: 'TSimulation', **kwargs) -> None:
-        """
-        Send the assets for a given simulation to the platform.
-        Args:
-            simulation: The simulation to process. Expected to have an `assets` attribute containing the collection.
-            **kwargs: Extra parameters used by the platform
-        """
-        pass
-
-    @abstractmethod
-    def refresh_experiment_status(self, experiment: 'TExperiment') -> None:
-        """
-        Populate the experiment and its simulations with status.
-        Args:
-            experiment: The experiment to check status for
-        """
-        pass
-
-    @abstractmethod
-    def restore_simulations(self, experiment: 'TExperiment') -> None:
-        """
-        Populate the experiment with the associated simulations.
-        Args:
-            experiment: The experiment to populate
-        """
-        pass
-
-    @abstractmethod
-    def get_assets_for_simulation(self, simulation: 'TSimulation', output_files: 'List[str]') -> 'Dict[str, bytearray]':
-        pass
-
-    @abstractmethod
-    def retrieve_experiment(self, experiment_id: 'uuid') -> 'TExperiment':
         pass
 
     def __repr__(self):
