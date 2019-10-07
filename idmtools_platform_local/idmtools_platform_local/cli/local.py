@@ -2,7 +2,7 @@ import click
 import stringcase as stringcase
 from colorama import Fore
 from idmtools_cli.cli import cli
-from idmtools_platform_local.docker.DockerOperations import DockerOperations
+from idmtools_platform_local.docker.docker_operations import DockerOperations
 
 
 pass_do = click.make_pass_decorator(DockerOperations)

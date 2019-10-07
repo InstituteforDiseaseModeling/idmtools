@@ -1,4 +1,4 @@
-from idmtools.services.IPersistanceService import IPersistenceService
+from idmtools.services.ipersistance_service import IPersistenceService
 
 
 class PlatformPersistService(IPersistenceService):

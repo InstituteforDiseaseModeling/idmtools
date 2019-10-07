@@ -10,7 +10,7 @@ import unittest.mock
 from idmtools_platform_local.workers.utils import create_or_update_status
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from idmtools_platform_local.docker.DockerOperations import DockerOperations
+from idmtools_platform_local.docker.docker_operations import DockerOperations
 from idmtools_test.utils.confg_local_runner_test import get_test_local_env_overrides
 from idmtools_test.utils.cli import get_subcommands_from_help_result, run_command
 

@@ -41,13 +41,13 @@ setup(
     keywords='modeling, IDM',
     name='idmtools_models',
     entry_points=dict(idmtools_model=  # noqa: E251
-                      ["idmtools_model_python = idmtools_models.python.PythonExperimentSpec:PythonExperimentSpec"]
+                      ["idmtools_model_python = idmtools_models.python.python_experiment_spec:PythonExperimentSpec"]
                       ),
     packages=find_packages(),
     setup_requires=setup_requirements,
     test_suite='tests',
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='0.1.0+nightly',
+    version='0.2.0+nightly',
     zip_safe=False,
 )

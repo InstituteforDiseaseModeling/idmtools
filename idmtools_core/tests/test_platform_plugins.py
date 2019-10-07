@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from idmtools.registry.PlatformSpecification import PlatformPlugins
+from idmtools.registry.platform_specification import PlatformPlugins
 
 
 class TestPlatformPlugins(TestCase):
