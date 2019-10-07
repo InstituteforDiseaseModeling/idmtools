@@ -142,7 +142,7 @@ class TestPlatform(IPlatform):
             self.simulations[experiment_id] = existing_simulations + simulations
         ids = [s.uid for s in simulations]
         logger.debug(f"Created simulations: {ids} for Experiment {experiment_id}")
-        return [s.uid for s in simulations]
+        return ids
 
     def set_simulation_status(self, experiment_uid, status):
         self.set_simulation_prob_status(experiment_uid, {status: 1})
