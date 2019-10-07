@@ -121,3 +121,26 @@ class TestConfig(ITestWithPersistence):
             IdmConfigParser(file_name="idmtools_NotExist.ini")
             IdmConfigParser.view_config_file()
         self.assertIn('Config file NOT FOUND or IS Empty!', context.exception.args[0])
+
+    def test_no_idmtools_values(self):
+        IdmConfigParser(file_name="idmtools_NotExist.ini")
+        max_workers = IdmConfigParser.get_option(None, 'max_workers')
+        batch_size = IdmConfigParser.get_option(None, 'batch_size')
+        self.assertIsNone(max_workers)
+        self.assertIsNone(batch_size)
+
+    def test_idmtools_values(self):
+        Platform('COMPS')
+        max_workers = IdmConfigParser.get_option(None, 'max_workers')
+        batch_size = IdmConfigParser.get_option(None, 'batch_size')
+        not_exist_option = IdmConfigParser.get_option(None, 'not_exist_option')
+        self.assertEqual(int(max_workers), 16)
+        self.assertEqual(int(batch_size), 10)
+        self.assertIsNone(not_exist_option)
+
+    def test_idmtools_no_section(self):
+        Platform('COMPS')
+        max_workers = IdmConfigParser.get_option('NotExistSection', 'max_workers')
+        batch_size = IdmConfigParser.get_option('NotExistSection', 'batch_size')
+        self.assertIsNone(max_workers)
+        self.assertIsNone(batch_size)
