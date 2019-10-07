@@ -7,12 +7,11 @@ from logging import getLogger
 from typing import Optional, NoReturn
 from dataclasses import dataclass
 from pathlib import Path
-
 from docker.models.containers import Container
-
 from idmtools.assets import Asset
 from idmtools.entities import IExperiment, IPlatform
 # we have to import brokers so that the proper configuration is achieved for redis
+from idmtools_platform_local import __version__
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
 from idmtools_platform_local.client.simulations_client import SimulationsClient
 from idmtools_platform_local.docker.DockerOperations import DockerOperations
@@ -35,7 +34,6 @@ def local_status_to_common(status):
 
 logger = getLogger(__name__)
 
-
 @dataclass
 class LocalPlatform(IPlatform):
     host_data_directory: str = os.path.join(str(Path.home()), '.local_data')
@@ -49,7 +47,7 @@ class LocalPlatform(IPlatform):
     postgres_mem_limit: str = '64m'
     postgres_mem_reservation: str = '32m'
     postgres_port: Optional[str] = 5432
-    workers_image: str = 'idm-docker-staging.packages.idmod.org/idmtools_local_workers:latest'
+    workers_image: str = f'{os.getenv("DOCKER_REPO", "idm-docker-public")}.packages.idmod.org/idmtools_local_workers:{__version__}'
     workers_ui_port: int = 5000
     default_timeout: int = 30
     run_as: Optional[str] = None
