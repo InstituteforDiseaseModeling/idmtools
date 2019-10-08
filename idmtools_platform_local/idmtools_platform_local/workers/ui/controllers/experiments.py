@@ -72,9 +72,11 @@ def experiment_filter(id: Optional[str], tags: Optional[List[Tuple[str, str]]], 
         li[row.parent_uuid].progress[str(row.status)] = row.total
 
     for row in items:
-        if hasattr(row, 'progess'):
+        # experiments without sims will have no progress field
+        if hasattr(row, 'progress'):
             row.status = progress_to_status_str(row.progress)
         else:
+            row.progress = dict()
             row.status = 'created'
         row.data_path = row.data_path.replace(DATA_PATH, '/data')
 

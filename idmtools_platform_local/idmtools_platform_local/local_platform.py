@@ -8,19 +8,17 @@ from typing import Optional, NoReturn, Union, List, Dict
 from dataclasses import dataclass
 from pathlib import Path
 from uuid import UUID
-
 from docker.models.containers import Container
 from idmtools.assets import Asset
 from idmtools.core import UnknownItemException
 from idmtools.entities import IExperiment, IPlatform
 from idmtools.entities.ianalyzer import TAnalyzerList
 from idmtools.entities.iitem import TItemList, TItem
-from idmtools_platform_local import __version__
 from idmtools.entities.iexperiment import TExperiment
 from idmtools.entities.isimulation import TSimulation, ISimulation
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
 from idmtools_platform_local.client.simulations_client import SimulationsClient
-from idmtools_platform_local.docker.docker_operations import DockerOperations
+from idmtools_platform_local.docker.docker_operations import DockerOperations, default_image
 from idmtools_platform_local.workers.brokers import setup_broker
 from idmtools.core.experiment_factory import experiment_factory
 
@@ -39,9 +37,6 @@ def local_status_to_common(status):
 
 
 logger = getLogger(__name__)
-docker_repo = f'{os.getenv("DOCKER_REPO", "idm-docker-public")}.packages.idmod.org'
-if logger.isEnabledFor(logging.DEBUG):
-    logger.debug(f"Default docker repo set to: {docker_repo}")
 
 
 @dataclass
@@ -57,7 +52,7 @@ class LocalPlatform(IPlatform):
     postgres_mem_limit: str = '64m'
     postgres_mem_reservation: str = '32m'
     postgres_port: Optional[str] = 5432
-    workers_image: str = f'{docker_repo}/idmtools_local_workers:{__version__.replace("+", ".")}'
+    workers_image: str = default_image
     workers_ui_port: int = 5000
     default_timeout: int = 30
     run_as: Optional[str] = None

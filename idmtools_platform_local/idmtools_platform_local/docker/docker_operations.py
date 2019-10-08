@@ -11,12 +11,10 @@ from dataclasses import dataclass
 from io import BytesIO
 from logging import getLogger
 from typing import Optional, Union, NoReturn, BinaryIO, Tuple, Dict, List
-
 import docker
 from docker.errors import APIError
 from docker.models.containers import Container
 from docker.models.networks import Network
-
 from idmtools.core.system_information import get_system_information
 from idmtools.utils.decorators import optional_yaspin_load, ParallelizeDecorator
 from idmtools_platform_local import __version__
@@ -24,6 +22,13 @@ from idmtools_platform_local import __version__
 logger = getLogger(__name__)
 # thread queue for docker copy operations
 io_queue = ParallelizeDecorator()
+
+
+docker_repo = f'{os.getenv("DOCKER_REPO", "idm-docker-public")}.packages.idmod.org'
+if logger.isEnabledFor(logging.DEBUG):
+    logger.debug(f"Default docker repo set to: {docker_repo}")
+
+default_image = f'{docker_repo}/idmtools_local_workers:{__version__.replace("+", ".")}'
 
 
 @dataclass
@@ -39,7 +44,7 @@ class DockerOperations:
     postgres_mem_limit: str = '64m'
     postgres_mem_reservation: str = '32m'
     postgres_port: Optional[str] = 5432
-    workers_image: str = 'idm-docker-staging.packages.idmod.org/idmtools_local_workers:latest'
+    workers_image: str = default_image
     workers_ui_port: int = 5000
     run_as: Optional[str] = None
     _fileio_pool = ThreadPoolExecutor()
