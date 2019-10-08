@@ -54,7 +54,7 @@ class LocalPlatform(IPlatform):
     postgres_mem_limit: str = '64m'
     postgres_mem_reservation: str = '32m'
     postgres_port: Optional[str] = 5432
-    workers_image: str = f'{docker_repo}/idmtools_local_workers:{__version__}'
+    workers_image: str = f'{docker_repo}/idmtools_local_workers:{__version__.replace("+", ".")}'
     workers_ui_port: int = 5000
     default_timeout: int = 30
     run_as: Optional[str] = None
