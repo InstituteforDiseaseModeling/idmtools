@@ -39,7 +39,7 @@ class ExperimentsClient(BaseClient):
         """
         args = cls._get_arguments(tags)
         response = cls.get(id, params=args)
-        result = cls._validate_response(response, 'Experiments')
+        result = cls._validate_response(response, 'Experiments', id=id)
         return result
 
     @classmethod

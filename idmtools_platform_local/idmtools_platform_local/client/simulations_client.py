@@ -53,7 +53,7 @@ class SimulationsClient(BaseClient):
         args = cls._get_arguments(tags)
         args.update(dict(experiment_id=experiment_id))
         response = cls.get(id, params=args)
-        result = cls._validate_response(response, 'Simulations')
+        result = cls._validate_response(response, 'Simulations', id=id)
         return result
 
     @classmethod

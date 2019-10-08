@@ -13,7 +13,9 @@ class BaseClient:
     base_url = API_PATH
 
     @classmethod
-    def _validate_response(cls, response, error_obj_str):
+    def _validate_response(cls, response, error_obj_str, id=None):
+        if response.status_code == 404:
+            raise FileNotFoundError(f"Could not find item with id of {id}")
         if response.status_code != 200:
             if logger.isEnabledFor(logging.DEBUG):
                 logging.debug(f'Error fetching {error_obj_str} {cls.base_url if id is None else cls.base_url + "/" + id}'
