@@ -36,7 +36,7 @@ class TestAnalyzeManager(ITestWithPersistence):
         reload(idmtools_platform_local.tasks.create_experiment)
         reload(idmtools_platform_local.tasks.create_simulation)
 
-        platform = Platform('Local_Staging')
+        platform = Platform('Local')
 
         # CreateSimulationTask.broker =
 
