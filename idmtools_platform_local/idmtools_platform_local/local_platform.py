@@ -40,6 +40,8 @@ def local_status_to_common(status):
 
 logger = getLogger(__name__)
 docker_repo = f'{os.getenv("DOCKER_REPO", "idm-docker-public")}.packages.idmod.org'
+if logger.isEnabledFor(logging.DEBUG):
+    logger.debug(f"Default docker repo set to: {docker_repo}")
 
 
 @dataclass
