@@ -211,7 +211,7 @@ class LocalPlatform(IPlatform):
         if not isinstance(item, IExperiment):
             raise ValueError("Only Experiments have no children on the LocalPlatform")
 
-        children = self.restore_simulations(item)
+        children = self.restore_simulations(item) or []
         for child in children:
             child.platform = self
         return children
@@ -471,7 +471,7 @@ class LocalPlatform(IPlatform):
         """
         from idmtools_platform_local.tasks.run import RunTask
         for simulation in experiment.simulations:
-            RunTask.send(simulation.experiment.command.cmd, simulation.experiment.uid, simulation.uid)
+            RunTask.send(experiment.command.cmd, experiment.uid, simulation.uid)
 
     def retrieve_output_files(self, job_id_path, paths):
         """
