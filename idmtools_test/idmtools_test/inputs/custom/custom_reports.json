@@ -1,0 +1,163 @@
+{
+   "Custom_Reports": {
+      "ReportEventCounter": {
+         "Enabled": 1,
+         "Reports": [
+            {
+               "Duration_Days": 10000000,
+               "Event_Trigger_List": [
+                  "Received_Treatment",
+                  "Received_Test"
+               ],
+               "Nodeset_Config": {
+                  "class": "NodeSetAll"
+               },
+               "Report_Description": "",
+               "Start_Day": 0
+            }
+         ]
+      },
+      "ReportMalariaFiltered": {
+         "Enabled": 1,
+         "Reports": [
+            {
+               "End_Day": 10000000,
+               "Node_IDs_Of_Interest": [
+                  100000
+               ],
+               "Report_File_Name": "ReportMalariaFilteredWork.json",
+               "Start_Day": 0
+            },
+            {
+               "End_Day": 10000000,
+               "Node_IDs_Of_Interest": [
+                  5540,
+                  5548,
+                  5549,
+                  5550,
+                  5559,
+                  5598,
+                  5599,
+                  5600,
+                  5601,
+                  5611,
+                  5612,
+                  5613,
+                  5614,
+                  5615,
+                  5616,
+                  5624,
+                  5625,
+                  5626,
+                  5627,
+                  5628,
+                  5629,
+                  5630,
+                  5636,
+                  5637,
+                  5638,
+                  5639,
+                  5640,
+                  5641,
+                  5642,
+                  5643,
+                  5644,
+                  5645,
+                  5658,
+                  5659,
+                  5660,
+                  5661,
+                  5662,
+                  5663,
+                  5664,
+                  5665,
+                  5666,
+                  5667,
+                  5677,
+                  5678,
+                  5679,
+                  5680,
+                  5681,
+                  5682,
+                  5683,
+                  5684,
+                  5695,
+                  5696,
+                  5697,
+                  5698,
+                  5699,
+                  5700,
+                  5701,
+                  5702,
+                  5716,
+                  5717,
+                  5718,
+                  5719,
+                  5720,
+                  5721,
+                  5722,
+                  5723,
+                  5724,
+                  5725,
+                  5726,
+                  5727,
+                  5728,
+                  5729,
+                  5744,
+                  5745,
+                  5746,
+                  5747,
+                  5748,
+                  5749,
+                  5750,
+                  5751,
+                  5752,
+                  5753,
+                  5754,
+                  5764,
+                  5765,
+                  5766,
+                  5767,
+                  5768,
+                  5769,
+                  5770,
+                  5778,
+                  5779,
+                  5780,
+                  5788,
+                  5799,
+                  5809,
+                  5823,
+                  5824,
+                  5841,
+                  5842,
+                  5850,
+                  5851,
+                  5852,
+                  5860,
+                  5861
+               ],
+               "Report_File_Name": "ReportMalariaFilteredCatchment.json",
+               "Start_Day": 0
+            }
+         ]
+      },
+      "SpatialReportMalariaFiltered": {
+         "Enabled": 1,
+         "Reports": [
+            {
+               "End_Day": 10000000,
+               "Node_IDs_Of_Interest": [],
+               "Report_File_Name": "SpatialReportMalariaFiltered",
+               "Reporting_Interval": 1,
+               "Spatial_Output_Channels": [
+                  "Population",
+                  "Blood_Smear_Parasite_Prevalence"
+               ],
+               "Start_Day": 0
+            }
+         ]
+      },
+      "Use_Explicit_Dlls": 1
+   }
+}

@@ -116,7 +116,19 @@ class TestConfig(ITestWithPersistence):
         self.assertEqual(p1, p2)
         self.assertEqual(id(p1), id(p2))
 
+    def test_idmtools_ini_local(self):
+        config_file = IdmConfigParser.get_config_path()
+        self.assertEqual(os.path.basename(config_file), 'idmtools.ini')
+
+        idm = IdmConfigParser()
+        local_type = idm.get_option("Custom_Local", 'type')
+        self.assertEqual(str(local_type), "Local")
+
     def test_no_idmtools(self):
+        IdmConfigParser(file_name="idmtools_NotExist.ini")
+        IdmConfigParser.view_config_file()
+        self.assertTrue(IdmConfigParser.get_config_path() is None)
+
         with self.assertRaises(ValueError) as context:
             IdmConfigParser(file_name="idmtools_NotExist.ini")
             IdmConfigParser.view_config_file()

@@ -32,14 +32,14 @@ class TestAssetsInComps(unittest.TestCase):
 
         # Create experiment on platform
         experiment.pre_creation()
-        self.platform.create_experiment(experiment)
+        self.platform.create_items(items=[experiment])
 
         for simulation_batch in experiment.batch_simulations(batch_size=10):
             # Create the simulations on the platform
             for simulation in simulation_batch:
                 simulation.pre_creation()
 
-            ids = self.platform.create_simulations(simulation_batch)
+            ids = self.platform.create_items(items=simulation_batch)
 
             for uid, simulation in zip(ids, simulation_batch):
                 simulation.uid = uid
@@ -47,25 +47,24 @@ class TestAssetsInComps(unittest.TestCase):
 
                 from idmtools.entities import ISimulation
                 simulation.__class__ = ISimulation
-                experiment.simulations.append(simulation)
 
-        self.platform.refresh_experiment_status(experiment)
+        self.platform.refresh_status(item=experiment)
 
         # Test if we have all simulations at status CREATED
         self.assertFalse(experiment.done)
-        self.assertTrue(all([s.status == EntityStatus.CREATED for s in experiment.simulations]))
+        self.assertTrue(all([s.status == EntityStatus.CREATED for s in experiment.children()]))
 
         # Start experiment
-        self.platform.run_simulations(experiment)
-        self.platform.refresh_experiment_status(experiment)
+        self.platform.run_items(items=[experiment])
+        self.platform.refresh_status(item=experiment)
         self.assertFalse(experiment.done)
-        self.assertTrue(all([s.status == EntityStatus.RUNNING for s in experiment.simulations]))
+        self.assertTrue(all([s.status == EntityStatus.RUNNING for s in experiment.children()]))
 
         # Wait till done
         import time
         start_time = time.time()
         while time.time() - start_time < 180:
-            self.platform.refresh_experiment_status(experiment)
+            self.platform.refresh_status(item=experiment)
             if experiment.done:
                 break
             time.sleep(3)
@@ -78,10 +77,12 @@ class TestAssetsInComps(unittest.TestCase):
         ac = AssetCollection()
         ac.add_asset(a)
         ac.add_asset(b)
+        ac.tags = {"idmtools": "idmtools-automation", "string_tag": "testACtag", "number_tag": 123, "KeyOnly": None}
 
         pe = PythonExperiment(name=self.case_name,
                               model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"), assets=ac)
         pe.tags = {"idmtools": "idmtools-automation"}
+        pe.platform = self.platform
         self._run_and_test_experiment(pe)
         exp_id = pe.uid
         # exp_id = 'ae077ddd-668d-e911-a2bb-f0921c167866'
@@ -91,6 +92,16 @@ class TestAssetsInComps(unittest.TestCase):
             self.assertEqual(asset_collection.assets[0]._md5_checksum, asset_collection.assets[1]._md5_checksum)
             self.assertEqual(asset_collection.assets[0]._file_name, 'test.json')
             self.assertEqual(asset_collection.assets[1]._file_name, 'test1.json')
+
+    # TODO: test is incomplete
+    # def test_create_asset_collection(self):
+    #     ac = AssetCollection()
+    #     assets_dir = os.path.join(COMMON_INPUT_PATH, "assets", "collections")
+    #     ac.assets_from_directory(assets_dir)
+    #     # add tags to ACs - can't currently do this
+    #     ac.tags = {"idmtools": "idmtools-automation", "string_tag": "testACtag", "number_tag": 123, "KeyOnly": None}
+    #
+    #     self.assertSetEqual(set(ac.assets), set(AssetCollection.tags))
 
 
 if __name__ == '__main__':
