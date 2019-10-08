@@ -7,7 +7,8 @@ from logging import getLogger
 from typing import Optional, NoReturn, Union, List, Dict
 from dataclasses import dataclass
 from pathlib import Path
-import uuid
+from uuid import UUID
+
 from docker.models.containers import Container
 from idmtools.assets import Asset
 from idmtools.core import UnknownItemException
@@ -77,7 +78,7 @@ class LocalPlatform(IPlatform):
     Represents the platform allowing to run simulations locally.
     """
 
-    def create_items(self, items: 'TItem') -> 'List[uuid]':
+    def create_items(self, items: 'TItem') -> List[UUID]:
         """
         Create items on the local Platform. Items must all be the same type.
         Args:

@@ -1,16 +1,14 @@
 import typing
-
 from idmtools.services.experiments import ExperimentPersistService
-from idmtools.core import ExperimentNotFound
+from idmtools.core import ExperimentNotFound, UUID
 from idmtools.services.platforms import PlatformPersistService
 
 if typing.TYPE_CHECKING:
     from idmtools.entities.iplatform import TPlatform
     from idmtools.entities.iexperiment import TExperiment
-    import uuid
 
 
-def retrieve_experiment(experiment_id: 'uuid', platform: 'TPlatform' = None,
+def retrieve_experiment(experiment_id: UUID, platform: 'TPlatform' = None,
                         with_simulations: 'bool' = False) -> 'TExperiment':
     experiment = ExperimentPersistService.retrieve(experiment_id)
 

@@ -1,27 +1,21 @@
 import os
 import shutil
-import uuid
-import typing
 from dataclasses import dataclass, field
-
+from uuid import UUID, uuid4
 import diskcache
 import numpy as np
 from typing import Type, List, Dict
-
 from idmtools.core import UnknownItemException
 from idmtools.entities.isimulation import TSimulation
 from idmtools.registry.platform_specification import example_configuration_impl, get_platform_impl, \
     get_platform_type_impl, PlatformSpecification
 from idmtools.registry.plugin_specification import get_description_impl
-
 from idmtools.entities import IPlatform
 from idmtools.entities import IExperiment
 from idmtools.entities import ISimulation
-
-if typing.TYPE_CHECKING:
-    from idmtools.entities.ianalyzer import TAnalyzerList
-    from idmtools.entities.iexperiment import TExperiment
-    from idmtools.entities.iitem import TItem, TItemList
+from idmtools.entities.ianalyzer import TAnalyzerList
+from idmtools.entities.iexperiment import TExperiment
+from idmtools.entities.iitem import TItem, TItemList
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 data_path = os.path.abspath(os.path.join(current_directory, "..", "data"))
@@ -72,7 +66,7 @@ class TestPlatform(IPlatform):
             child.platform = self
         return children
 
-    def _restore_simulations(self, experiment: 'TExperiment') -> None:
+    def _restore_simulations(self, experiment: TExperiment) -> None:
 
         simulations = self.simulations.get(experiment.uid)
         for sim in simulations:
@@ -92,7 +86,7 @@ class TestPlatform(IPlatform):
     def post_setstate(self):
         self.initialize_test_cache()
 
-    def create_items(self, items: 'TItemList') -> List[uuid]:
+    def create_items(self, items: 'TItemList') -> List[UUID]:
         # TODO: add ability to create suites
         types = list({type(item) for item in items})
         if len(types) != 1:
@@ -109,8 +103,8 @@ class TestPlatform(IPlatform):
             item.platform = self
         return ids
 
-    def _create_experiment(self, experiment: 'TExperiment') -> uuid.UUID:
-        uid = uuid.uuid4()
+    def _create_experiment(self, experiment: 'TExperiment') -> UUID:
+        uid = uuid4()
         experiment.uid = uid
         self.experiments.set(uid, experiment)
         lock = diskcache.Lock(self.simulations, 'simulations-lock')
@@ -123,7 +117,7 @@ class TestPlatform(IPlatform):
         experiment_id = None
         for simulation in simulation_batch:
             experiment_id = experiment_id or self.get_parent(simulation).uid
-            simulation.uid = uuid.uuid4()
+            simulation.uid = uuid4()
             simulations.append(simulation)
 
         lock = diskcache.Lock(self.simulations, 'simulations-lock')
@@ -179,13 +173,13 @@ class TestPlatform(IPlatform):
         item.platform = self
         return item
 
-    def _retrieve_experiment(self, experiment_id: 'uuid') -> 'TExperiment':
+    def _retrieve_experiment(self, experiment_id: UUID) -> 'TExperiment':
         if experiment_id not in self.experiments:
             raise Exception('No experiment id found: %s' % experiment_id)
         return self.experiments[experiment_id]
 
     # not currently used, but if we ever need to retrieve a single simulation instead of an experiment...
-    def _retrieve_simulation(self, simulation_id: 'uuid') -> 'TSimulation':
+    def _retrieve_simulation(self, simulation_id: UUID) -> 'TSimulation':
         found = False
         for experiment_id in self.simulations.iterkeys():
             simulations = self.simulations[experiment_id]
