@@ -1,30 +1,35 @@
-
+import os
 import time
-
-import pytest
-
-from idmtools_test.utils.confg_local_runner_test import config_local_test, patch_broker, patch_db
-import unittest
 import unittest.mock
-
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from idmtools_platform_local.docker.docker_operations import DockerOperations
 from operator import itemgetter
-
+import pytest
+os.environ['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://idmtools:idmtools@localhost/idmtools'
+from idmtools_platform_local.docker.docker_operations import DockerOperations
 from idmtools_platform_local.workers.utils import create_or_update_status
+from idmtools_test.utils.confg_local_runner_test import config_local_test, patch_broker
 
 
+dm = None
+
+@pytest.mark.docker
 class TestAPI(unittest.TestCase):
 
     @patch_broker
-    @patch_db
-    def setUp(self, mock_broker, mock_db):
+    def setUp(self, mock_broker):
+        global dm
         local_path = config_local_test()  # noqa: F841
         config_local_test()
-        from idmtools_platform_local.workers.ui.config import application
+        created = False
+        if dm is None:
+            dm = DockerOperations()
+            dm.cleanup(True)
+            dm.get_postgres()
+            time.sleep(8)
+            created = True
+        from idmtools_platform_local.workers.ui.app import application
         self.app = application.test_client()
-        self.create_test_data()
+        if created:
+            self.create_test_data()
 
     @staticmethod
     def create_test_data():
@@ -67,8 +72,8 @@ class TestAPI(unittest.TestCase):
         self.assertNotIn('CCCCC', map(itemgetter('experiment_id'), data))
         self.assertEqual(data[1]['experiment_id'], 'BBBBB')
         self.assertEqual(len(data[1]['progress']), 1)
-        self.assertIn('created', data[1]['progress'][0])
-        self.assertEqual(data[1]['progress'][0]['created'], 1)
+        self.assertIn('created', data[1]['progress'])
+        self.assertEqual(data[1]['progress']['created'], 1)
 
     def test_fetch_one_experiment_works(self):
         result = self.app.get('/api/experiments/AAAAA')
@@ -114,47 +119,15 @@ class TestAPI(unittest.TestCase):
         self.assertDictEqual(data['tags'], dict(i='j', k='l'))
         self.assertEqual(data['data_path'], '/data/CCCCC')
 
-    @pytest.mark.docker
     def test_experiment_filtering(self):
-        """
-        Filtering depends on a few postgres filtering method so we have to
-        setup a connection to postgres and then test querying
-        """
-        # start up postgres
-        dm = DockerOperations()
-        dm.cleanup(True)
-        dm.get_postgres()
-        # give postgres 5 seconds to start
-        time.sleep(8)
-        # ensure we are connecting to proper db
-        url = 'postgresql+psycopg2://idmtools:idmtools@localhost/idmtools'
-        engine = create_engine(url, echo=True, pool_size=32)
-        session_factory = sessionmaker(bind=engine)
-        from idmtools_platform_local.workers.data.job_status import Base
+        result = self.app.get('/api/experiments', query_string=dict(tags='a,b'))
+        self.assertEqual(200, result.status_code)
+        data = result.json
+        self.assertIsInstance(data, list)
+        self.assertEqual(len(result.json), 1)
 
-        def test_db_factory():
-            return session_factory()
-        Base.metadata.create_all(engine)
-
-        # Now patch our areas that use our session
-        @unittest.mock.patch('idmtools_platform_local.workers.ui.controllers.experiments.get_session', side_effect=test_db_factory)
-        @unittest.mock.patch('idmtools_platform_local.workers.utils.get_session', side_effect=test_db_factory)
-        def do_test(*mocks):
-            self.create_test_data()
-            # reset our config to default. This should connect to the postgres db as well
-            from idmtools_platform_local.workers.ui.config import application
-            other_app = application.test_client()
-            result = other_app.get('/api/experiments', query_string=dict(tags='a,b'))
-            self.assertEqual(200, result.status_code)
-            data = result.json
-            self.assertIsInstance(data, list)
-            self.assertEqual(len(result.json), 1)
-
-            result = other_app.get('/api/experiments', query_string=dict(tags='a,c'))
-            self.assertEqual(200, result.status_code)
-            data = result.json
-            self.assertIsInstance(data, list)
-            self.assertEqual(len(result.json), 0)
-        do_test()
-
-        dm.stop_services()
+        result = self.app.get('/api/experiments', query_string=dict(tags='a,c'))
+        self.assertEqual(200, result.status_code)
+        data = result.json
+        self.assertIsInstance(data, list)
+        self.assertEqual(len(result.json), 0)

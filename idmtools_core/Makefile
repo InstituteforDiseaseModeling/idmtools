@@ -43,7 +43,8 @@ coverage: ## Generate a code-coverage report
 coverage-all: ## Generate a code-coverage report
 	@make clean
 	# We have to run in our tests folder to use the proper config
-	os.chdir('tests'); os.system('coverage run -p no:warnings --source ../idmtools -m pytest -m \"not comps and not docker\" ')"
+	@+$(IPY) "os.chdir('tests'); os.environ['DOCKER_REPO'] = 'idm-docker-staging'; \
+	os.system('coverage run -p no:warnings --source ../idmtools -m pytest -m \"not comps and not docker\" ')"
 	# move our stuff back to the top
 	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
 

@@ -31,7 +31,7 @@ class TestPlatformSimulations(ITestWithPersistence):
 
     @restart_local_platform(silent=True, **get_test_local_env_overrides())
     def test_fetch_simulation_files(self):
-        platform = Platform('Local_Staging')
+        platform = Platform('Local')
 
         pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python",
                                                                            "realpath_verify.py"))

@@ -216,7 +216,7 @@ class LocalPlatform(IPlatform):
         if not isinstance(item, IExperiment):
             raise ValueError("Only Experiments have no children on the LocalPlatform")
 
-        children = self._retrieve_simulations(item)
+        children = self.restore_simulations(item)
         for child in children:
             child.platform = self
         return children
@@ -499,4 +499,14 @@ class LocalPlatform(IPlatform):
         return byte_arrs
 
     def _retrieve_simulations(self, item):
-        raise NotImplementedError('Method for retrieving a simulations not completed')
+        simulation_dict = SimulationsClient.get_all(experiment_id=item.uid)
+
+        sims = []
+        for sim_info in simulation_dict:
+            sim = item.simulation()
+            sim.uid = sim_info['simulation_uid']
+            sim.tags = sim_info['tags']
+            sim.status = local_status_to_common(sim_info['status'])
+            sim.platform = self
+            sims.append(sim)
+        return sims

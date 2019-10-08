@@ -449,6 +449,11 @@ class DockerOperations:
                 of.write(file.read())
             return True
 
+    def sync_copy(self, futures):
+        if not isinstance(futures, list):
+            futures = [futures]
+        return io_queue.get_results(futures)
+
     def copy_multiple_to_container(self, container: Container,
                                    files: Dict[str, List[Tuple[Union[str, bytes], Optional[str]]]],
                                    join_on_copy: bool = True):

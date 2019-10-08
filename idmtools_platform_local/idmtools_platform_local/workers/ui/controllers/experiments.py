@@ -72,7 +72,10 @@ def experiment_filter(id: Optional[str], tags: Optional[List[Tuple[str, str]]], 
         li[row.parent_uuid].progress[str(row.status)] = row.total
 
     for row in items:
-        row.status = progress_to_status_str(row.progress)
+        if hasattr(row, 'progess'):
+            row.status = progress_to_status_str(row.progress)
+        else:
+            row.status = 'created'
         row.data_path = row.data_path.replace(DATA_PATH, '/data')
 
     return items, total

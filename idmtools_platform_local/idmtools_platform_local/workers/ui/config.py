@@ -19,3 +19,9 @@ application.json_encoder = DateTimeEncoder
 db = SQLAlchemy(application)
 api = Api(application, prefix='/api')
 ai = AutoIndex(application, browse_root=DATA_PATH, add_url_rules=False)
+
+try:
+    from idmtools_platform_local.workers.data.job_status import Base
+    Base.metadata.create_all(db.get_engine())
+except Exception as e:
+    pass

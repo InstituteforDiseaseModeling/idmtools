@@ -35,7 +35,7 @@ class TestPythonSimulation(ITestWithPersistence):
     @restart_local_platform(silent=True, **get_test_local_env_overrides())
     def test_direct_sweep_one_parameter_local(self):
 
-        platform = Platform('Local_Staging')
+        platform = Platform('Local')
 
         # CreateSimulationTask.broker =
 
@@ -77,7 +77,7 @@ class TestPythonSimulation(ITestWithPersistence):
     @restart_local_platform(silent=True, **get_test_local_env_overrides())
     def test_add_prefixed_relative_path_to_assets_local(self):
         # platform = Platform('COMPS2', endpoint="https://comps2.idmod.org", environment="Bayesian")
-        platform = Platform('Local_Staging')
+        platform = Platform('Local')
         model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
         ac = AssetCollection()
         assets_path = os.path.join(COMMON_INPUT_PATH, "python", "Assets", "MyExternalLibrary")
