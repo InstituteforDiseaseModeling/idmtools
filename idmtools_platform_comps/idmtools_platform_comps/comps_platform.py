@@ -167,7 +167,6 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         self.send_assets(item=experiment)
         return experiment.uid
 
-
     def create_items(self, items: TItemList) -> 'List[uuid]':
         # TODO: add ability to create suites
         types = list({type(item) for item in items})
@@ -235,6 +234,8 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         elif isinstance(item, ISuite):
             raise Exception(f'Unknown how to refresh items of type {type(item)} '
                             f'for platform: {self.__class__.__name__}')
+        else:
+            raise Exception(f'Cannot fetch status of items of type {type(item)}')
         item.platform = self
         return return_value
 
@@ -328,21 +329,16 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     # TODO: verify the retrieve methods called here actually error when they fail to retrieve anything
     def get_parent(self, item: TItem) -> TItem:
         parent = None
-        successful = False
-        try:
-            parent = self._retrieve_suite(suite_id=item.parent_id)
-            successful = True
-        except NotImplementedError:  # TODO
-            pass
-        if not successful:
+        for lookup in [self._retrieve_suite, self._retrieve_experiment]:
             try:
-                parent = self._retrieve_experiment(experiment_id=item.parent_id)
-                successful = True
-            except:
+                parent = lookup(item.parent_id)
+                break
+            except NotImplementedError:  # TODO Fix once suite works
                 pass
-        if not successful:
+
+        if parent is None:
             raise UnknownItemException(f'Unable to retrieve parent for unknown item '
-                                            f'id: {item.uid} of type: {type(item)}')
+                                       f'id: {item.uid} of type: {type(item)}')
         parent.platform = self
         return parent
 
@@ -423,26 +419,14 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
     def get_item(self, id: uuid) -> TItem:
         # TODO: no options currently for loading a simulation or suite directly yet
-        successful = False
-        if not successful:
+        item = None
+        for lookup in [self._retrieve_suite, self._retrieve_experiment, self._retrieve_simulation]:
             try:
-                item = self._retrieve_suite(suite_id=id)
-                successful = True
+                item = lookup(id)
+                break
             except:
                 pass
-        if not successful:
-            try:
-                item = self._retrieve_experiment(experiment_id=id)
-                successful = True
-            except:
-                pass
-        if not successful:
-            try:
-                item = self._retrieve_simulation(simulation_id=id)
-                successful = True
-            except:
-                pass
-        if not successful:
+        if item is None:
             raise UnknownItemException(f'Unable to load item id: {id} from platform: {self.__class__.__name__}')
 
         item.platform = self
