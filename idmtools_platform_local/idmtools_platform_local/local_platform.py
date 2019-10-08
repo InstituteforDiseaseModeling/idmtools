@@ -4,14 +4,16 @@ import logging
 import os
 from collections import defaultdict
 from logging import getLogger
-from typing import Optional, NoReturn, Any, Union, List, Dict
+from typing import Optional, NoReturn, Union, List, Dict
 from dataclasses import dataclass
 from pathlib import Path
+import uuid
 from docker.models.containers import Container
 from idmtools.assets import Asset
 from idmtools.core import UnknownItemException
 from idmtools.entities import IExperiment, IPlatform
-# we have to import brokers so that the proper configuration is achieved for redis
+from idmtools.entities.ianalyzer import TAnalyzerList
+from idmtools.entities.iitem import TItemList, TItem
 from idmtools_platform_local import __version__
 from idmtools.entities.iexperiment import TExperiment
 from idmtools.entities.isimulation import TSimulation, ISimulation
@@ -36,6 +38,7 @@ def local_status_to_common(status):
 
 
 logger = getLogger(__name__)
+docker_repo = f'{os.getenv("DOCKER_REPO", "idm-docker-public")}.packages.idmod.org'
 
 
 @dataclass
@@ -51,7 +54,7 @@ class LocalPlatform(IPlatform):
     postgres_mem_limit: str = '64m'
     postgres_mem_reservation: str = '32m'
     postgres_port: Optional[str] = 5432
-    workers_image: str = f'{os.getenv("DOCKER_REPO", "idm-docker-public")}.packages.idmod.org/idmtools_local_workers:{__version__}'
+    workers_image: str = f'{docker_repo}/idmtools_local_workers:{__version__}'
     workers_ui_port: int = 5000
     default_timeout: int = 30
     run_as: Optional[str] = None
@@ -98,7 +101,7 @@ class LocalPlatform(IPlatform):
             item.platform = self
         return ids
 
-    def run_items(self, items: 'TItemList') -> NoReturn:
+    def run_items(self, items: TItemList) -> NoReturn:
         """
         Execute the specified items
 
@@ -116,7 +119,7 @@ class LocalPlatform(IPlatform):
         for item in items:
             item.platform = self
 
-    def send_assets(self, item: 'TItem', **kwargs) -> NoReturn:
+    def send_assets(self, item: TItem, **kwargs) -> NoReturn:
         """
         Send assets for item to platform
         Args:
@@ -171,6 +174,7 @@ class LocalPlatform(IPlatform):
                 break
             # TODO - Once _retrieve_simulation it implemented, remove NotImplementedError
             except (FileNotFoundError, NotImplementedError) as e:
+                logger.debug(e)
                 pass
         if item is None:
             raise UnknownItemException(f'Unable to load item id: {id} from platform: {self.__class__.__name__}')
@@ -230,7 +234,7 @@ class LocalPlatform(IPlatform):
 
         return self._get_assets_for_simulation(item, files)
 
-    def initialize_for_analysis(self, items: 'TItemList', analyzers: 'TAnalyzerList') -> NoReturn:
+    def initialize_for_analysis(self, items: 'TItemList', analyzers: TAnalyzerList) -> NoReturn:
         # run any necessary analysis prep steps on groups of items (hierarchy level > 0)
         for analyzer in analyzers:
             analyzer.per_group(items=items)

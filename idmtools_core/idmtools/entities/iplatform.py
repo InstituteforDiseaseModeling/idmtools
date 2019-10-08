@@ -12,7 +12,6 @@ from idmtools.core.interfaces.ientity import IEntity
 if typing.TYPE_CHECKING:
     from idmtools.entities.ianalyzer import TAnalyzerList
     from idmtools.entities.iitem import TItem, TItemList
-    import uuid
 
 logger = getLogger(__name__)
 

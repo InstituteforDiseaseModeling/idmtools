@@ -3,7 +3,6 @@ import logging
 import ntpath
 import os
 
-
 from COMPS import Client
 from COMPS.Data import AssetCollection, AssetCollectionFile, Configuration, Experiment as COMPSExperiment, \
     QueryCriteria, Simulation as COMPSSimulation, SimulationFile
@@ -17,7 +16,8 @@ from idmtools.entities import IPlatform, ISuite
 from idmtools.entities.ianalyzer import TAnalyzerList
 from idmtools.entities.iexperiment import TExperiment, TExperimentList, IExperiment
 from idmtools.entities.iitem import TItemList, TItem
-from idmtools.entities.isimulation import TSimulationList, ISimulation
+from idmtools.entities.isimulation import TSimulationList, ISimulation, TSimulation
+from idmtools.entities.isuite import TSuite
 from idmtools.utils.time import timestamp
 from typing import NoReturn, List
 import uuid
@@ -184,7 +184,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             item.platform = self
         return ids
 
-    def _create_simulations(self, simulation_batch: 'TSimulationList') -> 'List[uuid]':
+    def _create_simulations(self, simulation_batch: TSimulationList) -> 'List[uuid]':
         self._login()
         created_simulations = []
 
@@ -209,7 +209,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         for item in items:
             item.platform = self
 
-    def _run_simulations_for_experiment(self, experiment: 'TExperiment') -> NoReturn:
+    def _run_simulations_for_experiment(self, experiment: TExperiment) -> NoReturn:
         self._login()
         self._comps_experiment_id = experiment.uid
         self.comps_experiment.commission()
@@ -260,9 +260,9 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                     break
         return experiment
 
-    def _retrieve_experiments(self, suite: 'TSuite') -> TExperimentList:
+    def _retrieve_experiments(self, suite: TSuite) -> TExperimentList:
+        logger.debug(f"Retrieving Experiments from Suite: {suite.name}")
         raise NotImplementedError('No method for retrieving experiments for a suite object implemented yet.')
-        return experiments
 
     def _retrieve_simulations(self, experiment: TExperiment) -> TSimulationList:
         self._comps_experiment_id = experiment.uid
@@ -295,7 +295,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                 pass
         if not successful:
             raise UnknownItemException(f'Unable to retrieve children for unknown item '
-                                            f'id: {item.uid} of type: {type(item)}')
+                                       f'id: {item.uid} of type: {type(item)}')
         for child in children:
             child.platform = self
         return children
@@ -321,7 +321,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         return experiment
 
     # @retry_function
-    def _retrieve_simulation(self, simulation_id: 'uuid') -> 'TSimulation':
+    def _retrieve_simulation(self, simulation_id: 'uuid') -> TSimulation:
         raise NotImplementedError('Method for retrieving a simulation by id is not complete')
         # simulation = COMPSSimulation.get(id=simulation_id)
         # return simulation
@@ -379,6 +379,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                 if self._ep_dict:
                     pd = {**pd, **self._ep_dict}
                 return pd
+
         comps_simulation = COMPSSimulation.get(item.uid, query_criteria=QueryCriteriaExt().select(
             ['id', 'experiment_id']).select_children(
             ["files", "configuration"]).add_extra_params({'coalesceconfig': True}))

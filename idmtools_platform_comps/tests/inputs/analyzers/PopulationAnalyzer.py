@@ -61,13 +61,13 @@ class PopulationAnalyzer(IAnalyzer):
 
         if self.save_output:
             data.to_csv(os.path.join(analyzer_path, 'population.csv'))
-            #data.to_csv('population.csv')
+            # data.to_csv('population.csv')
 
         fig = plt.figure()
         for pop in list(all_data.values()):
             plt.plot(pop)
         plt.legend([s.uid for s in all_data.keys()])
-        #plt.show()
+        # plt.show()
         plt.savefig(os.path.join(analyzer_path, 'population.png'))
         plt.close(fig)
 

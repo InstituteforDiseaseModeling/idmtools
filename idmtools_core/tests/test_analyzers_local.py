@@ -1,6 +1,4 @@
 import os
-import pytest
-import json
 
 from idmtools.builders import ExperimentBuilder
 from idmtools.core.platform_factory import Platform
@@ -13,12 +11,10 @@ from idmtools.analysis.AnalyzeManager import AnalyzeManager
 from idmtools.analysis.AddAnalyzer import AddAnalyzer
 
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-from idmtools_test.utils.utils import del_folder
 
 from importlib import reload
 from operator import itemgetter
-from idmtools_test.utils.confg_local_runner_test import reset_local_broker, get_test_local_env_overrides
-from idmtools_test.utils.decorators import restart_local_platform
+from idmtools_test.utils.confg_local_runner_test import reset_local_broker
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 
@@ -84,10 +80,8 @@ class TestAnalyzeManager(ITestWithPersistence):
         # self.exp_id = '9eacbb9a-5ecf-e911-a2bb-f0921c167866' #comps2 staging
 
     def test_AddAnalyzer(self):
-
         analyzers = [AddAnalyzer()]
         platform = Platform(key='Local')
 
         am = AnalyzeManager(configuration={}, platform=platform, ids=[self.exp_id], analyzers=analyzers)
         am.analyze()
-

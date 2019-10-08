@@ -1,16 +1,12 @@
 import typing
 from abc import ABCMeta, abstractmethod
-from dataclasses import dataclass, field
-
+from dataclasses import dataclass
 from idmtools.entities.iroot_item import IRootItem
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 
-if typing.TYPE_CHECKING:
-    from idmtools.core.types import TExperiment
-
 
 @dataclass
-class ISimulation(IAssetsEnabled, IRootItem, metaclass=ABCMeta):
+class ISimulation(IRootItem, IAssetsEnabled, metaclass=ABCMeta):
     """
     Represents a generic Simulation.
     This class needs to be implemented for each model type with specifics.

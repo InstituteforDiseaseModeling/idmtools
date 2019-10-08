@@ -6,9 +6,10 @@ from dataclasses import dataclass, field
 
 import diskcache
 import numpy as np
-from typing import Type
+from typing import Type, List, Dict
 
 from idmtools.core import UnknownItemException
+from idmtools.entities.isimulation import TSimulation
 from idmtools.registry.platform_specification import example_configuration_impl, get_platform_impl, \
     get_platform_type_impl, PlatformSpecification
 from idmtools.registry.plugin_specification import get_description_impl
@@ -66,7 +67,7 @@ class TestPlatform(IPlatform):
             successful = True
         if not successful:
             raise UnknownItemException(f'Unable to retrieve children for unknown item '
-                                            f'id: {item.uid} of type: {type(item)}')
+                                       f'id: {item.uid} of type: {type(item)}')
         for child in children:
             child.platform = self
         return children
@@ -91,7 +92,7 @@ class TestPlatform(IPlatform):
     def post_setstate(self):
         self.initialize_test_cache()
 
-    def create_items(self, items: 'TItemList') -> 'List[uuid]':
+    def create_items(self, items: 'TItemList') -> List[uuid]:
         # TODO: add ability to create suites
         types = list({type(item) for item in items})
         if len(types) != 1:
@@ -144,17 +145,17 @@ class TestPlatform(IPlatform):
             simulation.status = new_status
         self.simulations.set(experiment_uid, simulations)
 
-    def run_simulations(self, experiment: 'TExperiment') -> None:
+    def run_simulations(self, experiment: TExperiment) -> None:
         from idmtools.core import EntityStatus
         self.set_simulation_status(experiment.uid, EntityStatus.RUNNING)
 
-    def send_assets_for_experiment(self, experiment: 'TExperiment', **kwargs) -> None:
+    def send_assets_for_experiment(self, experiment: TExperiment, **kwargs) -> None:
         pass
 
-    def send_assets_for_simulation(self, simulation: 'TSimulation', **kwargs) -> None:
+    def send_assets_for_simulation(self, simulation: TSimulation, **kwargs) -> None:
         pass
 
-    def refresh_experiment_status(self, experiment: 'TExperiment') -> None:
+    def refresh_experiment_status(self, experiment: TExperiment) -> None:
         for simulation in self.simulations.get(experiment.uid):
             for esim in experiment.children():
                 if esim == simulation:
@@ -179,7 +180,7 @@ class TestPlatform(IPlatform):
         return item
 
     def _retrieve_experiment(self, experiment_id: 'uuid') -> 'TExperiment':
-        if not experiment_id in self.experiments:
+        if experiment_id not in self.experiments:
             raise Exception('No experiment id found: %s' % experiment_id)
         return self.experiments[experiment_id]
 
@@ -215,7 +216,7 @@ class TestPlatform(IPlatform):
                 pass
         if not successful:
             raise UnknownItemException(f'Unable to retrieve parent for unknown item '
-                                            f'id: {item.uid} of type: {type(item)}')
+                                       f'id: {item.uid} of type: {type(item)}')
         parent.platform = self
         return parent
 
@@ -231,8 +232,9 @@ class TestPlatform(IPlatform):
     def refresh_status(self, item):
         pass
 
-    def get_files(self, item: 'TItem', files: 'List[str]') -> 'Dict[str, bytearray]':
+    def get_files(self, item: 'TItem', files: 'List[str]') -> Dict[str, bytearray]:
         pass
+
 
 TEST_PLATFORM_EXAMPLE_CONFIG = """
 [LOCAL]

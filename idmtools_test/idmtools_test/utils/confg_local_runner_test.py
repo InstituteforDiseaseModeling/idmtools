@@ -2,14 +2,11 @@ import os
 import tempfile
 import unittest.mock
 from os.path import join
-
 from sqlalchemy import create_engine
-
 from idmtools_platform_local.workers.brokers import setup_broker
 
 
 def config_local_test():
-
     os.environ['UNIT_TESTS'] = '1'
     os.environ['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
 
@@ -45,7 +42,7 @@ engine = None
 
 
 def get_db():
-    global  engine
+    global engine
     if engine is None:
         engine = create_engine('sqlite://', pool_size=32)
     return engine
