@@ -40,6 +40,8 @@ class DockerOperations:
     runtime: Optional[str] = 'runc'
     redis_mem_limit: str = '128m'
     redis_mem_reservation: str = '64m'
+    workers_mem_limit: str = '512m'
+    workers_mem_reservation: str = '128m'
     postgres_image: str = 'postgres:11.4'
     postgres_mem_limit: str = '64m'
     postgres_mem_reservation: str = '32m'
@@ -56,8 +58,9 @@ class DockerOperations:
         Returns:
 
         """
-        if not os.path.exists(self.host_data_directory):
-            os.makedirs(self.host_data_directory)
+        # Make sure the host_data_dir exists
+        os.makedirs(self.host_data_directory, exist_ok=True)
+
         self.timeout = 1
         self.system_info = get_system_information()
         if self.run_as is None:
@@ -111,6 +114,7 @@ class DockerOperations:
         # in the future this could be improved with service detection
         time.sleep(5)
         self.get_workers()
+        time.sleep(5)
 
     @optional_yaspin_load(text="Restarting IDM-Tools services")
     def restart_all(self) -> NoReturn:
@@ -268,9 +272,9 @@ class DockerOperations:
                                 volumes=worker_volumes, runtime=self.runtime, environment=environment)
 
         container_config.update(
-            self.get_common_config(
-                mem_limit=self.redis_mem_limit, mem_reservation=self.redis_mem_reservation
-            ))
+            self.get_common_config(mem_limit=self.workers_mem_limit, mem_reservation=self.workers_mem_reservation)
+        )
+
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f"Worker Config: {container_config}")
         return container_config

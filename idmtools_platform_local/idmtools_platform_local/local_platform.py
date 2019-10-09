@@ -54,7 +54,7 @@ class LocalPlatform(IPlatform):
     postgres_port: Optional[str] = 5432
     workers_image: str = default_image
     workers_ui_port: int = 5000
-    default_timeout: int = 30
+    default_timeout: int = 45
     run_as: Optional[str] = None
     # We use this to manage our docker containers
     _docker_operations: Optional[DockerOperations] = dataclasses.field(default=None, metadata={"pickle_ignore": True})
@@ -302,7 +302,7 @@ class LocalPlatform(IPlatform):
         Restores the simulation for a specific experiment
 
         Args:
-            experiment: Experiment to retore simulations for
+            experiment: Experiment to restore simulations for
 
         Returns:
 
@@ -315,6 +315,8 @@ class LocalPlatform(IPlatform):
             sim.tags = sim_info['tags']
             sim.status = local_status_to_common(sim_info['status'])
             experiment.simulations.append(sim)
+
+        return experiment.simulations
 
     def _refresh_experiment_status(self, experiment: TExperiment, update_sim_status=True):  # noqa: F821
         """

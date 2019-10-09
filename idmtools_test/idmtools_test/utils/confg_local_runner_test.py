@@ -18,6 +18,7 @@ def config_local_test():
 def reset_local_broker():
     if 'UNIT_TESTS' in os.environ:
         del os.environ['UNIT_TESTS']
+
     if 'SQLALCHEMY_DATABASE_URI' in os.environ:
         del os.environ['SQLALCHEMY_DATABASE_URI']
 

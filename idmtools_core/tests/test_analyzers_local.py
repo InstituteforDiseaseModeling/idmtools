@@ -1,22 +1,39 @@
 import os
+from importlib import reload
 
-from idmtools.builders import ExperimentBuilder
-from idmtools.core.platform_factory import Platform
-from idmtools.managers import ExperimentManager
-from idmtools_models.python import PythonExperiment
-from idmtools.core import EntityStatus
-from idmtools_platform_local.docker.docker_operations import DockerOperations
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools.analysis.AnalyzeManager import AnalyzeManager
-from idmtools.analysis.AddAnalyzer import AddAnalyzer
-
+from idmtools_test.utils.confg_local_runner_test import reset_local_broker
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
-from importlib import reload
-from operator import itemgetter
-from idmtools_test.utils.confg_local_runner_test import reset_local_broker
+from idmtools.analysis.AnalyzeManager import AnalyzeManager
+from idmtools.builders import ExperimentBuilder
+from idmtools.core.platform_factory import Platform
+from idmtools.entities import IAnalyzer
+from idmtools.managers import ExperimentManager
+from idmtools_models.python import PythonExperiment
+from idmtools_platform_local.docker.docker_operations import DockerOperations
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
+
+
+class AddAnalyzer(IAnalyzer):
+    """
+    Add Analyzer
+    A simple base class to add analyzers.
+
+    """
+
+    def __init__(self):
+        super().__init__(filenames=["output\\result.json"], parse=True)
+
+    def map(self, data, item):
+        number = data[self.filenames[0]]["a"]
+        result = number + 100
+        return result
+
+    def reduce(self, data):
+        value = sum(data.values())
+        return value
 
 
 class TestAnalyzeManager(ITestWithPersistence):
@@ -38,11 +55,7 @@ class TestAnalyzeManager(ITestWithPersistence):
 
         platform = Platform('Local')
 
-        # CreateSimulationTask.broker =
-
-        name = self.case_name
         pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
-
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
 
         def param_a_update(simulation, value):
@@ -53,35 +66,16 @@ class TestAnalyzeManager(ITestWithPersistence):
         # Sweep parameter "a"
         builder.add_sweep_definition(param_a_update, range(0, 5))
         pe.builder = builder
-
         em = ExperimentManager(experiment=pe, platform=platform)
         em.run()
         em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.FAILED for s in pe.simulations]))
-        # validation
-        self.assertEqual(pe.name, name)
-        self.assertEqual(pe.simulation_count, 5)
-        self.assertIsNotNone(pe.uid)
-        self.assertTrue(all([s.status == EntityStatus.FAILED for s in pe.simulations]))
-        self.assertFalse(pe.succeeded)
 
-        # validate tags
-        tags = []
-        for simulation in pe.simulations:
-            self.assertEqual(simulation.experiment.uid, pe.uid)
-            tags.append(simulation.tags)
-        expected_tags = [{'a': 0}, {'a': 1}, {'a': 2}, {'a': 3}, {'a': 4}]
-        sorted_tags = sorted(tags, key=itemgetter('a'))
-        sorted_expected_tags = sorted(expected_tags, key=itemgetter('a'))
-        self.assertEqual(sorted_tags, sorted_expected_tags)
         self.exp_id = pe.uid
-
-        # Uncomment out if you do not want to regenerate exp and sims
-        # self.exp_id = '9eacbb9a-5ecf-e911-a2bb-f0921c167866' #comps2 staging
 
     def test_AddAnalyzer(self):
         analyzers = [AddAnalyzer()]
-        platform = Platform(key='Local')
+        platform = Platform('Local')
 
         am = AnalyzeManager(configuration={}, platform=platform, ids=[self.exp_id], analyzers=analyzers)
         am.analyze()
+        self.assertEqual(analyzers[0].results, sum(n + 100 for n in range(0, 5)))
