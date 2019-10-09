@@ -15,7 +15,7 @@ class IEntity(metaclass=ABCMeta):
     """
     _uid: 'uuid' = field(default=None, metadata={"md": True})
     platform_id: 'uuid' = field(default=None, metadata={"md": True})
-    tags: 'TTags' = field(default_factory=lambda: {}, compare=False, metadata={"md": True})
+    tags: 'TTags' = field(default_factory=lambda: {}, metadata={"md": True})
 
     @property
     def metadata(self):
