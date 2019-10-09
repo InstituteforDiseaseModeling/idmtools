@@ -299,7 +299,8 @@ class LocalPlatform(IPlatform):
 
     def restore_simulations(self, experiment: TExperiment):  # noqa: F821
         """
-        Restores the simulation for a specific experiment
+        Restores the simulation for a specific experiment.
+        Leverage the paging mechanism to not overload the server for big experiments.
 
         Args:
             experiment: Experiment to restore simulations for
@@ -307,15 +308,27 @@ class LocalPlatform(IPlatform):
         Returns:
 
         """
-        simulation_dict = SimulationsClient.get_all(experiment_id=experiment.uid)
-
         experiment.simulations.clear()
-        for sim_info in simulation_dict:
-            sim = experiment.simulation()
-            sim.uid = sim_info['simulation_uid']
-            sim.tags = sim_info['tags']
-            sim.status = local_status_to_common(sim_info['status'])
-            experiment.simulations.append(sim)
+
+        page_number = 1
+        while True:
+            try:
+                # Retrieve the simulations for the current page
+                simulation_dict = SimulationsClient.get_all(experiment_id=experiment.uid, per_page=20, page=page_number)
+            except FileNotFoundError:
+                # If nothing -> we have all simulations
+                break
+
+            # Add the simulations
+            for sim_info in simulation_dict:
+                sim = experiment.simulation()
+                sim.uid = sim_info['simulation_uid']
+                sim.tags = sim_info['tags']
+                sim.status = local_status_to_common(sim_info['status'])
+                experiment.simulations.append(sim)
+
+            # Go to next page
+            page_number += 1
 
         return experiment.simulations
 

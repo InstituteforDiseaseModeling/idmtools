@@ -28,10 +28,10 @@ class SimulationsClient(BaseClient):
         args = cls._get_arguments(tags)
         args.update(dict(experiment_id=experiment_id))
         if page:
-            args[page] = page
+            args['page'] = page
 
         if per_page:
-            args[per_page] = per_page
+            args['per_page'] = per_page
         response = cls.get(None, params=args)
         result = cls._validate_response(response, 'Simulations')
         return result
