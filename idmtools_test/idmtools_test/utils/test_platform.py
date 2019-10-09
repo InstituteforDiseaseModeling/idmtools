@@ -32,15 +32,6 @@ class TestPlatform(IPlatform):
     experiments: 'diskcache.Cache' = field(default=None, compare=False, metadata={"pickle_ignore": True})
     simulations: 'diskcache.Cache' = field(default=None, compare=False, metadata={"pickle_ignore": True})
 
-    def __del__(self):
-        # Close and delete the cache when finished
-        self.experiments.close()
-        self.simulations.close()
-        try:
-            shutil.rmtree(data_path)
-        except OSError:
-            pass
-
     def __post_init__(self):
         super().__post_init__()
         os.makedirs(data_path, exist_ok=True)
@@ -114,9 +105,8 @@ class TestPlatform(IPlatform):
 
     def _create_simulations(self, simulation_batch):
         simulations = []
-        experiment_id = None
         for simulation in simulation_batch:
-            experiment_id = experiment_id or self.get_parent(simulation).uid
+            experiment_id = simulation.parent_id
             simulation.uid = uuid4()
             simulations.append(simulation)
 
