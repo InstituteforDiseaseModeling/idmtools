@@ -25,7 +25,8 @@ def prettify_simulation(simulation: Dict[str, Any]):
     """
     simulation['status'] = colorize_status(simulation['status'])
     simulation['data_path'] = urlize_data_path(simulation['data_path'])
-    return simulation
+    column_order = ("simulation_uid", "experiment_id", "status", "created", "tags", "extra_details", "updated", "data_path")
+    return {co: simulation[co] for co in column_order}
 
 
 def status(id: Optional[str], experiment_id: Optional[str], status: Optional[str],

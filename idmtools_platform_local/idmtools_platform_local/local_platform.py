@@ -309,6 +309,7 @@ class LocalPlatform(IPlatform):
         """
         simulation_dict = SimulationsClient.get_all(experiment_id=experiment.uid)
 
+        experiment.simulations.clear()
         for sim_info in simulation_dict:
             sim = experiment.simulation()
             sim.uid = sim_info['simulation_uid']
@@ -444,7 +445,6 @@ class LocalPlatform(IPlatform):
             Ids of simulations created
         """
         from idmtools_platform_local.tasks.create_simulation import CreateSimulationsTask
-
         worker = self._docker_operations.get_workers()
 
         m = CreateSimulationsTask.send(simulations_batch[0].experiment.uid, [s.tags for s in simulations_batch])

@@ -146,9 +146,6 @@ class TestPlatform(IPlatform):
                     esim.status = simulation.status
                     break
 
-    def get_assets_for_simulation(self, simulation, output_files):
-        pass
-
     def get_item(self, id: 'uuid'):
         successful = False
         if not successful:

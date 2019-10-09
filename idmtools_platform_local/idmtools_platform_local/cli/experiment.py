@@ -3,7 +3,6 @@ import click
 import requests
 from tabulate import tabulate
 
-
 from idmtools_platform_local.cli.utils import parent_status_to_progress, urlize_data_path
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
 from idmtools_platform_local.config import API_PATH
@@ -16,6 +15,7 @@ def prettify_experiment(experiment: Dict[str, Any]):
     Prettifies a JSON Experiment object for printing on a console. This includes
     - Making a pretty progress bar
     - URL-ifying the data paths
+    - sorting the columns
 
     Args:
         experiment: JSON representation of the Experiment(from API)
@@ -25,12 +25,11 @@ def prettify_experiment(experiment: Dict[str, Any]):
     """
     experiment['progress'] = parent_status_to_progress(experiment['progress'])
     experiment['data_path'] = urlize_data_path(experiment['data_path'])
-    del experiment['status']
-    return experiment
+    column_order = ("experiment_id", "created", "progress", "tags", "extra_details", "updated", "data_path")
+    return {co: experiment[co] for co in column_order}
 
 
 def status(id: Optional[str], tags: Optional[List[Tuple[str, str]]]):
-
     """
     List the status of experiment(s) with the ability to filter by experiment id and tags
 
