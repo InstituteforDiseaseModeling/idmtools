@@ -20,7 +20,7 @@ CALLER_LIST = ['_create_from_block',    # create platform through Platform Facto
                'fetch',                 # create platform through un-pickle
                'get',                   # create platform through platform spec' get method
                '__newobj__',            # create platform through copy.deepcopy
-               '_main']
+               '_main']                 # create platform through analyzer manager
 
 
 class IPlatform(IEntity, metaclass=ABCMeta):
