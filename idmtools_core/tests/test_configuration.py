@@ -85,10 +85,10 @@ class TestConfig(ITestWithPersistence):
 
         Platform('COMPS')
         max_workers = IdmConfigParser.get_option(None, 'max_workers')
-        self.assertEqual(int(max_workers), 26)
+        self.assertEqual(int(max_workers), 16)
 
         batch_size = IdmConfigParser.get_option(None, 'batch_size')
-        self.assertEqual(int(batch_size), 20)
+        self.assertEqual(int(batch_size), 10)
 
         not_exist = IdmConfigParser.get_option(None, 'batch_size_not_exist')
         print(not_exist)
@@ -126,8 +126,7 @@ class TestConfig(ITestWithPersistence):
 
     def test_no_idmtools(self):
         IdmConfigParser(file_name="idmtools_NotExist.ini")
-        IdmConfigParser.view_config_file()
-        self.assertTrue(IdmConfigParser.get_config_path() is None)
+        self.assertIsNone(IdmConfigParser.get_config_path())
 
         with self.assertRaises(ValueError) as context:
             IdmConfigParser(file_name="idmtools_NotExist.ini")
