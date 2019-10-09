@@ -103,7 +103,7 @@ class TimeseriesAnalyzer(IAnalyzer):
 if __name__ == "__main__":
     platform = Platform('COMPS2')
 
-    exp_id = '65a93d51-04db-e911-a2be-f0921c167861'  # comps2 exp_id
+    exp_id = '3dda8b9b-b5ea-e911-a2be-f0921c167861'  # comps2 exp_id
 
     filenames = ['output/InsetChart.json']
     analyzers = [TimeseriesAnalyzer(filenames=filenames)]

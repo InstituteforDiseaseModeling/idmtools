@@ -80,7 +80,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
 
         self.create_experiment()
 
-        filenames = ['output\\InsetChart.json', 'config.json']
+        filenames = ['output/InsetChart.json', 'config.json']
         analyzers = [DownloadAnalyzer(filenames=filenames, output_path='output')]
 
         am = AnalyzeManager(platform=self.p, ids=[self.exp_id], analyzers=analyzers)
@@ -89,7 +89,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         for simulation in Experiment.get(self.exp_id).get_simulations():
             s = simulation.get(id=simulation.id)
             self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "config.json")))
-            self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "insetChart.json")))
+            self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "InsetChart.json")))
 
     def test_analyzer_multiple_experiments(self):
         # delete output from previous run
@@ -98,7 +98,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         # create a new empty 'output' dir
         os.mkdir("output")
 
-        filenames = ['output\\InsetChart.json', 'config.json']
+        filenames = ['output/InsetChart.json', 'config.json']
         analyzers = [DownloadAnalyzer(filenames=filenames, output_path='output')]
 
         exp_list = ['6f693627-6de5-e911-a2be-f0921c167861', '1991ec0d-6ce5-e911-a2be-f0921c167861']  # comps2 staging
@@ -149,7 +149,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         # create a new empty 'output' dir
         os.mkdir("output")
 
-        filenames = ['output\\InsetChart.json', 'config.json']
+        filenames = ['output/InsetChart.json', 'config.json']
         analyzers = [DownloadAnalyzer(filenames=filenames, output_path='output')]
 
         exp_id = 'f48e09d4-acd9-e911-a2be-f0921c167861'  # comps2
@@ -160,4 +160,4 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         for simulation in Experiment.get(exp_id).get_simulations():
             s = simulation.get(id=simulation.id)
             self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "config.json")))
-            self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "insetChart.json")))
+            self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "InsetChart.json")))
