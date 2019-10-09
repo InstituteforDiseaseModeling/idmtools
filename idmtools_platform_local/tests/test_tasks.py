@@ -22,7 +22,10 @@ class TestTasks(TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
-        shutil.rmtree(cls.local_path)
+        try:
+            shutil.rmtree(cls.local_path)
+        except:
+            pass
 
     def test_create_experiment(self, mock_db):
         """

@@ -47,7 +47,7 @@ def status(id: Optional[str], experiment_id: Optional[str], status: Optional[str
     from idmtools_cli.cli.utils import show_error
     try:
         if id is None:
-            simulations = SimulationsClient.get_all(status=status, tags=tags)
+            simulations = SimulationsClient.get_all(status=status, tags=tags, per_page=100)
         else:
             simulations = [SimulationsClient.get_one(id, status=status, tags=tags)]
         simulations = list(map(lambda x: prettify_simulation(x), simulations))

@@ -41,7 +41,7 @@ def status(id: Optional[str], tags: Optional[List[Tuple[str, str]]]):
     from idmtools_cli.cli.utils import show_error
     try:
         if id is None:
-            experiments = ExperimentsClient.get_all(tags=tags)
+            experiments = ExperimentsClient.get_all(tags=tags, per_page=100)
         else:
             experiments = ExperimentsClient.get_one(id, tags=tags)
             experiments = [experiments]
