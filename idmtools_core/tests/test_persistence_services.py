@@ -46,13 +46,6 @@ class TestPersistenceServices(ITestWithPersistence):
         PlatformPersistService.clear()
         self.assertEqual(PlatformPersistService.length(), 0)
 
-    def test_platform_cache_clear_2(self):
-        p1 = Platform('Test')
-        PlatformPersistService.save(p1)
-        self.assertTrue(PlatformPersistService.length)
-        PlatformPersistService.clear()
-        self.assertEqual(PlatformPersistService.length, 0)
-
     def test_experiment_cache_clear(self):
         e = TstExperiment("test")
         e.simulation()
