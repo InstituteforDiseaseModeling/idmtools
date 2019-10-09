@@ -5,7 +5,6 @@ from idmtools.entities.ianalyzer import IAnalyzer
 
 class DownloadAnalyzer(IAnalyzer):
     """
-    Download Analyzer
     A simple base class that will download the files specified in filenames without further treatment.
 
     Can be used by creating a child class:
@@ -40,9 +39,13 @@ class DownloadAnalyzer(IAnalyzer):
 
     def get_sim_folder(self, item):
         """
-        Concatenate the specified top-level output folder with the simulation ID
-        :param parser: A simulation output parsing thread
-        :return: The name of the folder to download this simulation's output to
+        Concatenate the specified top-level output folder with the simulation ID.
+
+        Args:
+            item: A simulation output parsing thread.
+
+        Returns:
+            The name of the folder to download this simulation's output to.
         """
         return os.path.join(self.output_path, str(item.uid))
 

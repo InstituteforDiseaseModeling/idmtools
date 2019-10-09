@@ -43,8 +43,9 @@ class WindowsSystemInformation(SystemInformation):
 
 def get_system_information() -> SystemInformation:
     """
-    Fetches the system appropriate information inspection object
+    Fetch the system-appropriate information inspection object.
+
     Returns:
-        (SystemInformation): Returns a SystemInformation with platform specific implementation
+        :class:`SystemInformation` with platform-specific implementation.
     """
     return LinuxSystemInformation() if platform.system() in ["Linux", "Darwin"] else WindowsSystemInformation()

@@ -18,18 +18,17 @@ if typing.TYPE_CHECKING:
 
 def pool_worker_initializer(func, analyzers, cache, platform) -> None:
     """
-    Initializer function for the process pool.
-    Allows the pool to associate the analyzers, cache and path_mapping to the function executed to retrieve data.
-    We use an initializer to improve the performances.
+    Initialize the pool worker, which allows the process pool to associate the analyzers, cache, 
+    and path mapping to the function executed to retrieve data. Using an initializer improves performance.
 
     Args:
-        func: The function that the pool will call (probably `retrieve_data` here)
-        analyzers: The list of all analyzers to run
-        cache: The cache object
-        platform: The platform to communicate with to retrieve files from
+        func: The function that the pool will call.
+        analyzers: The list of all analyzers to run.
+        cache: The cache object.
+        platform: The platform to communicate with to retrieve files from.
 
     Returns:
-
+        None
     """
     func.analyzers = analyzers
     func.cache = cache
@@ -78,31 +77,36 @@ class AnalyzeManager(CacheEnabled):
 
     def add_item(self, item: 'TItem') -> NoReturn:
         """
-        Add an additional item for analysis
+        Add an additional item for analysis.
+
         Args:
-            item: the new thing to add for analysis
+            item: The new item to add for analysis.
 
         Returns:
-
+            None
         """
         self.potential_items.append(item)
 
     @staticmethod
     def can_analyze_item(item: 'TItem') -> bool:
         """
-        Can this item be processed now?
-        Args:
-            item: the thing to check for analyzability
+        Check if this item can be processed now. 
 
-        Returns: True/False
+        Args:
+            item: The item to check.
+
+        Returns: 
+            A Boolean indicating if the item can be analyzed. 
 
         """
         return item.status == EntityStatus.SUCCEEDED
 
     def _get_items_to_analyze(self) -> 'TItemList':
         """
-        Returns a list of items derived from self._items that are available to analyze
-        Returns: a list of IItem objects
+        Get a list of items derived from :meth:`self._items` that are available to analyze.
+        
+        Returns: 
+            A list of :class:`~idmtools.entities.iitem.IItem` objects.
 
         """
         #
@@ -133,9 +137,10 @@ class AnalyzeManager(CacheEnabled):
 
     def add_analyzer(self, analyzer: 'TAnalyzer') -> NoReturn:
         """
-        Add another analyzer to use on the to-analyze items
+        Add another analyzer to use on the items to be analyzed.
+
         Args:
-            analyzer: An analyzer object (IAnalyzer)
+            analyzer: An analyzer object (:class:`~idmtools.entities.ianalyzer.IAnalyzer`).
 
         Returns:
 
@@ -144,9 +149,10 @@ class AnalyzeManager(CacheEnabled):
 
     def _update_analyzer_uids(self) -> NoReturn:
         """
-        Ensures that each analyzer has a unique uid in this context by updating them as needed
-        Returns:
+        Ensure that each analyzer has a unique ID in this context by updating them as needed.
 
+        Returns:
+            None
         """
         unique_uids = {analyzer.uid for analyzer in self.analyzers}
         if len(unique_uids) < len(self.analyzers):
@@ -155,9 +161,10 @@ class AnalyzeManager(CacheEnabled):
 
     def _initialize_analyzers(self) -> NoReturn:
         """
-        Do the steps needed to get the analyzers ready for item analysis
-        Returns:
+        Do the steps needed to prepare analyzers for item analysis.
 
+        Returns:
+            None
         """
         # Setup the working directory and call initialize() on each analyzer
         for analyzer in self.analyzers:
@@ -174,7 +181,9 @@ class AnalyzeManager(CacheEnabled):
     def _check_exception(self) -> bool:
         """
         Determines if an exception has occurred in the processing of items, printing any related information.
-        Returns: True/False, has an exception occurred?
+
+        Returns: 
+            A Boolean indicating if an exception has occurred. 
 
         """
         exception = self.cache.get(self.EXCEPTION_KEY, default=None)
@@ -188,13 +197,14 @@ class AnalyzeManager(CacheEnabled):
 
     def _print_configuration(self, n_items: int, n_processes: int) -> NoReturn:
         """
-        Display some information about an ongoing analysis
+        Display some information about an ongoing analysis.
+
         Args:
-            n_items: the number of items being analyzed
-            n_processes: the number of active item processing handlers
+            n_items: The number of items being analyzed.
+            n_processes: The number of active item processing handlers.
 
         Returns:
-
+            None
         """
         n_ignored_items = len(self.potential_items) - n_items
         print('Analyze Manager')
@@ -212,12 +222,14 @@ class AnalyzeManager(CacheEnabled):
 
     def _run_and_wait_for_mapping(self, worker_pool: Pool, start_time: float) -> bool:
         """
-        Runs and manages the mapping call on each item
-        Args:
-            worker_pool: a Pool of workers
-            start_time: a relative time for updating the user on runtime
+        Run and manage the mapping call on each item.
 
-        Returns: False if an exception occurred processing .map on any item, otherwise True (succeeded)
+        Args:
+            worker_pool: A pool of workers.
+            start_time: A relative time for updating the user on runtime.
+
+        Returns: 
+            False if an exception occurred processing **.map** on any item; otherwise True (succeeded).
 
         """
         # add items to process (map)
@@ -251,11 +263,13 @@ class AnalyzeManager(CacheEnabled):
 
     def _run_and_wait_for_reducing(self, worker_pool: Pool) -> dict:
         """
-        Runs and manages the reduce call on the combined item results (by analyzer)
-        Args:
-            worker_pool: a Pool of workers
+        Run and manage the reduce call on the combined item results (by analyzer).
 
-        Returns: a analyzer-id keyed dict of finalize results
+        Args:
+            worker_pool: A pool of workers.
+
+        Returns: 
+            An analyzer ID keyed dictionary of finalize results.
 
         """
         # the keys in self.cache from map() calls are expected to be item ids. Each keyed value
@@ -276,8 +290,11 @@ class AnalyzeManager(CacheEnabled):
 
     def analyze(self) -> bool:
         """
-        The main driver method of AnalyzerManager. Call this to process the provided items with the provided analyzers
-        Returns: True on success, False on failure/exception
+        Process the provided items with the provided analyzers. This is the main driver method of 
+        :class:`AnalyzerManager`. 
+
+        Returns: 
+            True on success; False on failure/exception.
 
         """
         start_time = time.time()

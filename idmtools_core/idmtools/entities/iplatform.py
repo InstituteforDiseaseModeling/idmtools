@@ -26,8 +26,8 @@ CALLER_LIST = ['_create_from_block',    # create platform through Platform Facto
 class IPlatform(IEntity, metaclass=ABCMeta):
     """
     Interface defining a platform.
-    Interface defining a platform.
     A platform needs to implement basic operation such as:
+
     - Creating experiment
     - Creating simulation
     - Commissioning
@@ -37,8 +37,10 @@ class IPlatform(IEntity, metaclass=ABCMeta):
     @staticmethod
     def get_caller():
         """
-        Trace the stack and find the caller
-        Returns: the direct caller
+        Trace the stack and find the caller.
+
+        Returns: 
+            The direct caller.
         """
         import inspect
 
@@ -47,11 +49,14 @@ class IPlatform(IEntity, metaclass=ABCMeta):
 
     def __new__(cls, *args, **kwargs):
         """
-        Here is the code to create a new object!
+        Create a new object.
+
         Args:
-            args: user inputs
-            kwargs: user inputs
-        Returns: object created
+            args: User inputs.
+            kwargs: User inputs.
+
+        Returns: 
+            The object created.
         """
 
         # Check the caller
@@ -66,18 +71,23 @@ class IPlatform(IEntity, metaclass=ABCMeta):
 
     def __post_init__(self) -> None:
         """
-        Work to be done after object creation
-        Returns: None
+        Work to be done after object creation.
+
+        Returns: 
+            None
         """
         self.validate_inputs_types()
 
     @abstractmethod
     def create_items(self, items: 'TItem') -> 'List[uuid]':
         """
-        Function creating e.g. sims/exps/suites on the platform
+        Create items (simulations, experiments, or suites) on the platform.
+
         Args:
-            items: The batch of items to create
-        Returns: List of ids created
+            items: The batch of items to create.
+
+        Returns: 
+            List of item IDs created.
         """
         pass
 
@@ -93,10 +103,12 @@ class IPlatform(IEntity, metaclass=ABCMeta):
     @abstractmethod
     def send_assets(self, item: 'TItem', **kwargs) -> NoReturn:
         """
-        Send the assets for a given item (sim, experiment, suite, etc) to the platform.
+        Send the assets for a given item to the platform.
+
         Args:
-            item: The item to process. Expected to have an `assets` attribute containing the collection.
-            **kwargs: Extra parameters used by the platform
+            item: The item to process. Expected to have an **assets** attribute containing 
+                the collection.
+            **kwargs: Extra parameters used by the platform.
         """
         pass
 
@@ -104,20 +116,23 @@ class IPlatform(IEntity, metaclass=ABCMeta):
     def refresh_status(self, item) -> NoReturn:
         """
         Populate the platform item and specified item with its status.
+
         Args:
-            item: The item to check status for
+            item: The item to check status for.
         """
         pass
 
     @abstractmethod
     def get_item(self, id: 'uuid') -> Any:
         """
-        Get an item by its id. The implementing classes must know how to distinguish
-        items of different levels (e.g. simulation, experiment, ...)
-        Args:
-            id: the id of the item to obtain
+        Get an item by its ID. The implementing classes must know how to distinguish
+        items of different levels (e.g. simulation, experiment, suite).
 
-        Returns: the specified item
+        Args:
+            id: The ID of the item to obtain.
+
+        Returns: 
+            The specified item.
         """
         pass
 
@@ -150,12 +165,14 @@ class IPlatform(IEntity, metaclass=ABCMeta):
     @abstractmethod
     def get_files(self, item: 'TItem', files: 'List[str]') -> 'Dict[str, bytearray]':
         """
-        Obtain specified files related to the given item (an Item, a base item)
-        Args:
-            item: item to retrieve file data for
-            files: relative-path files to obtain
+        Obtain specified files related to the given item (an item, a base item).
 
-        Returns: a dict of file-path-keyed file data
+        Args:
+            item: The item to retrieve file data for.
+            files: The relative-path files to obtain.
+
+        Returns: 
+            A dictionary of file data keyed by file path.
 
         """
         pass
@@ -163,14 +180,15 @@ class IPlatform(IEntity, metaclass=ABCMeta):
     @abstractmethod
     def initialize_for_analysis(self, items: 'TItemList', analyzers: 'TAnalyzerList') -> NoReturn:
         """
-        Perform any pre-analysis steps needed before performing analysis on the given items with
-        the provided analyzers
+        Perform any preparation needed before performing analysis on the given items with
+        the provided analyzers.
+
         Args:
-            items: a list of items to initialize (base objects)
-            analyzers: analyzers to be applied to the items during analysis
+            items: A list of items to initialize (base objects).
+            analyzers: The analyzers to be applied to the items during analysis.
 
         Returns:
-
+            None
         """
         pass
 
@@ -179,8 +197,10 @@ class IPlatform(IEntity, metaclass=ABCMeta):
 
     def validate_inputs_types(self) -> None:
         """
-        Validate user inputs and case attr with the correct data types
-        Returns: None
+        Validate user inputs and case attributes with the correct data types.
+
+        Returns: 
+            None
         """
         # retrieve field values, default values and types
         fds = fields(self)

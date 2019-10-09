@@ -11,7 +11,7 @@ if typing.TYPE_CHECKING:
 @dataclass(repr=False)
 class IItem(IEntity, metaclass=ABCMeta):
     """
-    A generic thing that can be run and have a status.
+    A generic item that can be run and have a status.
     """
     status: 'EntityStatus' = field(default=None, compare=False)
 

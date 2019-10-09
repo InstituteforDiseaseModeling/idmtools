@@ -8,11 +8,12 @@ from idmtools.utils.collections import cut_iterable_to
 class IDisplaySetting(metaclass=ABCMeta):
     """
     Base class for a display setting.
-    The child class needs to implement the `display` method.
+    The child class needs to implement the :meth:`display` method.
 
     Includes:
-    - header: optional header for the display
-    - field: if specified, the `get_object` will call getattr for this field on the object
+
+    - header: Optional header for the display.
+    - field: If specified, the :meth:`get_object` will call :attr:`getattr` for this field on the object.
     """
 
     def __init__(self, header: str = None, field: str = None):
@@ -25,19 +26,21 @@ class IDisplaySetting(metaclass=ABCMeta):
     @abstractmethod
     def display(self, obj: Any) -> str:
         """
-        Displays the object.
-        Note that the attribute (identified by self.field) should be handled with `self.get_object`
-        Args:
-            obj: The object to consider for display
+        Display the object.
+        Note that the attribute (identified by self.field) should be handled with :meth:`self.get_object`.
 
-        Returns: A string representing what to show
+        Args:
+            obj: The object to consider for display.
+
+        Returns: 
+            A string representing what to show.
         """
         pass
 
 
 class StringDisplaySetting(IDisplaySetting):
     """
-    Displays the object as string
+    Class that displays the object as string.
     """
 
     def display(self, obj):
@@ -47,16 +50,16 @@ class StringDisplaySetting(IDisplaySetting):
 
 class DictDisplaySetting(IDisplaySetting):
     """
-    Displays a dictionary.
+    Class that displays a dictionary.
     """
 
     def __init__(self, header: str = None, field: str = None, max_items: int = 10, flat: bool = False):
         """
         Args:
-            header: Optional field header
-            field: Field in the object
-            max_items: How many items displayed maximum
-            flat: if False, display as a list, if True, display as a comma separated list
+            header: Optional field header.
+            field: The field in the object to consider.
+            max_items: The maximum number of items to display.
+            flat: If False, display as a list; if True, display as a comma-separated list.
         """
         super().__init__(header=header, field=field)
         self.max_items = max_items
@@ -88,15 +91,15 @@ class DictDisplaySetting(IDisplaySetting):
 
 class TableDisplay(IDisplaySetting):
     """
-    Display the object as a table.
+    Class that displays the object as a table.
     """
 
     def __init__(self, columns, max_rows=5, field=None):
         """
         Args:
-           columns: list of DisplaySettings
-           max_rows: How many rows to display max
-           field: Field of the object to consider
+           columns: A list of display settings.
+           max_rows: The maximum number of rows to display.
+           field: The field of the object to consider.
         """
         super().__init__(field=field)
         self.columns = columns

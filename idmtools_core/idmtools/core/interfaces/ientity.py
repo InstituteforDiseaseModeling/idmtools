@@ -45,25 +45,25 @@ class IEntity(metaclass=ABCMeta):
     # region Events methods
     def pre_creation(self) -> None:
         """
-        Called before the actual creation of the entity.
+        Call before the actual creation of the entity.
         """
         pass
 
     def post_creation(self) -> None:
         """
-        Called after the actual creation of the entity.
+        Call after the actual creation of the entity.
         """
         pass
 
     def post_setstate(self):
         """
-        Function called after restoring the state if additional initialization is required
+        Call after restoring the state if additional initialization is required.
         """
         pass
 
     def pre_getstate(self):
         """
-        Function called before picking and return default values for "pickle-ignore" fields
+        Call before picking to return default values for :meth:`pickle_ignore_fields`.
         """
         pass
 
@@ -72,7 +72,7 @@ class IEntity(metaclass=ABCMeta):
     # region State management
     def __getstate__(self):
         """
-        Ignore the fields in pickle_ignore_fields during pickling.
+        Ignore the fields in :meth:`pickle_ignore_fields` during pickling.
         """
         state = self.__dict__.copy()
         attrs = set(vars(self).keys())
@@ -98,7 +98,7 @@ class IEntity(metaclass=ABCMeta):
 
     def __setstate__(self, state):
         """
-        Add ignored fields back since they don't exist in the pickle
+        Add ignored fields back since they don't exist in the pickle.
         """
         self.__dict__.update(state)
 

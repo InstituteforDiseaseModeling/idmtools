@@ -16,7 +16,7 @@ if typing.TYPE_CHECKING:
 @dataclass(repr=False)
 class IContainerItem(IItem, metaclass=ABCMeta):
     """
-    An object that is both an item AND can contain (be a parent of) other _items
+    An object that is both an item AND can contain (be a parent of) other items.
     """
     class NoPlatformException(Exception):
         pass

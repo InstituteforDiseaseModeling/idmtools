@@ -12,38 +12,47 @@ if typing.TYPE_CHECKING:
 @dataclass
 class ISimulation(IAssetsEnabled, IRootItem, metaclass=ABCMeta):
     """
-    Represents a generic Simulation.
+    Class that epresents a generic simulation.
     This class needs to be implemented for each model type with specifics.
     """
 
     @abstractmethod
     def set_parameter(self, name: str, value: any) -> dict:
         """
-        Set a parameter in the simulation
+        Set a parameter in the simulation.
+
         Args:
-            name: Name of the parameter
-            value: Value of the parameter
-        Returns: Tag to record the change
+            name: The name of the parameter.
+            value: The value of the parameter.
+
+        Returns:    
+            Tag to record the change.
         """
         pass
 
     @abstractmethod
     def get_parameter(self, name, default=None):
         """
-        Get a parameter in the simulation
+        Get a parameter in the simulation.
+
         Args:
-            name: Name of the parameter
-        Returns: the Value of the parameter
+            name: The name of the parameter.
+
+        Returns: 
+            The value of the parameter.
         """
         return None
 
     @abstractmethod
     def update_parameters(self, params):
         """
-        Bulk update parameters/config
+        Bulk update parameter configuration.
+
         Args:
-            params: dict with new values
-        Returns: None
+            params: A dictionary with new values.
+
+        Returns: 
+            None
         """
         pass
 
@@ -59,8 +68,7 @@ class ISimulation(IAssetsEnabled, IRootItem, metaclass=ABCMeta):
 
     def pre_getstate(self):
         """
-        Function called before picking
-        Return default values for "pickle-ignore" fields
+        Return default values for :meth:`pickle_ignore_fields`. Call before pickling.
         """
         from idmtools.assets import AssetCollection
         from idmtools.core.interfaces.entity_container import EntityContainer
