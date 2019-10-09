@@ -9,7 +9,7 @@ from idmtools_test import COMMON_INPUT_PATH
 DEFAULT_CONFIG_PATH = os.path.join(COMMON_INPUT_PATH, "files", "config.json")
 DEFAULT_CAMPAIGN_JSON = os.path.join(COMMON_INPUT_PATH, "files", "campaign.json")
 DEFAULT_DEMOGRAPHICS_JSON = os.path.join(COMMON_INPUT_PATH, "files", "demographics.json")
-DEFAULT_ERADICATION_PATH = os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe")
+DEFAULT_ERADICATION_PATH = os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe")
 
 
 def param_update(simulation, param, value):
@@ -107,17 +107,12 @@ class TestCopy(ITestWithPersistence):
                        demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)
 
         sim.gather_assets()
-
         self.assertEqual(len(sim.assets.assets), 3)
-        self.assertIsNotNone(sim.experiment)
 
         # test deepcopy of simulation
         sp = copy.deepcopy(sim)
-
         self.assertEqual(len(sp.assets.assets), 0)
-        self.assertIsNotNone(sp.experiment)
         self.assertEqual(sim, sp)
-
         self.assertDictEqual(vars(sim), vars(sp))
 
     def test_deepcopy_platform(self):
