@@ -69,7 +69,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         # create a new empty 'output' dir
         os.mkdir("output")
         self.create_experiment()
-        filenames = ['output\\result.json', 'config.json']
+        filenames = ['output/result.json', 'config.json']
         analyzers = [DownloadAnalyzer(filenames=filenames, output_path='output')]
 
         am = AnalyzeManager(platform=self.p, ids=[self.exp_id], analyzers=analyzers)
