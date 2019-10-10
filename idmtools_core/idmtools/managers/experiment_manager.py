@@ -68,11 +68,23 @@ class ExperimentManager:
         """
         Create all the simulations contained in the experiment on the platform.
         """
+        from idmtools.config import IdmConfigParser
         from concurrent.futures.thread import ThreadPoolExecutor
 
-        with ThreadPoolExecutor(max_workers=16) as executor:
-            executor.map(self.simulation_batch_worker_thread,  # noqa: F841
-                        self.experiment.batch_simulations(batch_size=10))
+        # Consider values in COMMON section
+        # _max_workers = IdmConfigParser.get_option("COMMON", "max_workers")
+        # _batch_size = IdmConfigParser.get_option("COMMON", "batch_size")
+
+        # Consider values from the block that Platform uses
+        _max_workers = IdmConfigParser.get_option(None, "max_workers")
+        _batch_size = IdmConfigParser.get_option(None, "batch_size")
+
+        _max_workers = int(_max_workers) if _max_workers else 16
+        _batch_size = int(_batch_size) if _batch_size else 10
+
+        with ThreadPoolExecutor(max_workers=_max_workers) as executor:
+            executor.map(self.simulation_batch_worker_thread,
+                         self.experiment.batch_simulations(batch_size=_batch_size))
 
         self.experiment.children().set_status(EntityStatus.CREATED)
 
