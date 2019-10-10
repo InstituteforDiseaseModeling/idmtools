@@ -15,7 +15,7 @@ class AssetCollection(IEntity):
     """
 
     # region Constructors
-    def __init__(self, assets: 'TAssetList' = None):
+    def __init__(self, assets: 'TAssetList' = None):  # noqa: F821
         """
         Constructor.
         Args:
@@ -26,7 +26,7 @@ class AssetCollection(IEntity):
 
     @classmethod
     def from_directory(cls, assets_directory: str, recursive: bool = True, flatten: bool = False,
-                       filters: 'TAssetFilterList' = None, filters_mode: 'FilterMode' = FilterMode.OR,
+                       filters: 'TAssetFilterList' = None, filters_mode: 'FilterMode' = FilterMode.OR,  # noqa: F821
                        relative_path: str = None) -> 'TAssetCollection':
         """
         Fill up an AssetCollection from the specified directory
@@ -46,8 +46,9 @@ class AssetCollection(IEntity):
 
     @staticmethod
     def assets_from_directory(assets_directory: 'str', recursive: 'bool' = True, flatten: 'bool' = False,
-                              filters: 'TAssetFilterList' = None, filters_mode: 'FilterMode' = FilterMode.OR,
-                              forced_relative_path: 'str' = None) -> 'TAssetList':
+                              filters: 'TAssetFilterList' = None,  # noqa: F821
+                              filters_mode: 'FilterMode' = FilterMode.OR,
+                              forced_relative_path: 'str' = None) -> 'TAssetList':  # noqa: F821
         """
         Create assets for files in a given directory.
 
@@ -102,7 +103,7 @@ class AssetCollection(IEntity):
         return assets
 
     def add_directory(self, assets_directory: 'str', recursive: 'bool' = True, flatten: 'bool' = False,
-                      filters: 'TAssetFilterList' = None, filters_mode: 'FilterMode' = FilterMode.OR,
+                      filters: 'TAssetFilterList' = None, filters_mode: 'FilterMode' = FilterMode.OR,  # noqa: F821
                       relative_path: 'str' = None):
         """
         Retrieve assets from the specified directory and add them to the collection.
@@ -114,7 +115,7 @@ class AssetCollection(IEntity):
         for asset in assets:
             self.add_asset(asset)
 
-    def add_asset(self, asset: 'TAsset', fail_on_duplicate: 'bool' = True):
+    def add_asset(self, asset: 'TAsset', fail_on_duplicate: 'bool' = True):  # noqa: F821
         """
         Add an asset to the collection.
 

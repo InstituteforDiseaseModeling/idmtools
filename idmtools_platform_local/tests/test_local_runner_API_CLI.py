@@ -26,7 +26,7 @@ class TestLocalRunnerCLI(ITestWithPersistence):
         reset_local_broker()
         from idmtools_platform_local.workers.brokers import setup_broker
         setup_broker()
-        platform = Platform('Local_Staging', **get_test_local_env_overrides())
+        platform = Platform('Local', **get_test_local_env_overrides())
         cls.pe = PythonExperiment(name="python experiment", model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
 
         cls.pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}

@@ -30,7 +30,7 @@ class TestEMOD(ITestWithPersistence):
 
     def test_sir_with_StandAloneSimulationsBuilder(self):
         e = EMODExperiment.from_default(self.case_name, default=EMODSir,
-                                       eradication_path=os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe"))
+                                        eradication_path=os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe"))
 
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         sim = e.base_simulation
@@ -51,7 +51,7 @@ class TestEMOD(ITestWithPersistence):
 
     def test_sir_with_ExperimentBuilder(self):
         e = EMODExperiment.from_default(self.case_name, default=EMODSir,
-                                       eradication_path=os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe"))
+                                        eradication_path=os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe"))
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
 
         e.base_simulation.set_parameter("Enable_Immunity", 0)
@@ -79,7 +79,7 @@ class TestEMOD(ITestWithPersistence):
 
     def test_batch_simulations_StandAloneSimulationsBuilder(self):
         e = EMODExperiment.from_default(self.case_name, default=EMODSir,
-                                       eradication_path=os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe"))
+                                        eradication_path=os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe"))
 
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         b = StandAloneSimulationsBuilder()
@@ -104,7 +104,7 @@ class TestEMOD(ITestWithPersistence):
     def test_batch_simulations_ExperimentBuilder(self):
 
         e = EMODExperiment.from_default(self.case_name, default=EMODSir,
-                                       eradication_path=os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe"))
+                                        eradication_path=os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe"))
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         # s = Suite(name="test suite")
         # s.experiments.append(e)
@@ -125,11 +125,11 @@ class TestEMOD(ITestWithPersistence):
 
     def test_load_files(self):
         e = EMODExperiment.from_files(self.case_name,
-                                     eradication_path=DEFAULT_ERADICATION_PATH,
-                                     config_path=DEFAULT_CONFIG_PATH,
-                                     campaign_path=DEFAULT_CAMPAIGN_JSON,
-                                     demographics_paths=DEFAULT_DEMOGRAPHICS_JSON
-                                     )
+                                      eradication_path=DEFAULT_ERADICATION_PATH,
+                                      config_path=DEFAULT_CONFIG_PATH,
+                                      campaign_path=DEFAULT_CAMPAIGN_JSON,
+                                      demographics_paths=DEFAULT_DEMOGRAPHICS_JSON
+                                      )
 
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         sim = e.simulation()
@@ -152,7 +152,7 @@ class TestEMOD(ITestWithPersistence):
     def test_load_files_2(self):
 
         e = EMODExperiment.from_default(self.case_name, default=EMODSir,
-                                       eradication_path=DEFAULT_ERADICATION_PATH)
+                                        eradication_path=DEFAULT_ERADICATION_PATH)
 
         e.base_simulation.load_files(demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)
 

@@ -2,14 +2,13 @@ import json
 import logging
 import ntpath
 import os
-
+from uuid import UUID
 
 from COMPS import Client
 from COMPS.Data import AssetCollection, AssetCollectionFile, Configuration, Experiment as COMPSExperiment, \
     QueryCriteria, Simulation as COMPSSimulation, SimulationFile
 from COMPS.Data.Simulation import SimulationState
 from dataclasses import dataclass, field
-
 from idmtools.core import CacheEnabled, UnknownItemException
 from idmtools.core.experiment_factory import experiment_factory
 from idmtools.core.enums import EntityStatus
@@ -17,10 +16,10 @@ from idmtools.entities import IPlatform, ISuite
 from idmtools.entities.ianalyzer import TAnalyzerList
 from idmtools.entities.iexperiment import TExperiment, TExperimentList, IExperiment
 from idmtools.entities.iitem import TItemList, TItem
-from idmtools.entities.isimulation import TSimulationList, ISimulation
+from idmtools.entities.isimulation import TSimulationList, ISimulation, TSimulation
+from idmtools.entities.isuite import TSuite
 from idmtools.utils.time import timestamp
 from typing import NoReturn, List
-import uuid
 
 logging.getLogger('COMPS.Data.Simulation').disabled = True
 logger = logging.getLogger(__name__)
@@ -129,7 +128,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             experiment_name = experiment_name.replace(c, '_')
         return experiment_name
 
-    def _create_experiment(self, experiment: TExperiment) -> uuid:
+    def _create_experiment(self, experiment: TExperiment) -> UUID:
         self._login()
 
         # Cleanup the name
@@ -167,7 +166,6 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         self.send_assets(item=experiment)
         return experiment.uid
 
-
     def create_items(self, items: TItemList) -> 'List[uuid]':
         # TODO: add ability to create suites
         types = list({type(item) for item in items})
@@ -185,7 +183,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             item.platform = self
         return ids
 
-    def _create_simulations(self, simulation_batch: 'TSimulationList') -> 'List[uuid]':
+    def _create_simulations(self, simulation_batch: TSimulationList) -> 'List[uuid]':
         self._login()
         created_simulations = []
 
@@ -210,7 +208,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         for item in items:
             item.platform = self
 
-    def _run_simulations_for_experiment(self, experiment: 'TExperiment') -> NoReturn:
+    def _run_simulations_for_experiment(self, experiment: TExperiment) -> NoReturn:
         self._login()
         self._comps_experiment_id = experiment.uid
         self.comps_experiment.commission()
@@ -235,6 +233,8 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         elif isinstance(item, ISuite):
             raise Exception(f'Unknown how to refresh items of type {type(item)} '
                             f'for platform: {self.__class__.__name__}')
+        else:
+            raise Exception(f'Cannot fetch status of items of type {type(item)}')
         item.platform = self
         return return_value
 
@@ -259,9 +259,9 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                     break
         return experiment
 
-    def _retrieve_experiments(self, suite: 'TSuite') -> TExperimentList:
+    def _retrieve_experiments(self, suite: TSuite) -> TExperimentList:
+        logger.debug(f"Retrieving Experiments from Suite: {suite.name}")
         raise NotImplementedError('No method for retrieving experiments for a suite object implemented yet.')
-        return experiments
 
     def _retrieve_simulations(self, experiment: TExperiment) -> TSimulationList:
         self._comps_experiment_id = experiment.uid
@@ -294,14 +294,14 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                 pass
         if not successful:
             raise UnknownItemException(f'Unable to retrieve children for unknown item '
-                                            f'id: {item.uid} of type: {type(item)}')
+                                       f'id: {item.uid} of type: {type(item)}')
         for child in children:
             child.platform = self
         return children
 
     # TODO: This method is a total hack for now. It doesn't actually look for and attach ALL experiments for the suite
     # as it needs to.
-    def _retrieve_suite(self, suite_id: uuid) -> 'TSuite':
+    def _retrieve_suite(self, suite_id: UUID) -> 'TSuite':
         raise NotImplementedError('Method for retrieving a suite by id is not complete')
         # from idmtools_models.dtk.DTKSuite import DTKSuite
         # experiments = [experiment]
@@ -310,7 +310,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         # suite.parent = None
         # return suite
 
-    def _retrieve_experiment(self, experiment_id: uuid) -> TExperiment:
+    def _retrieve_experiment(self, experiment_id: UUID) -> TExperiment:
         self._comps_experiment_id = experiment_id
         experiment = experiment_factory.create(key=self.comps_experiment.tags.get('type', None),
                                                tags=self.comps_experiment.tags)
@@ -320,7 +320,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         return experiment
 
     # @retry_function
-    def _retrieve_simulation(self, simulation_id: 'uuid') -> 'TSimulation':
+    def _retrieve_simulation(self, simulation_id: UUID) -> TSimulation:
         raise NotImplementedError('Method for retrieving a simulation by id is not complete')
         # simulation = COMPSSimulation.get(id=simulation_id)
         # return simulation
@@ -328,26 +328,21 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     # TODO: verify the retrieve methods called here actually error when they fail to retrieve anything
     def get_parent(self, item: TItem) -> TItem:
         parent = None
-        successful = False
-        try:
-            parent = self._retrieve_suite(suite_id=item.parent_id)
-            successful = True
-        except NotImplementedError:  # TODO
-            pass
-        if not successful:
+        for lookup in [self._retrieve_suite, self._retrieve_experiment]:
             try:
-                parent = self._retrieve_experiment(experiment_id=item.parent_id)
-                successful = True
-            except:
+                parent = lookup(item.parent_id)
+                break
+            except NotImplementedError:  # TODO Fix once suite works
                 pass
-        if not successful:
+
+        if parent is None:
             raise UnknownItemException(f'Unable to retrieve parent for unknown item '
-                                            f'id: {item.uid} of type: {type(item)}')
+                                       f'id: {item.uid} of type: {type(item)}')
         parent.platform = self
         return parent
 
     @staticmethod
-    def _get_file_for_collection(collection_id: uuid, file_path: str) -> NoReturn:
+    def _get_file_for_collection(collection_id: UUID, file_path: str) -> NoReturn:
         print(f"Cache miss for {collection_id} {file_path}")
 
         # retrieve the collection
@@ -383,6 +378,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                 if self._ep_dict:
                     pd = {**pd, **self._ep_dict}
                 return pd
+
         comps_simulation = COMPSSimulation.get(item.uid, query_criteria=QueryCriteriaExt().select(
             ['id', 'experiment_id']).select_children(
             ["files", "configuration"]).add_extra_params({'coalesceconfig': True}))
@@ -421,28 +417,16 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         for analyzer in analyzers:
             analyzer.per_group(items=items)
 
-    def get_item(self, id: uuid) -> TItem:
+    def get_item(self, id: UUID) -> TItem:
         # TODO: no options currently for loading a simulation or suite directly yet
-        successful = False
-        if not successful:
+        item = None
+        for lookup in [self._retrieve_suite, self._retrieve_experiment, self._retrieve_simulation]:
             try:
-                item = self._retrieve_suite(suite_id=id)
-                successful = True
+                item = lookup(id)
+                break
             except:
                 pass
-        if not successful:
-            try:
-                item = self._retrieve_experiment(experiment_id=id)
-                successful = True
-            except:
-                pass
-        if not successful:
-            try:
-                item = self._retrieve_simulation(simulation_id=id)
-                successful = True
-            except:
-                pass
-        if not successful:
+        if item is None:
             raise UnknownItemException(f'Unable to load item id: {id} from platform: {self.__class__.__name__}')
 
         item.platform = self
