@@ -27,53 +27,54 @@ class TestTasks(TestCase):
         except:
             pass
 
+    def setUp(self) -> None:
+        from idmtools_platform_local.tasks.create_experiment import CreateExperimentTask
+        self.experiment_id = CreateExperimentTask.perform(dict(a='b', c='d'), "s")
+        print(os.environ["DATA_PATH"])
+
     def test_create_experiment(self, mock_db):
         """
         Test Create experiment actor
         """
-        from idmtools_platform_local.tasks.create_experiment import CreateExperimentTask
-        new_task_id = CreateExperimentTask.perform(dict(a='b', c='d'), "s")
-        print(os.environ["DATA_PATH"])
-        self.assertIsInstance(new_task_id, str)
+
+        self.assertIsInstance(self.experiment_id, str)
 
         # Check that the data directory
-        self.assertTrue(os.path.exists(os.path.join(self.local_path, new_task_id)))
+        self.assertTrue(os.path.exists(os.path.join(self.local_path, self.experiment_id)))
         # Check for assets
-        self.assertTrue(os.path.exists(os.path.join(self.local_path, new_task_id, "Assets")))
+        self.assertTrue(os.path.exists(os.path.join(self.local_path, self.experiment_id, "Assets")))
 
     def test_create_simulation(self, mock_db):
         """
         Test create simulation actor
         """
         from idmtools_platform_local.tasks.create_simulation import CreateSimulationTask
-        exp_id = CreateExperimentTask.perform(dict(a='b', c='d'), "s")
-        new_simulation_id = CreateSimulationTask.perform(exp_id, dict(y="z"))
+        new_simulation_id = CreateSimulationTask.perform(self.experiment_id, dict(y="z"))
 
         # Check that the data directory
-        self.assertTrue(os.path.exists(os.path.join(self.local_path, exp_id)))
+        self.assertTrue(os.path.exists(os.path.join(self.local_path, self.experiment_id)))
         # Check for assets
-        self.assertTrue(os.path.exists(os.path.join(self.local_path, exp_id, "Assets")))
+        self.assertTrue(os.path.exists(os.path.join(self.local_path, self.experiment_id, "Assets")))
         # Check for simulation id
-        self.assertTrue(os.path.exists(os.path.join(self.local_path, exp_id, new_simulation_id)))
+        self.assertTrue(os.path.exists(os.path.join(self.local_path, self.experiment_id, new_simulation_id)))
 
     def test_run_task(self, mock_db):
         """
         Test run task actor
         """
         from idmtools_platform_local.tasks.create_simulation import CreateSimulationTask
-        exp_id = CreateExperimentTask.perform(dict(a='b', c='d'), "s")
-        new_simulation_id = CreateSimulationTask.perform(exp_id, dict(y="z"))
+        new_simulation_id = CreateSimulationTask.perform(self.experiment_id, dict(y="z"))
 
         # Check that the data directory
-        self.assertTrue(os.path.exists(os.path.join(self.local_path, exp_id)))
+        self.assertTrue(os.path.exists(os.path.join(self.local_path, self.experiment_id)))
         # Check for assets
-        self.assertTrue(os.path.exists(os.path.join(self.local_path, exp_id, "Assets")))
+        self.assertTrue(os.path.exists(os.path.join(self.local_path, self.experiment_id, "Assets")))
         # Check for simulation id
-        self.assertTrue(os.path.exists(os.path.join(self.local_path, exp_id, new_simulation_id)))
+        self.assertTrue(os.path.exists(os.path.join(self.local_path, self.experiment_id, new_simulation_id)))
 
         # copy simple model over. Since we are doing low-level testing, let's not use asset management here
         shutil.copy(os.path.join(COMMON_INPUT_PATH, 'python', 'hello_world.py'),
-                    os.path.join(self.local_path, exp_id, new_simulation_id))
+                    os.path.join(self.local_path, self.experiment_id, new_simulation_id))
 
-        status = RunTask.perform("python hello_world.py", exp_id, new_simulation_id)
+        status = RunTask.perform("python hello_world.py", self.experiment_id, new_simulation_id)
         self.assertEqual(status, Status.done)
