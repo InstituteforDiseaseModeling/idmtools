@@ -25,7 +25,8 @@ def prettify_simulation(simulation: Dict[str, Any]):
     """
     simulation['status'] = colorize_status(simulation['status'])
     simulation['data_path'] = urlize_data_path(simulation['data_path'])
-    return simulation
+    column_order = ("simulation_uid", "experiment_id", "status", "created", "tags", "extra_details", "updated", "data_path")
+    return {co: simulation[co] for co in column_order}
 
 
 def status(id: Optional[str], experiment_id: Optional[str], status: Optional[str],
@@ -46,7 +47,7 @@ def status(id: Optional[str], experiment_id: Optional[str], status: Optional[str
     from idmtools_cli.cli.utils import show_error
     try:
         if id is None:
-            simulations = SimulationsClient.get_all(status=status, tags=tags)
+            simulations = SimulationsClient.get_all(status=status, tags=tags, per_page=100)
         else:
             simulations = [SimulationsClient.get_one(id, status=status, tags=tags)]
         simulations = list(map(lambda x: prettify_simulation(x), simulations))

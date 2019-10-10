@@ -1,8 +1,8 @@
 import typing
 from idmtools.core import EntityStatus
+from idmtools.entities.iplatform import TPlatform
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.services.platforms import PlatformPersistService
-from idmtools.utils.entities import retrieve_experiment
 
 if typing.TYPE_CHECKING:
     from idmtools.entities.iexperiment import TExperiment
@@ -13,7 +13,7 @@ class ExperimentManager:
     Manages an experiment.
     """
 
-    def __init__(self, experiment: 'TExperiment', platform: 'TPlatform'):
+    def __init__(self, experiment: 'TExperiment', platform: TPlatform):
         """
         Constructor
         Args:
@@ -42,7 +42,7 @@ class ExperimentManager:
         self.experiment.pre_creation()
 
         # Create experiment
-        experiment_id = self.platform.create_items(items=[self.experiment])[0]
+        self.platform.create_items(items=[self.experiment])  # noqa: F841
 
         # Persist the platform
         PlatformPersistService.save(self.platform)
@@ -62,7 +62,6 @@ class ExperimentManager:
         for uid, simulation in zip(ids, simulation_batch):
             simulation.uid = uid
             simulation.post_creation()
-
         return simulation_batch
 
     def create_simulations(self):
@@ -71,7 +70,6 @@ class ExperimentManager:
         """
         from idmtools.config import IdmConfigParser
         from concurrent.futures.thread import ThreadPoolExecutor
-        from idmtools.core import EntityContainer
 
         # Consider values in COMMON section
         # _max_workers = IdmConfigParser.get_option("COMMON", "max_workers")

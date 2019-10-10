@@ -80,7 +80,8 @@ class TestAssetsInComps(unittest.TestCase):
         ac.tags = {"idmtools": "idmtools-automation", "string_tag": "testACtag", "number_tag": 123, "KeyOnly": None}
 
         pe = PythonExperiment(name=self.case_name,
-                              model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"), assets=ac)
+                              model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"),
+                              assets=ac)
         pe.tags = {"idmtools": "idmtools-automation"}
         pe.platform = self.platform
         self._run_and_test_experiment(pe)

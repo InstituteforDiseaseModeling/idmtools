@@ -2,10 +2,7 @@ from abc import ABCMeta
 from dataclasses import dataclass, field
 from idmtools.core import EntityStatus
 from idmtools.core.interfaces.ientity import IEntity
-
 import typing
-if typing.TYPE_CHECKING:
-    from idmtools.core.enums import EntityStatus
 
 
 @dataclass(repr=False)

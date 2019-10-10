@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import shutil
 
+
 def del_folder(path):
     if os.path.exists(path):
         shutil.rmtree(path)

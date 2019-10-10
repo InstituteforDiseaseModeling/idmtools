@@ -233,7 +233,8 @@ class TestPythonExperiment(ITestWithPersistence):
         model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
         ac = AssetCollection()
         a = Asset(relative_path="MyExternalLibrary",
-                  absolute_path=os.path.join(COMMON_INPUT_PATH, "python", "Assets", "MyExternalLibrary", "functions.py"))
+                  absolute_path=os.path.join(COMMON_INPUT_PATH, "python", "Assets", "MyExternalLibrary",
+                                             "functions.py"))
         ac.add_asset(a)
         pe = PythonExperiment(name=self.case_name, model_path=model_path, assets=ac)
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}

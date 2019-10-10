@@ -36,7 +36,7 @@ class TestAnalyzeManager(unittest.TestCase):
         self.configuration = {'max_processes': 2}
         self.platform = Platform('COMPS2')
         self.analyze_manager = self._get_analyze_manager()
-        item_id = ItemId([('simulation_id', '123'), ('experiment_id', '456')])
+        item_id = ItemId([('simulation_id', '123'), ('experiment_id', '456')])  # noqa: F841
         self.sample_item = self.TestItem(uid='abc')
         self.sample_analyzer = SampleAnalyzer()
 
@@ -107,13 +107,15 @@ class TestAnalyzeManager(unittest.TestCase):
         am = self._get_analyze_manager(ids=None, partial_analyze_ok=True, potential_items=item_set)
         items_to_analyze = am._get_items_to_analyze()
         self.assertEqual(len(items_to_analyze), 2)
-        self.assertEqual(set(items_to_analyze.keys()), {item.uid for item in item_set if item.status == EntityStatus.SUCCEEDED})
+        self.assertEqual(set(items_to_analyze.keys()),
+                         {item.uid for item in item_set if item.status == EntityStatus.SUCCEEDED})
 
         # test partial_ok False
         am = self._get_analyze_manager(ids=None, partial_analyze_ok=False, potential_items=item_set)
         items_to_analyze = am._get_items_to_analyze()
         self.assertEqual(len(items_to_analyze), 2)
-        self.assertEqual(set(items_to_analyze.keys()), {item.uid for item in item_set if item.status == EntityStatus.SUCCEEDED})
+        self.assertEqual(set(items_to_analyze.keys()),
+                         {item.uid for item in item_set if item.status == EntityStatus.SUCCEEDED})
 
         # test max_items 1
         am = self._get_analyze_manager(ids=None, max_items=1, potential_items=item_set)
@@ -135,7 +137,8 @@ class TestAnalyzeManager(unittest.TestCase):
         am = self._get_analyze_manager(ids=None, partial_analyze_ok=True, potential_items=item_set)
         items_to_analyze = am._get_items_to_analyze()
         self.assertEqual(len(items_to_analyze), 0)
-        self.assertEqual(set(items_to_analyze.keys()), {item.uid for item in item_set if item.status == EntityStatus.SUCCEEDED})
+        self.assertEqual(set(items_to_analyze.keys()),
+                         {item.uid for item in item_set if item.status == EntityStatus.SUCCEEDED})
 
         # test partial_ok False
         am = self._get_analyze_manager(ids=None, partial_analyze_ok=False, potential_items=item_set)
@@ -157,7 +160,8 @@ class TestAnalyzeManager(unittest.TestCase):
         am = self._get_analyze_manager(ids=None, partial_analyze_ok=True, potential_items=item_set)
         items_to_analyze = am._get_items_to_analyze()
         self.assertEqual(len(items_to_analyze), 1)
-        self.assertEqual(set(items_to_analyze.keys()), {item.uid for item in item_set if item.status == EntityStatus.SUCCEEDED})
+        self.assertEqual(set(items_to_analyze.keys()),
+                         {item.uid for item in item_set if item.status == EntityStatus.SUCCEEDED})
 
         # test partial_ok False
         am = self._get_analyze_manager(ids=None, partial_analyze_ok=False, potential_items=item_set)
@@ -171,7 +175,6 @@ class TestAnalyzeManager(unittest.TestCase):
         potential_items_uids = {item.uid for item in item_set if item.status == EntityStatus.SUCCEEDED}
         for actual_item_uid in items_to_analyze.keys():
             self.assertTrue(actual_item_uid in potential_items_uids)
-
 
     def test_add_analyzer(self):
         self.assertEqual(len(self.analyze_manager.analyzers), 0)

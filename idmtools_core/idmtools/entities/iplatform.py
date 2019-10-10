@@ -1,18 +1,16 @@
 import ast
-import uuid
 import typing
-
 from abc import ABCMeta, abstractmethod
 from dataclasses import fields
 from logging import getLogger
 from typing import Any, Dict, List, NoReturn
+from uuid import UUID
 
 from idmtools.core.interfaces.ientity import IEntity
 
 if typing.TYPE_CHECKING:
     from idmtools.entities.ianalyzer import TAnalyzerList
     from idmtools.entities.iitem import TItem, TItemList
-    import uuid
 
 logger = getLogger(__name__)
 
@@ -71,7 +69,7 @@ class IPlatform(IEntity, metaclass=ABCMeta):
         self.validate_inputs_types()
 
     @abstractmethod
-    def create_items(self, items: 'TItem') -> 'List[uuid]':
+    def create_items(self, items: 'TItem') -> 'List[UUID]':
         """
         Function creating e.g. sims/exps/suites on the platform
         Args:
@@ -109,7 +107,7 @@ class IPlatform(IEntity, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def get_item(self, id: 'uuid') -> Any:
+    def get_item(self, id: UUID) -> Any:
         """
         Get an item by its id. The implementing classes must know how to distinguish
         items of different levels (e.g. simulation, experiment, ...)

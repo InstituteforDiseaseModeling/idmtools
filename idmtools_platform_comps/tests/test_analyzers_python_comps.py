@@ -1,8 +1,5 @@
 import os
-import unittest
-
 from functools import partial
-
 from COMPS.Data import Experiment
 from idmtools.builders import ExperimentBuilder
 from idmtools.core.platform_factory import Platform
@@ -29,7 +26,6 @@ setD = partial(param_update, param="d")
 
 
 class TestAnalyzeManagerPythonComps(ITestWithPersistence):
-
 
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
@@ -67,13 +63,13 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         # self.exp_id = '9eacbb9a-5ecf-e911-a2bb-f0921c167866' #comps2 staging
 
     def test_DownloadAnalyzer(self):
-        #delete output from previous run
+        # delete output from previous run
         del_folder("output")
 
         # create a new empty 'output' dir
         os.mkdir("output")
         self.create_experiment()
-        filenames = ['output\\result.json', 'config.json']
+        filenames = ['output/result.json', 'config.json']
         analyzers = [DownloadAnalyzer(filenames=filenames, output_path='output')]
 
         am = AnalyzeManager(platform=self.p, ids=[self.exp_id], analyzers=analyzers)
@@ -85,7 +81,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
             self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "result.json")))
 
     def test_analyzer_multiple_experiments(self):
-        #delete output from previous run
+        # delete output from previous run
         del_folder("output")
 
         # create a new empty 'output' dir
@@ -103,4 +99,3 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
                 s = simulation.get(id=simulation.id)
                 self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "config.json")))
                 self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "result.json")))
-
