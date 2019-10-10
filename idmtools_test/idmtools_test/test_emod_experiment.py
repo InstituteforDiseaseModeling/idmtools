@@ -32,10 +32,10 @@ class TestExperiments(ITestWithPersistence):
         DEFAULT_ERADICATION_PATH = os.path.join(COMMON_INPUT_PATH, "custom", "Eradication.exe")
 
         experiment = EMODExperiment.from_files(self.case_name,
-                                              eradication_path=DEFAULT_ERADICATION_PATH,
-                                              config_path=DEFAULT_CONFIG_PATH,
-                                              campaign_path=DEFAULT_CAMPAIGN_JSON,
-                                              demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)
+                                               eradication_path=DEFAULT_ERADICATION_PATH,
+                                               config_path=DEFAULT_CONFIG_PATH,
+                                               campaign_path=DEFAULT_CAMPAIGN_JSON,
+                                               demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)
         experiment.tags = {"idmtools": "idmtools-automation", "catch": "sianyoola", "rcd": "false"}
         experiment.name = 'malaria_sianyoola_interventions'
 

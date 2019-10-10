@@ -1,8 +1,10 @@
 import logging
+from multiprocessing import cpu_count
 from typing import List
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import sessionmaker, Session
+
 
 from idmtools_platform_local.config import SQLALCHEMY_ECHO, SQLALCHEMY_DATABASE_URI
 
@@ -29,7 +31,7 @@ def get_session() -> Session:
 def get_db() -> Engine:
     global engine
     if engine is None:
-        engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=SQLALCHEMY_ECHO, pool_size=32)
+        engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=SQLALCHEMY_ECHO, pool_size=cpu_count())
     return engine
 
 

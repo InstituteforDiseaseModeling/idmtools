@@ -1,18 +1,19 @@
 
 import re
 import time
-
-import pytest
-from click._compat import strip_ansi
-from idmtools_platform_local.status import Status
 import unittest
 import unittest.mock
-from idmtools_platform_local.workers.utils import create_or_update_status
+import os
+import pytest
+from click._compat import strip_ansi
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+os.environ['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://idmtools:idmtools@localhost/idmtools'
 from idmtools_platform_local.docker.docker_operations import DockerOperations
-from idmtools_test.utils.confg_local_runner_test import get_test_local_env_overrides
+from idmtools_platform_local.status import Status
+from idmtools_platform_local.workers.utils import create_or_update_status
 from idmtools_test.utils.cli import get_subcommands_from_help_result, run_command
+from idmtools_test.utils.confg_local_runner_test import get_test_local_env_overrides
 
 
 class TestLocalCLIBasic(unittest.TestCase):

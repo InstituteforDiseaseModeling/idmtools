@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# flake8: noqa W291,E701
 #
 # Author: Mike McKerns (mmckerns @caltech and @uqfoundation)
 # Copyright (c) 2008-2016 California Institute of Technology.

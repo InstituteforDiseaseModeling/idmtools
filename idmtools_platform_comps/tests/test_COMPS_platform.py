@@ -136,8 +136,8 @@ class TestCOMPSPlatform(ITestWithPersistence):
             raise Exception('NO CHILDREN')
 
         for s in experiment.children():
-            self.assertTrue((s.tags["P"] == '2' and s.status == EntityStatus.FAILED) or
-                            s.status == EntityStatus.SUCCEEDED)
+            self.assertTrue((s.tags["P"] == '2' and s.status == EntityStatus.FAILED) or  # noqa: W504
+                            (s.status == EntityStatus.SUCCEEDED))
 
     def test_from_experiment(self):
         experiment = PythonExperiment(name=self.case_name,

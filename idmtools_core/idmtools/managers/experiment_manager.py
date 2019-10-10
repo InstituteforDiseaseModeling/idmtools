@@ -2,6 +2,7 @@ import typing
 from logging import getLogger
 
 from idmtools.core import EntityStatus
+from idmtools.entities.iplatform import TPlatform
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.services.platforms import PlatformPersistService
 
@@ -17,7 +18,7 @@ class ExperimentManager:
     Manages an experiment.
     """
 
-    def __init__(self, experiment: 'TExperiment', platform: 'TPlatform'):
+    def __init__(self, experiment: 'TExperiment', platform: TPlatform):
         """
         Constructor
         Args:
@@ -46,7 +47,7 @@ class ExperimentManager:
         self.experiment.pre_creation()
 
         # Create experiment
-        experiment_id = self.platform.create_items(items=[self.experiment])[0]
+        self.platform.create_items(items=[self.experiment])  # noqa: F841
 
         # Persist the platform
         PlatformPersistService.save(self.platform)
@@ -67,7 +68,6 @@ class ExperimentManager:
         for uid, simulation in zip(ids, simulation_batch):
             simulation.uid = uid
             simulation.post_creation()
-
         return simulation_batch
 
     def create_simulations(self):
@@ -77,8 +77,9 @@ class ExperimentManager:
         from concurrent.futures.thread import ThreadPoolExecutor
 
         with ThreadPoolExecutor(max_workers=16) as executor:
-            results = executor.map(self.simulation_batch_worker_thread,
-                                   self.experiment.batch_simulations(batch_size=10))
+            executor.map(self.simulation_batch_worker_thread,  # noqa: F841
+                        self.experiment.batch_simulations(batch_size=10))
+
         self.experiment.children().set_status(EntityStatus.CREATED)
 
     def start_experiment(self):

@@ -7,13 +7,17 @@ from idmtools.entities import IAnalyzer
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 class TimeseriesAnalyzer(IAnalyzer):
     data_group_names = ['group', 'sim_id', 'channel']
     ordered_levels = ['channel', 'group', 'sim_id']
     output_file = 'timeseries.csv'
 
     def __init__(self, filenames=[os.path.join('output', 'InsetChart.json')], channels=('Statistical Population',
-                           'Infectious Population','Infected', 'Waning Population'), save_output=True, working_dir="."):
+                                                                                        'Infectious Population',
+                                                                                        'Infected',
+                                                                                        'Waning Population'),
+                 save_output=True, working_dir="."):
 
         super(TimeseriesAnalyzer, self).__init__(filenames=filenames, working_dir=working_dir)
         self.channels = set(channels)
@@ -92,18 +96,17 @@ class TimeseriesAnalyzer(IAnalyzer):
         self.plot_by_channel(channels, plot_fn)
 
         plt.legend()
-        #plt.show()
+        # plt.show()
         plt.savefig(os.path.join(analyzer_path, 'timeseries.png'))
 
 
 if __name__ == "__main__":
-
     platform = Platform('COMPS2')
 
-    exp_id = '65a93d51-04db-e911-a2be-f0921c167861' # comps2 exp_id
+    exp_id = '3dda8b9b-b5ea-e911-a2be-f0921c167861'  # comps2 exp_id
 
     filenames = ['output/InsetChart.json']
     analyzers = [TimeseriesAnalyzer(filenames=filenames)]
 
-    manager = AnalyzeManager( platform=platform, ids=[exp_id], analyzers=analyzers)
+    manager = AnalyzeManager(platform=platform, ids=[exp_id], analyzers=analyzers)
     manager.analyze()

@@ -10,17 +10,27 @@ class ExperimentsClient(BaseClient):
     base_url = f'{API_PATH}/experiments'
 
     @classmethod
-    def get_all(cls, tags: Optional[List[Tuple[str, str]]] = None) -> List[Dict[str, Any]]:
+    def get_all(cls, tags: Optional[List[Tuple[str, str]]] = None,
+                page: Optional[int] = None, per_page: Optional[int] = None) -> List[Dict[str, Any]]:
         """
         Get all experiments with options to filter by tags
 
         Args:
+            per_page: How many experiments to return per page
+            page: Which page
             tags (Optional[List[Tuple[str, str]]]): List of tags/values to filter experiment by
 
         Returns:
             List[Dict[str, Any]]: returns list of experiments
         """
         args = cls._get_arguments(tags)
+
+        if page:
+            args['page'] = page
+
+        if per_page:
+            args['per_page'] = per_page
+
         response = cls.get(None, params=args)
         result = cls._validate_response(response, 'Experiments')
         return result
@@ -39,7 +49,7 @@ class ExperimentsClient(BaseClient):
         """
         args = cls._get_arguments(tags)
         response = cls.get(id, params=args)
-        result = cls._validate_response(response, 'Experiments')
+        result = cls._validate_response(response, 'Experiments', id=id)
         return result
 
     @classmethod

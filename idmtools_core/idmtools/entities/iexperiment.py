@@ -122,7 +122,7 @@ class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
 
                 simulation.tags = tags
                 sims.append(simulation)
-                
+
             yield sims
 
     def simulation(self):

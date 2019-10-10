@@ -6,12 +6,14 @@ from idmtools.assets.asset_collection import AssetCollection
 if typing.TYPE_CHECKING:
     from idmtools.assets import TAssetCollection
 
+
 @dataclass
 class IAssetsEnabled(metaclass=ABCMeta):
     """
     Base class for objects containing an asset collection
     """
-    assets: 'TAssetCollection' = field(default_factory=lambda: AssetCollection(), compare=False, metadata={"pickle_ignore": True})
+    assets: 'TAssetCollection' = field(default_factory=lambda: AssetCollection(), compare=False,
+                                       metadata={"pickle_ignore": True})
 
     def __post_init__(self):
         pass

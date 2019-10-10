@@ -36,9 +36,9 @@ setup(
     name='idmtools_test',
     packages=find_packages(),
     setup_requires=setup_requirements,
-    entry_points=dict(idmtools_platform=
+    entry_points=dict(idmtools_platform=  # noqa: E251
                       ["idmtools_platform_test = idmtools_test.utils.test_platform:TestPlatformSpecification"],
-                      idmtools_model=
+                      idmtools_model=  # noqa: E251
                       ["idmtools_model_test = idmtools_test.utils.tst_experiment_spec:TstExperimentSpec"]
                       ),
     test_suite='tests',
