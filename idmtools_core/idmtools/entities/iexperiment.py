@@ -14,6 +14,7 @@ if typing.TYPE_CHECKING:
     from idmtools.core.types import TSimulation, TSimulationClass, TExperimentBuilder
     from idmtools.entities.command_line import TCommandLine
 
+
 @dataclass(repr=False)
 class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
     """
@@ -34,11 +35,7 @@ class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
     base_simulation: 'TSimulation' = field(default=None, compare=False, metadata={"pickle_ignore": True})
     builders: set = field(default_factory=lambda: set(), compare=False, metadata={"pickle_ignore": True})
     simulations: EntityContainer = field(default_factory=lambda: EntityContainer(), compare=False,
-                                           metadata={"pickle_ignore": True})
-
-    # @property
-    # def simulations(self):
-    #     return self.children(refresh=False)
+                                         metadata={"pickle_ignore": True})
 
     def __post_init__(self, simulation_type):
         super().__post_init__()
@@ -104,17 +101,17 @@ class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
         display(self, experiment_table_display)
 
     def batch_simulations(self, batch_size=5):
-        # make sure each simulation has experiment
+        # Make sure each simulation has platform and parent_id
         if self.simulations:
             for sim in self.simulations:
-                sim.experiment = self
+                sim.platform = self.platform
+                sim.parent_id = self.uid
 
         # Consider simulations first
         for groups in grouper(self.simulations, batch_size):
             sims = []
             for sim in filter(None, groups):
                 sims.append(sim)
-
             yield sims
 
         # Consider builders next
@@ -136,7 +133,7 @@ class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
 
                 simulation.tags = tags
                 sims.append(simulation)
-                
+
             yield sims
 
     def simulation(self):

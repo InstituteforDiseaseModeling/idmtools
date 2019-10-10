@@ -85,16 +85,9 @@ class ExperimentManager:
         _batch_size = int(_batch_size) if _batch_size else 10
 
         with ThreadPoolExecutor(max_workers=_max_workers) as executor:
-            results = executor.map(self.simulation_batch_worker_thread,
-                                   self.experiment.batch_simulations(batch_size=_batch_size))
+            executor.map(self.simulation_batch_worker_thread,
+                         self.experiment.batch_simulations(batch_size=_batch_size))
 
-        _sims = EntityContainer()
-        for sim_batch in results:
-            for simulation in sim_batch:
-                _sims.append(simulation.metadata)
-                _sims.set_status(EntityStatus.CREATED)
-
-        self.experiment.simulations = _sims
         self.experiment.children().set_status(EntityStatus.CREATED)
 
     def start_experiment(self):
