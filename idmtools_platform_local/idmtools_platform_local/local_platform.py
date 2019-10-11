@@ -3,20 +3,19 @@ import functools
 import logging
 import os
 from collections import defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from logging import getLogger
 from pathlib import Path
-from typing import Dict, List, NoReturn, Optional, Union
+from typing import Dict, List, NoReturn, Optional
 from uuid import UUID
 
 from docker.models.containers import Container
 
 from idmtools.assets import Asset
-from idmtools.core import ItemType, UnknownItemException
+from idmtools.core import ItemType
 from idmtools.core.experiment_factory import experiment_factory
 from idmtools.core.interfaces.iitem import TItem, TItemList
 from idmtools.entities import IExperiment, IPlatform
-from idmtools.entities.iexperiment import TExperiment
 from idmtools.entities.isimulation import ISimulation, TSimulation
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
 from idmtools_platform_local.client.simulations_client import SimulationsClient
@@ -46,23 +45,24 @@ class LocalPlatform(IPlatform):
     Represents the platform allowing to run simulations locally.
     """
 
-    host_data_directory: str = os.path.join(str(Path.home()), '.local_data')
-    network: str = 'idmtools'
-    redis_image: str = 'redis:5.0.4-alpine'
-    redis_port: int = 6379
-    runtime: Optional[str] = None
-    redis_mem_limit: str = '128m'
-    redis_mem_reservation: str = '64m'
-    postgres_image: str = 'postgres:11.4'
-    postgres_mem_limit: str = '64m'
-    postgres_mem_reservation: str = '32m'
-    postgres_port: Optional[str] = 5432
-    workers_image: str = default_image
-    workers_ui_port: int = 5000
-    default_timeout: int = 45
-    run_as: Optional[str] = None
+    host_data_directory: str = field(default=os.path.join(str(Path.home()), '.local_data'))
+    network: str = field(default='idmtools')
+    redis_image: str = field(default='redis:5.0.4-alpine')
+    redis_port: int = field(default=6379)
+    runtime: Optional[str] = field(default=None)
+    redis_mem_limit: str = field(default='128m')
+    redis_mem_reservation: str = field(default='64m')
+    postgres_image: str = field(default='postgres:11.4')
+    postgres_mem_limit: str = field(default='64m')
+    postgres_mem_reservation: str = field(default='32m')
+    postgres_port: Optional[str] = field(default=5432)
+    workers_image: str = field(default=default_image)
+    workers_ui_port: int = field(default=5000)
+    default_timeout: int = field(default=45)
+    run_as: Optional[str] = field(default=None)
+
     # We use this to manage our docker containers
-    _docker_operations: Optional[DockerOperations] = dataclasses.field(default=None, metadata={"pickle_ignore": True})
+    _docker_operations: Optional[DockerOperations] = field(default=None, metadata={"pickle_ignore": True})
 
     def __post_init__(self):
         super().__post_init__()
