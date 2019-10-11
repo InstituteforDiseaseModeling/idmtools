@@ -1,12 +1,12 @@
 import typing
 from abc import ABCMeta
 from dataclasses import dataclass, field, fields, _MISSING_TYPE
-from uuid import UUID
 
 from idmtools.utils.hashing import hash_obj
 
 if typing.TYPE_CHECKING:
     from idmtools.core import TTags
+    from uuid import UUID
 
 
 @dataclass(unsafe_hash=True)
@@ -14,8 +14,8 @@ class IEntity(metaclass=ABCMeta):
     """
     Interface for all entities in the system.
     """
-    _uid: UUID = field(default=None, metadata={"md": True})
-    platform_id: int = field(default=None, metadata={"md": True})
+    _uid: 'UUID' = field(default=None, metadata={"md": True})
+    platform_id: 'UUID' = field(default=None, metadata={"md": True})
     tags: 'TTags' = field(default_factory=lambda: {}, metadata={"md": True})
 
     @property

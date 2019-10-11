@@ -37,10 +37,6 @@ class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
     simulations: EntityContainer = field(default_factory=lambda: EntityContainer(), compare=False,
                                          metadata={"pickle_ignore": True})
 
-    # @property
-    # def simulations(self):
-    #     return self.children(refresh=False)
-
     def __post_init__(self, simulation_type):
         super().__post_init__()
         self.simulations = self.simulations or EntityContainer()
@@ -105,8 +101,23 @@ class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
         display(self, experiment_table_display)
 
     def batch_simulations(self, batch_size=5):
+        # Make sure each simulation has platform and parent_id
+        if self.simulations:
+            for sim in self.simulations:
+                sim.platform = self.platform
+                sim.parent_id = self.uid
+
+        # Consider simulations first
+        for groups in grouper(self.simulations, batch_size):
+            sims = []
+            for sim in filter(None, groups):
+                sims.append(sim)
+            yield sims
+
+        # Consider builders next
         if not self.builders:
-            yield (self.simulation(),)
+            if not self.simulations:
+                yield (self.simulation(),)
             return
 
         for groups in grouper(chain(*self.builders), batch_size):
