@@ -3,7 +3,7 @@ from abc import ABCMeta
 from dataclasses import dataclass, field
 from uuid import UUID
 
-from idmtools.core import EntityStatus, ItemType
+from idmtools.core import EntityStatus, ItemType, NoPlatformException
 from idmtools.core.interfaces.iitem import IItem
 
 if typing.TYPE_CHECKING:
@@ -16,11 +16,7 @@ class IEntity(IItem, metaclass=ABCMeta):
     """
     Interface for all entities in the system.
     """
-
-    class NoPlatformException(Exception):
-        pass
-
-    platform_id: 'UUID' = field(default=None, metadata={"md": True})
+    platform_id: 'UUID' = field(default=None, compare=False, metadata={"md": True})
     _platform: 'TPlatform' = field(default=None, compare=False, metadata={"pickle_ignore": True})
     parent_id: 'UUID' = field(default=None, metadata={"md": True})
     _parent: 'IEntity' = field(default=None, compare=False, metadata={"pickle_ignore": True})
@@ -34,7 +30,7 @@ class IEntity(IItem, metaclass=ABCMeta):
             if not self.parent_id:
                 return None
             if not self.platform:
-                raise self.NoPlatformException("The object has no platform set...")
+                raise NoPlatformException("The object has no platform set...")
             self._parent = self.platform.get_parent(self.parent_id, self.item_type)
 
         return self._parent
@@ -61,7 +57,7 @@ class IEntity(IItem, metaclass=ABCMeta):
 
     def get_platform_object(self, force=False, **kwargs):
         if not self.platform:
-            raise self.NoPlatformException("The object has no platform set...")
+            raise NoPlatformException("The object has no platform set...")
 
         return self.platform.get_item(self.uid, self.item_type, raw=True, force=force, **kwargs)
 

@@ -77,16 +77,15 @@ class LocalPlatform(IPlatform):
             # start the services
             self._docker_operations.create_services()
 
-    def _get_platform_item(self, item_id, item_type, **kwargs):
+    def get_platform_item(self, item_id, item_type, **kwargs):
         if item_type == ItemType.EXPERIMENT:
             experiment_dict = ExperimentsClient.get_one(item_id)
             experiment = experiment_factory.create(experiment_dict['tags'].get("type"), tags=experiment_dict['tags'])
             experiment.uid = experiment_dict['experiment_id']
-            experiment.platform = self
             return experiment
         elif item_type == ItemType.SIMULATION:
             simulation_dict = SimulationsClient.get_one(item_id)
-            experiment = self._get_platform_item(simulation_dict["experiment_id"], ItemType.EXPERIMENT)
+            experiment = self.get_platform_item(simulation_dict["experiment_id"], ItemType.EXPERIMENT)
             simulation = experiment.simulation()
             simulation.uid = simulation_dict['simulation_uid']
             simulation.tags = simulation_dict['tags']
@@ -102,6 +101,7 @@ class LocalPlatform(IPlatform):
     def get_children_for_platform_item(self, platform_item, raw, **kwargs):
         if isinstance(platform_item, IExperiment):
             platform_item.simulations.clear()
+
             # Retrieve the simulations for the current page
             simulation_dict = SimulationsClient.get_all(experiment_id=platform_item.uid, per_page=9999)
 
@@ -111,16 +111,13 @@ class LocalPlatform(IPlatform):
                 sim.uid = sim_info['simulation_uid']
                 sim.tags = sim_info['tags']
                 sim.status = local_status_to_common(sim_info['status'])
-                sim.platform = self
                 platform_item.simulations.append(sim)
 
             return platform_item.simulations
 
-        return None
-
     def get_parent_for_platform_item(self, platform_item, raw, **kwargs):
         if isinstance(platform_item, ISimulation):
-            return self._get_platform_item(platform_item.parent_id, ItemType.EXPERIMENT)
+            return self.get_platform_item(platform_item.parent_id, ItemType.EXPERIMENT)
         return None
 
     def _create_batch(self, batch:'TEntityList', item_type:'ItemType') -> 'List[UUID]':
@@ -183,7 +180,7 @@ class LocalPlatform(IPlatform):
             raise Exception(f'Unknown how to refresh items of type {type(item)} '
                             f'for platform: {self.__class__.__name__}')
         elif isinstance(item, IExperiment):
-            status = SimulationsClient.get_all(experiment_id=item.uid, per_page=99999)
+            status = SimulationsClient.get_all(experiment_id=item.uid, per_page=9999)
             for s in item.simulations:
                 sim_status = [st for st in status if st['simulation_uid'] == s.uid]
 

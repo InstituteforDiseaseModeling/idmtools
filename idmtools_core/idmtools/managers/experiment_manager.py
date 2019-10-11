@@ -1,5 +1,5 @@
 import typing
-from idmtools.core import EntityStatus
+from idmtools.core import EntityStatus, ItemType
 from idmtools.entities.iplatform import TPlatform
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.services.platforms import PlatformPersistService
@@ -25,7 +25,7 @@ class ExperimentManager:
 
     @classmethod
     def from_experiment_id(cls, experiment_id, platform):
-        experiment = platform.get_item(id=experiment_id)
+        experiment = platform.get_item(item_id=experiment_id, item_type=ItemType.EXPERIMENT)
         platform = PlatformPersistService.retrieve(experiment.platform.uid)
         # cache miss, add the platform
         if platform is None:

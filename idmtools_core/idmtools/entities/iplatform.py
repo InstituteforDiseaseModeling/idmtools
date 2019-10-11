@@ -7,7 +7,7 @@ from logging import getLogger
 
 from idmtools.core.interfaces.ientity import IEntity, TEntityList, TEntity
 from idmtools.core.interfaces.iitem import IItem
-from idmtools.core import CacheEnabled, ItemType
+from idmtools.core import CacheEnabled, ItemType, UnknownItemException
 
 if typing.TYPE_CHECKING:
     from idmtools.core.interfaces.iitem import TItem, TItemList
@@ -129,7 +129,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         return items
 
     @abstractmethod
-    def _get_platform_item(self, item_id, item_type, **kwargs):
+    def get_platform_item(self, item_id, item_type, **kwargs):
         pass
 
     @abstractmethod
@@ -170,17 +170,18 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         # If we cannot find the object in the cache -> retrieve depending on the type
         if cache_key not in self.cache:
-            ce = self._get_platform_item(item_id, item_type, **kwargs)
+            ce = self.get_platform_item(item_id, item_type, **kwargs)
 
             # Nothing was found on the platform
             if not ce:
-                raise Exception(f"Object {item_type} {item_id} not found on the platform...")
+                raise UnknownItemException(f"Object {item_type} {item_id} not found on the platform...")
 
             # Create the object if we do not want it raw
             if raw:
                 return_object = ce
             else:
                 return_object = self._platform_item_to_entity(ce, **kwargs)
+                return_object.platform = self
 
             # Persist
             self.cache.set(cache_key, return_object, expire=self._object_cache_expiration)
@@ -190,29 +191,29 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         return return_object
 
-    def get_children(self, object_id: 'uuid', object_type: 'ItemType' = None, force: 'bool' = False,
-                     raw: 'bool' = False, **kwargs) -> 'any':
+    def get_children(self, item_id: 'uuid', item_type: 'ItemType',
+                     force: 'bool' = False, raw: 'bool' = False, **kwargs) -> 'any':
         """
         Get the children of a given object.
 
         Args:
-            object_id: id of the object for which we want the children
+            item_id: id of the object for which we want the children
             force: Force the object fetching from the platform
             raw: Return either an idmtools object or a platform object
-            object_type: Pass the type of the object for quicker retrieval
+            item_type: Pass the type of the object for quicker retrieval
 
         Returns: Children of the object or None
 
         """
-        if not object_type or object_type not in self.supported_types:
+        if not item_type or item_type not in self.supported_types:
             raise Exception("The provided type is invalid or not supported by this platform...")
 
-        cache_key = f"c_{object_id}" + ('r' if raw else 'o')
+        cache_key = f"c_{item_id}" + ('r' if raw else 'o') + '_'.join(f"{k}_{v}" for k, v in kwargs.items())
         if force:
             self.cache.delete(cache_key)
 
         if cache_key not in self.cache:
-            ce = self.get_item(object_id, raw=True, item_type=object_type)
+            ce = self.get_item(item_id, raw=True, item_type=item_type)
             children = self.get_children_for_platform_item(ce, raw=raw, **kwargs)
             self.cache.set(cache_key, children, expire=self._object_cache_expiration)
             return children
@@ -236,7 +237,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         if not object_type or object_type not in self.supported_types:
             raise Exception("The provided type is invalid or not supported by this platform...")
 
-        cache_key = f'p_{object_id}' + ('r' if raw else 'o')
+        cache_key = f'p_{object_id}' + ('r' if raw else 'o') + '_'.join(f"{k}_{v}" for k, v in kwargs.items())
 
         if force:
             self.cache.delete(cache_key)

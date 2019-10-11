@@ -11,10 +11,9 @@ class TestUtils(ITestWithPersistence):
 
     def test_retrieve_experiment(self):
         # Test missing
-        with self.assertRaises(UnknownItemException) as context:
+        with self.assertRaises(UnknownItemException):
             retrieve_experiment("Missing", Platform('Test'))
-        self.assertTrue("Unable to load item id: Missing from platform: TestPlatform" in
-                        str(context.exception.args[0]))
+
         # Test correct retrieval
         e = TstExperiment("test")
         ExperimentPersistService.save(e)
@@ -31,7 +30,7 @@ class TestUtils(ITestWithPersistence):
         with self.assertRaises(ExperimentNotFound):
             e2 = retrieve_experiment(e.uid)
         e2 = retrieve_experiment(e.uid, p)
-        self.assertEqual(e2, e)
+        self.assertEqual(e2.metadata, e.metadata)
 
 
 if __name__ == '__main__':

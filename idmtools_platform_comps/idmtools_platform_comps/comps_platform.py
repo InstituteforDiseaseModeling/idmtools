@@ -174,7 +174,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         for item in items:
             item.get_platform_object().commission()
 
-    def _get_platform_item(self, item_id, item_type, **kwargs):
+    def get_platform_item(self, item_id, item_type, **kwargs):
         # Retrieve the eventual columns/children arguments
         cols = kwargs.get('columns')
         children = kwargs.get('children')
@@ -204,7 +204,6 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                                                    name=platform_item.name)
             # Set the correct attributes
             experiment.uid = platform_item.id
-            experiment.platform = self
             experiment.comps_experiment = platform_item
             return experiment
         elif isinstance(platform_item, COMPSSimulation):
