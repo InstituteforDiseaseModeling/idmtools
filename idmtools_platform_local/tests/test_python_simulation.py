@@ -1,7 +1,7 @@
 import os
 import pytest
 from importlib import reload
-from idmtools.core import EntityStatus
+from idmtools.core import EntityStatus, ItemType
 from idmtools_platform_local.docker.docker_operations import DockerOperations
 from operator import itemgetter
 from idmtools.assets import AssetCollection
@@ -96,8 +96,8 @@ class TestPythonSimulation(ITestWithPersistence):
 
         with self.subTest('test_retrieve_experiment_restore_sims'):
             # test we can fetch the experiment as well
-            oe = platform.get_item(pe.uid)
-            platform.restore_simulations(oe)
+            oe = platform.get_item(pe.uid, ItemType.EXPERIMENT)
+            oe.refresh_simulations()
             self.assertEqual(pe.uid, oe.uid)
             self.assertEqual(pe.simulation_type, oe.simulation_type)
             self.assertEqual(len(pe.simulations), len(oe.simulations))

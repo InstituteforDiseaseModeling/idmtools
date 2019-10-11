@@ -53,6 +53,7 @@ class TestExperimentSimulations(ITestWithPersistence):
         sim2 = EMODSimulation()
         sim2.load_files(config_path=DEFAULT_CONFIG_PATH, campaign_path=DEFAULT_CAMPAIGN_JSON,
                         demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)
+        sim2.experiment = exp
         exp.simulations.append(sim2)
 
         platform = Platform('COMPS2')
@@ -62,19 +63,14 @@ class TestExperimentSimulations(ITestWithPersistence):
 
         # Check simulations
         sims = em.experiment.simulations
-        children = em.experiment.children()
 
-        self.assertEqual(len(sims), 2)
-        self.assertEqual(len(children), 2 + num_sims)
+        self.assertEqual(len(sims), 7)
 
     def test_simulation_experiment(self):
         exp = EMODExperiment()
         sim = exp.simulation()
 
-        with self.assertRaises(Exception) as context:
-            print(sim.experiment)
-        self.assertIn('Items require a platform object to resolve their parent_id to an object',
-                      context.exception.args[0])
+        self.assertEqual(sim.experiment, exp)
 
 
 if __name__ == '__main__':
