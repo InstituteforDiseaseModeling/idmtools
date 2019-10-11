@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from logging import getLogger
 from threading import get_ident
 
-from diskcache import Cache, DEFAULT_SETTINGS, BoundedSemaphore
+from diskcache import Cache, DEFAULT_SETTINGS
 
 MAX_CACHE_SIZE = int(2 ** 33)  # 8GB
 DEFAULT_SETTINGS["size_limit"] = MAX_CACHE_SIZE
