@@ -115,7 +115,6 @@ class TestCopy(ITestWithPersistence):
         sp = copy.deepcopy(sim)
         self.assertEqual(len(sp.assets.assets), 0)
         self.assertEqual(sim, sp)
-        self.assertDictEqual(vars(sim), vars(sp))
 
     @pytest.mark.comps
     @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
