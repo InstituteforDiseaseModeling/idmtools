@@ -32,11 +32,8 @@ class ExperimentManager:
             PlatformPersistService.save(obj=experiment.platform)
             platform = PlatformPersistService.retrieve(experiment.platform.uid)
         em = cls(experiment, platform)
-        em.restore_simulations()
+        experiment.refresh_simulations()
         return em
-
-    def restore_simulations(self):
-        self.experiment.children(refresh=True)
 
     def create_experiment(self):
         self.experiment.pre_creation()
@@ -71,14 +68,17 @@ class ExperimentManager:
         from concurrent.futures.thread import ThreadPoolExecutor
 
         with ThreadPoolExecutor(max_workers=16) as executor:
-            executor.map(self.simulation_batch_worker_thread,  # noqa: F841
+            results = executor.map(self.simulation_batch_worker_thread,  # noqa: F841
                         self.experiment.batch_simulations(batch_size=10))
 
-        self.experiment.children().set_status(EntityStatus.CREATED)
+        for sim_batch in results:
+            for simulation in sim_batch:
+                self.experiment.simulations.append(simulation.metadata)
+                self.experiment.simulations.set_status(EntityStatus.CREATED)
 
     def start_experiment(self):
         self.platform.run_items([self.experiment])
-        self.experiment.children().set_status(EntityStatus.RUNNING)
+        self.experiment.simulations.set_status(EntityStatus.RUNNING)
 
     def run(self):
         """
@@ -117,5 +117,5 @@ class ExperimentManager:
         raise TimeoutError(f"Timeout of {timeout} seconds exceeded when monitoring experiment {self.experiment}")
 
     def refresh_status(self):
-        self.experiment = self.platform.refresh_status(item=self.experiment)
+        self.platform.refresh_status(item=self.experiment)
         ExperimentPersistService.save(self.experiment)

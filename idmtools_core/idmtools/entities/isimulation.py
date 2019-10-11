@@ -1,16 +1,31 @@
 import typing
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
-from idmtools.entities.iroot_item import IRootItem
+
+from idmtools.core import ObjectType
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
+from idmtools.core.interfaces.ientity import IEntity
+from idmtools.entities.iroot_item import IRootItem
 
 
 @dataclass
-class ISimulation(IRootItem, IAssetsEnabled, metaclass=ABCMeta):
+class ISimulation(IAssetsEnabled, IEntity, metaclass=ABCMeta):
     """
     Represents a generic Simulation.
     This class needs to be implemented for each model type with specifics.
     """
+
+    def __post_init__(self):
+        super().__post_init__()
+        self.object_type = ObjectType.SIMULATION
+
+    @property
+    def experiment(self):
+        return self.parent
+
+    @experiment.setter
+    def experiment(self, experiment):
+        self.parent = experiment
 
     @abstractmethod
     def set_parameter(self, name: str, value: any) -> dict:
@@ -68,10 +83,6 @@ class ISimulation(IRootItem, IAssetsEnabled, metaclass=ABCMeta):
         Gather all the assets for the simulation.
         """
         pass
-
-    @property
-    def experiment(self):
-        return self.parent(refresh=False)
 
 
 TSimulation = typing.TypeVar("TSimulation", bound=ISimulation)
