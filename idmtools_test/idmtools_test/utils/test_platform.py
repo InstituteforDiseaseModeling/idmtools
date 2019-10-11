@@ -137,9 +137,6 @@ class TestPlatform(IPlatform):
     def send_assets(self, item: 'TItem', **kwargs):
         pass
 
-    def refresh_status(self, item):
-        pass
-
     def get_files(self, item: 'TItem', files: 'List[str]') -> Dict[str, bytearray]:
         pass
 
