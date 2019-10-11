@@ -33,7 +33,7 @@ class TestExperimentSimulations(ITestWithPersistence):
         super().tearDown()
 
     def test_input_simulations(self):
-        # Create en experiment
+        # Create an experiment
         exp = EMODExperiment.from_default('simulation_test', default=EMODSir, eradication_path=DEFAULT_ERADICATION_PATH)
         exp.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         exp.base_simulation.load_files(demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)
