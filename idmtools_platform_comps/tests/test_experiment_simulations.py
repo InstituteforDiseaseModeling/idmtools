@@ -55,7 +55,7 @@ class TestExperimentSimulations(ITestWithPersistence):
                         demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)
         exp.simulations.append(sim2)
 
-        platform = Platform('COMPS')
+        platform = Platform('COMPS2')
         em = ExperimentManager(platform=platform, experiment=exp)
         em.create_experiment()
         em.create_simulations()
@@ -65,7 +65,7 @@ class TestExperimentSimulations(ITestWithPersistence):
         children = em.experiment.children()
 
         self.assertEqual(len(sims), 2)
-        self.assertEqual(len(children), 5)
+        self.assertEqual(len(children), 2 + num_sims)
 
     def test_simulation_experiment(self):
         exp = EMODExperiment()
