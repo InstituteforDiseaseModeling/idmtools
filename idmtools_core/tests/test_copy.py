@@ -1,5 +1,7 @@
 import os
 import copy
+import unittest.mock
+import pytest
 from functools import partial
 from idmtools_model_emod.defaults import EMODSir
 from idmtools_model_emod import EMODExperiment
@@ -115,7 +117,9 @@ class TestCopy(ITestWithPersistence):
         self.assertEqual(sim, sp)
         self.assertDictEqual(vars(sim), vars(sp))
 
-    def test_deepcopy_platform(self):
+    @pytest.mark.comps
+    @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
+    def test_deepcopy_platform(self, login_mock):
         from idmtools.core.platform_factory import Platform
         p = Platform('COMPS')
 
