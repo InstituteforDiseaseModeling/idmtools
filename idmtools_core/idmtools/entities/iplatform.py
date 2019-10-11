@@ -16,11 +16,11 @@ if typing.TYPE_CHECKING:
 
 logger = getLogger(__name__)
 
-CALLER_LIST = ['_create_from_block',  # create platform through Platform Factory
-               'fetch',  # create platform through un-pickle
-               'get',  # create platform through platform spec' get method
-               '_main',
-               '__newobj__']
+CALLER_LIST = ['_create_from_block',    # create platform through Platform Factory
+               'fetch',                 # create platform through un-pickle
+               'get',                   # create platform through platform spec' get method
+               '__newobj__',            # create platform through copy.deepcopy
+               '_main']                 # create platform through analyzer manager
 
 
 class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):

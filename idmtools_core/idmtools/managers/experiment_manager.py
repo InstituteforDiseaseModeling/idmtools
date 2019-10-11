@@ -1,5 +1,5 @@
 import typing
-from idmtools.core import EntityStatus, ItemType
+from idmtools.core import EntityStatus
 from idmtools.entities.iplatform import TPlatform
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.services.platforms import PlatformPersistService
@@ -67,12 +67,19 @@ class ExperimentManager:
         """
         Create all the simulations contained in the experiment on the platform.
         """
+        from idmtools.config import IdmConfigParser
         from concurrent.futures.thread import ThreadPoolExecutor
+
+        # Consider values from the block that Platform uses
+        _max_workers = IdmConfigParser.get_option(None, "max_workers")
+        _batch_size = IdmConfigParser.get_option(None, "batch_size")
+
+        _max_workers = int(_max_workers) if _max_workers else 16
+        _batch_size = int(_batch_size) if _batch_size else 10
 
         with ThreadPoolExecutor(max_workers=16) as executor:
             results = executor.map(self.simulation_batch_worker_thread,  # noqa: F841
-                        self.experiment.batch_simulations(batch_size=10))
-
+                                   self.experiment.batch_simulations(batch_size=_batch_size))
         for sim_batch in results:
             for simulation in sim_batch:
                 self.experiment.simulations.append(simulation.metadata)

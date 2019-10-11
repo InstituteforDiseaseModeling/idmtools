@@ -1,7 +1,6 @@
 import typing
 from abc import ABCMeta
 from dataclasses import dataclass, field
-from uuid import UUID
 
 from idmtools.core import EntityStatus, ItemType, NoPlatformException
 from idmtools.core.interfaces.iitem import IItem
@@ -9,6 +8,7 @@ from idmtools.core.interfaces.iitem import IItem
 if typing.TYPE_CHECKING:
     from idmtools.core import TTags
     from idmtools.entities.iplatform import TPlatform
+    from uuid import UUID
 
 
 @dataclass(unsafe_hash=True)
