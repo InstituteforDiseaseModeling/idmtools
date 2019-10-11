@@ -7,10 +7,11 @@ from dataclasses import dataclass, field
 from uuid import UUID
 
 from COMPS import Client
-from COMPS.Data import AssetCollection as COMPSAssetCollection, AssetCollectionFile, Configuration, Experiment as COMPSExperiment, \
+from COMPS.Data import AssetCollection as COMPSAssetCollection, AssetCollectionFile, Configuration, \
+    Experiment as COMPSExperiment, \
     QueryCriteria, Simulation as COMPSSimulation, SimulationFile, Suite as COMPSSuite
 
-from idmtools.core import CacheEnabled, EntityContainer, ObjectType
+from idmtools.core import CacheEnabled, EntityContainer, ItemType
 from idmtools.core.experiment_factory import experiment_factory
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities import IPlatform
@@ -22,8 +23,8 @@ from idmtools_platform_comps.utils import convert_COMPS_status
 if typing.TYPE_CHECKING:
     from typing import NoReturn, List, Dict
     from idmtools.entities.iexperiment import TExperiment
-    from idmtools.entities.iitem import TItemList, TItem
-    from idmtools.entities.isimulation import TSimulationList, TSimulation
+    from idmtools.core.interfaces.iitem import TItemList
+    from idmtools.entities.isimulation import TSimulationList
 
 logging.getLogger('COMPS.Data.Simulation').disabled = True
 logger = logging.getLogger(__name__)
@@ -58,7 +59,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         print("\nUser Login:")
         print(json.dumps({"endpoint": self.endpoint, "environment": self.environment}, indent=3))
         self._login()
-        self.supported_types = {ObjectType.EXPERIMENT, ObjectType.SIMULATION, ObjectType.SUITE, ObjectType.ASSETCOLLECTION}
+        self.supported_types = {ItemType.EXPERIMENT, ItemType.SIMULATION, ItemType.SUITE, ItemType.ASSETCOLLECTION}
 
     def _login(self):
         try:
@@ -153,97 +154,80 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
         return experiment.uid
 
-    def create_items(self, items: 'TItemList') -> 'List[UUID]':
-        # TODO: add ability to create suites
-        types = list({type(item) for item in items})
-        if len(types) != 1:
-            raise Exception('create_items only works with items of a single type at a time.')
-        sample_item = items[0]
-        if isinstance(sample_item, ISimulation):
-            ids = self._create_simulations(simulation_batch=items)
-        elif isinstance(sample_item, IExperiment):
-            ids = [self._create_experiment(experiment=item) for item in items]
+    def _create_batch(self, batch: 'TEntityList', item_type: 'ItemType') -> 'List[UUID]':
+        if item_type == ItemType.SIMULATION:
+            created_simulations = []
+            for simulation in batch:
+                s = COMPSSimulation(name=simulation.experiment.name, experiment_id=simulation.experiment.uid)
+                self.send_assets(item=simulation, comps_simulation=s)
+                s.set_tags(simulation.tags)
+                created_simulations.append(s)
+            COMPSSimulation.save_all(None, save_semaphore=COMPSSimulation.get_save_semaphore())
+            return [s.id for s in created_simulations]
+        elif item_type == ItemType.EXPERIMENT:
+            ids = [self._create_experiment(experiment=item) for item in batch]
+            return ids
         else:
-            raise Exception(f'Unable to create items of type: {type(sample_item)} '
-                            f'for platform: {self.__class__.__name__}')
-        for item in items:
-            item.platform = self
-        return ids
-
-    def _create_simulations(self, simulation_batch: 'TSimulationList') -> 'List[uuid]':
-        self._login()
-        created_simulations = []
-
-        for simulation in simulation_batch:
-            s = COMPSSimulation(name=simulation.experiment.name, experiment_id=simulation.experiment.uid)
-            self.send_assets(item=simulation, comps_simulation=s)
-            s.set_tags(simulation.tags)
-            created_simulations.append(s)
-
-        COMPSSimulation.save_all(None, save_semaphore=COMPSSimulation.get_save_semaphore())
-
-        # Register the IDs
-        return [s.id for s in created_simulations]
+            raise Exception(f'Unable to create items of type: {item_type} for platform: {self.__class__.__name__}')
 
     def run_items(self, items: 'TItemList') -> 'NoReturn':
         for item in items:
-            if isinstance(item, IExperiment):
-                item.get_platform_object().commission()
-            else:
-                raise Exception("comps_platform.run_items only supports Experiments for now...")
+            item.get_platform_object().commission()
 
-    def _get_object_of_type(self, object_id, object_type, **kwargs):
+    def _get_platform_item(self, item_id, item_type, **kwargs):
         # Retrieve the eventual columns/children arguments
         cols = kwargs.get('columns')
         children = kwargs.get('children')
 
         self._login()
 
-        if object_type == ObjectType.EXPERIMENT:
+        if item_type == ItemType.EXPERIMENT:
             cols = cols or ["id", "name"]
             children = children if children is not None else ["tags", "configuration"]
-            return COMPSExperiment.get(id=object_id,
+            return COMPSExperiment.get(id=item_id,
                                        query_criteria=QueryCriteria().select(cols).select_children(children))
 
-        if object_type == ObjectType.SIMULATION:
+        if item_type == ItemType.SIMULATION:
             cols = cols or ["id", "name", "experiment_id", "state"]
             children = children if children is not None else ["tags"]
-            return COMPSSimulation.get(id=object_id,
+            return COMPSSimulation.get(id=item_id,
                                        query_criteria=QueryCriteria().select(cols).select_children(children))
 
-        if object_type == ObjectType.ASSETCOLLECTION:
+        if item_type == ItemType.ASSETCOLLECTION:
             children = children if children is not None else ["assets"]
-            return COMPSAssetCollection.get(id=object_id, query_criteria=QueryCriteria().select_children(children))
+            return COMPSAssetCollection.get(id=item_id, query_criteria=QueryCriteria().select_children(children))
 
-    def _create_object(self, platform_object, **kwargs):
-        if isinstance(platform_object, COMPSExperiment):
+    def _platform_item_to_entity(self, platform_item, **kwargs):
+        if isinstance(platform_item, COMPSExperiment):
             # Create an experiment
-            experiment = experiment_factory.create(platform_object.tags.get("type"), tags=platform_object.tags,
-                                                   name=platform_object.name)
+            experiment = experiment_factory.create(platform_item.tags.get("type"), tags=platform_item.tags,
+                                                   name=platform_item.name)
             # Set the correct attributes
-            experiment.uid = platform_object.id
+            experiment.uid = platform_item.id
             experiment.platform = self
-            experiment.comps_experiment = platform_object
+            experiment.comps_experiment = platform_item
             return experiment
-        elif isinstance(platform_object, COMPSSimulation):
+        elif isinstance(platform_item, COMPSSimulation):
             # Recreate the experiment if needed
-            experiment = kwargs.get('experiment') or self.get_object(platform_object.experiment_id, object_type=ObjectType.EXPERIMENT)
+            experiment = kwargs.get('experiment') or self.get_item(platform_item.experiment_id,
+                                                                   item_type=ItemType.EXPERIMENT)
             # Get a simulation
             sim = experiment.simulation()
             # Set its correct attributes
-            sim.uid = platform_object.id
-            sim.tags = platform_object.tags
-            sim.status = convert_COMPS_status(platform_object.state)
+            sim.uid = platform_item.id
+            sim.tags = platform_item.tags
+            sim.status = convert_COMPS_status(platform_item.state)
             return sim
 
     def get_parent_for_platform_item(self, platform_item, raw=False, **kwargs):
         if isinstance(platform_item, COMPSExperiment):
             # For experiment -> find the suite
-            return self.get_object(platform_item.suite_id, object_type=ObjectType.SUITE, raw=raw, **kwargs) if platform_item.suite_id else None
+            return self.get_item(platform_item.suite_id, item_type=ItemType.SUITE, raw=raw,
+                                 **kwargs) if platform_item.suite_id else None
         if isinstance(platform_item, COMPSSimulation):
             # For a simulation, find the experiment
-            return self.get_object(platform_item.experiment_id, object_type=ObjectType.EXPERIMENT,
-                                  raw=raw, **kwargs) if platform_item.experiment_id else None
+            return self.get_item(platform_item.experiment_id, item_type=ItemType.EXPERIMENT,
+                                 raw=raw, **kwargs) if platform_item.experiment_id else None
         # If Suite return None
         return None
 
@@ -257,19 +241,21 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             children = platform_item.get_simulations(
                 query_criteria=QueryCriteria().select(cols).select_children(children))
             if not raw:
-                experiment = self._create_object(platform_item)
-                return EntityContainer([self._create_object(s, experiment=experiment) for s in children])
+                experiment = self._platform_item_to_entity(platform_item)
+                return EntityContainer([self._platform_item_to_entity(s, experiment=experiment) for s in children])
             else:
                 return children
         elif isinstance(platform_item, COMPSSuite):
-            return EntityContainer([self.get_object(e.id, object_type=ObjectType.EXPERIMENT, raw=raw) for e in
-                        COMPSExperiment.get(query_criteria=QueryCriteria().where("suite_id={}".format(platform_item.id)))])
+            return EntityContainer([self.get_item(e.id, item_type=ItemType.EXPERIMENT, raw=raw) for e in
+                                    COMPSExperiment.get(
+                                        query_criteria=QueryCriteria().where("suite_id={}".format(platform_item.id)))])
 
         return None
 
     def refresh_status(self, item) -> 'NoReturn':
         if isinstance(item, IExperiment):
-            simulations = self.get_children(item.uid, ObjectType.EXPERIMENT, force=True, raw=True, cols=["id", "state"], children=[])
+            simulations = self.get_children(item.uid, ItemType.EXPERIMENT, force=True, raw=True, cols=["id", "state"],
+                                            children=[])
             for s in simulations:
                 item.simulations.set_status_for_item(s.id, convert_COMPS_status(s.state))
 
@@ -281,7 +267,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         print(f"Cache miss for {collection_id} {file_path}")
 
         # retrieve the collection
-        ac = self.get_object(collection_id, ObjectType.ASSETCOLLECTION, raw=True)
+        ac = self.get_item(collection_id, ItemType.ASSETCOLLECTION, raw=True)
 
         # Look for the asset file in the collection
         file_name = ntpath.basename(file_path)

@@ -1,5 +1,4 @@
 import os
-import shutil
 from dataclasses import dataclass, field
 from uuid import UUID, uuid4
 import diskcache
@@ -15,7 +14,7 @@ from idmtools.entities import IExperiment
 from idmtools.entities import ISimulation
 from idmtools.entities.ianalyzer import TAnalyzerList
 from idmtools.entities.iexperiment import TExperiment
-from idmtools.entities.iitem import TItem, TItemList
+from idmtools.core.interfaces.iitem import TItem, TItemList
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 data_path = os.path.abspath(os.path.join(current_directory, "..", "data"))

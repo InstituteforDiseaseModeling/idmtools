@@ -70,7 +70,7 @@ class TestPythonSimulation(ITestWithPersistence):
         self.assertEqual(p.assets.assets[0].content, str.encode(json.dumps({"config": {"a": 1}})))
 
         print(p)  # verify __repr__method in ISumulation
-        self.assertIn("<Simulation: " + p.uid + " - Exp_id: NoPlatformSet>", mock_stdout.getvalue())
+        self.assertIn("<Simulation: " + p.uid + " - Exp_id: None>", mock_stdout.getvalue())
 
     def test_add_assets_to_python_experiment(self):
         ac = AssetCollection()

@@ -6,11 +6,10 @@ from itertools import chain
 from dataclasses import dataclass, field, InitVar
 from more_itertools import grouper
 
-from idmtools.core import ObjectType
+from idmtools.core import ItemType
 from idmtools.core.interfaces.entity_container import EntityContainer
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.core.interfaces.inamed_entity import INamedEntity
-from idmtools.entities.icontainer_item import IContainerItem
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TSimulation, TSimulationClass, TExperimentBuilder
@@ -42,7 +41,7 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
     def __post_init__(self, simulation_type):
         super().__post_init__()
         self.simulations = self.simulations or EntityContainer()
-        self.object_type = ObjectType.EXPERIMENT
+        self.item_type = ItemType.EXPERIMENT
         # Take care of the base simulation
         if not self.base_simulation:
             if simulation_type and callable(simulation_type):
@@ -157,8 +156,8 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         return len(self.simulations)
 
     def refresh_simulations(self):
-        from idmtools.core import ObjectType
-        self.simulations = self.platform.get_children(self.uid, ObjectType.EXPERIMENT, force=True)
+        from idmtools.core import ItemType
+        self.simulations = self.platform.get_children(self.uid, ItemType.EXPERIMENT, force=True)
 
     def refresh_simulations_status(self):
         self.platform.refresh_status(item=self)

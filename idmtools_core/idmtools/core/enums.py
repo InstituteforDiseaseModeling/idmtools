@@ -16,7 +16,7 @@ class FilterMode(Enum):
     OR = 1
 
 
-class ObjectType(Enum):
+class ItemType(Enum):
     SUITE = auto()
     EXPERIMENT = auto()
     SIMULATION = auto()

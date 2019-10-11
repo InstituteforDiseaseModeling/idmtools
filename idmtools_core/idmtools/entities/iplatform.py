@@ -2,16 +2,16 @@ import ast
 import typing
 from abc import ABCMeta, abstractmethod
 from dataclasses import field, fields
+from itertools import groupby
 from logging import getLogger
 
-from idmtools.core.interfaces.ientity import IEntity
-from idmtools.entities.iitem import IItem
-from idmtools.core import CacheEnabled, ObjectType
+from idmtools.core.interfaces.ientity import IEntity, TEntityList, TEntity
+from idmtools.core.interfaces.iitem import IItem
+from idmtools.core import CacheEnabled, ItemType
 
 if typing.TYPE_CHECKING:
-    from idmtools.entities.ianalyzer import TAnalyzerList
-    from idmtools.entities.iitem import TItem, TItemList
-    from typing import Any, Dict, List, NoReturn, Set
+    from idmtools.core.interfaces.iitem import TItem, TItemList
+    from typing import Dict, List, NoReturn, Set
     from uuid import UUID
 
 logger = getLogger(__name__)
@@ -33,7 +33,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     - Commissioning
     - File handling
     """
-    supported_types: 'Set[ObjectType]' = field(default_factory=lambda: set(), metadata={"pickle_ignore": True})
+    supported_types: 'Set[ItemType]' = field(default_factory=lambda: set(), metadata={"pickle_ignore": True})
     _object_cache_expiration: 'int' = 60
 
     @staticmethod
@@ -74,14 +74,21 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         self.validate_inputs_types()
 
     @abstractmethod
-    def create_items(self, items: 'TItem') -> 'List[UUID]':
+    def _create_batch(self, batch:'TEntityList', item_type:'ItemType') -> 'List[UUID]':
+        pass
+
+    def create_items(self, items: 'TEntity') -> 'List[UUID]':
         """
-        Function creating e.g. sims/exps/suites on the platform
+        Function creating e.g. sims/exps/suites on the platform.
+        The function will batch the items based on type and call the self._create_batch for creation
         Args:
-            items: The batch of items to create
+            items: All the items to create
         Returns: List of ids created
         """
-        pass
+        ids = []
+        for key, group in groupby(items, lambda x: x.item_type):
+            ids.extend(self._create_batch(list(group), key))
+        return ids
 
     @abstractmethod
     def run_items(self, items: 'TItemList') -> 'NoReturn':
@@ -112,7 +119,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         pass
 
     def flatten_item(self, item: 'IEntity') -> 'TItemList':
-        children = self.get_children(item.uid, item.object_type, force=True)
+        children = self.get_children(item.uid, item.item_type, force=True)
         if children is None:
             items = [item]
         else:
@@ -122,11 +129,11 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         return items
 
     @abstractmethod
-    def _get_object_of_type(self, object_id, object_type, **kwargs):
+    def _get_platform_item(self, item_id, item_type, **kwargs):
         pass
 
     @abstractmethod
-    def _create_object(self, platform_object, **kwargs):
+    def _platform_item_to_entity(self, platform_item, **kwargs):
         pass
 
     @abstractmethod
@@ -137,25 +144,25 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     def get_parent_for_platform_item(self, platform_item, raw, **kwargs):
         pass
 
-    def get_object(self, object_id: 'UUID', object_type: 'ObjectType' = None,
-                   force: 'bool' = False, raw: 'bool' = False, **kwargs) -> any:
+    def get_item(self, item_id: 'UUID', item_type: 'ItemType' = None,
+                 force: 'bool' = False, raw: 'bool' = False, **kwargs) -> any:
         """
         Retrieve an object from the platform.
         This function is cached, force allows to force the refresh of the cache.
         If no object_type passed: the function will try all the types (experiment, suite, simulation)
         Args:
-            object_id: id of the object to retrieve
-            object_type: Type of the object to be retrieved
+            item_id: id of the object to retrieve
+            item_type: Type of the object to be retrieved
             force: Force the object fetching from the platform
             raw: Return either an idmtools object or a platform object
 
         Returns: The object found on the platform or None
         """
-        if not object_type or object_type not in self.supported_types:
+        if not item_type or item_type not in self.supported_types:
             raise Exception("The provided type is invalid or not supported by this platform...")
 
         # Create the cache key
-        cache_key = f"o_{object_id}_" + ('r' if raw else 'o') + '_'.join(f"{k}_{v}" for k, v in kwargs.items())
+        cache_key = f"o_{item_id}_" + ('r' if raw else 'o') + '_'.join(f"{k}_{v}" for k, v in kwargs.items())
 
         # If force -> delete in the cache
         if force:
@@ -163,17 +170,17 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         # If we cannot find the object in the cache -> retrieve depending on the type
         if cache_key not in self.cache:
-            ce = self._get_object_of_type(object_id, object_type, **kwargs)
+            ce = self._get_platform_item(item_id, item_type, **kwargs)
 
             # Nothing was found on the platform
             if not ce:
-                raise Exception(f"Object {object_type} {object_id} not found on the platform...")
+                raise Exception(f"Object {item_type} {item_id} not found on the platform...")
 
             # Create the object if we do not want it raw
             if raw:
                 return_object = ce
             else:
-                return_object = self._create_object(ce, **kwargs)
+                return_object = self._platform_item_to_entity(ce, **kwargs)
 
             # Persist
             self.cache.set(cache_key, return_object, expire=self._object_cache_expiration)
@@ -183,7 +190,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         return return_object
 
-    def get_children(self, object_id: 'uuid', object_type: 'ObjectType' = None, force: 'bool' = False,
+    def get_children(self, object_id: 'uuid', object_type: 'ItemType' = None, force: 'bool' = False,
                      raw: 'bool' = False, **kwargs) -> 'any':
         """
         Get the children of a given object.
@@ -205,14 +212,14 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             self.cache.delete(cache_key)
 
         if cache_key not in self.cache:
-            ce = self.get_object(object_id, raw=True, object_type=object_type)
+            ce = self.get_item(object_id, raw=True, item_type=object_type)
             children = self.get_children_for_platform_item(ce, raw=raw, **kwargs)
             self.cache.set(cache_key, children, expire=self._object_cache_expiration)
             return children
 
         return self.cache.get(cache_key)
 
-    def get_parent(self, object_id: 'uuid', object_type: 'ObjectType' = None, force: 'bool' = False,
+    def get_parent(self, object_id: 'uuid', object_type: 'ItemType' = None, force: 'bool' = False,
                    raw: 'bool' = False, **kwargs):
         """
         Get the parent of a given object.
@@ -235,7 +242,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             self.cache.delete(cache_key)
 
         if cache_key not in self.cache:
-            ce = self.get_object(object_id, raw=True, object_type=object_type)
+            ce = self.get_item(object_id, raw=True, item_type=object_type)
             parent = self.get_parent_for_platform_item(ce, raw=raw, **kwargs)
             self.cache.set(cache_key, parent, expire=self._object_cache_expiration)
             return parent

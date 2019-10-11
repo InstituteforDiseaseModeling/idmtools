@@ -5,7 +5,7 @@ from idmtools.analysis.DownloadAnalyzer import DownloadAnalyzer as SampleAnalyze
 from idmtools.core.enums import EntityStatus
 from idmtools.core.item_id import ItemId
 from idmtools.core.platform_factory import Platform
-from idmtools.entities.iitem import IItem
+from idmtools.core.interfaces.iitem import IItem
 from idmtools.entities.ianalyzer import IAnalyzer
 
 

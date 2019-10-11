@@ -5,7 +5,6 @@ import typing
 
 from idmtools.analysis.map_worker_entry import map_item
 from idmtools.core import CacheEnabled
-from idmtools.core.enums import EntityStatus
 from idmtools.utils.command_line import animation
 from idmtools.utils.language import on_off, verbose_timedelta
 from multiprocessing.pool import Pool
@@ -13,7 +12,7 @@ from typing import NoReturn
 
 if typing.TYPE_CHECKING:
     from idmtools.entities.ianalyzer import TAnalyzer
-    from idmtools.entities.iitem import TItem, TItemList
+    from idmtools.core.interfaces.iitem import TItem, TItemList
 
 
 def pool_worker_initializer(func, analyzers, cache, platform) -> None:
@@ -67,7 +66,7 @@ class AnalyzeManager(CacheEnabled):
 
         # Take the provided ids and determine the full set of unique root items (e.g. simulations) in them to analyze
         ids = list(set(ids or list()))  # uniquify
-        items = [platform.get_object(oid, otype, force=True) for oid, otype in ids]
+        items = [platform.get_item(oid, otype, force=True) for oid, otype in ids]
         self.potential_items = []
         for i in items:
             self.potential_items.extend(platform.flatten_item(item=i))
