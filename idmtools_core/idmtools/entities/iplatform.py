@@ -240,8 +240,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         return return_object
 
-    def get_children(self, item_id: 'uuid', item_type: 'ItemType',
-                     force: 'bool' = False, raw: 'bool' = False, **kwargs) -> 'any':
+    def get_children(self, item_id: 'UUID', item_type: 'ItemType',
+                     force: 'bool' = False, raw: 'bool' = False, **kwargs) -> 'Any':
         """
         Get the children of a given object.
 
