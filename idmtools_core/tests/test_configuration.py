@@ -79,7 +79,9 @@ class TestConfig(ITestWithPersistence):
         batch_size = idm.get_option("COMMON", 'batch_size')
         self.assertEqual(int(batch_size), 10)
 
-    def test_idmtools_ini_option(self):
+    @pytest.mark.comps
+    @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
+    def test_idmtools_ini_option(self, login_mock):
         config_file = IdmConfigParser.get_config_path()
         self.assertEqual(os.path.basename(config_file), 'idmtools.ini')
 
@@ -140,7 +142,9 @@ class TestConfig(ITestWithPersistence):
         self.assertIsNone(max_workers)
         self.assertIsNone(batch_size)
 
-    def test_idmtools_values(self):
+    @pytest.mark.comps
+    @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
+    def test_idmtools_values(self, login_mock):
         Platform('COMPS')
         max_workers = IdmConfigParser.get_option(None, 'max_workers')
         batch_size = IdmConfigParser.get_option(None, 'batch_size')
@@ -149,7 +153,9 @@ class TestConfig(ITestWithPersistence):
         self.assertEqual(int(batch_size), 10)
         self.assertIsNone(not_exist_option)
 
-    def test_idmtools_no_section(self):
+    @pytest.mark.comps
+    @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
+    def test_idmtools_no_section(self, login_mock):
         Platform('COMPS')
         max_workers = IdmConfigParser.get_option('NotExistSection', 'max_workers')
         batch_size = IdmConfigParser.get_option('NotExistSection', 'batch_size')
