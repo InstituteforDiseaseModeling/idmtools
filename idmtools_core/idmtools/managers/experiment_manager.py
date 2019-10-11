@@ -3,6 +3,7 @@ from idmtools.core import EntityStatus, ItemType
 from idmtools.entities.iplatform import TPlatform
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.services.platforms import PlatformPersistService
+from idmtools.utils.entities import retrieve_experiment
 
 if typing.TYPE_CHECKING:
     from idmtools.entities.iexperiment import TExperiment
@@ -25,14 +26,13 @@ class ExperimentManager:
 
     @classmethod
     def from_experiment_id(cls, experiment_id, platform):
-        experiment = platform.get_item(item_id=experiment_id, item_type=ItemType.EXPERIMENT)
+        experiment = retrieve_experiment(experiment_id, platform, with_simulations=True)
         platform = PlatformPersistService.retrieve(experiment.platform.uid)
         # cache miss, add the platform
         if platform is None:
             PlatformPersistService.save(obj=experiment.platform)
             platform = PlatformPersistService.retrieve(experiment.platform.uid)
         em = cls(experiment, platform)
-        experiment.refresh_simulations()
         return em
 
     def create_experiment(self):
@@ -43,7 +43,9 @@ class ExperimentManager:
 
         # Persist the platform
         PlatformPersistService.save(self.platform)
-        self.experiment.platform_id = self.platform.uid
+
+        # Make sure to link it to the experiment
+        self.experiment.platform = self.platform
 
         self.experiment.post_creation()
 

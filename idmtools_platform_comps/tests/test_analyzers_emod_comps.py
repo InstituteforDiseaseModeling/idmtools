@@ -5,6 +5,7 @@ import json
 from functools import partial
 from COMPS.Data import Experiment
 from idmtools.builders import ExperimentBuilder
+from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_model_emod.defaults import EMODSir
@@ -68,7 +69,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
 
         analyzers = [AddAnalyzer()]
 
-        am = AnalyzeManager(platform=self.p, ids=[self.exp_id], analyzers=analyzers)
+        am = AnalyzeManager(platform=self.p, ids=[(self.exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
 
     def test_DownloadAnalyzer(self):
@@ -83,7 +84,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         filenames = ['output/InsetChart.json', 'config.json']
         analyzers = [DownloadAnalyzer(filenames=filenames, output_path='output')]
 
-        am = AnalyzeManager(platform=self.p, ids=[self.exp_id], analyzers=analyzers)
+        am = AnalyzeManager(platform=self.p, ids=[(self.exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
 
         for simulation in Experiment.get(self.exp_id).get_simulations():
@@ -101,7 +102,8 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         filenames = ['output/InsetChart.json', 'config.json']
         analyzers = [DownloadAnalyzer(filenames=filenames, output_path='output')]
 
-        exp_list = ['6f693627-6de5-e911-a2be-f0921c167861', '1991ec0d-6ce5-e911-a2be-f0921c167861']  # comps2 staging
+        exp_list = [('6f693627-6de5-e911-a2be-f0921c167861', ItemType.EXPERIMENT),
+                    ('1991ec0d-6ce5-e911-a2be-f0921c167861', ItemType.EXPERIMENT)]  # comps2 staging
         am = AnalyzeManager(platform=self.p, ids=exp_list, analyzers=analyzers)
         am.analyze()
 
@@ -118,7 +120,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
 
         analyzers = [PopulationAnalyzer(filenames=filenames)]
 
-        am = AnalyzeManager(platform=self.p, ids=[self.exp_id], analyzers=analyzers)
+        am = AnalyzeManager(platform=self.p, ids=[(self.exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
 
         # -----------------------------------------------------------------------------------------------------
@@ -152,12 +154,12 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         filenames = ['output/InsetChart.json', 'config.json']
         analyzers = [DownloadAnalyzer(filenames=filenames, output_path='output')]
 
-        exp_id = 'f48e09d4-acd9-e911-a2be-f0921c167861'  # comps2
+        exp_id = ('f48e09d4-acd9-e911-a2be-f0921c167861', ItemType.EXPERIMENT)  # comps2
 
         am = AnalyzeManager(platform=self.p, ids=[exp_id], analyzers=analyzers)
         am.analyze()
 
-        for simulation in Experiment.get(exp_id).get_simulations():
+        for simulation in Experiment.get(exp_id[0]).get_simulations():
             s = simulation.get(id=simulation.id)
             self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "config.json")))
             self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "InsetChart.json")))

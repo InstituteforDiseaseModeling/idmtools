@@ -92,12 +92,6 @@ class LocalPlatform(IPlatform):
             simulation.status = local_status_to_common(simulation_dict['status'])
             return simulation
 
-    def _platform_item_to_entity(self, platform_item, **kwargs):
-        """
-        Passthrough: the platform already handles idmtools entities
-        """
-        return platform_item
-
     def get_children_for_platform_item(self, platform_item, raw, **kwargs):
         if isinstance(platform_item, IExperiment):
             platform_item.simulations.clear()
@@ -120,7 +114,7 @@ class LocalPlatform(IPlatform):
             return self.get_platform_item(platform_item.parent_id, ItemType.EXPERIMENT)
         return None
 
-    def _create_batch(self, batch:'TEntityList', item_type:'ItemType') -> 'List[UUID]':
+    def _create_batch(self, batch: 'TEntityList', item_type: 'ItemType') -> 'List[UUID]':
         if item_type == ItemType.SIMULATION:
             ids = self._create_simulations(simulations_batch=batch)
         elif item_type == ItemType.EXPERIMENT:
@@ -131,15 +125,6 @@ class LocalPlatform(IPlatform):
         return ids
 
     def run_items(self, items: TItemList) -> NoReturn:
-        """
-        Execute the specified items
-
-        Args:
-            items: List of items to execute
-
-        Returns:
-            None
-        """
         from idmtools_platform_local.tasks.run import RunTask
         for item in items:
             if item.item_type == ItemType.EXPERIMENT:
@@ -151,12 +136,6 @@ class LocalPlatform(IPlatform):
     def send_assets(self, item: TItem, **kwargs) -> NoReturn:
         """
         Send assets for item to platform
-        Args:
-            item:
-            **kwargs:
-
-        Returns:
-
         """
         if isinstance(item, ISimulation):
             self._send_assets_for_simulation(item, **kwargs)
@@ -169,11 +148,6 @@ class LocalPlatform(IPlatform):
     def refresh_status(self, item) -> NoReturn:
         """
         Refresh the status of the specified item
-
-        Args:
-            item: Item to refresh status of
-
-        Returns:
 
         """
         if isinstance(item, ISimulation):
@@ -188,16 +162,6 @@ class LocalPlatform(IPlatform):
                     s.status = local_status_to_common(sim_status[0]['status'])
 
     def get_files(self, item: 'TItem', files: 'List[str]') -> 'Dict[str, bytearray]':
-        """
-        Returns a dictionary of the specified files for the specified item.
-
-        Args:
-            item: Item to fetch files for
-            files: List of file names to fetch
-
-        Returns:
-            A dict container filename->bytearray
-        """
         if not isinstance(item, ISimulation):
             raise NotImplementedError("Retrieving files only implemented for Simulations at the moment")
 
@@ -379,4 +343,3 @@ class LocalPlatform(IPlatform):
             with open(full_path, 'rb') as fin:
                 byte_arrs.append(fin.read())
         return byte_arrs
-

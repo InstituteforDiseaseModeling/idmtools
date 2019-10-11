@@ -8,7 +8,7 @@ if typing.TYPE_CHECKING:
     from idmtools.entities.iexperiment import TExperiment
 
 
-def retrieve_experiment(experiment_id: UUID, platform: 'TPlatform' = None) -> 'TExperiment':
+def retrieve_experiment(experiment_id: UUID, platform: 'TPlatform' = None, with_simulations=False) -> 'TExperiment':
     experiment = ExperimentPersistService.retrieve(experiment_id)
 
     if experiment:
@@ -26,5 +26,8 @@ def retrieve_experiment(experiment_id: UUID, platform: 'TPlatform' = None) -> 'T
         # We have the experiment -> persist it for next time
         experiment.platform_id = PlatformPersistService.save(platform)
         ExperimentPersistService.save(experiment)
+
+    if with_simulations:
+        experiment.refresh_simulations()
 
     return experiment

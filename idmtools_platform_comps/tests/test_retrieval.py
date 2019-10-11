@@ -44,7 +44,7 @@ class TestRetrieval(ITestWithPersistence):
         em.run()
 
     def test_retrieve_experiment(self):
-        exp = self.platform.get_object(self.pe.uid, ItemType.EXPERIMENT)
+        exp = self.platform.get_item(self.pe.uid, ItemType.EXPERIMENT)
 
         # Test attributes
         self.assertEqual(self.pe.uid, exp.uid)
@@ -54,14 +54,14 @@ class TestRetrieval(ITestWithPersistence):
         self.assertEqual({k: str(v or '') for k, v in self.pe.tags.items()}, exp.tags)
 
         # Test the raw retrieval
-        comps_experiment = self.platform.get_object(self.pe.uid, ItemType.EXPERIMENT, raw=True)
+        comps_experiment = self.platform.get_item(self.pe.uid, ItemType.EXPERIMENT, raw=True)
         self.assertIsInstance(comps_experiment, COMPSExperiment)
         self.assertEqual(self.pe.uid, comps_experiment.id)
         self.assertEqual(self.pe.name, comps_experiment.name)
         self.assertEqual({k: str(v or '') for k, v in self.pe.tags.items()}, comps_experiment.tags)
 
         # Test retrieving less columns
-        comps_experiment = self.platform.get_object(self.pe.uid, ItemType.EXPERIMENT, raw=True, children=[], columns=["id"])
+        comps_experiment = self.platform.get_item(self.pe.uid, ItemType.EXPERIMENT, raw=True, children=[], columns=["id"])
         self.assertIsNone(comps_experiment.name)
         self.assertIsNone(comps_experiment.tags)
         self.assertEqual(self.pe.uid, comps_experiment.id)

@@ -69,9 +69,6 @@ class TestPlatform(IPlatform):
         obj.platform = self
         return obj
 
-    def _platform_item_to_entity(self, platform_item, **kwargs):
-        return platform_item
-
     def get_children_for_platform_item(self, platform_item, raw, **kwargs):
         if platform_item.item_type == ItemType.EXPERIMENT:
             return self.simulations.get(platform_item.uid)
