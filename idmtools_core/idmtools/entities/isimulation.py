@@ -4,11 +4,11 @@ from dataclasses import dataclass
 
 from idmtools.core import ItemType
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
-from idmtools.core.interfaces.ientity import IEntity
+from idmtools.core.interfaces.inamed_entity import INamedEntity
 
 
 @dataclass
-class ISimulation(IAssetsEnabled, IEntity, metaclass=ABCMeta):
+class ISimulation(IAssetsEnabled, INamedEntity, metaclass=ABCMeta):
     """
     Represents a generic Simulation.
     This class needs to be implemented for each model type with specifics.

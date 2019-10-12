@@ -19,9 +19,9 @@ class CacheEnabled:
     """
     Allows a class to leverage Diskcache and expose a cache property.
     """
-    _cache: 'Cache' = field(default=None, init=False, compare=False)
-    _cache_directory: 'str' = field(default=None, init=False, compare=False)
-    _ident: 'int' = field(default=None, init=False, compare=False)
+    _cache: 'Cache' = field(default=None, init=False, compare=False, metadata={"pickle_ignore": True})
+    _cache_directory: 'str' = field(default=None, init=False, compare=False, metadata={"pickle_ignore": True})
+    _ident: 'int' = field(default=None, init=False, compare=False, metadata={"pickle_ignore": True})
 
     def __del__(self):
         # Only delete and close the cache if the owner thread ends

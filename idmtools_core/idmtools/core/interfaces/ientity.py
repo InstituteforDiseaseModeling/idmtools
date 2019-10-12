@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 
 from idmtools.core import EntityStatus, ItemType, NoPlatformException
 from idmtools.core.interfaces.iitem import IItem
+from idmtools.services.platforms import PlatformPersistService
 
 if typing.TYPE_CHECKING:
     from idmtools.core import TTags
@@ -31,7 +32,7 @@ class IEntity(IItem, metaclass=ABCMeta):
                 return None
             if not self.platform:
                 raise NoPlatformException("The object has no platform set...")
-            self._parent = self.platform.get_parent(self.parent_id, self.item_type)
+            self._parent = self.platform.get_parent(self.uid, self.item_type)
 
         return self._parent
 
@@ -45,6 +46,8 @@ class IEntity(IItem, metaclass=ABCMeta):
 
     @property
     def platform(self):
+        if not self._platform and self.platform_id:
+            self._platform = PlatformPersistService.retrieve(self.platform_id)
         return self._platform
 
     @platform.setter

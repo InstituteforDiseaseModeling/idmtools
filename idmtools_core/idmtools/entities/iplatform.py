@@ -271,7 +271,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         return self.cache.get(cache_key)
 
-    def get_parent(self, item_id: 'UUID', object_type: 'ItemType' = None, force: 'bool' = False,
+    def get_parent(self, item_id: 'UUID', item_type: 'ItemType' = None, force: 'bool' = False,
                    raw: 'bool' = False, **kwargs):
         """
         Get the parent of a given object.
@@ -280,12 +280,12 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             item_id: id of the object for which we want the parent
             force: Force the object fetching from the platform
             raw: Return either an idmtools object or a platform object
-            object_type: Pass the type of the object for quicker retrieval
+            item_type: Pass the type of the object for quicker retrieval
 
         Returns: Parent of the object or None
 
         """
-        if not object_type or object_type not in self.supported_types:
+        if not item_type or item_type not in self.supported_types:
             raise Exception("The provided type is invalid or not supported by this platform...")
 
         # Create the cache key based on everything we pass to the function
@@ -295,7 +295,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             self.cache.delete(cache_key)
 
         if cache_key not in self.cache:
-            ce = self.get_item(item_id, raw=True, item_type=object_type)
+            ce = self.get_item(item_id, raw=True, item_type=item_type)
             parent = self.get_parent_for_platform_item(ce, raw=raw, **kwargs)
             self.cache.set(cache_key, parent, expire=self._object_cache_expiration)
             return parent
