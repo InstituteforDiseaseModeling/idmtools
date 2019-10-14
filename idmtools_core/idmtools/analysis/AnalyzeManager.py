@@ -70,7 +70,6 @@ class AnalyzeManager(CacheEnabled):
         self.potential_items = []
         for i in items:
             self.potential_items.extend(platform.flatten_item(item=i))
-        self.potential_items = set(self.potential_items)
         self._items = dict()  # filled in later by _get_items_to_analyze
 
         self.analyzers = analyzers or list()
@@ -86,7 +85,7 @@ class AnalyzeManager(CacheEnabled):
         Returns:
 
         """
-        self.potential_items.add(self.platform.flatten_item(item=item))
+        self.potential_items.extend(self.platform.flatten_item(item=item))
 
     def _get_items_to_analyze(self) -> 'dict':
         """
