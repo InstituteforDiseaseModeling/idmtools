@@ -162,7 +162,7 @@ class TestAnalyzeManager(unittest.TestCase):
                 self.TestAnalyzer(),
                 self.TestAnalyzer(working_dir=analyzer_wd)
             ]
-            am = self._get_analyze_manager(analyzers=analyzers, working_dir=analyze_manager_wd, force_wd=force_wd)
+            am = AnalyzeManager(self.platform, analyzers=analyzers, working_dir=analyze_manager_wd, force_manager_working_directory=force_wd)
             am._initialize_analyzers()
             actual = [analyzer.working_dir for analyzer in am.analyzers]
             self.assertEqual(actual, expected[force_wd])
