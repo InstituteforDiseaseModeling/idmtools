@@ -77,7 +77,7 @@ class AnalyzeManager(CacheEnabled):
 
         self.verbose = verbose
 
-    def add_item(self, item: 'TItem') -> NoReturn:
+    def add_item(self, item: 'TEntity') -> NoReturn:
         """
         Add an additional item for analysis
         Args:
@@ -86,9 +86,9 @@ class AnalyzeManager(CacheEnabled):
         Returns:
 
         """
-        self.potential_items.append(item)
+        self.potential_items.add(self.platform.flatten_item(item=item))
 
-    def _get_items_to_analyze(self) -> 'TItemList':
+    def _get_items_to_analyze(self) -> 'dict':
         """
         Returns a list of items derived from self._items that are available to analyze
         Returns: a list of IItem objects
