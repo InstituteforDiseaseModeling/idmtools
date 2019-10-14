@@ -59,7 +59,13 @@ class TestPlatform(IPlatform):
 
     def get_platform_item(self, item_id, item_type, **kwargs):
         if item_type == ItemType.SIMULATION:
-            obj = self.simulations.get(item_id)
+            obj = None
+            for eid in self.simulations:
+                for sim in self.simulations.get(eid):
+                    if sim.uid == item_id:
+                        obj = sim
+                        break
+                if obj: break
         elif item_type == ItemType.EXPERIMENT:
             obj = self.experiments.get(item_id)
 
@@ -111,6 +117,14 @@ class TestPlatform(IPlatform):
             )
             simulation.status = new_status
         self.simulations.set(experiment_uid, simulations)
+
+    def set_simulation_num_status(self, experiment_uid, status, number):
+        simulations = self.simulations.get(experiment_uid)
+        for simulation in simulations:
+            simulation.status = status
+            self.simulations.set(experiment_uid, simulations)
+            number -= 1
+            if number <= 0: return
 
     def run_simulations(self, experiment: TExperiment) -> None:
         from idmtools.core import EntityStatus
