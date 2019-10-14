@@ -29,12 +29,12 @@ class setParam:
 
 
 builder = ExperimentBuilder()
-builder.add_sweep_definition(setA, range(10))
+builder.add_sweep_definition(setA, range(10000))
 builder.add_sweep_definition(setParam("b"), [1, 2, 3])
 
 experiment.add_builder(builder)
 
-platform = Platform('Local')
+platform = Platform('COMPS2')
 # You can easily switch platforms by simply commenting out the previous line and then
 # uncommenting the following line
 # platform = Platform('COMPS')

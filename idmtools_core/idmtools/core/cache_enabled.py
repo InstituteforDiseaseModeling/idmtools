@@ -3,6 +3,7 @@ import shutil
 import tempfile
 from dataclasses import dataclass, field
 from logging import getLogger
+from threading import get_ident
 
 from diskcache import Cache, DEFAULT_SETTINGS
 
@@ -18,10 +19,16 @@ class CacheEnabled:
     """
     Allows a class to leverage Diskcache and expose a cache property.
     """
-    _cache: 'Cache' = field(default=None, init=False, compare=False)
-    _cache_directory: 'str' = field(default=None, init=False, compare=False)
+    _cache: 'Cache' = field(default=None, init=False, compare=False, metadata={"pickle_ignore": True})
+    _cache_directory: 'str' = field(default=None, init=False, compare=False, metadata={"pickle_ignore": True})
+    _ident: 'int' = field(default=None, init=False, compare=False, metadata={"pickle_ignore": True})
 
     def __del__(self):
+        # Only delete and close the cache if the owner thread ends
+        # Avoid deleting and closing when a child thread ends
+        if self._ident != get_ident():
+            return
+
         if self._cache is not None:
             self._cache.close()
             del self._cache
@@ -37,6 +44,8 @@ class CacheEnabled:
         if not self._cache:
             if not self._cache_directory:
                 self._cache_directory = tempfile.mkdtemp()
+                self._ident = get_ident()
 
             self._cache = Cache(self._cache_directory)
+
         return self._cache

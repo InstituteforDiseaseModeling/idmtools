@@ -7,6 +7,7 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 from idmtools.analysis.AnalyzeManager import AnalyzeManager
 from idmtools.builders import ExperimentBuilder
+from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import IAnalyzer
 from idmtools.managers import ExperimentManager
@@ -76,6 +77,6 @@ class TestAnalyzeManager(ITestWithPersistence):
         analyzers = [AddAnalyzer()]
         platform = Platform('Local')
 
-        am = AnalyzeManager(configuration={}, platform=platform, ids=[self.exp_id], analyzers=analyzers)
+        am = AnalyzeManager(configuration={}, platform=platform, ids=[(self.exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
         self.assertEqual(analyzers[0].results, sum(n + 100 for n in range(0, 5)))
