@@ -13,7 +13,7 @@ from COMPS.Data import AssetCollection as COMPSAssetCollection, AssetCollectionF
 
 from idmtools.core import CacheEnabled, EntityContainer, ItemType
 from idmtools.core.experiment_factory import experiment_factory
-from idmtools.core.interfaces.ientity import IEntity
+from idmtools.core.interfaces.ientity import IEntity, TEntityList
 from idmtools.entities import IPlatform
 from idmtools.entities.iexperiment import IExperiment, StandardExperiment
 from idmtools.entities.isimulation import ISimulation
@@ -24,7 +24,6 @@ if typing.TYPE_CHECKING:
     from typing import NoReturn, List, Dict
     from idmtools.entities.iexperiment import TExperiment
     from idmtools.core.interfaces.iitem import TItemList
-    from idmtools.entities.isimulation import TSimulationList
 
 logging.getLogger('COMPS.Data.Simulation').disabled = True
 logger = logging.getLogger(__name__)
@@ -158,7 +157,8 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         if item_type == ItemType.SIMULATION:
             created_simulations = []
             for simulation in batch:
-                s = COMPSSimulation(name=simulation.experiment.name, experiment_id=simulation.experiment.uid)
+                s = COMPSSimulation(name=simulation.experiment.name, experiment_id=simulation.experiment.uid,
+                                    configuration=Configuration(asset_collection_id=simulation.experiment.assets.uid))
                 self.send_assets(item=simulation, comps_simulation=s)
                 s.set_tags(simulation.tags)
                 created_simulations.append(s)
@@ -280,30 +280,9 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         self._login()
 
         # Retrieve the simulation from COMPS
-        # TODO: revert back to normal object retrieval when pyCOMPS fix 'rollup' configurations.
-        # comps_simulation = item.get_platform_object(force=True, cols=['id', 'experiment_id'], children=["files", "configuration"])
+        comps_simulation = self.get_platform_item(item.uid, ItemType.SIMULATION,
+                                                  cols=["id", "experiment_id"], chuldren=["files", "configuration"])
 
-        # Temporary stand-in for pycomps fix; code below from Jeff S.
-        class QueryCriteriaExt(QueryCriteria):
-            _ep_dict = None
-
-            def add_extra_params(self, ep_dict):
-                self._ep_dict = ep_dict
-                return self
-
-            def to_param_dict(self, ent_type):
-                pd = super(QueryCriteriaExt, self).to_param_dict(ent_type)
-                if self._ep_dict:
-                    pd = {**pd, **self._ep_dict}
-                return pd
-
-        comps_simulation = COMPSSimulation.get(item.uid, query_criteria=QueryCriteriaExt().select(
-            ['id', 'experiment_id']).select_children(
-            ["files", "configuration"]).add_extra_params({'coalesceconfig': True}))
-
-        # Separate the output files in 2 groups:
-        # - one for the transient files (retrieved through the comps simulation)
-        # - one for the asset collection files (retrieved through the asset collection)
         all_paths = set(files)
         assets = set(path for path in all_paths if path.lower().startswith("assets"))
         transients = all_paths.difference(assets)
