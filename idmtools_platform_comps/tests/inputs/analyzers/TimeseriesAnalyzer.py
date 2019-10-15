@@ -1,12 +1,13 @@
 import os
+
+import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 
 from idmtools.analysis.AnalyzeManager import AnalyzeManager
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import IAnalyzer
-import numpy as np
-import matplotlib.pyplot as plt
 
 
 class TimeseriesAnalyzer(IAnalyzer):
