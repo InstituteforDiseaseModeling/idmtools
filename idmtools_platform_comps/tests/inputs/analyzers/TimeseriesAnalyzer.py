@@ -2,6 +2,7 @@ import os
 import pandas as pd
 
 from idmtools.analysis.AnalyzeManager import AnalyzeManager
+from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import IAnalyzer
 import numpy as np
@@ -108,5 +109,5 @@ if __name__ == "__main__":
     filenames = ['output/InsetChart.json']
     analyzers = [TimeseriesAnalyzer(filenames=filenames)]
 
-    manager = AnalyzeManager(platform=platform, ids=[exp_id], analyzers=analyzers)
+    manager = AnalyzeManager(platform=platform, ids=[(exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
     manager.analyze()
