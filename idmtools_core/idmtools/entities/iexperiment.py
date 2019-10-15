@@ -38,7 +38,7 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
     simulations: EntityContainer = field(default_factory=lambda: EntityContainer(), compare=False,
                                          metadata={"pickle_ignore": True})
     _simulation_default: 'TSimulation' = field(default=None, compare=False)
-    item_type: 'ItemType' = field(default=ItemType.EXPERIMENT)
+    item_type: 'ItemType' = field(default=ItemType.EXPERIMENT, compare=False)
 
     def __post_init__(self, simulation_type):
         super().__post_init__()

@@ -288,7 +288,9 @@ class AnalyzeManager(CacheEnabled):
         # initialize mapping results cache/storage
         n_items = len(self._items)
         n_processes = min(self.max_processes, max(n_items, 1))
-        # self.initialize_cache(shards=n_processes, eviction_policy='none')  # ck4, restore if CacheEnabled is refactored
+
+        # Initialize the cache
+        self.initialize_cache(shards=n_processes, eviction_policy='none')
 
         # do any platform-specific initializations
         for analyzer in self.analyzers:

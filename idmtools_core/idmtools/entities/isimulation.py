@@ -13,7 +13,7 @@ class ISimulation(IAssetsEnabled, INamedEntity, metaclass=ABCMeta):
     Represents a generic Simulation.
     This class needs to be implemented for each model type with specifics.
     """
-    item_type: 'ItemType' = field(default=ItemType.SIMULATION)
+    item_type: 'ItemType' = field(default=ItemType.SIMULATION, compare=False)
 
     @property
     def experiment(self):

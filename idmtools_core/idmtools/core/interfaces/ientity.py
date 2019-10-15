@@ -23,7 +23,7 @@ class IEntity(IItem, metaclass=ABCMeta):
     _parent: 'IEntity' = field(default=None, compare=False, metadata={"pickle_ignore": True})
     status: 'EntityStatus' = field(default=None, compare=False, metadata={"pickle_ignore": True})
     tags: 'TTags' = field(default_factory=lambda: {}, metadata={"md": True})
-    item_type: 'ItemType' = field(default=None)
+    item_type: 'ItemType' = field(default=None, compare=False)
 
     @property
     def parent(self):
