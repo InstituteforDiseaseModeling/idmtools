@@ -281,7 +281,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
         # Retrieve the simulation from COMPS
         comps_simulation = self.get_platform_item(item.uid, ItemType.SIMULATION,
-                                                  cols=["id", "experiment_id"], chuldren=["files", "configuration"])
+                                                  columns=["id", "experiment_id"], children=["files", "configuration"])
 
         all_paths = set(files)
         assets = set(path for path in all_paths if path.lower().startswith("assets"))
