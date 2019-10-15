@@ -12,7 +12,7 @@ if typing.TYPE_CHECKING:
     from uuid import UUID
 
 
-@dataclass(unsafe_hash=True)
+@dataclass
 class IEntity(IItem, metaclass=ABCMeta):
     """
     Interface for all entities in the system.
@@ -71,6 +71,9 @@ class IEntity(IItem, metaclass=ABCMeta):
     @property
     def succeeded(self):
         return self.status == EntityStatus.SUCCEEDED
+
+    def __hash__(self):
+        return id(self.uid)
 
 
 TEntity = typing.TypeVar("TEntity", bound=IEntity)

@@ -1,6 +1,6 @@
 import typing
 from abc import ABCMeta, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from idmtools.core import ItemType
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
@@ -13,10 +13,7 @@ class ISimulation(IAssetsEnabled, INamedEntity, metaclass=ABCMeta):
     Represents a generic Simulation.
     This class needs to be implemented for each model type with specifics.
     """
-
-    def __post_init__(self):
-        super().__post_init__()
-        self.item_type = ItemType.SIMULATION
+    item_type: 'ItemType' = field(default=ItemType.SIMULATION)
 
     @property
     def experiment(self):
@@ -60,6 +57,9 @@ class ISimulation(IAssetsEnabled, INamedEntity, metaclass=ABCMeta):
     def __repr__(self):
         return f"<Simulation: {self.uid} - Exp_id: {self.parent_id}>"
 
+    def __hash__(self):
+        return id(self.uid)
+
     def pre_creation(self):
         self.gather_assets()
 
@@ -85,3 +85,22 @@ TSimulationClass = typing.Type[TSimulation]
 TSimulationBatch = typing.List[TSimulation]
 TAllSimulationData = typing.Mapping[TSimulation, typing.Any]
 TSimulationList = typing.List[typing.Union[TSimulation, str]]
+
+
+@dataclass(repr=False)
+class StandardSimulation(ISimulation):
+    def set_parameter(self, name: str, value: any) -> dict:
+        pass
+
+    def get_parameter(self, name, default=None):
+        pass
+
+    def update_parameters(self, params):
+        pass
+
+    def gather_assets(self):
+        pass
+
+    def __hash__(self):
+        return id(self.uid)
+

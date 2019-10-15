@@ -15,7 +15,7 @@ from idmtools.core import CacheEnabled, EntityContainer, ItemType
 from idmtools.core.experiment_factory import experiment_factory
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities import IPlatform
-from idmtools.entities.iexperiment import IExperiment
+from idmtools.entities.iexperiment import IExperiment, StandardExperiment
 from idmtools.entities.isimulation import ISimulation
 from idmtools.utils.time import timestamp
 from idmtools_platform_comps.utils import convert_COMPS_status
@@ -201,7 +201,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         if isinstance(platform_item, COMPSExperiment):
             # Create an experiment
             experiment = experiment_factory.create(platform_item.tags.get("type"), tags=platform_item.tags,
-                                                   name=platform_item.name)
+                                                   name=platform_item.name, fallback=StandardExperiment)
             # Set the correct attributes
             experiment.uid = platform_item.id
             experiment.comps_experiment = platform_item
