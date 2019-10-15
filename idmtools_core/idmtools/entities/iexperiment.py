@@ -37,11 +37,11 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
     builders: set = field(default_factory=lambda: set(), compare=False, metadata={"pickle_ignore": True})
     simulations: EntityContainer = field(default_factory=lambda: EntityContainer(), compare=False,
                                          metadata={"pickle_ignore": True})
+    _simulation_default: 'TSimulation' = field(default=None, compare=False)
+    item_type: 'ItemType' = field(default=ItemType.EXPERIMENT)
 
     def __post_init__(self, simulation_type):
         super().__post_init__()
-        self.simulations = self.simulations or EntityContainer()
-        self.item_type = ItemType.EXPERIMENT
         # Take care of the base simulation
         if not self.base_simulation:
             if simulation_type and callable(simulation_type):
@@ -190,3 +190,12 @@ TExperiment = typing.TypeVar("TExperiment", bound=IExperiment)
 TExperimentClass = typing.Type[TExperiment]
 # Composed types
 TExperimentList = typing.List[typing.Union[TExperiment, str]]
+
+
+class StandardExperiment(IExperiment):
+    def __post_init__(self, simulation_type):
+        from idmtools.entities.isimulation import StandardSimulation
+        super().__post_init__(simulation_type=simulation_type or StandardSimulation)
+
+    def gather_assets(self) -> None:
+        pass

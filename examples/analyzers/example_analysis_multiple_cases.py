@@ -83,7 +83,7 @@ if __name__ == "__main__":
     manager3.analyze()
 
     # case #4: old experiment_id
-    filenames = ['output/InsetChart.json']
+    filenames = ['output/result.json']
     analyzer3 = [ExampleAnalyzer3(filenames=filenames)]
     manager4 = AnalyzeManager(platform=platform, ids=[experiment_tuple],
                               analyzers=analyzer3)
