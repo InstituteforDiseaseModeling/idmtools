@@ -21,10 +21,10 @@ class TestExperimentFactory(ITestWithPersistence):
         em = ExperimentManager(experiment=experiment, platform=test_platform)
         em.run()
 
-        self.assertEqual(len(em.experiment.children()), 2)
+        self.assertEqual(len(em.experiment.simulations), 2)
         self.assertEqual(em.experiment.assets.assets[0].filename, "working_model.py")
-        self.assertEqual(em.experiment.children()[0].tags, {'p': 0})
-        self.assertEqual(em.experiment.children()[1].tags, {'p': 1})
+        self.assertEqual(em.experiment.simulations[0].tags, {'p': 0})
+        self.assertEqual(em.experiment.simulations[1].tags, {'p': 1})
 
     def test_build_emod_experiment_from_factory(self):
         test_platform = Platform('Test')
@@ -44,7 +44,7 @@ class TestExperimentFactory(ITestWithPersistence):
         em = ExperimentManager(experiment=experiment, platform=test_platform)
         em.run()
 
-        self.assertEqual(len(em.experiment.children(refresh=True)), 20)
+        self.assertEqual(len(em.experiment.simulations), 20)
         self.assertEqual(em.experiment.tags, {'a': '1', 'b': 2,
                                               'type': 'idmtools_model_emod.emod_experiment.EMODExperiment'})
 

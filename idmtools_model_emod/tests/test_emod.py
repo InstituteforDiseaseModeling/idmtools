@@ -22,7 +22,7 @@ class TestEMOD(ITestWithPersistence):
 
     @classmethod
     def setUpClass(cls):
-        cls.platform = Platform('COMPS2')
+        cls.platform = Platform('COMPS')
 
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
@@ -33,7 +33,7 @@ class TestEMOD(ITestWithPersistence):
                                         eradication_path=os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe"))
 
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
-        sim = e.base_simulation
+        sim = e.simulation()
         sim.set_parameter("Enable_Immunity", 0)
         b = StandAloneSimulationsBuilder()
         b.add_simulation(sim)
@@ -85,7 +85,7 @@ class TestEMOD(ITestWithPersistence):
         b = StandAloneSimulationsBuilder()
 
         for i in range(20):
-            sim = e.base_simulation
+            sim = e.simulation()
             sim.set_parameter("Enable_Immunity", 0)
             b.add_simulation(sim)
 

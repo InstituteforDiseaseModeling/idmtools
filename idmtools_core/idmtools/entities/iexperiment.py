@@ -5,10 +5,11 @@ from abc import ABC
 from itertools import chain
 from dataclasses import dataclass, field, InitVar
 from more_itertools import grouper
+
+from idmtools.core import ItemType
 from idmtools.core.interfaces.entity_container import EntityContainer
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.core.interfaces.inamed_entity import INamedEntity
-from idmtools.entities.icontainer_item import IContainerItem
 
 if typing.TYPE_CHECKING:
     from idmtools.core.types import TSimulation, TSimulationClass, TExperimentBuilder
@@ -16,7 +17,7 @@ if typing.TYPE_CHECKING:
 
 
 @dataclass(repr=False)
-class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
+class IExperiment(IAssetsEnabled, INamedEntity, ABC):
     """
     Represents a generic Experiment.
     This class needs to be implemented for each model type with specifics.
@@ -36,10 +37,11 @@ class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
     builders: set = field(default_factory=lambda: set(), compare=False, metadata={"pickle_ignore": True})
     simulations: EntityContainer = field(default_factory=lambda: EntityContainer(), compare=False,
                                          metadata={"pickle_ignore": True})
+    _simulation_default: 'TSimulation' = field(default=None, compare=False)
+    item_type: 'ItemType' = field(default=ItemType.EXPERIMENT, compare=False)
 
     def __post_init__(self, simulation_type):
         super().__post_init__()
-        self.simulations = self.simulations or EntityContainer()
         # Take care of the base simulation
         if not self.base_simulation:
             if simulation_type and callable(simulation_type):
@@ -145,7 +147,7 @@ class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
         sim = copy.deepcopy(self.base_simulation)
         sim.assets = copy.deepcopy(self.base_simulation.assets)
         sim.platform = self.platform
-        sim.parent_id = self.uid
+        sim.experiment = self
         return sim
 
     def pre_creation(self):
@@ -157,15 +159,22 @@ class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
 
     @property
     def done(self):
-        return all([s.done for s in self.children()])
+        return all([s.done for s in self.simulations])
 
     @property
     def succeeded(self):
-        return all([s.succeeded for s in self.children()])
+        return all([s.succeeded for s in self.simulations])
 
     @property
     def simulation_count(self):
-        return len(self.children())
+        return len(self.simulations)
+
+    def refresh_simulations(self):
+        from idmtools.core import ItemType
+        self.simulations = self.platform.get_children(self.uid, ItemType.EXPERIMENT, force=True)
+
+    def refresh_simulations_status(self):
+        self.platform.refresh_status(item=self)
 
     def pre_getstate(self):
         """
@@ -181,3 +190,12 @@ TExperiment = typing.TypeVar("TExperiment", bound=IExperiment)
 TExperimentClass = typing.Type[TExperiment]
 # Composed types
 TExperimentList = typing.List[typing.Union[TExperiment, str]]
+
+
+class StandardExperiment(IExperiment):
+    def __post_init__(self, simulation_type):
+        from idmtools.entities.isimulation import StandardSimulation
+        super().__post_init__(simulation_type=simulation_type or StandardSimulation)
+
+    def gather_assets(self) -> None:
+        pass

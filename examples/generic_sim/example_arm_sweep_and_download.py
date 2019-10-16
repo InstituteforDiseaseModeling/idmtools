@@ -24,7 +24,7 @@ def param_update(simulation, param, value):
 
 
 if __name__ == "__main__":
-    platform = Platform('COMPS')
+    platform = Platform('COMPS2')
 
     ac = AssetCollection()
     a = Asset(absolute_path=os.path.join(INPUT_PATH, "single_node_demographics.json"))
@@ -68,5 +68,6 @@ if __name__ == "__main__":
     filenames = ['output\\InsetChart.json']
     analyzers = [DownloadAnalyzer(filenames=filenames, output_path='download-e2eB')]
 
-    manager = AnalyzeManager(platform=platform, ids=[em.experiment.uid], analyzers=analyzers)
+    manager = AnalyzeManager(platform=platform, analyzers=analyzers)
+    manager.add_item(em.experiment)
     manager.analyze()

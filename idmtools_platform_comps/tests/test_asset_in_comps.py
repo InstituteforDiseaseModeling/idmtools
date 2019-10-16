@@ -29,6 +29,7 @@ class TestAssetsInComps(unittest.TestCase):
 
     def _run_and_test_experiment(self, experiment):
         experiment.builder = self.builder
+        experiment.platform = self.platform
 
         # Create experiment on platform
         experiment.pre_creation()
@@ -45,20 +46,24 @@ class TestAssetsInComps(unittest.TestCase):
                 simulation.uid = uid
                 simulation.post_creation()
 
+                experiment.simulations.append(simulation.metadata)
+                experiment.simulations.set_status(EntityStatus.CREATED)
+
                 from idmtools.entities import ISimulation
                 simulation.__class__ = ISimulation
+
 
         self.platform.refresh_status(item=experiment)
 
         # Test if we have all simulations at status CREATED
         self.assertFalse(experiment.done)
-        self.assertTrue(all([s.status == EntityStatus.CREATED for s in experiment.children()]))
+        self.assertTrue(all([s.status == EntityStatus.CREATED for s in experiment.simulations]))
 
         # Start experiment
         self.platform.run_items(items=[experiment])
         self.platform.refresh_status(item=experiment)
         self.assertFalse(experiment.done)
-        self.assertTrue(all([s.status == EntityStatus.RUNNING for s in experiment.children()]))
+        self.assertTrue(all([s.status == EntityStatus.RUNNING for s in experiment.simulations]))
 
         # Wait till done
         import time

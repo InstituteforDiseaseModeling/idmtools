@@ -1,108 +1,80 @@
 import typing
 from abc import ABCMeta
-from dataclasses import dataclass, field, fields, _MISSING_TYPE
+from dataclasses import dataclass, field
 
-from idmtools.utils.hashing import hash_obj
+from idmtools.core import EntityStatus, ItemType, NoPlatformException
+from idmtools.core.interfaces.iitem import IItem
+from idmtools.services.platforms import PlatformPersistService
 
 if typing.TYPE_CHECKING:
     from idmtools.core import TTags
+    from idmtools.entities.iplatform import TPlatform
     from uuid import UUID
 
 
-@dataclass(unsafe_hash=True)
-class IEntity(metaclass=ABCMeta):
+@dataclass
+class IEntity(IItem, metaclass=ABCMeta):
     """
     Interface for all entities in the system.
     """
-    _uid: 'UUID' = field(default=None, metadata={"md": True})
-    platform_id: 'UUID' = field(default=None, metadata={"md": True})
+    platform_id: 'UUID' = field(default=None, compare=False, metadata={"md": True})
+    _platform: 'TPlatform' = field(default=None, compare=False, metadata={"pickle_ignore": True})
+    parent_id: 'UUID' = field(default=None, metadata={"md": True})
+    _parent: 'IEntity' = field(default=None, compare=False, metadata={"pickle_ignore": True})
+    status: 'EntityStatus' = field(default=None, compare=False, metadata={"pickle_ignore": True})
     tags: 'TTags' = field(default_factory=lambda: {}, metadata={"md": True})
+    item_type: 'ItemType' = field(default=None, compare=False)
 
     @property
-    def metadata(self):
-        attrs = set(vars(self).keys())
-        obj_dict = {k: getattr(self, k) for k in attrs.intersection(self.metadata_fields)}
-        return self.__class__(**obj_dict)
+    def parent(self):
+        if not self._parent:
+            if not self.parent_id:
+                return None
+            if not self.platform:
+                raise NoPlatformException("The object has no platform set...")
+            self._parent = self.platform.get_parent(self.uid, self.item_type)
+
+        return self._parent
+
+    @parent.setter
+    def parent(self, parent):
+        if parent:
+            self._parent = parent
+            self.parent_id = parent.uid
+        else:
+            self.parent_id = self._parent = None
 
     @property
-    def pickle_ignore_fields(self):
-        return set(f.name for f in fields(self) if "pickle_ignore" in f.metadata and f.metadata["pickle_ignore"])
+    def platform(self):
+        if not self._platform and self.platform_id:
+            self._platform = PlatformPersistService.retrieve(self.platform_id)
+        return self._platform
+
+    @platform.setter
+    def platform(self, platform):
+        if platform:
+            self.platform_id = platform.uid
+            self._platform = platform
+        else:
+            self._platform = self.platform_id = None
+
+    def get_platform_object(self, force=False, **kwargs):
+        if not self.platform:
+            raise NoPlatformException("The object has no platform set...")
+
+        return self.platform.get_item(self.uid, self.item_type, raw=True, force=force, **kwargs)
 
     @property
-    def metadata_fields(self):
-        return set(f.name for f in fields(self) if "md" in f.metadata and f.metadata["md"])
+    def done(self):
+        return self.status in (EntityStatus.SUCCEEDED, EntityStatus.FAILED)
 
     @property
-    def uid(self):
-        return hash_obj(self) if self._uid is None else self._uid
+    def succeeded(self):
+        return self.status == EntityStatus.SUCCEEDED
 
-    @uid.setter
-    def uid(self, uid):
-        self._uid = uid
+    def __hash__(self):
+        return id(self.uid)
 
-    def display(self):
-        return self.__repr__()
 
-    # region Events methods
-    def pre_creation(self) -> None:
-        """
-        Called before the actual creation of the entity.
-        """
-        pass
-
-    def post_creation(self) -> None:
-        """
-        Called after the actual creation of the entity.
-        """
-        pass
-
-    def post_setstate(self):
-        """
-        Function called after restoring the state if additional initialization is required
-        """
-        pass
-
-    def pre_getstate(self):
-        """
-        Function called before picking and return default values for "pickle-ignore" fields
-        """
-        pass
-
-    # endregion
-
-    # region State management
-    def __getstate__(self):
-        """
-        Ignore the fields in pickle_ignore_fields during pickling.
-        """
-        state = self.__dict__.copy()
-        attrs = set(vars(self).keys())
-
-        # Retrieve fields default values
-        fds = fields(self)
-        field_default = {f.name: f.default for f in fds}
-
-        # Update default with parent's pre-populated values
-        pre_state = self.pre_getstate()
-        pre_state = pre_state or {}
-        field_default.update(pre_state)
-
-        # Don't pickle ignore_pickle fields: set values to default
-        for field_name in attrs.intersection(self.pickle_ignore_fields):
-            if field_name in state:
-                if isinstance(field_default[field_name], _MISSING_TYPE):
-                    state[field_name] = None
-                else:
-                    state[field_name] = field_default[field_name]
-
-        return state
-
-    def __setstate__(self, state):
-        """
-        Add ignored fields back since they don't exist in the pickle
-        """
-        self.__dict__.update(state)
-
-        # Restore the pickle fields with values requested
-        self.post_setstate()
-    # endregion
+TEntity = typing.TypeVar("TEntity", bound=IEntity)
+TEntityList = typing.List[TEntity]

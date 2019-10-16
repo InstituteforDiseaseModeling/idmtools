@@ -1,20 +1,22 @@
 import io
 import logging
 import os
-from concurrent.futures.thread import ThreadPoolExecutor
-from pathlib import Path
 import platform
 import shutil
 import tarfile
 import time
+from concurrent.futures.thread import ThreadPoolExecutor
 from dataclasses import dataclass
 from io import BytesIO
 from logging import getLogger
-from typing import Optional, Union, NoReturn, BinaryIO, Tuple, Dict, List
+from pathlib import Path
+from typing import BinaryIO, Dict, List, NoReturn, Optional, Tuple, Union
+
 import docker
 from docker.errors import APIError
 from docker.models.containers import Container
 from docker.models.networks import Network
+
 from idmtools.core.system_information import get_system_information
 from idmtools.utils.decorators import optional_yaspin_load, ParallelizeDecorator
 from idmtools_platform_local import __version__
@@ -22,7 +24,6 @@ from idmtools_platform_local import __version__
 logger = getLogger(__name__)
 # thread queue for docker copy operations
 io_queue = ParallelizeDecorator()
-
 
 docker_repo = f'{os.getenv("DOCKER_REPO", "idm-docker-public")}.packages.idmod.org'
 if logger.isEnabledFor(logging.DEBUG):
@@ -409,7 +410,7 @@ class DockerOperations:
             self.client.volumes.create(name='idmtools_local_postgres')
 
     @staticmethod
-    def _get_optional_port_bindings(src_port: Optional[Union[str, int]], dest_port: Optional[Union[str, int]]) ->\
+    def _get_optional_port_bindings(src_port: Optional[Union[str, int]], dest_port: Optional[Union[str, int]]) -> \
             Optional[dict]:
         """
         Used to generate port bindings configurations if the inputs are not set to none
@@ -448,12 +449,20 @@ class DockerOperations:
             target_file = os.path.join(self.host_data_directory,
                                        destination_path.replace('/data', '/workers')[1:], name)
 
+            # Make sure to have the correct separators for the path
+            target_file = target_file.replace('/', os.sep).replace('\\', os.sep)
+
+            # Do the copy
             shutil.copy(file, target_file)
             return True
         elif isinstance(file, BytesIO):
             target_file = os.path.join(self.host_data_directory, destination_path.replace('/data', '/workers')[1:],
                                        dest_name)
+            # Make sure to have the correct separators for the path
+            target_file = target_file.replace('/', os.sep).replace('\\', os.sep)
+
             logger.debug(f'Copying {dest_name} to docker container {container.id}:{destination_path}')
+
             with open(target_file, 'wb') as of:
                 of.write(file.read())
             return True
@@ -516,5 +525,7 @@ class DockerOperations:
         Returns:
             (ExecResult) Result of the mkdir operation
         """
-        os.makedirs(os.path.join(self.host_data_directory, dir.replace('/data', '/workers')[1:]), exist_ok=True)
+        path = os.path.join(self.host_data_directory, dir.replace('/data', '/workers')[1:])
+        path.replace('/', os.sep).replace('\\', os.sep)
+        os.makedirs(path, exist_ok=True)
         return True

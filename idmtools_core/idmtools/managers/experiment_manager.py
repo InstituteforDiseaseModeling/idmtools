@@ -3,6 +3,7 @@ from idmtools.core import EntityStatus
 from idmtools.entities.iplatform import TPlatform
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.services.platforms import PlatformPersistService
+from idmtools.utils.entities import retrieve_experiment
 
 if typing.TYPE_CHECKING:
     from idmtools.entities.iexperiment import TExperiment
@@ -25,18 +26,14 @@ class ExperimentManager:
 
     @classmethod
     def from_experiment_id(cls, experiment_id, platform):
-        experiment = platform.get_item(id=experiment_id)
+        experiment = retrieve_experiment(experiment_id, platform, with_simulations=True)
         platform = PlatformPersistService.retrieve(experiment.platform.uid)
         # cache miss, add the platform
         if platform is None:
             PlatformPersistService.save(obj=experiment.platform)
             platform = PlatformPersistService.retrieve(experiment.platform.uid)
         em = cls(experiment, platform)
-        em.restore_simulations()
         return em
-
-    def restore_simulations(self):
-        self.experiment.children(refresh=True)
 
     def create_experiment(self):
         self.experiment.pre_creation()
@@ -46,7 +43,9 @@ class ExperimentManager:
 
         # Persist the platform
         PlatformPersistService.save(self.platform)
-        self.experiment.platform_id = self.platform.uid
+
+        # Make sure to link it to the experiment
+        self.experiment.platform = self.platform
 
         self.experiment.post_creation()
 
@@ -71,10 +70,6 @@ class ExperimentManager:
         from idmtools.config import IdmConfigParser
         from concurrent.futures.thread import ThreadPoolExecutor
 
-        # Consider values in COMMON section
-        # _max_workers = IdmConfigParser.get_option("COMMON", "max_workers")
-        # _batch_size = IdmConfigParser.get_option("COMMON", "batch_size")
-
         # Consider values from the block that Platform uses
         _max_workers = IdmConfigParser.get_option(None, "max_workers")
         _batch_size = IdmConfigParser.get_option(None, "batch_size")
@@ -82,15 +77,17 @@ class ExperimentManager:
         _max_workers = int(_max_workers) if _max_workers else 16
         _batch_size = int(_batch_size) if _batch_size else 10
 
-        with ThreadPoolExecutor(max_workers=_max_workers) as executor:
-            executor.map(self.simulation_batch_worker_thread,
-                         self.experiment.batch_simulations(batch_size=_batch_size))
-
-        self.experiment.children().set_status(EntityStatus.CREATED)
+        with ThreadPoolExecutor(max_workers=16) as executor:
+            results = executor.map(self.simulation_batch_worker_thread,  # noqa: F841
+                                   self.experiment.batch_simulations(batch_size=_batch_size))
+        for sim_batch in results:
+            for simulation in sim_batch:
+                self.experiment.simulations.append(simulation.metadata)
+                self.experiment.simulations.set_status(EntityStatus.CREATED)
 
     def start_experiment(self):
         self.platform.run_items([self.experiment])
-        self.experiment.children().set_status(EntityStatus.RUNNING)
+        self.experiment.simulations.set_status(EntityStatus.RUNNING)
 
     def run(self):
         """
@@ -129,5 +126,5 @@ class ExperimentManager:
         raise TimeoutError(f"Timeout of {timeout} seconds exceeded when monitoring experiment {self.experiment}")
 
     def refresh_status(self):
-        self.experiment = self.platform.refresh_status(item=self.experiment)
+        self.platform.refresh_status(item=self.experiment)
         ExperimentPersistService.save(self.experiment)
