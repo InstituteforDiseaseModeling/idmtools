@@ -172,12 +172,14 @@ class IdmConfigParser:
     @classmethod
     def get_option(cls, section: str = None, option: str = None, force=False) -> str:
         """
-        Get config value based on the INI section and option
-        Args:
-            section: INI section name
-            option: INI field name
+        Get configuration value based on the INI section and option.
 
-        Returns: config value as string
+        Args:
+            section: The INI section name.
+            option: The INI field name.
+
+        Returns: 
+            A configuration value as a string.
         """
         cls.ensure_init(force=force)
         if not cls.found_ini():
@@ -191,12 +193,14 @@ class IdmConfigParser:
     @classmethod
     def ensure_init(cls, dir_path: str = '.', file_name: str = default_config, force=False) -> None:
         """
-        Make sure INI file loaded and configparser instance available
-        Args:
-            dir_path: directory where we start to look for the idm config file
-            file_name: the config file name we will look for
+        Verify that the INI file loaded and a configparser instance is available.
 
-        Returns: None
+        Args:
+            dir_path: The directory to search for the INI configuration file.
+            file_name: The configuration file name to search for.
+
+        Returns: 
+            None
         """
         if cls._instance is None:
             cls(dir_path, file_name)

@@ -185,12 +185,14 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         Return the list of children for the given platform item.
         For example, an experiment passed to this function will return all the contained simulations.
         The results are either platform items or idm-tools entities depending on the `raw` parameter.
+        
         Args:
             platform_item: Parent item
             raw: Return a platform item if True, an idm-tools entity if false
             **kwargs: Additional platform specific parameters
 
-        Returns: A list of children, None if no children
+        Returns: 
+            A list of children, None if no children
         """
         pass
 
@@ -198,12 +200,14 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     def get_parent_for_platform_item(self, platform_item: 'Any', raw: 'bool', **kwargs) -> 'Any':
         """
         Return the parent item for a given platform_item.
+
         Args:
             platform_item: Child item
             raw: Return a platform item if True, an idm-tools entity if false
             **kwargs: Additional platform specific parameters
 
-        Returns: Parent or None
+        Returns: 
+            Parent or None
         """
         pass
 
@@ -211,15 +215,17 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
                  force: 'bool' = False, raw: 'bool' = False, **kwargs) -> 'Any':
         """
         Retrieve an object from the platform.
-        This function is cached, force allows to force the refresh of the cache.
-        If no object_type passed: the function will try all the types (experiment, suite, simulation)
+        This function is cached; force allows you to force the refresh of the cache.
+        If no **object_type** is passed, the function will try all the types (experiment, suite, simulation).
+        
         Args:
-            item_id: id of the object to retrieve
-            item_type: Type of the object to be retrieved
-            force: Force the object fetching from the platform
-            raw: Return either an idmtools object or a platform object
+            item_id: The ID of the object to retrieve.
+            item_type: The type of the object to be retrieved.
+            force: If True, force the object fetching from the platform.
+            raw: Return either an |IT_s| object or a platform object.
 
-        Returns: The object found on the platform or None
+        Returns: 
+            The object found on the platform or None.
         """
         if not item_type or item_type not in self.supported_types:
             raise Exception("The provided type is invalid or not supported by this platform...")
@@ -257,13 +263,12 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     def get_children(self, item_id: 'UUID', item_type: 'ItemType',
                      force: 'bool' = False, raw: 'bool' = False, **kwargs) -> 'Any':
         """
-<<<<<<< HEAD
-        Obtain the children of a given object.
+        Retrieve the children of a given object.
 
         Args:
             item_id: The ID of the object for which we want the children.
             force: If True, force the object fetching from the platform.
-            raw: Return either an idmtools object or a platform object.
+            raw: Return either an |IT_s| object or a platform object.
             item_type: Pass the type of the object for quicker retrieval.
 
         Returns: 
@@ -289,15 +294,16 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     def get_parent(self, item_id: 'UUID', item_type: 'ItemType' = None, force: 'bool' = False,
                    raw: 'bool' = False, **kwargs):
         """
-        Get the parent of a given object.
+        Retrieve the parent of a given object.
 
         Args:
-            item_id: id of the object for which we want the parent
-            force: Force the object fetching from the platform
-            raw: Return either an idmtools object or a platform object
-            item_type: Pass the type of the object for quicker retrieval
+            item_id: The ID of the object for which we want the parent.
+            force: If True, force the object fetching from the platform.
+            raw: Return either an |IT_s| object or a platform object.
+            item_type: Pass the type of the object for quicker retrieval.
 
-        Returns: Parent of the object or None
+        Returns: 
+            The parent of the object or None.
 
         """
         if not item_type or item_type not in self.supported_types:

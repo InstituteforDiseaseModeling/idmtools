@@ -10,7 +10,7 @@ from idmtools.core.interfaces.inamed_entity import INamedEntity
 @dataclass
 class ISimulation(IAssetsEnabled, INamedEntity, metaclass=ABCMeta):
     """
-    Class that epresents a generic simulation.
+    Class that represents a generic simulation.
     This class needs to be implemented for each model type with specifics.
     """
     item_type: 'ItemType' = field(default=ItemType.SIMULATION, compare=False)

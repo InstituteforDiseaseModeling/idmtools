@@ -10,7 +10,7 @@ if typing.TYPE_CHECKING:
 class IAnalyzer(metaclass=ABCMeta):
     """
     An abstract base class carrying the lowest level analyzer interfaces called by 
-    :class:`~idmtools.managers.ExperimentManager.ExperimentManager`.
+    :class:`~idmtools.managers.experiment_manager.ExperimentManager`.
     """
 
     @abstractmethod
