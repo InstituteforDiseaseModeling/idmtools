@@ -2,6 +2,7 @@ import os
 import pandas as pd
 
 from idmtools.analysis.AnalyzeManager import AnalyzeManager
+from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import IAnalyzer
 
@@ -79,5 +80,5 @@ if __name__ == "__main__":
     analyzers = [PopulationAnalyzer(filenames=filenames)]
 
     exp_id = '3dda8b9b-b5ea-e911-a2be-f0921c167861'  # comps2 exp_id
-    manager = AnalyzeManager(platform=platform, ids=[exp_id], analyzers=analyzers)
+    manager = AnalyzeManager(platform=platform, ids=[(exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
     manager.analyze()

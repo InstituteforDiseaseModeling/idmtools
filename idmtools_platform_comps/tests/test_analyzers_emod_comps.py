@@ -67,7 +67,8 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
 
         self.create_experiment()
 
-        analyzers = [AddAnalyzer()]
+        filenames = ['StdOut.txt']
+        analyzers = [AddAnalyzer(filenames=filenames)]
 
         am = AnalyzeManager(platform=self.p, ids=[(self.exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
