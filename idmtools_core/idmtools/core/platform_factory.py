@@ -58,7 +58,7 @@ class Platform:
         """
 
         # Read block details
-        section = IdmConfigParser.get_block(block)
+        section = IdmConfigParser.get_section(block, force=True)
 
         try:
             # Make sure block has type entry
@@ -115,7 +115,7 @@ class Platform:
         field_not_used = set(inputs.keys()) - set(field_type.keys())
         if len(field_not_used) > 0:
             field_not_used_display = [" - {} = {}".format(fn, inputs[fn]) for fn in field_not_used]
-            print(f"\n[{block}]: /!\\ WARNING: the following Config Settings are not used:")
+            print(f"\n[{block}]: /!\\ WARNING: the following Config Settings are not used when creating Platform:")
             print("\n".join(field_not_used_display))
 
         # Remove extra fields

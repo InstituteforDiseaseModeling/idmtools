@@ -5,7 +5,6 @@ import typing
 
 from idmtools.analysis.map_worker_entry import map_item
 from idmtools.core import CacheEnabled
-from idmtools.core.enums import EntityStatus
 from idmtools.utils.command_line import animation
 from idmtools.utils.language import on_off, verbose_timedelta
 from multiprocessing.pool import Pool
@@ -13,7 +12,7 @@ from typing import NoReturn
 
 if typing.TYPE_CHECKING:
     from idmtools.entities.ianalyzer import TAnalyzer
-    from idmtools.entities.iitem import TItem, TItemList
+    from idmtools.core.interfaces.iitem import TItem, TItemList
 
 
 def pool_worker_initializer(func, analyzers, cache, platform) -> None:
@@ -36,7 +35,6 @@ def pool_worker_initializer(func, analyzers, cache, platform) -> None:
 
 
 class AnalyzeManager(CacheEnabled):
-
     ANALYZE_TIMEOUT = 3600 * 8  # Maximum seconds before timing out - set to 8 hours
     WAIT_TIME = 1.15  # How much time to wait between check if the analysis is done
     EXCEPTION_KEY = '__EXCEPTION__'
@@ -67,15 +65,17 @@ class AnalyzeManager(CacheEnabled):
 
         # Take the provided ids and determine the full set of unique root items (e.g. simulations) in them to analyze
         ids = list(set(ids or list()))  # uniquify
-        items = [platform.get_item(id=id) for id in ids]
-        self.potential_items = platform.get_root_items(items=items)
+        items = [platform.get_item(oid, otype, force=True) for oid, otype in ids]
+        self.potential_items = []
+        for i in items:
+            self.potential_items.extend(platform.flatten_item(item=i))
         self._items = dict()  # filled in later by _get_items_to_analyze
 
         self.analyzers = analyzers or list()
 
         self.verbose = verbose
 
-    def add_item(self, item: 'TItem') -> NoReturn:
+    def add_item(self, item: 'TEntity') -> NoReturn:
         """
         Add an additional item for analysis.
 
@@ -85,23 +85,10 @@ class AnalyzeManager(CacheEnabled):
         Returns:
             None
         """
-        self.potential_items.append(item)
 
-    @staticmethod
-    def can_analyze_item(item: 'TItem') -> bool:
-        """
-        Check if this item can be processed now. 
+        self.potential_items.extend(self.platform.flatten_item(item=item))
 
-        Args:
-            item: The item to check.
-
-        Returns: 
-            A Boolean indicating if the item can be analyzed. 
-
-        """
-        return item.status == EntityStatus.SUCCEEDED
-
-    def _get_items_to_analyze(self) -> 'TItemList':
+    def _get_items_to_analyze(self) -> 'dict':
         """
         Get a list of items derived from :meth:`self._items` that are available to analyze.
         
@@ -116,7 +103,7 @@ class AnalyzeManager(CacheEnabled):
         can_analyze = {}
         cannot_analyze = {}
         for item in self.potential_items:
-            if self.can_analyze_item(item):
+            if item.succeeded:
                 can_analyze[item.uid] = item
             else:
                 cannot_analyze[item.uid] = item
@@ -124,16 +111,14 @@ class AnalyzeManager(CacheEnabled):
         # now consider item limiting arguments
         if self.partial_analyze_ok:
             if self.max_items_to_analyze is not None:
-                to_analyze = {item.uid: item for item in list(can_analyze.values())[0:self.max_items_to_analyze]}
-            else:
-                to_analyze = can_analyze
-        else:
-            if len(cannot_analyze) > 0:
-                raise self.ItemsNotReady('There are %d items that cannot be analyzed and partial_analyze_ok is off.' %
-                                         len(cannot_analyze))
-            to_analyze = can_analyze
+                return {item.uid: item for item in list(can_analyze.values())[0:self.max_items_to_analyze]}
+            return can_analyze
 
-        return to_analyze
+        if len(cannot_analyze) > 0:
+            raise self.ItemsNotReady('There are %d items that cannot be analyzed and partial_analyze_ok is off.' %
+                                     len(cannot_analyze))
+
+        return can_analyze
 
     def add_analyzer(self, analyzer: 'TAnalyzer') -> NoReturn:
         """
@@ -319,10 +304,13 @@ class AnalyzeManager(CacheEnabled):
         # initialize mapping results cache/storage
         n_items = len(self._items)
         n_processes = min(self.max_processes, max(n_items, 1))
-        # self.initialize_cache(shards=n_processes, eviction_policy='none')  # ck4, restore if CacheEnabled is refactored
+
+        # Initialize the cache
+        self.initialize_cache(shards=n_processes, eviction_policy='none')
 
         # do any platform-specific initializations
-        self.platform.initialize_for_analysis(self._items, self.analyzers)
+        for analyzer in self.analyzers:
+            analyzer.per_group(items=self._items)
 
         if self.verbose:
             self._print_configuration(n_items, n_processes)

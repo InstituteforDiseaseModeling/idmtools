@@ -1,19 +1,15 @@
 import os
 import sys
-
-import unittest
-
 import pytest
 import json
 from functools import partial
-
 from COMPS.Data import Experiment
 from idmtools.builders import ExperimentBuilder
+from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_model_emod.defaults import EMODSir
 from idmtools_model_emod.emod_experiment import EMODExperiment
-
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools.analysis.AnalyzeManager import AnalyzeManager
 from idmtools.analysis.AddAnalyzer import AddAnalyzer
@@ -33,6 +29,7 @@ setB = partial(param_update, param="b")
 setC = partial(param_update, param="c")
 setD = partial(param_update, param="d")
 
+
 @pytest.mark.comps
 class TestAnalyzeManagerEmodComps(ITestWithPersistence):
 
@@ -44,7 +41,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
     def create_experiment(self):
 
         e = EMODExperiment.from_default(self.case_name, default=EMODSir,
-                                       eradication_path=os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe"))
+                                        eradication_path=os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe"))
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
 
         e.base_simulation.set_parameter("Enable_Immunity", 0)
@@ -70,13 +67,14 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
 
         self.create_experiment()
 
-        analyzers = [AddAnalyzer()]
+        filenames = ['StdOut.txt']
+        analyzers = [AddAnalyzer(filenames=filenames)]
 
-        am = AnalyzeManager(platform=self.p, ids=[self.exp_id], analyzers=analyzers)
+        am = AnalyzeManager(platform=self.p, ids=[(self.exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
 
     def test_DownloadAnalyzer(self):
-        #delete output from previous run
+        # delete output from previous run
         del_folder("output")
 
         # create a new empty 'output' dir
@@ -84,47 +82,46 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
 
         self.create_experiment()
 
-        filenames = ['output\\InsetChart.json', 'config.json']
+        filenames = ['output/InsetChart.json', 'config.json']
         analyzers = [DownloadAnalyzer(filenames=filenames, output_path='output')]
 
-        am = AnalyzeManager(platform=self.p, ids=[self.exp_id], analyzers=analyzers)
+        am = AnalyzeManager(platform=self.p, ids=[(self.exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
 
         for simulation in Experiment.get(self.exp_id).get_simulations():
             s = simulation.get(id=simulation.id)
             self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "config.json")))
-            self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "insetChart.json")))
+            self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "InsetChart.json")))
 
     def test_analyzer_multiple_experiments(self):
-        #delete output from previous run
+        # delete output from previous run
         del_folder("output")
 
         # create a new empty 'output' dir
         os.mkdir("output")
 
-        filenames = ['output\\InsetChart.json', 'config.json']
+        filenames = ['output/InsetChart.json', 'config.json']
         analyzers = [DownloadAnalyzer(filenames=filenames, output_path='output')]
 
-        exp_list = ['6f693627-6de5-e911-a2be-f0921c167861', '1991ec0d-6ce5-e911-a2be-f0921c167861'] #comps2 staging
+        exp_list = [('6f693627-6de5-e911-a2be-f0921c167861', ItemType.EXPERIMENT),
+                    ('1991ec0d-6ce5-e911-a2be-f0921c167861', ItemType.EXPERIMENT)]  # comps2 staging
         am = AnalyzeManager(platform=self.p, ids=exp_list, analyzers=analyzers)
         am.analyze()
-
 
     def test_population_analyzer(self):
         analyzer_path = os.path.join(os.path.dirname(__file__), "inputs", "analyzers")
         del_file(os.path.join(analyzer_path, 'population.csv'))
         del_file(os.path.join(analyzer_path, 'population.png'))
         self.create_experiment()
-        #self.exp_id = "fc59240c-07db-e911-a2be-f0921c167861"
+        # self.exp_id = "fc59240c-07db-e911-a2be-f0921c167861"
         filenames = ['output/InsetChart.json']
-
 
         sys.path.insert(0, analyzer_path)
         from PopulationAnalyzer import PopulationAnalyzer
 
         analyzers = [PopulationAnalyzer(filenames=filenames)]
 
-        am = AnalyzeManager(platform=self.p, ids=[self.exp_id], analyzers=analyzers)
+        am = AnalyzeManager(platform=self.p, ids=[(self.exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
 
         # -----------------------------------------------------------------------------------------------------
@@ -148,7 +145,6 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
                 self.assertEqual(str(population_data[i]), df[2:].iloc[i, sim_count])
             sim_count = sim_count + 1
 
-
     def test_analyzer_preidmtools_exp(self):
         # delete output from previous run
         del_folder("output")
@@ -156,15 +152,15 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         # create a new empty 'output' dir
         os.mkdir("output")
 
-        filenames = ['output\\InsetChart.json', 'config.json']
+        filenames = ['output/InsetChart.json', 'config.json']
         analyzers = [DownloadAnalyzer(filenames=filenames, output_path='output')]
 
-        exp_id = 'f48e09d4-acd9-e911-a2be-f0921c167861' # comps2
+        exp_id = ('f48e09d4-acd9-e911-a2be-f0921c167861', ItemType.EXPERIMENT)  # comps2
 
         am = AnalyzeManager(platform=self.p, ids=[exp_id], analyzers=analyzers)
         am.analyze()
 
-        for simulation in Experiment.get(exp_id).get_simulations():
+        for simulation in Experiment.get(exp_id[0]).get_simulations():
             s = simulation.get(id=simulation.id)
             self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "config.json")))
-            self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "insetChart.json")))
+            self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "InsetChart.json")))

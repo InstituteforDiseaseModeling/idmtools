@@ -2,8 +2,10 @@ import datetime
 import importlib
 import importlib.util
 import os
+from concurrent.futures import Executor, as_completed
+from concurrent.futures.thread import ThreadPoolExecutor
 from functools import wraps
-from typing import Callable, Union
+from typing import Callable, Union, Optional, Type
 
 
 class abstractstatic(staticmethod):
@@ -157,6 +159,56 @@ def optional_yaspin_load(*yargs, **ykwargs) -> Callable:
             return result
         return wrapper
     return decorate
+
+
+class ParallelizeDecorator:
+    """
+    ParallelizeDecorator allows you to easily parallelize a group of code. A simple of example would be
+
+    Examples:
+        ::
+
+            op_queue = ParallelizeDecorator()
+
+            class Ops:
+                op_queue.parallelize
+                def heavy_op():
+                    time.sleep(10)
+
+                def do_lots_of_heavy():
+                    futures = [self.heavy_op() for i in range(100)]
+                    results = op_queue.get_results(futures)
+    """
+    def __init__(self, queue=None, pool_type: Optional[Type[Executor]] = ThreadPoolExecutor):
+        if queue is None:
+            self.queue = pool_type()
+        else:
+            self.queue = queue
+
+    def parallelize(self, func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            future = self.queue.submit(func, *args, **kwargs)
+            return future
+
+        return wrapper
+
+    def join(self):
+        return self.queue.join()
+
+    def get_results(self, futures, ordered=False):
+        results = []
+        if ordered:
+            for f in futures:
+                results.append(f.result())
+        else:
+            for f in as_completed(futures):
+                results.append(f.result())
+
+        return results
+
+    def __del__(self):
+        del self.queue
 
 
 def retry_function(func, wait=1.5, max_retries=5):

@@ -40,7 +40,9 @@ RUN apt-get update \
 # Our script that does smart user mapping
 COPY docker_scripts/user_conf.sh /etc/cont-init.d/01-user_conf.sh
 # Our service scripts
-COPY docker_scripts/start_workers.sh /etc/services.d/idmtools_workers/run
+COPY docker_scripts/start_general_workers.sh /etc/services.d/idmtools_general_workers/run
+COPY docker_scripts/start_cpu_workers.sh /etc/services.d/idmtools_cpu_workers/run
+COPY docker_scripts/start_gpu_workers.sh /etc/services.d/idmtools_gpu_workers/run
 COPY docker_scripts/start_ui.sh /etc/services.d/idmtools_ui/run
 
 # Define a workdirectory
@@ -57,6 +59,7 @@ RUN echo ${PYPIURL}
 # as we will only rebuild if any of the docker_scripts, setup.py, readme.md, and requirements.txt change
 # which should happen infrequently(or less so than library code)
 COPY dist/idmtools_platform_local*.tar.gz /tmp/
-RUN find /tmp -name idmtools_platform_local*.tar.gz -exec pip install {}[workers,ui] --extra-index-url=${PYPIURL} --trusted-host ${PYPIHOST} \;
+RUN find /tmp -name idmtools_platform_local*.tar.gz -exec pip install {}[workers,ui] --extra-index-url=${PYPIURL} --trusted-host ${PYPIHOST} \; && \
+    rm -rf /root/.cache
 
 CMD ["/init"]

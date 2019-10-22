@@ -24,14 +24,14 @@ class TestPlatformSimulations(ITestWithPersistence):
         dm = DockerOperations()
         dm.cleanup(True)
 
-        import idmtools_platform_local.tasks.create_experiement
+        import idmtools_platform_local.tasks.create_experiment
         import idmtools_platform_local.tasks.create_simulation
-        reload(idmtools_platform_local.tasks.create_experiement)
+        reload(idmtools_platform_local.tasks.create_experiment)
         reload(idmtools_platform_local.tasks.create_simulation)
 
     @restart_local_platform(silent=True, **get_test_local_env_overrides())
     def test_fetch_simulation_files(self):
-        platform = Platform('Local_Staging')
+        platform = Platform('Local')
 
         pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python",
                                                                            "realpath_verify.py"))
@@ -45,7 +45,7 @@ class TestPlatformSimulations(ITestWithPersistence):
         self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
 
         files_to_preview = ['StdOut.txt', 'Assets/realpath_verify.py']
-        files = platform.get_assets_for_simulation(pe.simulations[0], files_to_preview)
+        files = platform.get_files(pe.simulations[0], files_to_preview)
         self.assertEqual(len(files), len(files_to_preview))
         for filename in files_to_preview:
             self.assertIn(filename, files)

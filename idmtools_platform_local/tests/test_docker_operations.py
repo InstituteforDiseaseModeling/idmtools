@@ -59,9 +59,10 @@ class TestDockerOperations(unittest.TestCase):
             worker_container = dm.get_workers()
             result = dm.copy_to_container(worker_container,
                                           os.path.join(COMMON_INPUT_PATH, "python", "hello_world.py"),
-                                          "/tmp")
+                                          "/data")
+            result = dm.sync_copy(result)[0]
             self.assertTrue(result)
-            result = subprocess.run(['docker', 'exec', 'idmtools_workers', 'python', '/tmp/hello_world.py'],
+            result = subprocess.run(['docker', 'exec', 'idmtools_workers', 'python', '/data/hello_world.py'],
                                     stdout=subprocess.PIPE)
             self.assertEqual(0, result.returncode)
             self.assertIn('Hello World!', result.stdout.decode('utf-8'))
@@ -95,7 +96,6 @@ class TestDockerOperations(unittest.TestCase):
 
             with self.assertRaises(EnvironmentError) as e:
                 pl.create_services()
-                self.assertIn('Port 10000 is already taken', e.exception.args)
             httpd.server_close()
 
     def test_error_if_try_to_run_as_root(self):

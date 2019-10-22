@@ -7,7 +7,7 @@ from typing import NoReturn
 
 if typing.TYPE_CHECKING:
     from idmtools.entities.iplatform import TPlatform
-    from idmtools.entities.iitem import TItem
+    from idmtools.core.interfaces.iitem import TItem
     from idmtools.entities.ianalyzer import TAnalyzerList
     from diskcache import Cache
 

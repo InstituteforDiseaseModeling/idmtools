@@ -2,6 +2,7 @@ import os
 import pandas as pd
 
 from idmtools.analysis.AnalyzeManager import AnalyzeManager
+from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import IAnalyzer
 
@@ -61,13 +62,13 @@ class PopulationAnalyzer(IAnalyzer):
 
         if self.save_output:
             data.to_csv(os.path.join(analyzer_path, 'population.csv'))
-            #data.to_csv('population.csv')
+            # data.to_csv('population.csv')
 
         fig = plt.figure()
         for pop in list(all_data.values()):
             plt.plot(pop)
         plt.legend([s.uid for s in all_data.keys()])
-        #plt.show()
+        # plt.show()
         plt.savefig(os.path.join(analyzer_path, 'population.png'))
         plt.close(fig)
 
@@ -78,6 +79,6 @@ if __name__ == "__main__":
     filenames = ['output/InsetChart.json']
     analyzers = [PopulationAnalyzer(filenames=filenames)]
 
-    exp_id = '65a93d51-04db-e911-a2be-f0921c167861'  # comps2 exp_id
-    manager = AnalyzeManager(platform=platform, ids=[exp_id], analyzers=analyzers)
+    exp_id = '3dda8b9b-b5ea-e911-a2be-f0921c167861'  # comps2 exp_id
+    manager = AnalyzeManager(platform=platform, ids=[(exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
     manager.analyze()

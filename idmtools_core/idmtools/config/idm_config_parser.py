@@ -1,7 +1,7 @@
+import os
 import copy
 import json
 from logging import getLogger
-import os
 from configparser import ConfigParser
 from typing import Dict
 
@@ -18,6 +18,7 @@ class IdmConfigParser:
     _config = None
     _instance = None
     _config_path = None
+    _block = None
 
     def __new__(cls, dir_path: str = '.', file_name: str = default_config) -> 'IdmConfigParser':
         """
@@ -93,7 +94,7 @@ class IdmConfigParser:
                 return cls._config_path
 
     @classmethod
-    def _load_config_file(cls, dir_path: str = '.', file_name: str = default_config) -> None:
+    def _load_config_file(cls, dir_path: str = os.getcwd(), file_name: str = default_config):
         """
         Find and then load the INI configuration file and parse it with :class:`IdmConfigParser`.
 
@@ -116,12 +117,14 @@ class IdmConfigParser:
 
         cls._config = ConfigParser()
         cls._config.read(ini_file)
+
+        # setup logging
         log_config = cls.get_section('Logging')
         valid_options = ['level', 'log_filename', 'console']
         setup_logging(**{k: v for k, v in log_config.items() if k in valid_options})
 
     @classmethod
-    def get_section(cls, section: str = None) -> Dict[str, str]:
+    def get_section(cls, section: str = None, force=False) -> Dict[str, str]:
         """
         Retrieve INI section values (call directly from platform creation).
 
@@ -131,16 +134,20 @@ class IdmConfigParser:
         Returns: 
             All fields as a dictionary.
         """
-        cls.ensure_init()
-        if cls._config is None:
+        cls.ensure_init(force=force)
+        if not cls.found_ini():
             return {}
 
-        section_dict = dict(cls._config.items())
-        if section not in section_dict:
-            print("/!\\ WARNING: Section '{}' Not Found!".format(section))
-            return {}
+        block_name = section
+        if not cls.has_section(block_name):
+            if force:
+                raise ValueError(f"Block '{block_name}' doesn't exist!")
+            else:
+                print("/!\\ WARNING: Section '{}' Not Found!".format(block_name))
+                return {}
 
-        section = cls._config.items(section)
+        section = cls._config.items(block_name)
+        cls._block = block_name
         return dict(section)
 
     @classmethod
@@ -154,16 +161,48 @@ class IdmConfigParser:
         Returns: 
             All fields as a dictionary.
         """
-        cls.ensure_init()
-        if cls._config is None:
-            raise ValueError(f"Config file NOT FOUND or IS Empty!")
-
-        section_dict = dict(cls._config.items())
-        if block_name not in section_dict:
+        cls.ensure_init(force=True)
+        if not cls.has_section(block_name):
             raise ValueError(f"Block '{block_name}' doesn't exist!")
 
         section = cls._config.items(block_name)
+        cls._block = block_name
         return dict(section)
+
+    @classmethod
+    def get_option(cls, section: str = None, option: str = None, force=False) -> str:
+        """
+        Get config value based on the INI section and option
+        Args:
+            section: INI section name
+            option: INI field name
+
+        Returns: config value as string
+        """
+        cls.ensure_init(force=force)
+        if not cls.found_ini():
+            return None
+
+        if section:
+            return cls._config.get(section, option, fallback=None)
+        else:
+            return cls._config.get(cls._block, option, fallback=None)
+
+    @classmethod
+    def ensure_init(cls, dir_path: str = '.', file_name: str = default_config, force=False) -> None:
+        """
+        Make sure INI file loaded and configparser instance available
+        Args:
+            dir_path: directory where we start to look for the idm config file
+            file_name: the config file name we will look for
+
+        Returns: None
+        """
+        if cls._instance is None:
+            cls(dir_path, file_name)
+
+        if force and not cls.found_ini():
+            raise ValueError(f"Config file NOT FOUND or IS Empty!")
 
     @classmethod
     def get_config_path(cls) -> str:
@@ -184,7 +223,7 @@ class IdmConfigParser:
         Returns: 
             None
         """
-        cls.ensure_init()
+        cls.ensure_init(force=True)
         print(cls.get_config_path())
 
     @classmethod
@@ -195,10 +234,7 @@ class IdmConfigParser:
         Returns: 
             None
         """
-        cls.ensure_init()
-        if cls._config_path is None:
-            return
-
+        cls.ensure_init(force=True)
         print("View Config INI: \n{}".format(cls._config_path))
         print('-' * len(cls._config_path), '\n')
         with open(cls._config_path) as f:
@@ -206,42 +242,27 @@ class IdmConfigParser:
             print(read_data)
 
     @classmethod
-    def get_option(cls, section: str = None, option: str = None) -> str:
-        """
-        Get the configuration value based on the INI section and option.
 
-        Args:
-            section: The INI section name.
-            option: The INI field name.
-
-        Returns: 
-            The configuration value as a string.
-        """
-        cls.ensure_init()
-        return cls._config.get(section, option)
-
-    @classmethod
-    def ensure_init(cls, dir_path: str = '.', file_name: str = default_config) -> None:
-        """
-        Verify the INI file is loaded and a :class:`IdmConfigParser` instance is available.
-
-        Args:
-            dir_path: The directory to start looking for the INI configuration file.
-            file_name: The name of the configuration file to look for.
-
-        Returns: 
-            None
-        """
-        if cls._instance is None:
-            cls(dir_path, file_name)
-
-    @classmethod
     def display_config_block_details(cls, block):
-        if cls._config_path:
+        if cls.found_ini():
             block_details = cls.get_section(block)
             # print('\nConfig_info:')
             print(f"\n[{block}]")
             print(json.dumps(block_details, indent=3))
+
+    @classmethod
+    def has_section(cls, section):
+        cls.ensure_init()
+        return cls._config.has_section(section)
+
+    @classmethod
+    def has_option(cls, section, option):
+        cls.ensure_init()
+        return cls._config.has_option(section, option, fallback=None)
+
+    @classmethod
+    def found_ini(cls):
+        return cls._config is not None
 
     @classmethod
     def clear_instance(cls) -> None:
@@ -254,3 +275,4 @@ class IdmConfigParser:
         cls._config = None
         cls._instance = None
         cls._config_path = None
+        cls._block = None

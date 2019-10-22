@@ -10,7 +10,7 @@ class EMODExperimentSpec(ModelSpecification):
         return "Provides access to the Local Platform to IDM Tools"
 
     @get_model_impl
-    def get(self, configuration: dict) -> 'EMODExperiment':
+    def get(self, configuration: dict) -> 'EMODExperiment':  # noqa: F821
         """
         Build a local platform from the passed in configuration object. The
         import of platform is here to avoid problems.

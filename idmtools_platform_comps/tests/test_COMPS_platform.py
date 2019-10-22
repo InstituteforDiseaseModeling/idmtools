@@ -41,10 +41,10 @@ class TestCOMPSPlatform(ITestWithPersistence):
         from idmtools.utils.entities import retrieve_experiment
         experiment = retrieve_experiment(experiment.uid, platform=self.platform, with_simulations=True)
         files_needed = ["config.json", "Assets\\working_model.py"]
-        self.platform.get_files(item=experiment.children()[0], files=files_needed)
+        self.platform.get_files(item=experiment.simulations[0], files=files_needed)
 
         # Call twice to see if the cache is actually leveraged
-        files_retrieved = self.platform.get_files(item=experiment.children()[0], files=files_needed)
+        files_retrieved = self.platform.get_files(item=experiment.simulations[0], files=files_needed)
 
         # We have the correct files?
         self.assertEqual(len(files_needed), len(files_retrieved))
@@ -56,7 +56,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
 
         # Test different separators
         files_needed = ["Assets/working_model.py"]
-        files_retrieved = self.platform.get_files(item=experiment.children()[0], files=files_needed)
+        files_retrieved = self.platform.get_files(item=experiment.simulations[0], files=files_needed)
 
         # We have the correct files?
         self.assertEqual(len(files_needed), len(files_retrieved))
@@ -68,9 +68,10 @@ class TestCOMPSPlatform(ITestWithPersistence):
         # Test wrong filename
         files_needed = ["Assets/bad.py", "bad.json"]
         with self.assertRaises(RuntimeError):
-            self.platform.get_files(item=experiment.children()[0], files=files_needed)
+            self.platform.get_files(item=experiment.simulations[0], files=files_needed)
 
     def _run_and_test_experiment(self, experiment):
+        experiment.platform = self.platform
         experiment.builder = self.builder
 
         # Create experiment on platform
@@ -88,17 +89,20 @@ class TestCOMPSPlatform(ITestWithPersistence):
                 simulation.uid = uid
                 simulation.post_creation()
 
+                experiment.simulations.append(simulation.metadata)
+                experiment.simulations.set_status(EntityStatus.CREATED)
+
         self.platform.refresh_status(item=experiment)
 
         # Test if we have all simulations at status CREATED
         self.assertFalse(experiment.done)
-        self.assertTrue(all([s.status == EntityStatus.CREATED for s in experiment.children()]))
+        self.assertTrue(all([s.status == EntityStatus.CREATED for s in experiment.simulations]))
 
         # Start experiment
         self.platform.run_items(items=[experiment])
         self.platform.refresh_status(item=experiment)
         self.assertFalse(experiment.done)
-        self.assertTrue(all([s.status == EntityStatus.RUNNING for s in experiment.children()]))
+        self.assertTrue(all([s.status == EntityStatus.RUNNING for s in experiment.simulations]))
 
         # Wait till done
         import time
@@ -113,16 +117,15 @@ class TestCOMPSPlatform(ITestWithPersistence):
     def test_status_retrieval_succeeded(self):
         experiment = PythonExperiment(name=self.case_name,
                                       model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"))
-        experiment.platform = self.platform
         self._run_and_test_experiment(experiment)
-        print([s.status for s in experiment.children()])
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in experiment.children()]))
+        print([s.status for s in experiment.simulations])
+        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in experiment.simulations]))
 
     def test_status_retrieval_failed(self):
         experiment = PythonExperiment(name=self.case_name,
                                       model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "failing_model.py"))
         self._run_and_test_experiment(experiment)
-        self.assertTrue(all([s.status == EntityStatus.FAILED for s in experiment.children()]))
+        self.assertTrue(all([s.status == EntityStatus.FAILED for s in experiment.simulations]))
         self.assertFalse(experiment.succeeded)
 
     def test_status_retrieval_mixed(self):
@@ -132,25 +135,26 @@ class TestCOMPSPlatform(ITestWithPersistence):
         self.assertTrue(experiment.done)
         self.assertFalse(experiment.succeeded)
 
-        if len(experiment.children()) == 0:
+        if len(experiment.simulations) == 0:
             raise Exception('NO CHILDREN')
 
-        for s in experiment.children():
-            self.assertTrue((s.tags["P"] == '2' and s.status == EntityStatus.FAILED) or
-                            s.status == EntityStatus.SUCCEEDED)
+        for s in experiment.simulations:
+            self.assertTrue((s.tags["P"] == 2 and s.status == EntityStatus.FAILED) or  # noqa: W504
+                            (s.status == EntityStatus.SUCCEEDED))
 
     def test_from_experiment(self):
         experiment = PythonExperiment(name=self.case_name,
                                       model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"))
         self._run_and_test_experiment(experiment)
         experiment2 = copy.deepcopy(experiment)
+        experiment2.platform = self.platform
 
         # very explicitly clearing the stored children and re-querying
-        experiment2._children = None
-        experiment2.children(refresh=True)
+        experiment2.simulations.clear()
+        experiment2.refresh_simulations()
 
-        self.assertTrue(len(experiment.children()) > 0)
-        self.assertEqual(len(experiment.children()), len(experiment2.children()))
+        self.assertTrue(len(experiment.simulations) > 0)
+        self.assertEqual(len(experiment.simulations), len(experiment2.simulations))
         self.assertTrue(experiment2.done)
         self.assertTrue(experiment2.succeeded)
 

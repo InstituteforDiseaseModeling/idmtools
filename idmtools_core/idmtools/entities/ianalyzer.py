@@ -4,7 +4,7 @@ from abc import ABCMeta, abstractmethod
 from typing import Any, NoReturn
 
 if typing.TYPE_CHECKING:
-    from idmtools.entities.iitem import TItem, TItemList
+    from idmtools.core.interfaces.iitem import TItem, TItemList
 
 
 class IAnalyzer(metaclass=ABCMeta):

@@ -2,19 +2,26 @@ import typing
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
 
-from idmtools.entities.iroot_item import IRootItem
+from idmtools.core import ItemType
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
-
-if typing.TYPE_CHECKING:
-    from idmtools.core.types import TExperiment
+from idmtools.core.interfaces.inamed_entity import INamedEntity
 
 
 @dataclass
-class ISimulation(IAssetsEnabled, IRootItem, metaclass=ABCMeta):
+class ISimulation(IAssetsEnabled, INamedEntity, metaclass=ABCMeta):
     """
     Class that epresents a generic simulation.
     This class needs to be implemented for each model type with specifics.
     """
+    item_type: 'ItemType' = field(default=ItemType.SIMULATION, compare=False)
+
+    @property
+    def experiment(self):
+        return self.parent
+
+    @experiment.setter
+    def experiment(self, experiment):
+        self.parent = experiment
 
     @abstractmethod
     def set_parameter(self, name: str, value: any) -> dict:
@@ -57,11 +64,10 @@ class ISimulation(IAssetsEnabled, IRootItem, metaclass=ABCMeta):
         pass
 
     def __repr__(self):
-        try:
-            exp_id = self.experiment.uid
-        except IRootItem.NoPlatformException:
-            exp_id = 'NoPlatformSet'
-        return f"<Simulation: {self.uid} - Exp_id: {exp_id}>"
+        return f"<Simulation: {self.uid} - Exp_id: {self.parent_id}>"
+
+    def __hash__(self):
+        return id(self.uid)
 
     def pre_creation(self):
         self.gather_assets()
@@ -81,13 +87,28 @@ class ISimulation(IAssetsEnabled, IRootItem, metaclass=ABCMeta):
         """
         pass
 
-    @property
-    def experiment(self):
-        return self.parent(refresh=False)
-
 
 TSimulation = typing.TypeVar("TSimulation", bound=ISimulation)
 TSimulationClass = typing.Type[TSimulation]
 TSimulationBatch = typing.List[TSimulation]
 TAllSimulationData = typing.Mapping[TSimulation, typing.Any]
 TSimulationList = typing.List[typing.Union[TSimulation, str]]
+
+
+@dataclass(repr=False)
+class StandardSimulation(ISimulation):
+    def set_parameter(self, name: str, value: any) -> dict:
+        pass
+
+    def get_parameter(self, name, default=None):
+        pass
+
+    def update_parameters(self, params):
+        pass
+
+    def gather_assets(self):
+        pass
+
+    def __hash__(self):
+        return id(self.uid)
+

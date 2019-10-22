@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import Enum, auto
 
 
 class EntityStatus(Enum):
@@ -14,3 +14,11 @@ class FilterMode(Enum):
     """
     AND = 0
     OR = 1
+
+
+class ItemType(Enum):
+    SUITE = auto()
+    EXPERIMENT = auto()
+    SIMULATION = auto()
+    WORKITEM = auto()
+    ASSETCOLLECTION = auto()
