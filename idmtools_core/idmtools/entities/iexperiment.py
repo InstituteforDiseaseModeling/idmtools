@@ -61,7 +61,7 @@ class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
         For backward-compatibility purposes.
 
         Returns: 
-            The last :class:`TExperimentBuilder`.
+            The last ``TExperimentBuilder``.
         """
         return list(self.builders)[-1] if self.builders and len(self.builders) > 0 else None
 

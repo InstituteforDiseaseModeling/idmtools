@@ -27,7 +27,7 @@ class IDisplaySetting(metaclass=ABCMeta):
     def display(self, obj: Any) -> str:
         """
         Display the object.
-        Note that the attribute (identified by self.field) should be handled with :meth:`self.get_object`.
+        Note that the attribute (identified by self.field) should be handled with :meth:`get_object`.
 
         Args:
             obj: The object to consider for display.

@@ -291,7 +291,7 @@ class AnalyzeManager(CacheEnabled):
     def analyze(self) -> bool:
         """
         Process the provided items with the provided analyzers. This is the main driver method of 
-        :class:`AnalyzerManager`. 
+        :class:`AnalyzeManager`. 
 
         Returns: 
             True on success; False on failure/exception.

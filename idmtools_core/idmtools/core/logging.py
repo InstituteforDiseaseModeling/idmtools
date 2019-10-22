@@ -18,13 +18,13 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
     Set up logging.
 
     Args:
-        level(Union[int, str]): Log level. Default to warning. This should be either a string that matches a log level
-        from logging or an int that represent that level.
-        log_filename(str): Name of file to log messages to.
-        console(Union[str, bool]): When set to True or the strings 1, y, yes, or on, console logging will be enabled.
+        level: Log level. Default to warning. This should be either a string that matches a log level
+            from logging or an int that represent that level.
+        log_filename: Name of file to log messages to.
+        console: When set to True or the strings "1", "y", "yes", or "on", console logging will be enabled.
 
     Returns:
-        Returns the QueueListener created that writes the log messages. In advanced scenarios with
+        Returns the ``QueueListener`` created that writes the log messages. In advanced scenarios with
         multi-processing, you may need to manually stop the logger.
     """
     global listener, logging_queue

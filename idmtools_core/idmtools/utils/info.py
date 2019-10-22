@@ -10,9 +10,10 @@ def get_pip_packages_10_to_6():
     Load packages for versions 1.0 to 6 of pip.
 
     Returns:
+        None
 
     Raises:
-        ImportError if the pip version is different.
+        ImportError: If the pip version is different.
     """
     from pip.util import get_installed_distributions
     return get_installed_distributions()
@@ -23,9 +24,10 @@ def get_pip_packages_6_to_9():
     Get packages for pip versions 6 through 9.
 
     Returns:
+        None
 
     Raises:
-        ImportError if the pip version is different.
+        ImportError: If the pip version is different.
     """
     from pip.utils import get_installed_distributions
     return get_installed_distributions()
@@ -36,9 +38,10 @@ def get_pip_packages_10_to_current():
     Get packages for pip versions 10 to current.
 
     Returns:
+        None
 
     Raises:
-        ImportError if the pip version is different.
+        ImportError: If the pip version is different.
     """
     from pip._internal.utils.misc import get_installed_distributions
     return get_installed_distributions()

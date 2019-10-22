@@ -55,7 +55,7 @@ class AssetCollection(IEntity):
             assets_directory: The root directory of the assets.
             recursive: True to recursively traverse the subdirectory. 
             flatten: Put all the files in root regardless of whether they were in a subdirectory or not.
-            filters: A list of filters to apply to the assets. The filters are functions taking an :class:`~idmtoolsassets.Asset.Asset` 
+            filters: A list of filters to apply to the assets. The filters are functions taking an :class:`~idmtools.assets.asset.Asset` 
                 as argument and returning true or false. True adds the asset to the collection; False filters 
                 it out. See :meth:`~idmtools.utils.filters.asset_filters`.
             filters_mode: When given multiple filters, either OR or AND the results.
@@ -118,7 +118,7 @@ class AssetCollection(IEntity):
         Add an asset to the collection.
 
         Args:
-           asset: An :class:`~idmtools.assets.Asset` object to add.
+           asset: An :class:`~idmtools.assets.asset.Asset` object to add.
            fail_on_duplicate: Raise a **DuplicateAssetError** if an asset is duplicated. 
               If not, simply replace it.
         """

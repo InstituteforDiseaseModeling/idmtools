@@ -33,7 +33,7 @@ class IAnalyzer(metaclass=ABCMeta):
 
     def initialize(self) -> NoReturn:
         """
-        Call once after the analyzer has been added to the :class:`~idmtools.managers.AnalyzeManager`.
+        Call once after the analyzer has been added to the :class:`~idmtools.analysis.AnalyzeManager`.
 
         Add everything depending on the working directory or unique ID here instead of in __init__.
         """

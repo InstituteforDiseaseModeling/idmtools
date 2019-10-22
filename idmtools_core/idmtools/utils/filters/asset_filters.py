@@ -22,7 +22,7 @@ def default_asset_file_filter(asset: 'TAsset') -> 'bool':
     """
     Default filter to leave out Python caching.
     This filter is used in the creation of 
-    :class:`~idmtools.asset.AssetCollection`, regardless of user filters.
+    :class:`~idmtools.assets.asset_collection.AssetCollection`, regardless of user filters.
     """
     patterns = [
         "__pycache__",

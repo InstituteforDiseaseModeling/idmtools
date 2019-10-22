@@ -15,14 +15,14 @@ logger = getLogger(__name__)
 
 def is_a_plugin_of_type(value, plugin_specification: Type[PluginSpecification]) -> bool:
     """
-    Determine if a value of a plugin specification is of type **plugin_specification**.
+    Determine if a value of a plugin specification is of type :class:`~idmtools.registry.plugin_specification.PluginSpecification`.
 
     Args:
         value: The value to inspect.
         plugin_specification: Plugin specification to check against.
 
     Returns:
-        A Boolean indicating True if the plugin is of a subclass of :class:`~idmtools.registry.PluginSpecification`, 
+        A Boolean indicating True if the plugin is of a subclass of :class:`~idmtools.registry.plugin_specification.PluginSpecification`,
         else False.
     """
     return inspect.isclass(value) and issubclass(value, plugin_specification) \
@@ -42,7 +42,7 @@ def load_plugin_map(entrypoint: str, spec_type: Type[PluginSpecification]) -> Di
         spec_type: The type of plugin specification.
 
     Returns:
-        (Dict[str, Type[PluginSpecification]]): Returns a dictionary of name and :class:`~idmtools.registry.PluginSpecification`.
+        (Dict[str, Type[PluginSpecification]]): Returns a dictionary of name and :class:`~idmtools.registry.plugin_specification.PluginSpecification`.
     """
     plugins = plugins_loader(entrypoint, spec_type)
     # create instances of the plugins
@@ -60,7 +60,7 @@ def load_plugin_map(entrypoint: str, spec_type: Type[PluginSpecification]) -> Di
 
 def plugins_loader(entry_points_name: str, plugin_specification: Type[PluginSpecification]) -> Set[PluginSpecification]:
     """
-    Loads all the plugins of type *plugin_specification* from entry point name. |IT_s| also supports loading plugins
+    Loads all the plugins of type :class:`~idmtools.registry.plugin_specification.PluginSpecification` from entry point name. |IT_s| also supports loading plugins
     through a list of strings representing the paths to modules containing plugins.
 
     Args:
@@ -82,7 +82,7 @@ def plugins_loader(entry_points_name: str, plugin_specification: Type[PluginSpec
 def discover_plugins_from(library: Any, plugin_specification: Type[PluginSpecification]) -> \
         List[Type[PluginSpecification]]:
     """
-    Search a library object for plugins of type **plugin_specification**.
+    Search a library object for plugins of type :class:`~idmtools.registry.plugin_specification.PluginSpecification`.
 
     Currently it detects module and classes. In the future support for strings will be added.
 
