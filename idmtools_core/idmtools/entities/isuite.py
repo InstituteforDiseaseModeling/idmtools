@@ -10,10 +10,10 @@ if typing.TYPE_CHECKING:
 @dataclass(repr=False)
 class ISuite(INamedEntity, ABC):
     """
-    Represents a generic Suite (of experiments).
+    Class that represents a generic suite (a collection of experiments).
 
     Args:
-        experiments: the children items of this suite
+        experiments: The child items of this suite.
     """
     experiments: 'TExperimentList' = field(default=None, compare=False, metadata={"md": True})
 

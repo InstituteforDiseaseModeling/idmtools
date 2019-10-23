@@ -15,14 +15,15 @@ logger = getLogger(__name__)
 
 def is_a_plugin_of_type(value, plugin_specification: Type[PluginSpecification]) -> bool:
     """
-    Determine if a value if a plugin specification of type plugin_specification
+    Determine if a value of a plugin specification is of type :class:`~idmtools.registry.plugin_specification.PluginSpecification`.
 
     Args:
-        value: Value to inspect
-        plugin_specification: Plugin specification to check against
+        value: The value to inspect.
+        plugin_specification: Plugin specification to check against.
 
     Returns:
-        (bool) True if the plugin is of a subclass of PluginSpecification, else False
+        A Boolean indicating True if the plugin is of a subclass of :class:`~idmtools.registry.plugin_specification.PluginSpecification`,
+        else False.
     """
     return inspect.isclass(value) and issubclass(value, plugin_specification) \
         and not inspect.isabstract(value) and value is not plugin_specification
@@ -30,15 +31,18 @@ def is_a_plugin_of_type(value, plugin_specification: Type[PluginSpecification]) 
 
 def load_plugin_map(entrypoint: str, spec_type: Type[PluginSpecification]) -> Dict[str, Type[PluginSpecification]]:
     """
-    Loads plugins from entrypoint with type of spec into a map. This could cause name collisions
+    Load plugins from entry point with the indicated type of specification into a map. 
 
-    if plugins of the same name are installed
+    .. warning::
+
+        This could cause name collisions if plugins of the same name are installed.
+
     Args:
-        entrypoint: Name of entryrpoint
-        spec_type: Type of plugin spec
+        entrypoint: The name of the entry point.
+        spec_type: The type of plugin specification.
 
     Returns:
-        (Dict[str, Type[PluginSpecification]]): Returns a dict of name -> PluginSpecification
+        (Dict[str, Type[PluginSpecification]]): Returns a dictionary of name and :class:`~idmtools.registry.plugin_specification.PluginSpecification`.
     """
     plugins = plugins_loader(entrypoint, spec_type)
     # create instances of the plugins
@@ -56,15 +60,15 @@ def load_plugin_map(entrypoint: str, spec_type: Type[PluginSpecification]) -> Di
 
 def plugins_loader(entry_points_name: str, plugin_specification: Type[PluginSpecification]) -> Set[PluginSpecification]:
     """
-    Loads all the plugins of type *plugin_specification* from entry-point name. We also support loading plugins
-    through a list of strs representing the paths to modules containing plugins
+    Loads all the plugins of type :class:`~idmtools.registry.plugin_specification.PluginSpecification` from entry point name. |IT_s| also supports loading plugins
+    through a list of strings representing the paths to modules containing plugins.
 
     Args:
-        entry_points_name: Entry point name for plugins
-        plugin_specification: Plugin specification to load
+        entry_points_name: Entry point name for plugins.
+        plugin_specification: Plugin specification to load.
 
     Returns:
-        (Set[PluginSpecification]): All the plugins of type X
+        (Set[PluginSpecification]): All the plugins of the type indicated.
     """
     manager = pluggy.PluginManager(PLUGIN_REFERENCE_NAME)
     manager.add_hookspecs(plugin_specification)
@@ -78,15 +82,16 @@ def plugins_loader(entry_points_name: str, plugin_specification: Type[PluginSpec
 def discover_plugins_from(library: Any, plugin_specification: Type[PluginSpecification]) -> \
         List[Type[PluginSpecification]]:
     """
-    Search a library obj for plugins of type plugin_specification.
+    Search a library object for plugins of type :class:`~idmtools.registry.plugin_specification.PluginSpecification`.
 
-    Currently it detects module and classes. In the future support for strs will be added
+    Currently it detects module and classes. In the future support for strings will be added.
+
     Args:
-        library: Library object to discover plugins from
-        plugin_specification: Specification to search for
+        library: Library object to discover plugins from.
+        plugin_specification: Specification to search for.
 
     Returns:
-        List[Type[PluginSpecification]]: List of Plugins
+        List[Type[PluginSpecification]]: List of plugins.
     """
 
     plugins = []

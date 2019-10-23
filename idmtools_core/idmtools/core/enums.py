@@ -10,7 +10,7 @@ class EntityStatus(Enum):
 
 class FilterMode(Enum):
     """
-    Allows to specify AND/OR for the filtering system
+    Allows user to specify AND/OR for the filtering system.
     """
     AND = 0
     OR = 1
