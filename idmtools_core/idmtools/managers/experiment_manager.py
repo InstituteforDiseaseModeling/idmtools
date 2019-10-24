@@ -20,6 +20,8 @@ class ExperimentManager:
         Constructor
         Args:
             experiment: The experiment to manage
+            platform: The platform to use
+            suite: The suite to use
         """
         self.suite = suite
         self.experiment = experiment
@@ -38,6 +40,10 @@ class ExperimentManager:
         return em
 
     def create_suite(self):
+        """
+        Create a suite from platform and link it to experiment
+        Returns: None
+        """
         if self.suite is None:
             return
 

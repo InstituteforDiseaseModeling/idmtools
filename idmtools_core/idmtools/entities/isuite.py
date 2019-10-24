@@ -9,7 +9,6 @@ from idmtools.core import ItemType, EntityContainer
 class ISuite(INamedEntity, ABC):
     """
     Represents a generic Suite (of experiments).
-
     Args:
         experiments: the children items of this suite
     """

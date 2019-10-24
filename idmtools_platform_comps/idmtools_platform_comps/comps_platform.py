@@ -115,6 +115,12 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         return experiment_name
 
     def _create_suite(self, suite: 'TSuite') -> 'UUID':
+        """
+        Create a COMPS Suite
+        Args:
+            suite: local suite to be used to create COMPS Suite
+        Returns: None
+        """
         self._login()
 
         # Create suite
