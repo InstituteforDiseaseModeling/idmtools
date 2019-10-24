@@ -12,7 +12,7 @@ class ArmType(Enum):
 
 class SweepArm:
     """
-    Represents an parameter arm
+    Class that represents a parameter arm.
     """
 
     def __init__(self, type=ArmType.cross, funcs=[]):
@@ -49,7 +49,7 @@ class SweepArm:
 
 class ArmExperimentBuilder(ExperimentBuilder):
     """
-    Represents an experiment builder
+    Class that represents an experiment builder.
     """
 
     def __init__(self):

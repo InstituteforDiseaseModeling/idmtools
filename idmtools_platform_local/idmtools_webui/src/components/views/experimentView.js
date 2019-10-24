@@ -188,24 +188,13 @@ class ExperimentView extends React.Component {
             }
         }
 
-        let progressStr = (progressObj) => {
-            if (progressObj && progressObj.length > 0) {
-                let progress = progressObj[0]
-                return ("Done:" + (progress["done"] ? progress["done"] : "0") + " " + 
-                        "Created:" + (progress["created"] ? progress["created"] : "0") + " " +
-                        "In progress:" + (progress["in_progress"] ? progress["in_progress"] : "0") )
-            } else
-                return ""
-
-        };
-        
         if (this.state.selectedExp) {
             
             let index = _.findIndex(this.props.experiments, {experiment_id: this.state.selectedExp});
             let exps = this.props.experiments;
 
             if (index>=0) {
-                status = JSON.stringify(exps[index].progress);
+                status = JSON.stringify(exps[index].status);
                 command =  ""; //exps[index].extra_details.command;
                 tags = JSON.stringify( exps[index].tags);
             }
@@ -249,15 +238,14 @@ class ExperimentView extends React.Component {
                                 <TableBody>
                                     {sorted && sorted.map(exp => {
 
-                                        let disable = exp.progress && exp.progress.length > 0 && exp.progress[0].created && exp.progress[0].created > 0;
-                                        disable = disable || (exp.progress && exp.progress.length > 0 && exp.progress[0].in_progress && exp.progress[0].in_progress > 0); // eslint-disable-line no-unused-vars
+                                        let disable = !(exp.status in ["in_progress", "created"]); // eslint-disable-line no-unused-vars
 
                                         return (
 
                                             <TableRow key={exp.experiment_id} onClick={this.rowClick} exp_id={exp.experiment_id} className={exp.experiment_id === this.state.selectedExp ? classes.highlight: null}>
 
                                                 <TableCell align="right">{exp.experiment_id}</TableCell>
-                                                <TableCell align="right">{progressStr(exp.progress)}</TableCell>
+                                                <TableCell align="right">{exp.status}</TableCell>
                                                 <TableCell align="right">
                                                     <a target="_blank" rel="noopener noreferrer" href={'http://' + window.location.hostname + ':5000' + exp.data_path}>
                                                     <FolderIcon className={classes.folder}/>

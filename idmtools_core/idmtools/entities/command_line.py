@@ -1,5 +1,6 @@
 from typing import TypeVar
 
+
 class CommandLine:
     """
     A class to construct command line strings from executable, options, and params

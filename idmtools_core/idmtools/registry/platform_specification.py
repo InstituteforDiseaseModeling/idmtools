@@ -28,21 +28,22 @@ class PlatformSpecification(PluginSpecification, ABC):
     @example_configuration_spec
     def example_configuration(self):
         """
-        Example configuration for platform. This is useful in help or error messages
-        Returns:
+        Example configuration for the platform. This is useful in help or error messages.
 
+        Returns:
         """
         raise NotImplementedError("Plugin did not implement example_configuration")
 
     @get_platform_spec
     def get(self, configuration: dict) -> IPlatform:
         """
-        Factor that should return a new platform using the passed in configuration
+        Return a new platform using the passed in configuration.
+
         Args:
-            configuration:
+            configuration: The INI configuration file to use. 
 
         Returns:
-
+            The new platform.
         """
         raise NotImplementedError("Plugin did not implement get")
 

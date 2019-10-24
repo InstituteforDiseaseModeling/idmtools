@@ -1,7 +1,7 @@
 import os
 import pytest
 from importlib import reload
-from idmtools.core import EntityStatus
+from idmtools.core import EntityStatus, ItemType
 from idmtools_platform_local.docker.docker_operations import DockerOperations
 from operator import itemgetter
 from idmtools.assets import AssetCollection
@@ -20,12 +20,6 @@ class TestPythonSimulation(ITestWithPersistence):
 
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
-        reset_local_broker()
-        from idmtools_platform_local.workers.brokers import setup_broker
-        setup_broker()
-        # ensure we start from no environment
-        dm = DockerOperations()
-        dm.cleanup(True)
 
         import idmtools_platform_local.tasks.create_experiment
         import idmtools_platform_local.tasks.create_simulation
@@ -34,11 +28,7 @@ class TestPythonSimulation(ITestWithPersistence):
 
     @restart_local_platform(silent=True, **get_test_local_env_overrides())
     def test_direct_sweep_one_parameter_local(self):
-
-        platform = Platform('Local_Staging')
-
-        # CreateSimulationTask.broker =
-
+        platform = Platform('Local')
         name = self.case_name
         pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
 
@@ -56,13 +46,13 @@ class TestPythonSimulation(ITestWithPersistence):
         em = ExperimentManager(experiment=pe, platform=platform)
         em.run()
         em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.FAILED for s in pe.simulations]))
+        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
         # validation
         self.assertEqual(pe.name, name)
         self.assertEqual(pe.simulation_count, 5)
         self.assertIsNotNone(pe.uid)
-        self.assertTrue(all([s.status == EntityStatus.FAILED for s in pe.simulations]))
-        self.assertFalse(pe.succeeded)
+        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
+        self.assertTrue(pe.succeeded)
 
         # validate tags
         tags = []
@@ -77,7 +67,7 @@ class TestPythonSimulation(ITestWithPersistence):
     @restart_local_platform(silent=True, **get_test_local_env_overrides())
     def test_add_prefixed_relative_path_to_assets_local(self):
         # platform = Platform('COMPS2', endpoint="https://comps2.idmod.org", environment="Bayesian")
-        platform = Platform('Local_Staging')
+        platform = Platform('Local')
         model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
         ac = AssetCollection()
         assets_path = os.path.join(COMMON_INPUT_PATH, "python", "Assets", "MyExternalLibrary")
@@ -106,8 +96,8 @@ class TestPythonSimulation(ITestWithPersistence):
 
         with self.subTest('test_retrieve_experiment_restore_sims'):
             # test we can fetch the experiment as well
-            oe = platform.retrieve_experiment(pe.uid)
-            platform.restore_simulations(oe)
+            oe = platform.get_item(pe.uid, ItemType.EXPERIMENT)
+            oe.refresh_simulations()
             self.assertEqual(pe.uid, oe.uid)
             self.assertEqual(pe.simulation_type, oe.simulation_type)
             self.assertEqual(len(pe.simulations), len(oe.simulations))

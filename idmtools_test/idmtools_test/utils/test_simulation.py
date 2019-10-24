@@ -8,6 +8,7 @@ from idmtools.entities import ISimulation
 @dataclass(repr=False)
 class TestSimulation(ISimulation):
     parameters: dict = field(default_factory=lambda: {})
+    status: 'EntityStatus' = field(default=None, compare=False, metadata={"pickle_ignore": False})
 
     def set_parameter(self, name: str, value: any) -> dict:
         self.parameters[name] = value

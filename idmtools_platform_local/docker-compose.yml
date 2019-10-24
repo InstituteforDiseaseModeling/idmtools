@@ -30,7 +30,7 @@ services:
       context: .
     # We parameterize the build so we can easily specify our desired docker image name
     # ie docker-compose
-    image: "${REGISTRY:-idm-docker-staging.packages.idmod.org}/idmtools_local_workers:${service_version:-latest}"
+    image: "${REGISTRY:-idm-docker-staging.packages.idmod.org}/idmtools_local_workers:0.2.0.nightly"
     environment:
       - REDIS_URL=redis://redis:6379
       - "CURRENT_UID=${CURRENT_UID:-1000:1000}"
