@@ -5,7 +5,6 @@ from idmtools.entities.ianalyzer import IAnalyzer
 
 class AddAnalyzer(IAnalyzer):
     """
-    Add Analyzer
     A simple base class to add analyzers.
 
     """

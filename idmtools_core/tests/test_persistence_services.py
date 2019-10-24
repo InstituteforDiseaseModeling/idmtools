@@ -41,6 +41,24 @@ class TestPersistenceServices(ITestWithPersistence):
 
         self.assertEqual(ep.base_simulation, TestSimulation())
 
+    def test_platform_cache_clear(self):
+        p1 = Platform('Test')
+        PlatformPersistService.save(p1)
+        self.assertTrue(PlatformPersistService.length())
+        PlatformPersistService.clear()
+        self.assertEqual(PlatformPersistService.length(), 0)
+
+    def test_experiment_cache_clear(self):
+        e = TstExperiment("test")
+        e.simulation()
+        ExperimentPersistService.save(e)
+        e2 = ExperimentPersistService.retrieve(e.uid)
+        self.assertEqual(e, e2)
+
+        self.assertTrue(ExperimentPersistService.length())
+        ExperimentPersistService.clear()
+        self.assertEqual(ExperimentPersistService.length(), 0)
+
 
 if __name__ == '__main__':
     unittest.main()

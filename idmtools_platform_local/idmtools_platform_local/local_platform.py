@@ -3,24 +3,24 @@ import functools
 import logging
 import os
 from collections import defaultdict
+from dataclasses import dataclass, field
 from logging import getLogger
-from typing import Optional, NoReturn, Union, List, Dict
-from dataclasses import dataclass
 from pathlib import Path
+from typing import Dict, List, NoReturn, Optional
 from uuid import UUID
+
 from docker.models.containers import Container
+
 from idmtools.assets import Asset
-from idmtools.core import UnknownItemException
+from idmtools.core import ItemType
+from idmtools.core.experiment_factory import experiment_factory
+from idmtools.core.interfaces.iitem import TItem, TItemList
 from idmtools.entities import IExperiment, IPlatform
-from idmtools.entities.ianalyzer import TAnalyzerList
-from idmtools.entities.iitem import TItemList, TItem
-from idmtools.entities.iexperiment import TExperiment
-from idmtools.entities.isimulation import TSimulation, ISimulation
+from idmtools.entities.isimulation import ISimulation, TSimulation
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
 from idmtools_platform_local.client.simulations_client import SimulationsClient
-from idmtools_platform_local.docker.docker_operations import DockerOperations, default_image
+from idmtools_platform_local.docker.docker_operations import default_image, DockerOperations
 from idmtools_platform_local.workers.brokers import setup_broker
-from idmtools.core.experiment_factory import experiment_factory
 
 status_translate = dict(
     created='CREATED',
@@ -41,26 +41,32 @@ logger = getLogger(__name__)
 
 @dataclass
 class LocalPlatform(IPlatform):
-    host_data_directory: str = os.path.join(str(Path.home()), '.local_data')
-    network: str = 'idmtools'
-    redis_image: str = 'redis:5.0.4-alpine'
-    redis_port: int = 6379
-    runtime: Optional[str] = None
-    redis_mem_limit: str = '128m'
-    redis_mem_reservation: str = '64m'
-    postgres_image: str = 'postgres:11.4'
-    postgres_mem_limit: str = '64m'
-    postgres_mem_reservation: str = '32m'
-    postgres_port: Optional[str] = 5432
-    workers_image: str = default_image
-    workers_ui_port: int = 5000
-    default_timeout: int = 45
-    run_as: Optional[str] = None
+    """
+    Represents the platform allowing to run simulations locally.
+    """
+
+    host_data_directory: str = field(default=os.path.join(str(Path.home()), '.local_data'))
+    network: str = field(default='idmtools')
+    redis_image: str = field(default='redis:5.0.4-alpine')
+    redis_port: int = field(default=6379)
+    runtime: Optional[str] = field(default=None)
+    redis_mem_limit: str = field(default='128m')
+    redis_mem_reservation: str = field(default='64m')
+    postgres_image: str = field(default='postgres:11.4')
+    postgres_mem_limit: str = field(default='64m')
+    postgres_mem_reservation: str = field(default='32m')
+    postgres_port: Optional[str] = field(default=5432)
+    workers_image: str = field(default=default_image)
+    workers_ui_port: int = field(default=5000)
+    default_timeout: int = field(default=45)
+    run_as: Optional[str] = field(default=None)
+
     # We use this to manage our docker containers
-    _docker_operations: Optional[DockerOperations] = dataclasses.field(default=None, metadata={"pickle_ignore": True})
+    _docker_operations: Optional[DockerOperations] = field(default=None, metadata={"pickle_ignore": True})
 
     def __post_init__(self):
         super().__post_init__()
+        self.supported_types = {ItemType.EXPERIMENT, ItemType.SIMULATION}
         # ensure our brokers are started
         setup_broker()
         if self._docker_operations is None:
@@ -71,61 +77,65 @@ class LocalPlatform(IPlatform):
             # start the services
             self._docker_operations.create_services()
 
-    """
-    Represents the platform allowing to run simulations locally.
-    """
+    def get_platform_item(self, item_id, item_type, **kwargs):
+        if item_type == ItemType.EXPERIMENT:
+            experiment_dict = ExperimentsClient.get_one(item_id)
+            experiment = experiment_factory.create(experiment_dict['tags'].get("type"), tags=experiment_dict['tags'])
+            experiment.uid = experiment_dict['experiment_id']
+            return experiment
+        elif item_type == ItemType.SIMULATION:
+            simulation_dict = SimulationsClient.get_one(item_id)
+            experiment = self.get_platform_item(simulation_dict["experiment_id"], ItemType.EXPERIMENT)
+            simulation = experiment.simulation()
+            simulation.uid = simulation_dict['simulation_uid']
+            simulation.tags = simulation_dict['tags']
+            simulation.status = local_status_to_common(simulation_dict['status'])
+            return simulation
 
-    def create_items(self, items: 'TItem') -> List[UUID]:
-        """
-        Create items on the local Platform. Items must all be the same type.
-        Args:
-            items: List of items to be created
+    def get_children_for_platform_item(self, platform_item, raw, **kwargs):
+        if isinstance(platform_item, IExperiment):
+            platform_item.simulations.clear()
 
-        Returns:
-            List of id of created items
-        """
-        types = list({type(item) for item in items})
-        if len(types) != 1:
-            raise Exception('create_items only works with items of a single type at a time.')
-        sample_item = items[0]
-        if isinstance(sample_item, ISimulation):
-            ids = self._create_simulations(simulations_batch=items)
-        elif isinstance(sample_item, IExperiment):
-            ids = [self._create_experiment(experiment=item) for item in items]
+            # Retrieve the simulations for the current page
+            simulation_dict = SimulationsClient.get_all(experiment_id=platform_item.uid, per_page=9999)
+
+            # Add the simulations
+            for sim_info in simulation_dict:
+                sim = platform_item.simulation()
+                sim.uid = sim_info['simulation_uid']
+                sim.tags = sim_info['tags']
+                sim.status = local_status_to_common(sim_info['status'])
+                platform_item.simulations.append(sim)
+
+            return platform_item.simulations
+
+    def get_parent_for_platform_item(self, platform_item, raw, **kwargs):
+        if isinstance(platform_item, ISimulation):
+            return self.get_platform_item(platform_item.parent_id, ItemType.EXPERIMENT)
+        return None
+
+    def _create_batch(self, batch: 'TEntityList', item_type: 'ItemType') -> 'List[UUID]':
+        if item_type == ItemType.SIMULATION:
+            ids = self._create_simulations(simulations_batch=batch)
+        elif item_type == ItemType.EXPERIMENT:
+            ids = [self._create_experiment(experiment=item) for item in batch]
         else:
-            raise Exception(f'Unable to create items of type: {type(sample_item)} '
-                            f'for platform: {self.__class__.__name__}')
-        for item in items:
-            item.platform = self
+            raise Exception(f'Unable to create items of type: {item_type} for platform: {self.__class__.__name__}')
+
         return ids
 
     def run_items(self, items: TItemList) -> NoReturn:
-        """
-        Execute the specified items
-
-        Args:
-            items: List of items to execute
-
-        Returns:
-            None
-        """
+        from idmtools_platform_local.tasks.run import RunTask
         for item in items:
-            try:
-                self._run_simulations(experiment=item)
-            except:
+            if item.item_type == ItemType.EXPERIMENT:
+                for simulation in item.simulations:
+                    RunTask.send(item.command.cmd, item.uid, simulation.uid)
+            else:
                 raise Exception(f'Unable to run item id: {item.uid} of type: {type(item)} ')
-        for item in items:
-            item.platform = self
 
     def send_assets(self, item: TItem, **kwargs) -> NoReturn:
         """
         Send assets for item to platform
-        Args:
-            item:
-            **kwargs:
-
-        Returns:
-
         """
         if isinstance(item, ISimulation):
             self._send_assets_for_simulation(item, **kwargs)
@@ -139,130 +149,23 @@ class LocalPlatform(IPlatform):
         """
         Refresh the status of the specified item
 
-        Args:
-            item: Item to refresh status of
-
-        Returns:
-
         """
         if isinstance(item, ISimulation):
             raise Exception(f'Unknown how to refresh items of type {type(item)} '
                             f'for platform: {self.__class__.__name__}')
         elif isinstance(item, IExperiment):
-            return_value = self._refresh_experiment_status(experiment=item)
-        else:
-            raise Exception(f'Cannot fetch status of items of type {type(item)}')
-        item.platform = self
-        return return_value
+            status = SimulationsClient.get_all(experiment_id=item.uid, per_page=9999)
+            for s in item.simulations:
+                sim_status = [st for st in status if st['simulation_uid'] == s.uid]
 
-    def get_item(self, id: 'uuid') -> Union[ISimulation, IExperiment]:
-        """
-        Return the specified item from the platform
-
-        Args:
-            id: id of item to fetch
-
-        Returns:
-            Either the experiment or simulation matching the id
-        """
-        item = None
-        for lookup in [self._retrieve_simulation, self._retrieve_experiment]:
-            try:
-                item = lookup(id)
-                break
-            # TODO - Once _retrieve_simulation it implemented, remove NotImplementedError
-            except (FileNotFoundError, NotImplementedError) as e:
-                logger.debug(e)
-                pass
-        if item is None:
-            raise UnknownItemException(f'Unable to load item id: {id} from platform: {self.__class__.__name__}')
-        item.platform = self
-        return item
-
-    def get_parent(self, item: 'TItem') -> IExperiment:
-        """
-        Returns the parent of the item. On Local Platform, only simulations have parents so this will only work
-        on ISimulations objects. The return will always be an IExperiment object
-
-        Args:
-            item: Item to load parent of
-
-        Returns:
-            Experiment which is the parent of item
-        """
-        if isinstance(item, IExperiment):
-            raise ValueError("LocalPlatform Experiments have no parents")
-
-        parent = self._retrieve_experiment(item.parent_id)
-        parent.platform = self
-        return parent
-
-    def get_children(self, item: 'TItem') -> List[ISimulation]:
-        """
-        Returns the children for given object. On the local platform, only Experiments have children so item
-        should be an Experiment. The return will always be a list of simulations
-
-        Args:
-            item: item to load children for
-
-        Returns:
-            List of simulations that are the children of item
-        """
-        if not isinstance(item, IExperiment):
-            raise ValueError("Only Experiments have no children on the LocalPlatform")
-
-        children = self.restore_simulations(item) or []
-        for child in children:
-            child.platform = self
-        return children
+                if sim_status:
+                    s.status = local_status_to_common(sim_status[0]['status'])
 
     def get_files(self, item: 'TItem', files: 'List[str]') -> 'Dict[str, bytearray]':
-        """
-        Returns a dictionary of the specified files for the specified item.
-
-        Args:
-            item: Item to fetch files for
-            files: List of file names to fetch
-
-        Returns:
-            A dict container filename->bytearray
-        """
         if not isinstance(item, ISimulation):
             raise NotImplementedError("Retrieving files only implemented for Simulations at the moment")
 
         return self._get_assets_for_simulation(item, files)
-
-    def initialize_for_analysis(self, items: 'TItemList', analyzers: TAnalyzerList) -> NoReturn:
-        # run any necessary analysis prep steps on groups of items (hierarchy level > 0)
-        for analyzer in analyzers:
-            analyzer.per_group(items=items)
-
-    def _retrieve_simulation(self, simulation_id: 'uuid') -> 'TSimulation':
-        """
-        Retrieve a simulation object by id
-
-        Args:
-            simulation_id: id of simulation to retrieve
-
-        Returns:
-            Simulation matching sim id
-        """
-        raise NotImplementedError('Method for retrieving a simulation by id is not complete')
-
-    def _retrieve_experiment(self, experiment_id: str) -> IExperiment:
-        """
-        Restore experiment from local platform
-
-        Args:
-            experiment_id: Id of experiment to restore
-
-        Returns:
-
-        """
-        experiment_dict = ExperimentsClient.get_one(experiment_id)
-        experiment = experiment_factory.create(experiment_dict['tags'].get("type"), tags=experiment_dict['tags'])
-        experiment.uid = experiment_dict['experiment_id']
-        return experiment
 
     def _get_assets_for_simulation(self, simulation: TSimulation, output_files) -> Dict[str, bytearray]:  # noqa: F821
         """
@@ -285,71 +188,17 @@ class LocalPlatform(IPlatform):
 
         # Retrieve the transient if any
         if transients:
-            sim_path = f'{simulation.experiment.uid}/{simulation.uid}'
+            sim_path = f'{simulation.parent_id}/{simulation.uid}'
             transients_files = self.retrieve_output_files(job_id_path=sim_path, paths=transients)
             ret = dict(zip(transients, transients_files))
 
         # Take care of the assets
         if assets:
-            asset_path = f'{simulation.experiment.uid}'
+            asset_path = f'{simulation.parent_id}'
             common_files = self.retrieve_output_files(job_id_path=asset_path, paths=assets)
             ret.update(dict(zip(assets, common_files)))
 
         return ret
-
-    def restore_simulations(self, experiment: TExperiment):  # noqa: F821
-        """
-        Restores the simulation for a specific experiment.
-        Leverage the paging mechanism to not overload the server for big experiments.
-
-        Args:
-            experiment: Experiment to restore simulations for
-
-        Returns:
-
-        """
-        experiment.simulations.clear()
-
-        page_number = 1
-        while True:
-            try:
-                # Retrieve the simulations for the current page
-                simulation_dict = SimulationsClient.get_all(experiment_id=experiment.uid, per_page=20, page=page_number)
-            except FileNotFoundError:
-                # If nothing -> we have all simulations
-                break
-
-            # Add the simulations
-            for sim_info in simulation_dict:
-                sim = experiment.simulation()
-                sim.uid = sim_info['simulation_uid']
-                sim.tags = sim_info['tags']
-                sim.status = local_status_to_common(sim_info['status'])
-                experiment.simulations.append(sim)
-
-            # Go to next page
-            page_number += 1
-
-        return experiment.simulations
-
-    def _refresh_experiment_status(self, experiment: TExperiment, update_sim_status=True):  # noqa: F821
-        """
-
-        Args:
-            experiment:
-
-        Returns:
-
-        """
-        # Update the status of simulations objects within experiment
-        if update_sim_status:
-            status = SimulationsClient.get_all(experiment_id=experiment.uid, per_page=99999)
-            for s in experiment.simulations:
-                sim_status = [st for st in status if st['simulation_uid'] == s.uid]
-
-                if sim_status:
-                    s.status = local_status_to_common(sim_status[0]['status'])
-        return experiment
 
     def _create_experiment(self, experiment: IExperiment):
         """
@@ -474,20 +323,6 @@ class LocalPlatform(IPlatform):
             raise IOError("Coping of data for simulations failed.")
         return ids
 
-    def _run_simulations(self, experiment: IExperiment):
-        """
-        Run a specified experiment's simulations
-
-        Args:
-            experiment: Experiment who's simulations should be ran
-
-        Returns:
-            None
-        """
-        from idmtools_platform_local.tasks.run import RunTask
-        for simulation in experiment.simulations:
-            RunTask.send(experiment.command.cmd, experiment.uid, simulation.uid)
-
     def retrieve_output_files(self, job_id_path, paths):
         """
         Retrieves output files
@@ -508,16 +343,3 @@ class LocalPlatform(IPlatform):
             with open(full_path, 'rb') as fin:
                 byte_arrs.append(fin.read())
         return byte_arrs
-
-    def _retrieve_simulations(self, item):
-        simulation_dict = SimulationsClient.get_all(experiment_id=item.uid)
-
-        sims = []
-        for sim_info in simulation_dict:
-            sim = item.simulation()
-            sim.uid = sim_info['simulation_uid']
-            sim.tags = sim_info['tags']
-            sim.status = local_status_to_common(sim_info['status'])
-            sim.platform = self
-            sims.append(sim)
-        return sims

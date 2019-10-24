@@ -34,15 +34,18 @@ class EMODExperiment(IExperiment):
     def from_files(cls, name, eradication_path=None, config_path=None, campaign_path=None, demographics_paths=None,
                    force=False):
         """
-        Provide a way to load custom files when creating EMODExperiment
+        Load custom |EMOD_s| files when creating :class:`EMODExperiment`.
+
         Args:
-            name: experiment name
-            eradication_path: eradication.exe path
-            config_path: custom config file
-            campaign_path: custom campaign file
-            demographics_paths: custom demographics files (single file or a list)
-            force: always return if True, else throw exception if something wrong
-        Returns: None
+            name: The experiment name.
+            eradication_path: The eradication.exe path.
+            config_path: The custom configuration file.
+            campaign_path: The custom campaign file.
+            demographics_paths: The custom demographics files (single file or a list).
+            force: True to always return, else throw an exception if something goes wrong.
+
+        Returns: 
+            None
         """
         base_simulation = EMODSimulation()
         base_simulation.load_files(config_path, campaign_path, force)
@@ -54,13 +57,16 @@ class EMODExperiment(IExperiment):
 
     def load_files(self, config_path=None, campaign_path=None, demographics_paths=None, force=False):
         """
-        Provide a way to load custom files from EMODExperiment
+        Load custom |EMOD_s| files from :class:`EMODExperiment`.
+
         Args:
-            config_path: custom config file
-            campaign_path: custom campaign file
-            demographics_paths: custom demographics files (single file or a list)
-            force: always return if True, else throw exception if something wrong
-        Returns: None
+            config_path: The custom configuration file.
+            campaign_path: The custom campaign file.
+            demographics_paths: The custom demographics files (single file or a list).
+            force: True to always return, else throw an exception if something goes wrong.
+
+        Returns: 
+            None
         """
         self.base_simulation.load_files(config_path, campaign_path, force)
 
@@ -68,11 +74,14 @@ class EMODExperiment(IExperiment):
 
     def add_demographics_file(self, demographics_paths=None, force=False):
         """
-        Provide a way to load custom files
+        Load custom |EMOD_s| demographics files from :class:`EMODExperiment`.
+
         Args:
-            demographics_paths: custom demographics files (single file or a list)
-            force: always return if True, else throw exception is something wrong
-        Returns: None
+            demographics_paths: Path to custom demographics files (single file or a list).
+            force: True to always return, else throw an exception if something goes wrong.
+
+        Returns: 
+            None
         """
 
         def load_file(file_path):

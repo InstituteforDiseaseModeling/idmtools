@@ -7,19 +7,20 @@ from typing import NoReturn
 
 if typing.TYPE_CHECKING:
     from idmtools.entities.iplatform import TPlatform
-    from idmtools.entities.iitem import TItem
+    from idmtools.core.interfaces.iitem import TItem
     from idmtools.entities.ianalyzer import TAnalyzerList
     from diskcache import Cache
 
 
 def map_item(item: 'TItem') -> NoReturn:
     """
-    A worker process entry point for analyzer item-mapping that initializes some worker-global values
+    Initialize some worker-global values; a worker process entry point for analyzer item-mapping.
 
     Args:
-        item: The item (often simulation) to process
+        item: The item (often simulation) to process.
 
     Returns:
+        None
     """
     # Retrieve the global variables coming from the pool initialization
     analyzers = map_item.analyzers
@@ -33,12 +34,16 @@ def _get_mapped_data_for_item(item: 'TItem', analyzers: 'TAnalyzerList', cache: 
     """
 
     Args:
-        item: the IItem object to call analyzer map() methods on
-        analyzers: IAnalyzer items with map() methods to call on the provided items
-        cache: The diskcache Cache object to store item map() results in
-        platform: a platform object to query for information
+        item: The :class:`~idmtools.entities.iitem.IItem` object to call analyzer 
+            :meth:`~idmtools.analysis.AddAnalyzer.map` methods on.
+        analyzers: The :class:`~idmtools.analysis.IAnalyzer` items with 
+            :meth:`~idmtools.analysis.AddAnalyzer.map` methods to call on the provided items.
+        cache: The disk cache object to store item :meth:`~idmtools.analysis.AddAnalyzer.map` 
+            results in.
+        platform: A platform object to query for information.
 
-    Returns: False if an exception occurred, else True (succeeded)
+    Returns: 
+        False if an exception occurred; else True (succeeded).
 
     """
     # determine which analyzers (and by extension, which filenames) are applicable to this item
@@ -95,12 +100,12 @@ def _get_mapped_data_for_item(item: 'TItem', analyzers: 'TAnalyzerList', cache: 
 
 def _set_exception(step: str, info: dict, cache: 'Cache') -> NoReturn:
     """
-    Sets an exception in the cache in a standardized way.
+    Set an exception in the cache in a standardized way.
 
     Args:
-        step: Which step encountered an error
-        info: Dictionary for additional information to add to the message
-        cache: The cache object in which to set the exception
+        step: The step that encountered an error.
+        info: A dictionary for additional information to add to the message.
+        cache: The cache object in which to set the exception.
 
     Returns:
 

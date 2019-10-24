@@ -16,3 +16,7 @@ class ExperimentNotFound(Exception):
 class UnknownItemException(Exception):
     def __init__(self, err: 'str'):
         super().__init__(err)
+
+
+class NoPlatformException(Exception):
+    pass

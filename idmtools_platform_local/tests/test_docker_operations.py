@@ -96,7 +96,6 @@ class TestDockerOperations(unittest.TestCase):
 
             with self.assertRaises(EnvironmentError) as e:
                 pl.create_services()
-                self.assertIn('Port 10000 is already taken', e.exception.args)
             httpd.server_close()
 
     def test_error_if_try_to_run_as_root(self):
