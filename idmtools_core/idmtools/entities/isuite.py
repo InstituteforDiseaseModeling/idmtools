@@ -2,9 +2,7 @@ import typing
 from abc import ABC
 from dataclasses import dataclass, field
 from idmtools.core.interfaces.inamed_entity import INamedEntity
-
-if typing.TYPE_CHECKING:
-    from idmtools.entities.iexperiment import TExperimentList
+from idmtools.core import ItemType, EntityContainer
 
 
 @dataclass(repr=False)
@@ -15,7 +13,14 @@ class ISuite(INamedEntity, ABC):
     Args:
         experiments: the children items of this suite
     """
-    experiments: 'TExperimentList' = field(default=None, compare=False, metadata={"md": True})
+    experiments: 'EntityContainer' = field(default_factory=lambda: EntityContainer(), compare=False,
+                                           metadata={"pickle_ignore": True})
+
+    item_type: 'ItemType' = field(default=ItemType.SUITE, compare=False, init=False)
+
+    def add_experiment(self, experiment):
+        self.experiments.append(experiment)
 
 
 TSuite = typing.TypeVar("TSuite", bound=ISuite)
+TSuiteClass = typing.Type[TSuite]

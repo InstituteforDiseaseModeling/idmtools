@@ -1,18 +1,13 @@
 from dataclasses import field, dataclass
-from idmtools.core.interfaces.entity_container import EntityContainer
-from idmtools.core.interfaces.inamed_entity import INamedEntity
-
-
-def default_experiments():
-    return EntityContainer()
+from idmtools.entities import ISuite
 
 
 @dataclass
-class Suite(INamedEntity):
-    experiments: 'EntityContainer' = field(default_factory=default_experiments, metadata={"pickle_ignore": True})
+class Suite(ISuite):
+    description: str = field(default=None, compare=False)
 
-    def post_setstate(self):
-        self.experiments = EntityContainer()
+    def update_tags(self, tags={}):
+        self.tags.update(tags)
 
     def display(self):
         from idmtools.utils.display import display, suite_table_display
