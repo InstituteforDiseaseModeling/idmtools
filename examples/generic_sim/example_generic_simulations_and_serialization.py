@@ -31,7 +31,7 @@ if __name__ == "__main__":
     ac.add_asset(a)
     e = EMODExperiment.from_default(expname, default=EMODSir, eradication_path=os.path.join(BIN_PATH, "Eradication.exe"))
     e.add_assets(ac)
-    simulation = e.simulation()
+    simulation = e.base_simulation
 
     #Update bunch of config parameters
     sim = config_update_params(simulation)
@@ -46,8 +46,6 @@ if __name__ == "__main__":
     last_serialization_day = sorted(timesteps)[-1]
     end_day = start_day + last_serialization_day
     sim.set_parameter("Simulation_Duration", end_day)
-
-    e.base_simulation = sim
 
     builder = ExperimentBuilder()
     set_Run_Number = partial(param_update, param="Run_Number")

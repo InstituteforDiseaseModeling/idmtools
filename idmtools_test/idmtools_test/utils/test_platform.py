@@ -1,24 +1,19 @@
 import os
-import shutil
-import uuid
-import typing
 from dataclasses import dataclass, field
+from typing import Dict, List, Type
+from uuid import UUID, uuid4
 
 import diskcache
 import numpy as np
-from typing import Type
 
+from idmtools.core import EntityStatus, ItemType
+from idmtools.core.interfaces.iitem import TItem
+from idmtools.entities import IPlatform
+from idmtools.entities.iexperiment import TExperiment
+from idmtools.entities.isimulation import TSimulation
 from idmtools.registry.platform_specification import example_configuration_impl, get_platform_impl, \
     get_platform_type_impl, PlatformSpecification
 from idmtools.registry.plugin_specification import get_description_impl
-
-
-from idmtools.entities import IPlatform
-
-
-
-if typing.TYPE_CHECKING:
-    from idmtools.core import TExperiment
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 data_path = os.path.abspath(os.path.join(current_directory, "..", "data"))
@@ -29,28 +24,16 @@ class TestPlatform(IPlatform):
     """
     Test platform simulating a working platform to use in the test suites.
     """
-
     __test__ = False  # Hide from test discovery
 
     experiments: 'diskcache.Cache' = field(default=None, compare=False, metadata={"pickle_ignore": True})
     simulations: 'diskcache.Cache' = field(default=None, compare=False, metadata={"pickle_ignore": True})
 
-    def __del__(self):
-        # Close and delete the cache when finished
-        if self.experiments:
-            self.experiments.close()
-        if self.simulations:
-            self.simulations.close()
-        if os.path.exists(data_path):
-            try:
-                shutil.rmtree(data_path)
-            except OSError:
-                pass
-
     def __post_init__(self):
         super().__post_init__()
         os.makedirs(data_path, exist_ok=True)
         self.initialize_test_cache()
+        self.supported_types = {ItemType.EXPERIMENT, ItemType.SIMULATION}
 
     def initialize_test_cache(self):
         """
@@ -58,14 +41,6 @@ class TestPlatform(IPlatform):
         """
         self.experiments = diskcache.Cache(os.path.join(data_path, 'experiments_test'))
         self.simulations = diskcache.Cache(os.path.join(data_path, 'simulations_test'))
-
-    def restore_simulations(self, experiment: 'TExperiment') -> None:
-        for sim in self.simulations.get(experiment.uid):
-            s = experiment.simulation()
-            s.uid = sim.uid
-            s.status = sim.status
-            s.tags = sim.tags
-            experiment.simulations.append(s)
 
     def cleanup(self):
         for cache in [self.experiments, self.simulations]:
@@ -75,20 +50,59 @@ class TestPlatform(IPlatform):
     def post_setstate(self):
         self.initialize_test_cache()
 
-    def create_experiment(self, experiment: 'TExperiment') -> None:
-        uid = uuid.uuid4()
+    def _create_batch(self, batch: 'TEntityList', item_type: 'ItemType') -> 'List[UUID]':
+        if item_type == ItemType.SIMULATION:
+            return self._create_simulations(simulation_batch=batch)
+
+        if item_type == ItemType.EXPERIMENT:
+            return [self._create_experiment(experiment=item) for item in batch]
+
+    def get_platform_item(self, item_id, item_type, **kwargs):
+        if item_type == ItemType.SIMULATION:
+            obj = None
+            for eid in self.simulations:
+                for sim in self.simulations.get(eid):
+                    if sim.uid == item_id:
+                        obj = sim
+                        break
+                if obj: break
+        elif item_type == ItemType.EXPERIMENT:
+            obj = self.experiments.get(item_id)
+
+        if not obj:
+            return
+
+        obj.platform = self
+        return obj
+
+    def get_children_for_platform_item(self, platform_item, raw, **kwargs):
+        if platform_item.item_type == ItemType.EXPERIMENT:
+            return self.simulations.get(platform_item.uid)
+
+    def get_parent_for_platform_item(self, platform_item, raw, **kwargs):
+        if platform_item.item_type == ItemType.SIMULATION:
+            return self.experiments.get(platform_item.parent_id)
+
+    def _create_experiment(self, experiment: 'TExperiment') -> UUID:
+        uid = uuid4()
         experiment.uid = uid
         self.experiments.set(uid, experiment)
+        lock = diskcache.Lock(self.simulations, 'simulations-lock')
+        with lock:
+            self.simulations.set(uid, list())
+        return experiment.uid
 
-    def create_simulations(self, batch):
+    def _create_simulations(self, simulation_batch):
         simulations = []
-        experiment_id = None
-        for simulation in batch:
-            experiment_id = simulation.experiment.uid
-            simulation.uid = uuid.uuid4()
+        for simulation in simulation_batch:
+            experiment_id = simulation.parent_id
+            simulation.uid = uuid4()
             simulations.append(simulation)
 
-        self.simulations.set(experiment_id, simulations)
+        lock = diskcache.Lock(self.simulations, 'simulations-lock')
+        with lock:
+            existing_simulations = self.simulations.pop(experiment_id)
+            self.simulations[experiment_id] = existing_simulations + simulations
         return [s.uid for s in simulations]
 
     def set_simulation_status(self, experiment_uid, status):
@@ -104,30 +118,41 @@ class TestPlatform(IPlatform):
             simulation.status = new_status
         self.simulations.set(experiment_uid, simulations)
 
-    def run_simulations(self, experiment: 'TExperiment') -> None:
+    def set_simulation_num_status(self, experiment_uid, status, number):
+        simulations = self.simulations.get(experiment_uid)
+        for simulation in simulations:
+            simulation.status = status
+            self.simulations.set(experiment_uid, simulations)
+            number -= 1
+            if number <= 0: return
+
+    def run_simulations(self, experiment: TExperiment) -> None:
         from idmtools.core import EntityStatus
         self.set_simulation_status(experiment.uid, EntityStatus.RUNNING)
 
-    def send_assets_for_experiment(self, experiment: 'TExperiment', **kwargs) -> None:
+    def send_assets_for_experiment(self, experiment: TExperiment, **kwargs) -> None:
         pass
 
-    def send_assets_for_simulation(self, simulation: 'TSimulation', **kwargs) -> None:
+    def send_assets_for_simulation(self, simulation: TSimulation, **kwargs) -> None:
         pass
 
-    def refresh_experiment_status(self, experiment: 'TExperiment') -> None:
-        for simulation in self.simulations.get(experiment.uid):
-            for esim in experiment.simulations:
+    def refresh_status(self, item) -> None:
+        for simulation in self.simulations.get(item.uid):
+            for esim in item.simulations():
                 if esim == simulation:
                     esim.status = simulation.status
                     break
 
-    def get_assets_for_simulation(self, simulation, output_files):
+    def run_items(self, items: 'TItem'):
+        for item in items:
+            if item.item_type == ItemType.EXPERIMENT:
+                self.set_simulation_status(item.uid, EntityStatus.RUNNING)
+
+    def send_assets(self, item: 'TItem', **kwargs):
         pass
 
-    def retrieve_experiment(self, experiment_id: 'uuid') -> 'TExperiment':
-        if not experiment_id in self.experiments:
-            return None
-        return self.experiments[experiment_id]
+    def get_files(self, item: 'TItem', files: 'List[str]') -> Dict[str, bytearray]:
+        pass
 
 
 TEST_PLATFORM_EXAMPLE_CONFIG = """

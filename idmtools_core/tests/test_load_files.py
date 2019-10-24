@@ -8,7 +8,7 @@ from idmtools_test import COMMON_INPUT_PATH
 DEFAULT_CONFIG_PATH = os.path.join(COMMON_INPUT_PATH, "files", "config.json")
 DEFAULT_CAMPAIGN_JSON = os.path.join(COMMON_INPUT_PATH, "files", "campaign.json")
 DEFAULT_DEMOGRAPHICS_JSON = os.path.join(COMMON_INPUT_PATH, "files", "demographics.json")
-DEFAULT_ERADICATION_PATH = os.path.join(COMMON_INPUT_PATH, "dtk", "Eradication.exe")
+DEFAULT_ERADICATION_PATH = os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe")
 
 
 class TestCustomFiles(ITestWithPersistence):
@@ -141,11 +141,11 @@ class TestCustomFiles(ITestWithPersistence):
 
     def test_load_from_files(self):
         e = EMODExperiment.from_files(self.case_name,
-                                     eradication_path=DEFAULT_ERADICATION_PATH,
-                                     config_path=DEFAULT_CONFIG_PATH,
-                                     campaign_path=DEFAULT_CAMPAIGN_JSON,
-                                     demographics_paths=DEFAULT_DEMOGRAPHICS_JSON
-                                     )
+                                      eradication_path=DEFAULT_ERADICATION_PATH,
+                                      config_path=DEFAULT_CONFIG_PATH,
+                                      campaign_path=DEFAULT_CAMPAIGN_JSON,
+                                      demographics_paths=DEFAULT_DEMOGRAPHICS_JSON
+                                      )
 
         # Test the contents
         with open(DEFAULT_CONFIG_PATH, 'r') as m:
@@ -180,8 +180,8 @@ class TestCustomFiles(ITestWithPersistence):
 
     def test_experiment_load_multiple_demographics_files_2(self):
         e = EMODExperiment.from_files(self.case_name,
-                                     eradication_path=DEFAULT_ERADICATION_PATH,
-                                     demographics_paths=[DEFAULT_DEMOGRAPHICS_JSON])
+                                      eradication_path=DEFAULT_ERADICATION_PATH,
+                                      demographics_paths=[DEFAULT_DEMOGRAPHICS_JSON])
 
         # test number of files
         self.assertEqual(len(e.base_simulation.demographics), 0)

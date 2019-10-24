@@ -7,7 +7,7 @@ from idmtools.builders import ExperimentBuilder
 
 class CsvExperimentBuilder(ExperimentBuilder):
     """
-    Represents an experiment builder
+    Class that represents an experiment builder.
     """
 
     def __init__(self):

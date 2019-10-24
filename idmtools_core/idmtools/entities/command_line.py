@@ -1,6 +1,5 @@
+from typing import TypeVar, Dict, Any, List
 from dataclasses import dataclass, field
-
-from typing import Dict, Any, List
 
 
 @dataclass(init=False)
@@ -43,3 +42,6 @@ class CommandLine:
     @property
     def cmd(self):
         return ' '.join(filter(None, [self.executable, self.options, self.arguments]))
+
+
+TCommandLine = TypeVar("TCommandLine", bound=CommandLine)

@@ -60,7 +60,6 @@ const styles = theme => ({
     },
     tableHeader: {
         position: 'sticky',
-        top: 200
     }
 });
 

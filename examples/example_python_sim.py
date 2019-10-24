@@ -34,7 +34,7 @@ builder.add_sweep_definition(setParam("b"), [1, 2, 3])
 
 experiment.add_builder(builder)
 
-platform = Platform('Slurm')
+platform = Platform('COMPS2')
 # You can easily switch platforms by simply commenting out the previous line and then
 # uncommenting the following line
 # platform = Platform('COMPS')

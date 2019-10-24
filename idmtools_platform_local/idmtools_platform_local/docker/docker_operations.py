@@ -1,26 +1,35 @@
 import io
 import logging
 import os
-from pathlib import Path
 import platform
 import shutil
 import tarfile
 import time
+from concurrent.futures.thread import ThreadPoolExecutor
 from dataclasses import dataclass
 from io import BytesIO
 from logging import getLogger
-from typing import Optional, Union, NoReturn, BinaryIO
+from pathlib import Path
+from typing import BinaryIO, Dict, List, NoReturn, Optional, Tuple, Union
 
 import docker
 from docker.errors import APIError
-from docker.models.containers import Container, ExecResult
+from docker.models.containers import Container
 from docker.models.networks import Network
 
 from idmtools.core.system_information import get_system_information
-from idmtools.utils.decorators import optional_yaspin_load
+from idmtools.utils.decorators import optional_yaspin_load, ParallelizeDecorator
 from idmtools_platform_local import __version__
 
 logger = getLogger(__name__)
+# thread queue for docker copy operations
+io_queue = ParallelizeDecorator()
+
+docker_repo = f'{os.getenv("DOCKER_REPO", "idm-docker-public")}.packages.idmod.org'
+if logger.isEnabledFor(logging.DEBUG):
+    logger.debug(f"Default docker repo set to: {docker_repo}")
+
+default_image = f'{docker_repo}/idmtools_local_workers:{__version__.replace("+", ".")}'
 
 
 @dataclass
@@ -32,13 +41,16 @@ class DockerOperations:
     runtime: Optional[str] = 'runc'
     redis_mem_limit: str = '128m'
     redis_mem_reservation: str = '64m'
+    workers_mem_limit: str = '512m'
+    workers_mem_reservation: str = '128m'
     postgres_image: str = 'postgres:11.4'
     postgres_mem_limit: str = '64m'
     postgres_mem_reservation: str = '32m'
     postgres_port: Optional[str] = 5432
-    workers_image: str = 'idm-docker-staging.packages.idmod.org/idmtools_local_workers:latest'
+    workers_image: str = default_image
     workers_ui_port: int = 5000
     run_as: Optional[str] = None
+    _fileio_pool = ThreadPoolExecutor()
 
     def __post_init__(self):
         """
@@ -47,8 +59,9 @@ class DockerOperations:
         Returns:
 
         """
-        if not os.path.exists(self.host_data_directory):
-            os.makedirs(self.host_data_directory)
+        # Make sure the host_data_dir exists
+        os.makedirs(self.host_data_directory, exist_ok=True)
+
         self.timeout = 1
         self.system_info = get_system_information()
         if self.run_as is None:
@@ -102,6 +115,7 @@ class DockerOperations:
         # in the future this could be improved with service detection
         time.sleep(5)
         self.get_workers()
+        time.sleep(5)
 
     @optional_yaspin_load(text="Restarting IDM-Tools services")
     def restart_all(self) -> NoReturn:
@@ -198,23 +212,24 @@ class DockerOperations:
             that *None* is returned when *create=False*
         """
         logger.debug('Checking if worker is running')
-        workers_container = self.client.containers.list(filters=dict(name='idmtools_worker'), all=True)
-        if not workers_container and create:
-            container_config = self.create_worker_config()
-            logger.debug(f'Worker Container Config {str(container_config)}')
-            try:
+        try:
+            workers_container = self.client.containers.list(filters=dict(name='idmtools_worker'), all=True)
+            if not workers_container and create:
+                container_config = self.create_worker_config()
+                logger.debug(f'Worker Container Config {str(container_config)}')
                 workers_container = self.client.containers.run(**container_config)
-            except APIError as e:
-                if 'address already in use' in e.response:
-                    raise EnvironmentError(f"Port {self.workers_ui_port} already in use. Please configure another port "
-                                           f"for the Local Platform UI") from e
-                else:  # we don't know what the issue is so kick it down the road
-                    raise e
-        elif type(workers_container) is list and len(workers_container):
-            workers_container = workers_container[0]
-            if create:
-                workers_container = self.ensure_container_running(workers_container)
-        return workers_container
+            elif type(workers_container) is list and len(workers_container):
+                workers_container = workers_container[0]
+                if create:
+                    workers_container = self.ensure_container_running(workers_container)
+            return workers_container
+        except APIError as e:
+            if 'address already in use' in e.response:
+                raise EnvironmentError(f"Port {self.workers_ui_port} already in use. Please configure another port or "
+                                       f"stop the service/application using port {self.workers_ui_port}"
+                                       f"for the Local Platform UI") from e
+            else:  # we don't know what the issue is so kick it down the road
+                raise e
 
     @staticmethod
     def ensure_container_running(container: Container) -> Container:
@@ -258,9 +273,9 @@ class DockerOperations:
                                 volumes=worker_volumes, runtime=self.runtime, environment=environment)
 
         container_config.update(
-            self.get_common_config(
-                mem_limit=self.redis_mem_limit, mem_reservation=self.redis_mem_reservation
-            ))
+            self.get_common_config(mem_limit=self.workers_mem_limit, mem_reservation=self.workers_mem_reservation)
+        )
+
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f"Worker Config: {container_config}")
         return container_config
@@ -395,7 +410,7 @@ class DockerOperations:
             self.client.volumes.create(name='idmtools_local_postgres')
 
     @staticmethod
-    def _get_optional_port_bindings(src_port: Optional[Union[str, int]], dest_port: Optional[Union[str, int]]) ->\
+    def _get_optional_port_bindings(src_port: Optional[Union[str, int]], dest_port: Optional[Union[str, int]]) -> \
             Optional[dict]:
         """
         Used to generate port bindings configurations if the inputs are not set to none
@@ -410,6 +425,7 @@ class DockerOperations:
         """
         return {dest_port: src_port} if src_port is not None and dest_port is not None else None
 
+    @io_queue.parallelize
     def copy_to_container(self, container: Container, file: Union[str, bytes], destination_path: str,
                           dest_name: Optional[str] = None) -> bool:
         """
@@ -423,20 +439,52 @@ class DockerOperations:
             dest_name: Optional parameter for destination filename. By default the source filename is used
 
         Returns:
-            (bool) True if the copy suceeds, False otherwise
+            (bool) True if the copy succeeds, False otherwise
         """
         if isinstance(file, bytes):
             file = BytesIO(file)
         if type(file) is str:
             logger.debug(f'Copying {file} to docker container {container.id}:{destination_path}')
-            with open(file, 'rb') as in_file:
-                name = dest_name if dest_name else os.path.basename(file)
-                result = DockerOperations.create_archive_from_bytes(in_file, name)
-                return container.put_archive(path=destination_path, data=result.read())
+            name = dest_name if dest_name else os.path.basename(file)
+            target_file = os.path.join(self.host_data_directory,
+                                       destination_path.replace('/data', '/workers')[1:], name)
+
+            # Make sure to have the correct separators for the path
+            target_file = target_file.replace('/', os.sep).replace('\\', os.sep)
+
+            # Do the copy
+            shutil.copy(file, target_file)
+            return True
         elif isinstance(file, BytesIO):
+            target_file = os.path.join(self.host_data_directory, destination_path.replace('/data', '/workers')[1:],
+                                       dest_name)
+            # Make sure to have the correct separators for the path
+            target_file = target_file.replace('/', os.sep).replace('\\', os.sep)
+
             logger.debug(f'Copying {dest_name} to docker container {container.id}:{destination_path}')
-            with self.create_archive_from_bytes(file, dest_name) as archive:
-                return container.put_archive(path=destination_path, data=archive.read())
+
+            with open(target_file, 'wb') as of:
+                of.write(file.read())
+            return True
+
+    def sync_copy(self, futures):
+        if not isinstance(futures, list):
+            futures = [futures]
+        return io_queue.get_results(futures)
+
+    def copy_multiple_to_container(self, container: Container,
+                                   files: Dict[str, List[Tuple[Union[str, bytes], Optional[str]]]],
+                                   join_on_copy: bool = True):
+        results = []
+        for dest_path, sub_files in files.items():
+            for fn in sub_files:
+                results.append(self.copy_to_container(container, fn[0], dest_path, fn[1]))
+
+        if join_on_copy:
+            return all(io_queue.get_results(results))
+        # If we don't join, we assume the copy succeeds for now. This really means somewhere else should be handling the
+        # data join for this
+        return True
 
     @staticmethod
     def create_archive_from_bytes(content: Union[bytes, BytesIO, BinaryIO], name: str) -> BytesIO:
@@ -466,7 +514,7 @@ class DockerOperations:
         pw_tarstream.seek(0)
         return pw_tarstream
 
-    def create_directory(self, dir: str, container: Optional[Container] = None) -> ExecResult:
+    def create_directory(self, dir: str) -> bool:
         """
         Create a directory in a container
 
@@ -477,7 +525,7 @@ class DockerOperations:
         Returns:
             (ExecResult) Result of the mkdir operation
         """
-        if container is None:
-            container = self.get_workers()
-        user_str = self.run_as
-        return container.exec_run(f'mkdir -p "{dir}"', user=user_str)
+        path = os.path.join(self.host_data_directory, dir.replace('/data', '/workers')[1:])
+        path.replace('/', os.sep).replace('\\', os.sep)
+        os.makedirs(path, exist_ok=True)
+        return True

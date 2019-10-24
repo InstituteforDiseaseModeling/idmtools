@@ -10,24 +10,26 @@ logger = getLogger(__name__)
 
 class PluginSpecification:
     """
-    This class is a base generic definition for all classes
+    Base class for all plugins. 
     """
 
     @classmethod
     def get_name(cls) -> str:
         """
-        We can override if we need but the best option for more plugins is just use their class name as the plugin name
+        Get the name of the plugin. Although it can be overridden, the best practice is to use the class 
+        name as the plugin name.
+        
         Returns:
-            (str) Name of Plugin
+            The name of the plugin as a string.
         """
         return cls.__name__.replace("Specification", "")
 
     @get_description_spec
     def get_description(self) -> str:
         """
-        A brief description of the plugin and its functionality
+        Get a brief description of the plugin and its functionality.
 
         Returns:
-
+            The plugin description.
         """
         raise NotImplementedError("The plugin did not implement a description!")

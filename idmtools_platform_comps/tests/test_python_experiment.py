@@ -50,7 +50,6 @@ class TestPythonExperiment(ITestWithPersistence):
         pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
 
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123, "KeyOnly": None}
-
         pe.base_simulation.set_parameter("c", "c-value")
         builder = ExperimentBuilder()
         # ------------------------------------------------------
@@ -90,7 +89,6 @@ class TestPythonExperiment(ITestWithPersistence):
     # b=[2,3,4,5,6]  <-- b = a + 2
     def test_sweeps_2_related_parameters_comps(self):
         pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
-
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
 
         pe.base_simulation.set_parameter("c", "c-value")
@@ -235,7 +233,8 @@ class TestPythonExperiment(ITestWithPersistence):
         model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
         ac = AssetCollection()
         a = Asset(relative_path="MyExternalLibrary",
-                  absolute_path=os.path.join(COMMON_INPUT_PATH, "python", "Assets", "MyExternalLibrary", "functions.py"))
+                  absolute_path=os.path.join(COMMON_INPUT_PATH, "python", "Assets", "MyExternalLibrary",
+                                             "functions.py"))
         ac.add_asset(a)
         pe = PythonExperiment(name=self.case_name, model_path=model_path, assets=ac)
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}

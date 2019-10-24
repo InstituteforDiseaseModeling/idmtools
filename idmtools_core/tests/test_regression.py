@@ -72,7 +72,7 @@ class TestPersistenceServices(ITestWithPersistence):
         # https://github.com/InstituteforDiseaseModeling/idmtools/issues/138
         e = TstExperiment(name="test")
         p = Platform('Test')
-
+        e.platform = p
         # Set a parameter in the base simulation
         e.base_simulation.set_parameter("test", 0)
         self.assertEqual(e.base_simulation.parameters["test"], 0)
@@ -92,7 +92,8 @@ class TestPersistenceServices(ITestWithPersistence):
         self.assertEqual(b.simulations[0], s)
 
         # Run the experiment
-        em = ExperimentManager(e, p)
+
+        em = ExperimentManager(e, platform=p)
         em.run()
 
         # Make sure the base simulation was left untouched

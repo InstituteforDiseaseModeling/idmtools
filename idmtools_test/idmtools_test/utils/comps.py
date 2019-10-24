@@ -1,10 +1,12 @@
 from COMPS import Data
-from COMPS.Data import QueryCriteria, Simulation
+from COMPS.Data import QueryCriteria, Simulation as COMPSSimulation
 
 
 def get_asset_collection_id_for_simulation_id(sim_id):
-    query_criteria = QueryCriteria().select_children('configuration')
-    simulation = Simulation.get(id=sim_id, query_criteria=query_criteria)
+    simulation = COMPSSimulation.get(sim_id, query_criteria=QueryCriteria().select(
+        ['id', 'experiment_id']).select_children(
+        ["files", "configuration"]))
+
     collection_id = simulation.configuration.asset_collection_id
     return collection_id
 

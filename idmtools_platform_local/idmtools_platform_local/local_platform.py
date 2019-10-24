@@ -2,20 +2,25 @@ import dataclasses
 import functools
 import logging
 import os
+from collections import defaultdict
+from dataclasses import dataclass, field
 from logging import getLogger
-from typing import Optional, NoReturn
-from dataclasses import dataclass
 from pathlib import Path
+from typing import Dict, List, NoReturn, Optional
+from uuid import UUID
+
+from docker.models.containers import Container
+
 from idmtools.assets import Asset
+from idmtools.core import ItemType
+from idmtools.core.experiment_factory import experiment_factory
+from idmtools.core.interfaces.iitem import TItem, TItemList
 from idmtools.entities import IExperiment, IPlatform
-# we have to import brokers so that the proper configuration is achieved for redis
-from idmtools.entities.iexperiment import TExperiment
-from idmtools.entities.isimulation import TSimulation
+from idmtools.entities.isimulation import ISimulation, TSimulation
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
 from idmtools_platform_local.client.simulations_client import SimulationsClient
-from idmtools_platform_local.docker.docker_operations import DockerOperations
+from idmtools_platform_local.docker.docker_operations import default_image, DockerOperations
 from idmtools_platform_local.workers.brokers import setup_broker
-from idmtools.core.experiment_factory import experiment_factory
 
 status_translate = dict(
     created='CREATED',
@@ -36,26 +41,32 @@ logger = getLogger(__name__)
 
 @dataclass
 class LocalPlatform(IPlatform):
-    host_data_directory: str = os.path.join(str(Path.home()), '.local_data')
-    network: str = 'idmtools'
-    redis_image: str = 'redis:5.0.4-alpine'
-    redis_port: int = 6379
-    runtime: Optional[str] = None
-    redis_mem_limit: str = '128m'
-    redis_mem_reservation: str = '64m'
-    postgres_image: str = 'postgres:11.4'
-    postgres_mem_limit: str = '64m'
-    postgres_mem_reservation: str = '32m'
-    postgres_port: Optional[str] = 5432
-    workers_image: str = 'idm-docker-staging.packages.idmod.org/idmtools_local_workers:latest'
-    workers_ui_port: int = 5000
-    default_timeout: int = 30
-    run_as: Optional[str] = None
+    """
+    Represents the platform allowing to run simulations locally.
+    """
+
+    host_data_directory: str = field(default=os.path.join(str(Path.home()), '.local_data'))
+    network: str = field(default='idmtools')
+    redis_image: str = field(default='redis:5.0.4-alpine')
+    redis_port: int = field(default=6379)
+    runtime: Optional[str] = field(default=None)
+    redis_mem_limit: str = field(default='128m')
+    redis_mem_reservation: str = field(default='64m')
+    postgres_image: str = field(default='postgres:11.4')
+    postgres_mem_limit: str = field(default='64m')
+    postgres_mem_reservation: str = field(default='32m')
+    postgres_port: Optional[str] = field(default=5432)
+    workers_image: str = field(default=default_image)
+    workers_ui_port: int = field(default=5000)
+    default_timeout: int = field(default=45)
+    run_as: Optional[str] = field(default=None)
+
     # We use this to manage our docker containers
-    _docker_operations: Optional[DockerOperations] = dataclasses.field(default=None, metadata={"pickle_ignore": True})
+    _docker_operations: Optional[DockerOperations] = field(default=None, metadata={"pickle_ignore": True})
 
     def __post_init__(self):
         super().__post_init__()
+        self.supported_types = {ItemType.EXPERIMENT, ItemType.SIMULATION}
         # ensure our brokers are started
         setup_broker()
         if self._docker_operations is None:
@@ -66,26 +77,107 @@ class LocalPlatform(IPlatform):
             # start the services
             self._docker_operations.create_services()
 
-    """
-    Represents the platform allowing to run simulations locally.
-    """
+    def get_platform_item(self, item_id, item_type, **kwargs):
+        if item_type == ItemType.EXPERIMENT:
+            experiment_dict = ExperimentsClient.get_one(item_id)
+            experiment = experiment_factory.create(experiment_dict['tags'].get("type"), tags=experiment_dict['tags'])
+            experiment.uid = experiment_dict['experiment_id']
+            return experiment
+        elif item_type == ItemType.SIMULATION:
+            simulation_dict = SimulationsClient.get_one(item_id)
+            experiment = self.get_platform_item(simulation_dict["experiment_id"], ItemType.EXPERIMENT)
+            simulation = experiment.simulation()
+            simulation.uid = simulation_dict['simulation_uid']
+            simulation.tags = simulation_dict['tags']
+            simulation.status = local_status_to_common(simulation_dict['status'])
+            return simulation
 
-    def retrieve_experiment(self, experiment_id: str) -> IExperiment:
+    def get_children_for_platform_item(self, platform_item, raw, **kwargs):
+        if isinstance(platform_item, IExperiment):
+            platform_item.simulations.clear()
+
+            # Retrieve the simulations for the current page
+            simulation_dict = SimulationsClient.get_all(experiment_id=platform_item.uid, per_page=9999)
+
+            # Add the simulations
+            for sim_info in simulation_dict:
+                sim = platform_item.simulation()
+                sim.uid = sim_info['simulation_uid']
+                sim.tags = sim_info['tags']
+                sim.status = local_status_to_common(sim_info['status'])
+                platform_item.simulations.append(sim)
+
+            return platform_item.simulations
+
+    def get_parent_for_platform_item(self, platform_item, raw, **kwargs):
+        if isinstance(platform_item, ISimulation):
+            return self.get_platform_item(platform_item.parent_id, ItemType.EXPERIMENT)
+        return None
+
+    def _create_batch(self, batch: 'TEntityList', item_type: 'ItemType') -> 'List[UUID]':
+        if item_type == ItemType.SIMULATION:
+            ids = self._create_simulations(simulations_batch=batch)
+        elif item_type == ItemType.EXPERIMENT:
+            ids = [self._create_experiment(experiment=item) for item in batch]
+        else:
+            raise Exception(f'Unable to create items of type: {item_type} for platform: {self.__class__.__name__}')
+
+        return ids
+
+    def run_items(self, items: TItemList) -> NoReturn:
+        from idmtools_platform_local.tasks.run import RunTask
+        for item in items:
+            if item.item_type == ItemType.EXPERIMENT:
+                for simulation in item.simulations:
+                    RunTask.send(item.command.cmd, item.uid, simulation.uid)
+            else:
+                raise Exception(f'Unable to run item id: {item.uid} of type: {type(item)} ')
+
+    def send_assets(self, item: TItem, **kwargs) -> NoReturn:
         """
-        Restore experiment from local platform
+        Send assets for item to platform
+        """
+        if isinstance(item, ISimulation):
+            self._send_assets_for_simulation(item, **kwargs)
+        elif isinstance(item, IExperiment):
+            self._send_assets_for_experiment(item, **kwargs)
+        else:
+            raise Exception(f'Unknown how to send assets for item type: {type(item)} '
+                            f'for platform: {self.__class__.__name__}')
+
+    def refresh_status(self, item) -> NoReturn:
+        """
+        Refresh the status of the specified item
+
+        """
+        if isinstance(item, ISimulation):
+            raise Exception(f'Unknown how to refresh items of type {type(item)} '
+                            f'for platform: {self.__class__.__name__}')
+        elif isinstance(item, IExperiment):
+            status = SimulationsClient.get_all(experiment_id=item.uid, per_page=9999)
+            for s in item.simulations:
+                sim_status = [st for st in status if st['simulation_uid'] == s.uid]
+
+                if sim_status:
+                    s.status = local_status_to_common(sim_status[0]['status'])
+
+    def get_files(self, item: 'TItem', files: 'List[str]') -> 'Dict[str, bytearray]':
+        if not isinstance(item, ISimulation):
+            raise NotImplementedError("Retrieving files only implemented for Simulations at the moment")
+
+        return self._get_assets_for_simulation(item, files)
+
+    def _get_assets_for_simulation(self, simulation: TSimulation, output_files) -> Dict[str, bytearray]:  # noqa: F821
+        """
+        Get assets for a specific simulation
 
         Args:
-            experiment_id: Id of experiment to restore
+            simulation: Simulation object to fetch files for
+            output_files: List of files to fetch
 
         Returns:
-
+            Returns a dict containing mapping of filename->bytearry
         """
-        experiment_dict = ExperimentsClient.get_one(experiment_id)
-        experiment = experiment_factory.create(experiment_dict['tags'].get("type"), tags=experiment_dict['tags'])
-        experiment.uid = experiment_dict['experiment_id']
-        return experiment
-
-    def get_assets_for_simulation(self, simulation: TSimulation, output_files):  # noqa: F821
         all_paths = set(output_files)
 
         assets = set(path for path in all_paths if path.lower().startswith("assets"))
@@ -96,72 +188,98 @@ class LocalPlatform(IPlatform):
 
         # Retrieve the transient if any
         if transients:
-            sim_path = f'{simulation.experiment.uid}/{simulation.uid}'
+            sim_path = f'{simulation.parent_id}/{simulation.uid}'
             transients_files = self.retrieve_output_files(job_id_path=sim_path, paths=transients)
             ret = dict(zip(transients, transients_files))
 
         # Take care of the assets
         if assets:
-            asset_path = f'{simulation.experiment.uid}'
+            asset_path = f'{simulation.parent_id}'
             common_files = self.retrieve_output_files(job_id_path=asset_path, paths=assets)
             ret.update(dict(zip(assets, common_files)))
 
         return ret
 
-    def restore_simulations(self, experiment: TExperiment):  # noqa: F821
-        simulation_dict = SimulationsClient.get_all(experiment_id=experiment.uid)
-
-        for sim_info in simulation_dict:
-            sim = experiment.simulation()
-            sim.uid = sim_info['simulation_uid']
-            sim.tags = sim_info['tags']
-            sim.status = local_status_to_common(sim_info['status'])
-            experiment.simulations.append(sim)
-
-    def refresh_experiment_status(self, experiment: TExperiment):  # noqa: F821
+    def _create_experiment(self, experiment: IExperiment):
         """
-
+        Creates the experiment object on the LocalPlatform
         Args:
-            experiment:
+            experiment: Experiment object to create
 
         Returns:
-
+            Id
         """
-        # TODO Cleanup Client to return experiment id status directly
-        status = SimulationsClient.get_all(experiment_id=experiment.uid)
-        for s in experiment.simulations:
-            sim_status = [st for st in status if st['simulation_uid'] == s.uid]
-
-            if sim_status:
-                s.status = local_status_to_common(sim_status[0]['status'])
-
-    def create_experiment(self, experiment: IExperiment):
-        from idmtools_platform_local.tasks.create_experiement import CreateExperimentTask
+        from idmtools_platform_local.tasks.create_experiment import CreateExperimentTask
 
         m = CreateExperimentTask.send(experiment.tags, experiment.simulation_type)
         eid = m.get_result(block=True, timeout=self.default_timeout * 1000)
         experiment.uid = eid
         path = "/".join(["/data", experiment.uid, "Assets"])
         self._docker_operations.create_directory(path)
-        self.send_assets_for_experiment(experiment)
+        self._send_assets_for_experiment(experiment)
+        return experiment.uid
 
-    def send_assets_for_experiment(self, experiment):
+    def _send_assets_for_experiment(self, experiment):
+        """
+        Sends assets for specified experiment
+
+        Args:
+            experiment: Experiment to send assets for
+
+        Returns:
+            None
+        """
         # Go through all the assets
         path = "/".join(["/data", experiment.uid, "Assets"])
-        list(map(functools.partial(self.send_asset_to_docker, path=path), experiment.assets))
+        worker = self._docker_operations.get_workers()
+        list(map(functools.partial(self.send_asset_to_docker, path=path, worker=worker), experiment.assets))
 
-    def send_assets_for_simulation(self, simulation):
+    def _send_assets_for_simulation(self, simulation, worker: Container = None):
+        """
+        Send assets for specified simulation
+
+        Args:
+            simulation: Simulation Id
+            worker: Options worker container. Useful in batches to reduce overhead
+
+        Returns:
+            None
+        """
         # Go through all the assets
         path = "/".join(["/data", simulation.experiment.uid, simulation.uid])
-        list(map(functools.partial(self.send_asset_to_docker, path=path), simulation.assets))
+        if worker is None:
+            worker = self._docker_operations.get_workers()
 
-    def send_asset_to_docker(self, asset: Asset, path: str) -> NoReturn:
+        items = self.assets_to_copy_multiple_list(path, simulation.assests)
+        self._docker_operations.copy_multiple_to_container(worker, items)
+
+    def assets_to_copy_multiple_list(self, path, assets):
+        """
+        Batch copies a set of items assets to a grouped by path
+        Args:
+            path: Target path
+            assets: Assets to copy
+
+        Returns:
+            Dict of items groups be path.
+        """
+        items = defaultdict(list)
+        for asset in assets:
+            file_path = asset.absolute_path
+            remote_path = "/".join([path, asset.relative_path]) if asset.relative_path else path
+            self._docker_operations.create_directory(remote_path)
+            items[remote_path].append(
+                (file_path if file_path else asset.content, asset.filename if not file_path else None))
+        return items
+
+    def send_asset_to_docker(self, asset: Asset, path: str, worker: Container = None) -> NoReturn:
         """
         Handles sending an asset to docker.
 
         Args:
             asset: Asset object to send
             path: Path to send find to within docker container
+            worker: Optional worker to reduce docker calls
 
         Returns:
             (NoReturn): Nada
@@ -173,26 +291,37 @@ class LocalPlatform(IPlatform):
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f"Creating directory {remote_path} result: {str(result)}")
         # is it a real file?
-        worker = self._docker_operations.get_workers()
+        if worker is None:
+            worker = self._docker_operations.get_workers()
         self._docker_operations.copy_to_container(worker, file_path if file_path else asset.content, remote_path,
                                                   asset.filename if not file_path else None)
 
-    def create_simulations(self, simulations_batch):
-        from idmtools_platform_local.tasks.create_simulation import CreateSimulationTask
+    def _create_simulations(self, simulations_batch: List[ISimulation]):
+        """
+        Create a set of simulations
 
-        ids = []
-        for simulation in simulations_batch:
-            m = CreateSimulationTask.send(simulation.experiment.uid, simulation.tags)
-            sid = m.get_result(block=True, timeout=self.default_timeout * 1000)
-            simulation.uid = sid
-            self.send_assets_for_simulation(simulation)
-            ids.append(sid)
+        Args:
+            simulations_batch: List of simulations to create
+
+        Returns:
+            Ids of simulations created
+        """
+        from idmtools_platform_local.tasks.create_simulation import CreateSimulationsTask
+        worker = self._docker_operations.get_workers()
+
+        m = CreateSimulationsTask.send(simulations_batch[0].experiment.uid, [s.tags for s in simulations_batch])
+        ids = m.get_result(block=True, timeout=self.default_timeout * 1000)
+
+        items = dict()
+        # update our uids and then build a list of files to copy
+        for i, simulation in enumerate(simulations_batch):
+            simulation.uid = ids[i]
+            path = "/".join(["/data", simulation.experiment.uid, simulation.uid])
+            items.update(self.assets_to_copy_multiple_list(path, simulation.assets))
+        result = self._docker_operations.copy_multiple_to_container(worker, items)
+        if not result:
+            raise IOError("Coping of data for simulations failed.")
         return ids
-
-    def run_simulations(self, experiment: IExperiment):
-        from idmtools_platform_local.tasks.run import RunTask
-        for simulation in experiment.simulations:
-            RunTask.send(simulation.experiment.command.cmd, simulation.experiment.uid, simulation.uid)
 
     def retrieve_output_files(self, job_id_path, paths):
         """
@@ -210,6 +339,7 @@ class LocalPlatform(IPlatform):
 
         for path in paths:
             full_path = os.path.join(self.host_data_directory, 'workers', job_id_path, path)
+            full_path = full_path.replace('\\', os.sep).replace('/', os.sep)
             with open(full_path, 'rb') as fin:
                 byte_arrs.append(fin.read())
         return byte_arrs

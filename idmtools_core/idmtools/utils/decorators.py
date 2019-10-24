@@ -2,13 +2,15 @@ import datetime
 import importlib
 import importlib.util
 import os
+from concurrent.futures import Executor, as_completed
+from concurrent.futures.thread import ThreadPoolExecutor
 from functools import wraps
-from typing import Callable, Union
+from typing import Callable, Union, Optional, Type
 
 
 class abstractstatic(staticmethod):
     """
-    Decorator for defining a method both as static and abstract
+    A decorator for defining a method both as static and abstract.
     """
     __slots__ = ()
 
@@ -36,7 +38,7 @@ def optional_decorator(decorator: Callable, condition: Union[bool, Callable[[], 
 
 class SingletonDecorator:
     """
-    Wraps a class in a Singleton Decorator.
+    Wraps a class in a singleton decorator.
 
     Example:
         In the below example, we would print out *99* since *z* is referring to the same object as *x*::
@@ -48,8 +50,6 @@ class SingletonDecorator:
             x.y = 99
             z = Thing()
             print(z.y)
-    Notes:
-        Should be used on Classes
     """
     def __init__(self, klass):
         self.klass = klass
@@ -64,9 +64,9 @@ class SingletonDecorator:
 
 class LoadOnCallSingletonDecorator:
     """
-    Additional class decorator that creates a singleton instance only when a method/attr is accessed. This is useful
-    for expensive items like plugin factories loads that should only be executed when finally needed and not on
-    declaration
+    Additional class decorator that creates a singleton instance only when a method or attribute is accessed. 
+    This is useful for expensive tasks like loading plugin factories that should only be executed when finally 
+    needed and not on declaration.
 
     Examples:
         ::
@@ -118,14 +118,14 @@ def cache_for(ttl=datetime.timedelta(minutes=1)):
 
 def optional_yaspin_load(*yargs, **ykwargs) -> Callable:
     """
-    Adds a CLI spinner to a function if
+    Adds a CLI spinner to a function if:
 
-    * yaspin package is present
-    * NO_SPINNER environment variable is not defined
+    * yaspin package is present.
+    * NO_SPINNER environment variable is not defined.
 
     Args:
-        *yargs: Arguments to pass to yaspin constructor
-        **ykwargs: Keyword arguments to pass to yaspin constructor
+        *yargs: Arguments to pass to yaspin constructor.
+        **ykwargs: Keyword arguments to pass to yaspin constructor.
 
     Examples:
         ::
@@ -135,7 +135,7 @@ def optional_yaspin_load(*yargs, **ykwargs) -> Callable:
                 time.sleep(100)
 
     Returns:
-        (Callable): Wrapper function
+        A callable wrapper function.
     """
     has_yaspin = importlib.util.find_spec("yaspin")
     spinner = None
@@ -159,3 +159,95 @@ def optional_yaspin_load(*yargs, **ykwargs) -> Callable:
             return result
         return wrapper
     return decorate
+
+
+class ParallelizeDecorator:
+    """
+    ParallelizeDecorator allows you to easily parallelize a group of code. A simple of example would be
+
+    Examples:
+        ::
+
+            op_queue = ParallelizeDecorator()
+
+            class Ops:
+                op_queue.parallelize
+                def heavy_op():
+                    time.sleep(10)
+
+                def do_lots_of_heavy():
+                    futures = [self.heavy_op() for i in range(100)]
+                    results = op_queue.get_results(futures)
+    """
+    def __init__(self, queue=None, pool_type: Optional[Type[Executor]] = ThreadPoolExecutor):
+        if queue is None:
+            self.queue = pool_type()
+        else:
+            self.queue = queue
+
+    def parallelize(self, func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            future = self.queue.submit(func, *args, **kwargs)
+            return future
+
+        return wrapper
+
+    def join(self):
+        return self.queue.join()
+
+    def get_results(self, futures, ordered=False):
+        results = []
+        if ordered:
+            for f in futures:
+                results.append(f.result())
+        else:
+            for f in as_completed(futures):
+                results.append(f.result())
+
+        return results
+
+    def __del__(self):
+        del self.queue
+
+
+def retry_function(func, wait=1.5, max_retries=5):
+    """
+    Retry the call to a function with some time in between.
+
+    Args:
+        func: The function to retry.
+        time_between_tries: The time between retries, in seconds.
+        max_retries: The maximum number of times to retry the call.
+
+    Returns:
+        None
+
+    Example::
+
+        @retry_function
+        def my_func():
+            pass
+
+        @retry_function(max_retries=10, wait=2)
+        def my_func():
+            pass
+    """
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        retExc = None
+        for i in range(max_retries):
+            try:
+                return func(*args, **kwargs)
+            except RuntimeError as r:
+                # Immediately raise if this is an error.
+                # COMPS is reachable so let's be clever and trust COMPS
+                if str(r) == "404 NotFound - Failed to retrieve experiment for given id":
+                    raise r
+            except Exception as e:
+                retExc = e
+                time.sleep(wait)
+        raise retExc if retExc else Exception()
+
+    return wrapper
