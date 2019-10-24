@@ -17,11 +17,13 @@ from idmtools.core.interfaces.ientity import IEntity, TEntityList
 from idmtools.entities import IPlatform
 from idmtools.entities.iexperiment import IExperiment, StandardExperiment
 from idmtools.entities.isimulation import ISimulation
+from idmtools.entities.suite import Suite
 from idmtools.utils.time import timestamp
 from idmtools_platform_comps.utils import convert_COMPS_status
 
 if typing.TYPE_CHECKING:
     from typing import NoReturn, List, Dict
+    from idmtools.entities.isuite import TSuite
     from idmtools.entities.iexperiment import TExperiment
     from idmtools.core.interfaces.iitem import TItemList
 
@@ -112,6 +114,17 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             experiment_name = experiment_name.replace(c, '_')
         return experiment_name
 
+    def _create_suite(self, suite: 'TSuite') -> 'UUID':
+        self._login()
+
+        # Create suite
+        comps_suite = COMPSSuite(name=suite.name, description=suite.description)
+        comps_suite.save()
+
+        # Update suite uid
+        suite.uid = comps_suite.id
+        return suite.uid
+
     def _create_experiment(self, experiment: 'TExperiment') -> 'UUID':
         self._login()
 
@@ -167,6 +180,9 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         elif item_type == ItemType.EXPERIMENT:
             ids = [self._create_experiment(experiment=item) for item in batch]
             return ids
+        elif item_type == ItemType.SUITE:
+            ids = [self._create_suite(suite=item) for item in batch]
+            return ids
         else:
             raise Exception(f'Unable to create items of type: {item_type} for platform: {self.__class__.__name__}')
 
@@ -180,6 +196,12 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         children = kwargs.get('children')
 
         self._login()
+
+        if item_type == ItemType.SUITE:
+            cols = cols or ["id", "name"]
+            children = children if children is not None else ["tags", "configuration"]
+            return COMPSSuite.get(id=item_id,
+                                  query_criteria=QueryCriteria().select(cols).select_children(children))
 
         if item_type == ItemType.EXPERIMENT:
             cols = cols or ["id", "name"]
@@ -206,17 +228,30 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             experiment.uid = platform_item.id
             experiment.comps_experiment = platform_item
             return experiment
+
         elif isinstance(platform_item, COMPSSimulation):
             # Recreate the experiment if needed
             experiment = kwargs.get('experiment') or self.get_item(platform_item.experiment_id,
                                                                    item_type=ItemType.EXPERIMENT)
             # Get a simulation
             sim = experiment.simulation()
+
             # Set its correct attributes
             sim.uid = platform_item.id
             sim.tags = platform_item.tags
             sim.status = convert_COMPS_status(platform_item.state)
             return sim
+
+        elif isinstance(platform_item, COMPSSuite):
+            # Creat a suite
+            suite = Suite()
+
+            # Set its correct attributes
+            suite.uid = platform_item.id
+            suite.name = platform_item.name
+            suite.description = platform_item.description
+            suite.tags = platform_item.tags
+            return suite
 
     def get_parent_for_platform_item(self, platform_item, raw=False, **kwargs):
         if isinstance(platform_item, COMPSExperiment):
