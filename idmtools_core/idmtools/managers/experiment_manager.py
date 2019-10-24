@@ -7,6 +7,7 @@ from idmtools.utils.entities import retrieve_experiment
 
 if typing.TYPE_CHECKING:
     from idmtools.entities.iexperiment import TExperiment
+    from idmtools.entities.isuite import TSuite
 
 
 class ExperimentManager:
@@ -14,12 +15,13 @@ class ExperimentManager:
     Manages an experiment.
     """
 
-    def __init__(self, experiment: 'TExperiment', platform: TPlatform):
+    def __init__(self, experiment: 'TExperiment', platform: TPlatform, suite: 'TSuite' = None):
         """
         Constructor
         Args:
             experiment: The experiment to manage
         """
+        self.suite = suite
         self.experiment = experiment
         self.platform = platform
         self.experiment.platform = platform
@@ -34,6 +36,20 @@ class ExperimentManager:
             platform = PlatformPersistService.retrieve(experiment.platform.uid)
         em = cls(experiment, platform)
         return em
+
+    def create_suite(self):
+        if self.suite is None:
+            return
+
+        # Create suite
+        self.platform.create_items(items=[self.suite])
+
+        # Make sure to link experiment to the suite
+        self.experiment.suite_id = self.suite.uid
+        self.experiment.suite = self.suite
+
+        # Add experiment to the suite
+        self.suite.experiments.append(self.experiment)
 
     def create_experiment(self):
         self.experiment.pre_creation()
@@ -92,11 +108,15 @@ class ExperimentManager:
     def run(self):
         """
         Main entry point of the manager.
+        - Create the suite
         - Create the experiment
         - Execute the builder (if any) to generate all the simulations
         - Create the simulations on the platform
         - Trigger the run on the platform
         """
+        # Create suite on the platform
+        self.create_suite()
+
         # Create experiment on the platform
         self.create_experiment()
 
