@@ -96,6 +96,7 @@ def _get_mapped_data_for_item(item: 'TItem', analyzers: 'TAnalyzerList', cache: 
 
         # run the mapping routine for this analyzer and item
         try:
+            logger.debug("Running map on selected data")
             selected_data[analyzer.uid] = analyzer.map(data, item)
         except Exception:
             _set_exception(step="data processing", info={"Item": item, "Analyzer": analyzer.uid},
@@ -103,6 +104,8 @@ def _get_mapped_data_for_item(item: 'TItem', analyzers: 'TAnalyzerList', cache: 
             return False
 
     # Store all analyzer results for this item in the result cache
+    if logger.isEnabledFor(DEBUG):
+        logger.debug("Setting result to cache")
     cache.set(item.uid, selected_data)
     return True
 

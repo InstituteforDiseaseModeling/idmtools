@@ -25,9 +25,11 @@ class AddAnalyzer(IAnalyzer):
         super().__init__(filenames=["output\\result.json"], parse=True)
 
     def map(self, data, item):
+        print(f"Data: {str(data[self.filenames[0]])}")
         number = data[self.filenames[0]]["a"]
+        print(f"Number: {number}")
         result = number + 100
-        print(result)
+        print(f"Result: {result}")
         return result
 
     def reduce(self, data):
