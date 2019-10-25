@@ -258,6 +258,7 @@ class AnalyzeManager(CacheEnabled):
             logger.debug("Terminating workerpool")
             worker_pool.terminate()
             return False
+        logger.debug(f"Result fetching status: : {results.successful()}")
         return True
 
     def _run_and_wait_for_reducing(self, worker_pool: Pool) -> dict:
@@ -278,17 +279,20 @@ class AnalyzeManager(CacheEnabled):
         with self.cache.transact():
             for analyzer in self.analyzers:
                 item_data_for_analyzer = {}
+                items = self.cache.iterkeys()
+                logger.debug(str([i for i in items]))
                 for item_id in self.cache:
+                    logger.debug(f"Finalizing {item_id}")
                     item = self._items[item_id]
                     item_result = self.cache.get(item_id)
                     item_data_for_analyzer[item] = item_result.get(analyzer.uid, None)
                 finalize_results[analyzer.uid] = worker_pool.apply_async(analyzer.reduce, (item_data_for_analyzer,))
 
-        # wait for results and clean up multiprocessing
-        worker_pool.close()
-        worker_pool.join()
-        if logger.isEnabledFor(DEBUG):
-            logger.debug("Finished finalizing results")
+            # wait for results and clean up multiprocessing
+            worker_pool.close()
+            worker_pool.join()
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Finished finalizing results")
         return finalize_results
 
     def analyze(self) -> bool:
@@ -325,7 +329,7 @@ class AnalyzeManager(CacheEnabled):
 
         # Initialize the cache
         logger.debug("Initializing Analysis Cache")
-        self.initialize_cache(shards=n_processes, eviction_policy='none')
+        self.initialize_cache(shards=n_processes*2, eviction_policy='none')
 
         # do any platform-specific initializations
         logger.debug("Triggering per group functions")

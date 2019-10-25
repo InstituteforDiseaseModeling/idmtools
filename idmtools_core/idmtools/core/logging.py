@@ -26,7 +26,6 @@ class IDMQueueListener(QueueListener):
             return None
 
 
-
 def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'idmtools.log',
                   console: Union[str, bool] = False) -> QueueListener:
     """

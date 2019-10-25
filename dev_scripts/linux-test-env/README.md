@@ -1,7 +1,7 @@
 This environment is intended for Windows developers to test idmtools on linux.
 Before use, be sure you have ran 
 `make setup-dev`
-This is required to create the worker containers used by tasks internall
+This is required to create the worker containers used by tasks internally
 
 To use, run 
 `docker-compose run linuxtst` 

@@ -1,4 +1,5 @@
 import itertools
+import time
 import traceback
 import typing
 from logging import getLogger, DEBUG
@@ -105,8 +106,19 @@ def _get_mapped_data_for_item(item: 'TItem', analyzers: 'TAnalyzerList', cache: 
 
     # Store all analyzer results for this item in the result cache
     if logger.isEnabledFor(DEBUG):
-        logger.debug("Setting result to cache")
-    cache.set(item.uid, selected_data)
+        logger.debug(f"Setting result to cache on {item.uid}")
+    done = False
+    retries=0
+    while not done and retries < 6:
+        try:
+            cache.set(item.uid, selected_data)
+            done = True
+        except TimeoutError as e:
+            retries+=1
+            pass
+        if retries > 5:
+            raise StopAsyncIteration("Error set value to cache")
+    logger.debug(f"Wrote Setting result to cache on {item.uid}")
     return True
 
 
