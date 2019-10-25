@@ -59,10 +59,11 @@ def _get_mapped_data_for_item(item: 'TItem', analyzers: 'TAnalyzerList', cache: 
                        info={"Item": item, "Analyzers": ", ".join(analyzer_uids)},
                        cache=cache)
 
+    filenames = set(itertools.chain(*(a.filenames for a in analyzers_to_use)))
+
     if logger.isEnabledFor(DEBUG):
         logger.debug(f"Analyzers to use on item: {str(analyzer_uids)}")
-
-    filenames = set(itertools.chain(*(a.filenames for a in analyzers_to_use)))
+        logger.debug(f"Filenames to analyze: {filenames}")
 
     # The byte_arrays will associate filename with content
     try:

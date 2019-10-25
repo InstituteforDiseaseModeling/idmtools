@@ -72,7 +72,7 @@ class TestLocalCLIBasic(unittest.TestCase):
         # give services some time to start
         time.sleep(5)
         # ensure we are connecting to proper db
-        url = 'postgresql+psycopg2://idmtools:idmtools@localhost/idmtools'
+        url = f'postgresql+psycopg2://idmtools:idmtools@{api_host}/idmtools'
         engine = create_engine(url, echo=False, pool_size=32)
         session_factory = sessionmaker(bind=engine)
         from idmtools_platform_local.workers.data.job_status import Base

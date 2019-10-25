@@ -1,11 +1,9 @@
 import os
 import time
-from logging import getLogger
-
 import pytest
-
 from idmtools.analysis.AnalyzeManager import AnalyzeManager
 from idmtools.builders import ExperimentBuilder
+from idmtools.config import IdmConfigParser
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import IAnalyzer
@@ -13,6 +11,9 @@ from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+# load the config path before we get logger so test logging will also be part of final output
+c = IdmConfigParser.get_config_path()
+from logging import getLogger
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 

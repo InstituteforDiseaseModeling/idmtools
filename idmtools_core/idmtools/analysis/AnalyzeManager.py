@@ -181,6 +181,8 @@ class AnalyzeManager(CacheEnabled):
         """
         exception = self.cache.get(self.EXCEPTION_KEY, default=None)
         if exception:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(exception)
             print('\n' + exception)
             sys.stdout.flush()
             ex = True
@@ -227,8 +229,8 @@ class AnalyzeManager(CacheEnabled):
         """
         # add items to process (map)
         n_items = len(self._items)
-        logger.debug(f"Number of items to analysis: {n_items}")
-        logger.debug("Mapping the items to analysis")
+        logger.debug(f"Number of items for analysis: {n_items}")
+        logger.debug("Mapping the items for analysis")
         results = worker_pool.map_async(map_item, self._items.values())
 
         # Wait for the item map-results to be ready
@@ -269,6 +271,7 @@ class AnalyzeManager(CacheEnabled):
         """
         # the keys in self.cache from map() calls are expected to be item ids. Each keyed value
         # contains analyzer_id: item_results_for_analyzer entries.
+        logger.debug("Finalizing results")
         finalize_results = {}
         for analyzer in self.analyzers:
             item_data_for_analyzer = {}
@@ -316,9 +319,11 @@ class AnalyzeManager(CacheEnabled):
         n_processes = min(self.max_processes, max(n_items, 1))
 
         # Initialize the cache
+        logger.debug("Initializing Analysis Cache")
         self.initialize_cache(shards=n_processes, eviction_policy='none')
 
         # do any platform-specific initializations
+        logger.debug("Triggering per group functions")
         for analyzer in self.analyzers:
             analyzer.per_group(items=self._items)
 
