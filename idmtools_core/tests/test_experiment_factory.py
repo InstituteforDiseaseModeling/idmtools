@@ -5,7 +5,6 @@ from idmtools.core.experiment_factory import experiment_factory
 from idmtools.managers import ExperimentManager
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-from idmtools_test.utils.test_platform import cleanup_test_data
 from idmtools_test.utils.tst_experiment import TstExperiment
 
 
@@ -24,10 +23,10 @@ class TestExperimentFactory(ITestWithPersistence):
 
         self.assertEqual(len(em.experiment.simulations), 2)
         self.assertEqual(em.experiment.assets.assets[0].filename, "working_model.py")
-        self.assertEqual(em.experiment.children()[0].tags, {'p': 0})
-        self.assertEqual(em.experiment.children()[1].tags, {'p': 1})
+        self.assertEqual(em.experiment.simulations[0].tags, {'p': 0})
+        self.assertEqual(em.experiment.simulations[1].tags, {'p': 1})
 
-        cleanup_test_data()
+        test_platform.cleanup()
 
     def test_build_emod_experiment_from_factory(self):
         test_platform = Platform('Test')
@@ -50,7 +49,7 @@ class TestExperimentFactory(ITestWithPersistence):
         self.assertEqual(len(em.experiment.simulations), 20)
         self.assertEqual(em.experiment.tags, {'a': '1', 'b': 2,
                                               'type': 'idmtools_model_emod.emod_experiment.EMODExperiment'})
-        cleanup_test_data()
+        test_platform.cleanup()
 
     def test_build_test_experiment_from_factory(self):
         test_experiment = TstExperiment()

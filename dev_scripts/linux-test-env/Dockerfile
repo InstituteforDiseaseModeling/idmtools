@@ -19,7 +19,7 @@ RUN apt-get update \
     $(lsb_release -cs) \
     stable" \
     && apt-get update \
-    && apt-get install -y --no-install-recommends docker-ce-cli virtualenvwrapper \
+    && apt-get install -y --no-install-recommends docker-ce-cli net-tools virtualenvwrapper \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && useradd -s /bin/bash idmtools \
@@ -29,6 +29,9 @@ RUN apt-get update \
     && mkdir /home/idmtools /idmtools \
     && chown -R idmtools:idmtools /home/idmtools /idmtools \
     && addgroup idmtools staff \
+    && curl -L "https://github.com/docker/compose/releases/download/1.24.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose \
+    && chmod +x /usr/local/bin/docker-compose \
+    && ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose \
     # We add the s6 overlay kit which helps us manager permissions
     # multiple applications, etc within an image
     # overall it make management of our final image a bit easier

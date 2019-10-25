@@ -7,7 +7,6 @@ from idmtools.services.experiments import ExperimentPersistService
 from idmtools.services.platforms import PlatformPersistService
 from idmtools_models.python import PythonExperiment
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-from idmtools_test.utils.test_platform import cleanup_test_data
 from idmtools_test.utils.tst_experiment import TstExperiment
 from idmtools_test import COMMON_INPUT_PATH
 
@@ -37,7 +36,7 @@ class TestExperimentManager(ITestWithPersistence):
 
         self.assertEqual(em.platform, em2.platform)
         self.assertEqual(em.platform.uid, em2.platform.uid)
-        cleanup_test_data()
+        p.cleanup()
 
     def test_from_experiment_unknown(self):
         p = Platform('Test')
@@ -60,7 +59,7 @@ class TestExperimentManager(ITestWithPersistence):
         self.assertIsInstance(em2.experiment, PythonExperiment)
         self.assertDictEqual(em2.experiment.tags, experiment.tags)
         self.assertEqual(em2.experiment.platform.uid, p.uid)
-        cleanup_test_data()
+        p.cleanup()
 
     def test_bad_experiment_builder(self):
         builder = ExperimentBuilder()

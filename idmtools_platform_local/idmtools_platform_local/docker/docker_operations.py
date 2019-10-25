@@ -25,7 +25,14 @@ logger = getLogger(__name__)
 # thread queue for docker copy operations
 io_queue = ParallelizeDecorator()
 
-docker_repo = f'{os.getenv("DOCKER_REPO", "idm-docker-public")}.packages.idmod.org'
+# determine default docker to use
+# we first check if it is nightly. Nightly will ALWAYS use staging
+if "nightly" in __version__:
+    docker_repo = 'idm-docker-staging.packages.idmod.org'
+# otherwise we let the user have come control by default to docker-public
+else:
+    docker_repo = f'{os.getenv("DOCKER_REPO", "idm-docker-public")}.packages.idmod.org'
+
 if logger.isEnabledFor(logging.DEBUG):
     logger.debug(f"Default docker repo set to: {docker_repo}")
 
@@ -107,10 +114,12 @@ class DockerOperations:
         Returns:
             (NoReturn)
         """
-
-        self.get_network()
-        self.get_redis()
-        self.get_postgres()
+        try:
+            self.get_network()
+            self.get_redis()
+            self.get_postgres()
+        except Exception as e:
+            print(e)
         # wait on services to start
         # in the future this could be improved with service detection
         time.sleep(5)
@@ -263,7 +272,9 @@ class DockerOperations:
             data_dir: dict(bind='/data', mode='rw'),
             docker_socket: dict(bind='/var/run/docker.sock', mode='rw')
         }
-        environment = ['REDIS_URL=redis://redis:6379']
+        environment = [f'REDIS_URL=redis://redis:{self.redis_port}',
+                       f'SQLALCHEMY_DATABASE_URI='
+                       f'postgresql+psycopg2://idmtools:idmtools@postgres:{self.postgres_port}/idmtools']
         if platform.system() in ["Linux", "Darwin"]:
             environment.append(f'CURRENT_UID={self.run_as}')
         port_bindings = self._get_optional_port_bindings(self.workers_ui_port, 5000)
