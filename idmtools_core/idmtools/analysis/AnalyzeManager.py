@@ -237,6 +237,7 @@ class AnalyzeManager(CacheEnabled):
         while not results.ready():
             # If an exception happen, kill everything and exit
             if self._check_exception():
+                logger.debug("Terminating workerpool")
                 worker_pool.terminate()
                 return False
 
@@ -254,6 +255,7 @@ class AnalyzeManager(CacheEnabled):
         # Verify that no simulation failed to process properly one last time.
         # ck4, should we error out if there is a failure rather than printing and continuing?? Ask Benoit.
         if self._check_exception():
+            logger.debug("Terminating workerpool")
             worker_pool.terminate()
             return False
         return True
@@ -284,6 +286,8 @@ class AnalyzeManager(CacheEnabled):
         # wait for results and clean up multiprocessing
         worker_pool.close()
         worker_pool.join()
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Finished finalizing results")
         return finalize_results
 
     def analyze(self) -> bool:
@@ -336,6 +340,7 @@ class AnalyzeManager(CacheEnabled):
                            initargs=(map_item, self.analyzers, self.cache, self.platform))
 
         success = self._run_and_wait_for_mapping(worker_pool=worker_pool, start_time=start_time)
+        logger.debug(f"Success: {success}")
         if not success:
             return success
 
@@ -346,6 +351,9 @@ class AnalyzeManager(CacheEnabled):
         for analyzer in self.analyzers:
             analyzer.results = finalize_results[analyzer.uid].get()
 
+        logger.debug(str(analyzer.results))
+
+        logger.debug("Destroying analyzers")
         for analyzer in self.analyzers:
             analyzer.destroy()
 

@@ -3,7 +3,6 @@ import time
 import pytest
 from idmtools.analysis.AnalyzeManager import AnalyzeManager
 from idmtools.builders import ExperimentBuilder
-from idmtools.config import IdmConfigParser
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import IAnalyzer
@@ -11,13 +10,8 @@ from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-# load the config path before we get logger so test logging will also be part of final output
-c = IdmConfigParser.get_config_path()
-from logging import getLogger
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
-
-logger = getLogger(__name__)
 
 
 class AddAnalyzer(IAnalyzer):
@@ -31,13 +25,13 @@ class AddAnalyzer(IAnalyzer):
         super().__init__(filenames=["output\\result.json"], parse=True)
 
     def map(self, data, item):
-        logger.debug(data[self.filenames[0]]["a"])
         number = data[self.filenames[0]]["a"]
         result = number + 100
+        print(result)
         return result
 
     def reduce(self, data):
-        logger.debug(f'Sum: {str(data.values())}')
+        print(f'Sum: {str(data.values())}')
         value = sum(data.values())
         return value
 
@@ -77,4 +71,5 @@ class TestAnalyzeManager(ITestWithPersistence):
         am = AnalyzeManager(configuration={}, platform=self.platform,
                             ids=[(self.exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
+        print(analyzers[0].results)
         self.assertEqual(analyzers[0].results, sum(n + 100 for n in range(0, 5)))
