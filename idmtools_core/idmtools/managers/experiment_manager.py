@@ -1,5 +1,5 @@
 import typing
-from logging import getLogger
+from logging import getLogger, DEBUG
 
 from idmtools.core import EntityStatus
 from idmtools.entities.iplatform import TPlatform
@@ -128,8 +128,11 @@ class ExperimentManager:
         import time
         start_time = time.time()
         while time.time() - start_time < timeout:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Refreshing simulation status")
             self.refresh_status()
             if self.experiment.done:
+                logger.debug("Experiment Done")
                 return
             time.sleep(refresh_interval)
         raise TimeoutError(f"Timeout of {timeout} seconds exceeded when monitoring experiment {self.experiment}")

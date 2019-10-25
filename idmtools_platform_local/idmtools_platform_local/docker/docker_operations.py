@@ -37,11 +37,14 @@ if logger.isEnabledFor(logging.DEBUG):
     logger.debug(f"Default docker repo set to: {docker_repo}")
 
 default_image = f'{docker_repo}/idmtools_local_workers:{__version__.replace("+", ".")}'
+# determine our default base directory. We almost always want to use the users home directory
+# except odd environments like docker-in docker, special permissions, etc
+default_base_sir = os.getenv('IDMTOOLS_DATA_BASE_DIR', str(Path.home()))
 
 
 @dataclass
 class DockerOperations:
-    host_data_directory: str = os.path.join(str(Path.home()), '.local_data')
+    host_data_directory: str = os.path.join(default_base_sir, '.local_data')
     network: str = 'idmtools'
     redis_image: str = 'redis:5.0.4-alpine'
     redis_port: int = 6379
@@ -164,21 +167,45 @@ class DockerOperations:
                 logger.debug(f'Removing container {name}')
                 container.remove()
 
-    def cleanup(self, delete_data: bool = True) -> NoReturn:
+    def delete_files_below_level(self, directory, target_level=1, current_level=1):
+        for fn in os.listdir(directory):
+            file_path = os.path.join(directory, fn)
+            try:
+                # we only delete items at the target level
+                if os.path.isfile(file_path) and target_level == current_level:
+                    logger.debug(f"Deleting {file_path}")
+                    os.remove(file_path)
+                elif os.path.isdir(file_path):
+                    # if this is target level, let's delete it
+                    if target_level == current_level:
+                        logger.debug(f"Deleting {file_path}")
+                        shutil.rmtree(file_path)
+                    else:
+                        self.delete_files_below_level(file_path, target_level, current_level+1 if current_level > 1 else 1)
+            except PermissionError as e:
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.exception(e)
+                pass
+
+    def cleanup(self, delete_data: bool = True, shallow_delete: bool = True) -> NoReturn:
         """
         Stops the running services, removes local data, and removes network. You can optionally disable the deleting
         of local data
 
         Args:
-            delete_data: When true, deletes local data
+            delete_data(bool): When true, deletes local data
+            shallow_delete(bool): Deletes the data but not the container folders(redis, workers). Preferred to preserve
+                permissions and resolve docker issues
 
         Returns:
             (NoReturn)
         """
         self.stop_services()
         try:
-            if delete_data:
+            if delete_data and not shallow_delete:
                 shutil.rmtree(self.host_data_directory, True)
+            elif delete_data and shallow_delete:
+                self.delete_files_below_level(self.host_data_directory, 3)
         except PermissionError:
             print(f"Cannot cleanup directory {self.host_data_directory} because it is still in use")
             logger.warning(f"Cannot cleanup directory {self.host_data_directory} because it is still in use")
@@ -263,8 +290,16 @@ class DockerOperations:
             (dict) Dictionary representing the docker config for the workers container
         """
         logger.debug(f'Creating working container')
-        data_dir = os.path.join(self.host_data_directory, 'workers')
-        os.makedirs(data_dir, exist_ok=True)
+        default_data_host_dir = os.getenv("IDMTOOLS_WORKER_DATA_MOUNT_BY_VOLUMENAME", None)
+        if not default_data_host_dir:
+            data_dir = os.path.join(self.host_data_directory, 'workers')
+            os.makedirs(data_dir, exist_ok=True)
+        else:
+            logger.debug(f"Specifying Data directory using named volume {default_data_host_dir}")
+            data_dir = f'{default_data_host_dir}'
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f"Worker default directory is {data_dir}")
+
         docker_socket = '/var/run/docker.sock'
         if os.name == 'nt':
             docker_socket = '/' + docker_socket
@@ -345,7 +380,13 @@ class DockerOperations:
         Returns:
             (dict) Dictionary representing the docker config for the redis container
         """
-        data_dir = os.path.join(self.host_data_directory, 'redis-data')
+        default_data_host_dir = os.getenv("IDMTOOLS_REDIS_DATA_MOUNT_BY_VOLUMENAME", None)
+        if not default_data_host_dir:
+            data_dir = os.path.join(self.host_data_directory, 'redis-data')
+            os.makedirs(data_dir, exist_ok=True)
+        else:
+            logger.debug(f"Specifying Data directory using named volume {default_data_host_dir}")
+            data_dir = f'{default_data_host_dir}'
         os.makedirs(data_dir, exist_ok=True)
         redis_volumes = {
             data_dir: dict(bind='/data', mode='rw')
@@ -472,7 +513,8 @@ class DockerOperations:
             # Make sure to have the correct separators for the path
             target_file = target_file.replace('/', os.sep).replace('\\', os.sep)
 
-            logger.debug(f'Copying {dest_name} to docker container {container.id}:{destination_path}')
+            logger.debug(f'Copying {dest_name} to docker container {container.id}:{destination_path} '
+                         f'through {target_file}')
 
             with open(target_file, 'wb') as of:
                 of.write(file.read())

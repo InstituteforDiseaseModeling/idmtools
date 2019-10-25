@@ -5,7 +5,10 @@ import os
 from concurrent.futures import Executor, as_completed
 from concurrent.futures.thread import ThreadPoolExecutor
 from functools import wraps
+from logging import getLogger, DEBUG
 from typing import Callable, Union, Optional, Type
+
+logger = getLogger(__name__)
 
 
 class abstractstatic(staticmethod):
@@ -205,6 +208,8 @@ class ParallelizeDecorator:
             for f in as_completed(futures):
                 results.append(f.result())
 
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Parallelize Total Results: " + str(results))
         return results
 
     def __del__(self):

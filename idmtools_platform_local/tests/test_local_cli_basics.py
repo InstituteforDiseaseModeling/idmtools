@@ -8,7 +8,8 @@ import pytest
 from click._compat import strip_ansi
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-os.environ['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://idmtools:idmtools@localhost/idmtools'
+api_host = os.getenv('API_HOST', 'localhost')
+os.environ['SQLALCHEMY_DATABASE_URI'] = f'postgresql+psycopg2://idmtools:idmtools@{api_host}/idmtools'
 from idmtools_platform_local.docker.docker_operations import DockerOperations
 from idmtools_platform_local.status import Status
 from idmtools_platform_local.workers.utils import create_or_update_status

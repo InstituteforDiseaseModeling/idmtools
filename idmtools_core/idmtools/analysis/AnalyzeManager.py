@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import typing
+from logging import getLogger, DEBUG
 
 from idmtools.analysis.map_worker_entry import map_item
 from idmtools.core import CacheEnabled
@@ -13,6 +14,8 @@ from typing import NoReturn
 if typing.TYPE_CHECKING:
     from idmtools.entities.ianalyzer import TAnalyzer
     from idmtools.core.interfaces.iitem import TItem, TItemList
+
+logger = getLogger(__name__)
 
 
 def pool_worker_initializer(func, analyzers, cache, platform) -> None:
@@ -64,15 +67,17 @@ class AnalyzeManager(CacheEnabled):
         self.force_wd = force_manager_working_directory
 
         # Take the provided ids and determine the full set of unique root items (e.g. simulations) in them to analyze
+        logger.debug("Load information about items from platform")
         ids = list(set(ids or list()))  # uniquify
         items = [platform.get_item(oid, otype, force=True) for oid, otype in ids]
         self.potential_items = []
+
         for i in items:
             self.potential_items.extend(platform.flatten_item(item=i))
+        logger.debug(f"Potential items to analyze: {len(self.potential_items)}")
         self._items = dict()  # filled in later by _get_items_to_analyze
 
         self.analyzers = analyzers or list()
-
         self.verbose = verbose
 
     def add_item(self, item: 'TEntity') -> NoReturn:
@@ -151,6 +156,7 @@ class AnalyzeManager(CacheEnabled):
         Returns:
             None
         """
+        logger.debug("Initializing Analyzers")
         # Setup the working directory and call initialize() on each analyzer
         for analyzer in self.analyzers:
             if self.force_wd:
@@ -158,6 +164,8 @@ class AnalyzeManager(CacheEnabled):
             else:
                 analyzer.working_dir = analyzer.working_dir or self.working_dir
 
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f"Analyzer working directory set to {analyzer.working_dir}")
             analyzer.initialize()
 
         # make sure each analyzer in self.analyzers has a unique uid
@@ -219,6 +227,8 @@ class AnalyzeManager(CacheEnabled):
         """
         # add items to process (map)
         n_items = len(self._items)
+        logger.debug(f"Number of items to analysis: {n_items}")
+        logger.debug("Mapping the items to analysis")
         results = worker_pool.map_async(map_item, self._items.values())
 
         # Wait for the item map-results to be ready

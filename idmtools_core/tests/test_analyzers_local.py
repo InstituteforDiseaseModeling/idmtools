@@ -1,4 +1,5 @@
 import os
+import time
 from logging import getLogger
 
 import pytest
@@ -29,11 +30,13 @@ class AddAnalyzer(IAnalyzer):
         super().__init__(filenames=["output\\result.json"], parse=True)
 
     def map(self, data, item):
+        logger.debug(data[self.filenames[0]]["a"])
         number = data[self.filenames[0]]["a"]
         result = number + 100
         return result
 
     def reduce(self, data):
+        logger.debug(f'Sum: {str(data.values())}')
         value = sum(data.values())
         return value
 
@@ -61,6 +64,8 @@ class TestAnalyzeManager(ITestWithPersistence):
         em = ExperimentManager(experiment=pe, platform=self.platform)
         em.run()
         em.wait_till_done()
+        # TODO fix timing on local platform
+        time.sleep(4)
 
         self.exp_id = pe.uid
 

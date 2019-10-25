@@ -87,6 +87,7 @@ class TestDockerOperations(unittest.TestCase):
 
         pl = DockerOperations(workers_ui_port=10000, **get_test_local_env_overrides())
         pl.cleanup(True)
+        pl.create_services()
 
         Handler = http.server.SimpleHTTPRequestHandler
 
@@ -97,6 +98,7 @@ class TestDockerOperations(unittest.TestCase):
             with self.assertRaises(EnvironmentError) as e:
                 pl.create_services()
             httpd.server_close()
+        pl.cleanup()
 
     def test_error_if_try_to_run_as_root(self):
         with self.assertRaises(ValueError) as mock:

@@ -26,7 +26,7 @@ RUN apt-get update \
     && groupadd docker \
     && usermod -a -G docker idmtools \
     && echo "idmtools:idmtools" | chpasswd \
-    && mkdir /home/idmtools /idmtools \
+    && mkdir -p /home/idmtools /idmtools /home/idmtools/.local_data/redis-data /home/idmtools/.local_data/workers \
     && chown -R idmtools:idmtools /home/idmtools /idmtools \
     && addgroup idmtools staff \
     && curl -L "https://github.com/docker/compose/releases/download/1.24.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose \

@@ -30,13 +30,16 @@ class BaseTask:
             (Status) Status of the job. This is determine by the system return code of the process
         """
         # Open of Stdout and StdErr files that will be used to track input and output
+        logger.debug(f"Simulation path {simulation_path}")
         with open(os.path.join(simulation_path, "StdOut.txt"), "w") as out, \
                 open(os.path.join(simulation_path, "StdErr.txt"), "w") as err:
             logger.info('Executing %s from working directory %s', command, simulation_path)
+            err.write(f"{command}\n")
 
             # Run our task
             p = subprocess.Popen(shlex.split(command), cwd=simulation_path, shell=False, stdout=out, stderr=err)
             # store the pid in case we want to cancel later
+            logger.info(f"Process id: {p.pid}")
             current_job.extra_details['pid'] = p.pid
             # Log that we have started this particular simulation
             create_or_update_status(simulation_uuid, status=Status.in_progress, extra_details=current_job.extra_details)

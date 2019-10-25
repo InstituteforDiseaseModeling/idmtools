@@ -1,6 +1,7 @@
 import itertools
 import traceback
 import typing
+from logging import getLogger, DEBUG
 
 from idmtools.utils.file_parser import FileParser
 from typing import NoReturn
@@ -10,6 +11,8 @@ if typing.TYPE_CHECKING:
     from idmtools.core.interfaces.iitem import TItem
     from idmtools.entities.ianalyzer import TAnalyzerList
     from diskcache import Cache
+
+logger = getLogger(__name__)
 
 
 def map_item(item: 'TItem') -> NoReturn:
@@ -49,11 +52,15 @@ def _get_mapped_data_for_item(item: 'TItem', analyzers: 'TAnalyzerList', cache: 
     # determine which analyzers (and by extension, which filenames) are applicable to this item
     try:
         analyzers_to_use = [a for a in analyzers if a.filter(item)]
+        analyzer_uids = [a.uid for a in analyzers]
     except Exception:
         analyzer_uids = [a.uid for a in analyzers]
         _set_exception(step="Item filtering",
                        info={"Item": item, "Analyzers": ", ".join(analyzer_uids)},
                        cache=cache)
+
+    if logger.isEnabledFor(DEBUG):
+        logger.debug(f"Analyzers to use on item: {str(analyzer_uids)}")
 
     filenames = set(itertools.chain(*(a.filenames for a in analyzers_to_use)))
 
@@ -73,6 +80,7 @@ def _get_mapped_data_for_item(item: 'TItem', analyzers: 'TAnalyzerList', cache: 
     for analyzer in analyzers_to_use:
         # If the analyzer needs the parsed data, parse
         if analyzer.parse:
+            logger.debug(f'Parsing content for {analyzer.uid}')
             try:
                 data = {filename: FileParser.parse(filename, content)
                         for filename, content in file_data.items()}
