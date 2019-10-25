@@ -210,7 +210,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                                   query_criteria=QueryCriteria().select(cols).select_children(children))
 
         if item_type == ItemType.EXPERIMENT:
-            cols = cols or ["id", "name"]
+            cols = cols or ["id", "name", "suite_id"]
             children = children if children is not None else ["tags", "configuration"]
             return COMPSExperiment.get(id=item_id,
                                        query_criteria=QueryCriteria().select(cols).select_children(children))
