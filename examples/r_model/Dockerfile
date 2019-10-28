@@ -38,8 +38,10 @@ RUN Rscript -e "devtools::install_version('argparse', version = '2.0.1')" && \
 
 # Our script that does smart user mapping
 COPY user_conf.sh /etc/cont-init.d/01-user_conf.sh
+COPY user_init.sh /
 
 WORKDIR /app
 COPY user_conf.sh /app
-RUN chmod +x /app/user_conf.sh
-COPY model.R /app
+RUN chmod +x /user_init.sh /app/user_conf.sh
+COPY model.R example.json /app/
+ENTRYPOINT ["/user_init.sh"]

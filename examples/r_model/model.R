@@ -28,29 +28,27 @@ parser$add_argument("--beta", default=1.4247, type="double",
     help="beta value [default %(default)s]")
 parser$add_argument("--gamma", default=0.14286, type="double",
     help="gamma value [default %(default)s]")
-parser$add_argument("--timeframe", default=70, type="number",
+parser$add_argument("--timeframe", default=70, type="integer",
     help="Timeframe of simulation [default %(default)s]")
-parser$add_argument("--config-file", default=NULL, type="str")
+parser$add_argument("--config-file", default=NULL, type="character")
 # get command line options, if help option encountered print help and exit,
 # otherwise if options not found on command line then set defaults,
 args <- parser$parse_args()
 
-if (args$config_file) {
-    json_file <- stream_in(file(args$config_file))
-    content = fromJSON(json_file)
-    opts <- c('susceptible','infected','recovered','beta','gamma', timeframe)
+if (!is.null(args$config_file) && length(args$config_file) > 0) {
+    content <- fromJSON(readLines(args$config_file, warn = FALSE))
+    opts <- c('susceptible','infected','recovered','beta','gamma', 'timeframe')
+    print(content)
     for(opt in opts) {
-        if (any(names(content) == opts)) {
-
+        # only load the configuration options that are defined
+        if (any(names(content) == opt)) {
+            args[opt] <- content[opt]
         }
     }
-    # only load the configuration options that are defined
-    if (any(names(content) == "susceptible")) {
-        attr(args, opt) = attr(contents, opt)[1
-        args$susceptible = content$susceptible[1]
-    }
+
 }
 
+print("Config:")
 print(args)
 ### Set parameters
 ## Proportion in each compartment: Susceptible 0.999999, Infected 0.000001, Recovered 0
