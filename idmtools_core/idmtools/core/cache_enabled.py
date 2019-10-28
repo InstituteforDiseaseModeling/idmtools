@@ -1,13 +1,11 @@
-import multiprocessing
 import os
 import shutil
 import tempfile
-import threading
 import typing
 from dataclasses import dataclass, field
 from logging import getLogger
 from multiprocessing import current_process
-from threading import get_ident
+
 from diskcache import Cache, DEFAULT_SETTINGS, FanoutCache
 
 if typing.TYPE_CHECKING:
@@ -25,7 +23,8 @@ class CacheEnabled:
     """
     Allows a class to leverage Diskcache and expose a cache property.
     """
-    _cache: 'Union[Cache, FanoutCache]' = field(default=None, init=False, compare=False, metadata={"pickle_ignore": True})
+    _cache: 'Union[Cache, FanoutCache]' = field(default=None, init=False, compare=False,
+                                                metadata={"pickle_ignore": True})
     _cache_directory: 'str' = field(default=None, init=False, compare=False)
 
     def __del__(self):
@@ -50,8 +49,6 @@ class CacheEnabled:
             self._cache = FanoutCache(self._cache_directory, shards=shards, eviction_policy=eviction_policy)
         else:
             self._cache = Cache(self._cache_directory)
-
-
 
     def cleanup_cache(self):
         # Only delete and close the cache if the owner thread ends
