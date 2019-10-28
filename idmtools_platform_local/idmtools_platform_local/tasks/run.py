@@ -127,27 +127,8 @@ class BaseTask:
         return self.run_task(command, current_job, experiment_uuid, simulation_path, simulation_uuid)
 
 
-class RunTask(GenericActor, BaseTask):
-    """
-    Run the given `command` in the simulation folder.
-    """
-
-    class Meta:
-        store_results = False
-        max_retries = 0
-        queue_name = "cpu"
-
-    def perform(self, command: str, experiment_uuid: str, simulation_uuid: str) -> Status:
-        return self.execute_simulation(command, experiment_uuid, simulation_uuid)
-
-
-class DockerRunTask(GenericActor, BaseTask):
-    class Meta:
-        store_results = False
-        max_retries = 0
-        queue_name = "cpu"
-
-    def perform(self, command: str, experiment_uuid: str, simulation_uuid: str, image, container_config: dict) -> Status:
+class DockerBaseTask(BaseTask):
+    def docker_perform(self, command: str, experiment_uuid: str, simulation_uuid: str, container_config: dict)-> Status:
         from idmtools_platform_local.workers.utils import create_or_update_status
         container_config = container_config
         # update the config to container the volume info
@@ -159,16 +140,19 @@ class DockerRunTask(GenericActor, BaseTask):
         container_config['detach'] = True
         container_config['stderr'] = True
         container_config['working_dir'] = simulation_path
-        #container_config['auto_remove'] = True
+        container_config['user'] = os.getenv('CURRENT_UID')
+        # container_config['auto_remove'] = True
         # we have to mount using the host data path
         data_dir = f'{os.getenv("HOST_DATA_PATH")}/'
         container_config['volumes'] = {
-            data_dir: dict(bind='/data', mode='rw')
+            data_dir: dict(bind='/data', mode='rw'),
         }
         # limit cpu
         if cpu_count() > 2:
+
             container_config['cpuset_cpus'] = f'{next(cpu_sequence)}'
 
+        logger.info(f"Task Docker Config: {str(container_config)}")
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f"Task Docker Config: {str(container_config)}")
 
@@ -186,8 +170,8 @@ class DockerRunTask(GenericActor, BaseTask):
     def run_container(self, command, container_config, current_job, simulation_path, simulation_uuid):
         import docker
         from idmtools_platform_local.workers.utils import create_or_update_status
-        client = docker.from_env()
-        container = client.containers.run(command, **container_config)
+        client = docker.DockerClient(base_url='unix://var/run/docker.sock')
+        container = client.containers.run(command=command, **container_config)
         log_reader = container.logs(stream=True)
         with open(os.path.join(simulation_path, "StdOut.txt"), "w") as out, \
                 open(os.path.join(simulation_path, "StdErr.txt"), "w") as err:
@@ -200,11 +184,38 @@ class DockerRunTask(GenericActor, BaseTask):
         return result
 
 
+class RunTask(GenericActor, DockerBaseTask):
+    """
+    Run the given `command` in the simulation folder.
+    """
+
+    class Meta:
+        store_results = False
+        max_retries = 0
+        queue_name = "cpu"
+
+    def perform(self, command: str, experiment_uuid: str, simulation_uuid: str) -> Status:
+        return self.execute_simulation(command, experiment_uuid, simulation_uuid)
+
+
+class DockerRunTask(GenericActor, DockerBaseTask):
+    class Meta:
+        store_results = False
+        max_retries = 0
+        queue_name = "cpu"
+
+    def perform(self, command: str, experiment_uuid: str, simulation_uuid: str, container_config: dict) -> Status:
+        return self.docker_perform(command, experiment_uuid, simulation_uuid, container_config)
+
+
 # it would be great we could just derive from RunTask and change the meta but that doesn't seem to work with
 # GenericActors for some reason. Using BaseTask and these few lines of redundant code are our compromise
-class GPURunTask(DockerRunTask):
+class GPURunTask(GenericActor, DockerBaseTask):
     class Meta:
         store_results = False
         max_retries = 0
         queue_name = "gpu"
+
+    def perform(self, command: str, experiment_uuid: str, simulation_uuid: str,  container_config: dict) -> Status:
+        return self.docker_perform(command, experiment_uuid, simulation_uuid, container_config)
 

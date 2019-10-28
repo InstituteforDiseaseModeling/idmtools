@@ -41,7 +41,8 @@ setup(
     keywords='modeling, IDM',
     name='idmtools_models',
     entry_points=dict(idmtools_model=  # noqa: E251
-                      ["idmtools_model_python = idmtools_models.python.python_experiment_spec:PythonExperimentSpec"]
+                      ["idmtools_model_python = idmtools_models.python.python_experiment_spec:PythonExperimentSpec",
+                       "idmtools_model_r = idmtools_models.r.r_experiment_spec:RExperimentSpec"]
                       ),
     packages=find_packages(),
     setup_requires=setup_requirements,

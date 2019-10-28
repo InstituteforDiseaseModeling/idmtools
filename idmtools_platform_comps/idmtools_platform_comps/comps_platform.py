@@ -20,11 +20,9 @@ from idmtools.entities.iexperiment import IExperiment, StandardExperiment, IGPUE
 from idmtools.entities.isimulation import ISimulation
 from idmtools.utils.time import timestamp
 from idmtools_platform_comps.utils import convert_COMPS_status
-
-if typing.TYPE_CHECKING:
-    from typing import NoReturn, List, Dict
-    from idmtools.entities.iexperiment import TExperiment
-    from idmtools.core.interfaces.iitem import TItemList
+from typing import NoReturn, List, Dict
+from idmtools.entities.iexperiment import TExperiment
+from idmtools.core.interfaces.iitem import TItemList
 
 logging.getLogger('COMPS.Data.Simulation').disabled = True
 logger = logging.getLogger(__name__)

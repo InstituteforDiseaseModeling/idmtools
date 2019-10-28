@@ -139,7 +139,7 @@ class LocalPlatform(IPlatform):
                         is_gpu = isinstance(item, IGPUExperiment)
                         run_cmd = GPURunTask if is_gpu else DockerRunTask
                         docker_config = dict(
-                            image=item.image
+                            image=item.image_name
                         )
                         # if we are running gpu, use nvidia runtime
                         if is_gpu:

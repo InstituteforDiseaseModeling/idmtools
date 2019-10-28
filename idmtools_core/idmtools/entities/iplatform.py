@@ -10,11 +10,10 @@ from idmtools.core.interfaces.iitem import IItem
 from idmtools.core import CacheEnabled, ItemType, UnknownItemException
 from idmtools.entities import IExperiment
 from idmtools.entities.iexperiment import IDockerExperiment, IGPUExperiment
+from idmtools.core.interfaces.iitem import TItem, TItemList
+from typing import Dict, List, NoReturn, Set, Any
+from uuid import UUID
 
-if typing.TYPE_CHECKING:
-    from idmtools.core.interfaces.iitem import TItem, TItemList
-    from typing import Dict, List, NoReturn, Set, Any
-    from uuid import UUID
 
 logger = getLogger(__name__)
 
