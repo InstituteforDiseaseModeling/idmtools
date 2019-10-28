@@ -14,13 +14,12 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
     && useradd -s /bin/bash idmtools \
     && echo "idmtools:idmtools" | chpasswd \
     && mkdir /home/idmtools /data /app \
-    && chown -R idmtools:idmtools /home/idmtools /data /app
+    && chown -R idmtools:idmtools /home/idmtools /data /app && \
     # We add the s6 overlay kit which helps us manager permissions
     # multiple applications, etc within an image
     # overall it make management of our final image a bit easier
     # see https://github.com/just-containers/s6-overlay
-
-RUN (cd tmp && curl -LO https://github.com/just-containers/s6-overlay/releases/download/${S6_VERSION}/s6-overlay-amd64.tar.gz) \
+    (cd tmp && curl -LO https://github.com/just-containers/s6-overlay/releases/download/${S6_VERSION}/s6-overlay-amd64.tar.gz) \
     ## and set it up at root
     && tar xzf /tmp/s6-overlay-amd64.tar.gz -C / \
     && rm -rf /tmp/s6-overlay-amd64.tar.gz
@@ -32,8 +31,6 @@ ENV MAKE="make -j${WORKERS}"
 # install dev tools.
 # this increases the final build size but also gives use the ability to install specific versions of packages
 # which is overall more stable
-RUN Rscript -e "install.packages('roxygen2')"
-RUN Rscript -e "install.packages('rversions')"
 RUN Rscript -e "install.packages('devtools')"
 # For a stable environment, use specific versions of packages we use within our projectt
 RUN Rscript -e "devtools::install_version('argparse', version = '2.0.1')" && \

@@ -38,24 +38,16 @@ args <- parser$parse_args()
 if (args$config_file) {
     json_file <- stream_in(file(args$config_file))
     content = fromJSON(json_file)
-    # TODO Generalize this
+    opts <- c('susceptible','infected','recovered','beta','gamma', timeframe)
+    for(opt in opts) {
+        if (any(names(content) == opts)) {
+
+        }
+    }
+    # only load the configuration options that are defined
     if (any(names(content) == "susceptible")) {
+        attr(args, opt) = attr(contents, opt)[1
         args$susceptible = content$susceptible[1]
-    }
-    if (any(names(content) == "infected")) {
-        args$infected = content$infected[1]
-    }
-    if (any(names(content) == "recovered")) {
-        args$recovered = content$recovered[1]
-    }
-    if (any(names(content) == "beta")) {
-        args$beta = content$beta[1]
-    }
-    if (any(names(content) == "gamma")) {
-        args$gamma = content$gamma[1]
-    }
-    if (any(names(content) == "timeframe")) {
-        args$timeframe = content$timeframe[1]
     }
 }
 
