@@ -11,6 +11,7 @@ from idmtools_platform_local.workers.ui.utils import DateTimeEncoder
 
 static_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'static')
 application = Flask(__name__, static_url_path="")
+application.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS','1') == '1'
 application.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI',
                                                           "postgresql+psycopg2://idmtools:idmtools@postgres/idmtools")
 application.json_encoder = DateTimeEncoder

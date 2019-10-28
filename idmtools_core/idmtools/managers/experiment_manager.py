@@ -1,4 +1,6 @@
 import typing
+from logging import getLogger, DEBUG
+
 from idmtools.core import EntityStatus
 from idmtools.entities.iplatform import TPlatform
 from idmtools.services.experiments import ExperimentPersistService
@@ -7,6 +9,9 @@ from idmtools.utils.entities import retrieve_experiment
 
 if typing.TYPE_CHECKING:
     from idmtools.entities.iexperiment import TExperiment
+
+
+logger = getLogger(__name__)
 
 
 class ExperimentManager:
@@ -54,6 +59,7 @@ class ExperimentManager:
         ExperimentPersistService.save(self.experiment)
 
     def simulation_batch_worker_thread(self, simulation_batch):
+        logger.debug(f'Create {len(simulation_batch)} simulations')
         for simulation in simulation_batch:
             simulation.pre_creation()
 
@@ -122,8 +128,11 @@ class ExperimentManager:
         import time
         start_time = time.time()
         while time.time() - start_time < timeout:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Refreshing simulation status")
             self.refresh_status()
             if self.experiment.done:
+                logger.debug("Experiment Done")
                 return
             time.sleep(refresh_interval)
         raise TimeoutError(f"Timeout of {timeout} seconds exceeded when monitoring experiment {self.experiment}")

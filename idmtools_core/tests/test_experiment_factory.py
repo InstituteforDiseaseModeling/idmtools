@@ -26,6 +26,8 @@ class TestExperimentFactory(ITestWithPersistence):
         self.assertEqual(em.experiment.simulations[0].tags, {'p': 0})
         self.assertEqual(em.experiment.simulations[1].tags, {'p': 1})
 
+        test_platform.cleanup()
+
     def test_build_emod_experiment_from_factory(self):
         test_platform = Platform('Test')
         experiment = experiment_factory.create("EMODExperiment", tags={"a": "1", "b": 2},
@@ -47,6 +49,7 @@ class TestExperimentFactory(ITestWithPersistence):
         self.assertEqual(len(em.experiment.simulations), 20)
         self.assertEqual(em.experiment.tags, {'a': '1', 'b': 2,
                                               'type': 'idmtools_model_emod.emod_experiment.EMODExperiment'})
+        test_platform.cleanup()
 
     def test_build_test_experiment_from_factory(self):
         test_experiment = TstExperiment()
