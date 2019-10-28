@@ -58,6 +58,7 @@ class TestPlatformFactory(ITestWithPersistence):
 
         p3 = Platform('Test')
         self.assertEqual(p3.__class__.__name__, 'TestPlatform')
+        p3.cleanup()
 
     @pytest.mark.docker
     @pytest.mark.comps
@@ -72,6 +73,7 @@ class TestPlatformFactory(ITestWithPersistence):
 
         platform3 = Platform('Test')
         self.assertEqual(platform3.__class__.__name__, 'TestPlatform')
+        platform3.cleanup()
 
     @pytest.mark.comps
     @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
@@ -110,3 +112,4 @@ class TestPlatformFactory(ITestWithPersistence):
 
         platform2 = Platform('Test', **kwargs)
         self.assertEqual(platform, platform2)
+        platform2.cleanup()
