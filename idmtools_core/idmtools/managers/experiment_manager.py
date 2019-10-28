@@ -33,10 +33,6 @@ class ExperimentManager:
     @classmethod
     def from_experiment_id(cls, experiment_id, platform):
         experiment = retrieve_experiment(experiment_id, platform, with_simulations=True)
-        platform = PlatformPersistService.retrieve(experiment.platform.uid)
-        # cache miss, add the platform
-        if platform is None:
-            platform = PlatformPersistService.retrieve(experiment.platform.uid)
         em = cls(experiment, platform)
         return em
 
