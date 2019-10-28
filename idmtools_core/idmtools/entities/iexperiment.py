@@ -195,10 +195,42 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
                 "base_simulation": self._simulation_default}
 
 
+@dataclass(repr=False)
+class IWindowsExperiment:
+    execution_platform = 'windows'
+
+
+@dataclass(repr=False)
+class ILinuxExperiment:
+    execution_platform = 'linux'
+
+
+@dataclass(repr=False)
+class IGPUExperiment:
+    is_gpu: bool = True
+
+
+@dataclass(repr=False)
+class IDockerExperiment:
+    image_name: str
+
+
+@dataclass(repr=False)
+class IDockerGPUExperiment(IGPUExperiment, IDockerExperiment):
+    pass
+
+
 TExperiment = typing.TypeVar("TExperiment", bound=IExperiment)
+TGPUExperiment = typing.TypeVar("TGPUExperiment", bound=IGPUExperiment)
+TDockerExperiment = typing.TypeVar("TDockerExperiment", bound=IDockerExperiment)
+# class types
 TExperimentClass = typing.Type[TExperiment]
+TGPUExperimentClass = typing.Type[TGPUExperiment]
+TDockerExperimentClass = typing.Type[TDockerExperiment]
 # Composed types
 TExperimentList = typing.List[typing.Union[TExperiment, str]]
+TGPUExperimentList = typing.List[typing.Union[TGPUExperiment, str]]
+TDockerExperimentList = typing.List[typing.Union[TDockerExperiment, str]]
 
 
 class StandardExperiment(IExperiment):

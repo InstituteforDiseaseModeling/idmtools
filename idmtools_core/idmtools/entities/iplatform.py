@@ -8,6 +8,8 @@ from logging import getLogger
 from idmtools.core.interfaces.ientity import IEntity, TEntityList, TEntity
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.core import CacheEnabled, ItemType, UnknownItemException
+from idmtools.entities import IExperiment
+from idmtools.entities.iexperiment import IDockerExperiment, IGPUExperiment
 
 if typing.TYPE_CHECKING:
     from idmtools.core.interfaces.iitem import TItem, TItemList
@@ -362,6 +364,41 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         # Update attr with validated data types
         for fn in fs_kwargs:
             setattr(self, fn, field_value[fn])
+
+    @abstractmethod
+    def supported_experiment_types(self) -> List[typing.Type]:
+        """
+        Returns a list of supported experiment types. These types should be either abstract or full classes that have
+            been derived from IExperiment
+        Returns:
+
+        """
+        return [IExperiment]
+
+    @abstractmethod
+    def unsupported_experiment_types(self) -> List[typing.Type]:
+        """
+        Returns a list of experiment types not supported by the platform. These types should be either abstract or full
+            classes that have been derived from IExperiment
+        Returns:
+
+        """
+        return [IDockerExperiment, IGPUExperiment]
+
+    def is_supported_experiment(self, experiment: IExperiment) -> bool:
+        """
+        Determines if an experiment is supported by the specified platform.
+        Args:
+            experiment: Experiment to check
+
+        Returns:
+            True is experiment is supported, otherwise, false
+        """
+        ex_types = set(self.supported_experiment_types())
+        if any([isinstance(experiment, t) for t in ex_types]):
+            unsupported_types = self.unsupported_experiment_types()
+            return not any([isinstance(experiment, t) for t in unsupported_types])
+        return False
 
     def __repr__(self):
         return f"<Platform {self.__class__.__name__} - id: {self.uid}>"

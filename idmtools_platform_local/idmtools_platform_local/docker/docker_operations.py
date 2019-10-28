@@ -263,7 +263,7 @@ class DockerOperations:
             data_dir: dict(bind='/data', mode='rw'),
             docker_socket: dict(bind='/var/run/docker.sock', mode='rw')
         }
-        environment = ['REDIS_URL=redis://redis:6379']
+        environment = ['REDIS_URL=redis://redis:6379', f'HOST_DATA_PATH={self.host_data_directory}']
         if platform.system() in ["Linux", "Darwin"]:
             environment.append(f'CURRENT_UID={self.run_as}')
         port_bindings = self._get_optional_port_bindings(self.workers_ui_port, 5000)

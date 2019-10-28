@@ -6,7 +6,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from logging import getLogger
 from pathlib import Path
-from typing import Dict, List, NoReturn, Optional
+from typing import Dict, List, NoReturn, Optional, Type
 from uuid import UUID
 
 from docker.models.containers import Container
@@ -16,6 +16,7 @@ from idmtools.core import ItemType
 from idmtools.core.experiment_factory import experiment_factory
 from idmtools.core.interfaces.iitem import TItem, TItemList
 from idmtools.entities import IExperiment, IPlatform
+from idmtools.entities.iexperiment import IGPUExperiment, IDockerExperiment, IWindowsExperiment, IDockerGPUExperiment
 from idmtools.entities.isimulation import ISimulation, TSimulation
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
 from idmtools_platform_local.client.simulations_client import SimulationsClient
@@ -125,11 +126,27 @@ class LocalPlatform(IPlatform):
         return ids
 
     def run_items(self, items: TItemList) -> NoReturn:
-        from idmtools_platform_local.tasks.run import RunTask
+        from idmtools_platform_local.tasks.run import RunTask, DockerRunTask, GPURunTask
         for item in items:
             if item.item_type == ItemType.EXPERIMENT:
+                if not self.is_supported_experiment(item):
+                    raise ValueError("This experiment type is not support on the LocalPlatform.")
+                is_docker_type = isinstance(item, IDockerExperiment)
                 for simulation in item.simulations:
-                    RunTask.send(item.command.cmd, item.uid, simulation.uid)
+                    # if the task is docker, build the extra config
+                    if is_docker_type:
+                        logger.debug(f"Preparing Docker Task Configuration for {item.uid}:{simulation.uid}")
+                        is_gpu = isinstance(item, IGPUExperiment)
+                        run_cmd = GPURunTask if is_gpu else DockerRunTask
+                        docker_config = dict(
+                            image=item.image
+                        )
+                        # if we are running gpu, use nvidia runtime
+                        if is_gpu:
+                            docker_config['runtime'] = 'nvidia'
+                        run_cmd.send(item.command.cmd, item.uid, simulation.uid, docker_config)
+                    else:
+                        RunTask.send(item.command.cmd, item.uid, simulation.uid)
             else:
                 raise Exception(f'Unable to run item id: {item.uid} of type: {type(item)} ')
 
@@ -210,6 +227,8 @@ class LocalPlatform(IPlatform):
             Id
         """
         from idmtools_platform_local.tasks.create_experiment import CreateExperimentTask
+        if not self.is_supported_experiment(experiment):
+            raise ValueError("This experiment type is not support on the LocalPlatform.")
 
         m = CreateExperimentTask.send(experiment.tags, experiment.simulation_type)
         eid = m.get_result(block=True, timeout=self.default_timeout * 1000)
@@ -343,3 +362,9 @@ class LocalPlatform(IPlatform):
             with open(full_path, 'rb') as fin:
                 byte_arrs.append(fin.read())
         return byte_arrs
+
+    def supported_experiment_types(self) -> List[Type]:
+        return [IExperiment, IDockerExperiment, IDockerGPUExperiment]
+
+    def unsupported_experiment_types(self) -> List[Type]:
+        return [IWindowsExperiment]

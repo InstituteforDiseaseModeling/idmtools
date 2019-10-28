@@ -15,7 +15,8 @@ from idmtools.core import CacheEnabled, EntityContainer, ItemType
 from idmtools.core.experiment_factory import experiment_factory
 from idmtools.core.interfaces.ientity import IEntity, TEntityList
 from idmtools.entities import IPlatform
-from idmtools.entities.iexperiment import IExperiment, StandardExperiment
+from idmtools.entities.iexperiment import IExperiment, StandardExperiment, IGPUExperiment, IDockerExperiment, \
+    ILinuxExperiment
 from idmtools.entities.isimulation import ISimulation
 from idmtools.utils.time import timestamp
 from idmtools_platform_comps.utils import convert_COMPS_status
@@ -42,6 +43,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     """
     Represents the platform allowing to run simulations on COMPS.
     """
+
     MAX_SUBDIRECTORY_LENGTH = 35  # avoid maxpath issues on COMPS
 
     endpoint: str = field(default="https://comps2.idmod.org")
@@ -307,3 +309,9 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                 ret[file_path] = self.cache.memoize()(self._get_file_for_collection)(collection_id, normalized_path)
 
         return ret
+
+    def supported_experiment_types(self) -> List[typing.Type]:
+        return [IExperiment]
+
+    def unsupported_experiment_types(self) -> List[typing.Type]:
+        return [IDockerExperiment, IGPUExperiment, ILinuxExperiment]

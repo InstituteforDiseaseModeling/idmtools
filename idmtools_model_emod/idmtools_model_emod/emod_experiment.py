@@ -4,6 +4,7 @@ import collections
 import typing
 from dataclasses import dataclass, field
 from idmtools.entities import IExperiment, CommandLine
+from idmtools.entities.iexperiment import IWindowsExperiment, IDockerExperiment, ILinuxExperiment
 from idmtools_model_emod.emod_simulation import EMODSimulation
 
 if typing.TYPE_CHECKING:
@@ -11,7 +12,7 @@ if typing.TYPE_CHECKING:
 
 
 @dataclass(repr=False)
-class EMODExperiment(IExperiment):
+class EMODExperiment(IExperiment, IWindowsExperiment):
     eradication_path: str = field(default=None, compare=False, metadata={"md": True})
     demographics: collections.OrderedDict = field(default_factory=lambda: collections.OrderedDict())
 
@@ -129,3 +130,7 @@ class EMODExperiment(IExperiment):
 
         # Create the command line according to the location of the model
         self.command = CommandLine("Assets/Eradication.exe", "--config config.json", "--input-path ./Assets;.")
+
+
+class DockerEMODExperiment(EMODExperiment, IDockerExperiment, ILinuxExperiment):
+    image: str = 'dtk/2.20_runtime'
