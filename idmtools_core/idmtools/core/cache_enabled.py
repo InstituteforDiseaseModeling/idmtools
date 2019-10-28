@@ -3,7 +3,7 @@ import shutil
 import tempfile
 import typing
 from dataclasses import dataclass, field
-from logging import getLogger
+from logging import getLogger, DEBUG
 from threading import get_ident
 from diskcache import Cache, DEFAULT_SETTINGS, FanoutCache
 
@@ -66,8 +66,12 @@ class CacheEnabled:
             if self._cache_directory and os.path.exists(self._cache_directory):
                 try:
                     shutil.rmtree(self._cache_directory)
-                except IOError as e:
-                    logger.exception(e)
+                # In some scripts, like multi-processing, we could still end up with a locked file
+                # in these cases, let's just preserve cache. Often these are temp directories the os
+                # will clean up for us
+                except (IOError, PermissionError) as e:
+                    if logger.isEnabledFor(DEBUG):
+                        logger.exception(e)
 
     @property
     def cache(self):
