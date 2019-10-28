@@ -64,5 +64,4 @@ out <- ode(y = init, times = times, func = sir, parms = parameters)
 out <- as.data.frame(out)
 ## Delete time variable
 out$time <- NULL
-## Show data
-head(out, 10)
+write.csv(out, file="output.csv")
