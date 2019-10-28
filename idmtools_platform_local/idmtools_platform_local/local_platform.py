@@ -65,7 +65,6 @@ class LocalPlatform(IPlatform):
     _docker_operations: Optional[DockerOperations] = field(default=None, metadata={"pickle_ignore": True})
 
     def __post_init__(self):
-        super().__post_init__()
         self.supported_types = {ItemType.EXPERIMENT, ItemType.SIMULATION}
         # ensure our brokers are started
         setup_broker()
@@ -76,6 +75,8 @@ class LocalPlatform(IPlatform):
             self._docker_operations = DockerOperations(**opts)
             # start the services
             self._docker_operations.create_services()
+
+        super().__post_init__()
 
     def get_platform_item(self, item_id, item_type, **kwargs):
         if item_type == ItemType.EXPERIMENT:

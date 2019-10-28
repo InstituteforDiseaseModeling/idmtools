@@ -2,20 +2,20 @@ import os
 import sys
 import time
 import typing
+from multiprocessing.pool import Pool
+from typing import NoReturn
 
 from idmtools.analysis.map_worker_entry import map_item
 from idmtools.core import CacheEnabled
 from idmtools.utils.command_line import animation
 from idmtools.utils.language import on_off, verbose_timedelta
-from multiprocessing.pool import Pool
-from typing import NoReturn
 
 if typing.TYPE_CHECKING:
     from idmtools.entities.ianalyzer import TAnalyzer
-    from idmtools.core.interfaces.iitem import TItem, TItemList
+    from idmtools.core.interfaces.ientity import TEntity
 
 
-def pool_worker_initializer(func, analyzers, cache, platform) -> None:
+def pool_worker_initializer(func, analyzers, cache, platform) -> NoReturn:
     """
     Initialize the pool worker, which allows the process pool to associate the analyzers, cache, 
     and path mapping to the function executed to retrieve data. Using an initializer improves performance.
@@ -163,7 +163,7 @@ class AnalyzeManager(CacheEnabled):
         # make sure each analyzer in self.analyzers has a unique uid
         self._update_analyzer_uids()
 
-    def _check_exception(self) -> bool:
+    def _check_exception(self) -> 'bool':
         """
         Determines if an exception has occurred in the processing of items, printing any related information.
 
@@ -180,7 +180,7 @@ class AnalyzeManager(CacheEnabled):
             ex = False
         return ex
 
-    def _print_configuration(self, n_items: int, n_processes: int) -> NoReturn:
+    def _print_configuration(self, n_items: 'int', n_processes: 'int') -> NoReturn:
         """
         Display some information about an ongoing analysis.
 
@@ -205,7 +205,7 @@ class AnalyzeManager(CacheEnabled):
                 print(' | (Directory map: {}' % on_off(analyzer.need_dir_map))
         print(' | Pool of {} analyzing process(es)'.format(n_processes))
 
-    def _run_and_wait_for_mapping(self, worker_pool: Pool, start_time: float) -> bool:
+    def _run_and_wait_for_mapping(self, worker_pool: 'Pool', start_time: 'float') -> 'bool':
         """
         Run and manage the mapping call on each item.
 
@@ -246,7 +246,7 @@ class AnalyzeManager(CacheEnabled):
             return False
         return True
 
-    def _run_and_wait_for_reducing(self, worker_pool: Pool) -> dict:
+    def _run_and_wait_for_reducing(self, worker_pool: 'Pool') -> 'dict':
         """
         Run and manage the reduce call on the combined item results (by analyzer).
 
@@ -273,7 +273,7 @@ class AnalyzeManager(CacheEnabled):
         worker_pool.join()
         return finalize_results
 
-    def analyze(self) -> bool:
+    def analyze(self) -> 'bool':
         """
         Process the provided items with the provided analyzers. This is the main driver method of 
         :class:`AnalyzeManager`. 
