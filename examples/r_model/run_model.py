@@ -1,5 +1,4 @@
 import itertools
-import operator
 import os
 import numpy as np
 from idmtools.builders import ExperimentBuilder
@@ -11,7 +10,7 @@ from idmtools_models.r.r_experiment import RExperiment
 def sum_to_n(sum_to, spaced_samples=10, dimensions=3):
     for cuts in itertools.permutations(np.linspace(0, sum_to, spaced_samples), dimensions):
         # only return when the cut adds up to one and infections(index 0) is greater than 0
-        if sum(cuts) == sum_to and cuts[0] > 0:
+        if sum(cuts) == sum_to and all([x > 0 for x in cuts]):
             yield cuts
 
 
