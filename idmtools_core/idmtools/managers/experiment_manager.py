@@ -1,4 +1,6 @@
 import typing
+from logging import getLogger, DEBUG
+
 from idmtools.core import EntityStatus
 from idmtools.entities.iplatform import TPlatform
 from idmtools.services.experiments import ExperimentPersistService
@@ -10,14 +12,18 @@ if typing.TYPE_CHECKING:
     from idmtools.entities.isuite import TSuite
 
 
+logger = getLogger(__name__)
+
+
 class ExperimentManager:
     """
-    Manages an experiment.
+    Class that manages an experiment.
     """
 
     def __init__(self, experiment: 'TExperiment', platform: TPlatform, suite: 'TSuite' = None):
         """
-        Constructor
+        A constructor.
+
         Args:
             experiment: The experiment to manage
             platform: The platform to use
@@ -31,11 +37,6 @@ class ExperimentManager:
     @classmethod
     def from_experiment_id(cls, experiment_id, platform):
         experiment = retrieve_experiment(experiment_id, platform, with_simulations=True)
-        platform = PlatformPersistService.retrieve(experiment.platform.uid)
-        # cache miss, add the platform
-        if platform is None:
-            PlatformPersistService.save(obj=experiment.platform)
-            platform = PlatformPersistService.retrieve(experiment.platform.uid)
         em = cls(experiment, platform)
         return em
 
@@ -63,9 +64,6 @@ class ExperimentManager:
         # Create experiment
         self.platform.create_items(items=[self.experiment])  # noqa: F841
 
-        # Persist the platform
-        PlatformPersistService.save(self.platform)
-
         # Make sure to link it to the experiment
         self.experiment.platform = self.platform
 
@@ -75,6 +73,7 @@ class ExperimentManager:
         ExperimentPersistService.save(self.experiment)
 
     def simulation_batch_worker_thread(self, simulation_batch):
+        logger.debug(f'Create {len(simulation_batch)} simulations')
         for simulation in simulation_batch:
             simulation.pre_creation()
 
@@ -113,7 +112,8 @@ class ExperimentManager:
 
     def run(self):
         """
-        Main entry point of the manager.
+        Main entry point of the manager:
+
         - Create the suite
         - Create the experiment
         - Execute the builder (if any) to generate all the simulations
@@ -137,16 +137,20 @@ class ExperimentManager:
 
     def wait_till_done(self, timeout: 'int' = 60 * 60 * 24, refresh_interval: 'int' = 5):
         """
-        Wait for the experiment to be done
+        Wait for the experiment to be done.
+
         Args:
-            refresh_interval: How long in between polling
-            timeout: How long to wait before failing
+            refresh_interval: How long to wait between polling.
+            timeout: How long to wait before failing.
         """
         import time
         start_time = time.time()
         while time.time() - start_time < timeout:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Refreshing simulation status")
             self.refresh_status()
             if self.experiment.done:
+                logger.debug("Experiment Done")
                 return
             time.sleep(refresh_interval)
         raise TimeoutError(f"Timeout of {timeout} seconds exceeded when monitoring experiment {self.experiment}")

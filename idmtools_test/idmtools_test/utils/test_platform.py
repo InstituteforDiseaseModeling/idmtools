@@ -1,5 +1,6 @@
 import os
 from dataclasses import dataclass, field
+from logging import getLogger
 from typing import Dict, List, Type
 from uuid import UUID, uuid4
 
@@ -18,22 +19,24 @@ from idmtools.registry.plugin_specification import get_description_impl
 current_directory = os.path.dirname(os.path.realpath(__file__))
 data_path = os.path.abspath(os.path.join(current_directory, "..", "data"))
 
+logger = getLogger(__name__)
 
 @dataclass(repr=False)
 class TestPlatform(IPlatform):
     """
     Test platform simulating a working platform to use in the test suites.
     """
+
     __test__ = False  # Hide from test discovery
 
     experiments: 'diskcache.Cache' = field(default=None, compare=False, metadata={"pickle_ignore": True})
     simulations: 'diskcache.Cache' = field(default=None, compare=False, metadata={"pickle_ignore": True})
 
     def __post_init__(self):
-        super().__post_init__()
         os.makedirs(data_path, exist_ok=True)
         self.initialize_test_cache()
         self.supported_types = {ItemType.EXPERIMENT, ItemType.SIMULATION}
+        super().__post_init__()
 
     def initialize_test_cache(self):
         """
@@ -90,9 +93,11 @@ class TestPlatform(IPlatform):
         lock = diskcache.Lock(self.simulations, 'simulations-lock')
         with lock:
             self.simulations.set(uid, list())
+        logger.debug(f"Created Experiment {experiment.uid}")
         return experiment.uid
 
     def _create_simulations(self, simulation_batch):
+
         simulations = []
         for simulation in simulation_batch:
             experiment_id = simulation.parent_id

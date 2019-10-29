@@ -8,9 +8,10 @@ from idmtools.core import ItemType, EntityContainer
 @dataclass(repr=False)
 class ISuite(INamedEntity, ABC):
     """
-    Represents a generic Suite (of experiments).
+    Class that represents a generic suite (a collection of experiments).
+
     Args:
-        experiments: the children items of this suite
+        experiments: The child items of this suite.
     """
     experiments: 'EntityContainer' = field(default_factory=lambda: EntityContainer(), compare=False,
                                            metadata={"pickle_ignore": True})

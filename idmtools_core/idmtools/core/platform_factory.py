@@ -8,11 +8,14 @@ class Platform:
 
     def __new__(cls, block, **kwargs):
         """
-        Create a platform based on the block and all other inputs
+        Create a platform based on the block and all other inputs.
+
         Args:
-            block: idmtools.ini block name
-            kwargs: user inputs may overwrite the entries in the block
-        Returns: requested Platform
+            block: The INI configuration file block name.
+            kwargs: User inputs may overwrite the entries in the block.
+
+        Returns: 
+            The requested platform.
         """
         from idmtools.registry.platform_specification import PlatformPlugins
 
@@ -29,10 +32,13 @@ class Platform:
     @classmethod
     def _validate_platform_type(cls, name):
         """
-        Check if requested platform exists
+        Check if the requested platform exists.
+
         Args:
-            name: Platform type
-        Returns: None
+            name: The platform type.
+
+        Returns: 
+            None
         """
         if name not in cls._platforms:
             raise ValueError(f"{name} is an unknown Platform Type. "
@@ -41,11 +47,14 @@ class Platform:
     @classmethod
     def _create_from_block(cls, block: str, **kwargs):
         """
-        Retrieve section entries from config file by giving block
+        Retrieve section entries from the INI configuration file by giving block.
+
         Args:
-            block: the section name in config file
-            kwargs: inputs may override block values
-        Returns: platform with the type provided in the block
+            block: The section name in the configuration file.
+            overrides: Optional override of parameters from the configuration file.
+
+        Returns: 
+            A dictionary with entries from the block.
         """
 
         # Read block details

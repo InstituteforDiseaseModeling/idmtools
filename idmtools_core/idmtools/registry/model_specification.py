@@ -26,12 +26,13 @@ class ModelSpecification(PluginSpecification, ABC):
     @get_model_spec
     def get(self, configuration: dict) -> 'IExperiment':  # noqa: F821
         """
-        Factor that should return a new platform using the passed in configuration
+        Return a new model using the passed in configuration.
+
         Args:
-            configuration:
+            configuration: The INI configuration file to use.
 
         Returns:
-
+            The new model.
         """
         raise NotImplementedError("Plugin did not implement get")
 

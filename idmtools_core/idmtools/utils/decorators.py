@@ -5,12 +5,15 @@ import os
 from concurrent.futures import Executor, as_completed
 from concurrent.futures.thread import ThreadPoolExecutor
 from functools import wraps
+from logging import getLogger, DEBUG
 from typing import Callable, Union, Optional, Type
+
+logger = getLogger(__name__)
 
 
 class abstractstatic(staticmethod):
     """
-    Decorator for defining a method both as static and abstract
+    A decorator for defining a method both as static and abstract.
     """
     __slots__ = ()
 
@@ -38,7 +41,7 @@ def optional_decorator(decorator: Callable, condition: Union[bool, Callable[[], 
 
 class SingletonDecorator:
     """
-    Wraps a class in a Singleton Decorator.
+    Wraps a class in a singleton decorator.
 
     Example:
         In the below example, we would print out *99* since *z* is referring to the same object as *x*::
@@ -50,8 +53,6 @@ class SingletonDecorator:
             x.y = 99
             z = Thing()
             print(z.y)
-    Notes:
-        Should be used on Classes
     """
     def __init__(self, klass):
         self.klass = klass
@@ -66,9 +67,9 @@ class SingletonDecorator:
 
 class LoadOnCallSingletonDecorator:
     """
-    Additional class decorator that creates a singleton instance only when a method/attr is accessed. This is useful
-    for expensive items like plugin factories loads that should only be executed when finally needed and not on
-    declaration
+    Additional class decorator that creates a singleton instance only when a method or attribute is accessed. 
+    This is useful for expensive tasks like loading plugin factories that should only be executed when finally 
+    needed and not on declaration.
 
     Examples:
         ::
@@ -120,14 +121,14 @@ def cache_for(ttl=datetime.timedelta(minutes=1)):
 
 def optional_yaspin_load(*yargs, **ykwargs) -> Callable:
     """
-    Adds a CLI spinner to a function if
+    Adds a CLI spinner to a function if:
 
-    * yaspin package is present
-    * NO_SPINNER environment variable is not defined
+    * yaspin package is present.
+    * NO_SPINNER environment variable is not defined.
 
     Args:
-        *yargs: Arguments to pass to yaspin constructor
-        **ykwargs: Keyword arguments to pass to yaspin constructor
+        *yargs: Arguments to pass to yaspin constructor.
+        **ykwargs: Keyword arguments to pass to yaspin constructor.
 
     Examples:
         ::
@@ -137,7 +138,7 @@ def optional_yaspin_load(*yargs, **ykwargs) -> Callable:
                 time.sleep(100)
 
     Returns:
-        (Callable): Wrapper function
+        A callable wrapper function.
     """
     has_yaspin = importlib.util.find_spec("yaspin")
     spinner = None
@@ -207,6 +208,8 @@ class ParallelizeDecorator:
             for f in as_completed(futures):
                 results.append(f.result())
 
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Parallelize Total Results: " + str(results))
         return results
 
     def __del__(self):
@@ -215,8 +218,17 @@ class ParallelizeDecorator:
 
 def retry_function(func, wait=1.5, max_retries=5):
     """
-    Decorator allowing to retry the call to a function with some time in between.
-    Usage::
+    Retry the call to a function with some time in between.
+
+    Args:
+        func: The function to retry.
+        time_between_tries: The time between retries, in seconds.
+        max_retries: The maximum number of times to retry the call.
+
+    Returns:
+        None
+
+    Example::
 
         @retry_function
         def my_func():
@@ -225,12 +237,6 @@ def retry_function(func, wait=1.5, max_retries=5):
         @retry_function(max_retries=10, wait=2)
         def my_func():
             pass
-
-    :param func:
-    :param time_between_tries:
-    :param max_retries:
-
-    :return:
     """
 
     @wraps(func)

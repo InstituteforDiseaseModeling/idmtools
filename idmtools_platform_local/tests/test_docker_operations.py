@@ -4,6 +4,7 @@ import os
 import socket
 import socketserver
 import subprocess
+import time
 import unittest.mock
 
 import pytest
@@ -11,7 +12,7 @@ import pytest
 from idmtools_platform_local.docker.docker_operations import DockerOperations
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.confg_local_runner_test import get_test_local_env_overrides
-from idmtools_test.utils.decorators import restart_local_platform, linux_only
+from idmtools_test.utils.decorators import restart_local_platform, linux_only, skip_api_host
 
 
 def check_port_is_open(port):
@@ -82,11 +83,14 @@ class TestDockerOperations(unittest.TestCase):
         self.assertEqual(worker_container.status, 'running')
         dm.cleanup(True)
 
+    # skip this test in docker in docker tests since the port binding is actually on the true host
     @linux_only
+    @skip_api_host
     def test_port_taken_has_coherent_error(self):
 
         pl = DockerOperations(workers_ui_port=10000, **get_test_local_env_overrides())
         pl.cleanup(True)
+        pl.create_services()
 
         Handler = http.server.SimpleHTTPRequestHandler
 
@@ -97,6 +101,7 @@ class TestDockerOperations(unittest.TestCase):
             with self.assertRaises(EnvironmentError) as e:
                 pl.create_services()
             httpd.server_close()
+        pl.cleanup()
 
     def test_error_if_try_to_run_as_root(self):
         with self.assertRaises(ValueError) as mock:

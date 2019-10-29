@@ -5,12 +5,9 @@ import os
 from collections import defaultdict
 from dataclasses import dataclass, field
 from logging import getLogger
-from pathlib import Path
 from typing import Dict, List, NoReturn, Optional
 from uuid import UUID
-
 from docker.models.containers import Container
-
 from idmtools.assets import Asset
 from idmtools.core import ItemType
 from idmtools.core.experiment_factory import experiment_factory
@@ -19,7 +16,7 @@ from idmtools.entities import IExperiment, IPlatform
 from idmtools.entities.isimulation import ISimulation, TSimulation
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
 from idmtools_platform_local.client.simulations_client import SimulationsClient
-from idmtools_platform_local.docker.docker_operations import default_image, DockerOperations
+from idmtools_platform_local.docker.docker_operations import default_image, DockerOperations, default_base_sir
 from idmtools_platform_local.workers.brokers import setup_broker
 
 status_translate = dict(
@@ -45,7 +42,7 @@ class LocalPlatform(IPlatform):
     Represents the platform allowing to run simulations locally.
     """
 
-    host_data_directory: str = field(default=os.path.join(str(Path.home()), '.local_data'))
+    host_data_directory: str = field(default=os.path.join(default_base_sir, '.local_data'))
     network: str = field(default='idmtools')
     redis_image: str = field(default='redis:5.0.4-alpine')
     redis_port: int = field(default=6379)
@@ -65,7 +62,6 @@ class LocalPlatform(IPlatform):
     _docker_operations: Optional[DockerOperations] = field(default=None, metadata={"pickle_ignore": True})
 
     def __post_init__(self):
-        super().__post_init__()
         self.supported_types = {ItemType.EXPERIMENT, ItemType.SIMULATION}
         # ensure our brokers are started
         setup_broker()
@@ -76,6 +72,8 @@ class LocalPlatform(IPlatform):
             self._docker_operations = DockerOperations(**opts)
             # start the services
             self._docker_operations.create_services()
+
+        super().__post_init__()
 
     def get_platform_item(self, item_id, item_type, **kwargs):
         if item_type == ItemType.EXPERIMENT:
@@ -159,6 +157,8 @@ class LocalPlatform(IPlatform):
                 sim_status = [st for st in status if st['simulation_uid'] == s.uid]
 
                 if sim_status:
+                    if logger.isEnabledFor(logging.DEBUG):
+                        logger.debug(f"Simulation {sim_status[0]['simulation_uid']}status: {sim_status[0]['status']}")
                     s.status = local_status_to_common(sim_status[0]['status'])
 
     def get_files(self, item: 'TItem', files: 'List[str]') -> 'Dict[str, bytearray]':
@@ -340,6 +340,8 @@ class LocalPlatform(IPlatform):
         for path in paths:
             full_path = os.path.join(self.host_data_directory, 'workers', job_id_path, path)
             full_path = full_path.replace('\\', os.sep).replace('/', os.sep)
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f"Retrieving file from {full_path}")
             with open(full_path, 'rb') as fin:
                 byte_arrs.append(fin.read())
         return byte_arrs

@@ -13,6 +13,7 @@ class TestPersistenceServices(ITestWithPersistence):
         PlatformPersistService.save(p)
         p2 = PlatformPersistService.retrieve(p.uid)
         self.assertEqual(p, p2)
+        p.cleanup()
 
     def test_persist_retrieve_experiment(self):
         e = TstExperiment("test")

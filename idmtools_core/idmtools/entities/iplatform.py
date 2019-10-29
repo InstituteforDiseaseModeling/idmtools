@@ -8,6 +8,7 @@ from logging import getLogger
 from idmtools.core.interfaces.ientity import IEntity, TEntityList, TEntity
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.core import CacheEnabled, ItemType, UnknownItemException
+from idmtools.services.platforms import PlatformPersistService
 
 if typing.TYPE_CHECKING:
     from idmtools.core.interfaces.iitem import TItem, TItemList
@@ -26,8 +27,8 @@ CALLER_LIST = ['_create_from_block',    # create platform through Platform Facto
 class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     """
     Interface defining a platform.
-    Interface defining a platform.
     A platform needs to implement basic operation such as:
+
     - Creating experiment
     - Creating simulation
     - Commissioning
@@ -39,8 +40,10 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     @staticmethod
     def get_caller():
         """
-        Trace the stack and find the caller
-        Returns: the direct caller
+        Trace the stack and find the caller.
+
+        Returns: 
+            The direct caller.
         """
         import inspect
 
@@ -49,11 +52,14 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     def __new__(cls, *args, **kwargs):
         """
-        Here is the code to create a new object!
+        Create a new object.
+
         Args:
-            args: user inputs
-            kwargs: user inputs
-        Returns: object created
+            args: User inputs.
+            kwargs: User inputs.
+
+        Returns: 
+            The object created.
         """
 
         # Check the caller
@@ -68,10 +74,18 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     def __post_init__(self) -> 'NoReturn':
         """
-        Work to be done after object creation
-        Returns: None
+        Work to be done after object creation.
+
+        Returns: 
+            None
         """
         self.validate_inputs_types()
+
+        # Initialize the cache
+        self.initialize_cache()
+
+        # Save itself
+        PlatformPersistService.save(self)
 
     @abstractmethod
     def _create_batch(self, batch: 'TEntityList', item_type: 'ItemType') -> 'List[UUID]':
@@ -79,11 +93,13 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     def create_items(self, items: 'TEntity') -> 'List[UUID]':
         """
-        Function creating e.g. sims/exps/suites on the platform.
-        The function will batch the items based on type and call the self._create_batch for creation
+        Create items (simulations, experiments, or suites) on the platform. The function will batch the items based on type and call the self._create_batch for creation
+
         Args:
-            items: All the items to create
-        Returns: List of ids created
+            items: The list of items to create.
+
+        Returns: 
+            List of item IDs created.
         """
         ids = []
         for key, group in groupby(items, lambda x: x.item_type):
@@ -102,10 +118,12 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     @abstractmethod
     def send_assets(self, item: 'TItem', **kwargs) -> 'NoReturn':
         """
-        Send the assets for a given item (sim, experiment, suite, etc) to the platform.
+        Send the assets for a given item to the platform.
+
         Args:
-            item: The item to process. Expected to have an `assets` attribute containing the collection.
-            **kwargs: Extra parameters used by the platform
+            item: The item to process. Expected to have an **assets** attribute containing 
+                the collection.
+            **kwargs: Extra parameters used by the platform.
         """
         pass
 
@@ -113,8 +131,9 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     def refresh_status(self, item) -> 'NoReturn':
         """
         Populate the platform item and specified item with its status.
+
         Args:
-            item: The item to check status for
+            item: The item to check status for.
         """
         pass
 
@@ -142,13 +161,15 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     @abstractmethod
     def get_platform_item(self, item_id: 'UUID', item_type: 'ItemType', **kwargs) -> 'Any':
         """
-        Get an item from the platform
-        Args:
-            item_id: ID of the item to retrieve
-            item_type:  Which type of object are we retrieving
-            **kwargs: Additionalplatform specific parameters
+        Get an item by its ID. The implementing classes must know how to distinguish
+        items of different levels (e.g. simulation, experiment, suite).
 
-        Returns: The item found on the platform or None
+        Args:
+            item_id: The ID of the item to retrieve.
+            item_type: The type of object to retrieve.
+
+        Returns: 
+            The specified item found on the platform or None.
         """
         pass
 
@@ -171,12 +192,14 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         Return the list of children for the given platform item.
         For example, an experiment passed to this function will return all the contained simulations.
         The results are either platform items or idm-tools entities depending on the `raw` parameter.
+        
         Args:
             platform_item: Parent item
             raw: Return a platform item if True, an idm-tools entity if false
             **kwargs: Additional platform specific parameters
 
-        Returns: A list of children, None if no children
+        Returns: 
+            A list of children, None if no children
         """
         pass
 
@@ -184,12 +207,14 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     def get_parent_for_platform_item(self, platform_item: 'Any', raw: 'bool', **kwargs) -> 'Any':
         """
         Return the parent item for a given platform_item.
+
         Args:
             platform_item: Child item
             raw: Return a platform item if True, an idm-tools entity if false
             **kwargs: Additional platform specific parameters
 
-        Returns: Parent or None
+        Returns: 
+            Parent or None
         """
         pass
 
@@ -197,15 +222,17 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
                  force: 'bool' = False, raw: 'bool' = False, **kwargs) -> 'Any':
         """
         Retrieve an object from the platform.
-        This function is cached, force allows to force the refresh of the cache.
-        If no object_type passed: the function will try all the types (experiment, suite, simulation)
+        This function is cached; force allows you to force the refresh of the cache.
+        If no **object_type** is passed, the function will try all the types (experiment, suite, simulation).
+        
         Args:
-            item_id: id of the object to retrieve
-            item_type: Type of the object to be retrieved
-            force: Force the object fetching from the platform
-            raw: Return either an idmtools object or a platform object
+            item_id: The ID of the object to retrieve.
+            item_type: The type of the object to be retrieved.
+            force: If True, force the object fetching from the platform.
+            raw: Return either an |IT_s| object or a platform object.
 
-        Returns: The object found on the platform or None
+        Returns: 
+            The object found on the platform or None.
         """
         if not item_type or item_type not in self.supported_types:
             raise Exception("The provided type is invalid or not supported by this platform...")
@@ -243,16 +270,16 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     def get_children(self, item_id: 'UUID', item_type: 'ItemType',
                      force: 'bool' = False, raw: 'bool' = False, **kwargs) -> 'Any':
         """
-        Get the children of a given object.
+        Retrieve the children of a given object.
 
         Args:
-            item_id: id of the object for which we want the children
-            force: Force the object fetching from the platform
-            raw: Return either an idmtools object or a platform object
-            item_type: Pass the type of the object for quicker retrieval
+            item_id: The ID of the object for which we want the children.
+            force: If True, force the object fetching from the platform.
+            raw: Return either an |IT_s| object or a platform object.
+            item_type: Pass the type of the object for quicker retrieval.
 
-        Returns: Children of the object or None
-
+        Returns: 
+            The children of the object or None.
         """
         if not item_type or item_type not in self.supported_types:
             raise Exception("The provided type is invalid or not supported by this platform...")
@@ -274,15 +301,16 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     def get_parent(self, item_id: 'UUID', item_type: 'ItemType' = None, force: 'bool' = False,
                    raw: 'bool' = False, **kwargs):
         """
-        Get the parent of a given object.
+        Retrieve the parent of a given object.
 
         Args:
-            item_id: id of the object for which we want the parent
-            force: Force the object fetching from the platform
-            raw: Return either an idmtools object or a platform object
-            item_type: Pass the type of the object for quicker retrieval
+            item_id: The ID of the object for which we want the parent.
+            force: If True, force the object fetching from the platform.
+            raw: Return either an |IT_s| object or a platform object.
+            item_type: Pass the type of the object for quicker retrieval.
 
-        Returns: Parent of the object or None
+        Returns: 
+            The parent of the object or None.
 
         """
         if not item_type or item_type not in self.supported_types:
@@ -305,21 +333,23 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     @abstractmethod
     def get_files(self, item: 'TItem', files: 'List[str]') -> 'Dict[str, bytearray]':
         """
-        Returns a dictionary of the specified files for the specified item.
+        Return a dictionary of the specified files for the specified item.
 
         Args:
-            item: Item to fetch files for
-            files: List of file names to fetch
+            item: The item to fetch files for.
+            files: The list of file names to fetch.
 
         Returns:
-            A dict container filename->bytearray
+            A dictionary container filename->bytearray.
         """
         pass
 
     def validate_inputs_types(self) -> 'NoReturn':
         """
-        Validate user inputs and case attr with the correct data types
-        Returns: None
+        Validate user inputs and case attributes with the correct data types.
+
+        Returns: 
+            None
         """
         # retrieve field values, default values and types
         fds = fields(self)

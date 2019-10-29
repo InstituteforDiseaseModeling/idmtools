@@ -3,13 +3,15 @@ import time
 import unittest.mock
 from operator import itemgetter
 import pytest
-os.environ['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://idmtools:idmtools@localhost/idmtools'
+api_host = os.getenv('API_HOST', 'localhost')
+os.environ['SQLALCHEMY_DATABASE_URI'] = f'postgresql+psycopg2://idmtools:idmtools@{api_host}/idmtools'
 from idmtools_platform_local.docker.docker_operations import DockerOperations
 from idmtools_platform_local.workers.utils import create_or_update_status
 from idmtools_test.utils.confg_local_runner_test import config_local_test, patch_broker
 
 
 dm = None
+
 
 @pytest.mark.docker
 class TestAPI(unittest.TestCase):
