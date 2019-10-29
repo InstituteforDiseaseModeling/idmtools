@@ -292,7 +292,7 @@ class LocalPlatform(IPlatform):
             remote_path = "/".join([path, asset.relative_path]) if asset.relative_path else path
             self._docker_operations.create_directory(remote_path)
             items[remote_path].append(
-                (file_path if file_path else asset.content, asset.filename if not file_path else None))
+                (file_path if file_path else asset.content, asset.filename if asset.filename else file_path ))
         return items
 
     def send_asset_to_docker(self, asset: Asset, path: str, worker: Container = None) -> NoReturn:
@@ -317,7 +317,7 @@ class LocalPlatform(IPlatform):
         if worker is None:
             worker = self._docker_operations.get_workers()
         self._docker_operations.copy_to_container(worker, file_path if file_path else asset.content, remote_path,
-                                                  asset.filename if not file_path else None)
+                                                  asset.filename if asset.filename else file_path)
 
     def _create_simulations(self, simulations_batch: List[ISimulation]):
         """

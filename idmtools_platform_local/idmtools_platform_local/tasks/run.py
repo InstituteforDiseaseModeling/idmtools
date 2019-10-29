@@ -155,7 +155,6 @@ class DockerBaseTask(BaseTask):
 
             container_config['cpuset_cpus'] = f'{next(cpu_sequence)}'
 
-        logger.info(f"Task Docker Config: {str(container_config)}")
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f"Task Docker Config: {str(container_config)}")
 
@@ -175,6 +174,9 @@ class DockerBaseTask(BaseTask):
         import docker
         from idmtools_platform_local.workers.utils import create_or_update_status
         client = docker.DockerClient(base_url='unix://var/run/docker.sock')
+        dcmd = f'docker run -v {os.getenv("HOST_DATA_PATH")}:/data --user \"{os.getenv("CURRENT_UID")}\" ' \
+            f'-w {container_config["working_dir"]} {container_config["image"]} {command}'
+        logger.info(f"Running docker command: {dcmd}")
         with open(os.path.join(simulation_path, "StdOut.txt"), "w") as out, \
                 open(os.path.join(simulation_path, "StdErr.txt"), "w") as err:
             logger.info(f"Running {command} with docker config {str(container_config)}")
