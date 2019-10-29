@@ -125,6 +125,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
         # Create suite
         comps_suite = COMPSSuite(name=suite.name, description=suite.description)
+        comps_suite.set_tags(suite.tags)
         comps_suite.save()
 
         # Update suite uid
