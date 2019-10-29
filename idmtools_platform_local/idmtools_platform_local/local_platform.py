@@ -59,6 +59,8 @@ class LocalPlatform(IPlatform):
     workers_ui_port: int = field(default=5000)
     default_timeout: int = field(default=45)
     run_as: Optional[str] = field(default=None)
+    # allows user to specify auto removal of docker worker containers
+    auto_remove_worker_containers: bool = field(default=False)
 
     # We use this to manage our docker containers
     _docker_operations: Optional[DockerOperations] = field(default=None, metadata={"pickle_ignore": True})
@@ -138,7 +140,8 @@ class LocalPlatform(IPlatform):
                         is_gpu = isinstance(item, IGPUExperiment)
                         run_cmd = GPURunTask if is_gpu else DockerRunTask
                         docker_config = dict(
-                            image=item.image_name
+                            image=item.image_name,
+                            auto_remove=self.auto_remove_worker_containers
                         )
                         # if we are running gpu, use nvidia runtime
                         if is_gpu:

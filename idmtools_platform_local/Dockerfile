@@ -27,6 +27,10 @@ RUN apt-get update \
     && mkdir /home/idmtools /data /app \
     && chown -R idmtools:idmtools /home/idmtools /data /app \
     && addgroup idmtools staff \
+    # create docker group and idmtools to it so they can use it
+    # without prompts
+    && addgroup --gid 999 docker \
+    && usermod -a -G docker idmtools \
     # We add the s6 overlay kit which helps us manager permissions
     # multiple applications, etc within an image
     # overall it make management of our final image a bit easier

@@ -164,6 +164,7 @@ class DockerBaseTask(BaseTask):
             return current_job.status
 
         result = self.run_container(command, container_config, current_job, simulation_path, simulation_uuid)
+        logger.info(result['StatusCode'])
         return_code = result['StatusCode']
         status = self.extract_status(experiment_uuid, return_code, simulation_uuid)
         # Update task with the final status
@@ -174,15 +175,18 @@ class DockerBaseTask(BaseTask):
         import docker
         from idmtools_platform_local.workers.utils import create_or_update_status
         client = docker.DockerClient(base_url='unix://var/run/docker.sock')
-        container = client.containers.run(command=command, **container_config)
-        log_reader = container.logs(stream=True)
         with open(os.path.join(simulation_path, "StdOut.txt"), "w") as out, \
                 open(os.path.join(simulation_path, "StdErr.txt"), "w") as err:
+            logger.info(f"Running {command} with docker config {str(container_config)}")
+            out.write(f"{command}\n")
+            container = client.containers.run(command=command, **container_config)
+            log_reader = container.logs(stream=True)
+
             current_job.extra_details['container_id'] = container.id
             # Log that we have started this particular simulation
             create_or_update_status(simulation_uuid, status=Status.in_progress, extra_details=current_job.extra_details)
             for output in log_reader:
-                out.write(output)
+                out.write(output.decode("utf-8"))
         result = container.wait()
         return result
 

@@ -1,4 +1,5 @@
 import inspect
+import types
 import typing
 from functools import partial
 from inspect import signature
@@ -83,7 +84,6 @@ class ExperimentBuilder:
         # Everything is OK, create a partial to have everything set in the signature except `simulation` and add
         self.sweeps.append((partial(function, **{remaining_parameters[0]: v})) for v in values)
 
-        # Update the count of simulations generated
         self.count *= len(values)
 
     def __iter__(self):

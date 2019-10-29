@@ -309,7 +309,7 @@ class DockerOperations:
             docker_socket: dict(bind='/var/run/docker.sock', mode='rw')
         }
         environment = [f'REDIS_URL=redis://redis:{self.redis_port}',
-                       f'HOST_DATA_PATH={self.host_data_directory}',
+                       f'HOST_DATA_PATH={data_dir}',
                        f'SQLALCHEMY_DATABASE_URI='
                        f'postgresql+psycopg2://idmtools:idmtools@postgres:{self.postgres_port}/idmtools']
         if platform.system() in ["Linux", "Darwin"]:
