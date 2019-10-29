@@ -14,6 +14,7 @@ if typing.TYPE_CHECKING:
 class EMODExperiment(IExperiment):
     eradication_path: str = field(default=None, compare=False, metadata={"md": True})
     demographics: collections.OrderedDict = field(default_factory=lambda: collections.OrderedDict())
+    legacy_exe: 'bool' = field(default=False, metadata={"md": True})
 
     def __post_init__(self, simulation_type):
         super().__post_init__(simulation_type=EMODSimulation)
@@ -114,11 +115,12 @@ class EMODExperiment(IExperiment):
         self.assets.add_asset(Asset(absolute_path=self.eradication_path))
 
         # Clean up existing demographics files in case config got replaced
-        config_demo_files = self.base_simulation.config["Demographics_Filenames"]
-        exp_demo_files = list(self.demographics.keys())
-        for f in exp_demo_files:
-            if f not in config_demo_files:
-                self.demographics.pop(f)
+        config_demo_files = self.base_simulation.config.get("Demographics_Filenames", None)
+        if config_demo_files:
+            exp_demo_files = list(self.demographics.keys())
+            for f in exp_demo_files:
+                if f not in config_demo_files:
+                    self.demographics.pop(f)
 
         # Add demographics to assets
         for filename, content in self.demographics.items():
@@ -128,4 +130,10 @@ class EMODExperiment(IExperiment):
         super().pre_creation()
 
         # Create the command line according to the location of the model
-        self.command = CommandLine("Assets/Eradication.exe", "--config config.json", "--input-path ./Assets;.")
+        model_executable = os.path.basename(self.eradication_path)
+
+        # Input path is different for legacy exes
+        input_path = "./Assets;." if not self.legacy_exe else "./Assets"
+
+        # We have everything we need for the command, create the object
+        self.command = CommandLine(f"Assets/{model_executable}", "--config config.json", f"--input-path {input_path}")
