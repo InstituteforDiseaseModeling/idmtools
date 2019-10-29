@@ -56,7 +56,13 @@ class Asset:
         return self.__key() == other.__key()
 
     def __key(self):
-        return self.absolute_path, self.relative_path, self.filename, self._content
+        if self.absolute_path:
+            return self.absolute_path
+
+        if self._content:
+            return self._content, self.filename
+
+        return self.filename, self.relative_path
 
     def __hash__(self):
         return hash(self.__key())

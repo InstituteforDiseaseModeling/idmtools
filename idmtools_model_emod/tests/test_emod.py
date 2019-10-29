@@ -173,3 +173,26 @@ class TestEMOD(ITestWithPersistence):
             configString = simulation.retrieve_output_files(paths=["config.json"])
             config_parameters = json.loads(configString[0].decode('utf-8'))["parameters"]
             self.assertEqual(config_parameters["Enable_Immunity"], 0)
+
+    def test_duplicated_eradication(self):
+        """
+        Eradication is in the collection but also specified in the eradication_path.
+        We should only end up with one copy of Eradication, being at the root of the collection.
+        The exe/Eradication should be discarded.
+        """
+        from idmtools.assets import AssetCollection
+        duplicated_model_path = os.path.join(COMMON_INPUT_PATH, "duplicated_model")
+        asset_collection = AssetCollection()
+        asset_collection.add_directory(assets_directory=duplicated_model_path)
+        experiment = EMODExperiment(name="test",
+                                    eradication_path=os.path.join(duplicated_model_path, "exe", "Eradication"))
+        experiment.add_assets(asset_collection)
+        experiment.pre_creation()
+
+        # Check that we only have 2 assets
+        self.assertEqual(2, len(experiment.assets.assets))
+        # Check that Eradication is at the root and the one in exe/ not present
+        exe_eradication, = (a for a in experiment.assets if a.filename == "Eradication")
+        self.assertEqual("", exe_eradication.relative_path)
+        self.assertEqual("Eradication", exe_eradication.filename)
+        self.assertEqual(os.path.join(duplicated_model_path, "exe", "Eradication"), exe_eradication.absolute_path)
