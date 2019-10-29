@@ -114,6 +114,7 @@ class TestExperimentSimulations(ITestWithPersistence):
 
         exp = exps[0]
         self.assertTrue(isinstance(exp, EMODExperiment))
+        self.assertIsNotNone(exp.parent)
 
         # Test get parent from experiment
         comps_exp = platform.get_platform_item(item_id=exp.uid, item_type=ItemType.EXPERIMENT)
@@ -124,6 +125,10 @@ class TestExperimentSimulations(ITestWithPersistence):
         # Test retrieve simulations from experiment
         sims = platform.get_children_for_platform_item(comps_exp)
         self.assertEqual(len(sims), 3)
+
+        sim = sims[0]
+        self.assertTrue(isinstance(exp, EMODSimulation))
+        self.assertIsNotNone(sim.parent)
 
 
 if __name__ == '__main__':
