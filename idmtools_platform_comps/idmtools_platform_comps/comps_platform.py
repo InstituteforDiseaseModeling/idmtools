@@ -54,11 +54,11 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     exclusive: bool = field(default=False)
 
     def __post_init__(self):
-        super().__post_init__()
         print("\nUser Login:")
         print(json.dumps({"endpoint": self.endpoint, "environment": self.environment}, indent=3))
         self._login()
         self.supported_types = {ItemType.EXPERIMENT, ItemType.SIMULATION, ItemType.SUITE, ItemType.ASSETCOLLECTION}
+        super().__post_init__()
 
     def _login(self):
         try:
@@ -200,23 +200,25 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     def _platform_item_to_entity(self, platform_item, **kwargs):
         if isinstance(platform_item, COMPSExperiment):
             # Create an experiment
-            experiment = experiment_factory.create(platform_item.tags.get("type"), tags=platform_item.tags,
+            obj = experiment_factory.create(platform_item.tags.get("type"), tags=platform_item.tags,
                                                    name=platform_item.name, fallback=StandardExperiment)
             # Set the correct attributes
-            experiment.uid = platform_item.id
-            experiment.comps_experiment = platform_item
-            return experiment
+            obj.uid = platform_item.id
+            obj.comps_experiment = platform_item
         elif isinstance(platform_item, COMPSSimulation):
             # Recreate the experiment if needed
             experiment = kwargs.get('experiment') or self.get_item(platform_item.experiment_id,
                                                                    item_type=ItemType.EXPERIMENT)
             # Get a simulation
-            sim = experiment.simulation()
+            obj = experiment.simulation()
             # Set its correct attributes
-            sim.uid = platform_item.id
-            sim.tags = platform_item.tags
-            sim.status = convert_COMPS_status(platform_item.state)
-            return sim
+            obj.uid = platform_item.id
+            obj.tags = platform_item.tags
+            obj.status = convert_COMPS_status(platform_item.state)
+
+        # Associate the platform
+        obj.platform = self
+        return obj
 
     def get_parent_for_platform_item(self, platform_item, raw=False, **kwargs):
         if isinstance(platform_item, COMPSExperiment):

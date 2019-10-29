@@ -46,6 +46,9 @@ coverage    -   Run tests and generate coverage report that is shown in browser
 ```
 On Windows, you can use `pymake` instead of `make`
 
+Use will also need to ensure you have logged in to the staging docker repo using
+`docker login idm-docker-staging.idmod.org`
+
 ### IDE/Runtime Setup
 For development purpose, it is important to add the following folders as to your `PYTHONPATH` (In PyCharm, right click and `Mark Directoy as > Source Root`):
 - `idmtools/idmtools_core`
@@ -109,3 +112,14 @@ Navigate to the `examples` folder and run:
 You can now open a browser and navigate to: http://localhost:8888.
 
 The examples are available in the `work/notebooks` folder.
+
+
+# Troubleshppting the Devevelopment Environment
+
+1. Docker Auth issues.
+
+   Idmtools currently does not prompt users for docker credentials. Because of this you must login
+   beforehand using `docker login idm-docker-staging.packages.idmod.org`
+2.  Docker image not found
+
+   Check that the idmt

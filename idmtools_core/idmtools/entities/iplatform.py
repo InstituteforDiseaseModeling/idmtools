@@ -10,6 +10,7 @@ from idmtools.core.interfaces.iitem import IItem
 from idmtools.core import CacheEnabled, ItemType, UnknownItemException
 from idmtools.entities import IExperiment
 from idmtools.entities.iexperiment import IDockerExperiment, IGPUExperiment
+from idmtools.services.platforms import PlatformPersistService
 from idmtools.core.interfaces.iitem import TItem, TItemList
 from typing import Dict, List, NoReturn, Set, Any
 from uuid import UUID
@@ -80,6 +81,12 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             None
         """
         self.validate_inputs_types()
+
+        # Initialize the cache
+        self.initialize_cache()
+
+        # Save itself
+        PlatformPersistService.save(self)
 
     @abstractmethod
     def _create_batch(self, batch: 'TEntityList', item_type: 'ItemType') -> 'List[UUID]':
