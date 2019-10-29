@@ -33,10 +33,10 @@ class TestPlatform(IPlatform):
     simulations: 'diskcache.Cache' = field(default=None, compare=False, metadata={"pickle_ignore": True})
 
     def __post_init__(self):
-        super().__post_init__()
         os.makedirs(data_path, exist_ok=True)
         self.initialize_test_cache()
         self.supported_types = {ItemType.EXPERIMENT, ItemType.SIMULATION}
+        super().__post_init__()
 
     def initialize_test_cache(self):
         """

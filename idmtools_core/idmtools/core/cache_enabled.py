@@ -3,6 +3,9 @@ import shutil
 import tempfile
 import typing
 from dataclasses import dataclass, field
+from logging import getLogger
+from multiprocessing import current_process
+
 from logging import getLogger, DEBUG
 from threading import get_ident
 from diskcache import Cache, DEFAULT_SETTINGS, FanoutCache
@@ -22,9 +25,9 @@ class CacheEnabled:
     """
     Allows a class to leverage Diskcache and expose a cache property.
     """
-    _cache: 'Union[Cache, FanoutCache]' = field(default=None, init=False, compare=False)
+    _cache: 'Union[Cache, FanoutCache]' = field(default=None, init=False, compare=False,
+                                                metadata={"pickle_ignore": True})
     _cache_directory: 'str' = field(default=None, init=False, compare=False)
-    _ident: 'int' = field(default=None, init=False, compare=False)
 
     def __del__(self):
         self.cleanup_cache()
@@ -39,9 +42,9 @@ class CacheEnabled:
         # Create the cache directory if does not exist
         if not self._cache_directory or not os.path.exists(self._cache_directory):
             self._cache_directory = tempfile.mkdtemp()
-
-        # Retain which thread created the cache
-        self._ident = get_ident()
+            logger.debug(f"Cache created in {self._cache_directory}")
+        else:
+            logger.debug(f"Cache retrieved in {self._cache_directory}")
 
         # Create different cache depending on the options
         if shards:
@@ -50,12 +53,10 @@ class CacheEnabled:
         else:
             self._cache = Cache(self._cache_directory)
 
-        logger.debug(f"Cache created in {self._cache_directory}")
-
     def cleanup_cache(self):
         # Only delete and close the cache if the owner thread ends
         # Avoid deleting and closing when a child thread ends
-        if self._ident != get_ident():
+        if current_process().name != 'MainProcess':
             return
 
         if self._cache is not None:

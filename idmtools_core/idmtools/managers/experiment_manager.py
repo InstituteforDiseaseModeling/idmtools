@@ -33,11 +33,6 @@ class ExperimentManager:
     @classmethod
     def from_experiment_id(cls, experiment_id, platform):
         experiment = retrieve_experiment(experiment_id, platform, with_simulations=True)
-        platform = PlatformPersistService.retrieve(experiment.platform.uid)
-        # cache miss, add the platform
-        if platform is None:
-            PlatformPersistService.save(obj=experiment.platform)
-            platform = PlatformPersistService.retrieve(experiment.platform.uid)
         em = cls(experiment, platform)
         return em
 
@@ -46,9 +41,6 @@ class ExperimentManager:
 
         # Create experiment
         self.platform.create_items(items=[self.experiment])  # noqa: F841
-
-        # Persist the platform
-        PlatformPersistService.save(self.platform)
 
         # Make sure to link it to the experiment
         self.experiment.platform = self.platform

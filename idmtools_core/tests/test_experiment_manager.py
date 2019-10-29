@@ -50,9 +50,8 @@ class TestExperimentManager(ITestWithPersistence):
         em.run()
         self.assertEqual(len(em.experiment.simulations), 2)
 
-        # Delete the experiment and platform from the stores
+        # Delete the experiment from the stores
         ExperimentPersistService.delete(em.experiment.uid)
-        PlatformPersistService.delete(em.experiment.platform.uid)
 
         em2 = ExperimentManager.from_experiment_id(em.experiment.uid, platform=p)
         self.assertEqual(len(em2.experiment.simulations), 2)

@@ -8,6 +8,7 @@ from logging import getLogger
 from idmtools.core.interfaces.ientity import IEntity, TEntityList, TEntity
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.core import CacheEnabled, ItemType, UnknownItemException
+from idmtools.services.platforms import PlatformPersistService
 
 if typing.TYPE_CHECKING:
     from idmtools.core.interfaces.iitem import TItem, TItemList
@@ -79,6 +80,12 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             None
         """
         self.validate_inputs_types()
+
+        # Initialize the cache
+        self.initialize_cache()
+
+        # Save itself
+        PlatformPersistService.save(self)
 
     @abstractmethod
     def _create_batch(self, batch: 'TEntityList', item_type: 'ItemType') -> 'List[UUID]':
