@@ -228,9 +228,17 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
     def _platform_item_to_entity(self, platform_item, **kwargs):
         if isinstance(platform_item, COMPSExperiment):
+            # Recreate the suite if needed
+            suite = kwargs.get('suite') or self.get_item(platform_item.suite_id,
+                                                                   item_type=ItemType.SUITE)
+
             # Create an experiment
             obj = experiment_factory.create(platform_item.tags.get("type"), tags=platform_item.tags,
                                                    name=platform_item.name, fallback=StandardExperiment)
+
+            # Set parent
+            obj.parent = suite
+
             # Set the correct attributes
             obj.uid = platform_item.id
             obj.comps_experiment = platform_item
@@ -253,6 +261,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             obj.name = platform_item.name
             obj.description = platform_item.description
             obj.tags = platform_item.tags
+            obj.comps_suite = platform_item
 
         # Associate the platform
         obj.platform = self
@@ -285,9 +294,18 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             else:
                 return children
         elif isinstance(platform_item, COMPSSuite):
-            return EntityContainer([self.get_item(e.id, item_type=ItemType.EXPERIMENT, raw=raw) for e in
-                                    COMPSExperiment.get(
-                                        query_criteria=QueryCriteria().where("suite_id={}".format(platform_item.id)))])
+            cols = kwargs.get("cols")
+            children = kwargs.get("children")
+            cols = cols or ["id", "name", "suite_id"]
+            children = children if children is not None else ["tags"]
+
+            children = platform_item.get_experiments(
+                query_criteria=QueryCriteria().select(cols).select_children(children))
+            if not raw:
+                suite = self._platform_item_to_entity(platform_item)
+                return EntityContainer([self._platform_item_to_entity(e, suite=suite) for e in children])
+            else:
+                return children
 
         return None
 
