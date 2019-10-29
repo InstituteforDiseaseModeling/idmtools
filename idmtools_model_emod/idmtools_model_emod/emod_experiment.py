@@ -137,3 +137,4 @@ class EMODExperiment(IExperiment):
 
         # We have everything we need for the command, create the object
         self.command = CommandLine(f"Assets/{model_executable}", "--config config.json", f"--input-path {input_path}")
+
