@@ -9,8 +9,7 @@ from idmtools.core import FilterMode
 from idmtools.assets.errors import DuplicatedAssetError
 
 if typing.TYPE_CHECKING:
-    from idmtools.assets import TAssetFilterList
-    from idmtools.assets.asset import TAssetList
+    from idmtools.assets import TAssetList, TAsset, TAssetFilterList
 
 
 class AssetCollection(IEntity):

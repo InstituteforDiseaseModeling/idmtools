@@ -45,7 +45,7 @@ class EMODExperiment(IExperiment):
             demographics_paths: The custom demographics files (single file or a list).
             force: True to always return, else throw an exception if something goes wrong.
 
-        Returns: 
+        Returns:
             None
         """
         base_simulation = EMODSimulation()
@@ -66,7 +66,7 @@ class EMODExperiment(IExperiment):
             demographics_paths: The custom demographics files (single file or a list).
             force: True to always return, else throw an exception if something goes wrong.
 
-        Returns: 
+        Returns:
             None
         """
         self.base_simulation.load_files(config_path, campaign_path, force)
@@ -81,7 +81,7 @@ class EMODExperiment(IExperiment):
             demographics_paths: Path to custom demographics files (single file or a list).
             force: True to always return, else throw an exception if something goes wrong.
 
-        Returns: 
+        Returns:
             None
         """
 
@@ -112,7 +112,7 @@ class EMODExperiment(IExperiment):
         from idmtools.assets import Asset
 
         # Add Eradication.exe to assets
-        self.assets.add_asset(Asset(absolute_path=self.eradication_path))
+        self.assets.add_asset(Asset(absolute_path=self.eradication_path), fail_on_duplicate=False)
 
         # Clean up existing demographics files in case config got replaced
         config_demo_files = self.base_simulation.config.get("Demographics_Filenames", None)
@@ -137,3 +137,4 @@ class EMODExperiment(IExperiment):
 
         # We have everything we need for the command, create the object
         self.command = CommandLine(f"Assets/{model_executable}", "--config config.json", f"--input-path {input_path}")
+
