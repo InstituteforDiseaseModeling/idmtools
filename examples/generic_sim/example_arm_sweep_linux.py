@@ -26,16 +26,18 @@ def param_update(simulation, param, value):
 if __name__ == "__main__":
     platform = Platform('Local')
 
+    emod_version = '2.20.0'
     ac = AssetCollection()
     a = Asset(absolute_path=os.path.join(INPUT_PATH, "single_node_demographics.json"))
     ac.add_asset(a)
     e = DockerEMODExperiment.from_default(expname, default=EMODSir,
                                           image_name='idm-docker-public.packages.idmod.org/idm/centos:dtk-runtime',
                                           eradication_path='https://github.com/InstituteforDiseaseModeling/'
-                                                           'EMOD/releases/download/v2.20.0/Eradication')
+                                                           f'EMOD/releases/download/v{emod_version}/Eradication')
     e.add_assets(ac)
     simulation = e.base_simulation
     sim = config_update_params(simulation)
+    sim.set_parameter("Enable_Susceptibility_Scaling", 0)
     sim.set_parameter("Config_Name", "serializing sim")
 
     timesteps = [sim_duration * 365]
