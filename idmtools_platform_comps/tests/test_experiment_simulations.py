@@ -121,6 +121,10 @@ class TestExperimentSimulations(ITestWithPersistence):
         self.assertTrue(isinstance(parent, Suite))
         self.assertEqual(parent.uid, suite_uid)
 
+        # Test retrieve simulations from experiment
+        sims = platform.get_children_for_platform_item(comps_exp)
+        self.assertEqual(len(sims), 3)
+
 
 if __name__ == '__main__':
     unittest.main()
