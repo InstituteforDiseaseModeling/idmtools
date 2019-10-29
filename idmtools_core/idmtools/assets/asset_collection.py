@@ -8,6 +8,10 @@ from idmtools.utils.filters.asset_filters import default_asset_file_filter
 from idmtools.core import FilterMode
 from idmtools.assets.errors import DuplicatedAssetError
 
+if typing.TYPE_CHECKING:
+    from idmtools.assets import TAssetFilterList
+    from idmtools.assets.asset import TAssetList
+
 
 class AssetCollection(IEntity):
     """
@@ -93,7 +97,7 @@ class AssetCollection(IEntity):
                     continue
 
             if flatten:
-                asset.relative_path = forced_relative_path or None
+                asset.relative_path = None
 
             if forced_relative_path:
                 asset.relative_path = os.path.join(forced_relative_path, asset.relative_path)

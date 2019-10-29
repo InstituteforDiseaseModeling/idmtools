@@ -117,10 +117,9 @@ class TestAssets(unittest.TestCase):
 
         self.assertSetEqual(set(ac.assets), set(assets_to_find))
 
-    @unittest.skip("wait until fix issue #306")
     def test_assets_collection_from_dir_flatten_forced_relative_path(self):
         assets_to_find = [
-            Asset(absolute_path=os.path.join(self.base_path, "d.txt")),
+            Asset(relative_path='assets_dir', absolute_path=os.path.join(self.base_path, "d.txt")),
             Asset(relative_path='assets_dir', absolute_path=os.path.join(self.base_path, "1", "a.txt")),
             Asset(relative_path='assets_dir', absolute_path=os.path.join(self.base_path, "1", "b.txt")),
             Asset(relative_path='assets_dir', absolute_path=os.path.join(self.base_path, "2", "c.txt"))
