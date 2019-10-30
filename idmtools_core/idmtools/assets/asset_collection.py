@@ -10,6 +10,7 @@ from idmtools.assets.errors import DuplicatedAssetError
 
 if typing.TYPE_CHECKING:
     from idmtools.assets import TAssetList, TAsset, TAssetFilterList
+    from typing import NoReturn
 
 
 class AssetCollection(IEntity):
@@ -134,6 +135,56 @@ class AssetCollection(IEntity):
                 # nothing guarantees that the content is the same. So remove and add the fresh one.
                 self.assets.remove(asset)
         self.assets.append(asset)
+
+    def get_one(self, **kwargs):
+        """
+        Get an asset out of the collection based on the filers passed.
+        Examples:
+            >>> a = AssetCollection()
+            >>> a.get_one(filename="filename.txt")
+        Args:
+            **kwargs:  keyword argument representing the filters.
+
+        Returns: None or Asset if found
+
+        """
+        try:
+            return next(filter(lambda a: all(getattr(a, k) == kwargs.get(k) for k in kwargs), self.assets))
+        except StopIteration:
+            return None
+
+    def delete(self, **kwargs) -> 'NoReturn':
+        """
+        Delete an asset based on keywords attributes
+
+        Args:
+            **kwargs: Filter for the asset to delete.
+        """
+        asset = self.get_one(**kwargs)
+        if asset:
+            self.assets.remove(asset)
+
+    def extend(self, assets: 'TAssetList', fail_on_duplicate: 'bool' = True) -> 'NoReturn':
+        """
+        Extend the collection with new assets
+        Args:
+            assets: Which assets to add
+            fail_on_duplicate: Fail if duplicated asset is included.
+
+        """
+        for asset in assets:
+            self.add_asset(asset, fail_on_duplicate)
+
+    def difference(self, to_remove: 'TAssetList') -> 'NoReturn':
+        """
+        Remove assets based on the `to_remove` list passed.
+        Args:
+            to_remove: Which assets to remove in the current list
+
+        """
+        for asset in to_remove:
+            if asset in self.assets:
+                del self.assets[self.assets.index(asset)]
 
     @property
     def count(self):
