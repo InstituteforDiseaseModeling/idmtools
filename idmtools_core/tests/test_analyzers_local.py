@@ -40,14 +40,15 @@ class AddAnalyzer(IAnalyzer):
 
 class TestAnalyzeManager(ITestWithPersistence):
 
-    def setUp(self) -> None:
-        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.case_name = os.path.basename(__file__) + "--" + cls._testMethodName
         from idmtools_platform_local.docker.docker_operations import DockerOperations
         do = DockerOperations()
         do.cleanup()
-        self.platform = Platform('Local')
+        cls.platform = Platform('Local')
 
-        pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
+        pe = PythonExperiment(name=cls.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
 
         def param_a_update(simulation, value):
@@ -58,15 +59,18 @@ class TestAnalyzeManager(ITestWithPersistence):
         # Sweep parameter "a"
         builder.add_sweep_definition(param_a_update, range(0, 5))
         pe.builder = builder
-        em = ExperimentManager(experiment=pe, platform=self.platform)
+        em = ExperimentManager(experiment=pe, platform=cls.platform)
         em.run()
+        print('Waiting on experiment to finish')
         em.wait_till_done()
+        print('experiment done')
         # TODO fix timing on local platform
-        time.sleep(4)
+        time.sleep(5)
 
-        self.exp_id = pe.uid
+        cls.exp_id = pe.uid
 
     @pytest.mark.docker
+    @pytest.mark.timeout(60)
     def test_AddAnalyzer(self):
         analyzers = [AddAnalyzer()]
 

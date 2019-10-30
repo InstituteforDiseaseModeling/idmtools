@@ -26,7 +26,7 @@ test: ## Run our tests
 	@+$(IPY) "import os; os.environ['SQLALCHEMY_DATABASE_URI']='sqlite://'; \
 		os.environ['DATA_PATH'] = os.path.join(os.getcwd(), 'test_data'); \
 		os.environ['DOCKER_REPO'] = 'idm-docker-staging'; \
-		os.chdir('tests'); os.system('py.test -p no:warnings -m \"not comps and not docker\" --junitxml=test_results.xml')"
+		os.chdir('tests'); os.system('py.test -v -p no:warnings -m \"not comps and not docker\" --junitxml=test_results.xml')"
 
 test-docker: ## Run our  docker tests as well
 	@+$(IPY) "import os; os.chdir('tests'); \

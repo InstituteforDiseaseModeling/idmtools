@@ -14,7 +14,7 @@ with open('requirements.txt') as requirements_file:
 
 build_requirements = ['flake8', 'coverage', 'py-make', 'bump2version', 'twine']
 setup_requirements = []
-test_requirements = ['pytest', 'pytest-runner'] + build_requirements
+test_requirements = ['pytest', 'pytest-runner', 'pytest-timeout'] + build_requirements
 # special features targeted for internal idm users and developers. We will force users to install through extras
 # since it adds a bit of unnecessary overhead
 bamboo_requriements = [

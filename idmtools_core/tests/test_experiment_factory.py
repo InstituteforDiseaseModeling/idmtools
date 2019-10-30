@@ -4,6 +4,7 @@ from idmtools.core.platform_factory import Platform
 from idmtools.core.experiment_factory import experiment_factory
 from idmtools.managers import ExperimentManager
 from idmtools_test import COMMON_INPUT_PATH
+from idmtools_test.utils.decorators import windows_only
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.tst_experiment import TstExperiment
 
@@ -28,6 +29,7 @@ class TestExperimentFactory(ITestWithPersistence):
 
         test_platform.cleanup()
 
+    @windows_only
     def test_build_emod_experiment_from_factory(self):
         test_platform = Platform('Test')
         experiment = experiment_factory.create("EMODExperiment", tags={"a": "1", "b": 2},

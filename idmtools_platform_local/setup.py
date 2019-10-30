@@ -13,7 +13,7 @@ with open('requirements.txt') as requirements_file:
     requirements = requirements_file.read().split("\n")
 
 setup_requirements = []
-test_requirements = ['pytest', 'pytest-runner']
+test_requirements = ['pytest', 'pytest-runner', 'pytest-timeout']
 
 extras = dict(test=test_requirements, dev=['Pympler'],
               # Requirements for running workers server

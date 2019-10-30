@@ -25,7 +25,7 @@ test: ## Run our tests
 
 test-all: ## Run our  docker tests as well
 	@+$(IPY) "import os; os.environ['DOCKER_TESTS'] = '1'; \
-	os.environ['COMPS_TESTS'] = '1'; os.chdir('tests'); os.system('py.test -p no:warnings --junitxml=test_results.xml')"
+	os.environ['COMPS_TESTS'] = '1'; os.chdir('tests'); os.system('py.test -v -p no:warnings --junitxml=test_results.xml')"
 
 coverage: ## Generate a code-coverage report
 	@make clean

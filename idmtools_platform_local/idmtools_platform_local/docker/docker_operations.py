@@ -134,12 +134,15 @@ class DockerOperations:
         while retries < 3:
             try:
                 self.get_workers()
+                logger.debug("services started. waiting for platform to become ready")
             except APIError as e:
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.exception(e)
                 if e.status_code in [500]:
                     content = e.response.json()
                     if 'message' in content and 'unauthorized' in content['message']:
                         if spinner:
-                            spinner.stop()
+                            spinner.hide()
                         registry = self.workers_image.split("/")[0]
                         print(f"\nAuthentication needed for {registry}.\nIt is best to login manually outside of "
                               f"idmtools using\n docker login {registry}\nas this will save your password\n"
@@ -149,18 +152,18 @@ class DockerOperations:
                         self.client.login(username, password, registry=registry)
                         retries += 1
                         if spinner:
-                            spinner.start()
-                    if logger.isEnabledFor(logging.DEBUG):
-                        logger.exception(e)
+                            spinner.show()
                 elif e.status_code == 404:
                     print(f'\n\nCould not locate a docker image with the tag: {self.workers_image}\n'
                           f'Please check the name of the image or ensure you have built that image locally.'
                           f'You can test a manual pull using \n'
                           f'docker pull {self.workers_image}')
                     raise
+                else:
+                    raise
         if retries > 2:
             raise ValueError("Could not run workers image. Likely causes are:\n\t- A used port"
-                             "\n\t-A service being down suchs as redis or postgres"
+                             "\n\t-A service being down such as redis or postgres"
                              "\n\t-Authentication issues with the docker registry")
         time.sleep(5)
 
@@ -296,6 +299,8 @@ class DockerOperations:
                     workers_container = self.ensure_container_running(workers_container)
             return workers_container
         except APIError as e:
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.exception(e)
             if 'address already in use' in e.response:
                 raise EnvironmentError(f"Port {self.workers_ui_port} already in use. Please configure another port or "
                                        f"stop the service/application using port {self.workers_ui_port}"
@@ -314,6 +319,7 @@ class DockerOperations:
 
         """
         if container.status in ['exited', 'created']:
+            logger.debug(f"Restarting container: {container.name}")
             container.start()
             container.reload()
         return container

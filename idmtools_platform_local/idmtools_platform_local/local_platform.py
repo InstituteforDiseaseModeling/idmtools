@@ -18,7 +18,6 @@ from idmtools.entities.isimulation import ISimulation, TSimulation
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
 from idmtools_platform_local.client.simulations_client import SimulationsClient
 from idmtools_platform_local.docker.docker_operations import default_image, DockerOperations, default_base_sir
-from idmtools_platform_local.workers.brokers import setup_broker
 
 status_translate = dict(
     created='CREATED',
@@ -65,6 +64,7 @@ class LocalPlatform(IPlatform):
     _docker_operations: Optional[DockerOperations] = field(default=None, metadata={"pickle_ignore": True})
 
     def __post_init__(self):
+        from idmtools_platform_local.workers.brokers import setup_broker
         self.supported_types = {ItemType.EXPERIMENT, ItemType.SIMULATION}
         # ensure our brokers are started
         setup_broker()
