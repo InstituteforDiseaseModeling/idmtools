@@ -11,8 +11,8 @@ def cut_iterable_to(obj: Iterable, to: int) -> Tuple[Union[List, Mapping], int]:
         obj: The iterable to cut.
         to: The number of elements to return.
 
-    Returns: 
-        A list or dictionary (depending on the type of object) of elements and 
+    Returns:
+        A list or dictionary (depending on the type of object) of elements and
         the remaining elements in the original list or dictionary.
     """
     if isinstance(obj, dict):
@@ -28,7 +28,7 @@ def cut_iterable_to(obj: Iterable, to: int) -> Tuple[Union[List, Mapping], int]:
 def list_rindex(lst, item):
     """
     Find the first place item occurs in a list, starting from the end of the list.
-    
+
     Returns:
         The index of the item in the list, or -1 if item not found in the list.
     """

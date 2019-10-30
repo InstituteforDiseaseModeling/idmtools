@@ -31,7 +31,7 @@ def is_a_plugin_of_type(value, plugin_specification: Type[PluginSpecification]) 
 
 def load_plugin_map(entrypoint: str, spec_type: Type[PluginSpecification]) -> Dict[str, Type[PluginSpecification]]:
     """
-    Load plugins from entry point with the indicated type of specification into a map. 
+    Load plugins from entry point with the indicated type of specification into a map.
 
     .. warning::
 

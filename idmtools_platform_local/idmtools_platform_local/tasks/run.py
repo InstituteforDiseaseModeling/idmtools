@@ -10,12 +10,12 @@ from dramatiq import GenericActor
 from idmtools_platform_local.status import Status
 
 logger = logging.getLogger(__name__)
-cpu_sequence = itertools.cycle(range(0, cpu_count()-1))
+cpu_sequence = itertools.cycle(range(0, cpu_count() - 1))
 
 
 class BaseTask:
     @staticmethod
-    def run_task(command: str, current_job: 'JobStatus', experiment_uuid: str, simulation_path: str,
+    def run_task(command: str, current_job: 'JobStatus', experiment_uuid: str, simulation_path: str,  # noqa: F821
                  simulation_uuid: str) -> Status:
         """
         Executes the command and record its status in the database
@@ -131,14 +131,14 @@ class BaseTask:
 
 
 class DockerBaseTask(BaseTask):
-    def docker_perform(self, command: str, experiment_uuid: str, simulation_uuid: str, container_config: dict)-> Status:
+    def docker_perform(self, command: str, experiment_uuid: str, simulation_uuid: str, container_config: dict) \
+            -> Status:
         from idmtools_platform_local.workers.utils import create_or_update_status
         container_config = container_config
         # update the config to container the volume info
 
         # Define our simulation path and our root asset path
         simulation_path = os.path.join(os.getenv("DATA_PATH", "/data"), experiment_uuid, simulation_uuid)
-        asset_dir = os.path.join(simulation_path, "Assets")
 
         container_config['detach'] = True
         container_config['stderr'] = True
@@ -178,9 +178,10 @@ class DockerBaseTask(BaseTask):
             f'-w {container_config["working_dir"]} {container_config["image"]} {command}'
         logger.info(f"Running docker command: {dcmd}")
         with open(os.path.join(simulation_path, "StdOut.txt"), "w") as out, \
-                open(os.path.join(simulation_path, "StdErr.txt"), "w") as err:
+                open(os.path.join(simulation_path, "StdErr.txt"), "w") as err:  # noqa: F841
             logger.info(f"Running {command} with docker config {str(container_config)}")
             out.write(f"{command}\n")
+
             container = client.containers.run(command=command, **container_config)
             log_reader = container.logs(stream=True)
 
@@ -225,6 +226,5 @@ class GPURunTask(GenericActor, DockerBaseTask):
         max_retries = 0
         queue_name = "gpu"
 
-    def perform(self, command: str, experiment_uuid: str, simulation_uuid: str,  container_config: dict) -> Status:
+    def perform(self, command: str, experiment_uuid: str, simulation_uuid: str, container_config: dict) -> Status:
         return self.docker_perform(command, experiment_uuid, simulation_uuid, container_config)
-

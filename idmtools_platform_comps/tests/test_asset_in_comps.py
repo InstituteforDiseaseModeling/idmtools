@@ -52,7 +52,6 @@ class TestAssetsInComps(unittest.TestCase):
                 from idmtools.entities import ISimulation
                 simulation.__class__ = ISimulation
 
-
         self.platform.refresh_status(item=experiment)
 
         # Test if we have all simulations at status CREATED

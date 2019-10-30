@@ -1,5 +1,4 @@
 import inspect
-import types
 import typing
 from functools import partial
 from inspect import signature
@@ -26,7 +25,7 @@ class ExperimentBuilder:
         A sweep definition is composed of a function and a list of values to call the function with.
 
         Args:
-            function: The sweep function, which must include a **simulation** parameter (or 
+            function: The sweep function, which must include a **simulation** parameter (or
                 whatever is specified in :attr:`~idmtools.builders.ExperimentBuilder.SIMULATION_ATTR`).
                 The function also must include EXACTLY ONE free parameter, which the values will be passed to.
                 The function can also be a partial--any Callable type will work.
@@ -44,17 +43,16 @@ class ExperimentBuilder:
                 python
                 def myFunction(simulation, a, b):
                     pass
-                
+
             Partial solution::
 
                 python
                 from functools import partial
                 func = partial(myFunction, a=3)
                 eb.add_sweep_definition(func, [1,2,3])
-                
 
             Callable class solution::
-            
+
                 class setP:
                     def __init__(self, a):
                         self.a = a

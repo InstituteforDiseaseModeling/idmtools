@@ -79,7 +79,7 @@ class IEMODExperiment(IExperiment, ABC):
             demographics_paths: The custom demographics files (single file or a list).
             force: True to always return, else throw an exception if something goes wrong.
 
-        Returns: 
+        Returns:
             None
         """
         base_simulation = EMODSimulation()
@@ -100,7 +100,7 @@ class IEMODExperiment(IExperiment, ABC):
             demographics_paths: The custom demographics files (single file or a list).
             force: True to always return, else throw an exception if something goes wrong.
 
-        Returns: 
+        Returns:
             None
         """
         self.base_simulation.load_files(config_path, campaign_path, force)
@@ -115,7 +115,7 @@ class IEMODExperiment(IExperiment, ABC):
             demographics_paths: Path to custom demographics files (single file or a list).
             force: True to always return, else throw an exception if something goes wrong.
 
-        Returns: 
+        Returns:
             None
         """
 

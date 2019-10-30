@@ -20,6 +20,7 @@ test_requirements = ['pytest', 'pytest-runner'] + build_requirements
 bamboo_requriements = [
     'atlassian-python-api~=1.14.2',
     'keyring'
+    'requests'
 ]
 
 extras = dict(test=test_requirements, packaging=build_requirements, bamboo=bamboo_requriements)

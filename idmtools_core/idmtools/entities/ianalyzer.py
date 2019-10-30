@@ -9,8 +9,8 @@ if typing.TYPE_CHECKING:
 
 class IAnalyzer(metaclass=ABCMeta):
     """
-    An abstract base class carrying the lowest level analyzer interfaces called by 
-    :class:`~idmtools.managers.experiment_manager.ExperimentManager`.
+    An abstract base class carrying the lowest level analyzer interfaces called by
+     :class:`~idmtools.managers.experiment_manager.ExperimentManager`.
     """
 
     @abstractmethod
@@ -21,7 +21,7 @@ class IAnalyzer(metaclass=ABCMeta):
         Args:
             uid: The unique id identifying this analyzer.
             working_dir: A working directory to place files.
-            parse: True to leverage the :class:`OutputParser`; False to get the raw 
+            parse: True to leverage the :class:`OutputParser`; False to get the raw
                 data in the :meth:`select_simulation_data`.
             filenames: The files for the analyzer to download.
         """
@@ -44,8 +44,8 @@ class IAnalyzer(metaclass=ABCMeta):
         Call once before running the apply on the items.
 
         Args:
-            items: Ojects with attributes of type :class:`~idmtools.core.item_id.ItemId`. IDs of one or 
-                more higher-level hierarchical objects can be obtained from these IDs in order to perform 
+            items: Objects with attributes of type :class:`~idmtools.core.item_id.ItemId`. IDs of one or
+                more higher-level hierarchical objects can be obtained from these IDs in order to perform
                 tasks with them.
 
         Returns:
@@ -70,10 +70,10 @@ class IAnalyzer(metaclass=ABCMeta):
         In parallel for each simulation, consume raw data from filenames and emit selected data.
 
         Args:
-            data: A dictionary associating filename with content for simulation data. 
+            data: A dictionary associating filename with content for simulation data.
             item: :class:`~idmtools.entities.iitem.IItem` object that the passed data is associated with.
 
-        Returns: 
+        Returns:
             Selected data for the given item.
         """
         return None

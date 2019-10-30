@@ -20,8 +20,8 @@ logger = getLogger(__name__)
 
 def pool_worker_initializer(func, analyzers, cache, platform) -> NoReturn:
     """
-    Initialize the pool worker, which allows the process pool to associate the analyzers, cache, 
-    and path mapping to the function executed to retrieve data. Using an initializer improves performance.
+    Initialize the pool worker, which allows the process pool to associate the analyzers, cache, and
+    path mapping to the function executed to retrieve data. Using an initializer improves performance.
 
     Args:
         func: The function that the pool will call.
@@ -96,8 +96,8 @@ class AnalyzeManager(CacheEnabled):
     def _get_items_to_analyze(self) -> 'dict':
         """
         Get a list of items derived from :meth:`self._items` that are available to analyze.
-        
-        Returns: 
+
+        Returns:
             A list of :class:`~idmtools.entities.iitem.IItem` objects.
 
         """
@@ -175,8 +175,8 @@ class AnalyzeManager(CacheEnabled):
         """
         Determines if an exception has occurred in the processing of items, printing any related information.
 
-        Returns: 
-            A Boolean indicating if an exception has occurred. 
+        Returns:
+            A Boolean indicating if an exception has occurred.
 
         """
         exception = self.cache.get(self.EXCEPTION_KEY, default=None)
@@ -223,7 +223,7 @@ class AnalyzeManager(CacheEnabled):
             worker_pool: A pool of workers.
             start_time: A relative time for updating the user on runtime.
 
-        Returns: 
+        Returns:
             False if an exception occurred processing **.map** on any item; otherwise True (succeeded).
 
         """
@@ -268,7 +268,7 @@ class AnalyzeManager(CacheEnabled):
         Args:
             worker_pool: A pool of workers.
 
-        Returns: 
+        Returns:
             An analyzer ID keyed dictionary of finalize results.
 
         """
@@ -297,10 +297,10 @@ class AnalyzeManager(CacheEnabled):
 
     def analyze(self) -> 'bool':
         """
-        Process the provided items with the provided analyzers. This is the main driver method of 
-        :class:`AnalyzeManager`. 
+        Process the provided items with the provided analyzers. This is the main driver method of
+        :class:`AnalyzeManager`.
 
-        Returns: 
+        Returns:
             True on success; False on failure/exception.
 
         """
@@ -329,7 +329,7 @@ class AnalyzeManager(CacheEnabled):
 
         # Initialize the cache
         logger.debug("Initializing Analysis Cache")
-        self.initialize_cache(shards=n_processes*2, eviction_policy='none')
+        self.initialize_cache(shards=n_processes * 2, eviction_policy='none')
 
         # do any platform-specific initializations
         logger.debug("Triggering per group functions")

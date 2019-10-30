@@ -4,11 +4,8 @@ import os
 import socket
 import socketserver
 import subprocess
-import time
 import unittest.mock
-
 import pytest
-
 from idmtools_platform_local.docker.docker_operations import DockerOperations
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.confg_local_runner_test import get_test_local_env_overrides
@@ -99,6 +96,7 @@ class TestDockerOperations(unittest.TestCase):
             httpd.server_activate()
 
             with self.assertRaises(EnvironmentError) as e:
+                print(e)
                 pl.create_services()
             httpd.server_close()
         pl.cleanup()

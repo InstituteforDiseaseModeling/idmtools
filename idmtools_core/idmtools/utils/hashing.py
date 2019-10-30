@@ -30,7 +30,7 @@ class _ConsistentSet(object):
 
 class _MyHash(object):
     """
-    A class used to hash objects that won't normally pickle. 
+    A class used to hash objects that won't normally pickle.
     """
 
     def __init__(self, *args):
@@ -38,8 +38,8 @@ class _MyHash(object):
 
 
 class Hasher(Pickler):
-    """ 
-    A subclass of pickler to do hashing, rather than pickling. 
+    """
+    A subclass of pickler to do hashing, rather than pickling.
     """
 
     def __init__(self, hash_name='md5'):
@@ -103,11 +103,11 @@ class Hasher(Pickler):
 
 
 def hash_obj(obj, hash_name='md5'):
-    """ 
+    """
     Quick calculation of a hash to identify uniquely Python objects.
 
     Args:
-        hash_name: The hashing algorithm to use. 'md5' is faster; 'sha1' is considered safer. 
+        hash_name: The hashing algorithm to use. 'md5' is faster; 'sha1' is considered safer.
     """
     hasher = Hasher(hash_name=hash_name)
     return hasher.hash(obj)

@@ -59,7 +59,7 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         """
         For backward-compatibility purposes.
 
-        Returns: 
+        Returns:
             The last ``TExperimentBuilder``.
         """
         return list(self.builders)[-1] if self.builders and len(self.builders) > 0 else None
@@ -72,7 +72,7 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         Args:
             builder: The new builder to be used.
 
-        Returns: 
+        Returns:
             None
         """
 
@@ -89,7 +89,7 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         Args:
             builder: A builder to be added.
 
-        Returns: 
+        Returns:
             None
         """
         from idmtools.builders import ExperimentBuilder
@@ -150,7 +150,7 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         Return a new simulation object.
         The simulation will be copied from the base simulation of the experiment.
 
-        Returns: 
+        Returns:
             The created simulation.
         """
         sim = copy.deepcopy(self.base_simulation)

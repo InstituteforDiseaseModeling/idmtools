@@ -120,7 +120,6 @@ class TestCopy(ITestWithPersistence):
     @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
     def test_deepcopy_platform(self, login_mock):
         from idmtools.core.platform_factory import Platform
-        import dataclasses
         p = Platform('COMPS')
 
         pp = copy.deepcopy(p)

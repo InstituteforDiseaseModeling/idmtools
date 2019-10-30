@@ -28,7 +28,7 @@ class EMODSimulation(ISimulation):
             name: The name of the parameter.
             default: Optional, the devault value.
 
-        Returns: 
+        Returns:
             The value of the parameter.
         """
         return self.config.get(name, default)
@@ -40,7 +40,7 @@ class EMODSimulation(ISimulation):
         Args:
             params: A dictionary with new values.
 
-        Returns: 
+        Returns:
             None
         """
         self.config.update(params)
@@ -68,7 +68,7 @@ class EMODSimulation(ISimulation):
             demographics_paths: The custom demographics files (single file or a list).
             force: True to always return, else throw an exception if something goes wrong.
 
-        Returns: 
+        Returns:
             None
         """
 
@@ -118,7 +118,7 @@ class EMODSimulation(ISimulation):
         Args:
             demographics_files: The demographics files to update (single file or a list).
 
-        Returns: 
+        Returns:
             None
         """
         if isinstance(demographics_files, collections.Iterable) and not isinstance(demographics_files, str):

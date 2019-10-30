@@ -21,6 +21,7 @@ data_path = os.path.abspath(os.path.join(current_directory, "..", "data"))
 
 logger = getLogger(__name__)
 
+
 @dataclass(repr=False)
 class TestPlatform(IPlatform):
     """
@@ -53,7 +54,7 @@ class TestPlatform(IPlatform):
     def post_setstate(self):
         self.initialize_test_cache()
 
-    def _create_batch(self, batch: 'TEntityList', item_type: 'ItemType') -> 'List[UUID]':
+    def _create_batch(self, batch: 'TEntityList', item_type: 'ItemType') -> 'List[UUID]':  # noqa: F821
         if item_type == ItemType.SIMULATION:
             return self._create_simulations(simulation_batch=batch)
 
@@ -68,7 +69,8 @@ class TestPlatform(IPlatform):
                     if sim.uid == item_id:
                         obj = sim
                         break
-                if obj: break
+                if obj:
+                    break
         elif item_type == ItemType.EXPERIMENT:
             obj = self.experiments.get(item_id)
 
@@ -129,7 +131,8 @@ class TestPlatform(IPlatform):
             simulation.status = status
             self.simulations.set(experiment_uid, simulations)
             number -= 1
-            if number <= 0: return
+            if number <= 0:
+                return
 
     def run_simulations(self, experiment: TExperiment) -> None:
         from idmtools.core import EntityStatus

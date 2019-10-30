@@ -66,5 +66,3 @@ class RExperiment(IExperiment, IDockerExperiment):
         if self.add_config_file:
             commands_args.append(self.config_file_name)
         self.command = CommandLine(*commands_args)
-
-

@@ -4,7 +4,7 @@ from enum import Enum
 from getpass import getpass
 from logging import getLogger
 
-#TODo Make this configurable
+# TODO Make this configurable
 from typing import Tuple
 
 BAMBOO_URL = 'http://idm-bamboo.internal.idm.ctr:8085'
@@ -62,7 +62,7 @@ def get_bamboo_eradication_url(plan: EradicationBambooBuilds, build_number,
     return ERADICATION_BAMBOO_URL_TEMPLATE.format(plan.value, build_number, extension)
 
 
-def get_bamboo_creds() -> Tuple[str,str]:
+def get_bamboo_creds() -> Tuple[str, str]:
     """
     Get the Username and Password for bamboo using keyring
 
@@ -81,7 +81,7 @@ def get_bamboo_creds() -> Tuple[str,str]:
     return username, password
 
 
-def get_bamboo_client() -> 'Bamboo':
+def get_bamboo_client() -> 'Bamboo':  # noqa F821
     """
     Creates the bamboo API client
 
@@ -94,7 +94,7 @@ def get_bamboo_client() -> 'Bamboo':
     return client
 
 
-def get_bamboo_latest_successful(plan: EradicationBambooBuilds, client: 'Bamboo' = None,
+def get_bamboo_latest_successful(plan: EradicationBambooBuilds, client: 'Bamboo' = None,  # noqa F821
                                  extension: EradicationPlatformExtension = EradicationPlatformExtension.LINUX):
     """
     Get the url for Eradication from the last successful build of the specified bamboo plan
@@ -110,7 +110,7 @@ def get_bamboo_latest_successful(plan: EradicationBambooBuilds, client: 'Bamboo'
         Url of latest eradication exe
     """
     if client is None:
-        client=get_bamboo_client()
+        client = get_bamboo_client()
     project, short = plan.value.split('-')
     results = list(client.results(project, short))
     for result in results:
@@ -120,7 +120,7 @@ def get_bamboo_latest_successful(plan: EradicationBambooBuilds, client: 'Bamboo'
     raise FileNotFoundError(f"Could not find a successful build for plan {plan.value}. Please check plan name again")
 
 
-def download_latest_bamboo(plan: EradicationBambooBuilds, out_path: str, client: 'Bamboo' = None,
+def download_latest_bamboo(plan: EradicationBambooBuilds, out_path: str, client: 'Bamboo' = None,  # noqa F821
                            extension: EradicationPlatformExtension = EradicationPlatformExtension.LINUX) -> str:
     """
     Downloads the latest successful build for an Eradication Bamboo Plan to specified path

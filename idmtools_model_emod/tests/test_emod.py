@@ -1,7 +1,6 @@
 import json
 import os
 import pytest
-from COMPS.Data import Experiment
 from typing import Dict
 
 from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
@@ -23,10 +22,10 @@ DEFAULT_DEMOGRAPHICS_JSON = os.path.join(COMMON_INPUT_PATH, "files", "demographi
 DEFAULT_ERADICATION_PATH = os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe")
 
 emod_version = '2.20.0'
-EMOD_TYPES=dict(COMPS=EMODExperiment,
-                Local=DockerEMODExperiment)
-ERADICATION_BINARIES=dict(COMPS=os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe"),
-                          Local=get_github_eradication_url(emod_version))
+EMOD_TYPES = dict(COMPS=EMODExperiment,
+                  Local=DockerEMODExperiment)
+ERADICATION_BINARIES = dict(COMPS=os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe"),
+                            Local=get_github_eradication_url(emod_version))
 
 
 @pytest.mark.comps

@@ -28,7 +28,7 @@ class IdmConfigParser:
             dir_path: The INI configuration file directory.
             file_name: The INI file name.
 
-        Returns: 
+        Returns:
             An :class:`IdmConfigParser` instance.
         """
         if not cls._instance:
@@ -45,7 +45,7 @@ class IdmConfigParser:
             section: The INI section from which to retrieve configuration values.
             field_type: The requested data types.
 
-        Returns: 
+        Returns:
             The configuration values as a dictionary.
         """
         import ast
@@ -71,14 +71,14 @@ class IdmConfigParser:
     @classmethod
     def _find_config(cls, dir_path: str = None, file_name: str = default_config) -> None:
         """
-        Recursively search for the INI configuration file starting from the **dir_path** provided 
+        Recursively search for the INI configuration file starting from the **dir_path** provided
         up to the root, stopping once one is found.
 
         Args:
-            dir_path: The directory to start looking for the INI configuration file. 
+            dir_path: The directory to start looking for the INI configuration file.
             file_name: The name of the configuration file to look for.
 
-        Returns:    
+        Returns:
             None
         """
         full_dir_path = os.path.abspath(dir_path)
@@ -102,7 +102,7 @@ class IdmConfigParser:
             dir_path: The directory to start looking for the INI configuration file.
             file_name: The name of the configuration file to look for.
 
-        Returns: 
+        Returns:
             None
         """
         # init logging here as this is our most likely entry-point into an idm-tools "application"
@@ -131,7 +131,7 @@ class IdmConfigParser:
         Args:
             section: The INI section name where we retrieve all fields.
 
-        Returns: 
+        Returns:
             All fields as a dictionary.
         """
         cls.ensure_init(force=force)
@@ -158,7 +158,7 @@ class IdmConfigParser:
         Args:
             block_name: The INI section name where we retrieve all fields.
 
-        Returns: 
+        Returns:
             All fields as a dictionary.
         """
         cls.ensure_init(force=True)
@@ -178,7 +178,7 @@ class IdmConfigParser:
             section: The INI section name.
             option: The INI field name.
 
-        Returns: 
+        Returns:
             A configuration value as a string.
         """
         cls.ensure_init(force=force)
@@ -199,7 +199,7 @@ class IdmConfigParser:
             dir_path: The directory to search for the INI configuration file.
             file_name: The configuration file name to search for.
 
-        Returns: 
+        Returns:
             None
         """
         if cls._instance is None:
@@ -213,7 +213,7 @@ class IdmConfigParser:
         """
         Check which INI configuration file is being used.
 
-        Returns: 
+        Returns:
             The INI file full path that is loaded.
         """
         cls.ensure_init()
@@ -224,7 +224,7 @@ class IdmConfigParser:
         """
         Display the INI file path being used.
 
-        Returns: 
+        Returns:
             None
         """
         cls.ensure_init(force=True)
@@ -235,7 +235,7 @@ class IdmConfigParser:
         """
         Display the INI file being used.
 
-        Returns: 
+        Returns:
             None
         """
         cls.ensure_init(force=True)
@@ -246,7 +246,6 @@ class IdmConfigParser:
             print(read_data)
 
     @classmethod
-
     def display_config_block_details(cls, block):
         if cls.found_ini():
             block_details = cls.get_section(block)
@@ -271,9 +270,9 @@ class IdmConfigParser:
     @classmethod
     def clear_instance(cls) -> None:
         """
-        Uninitialize and clean the :class:`IdmConfigParser` instance. 
+        Uninitialize and clean the :class:`IdmConfigParser` instance.
 
-        Returns: 
+        Returns:
             None
         """
         cls._config = None

@@ -5,7 +5,6 @@ import os
 from collections import defaultdict
 from dataclasses import dataclass, field
 from logging import getLogger
-from pathlib import Path
 from typing import Dict, List, NoReturn, Optional, Type
 from uuid import UUID
 from docker.models.containers import Container
@@ -116,7 +115,7 @@ class LocalPlatform(IPlatform):
             return self.get_platform_item(platform_item.parent_id, ItemType.EXPERIMENT)
         return None
 
-    def _create_batch(self, batch: 'TEntityList', item_type: 'ItemType') -> 'List[UUID]':
+    def _create_batch(self, batch: 'TEntityList', item_type: 'ItemType') -> 'List[UUID]':  # noqa: F821
         if item_type == ItemType.SIMULATION:
             ids = self._create_simulations(simulations_batch=batch)
         elif item_type == ItemType.EXPERIMENT:
@@ -292,7 +291,7 @@ class LocalPlatform(IPlatform):
             remote_path = "/".join([path, asset.relative_path]) if asset.relative_path else path
             self._docker_operations.create_directory(remote_path)
             items[remote_path].append(
-                (file_path if file_path else asset.content, asset.filename if asset.filename else file_path ))
+                (file_path if file_path else asset.content, asset.filename if asset.filename else file_path))
         return items
 
     def send_asset_to_docker(self, asset: Asset, path: str, worker: Container = None) -> NoReturn:

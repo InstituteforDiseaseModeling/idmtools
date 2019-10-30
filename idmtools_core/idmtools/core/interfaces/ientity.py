@@ -69,12 +69,12 @@ class IEntity(IItem, metaclass=ABCMeta):
         return self.status in (EntityStatus.SUCCEEDED, EntityStatus.FAILED)
 
     @property
-
     def succeeded(self):
         return self.status == EntityStatus.SUCCEEDED
 
     def __hash__(self):
         return id(self.uid)
+
 
 TEntity = typing.TypeVar("TEntity", bound=IEntity)
 TEntityList = typing.List[TEntity]

@@ -106,7 +106,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         Enforce any COMPS-specific demands on experiment names.
         Args:
             experiment_name: name of the experiment
-        Returns: the experiment name allowed for use
+        Returns:the experiment name allowed for use
         """
         for c in ['/', '\\', ':']:
             experiment_name = experiment_name.replace(c, '_')
@@ -201,7 +201,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         if isinstance(platform_item, COMPSExperiment):
             # Create an experiment
             obj = experiment_factory.create(platform_item.tags.get("type"), tags=platform_item.tags,
-                                                   name=platform_item.name, fallback=StandardExperiment)
+                                            name=platform_item.name, fallback=StandardExperiment)
             # Set the correct attributes
             obj.uid = platform_item.id
             obj.comps_experiment = platform_item
@@ -262,7 +262,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
             return
 
-        raise NotImplemented("comps_platform.refresh_status only implemented for Experiments")
+        raise NotImplementedError("comps_platform.refresh_status only implemented for Experiments")
 
     def _get_file_for_collection(self, collection_id: 'UUID', file_path: str) -> 'NoReturn':
         print(f"Cache miss for {collection_id} {file_path}")

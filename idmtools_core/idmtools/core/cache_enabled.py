@@ -3,11 +3,8 @@ import shutil
 import tempfile
 import typing
 from dataclasses import dataclass, field
-from logging import getLogger
 from multiprocessing import current_process
-
 from logging import getLogger, DEBUG
-from threading import get_ident
 from diskcache import Cache, DEFAULT_SETTINGS, FanoutCache
 
 if typing.TYPE_CHECKING:

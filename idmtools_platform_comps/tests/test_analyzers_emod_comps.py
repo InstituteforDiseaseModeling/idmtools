@@ -1,7 +1,5 @@
 import os
 import sys
-import uuid
-
 import pytest
 import json
 from functools import partial
@@ -116,9 +114,8 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         del_file(os.path.join(analyzer_path, 'population.png'))
         self.create_experiment()
 
-        #self.exp_id = uuid.UUID("fc59240c-07db-e911-a2be-f0921c167861")
+        # self.exp_id = uuid.UUID("fc59240c-07db-e911-a2be-f0921c167861")
         filenames = ['output/InsetChart.json']
-
 
         sys.path.insert(0, analyzer_path)
         from PopulationAnalyzer import PopulationAnalyzer
@@ -166,7 +163,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
 
         analyzers = [TimeseriesAnalyzer(filenames=filenames)]
 
-        #self.exp_id = uuid.UUID("fc59240c-07db-e911-a2be-f0921c167861")
+        # self.exp_id = uuid.UUID("fc59240c-07db-e911-a2be-f0921c167861")
         am = AnalyzeManager(platform=self.p, ids=[(self.exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
 

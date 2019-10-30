@@ -1,7 +1,6 @@
 import typing
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.core import ExperimentNotFound, UUID, ItemType
-from idmtools.services.platforms import PlatformPersistService
 
 if typing.TYPE_CHECKING:
     from idmtools.entities.iplatform import TPlatform

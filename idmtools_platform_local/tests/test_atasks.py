@@ -5,7 +5,6 @@ from idmtools_test import COMMON_INPUT_PATH
 import os
 import shutil
 from unittest import TestCase
-from idmtools_platform_local.tasks.create_experiment import CreateExperimentTask
 from idmtools_platform_local.tasks.run import RunTask
 
 # These tests are simulating behaviours that normally would occur within the local worker container
@@ -24,7 +23,7 @@ class TestTasks(TestCase):
     def tearDownClass(cls) -> None:
         try:
             shutil.rmtree(cls.local_path)
-        except:
+        except Exception:
             pass
 
     def setUp(self) -> None:

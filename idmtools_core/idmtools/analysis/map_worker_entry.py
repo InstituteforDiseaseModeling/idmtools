@@ -1,5 +1,4 @@
 import itertools
-import time
 import traceback
 import typing
 from logging import getLogger, DEBUG
@@ -38,15 +37,15 @@ def _get_mapped_data_for_item(item: 'TItem', analyzers: 'TAnalyzerList', cache: 
     """
 
     Args:
-        item: The :class:`~idmtools.entities.iitem.IItem` object to call analyzer 
+        item: The :class:`~idmtools.entities.iitem.IItem` object to call analyzer
             :meth:`~idmtools.analysis.AddAnalyzer.map` methods on.
-        analyzers: The :class:`~idmtools.analysis.IAnalyzer` items with 
+        analyzers: The :class:`~idmtools.analysis.IAnalyzer` items with
             :meth:`~idmtools.analysis.AddAnalyzer.map` methods to call on the provided items.
-        cache: The disk cache object to store item :meth:`~idmtools.analysis.AddAnalyzer.map` 
+        cache: The disk cache object to store item :meth:`~idmtools.analysis.AddAnalyzer.map`
             results in.
         platform: A platform object to query for information.
 
-    Returns: 
+    Returns:
         False if an exception occurred; else True (succeeded).
 
     """
@@ -108,13 +107,15 @@ def _get_mapped_data_for_item(item: 'TItem', analyzers: 'TAnalyzerList', cache: 
     if logger.isEnabledFor(DEBUG):
         logger.debug(f"Setting result to cache on {item.uid}")
     done = False
-    retries=0
+    retries = 0
     while not done and retries < 6:
         try:
             cache.set(item.uid, selected_data)
             done = True
         except TimeoutError as e:
-            retries+=1
+            retries += 1
+            if logger.isEnabledFor(DEBUG):
+                logger.exception(e)
             pass
         if retries > 5:
             raise StopAsyncIteration("Error set value to cache")

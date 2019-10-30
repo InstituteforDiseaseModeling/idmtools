@@ -84,7 +84,7 @@ class TestAnalyzeManager(unittest.TestCase):
             # Fail a few or all
             if test_name == 'all':
                 self.platform.set_simulation_status(test_exp.uid, EntityStatus.SUCCEEDED)
-            elif test_name =='none':
+            elif test_name == 'none':
                 self.platform.set_simulation_status(test_exp.uid, EntityStatus.FAILED)
             else:
                 self.platform.set_simulation_status(test_exp.uid, EntityStatus.FAILED)
@@ -109,7 +109,6 @@ class TestAnalyzeManager(unittest.TestCase):
             else:
                 self.assertRaises(AnalyzeManager.ItemsNotReady, am._get_items_to_analyze)
 
-
             # test max_items 1
             am = AnalyzeManager(self.platform, ids=[(test_exp.uid, ItemType.EXPERIMENT)], max_items=1)
             items_to_analyze = am._get_items_to_analyze()
@@ -118,7 +117,6 @@ class TestAnalyzeManager(unittest.TestCase):
             potential_items_uids = {item.uid for item in self.platform.get_children(test_exp.uid, ItemType.EXPERIMENT, force=True) if item.status == EntityStatus.SUCCEEDED}
             for actual_item_uid in items_to_analyze.keys():
                 self.assertTrue(actual_item_uid in potential_items_uids)
-
 
     def test_add_analyzer(self):
         self.assertEqual(len(self.analyze_manager.analyzers), 0)
