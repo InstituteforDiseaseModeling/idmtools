@@ -141,7 +141,9 @@ class DockerOperations:
                         if spinner:
                             spinner.stop()
                         registry = self.workers_image.split("/")[0]
-                        print(f"Authentication needed for {registry}")
+                        print(f"\nAuthentication needed for {registry}.\nIt is best to login manually outside of "
+                              f"idmtools using\n docker login {registry}\nas this will save your password\n"
+                              f"Prompting for credentials for one time user:\n")
                         username = input(f'{registry} Username:')
                         password = getpass('Password:')
                         self.client.login(username, password, registry=registry)
