@@ -29,6 +29,7 @@ class TestDockerOperations(unittest.TestCase):
         check_port_is_open(6379)
         dm.stop_services()
 
+    @pytest.mark.timeout(60)
     def test_create_db_starts(self):
         """
         This test is mostly scaffolding but could be useful in future for troubleshooting
@@ -42,6 +43,7 @@ class TestDockerOperations(unittest.TestCase):
 
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     @restart_local_platform(silent=True)
+    @pytest.mark.timeout(60)
     def test_create_stack_starts(self, std_capture):
         dm = DockerOperations(**get_test_local_env_overrides())
         dm.cleanup(True)
@@ -65,6 +67,7 @@ class TestDockerOperations(unittest.TestCase):
             self.assertEqual(0, result.returncode)
             self.assertIn('Hello World!', result.stdout.decode('utf-8'))
 
+    @pytest.mark.timeout(60)
     def test_start_stopped_container(self):
         # create first
         dm = DockerOperations(**get_test_local_env_overrides())
@@ -83,6 +86,7 @@ class TestDockerOperations(unittest.TestCase):
     # skip this test in docker in docker tests since the port binding is actually on the true host
     @linux_only
     @skip_api_host
+    @pytest.mark.timeout(60)
     def test_port_taken_has_coherent_error(self):
 
         pl = DockerOperations(workers_ui_port=10000, **get_test_local_env_overrides())

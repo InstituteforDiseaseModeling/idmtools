@@ -158,8 +158,12 @@ class DockerOperations:
                           f'Please check the name of the image or ensure you have built that image locally.'
                           f'You can test a manual pull using \n'
                           f'docker pull {self.workers_image}')
+                    logger.exception(e)
+                    retries += 1
                     raise
                 else:
+                    logger.exception(e)
+                    retries += 1
                     raise
         if retries > 2:
             raise ValueError("Could not run workers image. Likely causes are:\n\t- A used port"
