@@ -7,6 +7,7 @@ import tarfile
 import time
 from concurrent.futures.thread import ThreadPoolExecutor
 from dataclasses import dataclass
+from getpass import getpass
 from io import BytesIO
 from logging import getLogger
 from pathlib import Path
@@ -87,7 +88,7 @@ class DockerOperations:
         self.client = docker.from_env()
 
     @optional_yaspin_load(text="Ensure IDM Tools Local Platform services are loaded")
-    def create_services(self) -> NoReturn:
+    def create_services(self, spinner=None) -> NoReturn:
         """
         Create all the components of our
 
@@ -122,16 +123,47 @@ class DockerOperations:
             self.get_redis()
             self.get_postgres()
         except Exception as e:
-            print(e)
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.exception(e)
             raise e
         # wait on services to start
         # in the future this could be improved with service detection
         time.sleep(5)
-        self.get_workers()
+
+        retries = 0
+        while retries < 3:
+            try:
+                self.get_workers()
+            except APIError as e:
+                if e.status_code in [500]:
+                    content = e.response.json()
+                    if 'message' in content and 'unauthorized' in content['message']:
+                        if spinner:
+                            spinner.stop()
+                        registry = self.workers_image.split("/")[0]
+                        print(f"Authentication needed for {registry}")
+                        username = input(f'{registry} Username:')
+                        password = getpass('Password:')
+                        self.client.login(username, password, registry=registry)
+                        retries += 1
+                        if spinner:
+                            spinner.start()
+                    if logger.isEnabledFor(logging.DEBUG):
+                        logger.exception(e)
+                elif e.status_code == 404:
+                    print(f'\n\nCould not locate a docker image with the tag: {self.workers_image}\n'
+                          f'Please check the name of the image or ensure you have built that image locally.'
+                          f'You can test a manual pull using \n'
+                          f'docker pull {self.workers_image}')
+                    raise
+        if retries > 2:
+            raise ValueError("Could not run workers image. Likely causes are:\n\t- A used port"
+                             "\n\t-A service being down suchs as redis or postgres"
+                             "\n\t-Authentication issues with the docker registry")
         time.sleep(5)
 
     @optional_yaspin_load(text="Restarting IDM-Tools services")
-    def restart_all(self) -> NoReturn:
+    def restart_all(self, spinner=None) -> NoReturn:
         """
         Restart all the services IDM-Tools services
 
@@ -152,7 +184,7 @@ class DockerOperations:
             workers.restart()
 
     @optional_yaspin_load(text="Stopping IDM Tools Local Platform services")
-    def stop_services(self) -> NoReturn:
+    def stop_services(self, spinner=None) -> NoReturn:
         """
         Stops all running IDM Tools services
 
