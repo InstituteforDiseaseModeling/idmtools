@@ -27,6 +27,7 @@ ERADICATION_BIN_NAME = 'Eradication.exe' if os.name == 'nt' else "Eradication"
 class IEMODExperiment(IExperiment, ABC):
     eradication_path: str = field(default=None, compare=False, metadata={"md": True})
     demographics: collections.OrderedDict = field(default_factory=lambda: collections.OrderedDict())
+    legacy_exe: 'bool' = field(default=False, metadata={"md": True})
 
     def __post_init__(self, simulation_type):
         super().__post_init__(simulation_type=EMODSimulation)
@@ -147,14 +148,16 @@ class IEMODExperiment(IExperiment, ABC):
 
         # Add Eradication.exe to assets
         logger.debug(f"Adding {self.eradication_path}")
-        self.assets.add_asset(Asset(absolute_path=self.eradication_path, filename=ERADICATION_BIN_NAME))
+        self.assets.add_asset(Asset(absolute_path=self.eradication_path, filename=ERADICATION_BIN_NAME),
+                              fail_on_duplicate=False)
 
         # Clean up existing demographics files in case config got replaced
-        config_demo_files = self.base_simulation.config["Demographics_Filenames"]
-        exp_demo_files = list(self.demographics.keys())
-        for f in exp_demo_files:
-            if f not in config_demo_files:
-                self.demographics.pop(f)
+        config_demo_files = self.base_simulation.config.get("Demographics_Filenames", None)
+        if config_demo_files:
+            exp_demo_files = list(self.demographics.keys())
+            for f in exp_demo_files:
+                if f not in config_demo_files:
+                    self.demographics.pop(f)
 
         # Add demographics to assets
         for filename, content in self.demographics.items():
@@ -164,8 +167,12 @@ class IEMODExperiment(IExperiment, ABC):
     def pre_creation(self):
         super().pre_creation()
 
+        # Input path is different for legacy exes
+        input_path = "./Assets;." if not self.legacy_exe else "./Assets"
+
         # Create the command line according to the location of the model
-        self.command = CommandLine(f"Assets/{ERADICATION_BIN_NAME}", "--config config.json", "--input-path ./Assets;.")
+        self.command = CommandLine(f"Assets/{ERADICATION_BIN_NAME}", "--config config.json",
+                                   f"--input-path {input_path}")
 
 
 @dataclass(repr=False)
