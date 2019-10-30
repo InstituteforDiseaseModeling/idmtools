@@ -35,8 +35,8 @@ test-docker: ## Run our  docker tests as well
 
 test-all: ## Run our  docker tests as well
 	@+$(IPY) "import os; os.chdir('tests'); \
-	    os.environ['DOCKER_REPO'] = 'idm-docker-staging'; \
-	    os.system('py.test --junitxml=test_results.xml')"
+	    os.environ['DOCKER_REPO'] = 'idm-docker-staging'; os.environ['NO_SPINNER'] = '1' ; \
+	    os.system('py.test -v --junitxml=test_results.xml')"
 
 docker-cleanup:
 	docker stop  idmtools_workers idmtools_postgres idmtools_redis

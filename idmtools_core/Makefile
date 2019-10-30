@@ -27,7 +27,7 @@ test: ## Run our tests
 
 test-all: ## Run our  docker tests as well
 	@+$(IPY) "import os; os.chdir('tests'); \
-	os.environ['DOCKER_REPO'] = 'idm-docker-staging'; \
+	os.environ['DOCKER_REPO'] = 'idm-docker-staging'; os.environ['NO_SPINNER'] = '1' ;\
 	os.system('py.test -v -p no:warnings --junitxml=test_results.xml')"
 
 coverage: ## Generate a code-coverage report
