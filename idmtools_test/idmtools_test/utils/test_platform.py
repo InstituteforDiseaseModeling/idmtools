@@ -99,6 +99,8 @@ class TestPlatform(IPlatform):
             return self.experiments.get(platform_item.parent_id)
 
     def _create_experiment(self, experiment: 'TExperiment') -> UUID:
+        if not self.is_supported_experiment(experiment):
+            raise ValueError("The specified experiment is not supported on this platform")
         uid = uuid4()
         experiment.uid = uid
         self.experiments.set(uid, experiment)

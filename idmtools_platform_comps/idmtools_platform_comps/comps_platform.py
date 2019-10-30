@@ -113,6 +113,9 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         return experiment_name
 
     def _create_experiment(self, experiment: 'TExperiment') -> 'UUID':
+
+        if not self.is_supported_experiment(experiment):
+            raise ValueError("The specified experiment is not supported on this platform")
         self._login()
 
         # Cleanup the name
