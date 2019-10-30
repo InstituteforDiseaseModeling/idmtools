@@ -127,7 +127,7 @@ class TestExperimentSimulations(ITestWithPersistence):
         self.assertEqual(len(sims), 3)
 
         sim = sims[0]
-        self.assertTrue(isinstance(exp, EMODSimulation))
+        self.assertTrue(isinstance(sim, EMODSimulation))
         self.assertIsNotNone(sim.parent)
 
 
