@@ -1,4 +1,5 @@
 import os
+import typing
 from dataclasses import dataclass, field
 from logging import getLogger
 from typing import Dict, List, Type
@@ -10,7 +11,8 @@ import numpy as np
 from idmtools.core import EntityStatus, ItemType
 from idmtools.core.interfaces.iitem import TItem
 from idmtools.entities import IPlatform
-from idmtools.entities.iexperiment import TExperiment
+from idmtools.entities.iexperiment import TExperiment, IExperiment, ILinuxExperiment, IWindowsExperiment, \
+    IGPUExperiment, IDockerExperiment
 from idmtools.entities.isimulation import TSimulation
 from idmtools.registry.platform_specification import example_configuration_impl, get_platform_impl, \
     get_platform_type_impl, PlatformSpecification
@@ -27,6 +29,14 @@ class TestPlatform(IPlatform):
     """
     Test platform simulating a working platform to use in the test suites.
     """
+
+    def supported_experiment_types(self) -> List[typing.Type]:
+        os_ex = IWindowsExperiment if os.name == "nt" else ILinuxExperiment
+        return [IExperiment, os_ex]
+
+    def unsupported_experiment_types(self) -> List[typing.Type]:
+        os_ex = IWindowsExperiment if os.name != "nt" else ILinuxExperiment
+        return [IGPUExperiment, IDockerExperiment, os_ex]
 
     __test__ = False  # Hide from test discovery
 
