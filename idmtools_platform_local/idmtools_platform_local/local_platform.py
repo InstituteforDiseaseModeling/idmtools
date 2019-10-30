@@ -65,6 +65,7 @@ class LocalPlatform(IPlatform):
 
     def __post_init__(self):
         from idmtools_platform_local.workers.brokers import setup_broker
+        logger.debug("Setting up local platform")
         self.supported_types = {ItemType.EXPERIMENT, ItemType.SIMULATION}
         # ensure our brokers are started
         setup_broker()

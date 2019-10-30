@@ -21,7 +21,7 @@ def setup_broker():
     if os.getenv("UNIT_TESTS") == "1":
         redis_broker = StubBroker()
         redis_backend = StubBackend()
-    else:
+    elif redis_broker is None and redis_backend is None:
         logger.debug(f"Using Redis URL: {REDIS_URL}")
         redis_broker = RedisBroker(url=REDIS_URL)
         redis_backend = RedisBackend(url=REDIS_URL)

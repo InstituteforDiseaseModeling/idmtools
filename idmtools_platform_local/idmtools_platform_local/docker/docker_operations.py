@@ -135,6 +135,7 @@ class DockerOperations:
             try:
                 self.get_workers()
                 logger.debug("services started. waiting for platform to become ready")
+                break
             except APIError as e:
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.exception(e)

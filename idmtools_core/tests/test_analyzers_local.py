@@ -42,13 +42,14 @@ class TestAnalyzeManager(ITestWithPersistence):
 
     @classmethod
     def setUpClass(cls) -> None:
-        cls.case_name = os.path.basename(__file__) + "--" + cls._testMethodName
-        from idmtools_platform_local.docker.docker_operations import DockerOperations
-        do = DockerOperations()
-        do.cleanup()
-        cls.platform = Platform('Local')
+        from idmtools_platform_local.local_platform import LocalPlatform
+        cls.platform: LocalPlatform = Platform('Local')
+        # cleanup first
+        cls.platform._docker_operations.cleanup()
+        cls.platform._docker_operations.create_services()
 
-        pe = PythonExperiment(name=cls.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
+        pe = PythonExperiment(name=os.path.basename(__file__) + "--"  + cls.__name__,
+                              model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
 
         def param_a_update(simulation, value):
@@ -72,6 +73,7 @@ class TestAnalyzeManager(ITestWithPersistence):
     @pytest.mark.docker
     @pytest.mark.timeout(60)
     def test_AddAnalyzer(self):
+        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         analyzers = [AddAnalyzer()]
 
         am = AnalyzeManager(configuration={}, platform=self.platform,
