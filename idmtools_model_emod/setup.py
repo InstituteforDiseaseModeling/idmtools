@@ -19,7 +19,7 @@ test_requirements = ['pytest', 'pytest-runner', 'pytest-timeout'] + build_requir
 # since it adds a bit of unnecessary overhead
 bamboo_requriements = [
     'atlassian-python-api~=1.14.2',
-    'keyring'
+    'keyring',
     'requests'
 ]
 
