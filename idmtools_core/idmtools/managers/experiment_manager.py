@@ -48,6 +48,11 @@ class ExperimentManager:
         if self.suite is None:
             return
 
+        from idmtools_platform_comps.comps_platform import COMPSPlatform
+        if not isinstance(self.platform, COMPSPlatform):
+            print("/!\\ WARNING: Currently Suite is only supported by COMPSPlatform!")
+            exit()
+
         # Create suite
         self.platform.create_items(items=[self.suite])
 
