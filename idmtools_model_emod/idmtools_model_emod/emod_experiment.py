@@ -66,12 +66,13 @@ class EMODExperiment(IExperiment):
         # Create the experiment
         exp = cls(name=name, base_simulation=base_simulation, eradication_path=eradication_path)
 
-        # Take care of the demographics files
-        if isinstance(demographics_paths, str):
-            demographics_paths = [demographics_paths]
+        # Take care of the demographics files if any
+        if demographics_paths:
+            if isinstance(demographics_paths, str):
+                demographics_paths = [demographics_paths]
 
-        for demog_path in demographics_paths:
-            exp.demographics.add_demographics_from_file(absolute_path=demog_path)
+            for demog_path in demographics_paths:
+                exp.demographics.add_demographics_from_file(absolute_path=demog_path)
 
         return exp
 

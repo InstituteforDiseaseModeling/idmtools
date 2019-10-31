@@ -99,4 +99,16 @@ class TestEMODExperiment(ITestWithPersistence):
         self.assertDictEqual(campaign, sim.campaign)
         self.assertDictEqual(campaign, e.base_simulation.campaign)
 
+    def test_load_files_without_demographics(self):
+        e = EMODExperiment.from_files(self.case_name,
+                                      eradication_path=DEFAULT_ERADICATION_PATH,
+                                      config_path=DEFAULT_CONFIG_PATH,
+                                      campaign_path=DEFAULT_CAMPAIGN_JSON)
 
+        with open(DEFAULT_CONFIG_PATH, 'r') as fp:
+            config = json.load(fp)["parameters"]
+        with open(DEFAULT_CAMPAIGN_JSON, 'r') as fp:
+            campaign = json.load(fp)
+
+        self.assertDictEqual(config, e.base_simulation.config)
+        self.assertDictEqual(campaign, e.base_simulation.campaign)
