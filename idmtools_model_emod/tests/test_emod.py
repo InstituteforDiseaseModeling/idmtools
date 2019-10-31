@@ -22,7 +22,7 @@ class TestEMOD(ITestWithPersistence):
 
     @classmethod
     def setUpClass(cls):
-        cls.platform = Platform('Test')
+        cls.platform = Platform('COMPS')
 
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
