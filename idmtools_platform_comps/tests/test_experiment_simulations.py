@@ -64,7 +64,7 @@ class TestExperimentSimulations(ITestWithPersistence):
         # Check simulations
         sims = em.experiment.simulations
 
-        self.assertEqual(len(sims), 7)
+        self.assertEqual(len(sims), num_sims + 2)
 
     def test_simulation_experiment(self):
         exp = EMODExperiment()
