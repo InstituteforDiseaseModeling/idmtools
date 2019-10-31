@@ -42,7 +42,7 @@ if __name__ == "__main__":
     #                                eradication_path=os.path.join(BIN_PATH, "Eradication.exe"))
 
     # Case: load demographics from experiment
-    e.load_files(config_path=os.path.join(INPUT_PATH, "config.json"),
+    e.from_files(expname, config_path=os.path.join(INPUT_PATH, "config.json"),
                  campaign_path=os.path.join(INPUT_PATH, "campaign.json"),
                  demographics_paths=demo_files)
 
