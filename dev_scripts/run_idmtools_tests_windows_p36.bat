@@ -9,6 +9,7 @@ echo "auto Login"
 python dev_scripts/create_auth_token_args.py --comps_url %1 --username %2 --password %3
 
 echo "start testing..."
+pip install py-make
 pymake test-all
 
 deactivate

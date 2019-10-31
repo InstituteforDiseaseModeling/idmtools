@@ -13,13 +13,13 @@ with open('requirements.txt') as requirements_file:
     requirements = requirements_file.read().split("\n")
 
 setup_requirements = []
-test_requirements = ['pytest', 'pytest-runner']
+test_requirements = ['pytest', 'pytest-runner', 'pytest-timeout']
 
 extras = dict(test=test_requirements, dev=['Pympler'],
               # Requirements for running workers server
-              workers=['pandas~=0.24.2', 'sqlalchemy~=1.3.5', 'psycopg2-binary~=2.8.3'],
+              workers=['sqlalchemy~=1.3.5', 'psycopg2-binary~=2.8.3'],
               # these are only needed when not running UI
-              ui=['flask~=1.0.3', 'Flask-AutoIndex~=0.6.4', 'flask_restful~=0.3.7'])
+              ui=['flask~=1.0.3', 'Flask-AutoIndex~=0.6.4', 'flask_restful~=0.3.7', 'Flask-SQLAlchemy~=2.4.0'])
 
 # check for python 3.6
 if sys.version_info[1] == 6:
@@ -56,6 +56,6 @@ setup(
     test_suite='tests',
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='0.1.0+nightly',
+    version='0.2.0+nightly',
     zip_safe=False,
 )

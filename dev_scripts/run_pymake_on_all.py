@@ -7,7 +7,8 @@ base_directory = abspath(join(dirname(__file__), '..'))
 
 def run_command_on_all(command, parallel = False):
 
-    modules = ['idmtools_core', 'idmtools_cli', 'idmtools_platform_comps', 'idmtools_platform_local', 'idmtools_models']
+    modules = ['idmtools_core', 'idmtools_cli', 'idmtools_platform_comps', 'idmtools_platform_local',
+               'idmtools_model_emod', 'idmtools_models', 'idmtools_test']
     processes = []
     for module in modules:
         p = subprocess.Popen(f'pymake {command}', cwd=join(base_directory, module), shell=True)

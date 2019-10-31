@@ -3,8 +3,9 @@ from idmtools_platform_local.workers.data.job_status import JobStatus, Status
 
 
 def create_or_update_status(uuid, data_path=None, tags=None, status=Status.created, parent_uuid=None,
-                            extra_details=None):
-    session = get_session()
+                            extra_details=None, session=None, autoclose=True, autocommit=True):
+    if session is None:
+        session = get_session()
     job_status: JobStatus = get_or_create(session, JobStatus, ['uuid'],
                                           uuid=uuid, data_path=data_path, tags=tags, status=status,
                                           parent_uuid=parent_uuid)
@@ -17,7 +18,10 @@ def create_or_update_status(uuid, data_path=None, tags=None, status=Status.creat
 
     if extra_details is not None:
         job_status.extra_details = extra_details
+
     session.add(job_status)
-    session.commit()
-    # close the sessions
-    session.close()
+    if autocommit:
+        session.commit()
+    if autoclose:
+        # close the sessions
+        session.close()

@@ -2,7 +2,7 @@ from typing import NoReturn
 
 from colorama import init
 
-from idmtools_cli.IPlatformCli import PlatformCLIPlugins
+from idmtools_cli.iplatform_cli import PlatformCLIPlugins
 from idmtools_cli.cli import cli
 
 

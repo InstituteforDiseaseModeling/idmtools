@@ -25,6 +25,10 @@ windows_only = unittest.skipIf(
     platform.system() in ["Linux", "Darwin"], 'No Tests that are meant for Windows'
 )
 
+# this is mainly for docker in docker environments but also applies to environments
+# where you must use the local ip address for connectivity vs localhost
+skip_api_host = unittest.skipIf(os.getenv("API_HOST", None) is not None, "API_HOST is defined")
+
 
 def run_test_in_n_seconds(n: int, print_elapsed_time: bool = False) -> Callable:
     """
@@ -58,7 +62,7 @@ def run_test_in_n_seconds(n: int, print_elapsed_time: bool = False) -> Callable:
 
 
 def restart_local_platform(silent=True, *args, **kwargs):
-    from idmtools_platform_local.docker.DockerOperations import DockerOperations
+    from idmtools_platform_local.docker.docker_operations import DockerOperations
     # disable spinner
     if silent:
         os.environ['NO_SPINNER'] = '1'

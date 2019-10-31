@@ -1,15 +1,15 @@
 from typing import Type
 
-from idmtools.registry.PlatformSpecification import example_configuration_impl, get_platform_impl, \
-    get_platform_type_impl, PlatformSpecification
-from idmtools.registry.PluginSpecification import get_description_impl
-
-
 from idmtools.entities import IPlatform
+from idmtools.registry.platform_specification import example_configuration_impl, get_platform_impl, \
+    get_platform_type_impl, PlatformSpecification
+from idmtools.registry.plugin_specification import get_description_impl
 
 
 LOCAL_PLATFORM_EXAMPLE_CONFIG = """
 [LOCAL]
+# The host data directory. Optional. Defaults to {HOME}/.local_data
+# host_data_directory = /home/ccollins/.local_data
 # Timeout of tasks submissions to local platform
 default_timeout: int = 30
 # Items related to internals of the local platform. Most likely you want to use the defaults
@@ -46,7 +46,7 @@ class LocalPlatformSpecification(PlatformSpecification):
         return "Provides access to the Local Platform to IDM Tools"
 
     @get_platform_impl
-    def get(self, configuration: dict) -> IPlatform:
+    def get(self, **configuration) -> IPlatform:
         """
         Build our local platform from the passed in configuration object
 
@@ -58,7 +58,7 @@ class LocalPlatformSpecification(PlatformSpecification):
 
         """
         from idmtools_platform_local.local_platform import LocalPlatform
-        return LocalPlatform()
+        return LocalPlatform(**configuration)
 
     @example_configuration_impl
     def example_configuration(self):

@@ -5,13 +5,11 @@ import socket
 import socketserver
 import subprocess
 import unittest.mock
-
 import pytest
-
-from idmtools_platform_local.docker.DockerOperations import DockerOperations
+from idmtools_platform_local.docker.docker_operations import DockerOperations
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.confg_local_runner_test import get_test_local_env_overrides
-from idmtools_test.utils.decorators import restart_local_platform, linux_only
+from idmtools_test.utils.decorators import restart_local_platform, linux_only, skip_api_host
 
 
 def check_port_is_open(port):
@@ -26,24 +24,30 @@ class TestDockerOperations(unittest.TestCase):
 
     def test_create_redis_starts(self):
         dm = DockerOperations(**get_test_local_env_overrides())
+        dm.cleanup(True)
         dm.get_redis()
         check_port_is_open(6379)
         dm.stop_services()
 
+    @pytest.mark.timeout(60)
     def test_create_db_starts(self):
         """
         This test is mostly scaffolding but could be useful in future for troubleshooting
         We mock out all b
         """
         dm = DockerOperations(**get_test_local_env_overrides())
+        dm.cleanup(True)
         dm.get_postgres()
         check_port_is_open(5432)
         dm.stop_services()
 
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     @restart_local_platform(silent=True)
+    @pytest.mark.timeout(60)
     def test_create_stack_starts(self, std_capture):
         dm = DockerOperations(**get_test_local_env_overrides())
+        dm.cleanup(True)
+        dm.create_services()
         check_port_is_open(5432)
         check_port_is_open(5432)
         check_port_is_open(6379)
@@ -55,18 +59,39 @@ class TestDockerOperations(unittest.TestCase):
             worker_container = dm.get_workers()
             result = dm.copy_to_container(worker_container,
                                           os.path.join(COMMON_INPUT_PATH, "python", "hello_world.py"),
-                                          "/tmp")
+                                          "/data")
+            result = dm.sync_copy(result)[0]
             self.assertTrue(result)
-            result = subprocess.run(['docker', 'exec', 'idmtools_workers', 'python', '/tmp/hello_world.py'],
+            result = subprocess.run(['docker', 'exec', 'idmtools_workers', 'python', '/data/hello_world.py'],
                                     stdout=subprocess.PIPE)
             self.assertEqual(0, result.returncode)
             self.assertIn('Hello World!', result.stdout.decode('utf-8'))
 
+    @pytest.mark.timeout(60)
+    def test_start_stopped_container(self):
+        # create first
+        dm = DockerOperations(**get_test_local_env_overrides())
+        dm.cleanup(True)
+        dm.create_services()
+
+        # stop workers
+        worker_container = dm.get_workers()
+        worker_container.stop()
+
+        # get container again and make sure it is started
+        worker_container = dm.get_workers()
+        self.assertEqual(worker_container.status, 'running')
+        dm.cleanup(True)
+
+    # skip this test in docker in docker tests since the port binding is actually on the true host
     @linux_only
+    @skip_api_host
+    @pytest.mark.timeout(60)
     def test_port_taken_has_coherent_error(self):
 
         pl = DockerOperations(workers_ui_port=10000, **get_test_local_env_overrides())
         pl.cleanup(True)
+        pl.create_services()
 
         Handler = http.server.SimpleHTTPRequestHandler
 
@@ -75,9 +100,10 @@ class TestDockerOperations(unittest.TestCase):
             httpd.server_activate()
 
             with self.assertRaises(EnvironmentError) as e:
+                print(e)
                 pl.create_services()
-                self.assertIn('Port 10000 is already taken', e.exception.args)
             httpd.server_close()
+        pl.cleanup()
 
     def test_error_if_try_to_run_as_root(self):
         with self.assertRaises(ValueError) as mock:

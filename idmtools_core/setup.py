@@ -13,7 +13,8 @@ with open('requirements.txt') as requirements_file:
     requirements = requirements_file.read().split("\n")
 
 build_requirements = ['flake8', 'coverage', 'py-make', 'bump2version', 'twine']
-test_requirements = ['pytest', 'pytest-runner', 'numpy==1.16.4', 'xmlrunner', 'pytest-xdist'] + build_requirements
+test_requirements = ['pytest', 'pytest-runner', 'numpy==1.16.4', 'xmlrunner', 'pytest-xdist',
+                     'pytest-timeout'] + build_requirements
 
 # check for python 3.6
 if sys.version_info[1] == 6:
@@ -24,8 +25,10 @@ extras = {
     # to support notebooks we need docker
     'notebooks': ['docker==4.0.1'],
     'packaging': build_requirements,
+    'idm': ['idmtools_platform_comps', 'idmtools_cli', 'idmtools_model_emod', 'idmtools_models'],
     # our full install include all common plugins
-    'full': ['idmtools_platform_comps', 'idmtools_platform_local', 'idmtools_cli']
+    'full': ['idmtools_platform_comps', 'idmtools_platform_local', 'idmtools_cli', 'idmtools_model_emod',
+             'idmtools_models']
 }
 
 authors = [
@@ -55,6 +58,6 @@ setup(
     test_suite='tests',
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='0.1.0+nightly',
+    version='0.2.0+nightly',
     zip_safe=False
 )

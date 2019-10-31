@@ -27,10 +27,10 @@ type = Local
  ```
  In your code, you could then get then use as would any other platform
 ```python
-from idmtools.core import PlatformFactory
+from idmtools.core.platform_factory import Platform
+from idmtools.managers.experiment_manager import ExperimentManager
 
-platform = PlatformFactory.create_from_block('Local')
-p1 = PlatformFactory.create_from_block('Local')
+platform = Platform('Local')
 ...
 em = ExperimentManager(experiment=experiment, platform=platform)
 em.run()
@@ -51,6 +51,17 @@ running at http://localhost:5000
 
 The Web UI is available at http://localhost:5000/data. Currently it only supports displaying the data directories from
 experiments. It is best used in conjunction with the CLI status commands
+
+# Using the local website
+
+
+To use the website, please use the following steps:
+
+1. Run `idmtools local start` to start the local platfrom  
+2. Run `pymake start-webui` to start the webserver
+3. If a browser has not started, please open a browser and visit "http://localhost:3000" to see the website
+
+Note: the above steps may change after the website is included as part of docker container
 
 # Development Tips
 

@@ -27,6 +27,10 @@ RUN apt-get update \
     && mkdir /home/idmtools /data /app \
     && chown -R idmtools:idmtools /home/idmtools /data /app \
     && addgroup idmtools staff \
+    # create docker group and idmtools to it so they can use it
+    # without prompts
+    && addgroup --gid 999 docker \
+    && usermod -a -G docker idmtools \
     # We add the s6 overlay kit which helps us manager permissions
     # multiple applications, etc within an image
     # overall it make management of our final image a bit easier
@@ -40,7 +44,9 @@ RUN apt-get update \
 # Our script that does smart user mapping
 COPY docker_scripts/user_conf.sh /etc/cont-init.d/01-user_conf.sh
 # Our service scripts
-COPY docker_scripts/start_workers.sh /etc/services.d/idmtools_workers/run
+COPY docker_scripts/start_general_workers.sh /etc/services.d/idmtools_general_workers/run
+COPY docker_scripts/start_cpu_workers.sh /etc/services.d/idmtools_cpu_workers/run
+COPY docker_scripts/start_gpu_workers.sh /etc/services.d/idmtools_gpu_workers/run
 COPY docker_scripts/start_ui.sh /etc/services.d/idmtools_ui/run
 
 # Define a workdirectory
@@ -53,22 +59,11 @@ ENV PYTHONPATH=/app:${PYTHONPATH}
 ARG PYPIURL=https://packages.idmod.org/api/pypi/pypi-production/simple
 ARG PYPIHOST=packages.idmod.org
 RUN echo ${PYPIURL}
-COPY README.md setup.py requirements.txt /tmp/
 # Run the setup instal before copying rest of package. This will increase cache hits during docker builds
 # as we will only rebuild if any of the docker_scripts, setup.py, readme.md, and requirements.txt change
 # which should happen infrequently(or less so than library code)
-RUN cd /tmp && pip install -r requirements.txt --extra-index-url=${PYPIURL} --trusted-host ${PYPIHOST}
-ADD idmtools_platform_local /tmp/idmtools_platform_local
-# We install the package directly here so the source is within the final image
-# This will allow users later to download the image without needing to build it
-# Also we specially use the internal pypy for ALL packages to take advantage of package caching
-
-RUN cd /tmp && \
-    # we need install the full version of local_runner as it is both a Client and Server package
-    # to do this, we specify we want the workers and the UI
-    pip install .[workers,ui] --extra-index-url=$PYPIURL --trusted-host ${PYPIHOST} && \
-    # cleanup pip cache and tmp
-    rm -rf /root/.cache && \
-    rm -rf /tmp/*
+COPY dist/idmtools_platform_local*.tar.gz /tmp/
+RUN find /tmp -name idmtools_platform_local*.tar.gz -exec pip install {}[workers,ui] --extra-index-url=${PYPIURL} --trusted-host ${PYPIHOST} \; && \
+    rm -rf /root/.cache
 
 CMD ["/init"]

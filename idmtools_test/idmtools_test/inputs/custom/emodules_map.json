@@ -1,0 +1,9 @@
+{
+   "disease_plugins": [],
+   "interventions": [],
+   "reporter_plugins": [
+      "Assets\\reporter_plugins\\libReportMalariaFiltered.dll",
+      "Assets\\reporter_plugins\\libreporteventcounter.dll",
+      "Assets\\reporter_plugins\\libSpatialReportMalariaFiltered.dll"
+   ]
+}

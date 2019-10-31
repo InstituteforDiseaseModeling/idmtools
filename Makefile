@@ -1,17 +1,17 @@
-.PHONY: clean lint test coverage release-local dist release-staging release-staging-minor-commit release-staging-minor
-
+.PHONY: clean lint test coverage release-local dist release-staging release-staging-release-commit release-staging-minor
+IPY=python -c
 
 clean: ## Clean all our jobs
-	python -c "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
+	$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
 	python dev_scripts/run_pymake_on_all.py clean p
 
 clean-all: ## Clean all our jobs
-	python -c "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
+	$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
 	python dev_scripts/run_pymake_on_all.py clean-all p
 
 setup-dev:  ## Setup packages in dev mode
 	python dev_scripts/bootstrap.py
-	@python -c "import os; os.chdir('idmtools_platform_local'); os.system('pymake docker-local')"
+	@$(IPY) "import os; os.chdir('idmtools_platform_local'); os.system('pymake docker-local')"
 
 lint: ## check style with flake8
 	python dev_scripts/run_pymake_on_all.py lint p
@@ -24,7 +24,7 @@ test-all: ## Run our tests. We cannot run in parallel
 
 coverage: ## Generate a code-coverage report
 	python dev_scripts/run_pymake_on_all.py coverage-all
-	coverage combine idmtools_cli/.coverage idmtools_core/.coverage idmtools_models/.coverage idmtools_platform_comps/.coverage idmtools_platform_local/.coverage
+	coverage combine idmtools_cli/.coverage idmtools_core/.coverage idmtools_model_emod/.coverage idmtools_models/.coverage idmtools_platform_comps/.coverage idmtools_platform_local/.coverage
 	coverage report -m
 	coverage html -i
 	python dev_scripts/launch_dir_in_browser.py htmlcov/index.html
@@ -39,10 +39,28 @@ release-staging: ## perform a release to staging
 	@make clean-all
 	python dev_scripts/run_pymake_on_all.py release-staging
 
-# Use before release-staging-minor-commit to confirm next version.
-release-staging-minor-dry-run: ## perform a release to staging and bump the minor version.
-	python dev_scripts/run_pymake_on_all.py release-staging-dry-run
+# Use before release-staging-release-commit to confirm next version.
+release-staging-release-dry-run: ## perform a release to staging and bump the minor version.
+	python dev_scripts/run_pymake_on_all.py release-staging-release-dry-run
 
 # This should be used when a pushing a "production" build to staging before being approved by test
-release-staging-minor-commit: ## perform a release to staging and commit the version.
-	python dev_scripts/run_pymake_on_all.py release-staging-minor-commit
+release-staging-release-commit: ## perform a release to staging and commit the version.
+	python dev_scripts/run_pymake_on_all.py release-staging-release-commit
+
+start-webui: ## start the webserver
+	$(IPY) "import os; os.chdir(os.path.join('idmtools_platform_local', 'idmtools_webui')); os.system('yarn'); os.system('yarn start')"
+
+bump-patch:
+	python dev_scripts/run_pymake_on_all.py bump-patch
+
+packages-changes-since-last-verison: ## Get list of versions since last release that have changes
+	git diff --name-only $(shell git tag -l --sort=-v:refname | grep -w '[0-9]\.[0-9]\.[0-9]' | head -n 1) HEAD | grep idmtools | cut -d "/" -f 1  | sort | uniq | grep -v ini | grep -v examples | grep -v dev_scripts
+
+run-docker-dev-env: ## Runs docker dev env
+	$(IPY) "import os; \
+	os.chdir(os.path.join('dev_scripts', 'linux-test-env')); \
+	os.system('docker-compose build linuxtst'); \
+	os.system('docker-compose run --rm linuxtst')"
+
+draft-change-log:
+	git log $(shell git tag -l --sort=-v:refname | grep -w '[0-9]\.[0-9]\.[0-9]' | head -n 1) HEAD --pretty=format:'%s' --reverse --simplify-merges | uniq

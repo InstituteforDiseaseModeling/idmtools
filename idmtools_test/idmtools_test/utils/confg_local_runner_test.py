@@ -3,16 +3,10 @@ import tempfile
 import unittest.mock
 from os.path import join
 
-from sqlalchemy import create_engine
-
-from idmtools_platform_local.workers.brokers import setup_broker
-
 
 def config_local_test():
-
+    from idmtools_platform_local.workers.brokers import setup_broker
     os.environ['UNIT_TESTS'] = '1'
-    os.environ['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
-
     if 'DATA_PATH' not in os.environ:
         test_temp_dir = tempfile.mkdtemp()
         os.environ['DATA_PATH'] = join(test_temp_dir, 'data')
@@ -23,6 +17,7 @@ def config_local_test():
 def reset_local_broker():
     if 'UNIT_TESTS' in os.environ:
         del os.environ['UNIT_TESTS']
+
     if 'SQLALCHEMY_DATABASE_URI' in os.environ:
         del os.environ['SQLALCHEMY_DATABASE_URI']
 
@@ -45,7 +40,8 @@ engine = None
 
 
 def get_db():
-    global  engine
+    from sqlalchemy import create_engine
+    global engine
     if engine is None:
         engine = create_engine('sqlite://', pool_size=32)
     return engine
