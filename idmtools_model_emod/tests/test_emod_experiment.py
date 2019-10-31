@@ -37,12 +37,13 @@ class TestEMOD(ITestWithPersistence):
         self.assertEqual("Assets/AnotherOne --config config.json --input-path ./Assets;.", exp.command.cmd)
 
     def test_legacy_emod(self):
+        ext = ".exe" if os.name == "nt" else ""
         models_dir = os.path.join(COMMON_INPUT_PATH, "fakemodels", "Eradication.exe")
         exp = EMODExperiment(eradication_path=models_dir)
         exp.pre_creation()
-        self.assertEqual("Assets/Eradication.exe --config config.json --input-path ./Assets;.", exp.command.cmd)
+        self.assertEqual(f"Assets/Eradication{ext} --config config.json --input-path ./Assets;.", exp.command.cmd)
 
         models_dir = os.path.join(COMMON_INPUT_PATH, "fakemodels", "Eradication.exe")
         exp = EMODExperiment(eradication_path=models_dir, legacy_exe=True)
         exp.pre_creation()
-        self.assertEqual("Assets/Eradication.exe --config config.json --input-path ./Assets", exp.command.cmd)
+        self.assertEqual(f"Assets/Eradication{ext} --config config.json --input-path ./Assets", exp.command.cmd)

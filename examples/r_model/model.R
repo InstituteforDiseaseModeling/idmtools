@@ -1,4 +1,5 @@
 #!/usr/bin/env Rscript
+
 suppressPackageStartupMessages(library("argparse"))
 ## Load deSolve package
 library(deSolve)
@@ -17,6 +18,7 @@ sir <- function(time, state, parameters) {
   })
 }
 
+### Create our argument parser
 parser <- ArgumentParser()
 parser$add_argument("--susceptible", default=1-1e-6, type="double",
     help="Initial proportion of susceptibles. Should be between 0 and 1 [default %(default)s]")
@@ -35,10 +37,12 @@ parser$add_argument("--config-file", default=NULL, type="character")
 # otherwise if options not found on command line then set defaults,
 args <- parser$parse_args()
 
+# check for a config file and update our parameters from this within the file as well
 if (!is.null(args$config_file) && length(args$config_file) > 0) {
     content <- fromJSON(readLines(args$config_file, warn = FALSE))
+    # possible parameters to get
     opts <- c('susceptible','infected','recovered','beta','gamma', 'timeframe')
-    print(content)
+    # loop through paramters and check if they exists in the json
     for(opt in opts) {
         # only load the configuration options that are defined
         if (any(names(content) == opt)) {
@@ -48,8 +52,13 @@ if (!is.null(args$config_file) && length(args$config_file) > 0) {
 
 }
 
+# TODO
+# We should add validation step here to ensure our parameters make sense.
+
+# Print our final running config. This is useful for debugging later
 print("Config:")
 print(args)
+
 ### Set parameters
 ## Proportion in each compartment: Susceptible 0.999999, Infected 0.000001, Recovered 0
 init       <- c(S = args$susceptible, I = args$infected, R = args$infected)

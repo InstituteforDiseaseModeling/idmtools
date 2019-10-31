@@ -5,7 +5,7 @@ from idmtools_test import COMMON_INPUT_PATH
 import os
 import shutil
 from unittest import TestCase
-from idmtools_platform_local.tasks.run import RunTask
+
 
 # These tests are simulating behaviours that normally would occur within the local worker container
 # Because of that, they should only be executed on linux
@@ -18,10 +18,14 @@ class TestTasks(TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.local_path = config_local_test()
+        # set the db to sqlite lite. Store old value in case it is already set
+        cls.old_db_uri = os.getenv('SQLALCHEMY_DATABASE_URI', None)
+        os.environ['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
 
     @classmethod
     def tearDownClass(cls) -> None:
         try:
+            os.environ['SQLALCHEMY_DATABASE_URI'] = cls.old_db_uri
             shutil.rmtree(cls.local_path)
         except Exception:
             pass
@@ -62,6 +66,7 @@ class TestTasks(TestCase):
         Test run task actor
         """
         from idmtools_platform_local.tasks.create_simulation import CreateSimulationTask
+        from idmtools_platform_local.tasks.run import RunTask
         new_simulation_id = CreateSimulationTask.perform(self.experiment_id, dict(y="z"))
 
         # Check that the data directory
@@ -74,6 +79,7 @@ class TestTasks(TestCase):
         # copy simple model over. Since we are doing low-level testing, let's not use asset management here
         shutil.copy(os.path.join(COMMON_INPUT_PATH, 'python', 'hello_world.py'),
                     os.path.join(self.local_path, self.experiment_id, new_simulation_id))
+
 
         status = RunTask.perform("python hello_world.py", self.experiment_id, new_simulation_id)
         self.assertEqual(status, Status.done)

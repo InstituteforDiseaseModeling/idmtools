@@ -7,7 +7,7 @@ from typing import Optional, List
 from idmtools.assets.asset import Asset
 from idmtools.entities import CommandLine, IExperiment
 from idmtools.entities.iexperiment import IDockerExperiment
-from idmtools_models.python.python_simulation import PythonSimulation
+from idmtools_models.r.r_simulation import RSimulation
 
 
 @dataclass(repr=False)
@@ -22,9 +22,7 @@ class RExperiment(IExperiment, IDockerExperiment):
     add_config_file: bool = field(default=True)
 
     def __post_init__(self, simulation_type):
-        super().__post_init__(simulation_type=PythonSimulation)
-        if self.image_name is None:
-            raise ValueError("image_name is required for R experiments")
+        super().__post_init__(simulation_type=RSimulation)
         if self.model_path:
             self.model_path = os.path.abspath(self.model_path)
 
@@ -55,7 +53,12 @@ class RExperiment(IExperiment, IDockerExperiment):
         self.assets.add_asset(Asset(absolute_path=self.model_path), fail_on_duplicate=False)
 
     def pre_creation(self):
+        # we don't want to check this until here since analysis could have issues
+        if self.image_name is None:
+            raise ValueError("image_name is required for R experiments")
+
         super().pre_creation()
+        self.build_image()
 
         # Create the command line according to the location of the model
         commands_args = [self.r_path, f"./Assets/{os.path.basename(self.model_path)}"]

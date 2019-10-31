@@ -184,6 +184,11 @@ class EMODExperiment(IEMODExperiment, IWindowsExperiment):
 class DockerEMODExperiment(IEMODExperiment, IDockerExperiment, ILinuxExperiment):
     image_name: str = 'idm-docker-public.packages.idmod.org/idm/centos:dtk-runtime'
 
+    def __post_init__(self, simulation_type=EMODSimulation):
+        super().__post_init__(simulation_type)
+        if os.name != "nt" and self.eradication_path is not None and self.eradication_path.endswith(".exe"):
+            raise ValueError("You are attempting to use a Windows Eradication executable on a linux experiment")
+
     @classmethod
     def from_default(cls, name, default: 'iemod_default',
                      image_name: str = 'idm-docker-public.packages.idmod.org/idm/centos:dtk-runtime',

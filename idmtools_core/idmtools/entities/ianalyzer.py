@@ -65,6 +65,7 @@ class IAnalyzer(metaclass=ABCMeta):
         """
         return True
 
+    @abstractmethod
     def map(self, data: 'Any', item: 'TItem') -> 'Any':
         """
         In parallel for each simulation, consume raw data from filenames and emit selected data.
@@ -78,6 +79,7 @@ class IAnalyzer(metaclass=ABCMeta):
         """
         return None
 
+    @abstractmethod
     def reduce(self, all_data: dict) -> 'Any':
         """
         Combine the :meth:`map` data for a set of items into an aggregate result.

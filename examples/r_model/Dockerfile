@@ -28,7 +28,6 @@ RUN apt-get update && apt-get install -y \
     && tar xzf /tmp/s6-overlay-amd64.tar.gz -C / \
     && rm -rf /tmp/s6-overlay-amd64.tar.gz
 
-
 # Set default make to parallel build
 ARG WORKERS=2
 ENV MAKE="make -j${WORKERS}"

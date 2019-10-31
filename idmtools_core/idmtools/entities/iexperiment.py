@@ -1,19 +1,25 @@
 import copy
+import os
+import sys
 import typing
 import uuid
 from abc import ABC
 from itertools import chain
+from datetime import datetime, timezone, timedelta
 from dataclasses import dataclass, field, InitVar
+from logging import getLogger
 from more_itertools import grouper
-
-from idmtools.core import ItemType
+from idmtools.core import ItemType, TExperimentBuilder
 from idmtools.core.interfaces.entity_container import EntityContainer
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.core.interfaces.inamed_entity import INamedEntity
+from idmtools.entities.command_line import TCommandLine
+from idmtools.entities.isimulation import TSimulationClass, TSimulation
+from idmtools.utils.decorators import optional_yaspin_load
+from idmtools import __version__
 
-if typing.TYPE_CHECKING:
-    from idmtools.core.types import TSimulation, TSimulationClass, TExperimentBuilder
-    from idmtools.entities.command_line import TCommandLine
+
+logger = getLogger(__name__)
 
 
 @dataclass(repr=False)
@@ -55,7 +61,7 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         return f"<Experiment: {self.uid} - {self.name} / Sim count {len(self.simulations) if self.simulations else 0}>"
 
     @property
-    def builder(self) -> 'TExperimentBuilder':
+    def builder(self) -> TExperimentBuilder:
         """
         For backward-compatibility purposes.
 
@@ -65,7 +71,7 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         return list(self.builders)[-1] if self.builders and len(self.builders) > 0 else None
 
     @builder.setter
-    def builder(self, builder: 'TExperimentBuilder') -> None:
+    def builder(self, builder: TExperimentBuilder) -> None:
         """
         For backward-compatibility purposes.
 
@@ -82,7 +88,7 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
 
         self.add_builder(builder)
 
-    def add_builder(self, builder: 'TExperimentBuilder') -> None:
+    def add_builder(self, builder: TExperimentBuilder) -> None:
         """
         Add builder to builder collection.
 
@@ -213,6 +219,41 @@ class IGPUExperiment:
 @dataclass(repr=False)
 class IDockerExperiment:
     image_name: str
+    # Optional config to build the docker image
+    build: bool = False
+    build_path: typing.Optional[str] = None
+    # This should in the build_path directory
+    Dockerfile: typing.Optional[str] = None
+    pull_before_build: bool = True
+
+    @optional_yaspin_load(text="Building docker image")
+    def build_image(self, spinner=None, **extra_build_args):
+        import docker
+        from docker.errors import BuildError
+        if spinner:
+            spinner.text = f"Building {self.image_name}"
+        # if the build_path is none use current working directory
+        if self.build_path is None:
+            self.build_path = os.getcwd()
+
+        client = docker.client.from_env()
+        build_config = dict(path=self.build_path, dockerfile=self.Dockerfile, tag=self.image_name,
+                            labels=dict(
+                                buildstamp=f'built-by idmtools {__version__}',
+                                builddate=str(datetime.now(timezone(timedelta(hours=-8))))
+                                )
+                            )
+        if extra_build_args:
+            build_config.update(extra_build_args)
+        logger.debug(f"Build configuration used: {str(build_config)}")
+
+        try:
+            result = client.images.build(**build_config)
+            logger.info(f'Build Successful of {result[0].tag} ({result[0].id})')
+        except BuildError as e:
+            logger.info(f"Build failed for {self.image} with message {e.msg}")
+            logger.info(f'Build log: {e.build_log}')
+            sys.exit(-1)
 
 
 @dataclass(repr=False)
