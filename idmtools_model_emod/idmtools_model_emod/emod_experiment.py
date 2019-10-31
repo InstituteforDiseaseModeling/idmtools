@@ -1,4 +1,3 @@
-import json
 import os
 import typing
 from dataclasses import dataclass, field
@@ -24,10 +23,10 @@ class EMODExperiment(IExperiment):
 
     @classmethod
     def from_default(cls, name, default: 'iemod_default', eradication_path=None):
-        base_simulation = EMODSimulation()
-        default.process_simulation(base_simulation)
+        exp = cls(name=name, eradication_path=eradication_path)
 
-        exp = cls(name=name, base_simulation=base_simulation, eradication_path=eradication_path)
+        # Set the base simulation
+        default.process_simulation(exp.base_simulation)
 
         # Add the demographics
         for filename, content in default.demographics().items():
@@ -49,30 +48,13 @@ class EMODExperiment(IExperiment):
 
         Returns: An initialized experiment
         """
-
-        def load_json_file(path):
-            if not path:
-                return
-            try:
-                with open(path, 'r') as fp:
-                    return json.load(fp)
-            except IOError as e:
-                print(f"The file at {path} could not be loaded or parsed to JSON.\n{e}")
-
-        base_simulation = EMODSimulation()
-        base_simulation.config = load_json_file(config_path)["parameters"]
-        base_simulation.campaign = load_json_file(campaign_path)
-
         # Create the experiment
-        exp = cls(name=name, base_simulation=base_simulation, eradication_path=eradication_path)
+        exp = cls(name=name, eradication_path=eradication_path)
 
-        # Take care of the demographics files if any
-        if demographics_paths:
-            if isinstance(demographics_paths, str):
-                demographics_paths = [demographics_paths]
-
-            for demog_path in demographics_paths:
-                exp.demographics.add_demographics_from_file(absolute_path=demog_path)
+        # Load the files
+        exp.base_simulation.load_files(config_path=config_path, campaign_path=campaign_path)
+        for demog_path in [demographics_paths] if isinstance(demographics_paths, str) else demographics_paths:
+            exp.demographics.add_demographics_from_file(demog_path)
 
         return exp
 

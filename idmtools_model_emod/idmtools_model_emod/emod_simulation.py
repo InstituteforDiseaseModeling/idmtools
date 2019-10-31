@@ -1,9 +1,10 @@
 import json
 from dataclasses import dataclass, field
-from typing import Optional, Any
+from typing import Optional, Any, NoReturn
 
 from idmtools.assets import Asset
 from idmtools.entities import ISimulation
+from idmtools.utils.json import load_json_file
 from idmtools_model_emod.emod_file import DemographicsFiles
 from idmtools_model_emod.interventions import EMODEmptyCampaign
 
@@ -17,6 +18,21 @@ class EMODSimulation(ISimulation):
     def set_parameter(self, name: str, value: any) -> dict:
         self.config[name] = value
         return {name: value}
+
+    def load_files(self, config_path=None, campaign_path=None) -> 'NoReturn':
+        """
+        Load files in the experiment/base_simulation.
+
+        Args:
+            config_path: Configuration file path
+            campaign_path: Campaign file path
+
+        """
+        if config_path:
+            self.config = load_json_file(config_path)["parameters"]
+
+        if campaign_path:
+            self.campaign = load_json_file(campaign_path)
 
     def get_parameter(self, name: str, default: Optional[Any] = None):
         """
