@@ -95,6 +95,7 @@ class ExperimentManager:
         """
         from idmtools.config import IdmConfigParser
         from concurrent.futures.thread import ThreadPoolExecutor
+        from idmtools.core import EntityContainer
 
         # Consider values from the block that Platform uses
         _max_workers = IdmConfigParser.get_option(None, "max_workers")
@@ -106,10 +107,14 @@ class ExperimentManager:
         with ThreadPoolExecutor(max_workers=16) as executor:
             results = executor.map(self.simulation_batch_worker_thread,  # noqa: F841
                                    self.experiment.batch_simulations(batch_size=_batch_size))
+
+        _sims = EntityContainer()
         for sim_batch in results:
             for simulation in sim_batch:
-                self.experiment.simulations.append(simulation.metadata)
-                self.experiment.simulations.set_status(EntityStatus.CREATED)
+                _sims.append(simulation.metadata)
+                _sims.set_status(EntityStatus.CREATED)
+
+        self.experiment.simulations = _sims
 
     def start_experiment(self):
         self.platform.run_items([self.experiment])
