@@ -2,7 +2,7 @@ import json
 import os
 from abc import ABCMeta, abstractmethod
 
-from idmtools.assets import Asset, AssetCollection
+from idmtools.assets import Asset, AssetCollection, json_handler
 
 
 class InputFilesList(AssetCollection, metaclass=ABCMeta):
@@ -29,7 +29,7 @@ class DemographicsFiles(InputFilesList):
         filename = filename or os.path.basename(absolute_path)
         with open(absolute_path, 'r') as fp:
             asset = Asset(filename=filename, content=json.load(fp), relative_path=self.relative_path,
-                          absolute_path=absolute_path)
+                          absolute_path=absolute_path, handler=json_handler)
 
         if asset in self.assets:
             raise Exception("Duplicated demographics file")
@@ -37,7 +37,7 @@ class DemographicsFiles(InputFilesList):
         self.assets.append(asset)
 
     def add_demographics_from_dict(self, content, filename):
-        asset = Asset(filename=filename, content=content, relative_path=self.relative_path)
+        asset = Asset(filename=filename, content=content, relative_path=self.relative_path, handler=json_handler)
         if asset in self.assets:
             raise Exception("Duplicated demographics file")
 

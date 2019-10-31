@@ -1,5 +1,5 @@
 import os
-from typing import Union, TypeVar, List, Callable
+from typing import TypeVar, Union, List, Callable, Any
 
 
 class Asset:
@@ -9,7 +9,7 @@ class Asset:
     """
 
     def __init__(self, absolute_path: 'str' = None, relative_path: 'str' = None, filename: 'str' = None,
-                 content: 'Any' = None):
+                 content: 'Any' = None, handler: 'Callable' = str):
         """
         A constructor.
 
@@ -29,6 +29,7 @@ class Asset:
         self.filename = filename or os.path.basename(self.absolute_path)
         self._content = content
         self.persisted = False
+        self.handler = handler
 
     def __repr__(self):
         return f"<Asset: {os.path.join(self.relative_path, self.filename)} from {self.absolute_path}>"
@@ -43,10 +44,9 @@ class Asset:
 
     @property
     def bytes(self):
-        if not isinstance(self.content, bytes):
-            return str.encode(self.content)
-
-        return self.bytes
+        if isinstance(self.content, bytes):
+            return self.content
+        return str.encode(self.handler(self.content))
 
     @property
     def content(self):
