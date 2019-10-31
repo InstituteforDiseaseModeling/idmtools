@@ -21,7 +21,7 @@ class Asset:
         """
 
         super().__init__()
-        if not absolute_path and not filename and not content:
+        if not absolute_path and (not filename and not content):
             raise ValueError("Impossible to create the asset without either absolute path or filename and content!")
 
         self.absolute_path = absolute_path

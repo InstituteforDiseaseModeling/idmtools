@@ -153,18 +153,11 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         Returns: 
             The created simulation.
         """
-        self.freeze()
         sim = copy.deepcopy(self.base_simulation)
         sim.assets = copy.deepcopy(self.base_simulation.assets)
         sim.platform = self.platform
         sim.experiment = self
         return sim
-
-    def freeze(self):
-        if self.frozen:
-            return
-        self.pre_creation()
-        self.frozen = True
 
     def pre_creation(self) -> None:
         # Gather the assets
