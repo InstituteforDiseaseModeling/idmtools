@@ -3,11 +3,11 @@ import os
 from functools import partial
 
 from idmtools.assets import AssetCollection, Asset
-from idmtools.builders import StandAloneSimulationsBuilder, SweepArm, ArmType, ArmExperimentBuilder, ExperimentBuilder
+from idmtools.builders import ExperimentBuilder
+from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
-from idmtools.platforms import COMPSPlatform
-from idmtools_models.dtk import DTKExperiment
-from idmtools_models.dtk.defaults import DTKSIR
+from idmtools_model_emod import EMODExperiment
+from idmtools_model_emod.defaults import EMODSir
 from config_update_parameters import config_update_params
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
@@ -24,14 +24,14 @@ def param_update(simulation, param, value):
     return simulation.set_parameter(param, value)
 
 if __name__ == "__main__":
-    platform = COMPSPlatform()
+    platform = Platform('COMPS')
 
     ac = AssetCollection()
     a = Asset(absolute_path=os.path.join(INPUT_PATH, "single_node_demographics.json"))
     ac.add_asset(a)
-    e = DTKExperiment.from_default(expname, default=DTKSIR, eradication_path=os.path.join(BIN_PATH, "Eradication.exe"))
+    e = EMODExperiment.from_default(expname, default=EMODSir, eradication_path=os.path.join(BIN_PATH, "Eradication.exe"))
     e.add_assets(ac)
-    simulation = e.simulation()
+    simulation = e.base_simulation
 
     #Update bunch of config parameters
     sim = config_update_params(simulation)
@@ -46,8 +46,6 @@ if __name__ == "__main__":
     last_serialization_day = sorted(timesteps)[-1]
     end_day = start_day + last_serialization_day
     sim.set_parameter("Simulation_Duration", end_day)
-
-    e.base_simulation = sim
 
     builder = ExperimentBuilder()
     set_Run_Number = partial(param_update, param="Run_Number")

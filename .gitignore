@@ -368,3 +368,15 @@ idmtools_core/tests/data
 examples/**/.pytest_cache/
 examples/**/__pycache__/
 idmtools_core/tests/reports/
+.local_data
+**/.local_data
+**/test_results.xml
+idmtools_platform_local/idmtools_webui/build
+examples/download/
+idmtools_platform_comps/tests/output/
+examples/generic_sim/download-e2eB/
+examples/analyzers/download/
+idmtools_platform_comps/tests/inputs/analyzers/population.csv
+idmtools_platform_comps/tests/inputs/analyzers/population.png
+idmtools_platform_comps/tests/inputs/analyzers/timeseries.csv
+idmtools_platform_comps/tests/inputs/analyzers/timeseries.png

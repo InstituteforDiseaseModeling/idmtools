@@ -84,6 +84,8 @@ class PlatformFactory:
         platform = platform_cls(**kwargs)
         delattr(platform_cls, '_FACTORY')
 
+        IdmConfigParser.display_config_block_details(block)
+
         return platform
 
 
