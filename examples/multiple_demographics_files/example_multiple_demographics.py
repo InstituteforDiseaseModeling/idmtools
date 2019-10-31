@@ -1,4 +1,6 @@
 import os
+
+from idmtools.builders import ExperimentBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_model_emod import EMODExperiment
@@ -21,10 +23,10 @@ def param_update(simulation, param, value):
 if __name__ == "__main__":
     platform = Platform('COMPS')
 
-    demo_files = [os.path.join(INPUT_PATH, "PFA_rates_overlay.json"),
+    demo_files = [os.path.join(INPUT_PATH, "demographics.json"),
+                  os.path.join(INPUT_PATH, "PFA_rates_overlay.json"),
                   os.path.join(INPUT_PATH, "pfa_simple.json"),
-                  os.path.join(INPUT_PATH, "uniform_demographics.json"),
-                  os.path.join(INPUT_PATH, "demographics.json")]
+                  os.path.join(INPUT_PATH, "uniform_demographics.json")]
 
     # Case: from_files
     # e = EMODExperiment.from_files(expname,
@@ -42,14 +44,16 @@ if __name__ == "__main__":
     #                                eradication_path=os.path.join(BIN_PATH, "Eradication.exe"))
 
     # Case: load demographics from experiment
-    e.from_files(expname, config_path=os.path.join(INPUT_PATH, "config.json"),
-                 campaign_path=os.path.join(INPUT_PATH, "campaign.json"),
-                 demographics_paths=demo_files)
+    # e.from_files(expname, config_path=os.path.join(INPUT_PATH, "config.json"),
+    #              campaign_path=os.path.join(INPUT_PATH, "campaign.json"),
+    #              demographics_paths=demo_files)
 
     # Case: load demographics from simulation
-    # e.base_simulation.load_files(config_path=os.path.join(INPUT_PATH, "config.json"),
-    #                              campaign_path=os.path.join(INPUT_PATH, "campaign.json"),
-    #                              demographics_paths=demo_files)
+    e.base_simulation.load_files(config_path=os.path.join(INPUT_PATH, "config.json"),
+                                 campaign_path=os.path.join(INPUT_PATH, "campaign.json"))
+    for demo_file in demo_files:
+        e.base_simulation.demographics.add_demographics_from_file(demo_file)
+
 
     em = ExperimentManager(experiment=e, platform=platform)
     em.run()
