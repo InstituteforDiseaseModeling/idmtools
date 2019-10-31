@@ -1,21 +1,20 @@
-import pytest
-
-from idmtools_test.utils.confg_local_runner_test import reset_local_broker, get_test_local_env_overrides
-from idmtools.core import PlatformFactory
 import os
 import re
 import subprocess
 import unittest
 from operator import itemgetter
 
+import pytest
+from idmtools_test import COMMON_INPUT_PATH
+from idmtools_test.utils.confg_local_runner_test import get_test_local_env_overrides, reset_local_broker
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 from idmtools.builders import ExperimentBuilder
+from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
+from idmtools_models.python import PythonExperiment
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
 from idmtools_platform_local.client.simulations_client import SimulationsClient
-from idmtools_models.python import PythonExperiment
-from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
-from idmtools_test import COMMON_INPUT_PATH
 
 
 @pytest.mark.docker
@@ -26,7 +25,7 @@ class TestLocalRunnerCLI(ITestWithPersistence):
         reset_local_broker()
         from idmtools_platform_local.workers.brokers import setup_broker
         setup_broker()
-        platform = PlatformFactory.create_from_block('Local_Staging', **get_test_local_env_overrides())
+        platform = Platform('Local', **get_test_local_env_overrides())
         cls.pe = PythonExperiment(name="python experiment", model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
 
         cls.pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
@@ -54,16 +53,13 @@ class TestLocalRunnerCLI(ITestWithPersistence):
         self.assertEqual(experiment['experiment_id'], str(self.pe.uid))
         self.assertEqual(experiment['tags'], self.pe.tags)
         self.assertEqual(experiment['data_path'], '/data/' + str(self.pe.uid))
-        self.assertEqual(experiment['extra_details'], {'simulation_type': None})
 
         # Test 2: get_one experiment with experiment id and tags
         experiment1 = ExperimentsClient.get_one(str(self.pe.uid),
                                                 tags=[('idmtools', 'idmtools-automation'), ('string_tag', 'test')])
-
         self.assertEqual(experiment1['experiment_id'], str(self.pe.uid))
         self.assertEqual(experiment1['tags'], self.pe.tags)
         self.assertEqual(experiment1['data_path'], '/data/' + str(self.pe.uid))
-        self.assertEqual(experiment1['extra_details'], {'simulation_type': None})
 
     def test_status_simulationClient_api(self):
         # Test 1: get_all simulations with simulation id only filter
