@@ -1,12 +1,10 @@
 # Running example
 
-This is a sample R model that currently runs in the LocalPlatform. To run, please follow the following steps:
-
-1. Build the image locally by changing to the examples/r_model in a terminal and run
-   ```
-   docker-compose build
-   ```
-1. Run the run_model.py
+This is a sample R model that currently runs in the LocalPlatform. The script automatically build the docker image for 
+the user. If you would like to test the image outside of the script, you need to first run
+```bash
+docker-compose build
+```
 
 # Notes
    
