@@ -1,3 +1,4 @@
+import copy
 import os
 import typing
 from dataclasses import dataclass, field
@@ -81,5 +82,8 @@ class EMODExperiment(IExperiment):
 
     def simulation(self):
         simulation = super().simulation()
-        simulation.demographics.extend(self.demographics)
+        # Copy the experiment demographics
+        demog_copy = copy.deepcopy(self.demographics)
+        # Add them to the simulation
+        simulation.demographics.extend(demog_copy)
         return simulation

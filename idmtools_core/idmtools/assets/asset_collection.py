@@ -45,9 +45,6 @@ class AssetCollection(IEntity):
 
     # endregion
 
-    def __iter__(self):
-        yield from self.assets
-
     @staticmethod
     def assets_from_directory(assets_directory: 'str', recursive: 'bool' = True, flatten: 'bool' = False,
                               filters: 'TAssetFilterList' = None,  # noqa: F821
@@ -160,9 +157,30 @@ class AssetCollection(IEntity):
         Args:
             **kwargs: Filter for the asset to delete.
         """
+        if 'index' in kwargs:
+            return self.assets.remove(self.assets[kwargs.get('index')])
+
+        if 'asset' in kwargs:
+            return self.assets.remove(kwargs.get('asset'))
+
         asset = self.get_one(**kwargs)
         if asset:
             self.assets.remove(asset)
+
+    def pop(self, **kwargs) -> 'TAsset':
+        """
+        Get and delete an asset based on keywords.
+        Args:
+            **kwargs: Filter for the asset to pop.
+
+        """
+        if not kwargs:
+            return self.assets.pop()
+
+        asset = self.get_one(**kwargs)
+        if asset:
+            self.assets.remove(asset)
+        return asset
 
     def extend(self, assets: 'TAssetList', fail_on_duplicate: 'bool' = True) -> 'NoReturn':
         """
@@ -186,6 +204,9 @@ class AssetCollection(IEntity):
             if asset in self.assets:
                 del self.assets[self.assets.index(asset)]
 
+    def clear(self):
+        self.assets.clear()
+
     @property
     def count(self):
         return len(self.assets)
@@ -199,8 +220,11 @@ class AssetCollection(IEntity):
     def __len__(self):
         return len(self.assets)
 
-    def __getitem__(self, item):
-        return self.assets[item]
+    def __getitem__(self, index):
+        return self.assets[index]
+
+    def __iter__(self):
+        yield from self.assets
 
 
 TAssetCollection = typing.TypeVar("TAssetCollection", bound=AssetCollection)
