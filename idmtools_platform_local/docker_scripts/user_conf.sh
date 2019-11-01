@@ -12,10 +12,9 @@ GROUPID=${id_array[1]}
 ROOT=${ROOT:=FALSE}
 UMASK=${UMASK:=022}
 
+# Get the owner of docker socket and the container docker id
 DOCKER_GROUP=$(stat -c '%g' /var/run/docker.sock)
 DOCKER_GID=$(cut -d: -f3 < <(getent group docker))
-
-echo "$USER"
 
 if [[ "$USERID" -ne 1000 ]]
 ## Configure user with a different USERID if requested.
@@ -51,6 +50,7 @@ if [[ "$GROUPID" -ne 1000 ]]
     echo "Primary group ID is now custom_group $GROUPID"
 fi
 
+## Ensure the docker group matches the host docker group id. This allows the idmtools users to run docker commands
 if [[ "$DOCKER_GID" -ne "$DOCKER_GROUP" ]]; then
     echo "Recreating docker group with gid of $DOCKER_GID"
     if [[ "${DOCKER_GROUP}" -eq "${USERID}" ]]; then
@@ -66,14 +66,14 @@ fi
 ## Add a password to user
 echo "$USER:$PASSWORD" | chpasswd
 
-# Use Env flag to know if user should be added to sudoers
+## Add user to sudo group to allow advanced changes/development tools for environment
 if [[ ${ROOT,,} == "true" ]]
   then
     adduser $USER sudo && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
     echo "$USER added to sudoers"
 fi
 
-# Check for dev build. If this exists we want to install fresh copies of the packages
+## Check for dev build. If this exists we want to install fresh copies of the packages
 if [[ -d "/dev_build" ]];
   then
     cd /dev_build && python dev_scripts/bootstrap.py

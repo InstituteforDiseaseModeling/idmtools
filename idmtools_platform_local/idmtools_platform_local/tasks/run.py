@@ -5,7 +5,6 @@ import shlex
 import sys
 import subprocess
 from multiprocessing import cpu_count
-
 from dramatiq import GenericActor
 from idmtools_platform_local.status import Status
 

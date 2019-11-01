@@ -25,3 +25,7 @@ we can test this by creating a test config.json and model.R in a directory and t
     Note that you must use an absolute path when specifying your data path mount. 
 1. This image also uses s6 for testing scenarios. A note when using s6 that you need to create your own entrypoint that
 skips s6 if the user is not root.
+
+A goal for end-users when developing an image is [this diagram of a final docker image](http://interactive.blockdiag.com/rackdiag/?compression=deflate&src=eJwrSkzOTslMTFeo5lJQMA615gJShlYKRbpJicWpCpm5iempQBEjK4WU1DLdkvz8nGJthWIzhdLi1CKF4uSizIKSYmuQTiuFUJBQckZiXnpqMVctAHikGro)
+This image is portrayed in a stack with the top being more recently modified items. As you gown down the stack, you
+beging to inherit those layers and steps from other images. 
