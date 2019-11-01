@@ -146,7 +146,8 @@ class DockerBaseTask(BaseTask):
         container_config['user'] = os.getenv('CURRENT_UID')
         # container_config['auto_remove'] = True
         # we have to mount using the host data path
-        data_dir = f'{os.getenv("HOST_DATA_PATH")}/'
+        data_dir = f'{os.getenv("HOST_DATA_PATH")}'
+        data_dir += "\\" if "\\" in data_dir else "/"
         container_config['volumes'] = {
             data_dir: dict(bind='/data', mode='rw'),
         }
