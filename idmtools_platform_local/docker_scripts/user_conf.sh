@@ -13,7 +13,7 @@ ROOT=${ROOT:=FALSE}
 UMASK=${UMASK:=022}
 
 DOCKER_GROUP=$(stat -c '%g' /var/run/docker.sock)
-DOCKER_GID=$(cut -d: -f3 < <(getent group sudo))
+DOCKER_GID=$(cut -d: -f3 < <(getent group docker))
 
 echo "$USER"
 
