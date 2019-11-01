@@ -13,7 +13,8 @@ from idmtools.core import ItemType
 from idmtools.core.experiment_factory import experiment_factory
 from idmtools.core.interfaces.iitem import TItem, TItemList
 from idmtools.entities import IExperiment, IPlatform
-from idmtools.entities.iexperiment import IGPUExperiment, IDockerExperiment, IWindowsExperiment, IDockerGPUExperiment
+from idmtools.entities.iexperiment import IGPUExperiment, IDockerExperiment, IWindowsExperiment, IDockerGPUExperiment, \
+    IHostBinaryExperiment
 from idmtools.entities.isimulation import ISimulation, TSimulation
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
 from idmtools_platform_local.client.simulations_client import SimulationsClient
@@ -373,4 +374,4 @@ class LocalPlatform(IPlatform):
         return [IExperiment, IDockerExperiment, IDockerGPUExperiment]
 
     def unsupported_experiment_types(self) -> List[Type]:
-        return [IWindowsExperiment]
+        return [IWindowsExperiment, IHostBinaryExperiment]

@@ -69,6 +69,10 @@ class TestAnalyzeManager(ITestWithPersistence):
         time.sleep(5)
 
         cls.exp_id = pe.uid
+        
+    @classmethod
+    def tearDownClass(cls) -> None:
+        cls.platform._docker_operations.cleanup()
 
     @pytest.mark.docker
     @pytest.mark.timeout(60)

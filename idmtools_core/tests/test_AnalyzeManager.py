@@ -19,6 +19,12 @@ class TestAnalyzeManager(unittest.TestCase):
         def initialize(self):
             self.initialize_was_called = True
 
+        def map(self, data: 'Any', item: 'TItem') -> 'Any':
+            pass
+
+        def reduce(self, all_data: dict) -> 'Any':
+            pass
+
     def setUp(self) -> None:
         self.platform = Platform('Test')
         self.sample_experiment = TstExperiment()

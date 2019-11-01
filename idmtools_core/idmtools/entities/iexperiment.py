@@ -217,6 +217,11 @@ class IGPUExperiment:
 
 
 @dataclass(repr=False)
+class IHostBinaryExperiment:
+    pass
+
+
+@dataclass(repr=False)
 class IDockerExperiment:
     image_name: str
     # Optional config to build the docker image

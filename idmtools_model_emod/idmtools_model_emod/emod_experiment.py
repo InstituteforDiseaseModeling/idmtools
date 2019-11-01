@@ -4,7 +4,7 @@ import json
 import collections
 import stat
 import typing
-from abc import ABC
+from abc import ABC, abstractmethod
 from urllib.parse import urlparse
 
 import requests
@@ -13,14 +13,14 @@ from logging import getLogger
 from pathlib import Path
 from dataclasses import dataclass, field
 from idmtools.entities import IExperiment, CommandLine
-from idmtools.entities.iexperiment import IWindowsExperiment, IDockerExperiment, ILinuxExperiment
+from idmtools.entities.iexperiment import IWindowsExperiment, IDockerExperiment, ILinuxExperiment, IHostBinaryExperiment
+from idmtools.utils.decorators import optional_yaspin_load
 from idmtools_model_emod.emod_simulation import EMODSimulation
 
 if typing.TYPE_CHECKING:
     from idmtools_model_emod.defaults import iemod_default
 
 logger = getLogger(__name__)
-ERADICATION_BIN_NAME = 'Eradication.exe' if os.name == 'nt' else "Eradication"
 
 
 @dataclass(repr=False)
@@ -31,30 +31,44 @@ class IEMODExperiment(IExperiment, ABC):
 
     def __post_init__(self, simulation_type):
         super().__post_init__(simulation_type=EMODSimulation)
+        self.executable_name = "Eradication.exe"
         if self.eradication_path is not None:
+            self.executable_name = os.path.basename(self.eradication_path)
             if urlparse(self.eradication_path).scheme in ('http', 'https',):
-                # download eradication from path to our local_data cache
-                cache_path = os.path.join(str(Path.home()), '.local_data', "eradication-cache")
-                filename = hashlib.md5(self.eradication_path.encode('utf-8')).hexdigest()
-                out_name = os.path.join(cache_path, filename)
-                os.makedirs(cache_path, exist_ok=True)
-                if not os.path.exists(out_name):
-                    logger.debug(f"Downloading {self.eradication_path} to {out_name}")
-                    with requests.get(self.eradication_path, stream=True) as r:
-                        r.raise_for_status()
-                        with open(out_name, 'wb') as f:
-                            for chunk in r.iter_content(chunk_size=8192):
-                                if chunk:  # filter out keep-alive new chunks
-                                    f.write(chunk)
-                    # ensure on linux we make it executable
-                    if os.name != 'nt':
-                        st = os.stat(out_name)
-                        os.chmod(out_name, st.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
-                    logger.debug(f"Finished downloading {self.eradication_path}")
-                else:
-                    logger.debug(f'{self.eradication_path} already cached as {out_name}')
-                self.eradication_path = out_name
+                self.eradication_path = self.download_eradication(self.eradication_path)
             self.eradication_path = os.path.abspath(self.eradication_path)
+
+    @staticmethod
+    @optional_yaspin_load(text='Downloading file')
+    def download_eradication(url, spinner=None):
+        """
+        Do
+        Returns:
+
+        """
+        # download eradication from path to our local_data cache
+        cache_path = os.path.join(str(Path.home()), '.local_data', "eradication-cache")
+        filename = hashlib.md5(url.encode('utf-8')).hexdigest()
+        out_name = os.path.join(cache_path, filename)
+        os.makedirs(cache_path, exist_ok=True)
+        if not os.path.exists(out_name):
+            if spinner:
+                spinner.text(f"Downloading {url} to {out_name}")
+            logger.debug(f"Downloading {url} to {out_name}")
+            with requests.get(url, stream=True) as r:
+                r.raise_for_status()
+                with open(out_name, 'wb') as f:
+                    for chunk in r.iter_content(chunk_size=8192):
+                        if chunk:  # filter out keep-alive new chunks
+                            f.write(chunk)
+            # ensure on linux we make it executable locally
+            if os.name != 'nt':
+                st = os.stat(out_name)
+                os.chmod(out_name, st.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+            logger.debug(f"Finished downloading {url}")
+        else:
+            logger.debug(f'{url} already cached as {out_name}')
+        return out_name
 
     @classmethod
     def from_default(cls, name, default: 'iemod_default', eradication_path=None):
@@ -148,7 +162,7 @@ class IEMODExperiment(IExperiment, ABC):
 
         # Add Eradication.exe to assets
         logger.debug(f"Adding {self.eradication_path}")
-        self.assets.add_asset(Asset(absolute_path=self.eradication_path, filename=ERADICATION_BIN_NAME),
+        self.assets.add_asset(Asset(absolute_path=self.eradication_path, filename=self.executable_name),
                               fail_on_duplicate=False)
 
         # Clean up existing demographics files in case config got replaced
@@ -170,13 +184,13 @@ class IEMODExperiment(IExperiment, ABC):
         # Input path is different for legacy exes
         input_path = "./Assets;." if not self.legacy_exe else "./Assets"
 
-        # Create the command line according to the location of the model
-        self.command = CommandLine(f"Assets/{ERADICATION_BIN_NAME}", "--config config.json",
+        # Create the command line according to self. location of the model
+        self.command = CommandLine(f"Assets/{self.executable_name}", "--config config.json",
                                    f"--input-path {input_path}")
 
 
 @dataclass(repr=False)
-class EMODExperiment(IEMODExperiment, IWindowsExperiment):
+class EMODExperiment(IEMODExperiment, IHostBinaryExperiment):
     pass
 
 
