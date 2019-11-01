@@ -22,5 +22,6 @@ we can test this by creating a test config.json and model.R in a directory and t
     ```
     docker run -v C:\path\to\config:/data -w /data -u "1000:1000" idm-docker-staging.idmod.org/idmtools_r_model_example Rscript model.R --config-file config.json
     ```
+    Note that you must use an absolute path when specifying your data path mount. 
 1. This image also uses s6 for testing scenarios. A note when using s6 that you need to create your own entrypoint that
 skips s6 if the user is not root.
