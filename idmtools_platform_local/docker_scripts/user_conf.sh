@@ -59,6 +59,7 @@ if [[ "$DOCKER_GID" -ne "$DOCKER_GROUP" ]]; then
     fi
     groupdel docker
     addgroup --gid ${DOCKER_GROUP} docker
+    # Adding idmtools to docker group
     usermod -a -G docker idmtools
 fi
 
