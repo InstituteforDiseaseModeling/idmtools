@@ -12,6 +12,9 @@ GROUPID=${id_array[1]}
 ROOT=${ROOT:=FALSE}
 UMASK=${UMASK:=022}
 
+DOCKER_GROUP=$(stat -c '%g' /var/run/docker.sock)
+DOCKER_GID=$(cut -d: -f3 < <(getent group sudo))
+
 echo "$USER"
 
 if [[ "$USERID" -ne 1000 ]]
@@ -46,6 +49,17 @@ if [[ "$GROUPID" -ne 1000 ]]
     echo "Modifying primary group $(id $USER -g -n)"
     groupmod -g $GROUPID $(id $USER -g -n)
     echo "Primary group ID is now custom_group $GROUPID"
+fi
+
+if [[ "$DOCKER_GID" -ne "$DOCKER_GROUP" ]]; then
+    echo "Recreating docker group with gid of $DOCKER_GID"
+    if [[ "${DOCKER_GROUP}" -eq "${USERID}" ]]; then
+        echo "Docker group id cannot be the same id as the run user"
+        exit -1
+    fi
+    groupdel docker
+    addgroup --gid ${DOCKER_GROUP} docker
+    usermod -a -G docker idmtools
 fi
 
 ## Add a password to user
