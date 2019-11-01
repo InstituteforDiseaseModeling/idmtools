@@ -193,19 +193,11 @@ class AssetCollection(IEntity):
         for asset in assets:
             self.add_asset(asset, fail_on_duplicate)
 
-    def difference(self, to_remove: 'TAssetList') -> 'NoReturn':
-        """
-        Remove assets based on the `to_remove` list passed.
-        Args:
-            to_remove: Which assets to remove in the current list
-
-        """
-        for asset in to_remove:
-            if asset in self.assets:
-                del self.assets[self.assets.index(asset)]
-
     def clear(self):
         self.assets.clear()
+
+    def set_all_persisted(self):
+        for a in self: a.persisted = True
 
     @property
     def count(self):

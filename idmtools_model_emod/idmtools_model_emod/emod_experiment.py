@@ -54,8 +54,10 @@ class EMODExperiment(IExperiment):
 
         # Load the files
         exp.base_simulation.load_files(config_path=config_path, campaign_path=campaign_path)
-        for demog_path in [demographics_paths] if isinstance(demographics_paths, str) else demographics_paths:
-            exp.demographics.add_demographics_from_file(demog_path)
+
+        if demographics_paths:
+            for demog_path in [demographics_paths] if isinstance(demographics_paths, str) else demographics_paths:
+                exp.demographics.add_demographics_from_file(demog_path)
 
         return exp
 
@@ -82,8 +84,10 @@ class EMODExperiment(IExperiment):
 
     def simulation(self):
         simulation = super().simulation()
-        # Copy the experiment demographics
+        # Copy the experiment demographics and set them as persisted to prevent change
+        # TODO: change persisted to the frozen mechanism when done
         demog_copy = copy.deepcopy(self.demographics)
+        demog_copy.set_all_persisted()
         # Add them to the simulation
         simulation.demographics.extend(demog_copy)
         return simulation

@@ -2,8 +2,9 @@ import copy
 import typing
 import uuid
 from abc import ABC
-from itertools import chain
 from dataclasses import dataclass, field, InitVar
+from itertools import chain
+
 from more_itertools import grouper
 
 from idmtools.core import ItemType
@@ -153,6 +154,7 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         Returns: 
             The created simulation.
         """
+        # TODO: the experiment should be frozen when the first simulation is created
         sim = copy.deepcopy(self.base_simulation)
         sim.assets = copy.deepcopy(self.base_simulation.assets)
         sim.platform = self.platform

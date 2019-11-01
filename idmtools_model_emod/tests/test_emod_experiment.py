@@ -91,7 +91,7 @@ class TestEMODExperiment(ITestWithPersistence):
         del sim.config["Demographics_Filenames"]
         self.assertDictEqual(config, sim.config)
 
-        # The demographics coming from the experiment, it should be in the demographics of the simulation but not in the assets
+        # The demographics coming from the experiment
         self.assertIsNone(sim.assets.get_one(filename=os.path.basename(DEFAULT_DEMOGRAPHICS_JSON)))
         self.assertIsNotNone(sim.demographics.get_one(filename=os.path.basename(DEFAULT_DEMOGRAPHICS_JSON)))
 
