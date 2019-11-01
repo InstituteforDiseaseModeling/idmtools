@@ -18,7 +18,7 @@ worry about this but to be compatible with execution on linux system you need to
 1. Your docker image and script should be executable through docker run as a non-root user. For example, in this model 
 we can test this by creating a test config.json and model.R in a directory and then running
     ```
-    docker run -v /path/to/config/dir:/data -w /data -u "$(id -u):$(id-g)" idm-docker-staging.idmod.org/idmtools_r_model_example Rscript model.R --config-file config.json
+    docker run -v /path/to/config/dir:/data -w /data -u "$(id -u):$(id -g)" idm-docker-staging.idmod.org/idmtools_r_model_example Rscript model.R --config-file config.json
     ```
     On Windows you would run
     ```
