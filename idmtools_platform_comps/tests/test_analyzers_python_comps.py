@@ -1,5 +1,7 @@
 import os
 from functools import partial
+
+import pytest
 from COMPS.Data import Experiment
 from idmtools.builders import ExperimentBuilder
 from idmtools.core.platform_factory import Platform
@@ -25,6 +27,9 @@ setC = partial(param_update, param="c")
 setD = partial(param_update, param="d")
 
 
+@pytest.mark.analysis
+@pytest.mark.python
+@pytest.mark.comps
 class TestAnalyzeManagerPythonComps(ITestWithPersistence):
 
     def setUp(self) -> None:

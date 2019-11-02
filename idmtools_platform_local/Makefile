@@ -124,10 +124,10 @@ release-staging-release-commit: ## perform a release to staging and commit the v
 	@make docker-release-staging
 
 build-ui:
-	@$(IPY) "import shutil; shutil.rmtree('idmtools_platform_local/workers/ui/static', True)"
+	@$(IPY) "import shutil; shutil.rmtree('idmtools_platform_local/internals/ui/static', True)"
 	@$(IPY) "import shutil; shutil.rmtree('idmtools_webui/build', True)"
 	@+$(IPY) "import os; os.chdir('idmtools_webui'); os.system('python build.py')"
-	@$(IPY) "import shutil; shutil.copytree('idmtools_webui/build', 'idmtools_platform_local/workers/ui/static')"
+	@$(IPY) "import shutil; shutil.copytree('idmtools_webui/build', 'idmtools_platform_local/internals/ui/static')"
 
 bump-patch:
 	bump2version patch --commit

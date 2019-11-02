@@ -29,7 +29,7 @@ class BaseTask:
         Returns:
             (Status) Status of the job. This is determine by the system return code of the process
         """
-        from idmtools_platform_local.workers.utils import create_or_update_status
+        from idmtools_platform_local.internals.workers.utils import create_or_update_status
         # Open of Stdout and StdErr files that will be used to track input and output
         logger.debug(f"Simulation path {simulation_path}")
         with open(os.path.join(simulation_path, "StdOut.txt"), "w") as out, \
@@ -64,8 +64,8 @@ class BaseTask:
         Returns:
             (Status) Status of the job
         """
-        from idmtools_platform_local.workers.data.job_status import JobStatus
-        from idmtools_platform_local.workers.database import get_session
+        from idmtools_platform_local.internals.data.job_status import JobStatus
+        from idmtools_platform_local.internals.workers.database import get_session
         # Determine if the task succeeded or failed
         status = Status.done if return_code == 0 else Status.failed
         # If it failed, we should let the user know with a log message
@@ -83,8 +83,8 @@ class BaseTask:
         return status
 
     def get_current_job(self, experiment_uuid, simulation_uuid, command):
-        from idmtools_platform_local.workers.data.job_status import JobStatus
-        from idmtools_platform_local.workers.database import get_session
+        from idmtools_platform_local.internals.data.job_status import JobStatus
+        from idmtools_platform_local.internals.workers.database import get_session
         # Get the current job
         current_job: JobStatus = get_session().query(JobStatus). \
             filter(JobStatus.uuid == simulation_uuid, JobStatus.parent_uuid == experiment_uuid).first()
@@ -92,7 +92,7 @@ class BaseTask:
         return current_job
 
     def is_canceled(self, current_job):
-        from idmtools_platform_local.workers.utils import create_or_update_status
+        from idmtools_platform_local.internals.workers.utils import create_or_update_status
         if current_job.status == Status.canceled:
             logger.info(f'Job {current_job.uuid} has been canceled')
             # update command extra_details. Useful in future for deletion
@@ -129,81 +129,7 @@ class BaseTask:
         return self.run_task(command, current_job, experiment_uuid, simulation_path, simulation_uuid)
 
 
-class DockerBaseTask(BaseTask):
-    def docker_perform(self, command: str, experiment_uuid: str, simulation_uuid: str, container_config: dict) \
-            -> Status:
-        from idmtools_platform_local.workers.utils import create_or_update_status
-        container_config = container_config
-        # update the config to container the volume info
-
-        # Define our simulation path and our root asset path
-        simulation_path = os.path.join(os.getenv("DATA_PATH", "/data"), experiment_uuid, simulation_uuid)
-
-        container_config['detach'] = True
-        container_config['stderr'] = True
-        container_config['working_dir'] = simulation_path
-        container_config['user'] = os.getenv('CURRENT_UID')
-        # container_config['auto_remove'] = True
-        # we have to mount using the host data path
-        data_dir = f'{os.getenv("HOST_DATA_PATH")}'
-        data_dir += "\\" if "\\" in data_dir else "/"
-        container_config['volumes'] = {
-            data_dir: dict(bind='/data', mode='rw'),
-        }
-        # limit cpu
-        if cpu_count() > 2:
-
-            container_config['cpuset_cpus'] = f'{next(cpu_sequence)}'
-
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f"Task Docker Config: {str(container_config)}")
-
-        current_job = self.get_current_job(experiment_uuid, simulation_uuid, command)
-        if self.is_canceled(current_job):
-            return current_job.status
-
-        result = self.run_container(command, container_config, current_job, simulation_path, simulation_uuid)
-        # check if we succeeded
-        if result:
-            logger.info(result['StatusCode'])
-            return_code = result['StatusCode']
-        else:
-            return_code = -999
-        status = self.extract_status(experiment_uuid, return_code, simulation_uuid)
-        # Update task with the final status
-        create_or_update_status(simulation_uuid, status=status, extra_details=current_job.extra_details)
-        return status
-
-    def run_container(self, command, container_config, current_job, simulation_path, simulation_uuid):
-        import docker
-        from idmtools_platform_local.workers.utils import create_or_update_status
-        result = None
-        with open(os.path.join(simulation_path, "StdOut.txt"), "w") as out, \
-                open(os.path.join(simulation_path, "StdErr.txt"), "w") as err:  # noqa: F841
-            try:
-                client = docker.DockerClient(base_url='unix://var/run/docker.sock')
-                dcmd = f'docker run -v {os.getenv("HOST_DATA_PATH")}:/data --user \"{os.getenv("CURRENT_UID")}\" ' \
-                    f'-w {container_config["working_dir"]} {container_config["image"]} {command}'
-                logger.info(f"Running docker command: {dcmd}")
-                logger.info(f"Running {command} with docker config {str(container_config)}")
-                out.write(f"{command}\n")
-
-                container = client.containers.run(command=command, **container_config)
-                log_reader = container.logs(stream=True)
-
-                current_job.extra_details['container_id'] = container.id
-                # Log that we have started this particular simulation
-                create_or_update_status(simulation_uuid, status=Status.in_progress, extra_details=current_job.extra_details)
-                for output in log_reader:
-                    out.write(output.decode("utf-8"))
-                result = container.wait()
-            except Exception as e:
-                err.write(str(e))
-                raise e
-        return result
-
-
-class RunTask(GenericActor, DockerBaseTask):
+class RunTask(GenericActor, BaseTask):
     """
     Run the given `command` in the simulation folder.
     """
@@ -215,25 +141,3 @@ class RunTask(GenericActor, DockerBaseTask):
 
     def perform(self, command: str, experiment_uuid: str, simulation_uuid: str) -> Status:
         return self.execute_simulation(command, experiment_uuid, simulation_uuid)
-
-
-class DockerRunTask(GenericActor, DockerBaseTask):
-    class Meta:
-        store_results = False
-        max_retries = 0
-        queue_name = "cpu"
-
-    def perform(self, command: str, experiment_uuid: str, simulation_uuid: str, container_config: dict) -> Status:
-        return self.docker_perform(command, experiment_uuid, simulation_uuid, container_config)
-
-
-# it would be great we could just derive from RunTask and change the meta but that doesn't seem to work with
-# GenericActors for some reason. Using BaseTask and these few lines of redundant code are our compromise
-class GPURunTask(GenericActor, DockerBaseTask):
-    class Meta:
-        store_results = False
-        max_retries = 0
-        queue_name = "gpu"
-
-    def perform(self, command: str, experiment_uuid: str, simulation_uuid: str, container_config: dict) -> Status:
-        return self.docker_perform(command, experiment_uuid, simulation_uuid, container_config)

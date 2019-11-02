@@ -29,6 +29,8 @@ class TestCOMPSPlatform(ITestWithPersistence):
         self.builder = ExperimentBuilder()
         self.builder.add_sweep_definition(setP, [1, 2, 3])
 
+    @pytest.mark.assets
+    @pytest.mark.python
     def test_output_files_retrieval(self):
         config = {"a": 1, "b": 2}
         experiment = PythonExperiment(name=self.case_name,

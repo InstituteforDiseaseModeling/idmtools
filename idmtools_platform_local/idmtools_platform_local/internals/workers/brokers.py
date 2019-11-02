@@ -9,7 +9,7 @@ from dramatiq.results.backends import RedisBackend, StubBackend
 logger = getLogger(__name__)
 
 redis_broker = None
-redis_backend = None
+redis_backend: RedisBackend = None
 
 
 def setup_broker():
@@ -21,13 +21,29 @@ def setup_broker():
     if os.getenv("UNIT_TESTS") == "1":
         redis_broker = StubBroker()
         redis_backend = StubBackend()
-    elif redis_broker is None and redis_backend is None:
+    elif redis_broker is None:
         logger.debug(f"Using Redis URL: {REDIS_URL}")
         redis_broker = RedisBroker(url=REDIS_URL)
         redis_backend = RedisBackend(url=REDIS_URL)
-    redis_broker.add_middleware(Results(backend=redis_backend))
-    dramatiq.set_broker(redis_broker)
+        redis_broker.add_middleware(Results(backend=redis_backend))
+        dramatiq.set_broker(redis_broker)
     return redis_broker
+
+
+def get_brokers():
+    setup_broker()
+    return redis_broker, redis_backend
+
+
+def close_brokers():
+    global redis_broker
+    global redis_backend
+    if redis_broker:
+        redis_broker.close()
+        redis_broker = None
+    if redis_backend:
+        del redis_backend
+        redis_backend = None
 
 
 redis_broker = setup_broker()

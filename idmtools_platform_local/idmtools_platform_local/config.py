@@ -15,7 +15,7 @@ API_PATH = os.getenv("API_PATH", f'http://{API_HOST}:{API_PORT}/api')
 # Database configuration for our workers
 SQLALCHEMY_ECHO = os.getenv('SQLALCHEMY_ECHO', '0').lower() in true_options
 SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI',
-                                    "postgresql+psycopg2://idmtools:idmtools@postgres/idmtools")
+                                    "postgresql+psycopg2://idmtools:idmtools@idmtools_postgres/idmtools")
 
 
 def get_api_path():

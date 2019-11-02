@@ -5,11 +5,11 @@ from flask_restful import Resource, reqparse, abort
 from sqlalchemy import String, func, or_, and_
 
 from idmtools_platform_local.config import DATA_PATH
+from idmtools_platform_local.internals.data.job_status import JobStatus
+from idmtools_platform_local.internals.ui.controllers.utils import validate_tags
 from idmtools_platform_local.status import Status
-from idmtools_platform_local.workers.data.job_status import JobStatus
-from idmtools_platform_local.workers.database import get_session
-from idmtools_platform_local.workers.ui.config import db
-from idmtools_platform_local.workers.ui.controllers.utils import validate_tags
+from idmtools_platform_local.internals.ui.config import db
+
 
 logger = logging.getLogger(__name__)
 
@@ -111,7 +111,7 @@ class Experiments(Resource):
 
     def delete(self, id):
         args = delete_args.parse_args()
-        session = get_session()
+        session = db.session
         try:
             job: JobStatus = session.query(JobStatus).filter(JobStatus.uuid == id).first()
             if job is None:

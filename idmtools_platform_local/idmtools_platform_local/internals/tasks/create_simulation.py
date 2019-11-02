@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 def create_simulation(experiment_id: str, tags: 'TTags', session=None):
     # we only want to import this here so that clients don't need postgres/sqlalchemy packages
-    from idmtools_platform_local.workers.utils import create_or_update_status
+    from idmtools_platform_local.internals.workers.utils import create_or_update_status
     uuid = ''.join(random.choice(string.digits + string.ascii_uppercase) for _ in range(8))
 
     if logger.isEnabledFor(logging.DEBUG):
@@ -89,7 +89,7 @@ class CreateSimulationsTask(GenericActor):
         Returns:
             (str) The generated simulation uuid
         """
-        from idmtools_platform_local.workers.database import get_session
+        from idmtools_platform_local.internals.workers.utils import get_session
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug('Batch Creating simulation for experiment %s', experiment_id)
         session = get_session()

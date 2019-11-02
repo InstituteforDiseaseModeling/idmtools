@@ -1,3 +1,5 @@
+import pytest
+
 from idmtools_test.utils.confg_local_runner_test import config_local_test, patch_db
 from idmtools_test.utils.decorators import linux_only
 from idmtools_platform_local.status import Status
@@ -13,6 +15,7 @@ from unittest import TestCase
 
 @linux_only
 @patch_db
+@pytest.mark.local_platform_internals
 class TestTasks(TestCase):
 
     @classmethod
@@ -31,7 +34,7 @@ class TestTasks(TestCase):
             pass
 
     def setUp(self) -> None:
-        from idmtools_platform_local.tasks.create_experiment import CreateExperimentTask
+        from idmtools_platform_local.internals.tasks.create_experiment import CreateExperimentTask
         self.experiment_id = CreateExperimentTask.perform(dict(a='b', c='d'), "s")
         print(os.environ["DATA_PATH"])
 
@@ -51,7 +54,7 @@ class TestTasks(TestCase):
         """
         Test create simulation actor
         """
-        from idmtools_platform_local.tasks.create_simulation import CreateSimulationTask
+        from idmtools_platform_local.internals.tasks.create_simulation import CreateSimulationTask
         new_simulation_id = CreateSimulationTask.perform(self.experiment_id, dict(y="z"))
 
         # Check that the data directory
@@ -65,8 +68,8 @@ class TestTasks(TestCase):
         """
         Test run task actor
         """
-        from idmtools_platform_local.tasks.create_simulation import CreateSimulationTask
-        from idmtools_platform_local.tasks.run import RunTask
+        from idmtools_platform_local.internals.tasks.create_simulation import CreateSimulationTask
+        from idmtools_platform_local.internals.tasks.general_task import RunTask
         new_simulation_id = CreateSimulationTask.perform(self.experiment_id, dict(y="z"))
 
         # Check that the data directory
@@ -79,7 +82,6 @@ class TestTasks(TestCase):
         # copy simple model over. Since we are doing low-level testing, let's not use asset management here
         shutil.copy(os.path.join(COMMON_INPUT_PATH, 'python', 'hello_world.py'),
                     os.path.join(self.local_path, self.experiment_id, new_simulation_id))
-
 
         status = RunTask.perform("python hello_world.py", self.experiment_id, new_simulation_id)
         self.assertEqual(status, Status.done)

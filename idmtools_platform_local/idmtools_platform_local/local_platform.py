@@ -18,7 +18,7 @@ from idmtools.entities.iexperiment import IGPUExperiment, IDockerExperiment, IWi
 from idmtools.entities.isimulation import ISimulation, TSimulation
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
 from idmtools_platform_local.client.simulations_client import SimulationsClient
-from idmtools_platform_local.docker.docker_operations import default_image, DockerOperations, default_base_sir
+from idmtools_platform_local.internals.docker_operations import DockerOperations, default_base_sir
 
 status_translate = dict(
     created='CREATED',
@@ -54,7 +54,7 @@ class LocalPlatform(IPlatform):
     postgres_mem_limit: str = field(default='64m')
     postgres_mem_reservation: str = field(default='32m')
     postgres_port: Optional[str] = field(default=5432)
-    workers_image: str = field(default=default_image)
+    workers_image: str = field(default=None)
     workers_ui_port: int = field(default=5000)
     default_timeout: int = field(default=45)
     run_as: Optional[str] = field(default=None)
@@ -65,7 +65,7 @@ class LocalPlatform(IPlatform):
     _docker_operations: Optional[DockerOperations] = field(default=None, metadata={"pickle_ignore": True})
 
     def __post_init__(self):
-        from idmtools_platform_local.workers.brokers import setup_broker
+        from idmtools_platform_local.internals.workers.brokers import setup_broker
         logger.debug("Setting up local platform")
         self.supported_types = {ItemType.EXPERIMENT, ItemType.SIMULATION}
         # ensure our brokers are started
@@ -128,7 +128,8 @@ class LocalPlatform(IPlatform):
         return ids
 
     def run_items(self, items: TItemList) -> NoReturn:
-        from idmtools_platform_local.tasks.run import RunTask, DockerRunTask, GPURunTask
+
+        from idmtools_platform_local.internals.tasks.general_task import RunTask
         for item in items:
             if item.item_type == ItemType.EXPERIMENT:
                 if not self.is_supported_experiment(item):
@@ -137,21 +138,25 @@ class LocalPlatform(IPlatform):
                 for simulation in item.simulations:
                     # if the task is docker, build the extra config
                     if is_docker_type:
-                        logger.debug(f"Preparing Docker Task Configuration for {item.uid}:{simulation.uid}")
-                        is_gpu = isinstance(item, IGPUExperiment)
-                        run_cmd = GPURunTask if is_gpu else DockerRunTask
-                        docker_config = dict(
-                            image=item.image_name,
-                            auto_remove=self.auto_remove_worker_containers
-                        )
-                        # if we are running gpu, use nvidia runtime
-                        if is_gpu:
-                            docker_config['runtime'] = 'nvidia'
-                        run_cmd.send(item.command.cmd, item.uid, simulation.uid, docker_config)
+                        self.run_docker_sim(item, simulation)
                     else:
                         RunTask.send(item.command.cmd, item.uid, simulation.uid)
             else:
                 raise Exception(f'Unable to run item id: {item.uid} of type: {type(item)} ')
+
+    def run_docker_sim(self, item, simulation):
+        from idmtools_platform_local.internals.tasks.docker_run import DockerRunTask, GPURunTask
+        logger.debug(f"Preparing Docker Task Configuration for {item.uid}:{simulation.uid}")
+        is_gpu = isinstance(item, IGPUExperiment)
+        run_cmd = GPURunTask if is_gpu else DockerRunTask
+        docker_config = dict(
+            image=item.image_name,
+            auto_remove=self.auto_remove_worker_containers
+        )
+        # if we are running gpu, use nvidia runtime
+        if is_gpu:
+            docker_config['runtime'] = 'nvidia'
+        run_cmd.send(item.command.cmd, item.uid, simulation.uid, docker_config)
 
     def send_assets(self, item: TItem, **kwargs) -> NoReturn:
         """
@@ -231,7 +236,7 @@ class LocalPlatform(IPlatform):
         Returns:
             Id
         """
-        from idmtools_platform_local.tasks.create_experiment import CreateExperimentTask
+        from idmtools_platform_local.internals.tasks.create_experiment import CreateExperimentTask
         if not self.is_supported_experiment(experiment):
             raise ValueError("This experiment type is not support on the LocalPlatform.")
 
@@ -255,7 +260,7 @@ class LocalPlatform(IPlatform):
         """
         # Go through all the assets
         path = "/".join(["/data", experiment.uid, "Assets"])
-        worker = self._docker_operations.get_workers()
+        worker = self._docker_operations._services['WorkersContainer'].get_or_create()
         list(map(functools.partial(self.send_asset_to_docker, path=path, worker=worker), experiment.assets))
 
     def _send_assets_for_simulation(self, simulation, worker: Container = None):
@@ -272,7 +277,7 @@ class LocalPlatform(IPlatform):
         # Go through all the assets
         path = "/".join(["/data", simulation.experiment.uid, simulation.uid])
         if worker is None:
-            worker = self._docker_operations.get_workers()
+            worker = self._docker_operations._services['WorkersContainer'].get_or_create()
 
         items = self.assets_to_copy_multiple_list(path, simulation.assests)
         self._docker_operations.copy_multiple_to_container(worker, items)
@@ -316,7 +321,7 @@ class LocalPlatform(IPlatform):
             logger.debug(f"Creating directory {remote_path} result: {str(result)}")
         # is it a real file?
         if worker is None:
-            worker = self._docker_operations.get_workers()
+            worker = self._docker_operations._services['WorkersContainer'].get_or_create()
         self._docker_operations.copy_to_container(worker, file_path if file_path else asset.content, remote_path,
                                                   asset.filename if asset.filename else file_path)
 
@@ -330,8 +335,8 @@ class LocalPlatform(IPlatform):
         Returns:
             Ids of simulations created
         """
-        from idmtools_platform_local.tasks.create_simulation import CreateSimulationsTask
-        worker = self._docker_operations.get_workers()
+        from idmtools_platform_local.internals.tasks.create_simulation import CreateSimulationsTask
+        worker = self._docker_operations._services['WorkersContainer'].get_or_create()
 
         m = CreateSimulationsTask.send(simulations_batch[0].experiment.uid, [s.tags for s in simulations_batch])
         ids = m.get_result(block=True, timeout=self.default_timeout * 1000)

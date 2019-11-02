@@ -4,11 +4,11 @@ from typing import Optional, List, Tuple, Dict
 from flask import request
 from flask_restful import Resource, reqparse, abort
 from sqlalchemy import String
-from idmtools_platform_local.workers.data.job_status import JobStatus
-from idmtools_platform_local.workers.database import get_session
+
+from idmtools_platform_local.internals.data.job_status import JobStatus
+from idmtools_platform_local.internals.ui.controllers.utils import validate_tags
 from idmtools_platform_local.status import Status
-from idmtools_platform_local.workers.ui.config import db
-from idmtools_platform_local.workers.ui.controllers.utils import validate_tags
+from idmtools_platform_local.internals.ui.config import db
 
 logger = logging.getLogger(__name__)
 
@@ -88,7 +88,7 @@ class Simulations(Resource):
         # later, we may support resuming but we will need to include more data in the db to do this
         data = {k: v for k, v in data.items() if k == 'status' and v in ['canceled']}
         if len(data) > 0:
-            s = get_session()
+            s = db.session
             current_job: JobStatus = s.query(JobStatus).filter(JobStatus.uuid == id).first()
             # check if we have a PID, if so kill it
             if current_job.metadata is not None and 'pid' in current_job.metadata:

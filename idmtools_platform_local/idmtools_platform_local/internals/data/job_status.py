@@ -3,7 +3,7 @@ import datetime
 import sqlalchemy
 from sqlalchemy import Enum, Column, String, DateTime, func, Index
 from sqlalchemy.dialects.postgresql import JSON
-from idmtools_platform_local.workers.data import Base
+from idmtools_platform_local.internals.data import Base
 from idmtools_platform_local.status import Status
 
 

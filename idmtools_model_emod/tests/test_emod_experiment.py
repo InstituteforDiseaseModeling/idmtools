@@ -8,6 +8,7 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 
 @pytest.mark.comps
+@pytest.mark.emod
 class TestEMOD(ITestWithPersistence):
 
     def setUp(self) -> None:

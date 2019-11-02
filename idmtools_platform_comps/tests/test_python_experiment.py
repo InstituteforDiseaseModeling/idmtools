@@ -34,6 +34,7 @@ class setParam:
 
 
 @pytest.mark.comps
+@pytest.mark.python
 class TestPythonExperiment(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName

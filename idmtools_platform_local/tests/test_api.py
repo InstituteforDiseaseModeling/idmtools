@@ -6,8 +6,8 @@ from operator import itemgetter
 import pytest
 api_host = os.getenv('API_HOST', 'localhost')
 os.environ['SQLALCHEMY_DATABASE_URI'] = f'postgresql+psycopg2://idmtools:idmtools@{api_host}/idmtools'
-from idmtools_platform_local.docker.docker_operations import DockerOperations
-from idmtools_platform_local.workers.utils import create_or_update_status
+from idmtools_platform_local.internals.docker_operations import DockerOperations
+from idmtools_platform_local.internals.workers.utils import create_or_update_status
 from idmtools_test.utils.confg_local_runner_test import config_local_test, patch_broker
 
 
@@ -15,6 +15,7 @@ dm = None
 
 
 @pytest.mark.docker
+@pytest.mark.local_platform_internals
 class TestAPI(unittest.TestCase):
 
     @patch_broker
@@ -26,19 +27,21 @@ class TestAPI(unittest.TestCase):
         if dm is None:
             dm = DockerOperations()
             dm.cleanup(True)
-            dm.get_postgres()
+            dm.get_network()
+            dm._services['PostgresContainer'].get_or_create()
             time.sleep(8)
             created = True
-        from idmtools_platform_local.workers.ui.app import application
+        from idmtools_platform_local.internals.ui.app import application
         self.app = application.test_client()
         if created:
             self.create_test_data()
 
     @staticmethod
     def create_test_data():
-        from idmtools_platform_local.workers.database import get_session
-        from idmtools_platform_local.workers.data.job_status import JobStatus
+        from idmtools_platform_local.internals.workers.database import get_session
+        from idmtools_platform_local.internals.data.job_status import JobStatus
         # delete any previous data
+
         get_session().query(JobStatus).delete()
         # this experiment has no children
         create_or_update_status('AAAAA', '/data/AAAAA', dict(a='b', c='d'),

@@ -18,13 +18,12 @@ from idmtools_platform_local.client.simulations_client import SimulationsClient
 
 
 @pytest.mark.docker
+@pytest.mark.local_platform_cli
 class TestLocalRunnerCLI(ITestWithPersistence):
 
     @classmethod
     def setUpClass(cls):
         reset_local_broker()
-        from idmtools_platform_local.workers.brokers import setup_broker
-        setup_broker()
         platform = Platform('Local', **get_test_local_env_overrides())
         cls.pe = PythonExperiment(name="python experiment", model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
 

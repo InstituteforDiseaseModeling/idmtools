@@ -5,7 +5,7 @@ from os.path import join
 
 
 def config_local_test():
-    from idmtools_platform_local.workers.brokers import setup_broker
+    from idmtools_platform_local.internals.workers.brokers import setup_broker
     os.environ['UNIT_TESTS'] = '1'
     if 'DATA_PATH' not in os.environ:
         test_temp_dir = tempfile.mkdtemp()
@@ -47,5 +47,5 @@ def get_db():
     return engine
 
 
-patch_broker = unittest.mock.patch('idmtools_platform_local.local_platform.setup_broker', side_effect=setup_test_broker)
-patch_db = unittest.mock.patch('idmtools_platform_local.workers.database.get_db', side_effect=get_db)
+patch_broker = unittest.mock.patch('idmtools_platform_local.internals.workers.brokers.setup_broker', side_effect=setup_test_broker)
+patch_db = unittest.mock.patch('idmtools_platform_local.internals.workers.database.get_db', side_effect=get_db)

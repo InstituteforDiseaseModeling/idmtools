@@ -30,6 +30,7 @@ ERADICATION_BINARIES = dict(COMPS=os.path.join(COMMON_INPUT_PATH, "emod", "Eradi
 
 @pytest.mark.comps
 @pytest.mark.docker
+@pytest.mark.emod
 class TestEMOD(ITestWithPersistence):
 
     @classmethod

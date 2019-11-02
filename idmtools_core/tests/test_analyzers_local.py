@@ -38,14 +38,15 @@ class AddAnalyzer(IAnalyzer):
         return value
 
 
+@pytest.mark.analysis
+@pytest.mark.docker
 class TestAnalyzeManager(ITestWithPersistence):
 
     @classmethod
     def setUpClass(cls) -> None:
-        from idmtools_platform_local.local_platform import LocalPlatform
-        cls.platform: LocalPlatform = Platform('Local')
+        cls.platform = Platform('Local')
         # cleanup first
-        cls.platform._docker_operations.cleanup()
+        cls.platform._docker_operations.cleanup(True, tear_down_broker=True)
         cls.platform._docker_operations.create_services()
 
         pe = PythonExperiment(name=os.path.basename(__file__) + "--"  + cls.__name__,
@@ -65,8 +66,6 @@ class TestAnalyzeManager(ITestWithPersistence):
         print('Waiting on experiment to finish')
         em.wait_till_done()
         print('experiment done')
-        # TODO fix timing on local platform
-        time.sleep(5)
 
         cls.exp_id = pe.uid
         
@@ -74,7 +73,6 @@ class TestAnalyzeManager(ITestWithPersistence):
     def tearDownClass(cls) -> None:
         cls.platform._docker_operations.cleanup()
 
-    @pytest.mark.docker
     @pytest.mark.timeout(60)
     def test_AddAnalyzer(self):
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName

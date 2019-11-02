@@ -1,7 +1,6 @@
-
-from idmtools_platform_local.workers.ui.config import application, api, ai
-from idmtools_platform_local.workers.ui.controllers.experiments import Experiments
-from idmtools_platform_local.workers.ui.controllers.simulations import Simulations
+from idmtools_platform_local.internals.ui.config import application, api, ai
+from idmtools_platform_local.internals.ui.controllers.experiments import Experiments
+from idmtools_platform_local.internals.ui.controllers.simulations import Simulations
 
 # We setup a simple data folder browser
 # We meed to manually add our rules because we don't want them at

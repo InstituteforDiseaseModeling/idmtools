@@ -1,5 +1,6 @@
-from idmtools_platform_local.workers.database import get_or_create, get_session
-from idmtools_platform_local.workers.data.job_status import JobStatus, Status
+from idmtools_platform_local.internals.data.job_status import JobStatus
+from idmtools_platform_local.internals.workers.database import get_session, get_or_create
+from idmtools_platform_local.status import Status
 
 
 def create_or_update_status(uuid, data_path=None, tags=None, status=Status.created, parent_uuid=None,

@@ -13,6 +13,7 @@ from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id,
 
 
 @pytest.mark.comps
+@pytest.mark.assets
 class TestAssetsInComps(unittest.TestCase):
 
     def setUp(self) -> None:

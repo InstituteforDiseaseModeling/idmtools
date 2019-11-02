@@ -6,7 +6,7 @@ import socketserver
 import subprocess
 import unittest.mock
 import pytest
-from idmtools_platform_local.docker.docker_operations import DockerOperations
+from idmtools_platform_local.internals.docker_operations import DockerOperations
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.confg_local_runner_test import get_test_local_env_overrides
 from idmtools_test.utils.decorators import restart_local_platform, linux_only, skip_api_host
@@ -20,12 +20,15 @@ def check_port_is_open(port):
 
 
 @pytest.mark.docker
+@pytest.mark.local_platform_internals
 class TestDockerOperations(unittest.TestCase):
 
     def test_create_redis_starts(self):
         dm = DockerOperations(**get_test_local_env_overrides())
         dm.cleanup(True)
-        dm.get_redis()
+        dm.get_network()
+        redis = list(dm._services.values())[1]
+        redis.get_or_create()
         check_port_is_open(6379)
         dm.stop_services()
 
@@ -37,7 +40,9 @@ class TestDockerOperations(unittest.TestCase):
         """
         dm = DockerOperations(**get_test_local_env_overrides())
         dm.cleanup(True)
-        dm.get_postgres()
+        dm.get_network()
+        postgres = list(dm._services.values())[0]
+        postgres.get_or_create()
         check_port_is_open(5432)
         dm.stop_services()
 
@@ -48,15 +53,13 @@ class TestDockerOperations(unittest.TestCase):
         dm = DockerOperations(**get_test_local_env_overrides())
         dm.cleanup(True)
         dm.create_services()
-        check_port_is_open(5432)
-        check_port_is_open(5432)
-        check_port_is_open(6379)
 
         with self.subTest("can_run_containers"):
             self.assertEqual(0, os.system(f'docker exec idmtools_workers docker run hello-world'))
 
         with self.subTest("can_copy_to_container"):
-            worker_container = dm.get_workers()
+            worker_container = list(dm._services.values())[2].get()
+
             result = dm.copy_to_container(worker_container,
                                           os.path.join(COMMON_INPUT_PATH, "python", "hello_world.py"),
                                           "/data")
@@ -75,11 +78,12 @@ class TestDockerOperations(unittest.TestCase):
         dm.create_services()
 
         # stop workers
-        worker_container = dm.get_workers()
+        worker_container = list(dm._services.values())[2]
         worker_container.stop()
 
         # get container again and make sure it is started
-        worker_container = dm.get_workers()
+        worker_container = list(dm._services.values())[2].get_or_create()
+
         self.assertEqual(worker_container.status, 'running')
         dm.cleanup(True)
 
@@ -91,7 +95,6 @@ class TestDockerOperations(unittest.TestCase):
 
         pl = DockerOperations(workers_ui_port=10000, **get_test_local_env_overrides())
         pl.cleanup(True)
-        pl.create_services()
 
         Handler = http.server.SimpleHTTPRequestHandler
 

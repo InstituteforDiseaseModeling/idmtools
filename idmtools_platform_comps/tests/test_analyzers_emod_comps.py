@@ -31,6 +31,7 @@ setD = partial(param_update, param="d")
 
 
 @pytest.mark.comps
+@pytest.mark.analysis
 class TestAnalyzeManagerEmodComps(ITestWithPersistence):
 
     def setUp(self) -> None:

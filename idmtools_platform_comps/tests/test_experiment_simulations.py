@@ -1,5 +1,8 @@
 import os
 import unittest
+
+import pytest
+
 from idmtools.core.platform_factory import Platform
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
@@ -32,6 +35,8 @@ class TestExperimentSimulations(ITestWithPersistence):
     def tearDown(self):
         super().tearDown()
 
+    @pytest.mark.emod
+    @pytest.mark.comps
     def test_input_simulations(self):
         # Create an experiment
         exp = EMODExperiment.from_default('simulation_test', default=EMODSir, eradication_path=DEFAULT_ERADICATION_PATH)
@@ -66,6 +71,7 @@ class TestExperimentSimulations(ITestWithPersistence):
 
         self.assertEqual(len(sims), 7)
 
+    @pytest.mark.emod
     def test_simulation_experiment(self):
         exp = EMODExperiment()
         sim = exp.simulation()

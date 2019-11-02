@@ -1,5 +1,7 @@
 import unittest
 
+import pytest
+
 from idmtools.analysis.AnalyzeManager import AnalyzeManager
 from idmtools.analysis.DownloadAnalyzer import DownloadAnalyzer as SampleAnalyzer
 from idmtools.builders import StandAloneSimulationsBuilder
@@ -10,6 +12,7 @@ from idmtools.managers import ExperimentManager
 from idmtools_test.utils.tst_experiment import TstExperiment
 
 
+@pytest.mark.analysis
 class TestAnalyzeManager(unittest.TestCase):
     class TestAnalyzer(IAnalyzer):
         def __init__(self, working_dir=None):

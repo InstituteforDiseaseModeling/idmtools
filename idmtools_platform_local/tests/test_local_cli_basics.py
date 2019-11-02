@@ -10,13 +10,14 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 api_host = os.getenv('API_HOST', 'localhost')
 os.environ['SQLALCHEMY_DATABASE_URI'] = f'postgresql+psycopg2://idmtools:idmtools@{api_host}/idmtools'
-from idmtools_platform_local.docker.docker_operations import DockerOperations
+from idmtools_platform_local.internals.docker_operations import DockerOperations
 from idmtools_platform_local.status import Status
-from idmtools_platform_local.workers.utils import create_or_update_status
+from idmtools_platform_local.internals.workers.utils import create_or_update_status
 from idmtools_test.utils.cli import get_subcommands_from_help_result, run_command
 from idmtools_test.utils.confg_local_runner_test import get_test_local_env_overrides
 
 
+@pytest.mark.local_platform_cli
 class TestLocalCLIBasic(unittest.TestCase):
     @staticmethod
     def create_test_data():
@@ -75,7 +76,7 @@ class TestLocalCLIBasic(unittest.TestCase):
         url = f'postgresql+psycopg2://idmtools:idmtools@{api_host}/idmtools'
         engine = create_engine(url, echo=False, pool_size=32)
         session_factory = sessionmaker(bind=engine)
-        from idmtools_platform_local.workers.data.job_status import Base
+        from idmtools_platform_local.internals.data import Base
 
         def test_db_factory():
             return session_factory()
@@ -84,7 +85,8 @@ class TestLocalCLIBasic(unittest.TestCase):
 
         with self.subTest("test_experiments_status"):
             # Now patch our areas that use our session
-            @unittest.mock.patch('idmtools_platform_local.workers.utils.get_session', side_effect=test_db_factory)
+            @unittest.mock.patch('idmtools_platform_local.internals.workers.utils.get_session',
+                                 side_effect=test_db_factory)
             def do_test(*mocks):
                 self.create_test_data()
                 time.sleep(1)
