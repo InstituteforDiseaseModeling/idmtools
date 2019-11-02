@@ -47,6 +47,7 @@ class TestAnalyzeManager(ITestWithPersistence):
         cls.platform = Platform('Local')
         # cleanup first
         cls.platform._docker_operations.cleanup(True, tear_down_broker=True)
+        cls.platform.setup_broker()
         cls.platform._docker_operations.create_services()
 
         pe = PythonExperiment(name=os.path.basename(__file__) + "--"  + cls.__name__,
