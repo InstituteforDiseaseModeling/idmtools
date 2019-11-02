@@ -1,5 +1,4 @@
 import os
-import time
 import pytest
 from idmtools.analysis.AnalyzeManager import AnalyzeManager
 from idmtools.builders import ExperimentBuilder
@@ -50,7 +49,7 @@ class TestAnalyzeManager(ITestWithPersistence):
         cls.platform.setup_broker()
         cls.platform._docker_operations.create_services()
 
-        pe = PythonExperiment(name=os.path.basename(__file__) + "--"  + cls.__name__,
+        pe = PythonExperiment(name=os.path.basename(__file__) + "--" + cls.__name__,
                               model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
 
@@ -69,7 +68,7 @@ class TestAnalyzeManager(ITestWithPersistence):
         print('experiment done')
 
         cls.exp_id = pe.uid
-        
+
     @classmethod
     def tearDownClass(cls) -> None:
         cls.platform._docker_operations.cleanup()

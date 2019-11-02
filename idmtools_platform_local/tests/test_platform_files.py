@@ -8,7 +8,7 @@ from idmtools_models.python import PythonExperiment
 from idmtools_platform_local.internals.docker_operations import DockerOperations
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-from idmtools_test.utils.confg_local_runner_test import reset_local_broker, get_test_local_env_overrides
+from idmtools_test.utils.confg_local_runner_test import get_test_local_env_overrides
 from idmtools_test.utils.decorators import restart_local_platform
 
 

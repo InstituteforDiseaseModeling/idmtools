@@ -1,4 +1,5 @@
 import unittest
+from typing import Any
 
 import pytest
 
@@ -6,6 +7,7 @@ from idmtools.analysis.AnalyzeManager import AnalyzeManager
 from idmtools.analysis.DownloadAnalyzer import DownloadAnalyzer as SampleAnalyzer
 from idmtools.builders import StandAloneSimulationsBuilder
 from idmtools.core.enums import EntityStatus, ItemType
+from idmtools.core.interfaces.iitem import TItem
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.ianalyzer import IAnalyzer
 from idmtools.managers import ExperimentManager

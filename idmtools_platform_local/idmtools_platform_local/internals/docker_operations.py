@@ -26,7 +26,6 @@ logger = getLogger(__name__)
 # thread queue for docker copy operations
 io_queue = ParallelizeDecorator()
 
-
 # determine our default base directory. We almost always want to use the users home directory
 # except odd environments like docker-in docker, special permissions, etc
 default_base_sir = os.getenv('IDMTOOLS_DATA_BASE_DIR', str(Path.home()))
@@ -122,7 +121,7 @@ class DockerOperations:
                     while retries < 5:
                         time.sleep(0.2)
                         if self.is_port_open('127.0.0.1', self.postgres_port) and \
-                            self.is_port_open('127.0.0.1', self.redis_port):
+                                self.is_port_open('127.0.0.1', self.redis_port):
                             break
                         retries += 1
                     if retries > 4:
@@ -208,7 +207,8 @@ class DockerOperations:
                     logger.exception(e)
                 pass
 
-    def cleanup(self, delete_data: bool = True, shallow_delete: bool = True, tear_down_broker = False) -> NoReturn:
+    def cleanup(self, delete_data: bool = True, shallow_delete: bool = True, tear_down_broker: bool = False) \
+            -> NoReturn:
         """
         Stops the running services, removes local data, and removes network. You can optionally disable the deleting
         of local data
@@ -217,7 +217,7 @@ class DockerOperations:
             delete_data(bool): When true, deletes local data
             shallow_delete(bool): Deletes the data but not the container folders(redis, workers). Preferred to preserve
                 permissions and resolve docker issues
-
+            tear_down_broker: Should the Redis broker be stopped
         Returns:
             (NoReturn)
         """

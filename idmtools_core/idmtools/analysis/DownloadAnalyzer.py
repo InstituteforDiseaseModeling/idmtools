@@ -1,6 +1,7 @@
 import datetime
 import os
 import time
+from typing import Any
 
 from idmtools.entities.ianalyzer import IAnalyzer
 
@@ -70,7 +71,6 @@ class DownloadAnalyzer(IAnalyzer):
 
     def reduce(self, all_data: dict) -> 'Any':
         finished = time.time()
-        runtime = str(datetime.timedelta(seconds=(finished - self.start_time)/1000))
+        runtime = str(datetime.timedelta(seconds=(finished - self.start_time) / 1000))
         total_files = sum([len(x) for x in all_data.values()])
         print(f"Downloaded {total_files} in {runtime}")
-

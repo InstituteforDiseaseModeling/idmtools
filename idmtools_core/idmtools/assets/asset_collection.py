@@ -197,7 +197,8 @@ class AssetCollection(IEntity):
         self.assets.clear()
 
     def set_all_persisted(self):
-        for a in self: a.persisted = True
+        for a in self:
+            a.persisted = True
 
     @property
     def count(self):

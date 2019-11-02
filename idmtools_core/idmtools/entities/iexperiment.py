@@ -247,8 +247,7 @@ class IDockerExperiment:
         build_config = dict(path=self.build_path, dockerfile=self.Dockerfile, tag=self.image_name,
                             labels=dict(
                                 buildstamp=f'built-by idmtools {__version__}',
-                                builddate=str(datetime.now(timezone(timedelta(hours=-8))))
-                                )
+                                builddate=str(datetime.now(timezone(timedelta(hours=-8)))))
                             )
         if extra_build_args:
             build_config.update(extra_build_args)

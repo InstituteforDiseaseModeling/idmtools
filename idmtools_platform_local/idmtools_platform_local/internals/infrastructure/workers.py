@@ -71,7 +71,7 @@ class WorkersContainer(BaseServiceContainer):
                                                   mem_reservation=self.mem_reservation, volumes=worker_volumes,
                                                   mem_limit=self.mem_limit, environment=environment,
                                                   links=dict(idmtools_redis='redis', idmtools_postgres='postgres')
-                                                 )
+                                                  )
 
         if logger.isEnabledFor(DEBUG):
             logger.debug(f"Worker Config: {container_config}")
