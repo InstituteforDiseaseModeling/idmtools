@@ -48,26 +48,26 @@ class TestPythonSimulation(ITestWithPersistence):
 
         self.assertEqual(p.parameters, {"a": 1})
         p.gather_assets()
-        self.assertEqual(p.assets.assets[0].content, str.encode(json.dumps({"a": 1})))
+        self.assertEqual(p.assets.assets[0].bytes, str.encode(json.dumps({"a": 1})))
 
         # Envelope
         p = PythonSimulation(parameters={"a": 1}, envelope="config")
 
         self.assertEqual(p.parameters, {"a": 1})
         p.gather_assets()
-        self.assertEqual(p.assets.assets[0].content, str.encode(json.dumps({"config": {"a": 1}})))
+        self.assertEqual(p.assets.assets[0].bytes, str.encode(json.dumps({"config": {"a": 1}})))
 
         # Envelope already set in parameters
         p = PythonSimulation(parameters={"config": {"a": 1}}, envelope="config")
         self.assertEqual(p.parameters, {"a": 1})
         p.gather_assets()
-        self.assertEqual(p.assets.assets[0].content, str.encode(json.dumps({"config": {"a": 1}})))
+        self.assertEqual(p.assets.assets[0].bytes, str.encode(json.dumps({"config": {"a": 1}})))
 
         # Envelope already set in parameters but no envelope parameter
         p = PythonSimulation(parameters={"config": {"a": 1}})
         self.assertEqual(p.parameters, {"config": {"a": 1}})
         p.gather_assets()
-        self.assertEqual(p.assets.assets[0].content, str.encode(json.dumps({"config": {"a": 1}})))
+        self.assertEqual(p.assets.assets[0].bytes, str.encode(json.dumps({"config": {"a": 1}})))
 
         print(p)  # verify __repr__method in ISumulation
         self.assertIn("<Simulation: " + p.uid + " - Exp_id: None>", mock_stdout.getvalue())
