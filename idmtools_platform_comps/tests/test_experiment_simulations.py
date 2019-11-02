@@ -41,7 +41,7 @@ class TestExperimentSimulations(ITestWithPersistence):
         # Create an experiment
         exp = EMODExperiment.from_default('simulation_test', default=EMODSir, eradication_path=DEFAULT_ERADICATION_PATH)
         exp.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
-        exp.base_simulation.load_files(demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)
+        exp.from_files("simulation_test", demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)
         exp.base_simulation.set_parameter("Enable_Immunity", 0)
 
         # User builder to create simulations
@@ -56,8 +56,7 @@ class TestExperimentSimulations(ITestWithPersistence):
 
         # Manually add simulation
         sim2 = EMODSimulation()
-        sim2.load_files(config_path=DEFAULT_CONFIG_PATH, campaign_path=DEFAULT_CAMPAIGN_JSON,
-                        demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)
+        sim2.load_files(config_path=DEFAULT_CONFIG_PATH, campaign_path=DEFAULT_CAMPAIGN_JSON)
         sim2.experiment = exp
         exp.simulations.append(sim2)
 

@@ -85,7 +85,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         ac = COMPSAssetCollection()
         for asset in experiment.assets:
             ac.add_asset(AssetCollectionFile(file_name=asset.filename, relative_path=asset.relative_path),
-                         data=asset.content)
+                         data=asset.bytes)
         ac.save()
         experiment.assets.uid = ac.id
         print("Asset collection for experiment: {}".format(ac.id))
@@ -98,7 +98,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     @staticmethod
     def _send_assets_for_simulation(simulation, comps_simulation) -> 'NoReturn':
         for asset in simulation.assets:
-            comps_simulation.add_file(simulationfile=SimulationFile(asset.filename, 'input'), data=asset.content)
+            comps_simulation.add_file(simulationfile=SimulationFile(asset.filename, 'input'), data=asset.bytes)
 
     @staticmethod
     def _clean_experiment_name(experiment_name: str) -> str:

@@ -221,7 +221,7 @@ class TestEMOD(ITestWithPersistence):
         # Check that we only have 2 assets
         self.assertEqual(2, len(experiment.assets.assets))
         # Check that Eradication is at the root and the one in exe/ not present
-        exe_eradication, = (a for a in experiment.assets if a.filename == "Eradication")
+        exe_eradication = experiment.assets.get_one(filename="Eradication")
         self.assertEqual("", exe_eradication.relative_path)
         self.assertEqual("Eradication", exe_eradication.filename)
         self.assertEqual(os.path.join(duplicated_model_path, "exe", "Eradication"), exe_eradication.absolute_path)

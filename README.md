@@ -59,31 +59,6 @@ For development purpose, it is important to add the following folders as to your
 - `idmtools/idmtools_models`
 - `idmtools/idmtools_test`
 
-### Manual Install
-
-Alternatively, you can install the packages manually by doing the following. 
-```bash
-> cd idmtools_core
-> pip install -e .[test] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
-> cd ..
-> cd idmtools_cli
-> pip install -e .[test]
-> cd idmtools_platform_local
-> pip install -e .[test]
-> cd ..
-> cd idmtools_platform_comps
-> pip install -e .[test]
-> cd ..
-> cd idmtools_model_emod
-> cd ..
-> cd idmtools_models
-> pip install -e .[test]
-> cd ..
-> cd idmtools_test
-> pip install -e .
-
-```
-
 ### Running specific tests from the command line
 
 From within a project directory such a local data
@@ -101,18 +76,6 @@ python -m unittest tests.test_docker_operations.TestDockerOperations.test_create
 
 Lastly, you can do also run the tests without setting the environment variables directly like so
 `DOCKER_TESTS=1 python -m unittest tests.test_docker_operations.TestDockerOperations.test_create_stack_starts`
-
-## Running the examples in Jupyter
-
-Navigate to the `examples` folder and run:
-```bash
-> docker-compose up
-```
-
-You can now open a browser and navigate to: http://localhost:8888.
-
-The examples are available in the `work/notebooks` folder.
-
 
 # Troubleshppting the Devevelopment Environment
 

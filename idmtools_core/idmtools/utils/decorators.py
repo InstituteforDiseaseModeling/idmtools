@@ -35,7 +35,9 @@ def optional_decorator(decorator: Callable, condition: Union[bool, Callable[[], 
         @wraps
         def wrapper(*args, **kwargs):
             func(*args, **kwargs)
+
         return wrapper
+
     return decorate_in
 
 
@@ -54,6 +56,7 @@ class SingletonDecorator:
             z = Thing()
             print(z.y)
     """
+
     def __init__(self, klass):
         self.klass = klass
         self.instance = None
@@ -85,6 +88,7 @@ class LoadOnCallSingletonDecorator:
             ExpensiveFactory = LoadOnCallSingletonDecorator(ExpensiveFactory)
             ExpensiveFactory.get_items()
     """
+
     def __init__(self, klass):
         self.instance = SingletonDecorator(klass)
         self.created = False
@@ -102,10 +106,11 @@ class LoadOnCallSingletonDecorator:
 def cache_for(ttl=datetime.timedelta(minutes=1)):
     def wrap(func):
         time, value = None, None
+
         @wraps(func)
         def wrapped(*args, **kw):
             # if we are testing, disable caching of functions as it complicates test-all setups
-            if os.getenv('TESTING', '0') .lower() in ['1', 'y', 'true', 'yes', 'on']:
+            if os.getenv('TESTING', '0').lower() in ['1', 'y', 'true', 'yes', 'on']:
                 return func(*args, **kw)
 
             nonlocal time
@@ -115,7 +120,9 @@ def cache_for(ttl=datetime.timedelta(minutes=1)):
                 value = func(*args, **kw)
                 time = now
             return value
+
         return wrapped
+
     return wrap
 
 
@@ -161,7 +168,9 @@ def optional_yaspin_load(*yargs, **ykwargs) -> Callable:
             if spinner:
                 spinner.stop()
             return result
+
         return wrapper
+
     return decorate
 
 
@@ -183,6 +192,7 @@ class ParallelizeDecorator:
                     futures = [self.heavy_op() for i in range(100)]
                     results = op_queue.get_results(futures)
     """
+
     def __init__(self, queue=None, pool_type: Optional[Type[Executor]] = ThreadPoolExecutor):
         if queue is None:
             self.queue = pool_type()
@@ -215,45 +225,3 @@ class ParallelizeDecorator:
 
     def __del__(self):
         del self.queue
-
-
-def retry_function(func, wait=1.5, max_retries=5):
-    """
-    Retry the call to a function with some time in between.
-
-    Args:
-        func: The function to retry.
-        time_between_tries: The time between retries, in seconds.
-        max_retries: The maximum number of times to retry the call.
-
-    Returns:
-        None
-
-    Example::
-
-        @retry_function
-        def my_func():
-            pass
-
-        @retry_function(max_retries=10, wait=2)
-        def my_func():
-            pass
-    """
-
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        retExc = None
-        for i in range(max_retries):
-            try:
-                return func(*args, **kwargs)
-            except RuntimeError as r:
-                # Immediately raise if this is an error.
-                # COMPS is reachable so let's be clever and trust COMPS
-                if str(r) == "404 NotFound - Failed to retrieve experiment for given id":
-                    raise r
-            except Exception as e:
-                retExc = e
-                time.sleep(wait)
-        raise retExc if retExc else Exception()
-
-    return wrapper

@@ -1,10 +1,11 @@
 import hashlib
+import copy
 import os
 import json
 import collections
 import stat
 import typing
-from abc import ABC, abstractmethod
+from abc import ABC
 from urllib.parse import urlparse
 
 import requests
@@ -13,7 +14,8 @@ from logging import getLogger
 from pathlib import Path
 from dataclasses import dataclass, field
 from idmtools.entities import IExperiment, CommandLine
-from idmtools.entities.iexperiment import IWindowsExperiment, IDockerExperiment, ILinuxExperiment, IHostBinaryExperiment
+from idmtools_model_emod.emod_file import DemographicsFiles
+from idmtools.entities.iexperiment import IDockerExperiment, ILinuxExperiment, IHostBinaryExperiment
 from idmtools.utils.decorators import optional_yaspin_load
 from idmtools_model_emod.emod_simulation import EMODSimulation
 
@@ -28,6 +30,7 @@ class IEMODExperiment(IExperiment, ABC):
     eradication_path: str = field(default=None, compare=False, metadata={"md": True})
     demographics: collections.OrderedDict = field(default_factory=lambda: collections.OrderedDict())
     legacy_exe: 'bool' = field(default=False, metadata={"md": True})
+    demographics: 'DemographicsFiles' = field(default_factory=lambda: DemographicsFiles('demographics'))
 
     def __post_init__(self, simulation_type):
         super().__post_init__(simulation_type=EMODSimulation)
@@ -72,17 +75,19 @@ class IEMODExperiment(IExperiment, ABC):
 
     @classmethod
     def from_default(cls, name, default: 'iemod_default', eradication_path=None):
-        base_simulation = EMODSimulation()
-        default.process_simulation(base_simulation)
+        exp = cls(name=name, eradication_path=eradication_path)
 
-        exp = cls(name=name, base_simulation=base_simulation, eradication_path=eradication_path)
-        exp.demographics.update(default.demographics())
+        # Set the base simulation
+        default.process_simulation(exp.base_simulation)
+
+        # Add the demographics
+        for filename, content in default.demographics().items():
+            exp.demographics.add_demographics_from_dict(content=content, filename=filename)
 
         return exp
 
     @classmethod
-    def from_files(cls, name, eradication_path=None, config_path=None, campaign_path=None, demographics_paths=None,
-                   force=False):
+    def from_files(cls, name, eradication_path=None, config_path=None, campaign_path=None, demographics_paths=None):
         """
         Load custom |EMOD_s| files when creating :class:`EMODExperiment`.
 
@@ -92,70 +97,20 @@ class IEMODExperiment(IExperiment, ABC):
             config_path: The custom configuration file.
             campaign_path: The custom campaign file.
             demographics_paths: The custom demographics files (single file or a list).
-            force: True to always return, else throw an exception if something goes wrong.
 
-        Returns:
-            None
+        Returns: An initialized experiment
         """
-        base_simulation = EMODSimulation()
-        base_simulation.load_files(config_path, campaign_path, force)
+        # Create the experiment
+        exp = cls(name=name, eradication_path=eradication_path)
 
-        exp = cls(name=name, base_simulation=base_simulation, eradication_path=eradication_path)
-        exp.add_demographics_file(demographics_paths, force)
-
-        return exp
-
-    def load_files(self, config_path=None, campaign_path=None, demographics_paths=None, force=False):
-        """
-        Load custom |EMOD_s| files from :class:`EMODExperiment`.
-
-        Args:
-            config_path: The custom configuration file.
-            campaign_path: The custom campaign file.
-            demographics_paths: The custom demographics files (single file or a list).
-            force: True to always return, else throw an exception if something goes wrong.
-
-        Returns:
-            None
-        """
-        self.base_simulation.load_files(config_path, campaign_path, force)
-
-        self.add_demographics_file(demographics_paths, force)
-
-    def add_demographics_file(self, demographics_paths=None, force=False):
-        """
-        Load custom |EMOD_s| demographics files from :class:`EMODExperiment`.
-
-        Args:
-            demographics_paths: Path to custom demographics files (single file or a list).
-            force: True to always return, else throw an exception if something goes wrong.
-
-        Returns:
-            None
-        """
-
-        def load_file(file_path):
-            try:
-                with open(file_path, 'rb') as f:
-                    return json.load(f)
-            except IOError:
-                if not force:
-                    raise Exception(f"Encounter issue when loading file: {file_path}")
-                else:
-                    return None
+        # Load the files
+        exp.base_simulation.load_files(config_path=config_path, campaign_path=campaign_path)
 
         if demographics_paths:
-            if isinstance(demographics_paths, collections.Iterable) \
-                    and not isinstance(demographics_paths, str):
-                demographics_paths = demographics_paths
-            else:
-                demographics_paths = [demographics_paths]
+            for demog_path in [demographics_paths] if isinstance(demographics_paths, str) else demographics_paths:
+                exp.demographics.add_demographics_from_file(demog_path)
 
-            for demographics_path in demographics_paths:
-                jn = load_file(demographics_path)
-                if jn:
-                    self.demographics.update({os.path.basename(demographics_path): jn})
-                    self.base_simulation.update_config_demographics_filenames(os.path.basename(demographics_path))
+        return exp
 
     def gather_assets(self) -> None:
         from idmtools.assets import Asset
@@ -165,15 +120,8 @@ class IEMODExperiment(IExperiment, ABC):
         self.assets.add_asset(Asset(absolute_path=self.eradication_path, filename=self.executable_name),
                               fail_on_duplicate=False)
 
-        # Clean up existing demographics files in case config got replaced
-        config_demo_files = self.base_simulation.config.get("Demographics_Filenames", None)
-        if config_demo_files:
-            exp_demo_files = list(self.demographics.keys())
-            for f in exp_demo_files:
-                if f not in config_demo_files:
-                    self.demographics.pop(f)
-
         # Add demographics to assets
+        self.assets.extend(self.demographics.gather_assets())
         for filename, content in self.demographics.items():
             logger.debug(f"Adding Demographics: {filename}")
             self.assets.add_asset(Asset(filename=filename, content=json.dumps(content)), fail_on_duplicate=False)
@@ -213,3 +161,13 @@ class DockerEMODExperiment(IEMODExperiment, IDockerExperiment, ILinuxExperiment)
         exp.demographics.update(default.demographics())
 
         return exp
+
+    def simulation(self):
+        simulation = super().simulation()
+        # Copy the experiment demographics and set them as persisted to prevent change
+        # TODO: change persisted to the frozen mechanism when done
+        demog_copy = copy.deepcopy(self.demographics)
+        demog_copy.set_all_persisted()
+        # Add them to the simulation
+        simulation.demographics.extend(demog_copy)
+        return simulation
