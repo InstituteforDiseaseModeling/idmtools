@@ -65,11 +65,11 @@ class LocalPlatform(IPlatform):
     _docker_operations: Optional[DockerOperations] = field(default=None, metadata={"pickle_ignore": True})
 
     def __post_init__(self):
-        from idmtools_platform_local.internals.workers.brokers import setup_broker
         logger.debug("Setting up local platform")
         self.supported_types = {ItemType.EXPERIMENT, ItemType.SIMULATION}
         # ensure our brokers are started
-        setup_broker()
+        self.setup_broker()
+
         if self._docker_operations is None:
             # extract configuration details for the docker manager
             local_docker_options = [f.name for f in dataclasses.fields(DockerOperations)]
@@ -79,6 +79,11 @@ class LocalPlatform(IPlatform):
             self._docker_operations.create_services()
 
         super().__post_init__()
+
+    @staticmethod
+    def setup_broker():
+        from idmtools_platform_local.internals.workers.brokers import setup_broker
+        setup_broker()
 
     def get_platform_item(self, item_id, item_type, **kwargs):
         if item_type == ItemType.EXPERIMENT:

@@ -378,4 +378,5 @@ idmtools_platform_comps/tests/inputs/analyzers/population.png
 idmtools_platform_comps/tests/inputs/analyzers/timeseries.csv
 idmtools_platform_comps/tests/inputs/analyzers/timeseries.png
 idmtools_platform_comps/tests/output/
+idmtools_platform_local/internals/ui/static/*
 idmtools_platform_local/idmtools_webui/build
