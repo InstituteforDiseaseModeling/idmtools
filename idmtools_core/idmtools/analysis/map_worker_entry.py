@@ -135,7 +135,7 @@ def _set_exception(step: str, info: dict, cache: 'Cache') -> NoReturn:
     Returns:
 
     """
-    from idmtools_core.idmtools.analysis.AnalyzeManager import AnalyzeManager
+    from idmtools_core.idmtools.analysis.analyze_manager import AnalyzeManager
     logger.debug(f"Exception in {step}")
 
     # construct exception message including traceback
