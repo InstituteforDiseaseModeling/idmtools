@@ -82,12 +82,16 @@ class BaseServiceContainer(ABC):
     def get(self) -> Union[Container, None]:
         container = self.client.containers.list(filters=dict(name=self.container_name), all=True)
         if container:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f"Found {container[0].name}")
             return container[0]
         return None
 
     def get_or_create(self, spinner=None) -> Container:
         container = self.get()
         if container is None:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f"Creating {self.__class__.__name__}")
             container = self.create(spinner)
         else:
             self.ensure_container_is_running(container)

@@ -15,13 +15,15 @@ redis_backend: RedisBackend = None
 def setup_broker():
     global redis_broker
     global redis_backend
-    REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
-    REDIS_URL = os.environ.get("REDIS_URL", f"redis://{REDIS_HOST}:6379")
 
     if os.getenv("UNIT_TESTS") == "1":
         redis_broker = StubBroker()
         redis_backend = StubBackend()
+        redis_broker.add_middleware(Results(backend=redis_backend))
+        dramatiq.set_broker(redis_broker)
     elif redis_broker is None:
+        REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+        REDIS_URL = os.environ.get("REDIS_URL", f"redis://{REDIS_HOST}:6379")
         logger.debug(f"Using Redis URL: {REDIS_URL}")
         redis_broker = RedisBroker(url=REDIS_URL)
         redis_backend = RedisBackend(url=REDIS_URL)
@@ -42,8 +44,4 @@ def close_brokers():
         redis_broker.close()
         redis_broker = None
     if redis_backend:
-        del redis_backend
         redis_backend = None
-
-
-redis_broker = setup_broker()

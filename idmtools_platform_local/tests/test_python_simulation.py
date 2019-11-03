@@ -9,7 +9,7 @@ from idmtools_models.python import PythonExperiment
 from idmtools.core.platform_factory import Platform
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-from idmtools_test.utils.confg_local_runner_test import get_test_local_env_overrides, reset_local_broker
+from idmtools_test.utils.confg_local_runner_test import get_test_local_env_overrides
 from idmtools_test.utils.decorators import restart_local_platform
 
 
@@ -19,10 +19,6 @@ class TestPythonSimulation(ITestWithPersistence):
 
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
-
-    @classmethod
-    def setUpClass(cls) -> None:
-        reset_local_broker()
 
     @restart_local_platform(silent=True, **get_test_local_env_overrides())
     def test_direct_sweep_one_parameter_local(self):

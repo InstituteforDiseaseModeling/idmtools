@@ -4,7 +4,7 @@ import time
 import unittest
 from functools import wraps
 from typing import Callable
-
+import docker
 # The following decorators are used to control test
 # To allow for different use cases(dev, test, packaging, etc)
 # We have switches that should allow a rich set of possible
@@ -15,7 +15,6 @@ from typing import Callable
 # This currently is any comps related test
 # test-docker run any tests that depend on docker locally(Mostly local runn)
 # test-all runs all tests
-
 
 linux_only = unittest.skipIf(
     not platform.system() in ["Linux", "Darwin"], 'No Tests that are meant for linux'
@@ -28,6 +27,7 @@ windows_only = unittest.skipIf(
 # this is mainly for docker in docker environments but also applies to environments
 # where you must use the local ip address for connectivity vs localhost
 skip_api_host = unittest.skipIf(os.getenv("API_HOST", None) is not None, "API_HOST is defined")
+client = docker.from_env()
 
 
 def run_test_in_n_seconds(n: int, print_elapsed_time: bool = False) -> Callable:
@@ -61,20 +61,27 @@ def run_test_in_n_seconds(n: int, print_elapsed_time: bool = False) -> Callable:
     return decorator
 
 
-def restart_local_platform(silent=True, *args, **kwargs):
-    from idmtools_platform_local.internals.docker_operations import DockerOperations
+def restart_local_platform(silent=True, stop_before=True, stop_after=True, *args, **kwargs):
+    from idmtools_platform_local.internals.infrastructure.service_manager import DockerServiceManager
+    from idmtools_platform_local.internals.docker_io import DockerIO
     # disable spinner
     if silent:
         os.environ['NO_SPINNER'] = '1'
-    do = DockerOperations(*args, **kwargs)
+
+    args = (client, ) + args
+    sm = DockerServiceManager(*args, **kwargs)
+    do = DockerIO()
 
     def decorate(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            do.cleanup()
-            do.create_services()
+            if stop_before:
+                sm.cleanup(tear_down_brokers=True, delete_data=True)
+                do.cleanup(True)
             result = func(*args, **kwargs)
-            do.cleanup()
+            if stop_after:
+                sm.cleanup(tear_down_brokers=True, delete_data=True)
+                do.cleanup(True)
             return result
         return wrapper
     return decorate

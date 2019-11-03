@@ -3,8 +3,8 @@ from typing import Any
 
 import pytest
 
-from idmtools.analysis.AnalyzeManager import AnalyzeManager
-from idmtools.analysis.DownloadAnalyzer import DownloadAnalyzer as SampleAnalyzer
+from idmtools.analysis.analyze_manager import AnalyzeManager
+from idmtools.analysis.download_analyzer import DownloadAnalyzer as SampleAnalyzer
 from idmtools.builders import StandAloneSimulationsBuilder
 from idmtools.core.enums import EntityStatus, ItemType
 from idmtools.core.interfaces.iitem import TItem

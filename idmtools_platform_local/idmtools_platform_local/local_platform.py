@@ -1,4 +1,3 @@
-import dataclasses
 import functools
 import logging
 import os
@@ -7,18 +6,24 @@ from dataclasses import dataclass, field
 from logging import getLogger
 from typing import Dict, List, NoReturn, Optional, Type
 from uuid import UUID
+
+import docker
 from docker.models.containers import Container
 from idmtools.assets import Asset
 from idmtools.core import ItemType
 from idmtools.core.experiment_factory import experiment_factory
+from idmtools.core.interfaces.ientity import TEntityList
 from idmtools.core.interfaces.iitem import TItem, TItemList
+from idmtools.core.system_information import get_data_directory
 from idmtools.entities import IExperiment, IPlatform
 from idmtools.entities.iexperiment import IGPUExperiment, IDockerExperiment, IWindowsExperiment, IDockerGPUExperiment, \
     IHostBinaryExperiment
 from idmtools.entities.isimulation import ISimulation, TSimulation
+from idmtools.utils.entities import get_dataclass_common_fields
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
 from idmtools_platform_local.client.simulations_client import SimulationsClient
-from idmtools_platform_local.internals.docker_operations import DockerOperations, default_base_sir
+from idmtools_platform_local.internals.docker_io import DockerIO
+from idmtools_platform_local.internals.infrastructure.service_manager import DockerServiceManager
 
 status_translate = dict(
     created='CREATED',
@@ -43,7 +48,7 @@ class LocalPlatform(IPlatform):
     Represents the platform allowing to run simulations locally.
     """
 
-    host_data_directory: str = field(default=os.path.join(default_base_sir, '.local_data'))
+    host_data_directory: str = field(default=get_data_directory())
     network: str = field(default='idmtools')
     redis_image: str = field(default='redis:5.0.4-alpine')
     redis_port: int = field(default=6379)
@@ -57,33 +62,35 @@ class LocalPlatform(IPlatform):
     workers_image: str = field(default=None)
     workers_ui_port: int = field(default=5000)
     default_timeout: int = field(default=45)
-    run_as: Optional[str] = field(default=None)
     # allows user to specify auto removal of docker worker containers
     auto_remove_worker_containers: bool = field(default=False)
 
     # We use this to manage our docker containers
-    _docker_operations: Optional[DockerOperations] = field(default=None, metadata={"pickle_ignore": True})
+    _do: Optional[DockerIO] = field(default=None, compare=False, metadata={"pickle_ignore": True})
+    _sm: Optional[DockerServiceManager] = field(default=None, compare=False, metadata={"pickle_ignore": True})
 
     def __post_init__(self):
         logger.debug("Setting up local platform")
         self.supported_types = {ItemType.EXPERIMENT, ItemType.SIMULATION}
-        # ensure our brokers are started
-        self.setup_broker()
 
-        if self._docker_operations is None:
+        # Configure our docker IO client
+        if self._do is None:
             # extract configuration details for the docker manager
-            local_docker_options = [f.name for f in dataclasses.fields(DockerOperations)]
-            opts = {k: v for k, v in self.__dict__.items() if k in local_docker_options}
-            self._docker_operations = DockerOperations(**opts)
-            # start the services
-            self._docker_operations.create_services()
+            opts = get_dataclass_common_fields(self, DockerIO)
+            self._do = DockerIO(**opts)
+
+        # Start our docker services
+        if self._sm is None:
+            client = docker.from_env()
+            opts = get_dataclass_common_fields(self, DockerServiceManager)
+            self._sm = DockerServiceManager(client, **opts)
+            self._sm.create_services()
 
         super().__post_init__()
 
-    @staticmethod
-    def setup_broker():
-        from idmtools_platform_local.internals.workers.brokers import setup_broker
-        setup_broker()
+    def cleanup(self, delete_data: bool = False, shallow_delete: bool = False, tear_down_brokers: bool = False):
+        self._sm.cleanup(delete_data, tear_down_brokers=tear_down_brokers)
+        self._do.cleanup(delete_data, shallow_delete=shallow_delete)
 
     def get_platform_item(self, item_id, item_type, **kwargs):
         if item_type == ItemType.EXPERIMENT:
@@ -122,7 +129,7 @@ class LocalPlatform(IPlatform):
             return self.get_platform_item(platform_item.parent_id, ItemType.EXPERIMENT)
         return None
 
-    def _create_batch(self, batch: 'TEntityList', item_type: 'ItemType') -> 'List[UUID]':  # noqa: F821
+    def _create_batch(self, batch: TEntityList, item_type: ItemType) -> 'List[UUID]':  # noqa: F821
         if item_type == ItemType.SIMULATION:
             ids = self._create_simulations(simulations_batch=batch)
         elif item_type == ItemType.EXPERIMENT:
@@ -133,7 +140,6 @@ class LocalPlatform(IPlatform):
         return ids
 
     def run_items(self, items: TItemList) -> NoReturn:
-
         from idmtools_platform_local.internals.tasks.general_task import RunTask
         for item in items:
             if item.item_type == ItemType.EXPERIMENT:
@@ -193,7 +199,7 @@ class LocalPlatform(IPlatform):
                         logger.debug(f"Simulation {sim_status[0]['simulation_uid']}status: {sim_status[0]['status']}")
                     s.status = local_status_to_common(sim_status[0]['status'])
 
-    def get_files(self, item: 'TItem', files: 'List[str]') -> 'Dict[str, bytearray]':
+    def get_files(self, item: TItem, files: List[str]) -> Dict[str, bytearray]:
         if not isinstance(item, ISimulation):
             raise NotImplementedError("Retrieving files only implemented for Simulations at the moment")
 
@@ -249,7 +255,7 @@ class LocalPlatform(IPlatform):
         eid = m.get_result(block=True, timeout=self.default_timeout * 1000)
         experiment.uid = eid
         path = "/".join(["/data", experiment.uid, "Assets"])
-        self._docker_operations.create_directory(path)
+        self._do.create_directory(path)
         self._send_assets_for_experiment(experiment)
         return experiment.uid
 
@@ -265,7 +271,7 @@ class LocalPlatform(IPlatform):
         """
         # Go through all the assets
         path = "/".join(["/data", experiment.uid, "Assets"])
-        worker = self._docker_operations._services['WorkersContainer'].get_or_create()
+        worker = self._sm.get('workers')
         list(map(functools.partial(self.send_asset_to_docker, path=path, worker=worker), experiment.assets))
 
     def _send_assets_for_simulation(self, simulation, worker: Container = None):
@@ -282,10 +288,10 @@ class LocalPlatform(IPlatform):
         # Go through all the assets
         path = "/".join(["/data", simulation.experiment.uid, simulation.uid])
         if worker is None:
-            worker = self._docker_operations._services['WorkersContainer'].get_or_create()
+            worker = self._sm.get('workers')
 
         items = self.assets_to_copy_multiple_list(path, simulation.assests)
-        self._docker_operations.copy_multiple_to_container(worker, items)
+        self._do.copy_multiple_to_container(worker, items)
 
     def assets_to_copy_multiple_list(self, path, assets):
         """
@@ -301,9 +307,13 @@ class LocalPlatform(IPlatform):
         for asset in assets:
             file_path = asset.absolute_path
             remote_path = "/".join([path, asset.relative_path]) if asset.relative_path else path
-            self._docker_operations.create_directory(remote_path)
-            items[remote_path].append(
-                (file_path if file_path else asset.content, asset.filename if asset.filename else file_path))
+            self._do.create_directory(remote_path)
+            opts = dict(dest_name=asset.filename if asset.filename else file_path)
+            if file_path:
+                opts['file'] = file_path
+            else:
+                opts['content'] = asset.content
+            items[remote_path].append(opts)
         return items
 
     def send_asset_to_docker(self, asset: Asset, path: str, worker: Container = None) -> NoReturn:
@@ -321,14 +331,19 @@ class LocalPlatform(IPlatform):
         file_path = asset.absolute_path
         remote_path = "/".join([path, asset.relative_path]) if asset.relative_path else path
         # ensure remote directory exists
-        result = self._docker_operations.create_directory(remote_path)
+        result = self._do.create_directory(remote_path)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f"Creating directory {remote_path} result: {str(result)}")
         # is it a real file?
         if worker is None:
-            worker = self._docker_operations._services['WorkersContainer'].get_or_create()
-        self._docker_operations.copy_to_container(worker, file_path if file_path else asset.content, remote_path,
-                                                  asset.filename if asset.filename else file_path)
+            worker = self._sm.get('workers')
+        src = dict()
+        if file_path:
+            src['file'] = file_path
+        else:
+            src['content'] = asset.content
+        self._do.copy_to_container(worker, remote_path, dest_name=asset.filename if asset.filename else file_path,
+                                   **src)
 
     def _create_simulations(self, simulations_batch: List[ISimulation]):
         """
@@ -341,7 +356,7 @@ class LocalPlatform(IPlatform):
             Ids of simulations created
         """
         from idmtools_platform_local.internals.tasks.create_simulation import CreateSimulationsTask
-        worker = self._docker_operations._services['WorkersContainer'].get_or_create()
+        worker = self._sm.get('workers')
 
         m = CreateSimulationsTask.send(simulations_batch[0].experiment.uid, [s.tags for s in simulations_batch])
         ids = m.get_result(block=True, timeout=self.default_timeout * 1000)
@@ -352,7 +367,7 @@ class LocalPlatform(IPlatform):
             simulation.uid = ids[i]
             path = "/".join(["/data", simulation.experiment.uid, simulation.uid])
             items.update(self.assets_to_copy_multiple_list(path, simulation.assets))
-        result = self._docker_operations.copy_multiple_to_container(worker, items)
+        result = self._do.copy_multiple_to_container(worker, items)
         if not result:
             raise IOError("Coping of data for simulations failed.")
         return ids

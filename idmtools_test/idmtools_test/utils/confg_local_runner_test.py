@@ -1,11 +1,13 @@
 import os
 import tempfile
 import unittest.mock
+from importlib import reload
 from os.path import join
 
 
 def config_local_test():
-    from idmtools_platform_local.internals.workers.brokers import setup_broker
+    from idmtools_platform_local.internals.workers.brokers import setup_broker, close_brokers
+    close_brokers()
     os.environ['UNIT_TESTS'] = '1'
     if 'DATA_PATH' not in os.environ:
         test_temp_dir = tempfile.mkdtemp()
@@ -15,6 +17,8 @@ def config_local_test():
 
 
 def reset_local_broker():
+    from idmtools_platform_local.internals.workers.brokers import close_brokers
+
     if 'UNIT_TESTS' in os.environ:
         del os.environ['UNIT_TESTS']
 
@@ -23,6 +27,22 @@ def reset_local_broker():
 
     if 'DATA_PATH' in os.environ:
         del os.environ['DATA_PATH']
+    close_brokers()
+    try:
+        from idmtools_platform_local.internals.workers.brokers import setup_broker
+        setup_broker()
+        import idmtools_platform_local.internals.tasks.create_experiment as ce
+        import idmtools_platform_local.internals.tasks.create_simulation as cs
+        import idmtools_platform_local.internals.tasks.general_task as gt
+        import idmtools_platform_local.internals.tasks.docker_run as dr
+        import dramatiq.broker as db
+        import dramatiq as dm
+        for m in [db, dm, cs, ce, gt, dr]:
+            reload(m)
+
+    except ModuleNotFoundError as e:
+        print(e)
+        pass
 
 
 def setup_test_broker():

@@ -3,7 +3,7 @@ import platform
 from dataclasses import dataclass
 from logging import getLogger, DEBUG
 from typing import Dict
-from idmtools_platform_local.internals.infrastructure.base_docker import BaseServiceContainer
+from idmtools_platform_local.internals.infrastructure.base_service_container import BaseServiceContainer
 from idmtools_platform_local import __version__
 
 logger = getLogger(__name__)

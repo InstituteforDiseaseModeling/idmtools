@@ -19,7 +19,7 @@ extras = dict(test=test_requirements, dev=['Pympler'],
               # Requirements for running workers server
               workers=['sqlalchemy~=1.3.5', 'psycopg2-binary~=2.8.3'],
               # these are only needed when not running UI
-              ui=['flask~=1.0.3', 'Flask-AutoIndex~=0.6.4', 'flask_restful~=0.3.7', 'Flask-SQLAlchemy~=2.4.0'])
+              ui=['flask~=1.0.3', 'Flask-AutoIndex~=0.6.4', 'flask_restful~=0.3.7', 'Flask-SQLAlchemy~=2.4.0', 'uwsgi'])
 
 # check for python 3.6
 if sys.version_info[1] == 6:

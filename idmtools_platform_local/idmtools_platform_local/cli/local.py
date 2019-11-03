@@ -2,10 +2,10 @@ import click
 import stringcase as stringcase
 from colorama import Fore
 from idmtools_cli.cli import cli
-from idmtools_platform_local.internals.docker_operations import DockerOperations
+from idmtools_platform_local.internals.docker_io import DockerIO
 
 
-pass_do = click.make_pass_decorator(DockerOperations)
+pass_do = click.make_pass_decorator(DockerIO)
 
 
 @cli.group(help="Commands related to managing the local platform")
@@ -17,14 +17,14 @@ def local(ctx, run_as):
     config = dict()
     if run_as:
         config['run_as'] = run_as
-    do = DockerOperations(**config)
+    do = DockerIO(**config)
     ctx.obj = do
 
 
 @local.command()
 @click.option("--delete-data/--no-delete-data", default=False)
 @pass_do
-def down(do: DockerOperations, delete_data):
+def down(do: DockerIO, delete_data):
     """Shutdown the local execution platform(and optionally delete data"""
     if delete_data:
         delete_data = click.confirm(f'Do you want to remove all data associated with the local platform?({do.host_data_directory})', abort=True)
@@ -33,21 +33,21 @@ def down(do: DockerOperations, delete_data):
 
 @local.command()
 @pass_do
-def start(do: DockerOperations):
+def start(do: DockerIO):
     """Start the local execution platform"""
     do.create_services()
 
 
 @local.command()
 @pass_do
-def restart(do: DockerOperations):
+def restart(do: DockerIO):
     """Restart the local execution platform"""
     do.restart_all()
 
 
 @local.command()
 @pass_do
-def status(do: DockerOperations):
+def status(do: DockerIO):
     """
     Check the status of the local execution platform
     """

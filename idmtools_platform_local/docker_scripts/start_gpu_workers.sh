@@ -1,4 +1,4 @@
 #!/usr/bin/with-contenv sh
 
 # This launches the workers that do all the actual gpu run task work
-exec s6-setuidgid idmtools /usr/local/bin/dramatiq idmtools_platform_local.internals.workers.brokers:redis_broker idmtools_platform_local.internals.workers.run --processes 1 --threads 1 --queues gpu
+exec s6-setuidgid idmtools /usr/local/bin/dramatiq idmtools_platform_local.internals.workers.run_broker:redis_broker idmtools_platform_local.internals.workers.run --processes 1 --threads 1 --queues gpu

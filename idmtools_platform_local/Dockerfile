@@ -19,7 +19,7 @@ RUN apt-get update \
     $(lsb_release -cs) \
     stable" \
     && apt-get update \
-    && apt-get install -y --no-install-recommends docker-ce-cli \
+    && apt-get install -y --no-install-recommends docker-ce-cli nginx \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && useradd -s /bin/bash idmtools \

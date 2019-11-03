@@ -1,7 +1,6 @@
 import hashlib
 import copy
 import os
-import json
 import collections
 import stat
 import typing
@@ -122,9 +121,6 @@ class IEMODExperiment(IExperiment, ABC):
 
         # Add demographics to assets
         self.assets.extend(self.demographics.gather_assets())
-        for filename, content in self.demographics.items():
-            logger.debug(f"Adding Demographics: {filename}")
-            self.assets.add_asset(Asset(filename=filename, content=json.dumps(content)), fail_on_duplicate=False)
 
     def pre_creation(self):
         super().pre_creation()
@@ -135,6 +131,16 @@ class IEMODExperiment(IExperiment, ABC):
         # Create the command line according to self. location of the model
         self.command = CommandLine(f"Assets/{self.executable_name}", "--config config.json",
                                    f"--input-path {input_path}")
+
+    def simulation(self):
+        simulation = super().simulation()
+        # Copy the experiment demographics and set them as persisted to prevent change
+        # TODO: change persisted to the frozen mechanism when done
+        demog_copy = copy.deepcopy(self.demographics)
+        demog_copy.set_all_persisted()
+        # Add them to the simulation
+        simulation.demographics.extend(demog_copy)
+        return simulation
 
 
 @dataclass(repr=False)
@@ -157,17 +163,9 @@ class DockerEMODExperiment(IEMODExperiment, IDockerExperiment, ILinuxExperiment)
                      eradication_path=None):
         base_simulation = EMODSimulation()
         default.process_simulation(base_simulation)
-        exp = cls(name=name, base_simulation=base_simulation, eradication_path=eradication_path, image_name=image_name)
-        exp.demographics.update(default.demographics())
+        exp = cls(name=name, eradication_path=eradication_path, image_name=image_name)
+        # Add the demographics
+        for filename, content in default.demographics().items():
+            exp.demographics.add_demographics_from_dict(content=content, filename=filename)
 
         return exp
-
-    def simulation(self):
-        simulation = super().simulation()
-        # Copy the experiment demographics and set them as persisted to prevent change
-        # TODO: change persisted to the frozen mechanism when done
-        demog_copy = copy.deepcopy(self.demographics)
-        demog_copy.set_all_persisted()
-        # Add them to the simulation
-        simulation.demographics.extend(demog_copy)
-        return simulation

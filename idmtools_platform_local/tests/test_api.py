@@ -2,39 +2,48 @@
 import os
 import time
 import unittest.mock
-from operator import itemgetter
+from importlib import reload
+import docker
 import pytest
+from operator import itemgetter
+
+from idmtools_platform_local.internals.workers.database import reset_db
+
 api_host = os.getenv('API_HOST', 'localhost')
 os.environ['SQLALCHEMY_DATABASE_URI'] = f'postgresql+psycopg2://idmtools:idmtools@{api_host}/idmtools'
-from idmtools_platform_local.internals.docker_operations import DockerOperations
 from idmtools_platform_local.internals.workers.utils import create_or_update_status
-from idmtools_test.utils.confg_local_runner_test import config_local_test, patch_broker
-
-
-dm = None
+from idmtools_test.utils.confg_local_runner_test import config_local_test, patch_broker, reset_local_broker
+from idmtools_platform_local.internals.infrastructure.service_manager import DockerServiceManager
 
 
 @pytest.mark.docker
 @pytest.mark.local_platform_internals
 class TestAPI(unittest.TestCase):
 
+    @classmethod
+    def setUpClass(cls) -> None:
+        sm = DockerServiceManager(docker.from_env())
+        sm.cleanup(delete_data=True,tear_down_brokers=True)
+        sm.get_network()
+        sm.get('postgres')
+        sm.wait_on_ports_to_open(['postgres_port'])
+        time.sleep(2)
+        cls.create_test_data()
+
     @patch_broker
     def setUp(self, mock_broker):
-        global dm
         local_path = config_local_test()  # noqa: F841
         config_local_test()
-        created = False
-        if dm is None:
-            dm = DockerOperations()
-            dm.cleanup(True)
-            dm.get_network()
-            dm._services['PostgresContainer'].get_or_create()
-            time.sleep(8)
-            created = True
+
         from idmtools_platform_local.internals.ui.app import application
         self.app = application.test_client()
-        if created:
-            self.create_test_data()
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        import idmtools_platform_local.internals.workers.brokers
+        reload(idmtools_platform_local.internals.workers.brokers)
+        reset_db()
+        reset_local_broker()
 
     @staticmethod
     def create_test_data():

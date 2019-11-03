@@ -73,8 +73,7 @@ class EMODSimulation(ISimulation):
                               fail_on_duplicate=False)
 
         # Add demographics files to assets
-        for filename, content in self.demographics.items():
-            self.assets.add_asset(Asset(filename=filename, content=json.dumps(content)), fail_on_duplicate=False)
+        self.assets.extend(self.demographics.gather_assets())
 
     def __hash__(self):
         return id(self.uid)

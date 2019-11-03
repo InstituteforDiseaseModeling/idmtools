@@ -11,9 +11,9 @@ from idmtools.managers import ExperimentManager
 from idmtools_model_emod.defaults import EMODSir
 from idmtools_model_emod.emod_experiment import EMODExperiment
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools.analysis.AnalyzeManager import AnalyzeManager
-from idmtools.analysis.AddAnalyzer import AddAnalyzer
-from idmtools.analysis.DownloadAnalyzer import DownloadAnalyzer
+from idmtools.analysis.analyze_manager import AnalyzeManager
+from idmtools.analysis.add_analyzer import AddAnalyzer
+from idmtools.analysis.download_analyzer import DownloadAnalyzer
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import del_file, del_folder, load_csv_file
 

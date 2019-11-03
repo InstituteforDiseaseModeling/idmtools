@@ -9,11 +9,16 @@ from idmtools import __version__
 from idmtools.utils.info import get_packages_list
 
 logger = getLogger(__name__)
+default_base_sir = os.getenv('IDMTOOLS_DATA_BASE_DIR', str(Path.home()))
+
+
+def get_data_directory() -> str:
+    return os.path.join(default_base_sir, '.local_data')
 
 
 @dataclass
 class SystemInformation:
-    data_directory: Optional[str] = str(Path.home())
+    data_directory: Optional[str] = field(default=get_data_directory())
     user: Optional[str] = getpass.getuser()
     python_version: str = platform.python_version()
     python_build: str = platform.python_build()

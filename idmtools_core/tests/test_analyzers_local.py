@@ -1,6 +1,8 @@
 import os
+import time
+
 import pytest
-from idmtools.analysis.AnalyzeManager import AnalyzeManager
+from idmtools.analysis.analyze_manager import AnalyzeManager
 from idmtools.builders import ExperimentBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
@@ -8,6 +10,7 @@ from idmtools.entities import IAnalyzer
 from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
 from idmtools_test import COMMON_INPUT_PATH
+from idmtools_test.utils.decorators import restart_local_platform
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
@@ -42,12 +45,9 @@ class AddAnalyzer(IAnalyzer):
 class TestAnalyzeManager(ITestWithPersistence):
 
     @classmethod
+    @restart_local_platform(silent=True, stop_before=True, stop_after=False)
     def setUpClass(cls) -> None:
         cls.platform = Platform('Local')
-        # cleanup first
-        cls.platform._docker_operations.cleanup(True, tear_down_broker=True)
-        cls.platform.setup_broker()
-        cls.platform._docker_operations.create_services()
 
         pe = PythonExperiment(name=os.path.basename(__file__) + "--" + cls.__name__,
                               model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
@@ -65,15 +65,13 @@ class TestAnalyzeManager(ITestWithPersistence):
         em.run()
         print('Waiting on experiment to finish')
         em.wait_till_done()
+        time.sleep(2)
         print('experiment done')
 
         cls.exp_id = pe.uid
 
-    @classmethod
-    def tearDownClass(cls) -> None:
-        cls.platform._docker_operations.cleanup()
-
     @pytest.mark.timeout(60)
+    @restart_local_platform(silent=True, stop_before=False, stop_after=True)
     def test_AddAnalyzer(self):
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         analyzers = [AddAnalyzer()]

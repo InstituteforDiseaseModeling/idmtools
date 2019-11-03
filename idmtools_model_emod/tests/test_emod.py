@@ -34,11 +34,17 @@ ERADICATION_BINARIES = dict(COMPS=os.path.join(COMMON_INPUT_PATH, "emod", "Eradi
 class TestEMOD(ITestWithPersistence):
 
     @classmethod
+    @restart_local_platform(silent=True, stop_before=True, stop_after=False, **get_test_local_env_overrides())
     def setUpClass(cls):
         cls.platforms: Dict[str, IPlatform] = dict(
             COMPS=Platform('COMPS'),
             Local=Platform('Local')
         )
+
+    @classmethod
+    @restart_local_platform(silent=True, stop_before=False, stop_after=True, **get_test_local_env_overrides())
+    def tearDownClass(cls) -> None:
+        pass
 
     @classmethod
     def get_emod_experiment(cls, platform: str) -> IEMODExperiment:
@@ -48,7 +54,6 @@ class TestEMOD(ITestWithPersistence):
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
 
-    @restart_local_platform(silent=True, **get_test_local_env_overrides())
     def test_sir_with_StandAloneSimulationsBuilder(self):
         for platform in self.platforms:
             with self.subTest(f"test_sir_with_StandAloneSimulationsBuilder_{platform}"):
@@ -72,7 +77,6 @@ class TestEMOD(ITestWithPersistence):
                     config_parameters = json.loads(files["config.json"])['parameters']
                     self.assertEqual(config_parameters["Enable_Immunity"], 0)
 
-    @restart_local_platform(silent=True, **get_test_local_env_overrides())
     def test_sir_with_ExperimentBuilder(self):
         for platform in self.platforms:
             with self.subTest(f"test_sir_with_ExperimentBuilder_{platform}"):
@@ -102,7 +106,6 @@ class TestEMOD(ITestWithPersistence):
                     self.assertEqual(config_parameters["Run_Number"], run_number)
                     run_number = run_number + 1
 
-    @restart_local_platform(silent=True, **get_test_local_env_overrides())
     def test_batch_simulations_StandAloneSimulationsBuilder(self):
         for platform in self.platforms:
             with self.subTest(f"test_batch_simulations_StandAloneSimulationsBuilder_{platform}"):
@@ -127,7 +130,6 @@ class TestEMOD(ITestWithPersistence):
                     config_parameters = json.loads(files["config.json"])['parameters']
                     self.assertEqual(config_parameters["Enable_Immunity"], 0)
 
-    @restart_local_platform(silent=True, **get_test_local_env_overrides())
     def test_batch_simulations_ExperimentBuilder(self):
         for platform in self.platforms:
             with self.subTest(f"test_batch_simulations_ExperimentBuilder_{platform}"):
@@ -151,7 +153,6 @@ class TestEMOD(ITestWithPersistence):
                 em.wait_till_done()
                 self.assertTrue(e.succeeded)
 
-    @restart_local_platform(silent=True, **get_test_local_env_overrides())
     def test_load_files(self):
         for platform in self.platforms:
             with self.subTest(f"test_load_files_{platform}"):
@@ -177,7 +178,6 @@ class TestEMOD(ITestWithPersistence):
                     config_parameters = json.loads(files["config.json"])['parameters']
                     self.assertEqual(config_parameters["Enable_Immunity"], 0)
 
-    @restart_local_platform(silent=True, **get_test_local_env_overrides())
     def test_load_files_2(self):
         for platform in self.platforms:
             with self.subTest(f"test_load_files_2_{platform}"):
