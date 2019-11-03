@@ -161,9 +161,11 @@ class DockerEMODExperiment(IEMODExperiment, IDockerExperiment, ILinuxExperiment)
     def from_default(cls, name, default: 'iemod_default',
                      image_name: str = 'idm-docker-public.packages.idmod.org/idm/centos:dtk-runtime',
                      eradication_path=None):
-        base_simulation = EMODSimulation()
-        default.process_simulation(base_simulation)
         exp = cls(name=name, eradication_path=eradication_path, image_name=image_name)
+
+        # Set the base simulation
+        default.process_simulation(exp.base_simulation)
+
         # Add the demographics
         for filename, content in default.demographics().items():
             exp.demographics.add_demographics_from_dict(content=content, filename=filename)

@@ -1,4 +1,5 @@
 import io
+import json
 import logging
 import os
 import shutil
@@ -110,6 +111,8 @@ class DockerIO:
             (bool) True if the copy succeeds, False otherwise
         """
         if content:
+            if isinstance(content, dict):
+                content = json.dumps(content)
             if isinstance(content, str):
                 file = BytesIO(content.encode('utf-8'))
             else:

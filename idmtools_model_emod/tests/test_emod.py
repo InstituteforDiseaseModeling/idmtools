@@ -153,56 +153,6 @@ class TestEMOD(ITestWithPersistence):
                 em.wait_till_done()
                 self.assertTrue(e.succeeded)
 
-    def test_load_files(self):
-        for platform in self.platforms:
-            with self.subTest(f"test_load_files_{platform}"):
-                e = self.get_emod_experiment(platform).\
-                    from_files(self.case_name, eradication_path=ERADICATION_BINARIES[platform],
-                               config_path=DEFAULT_CONFIG_PATH, campaign_path=DEFAULT_CAMPAIGN_JSON,
-                               demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)
-
-                e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
-                sim = e.simulation()
-                sim.set_parameter("Enable_Immunity", 0)
-                b = StandAloneSimulationsBuilder()
-                b.add_simulation(sim)
-                e.builder = b
-
-                em = ExperimentManager(experiment=e, platform=self.platforms[platform])
-                em.run()
-                em.wait_till_done()
-                self.assertTrue(e.succeeded)
-
-                for sim in e.simulations:
-                    files = self.platforms[platform].get_files(sim, ["config.json"])
-                    config_parameters = json.loads(files["config.json"])['parameters']
-                    self.assertEqual(config_parameters["Enable_Immunity"], 0)
-
-    def test_load_files_2(self):
-        for platform in self.platforms:
-            with self.subTest(f"test_load_files_2_{platform}"):
-                e = self.get_emod_experiment(platform).from_default(self.case_name, default=EMODSir,
-                                                                    eradication_path=ERADICATION_BINARIES[platform])
-
-                e.base_simulation.load_files(demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)
-
-                e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
-                sim = e.simulation()
-                sim.set_parameter("Enable_Immunity", 0)
-                b = StandAloneSimulationsBuilder()
-                b.add_simulation(sim)
-                e.builder = b
-
-                em = ExperimentManager(experiment=e, platform=self.platforms[platform])
-                em.run()
-                em.wait_till_done()
-                self.assertTrue(e.succeeded)
-
-                for sim in e.simulations:
-                    files = self.platforms[platform].get_files(sim, ["config.json"])
-                    config_parameters = json.loads(files["config.json"])['parameters']
-                    self.assertEqual(config_parameters["Enable_Immunity"], 0)
-
     def test_duplicated_eradication(self):
         """
         Eradication is in the collection but also specified in the eradication_path.
