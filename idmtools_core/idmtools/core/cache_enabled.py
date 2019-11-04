@@ -45,7 +45,7 @@ class CacheEnabled:
 
         # Create different cache depending on the options
         if shards:
-            self._cache = FanoutCache(self._cache_directory, shards=shards, timeout=0.050,
+            self._cache = FanoutCache(self._cache_directory, shards=shards, timeout=0.1,
                                       eviction_policy=eviction_policy)
         else:
             self._cache = Cache(self._cache_directory)
