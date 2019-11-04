@@ -5,6 +5,8 @@ import string
 from dataclasses import InitVar
 import typing as typing
 from dramatiq import GenericActor
+from sqlalchemy.exc import IntegrityError
+
 if typing.TYPE_CHECKING:
     from idmtools.core import TTags, TSimulationClass, typing  # noqa: F401
 
@@ -32,14 +34,21 @@ class CreateExperimentTask(GenericActor):
         """
         # we only want to import this here so that clients don't need postgres/sqlalchemy packages
         from idmtools_platform_local.internals.workers.utils import create_or_update_status
-        uuid = ''.join(random.choice(string.digits + string.ascii_uppercase) for _ in range(8))
-        if logger.isEnabledFor(logging.INFO):
-            logger.debug('Creating experiment with id %s', uuid)
+        retries = 0
+        while retries <= 3:
+            try:
+                uuid = ''.join(random.choice(string.digits + string.ascii_uppercase) for _ in range(8))
+                if logger.isEnabledFor(logging.INFO):
+                    logger.debug('Creating experiment with id %s', uuid)
 
-        data_path = os.path.join(os.getenv("DATA_PATH", "/data"), uuid)
-
-        # Update the database with experiment
-        create_or_update_status(uuid, data_path, tags, extra_details=dict(simulation_type=simulation_type))
+                # Update the database with experiment
+                data_path = os.path.join(os.getenv("DATA_PATH", "/data"), uuid)
+                create_or_update_status(uuid, data_path, tags, extra_details=dict(simulation_type=simulation_type))
+                break
+            except IntegrityError:
+                retries += 1
+        if retries > 3:
+            raise ValueError("Could not save experiment id because of conflicting ids")
 
         asset_path = os.path.join(data_path, "Assets")
         if logger.isEnabledFor(logging.DEBUG):
