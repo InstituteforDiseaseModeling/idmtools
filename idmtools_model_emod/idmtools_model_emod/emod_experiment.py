@@ -55,7 +55,7 @@ class IEMODExperiment(IExperiment, ABC):
         os.makedirs(cache_path, exist_ok=True)
         if not os.path.exists(out_name):
             if spinner:
-                spinner.text(f"Downloading {url} to {out_name}")
+                spinner.text = f"Downloading {url} to {out_name}"
             logger.debug(f"Downloading {url} to {out_name}")
             with requests.get(url, stream=True) as r:
                 r.raise_for_status()

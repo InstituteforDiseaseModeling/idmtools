@@ -141,6 +141,7 @@ class DockerServiceManager:
                 if sn in CONTAINER_WAIT:
                     self.wait_on_ports_to_open(CONTAINER_WAIT[sn])
                 self._services[sn].get_or_create(spinner)
+            self.wait_on_ports_to_open(['workers_ui_port'])
             self.setup_broker()
         except Exception as e:
             if logger.isEnabledFor(logging.DEBUG):

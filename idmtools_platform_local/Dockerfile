@@ -61,7 +61,7 @@ RUN echo ${PYPIURL}
 # as we will only rebuild if any of the docker_scripts, setup.py, readme.md, and requirements.txt change
 # which should happen infrequently(or less so than library code)
 COPY dist/idmtools_platform_local*.tar.gz /tmp/
-RUN find /tmp -name idmtools_platform_local*.tar.gz -exec pip install {}[workers,ui] --extra-index-url=${PYPIURL} --trusted-host ${PYPIHOST} \; && \
+RUN find /tmp -name idmtools_platform_local*.tar.gz -exec pip install {}[workers,ui,server] --extra-index-url=${PYPIURL} --trusted-host ${PYPIHOST} \; && \
     rm -rf /root/.cache
 COPY idmtools_platform_local/internals/ui/static /app/html
 CMD ["/init"]
