@@ -1,0 +1,3 @@
+#!/usr/bin/with-contenv sh
+cd /app
+exec s6-setuidgid idmtools uwsgi --ini /app/uwsgi.ini

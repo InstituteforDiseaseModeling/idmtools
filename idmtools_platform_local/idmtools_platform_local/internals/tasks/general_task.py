@@ -137,7 +137,7 @@ class RunTask(GenericActor, BaseTask):
     class Meta:
         store_results = False
         max_retries = 0
-        queue_name = "cpu"
+        queue_name = "cpu_workers"
 
     def perform(self, command: str, experiment_uuid: str, simulation_uuid: str) -> Status:
         return self.execute_simulation(command, experiment_uuid, simulation_uuid)
