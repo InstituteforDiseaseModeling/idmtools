@@ -34,9 +34,9 @@ class TestExperimentSimulations(ITestWithPersistence):
 
     def test_input_simulations(self):
         # Create an experiment
-        exp = EMODExperiment.from_default('simulation_test', default=EMODSir, eradication_path=DEFAULT_ERADICATION_PATH)
+        exp = EMODExperiment.from_default(self.case_name, default=EMODSir, eradication_path=DEFAULT_ERADICATION_PATH)
         exp.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
-        exp.from_files("simulation_test", demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)
+        exp.demographics.add_demographics_from_file(DEFAULT_DEMOGRAPHICS_JSON)
         exp.base_simulation.set_parameter("Enable_Immunity", 0)
 
         # User builder to create simulations
@@ -77,9 +77,9 @@ class TestExperimentSimulations(ITestWithPersistence):
         from idmtools.core import ItemType
 
         # Create an idm experiment
-        exp = EMODExperiment.from_default('simulation_test', default=EMODSir, eradication_path=DEFAULT_ERADICATION_PATH)
+        exp = EMODExperiment.from_default(self.case_name, default=EMODSir, eradication_path=DEFAULT_ERADICATION_PATH)
         exp.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
-        exp.base_simulation.load_files(demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)
+        exp.base_simulation.demographics.add_demographics_from_file(DEFAULT_DEMOGRAPHICS_JSON)
         exp.base_simulation.set_parameter("Enable_Immunity", 0)
 
         # User builder to create simulations
