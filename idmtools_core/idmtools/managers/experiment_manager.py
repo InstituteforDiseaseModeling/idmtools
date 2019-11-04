@@ -112,7 +112,7 @@ class ExperimentManager:
         for sim_batch in results:
             for simulation in sim_batch:
                 _sims.append(simulation.metadata)
-                _sims.set_status(EntityStatus.CREATED)
+        _sims.set_status(EntityStatus.CREATED)
 
         self.experiment.simulations = _sims
 
