@@ -116,9 +116,8 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         del_file(os.path.join(analyzer_path, 'population.png'))
         self.create_experiment()
 
-        #self.exp_id = uuid.UUID("fc59240c-07db-e911-a2be-f0921c167861")
+        # self.exp_id = uuid.UUID("fc59240c-07db-e911-a2be-f0921c167861")
         filenames = ['output/InsetChart.json']
-
 
         sys.path.insert(0, analyzer_path)
         from PopulationAnalyzer import PopulationAnalyzer
@@ -166,7 +165,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
 
         analyzers = [TimeseriesAnalyzer(filenames=filenames)]
 
-        #self.exp_id = uuid.UUID("fc59240c-07db-e911-a2be-f0921c167861")
+        # self.exp_id = uuid.UUID("fc59240c-07db-e911-a2be-f0921c167861")
         am = AnalyzeManager(platform=self.p, ids=[(self.exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
 
@@ -215,3 +214,28 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
             s = simulation.get(id=simulation.id)
             self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "config.json")))
             self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "InsetChart.json")))
+
+    def test_download_analyzer_suite(self):
+        # delete output from previous run
+        del_folder("output")
+
+        # create a new empty 'output' dir
+        os.mkdir("output")
+
+        filenames = ['output/InsetChart.json']
+        analyzers = [DownloadAnalyzer(filenames=filenames, output_path='output')]
+
+        suite_id = 'e00296a6-0200-ea11-a2be-f0921c167861'
+        suite_list = [(suite_id, ItemType.SUITE)]  # comps2 staging
+        am = AnalyzeManager(platform=self.p, ids=suite_list, analyzers=analyzers)
+        am.analyze()
+
+        # verify results:
+        # retrieve suite from comps
+        comps_suite = self.p.get_platform_item(item_id=suite_id, item_type=ItemType.SUITE)
+        # retrieve experiment from suite
+        exps = self.p.get_children_for_platform_item(comps_suite)
+        comps_exp = self.p.get_platform_item(item_id=exps[0].uid, item_type=ItemType.EXPERIMENT)
+        sims = self.p.get_children_for_platform_item(comps_exp)
+        for simulation in sims:
+            self.assertTrue(os.path.exists(os.path.join('output', str(simulation.uid), "InsetChart.json")))
