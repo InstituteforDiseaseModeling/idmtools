@@ -2,7 +2,7 @@
 def create_platform_suite(platform, suite):
     """
     Create a suite from platform
-    Returns: None
+    Returns: Platform Suite
     """
     if suite is None:
         return
