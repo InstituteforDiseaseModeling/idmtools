@@ -76,9 +76,8 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         am.analyze()
 
         for simulation in Experiment.get(self.exp_id).get_simulations():
-            s = simulation.get(id=simulation.id)
-            self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "config.json")))
-            self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "result.json")))
+            self.assertTrue(os.path.exists(os.path.join('output', str(simulation.id), "config.json")))
+            self.assertTrue(os.path.exists(os.path.join('output', str(simulation.id), "result.json")))
 
     def test_analyzer_multiple_experiments(self):
         # delete output from previous run
@@ -97,6 +96,5 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         am.analyze()
         for exp_id in exp_list:
             for simulation in Experiment.get(exp_id[0]).get_simulations():
-                s = simulation.get(id=simulation.id)
-                self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "config.json")))
-                self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "result.json")))
+                self.assertTrue(os.path.exists(os.path.join('output', str(simulation.id), "config.json")))
+                self.assertTrue(os.path.exists(os.path.join('output', str(simulation.id), "result.json")))
