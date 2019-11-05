@@ -229,8 +229,11 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     def _platform_item_to_entity(self, platform_item, **kwargs):
         if isinstance(platform_item, COMPSExperiment):
             # Recreate the suite if needed
-            suite = kwargs.get('suite') or self.get_item(platform_item.suite_id,
-                                                                   item_type=ItemType.SUITE)
+            if platform_item.suite_id is None:
+                suite = kwargs.get('suite')
+            else:
+                suite = kwargs.get('suite') or self.get_item(platform_item.suite_id,
+                                                                       item_type=ItemType.SUITE)
 
             # Create an experiment
             obj = experiment_factory.create(platform_item.tags.get("type"), tags=platform_item.tags,
