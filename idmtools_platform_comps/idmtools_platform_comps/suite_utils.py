@@ -20,3 +20,22 @@ def create_platform_suite(platform, suite):
     comps_suite = platform.get_platform_item(item_id=suite_uid, item_type=ItemType.SUITE)
 
     return comps_suite
+
+
+def link_experiment_suite(experiment, suite=None):
+    """
+    Args:
+        experiment: the experiment to be linked to suite
+        suite: the suite to be linked
+    Returns: None
+    """
+
+    if suite is None:
+        return
+
+    # Make sure to link experiment to the suite
+    experiment.suite_id = suite.uid
+    experiment.suite = suite
+
+    # Add experiment to the suite
+    suite.experiments.append(experiment)

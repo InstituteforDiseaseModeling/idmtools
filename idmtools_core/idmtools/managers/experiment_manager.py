@@ -52,11 +52,8 @@ class ExperimentManager:
         create_platform_suite(self.platform, self.suite)
 
         # Make sure to link experiment to the suite
-        self.experiment.suite_id = self.suite.uid
-        self.experiment.suite = self.suite
-
-        # Add experiment to the suite
-        self.suite.experiments.append(self.experiment)
+        from idmtools_platform_comps.suite_utils import link_experiment_suite
+        link_experiment_suite(self.experiment, self.suite)
 
     def create_experiment(self):
         self.experiment.pre_creation()

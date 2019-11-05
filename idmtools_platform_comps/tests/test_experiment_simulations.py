@@ -83,6 +83,73 @@ class TestExperimentSimulations(ITestWithPersistence):
         comps_suite = create_platform_suite(platform, suite)
         self.assertTrue(isinstance(comps_suite, CompsSuite))
 
+    def test_link_experiment_suite(self):
+        from idmtools.entities.suite import Suite
+        from COMPS.Data import Suite as CompsSuite
+        from idmtools.core import ItemType
+
+        # Create an idm experiment
+        exp = EMODExperiment.from_default(self.case_name, default=EMODSir, eradication_path=DEFAULT_ERADICATION_PATH)
+        exp.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
+        exp.base_simulation.demographics.add_demographics_from_file(DEFAULT_DEMOGRAPHICS_JSON)
+        exp.base_simulation.set_parameter("Enable_Immunity", 0)
+
+        # User builder to create simulations
+        num_sims = 3
+        builder = ExperimentBuilder()
+        builder.add_sweep_definition(param_a_update, range(0, num_sims))
+        exp.builder = builder
+
+        # Create a platform
+        platform = Platform('COMPS2')
+
+        # Create COMPS experiment and run
+        em = ExperimentManager(platform=platform, experiment=exp)
+
+        # Create a idm suite
+        suite = Suite(name='Idm Suite 1')
+        suite.update_tags({'name': 'test', 'fetch': 123})
+
+        from idmtools_platform_comps.suite_utils import create_platform_suite
+        create_platform_suite(platform, suite)
+
+        from idmtools_platform_comps.suite_utils import link_experiment_suite
+        link_experiment_suite(em.experiment, suite)
+
+        # Run experiment
+        em.run()
+        em.wait_till_done()
+
+        # Keep suite id
+        suite_uid = suite.uid
+
+        # Test suite retrieval
+        comps_suite = platform.get_platform_item(item_id=suite_uid, item_type=ItemType.SUITE)
+        self.assertTrue(isinstance(comps_suite, CompsSuite))
+
+        # Test retrieve experiment from suite
+        exps = platform.get_children_for_platform_item(comps_suite)
+        self.assertEqual(len(exps), 1)
+
+        exp = exps[0]
+        self.assertTrue(isinstance(exp, EMODExperiment))
+        self.assertIsNotNone(exp.parent)
+
+        # Test get parent from experiment
+        comps_exp = platform.get_platform_item(item_id=exp.uid, item_type=ItemType.EXPERIMENT)
+        parent = platform.get_parent_for_platform_item(comps_exp)
+        self.assertTrue(isinstance(parent, Suite))
+        self.assertEqual(parent.uid, suite_uid)
+
+        # Test retrieve simulations from experiment
+        sims = platform.get_children_for_platform_item(comps_exp)
+        self.assertEqual(len(sims), 3)
+
+        sim = sims[0]
+        self.assertTrue(isinstance(sim, EMODSimulation))
+        self.assertIsNotNone(sim.parent)
+
+
     def test_suite_experiment(self):
         from idmtools.entities.suite import Suite
         from COMPS.Data import Suite as CompsSuite
