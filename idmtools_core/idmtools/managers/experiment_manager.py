@@ -40,21 +40,16 @@ class ExperimentManager:
         em = cls(experiment, platform)
         return em
 
-    def create_suite(self):
+    def link_suite(self):
         """
-        Create a suite from platform and link it to experiment
+        Create a platform suite and link it to experiment
         Returns: None
         """
         if self.suite is None:
             return
 
-        from idmtools_platform_comps.comps_platform import COMPSPlatform
-        if not isinstance(self.platform, COMPSPlatform):
-            print("/!\\ WARNING: Currently Suite is only supported by COMPSPlatform!")
-            exit()
-
-        # Create suite
-        self.platform.create_items(items=[self.suite])
+        from idmtools_platform_comps.suite_utils import create_platform_suite
+        create_platform_suite(self.platform, self.suite)
 
         # Make sure to link experiment to the suite
         self.experiment.suite_id = self.suite.uid
@@ -131,7 +126,7 @@ class ExperimentManager:
         - Trigger the run on the platform
         """
         # Create suite on the platform
-        self.create_suite()
+        self.link_suite()
 
         # Create experiment on the platform
         self.create_experiment()

@@ -71,7 +71,19 @@ class TestExperimentSimulations(ITestWithPersistence):
 
         self.assertEqual(sim.experiment, exp)
 
-    def test_suite(self):
+    def test_create_suite(self):
+        from idmtools.entities.suite import Suite
+        from COMPS.Data import Suite as CompsSuite
+        from idmtools_platform_comps.suite_utils import create_platform_suite
+
+        suite = Suite(name='Idm Suite')
+        suite.update_tags({'name': 'test', 'fetch': 123})
+
+        platform = Platform('COMPS2')
+        comps_suite = create_platform_suite(platform, suite)
+        self.assertTrue(isinstance(comps_suite, CompsSuite))
+
+    def test_suite_experiment(self):
         from idmtools.entities.suite import Suite
         from COMPS.Data import Suite as CompsSuite
         from idmtools.core import ItemType
