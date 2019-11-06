@@ -11,15 +11,28 @@ application = Flask(__name__, static_url_path="")
 application.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS', '1') == '1'
 application.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI',
                                                           "postgresql+psycopg2://idmtools:idmtools@postgres/idmtools")
+
+
+def start_db():
+
+    retries = 0
+    while retries < 3:
+        db = SQLAlchemy(application)
+
+
+        try:
+            from idmtools_platform_local.internals.data import Base
+            Base.metadata.create_all(db.get_engine())
+            return db
+        except Exception as e:
+            application.logger.exception(e)
+            if retries >= 3:
+                raise e
+            retries += 1
+
 application.json_encoder = DateTimeEncoder
-
-
-db = SQLAlchemy(application)
 api = Api(application, prefix='/api')
 ai = AutoIndex(application, browse_root=DATA_PATH, add_url_rules=False)
 
-try:
-    from idmtools_platform_local.internals.data import Base
-    Base.metadata.create_all(db.get_engine())
-except Exception:
-    pass
+
+db = start_db()
