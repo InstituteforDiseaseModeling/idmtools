@@ -36,6 +36,10 @@ postgres_port = 5432
 # where you must sudo to run as root you would want to do use this setting to run the container as
 # you by getting your user id and group id id -u, id -g and replacing 1000 in the below with the values
 # run_as = "1000:1000"
+# 
+# This setting controls whether to remove docker based worker containers
+# You might want this to troubleshoot containers after failures in execiton
+auto_remove_worker_containers = False
 """
 
 
