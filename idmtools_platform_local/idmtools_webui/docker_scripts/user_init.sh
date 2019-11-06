@@ -1,4 +1,3 @@
 #!/usr/bin/env bash
 /init &
-su idmtools
-$@
+su idmtools -c "$@"
