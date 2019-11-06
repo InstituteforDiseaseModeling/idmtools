@@ -9,7 +9,7 @@ from idmtools.utils.entities import retrieve_experiment
 
 if typing.TYPE_CHECKING:
     from idmtools.entities.iexperiment import TExperiment
-    from idmtools.entities.isuite import TSuite
+    from idmtools.entities.suite import TSuite
 
 
 logger = getLogger(__name__)
@@ -40,22 +40,24 @@ class ExperimentManager:
         em = cls(experiment, platform)
         return em
 
-    def link_suite(self):
-        """
-        Create a platform suite and link it to experiment
-        Returns: None
-        """
-        if self.suite is None:
+    def create_suite(self):
+        # If no suite present -> do nothing
+        if not self.suite or self.suite.status == EntityStatus.CREATED:
             return
 
-        from idmtools_platform_comps.suite_utils import create_platform_suite
-        create_platform_suite(self.platform, self.suite)
+        # Create the suite on the platform
+        self.suite.pre_creation()
+        self.platform.create_items([self.suite])
+        self.suite.post_creation()
 
-        # Make sure to link experiment to the suite
-        from idmtools_platform_comps.suite_utils import link_experiment_suite
-        link_experiment_suite(self.experiment, self.suite)
+        # Add experiment to the suite
+        self.suite.add_experiment(self.experiment)
 
     def create_experiment(self):
+        # Do not recreate experiment
+        if self.experiment.status == EntityStatus.CREATED:
+            return
+
         self.experiment.pre_creation()
 
         # Create experiment
@@ -104,7 +106,6 @@ class ExperimentManager:
         for sim_batch in results:
             for simulation in sim_batch:
                 _sims.append(simulation.metadata)
-        _sims.set_status(EntityStatus.CREATED)
 
         self.experiment.simulations = _sims
 
@@ -123,7 +124,7 @@ class ExperimentManager:
         - Trigger the run on the platform
         """
         # Create suite on the platform
-        self.link_suite()
+        self.create_suite()
 
         # Create experiment on the platform
         self.create_experiment()

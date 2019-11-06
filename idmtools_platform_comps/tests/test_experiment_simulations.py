@@ -74,13 +74,16 @@ class TestExperimentSimulations(ITestWithPersistence):
     def test_create_suite(self):
         from idmtools.entities.suite import Suite
         from COMPS.Data import Suite as CompsSuite
-        from idmtools_platform_comps.suite_utils import create_platform_suite
+        from idmtools.core import ItemType
 
         suite = Suite(name='Idm Suite')
         suite.update_tags({'name': 'test', 'fetch': 123})
 
         platform = Platform('COMPS2')
-        comps_suite = create_platform_suite(platform, suite)
+        ids = platform.create_items([suite])
+
+        suite_uid = ids[0]
+        comps_suite = platform.get_platform_item(item_id=suite_uid, item_type=ItemType.SUITE)
         self.assertTrue(isinstance(comps_suite, CompsSuite))
 
     def test_link_experiment_suite(self):
@@ -110,11 +113,11 @@ class TestExperimentSimulations(ITestWithPersistence):
         suite = Suite(name='Idm Suite 1')
         suite.update_tags({'name': 'test', 'fetch': 123})
 
-        from idmtools_platform_comps.suite_utils import create_platform_suite
-        create_platform_suite(platform, suite)
+        # Create platform suite
+        platform.create_items([suite])
 
-        from idmtools_platform_comps.suite_utils import link_experiment_suite
-        link_experiment_suite(em.experiment, suite)
+        # Add experiment to the suite
+        suite.add_experiment(em.experiment)
 
         # Run experiment
         em.run()
@@ -148,7 +151,6 @@ class TestExperimentSimulations(ITestWithPersistence):
         sim = sims[0]
         self.assertTrue(isinstance(sim, EMODSimulation))
         self.assertIsNotNone(sim.parent)
-
 
     def test_suite_experiment(self):
         from idmtools.entities.suite import Suite

@@ -23,7 +23,7 @@ from idmtools_platform_comps.utils import convert_COMPS_status
 
 if typing.TYPE_CHECKING:
     from typing import NoReturn, List, Dict
-    from idmtools.entities.isuite import TSuite
+    from idmtools.entities.suite import TSuite
     from idmtools.entities.iexperiment import TExperiment
     from idmtools.core.interfaces.iitem import TItemList
 
@@ -156,7 +156,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
         e = COMPSExperiment(name=experiment_name,
                             configuration=config,
-                            suite_id=experiment.suite_id)
+                            suite_id=experiment.parent_id)
 
         # Add tags if present
         if experiment.tags:
@@ -177,7 +177,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         if item_type == ItemType.SIMULATION:
             created_simulations = []
             for simulation in batch:
-                s = COMPSSimulation(name=simulation.experiment.name, experiment_id=simulation.experiment.uid,
+                s = COMPSSimulation(name=simulation.experiment.name, experiment_id=simulation.parent_id,
                                     configuration=Configuration(asset_collection_id=simulation.experiment.assets.uid))
                 self.send_assets(item=simulation, comps_simulation=s)
                 s.set_tags(simulation.tags)
@@ -190,8 +190,6 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         elif item_type == ItemType.SUITE:
             ids = [self._create_suite(suite=item) for item in batch]
             return ids
-        else:
-            raise Exception(f'Unable to create items of type: {item_type} for platform: {self.__class__.__name__}')
 
     def run_items(self, items: 'TItemList') -> 'NoReturn':
         for item in items:
