@@ -63,7 +63,16 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         return f"<Experiment: {self.uid} - {self.name} / Sim count {len(self.simulations) if self.simulations else 0}>"
 
     @property
-    def builder(self) -> TExperimentBuilder:
+    def suite(self):
+        return self.parent
+
+    @suite.setter
+    def suite(self, suite):
+        self.parent = suite
+
+    @property
+    def builder(self) -> 'TExperimentBuilder':
+
         """
         For backward-compatibility purposes.
 
