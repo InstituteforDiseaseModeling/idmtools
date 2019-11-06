@@ -10,6 +10,7 @@ if typing.TYPE_CHECKING:
     from idmtools.core import TTags
     from idmtools.entities.iplatform import TPlatform
     from uuid import UUID
+    from typing import NoReturn
 
 
 @dataclass
@@ -24,6 +25,17 @@ class IEntity(IItem, metaclass=ABCMeta):
     status: 'EntityStatus' = field(default=None, compare=False, metadata={"pickle_ignore": True})
     tags: 'TTags' = field(default_factory=lambda: {}, metadata={"md": True})
     item_type: 'ItemType' = field(default=None, compare=False)
+
+    def update_tags(self, tags: 'dict' = None) -> 'NoReturn':
+        """
+        Shortcut to update the tags with the given dictionary
+        Args:
+            tags: New tags
+        """
+        self.tags.update(tags)
+
+    def post_creation(self) -> None:
+        self.status = EntityStatus.CREATED
 
     @property
     def parent(self):

@@ -104,7 +104,7 @@ class TestCopy(ITestWithPersistence):
         sim.demographics.add_demographics_from_file(DEFAULT_DEMOGRAPHICS_JSON)
 
         sim.pre_creation()
-        self.assertEqual(len(sim.assets.assets), 4)
+        self.assertEqual(len(sim.assets.assets), 3)
 
         # test deepcopy of simulation
         sp = copy.deepcopy(sim)

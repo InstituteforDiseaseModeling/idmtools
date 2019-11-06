@@ -134,8 +134,6 @@ class LocalPlatform(IPlatform):
             ids = self._create_simulations(simulations_batch=batch)
         elif item_type == ItemType.EXPERIMENT:
             ids = [self._create_experiment(experiment=item) for item in batch]
-        else:
-            raise Exception(f'Unable to create items of type: {item_type} for platform: {self.__class__.__name__}')
 
         return ids
 
