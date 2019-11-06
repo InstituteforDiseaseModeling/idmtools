@@ -1,3 +1,4 @@
+import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from getpass import getpass
@@ -114,6 +115,8 @@ class BaseServiceContainer(ABC):
                 if logger.isEnabledFor(DEBUG):
                     logger.debug(f'Container Config {str(container_config)}')
                 container = self.client.containers.run(**container_config)
+                # give some start time to containers
+                time.sleep(0.25)
                 return container
             except APIError as e:
                 retries += 1

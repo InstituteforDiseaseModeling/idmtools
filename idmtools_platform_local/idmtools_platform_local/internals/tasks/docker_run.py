@@ -88,7 +88,7 @@ class DockerRunTask(GenericActor, DockerBaseTask):
     class Meta:
         store_results = False
         max_retries = 0
-        queue_name = "cpu_workers"
+        queue_name = "cpu"
 
     def perform(self, command: str, experiment_uuid: str, simulation_uuid: str, container_config: dict) -> Status:
         return self.docker_perform(command, experiment_uuid, simulation_uuid, container_config)
