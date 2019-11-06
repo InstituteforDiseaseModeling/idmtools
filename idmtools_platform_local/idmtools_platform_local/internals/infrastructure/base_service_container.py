@@ -81,6 +81,7 @@ class BaseServiceContainer(ABC):
 
     def get(self) -> Union[Container, None]:
         container = self.client.containers.list(filters=dict(name=self.container_name), all=True)
+        container = [x for x in container if x.name == self.container_name]
         if container:
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f"Found {container[0].name}")

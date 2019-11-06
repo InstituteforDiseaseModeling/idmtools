@@ -24,7 +24,8 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && useradd -s /bin/bash idmtools \
     && echo "idmtools:idmtools" | chpasswd \
-    && mkdir -p /home/idmtools /data /app/log \
+    && mkdir -p /home/idmtools /data /app/log /app/tmp/client_body \
+        /app/tmp/fastcgi_temp /app/tmp/proxy_temp /app/tmp/scgi_temp /app/tmp/uwsgi_temp \
     && chown -R idmtools:idmtools /home/idmtools /data /app \
     && addgroup idmtools staff \
     # create docker group and idmtools to it so they can use it
@@ -42,9 +43,9 @@ RUN apt-get update \
     && rm -rf /tmp/s6-overlay-amd64.tar.gz
 
 # Our script that does smart user mapping
-COPY docker_scripts/cont-init.d/* /etc/cont-init.d/
+ADD docker_scripts/cont-init.d /etc/cont-init.d
 # Our service scripts
-COPY docker_scripts/services/* /etc/services.d/
+ADD docker_scripts/services /etc/services.d
 COPY docker_scripts/uwsgi.ini docker_scripts/nginx.conf /app/
 
 # Define a workdirectory
@@ -63,5 +64,5 @@ RUN echo ${PYPIURL}
 COPY dist/idmtools_platform_local*.tar.gz /tmp/
 RUN find /tmp -name idmtools_platform_local*.tar.gz -exec pip install {}[workers,ui,server] --extra-index-url=${PYPIURL} --trusted-host ${PYPIHOST} \; && \
     rm -rf /root/.cache
-COPY idmtools_platform_local/internals/ui/static /app/html
+ADD idmtools_platform_local/internals/ui/static /app/html
 CMD ["/init"]

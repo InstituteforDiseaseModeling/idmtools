@@ -34,23 +34,27 @@ class BaseTask:
         logger.debug(f"Simulation path {simulation_path}")
         with open(os.path.join(simulation_path, "StdOut.txt"), "w") as out, \
                 open(os.path.join(simulation_path, "StdErr.txt"), "w") as err:
-            logger.info('Executing %s from working directory %s', command, simulation_path)
-            err.write(f"{command}\n")
+            try:
+                logger.info('Executing %s from working directory %s', command, simulation_path)
+                err.write(f"{command}\n")
 
-            # Run our task
-            p = subprocess.Popen(shlex.split(command), cwd=simulation_path, shell=False, stdout=out, stderr=err)
-            # store the pid in case we want to cancel later
-            logger.info(f"Process id: {p.pid}")
-            current_job.extra_details['pid'] = p.pid
-            # Log that we have started this particular simulation
-            create_or_update_status(simulation_uuid, status=Status.in_progress, extra_details=current_job.extra_details)
-            p.wait()
+                # Run our task
+                p = subprocess.Popen(shlex.split(command), cwd=simulation_path, shell=False, stdout=out, stderr=err)
+                # store the pid in case we want to cancel later
+                logger.info(f"Process id: {p.pid}")
+                current_job.extra_details['pid'] = p.pid
+                # Log that we have started this particular simulation
+                create_or_update_status(simulation_uuid, status=Status.in_progress, extra_details=current_job.extra_details)
+                p.wait()
 
-            status = RunTask.extract_status(experiment_uuid, p.returncode, simulation_uuid)
+                status = RunTask.extract_status(experiment_uuid, p.returncode, simulation_uuid)
 
-            # Update task with the final status
-            create_or_update_status(simulation_uuid, status=status, extra_details=current_job.extra_details)
-            return status
+                # Update task with the final status
+                create_or_update_status(simulation_uuid, status=status, extra_details=current_job.extra_details)
+                return status
+            except Exception as e:
+                err.write(str(e))
+                return Status.failed
 
     @staticmethod
     def extract_status(experiment_uuid: str, return_code: int, simulation_uuid) -> Status:
@@ -137,7 +141,7 @@ class RunTask(GenericActor, BaseTask):
     class Meta:
         store_results = False
         max_retries = 0
-        queue_name = "cpu_workers"
+        queue_name = "cpu"
 
     def perform(self, command: str, experiment_uuid: str, simulation_uuid: str) -> Status:
         return self.execute_simulation(command, experiment_uuid, simulation_uuid)

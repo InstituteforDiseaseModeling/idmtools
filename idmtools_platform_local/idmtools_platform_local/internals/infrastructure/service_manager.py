@@ -259,7 +259,9 @@ class DockerServiceManager:
             (Network) Return Docker network object
         """
         # check that the network exists
-        network = self.client.networks.list([self.network])
+        network = self.client.networks.list(filters=dict(name=self.network))
+        # check name specifically
+        network = [x for x in network if x.name == self.network]
         if not network:
             logger.debug(f'Creating network {self.network}')
             network = self.client.networks.create(self.network, driver='bridge', internal=False,

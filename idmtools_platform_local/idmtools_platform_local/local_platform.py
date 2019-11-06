@@ -151,6 +151,7 @@ class LocalPlatform(IPlatform):
                     if is_docker_type:
                         self.run_docker_sim(item, simulation)
                     else:
+                        logger.debug(f"Running simulation: {simulation.uid}")
                         RunTask.send(item.command.cmd, item.uid, simulation.uid)
             else:
                 raise Exception(f'Unable to run item id: {item.uid} of type: {type(item)} ')

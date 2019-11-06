@@ -1,3 +1,4 @@
 #!/usr/bin/with-contenv sh
 
-exec s6-setuidgid idmtools nginx -c /app/nginx.conf
+echo Starting UI
+nginx -g 'daemon off;' -c /app/nginx.conf
