@@ -19,6 +19,9 @@ lint: ## check style with flake8
 test: ## Run our tests
 	python dev_scripts/run_pymake_on_all.py test p
 
+test-no-comps: ## Run our tests
+	python dev_scripts/run_pymake_on_all.py test-no-comps
+
 test-all: ## Run our tests. We cannot run in parallel
 	python dev_scripts/run_pymake_on_all.py test-all
 

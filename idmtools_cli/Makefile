@@ -20,7 +20,12 @@ lint: ## check style with flake8
 	flake8 --ignore=E501 idmtools_cli tests
 
 test: ## Run our tests
-	@$(IPY) "import os, sys; sys.path.append(os.getcwd()); os.system('py.test')"
+	@$(IPY) "import os, sys; sys.path.append(os.getcwd()); os.system('py.test -m \"not comps and not docker\" -v')"
+
+test-no-comps: ## Run our tests
+	@+$(IPY) "import os; os.chdir('tests'); \
+	os.environ['DOCKER_REPO'] = 'idm-docker-staging'; \
+	os.system('py.test -v -p no:warnings -m \"not comps\" --durations=3 --junitxml=test_results.xml')"
 
 test-all: ## Run our  docker tests as well
 	@+$(IPY) "import os; os.environ['DOCKER_TESTS'] = '1'; \

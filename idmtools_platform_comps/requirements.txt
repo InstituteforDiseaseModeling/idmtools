@@ -1,2 +1,2 @@
-pyCOMPS~=2.3.3
+pyCOMPS~=2.3.4
 idmtools~=0.2.0

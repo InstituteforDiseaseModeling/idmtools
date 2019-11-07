@@ -21,7 +21,14 @@ lint: ## check style with flake8
 	@+$(IPY) "import os; os.chdir('..'); os.system('flake8 --ignore=E501 idmtools_model_emod')"
 
 test: ## Run our tests
-	@+$(IPY) "import os; os.chdir('tests'); os.system('py.test -p no:warnings --junitxml=test_results.xml')"
+	@+$(IPY) "import os; os.chdir('tests'); \
+	os.environ['DOCKER_REPO'] = 'idm-docker-staging'; \
+	os.system('py.test -v -p no:warnings -m \"not comps and not docker\" --durations=3 --junitxml=test_results.xml')"
+
+test-no-comps: ## Run our tests
+	@+$(IPY) "import os; os.chdir('tests'); \
+	os.environ['DOCKER_REPO'] = 'idm-docker-staging'; \
+	os.system('py.test -v -p no:warnings -m \"not comps\" --durations=3 --junitxml=test_results.xml')"
 
 test-all: ## Run our  docker tests as well
 	@+$(IPY) "import os; os.environ['DOCKER_TESTS'] = '1'; \
