@@ -3,6 +3,8 @@ import itertools
 import logging
 from multiprocessing import cpu_count
 from dramatiq import GenericActor
+
+from idmtools_platform_local.internals.workers.utils import get_host_data_bind
 from idmtools_platform_local.status import Status
 from idmtools_platform_local.internals.tasks.general_task import BaseTask
 
@@ -24,9 +26,9 @@ class DockerBaseTask(BaseTask):
         container_config['stderr'] = True
         container_config['working_dir'] = simulation_path
         container_config['user'] = os.getenv('CURRENT_UID')
-        # container_config['auto_remove'] = True
+        container_config['auto_remove'] = True
         # we have to mount using the host data path
-        data_dir = f'{os.getenv("HOST_DATA_PATH")}'
+        data_dir = get_host_data_bind()
         data_dir += "\\" if "\\" in data_dir else "/"
         container_config['volumes'] = {
             data_dir: dict(bind='/data', mode='rw'),
@@ -63,7 +65,7 @@ class DockerBaseTask(BaseTask):
                 open(os.path.join(simulation_path, "StdErr.txt"), "w") as err:  # noqa: F841
             try:
                 client = docker.DockerClient(base_url='unix://var/run/docker.sock')
-                dcmd = f'docker run -v {os.getenv("HOST_DATA_PATH")}:/data --user \"{os.getenv("CURRENT_UID")}\" ' \
+                dcmd = f'docker run -v {get_host_data_bind()}:/data --user \"{os.getenv("CURRENT_UID")}\" ' \
                     f'-w {container_config["working_dir"]} {container_config["image"]} {command}'
                 logger.info(f"Running docker command: {dcmd}")
                 logger.info(f"Running {command} with docker config {str(container_config)}")

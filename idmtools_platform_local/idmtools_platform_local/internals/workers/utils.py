@@ -1,6 +1,10 @@
+import os
+
 from idmtools_platform_local.internals.data.job_status import JobStatus
 from idmtools_platform_local.internals.workers.database import get_session, get_or_create
 from idmtools_platform_local.status import Status
+
+HOST_DATA_BIND = None
 
 
 def create_or_update_status(uuid, data_path=None, tags=None, status=Status.created, parent_uuid=None,
@@ -26,3 +30,14 @@ def create_or_update_status(uuid, data_path=None, tags=None, status=Status.creat
     if autoclose:
         # close the sessions
         session.close()
+
+
+def get_host_data_bind():
+    global HOST_DATA_BIND
+    if HOST_DATA_BIND is None:
+        data_bind = os.getenv('HOST_DATA_BIND', None)
+        if data_bind is None:
+            raise ValueError("HOST_DATA_BIND is not set")
+        data_bind = data_bind.split()[0]
+        HOST_DATA_BIND = data_bind
+    return HOST_DATA_BIND
