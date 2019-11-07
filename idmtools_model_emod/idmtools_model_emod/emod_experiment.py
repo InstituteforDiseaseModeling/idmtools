@@ -8,7 +8,7 @@ from idmtools_model_emod.emod_file import DemographicsFiles
 from idmtools_model_emod.emod_simulation import EMODSimulation
 
 if typing.TYPE_CHECKING:
-    from idmtools_model_emod.defaults import iemod_default
+    from idmtools_model_emod import IEMODDefault
 
 
 @dataclass(repr=False)
@@ -23,7 +23,7 @@ class EMODExperiment(IExperiment):
             self.eradication_path = os.path.abspath(self.eradication_path)
 
     @classmethod
-    def from_default(cls, name, default: 'iemod_default', eradication_path=None):
+    def from_default(cls, name, default: 'IEMODDefault', eradication_path=None):
         exp = cls(name=name, eradication_path=eradication_path)
 
         # Set the base simulation
