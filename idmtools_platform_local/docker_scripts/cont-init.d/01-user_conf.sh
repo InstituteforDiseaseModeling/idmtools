@@ -26,6 +26,8 @@ if [[ "$USERID" -ne 1000 ]]
     mkdir /home/$USER
     chown -R $USER /home/$USER /data /app
     usermod -a -G staff $USER
+    # Adding idmtools to docker group
+    usermod -a -G docker idmtools
 elif [[ "$USER" != "idmtools" ]]
   then
     echo "Renaming idmtools to $USER"
