@@ -31,6 +31,9 @@ class WorkersContainer(BaseServiceContainer):
     postgres_port: int = 5432
     redis_port: int = 6379
     ui_port: int = 5000
+    # make this configurable and also size this to
+    # size of available ram. We should probably support like 0.8 for 80% because some models, this can be
+    # where they are ran
     mem_limit: str = '16g'
     mem_reservation: str = '64m'
     run_as: str = None
