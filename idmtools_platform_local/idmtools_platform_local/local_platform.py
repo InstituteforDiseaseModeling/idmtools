@@ -59,6 +59,8 @@ class LocalPlatform(IPlatform):
     postgres_mem_limit: str = field(default='64m')
     postgres_mem_reservation: str = field(default='32m')
     postgres_port: Optional[str] = field(default=5432)
+    workers_mem_limit: str = field(default='16g')
+    workers_mem_reservation: str = field(default='128m')
     workers_image: str = field(default=None)
     workers_ui_port: int = field(default=5000)
     default_timeout: int = field(default=45)
