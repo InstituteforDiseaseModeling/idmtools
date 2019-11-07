@@ -24,8 +24,6 @@ DEFAULT_ERADICATION_PATH = os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.
 emod_version = '2.20.0'
 
 
-@pytest.mark.comps
-@pytest.mark.docker
 @pytest.mark.emod
 class EMODPlatformTest(ABC):
 

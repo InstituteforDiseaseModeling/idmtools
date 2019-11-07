@@ -1,10 +1,12 @@
 import os
+from logging import getLogger
 
 from idmtools_platform_local.internals.data.job_status import JobStatus
 from idmtools_platform_local.internals.workers.database import get_session, get_or_create
 from idmtools_platform_local.status import Status
 
 HOST_DATA_BIND = None
+logger = getLogger(__name__)
 
 
 def create_or_update_status(uuid, data_path=None, tags=None, status=Status.created, parent_uuid=None,
@@ -36,8 +38,9 @@ def get_host_data_bind():
     global HOST_DATA_BIND
     if HOST_DATA_BIND is None:
         data_bind = os.getenv('HOST_DATA_BIND', None)
+        logger.info(f'HOST_DATA_BIND={data_bind}')
         if data_bind is None:
             raise ValueError("HOST_DATA_BIND is not set")
-        data_bind = data_bind.split()[0]
+        data_bind = data_bind.split(":")[0]
         HOST_DATA_BIND = data_bind
     return HOST_DATA_BIND
