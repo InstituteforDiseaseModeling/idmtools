@@ -34,7 +34,7 @@ class CreateSimulationTask(GenericActor):
         max_retries = 0
 
     @staticmethod
-    @backoff.on_exception(backoff.constant(0.1), IntegrityError, max_tries=3, jitter=None)
+    @backoff.on_exception(backoff.constant, IntegrityError, max_tries=3, interval=0.02, jitter=None)
     def get_uuid_and_data_path(experiment_id, session, tags):
         from idmtools_platform_local.internals.workers.utils import create_or_update_status
         uuid = ''.join(random.choice(string.digits + string.ascii_uppercase) for _ in range(SIM_ID_LENGTH))

@@ -23,12 +23,12 @@ lint: ## check style with flake8
 test: ## Run our tests
 	@+$(IPY) "import os; os.chdir('tests'); \
 	os.environ['DOCKER_REPO'] = 'idm-docker-staging'; \
-	os.system('py.test -p no:warnings -m \"not comps and not docker\" --junitxml=test_results.xml')"
+	os.system('py.test -p no:warnings -m \"not comps and not docker\" --durations=3 --junitxml=test_results.xml')"
 
 test-all: ## Run our  docker tests as well
 	@+$(IPY) "import os; os.chdir('tests'); \
 	os.environ['DOCKER_REPO'] = 'idm-docker-staging'; os.environ['NO_SPINNER'] = '1' ;\
-	os.system('py.test -v -p no:warnings --junitxml=test_results.xml')"
+	os.system('py.test -v --durations=3 -p no:warnings --junitxml=test_results.xml')"
 
 coverage: ## Generate a code-coverage report
 	@make clean

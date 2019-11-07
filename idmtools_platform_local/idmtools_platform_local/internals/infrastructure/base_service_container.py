@@ -123,6 +123,7 @@ class BaseServiceContainer(ABC):
                     time.sleep(0.2)
                     container.reload()
                     wait_checks += 1
+                logger.debug(f'{self.container_name}: {container.status}: {container.id}')
                 if container.status in ['failed']:
                     raise EnvironmentError(f"Could not start {self.__class__.__name__}")
                 return container

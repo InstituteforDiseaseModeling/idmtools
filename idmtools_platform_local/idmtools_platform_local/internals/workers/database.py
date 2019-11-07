@@ -28,7 +28,8 @@ def get_session() -> Session:
         from idmtools_platform_local.internals.data import Base
         logger.info("Creating database schema")
 
-        @backoff.on_exception(backoff.constant(0.1), OperationalError, max_tries=3, on_backoff=reset_db())
+        @backoff.on_exception(backoff.constant, OperationalError, max_tries=3, interval=0.25,
+                              on_backoff=lambda details: reset_db())
         def create_all():
             logger.debug("Creating db")
             Base.metadata.create_all(engine)

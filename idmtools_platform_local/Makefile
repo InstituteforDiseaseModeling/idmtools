@@ -31,12 +31,12 @@ test: ## Run our tests
 test-docker: ## Run our  docker tests as well
 	@+$(IPY) "import os; os.chdir('tests'); \
 	    os.environ['DOCKER_REPO'] = 'idm-docker-staging'; \
-	    os.system('py.test -m \"docker\" --junitxml=test_results.xml')"
+	    os.system('py.test --durations=3 -m \"docker\" --junitxml=test_results.xml')"
 
 test-all: ## Run our  docker tests as well
 	@+$(IPY) "import os; os.chdir('tests'); \
 	    os.environ['DOCKER_REPO'] = 'idm-docker-staging'; os.environ['NO_SPINNER'] = '1' ; \
-	    os.system('py.test -v --junitxml=test_results.xml')"
+	    os.system('py.test --durations=3 -v --junitxml=test_results.xml')"
 
 docker-cleanup:
 	docker stop  idmtools_workers idmtools_postgres idmtools_redis
