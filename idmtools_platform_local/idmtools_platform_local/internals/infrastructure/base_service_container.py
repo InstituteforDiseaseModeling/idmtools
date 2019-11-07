@@ -117,6 +117,14 @@ class BaseServiceContainer(ABC):
                 container = self.client.containers.run(**container_config)
                 # give some start time to containers
                 time.sleep(0.25)
+                # check status of container until it is no longer starting/created
+                wait_checks = 0
+                while container.status in ['starting', 'created'] and wait_checks < 10:
+                    time.sleep(0.2)
+                    container.reload()
+                    wait_checks += 1
+                if container.status in ['failed']:
+                    raise EnvironmentError(f"Could not start {self.__class__.__name__}")
                 return container
             except APIError as e:
                 retries += 1

@@ -1,4 +1,6 @@
 import os
+from sqlite3 import OperationalError
+import backoff
 from flask import Flask
 from flask_autoindex import AutoIndex
 from flask_restful import Api
@@ -13,26 +15,15 @@ application.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_U
                                                           "postgresql+psycopg2://idmtools:idmtools@postgres/idmtools")
 
 
+@backoff.on_exception(backoff.constant(0.2), OperationalError, max_tries=3)
 def start_db():
+    from idmtools_platform_local.internals.data import Base
+    db = SQLAlchemy(application)
+    Base.metadata.create_all(db.get_engine())
+    return db
 
-    retries = 0
-    while retries < 3:
-        db = SQLAlchemy(application)
-
-
-        try:
-            from idmtools_platform_local.internals.data import Base
-            Base.metadata.create_all(db.get_engine())
-            return db
-        except Exception as e:
-            application.logger.exception(e)
-            if retries >= 3:
-                raise e
-            retries += 1
 
 application.json_encoder = DateTimeEncoder
 api = Api(application, prefix='/api')
 ai = AutoIndex(application, browse_root=DATA_PATH, add_url_rules=False)
-
-
 db = start_db()

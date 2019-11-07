@@ -2,6 +2,8 @@ import logging
 import os
 from multiprocessing import cpu_count
 from typing import List
+
+import backoff
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import OperationalError
@@ -19,22 +21,19 @@ default_url = "postgresql+psycopg2://idmtools:idmtools@idmtools_postgres/idmtool
 
 def get_session() -> Session:
     global session_factory
-    print('Connecting to postgres with URI %s', os.getenv('SQLALCHEMY_DATABASE_URI', default_url))
     if session_factory is None:
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug('Connecting to postgres with URI %s', os.getenv('SQLALCHEMY_DATABASE_URI', default_url))
+        logger.debug('Connecting to postgres with URI %s', os.getenv('SQLALCHEMY_DATABASE_URI', default_url))
         engine = get_db()
         session_factory = sessionmaker(bind=engine)
         from idmtools_platform_local.internals.data import Base
         logger.info("Creating database schema")
-        retries = 0
-        while retries <= 3:
-            try:
-                Base.metadata.create_all(engine)
-                break
-            except OperationalError:
-                reset_db()
-                retries += 1
+
+        @backoff.on_exception(backoff.constant(0.1), OperationalError, max_tries=3, on_backoff=reset_db())
+        def create_all():
+            logger.debug("Creating db")
+            Base.metadata.create_all(engine)
+
+        create_all()
 
     return session_factory()
 
@@ -49,6 +48,7 @@ def get_db() -> Engine:
 
 def reset_db():
     global engine
+    logger.debug("Resetting db")
     engine = None
     engine = get_db()
 
