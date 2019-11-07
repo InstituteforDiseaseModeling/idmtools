@@ -77,6 +77,8 @@ class TestExperimentSimulations(ITestWithPersistence):
 
         self.assertEqual(sim.experiment, exp)
 
+    @pytest.mark.comps
+    @pytest.mark.suite
     def test_create_suite(self):
         from idmtools.entities.suite import Suite
         from COMPS.Data import Suite as CompsSuite
@@ -92,6 +94,9 @@ class TestExperimentSimulations(ITestWithPersistence):
         comps_suite = platform.get_platform_item(item_id=suite_uid, item_type=ItemType.SUITE)
         self.assertTrue(isinstance(comps_suite, CompsSuite))
 
+    @pytest.mark.comps
+    @pytest.mark.emod
+    @pytest.mark.suite
     def test_link_experiment_suite(self):
         from idmtools.entities.suite import Suite
         from COMPS.Data import Suite as CompsSuite
@@ -158,6 +163,9 @@ class TestExperimentSimulations(ITestWithPersistence):
         self.assertTrue(isinstance(sim, EMODSimulation))
         self.assertIsNotNone(sim.parent)
 
+    @pytest.mark.comps
+    @pytest.mark.emod
+    @pytest.mark.suite
     def test_suite_experiment(self):
         from idmtools.entities.suite import Suite
         from COMPS.Data import Suite as CompsSuite
