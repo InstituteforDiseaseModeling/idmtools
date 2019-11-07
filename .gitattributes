@@ -1,4 +1,4 @@
 *.sh text eol=lf
 .bash_profile text eol=lf
 # Docker run definitions
-run text eol=lf
+*run text eol=lf
