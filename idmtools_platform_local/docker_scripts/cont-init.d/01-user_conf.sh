@@ -13,7 +13,7 @@ ROOT=${ROOT:=FALSE}
 UMASK=${UMASK:=022}
 
 # Get the owner of docker socket and the container docker id
-DOCKER_GROUP=$(stat -c '%g' /var/run/docker.sock)
+DOCKER_SOCKET_GROUP=$(stat -c '%g' /var/run/docker.sock)
 DOCKER_GID=$(cut -d: -f3 < <(getent group docker))
 
 if [[ "$USERID" -ne 1000 ]]
@@ -51,16 +51,21 @@ if [[ "$GROUPID" -ne 1000 ]]
 fi
 
 ## Ensure the docker group matches the host docker group id. This allows the idmtools users to run docker commands
-if [[ "$DOCKER_GID" -ne "$DOCKER_GROUP" ]]; then
-    echo "Recreating docker group with gid of $DOCKER_GID"
-    if [[ "${DOCKER_GROUP}" -eq "${USERID}" ]]; then
+if [[ "$DOCKER_GID" -ne "$DOCKER_SOCKET_GROUP" ]]; then
+    if [[ "$DOCKER_SOCKET_GROUP" -eq 0 ]]; then
+        echo "Changing group on docker socket to docker from root group"
+        chgrp  docker /var/run/docker.sock
+    elif [[ "${DOCKER_SOCKET_GROUP}" -eq "${USERID}" ]]; then
         echo "Docker group id cannot be the same id as the run user"
         exit -1
+    else
+        echo "Recreating Docker GROUP with GID ${DOCKER_SOCKET_GROUP}"
+        groupdel docker
+        addgroup --gid ${DOCKER_SOCKET_GROUP} docker
+        # Adding idmtools to docker group
+        usermod -a -G docker idmtools
     fi
-    groupdel docker
-    addgroup --gid ${DOCKER_GROUP} docker
-    # Adding idmtools to docker group
-    usermod -a -G docker idmtools
+
 fi
 
 ## Add a password to user
