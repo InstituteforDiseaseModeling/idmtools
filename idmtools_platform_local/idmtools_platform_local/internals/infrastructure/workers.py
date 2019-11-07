@@ -31,7 +31,7 @@ class WorkersContainer(BaseServiceContainer):
     postgres_port: int = 5432
     redis_port: int = 6379
     ui_port: int = 5000
-    mem_limit: str = None
+    mem_limit: str = '16g'
     mem_reservation: str = '64m'
     run_as: str = None
     image: str = get_worker_image_default()
