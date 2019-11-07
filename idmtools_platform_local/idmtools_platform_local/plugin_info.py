@@ -18,6 +18,12 @@ default_timeout: int = 30
 workers_image: str = 'idm-docker-staging.packages.idmod.org:latest'
 # Port to display UI (ie the portion after colon in default URL http://localhost:5000)
 workers_ui_port int = 5000
+# This sets the max memory for workers container 
+# see https://docs.docker.com/compose/compose-file/compose-file-v2/#cpu-and-other-resources#specifying-byte-values 
+# for supported units
+workers_mem_limit = '16g'
+# Set mem reserved work worker
+workers_mem_reservation = '128m'
 # Docker runtime. On GPU Machines you may want to use nvidia instead of the default
 runtime = 'runc'
 # Name of idmtools local network
