@@ -24,7 +24,7 @@ test: ## Run our tests
 	@+$(IPY) "print('No Tests')"
 
 test-no-comps: ## Run our tests
-	"print('No Tests')"
+	@+$(IPY) "print('No Tests')"
 
 test-all: ## Run our  docker tests as well
 	@+$(IPY) "print('No Tests')"
