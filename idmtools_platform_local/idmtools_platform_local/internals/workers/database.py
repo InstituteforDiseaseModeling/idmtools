@@ -19,23 +19,27 @@ engine = None
 default_url = "postgresql+psycopg2://idmtools:idmtools@idmtools_postgres/idmtools"
 
 
+def create_db(engine):
+    from idmtools_platform_local.internals.data import Base
+    logger.info("Creating database schema")
+
+    @backoff.on_exception(backoff.constant, OperationalError, max_tries=3, interval=0.25,
+                          on_backoff=lambda details: reset_db(),
+                          on_giveup=lambda x: logger.debug("Problems creating db"))
+    def create_all():
+        logger.debug("Creating db")
+        Base.metadata.create_all(engine)
+
+    create_all()
+
+
 def get_session() -> Session:
     global session_factory
     if session_factory is None:
         logger.debug('Connecting to postgres with URI %s', os.getenv('SQLALCHEMY_DATABASE_URI', default_url))
         engine = get_db()
         session_factory = sessionmaker(bind=engine)
-        from idmtools_platform_local.internals.data import Base
-        logger.info("Creating database schema")
-
-        @backoff.on_exception(backoff.constant, OperationalError, max_tries=3, interval=0.25,
-                              on_backoff=lambda details: reset_db())
-        def create_all():
-            logger.debug("Creating db")
-            Base.metadata.create_all(engine)
-
-        create_all()
-
+        create_db(engine)
     return session_factory()
 
 

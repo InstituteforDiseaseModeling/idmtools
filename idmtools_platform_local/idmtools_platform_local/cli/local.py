@@ -1,3 +1,5 @@
+import time
+
 import click
 import docker
 import stringcase as stringcase
@@ -66,6 +68,14 @@ def stop(cli_context: LocalCliContext, delete_data):
 def start(cli_context: LocalCliContext):
     """Start the local execution platform"""
     cli_context.sm.create_services()
+    try:
+        time.sleep(4)
+        import webbrowser
+        from idmtools_platform_local.config import get_api_path
+        webbrowser.open(get_api_path().replace("/api", ""))
+    except Exception as e:
+        click.echo(f"Could not open in web browser: {str(e)}")
+        pass
 
 
 @local.command()
@@ -90,6 +100,11 @@ def info(cli_context: LocalCliContext, logs: bool, diff: bool):
             info.append(f'name: {container.name}')
             info.append(f'status: {container.status}')
             [info.append(f'{k}: {v}') for k, v in container.attrs.items()]
+            if container.status == ['running']:
+                info.append("Var Run")
+                info.append(container.exec_run('ls -al /var/run'))
+                info.append("/data")
+                info.append(container.exec_run('ls -al /data'))
             if logs:
                 info.extend(container.logs().decode('utf-8').split("\n"))
             if diff:

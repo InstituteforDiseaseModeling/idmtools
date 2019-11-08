@@ -26,6 +26,8 @@ workers_mem_limit = '16g'
 workers_mem_reservation = '128m'
 # How many seconds without communication before we consider redis dead?
 heartbeat_timeout = 10
+# Whether to launch created experiments in the local ui on creation
+launch_created_experiments_in_browser = False
 # Docker runtime. On GPU Machines you may want to use nvidia instead of the default
 runtime = 'runc'
 # Name of idmtools local network

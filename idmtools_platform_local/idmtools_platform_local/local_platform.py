@@ -68,6 +68,7 @@ class LocalPlatform(IPlatform):
     workers_ui_port: int = field(default=5000)
     heartbeat_timeout: int = field(default=15)
     default_timeout: int = field(default=45)
+    launch_created_experiments_in_browser: bool = field(default=False)
     # allows user to specify auto removal of docker worker containers
     auto_remove_worker_containers: bool = field(default=True)
 
@@ -260,19 +261,18 @@ class LocalPlatform(IPlatform):
         m = CreateExperimentTask.send(experiment.tags, experiment.simulation_type)
 
         # Create experiment is vulnerable to disconnects early on of redis errors. Lets do a retry on conditions
-        retries = 0
         start = time.time()
         timeout_diff = 0
+        time_increment = self.heartbeat_timeout if self.heartbeat_timeout < self.default_timeout else self.default_timeout
         while self.default_timeout - timeout_diff > 0:
             try:
-                eid = m.get_result(block=True, timeout=(self.default_timeout - timeout_diff) * 1000)
+                eid = m.get_result(block=True, timeout=time_increment * 1000)
                 break
             except ResultTimeout as e:
                 logger.debug('Resetting broker client because of a heartbeat failure')
                 timeout_diff = floor((time.time() - start) / 1000)
-                retries += 1
                 self._sm.restart_brokers(self.heartbeat_timeout)
-                if retries >= 2 or self.default_timeout < self.heartbeat_timeout or timeout_diff > self.default_timeout:
+                if timeout_diff >= self.default_timeout:
                     logger.exception(e)
                     logger.error("Could not connect to redis")
                     raise e
@@ -280,7 +280,23 @@ class LocalPlatform(IPlatform):
         path = "/".join(["/data", experiment.uid, "Assets"])
         self._do.create_directory(path)
         self._send_assets_for_experiment(experiment)
+        if self.launch_created_experiments_in_browser:
+            self.launch_item_in_browser(experiment)
         return experiment.uid
+
+    def launch_item_in_browser(self, item):
+        if isinstance(item, IExperiment):
+            t_str = item.uid
+        elif isinstance(item, ISimulation):
+            t_str = f'{item.parent_id}/{item.uid}'
+        else:
+            raise NotImplementedError("Only launching experiments and simulations is supported")
+        try:
+            import webbrowser
+            from idmtools_platform_local.config import get_api_path
+            webbrowser.open(f'{get_api_path().replace("/api", "/data")}/{t_str}?sort_by=modified&order=desc')
+        except Exception:
+            pass
 
     def _send_assets_for_experiment(self, experiment):
         """
