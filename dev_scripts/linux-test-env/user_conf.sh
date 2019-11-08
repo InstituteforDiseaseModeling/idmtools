@@ -14,6 +14,10 @@ UMASK=${UMASK:=022}
 
 echo "$USER"
 
+# Get the owner of docker socket and the container docker id
+DOCKER_SOCKET_GROUP=$(stat -c '%g' /var/run/docker.sock)
+DOCKER_GID=$(cut -d: -f3 < <(getent group docker))
+
 if [[ "$USERID" -ne 1000 ]]
 ## Configure user with a different USERID if requested.
   then
@@ -24,6 +28,7 @@ if [[ "$USERID" -ne 1000 ]]
     mkdir /home/$USER
     chown -R $USER /home/$USER /idmtools
     usermod -a -G staff $USER
+    usermod -a -G docker $USER
 elif [[ "$USER" != "idmtools" ]]
   then
     echo "Renaming idmtools to $USER"
@@ -48,15 +53,27 @@ if [[ "$GROUPID" -ne 1000 ]]
     echo "Primary group ID is now custom_group $GROUPID"
 fi
 
+## Ensure the docker group matches the host docker group id. This allows the idmtools users to run docker commands
+if [[ "$DOCKER_GID" -ne "$DOCKER_SOCKET_GROUP" ]]; then
+    if [[ "$DOCKER_SOCKET_GROUP" -eq 0 ]]; then
+        echo "Changing group on docker socket to docker from root group"
+        chgrp  docker /var/run/docker.sock
+    elif [[ "${DOCKER_SOCKET_GROUP}" -eq "${USERID}" ]]; then
+        echo "Docker group id cannot be the same id as the run user"
+        exit -1
+    else
+        echo "Recreating Docker GROUP with GID ${DOCKER_SOCKET_GROUP}"
+        groupdel docker
+        addgroup --gid ${DOCKER_SOCKET_GROUP} docker
+        # Adding idmtools to docker group
+        usermod -a -G docker idmtools
+    fi
+
+fi
+
 ## Add a password to user
 echo "$USER:$PASSWORD" | chpasswd
 
 chown root:docker /var/run/docker.sock
 adduser $USER sudo && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 echo "$USER added to sudoers"
-
-# Check for dev build. If this exists we want to install fresh copies of the packages
-# if [[ -d "/dev_build" ]];
-#  then
-#    cd /dev_build && python dev_scripts/bootstrap.py
-# fi
