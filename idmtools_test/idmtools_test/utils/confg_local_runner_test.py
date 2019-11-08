@@ -30,7 +30,7 @@ def reset_local_broker():
     close_brokers()
     try:
         from idmtools_platform_local.internals.workers.brokers import setup_broker
-        setup_broker()
+        setup_broker(10)
         import idmtools_platform_local.internals.tasks.create_experiment as ce
         import idmtools_platform_local.internals.tasks.create_simulation as cs
         import idmtools_platform_local.internals.tasks.general_task as gt

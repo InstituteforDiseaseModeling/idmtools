@@ -31,6 +31,7 @@ class DockerServiceManager:
     host_data_directory: str = get_data_directory()
     network: str = 'idmtools'
     redis_image: str = 'redis:5.0.4-alpine'
+    heartbeat_timeout: int = 15
     redis_port: int = 6379
     runtime: Optional[str] = 'runc'
     redis_mem_limit: str = '256m'
@@ -98,9 +99,15 @@ class DockerServiceManager:
             network.remove()
 
     @staticmethod
-    def setup_broker():
+    def setup_broker(heartbeat_timeout):
         from idmtools_platform_local.internals.workers.brokers import setup_broker
-        setup_broker()
+        broker = setup_broker(heartbeat_timeout)
+
+    @staticmethod
+    def restart_brokers(heartbeat_timeout):
+        from idmtools_platform_local.internals.workers.brokers import setup_broker, close_brokers
+        close_brokers()
+        setup_broker(heartbeat_timeout)
 
     @optional_yaspin_load(text="Ensure IDM Tools Local Platform services are loaded")
     def create_services(self, spinner=None) -> NoReturn:
@@ -142,7 +149,7 @@ class DockerServiceManager:
                     self.wait_on_ports_to_open(CONTAINER_WAIT[sn])
                 self._services[sn].get_or_create(spinner)
             self.wait_on_ports_to_open(['workers_ui_port'])
-            self.setup_broker()
+            self.setup_broker(self.heartbeat_timeout)
         except Exception as e:
             if logger.isEnabledFor(logging.DEBUG):
                 logger.exception(e)

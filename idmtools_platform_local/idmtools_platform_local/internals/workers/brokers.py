@@ -12,7 +12,7 @@ redis_broker = None
 redis_backend: RedisBackend = None
 
 
-def setup_broker():
+def setup_broker(heartbeat_timeout=60):
     global redis_broker
     global redis_backend
 
@@ -25,15 +25,15 @@ def setup_broker():
         REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
         REDIS_URL = os.environ.get("REDIS_URL", f"redis://{REDIS_HOST}:6379")
         logger.debug(f"Using Redis URL: {REDIS_URL}")
-        redis_broker = RedisBroker(url=REDIS_URL)
+        redis_broker = RedisBroker(url=REDIS_URL, heartbeat_timeout=heartbeat_timeout)
         redis_backend = RedisBackend(url=REDIS_URL)
         redis_broker.add_middleware(Results(backend=redis_backend))
         dramatiq.set_broker(redis_broker)
     return redis_broker
 
 
-def get_brokers():
-    setup_broker()
+def get_brokers(heartbeat_timeout=60):
+    setup_broker(heartbeat_timeout)
     return redis_broker, redis_backend
 
 

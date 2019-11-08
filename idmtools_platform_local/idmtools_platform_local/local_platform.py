@@ -1,6 +1,7 @@
 import functools
 import logging
 import os
+import time
 from collections import defaultdict
 from dataclasses import dataclass, field
 from logging import getLogger
@@ -9,6 +10,8 @@ from uuid import UUID
 
 import docker
 from docker.models.containers import Container
+from math import floor
+
 from idmtools.assets import Asset
 from idmtools.core import ItemType
 from idmtools.core.experiment_factory import experiment_factory
@@ -63,6 +66,7 @@ class LocalPlatform(IPlatform):
     workers_mem_reservation: str = field(default='128m')
     workers_image: str = field(default=None)
     workers_ui_port: int = field(default=5000)
+    heartbeat_timeout: int = field(default=15)
     default_timeout: int = field(default=45)
     # allows user to specify auto removal of docker worker containers
     auto_remove_worker_containers: bool = field(default=True)
@@ -249,11 +253,29 @@ class LocalPlatform(IPlatform):
             Id
         """
         from idmtools_platform_local.internals.tasks.create_experiment import CreateExperimentTask
+        from dramatiq.results import ResultTimeout
         if not self.is_supported_experiment(experiment):
             raise ValueError("This experiment type is not support on the LocalPlatform.")
 
         m = CreateExperimentTask.send(experiment.tags, experiment.simulation_type)
-        eid = m.get_result(block=True, timeout=self.default_timeout * 1000)
+
+        # Create experiment is vulnerable to disconnects early on of redis errors. Lets do a retry on conditions
+        retries = 0
+        start = time.time()
+        timeout_diff = 0
+        while self.default_timeout - timeout_diff > 0:
+            try:
+                eid = m.get_result(block=True, timeout=(self.default_timeout - timeout_diff) * 1000)
+                break
+            except ResultTimeout as e:
+                logger.debug('Resetting broker client because of a heartbeat failure')
+                timeout_diff = floor((time.time() - start) / 1000)
+                retries += 1
+                self._sm.restart_brokers(self.heartbeat_timeout)
+                if retries >= 2 or self.default_timeout < self.heartbeat_timeout or timeout_diff > self.default_timeout:
+                    logger.exception(e)
+                    logger.error("Could not connect to redis")
+                    raise e
         experiment.uid = eid
         path = "/".join(["/data", experiment.uid, "Assets"])
         self._do.create_directory(path)

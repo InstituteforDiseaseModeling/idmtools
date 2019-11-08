@@ -24,6 +24,8 @@ workers_ui_port int = 5000
 workers_mem_limit = '16g'
 # Set mem reserved work worker
 workers_mem_reservation = '128m'
+# How many seconds without communication before we consider redis dead?
+heartbeat_timeout = 10
 # Docker runtime. On GPU Machines you may want to use nvidia instead of the default
 runtime = 'runc'
 # Name of idmtools local network
