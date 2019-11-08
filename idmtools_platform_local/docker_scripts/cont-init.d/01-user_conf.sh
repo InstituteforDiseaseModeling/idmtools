@@ -3,9 +3,11 @@
 ## Set defaults for environmental variables in case they are undefined
 USER=${USER:=idmtools}
 PASSWORD=${PASSWORD:=idmtools}
+IDMTOOLS_ID=$(id -u idmtools)
+IDMTOOLS_GROUP=$(id -g idmtools)
 USER_DATA=
 # load the user and group ids
-IFS=':' read -r -a id_array <<< "${CURRENT_UID:=1000:1000}"
+IFS=':' read -r -a id_array <<< "${CURRENT_UID:=$IDMTOOLS_ID:$IDMTOOLS_GROUP}"
 
 USERID=${id_array[0]}
 GROUPID=${id_array[1]}
@@ -16,14 +18,14 @@ UMASK=${UMASK:=022}
 DOCKER_SOCKET_GROUP=$(stat -c '%g' /var/run/docker.sock)
 DOCKER_GID=$(cut -d: -f3 < <(getent group docker))
 
-if [[ "$USERID" -ne 1000 ]]
+if [[ "$USERID" -ne "$IDMTOOLS_ID" ]]
 ## Configure user with a different USERID if requested.
   then
     echo "deleting user idmtools"
     userdel idmtools
     echo "creating new $USER with UID $USERID"
     useradd -m $USER -u $USERID
-    mkdir /home/$USER
+    [[ -d /home/$USER ]] || mkdir /home/$USER
     chown -R $USER /home/$USER /data /app
     usermod -a -G staff $USER
     # Adding idmtools to docker group
@@ -46,7 +48,7 @@ else
     chown -R $USER:$USER /home/$USER /data /app
 fi
 
-if [[ "$GROUPID" -ne 1000 ]]
+if [[ "$GROUPID" -ne "$IDMTOOLS_GROUP" ]]
 ## Configure the primary GID (whether rstudio or $USER) with a different GROUPID if requested.
   then
     echo "Modifying primary group $(id $USER -g -n)"

@@ -1,8 +1,14 @@
 import os
 import platform
+import time
+from collections import Container
+
+import requests
 from dataclasses import dataclass
 from logging import getLogger, DEBUG
 from typing import Dict
+
+from idmtools_platform_local.client.healthcheck_client import HealthcheckClient
 from idmtools_platform_local.internals.infrastructure.base_service_container import BaseServiceContainer
 from idmtools_platform_local import __version__
 
@@ -79,3 +85,23 @@ class WorkersContainer(BaseServiceContainer):
         if logger.isEnabledFor(DEBUG):
             logger.debug(f"Worker Config: {container_config}")
         return container_config
+
+    def create(self, spinner=None) -> Container:
+        result = super().create(spinner)
+        # postgres will restart once so we should watch it again
+        time.sleep(0.2)
+        self.wait_on_status(result)
+        start = time.time()
+        while (time.time() - start) / 1000 < 5:
+            try:
+                response = HealthcheckClient.get(HealthcheckClient.path_url)
+                if response.status_code == 200:
+                    response = response.json()
+                    if 'db' in response and response['db']:
+                        logger.debug("Local API in ready state")
+                        return result
+            except requests.exceptions.ConnectionError:
+                pass
+            time.sleep(0.25)
+
+        raise EnvironmentError("Local Platform is not in ready state")
