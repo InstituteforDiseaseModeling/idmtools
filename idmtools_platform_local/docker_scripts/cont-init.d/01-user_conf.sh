@@ -37,6 +37,8 @@ elif [[ "$USER" != "idmtools" ]]
     usermod -l $USER -d /home/$USER idmtools
     groupmod -n $USER idmtools
     usermod -a -G staff $USER
+    # Adding idmtools to docker group
+    usermod -a -G docker idmtools
     chown -R $USER:$USER /home/$USER /data /app
     echo "USER is now $USER"
 else

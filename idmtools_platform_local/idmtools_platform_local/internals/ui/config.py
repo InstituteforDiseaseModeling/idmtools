@@ -15,11 +15,16 @@ application.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_U
                                                           "postgresql+psycopg2://idmtools:idmtools@postgres/idmtools")
 
 
+db = None
 @backoff.on_exception(backoff.constant, OperationalError, max_tries=3, interval=0.2)
 def start_db():
-    from idmtools_platform_local.internals.data import Base
-    db = SQLAlchemy(application)
-    Base.metadata.create_all(db.get_engine())
+    global db
+    if db is None:
+        from idmtools_platform_local.internals.data import Base
+        from idmtools_platform_local.internals.data.job_status import JobStatus
+        application.logger.info("Creating DB")
+        db = SQLAlchemy(application, session_options=dict(autocommit=True))
+        Base.metadata.create_all(db.get_engine(application))
     return db
 
 

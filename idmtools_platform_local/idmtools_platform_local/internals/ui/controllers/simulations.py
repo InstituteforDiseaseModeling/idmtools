@@ -52,6 +52,7 @@ def sim_status(id: Optional[str], experiment_id: Optional[str], status: Optional
         for tag in tags:
             criteria.append((JobStatus.tags[tag[0]].astext.cast(String) == tag[1]))
 
+    current_app.logger.debug("Getting simulation status")
     query = session.query(JobStatus).filter(*criteria)\
         .order_by(JobStatus.uuid.desc(), JobStatus.parent_uuid.desc()).paginate(page, per_page)
     total = query.total
@@ -105,6 +106,5 @@ class Simulations(Resource):
                     logger.exception(e)
             current_job.__dict__.update(data)
             s.add(current_job)
-            s.commit()
         else:
             abort(400, message='Currently the only allowed simulation update is canceling a simulation')

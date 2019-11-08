@@ -66,9 +66,11 @@ def experiment_filter(id: Optional[str], tags: Optional[List[Tuple[str, str]]], 
         for tag in tags:
             criteria.append((JobStatus.tags[tag[0]].astext.cast(String) == tag[1]))
 
+    current_app.logger.debug("Getting experiment status")
     query = session.query(JobStatus).filter(*criteria).order_by(JobStatus.uuid.desc()).paginate(page, per_page)
     items = query.items
     total = query.total
+    current_app.logger.debug("Getting simulations")
 
     # this will fetch the overall progress of the simulations(sub jobs) for the experiments
     subjob_status_query = session.query(JobStatus.parent_uuid, JobStatus.status,
@@ -126,20 +128,16 @@ class Experiments(Resource):
     def delete(self, id):
         args = delete_args.parse_args()
         session = db.session
-        try:
-            job: JobStatus = session.query(JobStatus).filter(JobStatus.uuid == id).first()
-            if job is None:
-                abort(400, message=f'Error: No experiment with id of {id}')
+        job: JobStatus = session.query(JobStatus).filter(JobStatus.uuid == id).first()
+        if job is None:
+            abort(400, message=f'Error: No experiment with id of {id}')
 
-            if args['data']:
-                print(f'Deleting {job.data_path}')
-                try:
-                    shutil.rmtree(job.data_path)
-                except FileNotFoundError:
-                    # we will assume it has been cleaned up manually
-                    pass
-            session.query(JobStatus).filter(or_(JobStatus.uuid == id, JobStatus.parent_uuid == id)).delete()
-            session.commit()
-        finally:
-            session.close()
+        if args['data']:
+            print(f'Deleting {job.data_path}')
+            try:
+                shutil.rmtree(job.data_path)
+            except FileNotFoundError:
+                # we will assume it has been cleaned up manually
+                pass
+        session.query(JobStatus).filter(or_(JobStatus.uuid == id, JobStatus.parent_uuid == id)).delete()
         return 204, None
