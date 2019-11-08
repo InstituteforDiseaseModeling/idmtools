@@ -77,10 +77,32 @@ class EMODExperiment(IExperiment):
         model_executable = os.path.basename(self.eradication_path)
 
         # Input path is different for legacy exes
-        input_path = "./Assets;." if not self.legacy_exe else "./Assets"
+        input_path = "./Assets\;." if not self.legacy_exe else "./Assets"
 
         # We have everything we need for the command, create the object
-        self.command = CommandLine(f"Assets/{model_executable}", "--config config.json", f"--input-path {input_path}")
+        self.command = CommandLine(f"Assets/{model_executable}", "--config config.json", f"--input-path {input_path}",
+                                   f"--dll-path ./Assets")
+
+    def add_dll_files(self, dll_files_path):
+        reporter_path = "reporter_plugins"
+        if os.path.isfile(dll_files_path):
+            from functools import partial
+            from idmtools.utils.filters.asset_filters import file_name_is
+
+            dll_files_dirname = os.path.dirname(dll_files_path)
+            dll_files_basename = os.path.basename(dll_files_path)
+            filter_name = partial(file_name_is, filenames=[dll_files_basename])
+            self.assets.add_directory(assets_directory=dll_files_dirname, filters=[filter_name],
+                                      relative_path=reporter_path)
+        elif os.path.isdir(dll_files_path):
+            dir_list = next(os.walk(dll_files_path))[1]
+            if reporter_path in dir_list:
+                self.assets.add_directory(assets_directory=os.path.join(dll_files_path, reporter_path),
+                                          relative_path=reporter_path)
+            else:
+                self.assets.add_directory(assets_directory=dll_files_path, relative_path=reporter_path)
+        else:
+            raise FileNotFoundError(f"No such file or directory: {dll_files_path}")
 
     def simulation(self):
         simulation = super().simulation()

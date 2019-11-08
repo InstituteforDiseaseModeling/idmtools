@@ -1,4 +1,5 @@
 import json
+import os
 from dataclasses import dataclass, field
 from typing import Optional, Any, NoReturn
 
@@ -74,6 +75,18 @@ class EMODSimulation(ISimulation):
 
         # Add demographics files to assets
         self.assets.extend(self.demographics.gather_assets())
+
+    def add_custom_reports(self, custom_reports_file):
+        """
+        Add custom reports file.
+        Args:
+            custom_reports_file: The custom reports file to add(single file).
+
+        Returns:
+            None
+        """
+        self.set_parameter("Custom_Reports_Filename", os.path.basename(custom_reports_file))
+        self.assets.add_asset(Asset(absolute_path=custom_reports_file))
 
     def __hash__(self):
         return id(self.uid)
