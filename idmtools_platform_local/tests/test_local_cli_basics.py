@@ -77,6 +77,7 @@ class TestLocalCLIBasic(unittest.TestCase):
         from idmtools_platform_local.internals.data import Base
 
         def test_db_factory():
+            print('Using mock db')
             return session_factory()
 
         Base.metadata.create_all(engine)
@@ -87,7 +88,9 @@ class TestLocalCLIBasic(unittest.TestCase):
                                  side_effect=test_db_factory)
             def do_test(*mocks):
                 self.create_test_data()
-                time.sleep(1)
+                # this is ugly but something odd is going on with db on windows
+                # it could be artifacts in tests but it appears db takes a moment to respond with experiments
+                time.sleep(10 if os.name == "nt" else 1)
 
                 result = self.run_command('experiment', '--platform', 'Local', 'status', base_command='')
                 self.assertEqual(result.exit_code, 0, f'{result.exit_code} - {result.output}')
