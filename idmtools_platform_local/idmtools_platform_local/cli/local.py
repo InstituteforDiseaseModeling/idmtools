@@ -100,11 +100,12 @@ def info(cli_context: LocalCliContext, logs: bool, diff: bool):
             info.append(f'name: {container.name}')
             info.append(f'status: {container.status}')
             [info.append(f'{k}: {v}') for k, v in container.attrs.items()]
-            if container.status == ['running']:
+            if container.status == 'running' and service in ['workers']:
                 info.append("Var Run")
-                info.append(container.exec_run('ls -al /var/run'))
-                info.append("/data")
-                info.append(container.exec_run('ls -al /data'))
+                for d in ['/var/run/', '/data']:
+                    code, result = container.exec_run(f'ls -al {d}')
+                    info.append(f'\n{d}')
+                    info.extend(result.decode('utf-8').split("\n"))
             if logs:
                 info.extend(container.logs().decode('utf-8').split("\n"))
             if diff:

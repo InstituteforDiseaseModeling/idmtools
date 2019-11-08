@@ -7,10 +7,6 @@ from idmtools_platform_local.internals.ui.controllers.simulations import Simulat
 # / and /<path>:<path>
 
 
-# Define where we want to render the data routes and pass those calls to AutoIndex
-from idmtools_platform_local.internals.workers.database import get_db, create_db
-
-
 @application.route('/data/')
 @application.route('/data/<path:path>')
 def autoindex(path='.'):
@@ -24,12 +20,6 @@ def index():
 
 api.add_resource(Experiments, '/experiments', '/experiments/<id>')
 api.add_resource(Simulations, '/simulations', '/simulations/<id>')
-
-try:
-    engine = get_db()
-    create_db(engine)
-except:
-    pass
 
 application.url_map.strict_slashes = False
 if __name__ == "__main__":

@@ -17,7 +17,7 @@ test_requirements = ['pytest', 'pytest-runner', 'pytest-timeout']
 
 extras = dict(test=test_requirements, dev=['Pympler'],
               # Requirements for running workers server
-              workers=['sqlalchemy~=1.3.5', 'psycopg2-binary~=2.8.3'],
+              workers=['sqlalchemy~=1.3.5', 'psycopg2-binary~=2.8.4'],
               # these are only needed when not running UI
               ui=['flask~=1.0.3', 'Flask-AutoIndex~=0.6.4', 'flask_restful~=0.3.7', 'Flask-SQLAlchemy~=2.4.0'],
               server=['uwsgi==2.0.18'])
