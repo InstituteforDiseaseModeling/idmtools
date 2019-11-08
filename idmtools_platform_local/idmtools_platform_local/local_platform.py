@@ -65,7 +65,7 @@ class LocalPlatform(IPlatform):
     workers_ui_port: int = field(default=5000)
     default_timeout: int = field(default=45)
     # allows user to specify auto removal of docker worker containers
-    auto_remove_worker_containers: bool = field(default=False)
+    auto_remove_worker_containers: bool = field(default=True)
 
     # We use this to manage our docker containers
     _do: Optional[DockerIO] = field(default=None, compare=False, metadata={"pickle_ignore": True})
