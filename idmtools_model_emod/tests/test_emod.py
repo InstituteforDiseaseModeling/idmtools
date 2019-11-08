@@ -11,8 +11,6 @@ from idmtools_model_emod.emod_experiment import EMODExperiment, DockerEMODExperi
 from idmtools_model_emod.defaults import EMODSir
 from idmtools_model_emod.utils import get_github_eradication_url
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools_test.utils.confg_local_runner_test import get_test_local_env_overrides
-from idmtools_test.utils.decorators import restart_local_platform
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
@@ -29,7 +27,7 @@ class EMODPlatformTest(ABC):
 
     @classmethod
     @abstractmethod
-    def get_emod_experiment(cls,) -> IEMODExperiment:
+    def get_emod_experiment(cls, ) -> IEMODExperiment:
         pass
 
     @classmethod
@@ -47,29 +45,29 @@ class EMODPlatformTest(ABC):
         print(self.case_name)
 
     def test_sir_with_StandAloneSimulationsBuilder(self):
-            e = self.get_emod_experiment().from_default(self.case_name, default=EMODSir,
-                                                                eradication_path=self.get_emod_binary())
+        e = self.get_emod_experiment().from_default(self.case_name, default=EMODSir,
+                                                    eradication_path=self.get_emod_binary())
 
-            e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
-            sim = e.simulation()
-            sim.set_parameter("Enable_Immunity", 0)
-            b = StandAloneSimulationsBuilder()
-            b.add_simulation(sim)
-            e.builder = b
+        e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
+        sim = e.simulation()
+        sim.set_parameter("Enable_Immunity", 0)
+        b = StandAloneSimulationsBuilder()
+        b.add_simulation(sim)
+        e.builder = b
 
-            em = ExperimentManager(experiment=e, platform=self.platform)
-            em.run()
-            em.wait_till_done()
-            self.assertTrue(e.succeeded)
-            # get the files in a platform agnostic way
-            for sim in e.simulations:
-                files = self.platform.get_files(sim, ["config.json"])
-                config_parameters = json.loads(files["config.json"])['parameters']
-                self.assertEqual(config_parameters["Enable_Immunity"], 0)
+        em = ExperimentManager(experiment=e, platform=self.platform)
+        em.run()
+        em.wait_till_done()
+        self.assertTrue(e.succeeded)
+        # get the files in a platform agnostic way
+        for sim in e.simulations:
+            files = self.platform.get_files(sim, ["config.json"])
+            config_parameters = json.loads(files["config.json"])['parameters']
+            self.assertEqual(config_parameters["Enable_Immunity"], 0)
 
     def test_sir_with_ExperimentBuilder(self):
         e = self.get_emod_experiment().from_default(self.case_name, default=EMODSir,
-                                                            eradication_path=self.get_emod_binary())
+                                                    eradication_path=self.get_emod_binary())
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
 
         e.base_simulation.set_parameter("Enable_Immunity", 0)
@@ -95,47 +93,47 @@ class EMODPlatformTest(ABC):
             run_number = run_number + 1
 
     def test_batch_simulations_StandAloneSimulationsBuilder(self):
-            e = self.get_emod_experiment().from_default(self.case_name, default=EMODSir,
-                                                                eradication_path=self.get_emod_binary())
-            e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
-            b = StandAloneSimulationsBuilder()
+        e = self.get_emod_experiment().from_default(self.case_name, default=EMODSir,
+                                                    eradication_path=self.get_emod_binary())
+        e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
+        b = StandAloneSimulationsBuilder()
 
-            for i in range(20):
-                sim = e.simulation()
-                sim.set_parameter("Enable_Immunity", 0)
-                b.add_simulation(sim)
+        for i in range(20):
+            sim = e.simulation()
+            sim.set_parameter("Enable_Immunity", 0)
+            b.add_simulation(sim)
 
-            e.builder = b
+        e.builder = b
 
-            em = ExperimentManager(experiment=e, platform=self.platform)
-            em.run()
-            em.wait_till_done()
-            self.assertTrue(e.succeeded)
-            for sim in e.simulations:
-                files = self.platform.get_files(sim, ["config.json"])
-                config_parameters = json.loads(files["config.json"])['parameters']
-                self.assertEqual(config_parameters["Enable_Immunity"], 0)
+        em = ExperimentManager(experiment=e, platform=self.platform)
+        em.run()
+        em.wait_till_done()
+        self.assertTrue(e.succeeded)
+        for sim in e.simulations:
+            files = self.platform.get_files(sim, ["config.json"])
+            config_parameters = json.loads(files["config.json"])['parameters']
+            self.assertEqual(config_parameters["Enable_Immunity"], 0)
 
     def test_batch_simulations_ExperimentBuilder(self):
-            e = self.get_emod_experiment().from_default(self.case_name, default=EMODSir,
-                                                                eradication_path=self.get_emod_binary())
-            e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
-            # s = Suite(name="test suite")
-            # s.experiments.append(e)
-            e.base_simulation.set_parameter("Enable_Immunity", 0)
+        e = self.get_emod_experiment().from_default(self.case_name, default=EMODSir,
+                                                    eradication_path=self.get_emod_binary())
+        e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
+        # s = Suite(name="test suite")
+        # s.experiments.append(e)
+        e.base_simulation.set_parameter("Enable_Immunity", 0)
 
-            def param_a_update(simulation, value):
-                simulation.set_parameter("Run_Number", value)
-                return {"Run_Number": value}
+        def param_a_update(simulation, value):
+            simulation.set_parameter("Run_Number", value)
+            return {"Run_Number": value}
 
-            builder = ExperimentBuilder()
-            # Sweep parameter "Run_Number"
-            builder.add_sweep_definition(param_a_update, range(0, 20))
-            e.builder = builder
-            em = ExperimentManager(experiment=e, platform=self.platform)
-            em.run()
-            em.wait_till_done()
-            self.assertTrue(e.succeeded)
+        builder = ExperimentBuilder()
+        # Sweep parameter "Run_Number"
+        builder.add_sweep_definition(param_a_update, range(0, 20))
+        e.builder = builder
+        em = ExperimentManager(experiment=e, platform=self.platform)
+        em.run()
+        em.wait_till_done()
+        self.assertTrue(e.succeeded)
 
     def test_duplicated_eradication(self):
         """
@@ -211,7 +209,7 @@ class TestLocalPlatformEMOD(ITestWithPersistence, EMODPlatformTest):
         cls.do.cleanup(True)
 
     @classmethod
-    def get_emod_experiment(cls,) -> IEMODExperiment:
+    def get_emod_experiment(cls, ) -> IEMODExperiment:
         return DockerEMODExperiment
 
     @classmethod

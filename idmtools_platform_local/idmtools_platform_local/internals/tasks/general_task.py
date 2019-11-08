@@ -92,6 +92,9 @@ class BaseTask:
         # Get the current job
         current_job: JobStatus = get_session().query(JobStatus). \
             filter(JobStatus.uuid == simulation_uuid, JobStatus.parent_uuid == experiment_uuid).first()
+        if current_job.extra_details is None:
+            logger.warning(f'{current_job.uuid} has no extra details')
+            current_job.extra_details = dict()
         current_job.extra_details['command'] = command
         return current_job
 

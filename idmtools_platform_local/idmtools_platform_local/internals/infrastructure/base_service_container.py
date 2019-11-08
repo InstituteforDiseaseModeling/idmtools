@@ -4,9 +4,7 @@ from dataclasses import dataclass
 from getpass import getpass
 from logging import getLogger, DEBUG
 from typing import Optional, Union, Dict, List
-
 from docker.errors import APIError
-
 from idmtools_platform_local import __version__
 from docker import DockerClient
 from docker.models.containers import Container
@@ -176,6 +174,15 @@ class BaseServiceContainer(ABC):
         container = self.get()
         if container:
             container.restart()
+
+    def get_logs(self):
+        container = self.get()
+        if container:
+            logs = container.logs()
+            if logs:
+                logs = logs.decode('utf-8')
+            return logs
+        return ''
 
     @abstractmethod
     def get_configuration(self) -> Dict:

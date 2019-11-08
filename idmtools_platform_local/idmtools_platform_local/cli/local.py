@@ -76,6 +76,33 @@ def restart(cli_context: LocalCliContext):
 
 
 @local.command()
+@click.option("--logs/--no-logs", default=False)
+@click.option("--diff/--no-diff", default=False)
+@pass_do
+def info(cli_context: LocalCliContext, logs: bool, diff: bool):
+    info = []
+    for service in ['redis', 'postgres', 'workers']:
+        info.append(f'\n{service}\n{"=" * 20}')
+        container = cli_context.sm.get(service, create=False)
+        if container:
+            info.append(f'id: {container.id}')
+            info.append(f'image: {container.image}')
+            info.append(f'name: {container.name}')
+            info.append(f'status: {container.status}')
+            [info.append(f'{k}: {v}') for k, v in container.attrs.items()]
+            if logs:
+                info.extend(container.logs().decode('utf-8').split("\n"))
+            if diff:
+                info.append("Diff:\n")
+                diff = container.diff()
+                if diff:
+                    info.append(container.diff())
+        else:
+            info.append('Not running')
+    print("\n".join(info))
+
+
+@local.command()
 @pass_do
 def status(cli_context: LocalCliContext):
     """
