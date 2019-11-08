@@ -1,9 +1,12 @@
 import logging
 import os
 from typing import Optional, List, Tuple, Dict
-from flask import request
+
+import backoff
+from flask import request, current_app
 from flask_restful import Resource, reqparse, abort
 from sqlalchemy import String
+from sqlalchemy.exc import ResourceClosedError, ProgrammingError, OperationalError, DatabaseError
 
 from idmtools_platform_local.internals.data.job_status import JobStatus
 from idmtools_platform_local.internals.ui.controllers.utils import validate_tags
@@ -13,6 +16,8 @@ from idmtools_platform_local.internals.ui.config import db
 logger = logging.getLogger(__name__)
 
 
+@backoff.on_exception(backoff.constant, (ResourceClosedError, ProgrammingError, OperationalError, DatabaseError),
+                      max_tries=5, interval=0.2)
 def sim_status(id: Optional[str], experiment_id: Optional[str], status: Optional[str],
                tags: Optional[List[Tuple[str, str]]], page: int = 1, per_page: int = 20) -> Tuple[Dict, int]:
     """
@@ -50,8 +55,8 @@ def sim_status(id: Optional[str], experiment_id: Optional[str], status: Optional
     query = session.query(JobStatus).filter(*criteria)\
         .order_by(JobStatus.uuid.desc(), JobStatus.parent_uuid.desc()).paginate(page, per_page)
     total = query.total
-
-    return list(map(lambda x: x.to_dict(False), query.items)), total
+    items = list(map(lambda x: x.to_dict(False), query.items))
+    return items, total
 
 
 status_strs = [str(status) for status in Status]
@@ -91,8 +96,10 @@ class Simulations(Resource):
             s = db.session
             current_job: JobStatus = s.query(JobStatus).filter(JobStatus.uuid == id).first()
             # check if we have a PID, if so kill it
+            current_app.logger.info(f"Getting metadata for {id}")
             if current_job.metadata is not None and 'pid' in current_job.metadata:
                 try:
+                    current_app.logger.info(f"Killing metadata for {current_job.metadata['pid']}")
                     os.killpg(current_job.metadata['pid'], 9)
                 except Exception as e:
                     logger.exception(e)

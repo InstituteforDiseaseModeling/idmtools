@@ -116,11 +116,7 @@ class BaseServiceContainer(ABC):
                 # give some start time to containers
                 time.sleep(0.25)
                 # check status of container until it is no longer starting/created
-                wait_checks = 0
-                while container.status in ['starting', 'created'] and wait_checks < 10:
-                    time.sleep(0.2)
-                    container.reload()
-                    wait_checks += 1
+                self.wait_on_status(container)
                 logger.debug(f'{self.container_name}: {container.status}: {container.id}')
                 if container.status in ['failed']:
                     raise EnvironmentError(f"Could not start {self.__class__.__name__}")
@@ -162,6 +158,16 @@ class BaseServiceContainer(ABC):
             raise ValueError("Could not run workers image. Likely causes are:\n\t- A used port"
                              "\n\t-A service being down such as redis or postgres"
                              "\n\t-Authentication issues with the docker registry")
+
+    @staticmethod
+    def wait_on_status(container, sleep_interval: float = 0.2, max_time: float = 2,
+                       statutes_to_wait_for: List[str] = None):
+        if statutes_to_wait_for is None:
+            statutes_to_wait_for = ['starting', 'created']
+        start = time.time()
+        while container.status in statutes_to_wait_for and ((time.time() - start) / 1000) < max_time:
+            time.sleep(sleep_interval)
+            container.reload()
 
     def stop(self, remove=False):
         container = self.get()

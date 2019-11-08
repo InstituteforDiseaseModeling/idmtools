@@ -1,3 +1,4 @@
+import time
 from dataclasses import dataclass
 from logging import getLogger, DEBUG
 from typing import Dict, NoReturn
@@ -48,7 +49,11 @@ class PostgresContainer(BaseServiceContainer):
 
     def create(self, spinner=None) -> Container:
         self.create_postgres_volume()
-        return super().create(spinner)
+        result = super().create(spinner)
+        # postgres will restart once so we should watch it again
+        time.sleep(0.5)
+        self.wait_on_status(result)
+        return result
 
     def create_postgres_volume(self) -> NoReturn:
         """

@@ -1,8 +1,13 @@
 import logging
 import shutil
+import sys
 from typing import Optional, List, Tuple, Dict
+
+import backoff
+from flask import current_app
 from flask_restful import Resource, reqparse, abort
 from sqlalchemy import String, func, or_, and_
+from sqlalchemy.exc import ProgrammingError, ResourceClosedError, OperationalError, DatabaseError
 
 from idmtools_platform_local.config import DATA_PATH
 from idmtools_platform_local.internals.data.job_status import JobStatus
@@ -27,6 +32,16 @@ def progress_to_status_str(progress):
         return 'done'
 
 
+def handle_backoff_exc(details):
+    current_app.logger.info("Attempting to recover from DB API Error")
+    curr_exec = sys.exc_info()[1]
+    if isinstance(curr_exec, ProgrammingError):
+        from idmtools_platform_local.internals.data import Base
+        Base.metadata.create_all(db.get_engine())
+
+
+@backoff.on_exception(backoff.constant, (ResourceClosedError, ProgrammingError, OperationalError, DatabaseError),
+                      max_tries=5, interval=0.2)
 def experiment_filter(id: Optional[str], tags: Optional[List[Tuple[str, str]]], page: int = 1, per_page: int = 10) -> \
         Tuple[Dict, int]:
     """
@@ -79,7 +94,7 @@ def experiment_filter(id: Optional[str], tags: Optional[List[Tuple[str, str]]], 
             row.progress = dict()
             row.status = 'created'
         row.data_path = row.data_path.replace(DATA_PATH, '/data')
-
+    items = list(map(lambda x: x.to_dict(), items))
     return items, total
 
 
@@ -101,7 +116,6 @@ class Experiments(Resource):
 
         validate_tags(args['tags'])
         result, total = experiment_filter(**args)
-        result = list(map(lambda x: x.to_dict(), result))
         if id:
             if not result:
                 abort(404, message=f"Could not find experiment with id {id}")
