@@ -1,4 +1,6 @@
 #!/usr/bin/with-contenv python
+# we name this .sh so that docker windows doesn't
+# pess with our EOLs
 import os
 import time
 
