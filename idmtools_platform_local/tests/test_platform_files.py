@@ -17,6 +17,7 @@ class TestPlatformSimulations(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
 
+    @pytest.mark.long
     @restart_local_platform(silent=True, **get_test_local_env_overrides())
     def test_fetch_simulation_files(self):
         platform = Platform('Local')

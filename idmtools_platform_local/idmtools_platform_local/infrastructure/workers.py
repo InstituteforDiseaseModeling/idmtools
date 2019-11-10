@@ -1,13 +1,11 @@
 import os
 import platform
 import time
-from collections import Container
-
 import requests
 from dataclasses import dataclass
 from logging import getLogger, DEBUG
 from typing import Dict
-
+from docker.models.containers import Container
 from idmtools_platform_local.client.healthcheck_client import HealthcheckClient
 from idmtools_platform_local.infrastructure.base_service_container import BaseServiceContainer
 from idmtools_platform_local import __version__

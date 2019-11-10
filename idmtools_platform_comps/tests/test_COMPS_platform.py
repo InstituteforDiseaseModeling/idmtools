@@ -31,6 +31,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
 
     @pytest.mark.assets
     @pytest.mark.python
+    @pytest.mark.long
     def test_output_files_retrieval(self):
         config = {"a": 1, "b": 2}
         experiment = PythonExperiment(name=self.case_name,
@@ -116,6 +117,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
             time.sleep(3)
         self.assertTrue(experiment.done)
 
+    @pytest.mark.long
     def test_status_retrieval_succeeded(self):
         experiment = PythonExperiment(name=self.case_name,
                                       model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"))
@@ -123,6 +125,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
         print([s.status for s in experiment.simulations])
         self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in experiment.simulations]))
 
+    @pytest.mark.long
     def test_status_retrieval_failed(self):
         experiment = PythonExperiment(name=self.case_name,
                                       model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "failing_model.py"))
@@ -130,6 +133,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
         self.assertTrue(all([s.status == EntityStatus.FAILED for s in experiment.simulations]))
         self.assertFalse(experiment.succeeded)
 
+    @pytest.mark.long
     def test_status_retrieval_mixed(self):
         experiment = PythonExperiment(name=self.case_name,
                                       model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "mixed_model.py"))
@@ -144,6 +148,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
             self.assertTrue((s.tags["P"] == 2 and s.status == EntityStatus.FAILED) or  # noqa: W504
                             (s.status == EntityStatus.SUCCEEDED))
 
+    @pytest.mark.long
     def test_from_experiment(self):
         experiment = PythonExperiment(name=self.case_name,
                                       model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"))

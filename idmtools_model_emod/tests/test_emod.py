@@ -44,6 +44,7 @@ class EMODPlatformTest(ABC):
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
 
+    @pytest.mark.long
     def test_sir_with_StandAloneSimulationsBuilder(self):
         e = self.get_emod_experiment().from_default(self.case_name, default=EMODSir,
                                                     eradication_path=self.get_emod_binary())
@@ -65,6 +66,7 @@ class EMODPlatformTest(ABC):
             config_parameters = json.loads(files["config.json"])['parameters']
             self.assertEqual(config_parameters["Enable_Immunity"], 0)
 
+    @pytest.mark.long
     def test_sir_with_ExperimentBuilder(self):
         e = self.get_emod_experiment().from_default(self.case_name, default=EMODSir,
                                                     eradication_path=self.get_emod_binary())
@@ -92,6 +94,7 @@ class EMODPlatformTest(ABC):
             self.assertEqual(config_parameters["Run_Number"], run_number)
             run_number = run_number + 1
 
+    @pytest.mark.long
     def test_batch_simulations_StandAloneSimulationsBuilder(self):
         e = self.get_emod_experiment().from_default(self.case_name, default=EMODSir,
                                                     eradication_path=self.get_emod_binary())
@@ -114,6 +117,7 @@ class EMODPlatformTest(ABC):
             config_parameters = json.loads(files["config.json"])['parameters']
             self.assertEqual(config_parameters["Enable_Immunity"], 0)
 
+    @pytest.mark.long
     def test_batch_simulations_ExperimentBuilder(self):
         e = self.get_emod_experiment().from_default(self.case_name, default=EMODSir,
                                                     eradication_path=self.get_emod_binary())

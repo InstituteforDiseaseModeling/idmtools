@@ -64,6 +64,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         # Uncomment out if you do not want to regenerate exp and sims
         # self.exp_id = '9eacbb9a-5ecf-e911-a2bb-f0921c167866' #comps2 staging
 
+    @pytest.mark.long
     def test_AddAnalyzer(self):
 
         self.create_experiment()
@@ -74,6 +75,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         am = AnalyzeManager(platform=self.p, ids=[(self.exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
 
+    @pytest.mark.long
     def test_DownloadAnalyzer(self):
         # delete output from previous run
         del_folder("output")
@@ -109,6 +111,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         am = AnalyzeManager(platform=self.p, ids=exp_list, analyzers=analyzers)
         am.analyze()
 
+    @pytest.mark.long
     def test_population_analyzer(self):
         analyzer_path = os.path.join(os.path.dirname(__file__), "inputs", "analyzers")
         del_file(os.path.join(analyzer_path, 'population.csv'))
@@ -151,6 +154,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
             sim_count = sim_count + 1
         self.assertSetEqual(set(actual_sim_ids_in_comps), set(expected_sim_ids))
 
+    @pytest.mark.long
     def test_timeseries_analyzer_with_filter(self):
         analyzer_path = os.path.join(os.path.dirname(__file__), "inputs", "analyzers")
         del_file(os.path.join(analyzer_path, 'timeseries.csv'))

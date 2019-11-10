@@ -67,6 +67,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         # Uncomment out if you do not want to regenerate exp and sims
         # self.exp_id = '9eacbb9a-5ecf-e911-a2bb-f0921c167866' #comps2 staging
 
+    @pytest.mark.long
     def test_DownloadAnalyzer(self):
         # delete output from previous run
         del_folder("output")

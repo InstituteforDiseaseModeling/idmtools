@@ -20,6 +20,7 @@ class TestPythonSimulation(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
 
+    @pytest.mark.long
     @restart_local_platform(silent=True, **get_test_local_env_overrides())
     def test_direct_sweep_one_parameter_local(self):
         platform = Platform('Local')
@@ -58,6 +59,7 @@ class TestPythonSimulation(ITestWithPersistence):
         sorted_expected_tags = sorted(expected_tags, key=itemgetter('a'))
         self.assertEqual(sorted_tags, sorted_expected_tags)
 
+    @pytest.mark.long
     @restart_local_platform(silent=True, **get_test_local_env_overrides())
     def test_add_prefixed_relative_path_to_assets_local(self):
         # platform = Platform('COMPS2', endpoint="https://comps2.idmod.org", environment="Bayesian")

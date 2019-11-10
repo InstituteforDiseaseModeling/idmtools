@@ -31,6 +31,9 @@ test: ## Run our tests
 test-all: ## Run all our tests
 	$(FULL_TEST_CMD)'
 
+test-long: ## Run any tests that takes more than 30s
+	$(FULL_TEST_CMD) -m "long"'
+
 test-no-long: ## Run any tests that takes less than 30s
 	$(FULL_TEST_CMD) -m "not long"'
 

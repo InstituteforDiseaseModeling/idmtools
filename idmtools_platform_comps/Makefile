@@ -6,7 +6,7 @@ PDS=$(PY) ../dev_scripts/
 PDR=$(PDS)run.py
 CLDIR=$(PDS)clean_dir.py
 CWD=$($(IPY) "import os; print(os.getcwd())")
-TEST_COMMAND=py.test --durations=3 -v --junitxml=test_results.xml
+TEST_COMMAND=py.test --durations=10 -v --junitxml=test_results.xml
 TEST_RUN_OPTS=-e DOCKER_REPO=idm-docker-staging NO_SPINNER=1
 FULL_TEST_CMD=$(PDR) -w 'tests' $(TEST_RUN_OPTS) -ex '$(TEST_COMMAND)
 COVERAGE_CMD=$(PDR) -w 'tests' $(TEST_RUN_OPTS) -p . ../ -ex 'coverage run --omit="*/test*,*/setup.py" --source ../,../../idmtools_core,../../idmtools_platform_local,../../idmtools_platform_comps,../../idmtools_models,../../idmtools_model_emod -m pytest
@@ -30,6 +30,9 @@ test: ## Run our tests
 
 test-all: ## Run all our tests
 	$(FULL_TEST_CMD)'
+
+test-long: ## Run any tests that takes more than 30s
+	$(FULL_TEST_CMD) -m "long"'
 
 test-no-long: ## Run any tests that takes less than 30s
 	$(FULL_TEST_CMD) -m "not long"'

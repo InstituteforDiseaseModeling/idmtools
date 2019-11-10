@@ -97,6 +97,7 @@ class TestExperimentSimulations(ITestWithPersistence):
     @pytest.mark.comps
     @pytest.mark.emod
     @pytest.mark.suite
+    @pytest.mark.long
     def test_link_experiment_suite(self):
         from idmtools.entities.suite import Suite
         from COMPS.Data import Suite as CompsSuite
@@ -166,6 +167,7 @@ class TestExperimentSimulations(ITestWithPersistence):
     @pytest.mark.comps
     @pytest.mark.emod
     @pytest.mark.suite
+    @pytest.mark.long
     def test_suite_experiment(self):
         from idmtools.entities.suite import Suite
         from COMPS.Data import Suite as CompsSuite

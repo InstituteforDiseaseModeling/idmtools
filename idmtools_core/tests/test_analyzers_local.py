@@ -71,6 +71,7 @@ class TestAnalyzeManager(ITestWithPersistence):
         cls.exp_id = pe.uid
 
     @pytest.mark.timeout(60)
+    @pytest.mark.long
     @restart_local_platform(silent=True, stop_before=False, stop_after=True)
     def test_AddAnalyzer(self):
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName

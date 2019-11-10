@@ -29,7 +29,10 @@ test: ## Run our tests
 test-all: ## Run all our tests
 	$(MAKEALL) test-all
 
-test-no-long: ## Run any tests that takes less than 30s
+test-long: ## Run any tests that takes longer than 30s on average
+	$(MAKEALL) test-no-long
+
+test-no-long: ## Run any tests that takes less than 30s on average
 	$(MAKEALL) test-no-long
 
 test-comps: ## Run our comps tests
