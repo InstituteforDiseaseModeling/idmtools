@@ -15,7 +15,7 @@ api_host = os.getenv('API_HOST', 'localhost')
 os.environ['SQLALCHEMY_DATABASE_URI'] = f'postgresql+psycopg2://idmtools:idmtools@{api_host}/idmtools'
 from idmtools_platform_local.internals.workers.utils import create_or_update_status
 from idmtools_test.utils.confg_local_runner_test import config_local_test, patch_broker, reset_local_broker
-from idmtools_platform_local.internals.infrastructure.service_manager import DockerServiceManager
+from idmtools_platform_local.infrastructure.service_manager import DockerServiceManager
 
 
 @pytest.mark.docker

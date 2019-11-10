@@ -11,10 +11,10 @@ from docker.models.networks import Network
 
 from idmtools.core.system_information import get_data_directory, get_system_information
 from idmtools.utils.decorators import optional_yaspin_load
-from idmtools_platform_local.internals.infrastructure.base_service_container import BaseServiceContainer
-from idmtools_platform_local.internals.infrastructure.postgres import PostgresContainer
-from idmtools_platform_local.internals.infrastructure.redis import RedisContainer
-from idmtools_platform_local.internals.infrastructure.workers import WorkersContainer
+from idmtools_platform_local.infrastructure.base_service_container import BaseServiceContainer
+from idmtools_platform_local.infrastructure.postgres import PostgresContainer
+from idmtools_platform_local.infrastructure.redis import RedisContainer
+from idmtools_platform_local.infrastructure.workers import WorkersContainer
 
 SERVICES = [PostgresContainer, RedisContainer, WorkersContainer]
 CONTAINER_WAIT: Dict[str, List[str]] = dict(

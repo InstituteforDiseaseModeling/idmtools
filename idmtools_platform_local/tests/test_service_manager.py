@@ -8,8 +8,8 @@ import unittest.mock
 
 import docker
 import pytest
-from idmtools_platform_local.internals.docker_io import DockerIO
-from idmtools_platform_local.internals.infrastructure.service_manager import DockerServiceManager
+from idmtools_platform_local.infrastructure.docker_io import DockerIO
+from idmtools_platform_local.infrastructure.service_manager import DockerServiceManager
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.confg_local_runner_test import get_test_local_env_overrides
 from idmtools_test.utils.decorators import restart_local_platform, linux_only, skip_api_host

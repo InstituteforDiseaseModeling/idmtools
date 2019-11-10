@@ -62,8 +62,8 @@ def run_test_in_n_seconds(n: int, print_elapsed_time: bool = False) -> Callable:
 
 
 def restart_local_platform(silent=True, stop_before=True, stop_after=True, *args, **kwargs):
-    from idmtools_platform_local.internals.infrastructure.service_manager import DockerServiceManager
-    from idmtools_platform_local.internals.docker_io import DockerIO
+    from idmtools_platform_local.infrastructure.service_manager import DockerServiceManager
+    from idmtools_platform_local.infrastructure.docker_io import DockerIO
     # disable spinner
     if silent:
         os.environ['NO_SPINNER'] = '1'

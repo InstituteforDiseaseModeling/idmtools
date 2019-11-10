@@ -13,9 +13,9 @@ from typing import BinaryIO, Dict, NoReturn, Optional, Union, Any
 from docker.models.containers import Container
 from idmtools.core.system_information import get_data_directory
 from idmtools.utils.decorators import ParallelizeDecorator
-from idmtools_platform_local.internals.infrastructure.postgres import PostgresContainer
-from idmtools_platform_local.internals.infrastructure.redis import RedisContainer
-from idmtools_platform_local.internals.infrastructure.workers import WorkersContainer
+from idmtools_platform_local.infrastructure.postgres import PostgresContainer
+from idmtools_platform_local.infrastructure.redis import RedisContainer
+from idmtools_platform_local.infrastructure.workers import WorkersContainer
 
 logger = getLogger(__name__)
 # thread queue for docker copy operations

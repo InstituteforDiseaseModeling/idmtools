@@ -6,8 +6,8 @@ import stringcase as stringcase
 from colorama import Fore
 
 from idmtools_cli.cli import cli
-from idmtools_platform_local.internals.docker_io import DockerIO
-from idmtools_platform_local.internals.infrastructure.service_manager import DockerServiceManager
+from idmtools_platform_local.infrastructure.docker_io import DockerIO
+from idmtools_platform_local.infrastructure.service_manager import DockerServiceManager
 
 
 class LocalCliContext:

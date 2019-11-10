@@ -9,7 +9,7 @@ from logging import getLogger, DEBUG
 from typing import Dict
 
 from idmtools_platform_local.client.healthcheck_client import HealthcheckClient
-from idmtools_platform_local.internals.infrastructure.base_service_container import BaseServiceContainer
+from idmtools_platform_local.infrastructure.base_service_container import BaseServiceContainer
 from idmtools_platform_local import __version__
 
 logger = getLogger(__name__)

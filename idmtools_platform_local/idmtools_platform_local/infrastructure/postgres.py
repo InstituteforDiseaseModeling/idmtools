@@ -5,7 +5,7 @@ from typing import Dict, NoReturn
 
 from docker.models.containers import Container
 
-from idmtools_platform_local.internals.infrastructure.base_service_container import BaseServiceContainer
+from idmtools_platform_local.infrastructure.base_service_container import BaseServiceContainer
 
 logger = getLogger(__name__)
 

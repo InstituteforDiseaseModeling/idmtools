@@ -194,8 +194,8 @@ class TestLocalPlatformEMOD(ITestWithPersistence, EMODPlatformTest):
 
     @classmethod
     def setUpClass(cls) -> None:
-        from idmtools_platform_local.internals.infrastructure.service_manager import DockerServiceManager
-        from idmtools_platform_local.internals.docker_io import DockerIO
+        from idmtools_platform_local.infrastructure.service_manager import DockerServiceManager
+        from idmtools_platform_local.infrastructure.docker_io import DockerIO
         import docker
         cls.do = DockerIO()
         cls.sdm = DockerServiceManager(docker.from_env())

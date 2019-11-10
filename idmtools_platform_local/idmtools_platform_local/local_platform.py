@@ -25,8 +25,8 @@ from idmtools.entities.isimulation import ISimulation, TSimulation
 from idmtools.utils.entities import get_dataclass_common_fields
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
 from idmtools_platform_local.client.simulations_client import SimulationsClient
-from idmtools_platform_local.internals.docker_io import DockerIO
-from idmtools_platform_local.internals.infrastructure.service_manager import DockerServiceManager
+from idmtools_platform_local.infrastructure.docker_io import DockerIO
+from idmtools_platform_local.infrastructure.service_manager import DockerServiceManager
 
 status_translate = dict(
     created='CREATED',
