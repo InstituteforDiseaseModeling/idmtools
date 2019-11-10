@@ -26,7 +26,6 @@ from idmtools.entities.suite import TSuite
 from idmtools.entities.iexperiment import TExperiment
 from idmtools.core.interfaces.iitem import TItemList
 
-
 logging.getLogger('COMPS.Data.Simulation').disabled = True
 logger = logging.getLogger(__name__)
 
@@ -235,7 +234,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                 suite = kwargs.get('suite')
             else:
                 suite = kwargs.get('suite') or self.get_item(platform_item.suite_id,
-                                                                       item_type=ItemType.SUITE)
+                                                             item_type=ItemType.SUITE)
 
             # Create an experiment
             obj = experiment_factory.create(platform_item.tags.get("type"), tags=platform_item.tags,

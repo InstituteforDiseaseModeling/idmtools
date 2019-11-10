@@ -56,5 +56,3 @@ class BaseClient:
     def delete(cls, path, **kwargs) -> requests.Response:
         url = f'{cls.base_url}/{path}' if path is not None else cls.base_url
         return requests.delete(url, **kwargs)
-
-

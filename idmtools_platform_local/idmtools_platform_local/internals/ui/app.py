@@ -1,4 +1,4 @@
-from idmtools_platform_local.internals.ui.config import application, api, ai, db
+from idmtools_platform_local.internals.ui.config import application, api, ai
 from idmtools_platform_local.internals.ui.controllers.experiments import Experiments
 from idmtools_platform_local.internals.ui.controllers.healthcheck import HealthCheck
 from idmtools_platform_local.internals.ui.controllers.simulations import Simulations

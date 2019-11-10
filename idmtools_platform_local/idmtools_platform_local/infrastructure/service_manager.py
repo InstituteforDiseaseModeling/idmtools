@@ -101,7 +101,7 @@ class DockerServiceManager:
     @staticmethod
     def setup_broker(heartbeat_timeout):
         from idmtools_platform_local.internals.workers.brokers import setup_broker
-        broker = setup_broker(heartbeat_timeout)
+        setup_broker(heartbeat_timeout)
 
     @staticmethod
     def restart_brokers(heartbeat_timeout):

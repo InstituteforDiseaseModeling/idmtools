@@ -1,47 +1,71 @@
 .PHONY: clean lint test coverage release-local dist release-staging release-staging-release-commit release-staging-minor
 IPY=python -c
+BASE_PIP_URL="packages.idmod.org/api/pypi/idm-pypi-"
+STAGING_PIP_URL?="$(BASE_PIP_URL)staging/"
+PRODUCTION_PIP_URL?="$(BASE_PIP_URL)production/"
+PACKAGE_NAME=idmtools_platform_local
+PY?=python
+PDS=$(PY) ../dev_scripts/
+PDR=$(PDS)run.py
+CLDIR=$(PDS)clean_dir.py
+CWD=$($(IPY) "import os; print(os.getcwd())")
+TEST_COMMAND=py.test --durations=3 -v --junitxml=test_results.xml
+TEST_RUN_OPTS=-e DOCKER_REPO=idm-docker-staging NO_SPINNER=1
+FULL_TEST_CMD=$(PDR) -w 'tests' $(TEST_RUN_OPTS) -ex '$(TEST_COMMAND)
+COVERAGE_CMD=$(PDR) -w 'tests' $(TEST_RUN_OPTS) -p . ../ -ex 'coverage run --omit="*/test*,*/setup.py" --source ../,../../idmtools_core,../../idmtools_models,../../idmtools_model_emod -m pytest
 
-clean: ## Clean all our jobs
-	@$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('*.py[co]', recursive=True)]"
-	@$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('*.done', recursive=True)]"
-	@$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('*.log', recursive=True)]"
-	@$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/.coverage', recursive=True)]"
-	@$(IPY) "import os, glob, shutil; [shutil.rmtree(i) for i in glob.glob('**/__pycache__', recursive=True)]"
-	@$(IPY) "import os, glob, shutil; [shutil.rmtree(i) for i in glob.glob('**/htmlcov', recursive=True)]"
-	@$(IPY) "import os, glob, shutil; [shutil.rmtree(i) for i in glob.glob('**/.pytest_cache', recursive=True)]"
-	@$(IPY) "import shutil; shutil.rmtree('dist', True)"
-	@$(IPY) "import shutil; shutil.rmtree('build', True)"
-	@$(IPY) "import shutil; shutil.rmtree('idmtools_webui/build', True)"
+help:
+	$(PDS)get_help_from_makefile.py
+
+clean: ## Clean most of the temp-data from the project
+	$(CLDIR) --file-patterns "*.py[co],*.done,*.log,**/.coverage" \
+		--dir-patterns "**/__pycache__,**/htmlcov,**/.pytest_cache" --directories "dist,build,idmtools_webui/build"
 
 clean-all:  ## Deleting package info hides plugins so we only want to do that for packaging
 	@make clean
-	@+$(IPY) "import os, shutil, glob; [shutil.rmtree(i) for i in [k for k in glob.glob('**/*.egg-info/', recursive=True) if os.path.isdir(k)]]"
+	$(CLDIR) --dir-patterns "**/*.egg-info/"
 
 # Dev and test related rules
-
 lint: ## check style with flake8
-	@+$(IPY) "import os; os.chdir('..'); os.system('flake8 --ignore=E501 idmtools_platform_local')"
+	$(PDR) -w '..' -ex 'flake8 --ignore=E501 $(PACKAGE_NAME)'
 
 test: ## Run our tests
-	@+$(IPY) "import os; os.environ['SQLALCHEMY_DATABASE_URI']='sqlite://'; \
-		os.environ['DATA_PATH'] = os.path.join(os.getcwd(), 'test_data'); \
-		os.environ['DOCKER_REPO'] = 'idm-docker-staging'; \
-		os.chdir('tests'); os.system('py.test -v -p no:warnings -m \"not comps and not docker\" --junitxml=test_results.xml')"
+	$(FULL_TEST_CMD) -m "not comps and not docker"'
 
-test-no-comps: ## Run our tests
-	@+$(IPY) "import os; os.chdir('tests'); \
-	os.environ['DOCKER_REPO'] = 'idm-docker-staging'; \
-	os.system('py.test -v -p no:warnings -m \"not comps\" --durations=3 --junitxml=test_results.xml')"
+test-all: ## Run all our tests
+	$(FULL_TEST_CMD)'
 
-test-docker: ## Run our  docker tests as well
-	@+$(IPY) "import os; os.chdir('tests'); \
-	    os.environ['DOCKER_REPO'] = 'idm-docker-staging'; \
-	    os.system('py.test --durations=3 -m \"docker\" --junitxml=test_results.xml')"
+test-no-long: ## Run any tests that takes less than 30s
+	$(FULL_TEST_CMD) -m "not long"'
 
-test-all: ## Run our  docker tests as well
-	@+$(IPY) "import os; os.chdir('tests'); \
-	    os.environ['DOCKER_REPO'] = 'idm-docker-staging'; os.environ['NO_SPINNER'] = '1' ; \
-	    os.system('py.test --durations=3 -v --junitxml=test_results.xml')"
+test-comps: ## Run our comps tests
+	$(FULL_TEST_CMD) -m "comps"'
+
+test-docker: ## Run our docker tests
+	$(FULL_TEST_CMD) -m "docker"'
+
+test-emod: ## Run our emod tests
+	$(FULL_TEST_CMD) -m "emod"'
+
+test-python: ## Run our python tests
+	$(FULL_TEST_CMD) -m "python"'
+
+coverage: ## Generate a code-coverage report
+	@make clean
+	# We have to run in our tests folder to use the proper config
+	$(COVERAGE_CMD) -m "not comps and not docker"'
+	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
+	coverage report -m
+	coverage html -i
+	$(PDS)/launch_dir_in_browser.py htmlcov/index.html
+
+coverage-all: ## Generate a code-coverage report
+	# We have to run in our tests folder to use the proper config
+	$(COVERAGE_CMD)
+	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
+	coverage report -m
+	coverage html -i
+	$(PDS)/launch_dir_in_browser.py htmlcov/index.html
 
 docker-cleanup:
 	docker stop  idmtools_workers idmtools_postgres idmtools_redis
@@ -52,8 +76,8 @@ docker-local: ## Build our docker image using the local pypi
 	# upstream changes that effect those areas(models and core). Otherwise, installing from latest in the nightly
 	# should suffice for development
 	# ensure pypi local is up
-	@+$(IPY) "import os; os.chdir('../dev_scripts/local_pypi'); os.system('docker-compose up -d')"
-	@+$(IPY) "import os; os.chdir('../idmtools_core'); os.system('pymake release-local')"
+	$(PDR) -w '../dev_scripts/local_pypi' -ex 'docker-compose up -d'
+	$(PDR) -w '../idmtools_core' -ex 'pymake release-local'
 	@pymake release-local
 	docker-compose build --build-arg PYPIURL=http://172.17.0.1:7171/ --build-arg PYPIHOST=172.17.0.1 workers
 
@@ -68,36 +92,14 @@ docker-local-no-cache:## Build our docker image using the local pypi
 	docker-compose build --no-cache --build-arg PYPIURL=http://172.17.0.1:7171/ --build-arg PYPIHOST=172.17.0.1 workers
 
 docker-staging: ## Build our docker image using staging pypi
-	pymake docker-local
+	@+$(IPY) "import os; os.chdir('../dev_scripts/local_pypi'); os.system('docker-compose up -d')"
+	@+$(IPY) "import os; os.chdir('../idmtools_core'); os.system('pymake release-local')"
+	@+make release-local
+	docker-compose build --build-arg PYPIURL=$(STAGING_PIP_URL) workers
 
 docker-release-staging:
 	@make docker-staging
 	docker-compose push workers
-
-coverage: ## Generate a code-coverage report
-	@make clean
-	# We have to run in our tests folder to use the proper config
-	@+$(IPY) "import os; os.chdir('tests'); \
-	os.environ['DOCKER_REPO'] = 'idm-docker-staging'; \
-	os.system('coverage run --source ../idmtools_platform_local -m pytest -m \"not comps and not docker\" ')"
-	# move our stuff back to the top
-	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
-	coverage report -m
-	coverage html -i
-	python ../dev_scripts/launch_dir_in_browser.py htmlcov/index.html
-
-coverage-all: ## Generate a code-coverage report
-	@make clean
-	# We have to run in our tests folder to use the proper config
-	@+$(IPY) "import os, sys; root_idmtools = os.path.abspath(os.path.join(os.getcwd(), '..', '..'));\
-	os.chdir('tests');  \
-	sys.path.insert(0, os.path.abspath(os.path.join(root_idmtools, 'idmtools_platform_local')));\
-	sys.path.insert(0, os.path.abspath(os.path.join(root_idmtools, 'idmtools_models')));\
-	sys.path.insert(0, os.path.abspath(os.path.join(root_idmtools, 'idmtools_core')));\
-	os.system('coverage run --source ../idmtools_models/idmtools_models --source ../../idmtools_core/idmtools \
-	--source ../idmtools_platform_local -m pytest -p no:warnings ')"
-	# move our stuff back to the top
-	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
 
 # Release related rules
 
@@ -114,7 +116,7 @@ release-staging: ## perform a release to staging
 	bump2version build --allow-dirty
 	@pymake build-ui
 	@pymake dist
-	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/idm-pypi-staging/ dist/*
+	twine upload --verbose --repository-url $(STAGING_PIP_URL) dist/*
 	@make docker-release-staging
 
 # Use before release-staging-release-commit to confirm next version.
@@ -125,14 +127,17 @@ release-staging-release-dry-run: ## perform a release to staging and bump the mi
 release-staging-release-commit: ## perform a release to staging and commit the version.
 	bump2version release --commit
 	@make dist
-	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/idm-pypi-staging/ dist/*
+	twine upload --verbose --repository-url $(STAGING_PIP_URL) dist/*
 	@make docker-release-staging
 
-build-ui:
-	@$(IPY) "import shutil; shutil.rmtree('idmtools_platform_local/internals/ui/static', True)"
-	@$(IPY) "import shutil; shutil.rmtree('idmtools_webui/build', True)"
+start-webui: ## start the webserver
+	$(PDR) -w 'idmtools_webui' -ex yarn
+	$(PDR) -w 'idmtools_webui' -ex 'yarn start'
+
+build-ui: ## build ui
+	$(CLDIR) --directories "idmtools_platform_local/internals/ui/static,idmtools_webui/build"
 	@+$(IPY) "import os; os.chdir('idmtools_webui'); os.system('python build.py')"
 	@$(IPY) "import shutil; shutil.copytree('idmtools_webui/build', 'idmtools_platform_local/internals/ui/static')"
 
-bump-patch:
+bump-patch: ## bump the patch version
 	bump2version patch --commit

@@ -48,12 +48,12 @@ class DockerIO:
             file_path = os.path.join(directory, fn)
             try:
                 # we only delete items at the target level
-                if os.path.isfile(file_path) and target_level == current_level:
+                if os.path.isfile(file_path) and target_level <= current_level:
                     logger.debug(f"Deleting {file_path}")
                     os.remove(file_path)
                 elif os.path.isdir(file_path):
                     # if this is target level, let's delete it
-                    if target_level == current_level:
+                    if target_level <= current_level:
                         logger.debug(f"Deleting {file_path}")
                         shutil.rmtree(file_path)
                     else:

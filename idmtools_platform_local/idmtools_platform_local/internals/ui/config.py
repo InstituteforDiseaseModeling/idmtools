@@ -21,7 +21,7 @@ def start_db():
     global db
     if db is None:
         from idmtools_platform_local.internals.data import Base
-        from idmtools_platform_local.internals.data.job_status import JobStatus
+        from idmtools_platform_local.internals.data.job_status import JobStatus  # noqa: F401
         application.logger.info("Creating DB")
         db = SQLAlchemy(application, session_options=dict(autocommit=True))
         Base.metadata.create_all(db.get_engine(application))

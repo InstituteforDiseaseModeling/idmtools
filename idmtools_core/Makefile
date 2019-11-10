@@ -1,57 +1,67 @@
 .PHONY: clean lint test coverage release-local dist release-staging release-staging-release-commit release-staging-minor
 IPY=python -c
+PACKAGE_NAME=idmtools_core
+PY?=python
+PDS=$(PY) ../dev_scripts/
+PDR=$(PDS)run.py
+CLDIR=$(PDS)clean_dir.py
+CWD=$($(IPY) "import os; print(os.getcwd())")
+TEST_COMMAND=py.test --durations=3 -v --junitxml=test_results.xml
+TEST_RUN_OPTS=-e DOCKER_REPO=idm-docker-staging NO_SPINNER=1
+FULL_TEST_CMD=$(PDR) -w 'tests' $(TEST_RUN_OPTS) -ex '$(TEST_COMMAND)
+COVERAGE_CMD=$(PDR) -w 'tests' $(TEST_RUN_OPTS) -p . ../ -ex 'coverage run --omit="*/test*,*/setup.py" --source ../,../../idmtools_platform_local,../../idmtools_platform_comps,../../idmtools_models,../../idmtools_model_emod -m pytest
 
-clean: ## Clean all our jobs
-	@$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('*.py[co]', recursive=True)]"
-	@$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('*.done', recursive=True)]"
-	@$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('*.log', recursive=True)]"
-	@$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/.coverage', recursive=True)]"
-	@$(IPY) "import os, glob, shutil; [shutil.rmtree(i, True) for i in glob.glob('**/__pycache__', recursive=True)]"
-	@$(IPY) "import os, glob, shutil; [shutil.rmtree(i, True) for i in glob.glob('**/htmlcov', recursive=True)]"
-	@$(IPY) "import os, glob, shutil; [shutil.rmtree(i) for i in glob.glob('**/.pytest_cache', recursive=True)]"
-	@$(IPY) "import shutil; shutil.rmtree('dist', True)"
-	@$(IPY) "import shutil; shutil.rmtree('build', True)"
+help:
+	$(PDS)get_help_from_makefile.py
+
+clean: ## Clean most of the temp-data from the project
+	$(CLDIR) --file-patterns "*.py[co],*.done,*.log,**/.coverage" \
+		--dir-patterns "**/__pycache__,**/htmlcov,**/.pytest_cache" --directories "dist,build"
 
 clean-all:  ## Deleting package info hides plugins so we only want to do that for packaging
 	@make clean
-	@+$(IPY) "import os, shutil, glob; [shutil.rmtree(i) for i in [k for k in glob.glob('**/*.egg-info/', recursive=True) if os.path.isdir(k)]]"
-# Dev and test related rules
+	$(CLDIR) --dir-patterns "**/*.egg-info/"
 
 lint: ## check style with flake8
-	@+$(IPY) "import os; os.chdir('..'); os.system('flake8 --ignore=E501 idmtools_core')"
+	flake8 --ignore=E501 $(PACKAGE_NAME) tests
 
 test: ## Run our tests
-	@+$(IPY) "import os; os.chdir('tests'); \
-	os.environ['DOCKER_REPO'] = 'idm-docker-staging'; \
-	os.system('py.test -p no:warnings -m \"not comps and not docker\" --durations=3 --junitxml=test_results.xml')"
+	$(FULL_TEST_CMD) -m "not comps and not docker"'
 
-test-no-comps: ## Run our tests
-	@+$(IPY) "import os; os.chdir('tests'); \
-	os.environ['DOCKER_REPO'] = 'idm-docker-staging'; \
-	os.system('py.test -v -p no:warnings -m \"not comps\" --durations=3 --junitxml=test_results.xml')"
+test-all: ## Run all our tests
+	$(FULL_TEST_CMD)'
 
-test-all: ## Run our  docker tests as well
-	@+$(IPY) "import os; os.chdir('tests'); \
-	os.environ['DOCKER_REPO'] = 'idm-docker-staging'; os.environ['NO_SPINNER'] = '1' ;\
-	os.system('py.test -v --durations=3 -p no:warnings --junitxml=test_results.xml')"
+test-no-long: ## Run any tests that takes less than 30s
+	$(FULL_TEST_CMD) -m "not long"'
+
+test-comps: ## Run our comps tests
+	$(FULL_TEST_CMD) -m "comps"'
+
+test-docker: ## Run our docker tests
+	$(FULL_TEST_CMD) -m "docker"'
+
+test-emod: ## Run our emod tests
+	$(FULL_TEST_CMD) -m "emod"'
+
+test-python: ## Run our python tests
+	$(FULL_TEST_CMD) -m "python"'
 
 coverage: ## Generate a code-coverage report
 	@make clean
 	# We have to run in our tests folder to use the proper config
-	@+$(IPY) "import os; os.chdir('tests'); os.system('coverage run --source ../idmtools -m pytest')"
-	# move our stuff back to the top
+	$(COVERAGE_CMD) -m "not comps and not docker"'
 	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
 	coverage report -m
 	coverage html -i
-	python ../dev_scripts/launch_dir_in_browser.py htmlcov/index.html
+	$(PDS)/launch_dir_in_browser.py htmlcov/index.html
 
-coverage-all: ## Generate a code-coverage report
-	@make clean
+coverage-all: ## Generate a code-coverage report using all tests
 	# We have to run in our tests folder to use the proper config
-	@+$(IPY) "os.chdir('tests'); os.environ['DOCKER_REPO'] = 'idm-docker-staging'; \
-	os.system('coverage run -p no:warnings --source ../idmtools -m pytest -m \"not comps and not docker\" ')"
-	# move our stuff back to the top
+	$(COVERAGE_CMD)
 	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
+	coverage report -m
+	coverage html -i
+	$(PDS)/launch_dir_in_browser.py htmlcov/index.html
 
 watch: ## Automate running of tests and linting of this project using watchdog. Useful for development
 	watchmedo tricks-from dev.yml

@@ -1,7 +1,6 @@
 import logging
 from typing import Optional, Tuple, List, Dict, Any
 from idmtools_platform_local.client.base import BaseClient
-from idmtools_platform_local.config import API_PATH
 from idmtools_platform_local.status import Status
 
 

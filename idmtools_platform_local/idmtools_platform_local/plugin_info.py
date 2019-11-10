@@ -18,8 +18,8 @@ default_timeout: int = 30
 workers_image: str = 'idm-docker-staging.packages.idmod.org:latest'
 # Port to display UI (ie the portion after colon in default URL http://localhost:5000)
 workers_ui_port int = 5000
-# This sets the max memory for workers container 
-# see https://docs.docker.com/compose/compose-file/compose-file-v2/#cpu-and-other-resources#specifying-byte-values 
+# This sets the max memory for workers container
+# see https://docs.docker.com/compose/compose-file/compose-file-v2/#cpu-and-other-resources#specifying-byte-values
 # for supported units
 workers_mem_limit = '16g'
 # Set mem reserved work worker
@@ -46,7 +46,7 @@ postgres_port = 5432
 # where you must sudo to run as root you would want to do use this setting to run the container as
 # you by getting your user id and group id id -u, id -g and replacing 1000 in the below with the values
 # run_as = "1000:1000"
-# 
+#
 # This setting controls whether to remove docker based worker containers
 # You might want this to troubleshoot containers after failures in execiton
 auto_remove_worker_containers = False
