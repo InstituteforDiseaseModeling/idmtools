@@ -58,11 +58,16 @@ ENV PYTHONPATH=/app:${PYTHONPATH}
 ARG PYPIURL=https://packages.idmod.org/api/pypi/pypi-production/simple
 ARG PYPIHOST=packages.idmod.org
 RUN echo ${PYPIURL}
+# Install requirements first to reduce build cache misses
+ADD requirements.txt ui_requirements.txt workers_requirements.txt /tmp/
+RUN pip install -r /tmp/requirements.txt --extra-index-url=${PYPIURL} --trusted-host ${PYPIHOST} && \
+        pip install -r /tmp/ui_requirements.txt --extra-index-url=${PYPIURL} --trusted-host ${PYPIHOST} && \
+        pip install -r /tmp/workers_requirements.txt --extra-index-url=${PYPIURL} --trusted-host ${PYPIHOST}
 # Run the setup instal before copying rest of package. This will increase cache hits during docker builds
 # as we will only rebuild if any of the docker_scripts, setup.py, readme.md, and requirements.txt change
 # which should happen infrequently(or less so than library code)
 COPY dist/idmtools_platform_local*.tar.gz /tmp/
-RUN find /tmp -name idmtools_platform_local*.tar.gz -exec pip install {}[workers,ui,server] --extra-index-url=${PYPIURL} --trusted-host ${PYPIHOST} \; && \
+RUN find /tmp -name idmtools_platform_local*.tar.gz -exec pip install {}[workers,ui] --extra-index-url=${PYPIURL} --trusted-host ${PYPIHOST} \; && \
     rm -rf /root/.cache
 ADD idmtools_platform_local/internals/ui/static /app/html
 CMD ["/init"]

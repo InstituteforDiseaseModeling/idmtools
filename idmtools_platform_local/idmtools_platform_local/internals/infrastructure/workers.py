@@ -92,7 +92,7 @@ class WorkersContainer(BaseServiceContainer):
         time.sleep(0.2)
         self.wait_on_status(result)
         start = time.time()
-        while (time.time() - start) / 1000 < 5:
+        while (time.time() - start) < 10:
             try:
                 response = HealthcheckClient.get(HealthcheckClient.path_url)
                 if response.status_code == 200:

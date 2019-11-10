@@ -7,6 +7,8 @@ import docker
 import pytest
 from operator import itemgetter
 
+from sqlalchemy.exc import OperationalError
+
 from idmtools_platform_local.internals.workers.database import reset_db
 
 api_host = os.getenv('API_HOST', 'localhost')
@@ -27,8 +29,14 @@ class TestAPI(unittest.TestCase):
         sm.get_network()
         sm.get('postgres')
         sm.wait_on_ports_to_open(['postgres_port'])
-        time.sleep(2)
-        cls.create_test_data()
+        retries = 0
+        while retries < 10:
+            try:
+                cls.create_test_data()
+                break
+            except (OperationalError, ConnectionError):
+                time.sleep(0.5)
+                retries += 1
 
     @patch_broker
     def setUp(self, mock_broker):

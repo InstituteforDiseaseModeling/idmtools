@@ -167,7 +167,7 @@ class BaseServiceContainer(ABC):
         start = time.time()
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'Waiting on {container.name} to become in {statutes_to_wait_for}')
-        while container.status in statutes_to_wait_for and ((time.time() - start) / 1000) < max_time:
+        while container.status in statutes_to_wait_for and (time.time() - start) < max_time:
             time.sleep(sleep_interval)
             container.reload()
 

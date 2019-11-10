@@ -270,7 +270,7 @@ class LocalPlatform(IPlatform):
                 break
             except ResultTimeout as e:
                 logger.debug('Resetting broker client because of a heartbeat failure')
-                timeout_diff = floor((time.time() - start) / 1000)
+                timeout_diff = floor(time.time() - start)
                 self._sm.restart_brokers(self.heartbeat_timeout)
                 if timeout_diff >= self.default_timeout:
                     logger.exception(e)
