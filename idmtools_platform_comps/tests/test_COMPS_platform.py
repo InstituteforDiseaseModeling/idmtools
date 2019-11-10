@@ -165,6 +165,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
         self.assertTrue(experiment2.done)
         self.assertTrue(experiment2.succeeded)
 
+    @pytest.mark.long
     def test_experiment_manager(self):
         experiment = PythonExperiment(name=self.case_name,
                                       model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"))

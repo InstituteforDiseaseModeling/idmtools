@@ -54,6 +54,7 @@ class TestServiceManager(unittest.TestCase):
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     @restart_local_platform(silent=True)
     @pytest.mark.timeout(60)
+    @pytest.mark.long
     def test_create_stack_starts(self, std_capture):
         sm = DockerServiceManager(self.client, **get_test_local_env_overrides())
         do = DockerIO()
@@ -77,6 +78,7 @@ class TestServiceManager(unittest.TestCase):
             self.assertIn('Hello World!', result.stdout.decode('utf-8'))
 
     @pytest.mark.timeout(60)
+    @pytest.mark.long
     def test_start_stopped_container(self):
         sm = DockerServiceManager(self.client, **get_test_local_env_overrides())
         sm.cleanup(True)

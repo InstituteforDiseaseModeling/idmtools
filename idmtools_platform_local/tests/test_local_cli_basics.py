@@ -80,6 +80,7 @@ class TestLocalCLIBasic(unittest.TestCase):
         result = self.run_command('experiment', '--platform', 'Local', 'status', base_command='')
         print(result)
 
+    @pytest.mark.long
     def test_docker(self):
         """
         Filtering depends on a few postgres filtering method so we have to
