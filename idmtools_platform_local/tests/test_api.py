@@ -55,8 +55,12 @@ class TestAPI(unittest.TestCase):
 
     @staticmethod
     def create_test_data():
-        from idmtools_platform_local.internals.workers.database import get_session
+        from idmtools_platform_local.internals.workers.database import get_session, create_db, get_db
         from idmtools_platform_local.internals.data.job_status import JobStatus
+        try:
+            create_db(get_db())
+        except:
+            pass
         # delete any previous data
 
         get_session().query(JobStatus).delete()
