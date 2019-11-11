@@ -83,7 +83,7 @@ def restart_local_platform(silent=True, stop_before=True, stop_after=True, dump_
             if dump_logs:
                 try:
                     info = get_service_info(sm, diff=False, logs=True)
-                    print("\n".join(info))
+                    print(info)
                 except:
                     pass
             if stop_after:
