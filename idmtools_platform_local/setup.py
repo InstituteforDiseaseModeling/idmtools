@@ -16,11 +16,11 @@ with open('requirements.txt') as requirements_file:
 with open('workers_requirements.txt') as requirements_file:
     worker_requirements = requirements_file.read().split("\n")
 
-if os.name != "nt":
-    worker_requirements.append('uwsgi==2.0.18')
-
 with open('ui_requirements.txt') as requirements_file:
     ui_requirements = requirements_file.read().split("\n")
+
+if os.name != "nt":
+    ui_requirements.append('uwsgi==2.0.18')
 
 setup_requirements = []
 test_requirements = ['pytest', 'pytest-runner', 'pytest-timeout']
