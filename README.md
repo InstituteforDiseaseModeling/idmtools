@@ -61,23 +61,24 @@ For development purpose, it is important to add the following folders as to your
 
 ### Running specific tests from the command line
 
-From within a project directory such a local data
-`python -m unittest tests.test_docker_operations.TestDockerOperations.test_create_stack_starts`
+To run a select set of tests, you can use the `run_all.py` python script
 
-To enable docker tests and comps test you can do the following on Linux 
-`export DOCKER_TESTS=1
-python -m unittest tests.test_docker_operations.TestDockerOperations.test_create_stack_starts
-`
-or on Windows
-`
-set DOCKER_TESTS=1
-python -m unittest tests.test_docker_operations.TestDockerOperations.test_create_stack_starts
-`
+For example to run all tests that tagged emod but not tagged comps run 
+```bash
+python dev_scripts/run_all.py -sd 'tests' --exec "py.test -m 'not comps and emod'"
+```
 
-Lastly, you can do also run the tests without setting the environment variables directly like so
-`DOCKER_TESTS=1 python -m unittest tests.test_docker_operations.TestDockerOperations.test_create_stack_starts`
+You can also filter by test case name or method name. The below will run any test with batch in the name. 
+```bash
+python dev_scripts/run_all.py -sd 'tests' --exec "py.test -k 'batch'"
+```
 
-# Troubleshppting the Devevelopment Environment
+To run a specific test, cd to the project directories test folder and run
+```bash
+py.test test_emod.py::TestLocalPlatformEMOD::test_duplicated_eradication
+```
+
+# Troubleshooting the Development Environment
 
 1. Docker Auth issues.
 

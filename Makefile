@@ -10,27 +10,24 @@ help:
 
 clean: ## Clean all our jobs
 	$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
-	$(MAKEALL) clean p
+	$(MAKEALL) --parallel clean
 
 clean-all: ## Clean all our jobs
 	$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
-	$(MAKEALL) clean-all p
+	$(MAKEALL) --parallel clean-all
 
 setup-dev:  ## Setup packages in dev mode
 	python dev_scripts/bootstrap.py
 	$(PDR) -w idmtools_platform_local -ex 'pymake docker-local'
 
 lint: ## check style with flake8
-	$(MAKEALL) lint p
+	$(MAKEALL) --parallel lint
 
 test: ## Run our tests
-	$(MAKEALL) test p
+	$(MAKEALL) --parallel test
 
 test-all: ## Run all our tests
 	$(MAKEALL) test-all
-
-test-long: ## Run any tests that takes longer than 30s on average
-	$(MAKEALL) test-no-long
 
 test-no-long: ## Run any tests that takes less than 30s on average
 	$(MAKEALL) test-no-long
@@ -55,10 +52,10 @@ coverage: ## Generate a code-coverage report
 	$(PDS)launch_dir_in_browser.py htmlcov/index.html
 
 release-local: ## package and upload a release to http://localhost:7171
-	$(MAKEALL) release-local p
+	$(MAKEALL) --parallel release-local
 
 dist: ## build our package
-	$(MAKEALL) dist p
+	$(MAKEALL) --parallel dist
 
 release-staging: ## perform a release to staging
 	@make clean-all
