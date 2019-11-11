@@ -57,7 +57,7 @@ class DockerIO:
                         logger.debug(f"Deleting {file_path}")
                         shutil.rmtree(file_path)
                     else:
-                        clevel = current_level + 1 if current_level > 1 else 1
+                        clevel = current_level + 1 if current_level >= 1 else 1
                         self.delete_files_below_level(file_path, target_level, clevel)
             except PermissionError as e:
                 if logger.isEnabledFor(logging.DEBUG):
@@ -85,7 +85,7 @@ class DockerIO:
             elif delete_data and shallow_delete:
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f"Shallow deleting: {self.host_data_directory}")
-                self.delete_files_below_level(self.host_data_directory, 3)
+                self.delete_files_below_level(self.host_data_directory, 2)
         except PermissionError:
             print(f"Cannot cleanup directory {self.host_data_directory} because it is still in use")
             logger.warning(f"Cannot cleanup directory {self.host_data_directory} because it is still in use")
