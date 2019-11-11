@@ -79,16 +79,21 @@ def restart_local_platform(silent=True, stop_before=True, stop_after=True, dump_
             if stop_before:
                 sm.cleanup(tear_down_brokers=True, delete_data=True)
                 do.cleanup(True)
-            result = func(*args, **kwargs)
-            if dump_logs:
-                try:
-                    info = get_service_info(sm, diff=False, logs=True)
-                    print(info)
-                except:
-                    pass
-            if stop_after:
-                sm.cleanup(tear_down_brokers=True, delete_data=True)
-                do.cleanup(True)
+            result = None
+            try:
+                result = func(*args, **kwargs)
+            except Exception:
+                raise
+            finally:
+                if dump_logs:
+                    try:
+                        info = get_service_info(sm, diff=False, logs=True)
+                        print(info)
+                    except:
+                        pass
+                if stop_after:
+                    sm.cleanup(tear_down_brokers=True, delete_data=True)
+                    do.cleanup(True)
             return result
         return wrapper
     return decorate
