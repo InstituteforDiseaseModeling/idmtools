@@ -2,6 +2,7 @@ from math import floor
 from typing import Dict
 from colorama import Fore, Back
 from idmtools_platform_local.config import DATA_PATH
+from idmtools_platform_local.infrastructure.service_manager import DockerServiceManager
 from idmtools_platform_local.status import Status
 
 status_text_color_map = dict(failed=Fore.RED, in_progress=Fore.YELLOW, done=Fore.GREEN, canceled=Fore.CYAN)
@@ -11,6 +12,35 @@ tags_help = "Tag to filter by. This should be in the form name value. For exampl
             "you would use --tags type PythonTask. In addition, you can provide multiple tags, ie --tags a 1 " \
             "--tags b 2. This will perform an AND based query on the tags meaning only jobs caontain ALL the tags " \
             "specified will be displayed"
+
+
+def get_service_info(service_manger: DockerServiceManager, diff: bool, logs: bool) -> str:
+    info = []
+    for service in ['redis', 'postgres', 'workers']:
+        info.append(f'\n{service}\n{"=" * 20}')
+        container = service_manger.get(service, create=False)
+        if container:
+            info.append(f'id: {container.id}')
+            info.append(f'image: {container.image}')
+            info.append(f'name: {container.name}')
+            info.append(f'status: {container.status}')
+            [info.append(f'{k}: {v}') for k, v in container.attrs.items()]
+            if container.status == 'running' and service in ['workers']:
+                info.append("Var Run")
+                for d in ['/var/run/', '/data']:
+                    code, result = container.exec_run(f'ls -al {d}')
+                    info.append(f'\n{d}')
+                    info.extend(result.decode('utf-8').split("\n"))
+            if logs:
+                info.extend(container.logs().decode('utf-8').split("\n"))
+            if diff:
+                info.append("Diff:\n")
+                diff = container.diff()
+                if diff:
+                    info.append(container.diff())
+        else:
+            info.append('Not running')
+    return "\n".join(info)
 
 
 def colorize_status(status: Status) -> str:

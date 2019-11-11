@@ -61,9 +61,10 @@ def run_test_in_n_seconds(n: int, print_elapsed_time: bool = False) -> Callable:
     return decorator
 
 
-def restart_local_platform(silent=True, stop_before=True, stop_after=True, *args, **kwargs):
+def restart_local_platform(silent=True, stop_before=True, stop_after=True, dump_logs=True, *args, **kwargs):
     from idmtools_platform_local.infrastructure.service_manager import DockerServiceManager
     from idmtools_platform_local.infrastructure.docker_io import DockerIO
+    from idmtools_platform_local.cli.utils import get_service_info
     # disable spinner
     if silent:
         os.environ['NO_SPINNER'] = '1'
@@ -79,6 +80,12 @@ def restart_local_platform(silent=True, stop_before=True, stop_after=True, *args
                 sm.cleanup(tear_down_brokers=True, delete_data=True)
                 do.cleanup(True)
             result = func(*args, **kwargs)
+            if dump_logs:
+                try:
+                    info = get_service_info(sm, diff=False, logs=True)
+                    print("\n".join(info))
+                except:
+                    pass
             if stop_after:
                 sm.cleanup(tear_down_brokers=True, delete_data=True)
                 do.cleanup(True)
