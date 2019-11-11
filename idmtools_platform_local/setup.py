@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """The setup script."""
+import os
 import sys
 
 from setuptools import setup, find_packages
