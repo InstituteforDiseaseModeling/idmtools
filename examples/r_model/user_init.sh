@@ -2,7 +2,8 @@
 if (( EUID == 0 )); then
     echo "Runing s6 init scripts"
     /init &
-    su idmtools
+    sleep 1
+    su idmtools -c "$@"
 else
     echo "Skipping s6"
      $@
