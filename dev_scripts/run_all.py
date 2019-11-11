@@ -1,4 +1,5 @@
 import argparse
+import os
 import signal
 import subprocess
 import sys
@@ -24,12 +25,13 @@ def run_command_on_all(idm_modules: List[str], command: str, parallel: bool = Fa
             p.wait()
         sys.exit(0)
 
-    # register signal handler to stop on ctrl c and ctrl k
-    signal.signal(signal.SIGINT, signal_handler)
-    signal.signal(signal.SIGTSTP, signal_handler)
+    if os.name != 'nt':
+        # register signal handler to stop on ctrl c and ctrl k
+        signal.signal(signal.SIGINT, signal_handler)
+        signal.signal(signal.SIGTSTP, signal_handler)
     for module in idm_modules:
         wd = join(base_directory, module)
-        if subprocess:
+        if subdir:
             wd = join(wd, subdir)
         print(f'Running {command} in {wd}')
         p = subprocess.Popen(f'{command}', cwd=wd, shell=True)
@@ -40,6 +42,7 @@ def run_command_on_all(idm_modules: List[str], command: str, parallel: bool = Fa
     if parallel:
         print('Waiting to finish')
         [p.wait() for p in processes]
+    sys.exit(0)
 
 
 if __name__ == '__main__':
