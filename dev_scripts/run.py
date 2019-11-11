@@ -6,6 +6,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-e', '--environment', nargs='+', help='Environment variables to set ')
     parser.add_argument('-wd', '--working-dir', help='Working Directory')
+    parser.add_argument('-rt', '--return-code', default=None, help='Return Code')
     parser.add_argument('-p', '--path', nargs='+', help='Add items to the path')
     parser.add_argument('-ex', help='Add items to the path')
 
@@ -26,4 +27,5 @@ if __name__ == '__main__':
         print(f'Changing working directory to {os.path.abspath(args.working_dir)}')
         os.chdir(os.path.abspath(args.working_dir))
     print(f'Running {args.ex}')
-    sys.exit(os.system(args.ex))
+    result = os.system(args.ex)
+    sys.exit(result if args.return_code is None else 0)

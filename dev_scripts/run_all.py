@@ -42,6 +42,7 @@ def run_command_on_all(idm_modules: List[str], command: str, parallel: bool = Fa
     if parallel:
         print('Waiting to finish')
         [p.wait() for p in processes]
+    sys.exit(0)
 
 
 if __name__ == '__main__':

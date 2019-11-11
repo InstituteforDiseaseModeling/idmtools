@@ -29,7 +29,7 @@ test: ## Run our tests
 	$(FULL_TEST_CMD) -m "not comps and not docker"'
 
 test-all: ## Run all our tests
-	$(FULL_TEST_CMD)'
+	$(FULL_TEST_CMD)' -rt 0
 
 test-long: ## Run any tests that takes more than 30s
 	$(FULL_TEST_CMD) -m "long"'
