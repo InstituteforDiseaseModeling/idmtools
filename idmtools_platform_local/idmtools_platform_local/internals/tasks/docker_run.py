@@ -25,7 +25,7 @@ class DockerBaseTask(BaseTask):
         container_config['detach'] = True
         container_config['stderr'] = True
         container_config['working_dir'] = simulation_path
-        if os.getenv('CURRENT_UID', None):
+        if os.getenv('CURRENT_UID', None) is not  None:
             container_config['user'] = os.getenv('CURRENT_UID')
         container_config['auto_remove'] = True
         # we have to mount using the host data path
