@@ -23,7 +23,7 @@ export function loading(loading) {
 export function fetchExperiments() { 
 
   
-    let url = "/api/experiments";
+    let url = "/api/experiments?per_page=9999";
   
     
     
