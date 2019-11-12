@@ -57,10 +57,17 @@ class MigrationFiles(InputFilesList):
 
     def gather_assets(self):
         for asset in self.migration_files.values():
+            if asset.persisted:
+                continue
             self.assets.append(asset)
             self.assets.append(Asset(absolute_path=asset.absolute_path + ".json", relative_path=self.relative_path))
 
         return super().gather_assets()
+
+    def set_all_persisted(self):
+        for asset in self.migration_files.values():
+            asset.persisted = True
+        super().set_all_persisted()
 
     def merge_with(self, mf: 'MigrationFiles', left_precedence: 'bool' = True) -> 'NoReturn':
         if not left_precedence:

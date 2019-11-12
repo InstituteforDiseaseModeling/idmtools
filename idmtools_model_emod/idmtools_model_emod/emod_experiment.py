@@ -20,6 +20,7 @@ from idmtools_model_emod.emod_simulation import EMODSimulation
 
 if typing.TYPE_CHECKING:
     from idmtools_model_emod.defaults import iemod_default
+    from typing import NoReturn
 
 logger = getLogger(__name__)
 
