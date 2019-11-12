@@ -104,7 +104,7 @@ class Simulations(Resource):
                 if 'pid' in current_job.extra_details:
                     try:
                         current_app.logger.info(f"Killing process for {current_job.extra_details['pid']} for {id}")
-                        os.kill(current_job.metadata['pid'], signal.SIGTERM)
+                        os.kill(current_job.extra_details['pid'], signal.SIGTERM)
                     except Exception as e:
                         current_app.logger.error('Could not kill procress')
                         current_app.logger.exception(e)
