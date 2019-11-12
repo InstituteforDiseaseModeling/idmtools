@@ -57,7 +57,6 @@ class DockerBaseTask(BaseTask):
     def run_container(self, command, container_config, current_job, simulation_path, simulation_uuid):
         import docker
         from idmtools_platform_local.internals.workers.utils import create_or_update_status
-        result = None
 
         with open(os.path.join(simulation_path, "StdOut.txt"), "w") as out, \
                 open(os.path.join(simulation_path, "StdErr.txt"), "w") as err:  # noqa: F841
