@@ -1,6 +1,9 @@
 import os
+from logging import getLogger
 
 from idmtools.entities.ianalyzer import IAnalyzer
+
+logger = getLogger(__name__)
 
 
 class DownloadAnalyzer(IAnalyzer):
@@ -21,6 +24,7 @@ class DownloadAnalyzer(IAnalyzer):
         analyzer = DownloadAnalyzer(filenames=['output/InsetChart.json'])
 
     """
+
     def __init__(self, filenames=None, output_path=None, **kwargs):
         super(DownloadAnalyzer, self).__init__(**kwargs)
 
@@ -57,6 +61,6 @@ class DownloadAnalyzer(IAnalyzer):
         # Create the requested files
         for filename in self.filenames:
             file_path = os.path.join(sim_folder, os.path.basename(filename))
-            print('writing to path: %s' % file_path)
+            logger.debug('writing to path: %s' % file_path)
             with open(file_path, 'wb') as outfile:
                 outfile.write(data[filename])

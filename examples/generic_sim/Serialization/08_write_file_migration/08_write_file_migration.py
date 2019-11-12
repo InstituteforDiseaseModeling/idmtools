@@ -1,108 +1,81 @@
-import os
 import sys
-sys.path.append('../')
-from config_update_parameters import config_update_params, param_update
-import numpy as np
-from functools import partial
 
-from idmtools.assets import AssetCollection, Asset
-from idmtools.builders import ExperimentBuilder
-from idmtools.core import ItemType
+from idmtools_model_emod.emod_file import MigrationTypes
+
+sys.path.append('../')
+
 from idmtools.core.platform_factory import Platform
-from idmtools.core import FilterMode
 from idmtools.managers import ExperimentManager
 from idmtools_model_emod import EMODExperiment
-from idmtools_model_emod.defaults import EMODSir
 from idmtools_model_emod.generic.serialization import add_serialization_timesteps
 from idmtools.analysis.AnalyzeManager import AnalyzeManager
 from idmtools.analysis.DownloadAnalyzer import DownloadAnalyzer
-from idmtools_test.utils.utils import del_file, del_folder, load_csv_file
-from idmtools.utils.filters.asset_filters import file_name_is
+from globals import *
 
-
-current_directory = os.path.dirname(os.path.realpath(__file__))
-BIN_PATH = os.path.abspath(os.path.join(current_directory, "../bin"))
-INPUT_PATH = os.path.abspath(os.path.join(current_directory, "../inputs"))
-
-start_day = 0
-simulation_duration = 120
-num_seeds = 4
-last_serialization_day = 70
-expname = '08_write_file_migration'
-dtk_migration_filenames = ["LocalMigration_3_Nodes.bin", "LocalMigration_3_Nodes.bin.json"]
+EXPERIMENT_NAME = 'Generic serialization 08 writes files migration'
+DTK_MIGRATION_FILENAME = "LocalMigration_3_Nodes.bin"
 
 
 if __name__ == "__main__":
 
-    platform = Platform('COMPS-Linux')
+    # Create the platform
+    platform = Platform('COMPS')
 
-    ac = AssetCollection()
-    filter_name = partial(file_name_is, filenames=dtk_migration_filenames)
-    ac.add_directory(assets_directory=INPUT_PATH, filters=[filter_name], filters_mode=FilterMode.OR)
-    e = EMODExperiment.from_files(expname, eradication_path=os.path.join(BIN_PATH, "Eradication"),
+    # Create an experiment based on input files
+    e = EMODExperiment.from_files(EXPERIMENT_NAME, eradication_path=os.path.join(BIN_PATH, "Eradication.exe"),
                                   config_path=os.path.join(INPUT_PATH, 'config.json'),
                                   campaign_path=os.path.join(INPUT_PATH, "campaign.json"),
                                   demographics_paths=os.path.join(INPUT_PATH, "3nodes_demographics.json"))
 
-    e.add_assets(ac)
+    # Add the migration files
+    e.migrations.add_migration_from_file(MigrationTypes.LOCAL, os.path.join(INPUT_PATH, DTK_MIGRATION_FILENAME))
+
+    # Add the DLLs to the collection
+    e.dlls.add_dll_folder("../custom_reports/reporter_plugins")
+    e.dlls.set_custom_reports_file("../custom_reports/custom_reports.json")
+
+    # Get the base simulation
     simulation = e.base_simulation
 
-    #Update bunch of config parameters
-    sim = config_update_params(simulation)
-
-    serialization_timesteps = np.append(np.arange(10, last_serialization_day, 20), last_serialization_day).tolist()
-    add_serialization_timesteps(sim=sim, timesteps=serialization_timesteps,
+    # Update parameters (adding migration) and setup serialization
+    config_update_params(simulation)
+    serialization_timesteps = list(range(10, LAST_SERIALIZATION_DAY, 20))
+    add_serialization_timesteps(simulation=simulation, timesteps=serialization_timesteps,
                                 end_at_final=False, use_absolute_times=False)
-
-    sim.update_parameters({
-        "Start_Time": start_day,
-        "Simulation_Duration": simulation_duration,
-        "Config_Name": 'Generic serialization 08 writes files migration',
+    simulation.update_parameters({
+        "Start_Time": START_DAY,
+        "Simulation_Duration": SIMULATION_DURATION,
+        "Enable_Migration_Heterogeneity": 0,
         "Migration_Model": "FIXED_RATE_MIGRATION",
         "Migration_Pattern": "RANDOM_WALK_DIFFUSION",
-        "Local_Migration_Filename": "Assets/LocalMigration_3_Nodes.bin",
-        "Enable_Local_Migration": 1,
-        "Enable_Air_Migration": 0,
-        "Enable_Family_Migration": 0,
-        "Enable_Migration_Heterogeneity": 0,
-        "Enable_Regional_Migration": 0,
-        "Enable_Sea_Migration": 0,
-        # "Enable_Spatial_Output": 1,
-        # "Spatial_Output_Channels": [
-        #     "Population",
-        #     "Prevalence"
-        # ],
-        "x_Local_Migration": 0.1
+        "x_Local_Migration": 0.1,
     })
-    sim.add_custom_reports(custom_reports_file="../custom_reports/custom_reports.json")
-    e.add_dll_files(dll_files_path="../custom_reports/reporter_plugins")
 
-    builder = ExperimentBuilder()
-    set_Run_Number = partial(param_update, param="Run_Number")
-    builder.add_sweep_definition(set_Run_Number, range(num_seeds))
+    # Retrieve the seed sweep
+    builder = get_seed_experiment_builder()
+    e.add_builder(builder)
 
-    e.builder = builder
+    # Create experiment manager and run
     em = ExperimentManager(experiment=e, platform=platform)
     em.run()
     em.wait_till_done()
     exp_id = em.experiment.uid
 
-    # if e.succeeded:
-    #   print(f"Experiment {exp_id} succeeded.\n")
     print("Downloading dtk serialization files from Comps:\n")
+    # Create the filenames
     filenames = ['output/InsetChart.json',
                  'output/ReportHumanMigrationTracking.csv',
                  'output/ReportNodeDemographics.csv']
     for serialization_timestep in serialization_timesteps:
-        filenames.append("output/state-000" + str(serialization_timestep) + ".dtk")
+        filenames.append("output/state-" + str(serialization_timestep).zfill(5) + ".dtk")
+
+    # Remove the outputs if already present
     output_path = 'outputs'
-    if os.path.isdir(output_path):
+    if os.path.exists(output_path):
         del_folder(output_path)
 
-    analyzers = [DownloadAnalyzer(filenames=filenames, output_path=output_path)]
-
-    am = AnalyzeManager(platform=platform, ids=[(exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
+    download_analyzer = DownloadAnalyzer(filenames=filenames, output_path=output_path)
+    am = AnalyzeManager(platform=platform)
+    am.add_analyzer(download_analyzer)
+    am.add_item(e)
     am.analyze()
-    # else:
-    #     print(f"Experiment {exp_id} failed.\n")
-

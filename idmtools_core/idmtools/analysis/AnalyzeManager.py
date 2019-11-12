@@ -356,8 +356,6 @@ class AnalyzeManager(CacheEnabled):
         for analyzer in self.analyzers:
             analyzer.results = finalize_results[analyzer.uid].get()
 
-        logger.debug(str(analyzer.results))
-
         logger.debug("Destroying analyzers")
         for analyzer in self.analyzers:
             analyzer.destroy()

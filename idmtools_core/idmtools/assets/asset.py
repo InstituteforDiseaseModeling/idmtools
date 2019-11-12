@@ -35,6 +35,10 @@ class Asset:
         return f"<Asset: {os.path.join(self.relative_path, self.filename)} from {self.absolute_path}>"
 
     @property
+    def extension(self):
+        return os.path.splitext(self.filename)[1].lstrip('.').lower()
+
+    @property
     def relative_path(self):
         return self._relative_path or ""
 
