@@ -20,8 +20,7 @@ application.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_U
 
 db = None
 @backoff.on_exception(backoff.constant, OperationalError, max_tries=3, interval=0.2)
-def start_db():
-    global db
+def start_db(db=None):
     if db is None:
         from idmtools_platform_local.internals.data import Base
         from idmtools_platform_local.internals.data.job_status import JobStatus  # noqa: F401
@@ -34,4 +33,4 @@ def start_db():
 application.json_encoder = DateTimeEncoder
 api = Api(application, prefix='/api')
 ai = AutoIndex(application, browse_root=DATA_PATH, add_url_rules=False)
-db = start_db()
+db = SQLAlchemy(application, session_options=dict(autocommit=True))
