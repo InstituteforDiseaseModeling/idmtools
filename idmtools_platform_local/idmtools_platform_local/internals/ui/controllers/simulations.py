@@ -117,8 +117,10 @@ class Simulations(Resource):
                     except Exception as e:
                         current_app.logger.error('Could not kill container')
                         current_app.logger.exception(e)
-            current_job.__dict__.update(data)
+            current_job.status = 'canceled'
+            s.begin()
             s.add(current_job)
+            s.commit()
             return current_job.to_dict()
         else:
             abort(400, message='Currently the only allowed simulation update is canceling a simulation')
