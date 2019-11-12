@@ -17,5 +17,5 @@ python3 dev_scripts/bootstrap.py
 export REDIS_HOST=$(sudo route -n | awk '$4 == "UG" {print $2}')
 export API_HOST=$REDIS_HOST
 # docker in docker requires us to mount via volume name so the directory can be mounted by items
-export IDMTOOLS_WORKER_DATA_MOUNT_BY_VOLUMENAME=linux-test-env_idmtools_local_workers
+export IDMTOOLS_WORKERS_DATA_MOUNT_BY_VOLUMENAME=linux-test-env_idmtools_local_workers
 export IDMTOOLS_REDIS_DATA_MOUNT_BY_VOLUMENAME=linux-test-env_idmtools_local_redis
