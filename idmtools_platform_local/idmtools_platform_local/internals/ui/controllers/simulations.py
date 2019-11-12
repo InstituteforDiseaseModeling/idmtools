@@ -100,19 +100,20 @@ class Simulations(Resource):
             current_job: JobStatus = s.query(JobStatus).filter(JobStatus.uuid == id).first()
             # check if we have a PID, if so kill it
             current_app.logger.info(f"Getting metadata for {id}")
-            if current_job.metadata is not None:
+            current_app.logger.debug(str(current_job.extra_details))
+            if current_job.extra_details is not None:
                 if 'pid' in current_job.metadata:
                     try:
-                        current_app.logger.info(f"Killing process for {current_job.metadata['pid']} for {id}")
+                        current_app.logger.info(f"Killing process for {current_job.extra_details['pid']} for {id}")
                         os.kill(current_job.metadata['pid'], signal.SIGTERM)
                     except Exception as e:
                         current_app.logger.error('Could not kill procress')
                         current_app.logger.exception(e)
-                elif 'container_id' in current_job.metadata:
-                    current_app.logger.info(f"Killing container {current_job.metadata['container_id']} for {id}")
+                elif 'container_id' in current_job.extra_details:
+                    current_app.logger.info(f"Killing container {current_job.extra_details['container_id']} for {id}")
                     try:
                         client = docker.from_env()
-                        con = client.containers.get(current_job.metadata['container_id'])
+                        con = client.containers.get(current_job.extra_details['container_id'])
                         con.stop()
                     except Exception as e:
                         current_app.logger.error('Could not kill container')
