@@ -77,3 +77,4 @@ echo "$USER:$PASSWORD" | chpasswd
 chown root:docker /var/run/docker.sock
 adduser $USER sudo && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 echo "$USER added to sudoers"
+chown -R $USER /home/$USER /idmtools
