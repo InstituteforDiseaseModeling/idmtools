@@ -101,7 +101,7 @@ class Simulations(Resource):
             current_app.logger.info(f"Getting metadata for {id}")
             current_app.logger.debug(str(current_job.extra_details))
             if current_job.extra_details is not None:
-                if 'pid' in current_job.metadata:
+                if 'pid' in current_job.extra_details:
                     try:
                         current_app.logger.info(f"Killing process for {current_job.extra_details['pid']} for {id}")
                         os.kill(current_job.metadata['pid'], signal.SIGTERM)
