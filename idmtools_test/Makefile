@@ -24,6 +24,9 @@ lint: ## check style with flake8
 test: ## Run our tests
 	@+$(IPY) "print('No Tests')"
 
+test-failed: ## Run only previously failed tests
+	@+$(IPY) "print('No Tests')"
+
 test-long: ## Run our tests
 	@+$(IPY) "print('No Tests')"
 

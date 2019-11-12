@@ -29,6 +29,9 @@ test: ## Run our tests
 test-all: ## Run all our tests
 	$(MAKEALL) test-all
 
+test-failed: ## Run only previously failed tests
+	$(MAKEALL) test-failed
+
 test-no-long: ## Run any tests that takes less than 30s on average
 	$(MAKEALL) test-no-long
 
