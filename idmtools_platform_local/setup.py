@@ -25,6 +25,7 @@ test_requirements = ['pytest', 'pytest-runner', 'pytest-timeout', 'pytest-cache'
 
 if os.name != "nt":
     ui_requirements.append('uwsgi==2.0.18')
+else:
     # TODO remove workaround. This is needed because 226 break windows virtual envs when calling processes
     # which we need
     test_requirements.append('pywin32==225')
