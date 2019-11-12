@@ -66,11 +66,9 @@ def experiment_filter(id: Optional[str], tags: Optional[List[Tuple[str, str]]], 
         for tag in tags:
             criteria.append((JobStatus.tags[tag[0]].astext.cast(String) == tag[1]))
 
-    current_app.logger.debug("Getting experiment status")
     query = session.query(JobStatus).filter(*criteria).order_by(JobStatus.uuid.desc()).paginate(page, per_page)
     items = query.items
     total = query.total
-    current_app.logger.debug("Getting simulations")
 
     # this will fetch the overall progress of the simulations(sub jobs) for the experiments
     subjob_status_query = session.query(JobStatus.parent_uuid, JobStatus.status,
