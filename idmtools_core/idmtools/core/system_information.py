@@ -33,7 +33,7 @@ class SystemInformation:
     system_architecture_details: str = platform.architecture()
     default_docket_socket_path: str = '/var/run/docker.sock'
     cwd: str = os.getcwd()
-    user_group_str: str = "1000:1000"
+    user_group_str: str = os.getenv("CURRENT_UID", "1000:1000")
     version: str = __version__
 
 
