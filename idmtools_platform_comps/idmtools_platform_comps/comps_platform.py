@@ -15,17 +15,16 @@ from idmtools.core import CacheEnabled, EntityContainer, ItemType
 from idmtools.core.experiment_factory import experiment_factory
 from idmtools.core.interfaces.ientity import IEntity, TEntityList
 from idmtools.entities import IPlatform
-from idmtools.entities.iexperiment import IExperiment, StandardExperiment
+from idmtools.entities.iexperiment import IExperiment, StandardExperiment, IGPUExperiment, IDockerExperiment, \
+    ILinuxExperiment
 from idmtools.entities.isimulation import ISimulation
 from idmtools.entities.suite import Suite
 from idmtools.utils.time import timestamp
 from idmtools_platform_comps.utils import convert_COMPS_status
-
-if typing.TYPE_CHECKING:
-    from typing import NoReturn, List, Dict
-    from idmtools.entities.suite import TSuite
-    from idmtools.entities.iexperiment import TExperiment
-    from idmtools.core.interfaces.iitem import TItemList
+from typing import NoReturn, List, Dict
+from idmtools.entities.suite import TSuite
+from idmtools.entities.iexperiment import TExperiment
+from idmtools.core.interfaces.iitem import TItemList
 
 logging.getLogger('COMPS.Data.Simulation').disabled = True
 logger = logging.getLogger(__name__)
@@ -44,6 +43,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     """
     Represents the platform allowing to run simulations on COMPS.
     """
+
     MAX_SUBDIRECTORY_LENGTH = 35  # avoid maxpath issues on COMPS
 
     endpoint: str = field(default="https://comps2.idmod.org")
@@ -108,7 +108,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         Enforce any COMPS-specific demands on experiment names.
         Args:
             experiment_name: name of the experiment
-        Returns: the experiment name allowed for use
+        Returns:the experiment name allowed for use
         """
         for c in ['/', '\\', ':']:
             experiment_name = experiment_name.replace(c, '_')
@@ -133,6 +133,9 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         return suite.uid
 
     def _create_experiment(self, experiment: 'TExperiment') -> 'UUID':
+
+        if not self.is_supported_experiment(experiment):
+            raise ValueError("The specified experiment is not supported on this platform")
         self._login()
 
         # Cleanup the name
@@ -231,11 +234,11 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                 suite = kwargs.get('suite')
             else:
                 suite = kwargs.get('suite') or self.get_item(platform_item.suite_id,
-                                                                       item_type=ItemType.SUITE)
+                                                             item_type=ItemType.SUITE)
 
             # Create an experiment
             obj = experiment_factory.create(platform_item.tags.get("type"), tags=platform_item.tags,
-                                                   name=platform_item.name, fallback=StandardExperiment)
+                                            name=platform_item.name, fallback=StandardExperiment)
 
             # Set parent
             obj.parent = suite
@@ -319,7 +322,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
             return
 
-        raise NotImplemented("comps_platform.refresh_status only implemented for Experiments")
+        raise NotImplementedError("comps_platform.refresh_status only implemented for Experiments")
 
     def _get_file_for_collection(self, collection_id: 'UUID', file_path: str) -> 'NoReturn':
         print(f"Cache miss for {collection_id} {file_path}")
@@ -366,3 +369,9 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                 ret[file_path] = self.cache.memoize()(self._get_file_for_collection)(collection_id, normalized_path)
 
         return ret
+
+    def supported_experiment_types(self) -> List[typing.Type]:
+        return [IExperiment]
+
+    def unsupported_experiment_types(self) -> List[typing.Type]:
+        return [IDockerExperiment, IGPUExperiment, ILinuxExperiment]

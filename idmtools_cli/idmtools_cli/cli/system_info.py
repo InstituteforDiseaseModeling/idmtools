@@ -24,9 +24,19 @@ def info():
 @click.option('--issue/--no-issue', default=False, help="Copy data and format for github alias")
 def system(copy_to_clipboard, no_format_for_gh, issue):
     system_info = get_system_information()
-    lines = ['System Information']
+    lines = [f'System Information\n{ "=" * 20}']
     ordered_fields = sorted(system_info.__dict__.keys())
     [lines.append(f'{k}: {system_info.__dict__[k]}') for k in ordered_fields]
+    try:
+        import docker
+        lines.append(f'\nDocker Information\n{ "=" * 20}')
+        client = docker.from_env()
+        lines.append(f'Version: {client.version()}')
+        docker_info = client.info()
+        ordered_fields = sorted(docker_info.keys())
+        [lines.append(f'{k}: {docker_info[k]}') for k in ordered_fields]
+    except ImportError:
+        pass
     if copy_to_clipboard:
         output = '\n'.join(lines)
         if not no_format_for_gh or issue:

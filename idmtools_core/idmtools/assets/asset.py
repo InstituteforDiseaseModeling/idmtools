@@ -4,7 +4,7 @@ from typing import TypeVar, Union, List, Callable, Any
 
 class Asset:
     """
-    A class representing an asset. An asset can either be related to a physical 
+    A class representing an asset. An asset can either be related to a physical
     asset present on the computer or directly specified by a filename and content.
     """
 
@@ -51,7 +51,7 @@ class Asset:
     @property
     def content(self):
         """
-        Returns: 
+        Returns:
             The content of the file, either from the content attribute or by opening the absolute path.
         """
         if not self._content:

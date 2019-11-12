@@ -32,5 +32,6 @@ RUN apt-get update \
 
 COPY docker_scripts/user_conf.sh /etc/cont-init.d/01-user_conf.sh
 ADD package.json yarn.lock /app/
-
-ENTRYPOINT ["/init"]
+ADD docker_scripts/user_init.sh /
+RUN chmod +x /user_init.sh
+ENTRYPOINT ["/user_init.sh"]

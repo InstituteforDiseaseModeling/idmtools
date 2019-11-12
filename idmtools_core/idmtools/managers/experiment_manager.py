@@ -1,10 +1,8 @@
 import typing
 from logging import getLogger, DEBUG
-
 from idmtools.core import EntityStatus
 from idmtools.entities.iplatform import TPlatform
 from idmtools.services.experiments import ExperimentPersistService
-from idmtools.services.platforms import PlatformPersistService
 from idmtools.utils.entities import retrieve_experiment
 
 if typing.TYPE_CHECKING:

@@ -1,7 +1,8 @@
 """
 This module contains all the default filters for the assets.
 
-A filter function needs to take only one argument: an asset. It returns True/False indicating whether to add or filter out the asset.
+A filter function needs to take only one argument: an asset. It returns True/False indicating whether to add or filter
+out the asset.
 
 You can notice functions taking more than only an asset.
 To use those functions, use must create a partial before adding it to a filters list.
@@ -21,7 +22,7 @@ if typing.TYPE_CHECKING:
 def default_asset_file_filter(asset: 'TAsset') -> 'bool':
     """
     Default filter to leave out Python caching.
-    This filter is used in the creation of 
+    This filter is used in the creation of
     :class:`~idmtools.assets.asset_collection.AssetCollection`, regardless of user filters.
     """
     patterns = [
@@ -33,7 +34,7 @@ def default_asset_file_filter(asset: 'TAsset') -> 'bool':
 
 def file_name_is(asset: 'TAsset', filenames: 'List[str]') -> 'bool':
     """
-    Restrict filtering to assets with the indicated filenames. 
+    Restrict filtering to assets with the indicated filenames.
 
     Args:
         asset: The asset to filter.
@@ -44,7 +45,7 @@ def file_name_is(asset: 'TAsset', filenames: 'List[str]') -> 'bool':
 
 def asset_in_directory(asset: 'TAsset', directories: 'List[str]') -> 'bool':
     """
-    Restrict filtering to assets within a given directory. 
+    Restrict filtering to assets within a given directory.
     This filter is not strict and simply checks if the directory portion is present in the assets absolute path.
 
     Args:

@@ -1,7 +1,5 @@
 import os
 import sys
-import uuid
-
 import pytest
 import json
 from functools import partial
@@ -13,9 +11,9 @@ from idmtools.managers import ExperimentManager
 from idmtools_model_emod.defaults import EMODSir
 from idmtools_model_emod.emod_experiment import EMODExperiment
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools.analysis.AnalyzeManager import AnalyzeManager
-from idmtools.analysis.AddAnalyzer import AddAnalyzer
-from idmtools.analysis.DownloadAnalyzer import DownloadAnalyzer
+from idmtools.analysis.analyze_manager import AnalyzeManager
+from idmtools.analysis.add_analyzer import AddAnalyzer
+from idmtools.analysis.download_analyzer import DownloadAnalyzer
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import del_file, del_folder, load_csv_file
 
@@ -33,6 +31,7 @@ setD = partial(param_update, param="d")
 
 
 @pytest.mark.comps
+@pytest.mark.analysis
 class TestAnalyzeManagerEmodComps(ITestWithPersistence):
 
     def setUp(self) -> None:
@@ -65,6 +64,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         # Uncomment out if you do not want to regenerate exp and sims
         # self.exp_id = '9eacbb9a-5ecf-e911-a2bb-f0921c167866' #comps2 staging
 
+    @pytest.mark.long
     def test_AddAnalyzer(self):
 
         self.create_experiment()
@@ -75,6 +75,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         am = AnalyzeManager(platform=self.p, ids=[(self.exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
 
+    @pytest.mark.long
     def test_DownloadAnalyzer(self):
         # delete output from previous run
         del_folder("output")
@@ -110,6 +111,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         am = AnalyzeManager(platform=self.p, ids=exp_list, analyzers=analyzers)
         am.analyze()
 
+    @pytest.mark.long
     def test_population_analyzer(self):
         analyzer_path = os.path.join(os.path.dirname(__file__), "inputs", "analyzers")
         del_file(os.path.join(analyzer_path, 'population.csv'))
@@ -152,6 +154,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
             sim_count = sim_count + 1
         self.assertSetEqual(set(actual_sim_ids_in_comps), set(expected_sim_ids))
 
+    @pytest.mark.long
     def test_timeseries_analyzer_with_filter(self):
         analyzer_path = os.path.join(os.path.dirname(__file__), "inputs", "analyzers")
         del_file(os.path.join(analyzer_path, 'timeseries.csv'))

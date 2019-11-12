@@ -1,5 +1,8 @@
 import os
 import unittest
+
+import pytest
+
 from idmtools.core.platform_factory import Platform
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
@@ -32,6 +35,8 @@ class TestExperimentSimulations(ITestWithPersistence):
     def tearDown(self):
         super().tearDown()
 
+    @pytest.mark.emod
+    @pytest.mark.comps
     def test_input_simulations(self):
         # Create an experiment
         exp = EMODExperiment.from_default(self.case_name, default=EMODSir, eradication_path=DEFAULT_ERADICATION_PATH)
@@ -65,12 +70,15 @@ class TestExperimentSimulations(ITestWithPersistence):
 
         self.assertEqual(len(sims), num_sims + 2)
 
+    @pytest.mark.emod
     def test_simulation_experiment(self):
         exp = EMODExperiment()
         sim = exp.simulation()
 
         self.assertEqual(sim.experiment, exp)
 
+    @pytest.mark.comps
+    @pytest.mark.suite
     def test_create_suite(self):
         from idmtools.entities.suite import Suite
         from COMPS.Data import Suite as CompsSuite
@@ -86,6 +94,10 @@ class TestExperimentSimulations(ITestWithPersistence):
         comps_suite = platform.get_platform_item(item_id=suite_uid, item_type=ItemType.SUITE)
         self.assertTrue(isinstance(comps_suite, CompsSuite))
 
+    @pytest.mark.comps
+    @pytest.mark.emod
+    @pytest.mark.suite
+    @pytest.mark.long
     def test_link_experiment_suite(self):
         from idmtools.entities.suite import Suite
         from COMPS.Data import Suite as CompsSuite
@@ -152,6 +164,10 @@ class TestExperimentSimulations(ITestWithPersistence):
         self.assertTrue(isinstance(sim, EMODSimulation))
         self.assertIsNotNone(sim.parent)
 
+    @pytest.mark.comps
+    @pytest.mark.emod
+    @pytest.mark.suite
+    @pytest.mark.long
     def test_suite_experiment(self):
         from idmtools.entities.suite import Suite
         from COMPS.Data import Suite as CompsSuite

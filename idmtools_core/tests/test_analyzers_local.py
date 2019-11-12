@@ -1,7 +1,8 @@
 import os
 import time
+
 import pytest
-from idmtools.analysis.AnalyzeManager import AnalyzeManager
+from idmtools.analysis.analyze_manager import AnalyzeManager
 from idmtools.builders import ExperimentBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
@@ -9,6 +10,7 @@ from idmtools.entities import IAnalyzer
 from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
 from idmtools_test import COMMON_INPUT_PATH
+from idmtools_test.utils.decorators import restart_local_platform
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
@@ -38,16 +40,17 @@ class AddAnalyzer(IAnalyzer):
         return value
 
 
+@pytest.mark.analysis
+@pytest.mark.docker
 class TestAnalyzeManager(ITestWithPersistence):
 
-    def setUp(self) -> None:
-        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
-        from idmtools_platform_local.docker.docker_operations import DockerOperations
-        do = DockerOperations()
-        do.cleanup()
-        self.platform = Platform('Local')
+    @classmethod
+    @restart_local_platform(silent=True, stop_before=True, stop_after=False)
+    def setUpClass(cls) -> None:
+        cls.platform = Platform('Local')
 
-        pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
+        pe = PythonExperiment(name=os.path.basename(__file__) + "--" + cls.__name__,
+                              model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
 
         def param_a_update(simulation, value):
@@ -58,16 +61,20 @@ class TestAnalyzeManager(ITestWithPersistence):
         # Sweep parameter "a"
         builder.add_sweep_definition(param_a_update, range(0, 5))
         pe.builder = builder
-        em = ExperimentManager(experiment=pe, platform=self.platform)
+        em = ExperimentManager(experiment=pe, platform=cls.platform)
         em.run()
+        print('Waiting on experiment to finish')
         em.wait_till_done()
-        # TODO fix timing on local platform
-        time.sleep(4)
+        time.sleep(2)
+        print('experiment done')
 
-        self.exp_id = pe.uid
+        cls.exp_id = pe.uid
 
-    @pytest.mark.docker
+    @pytest.mark.timeout(60)
+    @pytest.mark.long
+    @restart_local_platform(silent=True, stop_before=False, stop_after=True)
     def test_AddAnalyzer(self):
+        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         analyzers = [AddAnalyzer()]
 
         am = AnalyzeManager(configuration={}, platform=self.platform,

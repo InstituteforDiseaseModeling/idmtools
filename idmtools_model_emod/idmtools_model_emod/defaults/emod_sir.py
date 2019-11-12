@@ -55,6 +55,7 @@ class EMODSir(IEMODDefault):
             "Enable_Spatial_Output": 0,
             "Enable_Strain_Tracking": 0,
             "Enable_Superinfection": 0,
+            "Enable_Susceptibility_Scaling": 0,
             "Enable_Termination_On_Zero_Total_Infectivity": 0,
             "Enable_Vital_Dynamics": 0,
             "Geography": "SamplesInput",

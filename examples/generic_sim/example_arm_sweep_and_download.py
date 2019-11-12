@@ -62,8 +62,8 @@ if __name__ == "__main__":
     # Download analysis
     ###
 
-    from idmtools.analysis.AnalyzeManager import AnalyzeManager
-    from idmtools.analysis.DownloadAnalyzer import DownloadAnalyzer
+    from idmtools.analysis.analyze_manager import AnalyzeManager
+    from idmtools.analysis.download_analyzer import DownloadAnalyzer
 
     filenames = ['output\\InsetChart.json']
     analyzers = [DownloadAnalyzer(filenames=filenames, output_path='download-e2eB')]

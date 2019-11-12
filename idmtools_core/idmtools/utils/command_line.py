@@ -14,8 +14,8 @@ def suppress_output(stdout=True, stderr=True):
     Suppress any print/logging from a block of code.
 
     Args:
-        stdout: If True, hide output from stdout; if False, show it. 
-        stderr: If True, hide output from stderr; if False, show it. 
+        stdout: If True, hide output from stdout; if False, show it.
+        stderr: If True, hide output from stderr; if False, show it.
     """
     # Remember existing output streams for restoration
     original_stdout = sys.stdout

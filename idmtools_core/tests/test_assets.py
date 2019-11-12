@@ -3,6 +3,8 @@ import os
 import unittest
 from functools import partial
 
+import pytest
+
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core import FilterMode
 from idmtools.assets.errors import DuplicatedAssetError
@@ -10,6 +12,7 @@ from idmtools.utils.filters.asset_filters import asset_in_directory, file_name_i
 from idmtools_test import COMMON_INPUT_PATH
 
 
+@pytest.mark.assets
 class TestAssets(unittest.TestCase):
 
     def setUp(self) -> None:

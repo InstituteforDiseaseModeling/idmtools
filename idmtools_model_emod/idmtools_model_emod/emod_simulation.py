@@ -42,7 +42,7 @@ class EMODSimulation(ISimulation):
             name: The name of the parameter.
             default: Optional, the default value.
 
-        Returns: 
+        Returns:
             The value of the parameter.
         """
         return self.config.get(name, default)
@@ -54,7 +54,7 @@ class EMODSimulation(ISimulation):
         Args:
             params: A dictionary with new values.
 
-        Returns: 
+        Returns:
             None
         """
         self.config.update(params)

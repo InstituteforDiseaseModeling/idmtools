@@ -70,8 +70,8 @@ class SingletonDecorator:
 
 class LoadOnCallSingletonDecorator:
     """
-    Additional class decorator that creates a singleton instance only when a method or attribute is accessed. 
-    This is useful for expensive tasks like loading plugin factories that should only be executed when finally 
+    Additional class decorator that creates a singleton instance only when a method or attribute is accessed.
+    This is useful for expensive tasks like loading plugin factories that should only be executed when finally
     needed and not on declaration.
 
     Examples:
@@ -159,6 +159,7 @@ def optional_yaspin_load(*yargs, **ykwargs) -> Callable:
             if spinner and not os.getenv('NO_SPINNER', False):
                 spinner.start()
             try:
+                kwargs['spinner'] = spinner
                 result = func(*args, **kwargs)
             except Exception as e:
                 if spinner:
