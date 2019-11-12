@@ -99,7 +99,7 @@ docker-local-no-cache:## Build our docker image using the local pypi
 
 docker-staging: ## Build our docker image using staging pypi
 	$(PDR) -w '../dev_scripts/local_pypi' -ex 'docker-compose up -d'
-	@pymake build-ui
+	# rebuild local package at moment since we install local platform package from there
 	docker-compose build --build-arg PYPIURL=$(STAGING_PIP_URL) workers
 
 docker-release-staging:

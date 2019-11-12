@@ -85,6 +85,7 @@ class TestPlatform(IPlatform):
             obj = self.experiments.get(item_id)
 
         if not obj:
+            logger.warning(f"Could not find object with id: {item_id}")
             return
 
         obj.platform = self
