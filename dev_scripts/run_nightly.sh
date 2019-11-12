@@ -21,17 +21,8 @@ sed -i "s|<username>|${bamboo_UserArtifactory}|" ~/.pypirc
 # presence and then use an appriote sed expression
 if [[ "$bamboo_PasswordArtifactory" == *"|"* ]]; then
   sed -i "s/<password>/${bamboo_PasswordArtifactory@Q}/" ~/.pypirc
-elif [[ "$bamboo_PasswordArtifactory" == *"/"* ]]; then
-  sed -i "s|<password>|${bamboo_PasswordArtifactory@Q}|" ~/.pypirc
-elif [[ "$bamboo_PasswordArtifactory" == *"#"* ]]; then
-  sed -i "s#<password>#${bamboo_PasswordArtifactory@Q}#" ~/.pypirc
-elif [[ "$bamboo_PasswordArtifactory" == *"^"* ]]; then
-  sed -i "s^<password>^${bamboo_PasswordArtifactory@Q}^" ~/.pypirc
-elif [[ "$bamboo_PasswordArtifactory" == *"@"* ]]; then
-  sed -i "s@<password>@${bamboo_PasswordArtifactory@Q}@" ~/.pypirc
 else
-  echo "Could not find an appropriate expression to use for sed. Please add expression to setup_env.sh"
-  exit -1
+  sed -i "s|<password>|${bamboo_PasswordArtifactory@Q}|" ~/.pypirc
 fi
 
 echo "Login to docker"
