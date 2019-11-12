@@ -121,6 +121,6 @@ class Simulations(Resource):
             s.begin()
             s.add(current_job)
             s.commit()
-            return current_job.to_dict()
+            return True
         else:
             abort(400, message='Currently the only allowed simulation update is canceling a simulation')
