@@ -28,6 +28,7 @@ fi
 echo "Login to docker"
 docker login idm-docker-staging.packages.idmod.org -u "${bamboo_UserArtifactory@Q}" -p "${bamboo_PasswordArtifactory@Q}"
 
+export STAGING_PIP_URL=https://$(urlencode ${bamboo_UserArtifactory@Q}):$(urlencode ${bamboo_PasswordArtifactory@Q})@packages.idmod.org/api/pypi/idm-pypi-staging/simple
 echo "Release to staging"
 pymake release-staging
 

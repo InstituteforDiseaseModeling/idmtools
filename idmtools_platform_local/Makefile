@@ -1,8 +1,8 @@
 .PHONY: clean lint test coverage release-local dist release-staging release-staging-release-commit release-staging-minor
 IPY=python -c
 BASE_PIP_URL="packages.idmod.org/api/pypi/idm-pypi-"
-STAGING_PIP_URL?="https://$(BASE_PIP_URL)staging/"
-PRODUCTION_PIP_URL?="https://$(BASE_PIP_URL)production/"
+STAGING_PIP_URL?="https://$(BASE_PIP_URL)staging/simple"
+PRODUCTION_PIP_URL?="https://$(BASE_PIP_URL)production/simple"
 PACKAGE_NAME=idmtools_platform_local
 PY?=python
 PDS=$(PY) ../dev_scripts/
