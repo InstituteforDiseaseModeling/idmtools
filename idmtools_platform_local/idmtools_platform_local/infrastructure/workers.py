@@ -43,7 +43,7 @@ class WorkersContainer(BaseServiceContainer):
     run_as: str = None
     image: str = get_worker_image_default()
     container_name: str = 'idmtools_workers'
-    data_volume_name: str = os.getenv("IDMTOOLS_REDIS_DATA_MOUNT_BY_VOLUMENAME", None)
+    data_volume_name: str = os.getenv("IDMTOOLS_WORKERS_DATA_MOUNT_BY_VOLUMENAME", None)
     config_prefix: str = 'workers_'
 
     def get_configuration(self) -> Dict:

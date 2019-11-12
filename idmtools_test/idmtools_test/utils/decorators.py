@@ -91,7 +91,7 @@ def restart_local_platform(silent=True, stop_before=True, stop_after=True, dump_
                         print(info)
                     except:
                         pass
-                if stop_after:
+                if stop_after and os.getenv('NO_TEST_WORKER_CLEANUP', '0') not in 1:
                     sm.cleanup(tear_down_brokers=True, delete_data=True)
                     do.cleanup(True)
             return result

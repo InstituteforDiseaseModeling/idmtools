@@ -23,7 +23,7 @@ if os.name != "nt":
     ui_requirements.append('uwsgi==2.0.18')
 
 setup_requirements = []
-test_requirements = ['pytest', 'pytest-runner', 'pytest-timeout']
+test_requirements = ['pytest', 'pytest-runner', 'pytest-timeout', 'pytest-cache']
 
 extras = dict(test=test_requirements, dev=['Pympler'],
               # Requirements for running workers server

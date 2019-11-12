@@ -1,6 +1,9 @@
 #!/bin/bash
 source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
 export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python2.7
+# stop any existing setup as it nneds to be redone from within container
+docker stop idmtools_workers idmtools_redis idmtools_postgres || true
+docker rm idmtools_workers idmtools_redis idmtools_postgres || true
 # setup our idmtools virtualenv
 mkvirtualenv -p /usr/local/bin/python3.7 idmtools
 pip install py-make

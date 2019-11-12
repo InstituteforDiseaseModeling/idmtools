@@ -1,8 +1,8 @@
 .PHONY: clean lint test coverage release-local dist release-staging release-staging-release-commit release-staging-minor
 IPY=python -c
 BASE_PIP_URL="packages.idmod.org/api/pypi/idm-pypi-"
-STAGING_PIP_URL?="$(BASE_PIP_URL)staging/"
-PRODUCTION_PIP_URL?="$(BASE_PIP_URL)production/"
+STAGING_PIP_URL?="https://$(BASE_PIP_URL)staging/"
+PRODUCTION_PIP_URL?="https://$(BASE_PIP_URL)production/"
 PACKAGE_NAME=idmtools_platform_local
 PY?=python
 PDS=$(PY) ../dev_scripts/
@@ -107,7 +107,6 @@ docker-release-staging:
 # Release related rules
 
 release-local: ## package and upload a release to http://localhost:7171
-	@pymake build-ui
 	@pymake dist
 	twine upload --verbose --repository-url http://localhost:7171 -u admin -p admin dist/*
 
@@ -117,7 +116,6 @@ dist: ## build our package
 
 release-staging: ## perform a release to staging
 	bump2version build --allow-dirty
-	@pymake build-ui
 	@pymake dist
 	twine upload --verbose --repository-url $(STAGING_PIP_URL) dist/*
 	@make docker-release-staging
