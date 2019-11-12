@@ -9,9 +9,10 @@ from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_model_emod import EMODExperiment
+from idmtools.analysis.analyze_manager import AnalyzeManager
+from idmtools.analysis.download_analyzer import DownloadAnalyzer
 from idmtools_model_emod.generic.serialization import load_serialized_population, add_serialization_timesteps
-from idmtools.analysis.AnalyzeManager import AnalyzeManager
-from idmtools.analysis.DownloadAnalyzer import DownloadAnalyzer
+
 from globals import *
 
 EXPERIMENT_NAME = 'Generic serialization 02 read files'

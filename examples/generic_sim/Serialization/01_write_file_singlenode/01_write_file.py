@@ -7,8 +7,8 @@ from idmtools.managers import ExperimentManager
 from idmtools_model_emod import EMODExperiment
 from idmtools_model_emod.defaults import EMODSir
 from idmtools_model_emod.generic.serialization import add_serialization_timesteps
-from idmtools.analysis.AnalyzeManager import AnalyzeManager
-from idmtools.analysis.DownloadAnalyzer import DownloadAnalyzer
+from idmtools.analysis.analyze_manager import AnalyzeManager
+from idmtools.analysis.download_analyzer import DownloadAnalyzer
 from globals import *
 
 EXPERIMENT_NAME = 'Generic serialization 01 writes files'
