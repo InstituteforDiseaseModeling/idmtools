@@ -3,6 +3,7 @@ import os
 from typing import Optional, List, Tuple, Dict
 
 import backoff
+import docker
 from flask import request, current_app
 from flask_restful import Resource, reqparse, abort
 from sqlalchemy import String
@@ -98,12 +99,21 @@ class Simulations(Resource):
             current_job: JobStatus = s.query(JobStatus).filter(JobStatus.uuid == id).first()
             # check if we have a PID, if so kill it
             current_app.logger.info(f"Getting metadata for {id}")
-            if current_job.metadata is not None and 'pid' in current_job.metadata:
-                try:
-                    current_app.logger.info(f"Killing metadata for {current_job.metadata['pid']}")
-                    os.killpg(current_job.metadata['pid'], 9)
-                except Exception as e:
-                    logger.exception(e)
+            if current_job.metadata is not None:
+                if 'pid' in current_job.metadata:
+                    try:
+                        current_app.logger.info(f"Killing process for {current_job.metadata['pid']} for {id}")
+                        os.killpg(current_job.metadata['pid'], 9)
+                    except Exception as e:
+                        logger.exception(e)
+                elif 'container_id' in current_job.metadata:
+                    current_app.logger.info(f"Killing container {current_job.metadata['container_id']} for {id}")
+                    try:
+                        client = docker.from_env()
+                        con = client.containers.get(current_job.metadata['container_id'])
+                        con.stop()
+                    except Exception as e:
+                        logger.exception(e)
             current_job.__dict__.update(data)
             s.add(current_job)
         else:
