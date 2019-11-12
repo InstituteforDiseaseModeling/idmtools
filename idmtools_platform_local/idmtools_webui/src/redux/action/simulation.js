@@ -24,7 +24,7 @@ export function loading(loading) {
 export function fetchSimulations() { 
 
   
-    let url = "/api/simulations";
+    let url = "/api/simulations?per_page=9999";
 
     
     
