@@ -6,6 +6,7 @@ class EntityStatus(Enum):
     RUNNING = 'running'
     SUCCEEDED = 'succeeded'
     FAILED = 'failed'
+    CANCELED = 'canceled'
 
 
 class FilterMode(Enum):
