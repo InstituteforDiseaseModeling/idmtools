@@ -32,7 +32,7 @@ test-all: ## Run all our tests
 	$(FULL_TEST_CMD)' -rt 0
 
 test-failed: ## Run only previously failed tests
-	$(FULL_TEST_CMD)' --lf
+	$(FULL_TEST_CMD) --lf'
 
 test-long: ## Run any tests that takes more than 30s
 	$(FULL_TEST_CMD) -m "long"'
