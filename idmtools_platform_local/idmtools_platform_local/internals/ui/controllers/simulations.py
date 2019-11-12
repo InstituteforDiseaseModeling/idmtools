@@ -1,4 +1,5 @@
 import logging
+import signal
 import os
 from typing import Optional, List, Tuple, Dict
 
@@ -103,7 +104,7 @@ class Simulations(Resource):
                 if 'pid' in current_job.metadata:
                     try:
                         current_app.logger.info(f"Killing process for {current_job.metadata['pid']} for {id}")
-                        os.killpg(current_job.metadata['pid'], 9)
+                        os.kill(current_job.metadata['pid'], signal.SIGTERM)
                     except Exception as e:
                         current_app.logger.error('Could not kill procress')
                         current_app.logger.exception(e)
