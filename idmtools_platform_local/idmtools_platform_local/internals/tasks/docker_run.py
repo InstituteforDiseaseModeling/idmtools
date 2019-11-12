@@ -30,7 +30,9 @@ class DockerBaseTask(BaseTask):
         container_config['auto_remove'] = True
         # we have to mount using the host data path
         data_dir = get_host_data_bind()
-        data_dir += "\\" if "\\" in data_dir else "/"
+        # when using data volumes, we don't usually have to pass this value
+        if os.getenv('IDMTOOLS_WORKERS_DATA_MOUNT_BY_VOLUMENAME', None) is None:
+            data_dir += "\\" if "\\" in data_dir else "/"
         container_config['volumes'] = {
             data_dir: dict(bind='/data', mode='rw'),
         }

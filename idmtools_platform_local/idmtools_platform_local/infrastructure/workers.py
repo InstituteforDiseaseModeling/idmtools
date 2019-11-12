@@ -72,6 +72,9 @@ class WorkersContainer(BaseServiceContainer):
         if platform.system() in ["Linux", "Darwin"]:
             environment.append(f'CURRENT_UID={self.run_as}')
 
+        if self.data_volume_name:
+            environment.append(f'IDMTOOLS_WORKERS_DATA_MOUNT_BY_VOLUMENAME=self.data_volume_name')
+
         port_bindings = self._get_optional_port_bindings(self.ui_port, 5000)
         container_config = self.get_common_config(container_name=self.container_name, image=self.image,
                                                   port_bindings=port_bindings, network=self.network,
