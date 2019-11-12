@@ -49,13 +49,7 @@ class DockerBaseTask(BaseTask):
             return current_job.status
 
         result = self.run_container(command, container_config, current_job, simulation_path, simulation_uuid)
-        # check if we succeeded
-        if result:
-            logger.info(result['StatusCode'])
-            return_code = result['StatusCode']
-        else:
-            return_code = -999
-        status = self.extract_status(experiment_uuid, return_code, simulation_uuid)
+        status = self.extract_status(experiment_uuid, result, simulation_uuid)
         # Update task with the final status
         create_or_update_status(simulation_uuid, status=status, extra_details=current_job.extra_details)
         return status
@@ -64,29 +58,35 @@ class DockerBaseTask(BaseTask):
         import docker
         from idmtools_platform_local.internals.workers.utils import create_or_update_status
         result = None
+
         with open(os.path.join(simulation_path, "StdOut.txt"), "w") as out, \
                 open(os.path.join(simulation_path, "StdErr.txt"), "w") as err:  # noqa: F841
-            try:
-                client = docker.DockerClient(base_url='unix://var/run/docker.sock')
-                dcmd = f'docker run -v {get_host_data_bind()}:/data --user \"{os.getenv("CURRENT_UID")}\" ' \
-                    f'-w {container_config["working_dir"]} {container_config["image"]} {command}'
-                logger.info(f"Running docker command: {dcmd}")
-                logger.info(f"Running {command} with docker config {str(container_config)}")
-                out.write(f"{command}\n")
+            retries = 0
+            while retries < 3:
+                try:
 
-                container = client.containers.run(command=command, **container_config)
-                log_reader = container.logs(stream=True)
+                    client = docker.DockerClient(base_url='unix://var/run/docker.sock')
+                    dcmd = f'docker run -v {get_host_data_bind()}:/data --user \"{os.getenv("CURRENT_UID")}\" ' \
+                        f'-w {container_config["working_dir"]} {container_config["image"]} {command}'
+                    logger.info(f"Running docker command: {dcmd}")
+                    logger.info(f"Running {command} with docker config {str(container_config)}")
+                    out.write(f"{command}\n")
 
-                current_job.extra_details['container_id'] = container.id
-                # Log that we have started this particular simulation
-                create_or_update_status(simulation_uuid, status=Status.in_progress, extra_details=current_job.extra_details)
-                for output in log_reader:
-                    out.write(output.decode("utf-8"))
-                result = container.wait()
-            except Exception as e:
-                err.write(str(e))
-                raise e
-        return result
+                    container = client.containers.run(command=command, **container_config)
+                    log_reader = container.logs(stream=True)
+
+                    current_job.extra_details['container_id'] = container.id
+                    # Log that we have started this particular simulation
+                    create_or_update_status(simulation_uuid, status=Status.in_progress, extra_details=current_job.extra_details)
+                    for output in log_reader:
+                        out.write(output.decode("utf-8"))
+                    result = container.wait()
+                    return result['StatusCode']
+                except Exception as e:
+                    logger.exception(e)
+                    err.write(str(e))
+                    retries += 1
+            return -1
 
 
 class DockerRunTask(GenericActor, DockerBaseTask):
