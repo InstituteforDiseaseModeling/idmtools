@@ -105,7 +105,8 @@ class Simulations(Resource):
                         current_app.logger.info(f"Killing process for {current_job.metadata['pid']} for {id}")
                         os.killpg(current_job.metadata['pid'], 9)
                     except Exception as e:
-                        logger.exception(e)
+                        current_app.logger.error('Could not kill procress')
+                        current_app.logger.exception(e)
                 elif 'container_id' in current_job.metadata:
                     current_app.logger.info(f"Killing container {current_job.metadata['container_id']} for {id}")
                     try:
@@ -113,7 +114,8 @@ class Simulations(Resource):
                         con = client.containers.get(current_job.metadata['container_id'])
                         con.stop()
                     except Exception as e:
-                        logger.exception(e)
+                        current_app.logger.error('Could not kill container')
+                        current_app.logger.exception(e)
             current_job.__dict__.update(data)
             s.add(current_job)
         else:
