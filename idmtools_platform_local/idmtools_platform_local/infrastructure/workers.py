@@ -43,6 +43,7 @@ class WorkersContainer(BaseServiceContainer):
     mem_limit: str = '16g'
     mem_reservation: str = '64m'
     run_as: str = None
+    debug_api: bool = True
     image: str = get_worker_image_default()
     container_name: str = 'idmtools_workers'
     data_volume_name: str = os.getenv("IDMTOOLS_WORKERS_DATA_MOUNT_BY_VOLUMENAME", None)
@@ -78,6 +79,9 @@ class WorkersContainer(BaseServiceContainer):
 
         if platform.system() in ["Linux", "Darwin"]:
             environment.append(f'CURRENT_UID={self.run_as}')
+
+        if self.debug_api:
+            environment.append('API_LOGGING=1')
 
         if self.data_volume_name:
             environment.append(f'IDMTOOLS_WORKERS_DATA_MOUNT_BY_VOLUMENAME=self.data_volume_name')

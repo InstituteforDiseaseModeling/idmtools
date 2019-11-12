@@ -1,3 +1,4 @@
+import logging
 import os
 from sqlite3 import OperationalError
 import backoff
@@ -10,6 +11,8 @@ from idmtools_platform_local.internals.ui.utils import DateTimeEncoder
 
 static_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'static')
 application = Flask(__name__, static_url_path="")
+if os.getenv('API_LOGGING', '0').lower() in ['1', 't', 'y', 'true', 'yes', 'on', 'debug']:
+    application.logger.setLevel(logging.DEBUG)
 application.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS', '1') == '1'
 application.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI',
                                                           "postgresql+psycopg2://idmtools:idmtools@postgres/idmtools")
