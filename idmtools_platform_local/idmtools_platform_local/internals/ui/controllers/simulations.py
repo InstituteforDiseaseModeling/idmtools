@@ -95,7 +95,7 @@ class Simulations(Resource):
         # at moment, only allow status to be updated(ie canceled'
         # later, we may support resuming but we will need to include more data in the db to do this
         data = {k: v for k, v in data.items() if k == 'status' and v in ['canceled']}
-        if len(data) > 0:
+        if 'status' in data:
             s = db.session
             current_job: JobStatus = s.query(JobStatus).filter(JobStatus.uuid == id).first()
             # check if we have a PID, if so kill it
@@ -119,5 +119,6 @@ class Simulations(Resource):
                         current_app.logger.exception(e)
             current_job.__dict__.update(data)
             s.add(current_job)
+            return current_job.to_dict()
         else:
             abort(400, message='Currently the only allowed simulation update is canceling a simulation')
