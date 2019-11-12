@@ -12,7 +12,7 @@ DEFAULT_DEMOGRAPHICS_JSON = os.path.join(COMMON_INPUT_PATH, "files", "demographi
 DEFAULT_ERADICATION_PATH = os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe")
 
 
-class TestCustomFiles(ITestWithPersistence):
+class TestLoadFiles(ITestWithPersistence):
 
     def setUp(self):
         super().setUp()

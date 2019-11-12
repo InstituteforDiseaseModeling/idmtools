@@ -63,7 +63,7 @@ class TestEntity(ITestWithPersistence):
         s = Suite(name="test")
         self.assertSetEqual(s.pickle_ignore_fields, set(f.name for f in fields(s) if "pickle_ignore" in f.metadata and f.metadata["pickle_ignore"]))
         b = pickle.loads(pickle.dumps(s))
-        self.assertEqual(b.experiments, [])
+        self.assertIsNone(b.experiments)
 
         a = EntityWithIgnoreField(ignore=10, ignore_with_restore=5)
         self.assertEqual(a.ignore, 10)

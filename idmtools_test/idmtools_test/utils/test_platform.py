@@ -1,4 +1,5 @@
 import os
+import typing
 from dataclasses import dataclass, field
 from logging import getLogger
 from typing import Dict, List, Type
@@ -10,7 +11,8 @@ import numpy as np
 from idmtools.core import EntityStatus, ItemType
 from idmtools.core.interfaces.iitem import TItem
 from idmtools.entities import IPlatform
-from idmtools.entities.iexperiment import TExperiment
+from idmtools.entities.iexperiment import TExperiment, IExperiment, ILinuxExperiment, IWindowsExperiment, \
+    IGPUExperiment, IDockerExperiment
 from idmtools.entities.isimulation import TSimulation
 from idmtools.registry.platform_specification import example_configuration_impl, get_platform_impl, \
     get_platform_type_impl, PlatformSpecification
@@ -21,11 +23,20 @@ data_path = os.path.abspath(os.path.join(current_directory, "..", "data"))
 
 logger = getLogger(__name__)
 
+
 @dataclass(repr=False)
 class TestPlatform(IPlatform):
     """
     Test platform simulating a working platform to use in the test suites.
     """
+
+    def supported_experiment_types(self) -> List[typing.Type]:
+        os_ex = IWindowsExperiment if os.name == "nt" else ILinuxExperiment
+        return [IExperiment, os_ex]
+
+    def unsupported_experiment_types(self) -> List[typing.Type]:
+        os_ex = IWindowsExperiment if os.name != "nt" else ILinuxExperiment
+        return [IGPUExperiment, IDockerExperiment, os_ex]
 
     __test__ = False  # Hide from test discovery
 
@@ -53,7 +64,7 @@ class TestPlatform(IPlatform):
     def post_setstate(self):
         self.initialize_test_cache()
 
-    def _create_batch(self, batch: 'TEntityList', item_type: 'ItemType') -> 'List[UUID]':
+    def _create_batch(self, batch: 'TEntityList', item_type: 'ItemType') -> 'List[UUID]':  # noqa: F821
         if item_type == ItemType.SIMULATION:
             return self._create_simulations(simulation_batch=batch)
 
@@ -68,7 +79,8 @@ class TestPlatform(IPlatform):
                     if sim.uid == item_id:
                         obj = sim
                         break
-                if obj: break
+                if obj:
+                    break
         elif item_type == ItemType.EXPERIMENT:
             obj = self.experiments.get(item_id)
 
@@ -87,6 +99,8 @@ class TestPlatform(IPlatform):
             return self.experiments.get(platform_item.parent_id)
 
     def _create_experiment(self, experiment: 'TExperiment') -> UUID:
+        if not self.is_supported_experiment(experiment):
+            raise ValueError("The specified experiment is not supported on this platform")
         uid = uuid4()
         experiment.uid = uid
         self.experiments.set(uid, experiment)
@@ -129,7 +143,8 @@ class TestPlatform(IPlatform):
             simulation.status = status
             self.simulations.set(experiment_uid, simulations)
             number -= 1
-            if number <= 0: return
+            if number <= 0:
+                return
 
     def run_simulations(self, experiment: TExperiment) -> None:
         from idmtools.core import EntityStatus

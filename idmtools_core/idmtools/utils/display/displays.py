@@ -32,7 +32,7 @@ class IDisplaySetting(metaclass=ABCMeta):
         Args:
             obj: The object to consider for display.
 
-        Returns: 
+        Returns:
             A string representing what to show.
         """
         pass

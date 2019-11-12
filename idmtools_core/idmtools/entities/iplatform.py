@@ -8,12 +8,13 @@ from logging import getLogger
 from idmtools.core.interfaces.ientity import IEntity, TEntityList, TEntity
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.core import CacheEnabled, ItemType, UnknownItemException
+from idmtools.entities import IExperiment
+from idmtools.entities.iexperiment import IDockerExperiment, IGPUExperiment
 from idmtools.services.platforms import PlatformPersistService
+from idmtools.core.interfaces.iitem import TItem, TItemList
+from typing import Dict, List, NoReturn, Set, Any
+from uuid import UUID
 
-if typing.TYPE_CHECKING:
-    from idmtools.core.interfaces.iitem import TItem, TItemList
-    from typing import Dict, List, NoReturn, Set, Any
-    from uuid import UUID
 
 logger = getLogger(__name__)
 
@@ -42,7 +43,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         """
         Trace the stack and find the caller.
 
-        Returns: 
+        Returns:
             The direct caller.
         """
         import inspect
@@ -58,7 +59,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             args: User inputs.
             kwargs: User inputs.
 
-        Returns: 
+        Returns:
             The object created.
         """
 
@@ -76,7 +77,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         """
         Work to be done after object creation.
 
-        Returns: 
+        Returns:
             None
         """
         self.validate_inputs_types()
@@ -98,9 +99,13 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         Args:
             items: The list of items to create.
 
-        Returns: 
+        Returns:
             List of item IDs created.
         """
+        for item in items:
+            if item.item_type not in self.supported_types:
+                raise Exception(f'Unable to create items of type: {item.item_type} for platform: {self.__class__.__name__}')
+
         ids = []
         for key, group in groupby(items, lambda x: x.item_type):
             ids.extend(self._create_batch(list(group), key))
@@ -121,7 +126,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         Send the assets for a given item to the platform.
 
         Args:
-            item: The item to process. Expected to have an **assets** attribute containing 
+            item: The item to process. Expected to have an **assets** attribute containing
                 the collection.
             **kwargs: Extra parameters used by the platform.
         """
@@ -146,7 +151,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         Args:
             item: Which item to flatten
 
-        Returns: List of leaves
+        Returns:List of leaves
 
         """
         children = self.get_children(item.uid, item.item_type, force=True)
@@ -168,7 +173,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             item_id: The ID of the item to retrieve.
             item_type: The type of object to retrieve.
 
-        Returns: 
+        Returns:
             The specified item found on the platform or None.
         """
         pass
@@ -182,7 +187,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             platform_item: The platform item to transform
             **kwargs: Additional keyword parameters
 
-        Returns: An idm-tools entity
+        Returns:An idm-tools entity
         """
         return platform_item
 
@@ -192,13 +197,13 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         Return the list of children for the given platform item.
         For example, an experiment passed to this function will return all the contained simulations.
         The results are either platform items or idm-tools entities depending on the `raw` parameter.
-        
+
         Args:
             platform_item: Parent item
             raw: Return a platform item if True, an idm-tools entity if false
             **kwargs: Additional platform specific parameters
 
-        Returns: 
+        Returns:
             A list of children, None if no children
         """
         pass
@@ -213,7 +218,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             raw: Return a platform item if True, an idm-tools entity if false
             **kwargs: Additional platform specific parameters
 
-        Returns: 
+        Returns:
             Parent or None
         """
         pass
@@ -224,14 +229,14 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         Retrieve an object from the platform.
         This function is cached; force allows you to force the refresh of the cache.
         If no **object_type** is passed, the function will try all the types (experiment, suite, simulation).
-        
+
         Args:
             item_id: The ID of the object to retrieve.
             item_type: The type of the object to be retrieved.
             force: If True, force the object fetching from the platform.
             raw: Return either an |IT_s| object or a platform object.
 
-        Returns: 
+        Returns:
             The object found on the platform or None.
         """
         if not item_type or item_type not in self.supported_types:
@@ -278,7 +283,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             raw: Return either an |IT_s| object or a platform object.
             item_type: Pass the type of the object for quicker retrieval.
 
-        Returns: 
+        Returns:
             The children of the object or None.
         """
         if not item_type or item_type not in self.supported_types:
@@ -309,7 +314,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             raw: Return either an |IT_s| object or a platform object.
             item_type: Pass the type of the object for quicker retrieval.
 
-        Returns: 
+        Returns:
             The parent of the object or None.
 
         """
@@ -348,7 +353,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         """
         Validate user inputs and case attributes with the correct data types.
 
-        Returns: 
+        Returns:
             None
         """
         # retrieve field values, default values and types
@@ -369,6 +374,41 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         # Update attr with validated data types
         for fn in fs_kwargs:
             setattr(self, fn, field_value[fn])
+
+    @abstractmethod
+    def supported_experiment_types(self) -> List[typing.Type]:
+        """
+        Returns a list of supported experiment types. These types should be either abstract or full classes that have
+            been derived from IExperiment
+        Returns:
+
+        """
+        return [IExperiment]
+
+    @abstractmethod
+    def unsupported_experiment_types(self) -> List[typing.Type]:
+        """
+        Returns a list of experiment types not supported by the platform. These types should be either abstract or full
+            classes that have been derived from IExperiment
+        Returns:
+
+        """
+        return [IDockerExperiment, IGPUExperiment]
+
+    def is_supported_experiment(self, experiment: IExperiment) -> bool:
+        """
+        Determines if an experiment is supported by the specified platform.
+        Args:
+            experiment: Experiment to check
+
+        Returns:
+            True is experiment is supported, otherwise, false
+        """
+        ex_types = set(self.supported_experiment_types())
+        if any([isinstance(experiment, t) for t in ex_types]):
+            unsupported_types = self.unsupported_experiment_types()
+            return not any([isinstance(experiment, t) for t in unsupported_types])
+        return False
 
     def __repr__(self):
         return f"<Platform {self.__class__.__name__} - id: {self.uid}>"

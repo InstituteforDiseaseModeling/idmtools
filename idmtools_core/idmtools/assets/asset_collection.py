@@ -34,10 +34,10 @@ class AssetCollection(IEntity):
                        filters: 'TAssetFilterList' = None, filters_mode: 'FilterMode' = FilterMode.OR,  # noqa: F821
                        relative_path: str = None) -> 'TAssetCollection':
         """
-        Fill up an :class:`AssetCollection` from the specified directory. See 
+        Fill up an :class:`AssetCollection` from the specified directory. See
         :meth:`~AssetCollection.assets_from_directory` for arguments.
 
-        Returns: 
+        Returns:
             A created :class:`AssetCollection` object.
         """
         assets = cls.assets_from_directory(assets_directory, recursive, flatten, filters, filters_mode, relative_path)
@@ -55,22 +55,22 @@ class AssetCollection(IEntity):
 
         Args:
             assets_directory: The root directory of the assets.
-            recursive: True to recursively traverse the subdirectory. 
+            recursive: True to recursively traverse the subdirectory.
             flatten: Put all the files in root regardless of whether they were in a subdirectory or not.
-            filters: A list of filters to apply to the assets. The filters are functions taking an :class:`~idmtools.assets.asset.Asset` 
-                as argument and returning true or false. True adds the asset to the collection; False filters 
-                it out. See :meth:`~idmtools.utils.filters.asset_filters`.
+            filters: A list of filters to apply to the assets. The filters are functions taking an
+                :class:`~idmtools.assets.asset.Asset` as argument and returning true or false. True adds the asset to
+                the collection; False filters it out. See :meth:`~idmtools.utils.filters.asset_filters`.
             filters_mode: When given multiple filters, either OR or AND the results.
             forced_relative_path: Prefix a relative path to the path created from the root directory.
 
         Examples:
-            For **relative_path**, given the following folder structure root/a/1,txt root/b.txt and relative_path="test".
-            Will return assets with relative path: test/a/1,txt and test/b.txt
+            For **relative_path**, given the following folder structure root/a/1,txt root/b.txt and
+            relative_path="test". Will return assets with relative path: test/a/1,txt and test/b.txt
 
             Given the previous example, if flatten is also set to True, the following relative_path will be set:
             /1.txt and /b.txt
 
-        Returns: 
+        Returns:
             A list of assets.
         """
         found_assets = []
@@ -121,7 +121,7 @@ class AssetCollection(IEntity):
 
         Args:
            asset: An :class:`~idmtools.assets.asset.Asset` object to add.
-           fail_on_duplicate: Raise a **DuplicateAssetError** if an asset is duplicated. 
+           fail_on_duplicate: Raise a **DuplicateAssetError** if an asset is duplicated.
               If not, simply replace it.
         """
         if asset in self.assets:
@@ -197,7 +197,8 @@ class AssetCollection(IEntity):
         self.assets.clear()
 
     def set_all_persisted(self):
-        for a in self: a.persisted = True
+        for a in self:
+            a.persisted = True
 
     @property
     def count(self):

@@ -1,5 +1,6 @@
 import json
 import os
+import pytest
 
 from idmtools_model_emod import EMODExperiment
 from idmtools_test import COMMON_INPUT_PATH
@@ -12,6 +13,8 @@ DEFAULT_DEMOGRAPHICS_JSON = os.path.join(COMMON_INPUT_PATH, "files", "demographi
 DEFAULT_ERADICATION_PATH = os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe")
 
 
+@pytest.mark.comps
+@pytest.mark.emod
 class TestEMODExperiment(ITestWithPersistence):
 
     def setUp(self) -> None:
@@ -44,12 +47,12 @@ class TestEMODExperiment(ITestWithPersistence):
         models_dir = os.path.join(COMMON_INPUT_PATH, "fakemodels", "Eradication.exe")
         exp = EMODExperiment(eradication_path=models_dir)
         exp.pre_creation()
-        self.assertEqual("Assets/Eradication.exe --config config.json --input-path ./Assets;.", exp.command.cmd)
+        self.assertEqual(f"Assets/Eradication.exe --config config.json --input-path ./Assets;.", exp.command.cmd)
 
         models_dir = os.path.join(COMMON_INPUT_PATH, "fakemodels", "Eradication.exe")
         exp = EMODExperiment(eradication_path=models_dir, legacy_exe=True)
         exp.pre_creation()
-        self.assertEqual("Assets/Eradication.exe --config config.json --input-path ./Assets", exp.command.cmd)
+        self.assertEqual(f"Assets/Eradication.exe --config config.json --input-path ./Assets", exp.command.cmd)
 
     def test_load_files(self):
         e = EMODExperiment.from_files(self.case_name,

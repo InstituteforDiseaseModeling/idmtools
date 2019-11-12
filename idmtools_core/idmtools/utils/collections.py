@@ -11,8 +11,8 @@ def cut_iterable_to(obj: Iterable, to: int) -> Tuple[Union[List, Mapping], int]:
         obj: The iterable to cut.
         to: The number of elements to return.
 
-    Returns: 
-        A list or dictionary (depending on the type of object) of elements and 
+    Returns:
+        A list or dictionary (depending on the type of object) of elements and
         the remaining elements in the original list or dictionary.
     """
     if isinstance(obj, dict):

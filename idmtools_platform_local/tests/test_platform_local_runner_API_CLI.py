@@ -6,7 +6,7 @@ from operator import itemgetter
 
 import pytest
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools_test.utils.confg_local_runner_test import get_test_local_env_overrides, reset_local_broker
+from idmtools_test.utils.confg_local_runner_test import get_test_local_env_overrides
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 from idmtools.builders import ExperimentBuilder
@@ -18,13 +18,11 @@ from idmtools_platform_local.client.simulations_client import SimulationsClient
 
 
 @pytest.mark.docker
+@pytest.mark.local_platform_cli
 class TestLocalRunnerCLI(ITestWithPersistence):
 
     @classmethod
     def setUpClass(cls):
-        reset_local_broker()
-        from idmtools_platform_local.workers.brokers import setup_broker
-        setup_broker()
         platform = Platform('Local', **get_test_local_env_overrides())
         cls.pe = PythonExperiment(name="python experiment", model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
 

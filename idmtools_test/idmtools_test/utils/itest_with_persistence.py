@@ -16,5 +16,5 @@ class ITestWithPersistence(unittest.TestCase):
     def tearDown(self) -> None:
         try:
             shutil.rmtree(self.data_dir)
-        except:
+        except Exception:
             pass

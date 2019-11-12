@@ -47,6 +47,7 @@ class TestPlatformFactory(ITestWithPersistence):
 
     @pytest.mark.docker
     @pytest.mark.comps
+    @pytest.mark.timeout(60)
     @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
     def test_create_from_block(self, mock_login):
         p1 = Platform('Custom_Local', **get_test_local_env_overrides())
@@ -59,9 +60,11 @@ class TestPlatformFactory(ITestWithPersistence):
         p3 = Platform('Test')
         self.assertEqual(p3.__class__.__name__, 'TestPlatform')
         p3.cleanup()
+        del p1
 
     @pytest.mark.docker
     @pytest.mark.comps
+    @pytest.mark.timeout(60)
     @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
     def test_platform_factory(self, mock_login):
         platform1 = Platform('COMPS')
@@ -91,6 +94,7 @@ class TestPlatformFactory(ITestWithPersistence):
         self.assertEqual(platform, platform2)
 
     @pytest.mark.docker
+    @pytest.mark.timeout(60)
     def test_LocalPlatform(self):
         platform = Platform('Custom_Local', **get_test_local_env_overrides())
         members = platform.__dict__
@@ -101,6 +105,8 @@ class TestPlatformFactory(ITestWithPersistence):
 
         platform2 = Platform('Local', **kwargs)
         self.assertEqual(platform, platform2)
+        del platform
+        del platform2
 
     def test_TestPlatform(self):
         platform = Platform('Test')

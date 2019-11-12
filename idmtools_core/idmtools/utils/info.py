@@ -70,7 +70,7 @@ def get_packages_from_pip():
 
 def get_packages_list() -> List[str]:
     """
-    Return a list of installed packages in the current environment. Currently |IT_s| depends on pip for this 
+    Return a list of installed packages in the current environment. Currently |IT_s| depends on pip for this
     functionality and since it is just used for troubleshooting, errors can be ignored.
 
     Returns:
