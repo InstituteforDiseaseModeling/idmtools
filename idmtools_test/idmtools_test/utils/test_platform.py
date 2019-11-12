@@ -94,10 +94,12 @@ class TestPlatform(IPlatform):
     def get_children_for_platform_item(self, platform_item, raw, **kwargs):
         if platform_item.item_type == ItemType.EXPERIMENT:
             return self.simulations.get(platform_item.uid)
+        return []
 
     def get_parent_for_platform_item(self, platform_item, raw, **kwargs):
         if platform_item.item_type == ItemType.SIMULATION:
             return self.experiments.get(platform_item.parent_id)
+        return None
 
     def _create_experiment(self, experiment: 'TExperiment') -> UUID:
         if not self.is_supported_experiment(experiment):
