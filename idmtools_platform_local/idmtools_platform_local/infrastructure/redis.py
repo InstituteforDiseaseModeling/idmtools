@@ -2,6 +2,8 @@ import os
 import platform
 from dataclasses import dataclass
 from logging import getLogger, DEBUG
+
+from idmtools.core.system_information import get_system_information
 from idmtools_platform_local.infrastructure.base_service_container import BaseServiceContainer
 
 logger = getLogger(__name__)
@@ -18,6 +20,11 @@ class RedisContainer(BaseServiceContainer):
     data_volume_name: str = os.getenv("IDMTOOLS_REDIS_DATA_MOUNT_BY_VOLUMENAME", None)
     container_name: str = 'idmtools_redis'
     config_prefix: str = 'redis_'
+
+    def __post_init__(self):
+        system_info = get_system_information()
+        if self.run_as is None:
+            self.run_as = system_info.user_group_str
 
     def get_configuration(self) -> dict:
         # check if we are using the host data path or using a data volume to mount data
@@ -39,6 +46,7 @@ class RedisContainer(BaseServiceContainer):
         # if we are are unix based systems we should
         if platform.system() in ["Linux", "Darwin"]:
             container_config['user'] = self.run_as
+        print(container_config)
         if logger.isEnabledFor(DEBUG):
             logger.debug(f"Redis Config: {container_config}")
         return container_config

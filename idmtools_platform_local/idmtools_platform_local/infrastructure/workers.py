@@ -6,6 +6,8 @@ from dataclasses import dataclass
 from logging import getLogger, DEBUG
 from typing import Dict
 from docker.models.containers import Container
+
+from idmtools.core.system_information import get_system_information
 from idmtools_platform_local.client.healthcheck_client import HealthcheckClient
 from idmtools_platform_local.infrastructure.base_service_container import BaseServiceContainer
 from idmtools_platform_local import __version__
@@ -45,6 +47,11 @@ class WorkersContainer(BaseServiceContainer):
     container_name: str = 'idmtools_workers'
     data_volume_name: str = os.getenv("IDMTOOLS_WORKERS_DATA_MOUNT_BY_VOLUMENAME", None)
     config_prefix: str = 'workers_'
+
+    def __post_init__(self):
+        system_info = get_system_information()
+        if self.run_as is None:
+            self.run_as = system_info.user_group_str
 
     def get_configuration(self) -> Dict:
         logger.debug(f'Creating working container')
