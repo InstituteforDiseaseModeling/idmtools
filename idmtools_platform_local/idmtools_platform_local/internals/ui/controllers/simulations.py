@@ -89,7 +89,7 @@ class Simulations(Resource):
         return result, 200, {'X-Total': total, 'X-Per-Page': args.per_page}
 
     def put(self, id):
-        data = request.json()
+        data = request.json
         # at moment, only allow status to be updated(ie canceled'
         # later, we may support resuming but we will need to include more data in the db to do this
         data = {k: v for k, v in data.items() if k == 'status' and v in ['canceled']}
