@@ -84,7 +84,6 @@ docker-local: ## Build our docker image using the local pypi
 	# ensure pypi local is up
 	$(PDR) -w '../dev_scripts/local_pypi' -ex 'docker-compose up -d'
 	$(PDR) -w '../idmtools_core' -ex 'pymake release-local'
-	@pymake build-ui
 	@pymake release-local
 	docker-compose build --build-arg PYPIURL=http://172.17.0.1:7171/ --build-arg PYPIHOST=172.17.0.1 workers
 
@@ -95,7 +94,6 @@ docker-local-no-cache:## Build our docker image using the local pypi
 	# ensure pypi local is up
 	$(PDR) -w '../dev_scripts/local_pypi' -ex 'docker-compose up -d'
 	$(PDR) -w '../idmtools_core' -ex 'pymake release-local'
-	@pymake build-ui
 	@pymake release-local
 	docker-compose build --no-cache --build-arg PYPIURL=http://172.17.0.1:7171/ --build-arg PYPIHOST=172.17.0.1 workers
 
@@ -115,6 +113,7 @@ release-local: ## package and upload a release to http://localhost:7171
 	twine upload --verbose --repository-url http://localhost:7171 -u admin -p admin dist/*
 
 dist: ## build our package
+	@make build-ui
 	@make clean
 	python setup.py sdist
 
