@@ -25,7 +25,8 @@ class JobStatus(Base):
 
     def to_dict(self, as_experiment=True):
         result = {k: v for k, v in self.__dict__.items() if k[0] != "_"}
-        result['created'] = str(result['created'])
+        if 'created' in result:
+            result['created'] = str(result['created'])
         result['updated'] = str(result['updated'])
         if as_experiment:
             result['experiment_id'] = result['uuid']
