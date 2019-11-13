@@ -46,7 +46,6 @@ class RedisContainer(BaseServiceContainer):
         # if we are are unix based systems we should
         if platform.system() in ["Linux", "Darwin"]:
             container_config['user'] = self.run_as
-        print(container_config)
         if logger.isEnabledFor(DEBUG):
             logger.debug(f"Redis Config: {container_config}")
         return container_config
