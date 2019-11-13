@@ -46,7 +46,7 @@ def system(copy_to_clipboard, no_format_for_gh, issue):
     if copy_to_clipboard:
         output = '\n'.join(lines)
         if not no_format_for_gh or issue:
-            logger.debug('Formatting for githubb')
+            logger.debug('Formatting for github')
             # let's remove system information here by rebuilding without it
             output = '\n'.join(lines[0:])
             output = f'```### System Information\n{output}````'
