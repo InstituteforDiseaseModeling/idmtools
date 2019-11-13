@@ -39,7 +39,7 @@ class SystemInformation:
 
 @dataclass
 class LinuxSystemInformation(SystemInformation):
-    user_group_str: str = field(default_factory=lambda: f'{os.getuid()}:{os.getgid()}')
+    user_group_str: str = field(default_factory=lambda: os.getenv("CURRENT_UID", f'{os.getuid()}:{os.getgid()}'))
 
 
 class WindowsSystemInformation(SystemInformation):
