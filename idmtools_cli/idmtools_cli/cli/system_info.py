@@ -23,7 +23,8 @@ def info():
 @click.option('--no-format-for-gh/--format-for-gh', default=False, help="When copying to clipboard, do we want to "
                                                                         "formatted for Github")
 @click.option('--issue/--no-issue', default=False, help="Copy data and format for github alias")
-def system(copy_to_clipboard, no_format_for_gh, issue):
+@click.option('--output-filename', default=None, help="Output filename")
+def system(copy_to_clipboard, no_format_for_gh, issue, output_filename):
     system_info = get_system_information()
     lines = [f'System Information\n{ "=" * 20}']
     ordered_fields = sorted(system_info.__dict__.keys())
@@ -51,9 +52,12 @@ def system(copy_to_clipboard, no_format_for_gh, issue):
             output = '\n'.join(lines[0:])
             output = f'```### System Information\n{output}````'
         pyperclip.copy(output)
-
-    for line in lines:
-        click.echo(line)
+    if output_filename is not None:
+        with open(output_filename, 'w') as log_out:
+            log_out.writelines(lines)
+    else:
+        for line in lines:
+            click.echo(line)
 
 
 @info.group(help="Commands to get information about installed IDM-Tools plugins")
