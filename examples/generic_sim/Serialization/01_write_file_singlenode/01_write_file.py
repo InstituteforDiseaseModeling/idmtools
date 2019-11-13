@@ -31,7 +31,7 @@ if __name__ == "__main__":
     config_update_params(simulation)
 
     # Create the serialization timesteps
-    serialization_timesteps = list(range(10, LAST_SERIALIZATION_DAY, 20))
+    serialization_timesteps = list(range(10, LAST_SERIALIZATION_DAY + 20, 20))
     add_serialization_timesteps(simulation=simulation, timesteps=serialization_timesteps,
                                 end_at_final=False, use_absolute_times=False)
 
