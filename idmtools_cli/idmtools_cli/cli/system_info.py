@@ -1,5 +1,6 @@
+import os
 from logging import getLogger
-
+import stat
 import click
 import pyperclip
 from tabulate import tabulate
@@ -27,6 +28,11 @@ def system(copy_to_clipboard, no_format_for_gh, issue):
     lines = [f'System Information\n{ "=" * 20}']
     ordered_fields = sorted(system_info.__dict__.keys())
     [lines.append(f'{k}: {system_info.__dict__[k]}') for k in ordered_fields]
+    if os.name != 'nt':
+        for f in ['workers', 'redis-data']:
+            fname = os.path.join(system_info.data_directory, f)
+            if os.path.exists(fname):
+                lines.append(f'{fname} has permissions of {oct(stat.S_IMODE(os.lstat(fname).st_mode))}')
     try:
         import docker
         lines.append(f'\nDocker Information\n{ "=" * 20}')
