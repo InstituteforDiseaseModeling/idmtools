@@ -14,26 +14,6 @@ current_directory = os.path.dirname(os.path.realpath(__file__))
 BIN_PATH = os.path.abspath(os.path.join(current_directory, "bin"))
 INPUT_PATH = os.path.abspath(os.path.join(current_directory, "inputs"))
 
-SERIALIZATION_PATH = os.path.abspath(os.path.join(current_directory, "01_write_file_singlenode", "outputs"))
-if os.path.exists(SERIALIZATION_PATH):
-    random_sim_id = os.listdir(SERIALIZATION_PATH)[-1]
-    SERIALIZATION_PATH = os.path.join(SERIALIZATION_PATH, random_sim_id)
-
-MULTINODE_SERIALIZATION_PATH = os.path.abspath(os.path.join(current_directory, "04_write_file_multinode", "outputs"))
-if os.path.exists(MULTINODE_SERIALIZATION_PATH):
-    multinode_random_sim_id = os.listdir(MULTINODE_SERIALIZATION_PATH)[-1]
-    MULTINODE_SERIALIZATION_PATH = os.path.join(MULTINODE_SERIALIZATION_PATH, multinode_random_sim_id)
-
-MULTICORE_SERIALIZATION_PATH = os.path.abspath(os.path.join(current_directory, "06_write_file_multicore", "outputs"))
-if os.path.exists(MULTICORE_SERIALIZATION_PATH):
-    multicore_random_sim_id = os.listdir(MULTICORE_SERIALIZATION_PATH)[-1]
-    MULTICORE_SERIALIZATION_PATH = os.path.join(MULTICORE_SERIALIZATION_PATH, multicore_random_sim_id)
-
-MIGRATION_SERIALIZATION_PATH = os.path.abspath(os.path.join(current_directory, "08_write_file_migration", "outputs"))
-if os.path.exists(MIGRATION_SERIALIZATION_PATH):
-    migration_random_sim_id = os.listdir(MIGRATION_SERIALIZATION_PATH)[-1]
-    MIGRATION_SERIALIZATION_PATH = os.path.join(MIGRATION_SERIALIZATION_PATH, migration_random_sim_id)
-
 START_DAY = 0
 SIMULATION_DURATION = 120
 REPETITIONS = 4
@@ -46,10 +26,10 @@ def param_update(simulation: 'EMODSimulation', param, value):
     return simulation.set_parameter(param, value)
 
 
-def get_seed_experiment_builder():
+def get_seed_experiment_builder(num_seed=REPETITIONS):
     builder = ExperimentBuilder()
     set_Run_Number = partial(param_update, param="Run_Number")
-    builder.add_sweep_definition(set_Run_Number, range(REPETITIONS))
+    builder.add_sweep_definition(set_Run_Number, range(num_seed))
     return builder
 
 

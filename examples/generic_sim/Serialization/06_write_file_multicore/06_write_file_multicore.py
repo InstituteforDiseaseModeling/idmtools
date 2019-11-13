@@ -12,14 +12,15 @@ from idmtools.analysis.download_analyzer import DownloadAnalyzer
 from globals import *
 
 EXPERIMENT_NAME = 'Generic serialization 06 writes files multicore'
+REPETITIONS = 1
 
 if __name__ == "__main__":
 
     # Create the platform
-    platform = Platform('COMPS-Multicore')
+    platform = Platform('COMPS-Multicore-Linux')
 
     # Create an experiment from input files
-    e = EMODExperiment.from_files(EXPERIMENT_NAME, eradication_path=os.path.join(BIN_PATH, "Eradication.exe"),
+    e = EMODExperiment.from_files(EXPERIMENT_NAME, eradication_path=os.path.join(BIN_PATH, "Eradication"),
                                   config_path=os.path.join(INPUT_PATH, 'config.json'),
                                   campaign_path=os.path.join(INPUT_PATH, "campaign.json"),
                                   demographics_paths=os.path.join(INPUT_PATH, "9nodes_demographics.json"))
@@ -38,7 +39,7 @@ if __name__ == "__main__":
         "Num_Cores": NUM_CORES})
 
     # Get the seeds sweep
-    builder = get_seed_experiment_builder()
+    builder = get_seed_experiment_builder(REPETITIONS)
     e.add_builder(builder)
 
     # Create the manager and run
@@ -47,20 +48,18 @@ if __name__ == "__main__":
     em.wait_till_done()
 
     if e.succeeded:
-        print(f"Experiment {e.uid} succeeded.\n")
-        print("Downloading dtk serialization files from Comps:\n")
+        print(f"Experiment {e.uid} succeeded.\nDownloading dtk serialization files from Comps:\n")
 
         # Setup the filenames depending on the cores used
         filenames = []
         for serialization_timestep in serialization_timesteps:
             for i in range(NUM_CORES):
-                filenames.append("output/state-" + str(serialization_timestep).zfill(5) + f"-00{i}" + ".dtk")
+                filenames.append("output/state-" + str(serialization_timestep).zfill(5) + "-" + str(i).zfill(3) + ".dtk")
         filenames.append('output/InsetChart.json')
 
         # Delete outputs if already present
         output_path = 'outputs'
-        if os.path.exists(output_path):
-            del_folder(output_path)
+        del_folder(output_path)
 
         # Download
         download_analyzer = DownloadAnalyzer(filenames=filenames, output_path=output_path)

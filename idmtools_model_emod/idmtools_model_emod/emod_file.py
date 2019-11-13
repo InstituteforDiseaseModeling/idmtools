@@ -86,7 +86,7 @@ class Dlls(InputFilesList):
         self.add_asset(Asset(absolute_path=dll_path, relative_path=self.relative_path))
 
     def add_dll_folder(self, dll_folder):
-        filter_extensions = partial(file_extension_is, extensions=['dll'])
+        filter_extensions = partial(file_extension_is, extensions=['dll', 'so'])
         self.add_directory(dll_folder, recursive=False, relative_path=self.relative_path, filters=[filter_extensions])
 
     def set_custom_reports_file(self, custom_reports_path) -> 'NoReturn':

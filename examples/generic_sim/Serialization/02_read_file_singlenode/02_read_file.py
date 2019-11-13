@@ -1,8 +1,6 @@
 import sys
-
-from analyzers import TimeseriesAnalyzer
-
 sys.path.append('../')
+from analyzers import TimeseriesAnalyzer
 
 from idmtools.assets import Asset
 from idmtools.core import ItemType
@@ -14,6 +12,14 @@ from idmtools.analysis.download_analyzer import DownloadAnalyzer
 from idmtools_model_emod.generic.serialization import load_serialized_population, add_serialization_timesteps
 
 from globals import *
+
+SERIALIZATION_PATH = os.path.abspath(os.path.join(current_directory, "01_write_file_singlenode", "outputs"))
+try:
+    random_sim_id = os.listdir(SERIALIZATION_PATH)[-1]
+    SERIALIZATION_PATH = os.path.join(SERIALIZATION_PATH, random_sim_id)
+except Exception:
+    raise FileNotFoundError("Can't find serialization file from previous run, please make sure 01_write_file_singlenode"
+                            " succeeded.")
 
 EXPERIMENT_NAME = 'Generic serialization 02 read files'
 DTK_SERIALIZATION_FILENAME = "state-00050.dtk"
@@ -49,10 +55,7 @@ if __name__ == "__main__":
     simulation.set_parameter("Simulation_Duration", SIMULATION_DURATION - PRE_SERIALIZATION_DAY)
 
     # Create the sweep on seed
-    builder = ExperimentBuilder()
-    set_Run_Number = partial(param_update, param="Run_Number")
-    builder.add_sweep_definition(set_Run_Number, range(REPETITIONS))
-    e.add_builder(builder)
+    e.builder = get_seed_experiment_builder()
 
     # Create the experiment manager and run
     em = ExperimentManager(experiment=e, platform=platform)
@@ -86,8 +89,7 @@ if __name__ == "__main__":
 
         # Clean up previously ran analyzers if any
         output_path = 'outputs'
-        if os.path.exists(output_path):
-            del_folder(output_path)
+        del_folder(output_path)
 
         # Run the analysis
         analyzer_download = DownloadAnalyzer(filenames=filenames, output_path=output_path)

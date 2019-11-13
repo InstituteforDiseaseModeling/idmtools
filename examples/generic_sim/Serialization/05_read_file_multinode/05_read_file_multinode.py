@@ -13,6 +13,14 @@ from idmtools.analysis.download_analyzer import DownloadAnalyzer
 
 from globals import *
 
+MULTINODE_SERIALIZATION_PATH = os.path.abspath(os.path.join(current_directory, "04_write_file_multinode", "outputs"))
+try:
+    multinode_random_sim_id = os.listdir(MULTINODE_SERIALIZATION_PATH)[-1]
+    MULTINODE_SERIALIZATION_PATH = os.path.join(MULTINODE_SERIALIZATION_PATH, multinode_random_sim_id)
+except Exception:
+    raise FileNotFoundError("Can't find serialization file from previous run, please make sure 04_write_file_multinode"
+                            " succeeded.")
+
 EXPERIMENT_NAME = 'Generic serialization 05 read files multinode'
 DTK_SERIALIZATION_FILENAME = "state-00050.dtk"
 CHANNELS_TOLERANCE = {'Statistical Population': 1,
@@ -43,6 +51,10 @@ if __name__ == "__main__":
     simulation.update_parameters({
         "Start_Time": PRE_SERIALIZATION_DAY,
         "Simulation_Duration": SIMULATION_DURATION - PRE_SERIALIZATION_DAY})
+        #"Enable_Random_Generator_From_Serialized_Population": 1,
+        #"Random_Number_Generator_Policy": "ONE_PER_NODE",
+        #"Random_Number_Generator_Type": "USE_PSEUDO_DES"})
+
     add_serialization_timesteps(simulation=simulation, timesteps=[LAST_SERIALIZATION_DAY],
                                 end_at_final=False, use_absolute_times=True)
     load_serialized_population(simulation=simulation, population_path="Assets",
@@ -81,8 +93,7 @@ if __name__ == "__main__":
 
         # Cleanup if the outputs already exist
         output_path = 'outputs'
-        if os.path.exists(output_path):
-            del_folder(output_path)
+        del_folder(output_path)
 
         analyzers_download = DownloadAnalyzer(filenames=filenames, output_path=output_path)
         am_download = AnalyzeManager(platform=platform)

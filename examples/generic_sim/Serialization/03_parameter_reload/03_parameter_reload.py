@@ -13,6 +13,14 @@ from analyzers import TimeseriesAnalyzer
 from idmtools.analysis.analyze_manager import AnalyzeManager
 from idmtools.analysis.download_analyzer import DownloadAnalyzer
 
+SERIALIZATION_PATH = os.path.abspath(os.path.join(current_directory, "01_write_file_singlenode", "outputs"))
+try:
+    random_sim_id = os.listdir(SERIALIZATION_PATH)[-1]
+    SERIALIZATION_PATH = os.path.join(SERIALIZATION_PATH, random_sim_id)
+except Exception:
+    raise FileNotFoundError("Can't find serialization file from previous run, please make sure 01_write_file_singlenode"
+                            " succeeded.")
+
 EXPERIMENT_NAME = 'Generic serialization 03 parameter reload'
 dtk_serialization_filename = "state-00050.dtk"
 channels_tolerance = {'Statistical Population': 1,
@@ -50,14 +58,11 @@ if __name__ == "__main__":
     load_serialized_population(simulation=simulation, population_path="Assets",
                                population_filenames=[dtk_serialization_filename])
 
-    # Create the sweep for the repetitions and for the weep on Base_Infectivity
-    builder = ExperimentBuilder()
-    set_Run_Number = partial(param_update, param="Run_Number")
-    builder.add_sweep_definition(set_Run_Number, range(REPETITIONS))
+    # Create the sweep for the repetitions and for the sweep on Base_Infectivity
+    e.builder = get_seed_experiment_builder()
 
     set_Base_Infectivity = partial(param_update, param="Base_Infectivity")
-    builder.add_sweep_definition(set_Base_Infectivity, [0.2, 1])
-    e.add_builder(builder)
+    e.builder.add_sweep_definition(set_Base_Infectivity, [0.2, 1])
 
     # Experiment manager to run the experiment
     em = ExperimentManager(experiment=e, platform=platform)
@@ -86,8 +91,7 @@ if __name__ == "__main__":
 
         # Clean up output path if present
         output_path = 'outputs'
-        if os.path.exists(output_path):
-            del_folder(output_path)
+        del_folder(output_path)
 
         # Download
         analyzers_download = DownloadAnalyzer(filenames=filenames, output_path=output_path)

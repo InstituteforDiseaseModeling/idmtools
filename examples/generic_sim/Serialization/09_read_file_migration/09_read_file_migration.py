@@ -14,6 +14,15 @@ from idmtools_model_emod.emod_file import MigrationTypes
 
 from globals import *
 
+
+MIGRATION_SERIALIZATION_PATH = os.path.abspath(os.path.join(current_directory, "08_write_file_migration", "outputs"))
+try:
+    migration_random_sim_id = os.listdir(MIGRATION_SERIALIZATION_PATH)[-1]
+    MIGRATION_SERIALIZATION_PATH = os.path.join(MIGRATION_SERIALIZATION_PATH, migration_random_sim_id)
+except Exception:
+    raise FileNotFoundError("Can't find serialization file from previous run, please make sure 08_write_file_migration"
+                            " succeeded.")
+
 EXPERIMENT_NAME = '09_read_file_migration'
 DTK_SERIALIZATION_FILENAME = "state-00050.dtk"
 DTK_MIGRATION_FILENAME = "LocalMigration_3_Nodes.bin"
@@ -45,7 +54,7 @@ if __name__ == "__main__":
     e.migrations.add_migration_from_file(MigrationTypes.LOCAL, os.path.join(INPUT_PATH, DTK_MIGRATION_FILENAME))
 
     # Add the DLLs to the collection
-    e.dlls.add_dll_folder("../custom_reports/reporter_plugins")
+    e.dlls.add_dll_folder("../custom_reports/reporter_plugins/Windows")
     e.dlls.set_custom_reports_file("../custom_reports/custom_reports.json")
 
     # Get the base simulation
@@ -110,8 +119,7 @@ if __name__ == "__main__":
 
         # Cleanup the outptus if already present
         output_path = 'outputs'
-        if os.path.exists(output_path):
-            del_folder(output_path)
+        del_folder(output_path)
 
         analyzers_download = DownloadAnalyzer(filenames=filenames, output_path=output_path)
         am_download = AnalyzeManager(platform=platform)

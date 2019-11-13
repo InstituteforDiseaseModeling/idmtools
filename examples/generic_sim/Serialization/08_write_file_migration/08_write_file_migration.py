@@ -14,6 +14,7 @@ from globals import *
 
 EXPERIMENT_NAME = 'Generic serialization 08 writes files migration'
 DTK_MIGRATION_FILENAME = "LocalMigration_3_Nodes.bin"
+REPETITIONS = 1 # run with only one run_number in this test
 
 
 if __name__ == "__main__":
@@ -31,7 +32,7 @@ if __name__ == "__main__":
     e.migrations.add_migration_from_file(MigrationTypes.LOCAL, os.path.join(INPUT_PATH, DTK_MIGRATION_FILENAME))
 
     # Add the DLLs to the collection
-    e.dlls.add_dll_folder("../custom_reports/reporter_plugins")
+    e.dlls.add_dll_folder("../custom_reports/reporter_plugins/Windows")
     e.dlls.set_custom_reports_file("../custom_reports/custom_reports.json")
 
     # Get the base simulation
@@ -52,30 +53,32 @@ if __name__ == "__main__":
     })
 
     # Retrieve the seed sweep
-    builder = get_seed_experiment_builder()
+    builder = get_seed_experiment_builder(REPETITIONS)
     e.add_builder(builder)
 
     # Create experiment manager and run
     em = ExperimentManager(experiment=e, platform=platform)
     em.run()
     em.wait_till_done()
-    exp_id = em.experiment.uid
 
-    print("Downloading dtk serialization files from Comps:\n")
-    # Create the filenames
-    filenames = ['output/InsetChart.json',
-                 'output/ReportHumanMigrationTracking.csv',
-                 'output/ReportNodeDemographics.csv']
-    for serialization_timestep in serialization_timesteps:
-        filenames.append("output/state-" + str(serialization_timestep).zfill(5) + ".dtk")
+    if e.succeeded:
+        print(f"Experiment {e.uid} succeeded.\nDownloading dtk serialization files from Comps:\n")
 
-    # Remove the outputs if already present
-    output_path = 'outputs'
-    if os.path.exists(output_path):
+        # Create the filenames
+        filenames = ['output/InsetChart.json',
+                     'output/ReportHumanMigrationTracking.csv',
+                     'output/ReportNodeDemographics.csv']
+        for serialization_timestep in serialization_timesteps:
+            filenames.append("output/state-" + str(serialization_timestep).zfill(5) + ".dtk")
+
+        # Remove the outputs if already present
+        output_path = 'outputs'
         del_folder(output_path)
 
-    download_analyzer = DownloadAnalyzer(filenames=filenames, output_path=output_path)
-    am = AnalyzeManager(platform=platform)
-    am.add_analyzer(download_analyzer)
-    am.add_item(e)
-    am.analyze()
+        download_analyzer = DownloadAnalyzer(filenames=filenames, output_path=output_path)
+        am = AnalyzeManager(platform=platform)
+        am.add_analyzer(download_analyzer)
+        am.add_item(e)
+        am.analyze()
+    else:
+        print(f"Experiment {e.uid} failed.\n")

@@ -11,8 +11,8 @@ from idmtools.analysis.download_analyzer import DownloadAnalyzer
 
 from globals import *
 
-current_directory = os.path.dirname(os.path.realpath(__file__))
 EXPERIMENT_NAME = 'Generic serialization 04 writes files multinode'
+REPETITIONS = 1 # run with only one run_number in this test
 
 if __name__ == "__main__":
     # Create the platform
@@ -34,10 +34,13 @@ if __name__ == "__main__":
                                 end_at_final=False, use_absolute_times=False)
     simulation.update_parameters({
         "Start_Time": START_DAY,
-        "Simulation_Duration": SIMULATION_DURATION})
+        "Simulation_Duration": SIMULATION_DURATION
+        # "Random_Number_Generator_Policy": "ONE_PER_NODE",
+        # "Random_Number_Generator_Type": "USE_PSEUDO_DES"
+    })
 
     # Create the sweep on seeds
-    builder = get_seed_experiment_builder()
+    builder = get_seed_experiment_builder(REPETITIONS)
     e.add_builder(builder)
 
     # Create the manager and run
@@ -46,8 +49,7 @@ if __name__ == "__main__":
     em.wait_till_done()
 
     if e.succeeded:
-        print(f"Experiment {e.uid} succeeded.\n")
-        print("Downloading dtk serialization files from Comps:\n")
+        print(f"Experiment {e.uid} succeeded.\nDownloading dtk serialization files from Comps:\n")
 
         # Create the filename list
         filenames = []
@@ -57,8 +59,7 @@ if __name__ == "__main__":
 
         # Delete the outputs if existed already
         output_path = 'outputs'
-        if os.path.exists(output_path):
-            del_folder(output_path)
+        del_folder(output_path)
 
         # Download the files
         am = AnalyzeManager(platform=platform)

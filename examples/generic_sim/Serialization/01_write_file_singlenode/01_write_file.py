@@ -12,6 +12,7 @@ from idmtools.analysis.download_analyzer import DownloadAnalyzer
 from globals import *
 
 EXPERIMENT_NAME = 'Generic serialization 01 writes files'
+REPETITIONS = 1 # run with only one run_number in this test
 
 if __name__ == "__main__":
     # Create the platform
@@ -40,7 +41,7 @@ if __name__ == "__main__":
     simulation.set_parameter("Simulation_Duration", SIMULATION_DURATION)
 
     # Create the sweep for the seed
-    builder = get_seed_experiment_builder()
+    e.builder = get_seed_experiment_builder(REPETITIONS)
 
     # Create the manager and run
     em = ExperimentManager(experiment=e, platform=platform)
@@ -52,8 +53,7 @@ if __name__ == "__main__":
 
         # Cleanup the output path
         output_path = 'outputs'
-        if os.path.exists(output_path):
-            del_folder(output_path)
+        del_folder(output_path)
 
         # We want to download all the dtk state files and the InsetChart.json
         filenames = []

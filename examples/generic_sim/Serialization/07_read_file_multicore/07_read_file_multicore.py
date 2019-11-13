@@ -13,6 +13,15 @@ from idmtools.analysis.download_analyzer import DownloadAnalyzer
 
 from globals import *
 
+
+MULTICORE_SERIALIZATION_PATH = os.path.abspath(os.path.join(current_directory, "06_write_file_multicore", "outputs"))
+try:
+    multicore_random_sim_id = os.listdir(MULTICORE_SERIALIZATION_PATH)[-1]
+    MULTICORE_SERIALIZATION_PATH = os.path.join(MULTICORE_SERIALIZATION_PATH, multicore_random_sim_id)
+except Exception:
+    raise FileNotFoundError("Can't find serialization file from previous run, please make sure 06_write_file_multicore"
+                            " succeeded.")
+
 EXPERIMENT_NAME = 'Generic serialization 07 read files multicore'
 DTK_SERIALIZATION_FILENAMES = [f"state-00050-{str(i).zfill(3)}.dtk" for i in range(NUM_CORES)]
 CHANNELS_TOLERANCE = {'Statistical Population': 1,
@@ -73,7 +82,7 @@ if __name__ == "__main__":
         am_timeseries.add_item(pre_exp)
         am_timeseries.analyze()
 
-        analyzers_timeseries.interpret_results()
+        analyzers_timeseries.interpret_results(CHANNELS_TOLERANCE)
 
         # Download the  serialization files
         print("Downloading dtk serialization files from Comps:\n")
@@ -84,8 +93,7 @@ if __name__ == "__main__":
 
         # Delete outputs if present
         output_path = 'outputs'
-        if os.path.exists(output_path):
-            del_folder(output_path)
+        del_folder(output_path)
 
         # Download
         analyzers_download = DownloadAnalyzer(filenames=filenames, output_path=output_path)
