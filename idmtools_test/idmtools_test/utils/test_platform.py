@@ -75,10 +75,12 @@ class TestPlatform(IPlatform):
         if item_type == ItemType.SIMULATION:
             obj = None
             for eid in self.simulations:
-                for sim in self.simulations.get(eid):
-                    if sim.uid == item_id:
-                        obj = sim
-                        break
+                sims = self.simulations.get(eid)
+                if sims:
+                    for sim in self.simulations.get(eid):
+                        if sim.uid == item_id:
+                            obj = sim
+                            break
                 if obj:
                     break
         elif item_type == ItemType.EXPERIMENT:
