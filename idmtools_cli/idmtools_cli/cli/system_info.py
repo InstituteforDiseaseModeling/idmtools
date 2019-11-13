@@ -33,7 +33,11 @@ def system(copy_to_clipboard, no_format_for_gh, issue, output_filename):
         for f in ['workers', 'redis-data']:
             fname = os.path.join(system_info.data_directory, f)
             if os.path.exists(fname):
-                lines.append(f'{fname} has permissions of {oct(stat.S_IMODE(os.lstat(fname).st_mode))}')
+                from pwd import getpwuid
+                s = os.stat(fname)
+                owned_by = f'{getpwuid(s.st_uid).pw_name} UID {s.st_uid}:{s.st_gid}'
+                lines.append(f'{fname} has permissions of {oct(stat.S_IMODE(os.lstat(fname).st_mode))} '
+                             f'and is owned by {owned_by}')
     try:
         import docker
         lines.append(f'\nDocker Information\n{ "=" * 20}')
