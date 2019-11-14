@@ -104,7 +104,7 @@ class EMODPlatformTest(ABC):
         e2.demographics.clear()
         demo_file = os.path.join(COMMON_INPUT_PATH, "serialization", "single_node_demographics.json")
         e2.demographics.add_demographics_from_file(demo_file)
-        e1.tags = {'idmtools': 'realod serialization'}
+        e2.tags = {'idmtools': 'realod serialization'}
 
         reload_sim = e2.simulation()
         #reload_sim.config.pop('Serialization_Time_Steps') # Need this step if we use same exp
