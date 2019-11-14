@@ -1,0 +1,79 @@
+class ImDict(dict):
+    _frozen = False
+
+    # def __setattr__(self, key, value):
+    #     if self._frozen:
+    #     # if self._frozen and type(value) in self._frozen_types:
+    #         raise Exception("Frozen!")
+    #     else:
+    #         super().__setattr__(key, value)
+
+    def __setitem__(self, *args, **kwargs):  # real signature unknown
+        """ Set self[key] to value. """
+        if self._frozen:
+            raise Exception('Frozen')
+        else:
+            super().__setitem__(*args, **kwargs)
+
+    def __delitem__(self, *args, **kwargs):  # real signature unknown
+        """ Delete self[key]. """
+        if self._frozen:
+            raise Exception('Frozen')
+        else:
+            super().__delitem__(*args, **kwargs)
+
+    def setdefault(self, *args, **kwargs):  # real signature unknown
+        """
+        Insert key with a value of default if key is not in the dictionary.
+
+        Return the value for key if key is in the dictionary, else default.
+        """
+        if self._frozen:
+            raise Exception('Frozen')
+        else:
+            super().setdefault(*args, **kwargs)
+
+    def update(self, E=None, **F):  # known special case of dict.update
+        """
+        D.update([E, ]**F) -> None.  Update D from dict/iterable E and F.
+        If E is present and has a .keys() method, then does:  for k in E: D[k] = E[k]
+        If E is present and lacks a .keys() method, then does:  for k, v in E: D[k] = v
+        In either case, this is followed by: for k in F:  D[k] = F[k]
+        """
+        if self._frozen:
+            raise Exception('Frozen')
+        else:
+            super().update(E, **F)
+
+    def pop(self, k, d=None):  # real signature unknown; restored from __doc__
+        """
+        D.pop(k[,d]) -> v, remove specified key and return the corresponding value.
+        If key is not found, d is returned if given, otherwise KeyError is raised
+        """
+        if self._frozen:
+            raise Exception('Frozen')
+        else:
+            super().pop(k, d)
+
+    def popitem(self):  # real signature unknown; restored from __doc__
+        """
+        D.popitem() -> (k, v), remove and return some (key, value) pair as a
+        2-tuple; but raise KeyError if D is empty.
+        """
+        if self._frozen:
+            raise Exception('Frozen')
+        else:
+            super().popitem()
+
+    def __setattr__(self, key, value):  # real signature unknown
+        """ Set self[key] to value. """
+        if self._frozen:
+            raise Exception('Frozen')
+        else:
+            super().__setattr__(key, value)
+
+    def __delattr__(self, item):
+        if self._frozen:
+            raise Exception('Frozen')
+        else:
+            super().__delattr__(item)
