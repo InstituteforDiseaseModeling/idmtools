@@ -134,6 +134,7 @@ class TestLoadFiles(ITestWithPersistence):
             jt2 = json.load(m)
             jt1.pop("Demographics_Filenames")
             jt2['parameters'].pop("Demographics_Filenames")
+            jt2 = self.set_migrations(jt2)
             self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2['parameters'], sort_keys=True))
 
         with open(DEFAULT_CAMPAIGN_JSON, 'r') as m:
@@ -163,6 +164,7 @@ class TestLoadFiles(ITestWithPersistence):
             jt2 = json.load(m)
             jt1.pop("Demographics_Filenames")
             jt2['parameters'].pop("Demographics_Filenames")
+            jt2 = self.set_migrations(jt2)
             self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2['parameters'], sort_keys=True))
 
         with open(DEFAULT_CAMPAIGN_JSON, 'r') as m:
@@ -217,3 +219,12 @@ class TestLoadFiles(ITestWithPersistence):
         # test the order of files
         demographics_list = [d.filename for d in e.base_simulation.demographics]
         self.assertEqual(demographics_list[0], 'demographics.json')
+
+    def set_migrations(self, dict):
+        dict['parameters'].update({'Enable_Local_Migration': 0})
+        dict['parameters'].update({'Enable_Air_Migration': 0})
+        dict['parameters'].update({'Enable_Family_Migration': 0})
+        dict['parameters'].update({'Enable_Regional_Migration': 0})
+        dict['parameters'].update({'Enable_Sea_Migration': 0})
+        return dict
+
