@@ -1,0 +1,182 @@
+import json
+import os
+from functools import partial
+
+import pytest
+from abc import ABC, abstractmethod
+
+from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
+from idmtools.core import ItemType
+from idmtools.core.platform_factory import Platform
+from idmtools.entities import IPlatform
+from idmtools.managers import ExperimentManager
+from idmtools_test.utils.comps import sims_from_experiment, get_simulation_path
+
+from idmtools_model_emod.emod_experiment import EMODExperiment, IEMODExperiment
+from idmtools_model_emod.defaults import EMODSir
+from idmtools_model_emod.generic.serialization import add_serialization_timesteps, load_serialized_population
+from idmtools_test import COMMON_INPUT_PATH
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+
+current_directory = os.path.dirname(os.path.realpath(__file__))
+DEFAULT_CONFIG_PATH = os.path.join(COMMON_INPUT_PATH, "files", "config.json")
+DEFAULT_CAMPAIGN_JSON = os.path.join(COMMON_INPUT_PATH, "files", "campaign.json")
+DEFAULT_DEMOGRAPHICS_JSON = os.path.join(COMMON_INPUT_PATH, "files", "demographics.json")
+DEFAULT_ERADICATION_PATH = os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe")
+
+def param_update(simulation, param, value):
+    return simulation.set_parameter(param, value)
+
+@pytest.mark.emod
+class EMODPlatformTest(ABC):
+
+    @classmethod
+    @abstractmethod
+    def get_emod_experiment(cls, ) -> IEMODExperiment:
+        pass
+
+    @classmethod
+    @abstractmethod
+    def get_emod_binary(cls, ) -> str:
+        pass
+
+    @classmethod
+    @abstractmethod
+    def get_platform(cls) -> IPlatform:
+        pass
+
+    def setUp(self) -> None:
+        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        print(self.case_name)
+
+    @pytest.mark.long
+    def test_serialization(self):
+        # Step1: create experiment and simulation with serialization file in output
+        from config_update_parameters import config_update_params
+        BIN_PATH = os.path.join(COMMON_INPUT_PATH, "serialization")
+
+        sim_duration = 2  # in years
+        num_seeds = 1
+        e1 = EMODExperiment.from_default(self.case_name + " create serialization", default=EMODSir,
+                                        eradication_path=os.path.join(BIN_PATH, "Eradication.exe"))
+        e1.demographics.clear()
+        demo_file = os.path.join(COMMON_INPUT_PATH, "serialization", "single_node_demographics.json")
+        e1.demographics.add_demographics_from_file(demo_file)
+
+        simulation = e1.base_simulation
+
+        # Update bunch of config parameters
+        sim = config_update_params(simulation)
+        timesteps = [sim_duration * 365]
+        add_serialization_timesteps(simulation=sim, timesteps=[sim_duration * 365],
+                                    end_at_final=False, use_absolute_times=False)
+
+        start_day = sim.get_parameter("Start_Time")
+        last_serialization_day = sorted(timesteps)[-1]
+        end_day = start_day + last_serialization_day
+        sim.set_parameter("Simulation_Duration", end_day)
+
+        sim.tags = {'role': 's', 'idmtools': 'single s test'}
+
+        builder = ExperimentBuilder()
+        set_Run_Number = partial(param_update, param="Run_Number")
+        builder.add_sweep_definition(set_Run_Number, range(num_seeds))
+        e1.tags = {'idmtools': 'create serialization'}
+
+        e1.builder = builder
+        em = ExperimentManager(experiment=e1, platform=self.platform)
+        em.run()
+        em.wait_till_done()
+        self.assertTrue(e1.succeeded)
+
+        #---------------------------------------------------------------------------------------------
+        # Step2: Create new experiment and sim with previous serialized file
+        #TODO, ideally we could add new sim to existing exp, but currently we can not do with issue #459
+
+        # First get previous serialized file path
+        comps_exp = self.platform.get_platform_item(item_id=e1.uid, item_type=ItemType.EXPERIMENT)
+        comps_sims = sims_from_experiment(comps_exp)
+        serialized_file_path = [get_simulation_path(sim) for sim in comps_sims][0]
+
+        # create new experiment
+        e2 = EMODExperiment.from_default(self.case_name + " realod serialization", default=EMODSir,
+                                        eradication_path=os.path.join(BIN_PATH, "Eradication.exe"))
+        e2.demographics.clear()
+        demo_file = os.path.join(COMMON_INPUT_PATH, "serialization", "single_node_demographics.json")
+        e2.demographics.add_demographics_from_file(demo_file)
+        e1.tags = {'idmtools': 'realod serialization'}
+
+        reload_sim = e2.simulation()
+        #reload_sim.config.pop('Serialization_Time_Steps') # Need this step if we use same exp
+        reload_sim.set_parameter("Config_Name", "reloading sim")
+        reload_sim.set_parameter("Simulation_Duration", sim_duration * 365)
+        load_serialized_population(simulation=reload_sim, population_path=os.path.join(serialized_file_path, 'output'),
+                                       population_filenames=['state-00730.dtk'])
+
+        b = StandAloneSimulationsBuilder()
+        b.add_simulation(reload_sim)
+        e2.builder = b
+        # Ideally we do not need to create another ExperimentManager if we can use same experiment
+        em2 = ExperimentManager(experiment=e2, platform=self.platform)
+        em2.run()
+        em2.wait_till_done()
+        reload_comps_exp = self.platform.get_platform_item(item_id=e2.uid, item_type=ItemType.EXPERIMENT)
+        reload_comps_sims = sims_from_experiment(reload_comps_exp)
+        reload_sim_path = [get_simulation_path(sim) for sim in reload_comps_sims][0]
+
+        # Validate: check channel keys and length of each channel data
+        serialized_sim_output_path = os.path.join(serialized_file_path, 'output')
+        reloaded_sim_output_path = os.path.join(reload_sim_path, 'output')
+        serialized_sim_chart_path = os.path.join(serialized_sim_output_path, "InsetChart.json")
+        serialized_sim_dtkfile_path = os.path.join(serialized_sim_output_path, 'state-00730.dtk')
+        reload_sim_chart_path = os.path.join(reloaded_sim_output_path, "InsetChart.json")
+
+        # make sure files are existing in simulation's output
+        self.assertTrue(os.path.exists(serialized_sim_chart_path))
+        self.assertTrue(os.path.exists(serialized_sim_dtkfile_path))
+        self.assertTrue(os.path.exists(reload_sim_chart_path))
+
+        with open(serialized_sim_chart_path) as infile:
+            serialized_chart = json.load(infile)
+        with open(reload_sim_chart_path) as infil1e1:
+            reloaded_chart = json.load(infil1e1)
+
+        # make sure they have same keys
+        serialized_keys = sorted(serialized_chart['Channels'].keys())
+        reload_keys = sorted(reloaded_chart['Channels'].keys())
+        self.assertEqual(len(serialized_keys), len(reload_keys))
+
+        for key in serialized_keys:
+            self.assertTrue(key in reload_keys)
+
+        # make sure timestamps are the same for these 2 sims
+        serialized_channel_length = len(serialized_chart['Channels']['Infected']['Data'])
+        reload_channel_length = len(reloaded_chart['Channels']['Infected']['Data'])
+        self.assertEqual(serialized_channel_length, reload_channel_length)
+        self.assertEqual(serialized_channel_length, 730)
+
+@pytest.mark.comps
+@pytest.mark.emod
+class TestCompsEMOOD(ITestWithPersistence, EMODPlatformTest):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.platform: IPlatform = cls.get_platform()
+
+    def setUp(self) -> None:
+        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        print(self.case_name)
+
+    @classmethod
+    def get_emod_experiment(cls) -> IEMODExperiment:
+        return EMODExperiment
+
+    @classmethod
+    def get_platform(cls) -> IPlatform:
+        return Platform('COMPS')
+
+    @classmethod
+    def get_emod_binary(cls, ) -> str:
+        return os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe")
+
+
