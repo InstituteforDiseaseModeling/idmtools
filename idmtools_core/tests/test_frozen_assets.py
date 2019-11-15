@@ -51,7 +51,6 @@ class TestFrozenAssets(unittest.TestCase):
 
         # Get the frozen asset
         a_frozen = ac.assets[0]
-        # self.assertTrue(isinstance(a_frozen, Asset))
 
         # Test: user can still access the frozen asset
         print(a_frozen.filename)
@@ -304,6 +303,7 @@ class TestFrozenAssets(unittest.TestCase):
         ac_frozen = frozen_transform(ac)
         self.assertEqual(len(ac_frozen.assets), 4)
 
+        # Test: user can still access the frozen asset
         print(ac_frozen.tags)
 
         # Test: the frozen asset (the first one) can't be modified
