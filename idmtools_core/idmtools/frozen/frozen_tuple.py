@@ -4,11 +4,6 @@ class ImTuple(tuple):
     """
     _frozen = False
 
-    # def __init__(self, t=None):
-    #     if t:
-    #         super().__init__(t)
-    #     # self._frozen = False
-
     def __add__(self, *args, **kwargs):  # real signature unknown
         """ Return self+value. """
         if self._frozen:

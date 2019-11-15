@@ -16,7 +16,6 @@ from idmtools.frozen.frozen_utils import FrozenBase
 
 
 class AssetCollection(IEntity, FrozenBase):
-# class AssetCollection(IEntity):
     """
     A class that represents a collection of assets.
     """

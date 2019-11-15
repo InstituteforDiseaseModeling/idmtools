@@ -1,10 +1,6 @@
 class ImSet(set):
     _frozen = False
 
-    # def __init__(self, s=None):
-    #     if s:
-    #         super().__init__(s)
-
     def add(self, *args, **kwargs):  # real signature unknown
         """
         Add an element to a set.
@@ -99,4 +95,3 @@ class ImSet(set):
             raise Exception('Frozen')
         else:
             super().__delattr__(item)
-

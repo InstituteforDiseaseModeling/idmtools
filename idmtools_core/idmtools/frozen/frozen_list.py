@@ -1,10 +1,6 @@
 class ImList(list):
     _frozen = False
 
-    # def __init__(self, l=None):
-    #     if l:
-    #         super().__init__(l)
-
     def append(self, *args, **kwargs):  # real signature unknown
         """ Append object to the end of the list. """
         if self._frozen:
@@ -79,48 +75,3 @@ class ImList(list):
             raise Exception('Frozen')
         else:
             super().__delattr__(item)
-
-    # def insert(self, index, item):
-    #     if self._frozen:
-    #         raise Exception('Frozen')
-    #     else:
-    #         super().insert(index, item)
-
-    # [ZDU] Seems good but prevent user from access the item from index!
-    # def __getitem__(self, *args, **kwargs):  # real signature unknown
-    #     """ Return self[key]. """
-    #     if self._frozen:
-    #         raise Exception('Frozen')
-    #     else:
-    #         super().__getitem__(*args, **kwargs)
-
-    # def __iter__(self): # real signature unknown
-    #     """ Implement iter(self). """
-    #     if self._frozen:
-    #         raise Exception('Frozen')
-    #     else:
-    #         super().__iter__()
-
-    # def __iter__(self, *args, **kwargs): # real signature unknown
-    #     """ Implement iter(self). """
-    #     if self._frozen:
-    #         raise Exception('Frozen')
-    #     else:
-    #         super().__iter__(*args, **kwargs)
-
-    # def __setslice__(self, *args, **kwargs):
-    #     if self._frozen:
-    #         raise Exception('Frozen')
-    #     else:
-    #         super().__setslice__(*args, **kwargs)
-    #
-    # def index(self, *args, **kwargs):  # real signature unknown
-    #     """
-    #     Return first index of value.
-    #
-    #     Raises ValueError if the value is not present.
-    #     """
-    #     if self._frozen:
-    #         raise Exception('Frozen')
-    #     else:
-    #         super().pop(*args, **kwargs)

@@ -1,13 +1,8 @@
 class FrozenBase:
     _frozen = False
 
-    # def __init__(self):
-    #     pass
-
     def frozen(self):
         from idmtools.frozen.frozen_utils import frozen_transform
-        # import inspect
-        # print(inspect.signature(MyClass.__init__))
 
         # Make sure don't do it twice
         if self._frozen:

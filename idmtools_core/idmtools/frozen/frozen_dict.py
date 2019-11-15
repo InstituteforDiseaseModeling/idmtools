@@ -1,13 +1,6 @@
 class ImDict(dict):
     _frozen = False
 
-    # def __setattr__(self, key, value):
-    #     if self._frozen:
-    #     # if self._frozen and type(value) in self._frozen_types:
-    #         raise Exception("Frozen!")
-    #     else:
-    #         super().__setattr__(key, value)
-
     def __setitem__(self, *args, **kwargs):  # real signature unknown
         """ Set self[key] to value. """
         if self._frozen:
