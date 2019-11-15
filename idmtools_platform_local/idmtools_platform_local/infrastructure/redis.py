@@ -33,6 +33,7 @@ class RedisContainer(BaseServiceContainer):
             data_dir = f'{self.data_volume_name}'
         else:
             data_dir = os.path.join(self.host_data_directory, 'redis-data')
+            logger.debug(f'Creating redis data directory at {data_dir}')
             os.makedirs(data_dir, exist_ok=True)
 
         redis_volumes = {

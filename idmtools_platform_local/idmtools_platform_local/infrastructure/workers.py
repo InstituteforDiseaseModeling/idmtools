@@ -58,6 +58,7 @@ class WorkersContainer(BaseServiceContainer):
         logger.debug(f'Creating working container')
         if not self.data_volume_name:
             data_dir = os.path.join(self.host_data_directory, 'workers')
+            logger.debug(f'Creating worker data directory at {data_dir}')
             os.makedirs(data_dir, exist_ok=True)
         else:
             logger.debug(f"Specifying Data directory using named volume {self.data_volume_name}")
