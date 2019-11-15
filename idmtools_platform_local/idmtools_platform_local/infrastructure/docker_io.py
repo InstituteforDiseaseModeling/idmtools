@@ -64,7 +64,8 @@ class DockerIO:
                     logger.exception(e)
                 pass
 
-    def cleanup(self, delete_data: bool = True, shallow_delete: bool = True) -> NoReturn:
+    def cleanup(self, delete_data: bool = True,
+                shallow_delete: bool = os.getenv('SHALLOW_DELETE', '0').lower() in ['1', 'y', 'yes', 'on']) -> NoReturn:
         """
         Stops the running services, removes local data, and removes network. You can optionally disable the deleting
         of local data

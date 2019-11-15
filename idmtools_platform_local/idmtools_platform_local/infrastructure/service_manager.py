@@ -75,7 +75,7 @@ class DockerServiceManager:
     def cleanup(self, delete_data: bool = False, tear_down_brokers: bool = False) -> NoReturn:
         """
         Stops the containers and removes the network. Optionally the postgres data container can be deleted as well
-            as closing any active Redis conenctions
+            as closing any active Redis connections
         Args:
             delete_data: Delete postgres data
             tear_down_brokers: True to close redis brokers, false otherwise

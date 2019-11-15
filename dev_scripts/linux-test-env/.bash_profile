@@ -19,3 +19,6 @@ export API_HOST=$REDIS_HOST
 # docker in docker requires us to mount via volume name so the directory can be mounted by items
 export IDMTOOLS_WORKERS_DATA_MOUNT_BY_VOLUMENAME=linux-test-env_idmtools_local_workers
 export IDMTOOLS_REDIS_DATA_MOUNT_BY_VOLUMENAME=linux-test-env_idmtools_local_redis
+# Because the directories for local data are mapped as directories we want to shallow delete our data(only data within
+# container and not the whole directory)
+export SHALLOW_DELETE=1
