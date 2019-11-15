@@ -76,12 +76,6 @@ class TestFrozenAssets(unittest.TestCase):
             a_frozen._content = 'Hello World'
         self.assertIn('Frozen', context.exception.args[0])
 
-        # Test: the frozen asset (the first one) can't be modified
-        # a_frozen.filename = 'a_modified_again.txt'
-        # a_frozen.absolute_path = 'new.txt'
-        # a_frozen._relative_path = os.getcwd()
-        # a_frozen._content = 'Hello World'
-
     def test_frozen_assets_inherit(self):
         from idmtools_test.utils.test_asset import Asset
         from idmtools_test.utils.test_asset_collection import AssetCollection
@@ -135,12 +129,6 @@ class TestFrozenAssets(unittest.TestCase):
             a._content = 'Hello World'
         self.assertIn('Frozen', context.exception.args[0])
 
-        # Test: the frozen asset (the first one) can't be modified
-        # a.filename = 'a_modified_again.txt'
-        # a.absolute_path = 'new.txt'
-        # a._relative_path = os.getcwd()
-        # a._content = 'Hello World'
-
     def test_frozen_asset_collection_inherit(self):
         from idmtools_test.utils.test_asset_collection import AssetCollection
         from idmtools_test.utils.test_asset import Asset
@@ -182,14 +170,6 @@ class TestFrozenAssets(unittest.TestCase):
         with self.assertRaises(Exception) as context:
             ac_frozen.assets[2].filename = 'modified'
         self.assertIn('Frozen', context.exception.args[0])
-
-        # Test: the frozen asset (the first one) can't be modified
-        # ac_frozen.tags = {}
-        # ac_frozen.tags["number_tag"] = 111
-        # ac_frozen.tags.update({"number_tag": 123})
-        # del ac_frozen.assets[0]
-        # ac_frozen.assets[0].filename = 'modified'
-        # ac_frozen.assets[2].filename = 'modified'
 
     def test_frozen_asset_collection_only_inherit(self):
         from idmtools_test.utils.test_asset_collection import AssetCollection
@@ -233,14 +213,6 @@ class TestFrozenAssets(unittest.TestCase):
             ac_frozen.assets[1].filename = 'modified'
         self.assertIn('Frozen', context.exception.args[0])
 
-        # Test: the frozen asset (the first one) can't be modified
-        # ac_frozen.tags = {}
-        # ac_frozen.tags["number_tag"] = 111
-        # ac_frozen.tags.update({"number_tag": 123})
-        # del ac_frozen.assets[0]
-        # ac_frozen.assets[0].filename = 'modified'
-        # ac_frozen.assets[2].filename = 'modified'
-
     def test_frozen_asset_inherit(self):
         from idmtools.assets import AssetCollection
         from idmtools_test.utils.test_asset import Asset
@@ -283,14 +255,6 @@ class TestFrozenAssets(unittest.TestCase):
             ac_frozen.assets[1].filename = 'modified'
         self.assertIn('Frozen', context.exception.args[0])
 
-        # Test: the frozen asset (the first one) can't be modified
-        # ac_frozen.tags = {}
-        # ac_frozen.tags["number_tag"] = 111
-        # ac_frozen.tags.update({"number_tag": 123})
-        # del ac_frozen.assets[0]
-        # ac_frozen.assets[0].filename = 'modified'
-        # ac_frozen.assets[2].filename = 'modified'
-
     def test_frozen_asset_collection_inherit(self):
         from idmtools_test.utils.test_asset_collection import AssetCollection
 
@@ -327,14 +291,6 @@ class TestFrozenAssets(unittest.TestCase):
         with self.assertRaises(Exception) as context:
             ac_frozen.assets[1].filename = 'modified'
         self.assertIn('Frozen', context.exception.args[0])
-
-        # Test: the frozen asset (the first one) can't be modified
-        # ac_frozen.tags = {}
-        # ac_frozen.tags["number_tag"] = 111
-        # ac_frozen.tags.update({"number_tag": 123})
-        # del ac_frozen.assets[0]
-        # ac_frozen.assets[0].filename = 'modified'
-        # ac_frozen.assets[2].filename = 'modified'
 
     def test_frozen_transform_asset_collection(self):
         from idmtools.assets import AssetCollection
@@ -374,15 +330,6 @@ class TestFrozenAssets(unittest.TestCase):
         with self.assertRaises(Exception) as context:
             ac_frozen.assets[1].filename = 'modified'
         self.assertIn('Frozen', context.exception.args[0])
-
-        # Test: the frozen asset (the first one) can't be modified
-        # ac_frozen.tags = {}
-        # ac_frozen.tags["number_tag"] = 111
-        # ac_frozen.tags.update({"number_tag": 123})
-        # ac_frozen.tags.pop("number_tag")
-        # del ac_frozen.assets[0]
-        # ac_frozen.assets[0].filename = 'modified'
-        # ac_frozen.assets[2].filename = 'modified'
 
 
 if __name__ == '__main__':
