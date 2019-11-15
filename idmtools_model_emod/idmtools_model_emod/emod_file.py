@@ -33,30 +33,60 @@ class MigrationTypes(Enum):
     SEA = 'Sea'
 
 
+class MigrationModel(Enum):
+    NO_MIGRATION = 'NO_MIGRATION'
+    FIXED_RATE_MIGRATION = 'FIXED_RATE_MIGRATION'
+
+
+class MigrationPattern(Enum):
+    RANDOM_WALK_DIFFUSION = 'RANDOM_WALK_DIFFUSION'
+    SINGLE_ROUND_TRIPS = 'SINGLE_ROUND_TRIPS'
+    WAYPOINTS_HOME = 'WAYPOINTS_HOME'
+
+
 class MigrationFiles(InputFilesList):
     def __init__(self, relative_path=None):
         super().__init__(relative_path)
         self.migration_files = {}
+        self.migration_pattern = None
+        self.migration_other_params = {}
 
-    def add_migration_from_file(self, migration_type: 'MigrationTypes', file_path: 'str'):
+    def update_migration_pattern(self, migration_pattern: 'MigrationPattern', **kwargs):
+        self.migration_pattern = migration_pattern
+        for param, value in kwargs.items():
+            self.migration_other_params[param] = value
+
+    def add_migration_from_file(self, migration_type: 'MigrationTypes', file_path: 'str', x_migration: 'float' = 1):
         asset = Asset(absolute_path=file_path, relative_path=self.relative_path)
         if asset.extension != "bin":
             raise Exception("Please add the binary (.bin) path for the `add_migration_from_file` function!")
-        self.migration_files[migration_type] = asset
+        self.migration_files[migration_type] = (asset, x_migration)
 
     def set_simulation_config(self, simulation):
+        simulation.set_parameter("Migration_Model", MigrationModel.FIXED_RATE_MIGRATION.value)
+        if not self.migration_pattern:
+            self.migration_pattern = MigrationPattern.RANDOM_WALK_DIFFUSION
+        simulation.set_parameter("Migration_Pattern", self.migration_pattern.value)
+
+        if not self.migration_other_params:
+            self.migration_other_params["Enable_Migration_Heterogeneity"] = 0
+
+        for param, value in self.migration_other_params.items():
+            simulation.set_parameter(param, value)
         # Enable or disable migrations depending on the available files
         for migration_type in MigrationTypes:
             if migration_type in self.migration_files:
                 simulation.set_parameter(f"Enable_{migration_type.value}_Migration", 1)
-                migration_file = self.migration_files[migration_type]
+                migration_file, x_migration = self.migration_files[migration_type]
                 simulation.set_parameter(f"{migration_type.value}_Migration_Filename",
                                          os.path.join(migration_file.relative_path, migration_file.filename))
+                simulation.set_parameter(f"x_{migration_type.value}_Migration", x_migration)
+
             else:
                 simulation.set_parameter(f"Enable_{migration_type.value}_Migration", 0)
 
     def gather_assets(self):
-        for asset in self.migration_files.values():
+        for asset, _ in self.migration_files.values():
             if asset.persisted:
                 continue
             self.assets.append(asset)
@@ -65,16 +95,20 @@ class MigrationFiles(InputFilesList):
         return super().gather_assets()
 
     def set_all_persisted(self):
-        for asset in self.migration_files.values():
+        for asset, _ in self.migration_files.values():
             asset.persisted = True
         super().set_all_persisted()
 
     def merge_with(self, mf: 'MigrationFiles', left_precedence: 'bool' = True) -> 'NoReturn':
         if not left_precedence:
             self.migration_files.update(mf.migration_files)
+            self.migration_other_params.update(mf.migration_other_params)
         else:
             for migration_type in set(mf.migration_files.keys()).difference(self.migration_files.keys()):
                 self.migration_files[migration_type] = mf.migration_files[migration_type]
+            for migration_param in set(mf.migration_other_params.keys()).difference(self.migration_other_params.keys()):
+                self.migration_other_params[migration_param] = mf.migration_other_params[migration_param]
+        self.migration_pattern = mf.migration_pattern
 
 
 class Dlls(InputFilesList):

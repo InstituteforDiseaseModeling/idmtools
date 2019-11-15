@@ -10,7 +10,7 @@ from idmtools.utils.filters.asset_filters import file_name_is
 from analyzers import TimeseriesAnalyzer, NodeDemographicsAnalyzer
 from idmtools.analysis.analyze_manager import AnalyzeManager
 from idmtools.analysis.download_analyzer import DownloadAnalyzer
-from idmtools_model_emod.emod_file import MigrationTypes
+from idmtools_model_emod.emod_file import MigrationTypes, MigrationPattern
 
 from globals import *
 
@@ -50,8 +50,14 @@ if __name__ == "__main__":
     filter_name_s = partial(file_name_is, filenames=[DTK_SERIALIZATION_FILENAME])
     e.assets.add_directory(assets_directory=MIGRATION_SERIALIZATION_PATH, filters=[filter_name_s])
 
-    # Add the migration files
-    e.migrations.add_migration_from_file(MigrationTypes.LOCAL, os.path.join(INPUT_PATH, DTK_MIGRATION_FILENAME))
+    # Enable migration and Add the migration files
+    e.migrations.update_migration_pattern(MigrationPattern.RANDOM_WALK_DIFFUSION,  Enable_Migration_Heterogeneity=1)
+    e.migrations.add_migration_from_file(MigrationTypes.LOCAL,
+                                         os.path.join(INPUT_PATH, DTK_LOCAL_MIGRATION_FILENAME),
+                                         X_LOCAL_MIGRATION)
+    e.migrations.add_migration_from_file(MigrationTypes.REGIONAL,
+                                         os.path.join(INPUT_PATH, DTK_REGIONAL_MIGRATION_FILENAME),
+                                         X_REGIONAL_MIGRATION)
 
     # Add the DLLs to the collection
     e.dlls.add_dll_folder("../custom_reports/reporter_plugins/Windows")
@@ -69,11 +75,7 @@ if __name__ == "__main__":
                                population_filenames=[DTK_SERIALIZATION_FILENAME])
     simulation.update_parameters({
         "Start_Time": PRE_SERIALIZATION_DAY,
-        "Simulation_Duration": SIMULATION_DURATION - PRE_SERIALIZATION_DAY,
-        "Migration_Model": "FIXED_RATE_MIGRATION",
-        "Migration_Pattern": "RANDOM_WALK_DIFFUSION",
-        "Enable_Migration_Heterogeneity": 0,
-        "x_Local_Migration": 0.1
+        "Simulation_Duration": SIMULATION_DURATION - PRE_SERIALIZATION_DAY
     })
 
     # Get the seeds builder

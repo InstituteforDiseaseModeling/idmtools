@@ -20,6 +20,10 @@ REPETITIONS = 4
 NUM_CORES = 4
 LAST_SERIALIZATION_DAY = 70
 PRE_SERIALIZATION_DAY = 50
+X_LOCAL_MIGRATION = 0.05
+X_REGIONAL_MIGRATION = 0.005
+DTK_LOCAL_MIGRATION_FILENAME = "LocalMigration_3_Nodes.bin"
+DTK_REGIONAL_MIGRATION_FILENAME = "RegionalMigration_3_Nodes.bin"
 
 
 def param_update(simulation: 'EMODSimulation', param, value):

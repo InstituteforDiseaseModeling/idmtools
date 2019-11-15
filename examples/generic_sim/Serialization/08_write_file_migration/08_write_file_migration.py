@@ -8,12 +8,12 @@ from idmtools_model_emod import EMODExperiment
 from idmtools_model_emod.generic.serialization import add_serialization_timesteps
 from idmtools.analysis.analyze_manager import AnalyzeManager
 from idmtools.analysis.download_analyzer import DownloadAnalyzer
-from idmtools_model_emod.emod_file import MigrationTypes
+from idmtools_model_emod.emod_file import MigrationTypes, MigrationPattern
 
 from globals import *
 
 EXPERIMENT_NAME = 'Generic serialization 08 writes files migration'
-DTK_MIGRATION_FILENAME = "LocalMigration_3_Nodes.bin"
+
 REPETITIONS = 1 # run with only one run_number in this test
 
 
@@ -28,8 +28,15 @@ if __name__ == "__main__":
                                   campaign_path=os.path.join(INPUT_PATH, "campaign.json"),
                                   demographics_paths=os.path.join(INPUT_PATH, "3nodes_demographics.json"))
 
-    # Add the migration files
-    e.migrations.add_migration_from_file(MigrationTypes.LOCAL, os.path.join(INPUT_PATH, DTK_MIGRATION_FILENAME))
+    # Enable migration and Add the migration files
+    e.migrations.add_migration_from_file(MigrationTypes.LOCAL,
+                                         os.path.join(INPUT_PATH, DTK_LOCAL_MIGRATION_FILENAME),
+                                         X_LOCAL_MIGRATION)
+    e.migrations.add_migration_from_file(MigrationTypes.REGIONAL,
+                                         os.path.join(INPUT_PATH, DTK_REGIONAL_MIGRATION_FILENAME),
+                                         X_REGIONAL_MIGRATION)
+    e.migrations.update_migration_pattern(MigrationPattern.RANDOM_WALK_DIFFUSION,  Enable_Migration_Heterogeneity = 1)
+
 
     # Add the DLLs to the collection
     e.dlls.add_dll_folder("../custom_reports/reporter_plugins/Windows")
@@ -45,11 +52,7 @@ if __name__ == "__main__":
                                 end_at_final=False, use_absolute_times=False)
     simulation.update_parameters({
         "Start_Time": START_DAY,
-        "Simulation_Duration": SIMULATION_DURATION,
-        "Enable_Migration_Heterogeneity": 0,
-        "Migration_Model": "FIXED_RATE_MIGRATION",
-        "Migration_Pattern": "RANDOM_WALK_DIFFUSION",
-        "x_Local_Migration": 0.1,
+        "Simulation_Duration": SIMULATION_DURATION
     })
 
     # Retrieve the seed sweep
