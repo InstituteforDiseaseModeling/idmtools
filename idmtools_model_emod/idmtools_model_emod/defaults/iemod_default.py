@@ -1,30 +1,18 @@
 from abc import ABCMeta
 from typing import Dict
 
-from idmtools.utils.decorators import abstractstatic
-
 
 class IEMODDefault(metaclass=ABCMeta):
-    @abstractstatic
-    def config() -> Dict:
+    def config(self) -> Dict:
         return {}
 
-    @abstractstatic
-    def campaign() -> Dict:
+    def campaign(self) -> Dict:
         return {}
 
-    @abstractstatic
-    def demographics() -> Dict:
+    def demographics(self) -> Dict:
         return {}
 
-    @classmethod
-    def process_simulation(cls, simulation):
-        if cls.campaign:
-            simulation.campaign = cls.campaign()
+    def process_simulation(self, simulation):
+        simulation.campaign = self.campaign()
 
-        if cls.config:
-            simulation.config = cls.config()
-
-        # # The default demographics will be added to Experiment instead
-        # if cls.demographics:
-        #     simulation.demographics = cls.demographics()
+        simulation.config = self.config()
