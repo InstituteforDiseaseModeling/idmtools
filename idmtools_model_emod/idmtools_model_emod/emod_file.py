@@ -1,6 +1,7 @@
 import json
 import os
 from abc import ABCMeta, abstractmethod
+from enum import Enum
 
 from idmtools.assets import Asset, AssetCollection, json_handler
 
@@ -23,7 +24,8 @@ class InputFilesList(AssetCollection, metaclass=ABCMeta):
 
 class DemographicsFiles(InputFilesList):
     def set_simulation_config(self, simulation):
-        simulation.config["Demographics_Filenames"] = [os.path.join(df.relative_path, df.filename) for df in self.assets]
+        simulation.config["Demographics_Filenames"] = [os.path.join(df.relative_path, df.filename) for df in
+                                                       self.assets]
 
     def add_demographics_from_file(self, absolute_path, filename: 'str' = None):
         filename = filename or os.path.basename(absolute_path)
@@ -42,3 +44,23 @@ class DemographicsFiles(InputFilesList):
             raise Exception("Duplicated demographics file")
 
         self.assets.append(asset)
+
+
+class ClimateFileType(Enum):
+    AIR_TEMPERATURE = "Air_Temperature"
+    LAND_TEMPERATURE = "Land_Temperature"
+    HUMIDITY = "Humidity"
+    RAINFALL = "Rainfall"
+
+
+class ClimateFiles(InputFilesList):
+    files_by_type = {}
+
+    def __init__(self):
+        super().__init__("climate")
+
+    def set_simulation_config(self, simulation):
+        pass
+
+    def set_climate(self, file_type, file_path):
+        pass
