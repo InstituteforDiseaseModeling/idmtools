@@ -1,13 +1,13 @@
 import os
 from functools import partial
-from idmtools.assets import AssetCollection, Asset
+
+from config_update_parameters import config_update_params
+
 from idmtools.builders import SweepArm, ArmType, ArmExperimentBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
-from idmtools_model_emod.defaults import EMODSir
-from idmtools_model_emod.emod_experiment import DockerEMODExperiment
-from config_update_parameters import config_update_params
 from idmtools_model_emod import EMODExperiment
+from idmtools_model_emod.defaults import EMODSir
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 BIN_PATH = os.path.join(current_directory, "bin")
@@ -27,7 +27,7 @@ if __name__ == "__main__":
     platform = Platform('COMPS_SLURMCLUSTER')
 
     emod_version = '2.20.0'
-    e = EMODExperiment.from_default(expname, default=EMODSir, eradication_path=os.path.join(BIN_PATH, "Eradication"))
+    e = EMODExperiment.from_default(expname, default=EMODSir(), eradication_path=os.path.join(BIN_PATH, "Eradication"))
     e.demographics.clear()
     demo_file = os.path.join(INPUT_PATH, "single_node_demographics.json")
     e.demographics.add_demographics_from_file(demo_file)

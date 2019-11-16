@@ -1,21 +1,20 @@
 import json
 import os
+from abc import ABC, abstractmethod
 from functools import partial
 
 import pytest
-from abc import ABC, abstractmethod
 
 from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import IPlatform
 from idmtools.managers import ExperimentManager
-from idmtools_test.utils.comps import sims_from_experiment, get_simulation_path
-
-from idmtools_model_emod.emod_experiment import EMODExperiment, IEMODExperiment
 from idmtools_model_emod.defaults import EMODSir
+from idmtools_model_emod.emod_experiment import EMODExperiment, IEMODExperiment
 from idmtools_model_emod.generic.serialization import add_serialization_timesteps, load_serialized_population
 from idmtools_test import COMMON_INPUT_PATH
+from idmtools_test.utils.comps import sims_from_experiment, get_simulation_path
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
@@ -57,8 +56,8 @@ class EMODPlatformTest(ABC):
 
         sim_duration = 2  # in years
         num_seeds = 1
-        e1 = EMODExperiment.from_default(self.case_name + " create serialization", default=EMODSir,
-                                        eradication_path=os.path.join(BIN_PATH, "Eradication.exe"))
+        e1 = EMODExperiment.from_default(self.case_name + " create serialization", default=EMODSir(),
+                                         eradication_path=os.path.join(BIN_PATH, "Eradication.exe"))
         e1.demographics.clear()
         demo_file = os.path.join(COMMON_INPUT_PATH, "serialization", "single_node_demographics.json")
         e1.demographics.add_demographics_from_file(demo_file)
@@ -99,8 +98,8 @@ class EMODPlatformTest(ABC):
         serialized_file_path = [get_simulation_path(sim) for sim in comps_sims][0]
 
         # create new experiment
-        e2 = EMODExperiment.from_default(self.case_name + " realod serialization", default=EMODSir,
-                                        eradication_path=os.path.join(BIN_PATH, "Eradication.exe"))
+        e2 = EMODExperiment.from_default(self.case_name + " realod serialization", default=EMODSir(),
+                                         eradication_path=os.path.join(BIN_PATH, "Eradication.exe"))
         e2.demographics.clear()
         demo_file = os.path.join(COMMON_INPUT_PATH, "serialization", "single_node_demographics.json")
         e2.demographics.add_demographics_from_file(demo_file)

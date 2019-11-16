@@ -18,7 +18,7 @@ if __name__ == "__main__":
     platform = Platform('COMPS')
 
     # Experiment from the EMODSIR defaults
-    e = EMODExperiment.from_default(EXPERIMENT_NAME, default=EMODSir,
+    e = EMODExperiment.from_default(EXPERIMENT_NAME, default=EMODSir(),
                                     eradication_path=os.path.join(BIN_PATH, "Eradication.exe"))
 
     # Get the base simulation and set the campaign and demographics

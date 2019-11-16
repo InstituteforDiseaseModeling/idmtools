@@ -1,19 +1,17 @@
 import os
-
 from functools import partial
+
+from config_update_parameters import config_update_params
 
 from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
-from idmtools_test import COMMON_INPUT_PATH
-from idmtools_test.utils.comps import sims_from_experiment, get_simulation_path
-
 from idmtools_model_emod import EMODExperiment
 from idmtools_model_emod.defaults import EMODSir
-from config_update_parameters import config_update_params
-
 from idmtools_model_emod.generic.serialization import add_serialization_timesteps, load_serialized_population
+from idmtools_test import COMMON_INPUT_PATH
+from idmtools_test.utils.comps import sims_from_experiment, get_simulation_path
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 BIN_PATH = os.path.join(current_directory, "bin")
@@ -36,7 +34,7 @@ if __name__ == "__main__":
     num_seeds = 1
 
     expname = 'create_serialization'
-    e1 = EMODExperiment.from_default(expname, default=EMODSir,
+    e1 = EMODExperiment.from_default(expname, default=EMODSir(),
                                      eradication_path=os.path.join(BIN_PATH, "Eradication.exe"))
     e1.demographics.clear()
     demo_file = os.path.join(COMMON_INPUT_PATH, "serialization", "single_node_demographics.json")
@@ -80,7 +78,7 @@ if __name__ == "__main__":
 
     # create new experiment
     expname1 = 'reload_serialization'
-    e2 = EMODExperiment.from_default(expname1, default=EMODSir,
+    e2 = EMODExperiment.from_default(expname1, default=EMODSir(),
                                      eradication_path=os.path.join(BIN_PATH, "Eradication.exe"))
     e2.demographics.clear()
     demo_file = os.path.join(COMMON_INPUT_PATH, "serialization", "single_node_demographics.json")
