@@ -48,6 +48,7 @@ class MigrationFiles(InputFilesList):
     def __init__(self, relative_path=None):
         super().__init__(relative_path)
         self.migration_files = {}
+        self.migration_multipliers = {}
         self.migration_model = None
         self.migration_pattern = None
         self.migration_other_params = {}
@@ -65,34 +66,46 @@ class MigrationFiles(InputFilesList):
         for param, value in kwargs.items():
             self.migration_other_params[param] = value
 
-    def add_migration_from_file(self, migration_type: 'MigrationTypes', file_path: 'str', x_migration: 'float' = 1):
+    def add_migration_from_file(self, migration_type: 'MigrationTypes', file_path: 'str', multiplier: 'float' = 1):
         self.enable_migration()
         asset = Asset(absolute_path=file_path, relative_path=self.relative_path)
         if asset.extension != "bin":
             raise Exception("Please add the binary (.bin) path for the `add_migration_from_file` function!")
-        self.migration_files[migration_type] = (asset, x_migration)
+        self.migration_files[migration_type] = asset
+        self.migration_multipliers[migration_type] = multiplier
 
     def set_simulation_config(self, simulation):
+        # Set the migration  model if present
         if self.migration_model:
             simulation.set_parameter("Migration_Model", self.migration_model.value)
-        if  self.migration_pattern:
+
+        # Set the migration pattern if present
+        if self.migration_pattern:
             simulation.set_parameter("Migration_Pattern", self.migration_pattern.value)
-        for param, value in self.migration_other_params.items():
-            simulation.set_parameter(param, value)
+
+        # Set the extra parameters
+        simulation.update_parameters(self.migration_other_params)
+
         # Enable or disable migrations depending on the available files
         for migration_type in MigrationTypes:
             if migration_type in self.migration_files:
+                # Enable the migration
                 simulation.set_parameter(f"Enable_{migration_type.value}_Migration", 1)
-                migration_file, x_migration = self.migration_files[migration_type]
+
+                # Set the file
+                migration_file = self.migration_files[migration_type]
                 simulation.set_parameter(f"{migration_type.value}_Migration_Filename",
                                          os.path.join(migration_file.relative_path, migration_file.filename))
-                simulation.set_parameter(f"x_{migration_type.value}_Migration", x_migration)
+
+                # Set the multiplier
+                migration_multiplier = self.migration_multipliers.get(migration_type, 1)
+                simulation.set_parameter(f"x_{migration_type.value}_Migration", migration_multiplier)
 
             else:
                 simulation.set_parameter(f"Enable_{migration_type.value}_Migration", 0)
 
     def gather_assets(self):
-        for asset, _ in self.migration_files.values():
+        for asset in self.migration_files.values():
             if asset.persisted:
                 continue
             self.assets.append(asset)
@@ -101,7 +114,7 @@ class MigrationFiles(InputFilesList):
         return super().gather_assets()
 
     def set_all_persisted(self):
-        for asset, _ in self.migration_files.values():
+        for asset in self.migration_files.values():
             asset.persisted = True
         super().set_all_persisted()
 
@@ -112,8 +125,10 @@ class MigrationFiles(InputFilesList):
         else:
             for migration_type in set(mf.migration_files.keys()).difference(self.migration_files.keys()):
                 self.migration_files[migration_type] = mf.migration_files[migration_type]
+
             for migration_param in set(mf.migration_other_params.keys()).difference(self.migration_other_params.keys()):
                 self.migration_other_params[migration_param] = mf.migration_other_params[migration_param]
+
         self.migration_pattern = mf.migration_pattern
         self.migration_model = mf.migration_model
 

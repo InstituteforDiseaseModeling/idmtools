@@ -16,7 +16,6 @@ INPUT_PATH = os.path.abspath(os.path.join(current_directory, "inputs"))
 
 START_DAY = 0
 SIMULATION_DURATION = 120
-REPETITIONS = 4
 NUM_CORES = 4
 LAST_SERIALIZATION_DAY = 70
 PRE_SERIALIZATION_DAY = 50
@@ -30,7 +29,7 @@ def param_update(simulation: 'EMODSimulation', param, value):
     return simulation.set_parameter(param, value)
 
 
-def get_seed_experiment_builder(num_seed=REPETITIONS):
+def get_seed_experiment_builder(num_seed=4):
     builder = ExperimentBuilder()
     set_Run_Number = partial(param_update, param="Run_Number")
     builder.add_sweep_definition(set_Run_Number, range(num_seed))

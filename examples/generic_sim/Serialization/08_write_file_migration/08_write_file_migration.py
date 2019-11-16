@@ -13,9 +13,7 @@ from idmtools_model_emod.emod_file import MigrationTypes, MigrationPattern
 from globals import *
 
 EXPERIMENT_NAME = 'Generic serialization 08 writes files migration'
-
-REPETITIONS = 1 # run with only one run_number in this test
-
+DTK_MIGRATION_FILENAME = "LocalMigration_3_Nodes.bin"
 
 if __name__ == "__main__":
 
@@ -35,8 +33,7 @@ if __name__ == "__main__":
     e.migrations.add_migration_from_file(MigrationTypes.REGIONAL,
                                          os.path.join(INPUT_PATH, DTK_REGIONAL_MIGRATION_FILENAME),
                                          X_REGIONAL_MIGRATION)
-    e.migrations.update_migration_pattern(MigrationPattern.RANDOM_WALK_DIFFUSION,  Enable_Migration_Heterogeneity = 1)
-
+    e.migrations.update_migration_pattern(MigrationPattern.RANDOM_WALK_DIFFUSION, Enable_Migration_Heterogeneity=1)
 
     # Add the DLLs to the collection
     e.dlls.add_dll_folder("../custom_reports/reporter_plugins/Windows")
@@ -55,33 +52,28 @@ if __name__ == "__main__":
         "Simulation_Duration": SIMULATION_DURATION
     })
 
-    # Retrieve the seed sweep
-    builder = get_seed_experiment_builder(REPETITIONS)
-    e.add_builder(builder)
-
     # Create experiment manager and run
     em = ExperimentManager(experiment=e, platform=platform)
     em.run()
     em.wait_till_done()
 
-    if e.succeeded:
-        print(f"Experiment {e.uid} succeeded.\nDownloading dtk serialization files from Comps:\n")
-
-        # Create the filenames
-        filenames = ['output/InsetChart.json',
-                     'output/ReportHumanMigrationTracking.csv',
-                     'output/ReportNodeDemographics.csv']
-        for serialization_timestep in serialization_timesteps:
-            filenames.append("output/state-" + str(serialization_timestep).zfill(5) + ".dtk")
-
-        # Remove the outputs if already present
-        output_path = 'outputs'
-        del_folder(output_path)
-
-        download_analyzer = DownloadAnalyzer(filenames=filenames, output_path=output_path)
-        am = AnalyzeManager(platform=platform)
-        am.add_analyzer(download_analyzer)
-        am.add_item(e)
-        am.analyze()
-    else:
+    if not e.succeeded:
         print(f"Experiment {e.uid} failed.\n")
+        exit()
+
+    # Create the filenames
+    filenames = ['output/InsetChart.json',
+                 'output/ReportHumanMigrationTracking.csv',
+                 'output/ReportNodeDemographics.csv']
+    for serialization_timestep in serialization_timesteps:
+        filenames.append("output/state-" + str(serialization_timestep).zfill(5) + ".dtk")
+
+    # Remove the outputs if already present
+    output_path = 'outputs'
+    del_folder(output_path)
+
+    download_analyzer = DownloadAnalyzer(filenames=filenames, output_path=output_path)
+    am = AnalyzeManager(platform=platform)
+    am.add_analyzer(download_analyzer)
+    am.add_item(e)
+    am.analyze()

@@ -11,8 +11,7 @@ from idmtools.analysis.analyze_manager import AnalyzeManager
 from idmtools.analysis.download_analyzer import DownloadAnalyzer
 from globals import *
 
-EXPERIMENT_NAME = 'Generic serialization 01 writes files'
-REPETITIONS = 1 # run with only one run_number in this test
+EXPERIMENT_NAME = 'Generic serialization 01 write files'
 
 if __name__ == "__main__":
     # Create the platform
@@ -40,33 +39,31 @@ if __name__ == "__main__":
     simulation.set_parameter("Start_Time", START_DAY)
     simulation.set_parameter("Simulation_Duration", SIMULATION_DURATION)
 
-    # Create the sweep for the seed
-    e.builder = get_seed_experiment_builder(REPETITIONS)
-
     # Create the manager and run
     em = ExperimentManager(experiment=e, platform=platform)
     em.run()
     em.wait_till_done()
 
-    if e.succeeded:
-        print(f"Experiment {e.uid} succeeded.\nDownloading dtk serialization files from Comps:\n")
-
-        # Cleanup the output path
-        output_path = 'outputs'
-        del_folder(output_path)
-
-        # We want to download all the dtk state files and the InsetChart.json
-        filenames = []
-        for serialization_timestep in serialization_timesteps:
-            filenames.append("output/state-" + str(serialization_timestep).zfill(5) + ".dtk")
-        filenames.append('output/InsetChart.json')
-
-        # Create the analyze manager
-        am = AnalyzeManager(platform=platform)
-        am.add_item(e)
-        am.add_analyzer(DownloadAnalyzer(filenames=filenames, output_path=output_path))
-
-        # Analyze
-        am.analyze()
-    else:
+    if not e.succeeded:
         print(f"Experiment {e.uid} failed.\n")
+        exit()
+
+    print(f"Experiment {e.uid} succeeded.\nDownloading dtk serialization files from Comps:\n")
+
+    # Cleanup the output path
+    output_path = 'outputs'
+    del_folder(output_path)
+
+    # We want to download all the dtk state files and the InsetChart.json
+    filenames = []
+    for serialization_timestep in serialization_timesteps:
+        filenames.append("output/state-" + str(serialization_timestep).zfill(5) + ".dtk")
+    filenames.append('output/InsetChart.json')
+
+    # Create the analyze manager
+    am = AnalyzeManager(platform=platform)
+    am.add_item(e)
+    am.add_analyzer(DownloadAnalyzer(filenames=filenames, output_path=output_path))
+
+    # Analyze
+    am.analyze()

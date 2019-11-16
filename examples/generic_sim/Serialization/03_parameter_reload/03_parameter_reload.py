@@ -14,6 +14,7 @@ from idmtools.analysis.analyze_manager import AnalyzeManager
 from idmtools.analysis.download_analyzer import DownloadAnalyzer
 
 SERIALIZATION_PATH = os.path.abspath(os.path.join(current_directory, "01_write_file_singlenode", "outputs"))
+
 try:
     random_sim_id = os.listdir(SERIALIZATION_PATH)[-1]
     SERIALIZATION_PATH = os.path.join(SERIALIZATION_PATH, random_sim_id)
@@ -22,8 +23,8 @@ except Exception:
                             " succeeded.")
 
 EXPERIMENT_NAME = 'Generic serialization 03 parameter reload'
-dtk_serialization_filename = "state-00050.dtk"
-channels_tolerance = {'Statistical Population': 1,
+SERIALIZATION_FILENAME = "state-00050.dtk"
+CHANNELS_TOLERANCE = {'Statistical Population': 1,
                       'Infectious Population': 0.05,
                       'Waning Population': 0.05,
                       'New Infections': 20,
@@ -40,7 +41,7 @@ if __name__ == "__main__":
                                   demographics_paths=os.path.join(INPUT_PATH, "demographics.json"))
 
     # Add the dtk_file to the asset collection
-    dtk_file = Asset(absolute_path=os.path.join(SERIALIZATION_PATH, dtk_serialization_filename))
+    dtk_file = Asset(absolute_path=os.path.join(SERIALIZATION_PATH, SERIALIZATION_FILENAME))
     e.add_asset(dtk_file)
 
     # Retrieve the base_simulation
@@ -56,11 +57,10 @@ if __name__ == "__main__":
     add_serialization_timesteps(simulation=simulation, timesteps=[LAST_SERIALIZATION_DAY],
                                 end_at_final=False, use_absolute_times=True)
     load_serialized_population(simulation=simulation, population_path="Assets",
-                               population_filenames=[dtk_serialization_filename])
+                               population_filenames=[SERIALIZATION_FILENAME])
 
     # Create the sweep for the repetitions and for the sweep on Base_Infectivity
     e.builder = get_seed_experiment_builder()
-
     set_Base_Infectivity = partial(param_update, param="Base_Infectivity")
     e.builder.add_sweep_definition(set_Base_Infectivity, [0.2, 1])
 
@@ -69,36 +69,35 @@ if __name__ == "__main__":
     em.run()
     em.wait_till_done()
 
-    if e.succeeded:
-        print(f"Experiment {e.uid} succeeded.\n")
-
-        # Retrieve the parent experiment (The one used to generate the serialized population)
-        pre_exp = platform.get_parent(random_sim_id, ItemType.SIMULATION)
-
-        # Analyze
-        print(f"Running TimeseriesAnalyzer with experiment id: {e.uid} and {pre_exp.uid}:\n")
-        analyzers_timeseries = TimeseriesAnalyzer()
-        am_timeseries = AnalyzeManager(platform=platform)
-        am_timeseries.add_analyzer(analyzers_timeseries)
-        am_timeseries.add_item(e)
-        am_timeseries.add_item(pre_exp)
-        am_timeseries.analyze()
-
-        # Download the serialization files
-        print("Downloading dtk serialization files from Comps:\n")
-        filenames = ['output/InsetChart.json', "output/state-" +
-                     str(LAST_SERIALIZATION_DAY - PRE_SERIALIZATION_DAY).zfill(5) + ".dtk"]
-
-        # Clean up output path if present
-        output_path = 'outputs'
-        del_folder(output_path)
-
-        # Download
-        analyzers_download = DownloadAnalyzer(filenames=filenames, output_path=output_path)
-        am_download = AnalyzeManager(platform=platform)
-        am_download.add_analyzer(analyzers_download)
-        am_download.add_item(e)
-        am_download.analyze()
-
-    else:
+    if not e.succeeded:
         print(f"Experiment {e.uid} failed.\n")
+        exit()
+
+    # Retrieve the parent experiment (The one used to generate the serialized population)
+    pre_exp = platform.get_parent(random_sim_id, ItemType.SIMULATION)
+
+    # Analyze
+    print(f"Running TimeseriesAnalyzer with experiment id: {e.uid} and {pre_exp.uid}:\n")
+    analyzers_timeseries = TimeseriesAnalyzer()
+    am_timeseries = AnalyzeManager(platform=platform)
+    am_timeseries.add_analyzer(analyzers_timeseries)
+    am_timeseries.add_item(e)
+    am_timeseries.add_item(pre_exp)
+    am_timeseries.analyze()
+    analyzers_timeseries.interpret_results(CHANNELS_TOLERANCE)
+
+    # Download the serialization files
+    print("Downloading dtk serialization files from Comps:\n")
+    filenames = ['output/InsetChart.json', "output/state-" +
+                 str(LAST_SERIALIZATION_DAY - PRE_SERIALIZATION_DAY).zfill(5) + ".dtk"]
+
+    # Clean up output path if present
+    output_path = 'outputs'
+    del_folder(output_path)
+
+    # Download
+    analyzers_download = DownloadAnalyzer(filenames=filenames, output_path=output_path)
+    am_download = AnalyzeManager(platform=platform)
+    am_download.add_analyzer(analyzers_download)
+    am_download.add_item(e)
+    am_download.analyze()

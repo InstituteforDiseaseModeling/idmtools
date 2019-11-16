@@ -87,47 +87,45 @@ if __name__ == "__main__":
     em.run()
     em.wait_till_done()
 
-    if e.succeeded:
-        print(f"Experiment {e.uid} succeeded.\n")
-
-        pre_exp = platform.get_parent(migration_random_sim_id, ItemType.SIMULATION)
-
-        print(f"Running NodeDemographicsAnalyzer with experiment id: {e.uid} and {pre_exp.uid}:\n")
-        analyzers_nd = NodeDemographicsAnalyzer()
-        am_nd = AnalyzeManager(platform=platform)
-        am_nd.add_analyzer(analyzers_nd)
-        am_nd.add_item(e)
-        am_nd.add_item(pre_exp)
-        am_nd.analyze()
-
-        analyzers_nd.interpret_results(NODE_COLUMNS_TOLERANCE)
-
-        print(f"Running TimeseriesAnalyzer with experiment id: {e.uid} and {pre_exp.uid}:\n")
-        analyzers_ts = TimeseriesAnalyzer()
-        am_ts = AnalyzeManager(platform=platform)
-        am_ts.add_analyzer(analyzers_ts)
-        am_ts.add_item(e)
-        am_ts.add_item(pre_exp)
-        am_ts.analyze()
-
-        analyzers_ts.interpret_results(CHANNELS_TOLERANCE)
-
-        print("Downloading dtk serialization files from Comps:\n")
-
-        filenames = ['output/InsetChart.json',
-                     'output/ReportHumanMigrationTracking.csv',
-                     'output/ReportNodeDemographics.csv',
-                     f"output/state-{str(LAST_SERIALIZATION_DAY - PRE_SERIALIZATION_DAY).zfill(5)}.dtk"]
-
-        # Cleanup the outptus if already present
-        output_path = 'outputs'
-        del_folder(output_path)
-
-        analyzers_download = DownloadAnalyzer(filenames=filenames, output_path=output_path)
-        am_download = AnalyzeManager(platform=platform)
-        am_download.add_analyzer(analyzers_download)
-        am_download.add_item(e)
-        am_download.analyze()
-
-    else:
+    if not e.succeeded:
         print(f"Experiment {e.uid} failed.\n")
+        exit()
+
+    pre_exp = platform.get_parent(migration_random_sim_id, ItemType.SIMULATION)
+
+    print(f"Running NodeDemographicsAnalyzer with experiment id: {e.uid} and {pre_exp.uid}:\n")
+    analyzers_nd = NodeDemographicsAnalyzer()
+    am_nd = AnalyzeManager(platform=platform)
+    am_nd.add_analyzer(analyzers_nd)
+    am_nd.add_item(e)
+    am_nd.add_item(pre_exp)
+    am_nd.analyze()
+
+    analyzers_nd.interpret_results(NODE_COLUMNS_TOLERANCE)
+
+    print(f"Running TimeseriesAnalyzer with experiment id: {e.uid} and {pre_exp.uid}:\n")
+    analyzers_ts = TimeseriesAnalyzer()
+    am_ts = AnalyzeManager(platform=platform)
+    am_ts.add_analyzer(analyzers_ts)
+    am_ts.add_item(e)
+    am_ts.add_item(pre_exp)
+    am_ts.analyze()
+
+    analyzers_ts.interpret_results(CHANNELS_TOLERANCE)
+
+    print("Downloading dtk serialization files from Comps:\n")
+
+    filenames = ['output/InsetChart.json',
+                 'output/ReportHumanMigrationTracking.csv',
+                 'output/ReportNodeDemographics.csv',
+                 f"output/state-{str(LAST_SERIALIZATION_DAY - PRE_SERIALIZATION_DAY).zfill(5)}.dtk"]
+
+    # Cleanup the outptus if already present
+    output_path = 'outputs'
+    del_folder(output_path)
+
+    analyzers_download = DownloadAnalyzer(filenames=filenames, output_path=output_path)
+    am_download = AnalyzeManager(platform=platform)
+    am_download.add_analyzer(analyzers_download)
+    am_download.add_item(e)
+    am_download.analyze()

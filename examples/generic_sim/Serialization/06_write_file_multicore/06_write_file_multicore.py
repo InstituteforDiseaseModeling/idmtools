@@ -12,7 +12,6 @@ from idmtools.analysis.download_analyzer import DownloadAnalyzer
 from globals import *
 
 EXPERIMENT_NAME = 'Generic serialization 06 writes files multicore'
-REPETITIONS = 1
 
 if __name__ == "__main__":
 
@@ -38,34 +37,30 @@ if __name__ == "__main__":
         "Simulation_Duration": SIMULATION_DURATION,
         "Num_Cores": NUM_CORES})
 
-    # Get the seeds sweep
-    builder = get_seed_experiment_builder(REPETITIONS)
-    e.add_builder(builder)
-
     # Create the manager and run
     em = ExperimentManager(experiment=e, platform=platform)
     em.run()
     em.wait_till_done()
 
-    if e.succeeded:
-        print(f"Experiment {e.uid} succeeded.\nDownloading dtk serialization files from Comps:\n")
-
-        # Setup the filenames depending on the cores used
-        filenames = []
-        for serialization_timestep in serialization_timesteps:
-            for i in range(NUM_CORES):
-                filenames.append("output/state-" + str(serialization_timestep).zfill(5) + "-" + str(i).zfill(3) + ".dtk")
-        filenames.append('output/InsetChart.json')
-
-        # Delete outputs if already present
-        output_path = 'outputs'
-        del_folder(output_path)
-
-        # Download
-        download_analyzer = DownloadAnalyzer(filenames=filenames, output_path=output_path)
-        am = AnalyzeManager(platform=platform)
-        am.add_analyzer(download_analyzer)
-        am.add_item(e)
-        am.analyze()
-    else:
+    if not e.succeeded:
         print(f"Experiment {e.uid} failed.\n")
+        exit()
+    print(f"Experiment {e.uid} succeeded.\nDownloading dtk serialization files from Comps:\n")
+
+    # Setup the filenames depending on the cores used
+    filenames = []
+    for serialization_timestep in serialization_timesteps:
+        for i in range(NUM_CORES):
+            filenames.append("output/state-" + str(serialization_timestep).zfill(5) + "-" + str(i).zfill(3) + ".dtk")
+    filenames.append('output/InsetChart.json')
+
+    # Delete outputs if already present
+    output_path = 'outputs'
+    del_folder(output_path)
+
+    # Download
+    download_analyzer = DownloadAnalyzer(filenames=filenames, output_path=output_path)
+    am = AnalyzeManager(platform=platform)
+    am.add_analyzer(download_analyzer)
+    am.add_item(e)
+    am.analyze()

@@ -67,40 +67,38 @@ if __name__ == "__main__":
     em.run()
     em.wait_till_done()
 
-    if e.succeeded:
-        print(f"Experiment {e.uid} succeeded.\n")
-
-        # Retrieve the experiment used to generate the serialized population
-        pre_exp = platform.get_parent(multicore_random_sim_id, ItemType.SIMULATION)
-
-        # Run the timeseries analyzer
-        print(f"Running TimeseriesAnalyzer with experiment id: {e.uid} and {pre_exp.uid}:\n")
-        analyzers_timeseries = TimeseriesAnalyzer()
-        am_timeseries = AnalyzeManager(platform=platform)
-        am_timeseries.add_analyzer(analyzers_timeseries)
-        am_timeseries.add_item(e)
-        am_timeseries.add_item(pre_exp)
-        am_timeseries.analyze()
-
-        analyzers_timeseries.interpret_results(CHANNELS_TOLERANCE)
-
-        # Download the  serialization files
-        print("Downloading dtk serialization files from Comps:\n")
-        filenames = ['output/InsetChart.json']
-        for i in range(4):
-            filenames.append(
-                f"output/state-{str(LAST_SERIALIZATION_DAY - PRE_SERIALIZATION_DAY).zfill(5)}-{str(i).zfill(3)}.dtk")
-
-        # Delete outputs if present
-        output_path = 'outputs'
-        del_folder(output_path)
-
-        # Download
-        analyzers_download = DownloadAnalyzer(filenames=filenames, output_path=output_path)
-        am_download = AnalyzeManager(platform=platform)
-        am_download.add_analyzer(analyzers_download)
-        am_download.add_item(e)
-        am_download.analyze()
-
-    else:
+    if not e.succeeded:
         print(f"Experiment {e.uid} failed.\n")
+        exit()
+
+    # Retrieve the experiment used to generate the serialized population
+    pre_exp = platform.get_parent(multicore_random_sim_id, ItemType.SIMULATION)
+
+    # Run the timeseries analyzer
+    print(f"Running TimeseriesAnalyzer with experiment id: {e.uid} and {pre_exp.uid}:\n")
+    analyzers_timeseries = TimeseriesAnalyzer()
+    am_timeseries = AnalyzeManager(platform=platform)
+    am_timeseries.add_analyzer(analyzers_timeseries)
+    am_timeseries.add_item(e)
+    am_timeseries.add_item(pre_exp)
+    am_timeseries.analyze()
+
+    analyzers_timeseries.interpret_results(CHANNELS_TOLERANCE)
+
+    # Download the  serialization files
+    print("Downloading dtk serialization files from Comps:\n")
+    filenames = ['output/InsetChart.json']
+    for i in range(4):
+        filenames.append(
+            f"output/state-{str(LAST_SERIALIZATION_DAY - PRE_SERIALIZATION_DAY).zfill(5)}-{str(i).zfill(3)}.dtk")
+
+    # Delete outputs if present
+    output_path = 'outputs'
+    del_folder(output_path)
+
+    # Download
+    analyzers_download = DownloadAnalyzer(filenames=filenames, output_path=output_path)
+    am_download = AnalyzeManager(platform=platform)
+    am_download.add_analyzer(analyzers_download)
+    am_download.add_item(e)
+    am_download.analyze()
