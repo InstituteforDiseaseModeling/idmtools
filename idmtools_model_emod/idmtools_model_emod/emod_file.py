@@ -48,29 +48,35 @@ class MigrationFiles(InputFilesList):
     def __init__(self, relative_path=None):
         super().__init__(relative_path)
         self.migration_files = {}
+        self.migration_model = None
         self.migration_pattern = None
         self.migration_other_params = {}
 
+    def enable_migration(self):
+        self.migration_model = MigrationModel.FIXED_RATE_MIGRATION
+        if not self.migration_pattern:
+            self.migration_pattern = MigrationPattern.RANDOM_WALK_DIFFUSION
+        if not self.migration_other_params:
+            self.migration_other_params["Enable_Migration_Heterogeneity"] = 0
+
     def update_migration_pattern(self, migration_pattern: 'MigrationPattern', **kwargs):
+        self.enable_migration()
         self.migration_pattern = migration_pattern
         for param, value in kwargs.items():
             self.migration_other_params[param] = value
 
     def add_migration_from_file(self, migration_type: 'MigrationTypes', file_path: 'str', x_migration: 'float' = 1):
+        self.enable_migration()
         asset = Asset(absolute_path=file_path, relative_path=self.relative_path)
         if asset.extension != "bin":
             raise Exception("Please add the binary (.bin) path for the `add_migration_from_file` function!")
         self.migration_files[migration_type] = (asset, x_migration)
 
     def set_simulation_config(self, simulation):
-        simulation.set_parameter("Migration_Model", MigrationModel.FIXED_RATE_MIGRATION.value)
-        if not self.migration_pattern:
-            self.migration_pattern = MigrationPattern.RANDOM_WALK_DIFFUSION
-        simulation.set_parameter("Migration_Pattern", self.migration_pattern.value)
-
-        if not self.migration_other_params:
-            self.migration_other_params["Enable_Migration_Heterogeneity"] = 0
-
+        if self.migration_model:
+            simulation.set_parameter("Migration_Model", self.migration_model.value)
+        if  self.migration_pattern:
+            simulation.set_parameter("Migration_Pattern", self.migration_pattern.value)
         for param, value in self.migration_other_params.items():
             simulation.set_parameter(param, value)
         # Enable or disable migrations depending on the available files
@@ -109,6 +115,7 @@ class MigrationFiles(InputFilesList):
             for migration_param in set(mf.migration_other_params.keys()).difference(self.migration_other_params.keys()):
                 self.migration_other_params[migration_param] = mf.migration_other_params[migration_param]
         self.migration_pattern = mf.migration_pattern
+        self.migration_model = mf.migration_model
 
 
 class Dlls(InputFilesList):
