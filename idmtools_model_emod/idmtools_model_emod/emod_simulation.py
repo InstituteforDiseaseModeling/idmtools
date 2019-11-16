@@ -67,6 +67,15 @@ class EMODSimulation(ISimulation):
         # Set the migrations
         self.migrations.set_simulation_config(self)
 
+        # Set the campaign filename
+        if self.campaign:
+            self.config["Campaign_Filename"] = "campaign.json"
+
+        # Gather the custom coordinator, individual, and node events
+        self.config["Custom_Coordinator_Events"] = []
+        self.config["Custom_Individual_Events"] = []
+        self.config["Custom_Node_Events"] = []
+
         super().pre_creation()
 
     def gather_assets(self):
@@ -75,8 +84,10 @@ class EMODSimulation(ISimulation):
         # Add config and campaign to assets
         self.assets.add_asset(Asset(filename="config.json", content=json.dumps(config, sort_keys=True)),
                               fail_on_duplicate=False)
-        self.assets.add_asset(Asset(filename="campaign.json", content=json.dumps(self.campaign)),
-                              fail_on_duplicate=False)
+
+        if self.campaign:
+            self.assets.add_asset(Asset(filename="campaign.json", content=json.dumps(self.campaign)),
+                                  fail_on_duplicate=False)
 
         # Add demographics files to assets
         self.assets.extend(self.demographics.gather_assets())

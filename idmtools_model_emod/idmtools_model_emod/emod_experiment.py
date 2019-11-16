@@ -1,7 +1,7 @@
-import collections
 import copy
 import hashlib
 import os
+import collections
 import stat
 import typing
 from abc import ABC
@@ -19,8 +19,7 @@ from idmtools_model_emod.emod_file import DemographicsFiles, MigrationFiles, Dll
 from idmtools_model_emod.emod_simulation import EMODSimulation
 
 if typing.TYPE_CHECKING:
-    from idmtools_model_emod.defaults import iemod_default
-    from typing import NoReturn
+    from idmtools_model_emod import IEMODDefault
 
 logger = getLogger(__name__)
 
@@ -71,7 +70,7 @@ class IEMODExperiment(IExperiment, ABC):
         return out_name
 
     @classmethod
-    def from_default(cls, name, default: 'iemod_default', eradication_path=None):
+    def from_default(cls, name, default: 'IEMODDefault', eradication_path=None):
         exp = cls(name=name, eradication_path=eradication_path)
 
         # Set the base simulation
@@ -171,7 +170,7 @@ class DockerEMODExperiment(IEMODExperiment, IDockerExperiment, ILinuxExperiment)
             raise ValueError("You are attempting to use a Windows Eradication executable on a linux experiment")
 
     @classmethod
-    def from_default(cls, name, default: 'iemod_default',
+    def from_default(cls, name, default: 'IEMODDefault',
                      image_name: str = 'idm-docker-public.packages.idmod.org/idm/centos:dtk-runtime',
                      eradication_path=None):
         exp = cls(name=name, eradication_path=eradication_path, image_name=image_name)

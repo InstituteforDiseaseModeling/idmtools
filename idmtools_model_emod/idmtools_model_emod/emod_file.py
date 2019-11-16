@@ -181,3 +181,23 @@ class DemographicsFiles(InputFilesList):
             raise Exception("Duplicated demographics file")
 
         self.assets.append(asset)
+
+
+class ClimateFileType(Enum):
+    AIR_TEMPERATURE = "Air_Temperature"
+    LAND_TEMPERATURE = "Land_Temperature"
+    HUMIDITY = "Humidity"
+    RAINFALL = "Rainfall"
+
+
+class ClimateFiles(InputFilesList):
+    files_by_type = {}
+
+    def __init__(self):
+        super().__init__("climate")
+
+    def set_simulation_config(self, simulation):
+        pass
+
+    def set_climate(self, file_type, file_path):
+        pass
