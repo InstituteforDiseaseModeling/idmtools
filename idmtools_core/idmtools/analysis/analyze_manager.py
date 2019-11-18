@@ -53,7 +53,7 @@ class AnalyzeManager(CacheEnabled):
         super().__init__()
         self.configuration = configuration or {}
         self.platform = platform
-        self.max_processes = min(os.cpu_count(), self.configuration.get('max_processes', 32))
+        self.max_processes = self.configuration.get('max_threads', os.cpu_count())
 
         # analyze at most this many items, regardless of how many have been given
         self.max_items_to_analyze = max_items
@@ -355,8 +355,6 @@ class AnalyzeManager(CacheEnabled):
         finalize_results = self._run_and_wait_for_reducing(worker_pool=worker_pool)
         for analyzer in self.analyzers:
             analyzer.results = finalize_results[analyzer.uid].get()
-
-        logger.debug(str(analyzer.results))
 
         logger.debug("Destroying analyzers")
         for analyzer in self.analyzers:

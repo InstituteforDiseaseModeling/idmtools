@@ -147,7 +147,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         config = Configuration(
             environment_name=self.environment,
             simulation_input_args=experiment.command.arguments + " " + experiment.command.options,
-            working_directory_root=os.path.join(self.simulation_root, subdirectory),
+            working_directory_root=os.path.join(self.simulation_root, subdirectory).replace('\\', '/'),
             executable_path=experiment.command.executable,
             node_group_name=self.node_group,
             maximum_number_of_retries=self.num_retires,

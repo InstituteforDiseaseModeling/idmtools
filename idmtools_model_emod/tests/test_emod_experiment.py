@@ -25,34 +25,34 @@ class TestEMODExperiment(ITestWithPersistence):
         models_dir = os.path.join(COMMON_INPUT_PATH, "fakemodels", "Eradication.exe")
         exp = EMODExperiment(eradication_path=models_dir)
         exp.pre_creation()
-        self.assertEqual("Assets/Eradication.exe --config config.json --input-path ./Assets;.", exp.command.cmd)
+        self.assertEqual("Assets/Eradication.exe --config config.json --input-path ./Assets\;. --dll-path ./Assets", exp.command.cmd)
 
         models_dir = os.path.join(COMMON_INPUT_PATH, "fakemodels", "Eradication")
         exp = EMODExperiment(eradication_path=models_dir)
         exp.pre_creation()
-        self.assertEqual("Assets/Eradication --config config.json --input-path ./Assets;.", exp.command.cmd)
+        self.assertEqual("Assets/Eradication --config config.json --input-path ./Assets\;. --dll-path ./Assets", exp.command.cmd)
 
         models_dir = os.path.join(COMMON_INPUT_PATH, "fakemodels", "Eradication-2.11.custom.exe")
         exp = EMODExperiment(eradication_path=models_dir)
         exp.pre_creation()
-        self.assertEqual("Assets/Eradication-2.11.custom.exe --config config.json --input-path ./Assets;.",
+        self.assertEqual("Assets/Eradication-2.11.custom.exe --config config.json --input-path ./Assets\;. --dll-path ./Assets",
                          exp.command.cmd)
 
         models_dir = os.path.join(COMMON_INPUT_PATH, "fakemodels", "AnotherOne")
         exp = EMODExperiment(eradication_path=models_dir)
         exp.pre_creation()
-        self.assertEqual("Assets/AnotherOne --config config.json --input-path ./Assets;.", exp.command.cmd)
+        self.assertEqual("Assets/AnotherOne --config config.json --input-path ./Assets\;. --dll-path ./Assets", exp.command.cmd)
 
     def test_legacy_emod(self):
         models_dir = os.path.join(COMMON_INPUT_PATH, "fakemodels", "Eradication.exe")
         exp = EMODExperiment(eradication_path=models_dir)
         exp.pre_creation()
-        self.assertEqual(f"Assets/Eradication.exe --config config.json --input-path ./Assets;.", exp.command.cmd)
+        self.assertEqual(f"Assets/Eradication.exe --config config.json --input-path ./Assets\;. --dll-path ./Assets", exp.command.cmd)
 
         models_dir = os.path.join(COMMON_INPUT_PATH, "fakemodels", "Eradication.exe")
         exp = EMODExperiment(eradication_path=models_dir, legacy_exe=True)
         exp.pre_creation()
-        self.assertEqual(f"Assets/Eradication.exe --config config.json --input-path ./Assets", exp.command.cmd)
+        self.assertEqual(f"Assets/Eradication.exe --config config.json --input-path ./Assets --dll-path ./Assets", exp.command.cmd)
 
     def test_load_files(self):
         e = EMODExperiment.from_files(self.case_name,
@@ -92,6 +92,7 @@ class TestEMODExperiment(ITestWithPersistence):
         # The rest should be the same
         del config["Demographics_Filenames"]
         del sim.config["Demographics_Filenames"]
+        self.set_migrations(config)
         self.assertDictEqual(config, sim.config)
 
         # The demographics coming from the experiment
@@ -115,3 +116,11 @@ class TestEMODExperiment(ITestWithPersistence):
 
         self.assertDictEqual(config, e.base_simulation.config)
         self.assertDictEqual(campaign, e.base_simulation.campaign)
+
+    def set_migrations(self, dict):
+        dict.update({'Enable_Local_Migration': 0})
+        dict.update({'Enable_Air_Migration': 0})
+        dict.update({'Enable_Family_Migration': 0})
+        dict.update({'Enable_Regional_Migration': 0})
+        dict.update({'Enable_Sea_Migration': 0})
+        return dict

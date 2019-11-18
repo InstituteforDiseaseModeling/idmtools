@@ -42,7 +42,7 @@ class TestCopy(ITestWithPersistence):
         super().tearDown()
 
     def test_deepcopy_assets(self):
-        e = EMODExperiment.from_default(self.case_name, default=EMODSir,
+        e = EMODExperiment.from_default(self.case_name, default=EMODSir(),
                                         eradication_path=DEFAULT_ERADICATION_PATH)
 
         # test deepcopy of experiment
@@ -62,7 +62,7 @@ class TestCopy(ITestWithPersistence):
         self.assertEqual(e.base_simulation.assets, sim.assets)
 
     def test_deepcopy_experiment(self):
-        e = EMODExperiment.from_default(self.case_name, default=EMODSir,
+        e = EMODExperiment.from_default(self.case_name, default=EMODSir(),
                                         eradication_path=DEFAULT_ERADICATION_PATH)
 
         from idmtools.builders import ExperimentBuilder
@@ -97,7 +97,7 @@ class TestCopy(ITestWithPersistence):
         self.assertIn('Set self.maxDiff to None to see it', context.exception.args[0])
 
     def test_deepcopy_simulation(self):
-        e = EMODExperiment.from_default(self.case_name, default=EMODSir,
+        e = EMODExperiment.from_default(self.case_name, default=EMODSir(),
                                         eradication_path=DEFAULT_ERADICATION_PATH)
 
         sim = e.simulation()

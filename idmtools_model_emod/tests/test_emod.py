@@ -1,14 +1,15 @@
 import json
 import os
-import pytest
 from abc import ABC, abstractmethod
+
+import pytest
 
 from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import IPlatform
 from idmtools.managers import ExperimentManager
-from idmtools_model_emod.emod_experiment import EMODExperiment, DockerEMODExperiment, IEMODExperiment
 from idmtools_model_emod.defaults import EMODSir
+from idmtools_model_emod.emod_experiment import EMODExperiment, DockerEMODExperiment, IEMODExperiment
 from idmtools_model_emod.utils import get_github_eradication_url
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
@@ -46,7 +47,7 @@ class EMODPlatformTest(ABC):
 
     @pytest.mark.long
     def test_sir_with_StandAloneSimulationsBuilder(self):
-        e = self.get_emod_experiment().from_default(self.case_name, default=EMODSir,
+        e = self.get_emod_experiment().from_default(self.case_name, default=EMODSir(),
                                                     eradication_path=self.get_emod_binary())
 
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
@@ -68,7 +69,7 @@ class EMODPlatformTest(ABC):
 
     @pytest.mark.long
     def test_sir_with_ExperimentBuilder(self):
-        e = self.get_emod_experiment().from_default(self.case_name, default=EMODSir,
+        e = self.get_emod_experiment().from_default(self.case_name, default=EMODSir(),
                                                     eradication_path=self.get_emod_binary())
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
 
@@ -96,7 +97,7 @@ class EMODPlatformTest(ABC):
 
     @pytest.mark.long
     def test_batch_simulations_StandAloneSimulationsBuilder(self):
-        e = self.get_emod_experiment().from_default(self.case_name, default=EMODSir,
+        e = self.get_emod_experiment().from_default(self.case_name, default=EMODSir(),
                                                     eradication_path=self.get_emod_binary())
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         b = StandAloneSimulationsBuilder()
@@ -119,7 +120,7 @@ class EMODPlatformTest(ABC):
 
     @pytest.mark.long
     def test_batch_simulations_ExperimentBuilder(self):
-        e = self.get_emod_experiment().from_default(self.case_name, default=EMODSir,
+        e = self.get_emod_experiment().from_default(self.case_name, default=EMODSir(),
                                                     eradication_path=self.get_emod_binary())
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         # s = Suite(name="test suite")
