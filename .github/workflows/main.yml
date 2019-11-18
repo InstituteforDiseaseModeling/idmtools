@@ -1,7 +1,7 @@
 name: Add a new GitHub Project card linked to a GitHub issue to the specified project column
 on: 
   issues:
-    labels: Documentation
+    labeled: ["Documentation"]
 jobs:
   github-actions-automate-projects:
     runs-on: ubuntu-latest
