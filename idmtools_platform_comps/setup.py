@@ -14,7 +14,7 @@ with open('requirements.txt') as requirements_file:
 
 setup_requirements = []
 build_requirements = ['flake8', 'coverage', 'py-make', 'bump2version', 'twine']
-test_requirements = ['pytest', 'pytest-runner', 'matplotlib', 'pytest-timeout'] + build_requirements
+test_requirements = ['pytest', 'pytest-runner', 'matplotlib', 'pytest-timeout', 'pytest-cache'] + build_requirements
 
 extras = dict(test=test_requirements, dev=['Pympler'], packaging=build_requirements)
 

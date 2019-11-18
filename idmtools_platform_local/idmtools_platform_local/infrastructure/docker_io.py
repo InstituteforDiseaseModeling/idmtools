@@ -64,7 +64,8 @@ class DockerIO:
                     logger.exception(e)
                 pass
 
-    def cleanup(self, delete_data: bool = True, shallow_delete: bool = True) -> NoReturn:
+    def cleanup(self, delete_data: bool = True,
+                shallow_delete: bool = os.getenv('SHALLOW_DELETE', '0').lower() in ['1', 'y', 'yes', 'on']) -> NoReturn:
         """
         Stops the running services, removes local data, and removes network. You can optionally disable the deleting
         of local data
@@ -122,10 +123,12 @@ class DockerIO:
                 file = BytesIO(file)
 
         if type(file) is str:
-            logger.debug(f'Copying {file} to docker container {container.id}:{destination_path}')
+
             name = dest_name if dest_name else os.path.basename(file)
-            target_file = os.path.join(self.host_data_directory,
-                                       destination_path.replace('/data', '/workers')[1:], name)
+            if destination_path.startswith("/data"):
+                destination_path = destination_path.replace('/data', '/workers')[1:]
+            target_file = os.path.join(self.host_data_directory, destination_path, name)
+            logger.debug(f'Copying {file} to docker container {container.id}:{target_file}')
 
             # Make sure to have the correct separators for the path
             target_file = target_file.replace('/', os.sep).replace('\\', os.sep)

@@ -29,6 +29,9 @@ test: ## Run our tests
 test-all: ## Run all our tests
 	$(MAKEALL) test-all
 
+test-failed: ## Run only previously failed tests
+	$(MAKEALL) test-failed
+
 test-no-long: ## Run any tests that takes less than 30s on average
 	$(MAKEALL) test-no-long
 
@@ -75,9 +78,10 @@ bump-patch:
 packages-changes-since-last-verison: ## Get list of versions since last release that have changes
 	git diff --name-only $(shell git tag -l --sort=-v:refname | grep -w '[0-9]\.[0-9]\.[0-9]' | head -n 1) HEAD | grep idmtools | cut -d "/" -f 1  | sort | uniq | grep -v ini | grep -v examples | grep -v dev_scripts
 
-run-docker-dev-env: ## Runs docker dev env
+linux-dev-env: ## Runs docker dev env
 	$(PDR) -w 'dev_scripts/linux-test-env' -ex 'docker-compose build linuxtst'
 	$(PDR) -w 'dev_scripts/linux-test-env' -ex 'docker-compose run --rm linuxtst'
 
 draft-change-log:
 	git log $(shell git tag -l --sort=-v:refname | grep -w '[0-9]\.[0-9]\.[0-9]' | head -n 1) HEAD --pretty=format:'%s' --reverse --simplify-merges | uniq
+

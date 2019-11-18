@@ -145,3 +145,27 @@ You will most likely need the following environment variables. Change accordingl
 * `SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://idmtools:idmtools@localhost:5432/idmtools`
 * `SQLALCHEMY_ECHO=1`
     
+## Troubleshooting Tests
+
+* By setting the environment variable `NO_TEST_WORKER_CLEANUP=1`, worker cleanup will be disabled on test. This is 
+useful when a specific script/job is failing and you want to troubleshoot the output of the task(StdOut.txt)
+* You can attempt to run simple jobs like python simulations by following these steps.
+  1. Grab the command from the idmtools_workers logs
+  ```
+  [2019-11-12 07:22:19,253] [PID 341] [Thread-5] [idmtools_platform_local.internals.tasks.general_task] [INFO] Executing python ./Assets/model1.py config.json from working directory /data/8ZQTUTAC/T8PBPPHP
+  ```
+  1. With a running set of the local platform(if it is not running use `idmtools local start`) run the command
+      ```bash
+     docker exec -it idmtools_workers bash
+     ```
+  1. From within the bash shell run
+     ```bash
+     su - idmtools
+     ```
+  1. cd to the working directory. In this case, `/data/8ZQTUTAC/T8PBPPHP`
+  1. Run the command
+     ```
+     python ./Assets/model1.py config.json
+     ```
+  
+  

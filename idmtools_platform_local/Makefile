@@ -1,8 +1,8 @@
 .PHONY: clean lint test coverage release-local dist release-staging release-staging-release-commit release-staging-minor
 IPY=python -c
 BASE_PIP_URL="packages.idmod.org/api/pypi/idm-pypi-"
-STAGING_PIP_URL?="$(BASE_PIP_URL)staging/"
-PRODUCTION_PIP_URL?="$(BASE_PIP_URL)production/"
+STAGING_PIP_URL?="https://$(BASE_PIP_URL)staging/simple"
+PRODUCTION_PIP_URL?="https://$(BASE_PIP_URL)production/simple"
 PACKAGE_NAME=idmtools_platform_local
 PY?=python
 PDS=$(PY) ../dev_scripts/
@@ -34,6 +34,9 @@ test: ## Run our tests
 
 test-all: ## Run all our tests
 	$(FULL_TEST_CMD)'
+
+test-failed: ## Run only previously failed tests
+	$(FULL_TEST_CMD) --lf'
 
 test-long: ## Run any tests that takes more than 30s
 	$(FULL_TEST_CMD) -m "long"'
@@ -89,15 +92,14 @@ docker-local-no-cache:## Build our docker image using the local pypi
 	# upstream changes that effect those areas(models and core). Otherwise, installing from latest in the nightly
 	# should suffice for development
 	# ensure pypi local is up
-	@+$(IPY) "import os; os.chdir('../dev_scripts/local_pypi'); os.system('docker-compose up -d')"
-	@+$(IPY) "import os; os.chdir('../idmtools_core'); os.system('pymake release-local')"
+	$(PDR) -w '../dev_scripts/local_pypi' -ex 'docker-compose up -d'
+	$(PDR) -w '../idmtools_core' -ex 'pymake release-local'
 	@pymake release-local
 	docker-compose build --no-cache --build-arg PYPIURL=http://172.17.0.1:7171/ --build-arg PYPIHOST=172.17.0.1 workers
 
 docker-staging: ## Build our docker image using staging pypi
-	@+$(IPY) "import os; os.chdir('../dev_scripts/local_pypi'); os.system('docker-compose up -d')"
-	@+$(IPY) "import os; os.chdir('../idmtools_core'); os.system('pymake release-local')"
-	@+make release-local
+	$(PDR) -w '../dev_scripts/local_pypi' -ex 'docker-compose up -d'
+	# rebuild local package at moment since we install local platform package from there
 	docker-compose build --build-arg PYPIURL=$(STAGING_PIP_URL) workers
 
 docker-release-staging:
@@ -107,17 +109,16 @@ docker-release-staging:
 # Release related rules
 
 release-local: ## package and upload a release to http://localhost:7171
-	@pymake build-ui
 	@pymake dist
 	twine upload --verbose --repository-url http://localhost:7171 -u admin -p admin dist/*
 
 dist: ## build our package
+	@make build-ui
 	@make clean
 	python setup.py sdist
 
 release-staging: ## perform a release to staging
 	bump2version build --allow-dirty
-	@pymake build-ui
 	@pymake dist
 	twine upload --verbose --repository-url $(STAGING_PIP_URL) dist/*
 	@make docker-release-staging

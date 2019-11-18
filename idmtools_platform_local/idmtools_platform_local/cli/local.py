@@ -89,10 +89,15 @@ def restart(cli_context: LocalCliContext):
 @local.command()
 @click.option("--logs/--no-logs", default=False)
 @click.option("--diff/--no-diff", default=False)
+@click.option('--output-filename', default=None, help="Output filename")
 @pass_do
-def info(cli_context: LocalCliContext, logs: bool, diff: bool):
+def info(cli_context: LocalCliContext, logs: bool, diff: bool, output_filename: str):
     i = get_service_info(cli_context.sm, diff, logs)
-    print(i)
+    if output_filename is not None:
+        with open(output_filename, 'w') as logout:
+            logout.write(i)
+    else:
+        print(i)
 
 
 @local.command()
