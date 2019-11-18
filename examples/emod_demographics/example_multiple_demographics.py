@@ -64,7 +64,7 @@ def demographics_on_experiment() -> 'IExperiment':
     """
 
     # Case: load demographics from experiment
-    e = EMODExperiment.from_default(expname + "_demo_on_exp", default=EMODSir,
+    e = EMODExperiment.from_default(expname + "_demo_on_exp", default=EMODSir(),
                                     eradication_path=os.path.join(INPUT_PATH, "Eradication.exe"))
 
     for demog in demo_files:
@@ -85,7 +85,7 @@ def demographics_on_simulation() -> 'IExperiment':
         """
 
     # Case: load demographics from simulation
-    e = EMODExperiment.from_default(expname + "_demo_on_sim", default=EMODSir,
+    e = EMODExperiment.from_default(expname + "_demo_on_sim", default=EMODSir(),
                                     eradication_path=os.path.join(INPUT_PATH, "Eradication.exe"))
 
     e.base_simulation.load_files(config_path=os.path.join(INPUT_PATH, "config.json"),

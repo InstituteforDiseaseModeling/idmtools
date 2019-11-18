@@ -23,7 +23,7 @@ class TestLoadFiles(ITestWithPersistence):
         super().tearDown()
 
     def test_simulation_load_config(self):
-        e = EMODExperiment.from_default(self.case_name, default=EMODSir,
+        e = EMODExperiment.from_default(self.case_name, default=EMODSir(),
                                         eradication_path=DEFAULT_ERADICATION_PATH)
 
         e.base_simulation.load_files(config_path=DEFAULT_CONFIG_PATH)
@@ -50,7 +50,7 @@ class TestLoadFiles(ITestWithPersistence):
         self.assertEqual(len([d for d in s.demographics if not d.persisted]), 0)
 
     def test_simulation_load_campaign(self):
-        e = EMODExperiment.from_default(self.case_name, default=EMODSir,
+        e = EMODExperiment.from_default(self.case_name, default=EMODSir(),
                                         eradication_path=DEFAULT_ERADICATION_PATH)
 
         e.base_simulation.load_files(campaign_path=DEFAULT_CAMPAIGN_JSON)
@@ -72,7 +72,7 @@ class TestLoadFiles(ITestWithPersistence):
         self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
 
     def test_simulation_load_demographics(self):
-        e = EMODExperiment.from_default(self.case_name, default=EMODSir, eradication_path=DEFAULT_ERADICATION_PATH)
+        e = EMODExperiment.from_default(self.case_name, default=EMODSir(), eradication_path=DEFAULT_ERADICATION_PATH)
         e.base_simulation.demographics.add_demographics_from_file(DEFAULT_DEMOGRAPHICS_JSON)
 
         # Test the content
@@ -94,7 +94,7 @@ class TestLoadFiles(ITestWithPersistence):
         self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
 
     def test_simulation_load_files(self):
-        e = EMODExperiment.from_default(self.case_name, default=EMODSir,
+        e = EMODExperiment.from_default(self.case_name, default=EMODSir(),
                                         eradication_path=DEFAULT_ERADICATION_PATH)
 
         e.base_simulation.load_files(config_path=DEFAULT_CONFIG_PATH, campaign_path=DEFAULT_CAMPAIGN_JSON)
@@ -119,7 +119,7 @@ class TestLoadFiles(ITestWithPersistence):
             self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
 
     def test_experiment_load_files(self):
-        e = EMODExperiment.from_default(self.case_name, default=EMODSir,
+        e = EMODExperiment.from_default(self.case_name, default=EMODSir(),
                                         eradication_path=DEFAULT_ERADICATION_PATH)
         e.base_simulation.load_files(config_path=DEFAULT_CONFIG_PATH, campaign_path=DEFAULT_CAMPAIGN_JSON)
         e.demographics.add_demographics_from_file(DEFAULT_DEMOGRAPHICS_JSON)
@@ -134,6 +134,7 @@ class TestLoadFiles(ITestWithPersistence):
             jt2 = json.load(m)
             jt1.pop("Demographics_Filenames")
             jt2['parameters'].pop("Demographics_Filenames")
+            jt2 = self.set_migrations(jt2)
             self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2['parameters'], sort_keys=True))
 
         with open(DEFAULT_CAMPAIGN_JSON, 'r') as m:
@@ -163,6 +164,7 @@ class TestLoadFiles(ITestWithPersistence):
             jt2 = json.load(m)
             jt1.pop("Demographics_Filenames")
             jt2['parameters'].pop("Demographics_Filenames")
+            jt2 = self.set_migrations(jt2)
             self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2['parameters'], sort_keys=True))
 
         with open(DEFAULT_CAMPAIGN_JSON, 'r') as m:
@@ -176,7 +178,7 @@ class TestLoadFiles(ITestWithPersistence):
             self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
 
     def test_experiment_load_multiple_demographics_files_1(self):
-        e = EMODExperiment.from_default(self.case_name, default=EMODSir,
+        e = EMODExperiment.from_default(self.case_name, default=EMODSir(),
                                         eradication_path=DEFAULT_ERADICATION_PATH)
         e.demographics.add_demographics_from_file(DEFAULT_DEMOGRAPHICS_JSON)
 
@@ -202,7 +204,7 @@ class TestLoadFiles(ITestWithPersistence):
         self.assertEqual(demographics_list[0], 'demographics.json')
 
     def test_simulation_load_multiple_demographics_files(self):
-        e = EMODExperiment.from_default(self.case_name, default=EMODSir,
+        e = EMODExperiment.from_default(self.case_name, default=EMODSir(),
                                         eradication_path=DEFAULT_ERADICATION_PATH)
 
         e.base_simulation.demographics.add_demographics_from_file(DEFAULT_DEMOGRAPHICS_JSON)
@@ -217,3 +219,12 @@ class TestLoadFiles(ITestWithPersistence):
         # test the order of files
         demographics_list = [d.filename for d in e.base_simulation.demographics]
         self.assertEqual(demographics_list[0], 'demographics.json')
+
+    def set_migrations(self, dict):
+        dict['parameters'].update({'Enable_Local_Migration': 0})
+        dict['parameters'].update({'Enable_Air_Migration': 0})
+        dict['parameters'].update({'Enable_Family_Migration': 0})
+        dict['parameters'].update({'Enable_Regional_Migration': 0})
+        dict['parameters'].update({'Enable_Sea_Migration': 0})
+        return dict
+

@@ -1,9 +1,14 @@
+import json
 import os
 import sys
-import pytest
-import json
 from functools import partial
+
+import pytest
 from COMPS.Data import Experiment
+
+from idmtools.analysis.add_analyzer import AddAnalyzer
+from idmtools.analysis.analyze_manager import AnalyzeManager
+from idmtools.analysis.download_analyzer import DownloadAnalyzer
 from idmtools.builders import ExperimentBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
@@ -11,9 +16,6 @@ from idmtools.managers import ExperimentManager
 from idmtools_model_emod.defaults import EMODSir
 from idmtools_model_emod.emod_experiment import EMODExperiment
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools.analysis.analyze_manager import AnalyzeManager
-from idmtools.analysis.add_analyzer import AddAnalyzer
-from idmtools.analysis.download_analyzer import DownloadAnalyzer
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import del_file, del_folder, load_csv_file
 
@@ -41,7 +43,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
 
     def create_experiment(self):
 
-        e = EMODExperiment.from_default(self.case_name, default=EMODSir,
+        e = EMODExperiment.from_default(self.case_name, default=EMODSir(),
                                         eradication_path=os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe"))
         e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
 

@@ -1,9 +1,9 @@
-import datetime
 import os
-import time
-from typing import Any
+from logging import getLogger
 
 from idmtools.entities.ianalyzer import IAnalyzer
+
+logger = getLogger(__name__)
 
 
 class DownloadAnalyzer(IAnalyzer):
@@ -25,22 +25,16 @@ class DownloadAnalyzer(IAnalyzer):
 
     """
 
+    def reduce(self, all_data: dict):
+        pass
+
     def __init__(self, filenames=None, output_path=None, **kwargs):
-        super(DownloadAnalyzer, self).__init__(**kwargs)
-
+        super().__init__(filenames=filenames, parse=False, **kwargs)
         self.output_path = output_path or "output"
-        self.filenames = filenames or []
-        self.start_time = None
-        # We only want the raw files -> disable parsing
-        self.parse = False
-
-    def filter(self, item):
-        return True  # download them all!
 
     def initialize(self):
         self.output_path = os.path.join(self.working_dir, self.output_path)
         os.makedirs(self.output_path, exist_ok=True)
-        self.start_time = time.time()
 
     def get_sim_folder(self, item):
         """
@@ -59,18 +53,11 @@ class DownloadAnalyzer(IAnalyzer):
         sim_folder = self.get_sim_folder(item)
         os.makedirs(sim_folder, exist_ok=True)
 
-        ret = dict()
         # Create the requested files
         for filename in self.filenames:
             file_path = os.path.join(sim_folder, os.path.basename(filename))
-            ret[filename] = file_path
-            print('writing to path: %s' % file_path)
+
             with open(file_path, 'wb') as outfile:
                 outfile.write(data[filename])
-        return ret
 
-    def reduce(self, all_data: dict) -> 'Any':
-        finished = time.time()
-        runtime = str(datetime.timedelta(seconds=(finished - self.start_time)))
-        total_files = sum([len(x) for x in all_data.values()])
-        print(f"Downloaded {total_files} in {runtime}")
+            logger.debug(f'Writing to path: {file_path}')

@@ -43,6 +43,17 @@ def file_name_is(asset: 'TAsset', filenames: 'List[str]') -> 'bool':
     return asset.filename in filenames
 
 
+def file_extension_is(asset: 'TAsset', extensions: 'List[str]') -> 'bool':
+    """
+        Restrict filtering to assets with the indicated filetypes.
+
+        Args:
+            asset: The asset to filter.
+            extensions: List of extensions to filter on.
+        """
+    return asset.extension in extensions
+
+
 def asset_in_directory(asset: 'TAsset', directories: 'List[str]') -> 'bool':
     """
     Restrict filtering to assets within a given directory.
