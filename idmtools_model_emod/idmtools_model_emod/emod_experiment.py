@@ -19,7 +19,7 @@ from idmtools.utils.decorators import optional_yaspin_load
 from idmtools_model_emod.emod_simulation import EMODSimulation
 
 if typing.TYPE_CHECKING:
-    from idmtools_model_emod import IEMODDefault
+    from idmtools_model_emod.defaults import iemod_default
 
 logger = getLogger(__name__)
 
@@ -73,7 +73,7 @@ class IEMODExperiment(IExperiment, ABC):
         return out_name
 
     @classmethod
-    def from_default(cls, name, default: 'IEMODDefault', eradication_path=None):
+    def from_default(cls, name, default: 'iemod_default', eradication_path=None):
         exp = cls(name=name, eradication_path=eradication_path)
 
         # Set the base simulation
