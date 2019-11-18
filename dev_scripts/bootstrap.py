@@ -20,7 +20,7 @@ base_directory = abspath(join(dirname(__file__), '..'))
 default_install = ['test']
 data_class_default = default_install
 
-idmrepo = '--index-url=https://packages.idmod.org/api/pypi/pypi-production/simple'
+idmrepo = '--extra-index-url=https://packages.idmod.org/api/pypi/pypi-production/simple'
 
 # Our packages and the extras to install
 packages = dict(

@@ -1,8 +1,10 @@
 import logging
+import signal
 import os
 from typing import Optional, List, Tuple, Dict
 
 import backoff
+import docker
 from flask import request, current_app
 from flask_restful import Resource, reqparse, abort
 from sqlalchemy import String
@@ -52,7 +54,6 @@ def sim_status(id: Optional[str], experiment_id: Optional[str], status: Optional
         for tag in tags:
             criteria.append((JobStatus.tags[tag[0]].astext.cast(String) == tag[1]))
 
-    current_app.logger.debug("Getting simulation status")
     query = session.query(JobStatus).filter(*criteria)\
         .order_by(JobStatus.uuid.desc(), JobStatus.parent_uuid.desc()).paginate(page, per_page)
     total = query.total
@@ -89,22 +90,37 @@ class Simulations(Resource):
         return result, 200, {'X-Total': total, 'X-Per-Page': args.per_page}
 
     def put(self, id):
-        data = request.json()
+        data = request.json
         # at moment, only allow status to be updated(ie canceled'
         # later, we may support resuming but we will need to include more data in the db to do this
         data = {k: v for k, v in data.items() if k == 'status' and v in ['canceled']}
-        if len(data) > 0:
+        if 'status' in data:
             s = db.session
             current_job: JobStatus = s.query(JobStatus).filter(JobStatus.uuid == id).first()
             # check if we have a PID, if so kill it
             current_app.logger.info(f"Getting metadata for {id}")
-            if current_job.metadata is not None and 'pid' in current_job.metadata:
-                try:
-                    current_app.logger.info(f"Killing metadata for {current_job.metadata['pid']}")
-                    os.killpg(current_job.metadata['pid'], 9)
-                except Exception as e:
-                    logger.exception(e)
-            current_job.__dict__.update(data)
+            current_app.logger.debug(str(current_job.extra_details))
+            if current_job.extra_details is not None:
+                if 'pid' in current_job.extra_details:
+                    try:
+                        current_app.logger.info(f"Killing process for {current_job.extra_details['pid']} for {id}")
+                        os.kill(current_job.extra_details['pid'], signal.SIGTERM)
+                    except Exception as e:
+                        current_app.logger.error('Could not kill procress')
+                        current_app.logger.exception(e)
+                elif 'container_id' in current_job.extra_details:
+                    current_app.logger.info(f"Killing container {current_job.extra_details['container_id']} for {id}")
+                    try:
+                        client = docker.from_env()
+                        con = client.containers.get(current_job.extra_details['container_id'])
+                        con.stop()
+                    except Exception as e:
+                        current_app.logger.error('Could not kill container')
+                        current_app.logger.exception(e)
+            current_job.status = 'canceled'
+            s.begin()
             s.add(current_job)
+            s.commit()
+            return True
         else:
             abort(400, message='Currently the only allowed simulation update is canceling a simulation')

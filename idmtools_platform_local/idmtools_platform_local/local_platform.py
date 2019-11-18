@@ -31,7 +31,7 @@ from idmtools_platform_local.infrastructure.service_manager import DockerService
 status_translate = dict(
     created='CREATED',
     in_progress='RUNNING',
-    canceled='canceled',
+    canceled='FAILED',
     failed='FAILED',
     done='SUCCEEDED'
 )

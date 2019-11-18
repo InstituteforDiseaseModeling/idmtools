@@ -6,6 +6,8 @@ from dataclasses import dataclass
 from logging import getLogger, DEBUG
 from typing import Dict
 from docker.models.containers import Container
+
+from idmtools.core.system_information import get_system_information
 from idmtools_platform_local.client.healthcheck_client import HealthcheckClient
 from idmtools_platform_local.infrastructure.base_service_container import BaseServiceContainer
 from idmtools_platform_local import __version__
@@ -41,15 +43,22 @@ class WorkersContainer(BaseServiceContainer):
     mem_limit: str = '16g'
     mem_reservation: str = '64m'
     run_as: str = None
+    debug_api: bool = True
     image: str = get_worker_image_default()
     container_name: str = 'idmtools_workers'
-    data_volume_name: str = os.getenv("IDMTOOLS_REDIS_DATA_MOUNT_BY_VOLUMENAME", None)
+    data_volume_name: str = os.getenv("IDMTOOLS_WORKERS_DATA_MOUNT_BY_VOLUMENAME", None)
     config_prefix: str = 'workers_'
+
+    def __post_init__(self):
+        system_info = get_system_information()
+        if self.run_as is None:
+            self.run_as = system_info.user_group_str
 
     def get_configuration(self) -> Dict:
         logger.debug(f'Creating working container')
         if not self.data_volume_name:
             data_dir = os.path.join(self.host_data_directory, 'workers')
+            logger.debug(f'Creating worker data directory at {data_dir}')
             os.makedirs(data_dir, exist_ok=True)
         else:
             logger.debug(f"Specifying Data directory using named volume {self.data_volume_name}")
@@ -71,6 +80,12 @@ class WorkersContainer(BaseServiceContainer):
 
         if platform.system() in ["Linux", "Darwin"]:
             environment.append(f'CURRENT_UID={self.run_as}')
+
+        if self.debug_api:
+            environment.append('API_LOGGING=1')
+
+        if self.data_volume_name:
+            environment.append(f'IDMTOOLS_WORKERS_DATA_MOUNT_BY_VOLUMENAME=self.data_volume_name')
 
         port_bindings = self._get_optional_port_bindings(self.ui_port, 5000)
         container_config = self.get_common_config(container_name=self.container_name, image=self.image,

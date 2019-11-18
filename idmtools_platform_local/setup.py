@@ -19,15 +19,21 @@ with open('workers_requirements.txt') as requirements_file:
 with open('ui_requirements.txt') as requirements_file:
     ui_requirements = requirements_file.read().split("\n")
 
-if os.name != "nt":
-    ui_requirements.append('uwsgi==2.0.18')
 
 setup_requirements = []
-test_requirements = ['pytest', 'pytest-runner', 'pytest-timeout']
+server_requirements = ['uwsgi==2.0.18']
+test_requirements = ['pytest', 'pytest-runner', 'pytest-timeout', 'pytest-cache']
+
+# Only install uwsgi on python 3.7
+if os.name == "nt":
+    # TODO remove workaround. This is needed because 226 break windows virtual envs when calling processes
+    # which we need
+    test_requirements.append('pywin32==225')
 
 extras = dict(test=test_requirements, dev=['Pympler'],
               # Requirements for running workers server
               workers=worker_requirements,
+              server=server_requirements,
               # these are only needed when not running UI
               ui=ui_requirements)
 # check for python 3.6

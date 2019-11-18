@@ -16,6 +16,16 @@ def get_data_directory() -> str:
     return os.path.join(default_base_sir, '.local_data')
 
 
+def get_filtered_environment_vars(exclude=None):
+    ret = dict()
+    if exclude is None:
+        exclude = ['LS_COLORS', 'XDG_CONFIG_DIRS', 'PS1', 'XDG_DATA_DIRS']
+    for k, v in os.environ.items():
+        if k not in exclude:
+            ret[k] = v
+    return ret
+
+
 @dataclass
 class SystemInformation:
     data_directory: Optional[str] = field(default=get_data_directory())
@@ -24,7 +34,7 @@ class SystemInformation:
     python_build: str = platform.python_build()
     python_implementation = platform.python_implementation()
     python_packages: List[str] = field(default_factory=get_packages_list)
-    environment_variables: Dict[str, str] = field(default_factory=lambda: os.environ)
+    environment_variables: Dict[str, str] = field(default_factory=get_filtered_environment_vars)
     os_name: str = platform.system()
     hostname: str = platform.node()
     system_version: str = platform.version()
@@ -33,13 +43,13 @@ class SystemInformation:
     system_architecture_details: str = platform.architecture()
     default_docket_socket_path: str = '/var/run/docker.sock'
     cwd: str = os.getcwd()
-    user_group_str: str = "1000:1000"
+    user_group_str: str = os.getenv("CURRENT_UID", "1000:1000")
     version: str = __version__
 
 
 @dataclass
 class LinuxSystemInformation(SystemInformation):
-    user_group_str: str = field(default_factory=lambda: f'{os.getuid()}:{os.getgid()}')
+    user_group_str: str = field(default_factory=lambda: os.getenv("CURRENT_UID", f'{os.getuid()}:{os.getgid()}'))
 
 
 class WindowsSystemInformation(SystemInformation):

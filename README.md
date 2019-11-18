@@ -78,6 +78,10 @@ To run a specific test, cd to the project directories test folder and run
 py.test test_emod.py::TestLocalPlatformEMOD::test_duplicated_eradication
 ```
 
+
+In addition, you can rerun just the failed test using either the top-level `pymake test-failed` rule or by using the 
+`--lf` switch on py.test
+
 # Troubleshooting the Development Environment
 
 1. Docker Auth issues.

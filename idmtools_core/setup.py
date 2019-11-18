@@ -14,7 +14,7 @@ with open('requirements.txt') as requirements_file:
 
 build_requirements = ['flake8', 'coverage', 'py-make', 'bump2version', 'twine']
 test_requirements = ['pytest', 'pytest-runner', 'numpy==1.16.4', 'xmlrunner', 'pytest-xdist',
-                     'pytest-timeout'] + build_requirements
+                     'pytest-timeout', 'pytest-cache'] + build_requirements
 
 # check for python 3.6
 if sys.version_info[1] == 6:

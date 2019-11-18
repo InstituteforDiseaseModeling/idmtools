@@ -2,7 +2,9 @@ import json
 import os
 from abc import ABC, abstractmethod
 from functools import partial
-
+import sys
+current_directory = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(current_directory)
 import pytest
 
 from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
@@ -17,7 +19,7 @@ from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.comps import sims_from_experiment, get_simulation_path
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
-current_directory = os.path.dirname(os.path.realpath(__file__))
+
 DEFAULT_CONFIG_PATH = os.path.join(COMMON_INPUT_PATH, "files", "config.json")
 DEFAULT_CAMPAIGN_JSON = os.path.join(COMMON_INPUT_PATH, "files", "campaign.json")
 DEFAULT_DEMOGRAPHICS_JSON = os.path.join(COMMON_INPUT_PATH, "files", "demographics.json")
@@ -51,7 +53,7 @@ class EMODPlatformTest(ABC):
     @pytest.mark.long
     def test_serialization(self):
         # Step1: create experiment and simulation with serialization file in output
-        from config_update_parameters import config_update_params
+        from .config_update_parameters import config_update_params
         BIN_PATH = os.path.join(COMMON_INPUT_PATH, "serialization")
 
         sim_duration = 2  # in years

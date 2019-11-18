@@ -5,6 +5,7 @@ from typing import Dict, NoReturn
 
 from docker.models.containers import Container
 
+from idmtools.core.system_information import get_system_information
 from idmtools_platform_local.infrastructure.base_service_container import BaseServiceContainer
 
 logger = getLogger(__name__)
@@ -23,6 +24,11 @@ class PostgresContainer(BaseServiceContainer):
     password: str = 'idmtools'
     data_volume_name: str = 'idmtools_local_postgres'
     config_prefix: str = 'postgres_'
+
+    def __post_init__(self):
+        system_info = get_system_information()
+        if self.run_as is None:
+            self.run_as = system_info.user_group_str
 
     def get_configuration(self) -> Dict:
         """
