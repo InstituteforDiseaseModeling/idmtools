@@ -5,7 +5,7 @@ from typing import Optional, Any, NoReturn
 from idmtools.assets import Asset
 from idmtools.entities import ISimulation
 from idmtools.utils.json import load_json_file
-from idmtools_model_emod.emod_file import DemographicsFiles
+from idmtools_model_emod.emod_file import DemographicsFiles, MigrationFiles
 from idmtools_model_emod.interventions import EMODEmptyCampaign
 
 
@@ -14,6 +14,7 @@ class EMODSimulation(ISimulation):
     config: dict = field(default_factory=lambda: {})
     campaign: dict = field(default_factory=lambda: EMODEmptyCampaign.campaign())
     demographics: DemographicsFiles = field(default_factory=lambda: DemographicsFiles())
+    migrations: 'MigrationFiles' = field(default_factory=lambda: MigrationFiles())
 
     def set_parameter(self, name: str, value: any) -> dict:
         self.config[name] = value
@@ -62,18 +63,37 @@ class EMODSimulation(ISimulation):
     def pre_creation(self):
         # Set the demographics
         self.demographics.set_simulation_config(self)
+
+        # Set the migrations
+        self.migrations.set_simulation_config(self)
+
+        # Set the campaign filename
+        if self.campaign:
+            self.config["Campaign_Filename"] = "campaign.json"
+
+        # Gather the custom coordinator, individual, and node events
+        self.config["Custom_Coordinator_Events"] = []
+        self.config["Custom_Individual_Events"] = []
+        self.config["Custom_Node_Events"] = []
+
         super().pre_creation()
 
     def gather_assets(self):
         config = {"parameters": self.config}
 
         # Add config and campaign to assets
-        self.assets.add_asset(Asset(filename="config.json", content=json.dumps(config)), fail_on_duplicate=False)
-        self.assets.add_asset(Asset(filename="campaign.json", content=json.dumps(self.campaign)),
+        self.assets.add_asset(Asset(filename="config.json", content=json.dumps(config, sort_keys=True)),
                               fail_on_duplicate=False)
+
+        if self.campaign:
+            self.assets.add_asset(Asset(filename="campaign.json", content=json.dumps(self.campaign)),
+                                  fail_on_duplicate=False)
 
         # Add demographics files to assets
         self.assets.extend(self.demographics.gather_assets())
+
+        # Add the migrations
+        self.assets.extend(self.migrations.gather_assets())
 
     def __hash__(self):
         return id(self.uid)

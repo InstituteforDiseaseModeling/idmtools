@@ -1,13 +1,14 @@
 import os
 from functools import partial
+
+from config_update_parameters import config_update_params
+
 from idmtools.assets import AssetCollection, Asset
 from idmtools.builders import SweepArm, ArmType, ArmExperimentBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_model_emod.defaults import EMODSir
 from idmtools_model_emod.emod_experiment import DockerEMODExperiment
-from config_update_parameters import config_update_params
-
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 BIN_PATH = os.path.join(current_directory, "bin")
@@ -30,7 +31,7 @@ if __name__ == "__main__":
     ac = AssetCollection()
     a = Asset(absolute_path=os.path.join(INPUT_PATH, "single_node_demographics.json"))
     ac.add_asset(a)
-    e = DockerEMODExperiment.from_default(expname, default=EMODSir,
+    e = DockerEMODExperiment.from_default(expname, default=EMODSir(),
                                           image_name='idm-docker-public.packages.idmod.org/idm/centos:dtk-runtime',
                                           eradication_path='https://github.com/InstituteforDiseaseModeling/'
                                                            f'EMOD/releases/download/v{emod_version}/Eradication')

@@ -1,25 +1,25 @@
-import hashlib
 import copy
+import hashlib
 import os
 import collections
 import stat
 import typing
 from abc import ABC
+from dataclasses import dataclass, field
+from logging import getLogger
+from pathlib import Path
 from urllib.parse import urlparse
 
 import requests
 
-from logging import getLogger
-from pathlib import Path
-from dataclasses import dataclass, field
 from idmtools.entities import IExperiment, CommandLine
-from idmtools_model_emod.emod_file import DemographicsFiles
 from idmtools.entities.iexperiment import IDockerExperiment, ILinuxExperiment, IHostBinaryExperiment
 from idmtools.utils.decorators import optional_yaspin_load
+from idmtools_model_emod.emod_file import DemographicsFiles, MigrationFiles, Dlls
 from idmtools_model_emod.emod_simulation import EMODSimulation
 
 if typing.TYPE_CHECKING:
-    from idmtools_model_emod.defaults import iemod_default
+    from idmtools_model_emod import IEMODDefault
 
 logger = getLogger(__name__)
 
@@ -30,6 +30,8 @@ class IEMODExperiment(IExperiment, ABC):
     demographics: collections.OrderedDict = field(default_factory=lambda: collections.OrderedDict())
     legacy_exe: 'bool' = field(default=False, metadata={"md": True})
     demographics: 'DemographicsFiles' = field(default_factory=lambda: DemographicsFiles('demographics'))
+    dlls: 'Dlls' = field(default_factory=lambda: Dlls())
+    migrations: 'MigrationFiles' = field(default_factory=lambda: MigrationFiles('migrations'))
 
     def __post_init__(self, simulation_type):
         super().__post_init__(simulation_type=EMODSimulation)
@@ -43,11 +45,6 @@ class IEMODExperiment(IExperiment, ABC):
     @staticmethod
     @optional_yaspin_load(text='Downloading file')
     def download_eradication(url, spinner=None):
-        """
-        Do
-        Returns:
-
-        """
         # download eradication from path to our local_data cache
         cache_path = os.path.join(str(Path.home()), '.local_data', "eradication-cache")
         filename = hashlib.md5(url.encode('utf-8')).hexdigest()
@@ -73,7 +70,7 @@ class IEMODExperiment(IExperiment, ABC):
         return out_name
 
     @classmethod
-    def from_default(cls, name, default: 'iemod_default', eradication_path=None):
+    def from_default(cls, name, default: 'IEMODDefault', eradication_path=None):
         exp = cls(name=name, eradication_path=eradication_path)
 
         # Set the base simulation
@@ -111,7 +108,7 @@ class IEMODExperiment(IExperiment, ABC):
 
         return exp
 
-    def gather_assets(self) -> None:
+    def gather_assets(self) -> 'NoReturn':
         from idmtools.assets import Asset
 
         # Add Eradication.exe to assets
@@ -122,15 +119,21 @@ class IEMODExperiment(IExperiment, ABC):
         # Add demographics to assets
         self.assets.extend(self.demographics.gather_assets())
 
+        # Add DLLS to assets
+        self.assets.extend(self.dlls.gather_assets())
+
+        # Add the migrations
+        self.assets.extend(self.migrations.gather_assets())
+
     def pre_creation(self):
         super().pre_creation()
 
         # Input path is different for legacy exes
-        input_path = "./Assets;." if not self.legacy_exe else "./Assets"
+        input_path = r"./Assets\;." if not self.legacy_exe else "./Assets"
 
         # Create the command line according to self. location of the model
         self.command = CommandLine(f"Assets/{self.executable_name}", "--config config.json",
-                                   f"--input-path {input_path}")
+                                   f"--input-path {input_path}", f"--dll-path ./Assets")
 
     def simulation(self):
         simulation = super().simulation()
@@ -140,6 +143,15 @@ class IEMODExperiment(IExperiment, ABC):
         demog_copy.set_all_persisted()
         # Add them to the simulation
         simulation.demographics.extend(demog_copy)
+
+        # Tale care of the migrations
+        migration_copy = copy.deepcopy(self.migrations)
+        migration_copy.set_all_persisted()
+        simulation.migrations.merge_with(migration_copy)
+
+        # Handle the custom reporters
+        self.dlls.set_simulation_config(simulation)
+
         return simulation
 
 
@@ -158,7 +170,7 @@ class DockerEMODExperiment(IEMODExperiment, IDockerExperiment, ILinuxExperiment)
             raise ValueError("You are attempting to use a Windows Eradication executable on a linux experiment")
 
     @classmethod
-    def from_default(cls, name, default: 'iemod_default',
+    def from_default(cls, name, default: 'IEMODDefault',
                      image_name: str = 'idm-docker-public.packages.idmod.org/idm/centos:dtk-runtime',
                      eradication_path=None):
         exp = cls(name=name, eradication_path=eradication_path, image_name=image_name)

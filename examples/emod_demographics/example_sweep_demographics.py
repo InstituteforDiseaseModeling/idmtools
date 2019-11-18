@@ -77,7 +77,7 @@ def change_demog_overlay(simulation, demog_overlay):
 
 
 def sweep_on_demographics_files() -> 'IExperiment':
-    e = EMODExperiment.from_default(expname + "_demo_on_exp", default=EMODSir,
+    e = EMODExperiment.from_default(expname + "_demo_on_exp", default=EMODSir(),
                                     eradication_path=os.path.join(INPUT_PATH, "Eradication.exe"))
 
     # For the need of this example, we are reusing the default demographics to create 5 identical versions
