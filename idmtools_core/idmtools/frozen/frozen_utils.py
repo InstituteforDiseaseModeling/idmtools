@@ -64,7 +64,9 @@ def get_frozen_item(obj):
 
             return ImTuple(obj)
 
-    class FrozenObject(FrozenBase):
+    class FrozenObject(FrozenBase, obj.__class__):
+        __metaclass__ = obj.__class__
+
         def __init__(self):
             for key, value in obj.__dict__.items():
                 setattr(self, key, frozen_transform(value))
@@ -85,6 +87,10 @@ def get_frozen_item(obj):
 
 
 def is_builtins_single_object(obj):
+    # Handle special cases
+    if isinstance(obj, (Enum, range)):
+        return True
+
     return type(obj).__module__ == 'builtins' and not is_builtins_collection(obj)
 
 
