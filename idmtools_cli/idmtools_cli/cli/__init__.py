@@ -1,7 +1,5 @@
 import logging
-
 import click
-
 from idmtools.config import IdmConfigParser
 from idmtools.core.logging import setup_logging
 from idmtools_cli.iplatform_cli import IPlatformCLI

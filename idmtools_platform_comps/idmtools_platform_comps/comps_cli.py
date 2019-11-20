@@ -25,7 +25,8 @@ class COMPSCLISpecification(PlatformCLISpecification):
 
     @get_additional_commands_impl
     def get_additional_commands(self) -> NoReturn:
-        pass
+        import idmtools_platform_comps.cli.comps
+        import idmtools_platform_comps.cli.utils
 
     @get_description_impl
     def get_description(self) -> str:

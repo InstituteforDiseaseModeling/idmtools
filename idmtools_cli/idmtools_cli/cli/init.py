@@ -2,9 +2,9 @@ import itertools
 import logging
 import os
 from logging import getLogger
-import urllib.request, json
-from typing import NoReturn, Dict, List
-
+import urllib.request
+import json
+from typing import Dict, List
 from idmtools.config import IdmConfigParser
 from idmtools.registry.plugin_specification import ProjectTemplate
 from idmtools_cli.cli import cli
