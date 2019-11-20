@@ -1,7 +1,8 @@
+from collections import UserList
 from idmtools.frozen.ifrozen import IFrozen
 
 
-class ImList(list, IFrozen):
+class ImList(UserList, IFrozen):
 
     def append(self, *args, **kwargs):  # real signature unknown
         """ Append object to the end of the list. """

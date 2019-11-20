@@ -16,30 +16,33 @@ def get_frozen_item(obj):
 
     class FrozenDict(ImDict):
         def __init__(self):
+            super().__init__()
             for key, value in obj.items():
-                self[key] = frozen_transform(value)
+                self.data[key] = frozen_transform(value)
 
             # In case inherited from dict with customer fields
             if hasattr(obj, '__dict__'):
                 for key, value in obj.__dict__.items():
-                    setattr(self, key, frozen_transform(value))
+                    setattr(self.data, key, frozen_transform(value))
 
             self._frozen = True
 
     class FrozenList(ImList):
         def __init__(self):
+            super().__init__()
             for value in obj:
-                self.append(frozen_transform(value))
+                self.data.append(frozen_transform(value))
 
             # In case inherited from list with customer fields
             if hasattr(obj, '__dict__'):
                 for key, value in obj.__dict__.items():
-                    setattr(self, key, frozen_transform(value))
+                    setattr(self.data, key, frozen_transform(value))
 
             self._frozen = True
 
     class FrozenSet(ImSet):
         def __init__(self):
+            super().__init__()
             for value in obj:
                 self.add(frozen_transform(value))
 

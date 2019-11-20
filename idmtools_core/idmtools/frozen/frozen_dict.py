@@ -1,7 +1,8 @@
+from collections import UserDict
 from idmtools.frozen.ifrozen import IFrozen
 
 
-class ImDict(dict, IFrozen):
+class ImDict(UserDict, IFrozen):
 
     def __setitem__(self, *args, **kwargs):  # real signature unknown
         """ Set self[key] to value. """
