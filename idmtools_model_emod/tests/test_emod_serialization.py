@@ -1,12 +1,14 @@
+# flake8: noqa E402
 import json
 import os
 from abc import ABC, abstractmethod
 from functools import partial
 import sys
+
 current_directory = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(current_directory)
-import pytest
 
+import pytest
 from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
@@ -19,14 +21,15 @@ from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.comps import sims_from_experiment, get_simulation_path
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
-
 DEFAULT_CONFIG_PATH = os.path.join(COMMON_INPUT_PATH, "files", "config.json")
 DEFAULT_CAMPAIGN_JSON = os.path.join(COMMON_INPUT_PATH, "files", "campaign.json")
 DEFAULT_DEMOGRAPHICS_JSON = os.path.join(COMMON_INPUT_PATH, "files", "demographics.json")
 DEFAULT_ERADICATION_PATH = os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe")
 
+
 def param_update(simulation, param, value):
     return simulation.set_parameter(param, value)
+
 
 @pytest.mark.emod
 class EMODPlatformTest(ABC):
@@ -90,9 +93,9 @@ class EMODPlatformTest(ABC):
         em.wait_till_done()
         self.assertTrue(e1.succeeded)
 
-        #---------------------------------------------------------------------------------------------
+        # ---------------------------------------------------------------------------------------------
         # Step2: Create new experiment and sim with previous serialized file
-        #TODO, ideally we could add new sim to existing exp, but currently we can not do with issue #459
+        # TODO, ideally we could add new sim to existing exp, but currently we can not do with issue #459
 
         # First get previous serialized file path
         comps_exp = self.platform.get_platform_item(item_id=e1.uid, item_type=ItemType.EXPERIMENT)
@@ -108,11 +111,11 @@ class EMODPlatformTest(ABC):
         e2.tags = {'idmtools': 'realod serialization'}
 
         reload_sim = e2.simulation()
-        #reload_sim.config.pop('Serialization_Time_Steps') # Need this step if we use same exp
+        # reload_sim.config.pop('Serialization_Time_Steps') # Need this step if we use same exp
         reload_sim.set_parameter("Config_Name", "reloading sim")
         reload_sim.set_parameter("Simulation_Duration", sim_duration * 365)
         load_serialized_population(simulation=reload_sim, population_path=os.path.join(serialized_file_path, 'output'),
-                                       population_filenames=['state-00730.dtk'])
+                                   population_filenames=['state-00730.dtk'])
 
         b = StandAloneSimulationsBuilder()
         b.add_simulation(reload_sim)
@@ -156,6 +159,7 @@ class EMODPlatformTest(ABC):
         self.assertEqual(serialized_channel_length, reload_channel_length)
         self.assertEqual(serialized_channel_length, 730)
 
+
 @pytest.mark.comps
 @pytest.mark.emod
 class TestCompsEMOOD(ITestWithPersistence, EMODPlatformTest):
@@ -179,5 +183,3 @@ class TestCompsEMOOD(ITestWithPersistence, EMODPlatformTest):
     @classmethod
     def get_emod_binary(cls, ) -> str:
         return os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe")
-
-

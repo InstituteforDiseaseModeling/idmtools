@@ -108,7 +108,7 @@ class IEMODExperiment(IExperiment, ABC):
 
         return exp
 
-    def gather_assets(self) -> 'NoReturn':
+    def gather_assets(self) -> typing.NoReturn:
         from idmtools.assets import Asset
 
         # Add Eradication.exe to assets
