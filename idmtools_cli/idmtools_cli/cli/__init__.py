@@ -1,6 +1,8 @@
 import logging
 
 import click
+
+from idmtools.config import IdmConfigParser
 from idmtools.core.logging import setup_logging
 from idmtools_cli.iplatform_cli import IPlatformCLI
 
@@ -15,6 +17,7 @@ def cli(debug):
     Allows you to perform multiple idmtools commands
 
     """
+    IdmConfigParser()
     # init config by just calling config parser
     if debug:
         setup_logging(console=True, level=logging.DEBUG)

@@ -1,11 +1,20 @@
+from dataclasses import dataclass
 from logging import getLogger
-
 import pluggy
+from typing import Dict, List, Union
 
 PLUGIN_REFERENCE_NAME = 'idmtools_plugins'
 get_description_spec = pluggy.HookspecMarker(PLUGIN_REFERENCE_NAME)
 get_description_impl = pluggy.HookimplMarker(PLUGIN_REFERENCE_NAME)
 logger = getLogger(__name__)
+
+
+@dataclass
+class ProjectTemplate:
+    name: str
+    url: Union[str, List[str]]
+    description: str = None
+    info: str = None
 
 
 class PluginSpecification:
@@ -33,3 +42,11 @@ class PluginSpecification:
             The plugin description.
         """
         raise NotImplementedError("The plugin did not implement a description!")
+
+    def get_project_templates(self) -> List[ProjectTemplate]:
+        """
+        Returns a list of project templates related to the a plugin
+        Returns:
+
+        """
+        return list()
