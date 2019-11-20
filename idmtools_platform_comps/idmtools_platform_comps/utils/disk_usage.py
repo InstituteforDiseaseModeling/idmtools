@@ -128,16 +128,18 @@ class DiskSpaceUsage:
         cache = FanoutCache(shards=6, directory=cache_folder)
 
         # All experiments
-        all_experiments = list(
-            itertools.chain(*(get_all_experiments_for_user(owner) for owner in DiskSpaceUsage.OWNERS)))
-
-        all_experiments_len = len(all_experiments)
-
-        print("Analyzing disk space for:")
-        print(" | {} experiments".format(all_experiments_len))
-        print(" | Users: {}".format(", ".join(DiskSpaceUsage.OWNERS)))
-
+        all_experiments = []
         with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
+            for result in tqdm(executor.map(get_all_experiments_for_user, DiskSpaceUsage.OWNERS),
+                               total=len(DiskSpaceUsage.OWNERS)):
+                all_experiments.extend(result)
+
+            all_experiments_len = len(all_experiments)
+
+            print("Analyzing disk space for:")
+            print(" | {} experiments".format(all_experiments_len))
+            print(" | Users: {}".format(", ".join(DiskSpaceUsage.OWNERS)))
+
             exp_opts = functools.partial(DiskSpaceUsage.get_experiment_info, cache=cache, refresh=refresh)
             for result in tqdm(executor.map(exp_opts, all_experiments),
                                total=all_experiments_len,

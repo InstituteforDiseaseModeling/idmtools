@@ -69,7 +69,7 @@ def get_all_experiments_for_user(user: str) -> List[Experiment]:
         # Go from there
         end_date = start_date
 
-    return results.values()
+    return list(results.values())
 
 
 def get_simulations_from_big_experiments(experiment_id):

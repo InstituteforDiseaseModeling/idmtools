@@ -9,4 +9,4 @@ from idmtools_platform_comps.utils.disk_usage import DiskSpaceUsage
 @click.argument("users", nargs=-1)
 @pass_comps
 def disk_usage(platform: COMPSPlatform, users, top):
-    DiskSpaceUsage.display(platform, users, top)
+    DiskSpaceUsage.display(platform, list(users), top)
