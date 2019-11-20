@@ -4,10 +4,9 @@ import json
 from logging import getLogger
 import humanfriendly
 import pandas as pd
-import itertools
 import os
 import sys
-from COMPS.Data import QueryCriteria
+from COMPS.Data import QueryCriteria, Experiment
 from diskcache import FanoutCache
 from tqdm import tqdm
 from idmtools_platform_comps.comps_platform import COMPSPlatform
@@ -34,15 +33,20 @@ class DiskSpaceUsage:
     OWNERS = []  # default: will  be the login user passed in
 
     @staticmethod
-    def get_experiment_info(experiment, cache, refresh):
+    def get_experiment_info(experiment: Experiment, cache, refresh):
         """
         Adds the experiment information for a given experiment to the cache:
         - raw_size: the size in bytes
         - size: the formatted size (in KB, MB or GB)
         - sims: the number of simulations
         This function is used by the process pool to parallelize the retrieval of experiment info
+        Args:
+            experiment: The experiment to analyze
+            cache:
+            refresh:
 
-        :param experiment: The experiment to analyze
+        Returns:
+
         """
         if experiment.id in cache and cache.get(experiment.id) and not refresh:
             return
