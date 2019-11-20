@@ -1,49 +1,49 @@
 .PHONY: clean lint test coverage release-local dist release-staging release-staging-release-commit release-staging-minor
 IPY=python -c
+PACKAGE_NAME=idmtools_test
+PY?=python
+PDS=$(PY) ../dev_scripts/
+PDR=$(PDS)run.py
+CLDIR=$(PDS)clean_dir.py
+CWD=$($(IPY) "import os; print(os.getcwd())")
+help:
+	$(PDS)get_help_from_makefile.py
 
-clean: ## Clean all our jobs
-	@$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('*.py[co]', recursive=True)]"
-	@$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('*.done', recursive=True)]"
-	@$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('*.log', recursive=True)]"
-	@$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/.coverage', recursive=True)]"
-	@$(IPY) "import os, glob, shutil; [shutil.rmtree(i, True) for i in glob.glob('**/__pycache__', recursive=True)]"
-	@$(IPY) "import os, glob, shutil; [shutil.rmtree(i, True) for i in glob.glob('**/htmlcov', recursive=True)]"
-	@$(IPY) "import os, glob, shutil; [shutil.rmtree(i) for i in glob.glob('**/.pytest_cache', recursive=True)]"
-	@$(IPY) "import shutil; shutil.rmtree('dist', True)"
-	@$(IPY) "import shutil; shutil.rmtree('build', True)"
+clean: ## Clean most of the temp-data from the project
+	$(CLDIR) --file-patterns "*.py[co],*.done,*.log,**/.coverage" \
+		--dir-patterns "**/__pycache__,**/htmlcov,**/.pytest_cache" --directories "dist,build"
 
 clean-all:  ## Deleting package info hides plugins so we only want to do that for packaging
 	@make clean
-	@+$(IPY) "import os, shutil, glob; [shutil.rmtree(i) for i in [k for k in glob.glob('**/*.egg-info/', recursive=True) if os.path.isdir(k)]]"
+	$(CLDIR) --dir-patterns "**/*.egg-info/"
 # Dev and test related rules
 
 lint: ## check style with flake8
 	@+$(IPY) "import os; os.chdir('..'); os.system('flake8 --ignore=E501 idmtools_test')"
 
 test: ## Run our tests
-	@+$(IPY) "import os; os.chdir('tests'); os.system('py.test -p no:warnings --junitxml=test_results.xml')"
+	@+$(IPY) "print('No Tests')"
+
+test-failed: ## Run only previously failed tests
+	@+$(IPY) "print('No Tests')"
+
+test-long: ## Run our tests
+	@+$(IPY) "print('No Tests')"
+
+test-no-long: ## Run our tests
+	@+$(IPY) "print('No Tests')"
+
+test-no-comps: ## Run our tests
+	@+$(IPY) "print('No Tests')"
 
 test-all: ## Run our  docker tests as well
-	@+$(IPY) "import os; os.chdir('tests'); os.system('py.test -p no:warnings --junitxml=test_results.xml')"
+	@+$(IPY) "print('No Tests')"
 
 coverage: ## Generate a code-coverage report
-	@make clean
-	# We have to run in our tests folder to use the proper config
-	@+$(IPY) "import os; os.chdir('tests'); os.system('coverage run --source ../idmtools_test -m pytest')"
-	# move our stuff back to the top
-	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
-	coverage report -m
-	coverage html -i
-	python ../dev_scripts/launch_dir_in_browser.py htmlcov/index.html
+	@+$(IPY) "print('No Tests')"
 
 coverage-all: ## Generate a code-coverage report
-	@make clean
-	# We have to run in our tests folder to use the proper config
-	@+$(IPY) "import os; os.environ['DOCKER_TESTS'] = '1'; \
-	os.environ['COMPS_TESTS'] = '1'; \
-	os.chdir('tests'); os.system('coverage run --source ../idmtools_test -m pytest')"
-	# move our stuff back to the top
-	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
+	@+$(IPY) "print('No Tests')"
 
 # Release related rules
 

@@ -101,7 +101,9 @@ class TestPersistenceServices(ITestWithPersistence):
         self.assertEqual(s.parameters["test"], 10)
 
         # Ensure that we actually ran with the correct parameter
+        print(p.simulations[em.experiment.uid])
         self.assertEqual(p.simulations[em.experiment.uid][0].parameters["test"], 10, "Parameter in platform")
+        p.cleanup()
 
     def test_fix_170(self):
         # https://github.com/InstituteforDiseaseModeling/idmtools/issues/170

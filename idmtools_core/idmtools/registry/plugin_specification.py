@@ -10,15 +10,15 @@ logger = getLogger(__name__)
 
 class PluginSpecification:
     """
-    Base class for all plugins. 
+    Base class for all plugins.
     """
 
     @classmethod
     def get_name(cls) -> str:
         """
-        Get the name of the plugin. Although it can be overridden, the best practice is to use the class 
+        Get the name of the plugin. Although it can be overridden, the best practice is to use the class
         name as the plugin name.
-        
+
         Returns:
             The name of the plugin as a string.
         """

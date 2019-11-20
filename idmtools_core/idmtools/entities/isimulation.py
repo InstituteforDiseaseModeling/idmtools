@@ -32,7 +32,7 @@ class ISimulation(IAssetsEnabled, INamedEntity, metaclass=ABCMeta):
             name: The name of the parameter.
             value: The value of the parameter.
 
-        Returns:    
+        Returns:
             Tag to record the change.
         """
         pass
@@ -45,7 +45,7 @@ class ISimulation(IAssetsEnabled, INamedEntity, metaclass=ABCMeta):
         Args:
             name: The name of the parameter.
 
-        Returns: 
+        Returns:
             The value of the parameter.
         """
         return None
@@ -58,7 +58,7 @@ class ISimulation(IAssetsEnabled, INamedEntity, metaclass=ABCMeta):
         Args:
             params: A dictionary with new values.
 
-        Returns: 
+        Returns:
             None
         """
         pass
@@ -111,4 +111,3 @@ class StandardSimulation(ISimulation):
 
     def __hash__(self):
         return id(self.uid)
-

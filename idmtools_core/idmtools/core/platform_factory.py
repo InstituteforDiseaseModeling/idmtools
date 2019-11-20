@@ -14,7 +14,7 @@ class Platform:
             block: The INI configuration file block name.
             kwargs: User inputs may overwrite the entries in the block.
 
-        Returns: 
+        Returns:
             The requested platform.
         """
         from idmtools.registry.platform_specification import PlatformPlugins
@@ -37,7 +37,7 @@ class Platform:
         Args:
             name: The platform type.
 
-        Returns: 
+        Returns:
             None
         """
         if name not in cls._platforms:
@@ -53,7 +53,7 @@ class Platform:
             block: The section name in the configuration file.
             overrides: Optional override of parameters from the configuration file.
 
-        Returns: 
+        Returns:
             A dictionary with entries from the block.
         """
 

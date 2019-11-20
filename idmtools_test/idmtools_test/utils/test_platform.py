@@ -1,5 +1,7 @@
 import os
+import typing
 from dataclasses import dataclass, field
+from logging import getLogger
 from typing import Dict, List, Type
 from uuid import UUID, uuid4
 
@@ -9,7 +11,8 @@ import numpy as np
 from idmtools.core import EntityStatus, ItemType
 from idmtools.core.interfaces.iitem import TItem
 from idmtools.entities import IPlatform
-from idmtools.entities.iexperiment import TExperiment
+from idmtools.entities.iexperiment import TExperiment, IExperiment, ILinuxExperiment, IWindowsExperiment, \
+    IGPUExperiment, IDockerExperiment
 from idmtools.entities.isimulation import TSimulation
 from idmtools.registry.platform_specification import example_configuration_impl, get_platform_impl, \
     get_platform_type_impl, PlatformSpecification
@@ -18,22 +21,33 @@ from idmtools.registry.plugin_specification import get_description_impl
 current_directory = os.path.dirname(os.path.realpath(__file__))
 data_path = os.path.abspath(os.path.join(current_directory, "..", "data"))
 
+logger = getLogger(__name__)
+
 
 @dataclass(repr=False)
 class TestPlatform(IPlatform):
     """
     Test platform simulating a working platform to use in the test suites.
     """
+
+    def supported_experiment_types(self) -> List[typing.Type]:
+        os_ex = IWindowsExperiment if os.name == "nt" else ILinuxExperiment
+        return [IExperiment, os_ex]
+
+    def unsupported_experiment_types(self) -> List[typing.Type]:
+        os_ex = IWindowsExperiment if os.name != "nt" else ILinuxExperiment
+        return [IGPUExperiment, IDockerExperiment, os_ex]
+
     __test__ = False  # Hide from test discovery
 
     experiments: 'diskcache.Cache' = field(default=None, compare=False, metadata={"pickle_ignore": True})
     simulations: 'diskcache.Cache' = field(default=None, compare=False, metadata={"pickle_ignore": True})
 
     def __post_init__(self):
-        super().__post_init__()
         os.makedirs(data_path, exist_ok=True)
         self.initialize_test_cache()
         self.supported_types = {ItemType.EXPERIMENT, ItemType.SIMULATION}
+        super().__post_init__()
 
     def initialize_test_cache(self):
         """
@@ -50,7 +64,7 @@ class TestPlatform(IPlatform):
     def post_setstate(self):
         self.initialize_test_cache()
 
-    def _create_batch(self, batch: 'TEntityList', item_type: 'ItemType') -> 'List[UUID]':
+    def _create_batch(self, batch: 'TEntityList', item_type: 'ItemType') -> 'List[UUID]':  # noqa: F821
         if item_type == ItemType.SIMULATION:
             return self._create_simulations(simulation_batch=batch)
 
@@ -61,15 +75,19 @@ class TestPlatform(IPlatform):
         if item_type == ItemType.SIMULATION:
             obj = None
             for eid in self.simulations:
-                for sim in self.simulations.get(eid):
-                    if sim.uid == item_id:
-                        obj = sim
-                        break
-                if obj: break
+                sims = self.simulations.get(eid)
+                if sims:
+                    for sim in self.simulations.get(eid):
+                        if sim.uid == item_id:
+                            obj = sim
+                            break
+                if obj:
+                    break
         elif item_type == ItemType.EXPERIMENT:
             obj = self.experiments.get(item_id)
 
         if not obj:
+            logger.warning(f"Could not find object with id: {item_id}")
             return
 
         obj.platform = self
@@ -84,15 +102,19 @@ class TestPlatform(IPlatform):
             return self.experiments.get(platform_item.parent_id)
 
     def _create_experiment(self, experiment: 'TExperiment') -> UUID:
+        if not self.is_supported_experiment(experiment):
+            raise ValueError("The specified experiment is not supported on this platform")
         uid = uuid4()
         experiment.uid = uid
         self.experiments.set(uid, experiment)
         lock = diskcache.Lock(self.simulations, 'simulations-lock')
         with lock:
             self.simulations.set(uid, list())
+        logger.debug(f"Created Experiment {experiment.uid}")
         return experiment.uid
 
     def _create_simulations(self, simulation_batch):
+
         simulations = []
         for simulation in simulation_batch:
             experiment_id = simulation.parent_id
@@ -124,7 +146,8 @@ class TestPlatform(IPlatform):
             simulation.status = status
             self.simulations.set(experiment_uid, simulations)
             number -= 1
-            if number <= 0: return
+            if number <= 0:
+                return
 
     def run_simulations(self, experiment: TExperiment) -> None:
         from idmtools.core import EntityStatus
@@ -156,12 +179,8 @@ class TestPlatform(IPlatform):
 
 
 TEST_PLATFORM_EXAMPLE_CONFIG = """
-[LOCAL]
-redis_image=redis:5.0.4-alpine
-redis_port=6379
-runtime=nvidia
-workers_image: str = 'idm-docker-staging.packages.idmod.org:latest'
-workers_ui_port: int = 5000
+[Test]
+
 """
 
 

@@ -13,7 +13,7 @@ with open('requirements.txt') as requirements_file:
 
 build_requirements = ['flake8', 'coverage', 'py-make', 'bump2version', 'twine']
 setup_requirements = []
-test_requirements = ['pytest', 'pytest-runner'] + build_requirements
+test_requirements = ['pytest', 'pytest-runner', 'pytest-timeout', 'pytest-cache'] + build_requirements
 
 extras = dict(test=test_requirements, packaging=build_requirements)
 
@@ -41,7 +41,8 @@ setup(
     keywords='modeling, IDM',
     name='idmtools_models',
     entry_points=dict(idmtools_model=  # noqa: E251
-                      ["idmtools_model_python = idmtools_models.python.python_experiment_spec:PythonExperimentSpec"]
+                      ["idmtools_model_python = idmtools_models.python.python_experiment_spec:PythonExperimentSpec",
+                       "idmtools_model_r = idmtools_models.r.r_experiment_spec:RExperimentSpec"]
                       ),
     packages=find_packages(),
     setup_requires=setup_requirements,

@@ -3,6 +3,8 @@ import os
 import unittest
 from functools import partial
 
+import pytest
+
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core import FilterMode
 from idmtools.assets.errors import DuplicatedAssetError
@@ -10,6 +12,7 @@ from idmtools.utils.filters.asset_filters import asset_in_directory, file_name_i
 from idmtools_test import COMMON_INPUT_PATH
 
 
+@pytest.mark.assets
 class TestAssets(unittest.TestCase):
 
     def setUp(self) -> None:
@@ -117,10 +120,9 @@ class TestAssets(unittest.TestCase):
 
         self.assertSetEqual(set(ac.assets), set(assets_to_find))
 
-    @unittest.skip("wait until fix issue #306")
     def test_assets_collection_from_dir_flatten_forced_relative_path(self):
         assets_to_find = [
-            Asset(absolute_path=os.path.join(self.base_path, "d.txt")),
+            Asset(relative_path='assets_dir', absolute_path=os.path.join(self.base_path, "d.txt")),
             Asset(relative_path='assets_dir', absolute_path=os.path.join(self.base_path, "1", "a.txt")),
             Asset(relative_path='assets_dir', absolute_path=os.path.join(self.base_path, "1", "b.txt")),
             Asset(relative_path='assets_dir', absolute_path=os.path.join(self.base_path, "2", "c.txt"))

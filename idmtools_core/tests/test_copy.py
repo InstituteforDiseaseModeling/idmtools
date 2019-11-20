@@ -1,12 +1,14 @@
-import os
 import copy
+import os
 import unittest.mock
-import pytest
 from functools import partial
-from idmtools_model_emod.defaults import EMODSir
+
+import pytest
+
 from idmtools_model_emod import EMODExperiment
-from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+from idmtools_model_emod.defaults import EMODSir
 from idmtools_test import COMMON_INPUT_PATH
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 DEFAULT_CONFIG_PATH = os.path.join(COMMON_INPUT_PATH, "files", "config.json")
 DEFAULT_CAMPAIGN_JSON = os.path.join(COMMON_INPUT_PATH, "files", "campaign.json")
@@ -40,14 +42,11 @@ class TestCopy(ITestWithPersistence):
         super().tearDown()
 
     def test_deepcopy_assets(self):
-        e = EMODExperiment.from_default(self.case_name, default=EMODSir,
+        e = EMODExperiment.from_default(self.case_name, default=EMODSir(),
                                         eradication_path=DEFAULT_ERADICATION_PATH)
 
-        e.load_files(config_path=DEFAULT_CONFIG_PATH, campaign_path=DEFAULT_CAMPAIGN_JSON,
-                     demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)
-
         # test deepcopy of experiment
-        e.gather_assets()
+        e.pre_creation()
         ep = copy.deepcopy(e)
         self.assertEqual(len(ep.assets.assets), 0)
         ep.assets = copy.deepcopy(e.assets)
@@ -63,11 +62,8 @@ class TestCopy(ITestWithPersistence):
         self.assertEqual(e.base_simulation.assets, sim.assets)
 
     def test_deepcopy_experiment(self):
-        e = EMODExperiment.from_default(self.case_name, default=EMODSir,
+        e = EMODExperiment.from_default(self.case_name, default=EMODSir(),
                                         eradication_path=DEFAULT_ERADICATION_PATH)
-
-        e.load_files(config_path=DEFAULT_CONFIG_PATH, campaign_path=DEFAULT_CAMPAIGN_JSON,
-                     demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)
 
         from idmtools.builders import ExperimentBuilder
         builder = ExperimentBuilder()
@@ -101,14 +97,13 @@ class TestCopy(ITestWithPersistence):
         self.assertIn('Set self.maxDiff to None to see it', context.exception.args[0])
 
     def test_deepcopy_simulation(self):
-        e = EMODExperiment.from_default(self.case_name, default=EMODSir,
+        e = EMODExperiment.from_default(self.case_name, default=EMODSir(),
                                         eradication_path=DEFAULT_ERADICATION_PATH)
 
         sim = e.simulation()
-        sim.load_files(config_path=DEFAULT_CONFIG_PATH, campaign_path=DEFAULT_CAMPAIGN_JSON,
-                       demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)
+        sim.demographics.add_demographics_from_file(DEFAULT_DEMOGRAPHICS_JSON)
 
-        sim.gather_assets()
+        sim.pre_creation()
         self.assertEqual(len(sim.assets.assets), 3)
 
         # test deepcopy of simulation
@@ -124,4 +119,3 @@ class TestCopy(ITestWithPersistence):
 
         pp = copy.deepcopy(p)
         self.assertEqual(p, pp)
-        self.assertDictEqual(vars(p), vars(pp))

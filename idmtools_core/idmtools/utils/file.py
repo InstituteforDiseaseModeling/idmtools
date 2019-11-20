@@ -9,9 +9,9 @@ def scan_directory(basedir: str, recursive: bool = True) -> Iterable[DirEntry]:
 
     Args:
         basedir: The root directory to start from.
-        recursive: True to search the subfolders recursively; False to stay in the root directory. 
+        recursive: True to search the subfolders recursively; False to stay in the root directory.
 
-    Returns: 
+    Returns:
         An iterator yielding all the files found.
     """
     for entry in os.scandir(basedir):

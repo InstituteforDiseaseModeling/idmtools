@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """The setup script."""
+import os
 import sys
 
 from setuptools import setup, find_packages
@@ -12,15 +13,29 @@ with open('README.md', encoding='utf-8') as readme_file:
 with open('requirements.txt') as requirements_file:
     requirements = requirements_file.read().split("\n")
 
+with open('workers_requirements.txt') as requirements_file:
+    worker_requirements = requirements_file.read().split("\n")
+
+with open('ui_requirements.txt') as requirements_file:
+    ui_requirements = requirements_file.read().split("\n")
+
+
 setup_requirements = []
-test_requirements = ['pytest', 'pytest-runner']
+server_requirements = ['uwsgi==2.0.18']
+test_requirements = ['pytest', 'pytest-runner', 'pytest-timeout', 'pytest-cache']
+
+# Only install uwsgi on python 3.7
+if os.name == "nt":
+    # TODO remove workaround. This is needed because 226 break windows virtual envs when calling processes
+    # which we need
+    test_requirements.append('pywin32==225')
 
 extras = dict(test=test_requirements, dev=['Pympler'],
               # Requirements for running workers server
-              workers=['sqlalchemy~=1.3.5', 'psycopg2-binary~=2.8.3'],
+              workers=worker_requirements,
+              server=server_requirements,
               # these are only needed when not running UI
-              ui=['flask~=1.0.3', 'Flask-AutoIndex~=0.6.4', 'flask_restful~=0.3.7', 'Flask-SQLAlchemy~=2.4.0'])
-
+              ui=ui_requirements)
 # check for python 3.6
 if sys.version_info[1] == 6:
     requirements.append('dataclasses')
