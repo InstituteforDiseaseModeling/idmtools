@@ -16,6 +16,27 @@ class ProjectTemplate:
     description: str = None
     info: str = None
 
+    @staticmethod
+    def read_templates_from_json_stream(s) -> List['ProjectTemplate']:
+        """
+        Read Project Template from stream
+
+        Args:
+            s: Stream where json data resides
+
+        Returns:
+
+        """
+        import json
+        data = json.loads(s.read().decode())
+        ret = list()
+        if isinstance(data, list):
+            for item in data:
+                ret.append(ProjectTemplate(**item))
+        else:
+            ret.append(ProjectTemplate(**data))
+        return ret
+
 
 class PluginSpecification:
     """

@@ -38,8 +38,8 @@ def start() -> NoReturn:
     import idmtools_cli.cli.simulation
     import idmtools_cli.cli.system_info  # noqa: F401
     platform_plugins = PlatformCLIPlugins()
-    from idmtools_cli.cli.init import build_project_list
-    build_project_list()
+    from idmtools_cli.cli.init import build_project_commands
+    build_project_commands()
     # Trigger the loading of additional cli from platforms
     [p.get_additional_commands() for p in platform_plugins.get_plugins()]
 
