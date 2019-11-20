@@ -1,17 +1,20 @@
-class FrozenSimple:
+class IFrozen:
     _frozen = False
 
-    def __init__(self):
-        pass
+    def freeze(self):
+        from idmtools.frozen.frozen_utils import frozen_transform
 
-    def frozen(self):
         # Make sure don't do it twice
         if self._frozen:
             return
 
+        if hasattr(self, '__dict__'):
+            for key, value in self.__dict__.items():
+                setattr(self, key, frozen_transform(value))
+
         self._frozen = True
 
-    def __setattr__(self, key, value):  # real signature unknown
+    def __setattr__(self, key, value):
         """ Set self[key] to value. """
         if self._frozen:
             raise Exception('Frozen')

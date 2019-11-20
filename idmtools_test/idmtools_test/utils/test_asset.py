@@ -1,10 +1,9 @@
 import os
 from typing import TypeVar, Union, List, Callable, Any
-from idmtools.frozen.frozen_base import FrozenBase
-from idmtools.frozen.frozen_simple import FrozenSimple
+from idmtools.frozen.ifrozen import IFrozen
 
 
-class Asset(FrozenBase):
+class Asset(IFrozen):
     """
     A class representing an asset. An asset can either be related to a physical 
     asset present on the computer or directly specified by a filename and content.

@@ -3,19 +3,15 @@ from idmtools.frozen.frozen_dict import ImDict
 from idmtools.frozen.frozen_list import ImList
 from idmtools.frozen.frozen_set import ImSet
 from idmtools.frozen.frozen_tuple import ImTuple
-from idmtools.frozen.frozen_base import FrozenBase
-from idmtools.frozen.frozen_simple import FrozenSimple
+from idmtools.frozen.ifrozen import IFrozen
 
 
 def get_frozen_item(obj):
     """
-
     Args:
-        obj_dict:
-        cls:
+        obj: object to be frozen
 
-    Returns:
-
+    Returns: the transformed object
     """
 
     class FrozenDict(ImDict):
@@ -57,6 +53,7 @@ def get_frozen_item(obj):
     class FrozenTuple(ImTuple):
         def __new__(cls):
             o = ImTuple(obj)
+
             # In case inherited from tuple with customer fields
             if hasattr(obj, '__dict__'):
                 for key, value in obj.__dict__.items():
@@ -64,7 +61,7 @@ def get_frozen_item(obj):
 
             return ImTuple(obj)
 
-    class FrozenObject(FrozenBase, obj.__class__):
+    class FrozenObject(IFrozen, obj.__class__):
         __metaclass__ = obj.__class__
 
         def __init__(self):
@@ -104,10 +101,9 @@ def is_user_defined_object(obj):
 
 
 def frozen_transform(obj=None):
-    import types
 
-    if isinstance(obj, FrozenBase) or isinstance(obj, FrozenSimple):
-        obj.frozen()
+    if isinstance(obj, IFrozen):
+        obj.freeze()
         return obj
 
     if is_builtins_single_object(obj):

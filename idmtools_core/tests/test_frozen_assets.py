@@ -90,7 +90,7 @@ class TestFrozenAssets(unittest.TestCase):
         a.absolute_path = 'new.txt'
         self.assertTrue(isinstance(a, Asset))
 
-        a.frozen()
+        a.freeze()
 
         # Test: other asset can be modified
         a2 = ac.assets[1]
@@ -141,7 +141,7 @@ class TestFrozenAssets(unittest.TestCase):
         print(ac.uid)
         self.assertEqual(len(ac.assets), 2)
 
-        ac.frozen()
+        ac.freeze()
         ac_frozen = ac
         self.assertEqual(len(ac_frozen.assets), 2)
 
@@ -183,7 +183,7 @@ class TestFrozenAssets(unittest.TestCase):
         print(ac.uid)
         self.assertEqual(len(ac.assets), 2)
 
-        ac.frozen()
+        ac.freeze()
         ac_frozen = ac
         self.assertEqual(len(ac_frozen.assets), 2)
 
@@ -262,7 +262,7 @@ class TestFrozenAssets(unittest.TestCase):
         print(ac.uid)
         self.assertEqual(len(ac.assets), 4)
 
-        ac.frozen()
+        ac.freeze()
         ac_frozen = ac
         self.assertEqual(len(ac_frozen.assets), 4)
 

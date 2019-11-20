@@ -1,5 +1,7 @@
-class ImSet(set):
-    _frozen = False
+from idmtools.frozen.ifrozen import IFrozen
+
+
+class ImSet(set, IFrozen):
 
     def add(self, *args, **kwargs):  # real signature unknown
         """
@@ -82,16 +84,3 @@ class ImSet(set):
             raise Exception('Frozen')
         else:
             super().update(*args, **kwargs)
-
-    def __setattr__(self, key, value):  # real signature unknown
-        """ Set self[key] to value. """
-        if self._frozen:
-            raise Exception('Frozen')
-        else:
-            super().__setattr__(key, value)
-
-    def __delattr__(self, item):
-        if self._frozen:
-            raise Exception('Frozen')
-        else:
-            super().__delattr__(item)

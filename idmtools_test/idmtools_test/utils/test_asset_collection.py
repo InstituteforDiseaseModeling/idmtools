@@ -12,10 +12,10 @@ if typing.TYPE_CHECKING:
     from idmtools.assets import TAssetList, TAsset, TAssetFilterList
     from typing import NoReturn
 
-from idmtools.frozen.frozen_utils import FrozenBase
+from idmtools.frozen.frozen_utils import IFrozen
 
 
-class AssetCollection(IEntity, FrozenBase):
+class AssetCollection(IEntity, IFrozen):
     """
     A class that represents a collection of assets.
     """
