@@ -10,7 +10,6 @@ if typing.TYPE_CHECKING:
     from typing import Callable, Any, List, Iterable, Union
 
 
-@dataclass
 class ExperimentBuilder:
     """
     Class that represents an experiment builder.
@@ -19,6 +18,10 @@ class ExperimentBuilder:
     SIMULATION_ATTR = 'simulation'
     sweeps: List[Any] = field(default_factory=list)
     count: int = 1
+
+    def __init__(self):
+        self.sweeps = []
+        self.count = 1
 
     def __hash__(self):
         return hash((self.SIMULATION_ATTR, str(self.sweeps), self.count))
