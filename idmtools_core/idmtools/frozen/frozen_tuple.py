@@ -10,5 +10,4 @@ class ImTuple(tuple, IFrozen):
         """ Return self+value. """
         if self._frozen:
             raise Exception('Frozen')
-        else:
-            super().__add__(*args, **kwargs)
+        super().__add__(*args, **kwargs)

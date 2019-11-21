@@ -18,11 +18,9 @@ class IFrozen:
         """ Set self[key] to value. """
         if self._frozen:
             raise Exception('Frozen')
-        else:
-            super().__setattr__(key, value)
+        super().__setattr__(key, value)
 
     def __delattr__(self, item):
         if self._frozen:
             raise Exception('Frozen')
-        else:
-            super().__delattr__(item)
+        super().__delattr__(item)

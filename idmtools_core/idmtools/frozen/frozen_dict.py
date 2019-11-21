@@ -8,15 +8,13 @@ class ImDict(UserDict, IFrozen):
         """ Set self[key] to value. """
         if self._frozen:
             raise Exception('Frozen')
-        else:
-            super().__setitem__(*args, **kwargs)
+        super().__setitem__(*args, **kwargs)
 
     def __delitem__(self, *args, **kwargs):  # real signature unknown
         """ Delete self[key]. """
         if self._frozen:
             raise Exception('Frozen')
-        else:
-            super().__delitem__(*args, **kwargs)
+        super().__delitem__(*args, **kwargs)
 
     def setdefault(self, *args, **kwargs):  # real signature unknown
         """
@@ -26,8 +24,7 @@ class ImDict(UserDict, IFrozen):
         """
         if self._frozen:
             raise Exception('Frozen')
-        else:
-            super().setdefault(*args, **kwargs)
+        super().setdefault(*args, **kwargs)
 
     def update(self, E=None, **F):  # known special case of dict.update
         """
@@ -38,8 +35,7 @@ class ImDict(UserDict, IFrozen):
         """
         if self._frozen:
             raise Exception('Frozen')
-        else:
-            super().update(E, **F)
+        super().update(E, **F)
 
     def pop(self, k, d=None):  # real signature unknown; restored from __doc__
         """
@@ -48,8 +44,7 @@ class ImDict(UserDict, IFrozen):
         """
         if self._frozen:
             raise Exception('Frozen')
-        else:
-            super().pop(k, d)
+        super().pop(k, d)
 
     def popitem(self):  # real signature unknown; restored from __doc__
         """
@@ -58,5 +53,4 @@ class ImDict(UserDict, IFrozen):
         """
         if self._frozen:
             raise Exception('Frozen')
-        else:
-            super().popitem()
+        super().popitem()

@@ -11,22 +11,19 @@ class ImSet(set, IFrozen):
         """
         if self._frozen:
             raise Exception('Frozen')
-        else:
-            super().add(*args, **kwargs)
+        super().add(*args, **kwargs)
 
     def clear(self, *args, **kwargs):  # real signature unknown
         """ Remove all elements from this set. """
         if self._frozen:
             raise Exception('Frozen')
-        else:
-            super().clear(*args, **kwargs)
+        super().clear(*args, **kwargs)
 
     def difference_update(self, *args, **kwargs):  # real signature unknown
         """ Remove all elements of another set from this set. """
         if self._frozen:
             raise Exception('Frozen')
-        else:
-            super().difference_update(*args, **kwargs)
+        super().difference_update(*args, **kwargs)
 
     def discard(self, *args, **kwargs):  # real signature unknown
         """
@@ -36,15 +33,13 @@ class ImSet(set, IFrozen):
         """
         if self._frozen:
             raise Exception('Frozen')
-        else:
-            super().discard(*args, **kwargs)
+        super().discard(*args, **kwargs)
 
     def intersection_update(self, *args, **kwargs):  # real signature unknown
         """ Update a set with the intersection of itself and another. """
         if self._frozen:
             raise Exception('Frozen')
-        else:
-            super().intersection_update(*args, **kwargs)
+        super().intersection_update(*args, **kwargs)
 
     def pop(self, *args, **kwargs):  # real signature unknown
         """
@@ -53,8 +48,7 @@ class ImSet(set, IFrozen):
         """
         if self._frozen:
             raise Exception('Frozen')
-        else:
-            super().pop(*args, **kwargs)
+        super().pop(*args, **kwargs)
 
     def remove(self, *args, **kwargs):  # real signature unknown
         """
@@ -64,8 +58,7 @@ class ImSet(set, IFrozen):
         """
         if self._frozen:
             raise Exception('Frozen')
-        else:
-            super().remove(*args, **kwargs)
+        super().remove(*args, **kwargs)
 
     def union(self, *args, **kwargs):  # real signature unknown
         """
@@ -75,12 +68,10 @@ class ImSet(set, IFrozen):
         """
         if self._frozen:
             raise Exception('Frozen')
-        else:
-            super().union(*args, **kwargs)
+        super().union(*args, **kwargs)
 
     def update(self, *args, **kwargs):  # real signature unknown
         """ Update a set with the union of itself and others. """
         if self._frozen:
             raise Exception('Frozen')
-        else:
-            super().update(*args, **kwargs)
+        super().update(*args, **kwargs)

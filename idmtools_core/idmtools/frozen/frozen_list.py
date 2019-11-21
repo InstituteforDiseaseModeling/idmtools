@@ -8,29 +8,25 @@ class ImList(UserList, IFrozen):
         """ Append object to the end of the list. """
         if self._frozen:
             raise Exception('Frozen')
-        else:
-            super().append(*args, **kwargs)
+        super().append(*args, **kwargs)
 
     def clear(self, *args, **kwargs):  # real signature unknown
         """ Remove all items from list. """
         if self._frozen:
             raise Exception('Frozen')
-        else:
-            super().clear(*args, **kwargs)
+        super().clear(*args, **kwargs)
 
     def extend(self, *args, **kwargs):  # real signature unknown
         """ Extend list by appending elements from the iterable. """
         if self._frozen:
             raise Exception('Frozen')
-        else:
-            super().extend(*args, **kwargs)
+        super().extend(*args, **kwargs)
 
     def insert(self, *args, **kwargs):  # real signature unknown
         """ Insert object before index. """
         if self._frozen:
             raise Exception('Frozen')
-        else:
-            super().insert(*args, **kwargs)
+        super().insert(*args, **kwargs)
 
     def pop(self, *args, **kwargs):  # real signature unknown
         """
@@ -40,8 +36,7 @@ class ImList(UserList, IFrozen):
         """
         if self._frozen:
             raise Exception('Frozen')
-        else:
-            super().pop(*args, **kwargs)
+        super().pop(*args, **kwargs)
 
     def remove(self, *args, **kwargs):  # real signature unknown
         """
@@ -51,17 +46,14 @@ class ImList(UserList, IFrozen):
         """
         if self._frozen:
             raise Exception('Frozen')
-        else:
-            super().remove(*args, **kwargs)
+        super().remove(*args, **kwargs)
 
     def __setitem__(self, key, item):
         if self._frozen:
             raise Exception('Frozen')
-        else:
-            super().__setitem__(key, item)
+        super().__setitem__(key, item)
 
     def __delitem__(self, key):
         if self._frozen:
             raise Exception('Frozen')
-        else:
-            super().__delitem__(key)
+        super().__delitem__(key)
