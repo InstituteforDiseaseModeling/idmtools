@@ -157,6 +157,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
                         tags.update(new_tags)
 
                 simulation.tags = tags
+                simulation.pre_creation()
                 sims.append(simulation)
 
             yield sims
