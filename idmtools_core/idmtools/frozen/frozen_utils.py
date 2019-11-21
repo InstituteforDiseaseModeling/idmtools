@@ -23,7 +23,7 @@ def get_frozen_item(obj):
             # In case inherited from dict with customer fields
             if hasattr(obj, '__dict__'):
                 for key, value in obj.__dict__.items():
-                    setattr(self.data, key, frozen_transform(value))
+                    setattr(self, key, frozen_transform(value))
 
             self._frozen = True
 
@@ -36,7 +36,7 @@ def get_frozen_item(obj):
             # In case inherited from list with customer fields
             if hasattr(obj, '__dict__'):
                 for key, value in obj.__dict__.items():
-                    setattr(self.data, key, frozen_transform(value))
+                    setattr(self, key, frozen_transform(value))
 
             self._frozen = True
 
