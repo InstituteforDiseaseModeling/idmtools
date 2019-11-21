@@ -1,24 +1,16 @@
+import argparse
+import os
 import sys
 from os.path import abspath, join, dirname
-import subprocess
 
 base_directory = abspath(join(dirname(__file__), '..'))
 
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument(f'--parallel', default=False, action='store_true', help='Parallel Run')
+    parser.add_argument(f'command', help='Pymake Command to run')
 
-def run_command_on_all(command, parallel = False):
+    args = parser.parse_args()
 
-    modules = ['idmtools_core', 'idmtools_cli', 'idmtools_platform_comps', 'idmtools_platform_local',
-               'idmtools_model_emod', 'idmtools_models', 'idmtools_test', 'idmtools_platform_slurm']
-    processes = []
-    for module in modules:
-        p = subprocess.Popen(f'pymake {command}', cwd=join(base_directory, module), shell=True)
-        if parallel:
-            processes.append(p)
-        else:
-            p.wait()
-    if parallel:
-        print('Waiting to finish')
-        [p.wait() for p in processes]
-
-
-run_command_on_all(sys.argv[1], len(sys.argv) > 2 and sys.argv[2] == "p")
+    p_str = '--parallel ' if args.parallel else ''
+    sys.exit(os.system(f'python {os.path.join(base_directory, "dev_scripts", "run_all.py")} {p_str}--exec "pymake {args.command}"'))

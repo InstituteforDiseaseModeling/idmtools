@@ -8,6 +8,7 @@ from idmtools.core.platform_factory import Platform
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 
+@pytest.mark.cleanup
 class TestCleanup(ITestWithPersistence):
 
     # Enable this test by setting the environment variable CLEANUP_COMPS_TESTS to 1

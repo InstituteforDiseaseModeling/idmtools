@@ -14,7 +14,7 @@ class EMODExperimentSpec(ModelSpecification):
         """
         Build a local platform from the passed in configuration object. The
         import of platform is here to avoid problems.
-        
+
         Args:
             configuration:
 

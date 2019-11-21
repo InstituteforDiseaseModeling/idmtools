@@ -1,5 +1,7 @@
 import os
 from functools import partial
+
+import pytest
 from COMPS.Data import Experiment
 from idmtools.builders import ExperimentBuilder
 from idmtools.core.platform_factory import Platform
@@ -7,8 +9,8 @@ from idmtools.managers import ExperimentManager
 from idmtools.core import EntityStatus, ItemType
 from idmtools_models.python import PythonExperiment
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools.analysis.AnalyzeManager import AnalyzeManager
-from idmtools.analysis.DownloadAnalyzer import DownloadAnalyzer
+from idmtools.analysis.analyze_manager import AnalyzeManager
+from idmtools.analysis.download_analyzer import DownloadAnalyzer
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import del_folder
 
@@ -25,6 +27,9 @@ setC = partial(param_update, param="c")
 setD = partial(param_update, param="d")
 
 
+@pytest.mark.analysis
+@pytest.mark.python
+@pytest.mark.comps
 class TestAnalyzeManagerPythonComps(ITestWithPersistence):
 
     def setUp(self) -> None:
@@ -62,6 +67,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         # Uncomment out if you do not want to regenerate exp and sims
         # self.exp_id = '9eacbb9a-5ecf-e911-a2bb-f0921c167866' #comps2 staging
 
+    @pytest.mark.long
     def test_DownloadAnalyzer(self):
         # delete output from previous run
         del_folder("output")
@@ -76,9 +82,8 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         am.analyze()
 
         for simulation in Experiment.get(self.exp_id).get_simulations():
-            s = simulation.get(id=simulation.id)
-            self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "config.json")))
-            self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "result.json")))
+            self.assertTrue(os.path.exists(os.path.join('output', str(simulation.id), "config.json")))
+            self.assertTrue(os.path.exists(os.path.join('output', str(simulation.id), "result.json")))
 
     def test_analyzer_multiple_experiments(self):
         # delete output from previous run
@@ -97,6 +102,5 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         am.analyze()
         for exp_id in exp_list:
             for simulation in Experiment.get(exp_id[0]).get_simulations():
-                s = simulation.get(id=simulation.id)
-                self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "config.json")))
-                self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "result.json")))
+                self.assertTrue(os.path.exists(os.path.join('output', str(simulation.id), "config.json")))
+                self.assertTrue(os.path.exists(os.path.join('output', str(simulation.id), "result.json")))

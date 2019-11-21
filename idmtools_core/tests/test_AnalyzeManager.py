@@ -1,15 +1,20 @@
 import unittest
+from typing import Any
 
-from idmtools.analysis.AnalyzeManager import AnalyzeManager
-from idmtools.analysis.DownloadAnalyzer import DownloadAnalyzer as SampleAnalyzer
+import pytest
+
+from idmtools.analysis.analyze_manager import AnalyzeManager
+from idmtools.analysis.download_analyzer import DownloadAnalyzer as SampleAnalyzer
 from idmtools.builders import StandAloneSimulationsBuilder
 from idmtools.core.enums import EntityStatus, ItemType
+from idmtools.core.interfaces.iitem import TItem
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.ianalyzer import IAnalyzer
 from idmtools.managers import ExperimentManager
 from idmtools_test.utils.tst_experiment import TstExperiment
 
 
+@pytest.mark.analysis
 class TestAnalyzeManager(unittest.TestCase):
     class TestAnalyzer(IAnalyzer):
         def __init__(self, working_dir=None):
@@ -18,6 +23,12 @@ class TestAnalyzeManager(unittest.TestCase):
 
         def initialize(self):
             self.initialize_was_called = True
+
+        def map(self, data: 'Any', item: 'TItem') -> 'Any':
+            pass
+
+        def reduce(self, all_data: dict) -> 'Any':
+            pass
 
     def setUp(self) -> None:
         self.platform = Platform('Test')
@@ -84,7 +95,7 @@ class TestAnalyzeManager(unittest.TestCase):
             # Fail a few or all
             if test_name == 'all':
                 self.platform.set_simulation_status(test_exp.uid, EntityStatus.SUCCEEDED)
-            elif test_name =='none':
+            elif test_name == 'none':
                 self.platform.set_simulation_status(test_exp.uid, EntityStatus.FAILED)
             else:
                 self.platform.set_simulation_status(test_exp.uid, EntityStatus.FAILED)
@@ -109,7 +120,6 @@ class TestAnalyzeManager(unittest.TestCase):
             else:
                 self.assertRaises(AnalyzeManager.ItemsNotReady, am._get_items_to_analyze)
 
-
             # test max_items 1
             am = AnalyzeManager(self.platform, ids=[(test_exp.uid, ItemType.EXPERIMENT)], max_items=1)
             items_to_analyze = am._get_items_to_analyze()
@@ -118,7 +128,6 @@ class TestAnalyzeManager(unittest.TestCase):
             potential_items_uids = {item.uid for item in self.platform.get_children(test_exp.uid, ItemType.EXPERIMENT, force=True) if item.status == EntityStatus.SUCCEEDED}
             for actual_item_uid in items_to_analyze.keys():
                 self.assertTrue(actual_item_uid in potential_items_uids)
-
 
     def test_add_analyzer(self):
         self.assertEqual(len(self.analyze_manager.analyzers), 0)
@@ -162,7 +171,8 @@ class TestAnalyzeManager(unittest.TestCase):
                 self.TestAnalyzer(),
                 self.TestAnalyzer(working_dir=analyzer_wd)
             ]
-            am = AnalyzeManager(self.platform, analyzers=analyzers, working_dir=analyze_manager_wd, force_manager_working_directory=force_wd)
+            am = AnalyzeManager(self.platform, analyzers=analyzers, working_dir=analyze_manager_wd,
+                                force_manager_working_directory=force_wd)
             am._initialize_analyzers()
             actual = [analyzer.working_dir for analyzer in am.analyzers]
             self.assertEqual(actual, expected[force_wd])

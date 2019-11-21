@@ -20,7 +20,7 @@ base_directory = abspath(join(dirname(__file__), '..'))
 default_install = ['test']
 data_class_default = default_install
 
-idmrepo = '--index-url=https://packages.idmod.org/api/pypi/pypi-production/simple'
+idmrepo = '--extra-index-url=https://packages.idmod.org/api/pypi/pypi-production/simple'
 
 # Our packages and the extras to install
 packages = dict(
@@ -28,7 +28,7 @@ packages = dict(
     idmtools_cli=default_install,
     idmtools_platform_local=data_class_default + ['workers', 'ui'],
     idmtools_platform_comps=data_class_default,
-    idmtools_model_emod=data_class_default,
+    idmtools_model_emod=data_class_default + ['bamboo'],
     idmtools_models=data_class_default,
     idmtools_platform_slurm=data_class_default,
     idmtools_test=[]

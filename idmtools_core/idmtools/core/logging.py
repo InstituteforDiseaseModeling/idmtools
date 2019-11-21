@@ -12,6 +12,20 @@ listener = None
 logging_queue = None
 
 
+class IDMQueueListener(QueueListener):
+    def dequeue(self, block):
+        """
+        Dequeue a record and return it, optionally blocking.
+
+        The base implementation uses get. You may want to override this method
+        if you want to use timeouts or work with custom queue implementations.
+        """
+        try:
+            return self.queue.get(block)
+        except EOFError:
+            return None
+
+
 def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'idmtools.log',
                   console: Union[str, bool] = False) -> QueueListener:
     """
@@ -71,7 +85,7 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
         # setup file logger handler that rotates after 10 mb of logging and keeps 5 copies
 
         # now attach a listener to the logging queue and redirect all messages to our handler
-        listener = QueueListener(logging_queue, file_handler)
+        listener = IDMQueueListener(logging_queue, file_handler)
         listener.start()
         # register a stop signal
         register_stop_logger_signal_handler(listener)

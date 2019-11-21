@@ -68,7 +68,7 @@ class PythonSimulation(ISimulation):
         Get a parameter in the simulation
         Args:
             name: Name of the parameter
-        Returns: the Value of the parameter
+        Returns:the Value of the parameter
         """
         return self.parameters.get(name, default)
 
@@ -77,7 +77,7 @@ class PythonSimulation(ISimulation):
         Bulk update parameters
         Args:
             params: dict with new values
-        Returns: None
+        Returns:None
         """
         self.parameters.update(params)
 

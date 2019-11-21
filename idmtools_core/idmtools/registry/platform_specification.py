@@ -40,7 +40,7 @@ class PlatformSpecification(PluginSpecification, ABC):
         Return a new platform using the passed in configuration.
 
         Args:
-            configuration: The INI configuration file to use. 
+            configuration: The INI configuration file to use.
 
         Returns:
             The new platform.

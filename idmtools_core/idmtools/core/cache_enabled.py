@@ -3,8 +3,8 @@ import shutil
 import tempfile
 import typing
 from dataclasses import dataclass, field
-from logging import getLogger
-from threading import get_ident
+from multiprocessing import current_process
+from logging import getLogger, DEBUG
 from diskcache import Cache, DEFAULT_SETTINGS, FanoutCache
 
 if typing.TYPE_CHECKING:
@@ -22,9 +22,9 @@ class CacheEnabled:
     """
     Allows a class to leverage Diskcache and expose a cache property.
     """
-    _cache: 'Union[Cache, FanoutCache]' = field(default=None, init=False, compare=False)
+    _cache: 'Union[Cache, FanoutCache]' = field(default=None, init=False, compare=False,
+                                                metadata={"pickle_ignore": True})
     _cache_directory: 'str' = field(default=None, init=False, compare=False)
-    _ident: 'int' = field(default=None, init=False, compare=False)
 
     def __del__(self):
         self.cleanup_cache()
@@ -39,22 +39,21 @@ class CacheEnabled:
         # Create the cache directory if does not exist
         if not self._cache_directory or not os.path.exists(self._cache_directory):
             self._cache_directory = tempfile.mkdtemp()
-
-        # Retain which thread created the cache
-        self._ident = get_ident()
+            logger.debug(f"Cache created in {self._cache_directory}")
+        else:
+            logger.debug(f"Cache retrieved in {self._cache_directory}")
 
         # Create different cache depending on the options
         if shards:
-            self._cache = FanoutCache(self._cache_directory, shards=shards, eviction_policy=eviction_policy)
+            self._cache = FanoutCache(self._cache_directory, shards=shards, timeout=0.1,
+                                      eviction_policy=eviction_policy)
         else:
             self._cache = Cache(self._cache_directory)
-
-        logger.debug(f"Cache created in {self._cache_directory}")
 
     def cleanup_cache(self):
         # Only delete and close the cache if the owner thread ends
         # Avoid deleting and closing when a child thread ends
-        if self._ident != get_ident():
+        if current_process().name != 'MainProcess':
             return
 
         if self._cache is not None:
@@ -65,8 +64,13 @@ class CacheEnabled:
             if self._cache_directory and os.path.exists(self._cache_directory):
                 try:
                     shutil.rmtree(self._cache_directory)
-                except IOError as e:
-                    logger.exception(e)
+                # In some scripts, like multi-processing, we could still end up with a locked file
+                # in these cases, let's just preserve cache. Often these are temp directories the os
+                # will clean up for us
+                except (IOError, PermissionError) as e:
+                    logger.warning(f"Could not delete cache directory: {self._cache_directory}")
+                    if logger.isEnabledFor(DEBUG):
+                        logger.exception(e)
 
     @property
     def cache(self):

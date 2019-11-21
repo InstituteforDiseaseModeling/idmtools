@@ -46,6 +46,9 @@ coverage    -   Run tests and generate coverage report that is shown in browser
 ```
 On Windows, you can use `pymake` instead of `make`
 
+Use will also need to ensure you have logged in to the staging docker repo using
+`docker login idm-docker-staging.idmod.org`
+
 ### IDE/Runtime Setup
 For development purpose, it is important to add the following folders as to your `PYTHONPATH` (In PyCharm, right click and `Mark Directoy as > Source Root`):
 - `idmtools/idmtools_core`
@@ -56,56 +59,35 @@ For development purpose, it is important to add the following folders as to your
 - `idmtools/idmtools_models`
 - `idmtools/idmtools_test`
 
-### Manual Install
-
-Alternatively, you can install the packages manually by doing the following. 
-```bash
-> cd idmtools_core
-> pip install -e .[test] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
-> cd ..
-> cd idmtools_cli
-> pip install -e .[test]
-> cd idmtools_platform_local
-> pip install -e .[test]
-> cd ..
-> cd idmtools_platform_comps
-> pip install -e .[test]
-> cd ..
-> cd idmtools_model_emod
-> cd ..
-> cd idmtools_models
-> pip install -e .[test]
-> cd ..
-> cd idmtools_test
-> pip install -e .
-
-```
-
 ### Running specific tests from the command line
 
-From within a project directory such a local data
-`python -m unittest tests.test_docker_operations.TestDockerOperations.test_create_stack_starts`
+To run a select set of tests, you can use the `run_all.py` python script
 
-To enable docker tests and comps test you can do the following on Linux 
-`export DOCKER_TESTS=1
-python -m unittest tests.test_docker_operations.TestDockerOperations.test_create_stack_starts
-`
-or on Windows
-`
-set DOCKER_TESTS=1
-python -m unittest tests.test_docker_operations.TestDockerOperations.test_create_stack_starts
-`
-
-Lastly, you can do also run the tests without setting the environment variables directly like so
-`DOCKER_TESTS=1 python -m unittest tests.test_docker_operations.TestDockerOperations.test_create_stack_starts`
-
-## Running the examples in Jupyter
-
-Navigate to the `examples` folder and run:
+For example to run all tests that tagged emod but not tagged comps run 
 ```bash
-> docker-compose up
+python dev_scripts/run_all.py -sd 'tests' --exec "py.test -m 'not comps and emod'"
 ```
 
-You can now open a browser and navigate to: http://localhost:8888.
+You can also filter by test case name or method name. The below will run any test with batch in the name. 
+```bash
+python dev_scripts/run_all.py -sd 'tests' --exec "py.test -k 'batch'"
+```
 
-The examples are available in the `work/notebooks` folder.
+To run a specific test, cd to the project directories test folder and run
+```bash
+py.test test_emod.py::TestLocalPlatformEMOD::test_duplicated_eradication
+```
+
+
+In addition, you can rerun just the failed test using either the top-level `pymake test-failed` rule or by using the 
+`--lf` switch on py.test
+
+# Troubleshooting the Development Environment
+
+1. Docker Auth issues.
+
+   Idmtools currently does not prompt users for docker credentials. Because of this you must login
+   beforehand using `docker login idm-docker-staging.packages.idmod.org`
+2.  Docker image not found
+
+   Check that the idmt
