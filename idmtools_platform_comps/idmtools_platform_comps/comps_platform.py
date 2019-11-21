@@ -16,6 +16,7 @@ from idmtools.core.model_factory import model_factory
 from idmtools.core.interfaces.ientity import IEntity, TEntityList
 from idmtools.entities import IPlatform
 from idmtools.entities.experiment import Experiment, StandardExperiment, IDockerModel
+from idmtools.entities.itask import PlatformRequirement
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.suite import Suite
 from idmtools.utils.time import timestamp
@@ -145,9 +146,9 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
         config = Configuration(
             environment_name=self.environment,
-            simulation_input_args=experiment.command.arguments + " " + experiment.command.options,
+            simulation_input_args=experiment.model.command.arguments + " " + experiment.model.command.options,
             working_directory_root=os.path.join(self.simulation_root, subdirectory).replace('\\', '/'),
-            executable_path=experiment.command.executable,
+            executable_path=experiment.model.command.executable,
             node_group_name=self.node_group,
             maximum_number_of_retries=self.num_retires,
             priority=self.priority,
@@ -369,8 +370,5 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
         return ret
 
-    def supported_experiment_types(self) -> List[typing.Type]:
-        return [Experiment]
-
-    def unsupported_experiment_types(self) -> List[typing.Type]:
-        return [IDockerModel]
+    def platform_supports(self) -> List[PlatformRequirement]:
+        return [PlatformRequirement.WINDOWS, PlatformRequirement.PYTHON_SCRIPTING, PlatformRequirement.SHELL_CMD]

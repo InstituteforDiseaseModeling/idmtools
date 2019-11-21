@@ -14,6 +14,7 @@ def param_update(simulation, param, value):
 
 
 model = PythonModel(model_path=os.path.join("work", "inputs", "python_model_with_deps", "Assets", "model.py"))
+
 experiment = Experiment(name="My First experiment", model=model)
 experiment.tags["tag1"] = 1
 experiment.base_simulation.set_parameter("c", 0)

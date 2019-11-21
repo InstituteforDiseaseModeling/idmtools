@@ -3,7 +3,7 @@ import os
 from abc import ABCMeta, abstractmethod
 from enum import Enum
 from functools import partial
-from typing import NoReturn
+from typing import NoReturn, List
 
 from idmtools.assets import Asset, AssetCollection, json_handler
 from idmtools.utils.filters.asset_filters import file_extension_is
@@ -18,7 +18,7 @@ class InputFilesList(AssetCollection, metaclass=ABCMeta):
     def set_simulation_config(self, simulation):
         pass
 
-    def gather_assets(self):
+    def gather_assets(self) -> List[Asset]:
         assets = [a for a in self.assets if not a.persisted]
         for a in assets:
             a.persisted = True

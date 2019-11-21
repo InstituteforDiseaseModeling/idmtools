@@ -1,5 +1,6 @@
 import copy
 import hashlib
+import json
 import os
 import collections
 import stat
@@ -10,11 +11,17 @@ from logging import getLogger
 from pathlib import Path
 from urllib.parse import urlparse
 import requests
+from typing import Optional, Any, List
+
+from idmtools.assets import TAsset, Asset
 from idmtools.entities.command_line import CommandLine
 from idmtools.entities.experiment import IDockerModel
 from idmtools.entities.imodel import IModel
+from idmtools.entities.itask import PlatformRequirement
 from idmtools.utils.decorators import optional_yaspin_load
 from idmtools_model_emod.emod_file import DemographicsFiles, MigrationFiles, Dlls
+from idmtools.utils.json import load_json_file
+from idmtools_model_emod.interventions import EMODEmptyCampaign
 
 if typing.TYPE_CHECKING:
     from idmtools_model_emod import IEMODDefault
@@ -25,11 +32,14 @@ logger = getLogger(__name__)
 @dataclass(repr=False)
 class IEMODModel(IModel, ABC):
     eradication_path: str = field(default=None, compare=False, metadata={"md": True})
-    demographics: collections.OrderedDict = field(default_factory=lambda: collections.OrderedDict())
+    #demographics: collections.OrderedDict = field(default_factory=lambda: collections.OrderedDict())
     legacy_exe: 'bool' = field(default=False, metadata={"md": True})
-    demographics: 'DemographicsFiles' = field(default_factory=lambda: DemographicsFiles('demographics'))
+    demographics: DemographicsFiles = field(default_factory=lambda: DemographicsFiles('demographics'))
     dlls: 'Dlls' = field(default_factory=lambda: Dlls())
     migrations: 'MigrationFiles' = field(default_factory=lambda: MigrationFiles('migrations'))
+    campaign: dict = field(default_factory=lambda: EMODEmptyCampaign.campaign())
+    config: dict = field(default_factory=lambda: {})
+    platform_requirements: List[PlatformRequirement] = field(default_factory=lambda: [PlatformRequirement.WINDOWS, PlatformRequirement.SHELL_CMD])
 
     def __post_init__(self):
         super().__post_init__()
@@ -68,11 +78,11 @@ class IEMODModel(IModel, ABC):
         return out_name
 
     @classmethod
-    def from_default(cls, name, default: 'IEMODDefault', eradication_path=None):
-        exp = cls(name=name, eradication_path=eradication_path)
+    def from_default(cls, default: 'IEMODDefault', eradication_path=None):
+        exp = cls(eradication_path=eradication_path)
 
         # Set the base simulation
-        default.process_simulation(exp.base_simulation)
+        default.process_simulation(exp)
 
         # Add the demographics
         for filename, content in default.demographics().items():
@@ -81,7 +91,7 @@ class IEMODModel(IModel, ABC):
         return exp
 
     @classmethod
-    def from_files(cls, name, eradication_path=None, config_path=None, campaign_path=None, demographics_paths=None):
+    def from_files(cls, eradication_path=None, config_path=None, campaign_path=None, demographics_paths=None):
         """
         Load custom |EMOD_s| files when creating :class:`EMODExperiment`.
 
@@ -94,11 +104,11 @@ class IEMODModel(IModel, ABC):
 
         Returns: An initialized experiment
         """
-        # Create the experiment
-        exp = cls(name=name, eradication_path=eradication_path)
+        # Create the model
+        exp = cls(eradication_path=eradication_path)
 
         # Load the files
-        exp.base_simulation.load_files(config_path=config_path, campaign_path=campaign_path)
+        exp.load_files(config_path=config_path, campaign_path=campaign_path)
 
         if demographics_paths:
             for demog_path in [demographics_paths] if isinstance(demographics_paths, str) else demographics_paths:
@@ -106,25 +116,17 @@ class IEMODModel(IModel, ABC):
 
         return exp
 
-    def gather_assets(self) -> typing.NoReturn:
+    def gather_experiment_assets(self) -> List[TAsset]:
         from idmtools.assets import Asset
 
         # Add Eradication.exe to assets
         logger.debug(f"Adding {self.eradication_path}")
-        self.assets.add_asset(Asset(absolute_path=self.eradication_path, filename=self.executable_name),
-                              fail_on_duplicate=False)
+        common = [Asset(absolute_path=self.eradication_path, filename=self.executable_name)]
+        for i in [self.demographics, self.dlls, self.migrations]:
+            common.extend(i.gather_assets())
+        return common
 
-        # Add demographics to assets
-        self.assets.extend(self.demographics.gather_assets())
-
-        # Add DLLS to assets
-        self.assets.extend(self.dlls.gather_assets())
-
-        # Add the migrations
-        self.assets.extend(self.migrations.gather_assets())
-
-    def pre_creation(self):
-        super().pre_creation()
+    def pre_experiment_creation(self):
 
         # Input path is different for legacy exes
         input_path = r"./Assets\;." if not self.legacy_exe else "./Assets"
@@ -133,24 +135,103 @@ class IEMODModel(IModel, ABC):
         self.command = CommandLine(f"Assets/{self.executable_name}", "--config config.json",
                                    f"--input-path {input_path}", f"--dll-path ./Assets")
 
-    def simulation(self):
-        simulation = super().simulation()
-        # Copy the experiment demographics and set them as persisted to prevent change
-        # TODO: change persisted to the frozen mechanism when done
-        demog_copy = copy.deepcopy(self.demographics)
-        demog_copy.set_all_persisted()
-        # Add them to the simulation
-        simulation.demographics.extend(demog_copy)
+    # def simulation(self):
+    #     simulation = super().simulation()
+    #     # Copy the experiment demographics and set them as persisted to prevent change
+    #     # TODO: change persisted to the frozen mechanism when done
+    #     demog_copy = copy.deepcopy(self.demographics)
+    #     demog_copy.set_all_persisted()
+    #     # Add them to the simulation
+    #     simulation.demographics.extend(demog_copy)
+    #
+    #     # Tale care of the migrations
+    #     migration_copy = copy.deepcopy(self.migrations)
+    #     migration_copy.set_all_persisted()
+    #     simulation.migrations.merge_with(migration_copy)
+    #
+    #     # Handle the custom reporters
+    #     self.dlls.set_simulation_config(simulation)
+    #
+    #     return simulation
 
-        # Tale care of the migrations
-        migration_copy = copy.deepcopy(self.migrations)
-        migration_copy.set_all_persisted()
-        simulation.migrations.merge_with(migration_copy)
+    def set_parameter(self, name: str, value: any) -> dict:
+        self.config[name] = value
+        return {name: value}
 
-        # Handle the custom reporters
-        self.dlls.set_simulation_config(simulation)
+    def load_files(self, config_path=None, campaign_path=None) -> 'NoReturn':
+        """
+        Load files in the experiment/base_simulation.
 
-        return simulation
+        Args:
+            config_path: Configuration file path
+            campaign_path: Campaign file path
+
+        """
+        if config_path:
+            self.config = load_json_file(config_path)["parameters"]
+
+        if campaign_path:
+            self.campaign = load_json_file(campaign_path)
+
+    def get_parameter(self, name: str, default: Optional[Any] = None):
+
+
+        """
+        Get a parameter in the simulation.
+
+        Args:
+            name: The name of the parameter.
+            default: Optional, the default value.
+
+        Returns:
+            The value of the parameter.
+        """
+        return self.config.get(name, default)
+
+    def update_parameters(self, params):
+        """
+        Bulk update the configuration parameter values.
+
+        Args:
+            params: A dictionary with new values.
+
+        Returns:
+            None
+        """
+        self.config.update(params)
+
+    def pre_simulation_creation(self):
+        # Set the demographics
+        self.demographics.set_simulation_config(self)
+
+        # Set the migrations
+        self.migrations.set_simulation_config(self)
+
+        # Set the campaign filename
+        if self.campaign:
+            self.config["Campaign_Filename"] = "campaign.json"
+
+        # Gather the custom coordinator, individual, and node events
+        self.config["Custom_Coordinator_Events"] = []
+        self.config["Custom_Individual_Events"] = []
+        self.config["Custom_Node_Events"] = []
+
+    def gather_assets(self):
+        config = {"parameters": self.config}
+
+        # Add config and campaign to assets
+        self.assets.add_asset(Asset(filename="config.json", content=json.dumps(config, sort_keys=True)),
+                              fail_on_duplicate=False)
+
+        if self.campaign:
+            self.assets.add_asset(Asset(filename="campaign.json", content=json.dumps(self.campaign)),
+                                  fail_on_duplicate=False)
+
+        # Add demographics files to assets
+        self.assets.extend(self.demographics.gather_assets())
+
+        # Add the migrations
+        self.assets.extend(self.migrations.gather_assets())
 
 
 @dataclass(repr=False)

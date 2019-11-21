@@ -1,15 +1,11 @@
 import os
-import typing
-
 from idmtools.builders import ExperimentBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools.utils.collections import deep_set
-from idmtools_model_emod import EMODExperiment
+from idmtools_model_emod.emod_model import EMODModel
 from idmtools_model_emod.defaults import EMODSir
-
-if typing.TYPE_CHECKING:
-    from idmtools.entities import IExperiment
+from idmtools.entities.experiment import Experiment
 
 CURRENT_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
 INPUT_PATH = os.path.join(CURRENT_DIRECTORY, "inputs")
@@ -44,18 +40,18 @@ def replace_pfa_with_custom(simulation, pfa_informal_rate):
              pfa_informal_rate)
 
     # Add it to our simulation
-    simulation.demographics.add_demographics_from_dict(demographic_content, "PFA_rates_overlay_modified.json")
+    simulation.model.demographics.add_demographics_from_dict(demographic_content, "PFA_rates_overlay_modified.json")
 
     return {"pfa_rate": pfa_informal_rate}
 
 
 def sweep_on_demographics_param() -> 'IExperiment':
-    e = EMODExperiment.from_files(expname + "_sweep_demog_param",
-                                  eradication_path=os.path.join(INPUT_PATH, "Eradication.exe"),
-                                  config_path=os.path.join(INPUT_PATH, "config.json"),
-                                  campaign_path=os.path.join(INPUT_PATH, "campaign.json"),
-                                  demographics_paths=demo_files)
+    model = EMODModel.from_files(eradication_path=os.path.join(INPUT_PATH, "Eradication.exe"),
+                                 config_path=os.path.join(INPUT_PATH, "config.json"),
+                                 campaign_path=os.path.join(INPUT_PATH, "campaign.json"),
+                                 demographics_paths=demo_files)
 
+    e = Experiment(name=expname + "_sweep_demog_param", model=model)
     b = ExperimentBuilder()
     b.add_sweep_definition(replace_pfa_with_custom, (.1, .2, .5, .7))
     e.add_builder(b)
@@ -70,23 +66,24 @@ def change_demog_overlay(simulation, demog_overlay):
     discard the others based on the parameter passed to this function.
     """
     # delete all overlays that we do not want to use
-    to_delete = [d for d in simulation.demographics if d.filename != f"demographics_{demog_overlay}.json"]
+    to_delete = [d for d in simulation.model.demographics if d.filename != f"demographics_{demog_overlay}.json"]
     for demog in to_delete:
-        simulation.demographics.delete(asset=demog)
+        simulation.model.demographics.delete(asset=demog)
     return {"demog_overlay": demog_overlay}
 
 
 def sweep_on_demographics_files() -> 'IExperiment':
-    e = EMODExperiment.from_default(expname + "_demo_on_exp", default=EMODSir(),
-                                    eradication_path=os.path.join(INPUT_PATH, "Eradication.exe"))
+    model = EMODModel.from_default(default=EMODSir(),
+                                   eradication_path=os.path.join(INPUT_PATH, "Eradication.exe"))
 
     # For the need of this example, we are reusing the default demographics to create 5 identical versions
     # with different names
-    demog = e.demographics.pop()
+    demog = model.demographics.pop()
 
     for i in range(1, 6):
-        e.demographics.add_demographics_from_dict(content=demog.content, filename=f"demographics_{i}.json")
+        model.demographics.add_demographics_from_dict(content=demog.content, filename=f"demographics_{i}.json")
 
+    e = Experiment(name=expname + "_demo_on_exp", model=model)
     b = ExperimentBuilder()
     b.add_sweep_definition(change_demog_overlay, range(1, 6))
     e.add_builder(b)
