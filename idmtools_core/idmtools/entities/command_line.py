@@ -1,6 +1,8 @@
+from dataclasses import dataclass
 from typing import TypeVar
 
 
+@dataclass(init=False)
 class CommandLine:
     """
     A class to construct command line strings from executable, options, and params
@@ -35,6 +37,9 @@ class CommandLine:
     @property
     def cmd(self):
         return ' '.join(filter(None, [self.executable, self.options, self.arguments]))
+
+    def __str__(self):
+        return self.cmd
 
 
 TCommandLine = TypeVar("TCommandLine", bound=CommandLine)

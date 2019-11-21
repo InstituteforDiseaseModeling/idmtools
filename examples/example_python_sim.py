@@ -3,16 +3,18 @@ from functools import partial
 
 from idmtools.builders import ExperimentBuilder
 from idmtools.core.platform_factory import Platform
+from idmtools.entities import Experiment
 from idmtools.managers import ExperimentManager
 
-from idmtools_models.python.python_experiment import PythonExperiment
+from idmtools_models.python.python_model import PythonModel
 
 
 def param_update(simulation, param, value):
     return simulation.set_parameter(param, value)
 
 
-experiment = PythonExperiment(name="My First experiment", model_path=os.path.join("work", "inputs", "python_model_with_deps", "Assets", "model.py"))
+model = PythonModel(model_path=os.path.join("work", "inputs", "python_model_with_deps", "Assets", "model.py"))
+experiment = Experiment(name="My First experiment", model=model)
 experiment.tags["tag1"] = 1
 experiment.base_simulation.set_parameter("c", 0)
 experiment.assets.add_directory(assets_directory=os.path.join("work", "inputs", "python_model_with_deps", "Assets"))

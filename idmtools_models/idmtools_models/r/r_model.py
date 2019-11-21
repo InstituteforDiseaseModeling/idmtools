@@ -2,20 +2,26 @@ import os
 import subprocess
 import tempfile
 from dataclasses import dataclass, field
-
+from typing import Optional, List
 from idmtools.assets.asset import Asset
-from idmtools.entities import CommandLine, IExperiment
-from idmtools.entities.iexperiment import IDockerExperiment
-from idmtools_models.python.python_simulation import PythonSimulation
+from idmtools.entities.command_line import CommandLine
+from idmtools.entities.experiment import IDockerModel
+from idmtools.entities.imodel import IModel
 
 
 @dataclass(repr=False)
-class PythonExperiment(IExperiment):
+class RModel(IModel, IDockerModel):
+    image_name: str = field(default=None, metadata={"md": True})
     model_path: str = field(default=None, compare=False, metadata={"md": True})
     extra_libraries: list = field(default_factory=lambda: [], compare=False, metadata={"md": True})
+    r_path: str = field(default='Rscript')
+    config_param: Optional[str] = field(default=None)
+    extra_script_args: Optional[List[str]] = field(default=None)
+    config_file_name: str = field(default='config.json')
+    add_config_file: bool = field(default=True)
 
-    def __post_init__(self, simulation_type):
-        super().__post_init__(simulation_type=PythonSimulation)
+    def __post_init__(self):
+        super().__post_init__()
         if self.model_path:
             self.model_path = os.path.abspath(self.model_path)
 
@@ -46,30 +52,19 @@ class PythonExperiment(IExperiment):
         self.assets.add_asset(Asset(absolute_path=self.model_path), fail_on_duplicate=False)
 
     def pre_creation(self):
-        super().pre_creation()
-
-        # Create the command line according to the location of the model
-        self.command = CommandLine("python", f"./Assets/{os.path.basename(self.model_path)}", "config.json")
-
-
-@dataclass(repr=False)
-class DockerizedPythonExperiment(PythonExperiment, IDockerExperiment):
-    """
-    Dockerized Python Experiment. Currently planned for Comps/Local platform
-    """
-    image_name: str = field(default=None)
-    # extra_volume_mounts: str = field(default=None)
-
-    def __post_init__(self, simulation_type):
-        super().__post_init__(simulation_type=PythonSimulation)
+        # we don't want to check this until here since analysis could have issues
         if self.image_name is None:
-            raise ValueError("Docker image is required when running a dockerized python simulation")
+            raise ValueError("image_name is required for R experiments")
 
-    def pre_creation(self):
         super().pre_creation()
+        self.build_image()
 
         # Create the command line according to the location of the model
-        # the data path will be updated by the platform
-        self.command = CommandLine("docker", "run", "-v", "{data_path}:/workdir", f"{self.image_name}", "python",
-                                   f"./Assets/{os.path.basename(self.model_path)}", "config.json")
-        raise NotImplementedError("This feature is still in progress")
+        commands_args = [self.r_path, f"./Assets/{os.path.basename(self.model_path)}"]
+        if self.extra_script_args:
+            commands_args.append(self.extra_script_args)
+        if self.config_param:
+            commands_args.append(self.config_param)
+        if self.add_config_file:
+            commands_args.append(self.config_file_name)
+        self.command = CommandLine(*commands_args)

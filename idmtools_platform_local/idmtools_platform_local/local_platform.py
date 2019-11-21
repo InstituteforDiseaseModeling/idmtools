@@ -3,25 +3,22 @@ import logging
 import os
 import time
 from collections import defaultdict
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
 from logging import getLogger
-from typing import Dict, List, NoReturn, Optional, Type
+from typing import Dict, List, NoReturn, Optional
 from uuid import UUID
 
-import docker
 from docker.models.containers import Container
 from math import floor
-
 from idmtools.assets import Asset
 from idmtools.core import ItemType
-from idmtools.core.experiment_factory import experiment_factory
+from idmtools.core.model_factory import model_factory
 from idmtools.core.interfaces.ientity import TEntityList
 from idmtools.core.interfaces.iitem import TItem, TItemList
 from idmtools.core.system_information import get_data_directory
-from idmtools.entities import IExperiment, IPlatform
-from idmtools.entities.iexperiment import IGPUExperiment, IDockerExperiment, IWindowsExperiment, IDockerGPUExperiment, \
-    IHostBinaryExperiment
-from idmtools.entities.isimulation import ISimulation, TSimulation
+from idmtools.entities import Experiment, IPlatform
+from idmtools.entities.itask import PlatformRequirement
+from idmtools.entities.simulation import Simulation, TSimulation
 from idmtools.utils.entities import get_dataclass_common_fields
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
 from idmtools_platform_local.client.simulations_client import SimulationsClient
@@ -77,6 +74,7 @@ class LocalPlatform(IPlatform):
     _sm: Optional[DockerServiceManager] = field(default=None, compare=False, metadata={"pickle_ignore": True})
 
     def __post_init__(self):
+        import docker
         logger.debug("Setting up local platform")
         self.supported_types = {ItemType.EXPERIMENT, ItemType.SIMULATION}
 
@@ -102,7 +100,7 @@ class LocalPlatform(IPlatform):
     def get_platform_item(self, item_id, item_type, **kwargs):
         if item_type == ItemType.EXPERIMENT:
             experiment_dict = ExperimentsClient.get_one(item_id)
-            experiment = experiment_factory.create(experiment_dict['tags'].get("type"), tags=experiment_dict['tags'])
+            experiment = model_factory.create(experiment_dict['tags'].get("type"), tags=experiment_dict['tags'])
             experiment.uid = experiment_dict['experiment_id']
             return experiment
         elif item_type == ItemType.SIMULATION:
@@ -115,7 +113,7 @@ class LocalPlatform(IPlatform):
             return simulation
 
     def get_children_for_platform_item(self, platform_item, raw, **kwargs):
-        if isinstance(platform_item, IExperiment):
+        if isinstance(platform_item, Experiment):
             platform_item.simulations.clear()
 
             # Retrieve the simulations for the current page
@@ -132,7 +130,7 @@ class LocalPlatform(IPlatform):
             return platform_item.simulations
 
     def get_parent_for_platform_item(self, platform_item, raw, **kwargs):
-        if isinstance(platform_item, ISimulation):
+        if isinstance(platform_item, Simulation):
             return self.get_platform_item(platform_item.parent_id, ItemType.EXPERIMENT)
         return None
 
@@ -150,21 +148,21 @@ class LocalPlatform(IPlatform):
             if item.item_type == ItemType.EXPERIMENT:
                 if not self.is_supported_experiment(item):
                     raise ValueError("This experiment type is not support on the LocalPlatform.")
-                is_docker_type = isinstance(item, IDockerExperiment)
+                is_docker_type = PlatformRequirement.DOCKER in item.model.platform_requirements
                 for simulation in item.simulations:
                     # if the task is docker, build the extra config
                     if is_docker_type:
                         self.run_docker_sim(item, simulation)
                     else:
                         logger.debug(f"Running simulation: {simulation.uid}")
-                        RunTask.send(item.command.cmd, item.uid, simulation.uid)
+                        RunTask.send(str(item.model.command), item.uid, simulation.uid)
             else:
                 raise Exception(f'Unable to run item id: {item.uid} of type: {type(item)} ')
 
     def run_docker_sim(self, item, simulation):
         from idmtools_platform_local.internals.tasks.docker_run import DockerRunTask, GPURunTask
         logger.debug(f"Preparing Docker Task Configuration for {item.uid}:{simulation.uid}")
-        is_gpu = isinstance(item, IGPUExperiment)
+        is_gpu = PlatformRequirement.GPU in simulation.model.platform_requirments
         run_cmd = GPURunTask if is_gpu else DockerRunTask
         docker_config = dict(
             image=item.image_name,
@@ -179,9 +177,9 @@ class LocalPlatform(IPlatform):
         """
         Send assets for item to platform
         """
-        if isinstance(item, ISimulation):
+        if isinstance(item, Simulation):
             self._send_assets_for_simulation(item, **kwargs)
-        elif isinstance(item, IExperiment):
+        elif isinstance(item, Experiment):
             self._send_assets_for_experiment(item, **kwargs)
         else:
             raise Exception(f'Unknown how to send assets for item type: {type(item)} '
@@ -192,10 +190,10 @@ class LocalPlatform(IPlatform):
         Refresh the status of the specified item
 
         """
-        if isinstance(item, ISimulation):
+        if isinstance(item, Simulation):
             raise Exception(f'Unknown how to refresh items of type {type(item)} '
                             f'for platform: {self.__class__.__name__}')
-        elif isinstance(item, IExperiment):
+        elif isinstance(item, Experiment):
             status = SimulationsClient.get_all(experiment_id=item.uid, per_page=9999)
             for s in item.simulations:
                 sim_status = [st for st in status if st['simulation_uid'] == s.uid]
@@ -206,7 +204,7 @@ class LocalPlatform(IPlatform):
                     s.status = local_status_to_common(sim_status[0]['status'])
 
     def get_files(self, item: TItem, files: List[str]) -> Dict[str, bytearray]:
-        if not isinstance(item, ISimulation):
+        if not isinstance(item, Simulation):
             raise NotImplementedError("Retrieving files only implemented for Simulations at the moment")
 
         return self._get_assets_for_simulation(item, files)
@@ -244,7 +242,7 @@ class LocalPlatform(IPlatform):
 
         return ret
 
-    def _create_experiment(self, experiment: IExperiment):
+    def _create_experiment(self, experiment: Experiment):
         """
         Creates the experiment object on the LocalPlatform
         Args:
@@ -258,7 +256,7 @@ class LocalPlatform(IPlatform):
         if not self.is_supported_experiment(experiment):
             raise ValueError("This experiment type is not support on the LocalPlatform.")
 
-        m = CreateExperimentTask.send(experiment.tags, experiment.simulation_type)
+        m = CreateExperimentTask.send(experiment.tags, experiment.model_type, asdict(experiment.model))
 
         # Create experiment is vulnerable to disconnects early on of redis errors. Lets do a retry on conditions
         start = time.time()
@@ -285,9 +283,9 @@ class LocalPlatform(IPlatform):
         return experiment.uid
 
     def launch_item_in_browser(self, item):
-        if isinstance(item, IExperiment):
+        if isinstance(item, Experiment):
             t_str = item.uid
-        elif isinstance(item, ISimulation):
+        elif isinstance(item, Simulation):
             t_str = f'{item.parent_id}/{item.uid}'
         else:
             raise NotImplementedError("Only launching experiments and simulations is supported")
@@ -384,7 +382,7 @@ class LocalPlatform(IPlatform):
         self._do.copy_to_container(worker, remote_path, dest_name=asset.filename if asset.filename else file_path,
                                    **src)
 
-    def _create_simulations(self, simulations_batch: List[ISimulation]):
+    def _create_simulations(self, simulations_batch: List[Simulation]):
         """
         Create a set of simulations
 
@@ -434,8 +432,6 @@ class LocalPlatform(IPlatform):
                 byte_arrs.append(fin.read())
         return byte_arrs
 
-    def supported_experiment_types(self) -> List[Type]:
-        return [IExperiment, IDockerExperiment, IDockerGPUExperiment]
-
-    def unsupported_experiment_types(self) -> List[Type]:
-        return [IWindowsExperiment, IHostBinaryExperiment]
+    def platform_supports(self) -> List[PlatformRequirement]:
+        # TODO DEtect GPU
+        return [PlatformRequirement.PYTHON_SCRIPTING, PlatformRequirement.DOCKER, PlatformRequirement.LINUX, PlatformRequirement.GPU]

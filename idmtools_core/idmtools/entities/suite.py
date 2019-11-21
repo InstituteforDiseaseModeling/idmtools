@@ -6,7 +6,7 @@ from idmtools.core.interfaces.inamed_entity import INamedEntity
 from idmtools.core import ItemType, EntityContainer
 
 if typing.TYPE_CHECKING:
-    from idmtools.entities.iexperiment import TExperiment
+    from idmtools.entities.experiment import TExperiment
     from typing import NoReturn
 
 

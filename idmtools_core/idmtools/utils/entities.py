@@ -5,7 +5,7 @@ from idmtools.core import ExperimentNotFound, UUID, ItemType
 
 if typing.TYPE_CHECKING:
     from idmtools.entities.iplatform import TPlatform
-    from idmtools.entities.iexperiment import TExperiment
+    from idmtools.entities.experiment import TExperiment
 
 
 def retrieve_experiment(experiment_id: UUID, platform: 'TPlatform' = None, with_simulations=False) -> 'TExperiment':

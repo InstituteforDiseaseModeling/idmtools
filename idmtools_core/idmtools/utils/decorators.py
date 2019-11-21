@@ -68,41 +68,6 @@ class SingletonDecorator:
         return self.instance
 
 
-class LoadOnCallSingletonDecorator:
-    """
-    Additional class decorator that creates a singleton instance only when a method or attribute is accessed.
-    This is useful for expensive tasks like loading plugin factories that should only be executed when finally
-    needed and not on declaration.
-
-    Examples:
-        ::
-
-            import time
-            class ExpensiveFactory:
-                def __init__():
-                    time.sleep(1000)
-                    self.items = ['a', 'b', 'c']
-                def get_items():
-                    return self.items
-
-            ExpensiveFactory = LoadOnCallSingletonDecorator(ExpensiveFactory)
-            ExpensiveFactory.get_items()
-    """
-
-    def __init__(self, klass):
-        self.instance = SingletonDecorator(klass)
-        self.created = False
-
-    def __getattr__(self, item):
-        self.ensure_created()
-        return getattr(self.instance, item)
-
-    def ensure_created(self):
-        if not self.created:
-            self.instance = self.instance()
-            self.created = True
-
-
 def cache_for(ttl=datetime.timedelta(minutes=1)):
     def wrap(func):
         time, value = None, None

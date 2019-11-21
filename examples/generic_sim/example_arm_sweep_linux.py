@@ -8,7 +8,7 @@ from idmtools.builders import SweepArm, ArmType, ArmExperimentBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_model_emod.defaults import EMODSir
-from idmtools_model_emod.emod_experiment import DockerEMODExperiment
+from idmtools_model_emod.emod_model import DockerEMODExperiment
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 BIN_PATH = os.path.join(current_directory, "bin")

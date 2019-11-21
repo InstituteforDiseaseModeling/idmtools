@@ -3,14 +3,14 @@ from idmtools.registry.model_specification import ModelSpecification, get_model_
 from idmtools.registry.plugin_specification import get_description_impl
 
 
-class EMODExperimentSpec(ModelSpecification):
+class EMODModelSpec(ModelSpecification):
 
     @get_description_impl
     def get_description(self) -> str:
         return "Provides access to the Local Platform to IDM Tools"
 
     @get_model_impl
-    def get(self, configuration: dict) -> 'EMODExperiment':  # noqa: F821
+    def get(self, configuration: dict) -> 'EMODModel':  # noqa: F821
         """
         Build a local platform from the passed in configuration object. The
         import of platform is here to avoid problems.
@@ -21,10 +21,10 @@ class EMODExperimentSpec(ModelSpecification):
         Returns:
 
         """
-        from idmtools_model_emod.emod_experiment import EMODExperiment
-        return EMODExperiment(**configuration)
+        from idmtools_model_emod.emod_model import EMODModel
+        return EMODModel(**configuration)
 
     @get_model_type_impl
-    def get_type(self) -> Type['LocalPlatform']:
-        from idmtools_model_emod.emod_experiment import EMODExperiment
-        return EMODExperiment
+    def get_type(self) -> Type['EMODModel']:
+        from idmtools_model_emod.emod_model import EMODModel
+        return EMODModel

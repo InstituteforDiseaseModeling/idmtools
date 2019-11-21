@@ -9,14 +9,12 @@ from dataclasses import dataclass, field
 from logging import getLogger
 from pathlib import Path
 from urllib.parse import urlparse
-
 import requests
-
-from idmtools.entities import IExperiment, CommandLine
-from idmtools.entities.iexperiment import IDockerExperiment, ILinuxExperiment, IHostBinaryExperiment
+from idmtools.entities.command_line import CommandLine
+from idmtools.entities.experiment import IDockerModel
+from idmtools.entities.imodel import IModel
 from idmtools.utils.decorators import optional_yaspin_load
 from idmtools_model_emod.emod_file import DemographicsFiles, MigrationFiles, Dlls
-from idmtools_model_emod.emod_simulation import EMODSimulation
 
 if typing.TYPE_CHECKING:
     from idmtools_model_emod import IEMODDefault
@@ -25,7 +23,7 @@ logger = getLogger(__name__)
 
 
 @dataclass(repr=False)
-class IEMODExperiment(IExperiment, ABC):
+class IEMODModel(IModel, ABC):
     eradication_path: str = field(default=None, compare=False, metadata={"md": True})
     demographics: collections.OrderedDict = field(default_factory=lambda: collections.OrderedDict())
     legacy_exe: 'bool' = field(default=False, metadata={"md": True})
@@ -33,8 +31,8 @@ class IEMODExperiment(IExperiment, ABC):
     dlls: 'Dlls' = field(default_factory=lambda: Dlls())
     migrations: 'MigrationFiles' = field(default_factory=lambda: MigrationFiles('migrations'))
 
-    def __post_init__(self, simulation_type):
-        super().__post_init__(simulation_type=EMODSimulation)
+    def __post_init__(self):
+        super().__post_init__()
         self.executable_name = "Eradication.exe"
         if self.eradication_path is not None:
             self.executable_name = os.path.basename(self.eradication_path)
@@ -156,16 +154,16 @@ class IEMODExperiment(IExperiment, ABC):
 
 
 @dataclass(repr=False)
-class EMODExperiment(IEMODExperiment, IHostBinaryExperiment):
+class EMODModel(IEMODModel):
     pass
 
 
 @dataclass(repr=False)
-class DockerEMODExperiment(IEMODExperiment, IDockerExperiment, ILinuxExperiment):
+class DockerEMODModel(IEMODModel, IDockerModel):
     image_name: str = 'idm-docker-public.packages.idmod.org/idm/centos:dtk-runtime'
 
-    def __post_init__(self, simulation_type=EMODSimulation):
-        super().__post_init__(simulation_type)
+    def __post_init__(self):
+        super().__post_init__()
         if os.name != "nt" and self.eradication_path is not None and self.eradication_path.endswith(".exe"):
             raise ValueError("You are attempting to use a Windows Eradication executable on a linux experiment")
 

@@ -5,7 +5,7 @@ from idmtools.registry import model_specification
 logger = getLogger(__name__)
 
 
-class ExperimentFactory:
+class ModelFactory:
 
     DEFAULT_KEY = 'idmtools_model_emod.emod_experiment.EMODExperiment'
 
@@ -33,4 +33,4 @@ class ExperimentFactory:
         return model_spec.get(kwargs)
 
 
-experiment_factory = ExperimentFactory()
+model_factory = ModelFactory()

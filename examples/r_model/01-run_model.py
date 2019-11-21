@@ -7,7 +7,7 @@ import numpy as np
 from idmtools.builders import ExperimentBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
-from idmtools_models.r.r_experiment import RExperiment
+from idmtools_models.r.r_model import RModel
 
 
 def sum_to_n(sum_to, spaced_samples=10, dimensions=3):
@@ -55,11 +55,11 @@ def param_update(simulation, value):
 
 # the image_name is the same name of the image we tagged when we built our Dockerfile.
 # since we used docker-compose, it is the image options in the definition of the service
-experiment = RExperiment(name="R SIR",
-                         image_name='idm-docker-staging.idmod.org/idmtools_r_model_example:latest',
-                         config_param='--config-file',
-                         build=True,
-                         model_path=os.path.join("model.R"))
+experiment = RModel(name="R SIR",
+                    image_name='idm-docker-staging.idmod.org/idmtools_r_model_example:latest',
+                    config_param='--config-file',
+                    build=True,
+                    model_path=os.path.join("model.R"))
 
 experiment.tags["tag1"] = 1
 experiment.base_simulation.set_parameter("infections", 0.0001)

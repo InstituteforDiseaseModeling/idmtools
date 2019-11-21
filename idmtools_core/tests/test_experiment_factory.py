@@ -1,7 +1,7 @@
 import os
 
 from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
-from idmtools.core.experiment_factory import experiment_factory
+from idmtools.core.model_factory import model_factory
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_test import COMMON_INPUT_PATH
@@ -14,7 +14,7 @@ class TestExperimentFactory(ITestWithPersistence):
 
     def test_build_python_experiment_from_factory(self):
         test_platform = Platform('Test')
-        experiment = experiment_factory.create("PythonExperiment", tags={"a": "1", "b": 2})
+        experiment = model_factory.create("PythonExperiment", tags={"a": "1", "b": 2})
         experiment.model_path = os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py")
         builder = ExperimentBuilder()
         builder.add_sweep_definition(lambda simulation, value: {"p": value}, range(0, 2))
@@ -33,8 +33,8 @@ class TestExperimentFactory(ITestWithPersistence):
     @windows_only
     def test_build_emod_experiment_from_factory(self):
         test_platform = Platform('Test')
-        experiment = experiment_factory.create("EMODExperiment", tags={"a": "1", "b": 2},
-                                               eradication_path=os.path.join(COMMON_INPUT_PATH, "emod"))
+        experiment = model_factory.create("EMODExperiment", tags={"a": "1", "b": 2},
+                                          eradication_path=os.path.join(COMMON_INPUT_PATH, "emod"))
         experiment.base_simulation.load_files(config_path=os.path.join(COMMON_INPUT_PATH, "files", "config.json"),
                                               campaign_path=os.path.join(COMMON_INPUT_PATH, "files", "campaign.json"))
         experiment.demographics.add_demographics_from_file(
@@ -60,17 +60,17 @@ class TestExperimentFactory(ITestWithPersistence):
         test_experiment.tags = {"a": "1", "b": 2}
         test_experiment.pre_creation()
         # Test create experiment with full model name
-        experiment = experiment_factory.create(test_experiment.tags.get("type"), tags=test_experiment.tags)
+        experiment = model_factory.create(test_experiment.tags.get("type"), tags=test_experiment.tags)
         self.assertIsNotNone(experiment.uid)
         self.assertEqual(experiment.tags, {'a': '1', 'b': 2,
                                            'type': 'idmtools_test.utils.tst_experiment.TstExperiment'})
 
         # Test create experiment with sample model name
-        experiment1 = experiment_factory.create("TstExperiment")
+        experiment1 = model_factory.create("TstExperiment")
         self.assertIsNotNone(experiment1.uid)
 
         # Test create experiment with non-existing model name
         with self.assertRaises(ValueError) as context:
-            experiment_factory.create("SomeExperiment")
+            model_factory.create("SomeExperiment")
         self.assertTrue("The ExperimentFactory could not create an experiment of type SomeExperiment" in
                         str(context.exception.args[0]))

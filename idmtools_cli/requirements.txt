@@ -1,6 +1,6 @@
 click~=7.0
 colorama~=0.4.1
-cookiecutter~=1.6.8
+cookiecutter~=1.6.0
 idmtools
 tabulate~=0.8.3
 pyperclip~=1.7

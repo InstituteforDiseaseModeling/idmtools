@@ -1,6 +1,5 @@
 import os
 from logging import getLogger
-
 from idmtools_platform_local.internals.data.job_status import JobStatus
 from idmtools_platform_local.internals.workers.database import get_session, get_or_create
 from idmtools_platform_local.status import Status
@@ -46,3 +45,5 @@ def get_host_data_bind():
         logger.info(f'HOST_DATA_BIND={data_bind}')
         HOST_DATA_BIND = data_bind
     return HOST_DATA_BIND
+
+

@@ -6,7 +6,7 @@ from idmtools.services.experiments import ExperimentPersistService
 from idmtools.utils.entities import retrieve_experiment
 
 if typing.TYPE_CHECKING:
-    from idmtools.entities.iexperiment import TExperiment
+    from idmtools.entities.experiment import TExperiment
     from idmtools.entities.suite import TSuite
 
 

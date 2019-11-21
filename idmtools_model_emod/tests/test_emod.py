@@ -9,7 +9,7 @@ from idmtools.core.platform_factory import Platform
 from idmtools.entities import IPlatform
 from idmtools.managers import ExperimentManager
 from idmtools_model_emod.defaults import EMODSir
-from idmtools_model_emod.emod_experiment import EMODExperiment, DockerEMODExperiment, IEMODExperiment
+from idmtools_model_emod.emod_model import EMODExperiment, DockerEMODExperiment, IEMODExperiment
 from idmtools_model_emod.utils import get_github_eradication_url
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence

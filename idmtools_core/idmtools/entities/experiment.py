@@ -3,28 +3,26 @@ import os
 import sys
 import typing
 import uuid
-from abc import ABC
 from itertools import chain
 from datetime import datetime, timezone, timedelta
 from dataclasses import dataclass, field, InitVar
 from logging import getLogger
-
+from typing import Union, Type, NoReturn
 from more_itertools import grouper
 from idmtools.core import ItemType, TExperimentBuilder
 from idmtools.core.interfaces.entity_container import EntityContainer
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.core.interfaces.inamed_entity import INamedEntity
-from idmtools.entities.command_line import TCommandLine
-from idmtools.entities.isimulation import TSimulationClass, TSimulation
+from idmtools.entities.imodel import IModel
+from idmtools.entities.simulation import TSimulation, Simulation
 from idmtools.utils.decorators import optional_yaspin_load
 from idmtools import __version__
-
 
 logger = getLogger(__name__)
 
 
 @dataclass(repr=False)
-class IExperiment(IAssetsEnabled, INamedEntity, ABC):
+class Experiment(IAssetsEnabled, INamedEntity):
     """
     Class that represents a generic experiment.
     This class needs to be implemented for each model type with specifics.
@@ -36,9 +34,9 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         base_simulation: Optional, a simulation that will be the base for all simulations created for this experiment.
         command: Command to run on simulations.
     """
-    command: TCommandLine = field(default=None)
+    model: IModel = field(default=None)
     suite_id: uuid = field(default=None)
-    simulation_type: InitVar[TSimulationClass] = None
+    model_type: InitVar[Union[Type[IModel], str]] = None
     base_simulation: TSimulation = field(default=None, compare=False, metadata={"pickle_ignore": True})
     builders: set = field(default_factory=lambda: set(), compare=False, metadata={"pickle_ignore": True})
     simulations: EntityContainer = field(default_factory=lambda: EntityContainer(), compare=False,
@@ -47,17 +45,19 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
     item_type: ItemType = field(default=ItemType.EXPERIMENT, compare=False, init=False)
     frozen: bool = field(default=False, init=False)
 
-    def __post_init__(self, simulation_type):
+    def __post_init__(self, model_type):
         super().__post_init__()
-        # Take care of the base simulation
-        if not self.base_simulation:
-            if simulation_type and callable(simulation_type):
-                self.base_simulation = simulation_type()
+        if self.model is None and model_type is not None:
+            # TODO add logic to rebuild model
+            self.model = None
+            self.model_type = model_type
+        else:
+            if self.model.__class__.__module__:
+                self.model_type = f'{self.model.__class__.__module__}.{self.model.__class__.__name__}'
             else:
-                raise Exception(
-                    "A `base_simulation` or `simulation_type` needs to be provided to the Experiment object!")
-
-        self._simulation_default = self.base_simulation.__class__()
+                self.model_type = self.model.__class__.__name__
+        self._simulation_default = Simulation(model=self.model)
+        self.base_simulation = Simulation(model=self.model)
 
     def __repr__(self):
         return f"<Experiment: {self.uid} - {self.name} / Sim count {len(self.simulations) if self.simulations else 0}>"
@@ -171,7 +171,7 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         """
         # TODO: the experiment should be frozen when the first simulation is created
         sim = copy.deepcopy(self.base_simulation)
-        sim.assets = copy.deepcopy(self.base_simulation.assets)
+        #sim.assets = copy.deepcopy(self.base_simulation.assets)
         sim.platform = self.platform
         sim.experiment = self
         return sim
@@ -179,6 +179,7 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
     def pre_creation(self) -> None:
         # Gather the assets
         self.gather_assets()
+        self.model.pre_experiment_creation()
 
         # Add a tag to keep the class name
         self.tags["type"] = f'{self.__class__.__module__}.{self.__class__.__name__}'
@@ -211,29 +212,12 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         return {"assets": AssetCollection(), "simulations": EntityContainer(), "builders": set(),
                 "base_simulation": self._simulation_default}
 
-
-@dataclass(repr=False)
-class IWindowsExperiment:
-    execution_platform = 'windows'
+    def gather_assets(self) -> NoReturn:
+        self.add_assets(self.model.gather_experiment_assets(), fail_on_duplicate=False)
 
 
 @dataclass(repr=False)
-class ILinuxExperiment:
-    execution_platform = 'linux'
-
-
-@dataclass(repr=False)
-class IGPUExperiment:
-    is_gpu: bool = True
-
-
-@dataclass(repr=False)
-class IHostBinaryExperiment:
-    pass
-
-
-@dataclass(repr=False)
-class IDockerExperiment:
+class IDockerModel:
     image_name: str
     # Optional config to build the docker image
     build: bool = False
@@ -271,27 +255,17 @@ class IDockerExperiment:
             sys.exit(-1)
 
 
-@dataclass(repr=False)
-class IDockerGPUExperiment(IGPUExperiment, IDockerExperiment):
-    pass
-
-
-TExperiment = typing.TypeVar("TExperiment", bound=IExperiment)
-TGPUExperiment = typing.TypeVar("TGPUExperiment", bound=IGPUExperiment)
-TDockerExperiment = typing.TypeVar("TDockerExperiment", bound=IDockerExperiment)
+TExperiment = typing.TypeVar("TExperiment", bound=Experiment)
+TDockerModel = typing.TypeVar("TDockerModel", bound=IDockerModel)
 # class types
 TExperimentClass = typing.Type[TExperiment]
-TGPUExperimentClass = typing.Type[TGPUExperiment]
-TDockerExperimentClass = typing.Type[TDockerExperiment]
 # Composed types
 TExperimentList = typing.List[typing.Union[TExperiment, str]]
-TGPUExperimentList = typing.List[typing.Union[TGPUExperiment, str]]
-TDockerExperimentList = typing.List[typing.Union[TDockerExperiment, str]]
 
 
-class StandardExperiment(IExperiment):
+class StandardExperiment(Experiment):
     def __post_init__(self, simulation_type):
-        from idmtools.entities.isimulation import StandardSimulation
+        from idmtools.entities.simulation import StandardSimulation
         super().__post_init__(simulation_type=simulation_type or StandardSimulation)
 
     def gather_assets(self) -> None:

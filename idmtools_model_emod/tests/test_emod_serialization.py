@@ -15,7 +15,7 @@ from idmtools.core.platform_factory import Platform
 from idmtools.entities import IPlatform
 from idmtools.managers import ExperimentManager
 from idmtools_model_emod.defaults import EMODSir
-from idmtools_model_emod.emod_experiment import EMODExperiment, IEMODExperiment
+from idmtools_model_emod.emod_model import EMODExperiment, IEMODExperiment
 from idmtools_model_emod.generic.serialization import add_serialization_timesteps, load_serialized_population
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.comps import sims_from_experiment, get_simulation_path

@@ -3,14 +3,14 @@ from idmtools.registry.model_specification import ModelSpecification, get_model_
 from idmtools.registry.plugin_specification import get_description_impl
 
 
-class RExperimentSpec(ModelSpecification):
+class PythonModelSpec(ModelSpecification):
 
     @get_description_impl
     def get_description(self) -> str:
-        return "Provide R Based models for idmtools"
+        return "Provides access to the Local Platform to IDM Tools"
 
     @get_model_impl
-    def get(self, configuration: dict) -> 'RExperiment':  # noqa: F821
+    def get(self, configuration: dict) -> 'PythonModel':  # noqa: F821
         """
         Build our local platform from the passed in configuration object
 
@@ -21,10 +21,10 @@ class RExperimentSpec(ModelSpecification):
         Returns:
 
         """
-        from idmtools_models.r.r_experiment import RExperiment
-        return RExperiment(**configuration)
+        from idmtools_models.python.python_model import PythonModel
+        return PythonModel(**configuration)
 
     @get_model_type_impl
-    def get_type(self) -> Type['RExperiment']:
-        from idmtools_models.r.r_experiment import RExperiment
-        return RExperiment
+    def get_type(self) -> Type['PythonModel']:
+        from idmtools_models.python.python_model import PythonModel
+        return PythonModel

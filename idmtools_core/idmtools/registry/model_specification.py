@@ -2,11 +2,11 @@
 import typing
 from abc import ABC
 from logging import getLogger
-
 import pluggy
 from idmtools.registry import PluginSpecification
 from idmtools.registry.plugin_specification import PLUGIN_REFERENCE_NAME
 from idmtools.registry.utils import load_plugin_map
+from idmtools.utils.decorators import SingletonDecorator
 
 example_configuration_spec = pluggy.HookspecMarker(PLUGIN_REFERENCE_NAME)
 get_model_spec = pluggy.HookspecMarker(PLUGIN_REFERENCE_NAME)
@@ -24,7 +24,7 @@ class ModelSpecification(PluginSpecification, ABC):
         return cls.__name__.replace('ModelSpecification', '').replace("ModelSpec", '').replace('Spec', '')
 
     @get_model_spec
-    def get(self, configuration: dict) -> 'IExperiment':  # noqa: F821
+    def get(self, configuration: dict) -> 'IModel':  # noqa: F821
         """
         Return a new model using the passed in configuration.
 
@@ -37,7 +37,7 @@ class ModelSpecification(PluginSpecification, ABC):
         raise NotImplementedError("Plugin did not implement get")
 
     @get_model_type_spec
-    def get_type(self) -> typing.Type['IExperiment']:  # noqa: F821
+    def get_type(self) -> typing.Type['IModel']:  # noqa: F821
         pass
 
 
@@ -51,3 +51,6 @@ class ModelPlugins:
 
     def get_plugin_map(self) -> typing.Dict[str, ModelSpecification]:
         return self._plugins
+
+
+ModelPlugins = SingletonDecorator(ModelPlugins)

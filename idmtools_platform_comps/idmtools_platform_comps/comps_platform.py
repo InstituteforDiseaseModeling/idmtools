@@ -12,17 +12,16 @@ from COMPS.Data import AssetCollection as COMPSAssetCollection, AssetCollectionF
     QueryCriteria, Simulation as COMPSSimulation, SimulationFile, Suite as COMPSSuite
 
 from idmtools.core import CacheEnabled, EntityContainer, ItemType
-from idmtools.core.experiment_factory import experiment_factory
+from idmtools.core.model_factory import model_factory
 from idmtools.core.interfaces.ientity import IEntity, TEntityList
 from idmtools.entities import IPlatform
-from idmtools.entities.iexperiment import IExperiment, StandardExperiment, IGPUExperiment, IDockerExperiment, \
-    ILinuxExperiment
-from idmtools.entities.isimulation import ISimulation
+from idmtools.entities.experiment import Experiment, StandardExperiment, IDockerModel
+from idmtools.entities.simulation import Simulation
 from idmtools.entities.suite import Suite
 from idmtools.utils.time import timestamp
 from typing import NoReturn, List, Dict
 from idmtools.entities.suite import TSuite
-from idmtools.entities.iexperiment import TExperiment
+from idmtools.entities.experiment import TExperiment
 from idmtools.core.interfaces.iitem import TItemList
 from idmtools_platform_comps.utils.general import convert_COMPS_status
 
@@ -70,9 +69,9 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
     def send_assets(self, item, **kwargs) -> 'NoReturn':
         # TODO: add asset sending for suites if needed
-        if isinstance(item, ISimulation):
+        if isinstance(item, Simulation):
             self._send_assets_for_simulation(simulation=item, **kwargs)
-        elif isinstance(item, IExperiment):
+        elif isinstance(item, Experiment):
             self._send_assets_for_experiment(experiment=item, **kwargs)
         else:
             raise Exception(f'Unknown how to send assets for item type: {type(item)} '
@@ -237,8 +236,8 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                                                              item_type=ItemType.SUITE)
 
             # Create an experiment
-            obj = experiment_factory.create(platform_item.tags.get("type"), tags=platform_item.tags,
-                                            name=platform_item.name, fallback=StandardExperiment)
+            obj = model_factory.create(platform_item.tags.get("type"), tags=platform_item.tags,
+                                       name=platform_item.name, fallback=StandardExperiment)
 
             # Set parent
             obj.parent = suite
@@ -314,7 +313,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         return None
 
     def refresh_status(self, item) -> 'NoReturn':
-        if isinstance(item, IExperiment):
+        if isinstance(item, Experiment):
             simulations = self.get_children(item.uid, ItemType.EXPERIMENT, force=True, raw=True, cols=["id", "state"],
                                             children=[])
             for s in simulations:
@@ -371,7 +370,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         return ret
 
     def supported_experiment_types(self) -> List[typing.Type]:
-        return [IExperiment]
+        return [Experiment]
 
     def unsupported_experiment_types(self) -> List[typing.Type]:
-        return [IDockerExperiment, IGPUExperiment, ILinuxExperiment]
+        return [IDockerModel]

@@ -4,12 +4,11 @@ from abc import ABCMeta, abstractmethod
 from dataclasses import field, fields
 from itertools import groupby
 from logging import getLogger
-
 from idmtools.core.interfaces.ientity import IEntity, TEntityList, TEntity
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.core import CacheEnabled, ItemType, UnknownItemException
-from idmtools.entities import IExperiment
-from idmtools.entities.iexperiment import IDockerExperiment, IGPUExperiment
+from idmtools.entities.experiment import Experiment, IDockerModel
+from idmtools.entities.itask import PlatformRequirement
 from idmtools.services.platforms import PlatformPersistService
 from idmtools.core.interfaces.iitem import TItem, TItemList
 from typing import Dict, List, NoReturn, Set, Any
@@ -376,39 +375,18 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             setattr(self, fn, field_value[fn])
 
     @abstractmethod
-    def supported_experiment_types(self) -> List[typing.Type]:
+    def platform_supports(self) -> List[PlatformRequirement]:
         """
         Returns a list of supported experiment types. These types should be either abstract or full classes that have
             been derived from IExperiment
         Returns:
 
         """
-        return [IExperiment]
+        return []
 
-    @abstractmethod
-    def unsupported_experiment_types(self) -> List[typing.Type]:
-        """
-        Returns a list of experiment types not supported by the platform. These types should be either abstract or full
-            classes that have been derived from IExperiment
-        Returns:
-
-        """
-        return [IDockerExperiment, IGPUExperiment]
-
-    def is_supported_experiment(self, experiment: IExperiment) -> bool:
-        """
-        Determines if an experiment is supported by the specified platform.
-        Args:
-            experiment: Experiment to check
-
-        Returns:
-            True is experiment is supported, otherwise, false
-        """
-        ex_types = set(self.supported_experiment_types())
-        if any([isinstance(experiment, t) for t in ex_types]):
-            unsupported_types = self.unsupported_experiment_types()
-            return not any([isinstance(experiment, t) for t in unsupported_types])
-        return False
+    def is_supported_experiment(self, item: Experiment):
+        supported = self.platform_supports()
+        return all([x in supported for x in item.model.platform_requirements])
 
     def __repr__(self):
         return f"<Platform {self.__class__.__name__} - id: {self.uid}>"
