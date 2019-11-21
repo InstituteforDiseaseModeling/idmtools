@@ -12,6 +12,8 @@ from enum import Enum
 from io import BytesIO, StringIO
 from logging import getLogger
 
+from typing import Union
+
 from idmtools.assets import Asset
 from paramiko import SSHClient, SFTP, AutoAddPolicy
 
@@ -127,6 +129,10 @@ class SlurmOperations(ABC):
         pass
 
     @abstractmethod
+    def download_asset(self, dest, output: Union[str, BytesIO] = None):
+        pass
+
+    @abstractmethod
     def mk_directory(self, dest):
         pass
 
@@ -211,8 +217,6 @@ class SlurmOperations(ABC):
         pass
 
 
-
-
 @dataclass
 class RemoteSlurmOperations(SlurmOperations):
 
@@ -240,6 +244,14 @@ class RemoteSlurmOperations(SlurmOperations):
         elif asset.content:
             # TODO check pathing on windows to slurm on linux
             self._file_client.putfo(BytesIO(asset.content), os.path.join(dest, asset.filename))
+
+    def download_asset(self, dest, output: Union[str, BytesIO] = None):
+        # TODO Support streaming these objects to avoid full memory
+        if output is None:
+            output = BytesIO()
+        if isinstance(output, str):
+            output = open(output, 'wb')
+        self._file_client.getfo(dest, output)
 
     def link_dir(self, src, dest):
         self._cmd_client.exec_command(f'ln -s {src} {dest}')
@@ -293,6 +305,15 @@ class LocalSlurmOperations(SlurmOperations):
             json.dump(dataclasses.asdict(object), dest)
         else:
             json.dump(object, dest)
+
+    def download_asset(self, dest, output: Union[str, BytesIO] = None):
+        # TODO Support streaming these objects to avoid full memory
+        if output is None:
+            output = BytesIO()
+        if isinstance(output, str):
+            output = open(output, 'wb')
+        with open(dest, 'rb') as out:
+            output.write(out.read())
 
     def mk_directory(self, dest):
         os.makedirs(dest, exist_ok=True)
