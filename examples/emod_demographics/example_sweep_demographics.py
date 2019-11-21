@@ -31,7 +31,7 @@ def replace_pfa_with_custom(simulation, pfa_informal_rate):
     """
     # We cannot edit the demographics coming from the experiment but we can replace it
     # Pop the PFA_Rates_overlay.json
-    demographic_asset = simulation.demographics.pop(filename="PFA_rates_overlay.json")
+    demographic_asset = simulation.model.demographics.pop(filename="PFA_rates_overlay.json")
     demographic_content = demographic_asset.content
 
     # Modify what we need
