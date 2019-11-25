@@ -79,6 +79,10 @@ class ExperimentBuilder:
             raise ValueError(f"The function {function} passed to SweepBuilder.add_sweep_definition "
                              f"needs to only have {self.SIMULATION_ATTR} and exactly one free parameter.")
 
+        # Specially handle string case
+        if isinstance(values, str):
+            values = [values]
+
         # Everything is OK, create a partial to have everything set in the signature except `simulation` and add
         self.sweeps.append((partial(function, **{remaining_parameters[0]: v})) for v in values)
 
