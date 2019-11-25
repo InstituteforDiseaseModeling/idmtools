@@ -58,11 +58,12 @@ if __name__ == "__main__":
     set_Run_Number = partial(param_update, param="Run_Number")
     builder.add_sweep_definition(set_Run_Number, range(num_seeds))
     e1.tags = {'idmtools': 'create_serialization'}
-
     set_x_Temporary_Larval_Habitat = partial(param_update, param="x_Temporary_Larval_Habitat")
     builder.add_sweep_definition(set_x_Temporary_Larval_Habitat, [0.1, 0.2])
 
-    # add custom tags with add_sweep_definition
+    # Add simulation tags
+    e1.base_simulation.tags = {'add_base_sim_tag': 'my_tag'}
+    # another way to add custom simulation tags with add_sweep_definition
     set_tag = partial(param_update, param="test_tag")
     builder.add_sweep_definition(set_tag, "abcd")
 
