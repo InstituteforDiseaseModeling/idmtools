@@ -156,7 +156,7 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
                     if new_tags:
                         tags.update(new_tags)
 
-                simulation.tags = tags
+                simulation.tags.update(tags)
                 sims.append(simulation)
 
             yield sims
@@ -172,6 +172,7 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         # TODO: the experiment should be frozen when the first simulation is created
         sim = copy.deepcopy(self.base_simulation)
         sim.assets = copy.deepcopy(self.base_simulation.assets)
+        sim.tags.update(self.tags if self.tags else {})
         sim.platform = self.platform
         sim.experiment = self
         return sim
