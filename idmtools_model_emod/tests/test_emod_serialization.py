@@ -80,12 +80,12 @@ class EMODPlatformTest(ABC):
         end_day = start_day + last_serialization_day
         sim.set_parameter("Simulation_Duration", end_day)
 
-        sim.tags = {'role': 's', 'idmtools': 'single s test'}
+        sim.tags = {'role': 'serializer', 'idmtools': 'single serialization test'}
 
         builder = ExperimentBuilder()
         set_Run_Number = partial(param_update, param="Run_Number")
         builder.add_sweep_definition(set_Run_Number, range(num_seeds))
-        e1.tags = {'idmtools': 'create serialization'}
+        e1.tags = {'idmtools': 'create serialization', 'exp1': 'tag1'}
 
         e1.builder = builder
         em = ExperimentManager(experiment=e1, platform=self.platform)
@@ -108,9 +108,10 @@ class EMODPlatformTest(ABC):
         e2.demographics.clear()
         demo_file = os.path.join(COMMON_INPUT_PATH, "serialization", "single_node_demographics.json")
         e2.demographics.add_demographics_from_file(demo_file)
-        e2.tags = {'idmtools': 'realod serialization'}
+        e2.tags = {'idmtools': 'reload serialization', 'exp2': 'tag2'}
 
         reload_sim = e2.simulation()
+        reload_sim.tags = {'role': 'reloader', 'idmtools': 'single serialization test'}
         # reload_sim.config.pop('Serialization_Time_Steps') # Need this step if we use same exp
         reload_sim.set_parameter("Config_Name", "reloading sim")
         reload_sim.set_parameter("Simulation_Duration", sim_duration * 365)
@@ -124,18 +125,30 @@ class EMODPlatformTest(ABC):
         em2 = ExperimentManager(experiment=e2, platform=self.platform)
         em2.run()
         em2.wait_till_done()
+
+        # validation to make sure reload sim has same channel as serlized sim and same timesteps
+        from idmtools.analysis.download_analyzer import DownloadAnalyzer
+        from idmtools.analysis.analyze_manager import AnalyzeManager
+
+        filenames = ['output/InsetChart.json', 'output/state-00730.dtk']
+        analyzers = [DownloadAnalyzer(filenames=filenames, output_path='serialized_file_download')]
+        exp_id = [(e1.uid, ItemType.EXPERIMENT)]
+        manager = AnalyzeManager(platform=self.platform, ids=exp_id, analyzers=analyzers)
+        manager.analyze()
+
+        filenames = ['output/InsetChart.json']
+        analyzers = [DownloadAnalyzer(filenames=filenames, output_path='reload_sim_download')]
+        exp_id = [(e2.uid, ItemType.EXPERIMENT)]
+        manager = AnalyzeManager(platform=self.platform, ids=exp_id, analyzers=analyzers)
+        manager.analyze()
+
         reload_comps_exp = self.platform.get_platform_item(item_id=e2.uid, item_type=ItemType.EXPERIMENT)
         reload_comps_sims = sims_from_experiment(reload_comps_exp)
-        reload_sim_path = [get_simulation_path(sim) for sim in reload_comps_sims][0]
 
-        # Validate: check channel keys and length of each channel data
-        serialized_sim_output_path = os.path.join(serialized_file_path, 'output')
-        reloaded_sim_output_path = os.path.join(reload_sim_path, 'output')
-        serialized_sim_chart_path = os.path.join(serialized_sim_output_path, "InsetChart.json")
-        serialized_sim_dtkfile_path = os.path.join(serialized_sim_output_path, 'state-00730.dtk')
-        reload_sim_chart_path = os.path.join(reloaded_sim_output_path, "InsetChart.json")
+        serialized_sim_chart_path = os.path.join('serialized_file_download', str(comps_sims[0].id), 'InsetChart.json')
+        serialized_sim_dtkfile_path = os.path.join('serialized_file_download', str(comps_sims[0].id), 'state-00730.dtk')
+        reload_sim_chart_path = os.path.join('reload_sim_download', str(reload_comps_sims[0].id), 'InsetChart.json')
 
-        # make sure files are existing in simulation's output
         self.assertTrue(os.path.exists(serialized_sim_chart_path))
         self.assertTrue(os.path.exists(serialized_sim_dtkfile_path))
         self.assertTrue(os.path.exists(reload_sim_chart_path))
