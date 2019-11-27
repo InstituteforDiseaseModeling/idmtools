@@ -58,9 +58,14 @@ if __name__ == "__main__":
     set_Run_Number = partial(param_update, param="Run_Number")
     builder.add_sweep_definition(set_Run_Number, range(num_seeds))
     e1.tags = {'idmtools': 'create_serialization'}
-
     set_x_Temporary_Larval_Habitat = partial(param_update, param="x_Temporary_Larval_Habitat")
     builder.add_sweep_definition(set_x_Temporary_Larval_Habitat, [0.1, 0.2])
+
+    # Add simulation tags
+    e1.base_simulation.tags = {'add_base_sim_tag': 'my_tag'}
+    # another way to add custom simulation tags with add_sweep_definition
+    set_tag = partial(param_update, param="test_tag")
+    builder.add_sweep_definition(set_tag, "abcd")
 
     e1.builder = builder
     em = ExperimentManager(experiment=e1, platform=platform)
@@ -89,6 +94,7 @@ if __name__ == "__main__":
 
     for i in range(2):
         reload_sim = e2.simulation()
+        reload_sim.tags = {"my tag: ": i, "my_other_tag": "test"}  # Adding custom tags
         # reload_sim.config.pop('Serialization_Time_Steps') # Need this step if we use same experiment
         reload_sim.set_parameter("Enable_Immunity", 0)
         reload_sim.set_parameter("Config_Name", "reloading sim")

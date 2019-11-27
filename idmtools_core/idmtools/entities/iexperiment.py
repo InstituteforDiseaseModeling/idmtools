@@ -156,7 +156,7 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
                     if new_tags:
                         tags.update(new_tags)
 
-                simulation.tags = tags
+                simulation.tags.update(tags)
                 sims.append(simulation)
 
             yield sims
