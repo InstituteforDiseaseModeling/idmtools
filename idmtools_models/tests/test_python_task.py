@@ -14,7 +14,7 @@ class TestPythonTask(TestCase):
         task = PythonTask(script_name=fpath)
         task.gather_assets()
 
-        self.assertEqual(str(task.command), f'python {fpath}')
+        self.assertEqual(str(task.command), f'python ./Assets/model1.py')
         self.assertEqual(len(task.assets.assets), 1)
         self.assertEqual(task.assets.assets[0].absolute_path, fpath)
 
@@ -23,7 +23,7 @@ class TestPythonTask(TestCase):
         task = JSONConfiguredPythonTask(script_name=fpath)
         task.gather_assets()
 
-        self.assertEqual(str(task.command), f'python {fpath} --config config.json')
+        self.assertEqual(str(task.command), f'python ./Assets/model1.py --config config.json')
         self.assertEqual(len(task.assets.assets), 2)
         self.assertEqual(task.assets.assets[0].absolute_path, fpath)
         self.assertEqual(task.assets.assets[1].filename, 'config.json')
@@ -33,7 +33,14 @@ class TestPythonTask(TestCase):
         task = JSONConfiguredPythonTask(script_name=fpath, configfile_argument=None)
         task.gather_assets()
 
-        self.assertEqual(str(task.command), f'python {fpath}')
+        self.assertEqual(str(task.command), f'python ./Assets/model1.py')
         self.assertEqual(len(task.assets.assets), 2)
         self.assertEqual(task.assets.assets[0].absolute_path, fpath)
         self.assertEqual(task.assets.assets[1].filename, 'config.json')
+
+    def test_different_python_path(self):
+        fpath = os.path.join(COMMON_INPUT_PATH, "Rscript", "model1.py")
+        task = JSONConfiguredPythonTask(script_name=fpath, configfile_argument=None, python_path='python3.8')
+        task.gather_assets()
+
+        self.assertEqual(str(task.command), f'python3.8 ./Assets/model1.py')

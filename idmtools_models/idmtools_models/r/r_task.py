@@ -1,23 +1,25 @@
 from dataclasses import field, dataclass
-from typing import NoReturn, Optional
+from typing import NoReturn, Optional, Set
 from idmtools.assets import Asset
 from idmtools.entities import CommandLine
+from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.simulation import Simulation
 from idmtools.registry.task_specification import TaskSpecification
 from idmtools_models.docker_task import DockerTask
 from idmtools_models.json_configured_task import JSONConfiguredTask
-
+import os
 
 @dataclass
 class RTask(DockerTask):
     script_name: str = field(default=None)
     r_path: str = field(default='Rscript')
     extra_libraries: list = field(default_factory=lambda: [], compare=False, metadata={"md": True})
+    platform_requirements: Set[PlatformRequirements] = field(default_factory=lambda: [PlatformRequirements.DOCKER])
 
     def __post_init__(self):
         if self.script_name is None:
             raise ValueError("Script name is required")
-        self.command = CommandLine(f'{self.r_path} ./Assets/{self.script_name}')
+        self.command = CommandLine(f'{self.r_path} ./Assets/{os.path.basename(self.script_name)}')
 
     def reload_from_simulation(self, simulation: Simulation):
         pass

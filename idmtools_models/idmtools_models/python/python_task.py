@@ -11,17 +11,20 @@ from idmtools.registry.task_specification import TaskSpecification
 from idmtools_models.json_configured_task import JSONConfiguredTask
 
 
-@dataclass
+@dataclass()
 class PythonTask(ITask):
+    def reload_from_simulation(self, simulation: 'Simulation'):
+        pass
+
     script_name: str = None
-    python_command: str = 'python'
-    platform_requirements: Set[PlatformRequirements] = field(default_factory=[PlatformRequirements.PYTHON])
+    python_path: str = 'python'
+    platform_requirements: Set[PlatformRequirements] = field(default_factory=lambda: [PlatformRequirements.PYTHON])
 
     def __post_init__(self):
         super().__post_init__()
         if self.script_name is None:
             raise ValueError("Script name is required")
-        self.command = CommandLine(f'{self.python_command} ./Assets/{self.script_name}')
+        self.command = CommandLine(f'{self.python_path} ./Assets/{os.path.basename(self.script_name)}')
 
     def retrieve_python_dependencies(self):
         """
