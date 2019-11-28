@@ -50,7 +50,7 @@ class TestTasks(TestCase):
 
         def update_sim(simulation):
             simulation.tags['a'] = 12
-        task.init_hooks.append(update_sim)
+        task.add_pre_creation_hook(update_sim)
         sim = Simulation(task=task)
-        task.init(sim)
+        task.pre_creation(sim)
         self.assertEqual(sim.tags['a'], 12)
