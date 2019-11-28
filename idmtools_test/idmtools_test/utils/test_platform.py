@@ -1,3 +1,4 @@
+import copy
 import os
 import typing
 from dataclasses import dataclass, field
@@ -14,6 +15,7 @@ from idmtools.entities import IPlatform
 from idmtools.entities.iexperiment import TExperiment, IExperiment, ILinuxExperiment, IWindowsExperiment, \
     IGPUExperiment, IDockerExperiment
 from idmtools.entities.isimulation import TSimulation
+from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.registry.platform_specification import example_configuration_impl, get_platform_impl, \
     get_platform_type_impl, PlatformSpecification
 from idmtools.registry.plugin_specification import get_description_impl
@@ -23,12 +25,17 @@ data_path = os.path.abspath(os.path.join(current_directory, "..", "data"))
 
 logger = getLogger(__name__)
 
+supported_types = [PlatformRequirements.SHELL, PlatformRequirements.NativeBinary, PlatformRequirements.PYTHON,
+                   PlatformRequirements.WINDOWS if os.name == "nt" else PlatformRequirements.LINUX]
+
 
 @dataclass(repr=False)
 class TestPlatform(IPlatform):
     """
     Test platform simulating a working platform to use in the test suites.
     """
+
+    platform_supports: List[PlatformRequirements] = field(default_factory=lambda: copy.deepcopy(supported_types))
 
     def supported_experiment_types(self) -> List[typing.Type]:
         os_ex = IWindowsExperiment if os.name == "nt" else ILinuxExperiment

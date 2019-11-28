@@ -10,6 +10,7 @@ from idmtools.core.interfaces.iitem import IItem
 from idmtools.core import CacheEnabled, ItemType, UnknownItemException
 from idmtools.entities import IExperiment
 from idmtools.entities.iexperiment import IDockerExperiment, IGPUExperiment
+from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.services.platforms import PlatformPersistService
 from idmtools.core.interfaces.iitem import TItem, TItemList
 from typing import Dict, List, NoReturn, Set, Any
@@ -35,8 +36,9 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     - Commissioning
     - File handling
     """
-    supported_types: 'Set[ItemType]' = field(default_factory=lambda: set(), metadata={"pickle_ignore": True})
-    _object_cache_expiration: 'int' = 60
+    supported_types: Set[ItemType] = field(default_factory=lambda: set(), metadata={"pickle_ignore": True})
+    platform_supports: List[PlatformRequirements] = field(default_factory=list)
+    _object_cache_expiration: int = 60
 
     @staticmethod
     def get_caller():
@@ -73,7 +75,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             raise ValueError(
                 f"Please use Factory to create Platform! For example: \n    platform = Platform('COMPS', **kwargs)")
 
-    def __post_init__(self) -> 'NoReturn':
+    def __post_init__(self) -> NoReturn:
         """
         Work to be done after object creation.
 
@@ -89,10 +91,10 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         PlatformPersistService.save(self)
 
     @abstractmethod
-    def _create_batch(self, batch: 'TEntityList', item_type: 'ItemType') -> 'List[UUID]':
+    def _create_batch(self, batch: TEntityList, item_type: ItemType) -> List[UUID]:
         pass
 
-    def create_items(self, items: 'TEntity') -> 'List[UUID]':
+    def create_items(self, items: TEntity) -> List[UUID]:
         """
         Create items (simulations, experiments, or suites) on the platform. The function will batch the items based on
         type and call the self._create_batch for creation
@@ -113,7 +115,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         return ids
 
     @abstractmethod
-    def run_items(self, items: 'TItemList') -> 'NoReturn':
+    def run_items(self, items: TItemList) -> NoReturn:
         """
         Run the items (sims, exps, suites) on the platform
         Args:
@@ -122,7 +124,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def send_assets(self, item: 'TItem', **kwargs) -> 'NoReturn':
+    def send_assets(self, item: TItem, **kwargs) -> NoReturn:
         """
         Send the assets for a given item to the platform.
 
@@ -134,7 +136,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def refresh_status(self, item) -> 'NoReturn':
+    def refresh_status(self, item) -> NoReturn:
         """
         Populate the platform item and specified item with its status.
 
@@ -143,7 +145,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         """
         pass
 
-    def flatten_item(self, item: 'IEntity') -> 'TItemList':
+    def flatten_item(self, item: 'IEntity') -> TItemList:
         """
         Flatten an item: resolve the children until getting to the leaves.
         For example, for an experiment, will return all the simulations.
@@ -240,11 +242,10 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         Returns:
             The object found on the platform or None.
         """
+
+        cache_key = self.get_cache_key(force, item_id, item_type, kwargs, raw, 'o')
         if not item_type or item_type not in self.supported_types:
             raise Exception("The provided type is invalid or not supported by this platform...")
-
-        # Create the cache key
-        cache_key = f"o_{item_id}_" + ('r' if raw else 'o') + '_'.join(f"{k}_{v}" for k, v in kwargs.items())
 
         # If force -> delete in the cache
         if force:
@@ -287,11 +288,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         Returns:
             The children of the object or None.
         """
-        if not item_type or item_type not in self.supported_types:
-            raise Exception("The provided type is invalid or not supported by this platform...")
-
-        # Create the cache key based on everything we pass to the function
-        cache_key = f"c_{item_id}" + ('r' if raw else 'o') + '_'.join(f"{k}_{v}" for k, v in kwargs.items())
+        cache_key = self.get_cache_key(force, item_id, item_type, kwargs, raw, 'c')
 
         if force:
             self.cache.delete(cache_key)
@@ -319,14 +316,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             The parent of the object or None.
 
         """
-        if not item_type or item_type not in self.supported_types:
-            raise Exception("The provided type is invalid or not supported by this platform...")
-
-        # Create the cache key based on everything we pass to the function
-        cache_key = f'p_{item_id}' + ('r' if raw else 'o') + '_'.join(f"{k}_{v}" for k, v in kwargs.items())
-
-        if force:
-            self.cache.delete(cache_key)
+        cache_key = self.get_cache_key(force, item_id, item_type, kwargs, raw, 'p')
 
         if cache_key not in self.cache:
             ce = self.get_item(item_id, raw=True, item_type=item_type)
@@ -336,8 +326,17 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         return self.cache.get(cache_key)
 
+    def get_cache_key(self, force, item_id, item_type, kwargs, raw, prefix='p'):
+        if not item_type or item_type not in self.supported_types:
+            raise Exception("The provided type is invalid or not supported by this platform...")
+        # Create the cache key based on everything we pass to the function
+        cache_key = f'{prefix}_{item_id}' + ('r' if raw else 'o') + '_'.join(f"{k}_{v}" for k, v in kwargs.items())
+        if force:
+            self.cache.delete(cache_key)
+        return cache_key
+
     @abstractmethod
-    def get_files(self, item: 'TItem', files: 'List[str]') -> 'Dict[str, bytearray]':
+    def get_files(self, item: TItem, files: List[str]) -> Dict[str, bytearray]:
         """
         Return a dictionary of the specified files for the specified item.
 
@@ -350,7 +349,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         """
         pass
 
-    def validate_inputs_types(self) -> 'NoReturn':
+    def validate_inputs_types(self) -> NoReturn:
         """
         Validate user inputs and case attributes with the correct data types.
 
@@ -376,6 +375,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         for fn in fs_kwargs:
             setattr(self, fn, field_value[fn])
 
+    # TODO Remove these functions once we move to tasks completly
     @abstractmethod
     def supported_experiment_types(self) -> List[typing.Type]:
         """
@@ -413,6 +413,9 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     def __repr__(self):
         return f"<Platform {self.__class__.__name__} - id: {self.uid}>"
+
+    def is_task_supported(self, task: 'ITask') -> bool:
+        return all([x in self.platform_supports for x in task.platform_requirements])
 
 
 TPlatform = typing.TypeVar("TPlatform", bound=IPlatform)

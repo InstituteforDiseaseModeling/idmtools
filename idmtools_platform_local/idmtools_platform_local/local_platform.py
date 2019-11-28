@@ -1,3 +1,4 @@
+import copy
 import functools
 import logging
 import os
@@ -22,6 +23,7 @@ from idmtools.entities import IExperiment, IPlatform
 from idmtools.entities.iexperiment import IGPUExperiment, IDockerExperiment, IWindowsExperiment, IDockerGPUExperiment, \
     IHostBinaryExperiment
 from idmtools.entities.isimulation import ISimulation, TSimulation
+from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.utils.entities import get_dataclass_common_fields
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
 from idmtools_platform_local.client.simulations_client import SimulationsClient
@@ -44,6 +46,9 @@ def local_status_to_common(status):
 
 logger = getLogger(__name__)
 
+
+supported_types = [PlatformRequirements.DOCKER, PlatformRequirements.GPU, PlatformRequirements.SHELL,
+                   PlatformRequirements.NativeBinary, PlatformRequirements.LINUX]
 
 @dataclass
 class LocalPlatform(IPlatform):
@@ -75,6 +80,7 @@ class LocalPlatform(IPlatform):
     # We use this to manage our docker containers
     _do: Optional[DockerIO] = field(default=None, compare=False, metadata={"pickle_ignore": True})
     _sm: Optional[DockerServiceManager] = field(default=None, compare=False, metadata={"pickle_ignore": True})
+    platform_supports: List[PlatformRequirements] = field(default_factory=lambda: copy.deepcopy(supported_types))
 
     def __post_init__(self):
         logger.debug("Setting up local platform")

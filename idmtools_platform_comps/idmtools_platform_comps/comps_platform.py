@@ -1,3 +1,4 @@
+import copy
 import json
 import logging
 import ntpath
@@ -18,6 +19,7 @@ from idmtools.entities import IPlatform
 from idmtools.entities.iexperiment import IExperiment, StandardExperiment, IGPUExperiment, IDockerExperiment, \
     ILinuxExperiment
 from idmtools.entities.isimulation import ISimulation
+from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.suite import Suite
 from idmtools.utils.time import timestamp
 from idmtools_platform_comps.utils import convert_COMPS_status
@@ -38,6 +40,9 @@ class COMPSPriority:
     Highest = "Highest"
 
 
+supported_types = [PlatformRequirements.DOCKER, PlatformRequirements.PYTHON, PlatformRequirements.SHELL,
+                   PlatformRequirements.NativeBinary, PlatformRequirements.WINDOWS]
+
 @dataclass
 class COMPSPlatform(IPlatform, CacheEnabled):
     """
@@ -54,6 +59,8 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     num_retires: int = field(default=0)
     num_cores: int = field(default=1)
     exclusive: bool = field(default=False)
+
+    platform_supports: List[PlatformRequirements] = field(default_factory=lambda: copy.deepcopy(supported_types))
 
     def __post_init__(self):
         print("\nUser Login:")

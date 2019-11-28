@@ -20,3 +20,7 @@ class UnknownItemException(Exception):
 
 class NoPlatformException(Exception):
     pass
+
+
+class NoTaskFound(Exception):
+    pass
