@@ -3,7 +3,6 @@ from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
 from typing import Set, NoReturn, Union
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
-from idmtools.entities import IPlatform
 from idmtools.entities.command_line import CommandLine
 from idmtools.entities.platform_requirements import PlatformRequirements
 
