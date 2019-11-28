@@ -43,6 +43,7 @@ class COMPSPriority:
 supported_types = [PlatformRequirements.DOCKER, PlatformRequirements.PYTHON, PlatformRequirements.SHELL,
                    PlatformRequirements.NativeBinary, PlatformRequirements.WINDOWS]
 
+
 @dataclass
 class COMPSPlatform(IPlatform, CacheEnabled):
     """

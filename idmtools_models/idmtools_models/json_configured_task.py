@@ -69,7 +69,7 @@ class JSONConfiguredTask(ITask):
         """
         self.parameters.update(values)
 
-    def reload_from_simulation(self, simulation: 'Simulation'):
+    def reload_from_simulation(self, simulation: 'Simulation'):  # noqa: F821
         if simulation.platform:
             simulation.platform.get_files(simulation, self.config_file_name)
 

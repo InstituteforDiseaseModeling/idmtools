@@ -1,3 +1,4 @@
+# flake8: noqa E402
 import json
 import os
 from abc import ABC, abstractmethod
@@ -90,9 +91,9 @@ class EMODPlatformTest(ABC):
         em.wait_till_done()
         self.assertTrue(e1.succeeded)
 
-        #---------------------------------------------------------------------------------------------
+        # ---------------------------------------------------------------------------------------------
         # Step2: Create new experiment and sim with previous serialized file
-        #TODO, ideally we could add new sim to existing exp, but currently we can not do with issue #459
+        # TODO, ideally we could add new sim to existing exp, but currently we can not do with issue #459
 
         # First get previous serialized file path
         comps_exp = self.platform.get_platform_item(item_id=e1.uid, item_type=ItemType.EXPERIMENT)
@@ -109,7 +110,7 @@ class EMODPlatformTest(ABC):
 
         reload_sim = e2.simulation()
         reload_sim.tags = {'role': 'reloader', 'idmtools': 'single serialization test'}
-        #reload_sim.config.pop('Serialization_Time_Steps') # Need this step if we use same exp
+        # reload_sim.config.pop('Serialization_Time_Steps') # Need this step if we use same exp
         reload_sim.set_parameter("Config_Name", "reloading sim")
         reload_sim.set_parameter("Simulation_Duration", sim_duration * 365)
         load_serialized_population(simulation=reload_sim, population_path=os.path.join(serialized_file_path, 'output'),
@@ -169,6 +170,7 @@ class EMODPlatformTest(ABC):
         self.assertEqual(serialized_channel_length, reload_channel_length)
         self.assertEqual(serialized_channel_length, 730)
 
+
 @pytest.mark.comps
 @pytest.mark.emod
 class TestCompsEMOOD(ITestWithPersistence, EMODPlatformTest):
@@ -192,5 +194,3 @@ class TestCompsEMOOD(ITestWithPersistence, EMODPlatformTest):
     @classmethod
     def get_emod_binary(cls, ) -> str:
         return os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe")
-
-

@@ -50,6 +50,7 @@ logger = getLogger(__name__)
 supported_types = [PlatformRequirements.DOCKER, PlatformRequirements.GPU, PlatformRequirements.SHELL,
                    PlatformRequirements.NativeBinary, PlatformRequirements.LINUX]
 
+
 @dataclass
 class LocalPlatform(IPlatform):
     """

@@ -1,3 +1,4 @@
+# flake8: noqa W605
 import json
 import os
 import pytest
