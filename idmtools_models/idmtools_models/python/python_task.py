@@ -1,12 +1,12 @@
 import os
 import subprocess
 import tempfile
-from dataclasses import dataclass
-from typing import NoReturn, Optional
-
+from dataclasses import dataclass, field
+from typing import NoReturn, Optional, Set
 from idmtools.assets import Asset
 from idmtools.entities import CommandLine
 from idmtools.entities.itask import ITask
+from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.registry.task_specification import TaskSpecification
 from idmtools_models.json_configured_task import JSONConfiguredTask
 
@@ -15,12 +15,13 @@ from idmtools_models.json_configured_task import JSONConfiguredTask
 class PythonTask(ITask):
     script_name: str = None
     python_command: str = 'python'
+    platform_requirements: Set[PlatformRequirements] = field(default_factory=[PlatformRequirements.PYTHON])
 
     def __post_init__(self):
         super().__post_init__()
         if self.script_name is None:
             raise ValueError("Script name is required")
-        self.command = CommandLine(f'{self.python_command} {self.script_name}')
+        self.command = CommandLine(f'{self.python_command} ./Assets/{self.script_name}')
 
     def retrieve_python_dependencies(self):
         """
@@ -70,3 +71,12 @@ class PythonTaskSpecification(TaskSpecification):
 
     def get_description(self) -> str:
         return "Defines a python script command"
+
+
+class JSONConfiguredPythonTaskSpecification(TaskSpecification):
+
+    def get(self, configuration: dict) -> JSONConfiguredPythonTask:
+        return JSONConfiguredPythonTask(**configuration)
+
+    def get_description(self) -> str:
+        return "Defines a python script that has a single JSON config file"
