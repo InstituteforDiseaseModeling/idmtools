@@ -1,8 +1,7 @@
 from dataclasses import field, dataclass
-from typing import NoReturn, Optional, Set
+from typing import NoReturn, Optional
 from idmtools.assets import Asset
 from idmtools.entities import CommandLine
-from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.simulation import Simulation
 from idmtools.registry.task_specification import TaskSpecification
 from idmtools_models.docker_task import DockerTask
