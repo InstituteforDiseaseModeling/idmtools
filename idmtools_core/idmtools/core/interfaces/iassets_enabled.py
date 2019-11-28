@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
 from idmtools.assets.asset_collection import AssetCollection
-from typing import NoReturn
+from typing import NoReturn, Union
 from idmtools.assets import TAssetCollection, TAsset, TAssetList
 
 
@@ -10,8 +10,8 @@ class IAssetsEnabled(metaclass=ABCMeta):
     """
     Base class for objects containing an asset collection.
     """
-    assets: TAssetCollection = field(default_factory=lambda: AssetCollection(), compare=False,
-                                     metadata={"pickle_ignore": True})
+    assets: AssetCollection = field(default_factory=lambda: AssetCollection(), compare=False,
+                                    metadata={"pickle_ignore": True})
 
     def __post_init__(self):
         pass

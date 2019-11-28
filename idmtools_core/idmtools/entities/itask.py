@@ -1,21 +1,22 @@
 import copy
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
+from logging import getLogger
 from typing import Set, NoReturn, Union
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.entities.command_line import CommandLine
 from idmtools.entities.platform_requirements import PlatformRequirements
 
 
-@dataclass
+logger = getLogger(__name__)
+
+@dataclass()
 class ITask(IAssetsEnabled, metaclass=ABCMeta):
     command: CommandLine = None
     # Informs platform to what is needed to run a task
     platform_requirements: Set[PlatformRequirements] = field(default_factory=lambda: [])
 
     def __post_init__(self):
-        if self.command is None:  # there should be a better way to do this with dataclasses
-            raise ValueError("Command is required")
         if isinstance(self.command, str):
             self.command = CommandLine(self.command)
 
@@ -32,8 +33,7 @@ class ITask(IAssetsEnabled, metaclass=ABCMeta):
             requirement = PlatformRequirements[requirement.lower()]
         self.platform_requirements.add(requirement)
 
-    @abstractmethod
-    def init(self, simulation):
+    def on_simulation_prep(self, simulation):
         """
         Hook called at the time of creation of task. Can be used to setup simulation and experiment level hooks
         Args:
@@ -42,7 +42,10 @@ class ITask(IAssetsEnabled, metaclass=ABCMeta):
         Returns:
 
         """
-        pass
+        if self.command is None:
+            logger.error('Command is not defined')
+            raise ValueError("Command is required for on task when preparing an experiment")
+        self.gather_assets()
 
     @abstractmethod
     def gather_assets(self) -> NoReturn:
@@ -59,8 +62,7 @@ class ITask(IAssetsEnabled, metaclass=ABCMeta):
         new_simulation = copy.deepcopy(base_simulation)
         return new_simulation
 
-    @staticmethod
-    def reload_from_simulation(simulation: 'Simulation') -> 'ITask':
+    def reload_from_simulation(self, simulation: 'Simulation'):
         """
         Optional hook that is called when loading simulations from a platform
         """
