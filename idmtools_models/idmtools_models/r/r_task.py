@@ -14,7 +14,6 @@ class RTask(DockerTask):
     script_name: str = field(default=None)
     r_path: str = field(default='Rscript')
     extra_libraries: list = field(default_factory=lambda: [], compare=False, metadata={"md": True})
-    platform_requirements: Set[PlatformRequirements] = field(default_factory=lambda: [PlatformRequirements.DOCKER])
 
     def __post_init__(self):
         if self.script_name is None:

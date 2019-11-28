@@ -28,7 +28,7 @@ class DockerTask(ITask):
 
     def __post_init__(self):
         super().__post_init__()
-        self.add_platform_requirement(PlatformRequirements.PYTHON)
+        self.add_platform_requirement(PlatformRequirements.DOCKER)
         if self.build:
             self.build_image()
 
