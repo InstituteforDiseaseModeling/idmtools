@@ -43,9 +43,27 @@ class ITask(IAssetsEnabled, metaclass=ABCMeta):
         self.__post_creation_hooks = []
 
     def add_pre_creation_hook(self, hook: TTaskHook):
+        """
+        Called before a simulation is created on a platform. Each hook recieves either a Simulation or WorkflowTask
+
+        Args:
+            hook: Function to call on event
+
+        Returns:
+            None
+        """
         self.__pre_creation_hooks.append(hook)
 
     def add_post_creation_hook(self, hook: TTaskHook):
+        """
+        Called after a simulation has been created on a platform. Each hook recieves either a Simulation or WorkflowTask
+
+        Args:
+            hook: Function to call on event
+
+        Returns:
+
+        """
         self.__post_creation_hooks.append(hook)
 
     def add_platform_requirement(self, requirement: Union[PlatformRequirements, str]) -> NoReturn:
@@ -74,7 +92,6 @@ class ITask(IAssetsEnabled, metaclass=ABCMeta):
             logger.error('Command is not defined')
             raise ValueError("Command is required for on task when preparing an experiment")
         [hook(parent) for hook in self.__pre_creation_hooks]
-
 
     def post_creation(self, parent: Union['Simulation', 'WorkflowItem']):
         """
