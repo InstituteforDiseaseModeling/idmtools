@@ -9,6 +9,7 @@ from idmtools.core.interfaces.inamed_entity import INamedEntity
 logger = getLogger(__name__)
 user_logger = getLogger('user')
 
+
 @dataclass
 class Simulation(IAssetsEnabled, INamedEntity):
     """
