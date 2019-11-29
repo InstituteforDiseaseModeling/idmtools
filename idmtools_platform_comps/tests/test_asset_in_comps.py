@@ -9,7 +9,8 @@ from idmtools.core import EntityStatus
 from idmtools.core.platform_factory import Platform
 from idmtools_models.python import PythonExperiment
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id
+from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id, \
+    assure_running_then_wait_til_done
 
 
 @pytest.mark.comps
@@ -34,14 +35,14 @@ class TestAssetsInComps(unittest.TestCase):
 
         # Create experiment on platform
         experiment.pre_creation()
-        self.platform.create_items(items=[experiment])
+        self.platform.commissioning.create_items(items=[experiment])
 
         for simulation_batch in experiment.batch_simulations(batch_size=10):
             # Create the simulations on the platform
             for simulation in simulation_batch:
                 simulation.pre_creation()
 
-            ids = self.platform.create_items(items=simulation_batch)
+            ids = self.platform.commissioning.create_items(items=simulation_batch)
 
             for uid, simulation in zip(ids, simulation_batch):
                 simulation.uid = uid
@@ -53,27 +54,14 @@ class TestAssetsInComps(unittest.TestCase):
                 from idmtools.entities import ISimulation
                 simulation.__class__ = ISimulation
 
-        self.platform.refresh_status(item=experiment)
+        self.platform.metadata.refresh_status(item=experiment)
 
         # Test if we have all simulations at status CREATED
         self.assertFalse(experiment.done)
         self.assertTrue(all([s.status == EntityStatus.CREATED for s in experiment.simulations]))
 
         # Start experiment
-        self.platform.run_items(items=[experiment])
-        self.platform.refresh_status(item=experiment)
-        self.assertFalse(experiment.done)
-        self.assertTrue(all([s.status == EntityStatus.RUNNING for s in experiment.simulations]))
-
-        # Wait till done
-        import time
-        start_time = time.time()
-        while time.time() - start_time < 180:
-            self.platform.refresh_status(item=experiment)
-            if experiment.done:
-                break
-            time.sleep(3)
-        self.assertTrue(experiment.done)
+        assure_running_then_wait_til_done(self, experiment)
 
     @pytest.mark.long
     def test_md5_hashing_for_same_file_contents(self):

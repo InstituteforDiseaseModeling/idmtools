@@ -94,7 +94,7 @@ class TestPythonSimulation(ITestWithPersistence):
 
         with self.subTest('test_retrieve_experiment_restore_sims'):
             # test we can fetch the experiment as well
-            oe = platform.get_item(pe.uid, ItemType.EXPERIMENT)
+            oe = platform.metadata.get_item(pe.uid, ItemType.EXPERIMENT)
             oe.refresh_simulations()
             self.assertEqual(pe.uid, oe.uid)
             self.assertEqual(pe.simulation_type, oe.simulation_type)

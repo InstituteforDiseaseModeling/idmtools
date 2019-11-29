@@ -43,10 +43,10 @@ class TestLoadFiles(ITestWithPersistence):
         self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
 
         # Test: no changes to default demographics
-        jt1 = s.demographics[0].content
+        jt1 = s.demographics.assets[0].content
         jt2 = list(EMODSir.demographics().values())[0]
         self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
-        self.assertEqual(s.demographics[0].content, jt1)
+        self.assertEqual(s.demographics.assets[0].content, jt1)
         self.assertEqual(len([d for d in s.demographics if not d.persisted]), 0)
 
     def test_simulation_load_campaign(self):
@@ -67,7 +67,7 @@ class TestLoadFiles(ITestWithPersistence):
         self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
 
         # Test: no changes to default demographics
-        jt1 = e.demographics[0].content
+        jt1 = e.demographics.assets[0].content
         jt2 = list(EMODSir.demographics().values())[0]
         self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
 
@@ -77,7 +77,7 @@ class TestLoadFiles(ITestWithPersistence):
 
         # Test the content
         with open(DEFAULT_DEMOGRAPHICS_JSON, 'r') as m:
-            jt1 = e.base_simulation.demographics[0].content
+            jt1 = e.base_simulation.demographics.assets[0].content
             jt2 = json.load(m)
             self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
 
@@ -114,7 +114,7 @@ class TestLoadFiles(ITestWithPersistence):
             self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
 
         with open(DEFAULT_DEMOGRAPHICS_JSON, 'r') as m:
-            jt1 = e.base_simulation.demographics[0].content
+            jt1 = e.base_simulation.demographics.assets[0].content
             jt2 = json.load(m)
             self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
 
@@ -143,7 +143,7 @@ class TestLoadFiles(ITestWithPersistence):
             self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
 
         with open(DEFAULT_DEMOGRAPHICS_JSON, 'r') as m:
-            jt1 = s.demographics[1].content
+            jt1 = s.demographics.assets[1].content
             jt2 = json.load(m)
             self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
 
@@ -173,7 +173,7 @@ class TestLoadFiles(ITestWithPersistence):
             self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
 
         with open(DEFAULT_DEMOGRAPHICS_JSON, 'r') as m:
-            jt1 = e.demographics[0].content
+            jt1 = e.demographics.assets[0].content
             jt2 = json.load(m)
             self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
 

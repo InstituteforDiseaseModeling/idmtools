@@ -12,9 +12,8 @@ from idmtools_test.utils.decorators import restart_local_platform
 
 api_host = os.getenv('API_HOST', 'localhost')
 os.environ['SQLALCHEMY_DATABASE_URI'] = f'postgresql+psycopg2://idmtools:idmtools@{api_host}/idmtools'
-from idmtools_platform_local.status import Status
-from idmtools_platform_local.internals.workers.utils import create_or_update_status
 from idmtools_test.utils.cli import get_subcommands_from_help_result, run_command
+from idmtools_test.utils.local_platform import create_test_data
 
 
 @pytest.mark.docker
@@ -28,7 +27,7 @@ class TestLocalCLIBasic(unittest.TestCase):
         retries = 0
         while retries < 10:
             try:
-                cls.create_test_data()
+                create_test_data()
                 break
             except (OperationalError, ConnectionError):
                 time.sleep(0.5)
@@ -38,29 +37,6 @@ class TestLocalCLIBasic(unittest.TestCase):
     @restart_local_platform(silent=True, stop_before=False)
     def tearDownClass(cls) -> None:
         pass
-
-    @staticmethod
-    def create_test_data():
-        # this experiment has no children
-        create_or_update_status('AAAAA', '/data/AAAAA', dict(a='b', c='d'),
-                                extra_details=dict(simulation_type='Python'))
-        # Experiment
-        create_or_update_status('BBBBB', '/data/BBBBB', dict(e='f', g='h'),
-                                extra_details=dict(simulation_type='Python'))
-        # Simulation
-        create_or_update_status('CCCCC', '/data/CCCCC', dict(i='j', k='l'), parent_uuid='BBBBB',
-                                extra_details=dict(simulation_type='Python'))
-        # Experiment
-        create_or_update_status('DDDDD', '/data/DDDD', dict(e='f', c='d'),
-                                extra_details=dict(simulation_type='Python'))
-
-        # Simulation
-        create_or_update_status('EEEEE', '/data/EEEEE', dict(i='j', k='l'), parent_uuid='DDDDD',
-                                status=Status.done,
-                                extra_details=dict(simulation_type='Python'))
-        create_or_update_status('FFFFF', '/data/FFFFF', dict(i='j', k='l'), parent_uuid='DDDDD',
-                                status=Status.done,
-                                extra_details=dict(simulation_type='Python'))
 
     @staticmethod
     def run_command(*args, start_command=None, base_command=None):

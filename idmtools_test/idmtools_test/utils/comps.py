@@ -1,6 +1,8 @@
 from COMPS import Data
 from COMPS.Data import QueryCriteria, Simulation as COMPSSimulation, Simulation
 
+from idmtools.core import EntityStatus
+
 
 def get_asset_collection_id_for_simulation_id(sim_id):
     simulation = COMPSSimulation.get(sim_id, query_criteria=QueryCriteria().select(
@@ -34,3 +36,19 @@ def get_simulation_path(simulation):
 
 def get_simulation_by_id(sim_id, query_criteria=None):
     return Simulation.get(id=sim_id, query_criteria=query_criteria)
+
+
+def assure_running_then_wait_til_done(tst, experiment):
+    tst.platform.commissioning.run_items(items=[experiment])
+    tst.platform.metadata.refresh_status(item=experiment)
+    tst.assertFalse(experiment.done)
+    tst.assertTrue(all([s.status == EntityStatus.RUNNING for s in experiment.simulations]))
+    # Wait till done
+    import time
+    start_time = time.time()
+    while time.time() - start_time < 180:
+        tst.platform.metadata.refresh_status(item=experiment)
+        if experiment.done:
+            break
+        time.sleep(3)
+    tst.assertTrue(experiment.done)

@@ -35,7 +35,7 @@ class TestExperimentManager(ITestWithPersistence):
 
         self.assertEqual(em.platform, em2.platform)
         self.assertEqual(em.platform.uid, em2.platform.uid)
-        p.cleanup()
+        p.metadata.cleanup()
 
     def test_from_experiment_unknown(self):
         p = Platform('Test')
@@ -57,7 +57,7 @@ class TestExperimentManager(ITestWithPersistence):
         self.assertIsInstance(em2.experiment, PythonExperiment)
         self.assertDictEqual(em2.experiment.tags, experiment.tags)
         self.assertEqual(em2.experiment.platform.uid, p.uid)
-        p.cleanup()
+        p.metadata.cleanup()
 
     def test_bad_experiment_builder(self):
         builder = ExperimentBuilder()

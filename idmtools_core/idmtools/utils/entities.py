@@ -2,13 +2,10 @@ import dataclasses
 import typing
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.core import ExperimentNotFound, UUID, ItemType
-
-if typing.TYPE_CHECKING:
-    from idmtools.entities.iplatform import TPlatform
-    from idmtools.entities.iexperiment import TExperiment
+from idmtools.entities.iexperiment import IExperiment
 
 
-def retrieve_experiment(experiment_id: UUID, platform: 'TPlatform' = None, with_simulations=False) -> 'TExperiment':
+def retrieve_experiment(experiment_id: UUID, platform: 'IPlatform' = None, with_simulations=False) -> IExperiment:
     experiment = ExperimentPersistService.retrieve(experiment_id)
 
     if not experiment:
@@ -17,7 +14,7 @@ def retrieve_experiment(experiment_id: UUID, platform: 'TPlatform' = None, with_
             raise ExperimentNotFound(experiment_id)
 
         # Try to retrieve it from the platform
-        experiment = platform.get_item(item_id=experiment_id, item_type=ItemType.EXPERIMENT)
+        experiment = platform.metadata.get_item(item_id=experiment_id, item_type=ItemType.EXPERIMENT)
         if not experiment:
             raise ExperimentNotFound(experiment_id, platform)
 
@@ -50,3 +47,15 @@ def get_dataclass_common_fields(src, dest, exclude_none: bool = True) -> typing.
         if field.name in dest_fields and (not exclude_none or (exclude_none and getattr(src, field.name, None) is not None)):
             result[field.name] = getattr(src, field.name)
     return result
+
+
+def validate_user_inputs_against_dataclass(field_type, field_value):
+    fs_kwargs = set(field_type.keys()).intersection(set(field_value.keys()))
+    for fn in fs_kwargs:
+        ft = field_type[fn]
+        if ft in (int, float, str):
+            field_value[fn] = ft(field_value[fn]) if field_value[fn] is not None else field_value[fn]
+        elif ft is bool:
+            field_value[fn] = ast.literal_eval(field_value[fn]) if isinstance(field_value[fn], str) else \
+                field_value[fn]
+    return fs_kwargs

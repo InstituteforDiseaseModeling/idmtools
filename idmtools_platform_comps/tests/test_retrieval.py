@@ -44,7 +44,7 @@ class TestRetrieval(ITestWithPersistence):
         em.run()
 
     def test_retrieve_experiment(self):
-        exp = self.platform.get_item(self.pe.uid, ItemType.EXPERIMENT)
+        exp = self.platform.metadata.get_item(self.pe.uid, ItemType.EXPERIMENT)
 
         # Test attributes
         self.assertEqual(self.pe.uid, exp.uid)
@@ -54,14 +54,15 @@ class TestRetrieval(ITestWithPersistence):
         self.assertEqual({k: str(v or '') for k, v in self.pe.tags.items()}, exp.tags)
 
         # Test the raw retrieval
-        comps_experiment = self.platform.get_item(self.pe.uid, ItemType.EXPERIMENT, raw=True)
+        comps_experiment = self.platform.metadata.get_item(self.pe.uid, ItemType.EXPERIMENT, raw=True)
         self.assertIsInstance(comps_experiment, COMPSExperiment)
         self.assertEqual(self.pe.uid, comps_experiment.id)
         self.assertEqual(self.pe.name, comps_experiment.name)
         self.assertEqual({k: str(v or '') for k, v in self.pe.tags.items()}, comps_experiment.tags)
 
         # Test retrieving less columns
-        comps_experiment = self.platform.get_item(self.pe.uid, ItemType.EXPERIMENT, raw=True, children=[], columns=["id"])
+        comps_experiment = self.platform.metadata.get_item(self.pe.uid, ItemType.EXPERIMENT, raw=True, children=[],
+                                                           columns=["id"])
         self.assertIsNone(comps_experiment.name)
         self.assertIsNone(comps_experiment.tags)
         self.assertEqual(self.pe.uid, comps_experiment.id)
@@ -69,7 +70,7 @@ class TestRetrieval(ITestWithPersistence):
     @unittest.skip
     def test_retrieve_simulation(self):
         base = self.pe.simulations[0]
-        sim = self.platform.get_object(base.uid, ItemType.SIMULATION)
+        sim = self.platform.metadata.get_object(base.uid, ItemType.SIMULATION)
 
         # Test attributes
         self.assertEqual(sim.uid, base.uid)
@@ -77,24 +78,24 @@ class TestRetrieval(ITestWithPersistence):
         self.assertEqual({k: str(v or '') for k, v in base.tags.items()}, sim.tags)
 
         # Test the raw retrieval
-        comps_simulation = self.platform.get_object(base.uid, ItemType.SIMULATION, raw=True)
+        comps_simulation = self.platform.metadata.get_object(base.uid, ItemType.SIMULATION, raw=True)
         self.assertIsInstance(comps_simulation, COMPSSimulation)
         self.assertEqual(base.uid, comps_simulation.id)
         self.assertEqual(base.name, comps_simulation.name)
         self.assertEqual({k: str(v or '') for k, v in base.tags.items()}, comps_simulation.tags)
 
     def test_parent(self):
-        parent_exp = self.platform.get_parent(self.pe.simulations[0].uid, ItemType.SIMULATION)
+        parent_exp = self.platform.metadata.get_parent(self.pe.simulations[0].uid, ItemType.SIMULATION)
         self.assertEqual(self.pe.uid, parent_exp.uid)
         self.assertEqual({k: str(v or '') for k, v in self.pe.tags.items()}, parent_exp.tags)
-        self.assertIsNone(self.platform.get_parent(self.pe.uid, ItemType.EXPERIMENT))
+        self.assertIsNone(self.platform.metadata.get_parent(self.pe.uid, ItemType.EXPERIMENT))
 
     def test_children(self):
-        children = self.platform.get_children(self.pe.uid, ItemType.EXPERIMENT)
+        children = self.platform.metadata.get_children(self.pe.uid, ItemType.EXPERIMENT)
         self.assertEqual(len(self.pe.simulations), len(children))
         for s in self.pe.simulations:
             self.assertIn(s.uid, [s.uid for s in children])
-        self.assertIsNone(self.platform.get_children(self.pe.simulations[0].uid, ItemType.SIMULATION))
+        self.assertIsNone(self.platform.metadata.get_children(self.pe.simulations[0].uid, ItemType.SIMULATION))
 
 
 if __name__ == '__main__':

@@ -67,7 +67,7 @@ if __name__ == "__main__":
         exit()
 
     # Retrieve the experiment that was used to create the serialization
-    pre_exp = platform.get_parent(random_sim_id, ItemType.SIMULATION)
+    pre_exp = platform.metadata.get_parent(random_sim_id, ItemType.SIMULATION)
 
     # Configure the analyzer to work on the InsetChart.json
     analyzers_timeseries = TimeseriesAnalyzer()

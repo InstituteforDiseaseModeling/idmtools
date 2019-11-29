@@ -1,14 +1,11 @@
 import os
 import shutil
 import tempfile
-import typing
 from dataclasses import dataclass, field
 from multiprocessing import current_process
 from logging import getLogger, DEBUG
 from diskcache import Cache, DEFAULT_SETTINGS, FanoutCache
-
-if typing.TYPE_CHECKING:
-    from typing import Union
+from typing import Union
 
 MAX_CACHE_SIZE = int(2 ** 33)  # 8GB
 DEFAULT_SETTINGS["size_limit"] = MAX_CACHE_SIZE
@@ -22,9 +19,9 @@ class CacheEnabled:
     """
     Allows a class to leverage Diskcache and expose a cache property.
     """
-    _cache: 'Union[Cache, FanoutCache]' = field(default=None, init=False, compare=False,
-                                                metadata={"pickle_ignore": True})
-    _cache_directory: 'str' = field(default=None, init=False, compare=False)
+    _cache: Union[Cache, FanoutCache] = field(default=None, init=False, compare=False,
+                                              metadata={"pickle_ignore": True})
+    _cache_directory: str = field(default=None, init=False, compare=False)
 
     def __del__(self):
         self.cleanup_cache()
@@ -57,7 +54,10 @@ class CacheEnabled:
             return
 
         if self._cache is not None:
-            logger.debug(f"Cleaning up the cache at {self._cache_directory}")
+            try:
+                logger.debug(f"Cleaning up the cache at {self._cache_directory}")
+            except:  # Happens when things are shutting down
+                pass
             self._cache.close()
             del self._cache
 

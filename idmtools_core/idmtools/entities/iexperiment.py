@@ -197,10 +197,10 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
 
     def refresh_simulations(self):
         from idmtools.core import ItemType
-        self.simulations = self.platform.get_children(self.uid, ItemType.EXPERIMENT, force=True)
+        self.simulations = self.platform.metadata.get_children(self.uid, ItemType.EXPERIMENT, force=True)
 
     def refresh_simulations_status(self):
-        self.platform.refresh_status(item=self)
+        self.platform.metadata.refresh_status(item=self)
 
     def pre_getstate(self):
         """
@@ -275,18 +275,14 @@ class IDockerExperiment:
 class IDockerGPUExperiment(IGPUExperiment, IDockerExperiment):
     pass
 
-
-TExperiment = typing.TypeVar("TExperiment", bound=IExperiment)
-TGPUExperiment = typing.TypeVar("TGPUExperiment", bound=IGPUExperiment)
-TDockerExperiment = typing.TypeVar("TDockerExperiment", bound=IDockerExperiment)
 # class types
-TExperimentClass = typing.Type[TExperiment]
-TGPUExperimentClass = typing.Type[TGPUExperiment]
-TDockerExperimentClass = typing.Type[TDockerExperiment]
+IExperimentClass = typing.Type[IExperiment]
+IGPUExperimentClass = typing.Type[IGPUExperiment]
+IDockerExperimentClass = typing.Type[IDockerExperiment]
 # Composed types
-TExperimentList = typing.List[typing.Union[TExperiment, str]]
-TGPUExperimentList = typing.List[typing.Union[TGPUExperiment, str]]
-TDockerExperimentList = typing.List[typing.Union[TDockerExperiment, str]]
+IExperimentList = typing.List[typing.Union[IExperiment, str]]
+TGPUExperimentList = typing.List[typing.Union[IGPUExperiment, str]]
+TDockerExperimentList = typing.List[typing.Union[IDockerExperiment, str]]
 
 
 class StandardExperiment(IExperiment):

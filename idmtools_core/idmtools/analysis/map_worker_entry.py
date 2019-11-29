@@ -1,21 +1,18 @@
 import itertools
 import traceback
-import typing
 from logging import getLogger, DEBUG
 
+from idmtools.entities import IPlatform
 from idmtools.utils.file_parser import FileParser
 from typing import NoReturn
-
-if typing.TYPE_CHECKING:
-    from idmtools.entities.iplatform import TPlatform
-    from idmtools.core.interfaces.iitem import TItem
-    from idmtools.entities.ianalyzer import TAnalyzerList
-    from diskcache import Cache
+from idmtools.core.interfaces.iitem import IItem
+from idmtools.entities.ianalyzer import TAnalyzerList
+from diskcache import Cache
 
 logger = getLogger(__name__)
 
 
-def map_item(item: 'TItem') -> NoReturn:
+def map_item(item: IItem) -> NoReturn:
     """
     Initialize some worker-global values; a worker process entry point for analyzer item-mapping.
 
@@ -33,7 +30,7 @@ def map_item(item: 'TItem') -> NoReturn:
     _get_mapped_data_for_item(item, analyzers, cache, platform)
 
 
-def _get_mapped_data_for_item(item: 'TItem', analyzers: 'TAnalyzerList', cache: 'Cache', platform: 'TPlatform') -> bool:
+def _get_mapped_data_for_item(item: IItem, analyzers: TAnalyzerList, cache: Cache, platform: IPlatform) -> bool:
     """
 
     Args:
@@ -67,7 +64,7 @@ def _get_mapped_data_for_item(item: 'TItem', analyzers: 'TAnalyzerList', cache: 
 
     # The byte_arrays will associate filename with content
     try:
-        file_data = platform.get_files(item, filenames)  # make sure this does NOT error when filenames is empty
+        file_data = platform.io.get_files(item, filenames)  # make sure this does NOT error when filenames is empty
     except Exception:
         # an error has occurred
         analyzer_uids = [a.uid for a in analyzers]
@@ -123,7 +120,7 @@ def _get_mapped_data_for_item(item: 'TItem', analyzers: 'TAnalyzerList', cache: 
     return True
 
 
-def _set_exception(step: str, info: dict, cache: 'Cache') -> NoReturn:
+def _set_exception(step: str, info: dict, cache: Cache) -> NoReturn:
     """
     Set an exception in the cache in a standardized way.
 

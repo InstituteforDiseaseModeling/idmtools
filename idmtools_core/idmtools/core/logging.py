@@ -1,3 +1,4 @@
+import sys
 from signal import SIGTERM, SIGINT, signal
 from logging import getLogger
 import logging
@@ -13,6 +14,7 @@ logging_queue = None
 
 
 class IDMQueueListener(QueueListener):
+
     def dequeue(self, block):
         """
         Dequeue a record and return it, optionally blocking.
@@ -24,6 +26,14 @@ class IDMQueueListener(QueueListener):
             return self.queue.get(block)
         except EOFError:
             return None
+
+
+class IDMQueueHandler(QueueHandler):
+    def prepare(self, record):
+        try:
+            super().prepare(record)
+        except ImportError:
+            pass
 
 
 def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'idmtools.log',
@@ -75,7 +85,7 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
         except KeyError as e:  # noqa F841
             pass
         # set root the use send log messages to a queue by default
-        queue_handler = QueueHandler(logging_queue)
+        queue_handler = IDMQueueHandler(logging_queue)
         root.addHandler(queue_handler)
 
         if console:

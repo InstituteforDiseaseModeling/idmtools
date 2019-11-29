@@ -7,13 +7,14 @@ from idmtools.managers import ExperimentManager
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.decorators import windows_only
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+from idmtools_test.utils.test_platform import TestPlatform
 from idmtools_test.utils.tst_experiment import TstExperiment
 
 
 class TestExperimentFactory(ITestWithPersistence):
 
     def test_build_python_experiment_from_factory(self):
-        test_platform = Platform('Test')
+        test_platform: TestPlatform = Platform('Test')
         experiment = experiment_factory.create("PythonExperiment", tags={"a": "1", "b": 2})
         experiment.model_path = os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py")
         builder = ExperimentBuilder()
@@ -28,7 +29,7 @@ class TestExperimentFactory(ITestWithPersistence):
         self.assertEqual(em.experiment.simulations[0].tags, {'p': 0})
         self.assertEqual(em.experiment.simulations[1].tags, {'p': 1})
 
-        test_platform.cleanup()
+        test_platform.metadata.cleanup()
 
     @windows_only
     def test_build_emod_experiment_from_factory(self):
@@ -53,7 +54,7 @@ class TestExperimentFactory(ITestWithPersistence):
         self.assertEqual(len(em.experiment.simulations), 20)
         self.assertEqual(em.experiment.tags, {'a': '1', 'b': 2,
                                               'type': 'idmtools_model_emod.emod_experiment.EMODExperiment'})
-        test_platform.cleanup()
+        test_platform.metadata.cleanup()
 
     def test_build_test_experiment_from_factory(self):
         test_experiment = TstExperiment()

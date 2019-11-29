@@ -1,14 +1,9 @@
 import typing
 from logging import getLogger, DEBUG
 from idmtools.core import EntityStatus
-from idmtools.entities.iplatform import TPlatform
+from idmtools.entities import IExperiment, IPlatform, Suite
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.utils.entities import retrieve_experiment
-
-if typing.TYPE_CHECKING:
-    from idmtools.entities.iexperiment import TExperiment
-    from idmtools.entities.suite import TSuite
-
 
 logger = getLogger(__name__)
 
@@ -18,7 +13,7 @@ class ExperimentManager:
     Class that manages an experiment.
     """
 
-    def __init__(self, experiment: 'TExperiment', platform: TPlatform, suite: 'TSuite' = None):
+    def __init__(self, experiment: IExperiment, platform: IPlatform, suite: Suite = None):
         """
         A constructor.
 
@@ -45,7 +40,7 @@ class ExperimentManager:
 
         # Create the suite on the platform
         self.suite.pre_creation()
-        self.platform.create_items([self.suite])
+        self.platform.commissioning.create_items([self.suite])
         self.suite.post_creation()
 
         # Add experiment to the suite
@@ -59,7 +54,7 @@ class ExperimentManager:
         self.experiment.pre_creation()
 
         # Create experiment
-        self.platform.create_items(items=[self.experiment])  # noqa: F841
+        self.platform.commissioning.create_items(items=[self.experiment])  # noqa: F841
 
         # Make sure to link it to the experiment
         self.experiment.platform = self.platform
@@ -74,7 +69,7 @@ class ExperimentManager:
         for simulation in simulation_batch:
             simulation.pre_creation()
 
-        ids = self.platform.create_items(items=simulation_batch)
+        ids = self.platform.commissioning.create_items(items=simulation_batch)
 
         for uid, simulation in zip(ids, simulation_batch):
             simulation.uid = uid
@@ -108,7 +103,7 @@ class ExperimentManager:
         self.experiment.simulations = _sims
 
     def start_experiment(self):
-        self.platform.run_items([self.experiment])
+        self.platform.commissioning.run_items([self.experiment])
         self.experiment.simulations.set_status(EntityStatus.RUNNING)
 
     def run(self):
@@ -157,5 +152,5 @@ class ExperimentManager:
         raise TimeoutError(f"Timeout of {timeout} seconds exceeded when monitoring experiment {self.experiment}")
 
     def refresh_status(self):
-        self.platform.refresh_status(item=self.experiment)
+        self.platform.metadata.refresh_status(item=self.experiment)
         ExperimentPersistService.save(self.experiment)

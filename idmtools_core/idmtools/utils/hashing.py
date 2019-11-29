@@ -86,16 +86,16 @@ class Hasher(Pickler):
             return
         Pickler.memoize(self, obj)
 
-    def _batch_setitems(self, items):
+    def _batch_seIItems(self, items):
         """
         Force the order of keys in dictionary to ensure consistent hashing.
         """
         try:
             # First try quick way of sorting keys if possible
-            Pickler._batch_setitems(self, iter(sorted(items)))
+            Pickler._batch_seIItems(self, iter(sorted(items)))
         except TypeError:
             # If keys are unorderable, sort them using their hash
-            Pickler._batch_setitems(self, iter(sorted((hash(k), v) for k, v in items)))
+            Pickler._batch_seIItems(self, iter(sorted((hash(k), v) for k, v in items)))
 
     def save_set(self, set_items):
         # forces order of items in Set to ensure consistent hash

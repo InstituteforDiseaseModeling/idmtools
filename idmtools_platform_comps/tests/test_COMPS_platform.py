@@ -9,6 +9,7 @@ from idmtools.builders import ExperimentBuilder
 from idmtools.core import EntityStatus
 from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
+from idmtools_test.utils.comps import assure_running_then_wait_til_done
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test import COMMON_INPUT_PATH
 
@@ -44,10 +45,10 @@ class TestCOMPSPlatform(ITestWithPersistence):
         from idmtools.utils.entities import retrieve_experiment
         experiment = retrieve_experiment(experiment.uid, platform=self.platform, with_simulations=True)
         files_needed = ["config.json", "Assets\\working_model.py"]
-        self.platform.get_files(item=experiment.simulations[0], files=files_needed)
+        self.platform.io.get_files(item=experiment.simulations[0], files=files_needed)
 
         # Call twice to see if the cache is actually leveraged
-        files_retrieved = self.platform.get_files(item=experiment.simulations[0], files=files_needed)
+        files_retrieved = self.platform.io.get_files(item=experiment.simulations[0], files=files_needed)
 
         # We have the correct files?
         self.assertEqual(len(files_needed), len(files_retrieved))
@@ -59,7 +60,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
 
         # Test different separators
         files_needed = ["Assets/working_model.py"]
-        files_retrieved = self.platform.get_files(item=experiment.simulations[0], files=files_needed)
+        files_retrieved = self.platform.io.get_files(item=experiment.simulations[0], files=files_needed)
 
         # We have the correct files?
         self.assertEqual(len(files_needed), len(files_retrieved))
@@ -71,7 +72,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
         # Test wrong filename
         files_needed = ["Assets/bad.py", "bad.json"]
         with self.assertRaises(RuntimeError):
-            self.platform.get_files(item=experiment.simulations[0], files=files_needed)
+            self.platform.io.get_files(item=experiment.simulations[0], files=files_needed)
 
     def _run_and_test_experiment(self, experiment):
         experiment.platform = self.platform
@@ -79,14 +80,14 @@ class TestCOMPSPlatform(ITestWithPersistence):
 
         # Create experiment on platform
         experiment.pre_creation()
-        self.platform.create_items(items=[experiment])
+        self.platform.commissioning.create_items(items=[experiment])
 
         for simulation_batch in experiment.batch_simulations(batch_size=10):
             # Create the simulations on the platform
             for simulation in simulation_batch:
                 simulation.pre_creation()
 
-            ids = self.platform.create_items(items=simulation_batch)
+            ids = self.platform.commissioning.create_items(items=simulation_batch)
 
             for uid, simulation in zip(ids, simulation_batch):
                 simulation.uid = uid
@@ -95,27 +96,14 @@ class TestCOMPSPlatform(ITestWithPersistence):
                 experiment.simulations.append(simulation.metadata)
                 experiment.simulations.set_status(EntityStatus.CREATED)
 
-        self.platform.refresh_status(item=experiment)
+        self.platform.metadata.refresh_status(item=experiment)
 
         # Test if we have all simulations at status CREATED
         self.assertFalse(experiment.done)
         self.assertTrue(all([s.status == EntityStatus.CREATED for s in experiment.simulations]))
 
         # Start experiment
-        self.platform.run_items(items=[experiment])
-        self.platform.refresh_status(item=experiment)
-        self.assertFalse(experiment.done)
-        self.assertTrue(all([s.status == EntityStatus.RUNNING for s in experiment.simulations]))
-
-        # Wait till done
-        import time
-        start_time = time.time()
-        while time.time() - start_time < 180:
-            self.platform.refresh_status(item=experiment)
-            if experiment.done:
-                break
-            time.sleep(3)
-        self.assertTrue(experiment.done)
+        assure_running_then_wait_til_done(self, experiment)
 
     @pytest.mark.long
     def test_status_retrieval_succeeded(self):

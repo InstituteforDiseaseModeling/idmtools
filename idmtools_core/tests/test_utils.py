@@ -24,7 +24,7 @@ class TestUtils(ITestWithPersistence):
         # test correct retrieval with platform
         e = TstExperiment("test2")
         p = Platform('Test')
-        p.create_items(items=[e])
+        p.commissioning.create_items(items=[e])
 
         e.platform_id = p.uid
         with self.assertRaises(ExperimentNotFound):
