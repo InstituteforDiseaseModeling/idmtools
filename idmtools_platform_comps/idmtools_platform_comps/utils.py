@@ -1,5 +1,13 @@
+import functools
+import ntpath
+from typing import NoReturn, List, Dict
+from uuid import UUID
+
+from COMPS.Data import Simulation
 from COMPS.Data.Simulation import SimulationState
-from idmtools.core.enums import EntityStatus
+from idmtools.core.enums import EntityStatus, ItemType
+from idmtools.core.interfaces.ientity import IEntity
+from idmtools.entities import IPlatform
 
 
 def convert_COMPS_status(comps_status):
@@ -11,3 +19,62 @@ def convert_COMPS_status(comps_status):
         return EntityStatus.CREATED
     else:
         return EntityStatus.RUNNING
+
+
+def clean_experiment_name(experiment_name: str) -> str:
+    """
+    Enforce any COMPS-specific demands on experiment names.
+    Args:
+        experiment_name: name of the experiment
+    Returns:the experiment name allowed for use
+    """
+    for c in ['/', '\\', ':']:
+        experiment_name = experiment_name.replace(c, '_')
+    return experiment_name
+
+
+def get_file_from_collection(platform, collection_id: UUID, file_path: str) -> NoReturn:
+    print(f"Cache miss for {collection_id} {file_path}")
+
+    # retrieve the collection
+    ac = platform.get_item(collection_id, ItemType.ASSETCOLLECTION, raw=True)
+
+    # Look for the asset file in the collection
+    file_name = ntpath.basename(file_path)
+    path = ntpath.dirname(file_path).lstrip(f"Assets\\")
+
+    for asset_file in ac.assets:
+        if asset_file.file_name == file_name and (asset_file.relative_path or '') == path:
+            return asset_file.retrieve()
+
+
+def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str], cache=None) -> Dict[str, bytearray]:
+    # Retrieve comps item
+    comps_item: Simulation = item.get_platform_object(True, children=["files", "configuration"])
+    comps_item.refresh()
+
+    all_paths = set(files)
+    assets = set(path for path in all_paths if path.lower().startswith("assets"))
+    transients = all_paths.difference(assets)
+
+    # Create the return dict
+    ret = {}
+
+    # Retrieve the transient if any
+    if transients:
+        transient_files = comps_item.retrieve_output_files(paths=transients)
+        ret = dict(zip(transients, transient_files))
+
+    # Take care of the assets
+    if assets and comps_item.configuration:
+        # Get the collection_id for the simulation
+        collection_id = comps_item.configuration.asset_collection_id
+        # Retrieve the files
+        for file_path in assets:
+            # Normalize the separators
+            normalized_path = ntpath.normpath(file_path)
+            if cache is not None:
+                ret[file_path] = cache.memoize()(get_file_from_collection)(platform, collection_id, normalized_path)
+            else:
+                ret[file_path] = get_file_from_collection(platform, collection_id, normalized_path)
+    return ret

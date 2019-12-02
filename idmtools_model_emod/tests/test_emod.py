@@ -63,7 +63,7 @@ class EMODPlatformTest(ABC):
         self.assertTrue(e.succeeded)
         # get the files in a platform agnostic way
         for sim in e.simulations:
-            files = self.platform.io.get_files(sim, ["config.json"])
+            files = self.platform.get_files(sim, ["config.json"])
             config_parameters = json.loads(files["config.json"])['parameters']
             self.assertEqual(config_parameters["Enable_Immunity"], 0)
 
@@ -89,7 +89,7 @@ class EMODPlatformTest(ABC):
         self.assertTrue(e.succeeded)
         run_number = 0
         for sim in e.simulations:
-            files = self.platform.io.get_files(sim, ["config.json"])
+            files = self.platform.get_files(sim, ["config.json"])
             config_parameters = json.loads(files["config.json"])['parameters']
             self.assertEqual(config_parameters["Enable_Immunity"], 0)
             self.assertEqual(config_parameters["Run_Number"], run_number)
@@ -114,7 +114,7 @@ class EMODPlatformTest(ABC):
         em.wait_till_done()
         self.assertTrue(e.succeeded)
         for sim in e.simulations:
-            files = self.platform.io.get_files(sim, ["config.json"])
+            files = self.platform.get_files(sim, ["config.json"])
             config_parameters = json.loads(files["config.json"])['parameters']
             self.assertEqual(config_parameters["Enable_Immunity"], 0)
 

@@ -1,17 +1,18 @@
-import ast
-from abc import ABCMeta, abstractmethod, ABC
-from dataclasses import field, fields, dataclass
+from abc import ABCMeta, abstractmethod
+from dataclasses import fields
 from itertools import groupby
 from logging import getLogger
-
-from idmtools.core.interfaces.ientity import IEntity, IEntityList
-from idmtools.core import CacheEnabled, ItemType, UnknownItemException
+from uuid import UUID
+from idmtools.core import CacheEnabled, ItemType, UnknownItemException, EntityContainer, UnsupportedPlatformType
+from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities import IExperiment
 from idmtools.entities.iexperiment import IDockerExperiment, IGPUExperiment
+from idmtools.entities.iplatform_metadata import IPlatformExperimentOperations, \
+    IPlatformSimulationOperations, IPlatformSuiteOperations, IPlatformWorkflowItemOperations, \
+    IPlatformAssetCollectionOperations
 from idmtools.services.platforms import PlatformPersistService
 from idmtools.core.interfaces.iitem import IItem, IItemList
-from typing import Dict, List, NoReturn, Set, Any, Type, TypeVar
-from uuid import UUID
+from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union
 
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
 
@@ -24,281 +25,13 @@ CALLER_LIST = ['_create_from_block',    # create platform through Platform Facto
                '_main']                 # create platform through analyzer manager
 
 
-@dataclass
-class IPlatformIOOperations(ABC):
-    parent: 'IPlatform'
-
-    @abstractmethod
-    def send_assets(self, item: IItem, **kwargs) -> NoReturn:
-        """
-        Send the assets for a given item to the platform.
-
-        Args:
-            item: The item to process. Expected to have an **assets** attribute containing
-                the collection.
-            **kwargs: Extra parameters used by the platform.
-        """
-        pass
-
-    @abstractmethod
-    def get_files(self, item: IItem, files: List[str]) -> Dict[str, bytearray]:
-        """
-        Return a dictionary of the specified files for the specified item.
-
-        Args:
-            item: The item to fetch files for.
-            files: The list of file names to fetch.
-
-        Returns:
-            A dictionary container filename->bytearray.
-        """
-        pass
-
-
-@dataclass
-class IPlaformMetdataOperations(CacheEnabled, ABC):
-    parent: 'IPlatform'
-    _object_cache_expiration: 'int' = 60
-
-    @abstractmethod
-    def refresh_status(self, item) -> NoReturn:
-        """
-        Populate the platform item and specified item with its status.
-
-        Args:
-            item: The item to check status for.
-        """
-        pass
-
-    def flatten_item(self, item: IEntity) -> IItemList:
-        """
-        Flatten an item: resolve the children until getting to the leaves.
-        For example, for an experiment, will return all the simulations.
-        For a suite, will return all the simulations contained in the suites experiments.
-
-        Args:
-            item: Which item to flatten
-
-        Returns:List of leaves
-
-        """
-        children = self.get_children(item.uid, item.item_type, force=True)
-        if children is None:
-            items = [item]
-        else:
-            items = list()
-            for child in children:
-                items += self.flatten_item(item=child)
-        return items
-
-    @abstractmethod
-    def get_platform_item(self, item_id: UUID, item_type: ItemType, **kwargs) -> Any:
-        """
-        Get an item by its ID. The implementing classes must know how to distinguish
-        items of different levels (e.g. simulation, experiment, suite).
-
-        Args:
-            item_id: The ID of the item to retrieve.
-            item_type: The type of object to retrieve.
-
-        Returns:
-            The specified item found on the platform or None.
-        """
-        pass
-
-    @abstractmethod
-    def get_children_for_platform_item(self, platform_item: Any, raw: bool, **kwargs) -> List[Any]:
-        """
-        Return the list of children for the given platform item.
-        For example, an experiment passed to this function will return all the contained simulations.
-        The results are either platform items or idm-tools entities depending on the `raw` parameter.
-
-        Args:
-            platform_item: Parent item
-            raw: Return a platform item if True, an idm-tools entity if false
-            **kwargs: Additional platform specific parameters
-
-        Returns:
-            A list of children, None if no children
-        """
-        pass
-
-    @abstractmethod
-    def get_parent_for_platform_item(self, platform_item: Any, raw: bool, **kwargs) -> Any:
-        """
-        Return the parent item for a given platform_item.
-
-        Args:
-            platform_item: Child item
-            raw: Return a platform item if True, an idm-tools entity if false
-            **kwargs: Additional platform specific parameters
-
-        Returns:
-            Parent or None
-        """
-        pass
-
-    def get_item(self, item_id: UUID, item_type: ItemType = None,
-                 force: bool = False, raw: bool = False, **kwargs) -> Any:
-        """
-        Retrieve an object from the platform.
-        This function is cached; force allows you to force the refresh of the cache.
-        If no **object_type** is passed, the function will try all the types (experiment, suite, simulation).
-
-        Args:
-            item_id: The ID of the object to retrieve.
-            item_type: The type of the object to be retrieved.
-            force: If True, force the object fetching from the platform.
-            raw: Return either an |IT_s| object or a platform object.
-
-        Returns:
-            The object found on the platform or None.
-        """
-        if not item_type or item_type not in self.parent.supported_types:
-            raise Exception("The provided type is invalid or not supported by this platform...")
-
-        # Create the cache key
-        cache_key = f"o_{item_id}_" + ('r' if raw else 'o') + '_'.join(f"{k}_{v}" for k, v in kwargs.items())
-
-        # If force -> delete in the cache
-        if force:
-            self.cache.delete(cache_key)
-
-        # If we cannot find the object in the cache -> retrieve depending on the type
-        if cache_key not in self.cache:
-            ce = self.get_platform_item(item_id, item_type, **kwargs)
-
-            # Nothing was found on the platform
-            if not ce:
-                raise UnknownItemException(f"Object {item_type} {item_id} not found on the platform...")
-
-            # Create the object if we do not want it raw
-            if raw:
-                return_object = ce
-            else:
-                return_object = self._platform_item_to_entity(ce, **kwargs)
-                return_object.platform = self.parent
-
-            # Persist
-            self.cache.set(cache_key, return_object, expire=self._object_cache_expiration)
-
-        else:
-            return_object = self.cache.get(cache_key)
-
-        return return_object
-
-    def get_children(self, item_id: UUID, item_type: ItemType,
-                     force: bool = False, raw: bool = False, **kwargs) -> Any:
-        """
-        Retrieve the children of a given object.
-
-        Args:
-            item_id: The ID of the object for which we want the children.
-            force: If True, force the object fetching from the platform.
-            raw: Return either an |IT_s| object or a platform object.
-            item_type: Pass the type of the object for quicker retrieval.
-
-        Returns:
-            The children of the object or None.
-        """
-        if not item_type or item_type not in self.parent.supported_types:
-            raise Exception("The provided type is invalid or not supported by this platform...")
-
-        # Create the cache key based on everything we pass to the function
-        cache_key = f"c_{item_id}" + ('r' if raw else 'o') + '_'.join(f"{k}_{v}" for k, v in kwargs.items())
-
-        if force:
-            self.cache.delete(cache_key)
-
-        if cache_key not in self.cache:
-            ce = self.get_item(item_id, raw=True, item_type=item_type)
-            children = self.get_children_for_platform_item(ce, raw=raw, **kwargs)
-            self.cache.set(cache_key, children, expire=self._object_cache_expiration)
-            return children
-
-        return self.cache.get(cache_key)
-
-    def get_parent(self, item_id: UUID, item_type: ItemType = None, force: bool = False,
-                   raw: bool = False, **kwargs):
-        """
-        Retrieve the parent of a given object.
-
-        Args:
-            item_id: The ID of the object for which we want the parent.
-            force: If True, force the object fetching from the platform.
-            raw: Return either an |IT_s| object or a platform object.
-            item_type: Pass the type of the object for quicker retrieval.
-
-        Returns:
-            The parent of the object or None.
-
-        """
-        if not item_type or item_type not in self.parent.supported_types:
-            raise Exception("The provided type is invalid or not supported by this platform...")
-
-        # Create the cache key based on everything we pass to the function
-        cache_key = f'p_{item_id}' + ('r' if raw else 'o') + '_'.join(f"{k}_{v}" for k, v in kwargs.items())
-
-        if force:
-            self.cache.delete(cache_key)
-
-        if cache_key not in self.cache:
-            ce = self.get_item(item_id, raw=True, item_type=item_type)
-            parent = self.get_parent_for_platform_item(ce, raw=raw, **kwargs)
-            self.cache.set(cache_key, parent, expire=self._object_cache_expiration)
-            return parent
-
-        return self.cache.get(cache_key)
-
-    def _platform_item_to_entity(self, platform_item: Any, **kwargs) -> IEntity:
-        """
-        Transform a platform object into a idm-tools entity.
-        By default pass-through if the platform uses idm-tools entities already (Local and Test).
-
-        Args:
-            platform_item: The platform item to transform
-            **kwargs: Additional keyword parameters
-
-        Returns:An idm-tools entity
-        """
-        return platform_item
-
-@dataclass
-class IPlatformCommissioningOperations(ABC):
-    parent: 'IPlatform'
-
-    @abstractmethod
-    def run_items(self, items: IItemList) -> NoReturn:
-        """
-        Run the items (sims, exps, suites) on the platform
-        Args:
-            items: The items to run
-        """
-        pass
-
-    def create_items(self, items: IEntity) -> List[UUID]:
-        """
-        Create items (simulations, experiments, or suites) on the platform. The function will batch the items based on
-        type and call the self._create_batch for creation
-
-        Args:
-            items: The list of items to create.
-
-        Returns:
-            List of item IDs created.
-        """
-        for item in items:
-            if item.item_type not in self.parent.supported_types:
-                raise Exception(f'Unable to create items of type: {item.item_type} for platform: {self.__class__.__name__}')
-
-        ids = []
-        for key, group in groupby(items, lambda x: x.item_type):
-            ids.extend(self._create_batch(list(group), key))
-        return ids
-
-    @abstractmethod
-    def _create_batch(self, batch: IEntityList, item_type: ItemType) -> List[UUID]:
-        pass
+item_type_to_object_interface = {
+    ItemType.EXPERIMENT: '_experiments',
+    ItemType.SIMULATION: '_simulations',
+    ItemType.SUITE: '_suites',
+    ItemType.WORKFLOW_ITEM: '_workflow_items',
+    ItemType.ASSETCOLLECTION: '_assets'
+}
 
 
 class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
@@ -311,11 +44,14 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     - Commissioning
     - File handling
     """
-    supported_types: 'Set[ItemType]' = field(default_factory=lambda: set(), metadata={"pickle_ignore": True})
+    platform_type_map: Dict[Type, ItemType] = None
     _object_cache_expiration: 'int' = 60
-    io: IPlatformIOOperations = None
-    commissioning: IPlatformCommissioningOperations = None
-    metadata: IPlaformMetdataOperations = None
+
+    _experiments: IPlatformExperimentOperations = None
+    _simulations: IPlatformSimulationOperations = None
+    _suites: IPlatformSuiteOperations = None
+    _workflow_items: IPlatformWorkflowItemOperations = None
+    _assets: IPlatformAssetCollectionOperations = None
 
     @staticmethod
     def get_caller():
@@ -359,6 +95,12 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         Returns:
             None
         """
+        # build item type map and determined supported features
+        self.platform_type_map = dict()
+        for item_type, interface in item_type_to_object_interface.items():
+            if getattr(self, interface) is not None and getattr(self, interface).platform_type is not None:
+                self.platform_type_map[getattr(self, interface).platform_type] = item_type
+
         self.validate_inputs_types()
 
         # Initialize the cache
@@ -385,6 +127,210 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         # Update attr with validated data types
         for fn in fs_kwargs:
             setattr(self, fn, field_value[fn])
+
+    def _get_platform_item(self, item_id: UUID, item_type: ItemType, **kwargs) -> Any:
+        """
+        Get an item by its ID. The implementing classes must know how to distinguish
+        items of different levels (e.g. simulation, experiment, suite).
+
+        Args:
+            item_id: The ID of the item to retrieve.
+            item_type: The type of object to retrieve.
+
+        Returns:
+            The specified item found on the platform or None.
+        """
+        if item_type not in self.platform_type_map.values():
+            raise ValueError(f"Unsupported Item Type. {self.__class__.__name__} only supports "
+                             f"{self.platform_type_map.values()}")
+        interface = item_type_to_object_interface[item_type]
+        return getattr(self, interface).get(item_id, **kwargs)
+
+    def get_item(self, item_id: UUID, item_type: ItemType = None,
+                 force: bool = False, raw: bool = False, **kwargs) -> Any:
+        """
+        Retrieve an object from the platform.
+        This function is cached; force allows you to force the refresh of the cache.
+        If no **object_type** is passed, the function will try all the types (experiment, suite, simulation).
+
+        Args:
+            item_id: The ID of the object to retrieve.
+            item_type: The type of the object to be retrieved.
+            force: If True, force the object fetching from the platform.
+            raw: Return either an |IT_s| object or a platform object.
+
+        Returns:
+            The object found on the platform or None.
+        """
+        if not item_type or item_type not in self.platform_type_map.values():
+            raise Exception("The provided type is invalid or not supported by this platform...")
+
+        # Create the cache key
+        cache_key = f"o_{item_id}_" + ('r' if raw else 'o') + '_'.join(f"{k}_{v}" for k, v in kwargs.items())
+
+        # If force -> delete in the cache
+        if force:
+            self.cache.delete(cache_key)
+
+        # If we cannot find the object in the cache -> retrieve depending on the type
+        if cache_key not in self.cache:
+            ce = self._get_platform_item(item_id, item_type, **kwargs)
+
+            # Nothing was found on the platform
+            if not ce:
+                raise UnknownItemException(f"Object {item_type} {item_id} not found on the platform...")
+
+            # Create the object if we do not want it raw
+            if raw:
+                return_object = ce
+            else:
+                return_object = self._convert_platform_item_to_entity(ce, **kwargs)
+                return_object._platform_object = ce
+                return_object.platform = self
+
+            # Persist
+            self.cache.set(cache_key, return_object, expire=self._object_cache_expiration)
+
+        else:
+            return_object = self.cache.get(cache_key)
+
+        return return_object
+
+    def _get_platform_children_for_item(self, item: Any, raw: bool = False, **kwargs) -> List[Any]:
+        ent_opts = {}
+        if item.__class__ not in self.platform_type_map:
+            raise ValueError(f"{self.__class__.__name__} has no mapping for {item.__class__.__name__}")
+        it = self.platform_type_map[item.__class__]
+        if it == ItemType.EXPERIMENT:
+            children = self._experiments.get_children(item, **kwargs)
+        elif it == ItemType.SUITE:
+            children = self._suites.get(item, **kwargs)
+        else:
+            raise ValueError("Only suites and experiments have children")
+        if not raw:
+            ret = []
+            for e in children:
+                n = self._convert_platform_item_to_entity(e, **ent_opts)
+                n._platform_object = e
+                ret.append(n)
+            return EntityContainer(ret)
+        else:
+            return children
+
+    def get_children(self, item_id: UUID, item_type: ItemType,
+                     force: bool = False, raw: bool = False, **kwargs) -> Any:
+        """
+        Retrieve the children of a given object.
+
+        Args:
+            item_id: The ID of the object for which we want the children.
+            force: If True, force the object fetching from the platform.
+            raw: Return either an |IT_s| object or a platform object.
+            item_type: Pass the type of the object for quicker retrieval.
+
+        Returns:
+            The children of the object or None.
+        """
+        if not item_type or item_type not in self.platform_type_map.values():
+            raise Exception("The provided type is invalid or not supported by this platform...")
+
+        # Create the cache key based on everything we pass to the function
+        cache_key = f"c_{item_id}" + ('r' if raw else 'o') + '_'.join(f"{k}_{v}" for k, v in kwargs.items())
+
+        if force:
+            self.cache.delete(cache_key)
+
+        if cache_key not in self.cache:
+            ce = self.get_item(item_id, raw=True, item_type=item_type)
+            children = self._get_platform_children_for_item(ce, raw=raw, **kwargs)
+            self.cache.set(cache_key, children, expire=self._object_cache_expiration)
+            return children
+
+        return self.cache.get(cache_key)
+
+    def _get_parent_for_platform_item(self, platform_item: Any, raw: bool, **kwargs) -> Any:
+        """
+        Return the parent item for a given platform_item.
+
+        Args:
+            platform_item: Child item
+            raw: Return a platform item if True, an idm-tools entity if false
+            **kwargs: Additional platform specific parameters
+
+        Returns:
+            Parent or None
+        """
+        if type(platform_item) not in self.platform_type_map.values():
+            raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
+        item_type = self.platform_type_map[type(platform_item)]
+        if item_type not in [ItemType.EXPERIMENT, ItemType.SUITE]:
+            raise ValueError("Currently only Experiments and Suites supported children")
+
+        interface = item_type_to_object_interface[item_type]
+        return getattr(self, interface).get_children(platform_item, raw, **kwargs)
+
+    def get_parent(self, item_id: UUID, item_type: ItemType = None, force: bool = False,
+                   raw: bool = False, **kwargs):
+        """
+        Retrieve the parent of a given object.
+
+        Args:
+            item_id: The ID of the object for which we want the parent.
+            force: If True, force the object fetching from the platform.
+            raw: Return either an |IT_s| object or a platform object.
+            item_type: Pass the type of the object for quicker retrieval.
+
+        Returns:
+            The parent of the object or None.
+
+        """
+        if not item_type or item_type not in self.platform_type_map.values():
+            raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
+
+        # Create the cache key based on everything we pass to the function
+        cache_key = f'p_{item_id}' + ('r' if raw else 'o') + '_'.join(f"{k}_{v}" for k, v in kwargs.items())
+
+        if force:
+            self.cache.delete(cache_key)
+
+        if cache_key not in self.cache:
+            ce = self.get_item(item_id, raw=True, item_type=item_type)
+            parent = self._get_parent_for_platform_item(ce, raw=raw, **kwargs)
+            self.cache.set(cache_key, parent, expire=self._object_cache_expiration)
+            return parent
+
+        return self.cache.get(cache_key)
+
+    def create_items(self, items: List[IEntity]) -> List[UUID]:
+        """
+        Create items (simulations, experiments, or suites) on the platform. The function will batch the items based on
+        type and call the self._create_batch for creation
+        Args:
+            items: The list of items to create.
+        Returns:
+            List of item IDs created.
+        """
+        self._is_item_list_supported(items)
+
+        ids = []
+        for key, group in groupby(items, lambda x: x.item_type):
+            interface = item_type_to_object_interface[key]
+            group_ids = getattr(self, interface).batch_create(list(group))
+            ids.extend([i[1] for i in group_ids])
+        return ids
+
+    def _is_item_list_supported(self, items: List[IEntity]):
+        for item in items:
+            if item.item_type not in self.platform_type_map.values():
+                raise Exception(
+                    f'Unable to create items of type: {item.item_type} for platform: {self.__class__.__name__}')
+
+    def run_items(self, items: List[IEntity]):
+        self._is_item_list_supported(items)
+
+        for item in items:
+            interface = item_type_to_object_interface[item.item_type]
+            getattr(self, interface).run_item(item)
 
     @abstractmethod
     def supported_experiment_types(self) -> List[Type]:
@@ -423,6 +369,52 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     def __repr__(self):
         return f"<Platform {self.__class__.__name__} - id: {self.uid}>"
+
+    def _convert_platform_item_to_entity(self, platform_item: Any, **kwargs) -> IEntity:
+        for src_type, dest_type in self.platform_type_map.items():
+            if isinstance(platform_item, src_type):
+                interface = item_type_to_object_interface[dest_type]
+                return getattr(self, interface).to_entity(platform_item)
+        return platform_item
+
+    def flatten_item(self, item: IEntity) -> IItemList:
+        """
+        Flatten an item: resolve the children until getting to the leaves.
+        For example, for an experiment, will return all the simulations.
+        For a suite, will return all the simulations contained in the suites experiments.
+
+        Args:
+            item: Which item to flatten
+
+        Returns:List of leaves
+
+        """
+        children = self.get_children(item.uid, item.item_type, force=True)
+        if children is None:
+            items = [item]
+        else:
+            items = list()
+            for child in children:
+                items += self.flatten_item(item=child)
+        return items
+
+    def refresh_status(self, item: IEntity) -> NoReturn:
+        """
+        Populate the platform item and specified item with its status.
+
+        Args:
+            item: The item to check status for.
+        """
+        if item.item_type not in self.platform_type_map.values():
+            raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
+        interface = item_type_to_object_interface[item.item_type]
+        getattr(self, interface).refresh_status(item)
+
+    def get_files(self, item: IEntity, files: List[str]) -> Union[Dict[str, Dict[str, bytearray]], Dict[str, bytearray]]:
+        if item.item_type not in self.platform_type_map.values():
+            raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
+        interface = item_type_to_object_interface[item.item_type]
+        return getattr(self, interface).get_assets(item, files)
 
 
 TPlatform = TypeVar("TPlatform", bound=IPlatform)

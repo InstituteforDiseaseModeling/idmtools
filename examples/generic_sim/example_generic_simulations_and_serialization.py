@@ -77,7 +77,7 @@ if __name__ == "__main__":
     # TODO, ideally we could add new sim to existing exp, but currently we can not do with issue #459
 
     # First get previous serialized file path
-    comps_exp = platform.metadata.get_platform_item(item_id=e1.uid, item_type=ItemType.EXPERIMENT)
+    comps_exp = platform.get_platform_item(item_id=e1.uid, item_type=ItemType.EXPERIMENT)
     comps_sims = sims_from_experiment(comps_exp)
     serialized_file_path = [get_simulation_path(sim) for sim in comps_sims][0]
 

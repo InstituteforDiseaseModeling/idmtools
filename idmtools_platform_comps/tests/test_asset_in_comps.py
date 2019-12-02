@@ -35,14 +35,14 @@ class TestAssetsInComps(unittest.TestCase):
 
         # Create experiment on platform
         experiment.pre_creation()
-        self.platform.commissioning.create_items(items=[experiment])
+        self.platform.create_items(items=[experiment])
 
         for simulation_batch in experiment.batch_simulations(batch_size=10):
             # Create the simulations on the platform
             for simulation in simulation_batch:
                 simulation.pre_creation()
 
-            ids = self.platform.commissioning.create_items(items=simulation_batch)
+            ids = self.platform.create_items(items=simulation_batch)
 
             for uid, simulation in zip(ids, simulation_batch):
                 simulation.uid = uid
@@ -54,7 +54,7 @@ class TestAssetsInComps(unittest.TestCase):
                 from idmtools.entities import ISimulation
                 simulation.__class__ = ISimulation
 
-        self.platform.metadata.refresh_status(item=experiment)
+        self.platform.refresh_status(item=experiment)
 
         # Test if we have all simulations at status CREATED
         self.assertFalse(experiment.done)

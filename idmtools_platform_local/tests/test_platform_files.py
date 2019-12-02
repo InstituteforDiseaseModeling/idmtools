@@ -34,7 +34,7 @@ class TestPlatformSimulations(ITestWithPersistence):
         self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
 
         files_to_preview = ['StdOut.txt', 'Assets/realpath_verify.py']
-        files = platform.io.get_files(pe.simulations[0], files_to_preview)
+        files = platform.get_files(pe.simulations[0], files_to_preview)
         self.assertEqual(len(files), len(files_to_preview))
         for filename in files_to_preview:
             self.assertIn(filename, files)

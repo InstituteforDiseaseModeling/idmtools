@@ -5,7 +5,7 @@ from idmtools.core.interfaces.iitem import IItem
 from idmtools.services.platforms import PlatformPersistService
 from idmtools.core import TTags
 from uuid import UUID
-from typing import NoReturn, List
+from typing import NoReturn, List, Any
 
 
 @dataclass
@@ -20,6 +20,8 @@ class IEntity(IItem, metaclass=ABCMeta):
     status: EntityStatus = field(default=None, compare=False, metadata={"pickle_ignore": True})
     tags: TTags = field(default_factory=lambda: {}, metadata={"md": True})
     item_type: ItemType = field(default=None, compare=False)
+    # Platform
+    _platform_object: Any = field(default=None, compare=False, metadata={"pickle_ignore": True})
 
     def update_tags(self, tags: dict = None) -> NoReturn:
         """
@@ -39,7 +41,7 @@ class IEntity(IItem, metaclass=ABCMeta):
                 return None
             if not self.platform:
                 raise NoPlatformException("The object has no platform set...")
-            self._parent = self.platform.metadata.get_parent(self.uid, self.item_type)
+            self._parent = self.platform.get_parent(self.uid, self.item_type)
 
         return self._parent
 
@@ -69,7 +71,9 @@ class IEntity(IItem, metaclass=ABCMeta):
         if not self.platform:
             raise NoPlatformException("The object has no platform set...")
 
-        return self.platform.metadata.get_item(self.uid, self.item_type, raw=True, force=force, **kwargs)
+        if self._platform_object is None or force:
+             self._platform_object = self.platform.get_item(self.uid, self.item_type, raw=True, force=force, **kwargs)
+        return self._platform_object
 
     @property
     def done(self):

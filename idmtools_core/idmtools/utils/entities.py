@@ -14,7 +14,7 @@ def retrieve_experiment(experiment_id: UUID, platform: 'IPlatform' = None, with_
             raise ExperimentNotFound(experiment_id)
 
         # Try to retrieve it from the platform
-        experiment = platform.metadata.get_item(item_id=experiment_id, item_type=ItemType.EXPERIMENT)
+        experiment = platform.get_item(item_id=experiment_id, item_type=ItemType.EXPERIMENT)
         if not experiment:
             raise ExperimentNotFound(experiment_id, platform)
 

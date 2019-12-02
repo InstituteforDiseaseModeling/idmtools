@@ -48,8 +48,8 @@ class SortedDict(dict):
 
     Mutable mapping methods:
 
-    * :func:`SortedDict.__getitem__` (inherited from dict)
-    * :func:`SortedDict.__setitem__`
+    * :func:`SortedDict.__geIItem__` (inherited from dict)
+    * :func:`SortedDict.__seIItem__`
     * :func:`SortedDict.__delitem__`
     * :func:`SortedDict.__iter__`
     * :func:`SortedDict.__len__` (inherited from dict)
@@ -159,7 +159,7 @@ class SortedDict(dict):
         self._dict_delitem = _dict.__delitem__
         self._dict_iter = _dict.__iter__
         self._dict_pop = _dict.pop
-        self._dict_setitem = _dict.__setitem__
+        self._dict_seIItem = _dict.__seIItem__
         self._dict_update = _dict.update
 
         # Reaching through ``self._list`` repeatedly adds unnecessary overhead
@@ -284,10 +284,10 @@ class SortedDict(dict):
         return self._list_reversed()
 
 
-    def __setitem__(self, key, value):
+    def __seIItem__(self, key, value):
         """Store item in sorted dict with `key` and corresponding `value`.
 
-        ``sd.__setitem__(key, value)`` <==> ``sd[key] = value``
+        ``sd.__seIItem__(key, value)`` <==> ``sd[key] = value``
 
         Runtime complexity: `O(log(n))` -- approximate.
 
@@ -304,9 +304,9 @@ class SortedDict(dict):
         """
         if key not in self:
             self._list_add(key)
-        self._dict_setitem(key, value)
+        self._dict_seIItem(key, value)
 
-    _setitem = __setitem__
+    _seIItem = __seIItem__
 
 
     def copy(self):
@@ -526,7 +526,7 @@ class SortedDict(dict):
         """
         if key in self:
             return self[key]
-        self._dict_setitem(key, default)
+        self._dict_seIItem(key, default)
         self._list_add(key)
         return default
 
@@ -560,7 +560,7 @@ class SortedDict(dict):
             self._list_update(self._dict_iter())
         else:
             for key in pairs:
-                self._setitem(key, pairs[key])
+                self._seIItem(key, pairs[key])
 
     _update = update
 
@@ -658,10 +658,10 @@ class SortedKeysView(KeysView, Sequence):
         return SortedSet(it)
 
 
-    def __getitem__(self, index):
+    def __geIItem__(self, index):
         """Lookup key at `index` in sorted keys views.
 
-        ``skv.__getitem__(index)`` <==> ``skv[index]``
+        ``skv.__geIItem__(index)`` <==> ``skv[index]``
 
         Supports slicing.
 
@@ -707,10 +707,10 @@ class SortedItemsView(ItemsView, Sequence):
         return SortedSet(it)
 
 
-    def __getitem__(self, index):
+    def __geIItem__(self, index):
         """Lookup item at `index` in sorted items view.
 
-        ``siv.__getitem__(index)`` <==> ``siv[index]``
+        ``siv.__geIItem__(index)`` <==> ``siv[index]``
 
         Supports slicing.
 
@@ -759,10 +759,10 @@ class SortedValuesView(ValuesView, Sequence):
     __slots__ = ()
 
 
-    def __getitem__(self, index):
+    def __geIItem__(self, index):
         """Lookup value at `index` in sorted values view.
 
-        ``siv.__getitem__(index)`` <==> ``siv[index]``
+        ``siv.__geIItem__(index)`` <==> ``siv[index]``
 
         Supports slicing.
 

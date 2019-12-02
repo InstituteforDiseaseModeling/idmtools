@@ -139,7 +139,7 @@ class EMODPlatformTest(ABC):
         manager = AnalyzeManager(platform=self.platform, ids=exp_id, analyzers=analyzers)
         manager.analyze()
 
-        reload_comps_exp = self.platform.metadata.get_platform_item(item_id=e2.uid, item_type=ItemType.EXPERIMENT)
+        reload_comps_exp = self.platform.get_platform_item(item_id=e2.uid, item_type=ItemType.EXPERIMENT)
         reload_comps_sims = sims_from_experiment(reload_comps_exp)
 
         serialized_sim_chart_path = os.path.join('serialized_file_download', str(comps_sims[0].id), 'InsetChart.json')

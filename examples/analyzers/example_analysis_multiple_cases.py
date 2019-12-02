@@ -72,12 +72,12 @@ if __name__ == "__main__":
 
     # case #2: test add_item(experiment) --failed at  manager.add_item(experiment)
     manager2 = AnalyzeManager(platform=platform, analyzers=analyzers)
-    experiment = platform.metadata.get_item(item_id=experiment_tuple[0], item_type=ItemType.EXPERIMENT)
+    experiment = platform.get_item(item_id=experiment_tuple[0], item_type=ItemType.EXPERIMENT)
     manager2.add_item(experiment)
     manager2.analyze()
 
     # case #3: test add_item(simulation) --failed at platform.get_item
-    simulation = platform.metadata.get_item(item_id=simulation_tuple[0], item_type=ItemType.SIMULATION)
+    simulation = platform.get_item(item_id=simulation_tuple[0], item_type=ItemType.SIMULATION)
     manager3 = AnalyzeManager(platform=platform, analyzers=analyzers)
     manager3.add_item(simulation)
     manager3.analyze()

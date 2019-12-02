@@ -7,7 +7,7 @@ from idmtools.core import ItemType
 from idmtools.core.interfaces.ientity import IEntityList
 from idmtools.core.interfaces.iitem import IItemList
 from idmtools.entities import IExperiment
-from idmtools.entities.iplatform import IPlatformCommissioningOperations
+from idmtools.entities.iplatform_commissioning import IPlatformCommissioningOperations
 from idmtools.entities.isimulation import TSimulationBatch
 from idmtools_platform_slurm.slurm_operations import SlurmOperations
 

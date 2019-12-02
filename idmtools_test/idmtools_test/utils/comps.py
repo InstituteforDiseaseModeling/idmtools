@@ -39,15 +39,15 @@ def get_simulation_by_id(sim_id, query_criteria=None):
 
 
 def assure_running_then_wait_til_done(tst, experiment):
-    tst.platform.commissioning.run_items(items=[experiment])
-    tst.platform.metadata.refresh_status(item=experiment)
+    tst.run_items(items=[experiment])
+    tst.refresh_status(item=experiment)
     tst.assertFalse(experiment.done)
     tst.assertTrue(all([s.status == EntityStatus.RUNNING for s in experiment.simulations]))
     # Wait till done
     import time
     start_time = time.time()
     while time.time() - start_time < 180:
-        tst.platform.metadata.refresh_status(item=experiment)
+        tst.platform.refresh_status(item=experiment)
         if experiment.done:
             break
         time.sleep(3)

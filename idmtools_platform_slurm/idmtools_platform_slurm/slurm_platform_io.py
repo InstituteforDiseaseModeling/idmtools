@@ -7,7 +7,7 @@ from typing import NoReturn, List, Dict
 
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.entities import IExperiment, ISimulation
-from idmtools.entities.iplatform import IPlatformIOOperations
+from idmtools.entities.iplatform_io import IPlatformIOOperations
 from idmtools_platform_slurm.slurm_operations import SlurmOperations
 
 

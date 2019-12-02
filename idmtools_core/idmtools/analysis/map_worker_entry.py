@@ -64,7 +64,7 @@ def _get_mapped_data_for_item(item: IItem, analyzers: TAnalyzerList, cache: Cach
 
     # The byte_arrays will associate filename with content
     try:
-        file_data = platform.io.get_files(item, filenames)  # make sure this does NOT error when filenames is empty
+        file_data = platform.get_files(item, filenames)  # make sure this does NOT error when filenames is empty
     except Exception:
         # an error has occurred
         analyzer_uids = [a.uid for a in analyzers]

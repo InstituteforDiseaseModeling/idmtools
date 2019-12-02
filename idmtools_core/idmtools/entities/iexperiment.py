@@ -197,10 +197,10 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
 
     def refresh_simulations(self):
         from idmtools.core import ItemType
-        self.simulations = self.platform.metadata.get_children(self.uid, ItemType.EXPERIMENT, force=True)
+        self.simulations = self.platform.get_children(self.uid, ItemType.EXPERIMENT, force=True)
 
     def refresh_simulations_status(self):
-        self.platform.metadata.refresh_status(item=self)
+        self.platform.refresh_status(item=self)
 
     def pre_getstate(self):
         """

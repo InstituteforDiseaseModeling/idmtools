@@ -35,7 +35,7 @@ class TestAnalyzeManager(unittest.TestCase):
         self.sample_experiment = TstExperiment()
         em = ExperimentManager(self.sample_experiment, self.platform)
         em.run()
-        self.platform.metadata.set_simulation_status(self.sample_experiment.uid, status=EntityStatus.SUCCEEDED)
+        self.platform._simulations.set_simulation_status(self.sample_experiment.uid, status=EntityStatus.SUCCEEDED)
         self.configuration = {'max_processes': 2}
 
         self.analyze_manager = AnalyzeManager(self.platform)
@@ -50,7 +50,7 @@ class TestAnalyzeManager(unittest.TestCase):
     def test_can_analyze_item(self):
         self.analyze_manager.partial_analyze_ok = True
         for status in EntityStatus:
-            self.platform.metadata.set_simulation_status(self.sample_experiment.uid, status)
+            self.platform._simulations.set_simulation_status(self.sample_experiment.uid, status)
             self.analyze_manager.add_item(self.sample_experiment)
             if status == EntityStatus.SUCCEEDED:
                 self.assertTrue(len(self.analyze_manager._get_items_to_analyze()) == 1)
@@ -94,18 +94,18 @@ class TestAnalyzeManager(unittest.TestCase):
 
             # Fail a few or all
             if test_name == 'all':
-                self.platform.metadata.set_simulation_status(test_exp.uid, EntityStatus.SUCCEEDED)
+                self.platform._simulations.set_simulation_status(test_exp.uid, EntityStatus.SUCCEEDED)
             elif test_name == 'none':
-                self.platform.metadata.set_simulation_status(test_exp.uid, EntityStatus.FAILED)
+                self.platform._simulations.set_simulation_status(test_exp.uid, EntityStatus.FAILED)
             else:
-                self.platform.metadata.set_simulation_status(test_exp.uid, EntityStatus.FAILED)
-                self.platform.metadata.set_simulation_num_status(test_exp.uid, EntityStatus.SUCCEEDED, 1)
+                self.platform._simulations.set_simulation_status(test_exp.uid, EntityStatus.FAILED)
+                self.platform._simulations.set_simulation_num_status(test_exp.uid, EntityStatus.SUCCEEDED, 1)
 
             # test partial_ok True
             am = AnalyzeManager(self.platform, ids=[(test_exp.uid, ItemType.EXPERIMENT)], partial_analyze_ok=True)
             items_to_analyze = am._get_items_to_analyze()
             self.assertEqual(len(items_to_analyze), results[0])
-            succeeded_sims = {item.uid for item in self.platform.metadata.get_children(test_exp.uid, ItemType.EXPERIMENT, force=True) if item.status == EntityStatus.SUCCEEDED}
+            succeeded_sims = {item.uid for item in self.platform.get_children(test_exp.uid, ItemType.EXPERIMENT, force=True) if item.status == EntityStatus.SUCCEEDED}
             self.assertEqual(succeeded_sims, set(items_to_analyze.keys()))
 
             # test partial_ok False
@@ -115,7 +115,7 @@ class TestAnalyzeManager(unittest.TestCase):
                 self.assertEqual(len(items_to_analyze), results[1])
                 self.assertEqual(set(items_to_analyze.keys()),
                                  {item.uid for item in
-                                  self.platform.metadata.get_children(test_exp.uid, ItemType.EXPERIMENT, force=True) if
+                                  self.platform.get_children(test_exp.uid, ItemType.EXPERIMENT, force=True) if
                                   item.status == EntityStatus.SUCCEEDED})
             else:
                 self.assertRaises(AnalyzeManager.ItemsNotReady, am._get_items_to_analyze)
@@ -125,7 +125,7 @@ class TestAnalyzeManager(unittest.TestCase):
             items_to_analyze = am._get_items_to_analyze()
             self.assertEqual(len(items_to_analyze), results[2])
             # we don't know which successful items were actually returned
-            potential_items_uids = {item.uid for item in self.platform.metadata.get_children(test_exp.uid, ItemType.EXPERIMENT, force=True) if item.status == EntityStatus.SUCCEEDED}
+            potential_items_uids = {item.uid for item in self.platform.get_children(test_exp.uid, ItemType.EXPERIMENT, force=True) if item.status == EntityStatus.SUCCEEDED}
             for actual_item_uid in items_to_analyze.keys():
                 self.assertTrue(actual_item_uid in potential_items_uids)
 

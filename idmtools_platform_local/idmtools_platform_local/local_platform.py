@@ -9,12 +9,12 @@ from idmtools.entities.iexperiment import IDockerExperiment, IWindowsExperiment,
 from idmtools.utils.entities import get_dataclass_common_fields
 from idmtools_platform_local.infrastructure.docker_io import DockerIO
 from idmtools_platform_local.infrastructure.service_manager import DockerServiceManager
-from idmtools_platform_local.local_platform_commissioning import LocalPlatformCommissioningOperations
-from idmtools_platform_local.local_platform_io import LocalPlatformIOOperations
-from idmtools_platform_local.local_platform_metdata import LocalPlatformMetaDataOperations
+from idmtools_platform_local.platform_operations.experiment_operations import LocalPlatformExperimentOperations
+from idmtools_platform_local.platform_operations.simulation_operations import LocalPlatformSimulationOperations
 
 logger = getLogger(__name__)
 
+op_defaults=dict(default=None, compare=False, metadata={"pickle_ignore": True})
 
 @dataclass
 class LocalPlatform(IPlatform):
@@ -43,11 +43,11 @@ class LocalPlatform(IPlatform):
     # allows user to specify auto removal of docker worker containers
     auto_remove_worker_containers: bool = field(default=True)
 
-    _sm: Optional[DockerServiceManager] = field(default=None, compare=False, metadata={"pickle_ignore": True})
+    _sm: Optional[DockerServiceManager] = field(**op_defaults)
+    _do: DockerIO = field(**op_defaults)
 
-    io: LocalPlatformIOOperations = field(default=None, compare=False, metadata={"pickle_ignore": True})
-    commissioning: LocalPlatformCommissioningOperations = field(default=None, compare=False, metadata={"pickle_ignore": True})
-    metadata: LocalPlatformMetaDataOperations = field(default=None, compare=False, metadata={"pickle_ignore": True})
+    _experiments: LocalPlatformExperimentOperations = field(**op_defaults)
+    _simulation: LocalPlatformSimulationOperations = field(**op_defaults)
 
     def __post_init__(self):
         logger.debug("Setting up local platform")
@@ -64,13 +64,13 @@ class LocalPlatform(IPlatform):
             opts = get_dataclass_common_fields(self, DockerServiceManager)
             self._sm = DockerServiceManager(client, **opts)
             self._sm.create_services()
-        self.io = LocalPlatformIOOperations(parent=self, sm=self._sm)
-        self.commissioning = LocalPlatformCommissioningOperations(parent=self, sm=self._sm)
-        self.metadata = LocalPlatformMetaDataOperations(parent=self)
+        self._do = DockerIO(self.host_data_directory)
+        self._experiments = LocalPlatformExperimentOperations(platform=self)
+        self._simulations = LocalPlatformSimulationOperations(platform=self)
 
     def cleanup(self, delete_data: bool = False, shallow_delete: bool = False, tear_down_brokers: bool = False):
         self._sm.cleanup(delete_data, tear_down_brokers=tear_down_brokers)
-        self.io._do.cleanup(delete_data, shallow_delete=shallow_delete)
+        self._do.cleanup(delete_data, shallow_delete=shallow_delete)
 
     def supported_experiment_types(self) -> List[Type]:
         return [IExperiment, IDockerExperiment, IDockerGPUExperiment]

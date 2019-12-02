@@ -68,11 +68,11 @@ class AnalyzeManager(CacheEnabled):
         # Take the provided ids and determine the full set of unique root items (e.g. simulations) in them to analyze
         logger.debug("Load information about items from platform")
         ids = list(set(ids or list()))  # uniquify
-        items = [platform.metadata.get_item(oid, otype, force=True) for oid, otype in ids]
+        items = [platform.get_item(oid, otype, force=True) for oid, otype in ids]
         self.potential_items = []
 
         for i in items:
-            self.potential_items.extend(platform.metadata.flatten_item(item=i))
+            self.potential_items.extend(platform.flatten_item(item=i))
         logger.debug(f"Potential items to analyze: {len(self.potential_items)}")
         self._items = dict()  # filled in later by _get_items_to_analyze
 
@@ -90,7 +90,7 @@ class AnalyzeManager(CacheEnabled):
             None
         """
 
-        self.potential_items.extend(self.platform.metadata.flatten_item(item=item))
+        self.potential_items.extend(self.platform.flatten_item(item=item))
 
     def _get_items_to_analyze(self) -> dict:
         """

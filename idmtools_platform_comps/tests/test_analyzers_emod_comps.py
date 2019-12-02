@@ -238,10 +238,10 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
 
         # verify results:
         # retrieve suite from comps
-        comps_suite = self.p.metadata.get_platform_item(item_id=suite_id, item_type=ItemType.SUITE)
+        comps_suite = self.p.get_platform_item(item_id=suite_id, item_type=ItemType.SUITE)
         # retrieve experiment from suite
-        exps = self.p.metadata.get_children_for_platform_item(comps_suite)
-        comps_exp = self.p.metadata.get_platform_item(item_id=exps[0].uid, item_type=ItemType.EXPERIMENT)
-        sims = self.p.metadata.get_children_for_platform_item(comps_exp)
+        exps = self.p.get_children_for_platform_item(comps_suite)
+        comps_exp = self.p.get_platform_item(item_id=exps[0].uid, item_type=ItemType.EXPERIMENT)
+        sims = self.p.get_children_for_platform_item(comps_exp)
         for simulation in sims:
             self.assertTrue(os.path.exists(os.path.join('output', str(simulation.uid), "InsetChart.json")))

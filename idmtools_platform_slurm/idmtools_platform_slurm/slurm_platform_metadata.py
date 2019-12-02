@@ -5,7 +5,7 @@ from uuid import UUID
 
 from idmtools.core import ItemType
 from idmtools.entities import IExperiment
-from idmtools.entities.iplatform import IPlaformMetdataOperations
+from idmtools.entities.iplatform_metadata import IPlaformMetdataOperations
 from idmtools_platform_slurm.slurm_operations import SlurmOperations, SLURM_STATES
 
 

@@ -7,11 +7,14 @@ from idmtools.core import CacheEnabled, ItemType
 from idmtools.entities import IPlatform
 from idmtools.entities.iexperiment import IExperiment, IGPUExperiment, IDockerExperiment, \
     ILinuxExperiment
-from idmtools_platform_comps.comps_commision_operations import COMPSPlatformCommissionOperations
-from idmtools_platform_comps.comps_io_operations import COMPSPlatformIOOperations
 from typing import List
 
-from idmtools_platform_comps.comps_metadata_operations import COMPSMetaDataOperations
+from idmtools_platform_comps.comps_operations.asset_collection_operations import \
+    CompsPlatformAssetCollectionOperations
+from idmtools_platform_comps.comps_operations.experiment_operations import CompsPlatformExperimentOperations
+from idmtools_platform_comps.comps_operations.simulation_operations import CompsPlatformSimulationOperations
+from idmtools_platform_comps.comps_operations.suite_operations import CompsPlatformSuiteOperations
+from idmtools_platform_comps.comps_operations.workflow_item_operations import CompsPlatformWorkflowItemOperations
 
 logging.getLogger('COMPS.Data.Simulation').disabled = True
 logger = logging.getLogger(__name__)
@@ -23,6 +26,9 @@ class COMPSPriority:
     Normal = "Normal"
     AboveNormal = "AboveNormal"
     Highest = "Highest"
+
+
+op_defaults = dict(default=None, compare=False, metadata=dict(pickle_ignore=True))
 
 
 @dataclass
@@ -42,9 +48,11 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     num_cores: int = field(default=1)
     exclusive: bool = field(default=False)
 
-    io: COMPSPlatformIOOperations = field(default=None, compare=False, metadata={"pickle_ignore": True})
-    commissioning: COMPSPlatformCommissionOperations = field(default=None, compare=False, metadata={"pickle_ignore": True})
-    metadata: COMPSMetaDataOperations = field(default=None, compare=False, metadata={"pickle_ignore": True})
+    _experiments: CompsPlatformExperimentOperations = field(**op_defaults)
+    _simulations: CompsPlatformSimulationOperations = field(**op_defaults)
+    _suites: CompsPlatformSuiteOperations = field(**op_defaults)
+    _workflow_items: CompsPlatformWorkflowItemOperations = field(**op_defaults)
+    _assets: CompsPlatformAssetCollectionOperations = field(**op_defaults)
 
     def __post_init__(self):
         print("\nUser Login:")
@@ -55,9 +63,11 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         super().__post_init__()
 
     def __init_interfaces(self):
-        self.io = COMPSPlatformIOOperations(parent=self)
-        self.commissioning = COMPSPlatformCommissionOperations(parent=self)
-        self.metadata = COMPSMetaDataOperations(parent=self)
+        self._experiments = CompsPlatformExperimentOperations(platform=self)
+        self._simulations = CompsPlatformSimulationOperations(platform=self)
+        self._suites = CompsPlatformSuiteOperations(platform=self)
+        self._workflow_items = CompsPlatformWorkflowItemOperations(platform=self)
+        self._assets = CompsPlatformAssetCollectionOperations(platform=self)
 
     def _login(self):
         try:

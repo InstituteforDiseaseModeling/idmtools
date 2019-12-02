@@ -91,7 +91,7 @@ if __name__ == "__main__":
         print(f"Experiment {e.uid} failed.\n")
         exit()
 
-    pre_exp = platform.metadata.get_parent(migration_random_sim_id, ItemType.SIMULATION)
+    pre_exp = platform.get_parent(migration_random_sim_id, ItemType.SIMULATION)
 
     print(f"Running NodeDemographicsAnalyzer with experiment id: {e.uid} and {pre_exp.uid}:\n")
     analyzers_nd = NodeDemographicsAnalyzer()

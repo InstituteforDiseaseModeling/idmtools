@@ -74,7 +74,7 @@ if __name__ == "__main__":
         exit()
 
     # Get the parent experiment (used to generate the serialized population)
-    pre_exp = platform.metadata.get_parent(multinode_random_sim_id, ItemType.SIMULATION)
+    pre_exp = platform.get_parent(multinode_random_sim_id, ItemType.SIMULATION)
 
     print(f"Running TimeseriesAnalyzer with experiment id: {e.uid} and {pre_exp.uid}:\n")
 
