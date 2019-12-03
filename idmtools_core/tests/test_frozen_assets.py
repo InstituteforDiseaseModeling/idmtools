@@ -35,8 +35,10 @@ class TestFrozenAssets(unittest.TestCase):
 
         # Test: Asset can be modified before frozen
         a = ac.assets[0]
-        a.filename = 'a_modified.txt'
-        a.absolute_path = 'new.txt'
+        a.filename = 'new_value.txt'
+        a.absolute_path = 'new_value.txt'
+        self.assertEqual(a.filename, 'new_value.txt')
+        self.assertEqual(a.absolute_path, 'new_value.txt')
         self.assertTrue(isinstance(a, Asset))
 
         # Frozen asset
@@ -44,10 +46,14 @@ class TestFrozenAssets(unittest.TestCase):
 
         # Test: other asset can be modified
         a2 = ac.assets[1]
-        a2.filename = 'a_modified.txt'
-        a2.absolute_path = 'new.txt'
+        a2.filename = 'modified.txt'
+        a2.absolute_path = 'modified.txt'
         a2._relative_path = os.getcwd()
-        a2._content = 'Hello World'
+        a2._content = 'modified'
+        self.assertEqual(a2.filename, 'modified.txt')
+        self.assertEqual(a2.absolute_path, 'modified.txt')
+        self.assertEqual(a2._relative_path, os.getcwd())
+        self.assertEqual(a2._content, 'modified')
 
         # Get the frozen asset
         a_frozen = ac.assets[0]
@@ -86,20 +92,25 @@ class TestFrozenAssets(unittest.TestCase):
 
         # Test: Asset can be modified before frozen
         a = ac.assets[0]
-        a.filename = 'a_modified.txt'
-        a.absolute_path = 'new.txt'
+        a.filename = 'new_value.txt'
+        a.absolute_path = 'new_value.txt'
+        self.assertEqual(a.filename, 'new_value.txt')
+        self.assertEqual(a.absolute_path, 'new_value.txt')
         self.assertTrue(isinstance(a, Asset))
 
+        # Now freeze the asset
         a.freeze()
 
         # Test: other asset can be modified
         a2 = ac.assets[1]
-        print(a2)
-        print(a2.__dict__)
-        a2.filename = 'a_modified.txt'
-        a2.absolute_path = 'new.txt'
+        a2.filename = 'modified.txt'
+        a2.absolute_path = 'modified.txt'
         a2._relative_path = os.getcwd()
-        a2._content = 'Hello World'
+        a2._content = 'modified'
+        self.assertEqual(a2.filename, 'modified.txt')
+        self.assertEqual(a2.absolute_path, 'modified.txt')
+        self.assertEqual(a2._relative_path, os.getcwd())
+        self.assertEqual(a2._content, 'modified')
 
         # get the frozen asset
         a = ac.assets[0]
@@ -167,7 +178,7 @@ class TestFrozenAssets(unittest.TestCase):
         self.assertIn('Frozen', context.exception.args[0])
 
         with self.assertRaises(Exception) as context:
-            ac_frozen.assets[2].filename = 'modified'
+            ac_frozen.assets[1].filename = 'modified'
         self.assertIn('Frozen', context.exception.args[0])
 
     def test_frozen_asset_collection_only_inherit(self):
@@ -183,6 +194,7 @@ class TestFrozenAssets(unittest.TestCase):
         print(ac.uid)
         self.assertEqual(len(ac.assets), 2)
 
+        # Freeze asset collection
         ac.freeze()
         ac_frozen = ac
         self.assertEqual(len(ac_frozen.assets), 2)
@@ -212,7 +224,7 @@ class TestFrozenAssets(unittest.TestCase):
             ac_frozen.assets[1].filename = 'modified'
         self.assertIn('Frozen', context.exception.args[0])
 
-    def test_frozen_asset_inherit(self):
+    def test_frozen_asset_collection(self):
         from idmtools.assets import AssetCollection
         from idmtools_test.utils.test_asset import Asset
 
@@ -225,7 +237,7 @@ class TestFrozenAssets(unittest.TestCase):
         print(ac.uid)
         self.assertEqual(len(ac.assets), 2)
 
-        # Frozen asset collection
+        # Freeze asset collection
         ac_frozen = frozen_transform(ac)
         self.assertEqual(len(ac_frozen.assets), 2)
 
@@ -262,6 +274,7 @@ class TestFrozenAssets(unittest.TestCase):
         print(ac.uid)
         self.assertEqual(len(ac.assets), 4)
 
+        # Freeze asset collection
         ac.freeze()
         ac_frozen = ac
         self.assertEqual(len(ac_frozen.assets), 4)
@@ -299,12 +312,12 @@ class TestFrozenAssets(unittest.TestCase):
         print(ac.uid)
         self.assertEqual(len(ac.assets), 4)
 
-        # Frozen asset collection
+        # Freeze asset collection
         ac_frozen = frozen_transform(ac)
         self.assertEqual(len(ac_frozen.assets), 4)
 
         # Test: user can still access the frozen asset
-        print(ac_frozen.tags)
+        self.assertEqual(ac_frozen.tags, ac.tags)
 
         # Test: the frozen asset (the first one) can't be modified
         with self.assertRaises(Exception) as context:
