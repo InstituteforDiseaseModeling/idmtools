@@ -1,7 +1,6 @@
 import logging
 from typing import Optional, Tuple, List, Dict, Any
 from idmtools_platform_local.client.base import BaseClient
-from idmtools_platform_local.config import API_PATH
 from idmtools_platform_local.status import Status
 
 
@@ -9,11 +8,11 @@ logger = logging.getLogger(__name__)
 
 
 class SimulationsClient(BaseClient):
-    base_url = f'{API_PATH}/simulations'
+    path_url = 'simulations'
 
     @classmethod
     def get_all(cls, experiment_id: Optional[str] = None, status: Optional[Status] = None,
-                tags: Optional[List[Tuple[str, str]]] = None) -> List[Dict[str, Any]]:
+                tags: Optional[List[Tuple[str, str]]] = None, page: Optional[int] = None, per_page: Optional[int] = None) -> List[Dict[str, Any]]:
         """
 
         Args:
@@ -27,7 +26,12 @@ class SimulationsClient(BaseClient):
         """
         args = cls._get_arguments(tags)
         args.update(dict(experiment_id=experiment_id))
-        response = cls.get(None, params=args)
+        if page:
+            args['page'] = page
+
+        if per_page:
+            args['per_page'] = per_page
+        response = cls.get(cls.path_url, params=args)
         result = cls._validate_response(response, 'Simulations')
         return result
 
@@ -47,8 +51,8 @@ class SimulationsClient(BaseClient):
         """
         args = cls._get_arguments(tags)
         args.update(dict(experiment_id=experiment_id))
-        response = cls.get(id, params=args)
-        result = cls._validate_response(response, 'Simulations')
+        response = cls.get(f'{cls.path_url}/{id}', params=args)
+        result = cls._validate_response(response, 'Simulations', id=id)
         return result
 
     @classmethod
@@ -63,7 +67,7 @@ class SimulationsClient(BaseClient):
         """
         data = cls.get_one(id)
         data['status'] = 'canceled'
-        response = cls.put(id, data=data)
+        response = cls.put(f'{cls.path_url}/{id}', data=data)
         if response.status_code != 200:
             if logger.isEnabledFor(logging.DEBUG):
                 logging.debug(f'Updating  {cls.base_url if id is None else cls.base_url + "/" + id}'

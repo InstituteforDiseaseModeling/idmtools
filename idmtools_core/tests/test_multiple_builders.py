@@ -1,11 +1,13 @@
 import os
+from dataclasses import fields
+
 import numpy as np
 from functools import partial
 from idmtools.builders import ArmExperimentBuilder, SweepArm, ArmType
 from idmtools.builders import YamlExperimentBuilder
 from idmtools.builders import CsvExperimentBuilder
-from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
-from idmtools_test.utils.TstExperiment import TstExperiment
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+from idmtools_test.utils.tst_experiment import TstExperiment
 from idmtools_test import COMMON_INPUT_PATH
 
 
@@ -94,10 +96,10 @@ class TestMultipleBuilders(ITestWithPersistence):
 
     def test_validation(self):
         a = TstExperiment(name="test")
-        self.assertSetEqual(a.pickle_ignore_fields, {'builders'})
+        self.assertSetEqual(a.pickle_ignore_fields, set(f.name for f in fields(a) if "pickle_ignore" in f.metadata and f.metadata["pickle_ignore"]))
 
         with self.assertRaises(Exception):
             a.builder = 1
 
         # test no builder has been added
-        self.assertIsNone(a.builders)
+        self.assertSetEqual(a.builders, set())

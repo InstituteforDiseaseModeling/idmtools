@@ -1,7 +1,7 @@
 from typing import Optional, Tuple, List
 import click
 
-from idmtools_cli.IPlatformCli import IPlatformCLI
+from idmtools_cli.iplatform_cli import IPlatformCLI
 
 from idmtools_cli.cli import cli, pass_platform_cli
 from idmtools_cli.cli.utils import tags_help, get_platform_from_config_or_name, supported_platforms
@@ -21,6 +21,7 @@ def experiment(ctx, platform, config_block):
     Get the status of experiments for the platform defined by the "Local" configuration block
 
     Get the usage details of the status command:
+
     idmtools experiment --platform Local status --help
 
     """

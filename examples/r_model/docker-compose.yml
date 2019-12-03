@@ -1,0 +1,6 @@
+version: "2.3"
+services:
+  r_model:
+    build:
+      context: .
+    image: idm-docker-staging.idmod.org/idmtools_r_model_example

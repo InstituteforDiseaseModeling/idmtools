@@ -3,7 +3,8 @@ if exist C:\idmtools_venv_37 rd /s /q C:\idmtools_venv_37
 call "C:\idmtools_venv_37\Scripts\activate"
 echo "Virtual Environment Activated"
 
-python dev_scripts/bootstrap.py
+pip install py-make
+pymake setup-dev
 
 echo "auto Login"
 python dev_scripts/create_auth_token_args.py --comps_url %1 --username %2 --password %3

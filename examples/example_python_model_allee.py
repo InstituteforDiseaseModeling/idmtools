@@ -1,23 +1,21 @@
 import os
 from functools import partial
-
 from idmtools.builders import ExperimentBuilder
+from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
+from idmtools_models.python.python_experiment import PythonExperiment
 
-from idmtools_models.python.PythonExperiment import PythonExperiment
-from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
-from idmtools_platform_local.local_platform import LocalPlatform
 
 def param_update(simulation, param, value):
     return simulation.set_parameter(param, 'sweepR04_a_' + str(value) + '.json')
 
 
 pe = PythonExperiment(name="Allee python model example",
-                      model_path=os.path.join("work", "inputs", "allee_python_model", "run_dtk_sweep.py"))
+                      model_path=os.path.join("work", "inputs", "allee_python_model", "run_emod_sweep.py"))
 pe.base_simulation.envelope = "parameters"
 pe.retrieve_python_dependencies()
 # pe = PythonExperiment(name="Allee python model example",
-#                               model_path=os.path.join("work", "inputs", "allee_python_model", "run_dtk_sweep.py"))
+#                               model_path=os.path.join("work", "inputs", "allee_python_model", "run_emod_sweep.py"))
 
 pe.tags["tag1"] = "example from allee python model with idmtools"
 
@@ -42,8 +40,8 @@ pe.base_simulation.set_parameter("nsims", 100)
 
 pe.builder = builder
 
-# platform = LocalPlatform()
-platform = COMPSPlatform(endpoint="https://comps2.idmod.org", environment="Bayesian")
+# platform = Platform('Local')
+platform = Platform('COMPS2', endpoint="https://comps2.idmod.org", environment="Bayesian")
 
 em = ExperimentManager(experiment=pe, platform=platform)
 em.run()
