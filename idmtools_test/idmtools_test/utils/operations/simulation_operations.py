@@ -1,3 +1,4 @@
+import os
 from dataclasses import dataclass, field
 from typing import List, Dict, Any, Tuple, Type
 from uuid import UUID, uuid4
@@ -7,12 +8,18 @@ from pandas.tests.extension.numpy_.test_numpy_nested import np
 
 from idmtools.entities import ISimulation
 from idmtools.entities.iplatform_metadata import IPlatformSimulationOperations
+from idmtools_test.utils.test_simulation import TestSimulation
 
+current_directory = os.path.dirname(os.path.realpath(__file__))
+data_path = os.path.abspath(os.path.join(current_directory, "..", "..", "data"))
 
 @dataclass
 class TestPlaformSimulationOperation(IPlatformSimulationOperations):
     platform_type: Type = ISimulation
     simulations: diskcache.Cache = field(default=None, compare=False, metadata={"pickle_ignore": True})
+
+    def __post_init__(self):
+        self.simulations = diskcache.Cache(os.path.join(data_path, 'simulations_test'))
 
     def get(self, simulation_id: UUID, **kwargs) -> Any:
         obj = None

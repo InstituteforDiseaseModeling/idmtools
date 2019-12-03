@@ -53,7 +53,7 @@ class SortedSet(MutableSet, Sequence):
 
     Sequence methods:
 
-    * :func:`SortedSet.__geIItem__`
+    * :func:`SortedSet.__getitem__`
     * :func:`SortedSet.__delitem__`
     * :func:`SortedSet.__reversed__`
 
@@ -209,10 +209,10 @@ class SortedSet(MutableSet, Sequence):
         return value in self._set
 
 
-    def __geIItem__(self, index):
+    def __getitem__(self, index):
         """Lookup value at `index` in sorted set.
 
-        ``ss.__geIItem__(index)`` <==> ``ss[index]``
+        ``ss.__getitem__(index)`` <==> ``ss[index]``
 
         Supports slicing.
 

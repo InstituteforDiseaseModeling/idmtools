@@ -4,19 +4,14 @@ from dataclasses import dataclass
 from logging import getLogger, DEBUG
 from typing import List, Dict, Any, Tuple
 from uuid import UUID
-
 from docker.models.containers import Container
 from idmtools.core import ItemType
 from idmtools.entities import ISimulation
 from idmtools.entities.iplatform_metadata import IPlatformSimulationOperations
 from idmtools_platform_local.client.simulations_client import SimulationsClient
-from idmtools_platform_local.platform_operations.uitils import local_status_to_common
+from idmtools_platform_local.platform_operations.uitils import local_status_to_common, SimulationDict, ExperimentDict
 
 logger = getLogger(__name__)
-
-
-class SimulationDict(dict):
-    pass
 
 
 @dataclass
@@ -58,7 +53,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         ids = [(SimulationDict(dict(simulation_uid=id, experiment_id=sims[0].experiment.uid)), id) for id in ids]
         return ids
 
-    def get_parent(self, simulation: Any, **kwargs) -> Any:
+    def get_parent(self, simulation: Any, **kwargs) -> ExperimentDict:
         return self.platform.get_platform_item(simulation.parent_id, ItemType.EXPERIMENT)
 
     def run_item(self, simulation: ISimulation):
@@ -122,7 +117,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         raise NotImplementedError("List assets is not yet supported on the LocalPlatform")
 
     def to_entity(self, simulation: Dict, **kwargs) -> ISimulation:
-        experiment = self.platform.get_platform_item(simulation["experiment_id"], ItemType.EXPERIMENT)
+        experiment = self.platform.get_item(simulation["experiment_id"], ItemType.EXPERIMENT)
         isim = experiment.simulation()
         isim.uid = simulation['simulation_uid']
         isim.tags = simulation['tags']

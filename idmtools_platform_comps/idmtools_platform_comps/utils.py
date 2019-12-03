@@ -51,7 +51,6 @@ def get_file_from_collection(platform, collection_id: UUID, file_path: str) -> N
 def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str], cache=None) -> Dict[str, bytearray]:
     # Retrieve comps item
     comps_item: Simulation = item.get_platform_object(True, children=["files", "configuration"])
-    comps_item.refresh()
 
     all_paths = set(files)
     assets = set(path for path in all_paths if path.lower().startswith("assets"))

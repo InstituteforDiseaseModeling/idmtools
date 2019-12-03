@@ -101,7 +101,7 @@ class TestPersistenceServices(ITestWithPersistence):
         self.assertEqual(s.parameters["test"], 10)
 
         # Ensure that we actually ran with the correct parameter
-        print(p.metadata.simulations[em.experiment.uid])
+        print(p._simulations.simulations[em.experiment.uid])
         self.assertEqual(p._simulations.simulations[em.experiment.uid][0].parameters["test"], 10, "Parameter in platform")
         p.cleanup()
 

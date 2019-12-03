@@ -63,7 +63,12 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         """
         import inspect
 
-        s = inspect.stack()
+        try:
+            s = inspect.stack()
+        except RuntimeError:
+            # in some high thread environments and under heavy load, we can get environment changes before retrieving
+            # stack in those case assume we are good
+            return "__newobj__"
         return s[2][3]
 
     def __new__(cls, *args, **kwargs):
@@ -198,15 +203,13 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     def _get_platform_children_for_item(self, item: Any, raw: bool = False, **kwargs) -> List[Any]:
         ent_opts = {}
-        if item.__class__ not in self.platform_type_map:
-            raise ValueError(f"{self.__class__.__name__} has no mapping for {item.__class__.__name__}")
-        it = self.platform_type_map[item.__class__]
-        if it == ItemType.EXPERIMENT:
+        interface = self._get_operation_interface(item)
+        if interface == ItemType.EXPERIMENT:
             children = self._experiments.get_children(item, **kwargs)
-        elif it == ItemType.SUITE:
+        elif interface == ItemType.SUITE:
             children = self._suites.get(item, **kwargs)
         else:
-            raise ValueError("Only suites and experiments have children")
+            return []
         if not raw:
             ret = []
             for e in children:
@@ -216,6 +219,12 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             return EntityContainer(ret)
         else:
             return children
+
+    def _get_operation_interface(self, item):
+        for t, interface in self.platform_type_map.items():
+            if isinstance(item, t):
+                return interface
+        raise ValueError(f"{self.__class__.__name__} has no mapping for {item.__class__.__name__}")
 
     def get_children(self, item_id: UUID, item_type: ItemType,
                      force: bool = False, raw: bool = False, **kwargs) -> Any:
@@ -262,7 +271,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         """
         if type(platform_item) not in self.platform_type_map.values():
             raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
-        item_type = self.platform_type_map[type(platform_item)]
+        item_type = self._get_operation_interface(platform_item)
         if item_type not in [ItemType.EXPERIMENT, ItemType.SUITE]:
             raise ValueError("Currently only Experiments and Suites supported children")
 
@@ -390,7 +399,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         """
         children = self.get_children(item.uid, item.item_type, force=True)
-        if children is None:
+        if children is None or (isinstance(children, list) and len(children) == 0):
             items = [item]
         else:
             items = list()

@@ -14,13 +14,9 @@ from idmtools.entities.iexperiment import IDockerExperiment, IGPUExperiment
 from idmtools.entities.iplatform_metadata import IPlatformExperimentOperations
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
 from idmtools_platform_local.client.simulations_client import SimulationsClient
-from idmtools_platform_local.platform_operations.uitils import local_status_to_common
+from idmtools_platform_local.platform_operations.uitils import local_status_to_common, ExperimentDict, SimulationDict
 
 logger = getLogger(__name__)
-
-
-class ExperimentDict(dict):
-    pass
 
 
 @dataclass
@@ -69,21 +65,19 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
             self._launch_item_in_browser(experiment)
         return experiment.uid
 
-    def get_children(self, experiment: IExperiment, **kwargs) -> List[Any]:
-        experiment.simulations.clear()
-
+    def get_children(self, experiment: Dict, **kwargs) -> List[Any]:
         # Retrieve the simulations for the current page
-        simulation_dict = SimulationsClient.get_all(experiment_id=experiment.uid, per_page=9999)
-
-        # Add the simulations
-        for sim_info in simulation_dict:
-            sim = experiment.simulation()
-            sim.uid = sim_info['simulation_uid']
-            sim.tags = sim_info['tags']
-            sim.status = local_status_to_common(sim_info['status'])
-            experiment.simulations.append(sim)
-
-        return experiment.simulations
+        simulations = SimulationsClient.get_all(experiment_id=experiment['experiment_id'], per_page=9999)
+        return [SimulationDict(s) for s in simulations]
+        # # Add the simulations
+        # for sim_info in simulation_dict:
+        #     sim = experiment.simulation()
+        #     sim.uid = sim_info['simulation_uid']
+        #     sim.tags = sim_info['tags']
+        #     sim.status = local_status_to_common(sim_info['status'])
+        #     experiment.simulations.append(sim)
+        #
+        # return experiment.simulations
 
     def get_parent(self, experiment: Any, **kwargs) -> Any:
         return None

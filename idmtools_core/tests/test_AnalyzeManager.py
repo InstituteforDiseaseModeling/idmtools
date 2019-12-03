@@ -51,6 +51,7 @@ class TestAnalyzeManager(unittest.TestCase):
         self.analyze_manager.partial_analyze_ok = True
         for status in EntityStatus:
             self.platform._simulations.set_simulation_status(self.sample_experiment.uid, status)
+            self.platform.refresh_status(self.sample_experiment)
             self.analyze_manager.add_item(self.sample_experiment)
             if status == EntityStatus.SUCCEEDED:
                 self.assertTrue(len(self.analyze_manager._get_items_to_analyze()) == 1)
@@ -102,6 +103,7 @@ class TestAnalyzeManager(unittest.TestCase):
                 self.platform._simulations.set_simulation_num_status(test_exp.uid, EntityStatus.SUCCEEDED, 1)
 
             # test partial_ok True
+            self.platform.refresh_status(test_exp)
             am = AnalyzeManager(self.platform, ids=[(test_exp.uid, ItemType.EXPERIMENT)], partial_analyze_ok=True)
             items_to_analyze = am._get_items_to_analyze()
             self.assertEqual(len(items_to_analyze), results[0])

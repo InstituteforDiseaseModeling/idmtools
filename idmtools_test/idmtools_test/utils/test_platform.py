@@ -51,7 +51,6 @@ class TestPlatform(IPlatform):
 
     def post_setstate(self):
         self.init_interfaces()
-        self.initialize_test_cache()
 
     def run_simulations(self, experiment: IExperiment) -> None:
         from idmtools.core import EntityStatus
@@ -61,13 +60,6 @@ class TestPlatform(IPlatform):
         for cache in [self._experiments.experiments, self._simulations.simulations]:
             cache.clear()
             cache.close()
-
-    def initialize_test_cache(self):
-        """
-        Create a cache experiments/simulations that will only exist during test
-        """
-        self._experiments.experiments = diskcache.Cache(os.path.join(data_path, 'experiments_test'))
-        self._simulations.simulations = diskcache.Cache(os.path.join(data_path, 'simulations_test'))
 
 
 TEST_PLATFORM_EXAMPLE_CONFIG = """

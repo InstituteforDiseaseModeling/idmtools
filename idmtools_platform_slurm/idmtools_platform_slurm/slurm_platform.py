@@ -2,18 +2,18 @@ import typing
 from typing import Optional, List
 from dataclasses import dataclass, field
 from logging import getLogger
-
 from idmtools.entities import IPlatform
 from idmtools.entities.iexperiment import IExperiment, IHostBinaryExperiment, IWindowsExperiment, \
     ILinuxExperiment, IDockerExperiment
+from idmtools_platform_slurm.platform_operations.experiment_operations import SlurmPLatformExperimentOperations
+from idmtools_platform_slurm.platform_operations.simulation_operations import SlurmPLatformSimulationOperations
 from idmtools_platform_slurm.slurm_operations import SlurmOperationalMode, SlurmOperations, \
     RemoteSlurmOperations, LocalSlurmOperations
-from idmtools_platform_slurm.slurm_platform_commissioning import SlurmPlatformCommissioningOperations
-from idmtools_platform_slurm.slurm_platform_io import SlurmPlatformIOOperations
-from idmtools_platform_slurm.slurm_platform_metadata import SlurmPlaformMetdataOperations
+
 
 logger = getLogger(__name__)
 
+op_defaults = dict(default=None, compare=False, metadata={"pickle_ignore": True})
 
 @dataclass
 class SlurmPlatform(IPlatform):
@@ -29,12 +29,9 @@ class SlurmPlatform(IPlatform):
     remote_user: Optional[str] = None
     key_file: Optional[str] = None
 
-    io: SlurmPlatformIOOperations = field(default=None, compare=False, metadata={"pickle_ignore": True})
-    commissioning: SlurmPlatformCommissioningOperations = field(default=None, compare=False,
-                                                                metadata={"pickle_ignore": True})
-    metadata: SlurmPlaformMetdataOperations = field(default=None, compare=False, metadata={"pickle_ignore": True})
-
-    _op_client: SlurmOperations = field(default=None, metadata={"pickle_ignore": True})
+    _simulations: SlurmPLatformSimulationOperations = field(**op_defaults)
+    _experiments: SlurmPLatformExperimentOperations = field(**op_defaults)
+    _op_client: SlurmOperations = field(**op_defaults)
 
     def __post_init__(self):
         super().__post_init__()
@@ -53,6 +50,8 @@ class SlurmPlatform(IPlatform):
                                                     port=self.remote_port)
         else:
             self._op_client = LocalSlurmOperations()
+        self._simulations = SlurmPLatformSimulationOperations(self)
+        self._experiments = SlurmPLatformExperimentOperations(self)
 
     def __has_singularity(self):
         """

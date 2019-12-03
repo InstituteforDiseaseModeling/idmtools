@@ -111,7 +111,7 @@ class SortedList(MutableSequence):
     * :func:`SortedList.count`
     * :func:`SortedList.index`
     * :func:`SortedList.__contains__`
-    * :func:`SortedList.__geIItem__`
+    * :func:`SortedList.__getitem__`
 
     Methods for iterating values:
 
@@ -785,9 +785,9 @@ class SortedList(MutableSequence):
                 if start == 0 and stop == self._len:
                     return self._clear()
                 elif self._len <= 8 * (stop - start):
-                    values = self._geIItem(slice(None, start))
+                    values = self._getitem(slice(None, start))
                     if stop < self._len:
-                        values += self._geIItem(slice(stop, None))
+                        values += self._getitem(slice(stop, None))
                     self._clear()
                     return self._update(values)
 
@@ -809,10 +809,10 @@ class SortedList(MutableSequence):
             self._delete(pos, idx)
 
 
-    def __geIItem__(self, index):
+    def __getitem__(self, index):
         """Lookup value at `index` in sorted list.
 
-        ``sl.__geIItem__(index)`` <==> ``sl[index]``
+        ``sl.__getitem__(index)`` <==> ``sl[index]``
 
         Supports slicing.
 
@@ -859,7 +859,7 @@ class SortedList(MutableSequence):
                 return result
 
             if step == -1 and start > stop:
-                result = self._geIItem(slice(stop + 1, start + 1))
+                result = self._getitem(slice(stop + 1, start + 1))
                 result.reverse()
                 return result
 
@@ -868,7 +868,7 @@ class SortedList(MutableSequence):
             # be the desired behavior.
 
             indices = range(start, stop, step)
-            return list(self._geIItem(index) for index in indices)
+            return list(self._getitem(index) for index in indices)
         else:
             if self._len:
                 if index == 0:
@@ -889,13 +889,13 @@ class SortedList(MutableSequence):
             pos, idx = self._pos(index)
             return _lists[pos][idx]
 
-    _geIItem = __geIItem__
+    _getitem = __getitem__
 
 
-    def __seIItem__(self, index, value):
+    def __setitem__(self, index, value):
         """Raise not-implemented error.
 
-        ``sl.__seIItem__(index, value)`` <==> ``sl[index] = value``
+        ``sl.__setitem__(index, value)`` <==> ``sl[index] = value``
 
         :raises NotImplementedError: use ``del sl[index]`` and
             ``sl.add(value)`` instead
@@ -1012,10 +1012,10 @@ class SortedList(MutableSequence):
         if min_pos == max_pos:
             if reverse:
                 indices = reversed(range(min_idx, max_idx))
-                return map(_lists[min_pos].__geIItem__, indices)
+                return map(_lists[min_pos].__getitem__, indices)
 
             indices = range(min_idx, max_idx)
-            return map(_lists[min_pos].__geIItem__, indices)
+            return map(_lists[min_pos].__getitem__, indices)
 
         next_pos = min_pos + 1
 
@@ -1024,36 +1024,36 @@ class SortedList(MutableSequence):
                 min_indices = range(min_idx, len(_lists[min_pos]))
                 max_indices = range(max_idx)
                 return chain(
-                    map(_lists[max_pos].__geIItem__, reversed(max_indices)),
-                    map(_lists[min_pos].__geIItem__, reversed(min_indices)),
+                    map(_lists[max_pos].__getitem__, reversed(max_indices)),
+                    map(_lists[min_pos].__getitem__, reversed(min_indices)),
                 )
 
             min_indices = range(min_idx, len(_lists[min_pos]))
             max_indices = range(max_idx)
             return chain(
-                map(_lists[min_pos].__geIItem__, min_indices),
-                map(_lists[max_pos].__geIItem__, max_indices),
+                map(_lists[min_pos].__getitem__, min_indices),
+                map(_lists[max_pos].__getitem__, max_indices),
             )
 
         if reverse:
             min_indices = range(min_idx, len(_lists[min_pos]))
             sublist_indices = range(next_pos, max_pos)
-            sublists = map(_lists.__geIItem__, reversed(sublist_indices))
+            sublists = map(_lists.__getitem__, reversed(sublist_indices))
             max_indices = range(max_idx)
             return chain(
-                map(_lists[max_pos].__geIItem__, reversed(max_indices)),
+                map(_lists[max_pos].__getitem__, reversed(max_indices)),
                 chain.from_iterable(map(reversed, sublists)),
-                map(_lists[min_pos].__geIItem__, reversed(min_indices)),
+                map(_lists[min_pos].__getitem__, reversed(min_indices)),
             )
 
         min_indices = range(min_idx, len(_lists[min_pos]))
         sublist_indices = range(next_pos, max_pos)
-        sublists = map(_lists.__geIItem__, sublist_indices)
+        sublists = map(_lists.__getitem__, sublist_indices)
         max_indices = range(max_idx)
         return chain(
-            map(_lists[min_pos].__geIItem__, min_indices),
+            map(_lists[min_pos].__getitem__, min_indices),
             chain.from_iterable(sublists),
-            map(_lists[max_pos].__geIItem__, max_indices),
+            map(_lists[max_pos].__getitem__, max_indices),
         )
 
 
