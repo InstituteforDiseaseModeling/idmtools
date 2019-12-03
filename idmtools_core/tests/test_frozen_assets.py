@@ -139,7 +139,7 @@ class TestFrozenAssets(unittest.TestCase):
             a._content = 'Hello World'
         self.assertIn('Frozen', context.exception.args[0])
 
-    def test_frozen_asset_collection_inherit(self):
+    def test_frozen_asset_collection_both_inherit(self):
         from idmtools_test.utils.test_asset_collection import AssetCollection
         from idmtools_test.utils.test_asset import Asset
 
