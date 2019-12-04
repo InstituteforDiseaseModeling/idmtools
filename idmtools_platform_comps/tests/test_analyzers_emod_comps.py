@@ -123,6 +123,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         # self.exp_id = uuid.UUID("fc59240c-07db-e911-a2be-f0921c167861")
         filenames = ['output/InsetChart.json']
 
+
         sys.path.insert(0, analyzer_path)
         from PopulationAnalyzer import PopulationAnalyzer
         analyzers = [PopulationAnalyzer(filenames=filenames)]
