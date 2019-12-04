@@ -1,52 +1,56 @@
 import os
-import pytest
-import json
+import time
 
+import pytest
+from idmtools.analysis.analyze_manager import AnalyzeManager
 from idmtools.builders import ExperimentBuilder
+from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
+from idmtools.entities import IAnalyzer
 from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
-from idmtools.core import EntityStatus
-from idmtools_platform_local.docker.docker_operations import DockerOperations
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools.analysis.AnalyzeManager import AnalyzeManager
-from idmtools.analysis.AddAnalyzer import AddAnalyzer
-
-from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-from idmtools_test.utils.utils import del_folder
-
-from importlib import reload
-from operator import itemgetter
-from idmtools_test.utils.confg_local_runner_test import reset_local_broker, get_test_local_env_overrides
 from idmtools_test.utils.decorators import restart_local_platform
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 
 
+class AddAnalyzer(IAnalyzer):
+    """
+    Add Analyzer
+    A simple base class to add analyzers.
+
+    """
+
+    def __init__(self):
+        super().__init__(filenames=["output\\result.json"], parse=True)
+
+    def map(self, data, item):
+        print(f"Data: {str(data[self.filenames[0]])}")
+        number = data[self.filenames[0]]["a"]
+        print(f"Number: {number}")
+        result = number + 100
+        print(f"Result: {result}")
+        return result
+
+    def reduce(self, data):
+        print(f'Sum: {str(data.values())}')
+        value = sum(data.values())
+        return value
+
+
+@pytest.mark.analysis
+@pytest.mark.docker
 class TestAnalyzeManager(ITestWithPersistence):
 
-    def setUp(self) -> None:
-        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
-        print(self.case_name)
-        reset_local_broker()
-        from idmtools_platform_local.workers.brokers import setup_broker
-        setup_broker()
-        # ensure we start from no environment
-        dm = DockerOperations()
-        dm.cleanup(True)
+    @classmethod
+    @restart_local_platform(silent=True, stop_before=True, stop_after=False)
+    def setUpClass(cls) -> None:
+        cls.platform = Platform('Local')
 
-        import idmtools_platform_local.tasks.create_experiment
-        import idmtools_platform_local.tasks.create_simulation
-        reload(idmtools_platform_local.tasks.create_experiment)
-        reload(idmtools_platform_local.tasks.create_simulation)
-
-        platform = Platform('Local_Staging')
-
-        # CreateSimulationTask.broker =
-
-        name = self.case_name
-        pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
-
+        pe = PythonExperiment(name=os.path.basename(__file__) + "--" + cls.__name__,
+                              model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
 
         def param_a_update(simulation, value):
@@ -57,37 +61,24 @@ class TestAnalyzeManager(ITestWithPersistence):
         # Sweep parameter "a"
         builder.add_sweep_definition(param_a_update, range(0, 5))
         pe.builder = builder
-
-        em = ExperimentManager(experiment=pe, platform=platform)
+        em = ExperimentManager(experiment=pe, platform=cls.platform)
         em.run()
+        print('Waiting on experiment to finish')
         em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.FAILED for s in pe.simulations]))
-        # validation
-        self.assertEqual(pe.name, name)
-        self.assertEqual(pe.simulation_count, 5)
-        self.assertIsNotNone(pe.uid)
-        self.assertTrue(all([s.status == EntityStatus.FAILED for s in pe.simulations]))
-        self.assertFalse(pe.succeeded)
+        time.sleep(2)
+        print('experiment done')
 
-        # validate tags
-        tags = []
-        for simulation in pe.simulations:
-            self.assertEqual(simulation.experiment.uid, pe.uid)
-            tags.append(simulation.tags)
-        expected_tags = [{'a': 0}, {'a': 1}, {'a': 2}, {'a': 3}, {'a': 4}]
-        sorted_tags = sorted(tags, key=itemgetter('a'))
-        sorted_expected_tags = sorted(expected_tags, key=itemgetter('a'))
-        self.assertEqual(sorted_tags, sorted_expected_tags)
-        self.exp_id = pe.uid
+        cls.exp_id = pe.uid
 
-        # Uncomment out if you do not want to regenerate exp and sims
-        # self.exp_id = '9eacbb9a-5ecf-e911-a2bb-f0921c167866' #comps2 staging
-
+    @pytest.mark.timeout(60)
+    @pytest.mark.long
+    @restart_local_platform(silent=True, stop_before=False, stop_after=True)
     def test_AddAnalyzer(self):
-
+        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         analyzers = [AddAnalyzer()]
-        platform = Platform(key='Local')
 
-        am = AnalyzeManager(configuration={}, platform=platform, ids=[self.exp_id], analyzers=analyzers)
+        am = AnalyzeManager(configuration={}, platform=self.platform,
+                            ids=[(self.exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
-
+        print(analyzers[0].results)
+        self.assertEqual(analyzers[0].results, sum(n + 100 for n in range(0, 5)))

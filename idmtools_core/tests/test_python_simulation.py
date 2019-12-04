@@ -1,5 +1,8 @@
 import os
 from functools import partial
+
+import pytest
+
 from idmtools.assets import AssetCollection, Asset
 from idmtools_models.python import PythonExperiment, PythonSimulation
 from idmtools_test import COMMON_INPUT_PATH
@@ -48,30 +51,32 @@ class TestPythonSimulation(ITestWithPersistence):
 
         self.assertEqual(p.parameters, {"a": 1})
         p.gather_assets()
-        self.assertEqual(p.assets.assets[0].content, str.encode(json.dumps({"a": 1})))
+        self.assertEqual(p.assets.assets[0].bytes, str.encode(json.dumps({"a": 1})))
 
         # Envelope
         p = PythonSimulation(parameters={"a": 1}, envelope="config")
 
         self.assertEqual(p.parameters, {"a": 1})
         p.gather_assets()
-        self.assertEqual(p.assets.assets[0].content, str.encode(json.dumps({"config": {"a": 1}})))
+        self.assertEqual(p.assets.assets[0].bytes, str.encode(json.dumps({"config": {"a": 1}})))
 
         # Envelope already set in parameters
         p = PythonSimulation(parameters={"config": {"a": 1}}, envelope="config")
         self.assertEqual(p.parameters, {"a": 1})
         p.gather_assets()
-        self.assertEqual(p.assets.assets[0].content, str.encode(json.dumps({"config": {"a": 1}})))
+        self.assertEqual(p.assets.assets[0].bytes, str.encode(json.dumps({"config": {"a": 1}})))
 
         # Envelope already set in parameters but no envelope parameter
         p = PythonSimulation(parameters={"config": {"a": 1}})
         self.assertEqual(p.parameters, {"config": {"a": 1}})
         p.gather_assets()
-        self.assertEqual(p.assets.assets[0].content, str.encode(json.dumps({"config": {"a": 1}})))
+        self.assertEqual(p.assets.assets[0].bytes, str.encode(json.dumps({"config": {"a": 1}})))
 
         print(p)  # verify __repr__method in ISumulation
-        self.assertIn("<Simulation: " + p.uid + " - Exp_id: NoPlatformSet>", mock_stdout.getvalue())
+        self.assertIn("<Simulation: " + p.uid + " - Exp_id: None>", mock_stdout.getvalue())
 
+    @pytest.mark.python
+    @pytest.mark.assets
     def test_add_assets_to_python_experiment(self):
         ac = AssetCollection()
         a = Asset(relative_path="MyExternalLibrary",
@@ -91,6 +96,7 @@ class TestPythonSimulation(ITestWithPersistence):
 
         self.assertSetEqual(set(assets_in_pythonexperiment), set(assets_to_find))
 
+    @pytest.mark.python
     def test_add_assets_after_python_experiment_created(self):
         ac = AssetCollection()
         a = Asset(relative_path="MyExternalLibrary",

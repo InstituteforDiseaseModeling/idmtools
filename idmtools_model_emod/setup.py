@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """The setup script."""
+import itertools
 
 from setuptools import setup, find_packages
 
@@ -13,9 +14,17 @@ with open('requirements.txt') as requirements_file:
 
 build_requirements = ['flake8', 'coverage', 'py-make', 'bump2version', 'twine']
 setup_requirements = []
-test_requirements = ['pytest', 'pytest-runner'] + build_requirements
+test_requirements = ['pytest', 'pytest-runner', 'pytest-timeout', 'pytest-cache'] + build_requirements
+# special features targeted for internal idm users and developers. We will force users to install through extras
+# since it adds a bit of unnecessary overhead
+bamboo_requriements = [
+    'atlassian-python-api~=1.14.2',
+    'keyring',
+    'requests'
+]
 
-extras = dict(test=test_requirements, packaging=build_requirements)
+extras = dict(test=test_requirements, packaging=build_requirements, bamboo=bamboo_requriements)
+extras['all'] = list(itertools.chain(extras.values()))
 
 authors = [
     ("Sharon Chen", "'schen@idmod.org"),

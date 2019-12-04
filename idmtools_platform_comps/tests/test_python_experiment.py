@@ -34,6 +34,7 @@ class setParam:
 
 
 @pytest.mark.comps
+@pytest.mark.python
 class TestPythonExperiment(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
@@ -46,6 +47,7 @@ class TestPythonExperiment(ITestWithPersistence):
     # Also current add_sweep_definition will do product of each call. if first call has 5 parameters, second call also
     # has 5 parameter, total sweep parameters are 5*5=25
 
+    @pytest.mark.long
     def test_sweeps_with_partial_comps(self):
         pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
 
@@ -66,7 +68,7 @@ class TestPythonExperiment(ITestWithPersistence):
         em = ExperimentManager(experiment=pe, platform=self.platform)
         em.run()
         em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.children()]))
+        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
         experiment = Experiment.get(em.experiment.uid)
         print(experiment.id)
         exp_id = experiment.id
@@ -87,6 +89,7 @@ class TestPythonExperiment(ITestWithPersistence):
     # Test parameter "b" set is depending on parameter "a"
     # a=[0,1,2,3,4] <--sweep parameter
     # b=[2,3,4,5,6]  <-- b = a + 2
+    @pytest.mark.long
     def test_sweeps_2_related_parameters_comps(self):
         pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
@@ -109,7 +112,7 @@ class TestPythonExperiment(ITestWithPersistence):
         em = ExperimentManager(experiment=pe, platform=self.platform)
         em.run()
         em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.children()]))
+        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
         experiment = Experiment.get(em.experiment.uid)
         print(experiment.id)
         exp_id = experiment.id
@@ -119,6 +122,7 @@ class TestPythonExperiment(ITestWithPersistence):
         expected_tags = [{'a': '0'}, {'a': '1'}, {'a': '2'}, {'a': '3'}, {'a': '4'}]
         self.validate_sim_tags(exp_id, expected_tags)
 
+    @pytest.mark.long
     @pytest.mark.comps
     def test_add_prefixed_relative_path_to_assets_comps(self):
         model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
@@ -143,7 +147,7 @@ class TestPythonExperiment(ITestWithPersistence):
         em = ExperimentManager(experiment=pe, platform=self.platform)
         em.run()
         em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.children()]))
+        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
         exp_id = em.experiment.uid
         # exp_id ='ef8e7f2f-a793-e911-a2bb-f0921c167866'
         count = 0
@@ -176,6 +180,7 @@ class TestPythonExperiment(ITestWithPersistence):
     #       |--functions.py
     #   |--__init__.py
     #   |--model.py
+    @pytest.mark.long
     @pytest.mark.comps
     def test_add_dirs_to_assets_comps(self):
         model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
@@ -186,7 +191,7 @@ class TestPythonExperiment(ITestWithPersistence):
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         pe.base_simulation.envelope = "parameters"
         # sim = pe.simulation() # uncomment this line when issue #138 gets fixed
-        sim = pe.base_simulation
+        sim = pe.simulation()
         sim.set_parameter("a", 1)
         sim.set_parameter("b", 10)
         builder = StandAloneSimulationsBuilder()
@@ -195,7 +200,7 @@ class TestPythonExperiment(ITestWithPersistence):
         em = ExperimentManager(experiment=pe, platform=self.platform)
         em.run()
         em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.children()]))
+        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
         exp_id = em.experiment.uid
         # validate results from comps
         # exp_id ='eb7ce224-9993-e911-a2bb-f0921c167866'
@@ -228,12 +233,14 @@ class TestPythonExperiment(ITestWithPersistence):
     #   |--MyExternalLibrary
     #       |--functions.py
     #   |--model.py
+    @pytest.mark.long
     @pytest.mark.comps
     def test_add_specific_files_to_assets_comps(self):
         model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
         ac = AssetCollection()
         a = Asset(relative_path="MyExternalLibrary",
-                  absolute_path=os.path.join(COMMON_INPUT_PATH, "python", "Assets", "MyExternalLibrary", "functions.py"))
+                  absolute_path=os.path.join(COMMON_INPUT_PATH, "python", "Assets", "MyExternalLibrary",
+                                             "functions.py"))
         ac.add_asset(a)
         pe = PythonExperiment(name=self.case_name, model_path=model_path, assets=ac)
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
@@ -243,7 +250,7 @@ class TestPythonExperiment(ITestWithPersistence):
         em = ExperimentManager(experiment=pe, platform=self.platform)
         em.run()
         em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.children()]))
+        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
         exp_id = em.experiment.uid
         # validate results from comps
         # exp_id ='a98090dc-ea92-e911-a2bb-f0921c167866'
@@ -279,6 +286,7 @@ class TestPythonExperiment(ITestWithPersistence):
     # {6,2}
     # {7,2}
     @pytest.mark.comps
+    @pytest.mark.long
     def test_sweep_in_arms_cross(self):
         pe = PythonExperiment(name=self.case_name,
                               model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
@@ -299,7 +307,7 @@ class TestPythonExperiment(ITestWithPersistence):
         em.run()
         em.wait_till_done()
         exp_id = em.experiment.uid
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.children()]))
+        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
         self.validate_output(exp_id, 6)
         expected_tags = [{'a': '1', 'b': '2', 'c': '4'}, {'a': '1', 'b': '2', 'c': '5'}, {'a': '1', 'b': '3', 'c': '4'},
                          {'a': '1', 'b': '3', 'c': '5'}, {'a': '6', 'b': '2'}, {'a': '7', 'b': '2'}]

@@ -12,7 +12,7 @@ class ArmType(Enum):
 
 class SweepArm:
     """
-    Represents an parameter arm
+    Class that represents a parameter arm.
     """
 
     def __init__(self, type=ArmType.cross, funcs=[]):
@@ -23,7 +23,8 @@ class SweepArm:
             self.add_sweep_definition(func, values)
 
     def add_sweep_definition(self, func: 'Callable', values: 'Iterable[Any]'):  # noqa F821
-        self.sweep_functions.append((func, values if isinstance(values, collections.abc.Iterable) else [values]))
+        self.sweep_functions.append((func, values if isinstance(values, collections.abc.Iterable) and not (
+            isinstance(values, str)) else [values]))
 
         if self.type == ArmType.pair:
             self.adjust_values_length()
@@ -49,7 +50,7 @@ class SweepArm:
 
 class ArmExperimentBuilder(ExperimentBuilder):
     """
-    Represents an experiment builder
+    Class that represents an experiment builder.
     """
 
     def __init__(self):

@@ -1,13 +1,14 @@
 import os
 from functools import partial
 
+from config_update_parameters import config_update_params
+
 from idmtools.assets import AssetCollection, Asset
 from idmtools.builders import SweepArm, ArmType, ArmExperimentBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_model_emod import EMODExperiment
 from idmtools_model_emod.defaults import EMODSir
-from config_update_parameters import config_update_params
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 BIN_PATH = os.path.join(current_directory, "bin")
@@ -24,12 +25,13 @@ def param_update(simulation, param, value):
 
 
 if __name__ == "__main__":
-    platform = Platform('COMPS')
+    platform = Platform('COMPS2')
 
     ac = AssetCollection()
     a = Asset(absolute_path=os.path.join(INPUT_PATH, "single_node_demographics.json"))
     ac.add_asset(a)
-    e = EMODExperiment.from_default(expname, default=EMODSir, eradication_path=os.path.join(BIN_PATH, "Eradication.exe"))
+    e = EMODExperiment.from_default(expname, default=EMODSir(),
+                                    eradication_path=os.path.join(BIN_PATH, "Eradication.exe"))
     e.add_assets(ac)
     simulation = e.base_simulation
     sim = config_update_params(simulation)
@@ -62,11 +64,12 @@ if __name__ == "__main__":
     # Download analysis
     ###
 
-    from idmtools.analysis.AnalyzeManager import AnalyzeManager
-    from idmtools.analysis.DownloadAnalyzer import DownloadAnalyzer
+    from idmtools.analysis.analyze_manager import AnalyzeManager
+    from idmtools.analysis.download_analyzer import DownloadAnalyzer
 
     filenames = ['output\\InsetChart.json']
     analyzers = [DownloadAnalyzer(filenames=filenames, output_path='download-e2eB')]
 
-    manager = AnalyzeManager(platform=platform, ids=[em.experiment.uid], analyzers=analyzers)
+    manager = AnalyzeManager(platform=platform, analyzers=analyzers)
+    manager.add_item(em.experiment)
     manager.analyze()

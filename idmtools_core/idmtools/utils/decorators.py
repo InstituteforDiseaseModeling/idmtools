@@ -2,13 +2,18 @@ import datetime
 import importlib
 import importlib.util
 import os
+from concurrent.futures import Executor, as_completed
+from concurrent.futures.thread import ThreadPoolExecutor
 from functools import wraps
-from typing import Callable, Union
+from logging import getLogger, DEBUG
+from typing import Callable, Union, Optional, Type
+
+logger = getLogger(__name__)
 
 
 class abstractstatic(staticmethod):
     """
-    Decorator for defining a method both as static and abstract
+    A decorator for defining a method both as static and abstract.
     """
     __slots__ = ()
 
@@ -30,13 +35,15 @@ def optional_decorator(decorator: Callable, condition: Union[bool, Callable[[], 
         @wraps
         def wrapper(*args, **kwargs):
             func(*args, **kwargs)
+
         return wrapper
+
     return decorate_in
 
 
 class SingletonDecorator:
     """
-    Wraps a class in a Singleton Decorator.
+    Wraps a class in a singleton decorator.
 
     Example:
         In the below example, we would print out *99* since *z* is referring to the same object as *x*::
@@ -48,9 +55,8 @@ class SingletonDecorator:
             x.y = 99
             z = Thing()
             print(z.y)
-    Notes:
-        Should be used on Classes
     """
+
     def __init__(self, klass):
         self.klass = klass
         self.instance = None
@@ -64,9 +70,9 @@ class SingletonDecorator:
 
 class LoadOnCallSingletonDecorator:
     """
-    Additional class decorator that creates a singleton instance only when a method/attr is accessed. This is useful
-    for expensive items like plugin factories loads that should only be executed when finally needed and not on
-    declaration
+    Additional class decorator that creates a singleton instance only when a method or attribute is accessed.
+    This is useful for expensive tasks like loading plugin factories that should only be executed when finally
+    needed and not on declaration.
 
     Examples:
         ::
@@ -82,6 +88,7 @@ class LoadOnCallSingletonDecorator:
             ExpensiveFactory = LoadOnCallSingletonDecorator(ExpensiveFactory)
             ExpensiveFactory.get_items()
     """
+
     def __init__(self, klass):
         self.instance = SingletonDecorator(klass)
         self.created = False
@@ -99,10 +106,11 @@ class LoadOnCallSingletonDecorator:
 def cache_for(ttl=datetime.timedelta(minutes=1)):
     def wrap(func):
         time, value = None, None
+
         @wraps(func)
         def wrapped(*args, **kw):
             # if we are testing, disable caching of functions as it complicates test-all setups
-            if os.getenv('TESTING', '0') .lower() in ['1', 'y', 'true', 'yes', 'on']:
+            if os.getenv('TESTING', '0').lower() in ['1', 'y', 'true', 'yes', 'on']:
                 return func(*args, **kw)
 
             nonlocal time
@@ -112,20 +120,22 @@ def cache_for(ttl=datetime.timedelta(minutes=1)):
                 value = func(*args, **kw)
                 time = now
             return value
+
         return wrapped
+
     return wrap
 
 
 def optional_yaspin_load(*yargs, **ykwargs) -> Callable:
     """
-    Adds a CLI spinner to a function if
+    Adds a CLI spinner to a function if:
 
-    * yaspin package is present
-    * NO_SPINNER environment variable is not defined
+    * yaspin package is present.
+    * NO_SPINNER environment variable is not defined.
 
     Args:
-        *yargs: Arguments to pass to yaspin constructor
-        **ykwargs: Keyword arguments to pass to yaspin constructor
+        *yargs: Arguments to pass to yaspin constructor.
+        **ykwargs: Keyword arguments to pass to yaspin constructor.
 
     Examples:
         ::
@@ -135,7 +145,7 @@ def optional_yaspin_load(*yargs, **ykwargs) -> Callable:
                 time.sleep(100)
 
     Returns:
-        (Callable): Wrapper function
+        A callable wrapper function.
     """
     has_yaspin = importlib.util.find_spec("yaspin")
     spinner = None
@@ -149,6 +159,7 @@ def optional_yaspin_load(*yargs, **ykwargs) -> Callable:
             if spinner and not os.getenv('NO_SPINNER', False):
                 spinner.start()
             try:
+                kwargs['spinner'] = spinner
                 result = func(*args, **kwargs)
             except Exception as e:
                 if spinner:
@@ -157,44 +168,60 @@ def optional_yaspin_load(*yargs, **ykwargs) -> Callable:
             if spinner:
                 spinner.stop()
             return result
+
         return wrapper
+
     return decorate
 
 
-def retry_function(func, wait=1.5, max_retries=5):
+class ParallelizeDecorator:
     """
-    Decorator allowing to retry the call to a function with some time in between.
-    Usage::
+    ParallelizeDecorator allows you to easily parallelize a group of code. A simple of example would be
 
-        @retry_function
-        def my_func():
-            pass
+    Examples:
+        ::
 
-        @retry_function(max_retries=10, wait=2)
-        def my_func():
-            pass
+            op_queue = ParallelizeDecorator()
 
-    :param func:
-    :param time_between_tries:
-    :param max_retries:
+            class Ops:
+                op_queue.parallelize
+                def heavy_op():
+                    time.sleep(10)
 
-    :return:
+                def do_lots_of_heavy():
+                    futures = [self.heavy_op() for i in range(100)]
+                    results = op_queue.get_results(futures)
     """
 
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        retExc = None
-        for i in range(max_retries):
-            try:
-                return func(*args, **kwargs)
-            except RuntimeError as r:
-                # Immediately raise if this is an error.
-                # COMPS is reachable so let's be clever and trust COMPS
-                if str(r) == "404 NotFound - Failed to retrieve experiment for given id":
-                    raise r
-            except Exception as e:
-                retExc = e
-                time.sleep(wait)
-        raise retExc if retExc else Exception()
+    def __init__(self, queue=None, pool_type: Optional[Type[Executor]] = ThreadPoolExecutor):
+        if queue is None:
+            self.queue = pool_type()
+        else:
+            self.queue = queue
 
-    return wrapper
+    def parallelize(self, func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            future = self.queue.submit(func, *args, **kwargs)
+            return future
+
+        return wrapper
+
+    def join(self):
+        return self.queue.join()
+
+    def get_results(self, futures, ordered=False):
+        results = []
+        if ordered:
+            for f in futures:
+                results.append(f.result())
+        else:
+            for f in as_completed(futures):
+                results.append(f.result())
+
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Parallelize Total Results: " + str(results))
+        return results
+
+    def __del__(self):
+        del self.queue

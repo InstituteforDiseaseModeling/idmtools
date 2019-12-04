@@ -4,7 +4,7 @@ import time
 import unittest
 from functools import wraps
 from typing import Callable
-
+import docker
 # The following decorators are used to control test
 # To allow for different use cases(dev, test, packaging, etc)
 # We have switches that should allow a rich set of possible
@@ -16,7 +16,6 @@ from typing import Callable
 # test-docker run any tests that depend on docker locally(Mostly local runn)
 # test-all runs all tests
 
-
 linux_only = unittest.skipIf(
     not platform.system() in ["Linux", "Darwin"], 'No Tests that are meant for linux'
 )
@@ -24,6 +23,11 @@ linux_only = unittest.skipIf(
 windows_only = unittest.skipIf(
     platform.system() in ["Linux", "Darwin"], 'No Tests that are meant for Windows'
 )
+
+# this is mainly for docker in docker environments but also applies to environments
+# where you must use the local ip address for connectivity vs localhost
+skip_api_host = unittest.skipIf(os.getenv("API_HOST", None) is not None, "API_HOST is defined")
+client = docker.from_env()
 
 
 def run_test_in_n_seconds(n: int, print_elapsed_time: bool = False) -> Callable:
@@ -57,20 +61,40 @@ def run_test_in_n_seconds(n: int, print_elapsed_time: bool = False) -> Callable:
     return decorator
 
 
-def restart_local_platform(silent=True, *args, **kwargs):
-    from idmtools_platform_local.docker.docker_operations import DockerOperations
+def restart_local_platform(silent=True, stop_before=True, stop_after=True, dump_logs=True, *args, **kwargs):
+    from idmtools_platform_local.infrastructure.service_manager import DockerServiceManager
+    from idmtools_platform_local.infrastructure.docker_io import DockerIO
+    from idmtools_platform_local.cli.utils import get_service_info
     # disable spinner
     if silent:
         os.environ['NO_SPINNER'] = '1'
-    do = DockerOperations(*args, **kwargs)
+
+    args = (client, ) + args
+    sm = DockerServiceManager(*args, **kwargs)
+    do = DockerIO()
 
     def decorate(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            do.cleanup()
-            do.create_services()
-            result = func(*args, **kwargs)
-            do.cleanup()
+            if stop_before:
+                sm.cleanup(tear_down_brokers=True, delete_data=True)
+                do.cleanup(True)
+            result = None
+            try:
+                result = func(*args, **kwargs)
+            except Exception:
+                raise
+            finally:
+                if dump_logs:
+                    try:
+                        info = get_service_info(sm, diff=False, logs=True)
+                        print(info)
+                    except Exception as e:
+                        print(e)
+                        pass
+                if stop_after and os.getenv('NO_TEST_WORKER_CLEANUP', '0').lower() not in ['1', 'true', 'yes', 'y']:
+                    sm.cleanup(tear_down_brokers=True, delete_data=True)
+                    do.cleanup(True)
             return result
         return wrapper
     return decorate

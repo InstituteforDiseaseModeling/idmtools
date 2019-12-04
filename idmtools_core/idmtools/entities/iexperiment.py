@@ -1,48 +1,54 @@
 import copy
+import os
+import sys
 import typing
 import uuid
 from abc import ABC
 from itertools import chain
+from datetime import datetime, timezone, timedelta
 from dataclasses import dataclass, field, InitVar
+from logging import getLogger
+
 from more_itertools import grouper
+from idmtools.core import ItemType, TExperimentBuilder
 from idmtools.core.interfaces.entity_container import EntityContainer
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.core.interfaces.inamed_entity import INamedEntity
-from idmtools.entities.icontainer_item import IContainerItem
+from idmtools.entities.command_line import TCommandLine
+from idmtools.entities.isimulation import TSimulationClass, TSimulation
+from idmtools.utils.decorators import optional_yaspin_load
+from idmtools import __version__
 
-if typing.TYPE_CHECKING:
-    from idmtools.core.types import TSimulation, TSimulationClass, TExperimentBuilder
-    from idmtools.entities.command_line import TCommandLine
+
+logger = getLogger(__name__)
+
 
 @dataclass(repr=False)
-class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
+class IExperiment(IAssetsEnabled, INamedEntity, ABC):
     """
-    Represents a generic Experiment.
+    Class that represents a generic experiment.
     This class needs to be implemented for each model type with specifics.
 
     Args:
-        command: The command to run for experiment
-        suite_id: Suite Id for the experiment
-        simulation_type: A typpe of simulation
-        base_simulation: Optional a simulation that will be the base for all simulations created for this experiment
-        builders: A set of Experiment Builders to be used to generate simulations
-        simulations: Optional a user input simulations
+        name: The experiment name.
+        simulation_type: A class to initialize the simulations that will be created for this experiment.
+        assets: The asset collection for assets global to this experiment.
+        base_simulation: Optional, a simulation that will be the base for all simulations created for this experiment.
+        command: Command to run on simulations.
     """
-    command: 'TCommandLine' = field(default=None)
+    command: TCommandLine = field(default=None)
     suite_id: uuid = field(default=None)
-    simulation_type: 'InitVar[TSimulationClass]' = None
-    base_simulation: 'TSimulation' = field(default=None, compare=False, metadata={"pickle_ignore": True})
+    simulation_type: InitVar[TSimulationClass] = None
+    base_simulation: TSimulation = field(default=None, compare=False, metadata={"pickle_ignore": True})
     builders: set = field(default_factory=lambda: set(), compare=False, metadata={"pickle_ignore": True})
     simulations: EntityContainer = field(default_factory=lambda: EntityContainer(), compare=False,
-                                           metadata={"pickle_ignore": True})
-
-    # @property
-    # def simulations(self):
-    #     return self.children(refresh=False)
+                                         metadata={"pickle_ignore": True})
+    _simulation_default: TSimulation = field(default=None, compare=False, init=False)
+    item_type: ItemType = field(default=ItemType.EXPERIMENT, compare=False, init=False)
+    frozen: bool = field(default=False, init=False)
 
     def __post_init__(self, simulation_type):
         super().__post_init__()
-        self.simulations = self.simulations or EntityContainer()
         # Take care of the base simulation
         if not self.base_simulation:
             if simulation_type and callable(simulation_type):
@@ -57,20 +63,34 @@ class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
         return f"<Experiment: {self.uid} - {self.name} / Sim count {len(self.simulations) if self.simulations else 0}>"
 
     @property
+    def suite(self):
+        return self.parent
+
+    @suite.setter
+    def suite(self, suite):
+        self.parent = suite
+
+    @property
     def builder(self) -> 'TExperimentBuilder':
+
         """
-        For back-compatibility purpose
-        Returns: the last 'TExperimentBuilder'
+        For backward-compatibility purposes.
+
+        Returns:
+            The last ``TExperimentBuilder``.
         """
         return list(self.builders)[-1] if self.builders and len(self.builders) > 0 else None
 
     @builder.setter
-    def builder(self, builder: 'TExperimentBuilder') -> None:
+    def builder(self, builder: TExperimentBuilder) -> None:
         """
-        For back-compatibility purpose
+        For backward-compatibility purposes.
+
         Args:
-            builder: new builder to be used
-        Returns: None
+            builder: The new builder to be used.
+
+        Returns:
+            None
         """
 
         # Make sure we only take the last builder assignment
@@ -79,12 +99,15 @@ class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
 
         self.add_builder(builder)
 
-    def add_builder(self, builder: 'TExperimentBuilder') -> None:
+    def add_builder(self, builder: TExperimentBuilder) -> None:
         """
-        Add builder to builder collection
+        Add builder to builder collection.
+
         Args:
-            builder: a builder to be added
-        Returns: None
+            builder: A builder to be added.
+
+        Returns:
+            None
         """
         from idmtools.builders import ExperimentBuilder
 
@@ -104,10 +127,24 @@ class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
         display(self, experiment_table_display)
 
     def batch_simulations(self, batch_size=5):
-        if not self.builders:
+        # If no builders and no simulation, just return the base simulation
+        if not self.builders and not self.simulations:
             yield (self.simulation(),)
             return
 
+        # First consider the simulations of the experiment
+        if self.simulations:
+            for sim in self.simulations:
+                sim.platform = self.platform
+                sim.experiment = self
+
+            for groups in grouper(self.simulations, batch_size):
+                sims = []
+                for sim in filter(None, groups):
+                    sims.append(sim)
+                yield sims
+
+        # Then the builders
         for groups in grouper(chain(*self.builders), batch_size):
             sims = []
             for simulation_functions in filter(None, groups):
@@ -119,24 +156,27 @@ class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
                     if new_tags:
                         tags.update(new_tags)
 
-                simulation.tags = tags
+                simulation.tags.update(tags)
                 sims.append(simulation)
-                
+
             yield sims
 
     def simulation(self):
         """
-        Returns a new simulation object.
+        Return a new simulation object.
         The simulation will be copied from the base simulation of the experiment.
-        Returns: The created simulation
+
+        Returns:
+            The created simulation.
         """
+        # TODO: the experiment should be frozen when the first simulation is created
         sim = copy.deepcopy(self.base_simulation)
         sim.assets = copy.deepcopy(self.base_simulation.assets)
         sim.platform = self.platform
-        sim.parent_id = self.uid
+        sim.experiment = self
         return sim
 
-    def pre_creation(self):
+    def pre_creation(self) -> None:
         # Gather the assets
         self.gather_assets()
 
@@ -145,27 +185,114 @@ class IExperiment(IAssetsEnabled, IContainerItem, INamedEntity, ABC):
 
     @property
     def done(self):
-        return all([s.done for s in self.children()])
+        return all([s.done for s in self.simulations])
 
     @property
     def succeeded(self):
-        return all([s.succeeded for s in self.children()])
+        return all([s.succeeded for s in self.simulations])
 
     @property
     def simulation_count(self):
-        return len(self.children())
+        return len(self.simulations)
+
+    def refresh_simulations(self):
+        from idmtools.core import ItemType
+        self.simulations = self.platform.get_children(self.uid, ItemType.EXPERIMENT, force=True)
+
+    def refresh_simulations_status(self):
+        self.platform.refresh_status(item=self)
 
     def pre_getstate(self):
         """
-        Function called before picking
-        Return default values for "pickle-ignore" fields
+        Return default values for :meth:`~idmtools.interfaces.ientity.pickle_ignore_fields`.
+        Call before pickling.
         """
         from idmtools.assets import AssetCollection
         return {"assets": AssetCollection(), "simulations": EntityContainer(), "builders": set(),
                 "base_simulation": self._simulation_default}
 
 
+@dataclass(repr=False)
+class IWindowsExperiment:
+    execution_platform = 'windows'
+
+
+@dataclass(repr=False)
+class ILinuxExperiment:
+    execution_platform = 'linux'
+
+
+@dataclass(repr=False)
+class IGPUExperiment:
+    is_gpu: bool = True
+
+
+@dataclass(repr=False)
+class IHostBinaryExperiment:
+    pass
+
+
+@dataclass(repr=False)
+class IDockerExperiment:
+    image_name: str
+    # Optional config to build the docker image
+    build: bool = False
+    build_path: typing.Optional[str] = None
+    # This should in the build_path directory
+    Dockerfile: typing.Optional[str] = None
+    pull_before_build: bool = True
+
+    @optional_yaspin_load(text="Building docker image")
+    def build_image(self, spinner=None, **extra_build_args):
+        import docker
+        from docker.errors import BuildError
+        if spinner:
+            spinner.text = f"Building {self.image_name}"
+        # if the build_path is none use current working directory
+        if self.build_path is None:
+            self.build_path = os.getcwd()
+
+        client = docker.client.from_env()
+        build_config = dict(path=self.build_path, dockerfile=self.Dockerfile, tag=self.image_name,
+                            labels=dict(
+                                buildstamp=f'built-by idmtools {__version__}',
+                                builddate=str(datetime.now(timezone(timedelta(hours=-8)))))
+                            )
+        if extra_build_args:
+            build_config.update(extra_build_args)
+        logger.debug(f"Build configuration used: {str(build_config)}")
+
+        try:
+            result = client.images.build(**build_config)
+            logger.info(f'Build Successful of {result[0].tag} ({result[0].id})')
+        except BuildError as e:
+            logger.info(f"Build failed for {self.image} with message {e.msg}")
+            logger.info(f'Build log: {e.build_log}')
+            sys.exit(-1)
+
+
+@dataclass(repr=False)
+class IDockerGPUExperiment(IGPUExperiment, IDockerExperiment):
+    pass
+
+
 TExperiment = typing.TypeVar("TExperiment", bound=IExperiment)
+TGPUExperiment = typing.TypeVar("TGPUExperiment", bound=IGPUExperiment)
+TDockerExperiment = typing.TypeVar("TDockerExperiment", bound=IDockerExperiment)
+# class types
 TExperimentClass = typing.Type[TExperiment]
+TGPUExperimentClass = typing.Type[TGPUExperiment]
+TDockerExperimentClass = typing.Type[TDockerExperiment]
 # Composed types
 TExperimentList = typing.List[typing.Union[TExperiment, str]]
+TGPUExperimentList = typing.List[typing.Union[TGPUExperiment, str]]
+TDockerExperimentList = typing.List[typing.Union[TDockerExperiment, str]]
+
+
+class StandardExperiment(IExperiment):
+    def __post_init__(self, simulation_type):
+        from idmtools.entities.isimulation import StandardSimulation
+        super().__post_init__(simulation_type=simulation_type or StandardSimulation)
+
+    def gather_assets(self) -> None:
+        pass

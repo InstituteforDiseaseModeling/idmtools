@@ -13,6 +13,7 @@ from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id,
 
 
 @pytest.mark.comps
+@pytest.mark.assets
 class TestAssetsInComps(unittest.TestCase):
 
     def setUp(self) -> None:
@@ -29,6 +30,7 @@ class TestAssetsInComps(unittest.TestCase):
 
     def _run_and_test_experiment(self, experiment):
         experiment.builder = self.builder
+        experiment.platform = self.platform
 
         # Create experiment on platform
         experiment.pre_creation()
@@ -45,6 +47,9 @@ class TestAssetsInComps(unittest.TestCase):
                 simulation.uid = uid
                 simulation.post_creation()
 
+                experiment.simulations.append(simulation.metadata)
+                experiment.simulations.set_status(EntityStatus.CREATED)
+
                 from idmtools.entities import ISimulation
                 simulation.__class__ = ISimulation
 
@@ -52,13 +57,13 @@ class TestAssetsInComps(unittest.TestCase):
 
         # Test if we have all simulations at status CREATED
         self.assertFalse(experiment.done)
-        self.assertTrue(all([s.status == EntityStatus.CREATED for s in experiment.children()]))
+        self.assertTrue(all([s.status == EntityStatus.CREATED for s in experiment.simulations]))
 
         # Start experiment
         self.platform.run_items(items=[experiment])
         self.platform.refresh_status(item=experiment)
         self.assertFalse(experiment.done)
-        self.assertTrue(all([s.status == EntityStatus.RUNNING for s in experiment.children()]))
+        self.assertTrue(all([s.status == EntityStatus.RUNNING for s in experiment.simulations]))
 
         # Wait till done
         import time
@@ -70,6 +75,7 @@ class TestAssetsInComps(unittest.TestCase):
             time.sleep(3)
         self.assertTrue(experiment.done)
 
+    @pytest.mark.long
     def test_md5_hashing_for_same_file_contents(self):
         a = Asset(relative_path=None, filename="test.json", content=json.dumps({"a": 1, "b": 2}))
         b = Asset(relative_path=None, filename="test1.json", content=json.dumps({"a": 1, "b": 2}))
@@ -80,7 +86,8 @@ class TestAssetsInComps(unittest.TestCase):
         ac.tags = {"idmtools": "idmtools-automation", "string_tag": "testACtag", "number_tag": 123, "KeyOnly": None}
 
         pe = PythonExperiment(name=self.case_name,
-                              model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"), assets=ac)
+                              model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"),
+                              assets=ac)
         pe.tags = {"idmtools": "idmtools-automation"}
         pe.platform = self.platform
         self._run_and_test_experiment(pe)

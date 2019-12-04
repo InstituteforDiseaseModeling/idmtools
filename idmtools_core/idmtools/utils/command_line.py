@@ -11,11 +11,11 @@ animation = cycle(("|", "/", "-", "\\"))
 @contextlib.contextmanager
 def suppress_output(stdout=True, stderr=True):
     """
-    Context used to suppress any print/logging from block of code
+    Suppress any print/logging from a block of code.
 
     Args:
-        stdout: If True, hides. If False, shows. True by default.
-        stderr: If True, hides. If False, shows. True by default.
+        stdout: If True, hide output from stdout; if False, show it.
+        stderr: If True, hide output from stderr; if False, show it.
     """
     # Remember existing output streams for restoration
     original_stdout = sys.stdout

@@ -8,6 +8,7 @@ from idmtools.entities import ISimulation
 @dataclass(repr=False)
 class TestSimulation(ISimulation):
     parameters: dict = field(default_factory=lambda: {})
+    status: 'EntityStatus' = field(default=None, compare=False, metadata={"pickle_ignore": False})  # noqa: F821
 
     def set_parameter(self, name: str, value: any) -> dict:
         self.parameters[name] = value
@@ -18,7 +19,7 @@ class TestSimulation(ISimulation):
         Get a parameter in the simulation
         Args:
             name: Name of the parameter
-        Returns: the Value of the parameter
+        Returns:the Value of the parameter
         """
         return self.parameters.get(name, default)
 
@@ -27,7 +28,7 @@ class TestSimulation(ISimulation):
         Bulk update parameters
         Args:
             params: dict with new values
-        Returns: None
+        Returns:None
         """
         self.parameters.update(params)
 

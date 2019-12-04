@@ -4,7 +4,6 @@ from idmtools.builders import ExperimentBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools.services.experiments import ExperimentPersistService
-from idmtools.services.platforms import PlatformPersistService
 from idmtools_models.python import PythonExperiment
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.tst_experiment import TstExperiment
@@ -27,15 +26,16 @@ class TestExperimentManager(ITestWithPersistence):
 
         # Ensure we get the same thing when calling from_experiment
         self.assertEqual(em.experiment.base_simulation, em2.experiment.base_simulation)
-        self.assertListEqual(em.experiment.children(), em2.experiment.children())
+        self.assertListEqual(em.experiment.simulations, em2.experiment.simulations)
 
         # self.assertEqual(em.experiment, em2.experiment)  # not working for some reason; added more explicit tests
         self.assertEqual(em.experiment.uid, em2.experiment.uid)
-        self.assertEqual(len(em.experiment.children()), len(em2.experiment.children()))
-        self.assertEqual(sorted([s.uid for s in em.experiment.children()]), sorted([s.uid for s in em2.experiment.children()]))
+        self.assertEqual(len(em.experiment.simulations), len(em2.experiment.simulations))
+        self.assertEqual(sorted([s.uid for s in em.experiment.simulations]), sorted([s.uid for s in em2.experiment.simulations]))
 
         self.assertEqual(em.platform, em2.platform)
         self.assertEqual(em.platform.uid, em2.platform.uid)
+        p.cleanup()
 
     def test_from_experiment_unknown(self):
         p = Platform('Test')
@@ -47,17 +47,17 @@ class TestExperimentManager(ITestWithPersistence):
 
         em = ExperimentManager(experiment=experiment, platform=p)
         em.run()
-        self.assertEqual(len(em.experiment.children()), 2)
+        self.assertEqual(len(em.experiment.simulations), 2)
 
-        # Delete the experiment and platform from the stores
+        # Delete the experiment from the stores
         ExperimentPersistService.delete(em.experiment.uid)
-        PlatformPersistService.delete(em.experiment.platform.uid)
 
         em2 = ExperimentManager.from_experiment_id(em.experiment.uid, platform=p)
-        self.assertEqual(len(em2.experiment.children()), 2)
+        self.assertEqual(len(em2.experiment.simulations), 2)
         self.assertIsInstance(em2.experiment, PythonExperiment)
         self.assertDictEqual(em2.experiment.tags, experiment.tags)
         self.assertEqual(em2.experiment.platform.uid, p.uid)
+        p.cleanup()
 
     def test_bad_experiment_builder(self):
         builder = ExperimentBuilder()

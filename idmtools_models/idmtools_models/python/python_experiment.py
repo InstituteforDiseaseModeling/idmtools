@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 
 from idmtools.assets.asset import Asset
 from idmtools.entities import CommandLine, IExperiment
+from idmtools.entities.iexperiment import IDockerExperiment
 from idmtools_models.python.python_simulation import PythonSimulation
 
 
@@ -52,16 +53,16 @@ class PythonExperiment(IExperiment):
 
 
 @dataclass(repr=False)
-class DockerizedPythonExperiment(PythonExperiment):
+class DockerizedPythonExperiment(PythonExperiment, IDockerExperiment):
     """
     Dockerized Python Experiment. Currently planned for Comps/Local platform
     """
-    docker_image: str = field(default=None)
+    image_name: str = field(default=None)
     # extra_volume_mounts: str = field(default=None)
 
     def __post_init__(self, simulation_type):
         super().__post_init__(simulation_type=PythonSimulation)
-        if self.docker_image is None:
+        if self.image_name is None:
             raise ValueError("Docker image is required when running a dockerized python simulation")
 
     def pre_creation(self):
@@ -69,6 +70,6 @@ class DockerizedPythonExperiment(PythonExperiment):
 
         # Create the command line according to the location of the model
         # the data path will be updated by the platform
-        self.command = CommandLine("docker", "run", "-v", "{data_path}:/workdir", f"{self.docker_image}", "python",
+        self.command = CommandLine("docker", "run", "-v", "{data_path}:/workdir", f"{self.image_name}", "python",
                                    f"./Assets/{os.path.basename(self.model_path)}", "config.json")
         raise NotImplementedError("This feature is still in progress")

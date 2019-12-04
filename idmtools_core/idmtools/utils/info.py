@@ -7,11 +7,13 @@ logger = getLogger(__name__)
 
 def get_pip_packages_10_to_6():
     """
-    Load packages for versions 1.0-6 of pip
+    Load packages for versions 1.0 to 6 of pip.
+
     Returns:
+        None
 
     Raises:
-        ImportError if pip version differing
+        ImportError: If the pip version is different.
     """
     from pip.util import get_installed_distributions
     return get_installed_distributions()
@@ -19,12 +21,13 @@ def get_pip_packages_10_to_6():
 
 def get_pip_packages_6_to_9():
     """
-    Get packages for pip versions 6 through 9
+    Get packages for pip versions 6 through 9.
 
     Returns:
+        None
 
     Raises:
-        ImportError if pip version differing
+        ImportError: If the pip version is different.
     """
     from pip.utils import get_installed_distributions
     return get_installed_distributions()
@@ -32,12 +35,13 @@ def get_pip_packages_6_to_9():
 
 def get_pip_packages_10_to_current():
     """
-    Get packages for pip versions 10 to current
+    Get packages for pip versions 10 to current.
 
     Returns:
+        None
 
     Raises:
-        ImportError if pip version differing
+        ImportError: If the pip version is different.
     """
     from pip._internal.utils.misc import get_installed_distributions
     return get_installed_distributions()
@@ -45,10 +49,11 @@ def get_pip_packages_10_to_current():
 
 def get_packages_from_pip():
     """
-        Attempts to load pacakges from pip
-        Returns:
-            (List[str]): List of packages installed
-        """
+    Attempt to load pacakges from pip.
+
+    Returns:
+        (List[str]): A list of packages installed.
+    """
     load_pip_versions = [get_pip_packages_10_to_current, get_pip_packages_6_to_9, get_pip_packages_10_to_6]
     installed_packages_list = None
 
@@ -65,11 +70,11 @@ def get_packages_from_pip():
 
 def get_packages_list() -> List[str]:
     """
-    Returns a list of installed packages in current environment. Currently we depend on pip for this functionality
-    and since it is just used for troubleshooting, we can ignore if it errors.
+    Return a list of installed packages in the current environment. Currently |IT_s| depends on pip for this
+    functionality and since it is just used for troubleshooting, errors can be ignored.
 
     Returns:
-        (List[str]): List of packages installed
+        (List[str]): A list of packages installed.
     """
 
     packages = get_packages_from_pip()
