@@ -1,7 +1,9 @@
+import os
+
 from COMPS import Data
 from COMPS.Data import QueryCriteria, Simulation as COMPSSimulation, Simulation
 
-from idmtools.core import EntityStatus
+from idmtools.core import EntityStatus, ExperimentBuilder
 from idmtools.entities import IExperiment
 
 
@@ -56,3 +58,16 @@ def assure_running_then_wait_til_done(tst, experiment):
             break
         time.sleep(3)
     tst.assertTrue(experiment.done)
+
+
+def setup_test_with_platform_and_simple_sweep(tst):
+    from idmtools.core.platform_factory import Platform
+    tst.platform = Platform('COMPS2')
+    tst.case_name = os.path.basename(__file__) + "--" + tst._testMethodName
+    print(tst.case_name)
+
+    def setP(simulation, p):
+        return simulation.set_parameter("P", p)
+
+    tst.builder = ExperimentBuilder()
+    tst.builder.add_sweep_definition(setP, [1, 2, 3])

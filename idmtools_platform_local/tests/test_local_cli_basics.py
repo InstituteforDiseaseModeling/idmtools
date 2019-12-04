@@ -38,22 +38,14 @@ class TestLocalCLIBasic(unittest.TestCase):
     def tearDownClass(cls) -> None:
         pass
 
-    @staticmethod
-    def run_command(*args, start_command=None, base_command=None):
-        if start_command is None:
-            start_command = []
-        if base_command:
-            start_command.append(base_command)
-        return run_command(*args, start_command=start_command)
-
     def test_load(self):
-        result = self.run_command('experiment', '--platform', 'Local', '--help', base_command='')
+        result = run_command('experiment', '--platform', 'Local', '--help', base_command='')
         lines = get_subcommands_from_help_result(result)
         # ensure our command is in the options
         self.assertIn('status', lines)
 
     def test_status(self):
-        result = self.run_command('experiment', '--platform', 'Local', 'status', base_command='')
+        result = run_command('experiment', '--platform', 'Local', 'status', base_command='')
         print(result)
 
     @pytest.mark.long
@@ -68,7 +60,7 @@ class TestLocalCLIBasic(unittest.TestCase):
             # it could be artifacts in tests but it appears db takes a moment to respond with experiments
             time.sleep(10 if os.name == "nt" else 1)
 
-            result = self.run_command('experiment', '--platform', 'Local', 'status', base_command='')
+            result = run_command('experiment', '--platform', 'Local', 'status', base_command='')
             self.assertEqual(result.exit_code, 0, f'{result.exit_code} - {result.output}')
             output = re.sub(r'[\+\-]+', '', result.output).split("\n")
             output = [o for o in output if o and len(o) > 3 and 'experiment_id' not in o]
@@ -79,7 +71,7 @@ class TestLocalCLIBasic(unittest.TestCase):
             self.assertEqual(rows[2][1], "AAAAA")
 
         with self.subTest("test_simulation_status"):
-            result = self.run_command('simulation', '--platform', 'Local', 'status', base_command='')
+            result = run_command('simulation', '--platform', 'Local', 'status', base_command='')
             self.assertEqual(result.exit_code, 0, f'{result.exit_code} - {result.output}')
             output = re.sub(r'[\+\-]+', '', strip_ansi(result.output)).split("\n")
             output = [o for o in output if o and len(o) > 3 and 'simulation_uid' not in o]

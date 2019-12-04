@@ -40,11 +40,14 @@ class TestPlaformSimulationOperation(IPlatformSimulationOperations):
         experiment_id = simulation.parent_id
         simulation.uid = uuid4()
 
+        self._save_simulation_to_cache(experiment_id, simulation)
+        return simulation, simulation.uid
+
+    def _save_simulation_to_cache(self, experiment_id, simulation):
         lock = diskcache.Lock(self.simulations, 'simulations-lock')
         with lock:
             existing_simulations = self.simulations.pop(experiment_id)
             self.simulations[experiment_id] = existing_simulations + simulation
-        return simulation, simulation.uid
 
     def batch_create(self, sims: List[ISimulation], **kwargs) -> List[Tuple[Any, UUID]]:
         simulations = []
@@ -53,10 +56,7 @@ class TestPlaformSimulationOperation(IPlatformSimulationOperations):
             simulation.uid = uuid4()
             simulations.append(simulation)
 
-        lock = diskcache.Lock(self.simulations, 'simulations-lock')
-        with lock:
-            existing_simulations = self.simulations.pop(experiment_id)
-            self.simulations[experiment_id] = existing_simulations + simulations
+        self._save_simulation_to_cache(experiment_id, simulations)
         return [(s, s.uid) for s in simulations]
 
     def get_parent(self, simulation: Any, **kwargs) -> Any:

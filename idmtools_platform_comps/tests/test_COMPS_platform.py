@@ -9,7 +9,8 @@ from idmtools.builders import ExperimentBuilder
 from idmtools.core import EntityStatus
 from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
-from idmtools_test.utils.comps import assure_running_then_wait_til_done
+from idmtools_platform_comps.comps_platform import COMPSPlatform
+from idmtools_test.utils.comps import assure_running_then_wait_til_done, setup_test_with_platform_and_simple_sweep
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test import COMMON_INPUT_PATH
 
@@ -20,15 +21,8 @@ current_directory = path.dirname(path.realpath(__file__))
 class TestCOMPSPlatform(ITestWithPersistence):
     def setUp(self) -> None:
         super().setUp()
-        self.platform = Platform('COMPS2')
-        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
-        print(self.case_name)
-
-        def setP(simulation, p):
-            return simulation.set_parameter("P", p)
-
-        self.builder = ExperimentBuilder()
-        self.builder.add_sweep_definition(setP, [1, 2, 3])
+        self.platform: COMPSPlatform = None
+        setup_test_with_platform_and_simple_sweep(self)
 
     @pytest.mark.assets
     @pytest.mark.python

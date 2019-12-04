@@ -124,10 +124,12 @@ class TestLoadFiles(ITestWithPersistence):
         e.base_simulation.load_files(config_path=DEFAULT_CONFIG_PATH, campaign_path=DEFAULT_CAMPAIGN_JSON)
         e.demographics.add_demographics_from_file(DEFAULT_DEMOGRAPHICS_JSON)
 
+        self.run_experiment_and_verify_output(e)
+
+    def run_experiment_and_verify_output(self, e):
         e.pre_creation()
         s = e.simulation()
         s.pre_creation()
-
         # Test the contents
         with open(DEFAULT_CONFIG_PATH, 'r') as m:
             jt1 = s.config
@@ -136,12 +138,10 @@ class TestLoadFiles(ITestWithPersistence):
             jt2['parameters'].pop("Demographics_Filenames")
             jt2 = self.set_migrations(jt2)
             self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2['parameters'], sort_keys=True))
-
         with open(DEFAULT_CAMPAIGN_JSON, 'r') as m:
             jt1 = s.campaign
             jt2 = json.load(m)
             self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
-
         with open(DEFAULT_DEMOGRAPHICS_JSON, 'r') as m:
             jt1 = s.demographics.assets[1].content
             jt2 = json.load(m)
@@ -155,27 +155,7 @@ class TestLoadFiles(ITestWithPersistence):
                                       demographics_paths=DEFAULT_DEMOGRAPHICS_JSON
                                       )
 
-        e.pre_creation()
-        s = e.simulation()
-        s.pre_creation()
-        # Test the contents
-        with open(DEFAULT_CONFIG_PATH, 'r') as m:
-            jt1 = s.config
-            jt2 = json.load(m)
-            jt1.pop("Demographics_Filenames")
-            jt2['parameters'].pop("Demographics_Filenames")
-            jt2 = self.set_migrations(jt2)
-            self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2['parameters'], sort_keys=True))
-
-        with open(DEFAULT_CAMPAIGN_JSON, 'r') as m:
-            jt1 = s.campaign
-            jt2 = json.load(m)
-            self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
-
-        with open(DEFAULT_DEMOGRAPHICS_JSON, 'r') as m:
-            jt1 = e.demographics.assets[0].content
-            jt2 = json.load(m)
-            self.assertEqual(json.dumps(jt1, sort_keys=True), json.dumps(jt2, sort_keys=True))
+        self.run_experiment_and_verify_output(e)
 
     def test_experiment_load_multiple_demographics_files_1(self):
         e = EMODExperiment.from_default(self.case_name, default=EMODSir(),
