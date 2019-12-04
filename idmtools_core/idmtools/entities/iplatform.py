@@ -209,7 +209,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         return return_object
 
-    def _get_platform_children_for_item(self, item: Any, raw: bool = True, **kwargs) -> List[Any]:
+    def _get_children_for_platform_item(self, item: Any, raw: bool = True, **kwargs) -> List[Any]:
         """
         Returns the children for a platform object. For example, A Comps Experiment or Simulation
 
@@ -285,16 +285,34 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         if cache_key not in self.cache:
             ce = self.get_item(item_id, raw=True, item_type=item_type)
-            children = self._get_platform_children_for_item(ce, raw=raw, **kwargs)
+            children = self._get_children_for_platform_item(ce, raw=raw, **kwargs)
             self.cache.set(cache_key, children, expire=self._object_cache_expiration)
             return children
 
         return self.cache.get(cache_key)
 
     def get_children_by_object(self, parent: IEntity) -> List[IEntity]:
-        return self._get_platform_children_for_item(parent.get_platform_object(), raw=False)
+        """
+        Returns a list of children for an entity
 
-    def get_parent_by_object(self, child: IEntity) -> List[IEntity]:
+        Args:
+            parent: Parent object
+
+        Returns:
+            List of children
+        """
+        return self._get_children_for_platform_item(parent.get_platform_object(), raw=False)
+
+    def get_parent_by_object(self, child: IEntity) -> IEntity:
+        """
+        Parent of object
+
+        Args:
+            child: Child object to find parent for
+
+        Returns:
+            Returns parent object
+        """
         return self._get_parent_for_platform_item(child.get_platform_object(), raw=False)
 
     def _get_parent_for_platform_item(self, platform_item: Any, raw: bool = True, **kwargs) -> Any:
@@ -421,10 +439,19 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         return f"<Platform {self.__class__.__name__} - id: {self.uid}>"
 
     def _convert_platform_item_to_entity(self, platform_item: Any, **kwargs) -> IEntity:
+        """
+        Convert an Native Platform Object to an idmtools object
+        Args:
+            platform_item:  Item to convert
+            **kwargs: Optional items to be used in to_entity calls
+
+        Returns:
+            IDMTools representation of object
+        """
         for src_type, dest_type in self.platform_type_map.items():
             if isinstance(platform_item, src_type):
                 interface = ITEM_TYPE_TO_OBJECT_INTERFACE[dest_type]
-                return getattr(self, interface).to_entity(platform_item)
+                return getattr(self, interface).to_entity(platform_item, **kwargs)
         return platform_item
 
     def flatten_item(self, item: IEntity) -> IItemList:
@@ -460,7 +487,21 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
         getattr(self, interface).refresh_status(item)
 
-    def get_files(self, item: IEntity, files: List[str]) -> Union[Dict[str, Dict[str, bytearray]], Dict[str, bytearray]]:
+    def get_files(self, item: IEntity, files: List[str]) -> \
+            Union[Dict[str, Dict[str, bytearray]], Dict[str, bytearray]]:
+        """
+        Get files for a platform entity
+
+        Args:
+            item: Item to fetch files for
+            files: List of file names to get
+
+        Returns:
+            For simulations, this returns a dictionary with filename as key and values being binary data from file or a
+                dict
+            For experiments, this returns a dictionary with key as sim id and then the values as a dict of the
+                simulations described above
+        """
         if item.item_type not in self.platform_type_map.values():
             raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]

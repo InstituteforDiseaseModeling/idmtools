@@ -116,13 +116,42 @@ class IPlatformExperimentOperations(ABC):
     
     @abstractmethod
     def send_assets(self, experiment: Any):
+        """
+        Transfer Experiment assets to the platform.
+        Args:
+            experiment: Experiment to send assets for
+
+        Returns:
+
+        """
         pass
 
     @abstractmethod
     def refresh_status(self, experiment: IExperiment):
+        """
+        Refresh status for experiment object. This should update the object directly. For experiments it is best if
+        all simulation states are updated as well
+
+        Args:
+            experiment: Experiment to get status for
+
+        Returns:
+            None
+        """
         pass
 
     def get_assets(self, experiment: IExperiment, files: List[str], **kwargs) -> Dict[str, Dict[str, bytearray]]:
+        """
+        Get files from experiment
+
+        Args:
+            experiment: Experiment to get files from
+            files: List files
+            **kwargs:
+
+        Returns:
+            Dict with each sim id and the files contents matching specified list
+        """
         ret = dict()
         for sim in experiment.simulations:
             ret[sim.uid] = self.platform._simulation.get_assets(sim, files, **kwargs)
@@ -130,6 +159,15 @@ class IPlatformExperimentOperations(ABC):
 
     @abstractmethod
     def list_assets(self, experiment: IExperiment) -> List[str]:
+        """
+        List assets available for experiment
+
+        Args:
+            experiment:
+
+        Returns:
+
+        """
         pass
 
 
@@ -229,14 +267,43 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
 
     @abstractmethod
     def refresh_status(self, simulation: ISimulation):
+        """
+        Refresh status for simulation object
+
+        Args:
+            simulation: Experiment to get status for
+
+        Returns:
+            None
+        """
         pass
 
     @abstractmethod
     def get_assets(self, simulation: ISimulation, files: List[str], **kwargs) -> Dict[str, bytearray]:
+        """
+        Get files from simulation
+
+        Args:
+            simulation: Simulation to fetch files from
+            files: Files to get
+            **kwargs:
+
+        Returns:
+            Dictionary containting filename and content
+        """
         pass
 
     @abstractmethod
     def list_assets(self, simulation: ISimulation) -> List[str]:
+        """
+        List available files for a simulation
+
+        Args:
+            simulation: Simulation to list files for
+
+        Returns:
+            List of filenames
+        """
         pass
 
 
@@ -333,9 +400,28 @@ class IPlatformSuiteOperations(ABC):
 
     @abstractmethod
     def refresh_status(self, experiment: Suite):
+        """
+        Refresh status of suite
+        Args:
+            experiment:
+
+        Returns:
+
+        """
         pass
 
     def get_assets(self, suite: Suite, files: List[str], **kwargs) -> Dict[str, Dict[str, Dict[str, bytearray]]]:
+        """
+        Fetch assets for suite
+        Args:
+            suite: suite to get assets for
+            files: Files to load
+            **kwargs:
+
+        Returns:
+            Nested dictionaries in the structure
+            experiment_id { simulation_id { files = content } } }
+        """
         ret = dict()
         for exp in suite.experiments:
             ret[exp.uid] = self.platform._experiments.get_assets(exp, files, **kwargs)
@@ -435,18 +521,54 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
 
     @abstractmethod
     def refresh_status(self, workflow_item: IWorkflowItem):
+        """
+        Refresh status for workflow item
+        Args:
+            workflow_item: Item to refresh status for
+
+        Returns:
+            None
+        """
         pass
 
     @abstractmethod
     def send_assets(self, workflow_item: Any):
+        """
+        Send assets for workflow item to platform
+
+        Args:
+            workflow_item: Item to send assets for
+
+        Returns:
+
+        """
         pass
 
     @abstractmethod
     def get_assets(self, workflow_item: IWorkflowItem, files: List[str], **kwargs) -> Dict[str, bytearray]:
+        """
+        Load assets for workflow item
+        Args:
+            workflow_item: Item
+            files: List of files to load
+            **kwargs:
+
+        Returns:
+            Dictionary with filename as key and value as binary content
+        """
         pass
 
     @abstractmethod
     def list_assets(self, workflow_item: IWorkflowItem) -> List[str]:
+        """
+        List files available  for workflow item
+
+        Args:
+            workflow_item: Workflow item
+
+        Returns:
+            List of filenames
+        """
         pass
 
 
