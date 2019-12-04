@@ -4,10 +4,11 @@ import os
 from abc import ABC, abstractmethod
 from functools import partial
 import sys
+
 current_directory = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(current_directory)
-import pytest
 
+import pytest
 from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
@@ -20,14 +21,15 @@ from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.comps import sims_from_experiment, get_simulation_path
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
-
 DEFAULT_CONFIG_PATH = os.path.join(COMMON_INPUT_PATH, "files", "config.json")
 DEFAULT_CAMPAIGN_JSON = os.path.join(COMMON_INPUT_PATH, "files", "campaign.json")
 DEFAULT_DEMOGRAPHICS_JSON = os.path.join(COMMON_INPUT_PATH, "files", "demographics.json")
 DEFAULT_ERADICATION_PATH = os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe")
 
+
 def param_update(simulation, param, value):
     return simulation.set_parameter(param, value)
+
 
 @pytest.mark.emod
 class EMODPlatformTest(ABC):
@@ -114,7 +116,7 @@ class EMODPlatformTest(ABC):
         reload_sim.set_parameter("Config_Name", "reloading sim")
         reload_sim.set_parameter("Simulation_Duration", sim_duration * 365)
         load_serialized_population(simulation=reload_sim, population_path=os.path.join(serialized_file_path, 'output'),
-                                       population_filenames=['state-00730.dtk'])
+                                   population_filenames=['state-00730.dtk'])
 
         b = StandAloneSimulationsBuilder()
         b.add_simulation(reload_sim)
