@@ -1,7 +1,7 @@
 from idmtools_model_emod import EMODSimulation
 
 
-def standard_cb_updates(sim: 'EMODSimulation' =None):
+def standard_cb_updates(sim: 'EMODSimulation' = None):
     sim.update_parameters({
         'x_Temporary_Larval_Habitat': 0.2,
         'Base_Population_Scale_Factor': 0.1,
@@ -29,7 +29,7 @@ def standard_cb_updates(sim: 'EMODSimulation' =None):
     })
 
     # Set climate
-    #set_climate_constant(sim)
+    # set_climate_constant(sim)
     sim.set_parameter('Climate_Model', 'CLIMATE_CONSTANT')
     sim.set_parameter('Climate_Update_Resolution', 'CLIMATE_UPDATE_DAY')
 
@@ -60,7 +60,6 @@ def update_vector_params(sim):
 
 
 def config_update_params(sim):
-
     # General
     standard_cb_updates(sim)
     update_vector_params(sim)

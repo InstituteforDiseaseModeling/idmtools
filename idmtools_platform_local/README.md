@@ -167,5 +167,24 @@ useful when a specific script/job is failing and you want to troubleshoot the ou
      ```
      python ./Assets/model1.py config.json
      ```
-  
+* The Local platform requires you to be able to run docker without needing sudo access. You can test this by running
+`docker ps` and see if the command succeeds for you. Usually when you do not have access to docker as the current user
+then you will receive errors like 
+
+ ```bash
+ Creating tar archive
+removing 'idmtools-0.2.0+nightly' (and everything under it)
+twine upload --verbose --repository-url http://localhost:7171 -u admin -p admin dist/*
+Uploading distributions to http://localhost:7171
+Uploading idmtools-0.2.0+nightly.tar.gz
+ 0%|                                                                                     | 0.00/48.4k [00:00<?, ?B/s]
+Traceback (most recent call last):
+ File "/software/anaconda3/lib/python3.7/site-packages/urllib3/connection.py", line 159, in _new_conn
+   (self._dns_host, self.port), self.timeout, **extra_kw)
+ File "/software/anaconda3/lib/python3.7/site-packages/urllib3/util/connection.py", line 80, in create_connection
+   raise err
+ File "/software/anaconda3/lib/python3.7/site-packages/urllib3/util/connection.py", line 70, in create_connection
+   sock.connect(sa)
+ConnectionRefusedError: [Errno 111] Connection refused
+ ```
   
