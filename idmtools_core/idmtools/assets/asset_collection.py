@@ -213,7 +213,7 @@ class AssetCollection(IEntity):
     def __len__(self):
         return len(self.assets)
 
-    def __geIItem__(self, index):
+    def __getitem__(self, index):
         return self.assets[index]
 
     def __iter__(self):
