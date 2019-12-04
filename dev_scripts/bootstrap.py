@@ -30,6 +30,7 @@ packages = dict(
     idmtools_platform_comps=data_class_default,
     idmtools_model_emod=data_class_default + ['bamboo'],
     idmtools_models=data_class_default,
+    idmtools_platform_slurm=data_class_default,
     idmtools_test=[]
 )
 

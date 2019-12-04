@@ -1,11 +1,9 @@
 import inspect
-import typing
 from functools import partial
 from inspect import signature
 from itertools import product
 
-if typing.TYPE_CHECKING:
-    from typing import Callable, Any, List, Iterable, Union
+from typing import Callable, Any, List, Iterable, Union
 
 
 class ExperimentBuilder:
