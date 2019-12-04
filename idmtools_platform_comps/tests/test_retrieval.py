@@ -95,7 +95,7 @@ class TestRetrieval(ITestWithPersistence):
         self.assertEqual(len(self.pe.simulations), len(children))
         for s in self.pe.simulations:
             self.assertIn(s.uid, [s.uid for s in children])
-        self.assertIsNone(self.platform.get_children(self.pe.simulations[0].uid, ItemType.SIMULATION))
+        self.assertCountEqual(self.platform.get_children(self.pe.simulations[0].uid, ItemType.SIMULATION), [])
 
 
 if __name__ == '__main__':

@@ -2,6 +2,7 @@ from COMPS import Data
 from COMPS.Data import QueryCriteria, Simulation as COMPSSimulation, Simulation
 
 from idmtools.core import EntityStatus
+from idmtools.entities import IExperiment
 
 
 def get_asset_collection_id_for_simulation_id(sim_id):
@@ -22,7 +23,10 @@ def get_asset_collection_by_id(collection_id, query_criteria=None):
 
 
 def sims_from_experiment(e):
-    return e.get_simulations(QueryCriteria().select(['id', 'state']).select_children('hpc_jobs'))
+    o = e
+    if isinstance(e, IExperiment):
+        o = e.get_platform_object()
+    return o.get_simulations(QueryCriteria().select(['id', 'state']).select_children('hpc_jobs'))
 
 
 def workdirs_from_simulations(sims):

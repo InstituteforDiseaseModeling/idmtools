@@ -19,14 +19,14 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         cols = kwargs.get('columns')
         children = kwargs.get('children')
         cols = cols or ["id", "name", "experiment_id", "state"]
-        children = children if children is not None else ["tags"]
+        children = children if children is not None else ["tags", "configuration"]
         return COMPSSimulation.get(id=simulation_id,
                                    query_criteria=QueryCriteria().select(cols).select_children(children))
 
     def create(self, simulation: ISimulation, **kwargs) -> Tuple[COMPSSimulation, UUID]:
         s = COMPSSimulation(name=simulation.experiment.name, experiment_id=simulation.parent_id,
                             configuration=Configuration(asset_collection_id=simulation.experiment.assets.uid))
-        self.send_assets(s)
+        self.send_assets(simulation, s)
         s.set_tags(simulation.tags)
         COMPSSimulation.save(s, save_semaphore=COMPSSimulation.get_save_semaphore())
         return s, s.id
@@ -49,8 +49,9 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
     def run_item(self, simulation: ISimulation):
         pass
 
-    def send_assets(self, simulation: ISimulation):
-        comps_sim = simulation.get_platform_object()
+    def send_assets(self, simulation: ISimulation, comps_sim: COMPSSimulation = None):
+        if comps_sim is None:
+            comps_sim = simulation.get_platform_object()
         for asset in simulation.assets:
             comps_sim.add_file(simulationfile=SimulationFile(asset.filename, 'input'),  data=asset.bytes)
 

@@ -78,6 +78,8 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         return children
 
     def get_parent(self, experiment: COMPSExperiment, **kwargs) -> Any:
+        if experiment.suite_id is None:
+            return None
         return self.platform._suites.get(experiment.suite_id, **kwargs)
 
     def run_item(self, experiment: IExperiment):

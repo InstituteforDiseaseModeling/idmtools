@@ -16,7 +16,9 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
         children = kwargs.get('children')
         cols = cols or ["id", "name"]
         children = children if children is not None else ["tags", "configuration"]
-        return COMPSSuite.get(id=suite_id, query_criteria=QueryCriteria().select(cols).select_children(children))
+        # Comps doesn't like getting uuids for some reason
+        s = COMPSSuite.get(id=str(suite_id), query_criteria=QueryCriteria().select(cols).select_children(children))
+        return s
 
     def create(self, suite: Suite, **kwargs) -> Tuple[COMPSSuite, UUID]:
         self.platform._login()
@@ -28,7 +30,7 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
 
         # Update suite uid
         suite.uid = comps_suite.id
-        return suite.uid
+        return comps_suite, suite.uid
 
     def get_parent(self, suite: COMPSSuite, **kwargs) -> Any:
         return None

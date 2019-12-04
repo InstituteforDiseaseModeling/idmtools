@@ -5,14 +5,15 @@ from logging import getLogger
 from uuid import UUID
 from idmtools.core import CacheEnabled, ItemType, UnknownItemException, EntityContainer, UnsupportedPlatformType
 from idmtools.core.interfaces.ientity import IEntity
-from idmtools.entities import IExperiment
-from idmtools.entities.iexperiment import IDockerExperiment, IGPUExperiment
+from idmtools.entities.isimulation import ISimulation
+from idmtools.entities.suite import Suite
+from idmtools.entities.iexperiment import IDockerExperiment, IGPUExperiment, IExperiment
 from idmtools.entities.iplatform_metadata import IPlatformExperimentOperations, \
     IPlatformSimulationOperations, IPlatformSuiteOperations, IPlatformWorkflowItemOperations, \
     IPlatformAssetCollectionOperations
 from idmtools.services.platforms import PlatformPersistService
 from idmtools.core.interfaces.iitem import IItem, IItemList
-from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union
+from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple
 
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
 
@@ -24,13 +25,19 @@ CALLER_LIST = ['_create_from_block',    # create platform through Platform Facto
                '__newobj__',            # create platform through copy.deepcopy
                '_main']                 # create platform through analyzer manager
 
-
-item_type_to_object_interface = {
+# Maps an object type to a platform interface object. We use strings to use getattr. This also let's us also reduce
+# all the if else crud
+ITEM_TYPE_TO_OBJECT_INTERFACE = {
     ItemType.EXPERIMENT: '_experiments',
     ItemType.SIMULATION: '_simulations',
     ItemType.SUITE: '_suites',
     ItemType.WORKFLOW_ITEM: '_workflow_items',
     ItemType.ASSETCOLLECTION: '_assets'
+}
+STANDARD_TYPE_TO_INTERFACE = {
+    IExperiment: ItemType.EXPERIMENT,
+    ISimulation: ItemType.SIMULATION,
+    Suite: ItemType.SUITE
 }
 
 
@@ -102,7 +109,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         """
         # build item type map and determined supported features
         self.platform_type_map = dict()
-        for item_type, interface in item_type_to_object_interface.items():
+        for item_type, interface in ITEM_TYPE_TO_OBJECT_INTERFACE.items():
             if getattr(self, interface) is not None and getattr(self, interface).platform_type is not None:
                 self.platform_type_map[getattr(self, interface).platform_type] = item_type
 
@@ -148,7 +155,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         if item_type not in self.platform_type_map.values():
             raise ValueError(f"Unsupported Item Type. {self.__class__.__name__} only supports "
                              f"{self.platform_type_map.values()}")
-        interface = item_type_to_object_interface[item_type]
+        interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item_type]
         return getattr(self, interface).get(item_id, **kwargs)
 
     def get_item(self, item_id: UUID, item_type: ItemType = None,
@@ -190,7 +197,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
                 return_object = ce
             else:
                 return_object = self._convert_platform_item_to_entity(ce, **kwargs)
-                return_object._platform_object = ce
+                if return_object._platform_object is None:
+                    return_object._platform_object = ce
                 return_object.platform = self
 
             # Persist
@@ -201,29 +209,55 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         return return_object
 
-    def _get_platform_children_for_item(self, item: Any, raw: bool = False, **kwargs) -> List[Any]:
+    def _get_platform_children_for_item(self, item: Any, raw: bool = True, **kwargs) -> List[Any]:
+        """
+        Returns the children for a platform object. For example, A Comps Experiment or Simulation
+
+        The children can either be returns as native platform objects or as idmtools objects.
+
+        Args:
+            item: Item to fetch children for
+            raw: When true, return the native platform representation of  the children, otherwise return the idmtools
+                implementation
+            **kwargs:
+
+        Returns:
+            Children of platform object
+        """
         ent_opts = {}
-        interface = self._get_operation_interface(item)
-        if interface == ItemType.EXPERIMENT:
-            children = self._experiments.get_children(item, **kwargs)
-        elif interface == ItemType.SUITE:
-            children = self._suites.get(item, **kwargs)
+        item_type, interface = self._get_operation_interface(item)
+        if item_type in [ItemType.EXPERIMENT, ItemType.SUITE]:
+            children = getattr(self, ITEM_TYPE_TO_OBJECT_INTERFACE[item_type]).get_children(item, **kwargs)
         else:
             return []
         if not raw:
             ret = []
             for e in children:
                 n = self._convert_platform_item_to_entity(e, **ent_opts)
-                n._platform_object = e
+                if n._platform_object is None:
+                    n._platform_object = e
                 ret.append(n)
             return EntityContainer(ret)
         else:
             return children
 
-    def _get_operation_interface(self, item):
-        for t, interface in self.platform_type_map.items():
-            if isinstance(item, t):
-                return interface
+    def _get_operation_interface(self, item: Any) -> Tuple[ItemType, str]:
+        """
+        Get the base item type and the interface string for said item. For example, on COMPSPlatform, if you passed a
+        COMPSExperiment object, the function would return ItemType.Experiment, _experiments
+
+
+        Args:
+            item: Item to look up
+
+        Returns:
+            Tuple with the Base item type and the string path to the interface
+        """
+        # check both base types and platform speci
+        for l in [STANDARD_TYPE_TO_INTERFACE, self.platform_type_map]:
+            for interface, item_type in l.items():
+                if isinstance(item, interface):
+                    return item_type, ITEM_TYPE_TO_OBJECT_INTERFACE[item_type]
         raise ValueError(f"{self.__class__.__name__} has no mapping for {item.__class__.__name__}")
 
     def get_children(self, item_id: UUID, item_type: ItemType,
@@ -257,7 +291,13 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         return self.cache.get(cache_key)
 
-    def _get_parent_for_platform_item(self, platform_item: Any, raw: bool, **kwargs) -> Any:
+    def get_children_by_object(self, parent: IEntity) -> List[IEntity]:
+        return self._get_platform_children_for_item(parent.get_platform_object(), raw=False)
+
+    def get_parent_by_object(self, child: IEntity) -> List[IEntity]:
+        return self._get_parent_for_platform_item(child.get_platform_object(), raw=False)
+
+    def _get_parent_for_platform_item(self, platform_item: Any, raw: bool = True, **kwargs) -> Any:
         """
         Return the parent item for a given platform_item.
 
@@ -269,14 +309,15 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         Returns:
             Parent or None
         """
-        if type(platform_item) not in self.platform_type_map.values():
-            raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
-        item_type = self._get_operation_interface(platform_item)
-        if item_type not in [ItemType.EXPERIMENT, ItemType.SUITE]:
-            raise ValueError("Currently only Experiments and Suites supported children")
-
-        interface = item_type_to_object_interface[item_type]
-        return getattr(self, interface).get_children(platform_item, raw, **kwargs)
+        item_type, interface = self._get_operation_interface(platform_item)
+        if item_type not in [ItemType.EXPERIMENT, ItemType.SIMULATION, ItemType.WORKFLOW_ITEM]:
+            raise ValueError("Currently only Experiments, Simulations and Work Items support parents")
+        obj = getattr(self, interface).get_parent(platform_item, **kwargs)
+        if obj is not None:
+            parent_item_type, parent_interface = self._get_operation_interface(obj)
+            if not raw:
+                return getattr(self, parent_interface).to_entity(obj)
+        return obj
 
     def get_parent(self, item_id: UUID, item_type: ItemType = None, force: bool = False,
                    raw: bool = False, **kwargs):
@@ -323,7 +364,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         ids = []
         for key, group in groupby(items, lambda x: x.item_type):
-            interface = item_type_to_object_interface[key]
+            interface = ITEM_TYPE_TO_OBJECT_INTERFACE[key]
             group_ids = getattr(self, interface).batch_create(list(group))
             ids.extend([i[1] for i in group_ids])
         return ids
@@ -338,7 +379,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         self._is_item_list_supported(items)
 
         for item in items:
-            interface = item_type_to_object_interface[item.item_type]
+            interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
             getattr(self, interface).run_item(item)
 
     @abstractmethod
@@ -382,7 +423,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     def _convert_platform_item_to_entity(self, platform_item: Any, **kwargs) -> IEntity:
         for src_type, dest_type in self.platform_type_map.items():
             if isinstance(platform_item, src_type):
-                interface = item_type_to_object_interface[dest_type]
+                interface = ITEM_TYPE_TO_OBJECT_INTERFACE[dest_type]
                 return getattr(self, interface).to_entity(platform_item)
         return platform_item
 
@@ -416,13 +457,13 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         """
         if item.item_type not in self.platform_type_map.values():
             raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
-        interface = item_type_to_object_interface[item.item_type]
+        interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
         getattr(self, interface).refresh_status(item)
 
     def get_files(self, item: IEntity, files: List[str]) -> Union[Dict[str, Dict[str, bytearray]], Dict[str, bytearray]]:
         if item.item_type not in self.platform_type_map.values():
             raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
-        interface = item_type_to_object_interface[item.item_type]
+        interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
         return getattr(self, interface).get_assets(item, files)
 
 

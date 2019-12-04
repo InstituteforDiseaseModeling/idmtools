@@ -54,7 +54,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         return ids
 
     def get_parent(self, simulation: Any, **kwargs) -> ExperimentDict:
-        return self.platform.get_platform_item(simulation.parent_id, ItemType.EXPERIMENT)
+        return self.platform.get_item(simulation['experiment_id'], ItemType.EXPERIMENT,raw=True)
 
     def run_item(self, simulation: ISimulation):
         """
