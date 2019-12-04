@@ -14,7 +14,8 @@ from idmtools_platform_local.platform_operations.simulation_operations import Lo
 
 logger = getLogger(__name__)
 
-op_defaults=dict(default=None, compare=False, metadata={"pickle_ignore": True})
+op_defaults = dict(default=None, compare=False, metadata={"pickle_ignore": True})
+
 
 @dataclass
 class LocalPlatform(IPlatform):

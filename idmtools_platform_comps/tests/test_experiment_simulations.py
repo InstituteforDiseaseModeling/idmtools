@@ -1,9 +1,7 @@
 import os
 import unittest
-
 import pytest
 from COMPS.Data import Suite as CompsSuite, Experiment as CompsExperiment, Simulation as CompsSimulation
-
 from idmtools.builders import ExperimentBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
@@ -114,12 +112,12 @@ class TestExperimentSimulations(ITestWithPersistence):
         em.wait_till_done()
         # Keep suite id
         suite_uid = suite.uid
-        ################### Test raw
+        # ################## Test raw
         # Test suite retrieval
         comps_suite = platform.get_item(item_id=suite_uid, item_type=ItemType.SUITE, raw=True)
         self.assertTrue(isinstance(comps_suite, CompsSuite))
         # Test retrieve experiment from suite
-        exps = platform._get_platform_children_for_item(comps_suite)
+        exps = platform._get_children_for_platform_item(comps_suite)
         self.assertEqual(len(exps), 1)
         exp = exps[0]
         self.assertTrue(isinstance(exp, CompsExperiment))
@@ -131,13 +129,13 @@ class TestExperimentSimulations(ITestWithPersistence):
         self.assertEqual(parent.id, suite_uid)
         # Test retrieve simulations from experiment
 
-        sims = platform._get_platform_children_for_item(comps_exp)
+        sims = platform._get_children_for_platform_item(comps_exp)
         self.assertEqual(len(sims), 3)
         sim = sims[0]
         self.assertTrue(isinstance(sim, CompsSimulation))
         self.assertIsNotNone(sim.experiment_id)
 
-        #### Test idmtools objects
+        # ### Test idmtools objects
         # Test suite retrieval
         comps_suite = platform.get_item(item_id=suite_uid, item_type=ItemType.SUITE)
         self.assertTrue(isinstance(comps_suite, Suite))
@@ -166,8 +164,6 @@ class TestExperimentSimulations(ITestWithPersistence):
     @pytest.mark.long
     def test_link_experiment_suite(self):
         from idmtools.entities.suite import Suite
-        from COMPS.Data import Suite as CompsSuite
-        from idmtools.core import ItemType
 
         # Create an idm experiment
         exp = self.get_sir_experiment(self.case_name)
@@ -196,8 +192,6 @@ class TestExperimentSimulations(ITestWithPersistence):
     @pytest.mark.long
     def test_suite_experiment(self):
         from idmtools.entities.suite import Suite
-        from COMPS.Data import Suite as CompsSuite
-        from idmtools.core import ItemType
 
         # Create an idm experiment
         exp = self.get_sir_experiment(self.case_name)

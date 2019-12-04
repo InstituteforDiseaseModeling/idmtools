@@ -1,5 +1,4 @@
 from typing import List, Dict
-
 from idmtools.entities import ISimulation
 from idmtools_platform_comps.comps_operations.simulation_operations import CompsPlatformSimulationOperations
 

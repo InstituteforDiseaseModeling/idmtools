@@ -2,7 +2,7 @@ import os
 from collections import defaultdict
 from dataclasses import dataclass
 from logging import getLogger, DEBUG
-from typing import List, Dict, Any, Tuple
+from typing import Dict, Any, Tuple, List, Set, Union
 from uuid import UUID
 from docker.models.containers import Container
 from idmtools.core import ItemType
@@ -16,15 +16,33 @@ logger = getLogger(__name__)
 
 @dataclass
 class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
-    platform: 'LocalPlatform'
+    platform: 'LocalPlatform'  # noqa F821
     platform_type: type = SimulationDict
 
     def get(self, simulation_id: UUID, **kwargs) -> Dict:
+        """
+        Fetch simulation with specified id
+        Args:
+            simulation_id: simulation id
+            **kwargs:
+
+        Returns:
+            SimulationDIct
+        """
         return SimulationDict(SimulationsClient.get_one(str(simulation_id)))
 
     def create(self, simulation: ISimulation, **kwargs) -> Tuple[Any, UUID]:
+        """
+        Create a simulation object
+
+        Args:
+            simulation: Simulation to create
+            **kwargs:
+
+        Returns:
+            Simulation dict and created id
+        """
         from idmtools_platform_local.internals.tasks.create_simulation import CreateSimulationTask
-        worker = self.platform._sm.get('workers')
 
         m = CreateSimulationTask.send(simulation.experiment.uid, simulation.tags)
         id = m.get_result(block=True, timeout=self.platform.default_timeout * 1000)
@@ -35,6 +53,18 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         return s_dict, id
 
     def batch_create(self, sims: List[ISimulation], **kwargs) -> List[Tuple[Any, UUID]]:
+        """
+        Batch creation of simulations.
+
+        This is optimized by bulk uploading assets after creating of all the assets
+
+        Args:
+            sims: List of sims to create
+            **kwargs:
+
+        Returns:
+            List of SimulationDict object and their IDs
+        """
         from idmtools_platform_local.internals.tasks.create_simulation import CreateSimulationsTask
         worker = self.platform._sm.get('workers')
 
@@ -47,14 +77,24 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
             simulation.uid = ids[i]
             path = "/".join(["/data", simulation.experiment.uid, simulation.uid])
             items.update(self._assets_to_copy_multiple_list(path, simulation.assets))
-        result = self._copy_multiple_to_container(worker, items)
+        result = self.platform._do.copy_multiple_to_container(worker, items)
         if not result:
             raise IOError("Coping of data for simulations failed.")
         ids = [(SimulationDict(dict(simulation_uid=id, experiment_id=sims[0].experiment.uid)), id) for id in ids]
         return ids
 
-    def get_parent(self, simulation: Any, **kwargs) -> ExperimentDict:
-        return self.platform.get_item(simulation['experiment_id'], ItemType.EXPERIMENT,raw=True)
+    def get_parent(self, simulation: SimulationDict, **kwargs) -> ExperimentDict:
+        """
+        Get the parent of a simulation, aka its experiment
+
+        Args:
+            simulation: Simulation to get parent from
+            **kwargs:
+
+        Returns:
+            ExperimentDict object
+        """
+        return self.platform.get_item(simulation['experiment_id'], ItemType.EXPERIMENT, raw=True)
 
     def run_item(self, simulation: ISimulation):
         """
@@ -68,15 +108,34 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         pass
 
     def send_assets(self, simulation: ISimulation, worker: Container = None):
+        """
+        Transfer assets to local sim folder for simulation
+
+        Args:
+            simulation: Simulation object
+            worker: docker worker containers. Useful in batches
+
+        Returns:
+
+        """
         # Go through all the assets
         path = "/".join(["/data", simulation.experiment.uid, simulation.uid])
         if worker is None:
             worker = self.platform._sm.get('workers')
 
         items = self._assets_to_copy_multiple_list(path, simulation.assets)
-        self._copy_multiple_to_container(worker, items)
+        self.platform._do.copy_multiple_to_container(worker, items)
 
     def refresh_status(self, simulation: ISimulation):
+        """
+        Refresh status of a sim
+
+        Args:
+            simulation:
+
+        Returns:
+
+        """
         latest = self.get(simulation.uid)
         simulation.status = local_status_to_common(latest['status'])
 
@@ -86,7 +145,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
 
         Args:
             simulation: Simulation object to fetch files for
-            output_files: List of files to fetch
+            files: List of files to fetch
 
         Returns:
             Returns a dict containing mapping of filename->bytearry
@@ -114,9 +173,28 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         return ret
 
     def list_assets(self, simulation: ISimulation) -> List[str]:
+        """
+        List assets for a sim
+
+        Args:
+            simulation: Simulation object
+
+        Returns:
+
+        """
         raise NotImplementedError("List assets is not yet supported on the LocalPlatform")
 
     def to_entity(self, simulation: Dict, **kwargs) -> ISimulation:
+        """
+        Convert a sim dict object to an ISimulation
+
+        Args:
+            simulation: simulation to convert
+            **kwargs:
+
+        Returns:
+            ISimulation object
+        """
         experiment = self.platform.get_item(simulation["experiment_id"], ItemType.EXPERIMENT)
         isim = experiment.simulation()
         isim.uid = simulation['simulation_uid']
@@ -124,7 +202,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         isim.status = local_status_to_common(simulation['status'])
         return isim
 
-    def _retrieve_output_files(self, job_id_path: str, paths: List[str]) -> List[bytes]:
+    def _retrieve_output_files(self, job_id_path: str, paths: Union[List[str], Set[str]]) -> List[bytes]:
         """
         Retrieves output files
         Args:
@@ -169,7 +247,3 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
                 opts['content'] = asset.content
             items[remote_path].append(opts)
         return items
-
-    def _copy_multiple_to_container(self, container: Container, files: Dict[str, Dict[str, Any]],
-                                   join_on_copy: bool = True):
-        return self.platform._do.copy_multiple_to_container(container, files, join_on_copy)

@@ -7,7 +7,7 @@ from idmtools.entities.iplatform_metadata import IPlatformAssetCollectionOperati
 
 @dataclass
 class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations):
-    platform: 'COMPSPlaform'
+    platform: 'COMPSPlaform'  # noqa F821
     platform_type: Type = field(default=AssetCollection)
 
     def get(self, asset_collection_id: UUID, **kwargs) -> Any:

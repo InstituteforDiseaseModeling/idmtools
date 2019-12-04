@@ -2,13 +2,13 @@ from dataclasses import dataclass, field
 from typing import Any, List, Tuple, Union, Type
 from uuid import UUID
 from COMPS.Data import Suite as COMPSSuite, QueryCriteria, Experiment as COMPSExperiment, WorkItem
-from idmtools.entities import  Suite
+from idmtools.entities import Suite
 from idmtools.entities.iplatform_metadata import IPlatformSuiteOperations
 
 
 @dataclass
 class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
-    platform: 'COMPSPlaform'
+    platform: 'COMPSPlaform'  # noqa F821
     platform_type: Type = field(default=COMPSSuite)
 
     def get(self, suite_id: UUID, **kwargs) -> COMPSSuite:

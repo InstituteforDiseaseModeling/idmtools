@@ -13,6 +13,7 @@ from idmtools_test.utils.test_simulation import TestSimulation
 current_directory = os.path.dirname(os.path.realpath(__file__))
 data_path = os.path.abspath(os.path.join(current_directory, "..", "..", "data"))
 
+
 @dataclass
 class TestPlaformSimulationOperation(IPlatformSimulationOperations):
     platform_type: Type = ISimulation

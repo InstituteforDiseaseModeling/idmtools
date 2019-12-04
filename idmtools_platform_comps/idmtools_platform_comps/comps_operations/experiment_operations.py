@@ -1,8 +1,6 @@
 import os
-from concurrent.futures import as_completed
-from concurrent.futures.thread import ThreadPoolExecutor
 from dataclasses import dataclass, field
-from typing import Any, List, Tuple, Dict, Type
+from typing import Any, List, Tuple, Type
 from uuid import UUID
 from COMPS.Data import Experiment as COMPSExperiment, QueryCriteria, AssetCollection as COMPSAssetCollection, \
     AssetCollectionFile, Configuration
@@ -17,7 +15,7 @@ from idmtools_platform_comps.utils import convert_COMPS_status, clean_experiment
 
 @dataclass
 class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
-    platform: 'COMPSPlaform'
+    platform: 'COMPSPlaform'  # noqa F821
     platform_type: Type = field(default=COMPSExperiment)
 
     def get(self, experiment_id: UUID, **kwargs) -> COMPSExperiment:
@@ -25,7 +23,8 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         children = kwargs.get('children')
         cols = cols or ["id", "name", "suite_id"]
         children = children if children is not None else ["tags", "configuration"]
-        return COMPSExperiment.get(id=experiment_id, query_criteria=QueryCriteria().select(cols).select_children(children))
+        return COMPSExperiment.get(id=experiment_id,
+                                   query_criteria=QueryCriteria().select(cols).select_children(children))
 
     def create(self, experiment: IExperiment, **kwargs) -> Tuple[COMPSExperiment, UUID]:
         if not self.platform.is_supported_experiment(experiment):
@@ -125,15 +124,3 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         obj.uid = experiment.id
         obj.comps_experiment = experiment
         return obj
-
-    def list_assets(self, experiment: IExperiment) -> Dict[str, List[str]]:
-        ret = {}
-        with ThreadPoolExecutor() as pool:
-            futures = dict()
-            for sim in experiment.simulations:
-                future = pool.submit(self.platform._simulations.list_assets, sim)
-                futures[future] = sim
-
-            for future in as_completed(futures):
-                ret[futures[future]] = future.result()
-        return ret

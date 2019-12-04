@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+from concurrent.futures import as_completed
+from concurrent.futures.thread import ThreadPoolExecutor
 from dataclasses import dataclass
 from typing import Any, List, Tuple, Type, Dict
 from uuid import UUID
@@ -157,18 +159,26 @@ class IPlatformExperimentOperations(ABC):
             ret[sim.uid] = self.platform._simulation.get_assets(sim, files, **kwargs)
         return ret
 
-    @abstractmethod
-    def list_assets(self, experiment: IExperiment) -> List[str]:
+    def list_assets(self, experiment: IExperiment) -> Dict[str, List[str]]:
         """
         List assets available for experiment
 
         Args:
-            experiment:
+            experiment: Experiment to get assets for
 
         Returns:
-
+            Dictionary of simulation and assets on each sim
         """
-        pass
+        ret = {}
+        with ThreadPoolExecutor() as pool:
+            futures = dict()
+            for sim in experiment.simulations:
+                future = pool.submit(self.platform._simulations.list_assets, sim)
+                futures[future] = sim
+
+            for future in as_completed(futures):
+                ret[futures[future]] = future.result()
+        return ret
 
 
 @dataclass

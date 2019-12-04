@@ -21,14 +21,33 @@ logger = getLogger(__name__)
 
 @dataclass
 class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
-    platform: 'LocalPlatform'
+    platform: 'LocalPlatform'  # noqa F821
     platform_type: type = ExperimentDict
 
     def get(self, experiment_id: UUID, **kwargs) -> ExperimentDict:
-        experiment_dict = ExperimentsClient.get_one(experiment_id)
+        """
+        Get the experiment object by id
+        Args:
+            experiment_id: Id
+            **kwargs:
+
+        Returns:
+            Experiment Dict object
+        """
+        experiment_dict = ExperimentsClient.get_one(str(experiment_id))
         return ExperimentDict(experiment_dict)
 
     def create(self, experiment: IExperiment, **kwargs) -> Tuple[IExperiment, UUID]:
+        """
+        Create an experiment.
+
+        Args:
+            experiment: Experiment to create
+            **kwargs:
+
+        Returns:
+            Created experiment object and UUID
+        """
         from idmtools_platform_local.internals.tasks.create_experiment import CreateExperimentTask
         from dramatiq.results import ResultTimeout
         if not self.platform.is_supported_experiment(experiment):
@@ -65,24 +84,42 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
             self._launch_item_in_browser(experiment)
         return experiment.uid
 
-    def get_children(self, experiment: Dict, **kwargs) -> List[Any]:
+    def get_children(self, experiment: Dict, **kwargs) -> List[SimulationDict]:
+        """
+        Get children for an experiment
+
+        Args:
+            experiment: Experiment to get chidren for
+            **kwargs:
+
+        Returns:
+            List of simulation dicts
+        """
         # Retrieve the simulations for the current page
         simulations = SimulationsClient.get_all(experiment_id=experiment['experiment_id'], per_page=9999)
         return [SimulationDict(s) for s in simulations]
-        # # Add the simulations
-        # for sim_info in simulation_dict:
-        #     sim = experiment.simulation()
-        #     sim.uid = sim_info['simulation_uid']
-        #     sim.tags = sim_info['tags']
-        #     sim.status = local_status_to_common(sim_info['status'])
-        #     experiment.simulations.append(sim)
-        #
-        # return experiment.simulations
 
-    def get_parent(self, experiment: Any, **kwargs) -> Any:
+    def get_parent(self, experiment: Any, **kwargs) -> None:
+        """
+        Experiment on local platform have no parents so return None
+        Args:
+            experiment:
+            **kwargs:
+
+        Returns:
+
+        """
         return None
 
     def run_item(self, experiment: IExperiment):
+        """
+        Run the experiment
+        Args:
+            experiment: experiment to run
+
+        Returns:
+
+        """
         if not self.platform.is_supported_experiment(experiment):
             raise ValueError("This experiment type is not support on the LocalPlatform.")
         is_docker_type = isinstance(experiment, IDockerExperiment)
@@ -112,6 +149,15 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         list(map(functools.partial(self._send_asset_to_docker, path=path, worker=worker), experiment.assets))
 
     def refresh_status(self, experiment: IExperiment):
+        """
+        Refresh status of experiment
+
+        Args:
+            experiment: Experiment to refresh status for
+
+        Returns:
+
+        """
         status = SimulationsClient.get_all(experiment_id=experiment.uid, per_page=9999)
         for s in experiment.simulations:
             sim_status = [st for st in status if st['simulation_uid'] == s.uid]
@@ -121,15 +167,32 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
                     logger.debug(f"Simulation {sim_status[0]['simulation_uid']}status: {sim_status[0]['status']}")
                 s.status = local_status_to_common(sim_status[0]['status'])
 
-    def list_assets(self, experiment: IExperiment) -> List[str]:
-        pass
-
     def to_entity(self, experiment: Dict, **kwargs) -> IExperiment:
+        """
+        Convert an ExperimentDict to an IExperiment
+
+        Args:
+            experiment: Experiment to convert
+            **kwargs:
+
+        Returns:
+            object as an IExperiment object
+        """
         e = experiment_factory.create(experiment['tags'].get("type"), tags=experiment['tags'])
         e.uid = experiment['experiment_id']
         return e
 
     def _run_docker_sim(self, experiment: IDockerExperiment, simulation: ISimulation):
+        """
+        Run a docker based simulation
+
+        Args:
+            experiment: Experiment to run
+            simulation: Simulation to run
+
+        Returns:
+
+        """
         from idmtools_platform_local.internals.tasks.docker_run import DockerRunTask, GPURunTask
         logger.debug(f"Preparing Docker Task Configuration for {experiment.uid}:{simulation.uid}")
         is_gpu = isinstance(experiment, IGPUExperiment)
@@ -144,6 +207,14 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         run_cmd.send(experiment.command.cmd, experiment.uid, simulation.uid, docker_config)
 
     def _launch_item_in_browser(self, item):
+        """
+        Launch experiment data page in a web browser
+        Args:
+            item:
+
+        Returns:
+
+        """
         if isinstance(item, IExperiment):
             t_str = item.uid
         elif isinstance(item, ISimulation):

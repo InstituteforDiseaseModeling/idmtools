@@ -12,7 +12,7 @@ from idmtools_platform_comps.utils import convert_COMPS_status, get_asset_for_co
 
 @dataclass
 class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
-    platform: 'COMPSPlaform'
+    platform: 'COMPSPlaform'  # noqa F821
     platform_type: Type = field(default=COMPSSimulation)
 
     def get(self, simulation_id: UUID, **kwargs) -> COMPSSimulation:
@@ -44,7 +44,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         return [(s, s.id) for s in created_simulations]
 
     def get_parent(self, simulation: Any, **kwargs) -> COMPSExperiment:
-        return self.platform._experiments.get(simulation.experiment_id,  **kwargs) if simulation.experiment_id else None
+        return self.platform._experiments.get(simulation.experiment_id, **kwargs) if simulation.experiment_id else None
 
     def run_item(self, simulation: ISimulation):
         pass
@@ -53,7 +53,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         if comps_sim is None:
             comps_sim = simulation.get_platform_object()
         for asset in simulation.assets:
-            comps_sim.add_file(simulationfile=SimulationFile(asset.filename, 'input'),  data=asset.bytes)
+            comps_sim.add_file(simulationfile=SimulationFile(asset.filename, 'input'), data=asset.bytes)
 
     def refresh_status(self, simulation: ISimulation):
         s = COMPSSimulation.get(id=simulation.uid, query_criteria=QueryCriteria().select(['state']))
@@ -77,5 +77,3 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
     def list_assets(self, simulation: ISimulation) -> List[str]:
         comps_sim: COMPSSimulation = simulation.get_platform_object(True, children=["files", "configuration"])
         return comps_sim.files
-
-
