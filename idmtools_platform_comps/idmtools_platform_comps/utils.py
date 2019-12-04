@@ -1,4 +1,3 @@
-import functools
 import ntpath
 from typing import NoReturn, List, Dict
 from uuid import UUID
