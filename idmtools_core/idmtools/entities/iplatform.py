@@ -13,7 +13,7 @@ from idmtools.entities.iplatform_metadata import IPlatformExperimentOperations, 
     IPlatformAssetCollectionOperations
 from idmtools.services.platforms import PlatformPersistService
 from idmtools.core.interfaces.iitem import IItem, IItemList
-from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple
+from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set
 
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
 
@@ -454,7 +454,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
                 return getattr(self, interface).to_entity(platform_item, **kwargs)
         return platform_item
 
-    def flatten_item(self, item: IEntity) -> IItemList:
+    def flatten_item(self, item: IEntity) -> List[IEntity]:
         """
         Flatten an item: resolve the children until getting to the leaves.
         For example, for an experiment, will return all the simulations.
@@ -487,7 +487,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
         getattr(self, interface).refresh_status(item)
 
-    def get_files(self, item: IEntity, files: List[str]) -> \
+    def get_files(self, item: IEntity, files: Union[Set[str], List[str]]) -> \
             Union[Dict[str, Dict[str, bytearray]], Dict[str, bytearray]]:
         """
         Get files for a platform entity

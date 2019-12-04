@@ -3,7 +3,7 @@ import sys
 import time
 from logging import getLogger, DEBUG
 from multiprocessing.pool import Pool
-from typing import NoReturn
+from typing import NoReturn, List
 
 from idmtools.analysis.map_worker_entry import map_item
 from idmtools.core import CacheEnabled
@@ -69,7 +69,7 @@ class AnalyzeManager(CacheEnabled):
         logger.debug("Load information about items from platform")
         ids = list(set(ids or list()))  # uniquify
         items = [platform.get_item(oid, otype, force=True) for oid, otype in ids]
-        self.potential_items = []
+        self.potential_items: List[IEntity] = []
 
         for i in items:
             self.potential_items.extend(platform.flatten_item(item=i))

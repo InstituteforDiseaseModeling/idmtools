@@ -77,7 +77,7 @@ class CacheEnabled:
                         logger.exception(e)
 
     @property
-    def cache(self):
+    def cache(self) -> Union[Cache, FanoutCache]:
         if self._cache is None:
             self.initialize_cache()
 
