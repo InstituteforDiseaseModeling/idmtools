@@ -1,4 +1,3 @@
-import os
 from dataclasses import dataclass, field, fields
 import logging
 import time
@@ -6,11 +5,9 @@ from concurrent.futures import as_completed
 from concurrent.futures.thread import ThreadPoolExecutor
 from logging import getLogger
 from typing import NoReturn, Dict, Optional, List, Union
-
 from docker import DockerClient
 from docker.models.containers import Container
 from docker.models.networks import Network
-
 from idmtools.core.system_information import get_data_directory, get_system_information
 from idmtools.utils.decorators import optional_yaspin_load
 from idmtools_platform_local.infrastructure.base_service_container import BaseServiceContainer

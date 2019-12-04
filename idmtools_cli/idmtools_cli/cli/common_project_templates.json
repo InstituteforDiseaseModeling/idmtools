@@ -1,0 +1,19 @@
+[{
+  "name": "reproducible-science",
+  "url": "gh:mkrapp/cookiecutter-reproducible-science",
+  "description": "A boilerplate for reproducible and transparent science with close resemblances to the philosophy of Cookiecutter Data Science: A logical, reasonably standardized, but flexible project structure for doing and sharing data science work.",
+  "info": "https://github.com/mkrapp/cookiecutter-reproducible-science"
+  },
+  {
+  "name": "docker-science",
+  "url": "git@github.com:docker-science/cookiecutter-docker-science.git",
+  "description": "This project is a tiny template for machine learning projects developed in Docker environments. In machine learning tasks, projects glow uniquely to fit target tasks, but in the initial state, most directory structure and targets in Makefile are common. Cookiecutter Docker Science generates initial directories which fits simple machine learning tasks.",
+  "info": "https://docker-science.github.io/"
+  },
+  {
+  "name": "data-science",
+  "url": "https://github.com/drivendata/cookiecutter-data-science",
+  "description": "A logical, reasonably standardized, but flexible project structure for doing and sharing data science work.",
+  "info": "https://docker-science.github.io/"
+  }
+  ]
