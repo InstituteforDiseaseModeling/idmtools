@@ -28,6 +28,7 @@ services:
   workers:
     build:
       context: .
+      network: host
     # We parameterize the build so we can easily specify our desired docker image name
     # ie docker-compose
     image: "${REGISTRY:-idm-docker-staging.packages.idmod.org}/idmtools_local_workers:0.2.0.nightly"
