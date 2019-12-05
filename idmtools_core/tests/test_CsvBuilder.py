@@ -3,8 +3,8 @@ import numpy as np
 from functools import partial
 from idmtools.builders import CsvExperimentBuilder
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
-from idmtools_test.utils.TstExperiment import TstExperiment
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+from idmtools_test.utils.tst_experiment import TstExperiment
 
 
 def param_update(simulation, param, value):

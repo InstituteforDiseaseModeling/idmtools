@@ -1,12 +1,12 @@
 import copy
 import pickle
 import unittest
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields
 from idmtools.builders import ExperimentBuilder
-from idmtools.core.interfaces.IEntity import IEntity
-from idmtools.entities.Suite import Suite
-from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
-from idmtools_test.utils.TstExperiment import TstExperiment
+from idmtools.core.interfaces.ientity import IEntity
+from idmtools.entities.suite import Suite
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+from idmtools_test.utils.tst_experiment import TstExperiment
 
 
 @dataclass
@@ -48,22 +48,28 @@ class TestEntity(ITestWithPersistence):
         self.assertEqual(a, b)
 
     def test_pickle_ignore(self):
+        from idmtools.assets import AssetCollection
+        from idmtools.core import EntityContainer
+
         a = TstExperiment(name="test")
-        self.assertSetEqual(a.pickle_ignore_fields, {'builders'})
+        self.assertSetEqual(a.pickle_ignore_fields, set(f.name for f in fields(a) if "pickle_ignore" in f.metadata and f.metadata["pickle_ignore"]))
         a.builder = ExperimentBuilder()
 
         b = pickle.loads(pickle.dumps(a))
-        self.assertIsNone(b.builders)
+        self.assertSetEqual(b.builders, set())
+        self.assertEqual(b.assets, AssetCollection())
+        self.assertEqual(b.simulations, EntityContainer())
 
         s = Suite(name="test")
-        self.assertSetEqual(s.pickle_ignore_fields, {"experiments"})
+        self.assertSetEqual(s.pickle_ignore_fields, set(f.name for f in fields(s) if "pickle_ignore" in f.metadata and f.metadata["pickle_ignore"]))
         b = pickle.loads(pickle.dumps(s))
-        self.assertEqual(b.experiments, [])
+        self.assertIsNone(b.experiments)
 
         a = EntityWithIgnoreField(ignore=10, ignore_with_restore=5)
         self.assertEqual(a.ignore, 10)
         self.assertEqual(a.ignore_with_restore, 5)
         self.assertEqual(a.not_ignored, 4)
+
         b = pickle.loads(pickle.dumps(a))
         self.assertNotEqual(b.ignore, a.ignore)
         self.assertEqual(b.not_ignored, a.not_ignored)

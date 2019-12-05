@@ -1,23 +1,23 @@
 import logging
-from logging import getLogger
-
 import requests
-
-from idmtools_platform_local.config import API_PATH
-
+from logging import getLogger
+from idmtools_platform_local.config import get_api_path
 
 logger = getLogger(__name__)
 
 
 class BaseClient:
-    base_url = API_PATH
+    base_url = get_api_path()
 
     @classmethod
-    def _validate_response(cls, response, error_obj_str):
+    def _validate_response(cls, response, error_obj_str, id=None):
+        if response.status_code == 404:
+            raise FileNotFoundError(f"Could not find item with id of {id}")
         if response.status_code != 200:
             if logger.isEnabledFor(logging.DEBUG):
-                logging.debug(f'Error fetching {error_obj_str} {cls.base_url if id is None else cls.base_url + "/" + id}'
-                              f'Response Status Code: {response.status_code}. Response Content: {response.text}')
+                logging.debug(
+                    f'Error fetching {error_obj_str} {cls.base_url if id is None else cls.base_url + "/" + id}'
+                    f'Response Status Code: {response.status_code}. Response Content: {response.text}')
             data = response.json()
             raise RuntimeError(data['message'])
         result = response.json()
@@ -45,14 +45,14 @@ class BaseClient:
     @classmethod
     def post(cls, path, **kwargs) -> requests.Response:
         url = f'{cls.base_url}/{path}' if path is not None else cls.base_url
-        return requests.get(url, **kwargs)
+        return requests.post(url, **kwargs)
 
     @classmethod
     def put(cls, path, **kwargs) -> requests.Response:
         url = f'{cls.base_url}/{path}' if path is not None else cls.base_url
-        return requests.get(url, **kwargs)
+        return requests.put(url, **kwargs)
 
     @classmethod
     def delete(cls, path, **kwargs) -> requests.Response:
         url = f'{cls.base_url}/{path}' if path is not None else cls.base_url
-        return requests.get(url, **kwargs)
+        return requests.delete(url, **kwargs)

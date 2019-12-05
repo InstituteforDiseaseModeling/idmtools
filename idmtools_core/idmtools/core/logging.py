@@ -12,18 +12,34 @@ listener = None
 logging_queue = None
 
 
+class IDMQueueListener(QueueListener):
+    def dequeue(self, block):
+        """
+        Dequeue a record and return it, optionally blocking.
+
+        The base implementation uses get. You may want to override this method
+        if you want to use timeouts or work with custom queue implementations.
+        """
+        try:
+            return self.queue.get(block)
+        except EOFError:
+            return None
+
+
 def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'idmtools.log',
                   console: Union[str, bool] = False) -> QueueListener:
     """
+    Set up logging.
 
     Args:
-        level(Union[int, str]): Log level. Default to warning. This should be either a string that matches a log level
-        from logging or an int that represent that level
-        log_filename(str): Name of file to log messages too
-        console(Union[str, bool]): When set to True or the strings 1, y, yes, or on, console logging will be enabled
+        level: Log level. Default to warning. This should be either a string that matches a log level
+            from logging or an int that represent that level.
+        log_filename: Name of file to log messages to.
+        console: When set to True or the strings "1", "y", "yes", or "on", console logging will be enabled.
+
     Returns:
-        (QueueListener) Returns the QueueListener created that writes the log messages. In advanced scenarios with
-        multi-processing you may need to manually stop the logger
+        Returns the ``QueueListener`` created that writes the log messages. In advanced scenarios with
+        multi-processing, you may need to manually stop the logger.
     """
     global listener, logging_queue
     if type(level) is str:
@@ -69,7 +85,7 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
         # setup file logger handler that rotates after 10 mb of logging and keeps 5 copies
 
         # now attach a listener to the logging queue and redirect all messages to our handler
-        listener = QueueListener(logging_queue, file_handler)
+        listener = IDMQueueListener(logging_queue, file_handler)
         listener.start()
         # register a stop signal
         register_stop_logger_signal_handler(listener)
@@ -78,22 +94,24 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
     return listener
 
 
-def exclude_logging_classes():
+def exclude_logging_classes(items_to_exclude=None):
+    if items_to_exclude is None:
+        items_to_exclude = ['urllib3', 'COMPS', 'paramiko']
     # remove comps by default
-    for l in ['urllib3', 'COMPS']:
+    for l in items_to_exclude:
         comps_logger = getLogger(l)
         comps_logger.setLevel(logging.WARN)
 
 
 def register_stop_logger_signal_handler(listener) -> NoReturn:
     """
-    Register a signal watcher that will stop our logging gracefully in the case of queue based logging
+    Register a signal watcher that will stop our logging gracefully in the case of queue based logging.
 
     Args:
-        listener: Log listener object
+        listener: The log listener object.
 
     Returns:
-
+        None
     """
 
     def stop_logger(*args, **kwargs):

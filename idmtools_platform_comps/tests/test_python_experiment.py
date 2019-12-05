@@ -1,18 +1,17 @@
 import json
 import os
+import pytest
 import unittest
 from functools import partial
 from operator import itemgetter
-
-import pytest
 from COMPS.Data import Experiment, QueryCriteria
 from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import ArmExperimentBuilder, ArmType, ExperimentBuilder, StandAloneSimulationsBuilder, SweepArm
 from idmtools.core import EntityStatus
+from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
-from idmtools_platform_comps.COMPSPlatform import COMPSPlatform
-from idmtools_test.utils.ITestWithPersistence import ITestWithPersistence
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id
 from idmtools_test import COMMON_INPUT_PATH
 
@@ -35,11 +34,12 @@ class setParam:
 
 
 @pytest.mark.comps
+@pytest.mark.python
 class TestPythonExperiment(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
-        self.platform = COMPSPlatform()
+        self.platform = Platform('COMPS2')
 
     # Test 2 ways to sweep parameters
     # First way: use partial function
@@ -47,11 +47,11 @@ class TestPythonExperiment(ITestWithPersistence):
     # Also current add_sweep_definition will do product of each call. if first call has 5 parameters, second call also
     # has 5 parameter, total sweep parameters are 5*5=25
 
+    @pytest.mark.long
     def test_sweeps_with_partial_comps(self):
         pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
 
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123, "KeyOnly": None}
-
         pe.base_simulation.set_parameter("c", "c-value")
         builder = ExperimentBuilder()
         # ------------------------------------------------------
@@ -83,15 +83,15 @@ class TestPythonExperiment(ITestWithPersistence):
         # validate experiment tags
         actual_exp_tags = experiment.get(experiment.id, QueryCriteria().select_children('tags')).tags
         expected_exp_tags = {'idmtools': 'idmtools-automation', 'number_tag': '123', 'string_tag': 'test',
-                             'KeyOnly': '', 'type': 'idmtools_models.python.PythonExperiment'}
+                             'KeyOnly': '', 'type': 'idmtools_models.python.python_experiment.PythonExperiment'}
         self.assertDictEqual(expected_exp_tags, actual_exp_tags)
 
     # Test parameter "b" set is depending on parameter "a"
     # a=[0,1,2,3,4] <--sweep parameter
     # b=[2,3,4,5,6]  <-- b = a + 2
+    @pytest.mark.long
     def test_sweeps_2_related_parameters_comps(self):
         pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
-
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
 
         pe.base_simulation.set_parameter("c", "c-value")
@@ -122,6 +122,7 @@ class TestPythonExperiment(ITestWithPersistence):
         expected_tags = [{'a': '0'}, {'a': '1'}, {'a': '2'}, {'a': '3'}, {'a': '4'}]
         self.validate_sim_tags(exp_id, expected_tags)
 
+    @pytest.mark.long
     @pytest.mark.comps
     def test_add_prefixed_relative_path_to_assets_comps(self):
         model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
@@ -179,6 +180,7 @@ class TestPythonExperiment(ITestWithPersistence):
     #       |--functions.py
     #   |--__init__.py
     #   |--model.py
+    @pytest.mark.long
     @pytest.mark.comps
     def test_add_dirs_to_assets_comps(self):
         model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
@@ -231,12 +233,14 @@ class TestPythonExperiment(ITestWithPersistence):
     #   |--MyExternalLibrary
     #       |--functions.py
     #   |--model.py
+    @pytest.mark.long
     @pytest.mark.comps
     def test_add_specific_files_to_assets_comps(self):
         model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
         ac = AssetCollection()
         a = Asset(relative_path="MyExternalLibrary",
-                  absolute_path=os.path.join(COMMON_INPUT_PATH, "python", "Assets", "MyExternalLibrary", "functions.py"))
+                  absolute_path=os.path.join(COMMON_INPUT_PATH, "python", "Assets", "MyExternalLibrary",
+                                             "functions.py"))
         ac.add_asset(a)
         pe = PythonExperiment(name=self.case_name, model_path=model_path, assets=ac)
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
@@ -282,6 +286,7 @@ class TestPythonExperiment(ITestWithPersistence):
     # {6,2}
     # {7,2}
     @pytest.mark.comps
+    @pytest.mark.long
     def test_sweep_in_arms_cross(self):
         pe = PythonExperiment(name=self.case_name,
                               model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))

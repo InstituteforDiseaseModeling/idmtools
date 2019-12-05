@@ -1,1 +1,3 @@
-include idmtools_test/*
+recursive-include idmtools_test *
+include requirements.txt
+include README.md

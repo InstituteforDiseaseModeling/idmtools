@@ -1,7 +1,7 @@
 from typing import NoReturn
 
-from idmtools.registry.PluginSpecification import get_description_impl
-from idmtools_cli.IPlatformCli import IPlatformCLI, PlatformCLISpecification, get_platform_cli_impl, \
+from idmtools.registry.plugin_specification import get_description_impl
+from idmtools_cli.iplatform_cli import IPlatformCLI, PlatformCLISpecification, get_platform_cli_impl, \
     get_additional_commands_impl
 
 
@@ -25,7 +25,8 @@ class COMPSCLISpecification(PlatformCLISpecification):
 
     @get_additional_commands_impl
     def get_additional_commands(self) -> NoReturn:
-        pass
+        import idmtools_platform_comps.cli.comps  # noqa: F401
+        import idmtools_platform_comps.cli.utils  # noqa: F401
 
     @get_description_impl
     def get_description(self) -> str:

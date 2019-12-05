@@ -1,0 +1,25 @@
+# We have to use version 2 formatting of docker-compose to allow use to limit resource usage
+version: "2.3"
+services:
+  linuxtst:
+    build:
+      context: .
+    # We parameterize the build so we can easily specify our desired docker image name
+    # ie docker-compose
+    image: "idmtools-linux"
+    environment:
+      - "CURRENT_UID=${CURRENT_UID:-1000:1000}"
+      - "IDMTOOLS_DATA_BASE_DIR=/home/idmtools/testing"
+    ports:
+      - 5000:5000
+    volumes:
+      - //var/run/docker.sock:/var/run/docker.sock
+      - ../../:/idmtools
+      # attach to named volume to solve the docker-in-docker mounting situation
+      # that arises from running local-platform mounts
+      - idmtools_local_redis:/home/idmtools/.local_data/redis-data
+      - idmtools_local_workers:/home/idmtools/.local_data/workers
+
+volumes:
+  idmtools_local_redis:
+  idmtools_local_workers:

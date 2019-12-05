@@ -1,5 +1,8 @@
 # flake8: noqa F821
-from idmtools.entities.CommandLine import CommandLine
-from idmtools.entities.IExperiment import IExperiment
-from idmtools.entities.IPlatform import IPlatform
-from idmtools.entities.ISimulation import ISimulation
+from idmtools.entities.command_line import CommandLine
+from idmtools.entities.ianalyzer import IAnalyzer
+from idmtools.entities.iexperiment import IExperiment
+from idmtools.entities.iplatform import IPlatform
+from idmtools.entities.isimulation import ISimulation
+from idmtools.entities.suite import Suite
+
