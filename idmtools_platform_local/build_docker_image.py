@@ -6,8 +6,8 @@ import subprocess
 import sys
 from urllib.parse import urlparse
 version = open('VERSION').read().strip()
-if '+nightly.0' in version:
-    version = version.replace('+nightly.0', '.nightly')
+if '+nightly' in version:
+    version = version.replace('+nightly', '.nightly')
 uri = urlparse(sys.argv[1])
 
 cmd = ['docker', 'build', '--network=host', '--build-arg', f'PYPIURL={sys.argv[1]}', '--build-arg',
