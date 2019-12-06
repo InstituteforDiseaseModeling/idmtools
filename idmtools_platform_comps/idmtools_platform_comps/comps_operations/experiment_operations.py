@@ -10,7 +10,7 @@ from idmtools.entities import IExperiment
 from idmtools.entities.iexperiment import StandardExperiment
 from idmtools.entities.iplatform_metadata import IPlatformExperimentOperations
 from idmtools.utils.time import timestamp
-from idmtools_platform_comps.utils import convert_COMPS_status, clean_experiment_name
+from idmtools_platform_comps.utils.general import clean_experiment_name, convert_COMPS_status
 
 
 @dataclass

@@ -3,11 +3,11 @@ from typing import Any, Tuple, List, Dict, Type
 from uuid import UUID
 from COMPS.Data import Simulation as COMPSSimulation, QueryCriteria, Experiment as COMPSExperiment, SimulationFile, \
     Configuration
+from idmtools_platform_comps.utils.general import convert_COMPS_status, get_asset_for_comps_item
 
 from idmtools.core import ItemType
 from idmtools.entities import ISimulation
 from idmtools.entities.iplatform_metadata import IPlatformSimulationOperations
-from idmtools_platform_comps.utils import convert_COMPS_status, get_asset_for_comps_item
 
 
 @dataclass
