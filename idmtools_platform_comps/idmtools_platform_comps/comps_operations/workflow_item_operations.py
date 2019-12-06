@@ -4,7 +4,7 @@ from uuid import UUID
 from idmtools.entities.iplatform_metadata import IPlatformWorkflowItemOperations
 from COMPS.Data import WorkItem, QueryCriteria, WorkItemFile
 from idmtools.entities.iworkflow_item import IWorkflowItem
-from idmtools_platform_comps.utils import convert_COMPS_status, get_asset_for_comps_item
+from idmtools_platform_comps.utils.general import convert_COMPS_status, get_asset_for_comps_item
 
 
 @dataclass
