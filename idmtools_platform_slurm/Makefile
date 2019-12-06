@@ -96,3 +96,6 @@ release-staging-release-commit: ## perform a release to staging and commit the v
 
 bump-patch:
 	bump2version patch --commit
+
+bump-minor: ## bump the minor version
+	bump2version minor --commit

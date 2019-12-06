@@ -93,5 +93,8 @@ release-staging-release-commit: ## perform a release to staging and commit the v
 	@make dist
 	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/idm-pypi-staging/ dist/*
 
-bump-patch:
+bump-patch: ## bump the patch version
 	bump2version patch --commit
+
+bump-minor: ## bump the minor version
+	bump2version minor --commit

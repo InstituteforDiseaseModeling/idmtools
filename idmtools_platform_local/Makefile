@@ -13,7 +13,7 @@ TEST_COMMAND=py.test --durations=10 -v --junitxml=test_results.xml
 TEST_RUN_OPTS=-e DOCKER_REPO=idm-docker-staging NO_SPINNER=1
 FULL_TEST_CMD=$(PDR) -w 'tests' $(TEST_RUN_OPTS) -ex '$(TEST_COMMAND)
 COVERAGE_CMD=$(PDR) -w 'tests' $(TEST_RUN_OPTS) -p . ../ -ex 'coverage run --omit="*/test*,*/setup.py" --source ../,../../idmtools_core,../../idmtools_models,../../idmtools_model_emod -m pytest
-
+DOCKER_VERSION=$($(IPY) "print(")
 help:
 	$(PDS)get_help_from_makefile.py
 
@@ -24,6 +24,9 @@ clean: ## Clean most of the temp-data from the project
 clean-all:  ## Deleting package info hides plugins so we only want to do that for packaging
 	@make clean
 	$(CLDIR) --dir-patterns "**/*.egg-info/"
+
+edv:
+	echo $(CWD)
 
 # Dev and test related rules
 lint: ## check style with flake8
@@ -85,7 +88,7 @@ docker-local: ## Build our docker image using the local pypi
 	$(PDR) -w '../dev_scripts/local_pypi' -ex 'docker-compose up -d'
 	$(PDR) -w '../idmtools_core' -ex 'pymake release-local'
 	@pymake release-local
-	docker-compose build --build-arg PYPIURL=http://localhost:7171/ --build-arg PYPIHOST=localhost workers
+	python build_docker_image.py http://localhost:7171/
 
 docker-local-no-cache:## Build our docker image using the local pypi
 	# This job is most useful when actively developing changes to the local_platform internals(tasks, api, cli) or
@@ -95,19 +98,18 @@ docker-local-no-cache:## Build our docker image using the local pypi
 	$(PDR) -w '../dev_scripts/local_pypi' -ex 'docker-compose up -d'
 	$(PDR) -w '../idmtools_core' -ex 'pymake release-local'
 	@pymake release-local
-	docker-compose build --no-cache --build-arg PYPIURL=http://localhost:7171/ --build-arg PYPIHOST=localhost workers
+	python build_docker_image.py http://localhost:7171/ no-cache
 
 docker-staging: ## Build our docker image using staging pypi
 	$(PDR) -w '../dev_scripts/local_pypi' -ex 'docker-compose up -d'
 	# rebuild local package at moment since we install local platform package from there
-	docker-compose build --build-arg PYPIURL=$(STAGING_PIP_URL) workers
+	python build_docker_image.py $(STAGING_PIP_URL) no-cache
 
 docker-release-staging:
 	@make docker-staging
-	docker-compose push workers
+	python push_docker_image.py
 
 # Release related rules
-
 release-local: ## package and upload a release to http://localhost:7171
 	@pymake dist
 	twine upload --verbose --repository-url http://localhost:7171 -u admin -p admin dist/*
@@ -145,3 +147,6 @@ build-ui: ## build ui
 
 bump-patch: ## bump the patch version
 	bump2version patch --commit
+
+bump-minor: ## bump the minor version
+	bump2version minor --commit
