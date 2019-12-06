@@ -2,7 +2,9 @@
 import os
 import subprocess
 import sys
-version = open('VERSION').read().strip().replace('+', '.')
+version = open('VERSION').read().strip()
+if '+nightly.0' in version:
+    version = version.replace('+nightly.0', '.nightly')
 cmd = ['docker', 'push', f'idm-docker-staging.packages.idmod.org/idmtools_local_workers:{version}']
 print(f'Running: {" ".join(cmd)}')
 p = subprocess.Popen(" ".join(cmd),  cwd=os.path.abspath(os.path.dirname(__file__)), shell=True)
