@@ -119,23 +119,6 @@ dist: ## build our package
 	@make clean
 	python setup.py sdist
 
-release-staging: ## perform a release to staging
-	bump2version build --allow-dirty
-	@pymake dist
-	twine upload --verbose --repository-url $(STAGING_PIP_URL) dist/*
-	@make docker-release-staging
-
-# Use before release-staging-release-commit to confirm next version.
-release-staging-release-dry-run: ## perform a release to staging and bump the minor version.
-	bump2version release --dry-run --allow-dirty --verbose
-
-# This should be used when a pushing a "production" build to staging before being approved by test
-release-staging-release-commit: ## perform a release to staging and commit the version.
-	bump2version release --commit
-	@make dist
-	twine upload --verbose --repository-url $(STAGING_PIP_URL) dist/*
-	@make docker-release-staging
-
 start-webui: ## start the webserver
 	$(PDR) -w 'idmtools_webui' -ex yarn
 	$(PDR) -w 'idmtools_webui' -ex 'yarn start'
@@ -145,8 +128,23 @@ build-ui: ## build ui
 	@+$(IPY) "import os; os.chdir('idmtools_webui'); os.system('python build.py')"
 	@$(IPY) "import shutil; shutil.copytree('idmtools_webui/build', 'idmtools_platform_local/internals/ui/static')"
 
+release-staging: ## perform a release to staging
+	@make dist
+	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/idm-pypi-staging/ dist/*
+	@make docker-release-staging
+
+# Use before release-staging-release-commit to confirm next version.
+bump-release-dry-run: ## perform a release to staging and bump the minor version.
+	bump2version release --dry-run --allow-dirty --verbose
+
 bump-patch: ## bump the patch version
 	bump2version patch --commit
 
 bump-minor: ## bump the minor version
 	bump2version minor --commit
+
+bump-patch-dry-run: ## bump the patch version
+	bump2version patch --dry-run --allow-dirty --verbose
+
+bump-minor-dry-run: ## bump the minor version
+	bump2version minor --dry-run --allow-dirty --verbose
