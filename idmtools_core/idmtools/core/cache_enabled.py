@@ -68,9 +68,13 @@ class CacheEnabled:
                 # in these cases, let's just preserve cache. Often these are temp directories the os
                 # will clean up for us
                 except (IOError, PermissionError) as e:
-                    logger.warning(f"Could not delete cache directory: {self._cache_directory}")
-                    if logger.isEnabledFor(DEBUG):
-                        logger.exception(e)
+                    # We can hit logging issues as we are shutting down. Ignore those
+                    try:
+                        logger.warning(f"Could not delete cache directory: {self._cache_directory}")
+                        if logger.isEnabledFor(DEBUG):
+                            logger.exception(e)
+                    except Exception:
+                        pass
 
     @property
     def cache(self):

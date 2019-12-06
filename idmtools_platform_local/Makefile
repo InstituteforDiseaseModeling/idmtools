@@ -85,7 +85,7 @@ docker-local: ## Build our docker image using the local pypi
 	$(PDR) -w '../dev_scripts/local_pypi' -ex 'docker-compose up -d'
 	$(PDR) -w '../idmtools_core' -ex 'pymake release-local'
 	@pymake release-local
-	docker-compose build --build-arg PYPIURL=http://172.17.0.1:7171/ --build-arg PYPIHOST=172.17.0.1 workers
+	docker-compose build --build-arg PYPIURL=http://localhost:7171/ --build-arg PYPIHOST=localhost workers
 
 docker-local-no-cache:## Build our docker image using the local pypi
 	# This job is most useful when actively developing changes to the local_platform internals(tasks, api, cli) or
@@ -95,7 +95,7 @@ docker-local-no-cache:## Build our docker image using the local pypi
 	$(PDR) -w '../dev_scripts/local_pypi' -ex 'docker-compose up -d'
 	$(PDR) -w '../idmtools_core' -ex 'pymake release-local'
 	@pymake release-local
-	docker-compose build --no-cache --build-arg PYPIURL=http://172.17.0.1:7171/ --build-arg PYPIHOST=172.17.0.1 workers
+	docker-compose build --no-cache --build-arg PYPIURL=http://localhost:7171/ --build-arg PYPIHOST=localhost workers
 
 docker-staging: ## Build our docker image using staging pypi
 	$(PDR) -w '../dev_scripts/local_pypi' -ex 'docker-compose up -d'

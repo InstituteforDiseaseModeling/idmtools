@@ -227,4 +227,3 @@ class TestLoadFiles(ITestWithPersistence):
         dict['parameters'].update({'Enable_Regional_Migration': 0})
         dict['parameters'].update({'Enable_Sea_Migration': 0})
         return dict
-

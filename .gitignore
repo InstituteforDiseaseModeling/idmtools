@@ -380,3 +380,5 @@ idmtools_platform_comps/tests/inputs/analyzers/timeseries.png
 idmtools_platform_comps/tests/output/
 idmtools_platform_local/internals/ui/static/*
 idmtools_platform_local/idmtools_webui/build
+idmtools_platform_local/idmtools_platform_local/internals/ui/static/
+idmtools_test/idmtools_test/data/
