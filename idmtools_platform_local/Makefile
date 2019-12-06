@@ -101,7 +101,6 @@ docker-local-no-cache:## Build our docker image using the local pypi
 	python build_docker_image.py http://localhost:7171/ no-cache
 
 docker-staging: ## Build our docker image using staging pypi
-	$(PDR) -w '../dev_scripts/local_pypi' -ex 'docker-compose up -d'
 	# rebuild local package at moment since we install local platform package from there
 	python build_docker_image.py $(STAGING_PIP_URL) no-cache
 
