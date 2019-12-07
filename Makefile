@@ -76,6 +76,10 @@ linux-dev-env: ## Runs docker dev env
 draft-change-log:
 	git log $(shell git tag -l --sort=-v:refname | grep -w '[0-9]\.[0-9]\.[0-9]' | head -n 1) HEAD --pretty=format:'%s' --reverse --simplify-merges | uniq
 
+
+bump-release: #bump the release version.
+	$(MAKEALL) bump-release
+
 # Use before release-staging-release-commit to confirm next version.
 bump-release-dry-run: ## perform a release to staging and bump the minor version.
 	$(MAKEALL) bump-release-dry-run
