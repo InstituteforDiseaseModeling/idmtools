@@ -19,7 +19,7 @@ class IPersistenceService(metaclass=ABCMeta):
     @classmethod
     def retrieve(cls, uid):
         with cls._open_cache() as cache:
-            obj = cache.get(uid)
+            obj = cache.get(uid, retry=True)
             return obj
 
     @classmethod
@@ -27,7 +27,7 @@ class IPersistenceService(metaclass=ABCMeta):
         with cls._open_cache() as cache:
             if logger.isEnabledFor(logging.DEBUG):
                 logging.debug('Saving %s to %s', obj.uid, cls.cache_name)
-            cache.set(obj.uid, obj)
+            cache.set(obj.uid, obj, retry=True)
 
         return obj.uid
 
