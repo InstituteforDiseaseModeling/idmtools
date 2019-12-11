@@ -1,0 +1,5 @@
+flake8
+coverage
+py-make
+bump2version
+twine
