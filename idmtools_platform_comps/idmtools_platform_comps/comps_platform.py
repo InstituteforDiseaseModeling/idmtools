@@ -57,12 +57,12 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     def __post_init__(self):
         print("\nUser Login:")
         print(json.dumps({"endpoint": self.endpoint, "environment": self.environment}, indent=3))
-        self._login()
         self.__init_interfaces()
         self.supported_types = {ItemType.EXPERIMENT, ItemType.SIMULATION, ItemType.SUITE, ItemType.ASSETCOLLECTION}
         super().__post_init__()
 
     def __init_interfaces(self):
+        self._login()
         self._experiments = CompsPlatformExperimentOperations(platform=self)
         self._simulations = CompsPlatformSimulationOperations(platform=self)
         self._suites = CompsPlatformSuiteOperations(platform=self)
