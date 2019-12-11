@@ -55,7 +55,7 @@ ENV PYTHONPATH=/app:${PYTHONPATH}
 #TODO: Move the actual package to artifactory and install from there. It would simpify the environmetn quite a bit
 
 # make it where we can specifiy our dependent packages at build time
-ARG PYPIURL=https://packages.idmod.org/api/pypi/pypi-production/simple
+ARG PYPIURL=https://packages.idmod.org/api/pypi/pypi-staging/simple
 ARG PYPIHOST=packages.idmod.org
 RUN echo ${PYPIURL}
 # Install requirements first to reduce build cache misses
