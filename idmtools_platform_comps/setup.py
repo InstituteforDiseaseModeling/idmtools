@@ -47,7 +47,8 @@ setup(
     setup_requires=setup_requirements,
     test_suite='tests',
     entry_points=dict(idmtools_platform=  # noqa: E251
-                      ["idmtools_platform_comps = idmtools_platform_comps.plugin_info:COMPSPlatformSpecification"],
+                      ["idmtools_platform_comps = idmtools_platform_comps.plugin_info:COMPSPlatformSpecification",
+                       "idmtools_platform_ssmt = idmtools_platform_comps.plugin_info:SSMTPlatformSpecification"],
                       idmtools_platform_cli=  # noqa: E251
                       ["idmtools_platform_cli_comps = idmtools_platform_comps.comps_cli:COMPSCLISpecification"]
                       ),

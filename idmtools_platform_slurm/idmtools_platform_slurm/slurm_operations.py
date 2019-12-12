@@ -300,6 +300,12 @@ class RemoteSlurmOperations(SlurmOperations):
 @dataclass
 class LocalSlurmOperations(SlurmOperations):
 
+    def experiment_status(self, experiment):
+        raise NotImplementedError("TODO")
+
+    def link_dir(self, src, dest):
+        raise NotImplementedError("TODO")
+
     def dump_metadata(self, object, dest):
         if dataclasses.is_dataclass(object):
             json.dump(dataclasses.asdict(object), dest)
