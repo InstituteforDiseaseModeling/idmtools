@@ -45,7 +45,7 @@ class CacheEnabled:
 
         # Create different cache depending on the options
         if shards:
-            self._cache = FanoutCache(self._cache_directory, shards=shards, timeout=0.050,
+            self._cache = FanoutCache(self._cache_directory, shards=shards, timeout=0.1,
                                       eviction_policy=eviction_policy)
         else:
             self._cache = Cache(self._cache_directory)
@@ -68,9 +68,13 @@ class CacheEnabled:
                 # in these cases, let's just preserve cache. Often these are temp directories the os
                 # will clean up for us
                 except (IOError, PermissionError) as e:
-                    logger.warning(f"Could not delete cache directory: {self._cache_directory}")
-                    if logger.isEnabledFor(DEBUG):
-                        logger.exception(e)
+                    # We can hit logging issues as we are shutting down. Ignore those
+                    try:
+                        logger.warning(f"Could not delete cache directory: {self._cache_directory}")
+                        if logger.isEnabledFor(DEBUG):
+                            logger.exception(e)
+                    except Exception:
+                        pass
 
     @property
     def cache(self):

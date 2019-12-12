@@ -1,7 +1,8 @@
 import os
+
 from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
-from idmtools.core.platform_factory import Platform
 from idmtools.core.experiment_factory import experiment_factory
+from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.decorators import windows_only
@@ -34,9 +35,10 @@ class TestExperimentFactory(ITestWithPersistence):
         test_platform = Platform('Test')
         experiment = experiment_factory.create("EMODExperiment", tags={"a": "1", "b": 2},
                                                eradication_path=os.path.join(COMMON_INPUT_PATH, "emod"))
-        experiment.load_files(config_path=os.path.join(COMMON_INPUT_PATH, "files", "config.json"),
-                              campaign_path=os.path.join(COMMON_INPUT_PATH, "files", "campaign.json"),
-                              demographics_paths=os.path.join(COMMON_INPUT_PATH, "files", "demographics.json"))
+        experiment.base_simulation.load_files(config_path=os.path.join(COMMON_INPUT_PATH, "files", "config.json"),
+                                              campaign_path=os.path.join(COMMON_INPUT_PATH, "files", "campaign.json"))
+        experiment.demographics.add_demographics_from_file(
+            os.path.join(COMMON_INPUT_PATH, "files", "demographics.json"))
 
         b = StandAloneSimulationsBuilder()
         for i in range(20):

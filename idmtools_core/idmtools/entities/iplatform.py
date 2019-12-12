@@ -94,7 +94,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     def create_items(self, items: 'TEntity') -> 'List[UUID]':
         """
-        Create items (simulations, experiments, or suites) on the platform. The function will batch the items based on type and call the self._create_batch for creation
+        Create items (simulations, experiments, or suites) on the platform. The function will batch the items based on
+        type and call the self._create_batch for creation
 
         Args:
             items: The list of items to create.
@@ -102,6 +103,10 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         Returns:
             List of item IDs created.
         """
+        for item in items:
+            if item.item_type not in self.supported_types:
+                raise Exception(f'Unable to create items of type: {item.item_type} for platform: {self.__class__.__name__}')
+
         ids = []
         for key, group in groupby(items, lambda x: x.item_type):
             ids.extend(self._create_batch(list(group), key))

@@ -13,7 +13,7 @@ with open('requirements.txt') as requirements_file:
 
 build_requirements = ['flake8', 'coverage', 'py-make', 'bump2version', 'twine']
 setup_requirements = []
-test_requirements = ['pytest', 'pytest-runner', 'pytest-timeout'] + build_requirements
+test_requirements = ['pytest', 'pytest-runner', 'pytest-timeout', 'pytest-cache'] + build_requirements
 
 extras = dict(test=test_requirements, packaging=build_requirements)
 
@@ -49,6 +49,6 @@ setup(
     test_suite='tests',
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='0.2.0+nightly',
+    version='0.3.0+nightly',
     zip_safe=False,
 )

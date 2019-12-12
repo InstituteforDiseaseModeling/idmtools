@@ -8,6 +8,7 @@ from itertools import chain
 from datetime import datetime, timezone, timedelta
 from dataclasses import dataclass, field, InitVar
 from logging import getLogger
+
 from more_itertools import grouper
 from idmtools.core import ItemType, TExperimentBuilder
 from idmtools.core.interfaces.entity_container import EntityContainer
@@ -35,15 +36,16 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         base_simulation: Optional, a simulation that will be the base for all simulations created for this experiment.
         command: Command to run on simulations.
     """
-    command: 'TCommandLine' = field(default=None)
+    command: TCommandLine = field(default=None)
     suite_id: uuid = field(default=None)
-    simulation_type: 'InitVar[TSimulationClass]' = None
-    base_simulation: 'TSimulation' = field(default=None, compare=False, metadata={"pickle_ignore": True})
+    simulation_type: InitVar[TSimulationClass] = None
+    base_simulation: TSimulation = field(default=None, compare=False, metadata={"pickle_ignore": True})
     builders: set = field(default_factory=lambda: set(), compare=False, metadata={"pickle_ignore": True})
     simulations: EntityContainer = field(default_factory=lambda: EntityContainer(), compare=False,
                                          metadata={"pickle_ignore": True})
-    _simulation_default: 'TSimulation' = field(default=None, compare=False)
-    item_type: 'ItemType' = field(default=ItemType.EXPERIMENT, compare=False)
+    _simulation_default: TSimulation = field(default=None, compare=False, init=False)
+    item_type: ItemType = field(default=ItemType.EXPERIMENT, compare=False, init=False)
+    frozen: bool = field(default=False, init=False)
 
     def __post_init__(self, simulation_type):
         super().__post_init__()
@@ -61,7 +63,16 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         return f"<Experiment: {self.uid} - {self.name} / Sim count {len(self.simulations) if self.simulations else 0}>"
 
     @property
-    def builder(self) -> TExperimentBuilder:
+    def suite(self):
+        return self.parent
+
+    @suite.setter
+    def suite(self, suite):
+        self.parent = suite
+
+    @property
+    def builder(self) -> 'TExperimentBuilder':
+
         """
         For backward-compatibility purposes.
 
@@ -116,25 +127,24 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         display(self, experiment_table_display)
 
     def batch_simulations(self, batch_size=5):
-        # Make sure each simulation has platform and parent_id
+        # If no builders and no simulation, just return the base simulation
+        if not self.builders and not self.simulations:
+            yield (self.simulation(),)
+            return
+
+        # First consider the simulations of the experiment
         if self.simulations:
             for sim in self.simulations:
                 sim.platform = self.platform
-                sim.parent_id = self.uid
+                sim.experiment = self
 
-        # Consider simulations first
-        for groups in grouper(self.simulations, batch_size):
-            sims = []
-            for sim in filter(None, groups):
-                sims.append(sim)
-            yield sims
+            for groups in grouper(self.simulations, batch_size):
+                sims = []
+                for sim in filter(None, groups):
+                    sims.append(sim)
+                yield sims
 
-        # Consider builders next
-        if not self.builders:
-            if not self.simulations:
-                yield (self.simulation(),)
-            return
-
+        # Then the builders
         for groups in grouper(chain(*self.builders), batch_size):
             sims = []
             for simulation_functions in filter(None, groups):
@@ -146,7 +156,7 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
                     if new_tags:
                         tags.update(new_tags)
 
-                simulation.tags = tags
+                simulation.tags.update(tags)
                 sims.append(simulation)
 
             yield sims
@@ -159,13 +169,14 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         Returns:
             The created simulation.
         """
+        # TODO: the experiment should be frozen when the first simulation is created
         sim = copy.deepcopy(self.base_simulation)
         sim.assets = copy.deepcopy(self.base_simulation.assets)
         sim.platform = self.platform
         sim.experiment = self
         return sim
 
-    def pre_creation(self):
+    def pre_creation(self) -> None:
         # Gather the assets
         self.gather_assets()
 
@@ -217,6 +228,11 @@ class IGPUExperiment:
 
 
 @dataclass(repr=False)
+class IHostBinaryExperiment:
+    pass
+
+
+@dataclass(repr=False)
 class IDockerExperiment:
     image_name: str
     # Optional config to build the docker image
@@ -240,8 +256,7 @@ class IDockerExperiment:
         build_config = dict(path=self.build_path, dockerfile=self.Dockerfile, tag=self.image_name,
                             labels=dict(
                                 buildstamp=f'built-by idmtools {__version__}',
-                                builddate=str(datetime.now(timezone(timedelta(hours=-8))))
-                                )
+                                builddate=str(datetime.now(timezone(timedelta(hours=-8)))))
                             )
         if extra_build_args:
             build_config.update(extra_build_args)

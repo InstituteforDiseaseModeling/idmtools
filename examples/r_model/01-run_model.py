@@ -1,4 +1,3 @@
-import glob
 import itertools
 import os
 import shutil

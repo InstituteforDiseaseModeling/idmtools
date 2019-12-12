@@ -1,15 +1,20 @@
 import unittest
+from typing import Any
 
-from idmtools.analysis.AnalyzeManager import AnalyzeManager
-from idmtools.analysis.DownloadAnalyzer import DownloadAnalyzer as SampleAnalyzer
+import pytest
+
+from idmtools.analysis.analyze_manager import AnalyzeManager
+from idmtools.analysis.download_analyzer import DownloadAnalyzer as SampleAnalyzer
 from idmtools.builders import StandAloneSimulationsBuilder
 from idmtools.core.enums import EntityStatus, ItemType
+from idmtools.core.interfaces.iitem import TItem
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.ianalyzer import IAnalyzer
 from idmtools.managers import ExperimentManager
 from idmtools_test.utils.tst_experiment import TstExperiment
 
 
+@pytest.mark.analysis
 class TestAnalyzeManager(unittest.TestCase):
     class TestAnalyzer(IAnalyzer):
         def __init__(self, working_dir=None):
@@ -18,6 +23,12 @@ class TestAnalyzeManager(unittest.TestCase):
 
         def initialize(self):
             self.initialize_was_called = True
+
+        def map(self, data: 'Any', item: 'TItem') -> 'Any':
+            pass
+
+        def reduce(self, all_data: dict) -> 'Any':
+            pass
 
     def setUp(self) -> None:
         self.platform = Platform('Test')

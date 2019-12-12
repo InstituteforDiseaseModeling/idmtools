@@ -1,6 +1,5 @@
 import os
 import pytest
-from importlib import reload
 from idmtools.core import EntityStatus, ItemType
 from operator import itemgetter
 from idmtools.assets import AssetCollection
@@ -15,16 +14,14 @@ from idmtools_test.utils.decorators import restart_local_platform
 
 
 @pytest.mark.docker
+@pytest.mark.python
 class TestPythonSimulation(ITestWithPersistence):
 
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
 
-        import idmtools_platform_local.tasks.create_experiment
-        import idmtools_platform_local.tasks.create_simulation
-        reload(idmtools_platform_local.tasks.create_experiment)
-        reload(idmtools_platform_local.tasks.create_simulation)
-
+    @pytest.mark.long
+    @pytest.mark.timeout(90)
     @restart_local_platform(silent=True, **get_test_local_env_overrides())
     def test_direct_sweep_one_parameter_local(self):
         platform = Platform('Local')
@@ -63,6 +60,8 @@ class TestPythonSimulation(ITestWithPersistence):
         sorted_expected_tags = sorted(expected_tags, key=itemgetter('a'))
         self.assertEqual(sorted_tags, sorted_expected_tags)
 
+    @pytest.mark.long
+    @pytest.mark.timeout(90)
     @restart_local_platform(silent=True, **get_test_local_env_overrides())
     def test_add_prefixed_relative_path_to_assets_local(self):
         # platform = Platform('COMPS2', endpoint="https://comps2.idmod.org", environment="Bayesian")

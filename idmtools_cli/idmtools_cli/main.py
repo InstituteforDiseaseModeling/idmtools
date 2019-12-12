@@ -1,6 +1,6 @@
 from typing import NoReturn
 
-from colorama import init
+from colorama import init as color_init
 
 from idmtools_cli.iplatform_cli import PlatformCLIPlugins
 from idmtools_cli.cli import cli
@@ -32,11 +32,14 @@ def start() -> NoReturn:
     Returns:
         None
     """
-    init()
+    color_init()
+    import idmtools_cli.cli.init
     import idmtools_cli.cli.experiment
     import idmtools_cli.cli.simulation
     import idmtools_cli.cli.system_info  # noqa: F401
     platform_plugins = PlatformCLIPlugins()
+    from idmtools_cli.cli.init import build_project_commands
+    build_project_commands()
     # Trigger the loading of additional cli from platforms
     [p.get_additional_commands() for p in platform_plugins.get_plugins()]
 

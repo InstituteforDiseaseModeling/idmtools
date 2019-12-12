@@ -2,43 +2,67 @@
 import os
 import time
 import unittest.mock
-from operator import itemgetter
+from importlib import reload
+import docker
 import pytest
+from operator import itemgetter
+
+from sqlalchemy.exc import OperationalError
+
+from idmtools_platform_local.internals.workers.database import reset_db
+
 api_host = os.getenv('API_HOST', 'localhost')
 os.environ['SQLALCHEMY_DATABASE_URI'] = f'postgresql+psycopg2://idmtools:idmtools@{api_host}/idmtools'
-from idmtools_platform_local.docker.docker_operations import DockerOperations
-from idmtools_platform_local.workers.utils import create_or_update_status
-from idmtools_test.utils.confg_local_runner_test import config_local_test, patch_broker
-
-
-dm = None
+from idmtools_platform_local.internals.workers.utils import create_or_update_status
+from idmtools_test.utils.confg_local_runner_test import config_local_test, patch_broker, reset_local_broker
+from idmtools_platform_local.infrastructure.service_manager import DockerServiceManager
 
 
 @pytest.mark.docker
+@pytest.mark.local_platform_internals
 class TestAPI(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        sm = DockerServiceManager(docker.from_env())
+        sm.cleanup(delete_data=True,tear_down_brokers=True)
+        sm.get_network()
+        sm.get('postgres')
+        sm.wait_on_ports_to_open(['postgres_port'])
+        retries = 0
+        while retries < 10:
+            try:
+                cls.create_test_data()
+                break
+            except (OperationalError, ConnectionError):
+                time.sleep(0.5)
+                retries += 1
 
     @patch_broker
     def setUp(self, mock_broker):
-        global dm
         local_path = config_local_test()  # noqa: F841
         config_local_test()
-        created = False
-        if dm is None:
-            dm = DockerOperations()
-            dm.cleanup(True)
-            dm.get_postgres()
-            time.sleep(8)
-            created = True
-        from idmtools_platform_local.workers.ui.app import application
+
+        from idmtools_platform_local.internals.ui.app import application
         self.app = application.test_client()
-        if created:
-            self.create_test_data()
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        import idmtools_platform_local.internals.workers.brokers
+        reload(idmtools_platform_local.internals.workers.brokers)
+        reset_db()
+        reset_local_broker()
 
     @staticmethod
     def create_test_data():
-        from idmtools_platform_local.workers.database import get_session
-        from idmtools_platform_local.workers.data.job_status import JobStatus
+        from idmtools_platform_local.internals.workers.database import get_session, create_db, get_db
+        from idmtools_platform_local.internals.data.job_status import JobStatus
+        try:
+            create_db(get_db())
+        except:
+            pass
         # delete any previous data
+
         get_session().query(JobStatus).delete()
         # this experiment has no children
         create_or_update_status('AAAAA', '/data/AAAAA', dict(a='b', c='d'),

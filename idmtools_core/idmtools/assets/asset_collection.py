@@ -2,14 +2,15 @@ import os
 import typing
 
 from idmtools.assets import Asset
+from idmtools.assets.errors import DuplicatedAssetError
+from idmtools.core import FilterMode
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.utils.file import scan_directory
 from idmtools.utils.filters.asset_filters import default_asset_file_filter
-from idmtools.core import FilterMode
-from idmtools.assets.errors import DuplicatedAssetError
 
 if typing.TYPE_CHECKING:
     from idmtools.assets import TAssetList, TAsset, TAssetFilterList
+    from typing import NoReturn
 
 
 class AssetCollection(IEntity):
@@ -43,9 +44,6 @@ class AssetCollection(IEntity):
         return cls(assets=assets)
 
     # endregion
-
-    def __iter__(self):
-        yield from self.assets
 
     @staticmethod
     def assets_from_directory(assets_directory: 'str', recursive: 'bool' = True, flatten: 'bool' = False,
@@ -135,6 +133,73 @@ class AssetCollection(IEntity):
                 self.assets.remove(asset)
         self.assets.append(asset)
 
+    def get_one(self, **kwargs):
+        """
+        Get an asset out of the collection based on the filers passed.
+        Examples:
+            >>> a = AssetCollection()
+            >>> a.get_one(filename="filename.txt")
+        Args:
+            **kwargs:  keyword argument representing the filters.
+
+        Returns: None or Asset if found
+
+        """
+        try:
+            return next(filter(lambda a: all(getattr(a, k) == kwargs.get(k) for k in kwargs), self.assets))
+        except StopIteration:
+            return None
+
+    def delete(self, **kwargs) -> 'NoReturn':
+        """
+        Delete an asset based on keywords attributes
+
+        Args:
+            **kwargs: Filter for the asset to delete.
+        """
+        if 'index' in kwargs:
+            return self.assets.remove(self.assets[kwargs.get('index')])
+
+        if 'asset' in kwargs:
+            return self.assets.remove(kwargs.get('asset'))
+
+        asset = self.get_one(**kwargs)
+        if asset:
+            self.assets.remove(asset)
+
+    def pop(self, **kwargs) -> 'TAsset':
+        """
+        Get and delete an asset based on keywords.
+        Args:
+            **kwargs: Filter for the asset to pop.
+
+        """
+        if not kwargs:
+            return self.assets.pop()
+
+        asset = self.get_one(**kwargs)
+        if asset:
+            self.assets.remove(asset)
+        return asset
+
+    def extend(self, assets: 'TAssetList', fail_on_duplicate: 'bool' = True) -> 'NoReturn':
+        """
+        Extend the collection with new assets
+        Args:
+            assets: Which assets to add
+            fail_on_duplicate: Fail if duplicated asset is included.
+
+        """
+        for asset in assets:
+            self.add_asset(asset, fail_on_duplicate)
+
+    def clear(self):
+        self.assets.clear()
+
+    def set_all_persisted(self):
+        for a in self:
+            a.persisted = True
+
     @property
     def count(self):
         return len(self.assets)
@@ -144,6 +209,15 @@ class AssetCollection(IEntity):
         if self.count == 0:
             return None
         return super().uid
+
+    def __len__(self):
+        return len(self.assets)
+
+    def __getitem__(self, index):
+        return self.assets[index]
+
+    def __iter__(self):
+        yield from self.assets
 
 
 TAssetCollection = typing.TypeVar("TAssetCollection", bound=AssetCollection)

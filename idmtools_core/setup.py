@@ -14,7 +14,7 @@ with open('requirements.txt') as requirements_file:
 
 build_requirements = ['flake8', 'coverage', 'py-make', 'bump2version', 'twine']
 test_requirements = ['pytest', 'pytest-runner', 'numpy==1.16.4', 'xmlrunner', 'pytest-xdist',
-                     'pytest-timeout'] + build_requirements
+                     'pytest-timeout', 'pytest-cache'] + build_requirements
 
 # check for python 3.6
 if sys.version_info[1] == 6:
@@ -58,6 +58,6 @@ setup(
     test_suite='tests',
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='0.2.0+nightly',
+    version='0.3.0+nightly',
     zip_safe=False
 )

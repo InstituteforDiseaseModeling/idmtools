@@ -10,7 +10,7 @@ export function showError(data) {
     msg = data;
   }
   else {
-    let jsonData = JSON.parse(data)
+    let jsonData = JSON.parse(data);
     if (jsonData && jsonData.message) {
       if (jsonData.message  === "Unexpected token E in JSON at position 0")
         msg = genericError;

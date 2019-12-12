@@ -10,7 +10,6 @@ services:
     environment:
       - "CURRENT_UID=${CURRENT_UID:-1000:1000}"
       - "IDMTOOLS_DATA_BASE_DIR=/home/idmtools/testing"
-      - "IDMTOOLS_WORKER_DATA_MOUNT_BY_VOLUMENAME=idmtools_local"
     ports:
       - 5000:5000
     volumes:

@@ -75,16 +75,19 @@ class TestPlatform(IPlatform):
         if item_type == ItemType.SIMULATION:
             obj = None
             for eid in self.simulations:
-                for sim in self.simulations.get(eid):
-                    if sim.uid == item_id:
-                        obj = sim
-                        break
+                sims = self.simulations.get(eid)
+                if sims:
+                    for sim in self.simulations.get(eid):
+                        if sim.uid == item_id:
+                            obj = sim
+                            break
                 if obj:
                     break
         elif item_type == ItemType.EXPERIMENT:
             obj = self.experiments.get(item_id)
 
         if not obj:
+            logger.warning(f"Could not find object with id: {item_id}")
             return
 
         obj.platform = self
@@ -176,12 +179,8 @@ class TestPlatform(IPlatform):
 
 
 TEST_PLATFORM_EXAMPLE_CONFIG = """
-[LOCAL]
-redis_image=redis:5.0.4-alpine
-redis_port=6379
-runtime=nvidia
-workers_image: str = 'idm-docker-staging.packages.idmod.org:latest'
-workers_ui_port: int = 5000
+[Test]
+
 """
 
 

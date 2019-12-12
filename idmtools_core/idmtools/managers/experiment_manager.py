@@ -7,6 +7,7 @@ from idmtools.utils.entities import retrieve_experiment
 
 if typing.TYPE_CHECKING:
     from idmtools.entities.iexperiment import TExperiment
+    from idmtools.entities.suite import TSuite
 
 
 logger = getLogger(__name__)
@@ -17,13 +18,16 @@ class ExperimentManager:
     Class that manages an experiment.
     """
 
-    def __init__(self, experiment: 'TExperiment', platform: TPlatform):
+    def __init__(self, experiment: 'TExperiment', platform: TPlatform, suite: 'TSuite' = None):
         """
         A constructor.
 
         Args:
-            experiment: The experiment to manage.
+            experiment: The experiment to manage
+            platform: The platform to use
+            suite: The suite to use
         """
+        self.suite = suite
         self.experiment = experiment
         self.platform = platform
         self.experiment.platform = platform
@@ -34,7 +38,24 @@ class ExperimentManager:
         em = cls(experiment, platform)
         return em
 
+    def create_suite(self):
+        # If no suite present -> do nothing
+        if not self.suite or self.suite.status == EntityStatus.CREATED:
+            return
+
+        # Create the suite on the platform
+        self.suite.pre_creation()
+        self.platform.create_items([self.suite])
+        self.suite.post_creation()
+
+        # Add experiment to the suite
+        self.suite.add_experiment(self.experiment)
+
     def create_experiment(self):
+        # Do not recreate experiment
+        if self.experiment.status == EntityStatus.CREATED:
+            return
+
         self.experiment.pre_creation()
 
         # Create experiment
@@ -66,6 +87,7 @@ class ExperimentManager:
         """
         from idmtools.config import IdmConfigParser
         from concurrent.futures.thread import ThreadPoolExecutor
+        from idmtools.core import EntityContainer
 
         # Consider values from the block that Platform uses
         _max_workers = IdmConfigParser.get_option(None, "max_workers")
@@ -77,10 +99,13 @@ class ExperimentManager:
         with ThreadPoolExecutor(max_workers=16) as executor:
             results = executor.map(self.simulation_batch_worker_thread,  # noqa: F841
                                    self.experiment.batch_simulations(batch_size=_batch_size))
+
+        _sims = EntityContainer()
         for sim_batch in results:
             for simulation in sim_batch:
-                self.experiment.simulations.append(simulation.metadata)
-                self.experiment.simulations.set_status(EntityStatus.CREATED)
+                _sims.append(simulation.metadata)
+
+        self.experiment.simulations = _sims
 
     def start_experiment(self):
         self.platform.run_items([self.experiment])
@@ -90,11 +115,15 @@ class ExperimentManager:
         """
         Main entry point of the manager:
 
-        - Create the experiment.
-        - Execute the builder (if any) to generate all the simulations.
-        - Create the simulations on the platform.
-        - Trigger the run on the platform.
+        - Create the suite
+        - Create the experiment
+        - Execute the builder (if any) to generate all the simulations
+        - Create the simulations on the platform
+        - Trigger the run on the platform
         """
+        # Create suite on the platform
+        self.create_suite()
+
         # Create experiment on the platform
         self.create_experiment()
 

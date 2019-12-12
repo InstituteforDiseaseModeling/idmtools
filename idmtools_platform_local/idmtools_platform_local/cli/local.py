@@ -1,11 +1,39 @@
+import time
+
 import click
+import docker
 import stringcase as stringcase
 from colorama import Fore
+
 from idmtools_cli.cli import cli
-from idmtools_platform_local.docker.docker_operations import DockerOperations
+from idmtools_platform_local.cli.utils import get_service_info
+from idmtools_platform_local.infrastructure.docker_io import DockerIO
+from idmtools_platform_local.infrastructure.service_manager import DockerServiceManager
 
 
-pass_do = click.make_pass_decorator(DockerOperations)
+class LocalCliContext:
+    do: DockerIO = None
+    sm: DockerServiceManager = None
+
+    def __init__(self, config=None):
+        client = docker.from_env()
+        if config is None:
+            config = dict()
+        self.do = DockerIO()
+        self.sm = DockerServiceManager(client, **config)
+
+
+cli_command_type = LocalCliContext
+pass_do = click.make_pass_decorator(LocalCliContext)
+
+
+def stop_services(cli_context: LocalCliContext, delete_data):
+    if delete_data:
+        delete_data = click.confirm(
+            f'Do you want to remove all data associated with the local platform?({cli_context.do.host_data_directory})',
+            abort=True)
+    cli_context.sm.cleanup(delete_data)
+    cli_context.do.cleanup(delete_data)
 
 
 @cli.group(help="Commands related to managing the local platform")
@@ -17,42 +45,69 @@ def local(ctx, run_as):
     config = dict()
     if run_as:
         config['run_as'] = run_as
-    do = DockerOperations(**config)
-    ctx.obj = do
+
+    ctx.obj = LocalCliContext(config)
 
 
 @local.command()
 @click.option("--delete-data/--no-delete-data", default=False)
 @pass_do
-def down(do: DockerOperations, delete_data):
+def down(cli_context: LocalCliContext, delete_data):
     """Shutdown the local execution platform(and optionally delete data"""
-    if delete_data:
-        delete_data = click.confirm(f'Do you want to remove all data associated with the local platform?({do.host_data_directory})', abort=True)
-    do.cleanup(delete_data)
+    stop_services(cli_context, delete_data)
+
+
+@local.command()
+@click.option("--delete-data/--no-delete-data", default=False)
+@pass_do
+def stop(cli_context: LocalCliContext, delete_data):
+    stop_services(cli_context, delete_data)
 
 
 @local.command()
 @pass_do
-def start(do: DockerOperations):
+def start(cli_context: LocalCliContext):
     """Start the local execution platform"""
-    do.create_services()
+    cli_context.sm.create_services()
+    try:
+        time.sleep(4)
+        import webbrowser
+        from idmtools_platform_local.config import get_api_path
+        webbrowser.open(get_api_path().replace("/api", ""))
+    except Exception as e:
+        click.echo(f"Could not open in web browser: {str(e)}")
+        pass
 
 
 @local.command()
 @pass_do
-def restart(do: DockerOperations):
+def restart(cli_context: LocalCliContext):
     """Restart the local execution platform"""
-    do.restart_all()
+    cli_context.sm.restart_all()
+
+
+@local.command()
+@click.option("--logs/--no-logs", default=False)
+@click.option("--diff/--no-diff", default=False)
+@click.option('--output-filename', default=None, help="Output filename")
+@pass_do
+def info(cli_context: LocalCliContext, logs: bool, diff: bool, output_filename: str):
+    i = get_service_info(cli_context.sm, diff, logs)
+    if output_filename is not None:
+        with open(output_filename, 'w') as logout:
+            logout.write(i)
+    else:
+        print(i)
 
 
 @local.command()
 @pass_do
-def status(do: DockerOperations):
+def status(cli_context: LocalCliContext):
     """
     Check the status of the local execution platform
     """
     for c in ['redis', 'postgres', 'workers']:
-        container = getattr(do, f'get_{c}')(False)
+        container = cli_context.sm.get(c, create=False)
         container_status_text(stringcase.titlecase(c), container)
 
 

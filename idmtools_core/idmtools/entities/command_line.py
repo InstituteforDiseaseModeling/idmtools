@@ -1,7 +1,14 @@
-from typing import TypeVar
+from typing import TypeVar, Dict, Any, List
+from dataclasses import dataclass, field
 
 
+@dataclass(init=False)
 class CommandLine:
+    _executable: str = None
+    _options: Dict[str, Any] = field(default_factory=dict)
+    _args: List[Any] = field(default_factory=list)
+
+
     """
     A class to construct command line strings from executable, options, and params
     """

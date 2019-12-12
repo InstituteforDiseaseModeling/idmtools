@@ -13,6 +13,7 @@ from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id,
 
 
 @pytest.mark.comps
+@pytest.mark.assets
 class TestAssetsInComps(unittest.TestCase):
 
     def setUp(self) -> None:
@@ -74,6 +75,7 @@ class TestAssetsInComps(unittest.TestCase):
             time.sleep(3)
         self.assertTrue(experiment.done)
 
+    @pytest.mark.long
     def test_md5_hashing_for_same_file_contents(self):
         a = Asset(relative_path=None, filename="test.json", content=json.dumps({"a": 1, "b": 2}))
         b = Asset(relative_path=None, filename="test1.json", content=json.dumps({"a": 1, "b": 2}))

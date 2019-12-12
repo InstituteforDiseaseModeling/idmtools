@@ -21,7 +21,7 @@ class StandAloneSimulationsBuilder(ExperimentBuilder):
 
         simulation.parent_id = parent_id
         simulation.platform = platform
-        return {}
+        return simulation.tags or {}
 
     def __iter__(self):
         for simulation in self.simulations:

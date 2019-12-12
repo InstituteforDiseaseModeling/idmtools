@@ -1,4 +1,4 @@
-FROM python:3.7.4
+FROM python:3.7.5
 ARG S6_VERSION
 ENV S6_VERSION=${S6_VERSION:-v1.21.7.0} \
     S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
@@ -19,12 +19,13 @@ RUN apt-get update \
     $(lsb_release -cs) \
     stable" \
     && apt-get update \
-    && apt-get install -y --no-install-recommends docker-ce-cli \
+    && apt-get install -y --no-install-recommends docker-ce-cli nginx \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && useradd -s /bin/bash idmtools \
     && echo "idmtools:idmtools" | chpasswd \
-    && mkdir /home/idmtools /data /app \
+    && mkdir -p /home/idmtools /data /app/log /app/tmp/client_body \
+        /app/tmp/fastcgi_temp /app/tmp/proxy_temp /app/tmp/scgi_temp /app/tmp/uwsgi_temp \
     && chown -R idmtools:idmtools /home/idmtools /data /app \
     && addgroup idmtools staff \
     # create docker group and idmtools to it so they can use it
@@ -42,12 +43,10 @@ RUN apt-get update \
     && rm -rf /tmp/s6-overlay-amd64.tar.gz
 
 # Our script that does smart user mapping
-COPY docker_scripts/user_conf.sh /etc/cont-init.d/01-user_conf.sh
+ADD docker_scripts/cont-init.d /etc/cont-init.d
 # Our service scripts
-COPY docker_scripts/start_general_workers.sh /etc/services.d/idmtools_general_workers/run
-COPY docker_scripts/start_cpu_workers.sh /etc/services.d/idmtools_cpu_workers/run
-COPY docker_scripts/start_gpu_workers.sh /etc/services.d/idmtools_gpu_workers/run
-COPY docker_scripts/start_ui.sh /etc/services.d/idmtools_ui/run
+ADD docker_scripts/services /etc/services.d
+COPY docker_scripts/uwsgi.ini docker_scripts/nginx.conf /app/
 
 # Define a workdirectory
 WORKDIR /app
@@ -56,14 +55,19 @@ ENV PYTHONPATH=/app:${PYTHONPATH}
 #TODO: Move the actual package to artifactory and install from there. It would simpify the environmetn quite a bit
 
 # make it where we can specifiy our dependent packages at build time
-ARG PYPIURL=https://packages.idmod.org/api/pypi/pypi-production/simple
+ARG PYPIURL=https://packages.idmod.org/api/pypi/pypi-staging/simple
 ARG PYPIHOST=packages.idmod.org
 RUN echo ${PYPIURL}
+# Install requirements first to reduce build cache misses
+ADD requirements.txt ui_requirements.txt workers_requirements.txt /tmp/
+RUN pip install -r /tmp/requirements.txt --extra-index-url=${PYPIURL} --trusted-host ${PYPIHOST} && \
+        pip install -r /tmp/ui_requirements.txt --extra-index-url=${PYPIURL} --trusted-host ${PYPIHOST} && \
+        pip install -r /tmp/workers_requirements.txt --extra-index-url=${PYPIURL} --trusted-host ${PYPIHOST}
 # Run the setup instal before copying rest of package. This will increase cache hits during docker builds
 # as we will only rebuild if any of the docker_scripts, setup.py, readme.md, and requirements.txt change
 # which should happen infrequently(or less so than library code)
 COPY dist/idmtools_platform_local*.tar.gz /tmp/
-RUN find /tmp -name idmtools_platform_local*.tar.gz -exec pip install {}[workers,ui] --extra-index-url=${PYPIURL} --trusted-host ${PYPIHOST} \; && \
+RUN find /tmp -name idmtools_platform_local*.tar.gz -exec pip install {}[workers,ui,server] --extra-index-url=${PYPIURL} --trusted-host ${PYPIHOST} \; && \
     rm -rf /root/.cache
-
+ADD idmtools_platform_local/internals/ui/static /app/html
 CMD ["/init"]

@@ -34,6 +34,7 @@ class setParam:
 
 
 @pytest.mark.comps
+@pytest.mark.python
 class TestPythonExperiment(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
@@ -46,6 +47,7 @@ class TestPythonExperiment(ITestWithPersistence):
     # Also current add_sweep_definition will do product of each call. if first call has 5 parameters, second call also
     # has 5 parameter, total sweep parameters are 5*5=25
 
+    @pytest.mark.long
     def test_sweeps_with_partial_comps(self):
         pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
 
@@ -87,6 +89,7 @@ class TestPythonExperiment(ITestWithPersistence):
     # Test parameter "b" set is depending on parameter "a"
     # a=[0,1,2,3,4] <--sweep parameter
     # b=[2,3,4,5,6]  <-- b = a + 2
+    @pytest.mark.long
     def test_sweeps_2_related_parameters_comps(self):
         pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
@@ -119,6 +122,7 @@ class TestPythonExperiment(ITestWithPersistence):
         expected_tags = [{'a': '0'}, {'a': '1'}, {'a': '2'}, {'a': '3'}, {'a': '4'}]
         self.validate_sim_tags(exp_id, expected_tags)
 
+    @pytest.mark.long
     @pytest.mark.comps
     def test_add_prefixed_relative_path_to_assets_comps(self):
         model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
@@ -176,6 +180,7 @@ class TestPythonExperiment(ITestWithPersistence):
     #       |--functions.py
     #   |--__init__.py
     #   |--model.py
+    @pytest.mark.long
     @pytest.mark.comps
     def test_add_dirs_to_assets_comps(self):
         model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
@@ -228,6 +233,7 @@ class TestPythonExperiment(ITestWithPersistence):
     #   |--MyExternalLibrary
     #       |--functions.py
     #   |--model.py
+    @pytest.mark.long
     @pytest.mark.comps
     def test_add_specific_files_to_assets_comps(self):
         model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
@@ -280,6 +286,7 @@ class TestPythonExperiment(ITestWithPersistence):
     # {6,2}
     # {7,2}
     @pytest.mark.comps
+    @pytest.mark.long
     def test_sweep_in_arms_cross(self):
         pe = PythonExperiment(name=self.case_name,
                               model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))

@@ -1,5 +1,5 @@
-from idmtools.analysis.AnalyzeManager import AnalyzeManager
-from idmtools.analysis.AddAnalyzer import AddAnalyzer
+from idmtools.analysis.analyze_manager import AnalyzeManager
+from idmtools.analysis.add_analyzer import AddAnalyzer
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 

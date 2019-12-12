@@ -1,45 +1,74 @@
 .PHONY: clean lint test coverage release-local dist release-staging release-staging-release-commit release-staging-minor
 IPY=python -c
+PACKAGE_NAME=idmtools_cli
+PY?=python
+PDS=$(PY) ../dev_scripts/
+PDR=$(PDS)run.py
+CLDIR=$(PDS)clean_dir.py
+CWD=$($(IPY) "import os; print(os.getcwd())")
+TEST_COMMAND=py.test --durations=3 -v --junitxml=test_results.xml
+TEST_RUN_OPTS=-e DOCKER_REPO=idm-docker-staging NO_SPINNER=1
+FULL_TEST_CMD=$(PDR) -w 'tests' $(TEST_RUN_OPTS) -ex '$(TEST_COMMAND)
+COVERAGE_CMD=$(PDR) -w 'tests' $(TEST_RUN_OPTS) -p . ../ -ex 'coverage run --omit="*/test*,*/setup.py" --source ../,../../idmtools_core,../../idmtools_models,../../idmtools_model_emod -m pytest
 
-clean: ## Clean all our jobs
-	@$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('*.py[co]', recursive=True)]"
-	@$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('*.done', recursive=True)]"
-	@$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('*.log', recursive=True)]"
-	@$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/.coverage', recursive=True)]"
-	@$(IPY) "import os, glob, shutil; [shutil.rmtree(i) for i in glob.glob('**/__pycache__', recursive=True)]"
-	@$(IPY) "import os, glob, shutil; [shutil.rmtree(i) for i in glob.glob('**/htmlcov', recursive=True)]"
-	@$(IPY) "import os, glob, shutil; [shutil.rmtree(i) for i in glob.glob('**/.pytest_cache', recursive=True)]"
-	@$(IPY) "import shutil; shutil.rmtree('dist', True)"
-	@$(IPY) "import shutil; shutil.rmtree('build', True)"
+
+help:
+	$(PDS)get_help_from_makefile.py
+
+clean: ## Clean most of the temp-data from the project
+	$(CLDIR) --file-patterns "*.py[co],*.done,*.log,**/.coverage" \
+		--dir-patterns "**/__pycache__,**/htmlcov,**/.pytest_cache" --directories "dist,build"
 
 clean-all:  ## Deleting package info hides plugins so we only want to do that for packaging
 	@make clean
-	@+$(IPY) "import os, shutil, glob; [shutil.rmtree(i) for i in [k for k in glob.glob('**/*.egg-info/', recursive=True) if os.path.isdir(k)]]"
+	$(CLDIR) --dir-patterns "**/*.egg-info/"
 
 lint: ## check style with flake8
-	flake8 --ignore=E501 idmtools_cli tests
+	flake8 --ignore=E501 $(PACKAGE_NAME) tests
 
 test: ## Run our tests
-	@$(IPY) "import os, sys; sys.path.append(os.getcwd()); os.system('py.test')"
+	$(FULL_TEST_CMD) -m "not comps and not docker"'
 
-test-all: ## Run our  docker tests as well
-	@+$(IPY) "import os; os.environ['DOCKER_TESTS'] = '1'; \
-	os.environ['COMPS_TESTS'] = '1'; os.chdir('tests'); os.system('py.test -p no:warnings --junitxml=test_results.xml')"
+test-all: ## Run all our tests
+	$(FULL_TEST_CMD)'
+
+test-failed: ## Run only previously failed tests
+	$(FULL_TEST_CMD) --lf'
+
+test-long: ## Run any tests that takes more than 30s
+	$(FULL_TEST_CMD) -m "long"'
+
+test-no-long: ## Run any tests that takes less than 30s
+	$(FULL_TEST_CMD) -m "not long"'
+
+test-comps: ## Run our comps tests
+	$(FULL_TEST_CMD) -m "comps"'
+
+test-docker: ## Run our docker tests
+	$(FULL_TEST_CMD) -m "docker"'
+
+test-emod: ## Run our emod tests
+	$(FULL_TEST_CMD) -m "emod"'
+
+test-python: ## Run our python tests
+	$(FULL_TEST_CMD) -m "python"'
 
 coverage: ## Generate a code-coverage report
-	coverage run --source idmtools_cli -m pytest
-	coverage report -m
-	coverage html
-	python ../dev_scripts/launch_dir_in_browser.py htmlcov/index.html
-
-coverage-all: ## Generate a code-coverage report
 	@make clean
 	# We have to run in our tests folder to use the proper config
-	@+$(IPY) "import os; os.environ['DOCKER_TESTS'] = '1'; \
-	os.environ['COMPS_TESTS'] = '1'; \
-	os.chdir('tests'); os.system('coverage run --source ../idmtools_cli -m pytest')"
-	# move our stuff back to the top
+	$(COVERAGE_CMD) -m "not comps and not docker"'
 	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
+	coverage report -m
+	coverage html -i
+	$(PDS)/launch_dir_in_browser.py htmlcov/index.html
+
+coverage-all: ## Generate a code-coverage report using all tests
+	# We have to run in our tests folder to use the proper config
+	$(COVERAGE_CMD)
+	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
+	coverage report -m
+	coverage html -i
+	$(PDS)/launch_dir_in_browser.py htmlcov/index.html
 
 release-local: ## package and upload a release to http://localhost:7171
 	@make dist
@@ -50,19 +79,24 @@ dist: ## build our package
 	python setup.py sdist bdist
 
 release-staging: ## perform a release to staging
-	bump2version build --allow-dirty
 	@make dist
 	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/idm-pypi-staging/ dist/*
+
+bump-release: ## bump the release version.
+	bump2version release --commit
 
 # Use before release-staging-release-commit to confirm next version.
-release-staging-release-dry-run: ## perform a release to staging and bump the minor version.
+bump-release-dry-run: ## perform a release to staging and bump the minor version.
 	bump2version release --dry-run --allow-dirty --verbose
 
-# This should be used when a pushing a "production" build to staging before being approved by test
-release-staging-release-commit: ## perform a release to staging and commit the version.
-	bump2version release --commit
-	@make dist
-	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/idm-pypi-staging/ dist/*
-
-bump-patch:
+bump-patch: ## bump the patch version
 	bump2version patch --commit
+
+bump-minor: ## bump the minor version
+	bump2version minor --commit
+
+bump-patch-dry-run: ## bump the patch version
+	bump2version patch --dry-run --allow-dirty --verbose
+
+bump-minor-dry-run: ## bump the minor version
+	bump2version minor --dry-run --allow-dirty --verbose

@@ -94,9 +94,11 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
     return listener
 
 
-def exclude_logging_classes():
+def exclude_logging_classes(items_to_exclude=None):
+    if items_to_exclude is None:
+        items_to_exclude = ['urllib3', 'COMPS', 'paramiko']
     # remove comps by default
-    for l in ['urllib3', 'COMPS']:
+    for l in items_to_exclude:
         comps_logger = getLogger(l)
         comps_logger.setLevel(logging.WARN)
 

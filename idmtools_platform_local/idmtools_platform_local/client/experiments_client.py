@@ -1,13 +1,12 @@
 import logging
 from typing import Optional, Tuple, List, Dict, Any
 from idmtools_platform_local.client.base import BaseClient
-from idmtools_platform_local.config import API_PATH
 
 logger = logging.getLogger(__name__)
 
 
 class ExperimentsClient(BaseClient):
-    base_url = f'{API_PATH}/experiments'
+    path_url = 'experiments'
 
     @classmethod
     def get_all(cls, tags: Optional[List[Tuple[str, str]]] = None,
@@ -31,7 +30,7 @@ class ExperimentsClient(BaseClient):
         if per_page:
             args['per_page'] = per_page
 
-        response = cls.get(None, params=args)
+        response = cls.get(cls.path_url, params=args)
         result = cls._validate_response(response, 'Experiments')
         return result
 
@@ -48,7 +47,7 @@ class ExperimentsClient(BaseClient):
             dict: Dictionary containing the experiment objects
         """
         args = cls._get_arguments(tags)
-        response = cls.get(id, params=args)
+        response = cls.get(f'{cls.path_url}/{id}', params=args)
         result = cls._validate_response(response, 'Experiments', id=id)
         return result
 
@@ -68,7 +67,7 @@ class ExperimentsClient(BaseClient):
         params = dict()
         if delete_data:
             params['data'] = True
-        response = super().delete(id, params=params)
+        response = super().delete(f'{cls.path_url}/{id}', params=params)
 
         if response.status_code != 204 and (response.status_code != 404 and ignore_doesnt_exist):
             return False
