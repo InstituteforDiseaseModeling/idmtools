@@ -1,5 +1,7 @@
 import os
 import logging
+from multiprocessing import cpu_count
+
 import diskcache
 from abc import ABCMeta
 
@@ -14,7 +16,10 @@ class IPersistenceService(metaclass=ABCMeta):
     def _open_cache(cls):
         cache_directory = os.path.join(cls.cache_directory, 'disk_cache', cls.cache_name)
         os.makedirs(cache_directory, exist_ok=True)
-        return diskcache.Cache(os.path.join(cls.cache_directory, 'disk_cache', cls.cache_name), timeout=-1)
+        # the more the cpus, the more likely we are to encounter a scaling issue. Let's try to scale with that up to
+        # one second. above one second, we are introducing to much lag in processes
+        default_timeout = min(max(0.1, cpu_count() * 0.0125), 1)
+        return diskcache.Cache(os.path.join(cls.cache_directory, 'disk_cache', cls.cache_name), timeout=default_timeout)
 
     @classmethod
     def retrieve(cls, uid):
@@ -34,12 +39,12 @@ class IPersistenceService(metaclass=ABCMeta):
     @classmethod
     def delete(cls, uid):
         with cls._open_cache() as cache:
-            cache.delete(uid)
+            cache.delete(uid, retry=True)
 
     @classmethod
     def clear(cls):
         with cls._open_cache() as cache:
-            cache.clear()
+            cache.clear(retry=True)
 
     @classmethod
     def list(cls):
