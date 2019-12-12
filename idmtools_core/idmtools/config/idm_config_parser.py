@@ -1,12 +1,11 @@
 import os
 import copy
 import json
-import functools
 from logging import getLogger
 from configparser import ConfigParser
 from typing import Dict
 
-from idmtools.singleton.Singleton import Singleton
+from idmtools.config.singleton import Singleton
 
 default_config = 'idmtools.ini'
 
