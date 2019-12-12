@@ -78,11 +78,7 @@ class TestPythonSimulation(ITestWithPersistence):
     @pytest.mark.python
     @pytest.mark.assets
     def test_add_assets_to_python_experiment(self):
-        ac = AssetCollection()
-        a = Asset(relative_path="MyExternalLibrary",
-                  absolute_path=os.path.join(COMMON_INPUT_PATH, "python", "Assets", "MyExternalLibrary",
-                                             "functions.py"))
-        ac.add_asset(a)
+        ac = self.create_functions_asset_collection()
         pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model.py"),
                               assets=ac)
         pe.pre_creation()
@@ -96,13 +92,17 @@ class TestPythonSimulation(ITestWithPersistence):
 
         self.assertSetEqual(set(assets_in_pythonexperiment), set(assets_to_find))
 
-    @pytest.mark.python
-    def test_add_assets_after_python_experiment_created(self):
+    def create_functions_asset_collection(self):
         ac = AssetCollection()
         a = Asset(relative_path="MyExternalLibrary",
                   absolute_path=os.path.join(COMMON_INPUT_PATH, "python", "Assets", "MyExternalLibrary",
                                              "functions.py"))
         ac.add_asset(a)
+        return ac
+
+    @pytest.mark.python
+    def test_add_assets_after_python_experiment_created(self):
+        ac = self.create_functions_asset_collection()
         pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model.py"))
         pe.add_assets(ac)
         pe.pre_creation()

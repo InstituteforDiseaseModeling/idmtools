@@ -42,7 +42,7 @@ class AddAnalyzer(IAnalyzer):
 
 @pytest.mark.analysis
 @pytest.mark.docker
-class TestAnalyzeManager(ITestWithPersistence):
+class TestAnalyzersLocal(ITestWithPersistence):
 
     @classmethod
     @restart_local_platform(silent=True, stop_before=True, stop_after=False)

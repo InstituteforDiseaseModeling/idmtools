@@ -3,7 +3,7 @@ import copy
 import json
 from logging import getLogger
 from configparser import ConfigParser
-from typing import Dict
+from typing import Dict, Any
 
 default_config = 'idmtools.ini'
 
@@ -37,6 +37,20 @@ class IdmConfigParser:
         return cls._instance
 
     @classmethod
+    def retrieve_dict_config_block(cls, field_type, section) -> Dict[str, Any]:
+        import ast
+
+        inputs = copy.deepcopy(section)
+        fs = set(field_type.keys()).intersection(set(section.keys()))
+        for fn in fs:
+            ft = field_type[fn]
+            if ft in (int, float, str):
+                inputs[fn] = ft(section[fn])
+            elif ft is bool:
+                inputs[fn] = ast.literal_eval(section[fn])
+        return inputs
+
+    @classmethod
     def retrieve_settings(cls, section: str = None, field_type: Dict[str, str] = {}) -> Dict[str, str]:
         """
         Retrieve INI configuration values (to be used when updating platform fields). Call from each platform.
@@ -56,16 +70,7 @@ class IdmConfigParser:
         field_config = cls.get_section(section)
 
         # update field types
-        field_config_updated = copy.deepcopy(field_config)
-        fs = set(field_type.keys()).intersection(set(field_config.keys()))
-
-        for fn in fs:
-            ft = field_type[fn]
-            if ft in (int, float, str):
-                field_config_updated[fn] = ft(field_config[fn])
-            elif ft is bool:
-                field_config_updated[fn] = ast.literal_eval(field_config[fn])
-
+        field_config_updated = cls.retrieve_dict_config_block(field_config, section)
         return field_config_updated
 
     @classmethod

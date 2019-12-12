@@ -4,7 +4,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { connect } from "react-redux";
 import { fetchSimulations, cancelSimulation } from "../../redux/action/simulation"
 import { Table, TableHead, TableCell, TableSortLabel, TableRow, TableBody, Paper, Button, Typography, Divider,
-        Card, CardContent, List, ListItem, ListItemText, Grid, IconButton,
+        Card, CardContent, List, LisIItem, LisIItemText, Grid, IconButton,
         Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@material-ui/core";
 import FolderIcon from "@material-ui/icons/Folder";
 import ClearIcon from "@material-ui/icons/Clear";
@@ -287,22 +287,22 @@ class SimulationView extends React.Component {
                                         </Grid>
                                         <Divider/>
                                         <List>
-                                            <ListItem>
-                                                <ListItemText className={classes.itemText}>Id:</ListItemText>
-                                                <ListItemText className={classes.itemValue}>{this.state.selectedSim}</ListItemText>
-                                            </ListItem>
-                                            <ListItem >
-                                                <ListItemText className={classes.itemText}>Status</ListItemText>
-                                                <ListItemText className={classes.itemValue}>{status}</ListItemText>
-                                            </ListItem>
-                                            <ListItem >
-                                                <ListItemText className={classes.itemText}>Command</ListItemText>
-                                                <ListItemText className={classes.itemValue}>{command}</ListItemText>
-                                            </ListItem>
-                                            <ListItem >
-                                                <ListItemText className={classes.itemText}>Tags</ListItemText>
-                                                <ListItemText className={classes.itemValue}>{tags}</ListItemText>
-                                            </ListItem>
+                                            <LisIItem>
+                                                <LisIItemText className={classes.itemText}>Id:</LisIItemText>
+                                                <LisIItemText className={classes.itemValue}>{this.state.selectedSim}</LisIItemText>
+                                            </LisIItem>
+                                            <LisIItem >
+                                                <LisIItemText className={classes.itemText}>Status</LisIItemText>
+                                                <LisIItemText className={classes.itemValue}>{status}</LisIItemText>
+                                            </LisIItem>
+                                            <LisIItem >
+                                                <LisIItemText className={classes.itemText}>Command</LisIItemText>
+                                                <LisIItemText className={classes.itemValue}>{command}</LisIItemText>
+                                            </LisIItem>
+                                            <LisIItem >
+                                                <LisIItemText className={classes.itemText}>Tags</LisIItemText>
+                                                <LisIItemText className={classes.itemValue}>{tags}</LisIItemText>
+                                            </LisIItem>
 
                                         </List>
                                     </CardContent>

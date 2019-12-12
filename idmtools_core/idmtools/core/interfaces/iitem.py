@@ -101,5 +101,5 @@ class IItem:
     # endregion
 
 
-TItem = typing.TypeVar("TItem", bound=IItem)
-TItemList = typing.List[TItem]
+IItemList = typing.List[IItem]
+

@@ -206,18 +206,7 @@ class TestPythonExperiment(ITestWithPersistence):
         # exp_id ='eb7ce224-9993-e911-a2bb-f0921c167866'
         for simulation in Experiment.get(exp_id).get_simulations():
             # validate output/config.json
-            config_string = simulation.retrieve_output_files(paths=["config.json"])
-            config_parameters = json.loads(config_string[0].decode('utf-8'))['parameters']
-            self.assertEqual(config_parameters["a"], 1)
-            self.assertEqual(config_parameters["b"], 10)
-            # validate StdOut.txt
-            stdout = simulation.retrieve_output_files(paths=["StdOut.txt"])
-            self.assertEqual(stdout, [b"11\r\n{'a': 1, 'b': 10}\r\n"])
-
-            # validate Assets files
-            collection_id = get_asset_collection_id_for_simulation_id(simulation.id)
-            asset_collection = get_asset_collection_by_id(collection_id)
-            assets = asset_collection.assets
+            assets = self.assert_valid_config_stdout_and_assets(simulation)
             self.assertEqual(len(assets), 5)
 
             expected_list = [{'filename': '__init__.py', 'relative_path': 'MyExternalLibrary'},
@@ -226,6 +215,20 @@ class TestPythonExperiment(ITestWithPersistence):
                              {'filename': 'temp.py', 'relative_path': 'MyLib'},
                              {'filename': 'functions.py', 'relative_path': 'MyExternalLibrary'}]
             self.validate_assets(assets, expected_list)
+
+    def assert_valid_config_stdout_and_assets(self, simulation):
+        config_string = simulation.retrieve_output_files(paths=["config.json"])
+        config_parameters = json.loads(config_string[0].decode('utf-8'))['parameters']
+        self.assertEqual(config_parameters["a"], 1)
+        self.assertEqual(config_parameters["b"], 10)
+        # validate StdOut.txt
+        stdout = simulation.retrieve_output_files(paths=["StdOut.txt"])
+        self.assertEqual(stdout, [b"11\r\n{'a': 1, 'b': 10}\r\n"])
+        # validate Assets files
+        collection_id = get_asset_collection_id_for_simulation_id(simulation.id)
+        asset_collection = get_asset_collection_by_id(collection_id)
+        assets = asset_collection.assets
+        return assets
 
     # Test will test pythonExperiment's assets parameter which adds only specific file under
     # tests/inputs/python/Assets/MyExternalLibrary to COMPS' Assets and add relative_path MyExternalLibrary in comps
@@ -256,18 +259,7 @@ class TestPythonExperiment(ITestWithPersistence):
         # exp_id ='a98090dc-ea92-e911-a2bb-f0921c167866'
         for simulation in Experiment.get(exp_id).get_simulations():
             # validate output/config.json
-            config_string = simulation.retrieve_output_files(paths=["config.json"])
-            config_parameters = json.loads(config_string[0].decode('utf-8'))['parameters']
-            self.assertEqual(config_parameters["a"], 1)
-            self.assertEqual(config_parameters["b"], 10)
-            # validate StdOut.txt
-            stdout = simulation.retrieve_output_files(paths=["StdOut.txt"])
-            self.assertEqual(stdout, [b"11\r\n{'a': 1, 'b': 10}\r\n"])
-
-            # validate Assets files
-            collection_id = get_asset_collection_id_for_simulation_id(simulation.id)
-            asset_collection = get_asset_collection_by_id(collection_id)
-            assets = asset_collection.assets
+            assets = self.assert_valid_config_stdout_and_assets(simulation)
             self.assertEqual(len(assets), 2)
             expected_list = [{'filename': 'functions.py', 'relative_path': 'MyExternalLibrary'},
                              {'filename': 'model.py', 'relative_path': ''}]

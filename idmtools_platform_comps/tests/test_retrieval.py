@@ -61,7 +61,8 @@ class TestRetrieval(ITestWithPersistence):
         self.assertEqual({k: str(v or '') for k, v in self.pe.tags.items()}, comps_experiment.tags)
 
         # Test retrieving less columns
-        comps_experiment = self.platform.get_item(self.pe.uid, ItemType.EXPERIMENT, raw=True, children=[], columns=["id"])
+        comps_experiment = self.platform.get_item(self.pe.uid, ItemType.EXPERIMENT, raw=True, children=[],
+                                                  columns=["id"])
         self.assertIsNone(comps_experiment.name)
         self.assertIsNone(comps_experiment.tags)
         self.assertEqual(self.pe.uid, comps_experiment.id)
@@ -69,7 +70,7 @@ class TestRetrieval(ITestWithPersistence):
     @unittest.skip
     def test_retrieve_simulation(self):
         base = self.pe.simulations[0]
-        sim = self.platform.get_object(base.uid, ItemType.SIMULATION)
+        sim = self.platform.get_item(base.uid, ItemType.SIMULATION)
 
         # Test attributes
         self.assertEqual(sim.uid, base.uid)
@@ -77,7 +78,7 @@ class TestRetrieval(ITestWithPersistence):
         self.assertEqual({k: str(v or '') for k, v in base.tags.items()}, sim.tags)
 
         # Test the raw retrieval
-        comps_simulation = self.platform.get_object(base.uid, ItemType.SIMULATION, raw=True)
+        comps_simulation: COMPSSimulation = self.platform.get_item(base.uid, ItemType.SIMULATION, raw=True)
         self.assertIsInstance(comps_simulation, COMPSSimulation)
         self.assertEqual(base.uid, comps_simulation.id)
         self.assertEqual(base.name, comps_simulation.name)
@@ -94,7 +95,7 @@ class TestRetrieval(ITestWithPersistence):
         self.assertEqual(len(self.pe.simulations), len(children))
         for s in self.pe.simulations:
             self.assertIn(s.uid, [s.uid for s in children])
-        self.assertIsNone(self.platform.get_children(self.pe.simulations[0].uid, ItemType.SIMULATION))
+        self.assertCountEqual(self.platform.get_children(self.pe.simulations[0].uid, ItemType.SIMULATION), [])
 
 
 if __name__ == '__main__':

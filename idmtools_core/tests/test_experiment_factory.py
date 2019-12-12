@@ -7,13 +7,14 @@ from idmtools.managers import ExperimentManager
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.decorators import windows_only
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+from idmtools_test.utils.test_platform import TestPlatform
 from idmtools_test.utils.tst_experiment import TstExperiment
 
 
 class TestExperimentFactory(ITestWithPersistence):
 
     def test_build_python_experiment_from_factory(self):
-        test_platform = Platform('Test')
+        test_platform: TestPlatform = Platform('Test')
         experiment = experiment_factory.create("PythonExperiment", tags={"a": "1", "b": 2})
         experiment.model_path = os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py")
         builder = ExperimentBuilder()

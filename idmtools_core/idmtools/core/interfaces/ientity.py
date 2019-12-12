@@ -1,16 +1,11 @@
-import typing
 from abc import ABCMeta
 from dataclasses import dataclass, field
-
 from idmtools.core import EntityStatus, ItemType, NoPlatformException
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.services.platforms import PlatformPersistService
-
-if typing.TYPE_CHECKING:
-    from idmtools.core import TTags
-    from idmtools.entities.iplatform import TPlatform
-    from uuid import UUID
-    from typing import NoReturn
+from idmtools.core import TTags
+from uuid import UUID
+from typing import NoReturn, List, Any
 
 
 @dataclass
@@ -18,15 +13,17 @@ class IEntity(IItem, metaclass=ABCMeta):
     """
     Interface for all entities in the system.
     """
-    platform_id: 'UUID' = field(default=None, compare=False, metadata={"md": True})
-    _platform: 'TPlatform' = field(default=None, compare=False, metadata={"pickle_ignore": True})
-    parent_id: 'UUID' = field(default=None, metadata={"md": True})
+    platform_id: UUID = field(default=None, compare=False, metadata={"md": True})
+    _platform: 'IPlatform' = field(default=None, compare=False, metadata={"pickle_ignore": True})
+    parent_id: UUID = field(default=None, metadata={"md": True})
     _parent: 'IEntity' = field(default=None, compare=False, metadata={"pickle_ignore": True})
-    status: 'EntityStatus' = field(default=None, compare=False, metadata={"pickle_ignore": True})
-    tags: 'TTags' = field(default_factory=lambda: {}, metadata={"md": True})
-    item_type: 'ItemType' = field(default=None, compare=False)
+    status: EntityStatus = field(default=None, compare=False, metadata={"pickle_ignore": True})
+    tags: TTags = field(default_factory=lambda: {}, metadata={"md": True})
+    item_type: ItemType = field(default=None, compare=False)
+    # Platform
+    _platform_object: Any = field(default=None, compare=False, metadata={"pickle_ignore": True})
 
-    def update_tags(self, tags: 'dict' = None) -> 'NoReturn':
+    def update_tags(self, tags: dict = None) -> NoReturn:
         """
         Shortcut to update the tags with the given dictionary
         Args:
@@ -74,7 +71,9 @@ class IEntity(IItem, metaclass=ABCMeta):
         if not self.platform:
             raise NoPlatformException("The object has no platform set...")
 
-        return self.platform.get_item(self.uid, self.item_type, raw=True, force=force, **kwargs)
+        if self._platform_object is None or force:
+             self._platform_object = self.platform.get_item(self.uid, self.item_type, raw=True, force=force, **kwargs)
+        return self._platform_object
 
     @property
     def done(self):
@@ -88,5 +87,4 @@ class IEntity(IItem, metaclass=ABCMeta):
         return id(self.uid)
 
 
-TEntity = typing.TypeVar("TEntity", bound=IEntity)
-TEntityList = typing.List[TEntity]
+IEntityList = List[IEntity]
