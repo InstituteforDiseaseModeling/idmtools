@@ -58,7 +58,7 @@ class Platform:
         """
 
         # Read block details
-        section = IdmConfigParser.get_section(block, force=True)
+        section = IdmConfigParser.get_section(block)
 
         try:
             # Make sure block has type entry
