@@ -32,9 +32,6 @@ class TestConfig(ITestWithPersistence):
 
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     def test_section_not_found(self, mock_stdout):
-        # IdmConfigParser().get_section('NotReallyASection')
-        # self.assertIn("Block 'NotReallyASection' doesn't exist!", mock_stdout.getvalue())
-
         with self.assertRaises(ValueError) as context:
             IdmConfigParser().get_section('NotReallyASection')
         self.assertIn("Block 'NotReallyASection' doesn't exist!", context.exception.args[0])
