@@ -94,9 +94,12 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         am.analyze()
 
         for simulation in Experiment.get(self.exp_id).get_simulations():
-            s = simulation.get(id=simulation.id)
-            self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "config.json")))
-            self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "InsetChart.json")))
+            self.assert_sim_has_config_and_inset_chart(simulation)
+
+    def assert_sim_has_config_and_inset_chart(self, simulation):
+        s = simulation.get(id=simulation.id)
+        self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "config.json")))
+        self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "InsetChart.json")))
 
     def test_analyzer_multiple_experiments(self):
         # delete output from previous run
@@ -139,12 +142,8 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         expected_sim_ids = []
         actual_sim_ids_in_comps = []
         for simulation in Experiment.get(self.exp_id).get_simulations():
-            s = simulation.get(id=simulation.id)
-            actual_sim_ids_in_comps.append(str(s.id))
-            expected_sim_ids.append(df[1:2].iat[0, sim_count])
-
-            insetchart_string = s.retrieve_output_files(paths=['output/InsetChart.json'])
-            insetchart_dict = json.loads(insetchart_string[0].decode('utf-8'))
+            insetchart_dict = self.assert_has_inset(actual_sim_ids_in_comps, df, expected_sim_ids, sim_count,
+                                                    simulation)
             population_data = insetchart_dict['Channels']['Statistical Population']['Data']
             # Validate every single Statistical Population' from insetChart.json are equals to population.csv file
             actual_population_data = []
@@ -182,13 +181,8 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         expected_sim_ids = []
         actual_sim_ids_in_comps = []
         for simulation in Experiment.get(self.exp_id).get_simulations():
-            s = simulation.get(id=simulation.id)
-            actual_sim_ids_in_comps.append(str(s.id))
-            expected_sim_ids.append(df[1:2].iat[0, sim_count])
-
-            # Validate every single 'Infected' are same in these 2 files
-            insetchart_string = s.retrieve_output_files(paths=['output/InsetChart.json'])
-            insetchart_dict = json.loads(insetchart_string[0].decode('utf-8'))
+            insetchart_dict = self.assert_has_inset(actual_sim_ids_in_comps, df, expected_sim_ids, sim_count,
+                                                    simulation)
             infected_json_from_file = insetchart_dict['Channels']['Infected']['Data']
             actual_infected_data = []
             expected_infected_data = []
@@ -199,6 +193,15 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
             sim_count = sim_count + 1
 
         self.assertSetEqual(set(actual_sim_ids_in_comps), set(expected_sim_ids))
+
+    def assert_has_inset(self, actual_sim_ids_in_comps, df, expected_sim_ids, sim_count, simulation):
+        s = simulation.get(id=simulation.id)
+        actual_sim_ids_in_comps.append(str(s.id))
+        expected_sim_ids.append(df[1:2].iat[0, sim_count])
+        # Validate every single 'Infected' are same in these 2 files
+        insetchart_string = s.retrieve_output_files(paths=['output/InsetChart.json'])
+        insetchart_dict = json.loads(insetchart_string[0].decode('utf-8'))
+        return insetchart_dict
 
     def test_analyzer_preidmtools_exp(self):
         # delete output from previous run
@@ -216,9 +219,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         am.analyze()
 
         for simulation in Experiment.get(exp_id[0]).get_simulations():
-            s = simulation.get(id=simulation.id)
-            self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "config.json")))
-            self.assertTrue(os.path.exists(os.path.join('output', str(s.id), "InsetChart.json")))
+            self.assert_sim_has_config_and_inset_chart(simulation)
 
     def test_download_analyzer_suite(self):
         # delete output from previous run
@@ -237,10 +238,10 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
 
         # verify results:
         # retrieve suite from comps
-        comps_suite = self.p.get_platform_item(item_id=suite_id, item_type=ItemType.SUITE)
+        comps_suite = self.p.get_item(item_id=suite_id, item_type=ItemType.SUITE)
         # retrieve experiment from suite
-        exps = self.p.get_children_for_platform_item(comps_suite)
-        comps_exp = self.p.get_platform_item(item_id=exps[0].uid, item_type=ItemType.EXPERIMENT)
-        sims = self.p.get_children_for_platform_item(comps_exp)
+        exps = self.p.get_children_by_object(comps_suite)
+        comps_exp = self.p.get_item(item_id=exps[0].uid, item_type=ItemType.EXPERIMENT)
+        sims = self.p.get_children_by_object(comps_exp)
         for simulation in sims:
             self.assertTrue(os.path.exists(os.path.join('output', str(simulation.uid), "InsetChart.json")))

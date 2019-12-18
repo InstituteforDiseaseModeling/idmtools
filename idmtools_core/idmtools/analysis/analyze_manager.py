@@ -1,19 +1,18 @@
 import os
 import sys
 import time
-import typing
 from logging import getLogger, DEBUG
 from multiprocessing.pool import Pool
-from typing import NoReturn
+from typing import NoReturn, List
 
 from idmtools.analysis.map_worker_entry import map_item
 from idmtools.core import CacheEnabled
+from idmtools.entities import IPlatform
 from idmtools.utils.command_line import animation
 from idmtools.utils.language import on_off, verbose_timedelta
 
-if typing.TYPE_CHECKING:
-    from idmtools.entities.ianalyzer import TAnalyzer
-    from idmtools.core.interfaces.ientity import TEntity
+from idmtools.entities.ianalyzer import TAnalyzer
+from idmtools.core.interfaces.ientity import IEntity
 
 logger = getLogger(__name__)
 
@@ -48,7 +47,7 @@ class AnalyzeManager(CacheEnabled):
     class ItemsNotReady(Exception):
         pass
 
-    def __init__(self, platform, configuration=None, ids=None, analyzers=None, working_dir=os.getcwd(),
+    def __init__(self, platform: IPlatform, configuration=None, ids=None, analyzers=None, working_dir=os.getcwd(),
                  partial_analyze_ok=False, max_items=None, verbose=True, force_manager_working_directory=False):
         super().__init__()
         self.configuration = configuration or {}
@@ -70,7 +69,7 @@ class AnalyzeManager(CacheEnabled):
         logger.debug("Load information about items from platform")
         ids = list(set(ids or list()))  # uniquify
         items = [platform.get_item(oid, otype, force=True) for oid, otype in ids]
-        self.potential_items = []
+        self.potential_items: List[IEntity] = []
 
         for i in items:
             self.potential_items.extend(platform.flatten_item(item=i))
@@ -80,7 +79,7 @@ class AnalyzeManager(CacheEnabled):
         self.analyzers = analyzers or list()
         self.verbose = verbose
 
-    def add_item(self, item: 'TEntity') -> NoReturn:
+    def add_item(self, item: IEntity) -> NoReturn:
         """
         Add an additional item for analysis.
 
@@ -93,7 +92,7 @@ class AnalyzeManager(CacheEnabled):
 
         self.potential_items.extend(self.platform.flatten_item(item=item))
 
-    def _get_items_to_analyze(self) -> 'dict':
+    def _get_items_to_analyze(self) -> dict:
         """
         Get a list of items derived from :meth:`self._items` that are available to analyze.
 
@@ -125,7 +124,7 @@ class AnalyzeManager(CacheEnabled):
 
         return can_analyze
 
-    def add_analyzer(self, analyzer: 'TAnalyzer') -> NoReturn:
+    def add_analyzer(self, analyzer: TAnalyzer) -> NoReturn:
         """
         Add another analyzer to use on the items to be analyzed.
 
@@ -171,7 +170,7 @@ class AnalyzeManager(CacheEnabled):
         # make sure each analyzer in self.analyzers has a unique uid
         self._update_analyzer_uids()
 
-    def _check_exception(self) -> 'bool':
+    def _check_exception(self) -> bool:
         """
         Determines if an exception has occurred in the processing of items, printing any related information.
 
@@ -190,7 +189,7 @@ class AnalyzeManager(CacheEnabled):
             ex = False
         return ex
 
-    def _print_configuration(self, n_items: 'int', n_processes: 'int') -> NoReturn:
+    def _print_configuration(self, n_items: int, n_processes: int) -> NoReturn:
         """
         Display some information about an ongoing analysis.
 
@@ -215,7 +214,7 @@ class AnalyzeManager(CacheEnabled):
                 print(' | (Directory map: {}' % on_off(analyzer.need_dir_map))
         print(' | Pool of {} analyzing process(es)'.format(n_processes))
 
-    def _run_and_wait_for_mapping(self, worker_pool: 'Pool', start_time: 'float') -> 'bool':
+    def _run_and_wait_for_mapping(self, worker_pool: Pool, start_time: float) -> bool:
         """
         Run and manage the mapping call on each item.
 
@@ -261,7 +260,7 @@ class AnalyzeManager(CacheEnabled):
         logger.debug(f"Result fetching status: : {results.successful()}")
         return True
 
-    def _run_and_wait_for_reducing(self, worker_pool: 'Pool') -> 'dict':
+    def _run_and_wait_for_reducing(self, worker_pool: Pool) -> dict:
         """
         Run and manage the reduce call on the combined item results (by analyzer).
 
@@ -295,7 +294,7 @@ class AnalyzeManager(CacheEnabled):
                 logger.debug("Finished finalizing results")
         return finalize_results
 
-    def analyze(self) -> 'bool':
+    def analyze(self) -> bool:
         """
         Process the provided items with the provided analyzers. This is the main driver method of
         :class:`AnalyzeManager`.

@@ -1,3 +1,5 @@
+from typing import List
+
 from click.testing import CliRunner
 
 
@@ -17,7 +19,7 @@ def striped_cli_output_lines(result):
     return list(filter(lambda x: len(x), map(str.strip, result.output.split('\n'))))
 
 
-def run_command(*args, start_command=None):
+def invoke_command(*args, start_command=None):
     if start_command is None:
         start_command = []
     from idmtools_cli.main import start
@@ -27,3 +29,11 @@ def run_command(*args, start_command=None):
     final_command = start_command + list(args) if len(args) else start_command
     result = runner.invoke(cli, final_command)
     return result
+
+
+def run_command(*args: List[str], start_command: List[str] = None, base_command: str = None) -> object:
+    if start_command is None:
+        start_command = []
+    if base_command:
+        start_command.append(base_command)
+    return invoke_command(*args, start_command=start_command)
