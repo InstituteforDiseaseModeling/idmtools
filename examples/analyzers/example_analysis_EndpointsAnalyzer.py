@@ -16,7 +16,7 @@ class EndpointsAnalyzer(IAnalyzer):
         # Arg option for analyzer init are uid, working_dir, data in the method map (aka select_simulation_data),
         # and filenames
         # In this case, we want to provide a filename to analyze
-        filenames = ['output/ReportMalariaFilteredCatchment.json']
+        filenames = ['output/InsetChart.json']
         super().__init__(filenames=filenames)
 
         # Create a variable to save the results of the analysis to file

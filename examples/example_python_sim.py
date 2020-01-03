@@ -4,6 +4,7 @@
 # First, import some necessary system and idmtools packages.
 # - ExperimentBuilder: To create sweeps
 # - ExperimentManager: To manage our experiment
+# - Platform: To specify the platform you want to run your experiment on
 # - PythonExperiment: We want to run an experiment executing a Python script
 import os
 from functools import partial
