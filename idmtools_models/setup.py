@@ -42,13 +42,21 @@ setup(
     name='idmtools_models',
     entry_points=dict(idmtools_model=  # noqa: E251
                       ["idmtools_model_python = idmtools_models.python.python_experiment_spec:PythonExperimentSpec",
-                       "idmtools_model_r = idmtools_models.r.r_experiment_spec:RExperimentSpec"]
+                       "idmtools_model_r = idmtools_models.r.r_experiment_spec:RExperimentSpec"],
+                      idmtools_task=
+                      ["idmtools_task_python = idmtools_models.python.python_task:PythonTaskSpecification",
+                       "idmtools_task_python_json = idmtools_models.python.python_task:JSONConfiguredPythonTaskSpecification",
+                       "idmtools_task_r = idmtools_models.r.r_task:RTaskSpecification",
+                       "idmtools_task_r_json = idmtools_models.r.r_task:JSONConfiguredRTaskSpecification",
+                       "idmtools_task_json = idmtools_models.json_configured_task:JSONConfiguredTaskSpecification",
+                       "idmtools_docker = idmtools_models.docker_task:DockerTaskSpecification"
+                       ]
                       ),
     packages=find_packages(),
     setup_requires=setup_requirements,
     test_suite='tests',
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='0.2.0+nightly',
+    version='0.3.0+nightly',
     zip_safe=False,
 )

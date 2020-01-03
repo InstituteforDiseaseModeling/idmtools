@@ -1,4 +1,4 @@
-# flake8: noqa F821
+# flake8: noqa W605,F821
 import json
 import os
 import pytest
@@ -26,34 +26,34 @@ class TestEMODExperiment(ITestWithPersistence):
         models_dir = os.path.join(COMMON_INPUT_PATH, "fakemodels", "Eradication.exe")
         exp = EMODExperiment(eradication_path=models_dir)
         exp.pre_creation()
-        self.assertEqual("Assets/Eradication.exe --config config.json --input-path ./Assets\;. --dll-path ./Assets", exp.command.cmd)
+        self.assertEqual(r"Assets/Eradication.exe --config config.json --input-path ./Assets\;. --dll-path ./Assets", exp.command.cmd)
 
         models_dir = os.path.join(COMMON_INPUT_PATH, "fakemodels", "Eradication")
         exp = EMODExperiment(eradication_path=models_dir)
         exp.pre_creation()
-        self.assertEqual("Assets/Eradication --config config.json --input-path ./Assets\;. --dll-path ./Assets", exp.command.cmd)
+        self.assertEqual(r"Assets/Eradication --config config.json --input-path ./Assets\;. --dll-path ./Assets", exp.command.cmd)
 
         models_dir = os.path.join(COMMON_INPUT_PATH, "fakemodels", "Eradication-2.11.custom.exe")
         exp = EMODExperiment(eradication_path=models_dir)
         exp.pre_creation()
-        self.assertEqual("Assets/Eradication-2.11.custom.exe --config config.json --input-path ./Assets\;. --dll-path ./Assets",
+        self.assertEqual(r"Assets/Eradication-2.11.custom.exe --config config.json --input-path ./Assets\;. --dll-path ./Assets",
                          exp.command.cmd)
 
         models_dir = os.path.join(COMMON_INPUT_PATH, "fakemodels", "AnotherOne")
         exp = EMODExperiment(eradication_path=models_dir)
         exp.pre_creation()
-        self.assertEqual("Assets/AnotherOne --config config.json --input-path ./Assets\;. --dll-path ./Assets", exp.command.cmd)
+        self.assertEqual(r"Assets/AnotherOne --config config.json --input-path ./Assets\;. --dll-path ./Assets", exp.command.cmd)
 
     def test_legacy_emod(self):
         models_dir = os.path.join(COMMON_INPUT_PATH, "fakemodels", "Eradication.exe")
         exp = EMODExperiment(eradication_path=models_dir)
         exp.pre_creation()
-        self.assertEqual(f"Assets/Eradication.exe --config config.json --input-path ./Assets\;. --dll-path ./Assets", exp.command.cmd)
+        self.assertEqual(r"Assets/Eradication.exe --config config.json --input-path ./Assets\;. --dll-path ./Assets", exp.command.cmd)
 
         models_dir = os.path.join(COMMON_INPUT_PATH, "fakemodels", "Eradication.exe")
         exp = EMODExperiment(eradication_path=models_dir, legacy_exe=True)
         exp.pre_creation()
-        self.assertEqual(f"Assets/Eradication.exe --config config.json --input-path ./Assets --dll-path ./Assets", exp.command.cmd)
+        self.assertEqual(r"Assets/Eradication.exe --config config.json --input-path ./Assets --dll-path ./Assets", exp.command.cmd)
 
     def test_load_files(self):
         e = EMODExperiment.from_files(self.case_name,

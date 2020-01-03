@@ -7,7 +7,7 @@ from idmtools.analysis.analyze_manager import AnalyzeManager
 from idmtools.analysis.download_analyzer import DownloadAnalyzer as SampleAnalyzer
 from idmtools.builders import StandAloneSimulationsBuilder
 from idmtools.core.enums import EntityStatus, ItemType
-from idmtools.core.interfaces.iitem import TItem
+from idmtools.core.interfaces.iitem import IItem
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.ianalyzer import IAnalyzer
 from idmtools.managers import ExperimentManager
@@ -24,7 +24,7 @@ class TestAnalyzeManager(unittest.TestCase):
         def initialize(self):
             self.initialize_was_called = True
 
-        def map(self, data: 'Any', item: 'TItem') -> 'Any':
+        def map(self, data: 'Any', item: 'IItem') -> 'Any':
             pass
 
         def reduce(self, all_data: dict) -> 'Any':
@@ -35,7 +35,7 @@ class TestAnalyzeManager(unittest.TestCase):
         self.sample_experiment = TstExperiment()
         em = ExperimentManager(self.sample_experiment, self.platform)
         em.run()
-        self.platform.set_simulation_status(self.sample_experiment.uid, status=EntityStatus.SUCCEEDED)
+        self.platform._simulations.set_simulation_status(self.sample_experiment.uid, status=EntityStatus.SUCCEEDED)
         self.configuration = {'max_processes': 2}
 
         self.analyze_manager = AnalyzeManager(self.platform)
@@ -50,7 +50,8 @@ class TestAnalyzeManager(unittest.TestCase):
     def test_can_analyze_item(self):
         self.analyze_manager.partial_analyze_ok = True
         for status in EntityStatus:
-            self.platform.set_simulation_status(self.sample_experiment.uid, status)
+            self.platform._simulations.set_simulation_status(self.sample_experiment.uid, status)
+            self.platform.refresh_status(self.sample_experiment)
             self.analyze_manager.add_item(self.sample_experiment)
             if status == EntityStatus.SUCCEEDED:
                 self.assertTrue(len(self.analyze_manager._get_items_to_analyze()) == 1)
@@ -94,19 +95,20 @@ class TestAnalyzeManager(unittest.TestCase):
 
             # Fail a few or all
             if test_name == 'all':
-                self.platform.set_simulation_status(test_exp.uid, EntityStatus.SUCCEEDED)
+                self.platform._simulations.set_simulation_status(test_exp.uid, EntityStatus.SUCCEEDED)
             elif test_name == 'none':
-                self.platform.set_simulation_status(test_exp.uid, EntityStatus.FAILED)
+                self.platform._simulations.set_simulation_status(test_exp.uid, EntityStatus.FAILED)
             else:
-                self.platform.set_simulation_status(test_exp.uid, EntityStatus.FAILED)
-                self.platform.set_simulation_num_status(test_exp.uid, EntityStatus.SUCCEEDED, 1)
+                self.platform._simulations.set_simulation_status(test_exp.uid, EntityStatus.FAILED)
+                self.platform._simulations.set_simulation_num_status(test_exp.uid, EntityStatus.SUCCEEDED, 1)
 
             # test partial_ok True
+            self.platform.refresh_status(test_exp)
             am = AnalyzeManager(self.platform, ids=[(test_exp.uid, ItemType.EXPERIMENT)], partial_analyze_ok=True)
             items_to_analyze = am._get_items_to_analyze()
             self.assertEqual(len(items_to_analyze), results[0])
-            self.assertEqual(set(items_to_analyze.keys()),
-                             {item.uid for item in self.platform.get_children(test_exp.uid, ItemType.EXPERIMENT, force=True) if item.status == EntityStatus.SUCCEEDED})
+            succeeded_sims = {item.uid for item in self.platform.get_children(test_exp.uid, ItemType.EXPERIMENT, force=True) if item.status == EntityStatus.SUCCEEDED}
+            self.assertEqual(succeeded_sims, set(items_to_analyze.keys()))
 
             # test partial_ok False
             am = AnalyzeManager(self.platform, ids=[(test_exp.uid, ItemType.EXPERIMENT)], partial_analyze_ok=False)

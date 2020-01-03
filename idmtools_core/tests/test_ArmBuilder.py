@@ -4,6 +4,7 @@ from functools import partial
 from idmtools.builders.arm_experiment_builder import ArmExperimentBuilder, SweepArm, ArmType
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.tst_experiment import TstExperiment
+from idmtools_test.utils.utils import verify_simulation
 
 
 def param_update(simulation, param, value):
@@ -12,15 +13,6 @@ def param_update(simulation, param, value):
 
 setA = partial(param_update, param="a")
 setB = partial(param_update, param="b")
-
-
-def verify_simulation(simulation, expected_parameters, expected_values):
-    for value_set in expected_values:
-        for i, value in enumerate(list(value_set)):
-            if not simulation.parameters[expected_parameters[i]] == expected_values:
-                break
-        return True
-    return False
 
 
 class TestArmBuilder(ITestWithPersistence):
@@ -33,10 +25,7 @@ class TestArmBuilder(ITestWithPersistence):
         super().tearDown()
 
     def test_simple_arm_cross(self):
-        arm = SweepArm(type=ArmType.cross)
-        arm.add_sweep_definition(setA, range(5))
-        arm.add_sweep_definition(setB, [1, 2, 3])
-        self.builder.add_arm(arm)
+        self.create_simple_arm()
 
         expected_values = list(itertools.product(range(5), [1, 2, 3]))
 
@@ -53,11 +42,14 @@ class TestArmBuilder(ITestWithPersistence):
             found = verify_simulation(simulation, ["a", "b"], expected_values)
             self.assertTrue(found)
 
-    def test_reverse_order(self):
+    def create_simple_arm(self):
         arm = SweepArm(type=ArmType.cross)
         arm.add_sweep_definition(setA, range(5))
         arm.add_sweep_definition(setB, [1, 2, 3])
         self.builder.add_arm(arm)
+
+    def test_reverse_order(self):
+        self.create_simple_arm()
 
         experiment = TstExperiment("test")
         experiment.builder = self.builder

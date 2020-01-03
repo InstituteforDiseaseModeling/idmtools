@@ -44,5 +44,4 @@ class Suite(INamedEntity, ABC):
         return f"<Suite {self.uid} - {len(self.experiments)} experiments>"
 
 
-TSuite = typing.TypeVar("TSuite", bound=Suite)
-TSuiteClass = typing.Type[TSuite]
+ISuiteClass = typing.Type[Suite]

@@ -19,6 +19,23 @@ class UnknownItemException(Exception):
 
 
 class NoPlatformException(Exception):
+    """
+    Cannot find a platform matching the one requested by user
+    """
+    pass
+
+
+class TopLevelItem(Exception):
+    """
+    Thrown when a parent of a top-level item is requested by the platform
+    """
+    pass
+
+
+class UnsupportedPlatformType(Exception):
+    """
+    Occurs when an item is not supported by a platform but is requested
+    """
     pass
 
 

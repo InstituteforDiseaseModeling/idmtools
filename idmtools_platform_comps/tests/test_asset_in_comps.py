@@ -4,12 +4,12 @@ import pytest
 import unittest
 from COMPS.Data import Experiment
 from idmtools.assets import Asset, AssetCollection
-from idmtools.builders import ExperimentBuilder
 from idmtools.core import EntityStatus
-from idmtools.core.platform_factory import Platform
 from idmtools_models.python import PythonExperiment
+from idmtools_platform_comps.comps_platform import COMPSPlatform
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id
+from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id, \
+    assure_running_then_wait_til_done, setup_test_with_platform_and_simple_sweep
 
 
 @pytest.mark.comps
@@ -18,15 +18,8 @@ class TestAssetsInComps(unittest.TestCase):
 
     def setUp(self) -> None:
         self.base_path = os.path.abspath(os.path.join(COMMON_INPUT_PATH, "assets", "collections"))
-        self.platform = Platform('COMPS2')
-        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
-        print(self.case_name)
-
-        def setP(simulation, p):
-            return simulation.set_parameter("P", p)
-
-        self.builder = ExperimentBuilder()
-        self.builder.add_sweep_definition(setP, [1, 2, 3])
+        self.platform: COMPSPlatform = None
+        setup_test_with_platform_and_simple_sweep(self)
 
     def _run_and_test_experiment(self, experiment):
         experiment.builder = self.builder
@@ -60,20 +53,7 @@ class TestAssetsInComps(unittest.TestCase):
         self.assertTrue(all([s.status == EntityStatus.CREATED for s in experiment.simulations]))
 
         # Start experiment
-        self.platform.run_items(items=[experiment])
-        self.platform.refresh_status(item=experiment)
-        self.assertFalse(experiment.done)
-        self.assertTrue(all([s.status == EntityStatus.RUNNING for s in experiment.simulations]))
-
-        # Wait till done
-        import time
-        start_time = time.time()
-        while time.time() - start_time < 180:
-            self.platform.refresh_status(item=experiment)
-            if experiment.done:
-                break
-            time.sleep(3)
-        self.assertTrue(experiment.done)
+        assure_running_then_wait_til_done(self, experiment)
 
     @pytest.mark.long
     def test_md5_hashing_for_same_file_contents(self):

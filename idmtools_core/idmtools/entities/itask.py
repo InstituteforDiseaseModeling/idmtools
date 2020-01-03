@@ -1,14 +1,15 @@
 import copy
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
+from logging import getLogger
 from typing import Set, NoReturn, Union, Callable, List, Optional
-
 from idmtools.assets import AssetCollection
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.entities.command_line import CommandLine
 from idmtools.entities.platform_requirements import PlatformRequirements
 
 
+logger = getLogger(__name__)
 # Tasks can be allocated multiple ways
 # They can be used in Experiments as the description of the item to run within a Simulation
 # They can also be used in Workflows to run items
@@ -19,6 +20,7 @@ from idmtools.entities.platform_requirements import PlatformRequirements
 
 TTaskParent = Union['Simulation', 'WorkflowItem']
 TTaskHook = Callable[[TTaskParent], NoReturn]
+
 
 @dataclass
 class ITask(IAssetsEnabled, metaclass=ABCMeta):
@@ -34,8 +36,6 @@ class ITask(IAssetsEnabled, metaclass=ABCMeta):
     experiment_assets: Optional[AssetCollection] = None
 
     def __post_init__(self):
-        if self.command is None:  # there should be a better way to do this with dataclasses
-            raise ValueError("Command is required")
         if isinstance(self.command, str):
             self.command = CommandLine(self.command)
 
@@ -43,9 +43,27 @@ class ITask(IAssetsEnabled, metaclass=ABCMeta):
         self.__post_creation_hooks = []
 
     def add_pre_creation_hook(self, hook: TTaskHook):
+        """
+        Called before a simulation is created on a platform. Each hook recieves either a Simulation or WorkflowTask
+
+        Args:
+            hook: Function to call on event
+
+        Returns:
+            None
+        """
         self.__pre_creation_hooks.append(hook)
 
     def add_post_creation_hook(self, hook: TTaskHook):
+        """
+        Called after a simulation has been created on a platform. Each hook recieves either a Simulation or WorkflowTask
+
+        Args:
+            hook: Function to call on event
+
+        Returns:
+
+        """
         self.__post_creation_hooks.append(hook)
 
     def add_platform_requirement(self, requirement: Union[PlatformRequirements, str]) -> NoReturn:
@@ -70,6 +88,9 @@ class ITask(IAssetsEnabled, metaclass=ABCMeta):
         Returns:
 
         """
+        if self.command is None:
+            logger.error('Command is not defined')
+            raise ValueError("Command is required for on task when preparing an experiment")
         [hook(parent) for hook in self.__pre_creation_hooks]
 
     def post_creation(self, parent: Union['Simulation', 'WorkflowItem']):
@@ -98,8 +119,7 @@ class ITask(IAssetsEnabled, metaclass=ABCMeta):
         new_simulation = copy.deepcopy(base_simulation)
         return new_simulation
 
-    @staticmethod
-    def reload_from_simulation(simulation: 'Simulation') -> 'ITask':
+    def reload_from_simulation(self, simulation: 'Simulation'):
         """
         Optional hook that is called when loading simulations from a platform
         """

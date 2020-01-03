@@ -2,7 +2,7 @@ import React from "react";
 
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from "react-redux";
-import { AppBar, Toolbar, Typography, IconButton, List, ListItemIcon, ListItem, ListItemText, Snackbar } from "@material-ui/core";
+import { AppBar, Toolbar, Typography, IconButton, List, LisIItemIcon, LisIItem, LisIItemText, Snackbar } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import SimulationIcon from '@material-ui/icons/SimCard';
@@ -143,10 +143,10 @@ class Layout extends React.Component {
                     icons.push( ()=> (<ExperimentIcon/>));
 
                     return (
-                      <ListItem button key={text} onClick={this.navigate(text)} >
-                        <ListItemIcon>{icons[index]()}</ListItemIcon>
-                        <ListItemText primary={text} />
-                      </ListItem>)
+                      <LisIItem button key={text} onClick={this.navigate(text)} >
+                        <LisIItemIcon>{icons[index]()}</LisIItemIcon>
+                        <LisIItemText primary={text} />
+                      </LisIItem>)
                   })}
                 </List>              
             </div>
