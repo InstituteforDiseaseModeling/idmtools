@@ -89,7 +89,7 @@ def restart_local_platform(silent=True, stop_before=True, stop_after=True, dump_
                     try:
                         info = get_service_info(sm, diff=False, logs=True)
                         print(info)
-                    except:
+                    except:  # noqa E722
                         pass
                 if stop_after and os.getenv('NO_TEST_WORKER_CLEANUP', '0').lower() not in ['1', 'true', 'yes', 'y']:
                     sm.cleanup(tear_down_brokers=True, delete_data=True)

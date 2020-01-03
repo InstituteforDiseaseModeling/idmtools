@@ -1,16 +1,12 @@
 import os
-import typing
-
+from typing import List, NoReturn, TypeVar
 from idmtools.assets import Asset
 from idmtools.assets.errors import DuplicatedAssetError
 from idmtools.core import FilterMode
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.utils.file import scan_directory
 from idmtools.utils.filters.asset_filters import default_asset_file_filter
-
-if typing.TYPE_CHECKING:
-    from idmtools.assets import TAssetList, TAsset, TAssetFilterList
-    from typing import NoReturn
+from idmtools.assets import TAssetFilterList
 
 
 class AssetCollection(IEntity):
@@ -19,7 +15,7 @@ class AssetCollection(IEntity):
     """
 
     # region Constructors
-    def __init__(self, assets: 'TAssetList' = None):  # noqa: F821
+    def __init__(self, assets: List[Asset] = None):
         """
         A constructor.
 
@@ -31,7 +27,7 @@ class AssetCollection(IEntity):
 
     @classmethod
     def from_directory(cls, assets_directory: str, recursive: bool = True, flatten: bool = False,
-                       filters: 'TAssetFilterList' = None, filters_mode: 'FilterMode' = FilterMode.OR,  # noqa: F821
+                       filters: 'TAssetFilterList' = None, filters_mode: FilterMode = FilterMode.OR,  # noqa: F821
                        relative_path: str = None) -> 'TAssetCollection':
         """
         Fill up an :class:`AssetCollection` from the specified directory. See
@@ -46,10 +42,10 @@ class AssetCollection(IEntity):
     # endregion
 
     @staticmethod
-    def assets_from_directory(assets_directory: 'str', recursive: 'bool' = True, flatten: 'bool' = False,
+    def assets_from_directory(assets_directory: str, recursive: bool = True, flatten: bool = False,
                               filters: 'TAssetFilterList' = None,  # noqa: F821
-                              filters_mode: 'FilterMode' = FilterMode.OR,
-                              forced_relative_path: 'str' = None) -> 'TAssetList':  # noqa: F821
+                              filters_mode: FilterMode = FilterMode.OR,
+                              forced_relative_path: str = None) -> List[Asset]:
         """
         Create assets for files in a given directory.
 
@@ -103,9 +99,9 @@ class AssetCollection(IEntity):
 
         return assets
 
-    def add_directory(self, assets_directory: 'str', recursive: 'bool' = True, flatten: 'bool' = False,
-                      filters: 'TAssetFilterList' = None, filters_mode: 'FilterMode' = FilterMode.OR,  # noqa: F821
-                      relative_path: 'str' = None):
+    def add_directory(self, assets_directory: str, recursive: bool = True, flatten: bool = False,
+                      filters: 'TAssetFilterList' = None, filters_mode: FilterMode = FilterMode.OR,  # noqa: F821
+                      relative_path: str = None):
         """
         Retrieve assets from the specified directory and add them to the collection.
         See :meth:`~AssetCollection.assets_from_directory` for arguments.
@@ -115,7 +111,7 @@ class AssetCollection(IEntity):
         for asset in assets:
             self.add_asset(asset)
 
-    def add_asset(self, asset: Asset, fail_on_duplicate: 'bool' = True):  # noqa: F821
+    def add_asset(self, asset: Asset, fail_on_duplicate: bool = True):  # noqa: F821
         """
         Add an asset to the collection.
 
@@ -132,7 +128,7 @@ class AssetCollection(IEntity):
                 # nothing guarantees that the content is the same. So remove and add the fresh one.
                 self.assets.remove(asset)
         self.assets.append(asset)
-        
+
     def add_or_replace_asset(self, asset: Asset):
         """
         Add or replaces an asset in a collection
@@ -166,7 +162,7 @@ class AssetCollection(IEntity):
         except StopIteration:
             return None
 
-    def delete(self, **kwargs) -> 'NoReturn':
+    def delete(self, **kwargs) -> NoReturn:
         """
         Delete an asset based on keywords attributes
 
@@ -198,7 +194,7 @@ class AssetCollection(IEntity):
             self.assets.remove(asset)
         return asset
 
-    def extend(self, assets: 'TAssetList', fail_on_duplicate: 'bool' = True) -> 'NoReturn':
+    def extend(self, assets: List[Asset], fail_on_duplicate: bool = True) -> NoReturn:
         """
         Extend the collection with new assets
         Args:
@@ -271,4 +267,4 @@ class AssetCollection(IEntity):
         return None
 
 
-TAssetCollection = typing.TypeVar("TAssetCollection", bound=AssetCollection)
+TAssetCollection = TypeVar("TAssetCollection", bound=AssetCollection)

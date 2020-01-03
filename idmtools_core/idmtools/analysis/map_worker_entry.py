@@ -1,21 +1,18 @@
 import itertools
 import traceback
-import typing
 from logging import getLogger, DEBUG
-
+from idmtools.core.interfaces.ientity import IEntity
+from idmtools.entities import IPlatform
 from idmtools.utils.file_parser import FileParser
 from typing import NoReturn
-
-if typing.TYPE_CHECKING:
-    from idmtools.entities.iplatform import TPlatform
-    from idmtools.core.interfaces.iitem import TItem
-    from idmtools.entities.ianalyzer import TAnalyzerList
-    from diskcache import Cache
+from idmtools.core.interfaces.iitem import IItem
+from idmtools.entities.ianalyzer import TAnalyzerList
+from diskcache import Cache
 
 logger = getLogger(__name__)
 
 
-def map_item(item: 'TItem') -> NoReturn:
+def map_item(item: IItem) -> NoReturn:
     """
     Initialize some worker-global values; a worker process entry point for analyzer item-mapping.
 
@@ -33,7 +30,7 @@ def map_item(item: 'TItem') -> NoReturn:
     _get_mapped_data_for_item(item, analyzers, cache, platform)
 
 
-def _get_mapped_data_for_item(item: 'TItem', analyzers: 'TAnalyzerList', cache: 'Cache', platform: 'TPlatform') -> bool:
+def _get_mapped_data_for_item(item: IEntity, analyzers: TAnalyzerList, cache: Cache, platform: IPlatform) -> bool:
     """
 
     Args:
@@ -68,7 +65,8 @@ def _get_mapped_data_for_item(item: 'TItem', analyzers: 'TAnalyzerList', cache: 
     # The byte_arrays will associate filename with content
     try:
         file_data = platform.get_files(item, filenames)  # make sure this does NOT error when filenames is empty
-    except Exception:
+    except Exception as e:
+        logger.error(e)
         # an error has occurred
         analyzer_uids = [a.uid for a in analyzers]
         _set_exception(step="data retrieval",
@@ -85,7 +83,8 @@ def _get_mapped_data_for_item(item: 'TItem', analyzers: 'TAnalyzerList', cache: 
             try:
                 data = {filename: FileParser.parse(filename, content)
                         for filename, content in file_data.items()}
-            except Exception:
+            except Exception as e:
+                logger.error(e)
                 _set_exception(step="data parsing",
                                info={"Item": item, "Analyzer": analyzer.uid},
                                cache=cache)
@@ -98,7 +97,8 @@ def _get_mapped_data_for_item(item: 'TItem', analyzers: 'TAnalyzerList', cache: 
         try:
             logger.debug("Running map on selected data")
             selected_data[analyzer.uid] = analyzer.map(data, item)
-        except Exception:
+        except Exception as e:
+            logger.error(e)
             _set_exception(step="data processing", info={"Item": item, "Analyzer": analyzer.uid},
                            cache=cache)
             return False
@@ -106,24 +106,13 @@ def _get_mapped_data_for_item(item: 'TItem', analyzers: 'TAnalyzerList', cache: 
     # Store all analyzer results for this item in the result cache
     if logger.isEnabledFor(DEBUG):
         logger.debug(f"Setting result to cache on {item.uid}")
-    done = False
-    retries = 0
-    while not done and retries < 6:
-        try:
-            cache.set(item.uid, selected_data)
-            done = True
-        except TimeoutError as e:
-            retries += 1
-            if logger.isEnabledFor(DEBUG):
-                logger.exception(e)
-            pass
-        if retries > 5:
-            raise StopAsyncIteration("Error set value to cache")
+
+    cache.set(item.uid, selected_data, retry=True,)
     logger.debug(f"Wrote Setting result to cache on {item.uid}")
     return True
 
 
-def _set_exception(step: str, info: dict, cache: 'Cache') -> NoReturn:
+def _set_exception(step: str, info: dict, cache: Cache) -> NoReturn:
     """
     Set an exception in the cache in a standardized way.
 

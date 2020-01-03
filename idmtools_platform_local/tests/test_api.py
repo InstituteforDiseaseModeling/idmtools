@@ -13,9 +13,9 @@ from idmtools_platform_local.internals.workers.database import reset_db
 
 api_host = os.getenv('API_HOST', 'localhost')
 os.environ['SQLALCHEMY_DATABASE_URI'] = f'postgresql+psycopg2://idmtools:idmtools@{api_host}/idmtools'
-from idmtools_platform_local.internals.workers.utils import create_or_update_status
 from idmtools_test.utils.confg_local_runner_test import config_local_test, patch_broker, reset_local_broker
 from idmtools_platform_local.infrastructure.service_manager import DockerServiceManager
+from idmtools_test.utils.local_platform import create_test_data
 
 
 @pytest.mark.docker
@@ -65,23 +65,7 @@ class TestAPI(unittest.TestCase):
 
         get_session().query(JobStatus).delete()
         # this experiment has no children
-        create_or_update_status('AAAAA', '/data/AAAAA', dict(a='b', c='d'),
-                                extra_details=dict(simulation_type='Python'))
-        # Experiment
-        create_or_update_status('BBBBB', '/data/BBBBB', dict(e='f', g='h'),
-                                extra_details=dict(simulation_type='Python'))
-        # Simulation
-        create_or_update_status('CCCCC', '/data/CCCCC', dict(i='j', k='l'), parent_uuid='BBBBB',
-                                extra_details=dict(simulation_type='Python'))
-        # Experiment
-        create_or_update_status('DDDDD', '/data/DDDD', dict(e='f', c='d'),
-                                extra_details=dict(simulation_type='Python'))
-
-        # Simulation
-        create_or_update_status('EEEEE', '/data/EEEEE', dict(i='j', k='l'), parent_uuid='DDDDD',
-                                extra_details=dict(simulation_type='Python'))
-        create_or_update_status('FFFFF', '/data/FFFFF', dict(i='j', k='l'), parent_uuid='DDDDD',
-                                extra_details=dict(simulation_type='Python'))
+        create_test_data()
 
     def test_fetch_experiments(self):
         # ensure we have some phony data
