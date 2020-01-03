@@ -1,11 +1,12 @@
 from abc import ABCMeta, abstractmethod
-from dataclasses import fields
+from dataclasses import fields, field
 from itertools import groupby
 from logging import getLogger
 from uuid import UUID
 from idmtools.core import CacheEnabled, ItemType, UnknownItemException, EntityContainer, UnsupportedPlatformType
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.isimulation import ISimulation
+from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.suite import Suite
 from idmtools.entities.iexperiment import IDockerExperiment, IGPUExperiment, IExperiment
 from idmtools.entities.iplatform_metadata import IPlatformExperimentOperations, \
@@ -53,6 +54,9 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     """
     platform_type_map: Dict[Type, ItemType] = None
     _object_cache_expiration: 'int' = 60
+
+    supported_types: Set[ItemType] = field(default_factory=lambda: set(), metadata={"pickle_ignore": True})
+    platform_supports: List[PlatformRequirements] = field(default_factory=list)
 
     _experiments: IPlatformExperimentOperations = None
     _simulations: IPlatformSimulationOperations = None
@@ -177,8 +181,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         if not item_type or item_type not in self.platform_type_map.values():
             raise Exception("The provided type is invalid or not supported by this platform...")
 
-        # Create the cache key
-        cache_key = f"o_{item_id}_" + ('r' if raw else 'o') + '_'.join(f"{k}_{v}" for k, v in kwargs.items())
+        cache_key = self.get_cache_key(force, item_id, item_type, kwargs, raw, 'r' if raw else 'o')
 
         # If force -> delete in the cache
         if force:
@@ -274,11 +277,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         Returns:
             The children of the object or None.
         """
-        if not item_type or item_type not in self.platform_type_map.values():
-            raise Exception("The provided type is invalid or not supported by this platform...")
-
-        # Create the cache key based on everything we pass to the function
-        cache_key = f"c_{item_id}" + ('r' if raw else 'o') + '_'.join(f"{k}_{v}" for k, v in kwargs.items())
+        cache_key = self.get_cache_key(force, item_id, item_type, kwargs, raw, 'c')
 
         if force:
             self.cache.delete(cache_key)
@@ -368,6 +367,15 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             return parent
 
         return self.cache.get(cache_key)
+
+    def get_cache_key(self, force, item_id, item_type, kwargs, raw, prefix='p'):
+        if not item_type or item_type not in self.supported_types:
+            raise Exception("The provided type is invalid or not supported by this platform...")
+        # Create the cache key based on everything we pass to the function
+        cache_key = f'{prefix}_{item_id}' + ('r' if raw else 'o') + '_'.join(f"{k}_{v}" for k, v in kwargs.items())
+        if force:
+            self.cache.delete(cache_key)
+        return cache_key
 
     def create_items(self, items: List[IEntity]) -> List[UUID]:
         """
@@ -506,6 +514,9 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
         return getattr(self, interface).get_assets(item, files)
+
+    def is_task_supported(self, task: 'ITask') -> bool:
+        return all([x in self.platform_supports for x in task.platform_requirements])
 
 
 TPlatform = TypeVar("TPlatform", bound=IPlatform)

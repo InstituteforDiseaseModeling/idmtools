@@ -129,6 +129,22 @@ class AssetCollection(IEntity):
                 self.assets.remove(asset)
         self.assets.append(asset)
 
+    def add_or_replace_asset(self, asset: Asset):
+        """
+        Add or replaces an asset in a collection
+
+        Args:
+            asset: Asset to add or replace
+
+        Returns:
+
+        """
+        index = self.find_index_of_asset(asset.absolute_path, asset.filename)
+        if index is not None:
+            self.assets[index] = asset
+        else:
+            self.assets.append(asset)
+
     def get_one(self, **kwargs):
         """
         Get an asset out of the collection based on the filers passed.
@@ -214,6 +230,41 @@ class AssetCollection(IEntity):
 
     def __iter__(self):
         yield from self.assets
+
+    def has_asset(self, absolute_path: str = None, filename: str = None) -> bool:
+        """
+        Search for asset by absolute_path or by filename
+
+        Args:
+            absolute_path: Absolute path of source file
+            filename: Destination filename
+
+        Returns:
+            True if asset exists, False otherwise
+        """
+        return self.find_index_of_asset(absolute_path, filename) is not None
+
+    def find_index_of_asset(self, absolute_path: str = None, filename: str = None) -> typing.Union[int, None]:
+        """
+        Finds the index of asset by path or filename
+        Args:
+            absolute_path: Path to search
+            filename: Filename to search
+
+        Returns:
+            Index number if found
+            None if not found
+        """
+        for idx, asset in enumerate(self.assets):
+            if filename and asset.filename == filename:
+                if absolute_path and absolute_path == asset.absolute_path:
+                    return idx
+                elif absolute_path is None:
+                    return idx
+
+            if absolute_path and asset.absolute_path:
+                return idx
+        return None
 
 
 TAssetCollection = TypeVar("TAssetCollection", bound=AssetCollection)
