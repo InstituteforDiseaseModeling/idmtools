@@ -38,6 +38,7 @@ def runFits(fname='', customGrid=0, gridFile='',
                         help='number of sims to run per sample')
     parser.add_argument('-ab','--agentbased', action='store_true',
                         help='set to agent-based mode')
+    parser.add_argument('config.json', type=str, help='config file')
     args = parser.parse_args()
     if args.fname:
         fname = args.fname
