@@ -26,7 +26,7 @@ def param_update(simulation, param, value):
 pe = PythonExperiment(name="Allee python model example",
                       model_path=os.path.join("work", "inputs", "allee_python_model", "run_emod_sweep.py"))
 pe.base_simulation.envelope = "parameters"
-pe.retrieve_python_dependencies()
+# pe.retrieve_python_dependencies()
 
 # Example of how to add tags to the Experiment
 pe.tags["tag1"] = "example from allee python model with idmtools"
