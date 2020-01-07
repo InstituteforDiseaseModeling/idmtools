@@ -1,3 +1,4 @@
+import copy
 from dataclasses import dataclass, field
 from logging import getLogger
 from typing import List, Optional, Type

@@ -1,5 +1,5 @@
 import os
-from typing import List, NoReturn, TypeVar
+from typing import List, NoReturn, TypeVar, Union
 from idmtools.assets import Asset
 from idmtools.assets.errors import DuplicatedAssetError
 from idmtools.core import FilterMode
@@ -244,7 +244,7 @@ class AssetCollection(IEntity):
         """
         return self.find_index_of_asset(absolute_path, filename) is not None
 
-    def find_index_of_asset(self, absolute_path: str = None, filename: str = None) -> typing.Union[int, None]:
+    def find_index_of_asset(self, absolute_path: str = None, filename: str = None) -> Union[int, None]:
         """
         Finds the index of asset by path or filename
         Args:
