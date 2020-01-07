@@ -62,7 +62,7 @@ class TestAssetsInComps(unittest.TestCase):
         ac: AssetCollection = self.platform._assets.to_entity(comps_ac)
         self.assertIsInstance(ac, AssetCollection)
 
-        filenames_comps = sorted([f'{a.relative_path}{a.filename}' for a in comps_ac.assets])
+        filenames_comps = sorted([f'{a.relative_path}{a.file_name}' if a.relative_path else f'{a.file_name}' for a in comps_ac.assets])
         filenames = sorted([f'{a.relative_path}{a.filename}' for a in ac.assets])
         self.assertEqual(filenames_comps, filenames)
 
