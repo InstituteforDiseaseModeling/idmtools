@@ -88,12 +88,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         if experiment.assets.count == 0:
             return
 
-        ac = COMPSAssetCollection()
-        for asset in experiment.assets:
-            ac.add_asset(AssetCollectionFile(file_name=asset.filename, relative_path=asset.relative_path),
-                         data=asset.bytes)
-        ac.save()
-        experiment.assets.uid = ac.id
+        ac, aid = self.platform._assets.create(experiment.assets)
         print("Asset collection for experiment: {}".format(ac.id))
 
         # associate the assets with the experiment in COMPS

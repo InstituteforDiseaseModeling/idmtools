@@ -1,8 +1,9 @@
+import copy
 import os
-from typing import List, NoReturn, TypeVar
+from typing import List, NoReturn, TypeVar, Union
 from idmtools.assets import Asset
 from idmtools.assets.errors import DuplicatedAssetError
-from idmtools.core import FilterMode
+from idmtools.core import FilterMode, ItemType
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.utils.file import scan_directory
 from idmtools.utils.filters.asset_filters import default_asset_file_filter
@@ -23,7 +24,8 @@ class AssetCollection(IEntity):
             assets: An optional list of assets to create the collection with.
         """
         super().__init__()
-        self.assets = assets or []
+        self.assets = copy.deepcopy(assets) or []
+        self.item_type = ItemType.ASSETCOLLECTION
 
     @classmethod
     def from_directory(cls, assets_directory: str, recursive: bool = True, flatten: bool = False,
@@ -244,7 +246,7 @@ class AssetCollection(IEntity):
         """
         return self.find_index_of_asset(absolute_path, filename) is not None
 
-    def find_index_of_asset(self, absolute_path: str = None, filename: str = None) -> typing.Union[int, None]:
+    def find_index_of_asset(self, absolute_path: str = None, filename: str = None) -> Union[int, None]:
         """
         Finds the index of asset by path or filename
         Args:

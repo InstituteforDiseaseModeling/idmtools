@@ -2,9 +2,10 @@ import json
 import os
 import pytest
 import unittest
-from COMPS.Data import Experiment
+from COMPS.Data import Experiment, AssetCollection as CompsAssetCollection
 from idmtools.assets import Asset, AssetCollection
-from idmtools.core import EntityStatus
+from idmtools.core import EntityStatus, ItemType
+from idmtools.core.platform_factory import Platform
 from idmtools_models.python import PythonExperiment
 from idmtools_platform_comps.comps_platform import COMPSPlatform
 from idmtools_test import COMMON_INPUT_PATH
@@ -54,6 +55,35 @@ class TestAssetsInComps(unittest.TestCase):
 
         # Start experiment
         assure_running_then_wait_til_done(self, experiment)
+
+    def test_comps_asset_to_idmtools_asset(self):
+        comps_ac: CompsAssetCollection = self.platform.get_item('2c62399b-1a31-ea11-a2be-f0921c167861',
+                                                                item_type=ItemType.ASSETCOLLECTION, raw=True)
+        ac: AssetCollection = self.platform._assets.to_entity(comps_ac)
+        self.assertIsInstance(ac, AssetCollection)
+
+        filenames_comps = sorted([f'{a.relative_path}{a.filename}' for a in comps_ac.assets])
+        filenames = sorted([f'{a.relative_path}{a.filename}' for a in ac.assets])
+        self.assertEqual(filenames_comps, filenames)
+
+    def test_create_asset_collection_from_existing_collection(self):
+        ac = self.platform.get_item('2c62399b-1a31-ea11-a2be-f0921c167861', item_type=ItemType.ASSETCOLLECTION)
+        self.assertIsInstance(ac, AssetCollection)
+        new_ac = AssetCollection(ac.assets)
+        new_ac.add_asset(Asset(relative_path=None, filename="test.json", content=json.dumps({"a": 9, "b": 2})))
+        ids = self.platform.create_items([new_ac])
+        new_ac = self.platform.get_item(ids[0], item_type=ItemType.ASSETCOLLECTION)
+        self.assertIsInstance(new_ac, AssetCollection)
+
+        filenames = set(sorted([f'{a.relative_path}{a.filename}' for a in ac.assets]))
+        new_filenames = set(sorted([f'{a.relative_path}{a.filename}' for a in new_ac.assets]))
+
+        # we should have one additional file
+        self.assertEqual(len(filenames) + 1, len(new_filenames))
+        # all files from original asset should be in new asset
+        self.assertTrue(all([f'{a.relative_path}{a.filename}' in filenames for a in ac]))
+        # the only difference should be test.json
+        self.assertEqual(set(['test.json']), new_filenames - filenames)
 
     @pytest.mark.long
     def test_md5_hashing_for_same_file_contents(self):
