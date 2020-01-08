@@ -123,6 +123,9 @@ start-webui: ## start the webserver
 	$(PDR) -w 'idmtools_webui' -ex yarn
 	$(PDR) -w 'idmtools_webui' -ex 'yarn start'
 
+ui-yarn-upgrade:
+	@+$(IPY) "import os; os.chdir('idmtools_webui'); os.system('python build.py upgrade')"
+
 build-ui: ## build ui
 	$(CLDIR) --directories "idmtools_platform_local/internals/ui/static,idmtools_webui/build"
 	@+$(IPY) "import os; os.chdir('idmtools_webui'); os.system('python build.py')"
