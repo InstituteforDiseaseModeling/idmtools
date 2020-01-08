@@ -12,10 +12,8 @@ class Asset:
 
     absolute_path: 'str' = field(default=None)
     relative_path: 'str' = field(default=None)
-    # _relative_path: 'str' = field(default=None, init=False, repr=False)
     filename: 'str' = field(default=None)
     content: 'Any' = field(default=None)
-    # _content: 'Any' = field(default=None, init=False, repr=False)
     persisted: 'bool' = field(default=False)
     handler: 'Callable' = field(default=None)
 
@@ -38,7 +36,6 @@ class Asset:
 
     @relative_path.setter
     def relative_path(self, relative_path):
-        # self._relative_path = relative_path.strip(" \\/") if relative_path else None
         self._relative_path = relative_path.strip(" \\/") if not isinstance(relative_path,
                                                                             property) and relative_path else None
 
@@ -62,7 +59,6 @@ class Asset:
 
     @content.setter
     def content(self, content):
-        # print('content.setter')
         self._content = None if isinstance(content, property) else content
 
     # region Equality and Hashing
