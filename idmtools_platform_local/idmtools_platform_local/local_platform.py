@@ -56,7 +56,7 @@ class LocalPlatform(IPlatform):
 
     _experiments: LocalPlatformExperimentOperations = field(**op_defaults)
     _simulation: LocalPlatformSimulationOperations = field(**op_defaults)
-    platform_supports: List[PlatformRequirements] = field(default_factory=lambda: copy.deepcopy(supported_types))
+    _platform_supports: List[PlatformRequirements] = field(default_factory=lambda: copy.deepcopy(supported_types))
 
     def __post_init__(self):
         logger.debug("Setting up local platform")

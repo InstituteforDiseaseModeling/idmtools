@@ -53,7 +53,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     num_cores: int = field(default=1)
     exclusive: bool = field(default=False)
 
-    platform_supports: List[PlatformRequirements] = field(default_factory=lambda: copy.deepcopy(supported_types))
+    _platform_supports: List[PlatformRequirements] = field(default_factory=lambda: copy.deepcopy(supported_types))
 
     _experiments: CompsPlatformExperimentOperations = field(**op_defaults)
     _simulations: CompsPlatformSimulationOperations = field(**op_defaults)

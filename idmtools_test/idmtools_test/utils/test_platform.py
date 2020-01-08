@@ -34,7 +34,7 @@ class TestPlatform(IPlatform):
     _experiments: TestPlaformExperimentOperation = field(default=None, compare=False, metadata={"pickle_ignore": True})
     _simulations: TestPlaformSimulationOperation = field(default=None, compare=False, metadata={"pickle_ignore": True})
 
-    platform_supports: List[PlatformRequirements] = field(default_factory=lambda: copy.deepcopy(supported_types))
+    _platform_supports: List[PlatformRequirements] = field(default_factory=lambda: copy.deepcopy(supported_types))
 
     __test__ = False  # Hide from test discovery
 

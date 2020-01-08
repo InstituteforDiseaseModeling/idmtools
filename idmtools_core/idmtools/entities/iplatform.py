@@ -56,7 +56,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     _object_cache_expiration: 'int' = 60
 
     supported_types: Set[ItemType] = field(default_factory=lambda: set(), metadata={"pickle_ignore": True})
-    platform_supports: List[PlatformRequirements] = field(default_factory=list)
+    _platform_supports: List[PlatformRequirements] = field(default_factory=list)
 
     _experiments: IPlatformExperimentOperations = None
     _simulations: IPlatformSimulationOperations = None
@@ -516,7 +516,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         return getattr(self, interface).get_assets(item, files)
 
     def is_task_supported(self, task: 'ITask') -> bool:
-        return all([x in self.platform_supports for x in task.platform_requirements])
+        return all([x in self._platform_supports for x in task.platform_requirements])
 
 
 TPlatform = TypeVar("TPlatform", bound=IPlatform)
