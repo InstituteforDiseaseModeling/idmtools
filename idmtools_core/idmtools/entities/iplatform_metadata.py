@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Any, List, Tuple, Type, Dict
 from uuid import UUID
 
+from idmtools.assets import AssetCollection
 from idmtools.core import CacheEnabled
 from idmtools.entities.iexperiment import IExperiment
 from idmtools.entities.isimulation import  ISimulation
@@ -588,15 +589,57 @@ class IPlatformAssetCollectionOperations(CacheEnabled, ABC):
     platform_type: Type
 
     @abstractmethod
+    def create(self, asset_collection: AssetCollection, **kwargs) -> Tuple[Any, UUID]:
+        """
+        Creates an workflow_item from an IDMTools AssetCollection object
+
+        Args:
+            asset_collection: AssetCollection to create
+            **kwargs: Optional arguments mainly for extensibility
+
+        Returns:
+            Created platform item and the UUID of said item
+        """
+        pass
+
+    def batch_create(self, asset_collections: List[AssetCollection], **kwargs) -> List[Tuple[Any, UUID]]:
+        """
+        Provides a method to batch create asset collections items
+
+        Args:
+            asset_collections: List of asset collection items to create
+            **kwargs:
+
+        Returns:
+            List of tuples containing the create object and id of item that was created
+        """
+        ret = []
+        for ac in asset_collections:
+            ret.append(self.create(ac, **kwargs))
+        return ret
+
+    @abstractmethod
     def get(self, asset_collection_id: UUID, **kwargs) -> Any:
         """
         Returns the platform representation of an AssetCollection
 
         Args:
-            asset_collection_id: Item id of WorkflowItems
+            asset_collection_id: Item id of AssetCollection
             **kwargs:
 
         Returns:
-            Platform Representation of an workflow_item
+            Platform Representation of an AssetCollection
         """
         pass
+
+    def to_entity(self, asset_collection: Any, **kwargs) -> AssetCollection:
+        """
+        Converts the platform representation of AssetCollection to idmtools representation
+
+        Args:
+            asset_collection: Platform AssetCollection object
+
+        Returns:
+            IDMTools suite object
+        """
+        return asset_collection

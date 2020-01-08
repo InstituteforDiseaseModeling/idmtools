@@ -1,3 +1,4 @@
+import hashlib
 import os
 from typing import TypeVar, Union, List, Callable, Any
 
@@ -9,7 +10,7 @@ class Asset:
     """
 
     def __init__(self, absolute_path: 'str' = None, relative_path: 'str' = None, filename: 'str' = None,
-                 content: 'Any' = None, handler: 'Callable' = str):
+                 content: 'Any' = None, handler: 'Callable' = str, md5sum: str = None):
         """
         A constructor.
 
@@ -18,6 +19,8 @@ class Asset:
             relative_path:  The relative path (compared to the simulation root folder).
             filename: Name of the file. Optional if **absolute_path** is given.
             content: The content of the file. Optional if **absolute_path** is given.
+            md5sum: Optional. Useful in systems that allow single upload based on checksums and retrieving from those
+            systems
         """
 
         super().__init__()
@@ -30,9 +33,26 @@ class Asset:
         self._content = content
         self.persisted = False
         self.handler = handler
+        # We add this to allow systems who provide asset caching by MD5 opportunity to avoid re-uploading assets
+        self._md5_sum = md5sum
 
     def __repr__(self):
         return f"<Asset: {os.path.join(self.relative_path, self.filename)} from {self.absolute_path}>"
+
+    @property
+    def md5_sum(self):
+        """
+
+        Returns:
+
+        """
+        if self._md5_sum is None:
+            if self.content:
+                self._md5_sum = hashlib.md5(self.content).hexdigest()
+            else:
+                with open(self.filename, 'rb') as checksum_file:
+                    self._md5_sum = hashlib.md5(checksum_file.read()).hexdigest()
+        return self._md5_sum
 
     @property
     def extension(self):
