@@ -4,7 +4,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { connect } from "react-redux";
 import { fetchExperiments, deleteExperiment } from "../../redux/action/experiment"
 import { Table, TableHead, TableCell, TableRow, TableSortLabel, TableBody, Paper, Button, Typography, Divider,
-    Card, CardContent, List, LisIItem, LisIItemText, Grid, IconButton ,
+    Card, CardContent, List, ListItem, ListItemText, Grid, IconButton ,
     Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@material-ui/core";
 
 import {formatDateString} from  "../../utils/utils";
@@ -281,22 +281,22 @@ class ExperimentView extends React.Component {
                                         </Grid>
                                         <Divider/>
                                         <List>
-                                            <LisIItem>
-                                                <LisIItemText className={classes.itemText}>Id:</LisIItemText>
-                                                <LisIItemText className={classes.itemValue}>{this.state.selectedExp}</LisIItemText>
-                                            </LisIItem>
-                                            <LisIItem >
-                                                <LisIItemText className={classes.itemText}>Status</LisIItemText>
-                                                <LisIItemText className={classes.itemValue}>{status}</LisIItemText>
-                                            </LisIItem>
-                                            <LisIItem >
-                                                <LisIItemText className={classes.itemText}>Command</LisIItemText>
-                                                <LisIItemText className={classes.itemValue}>{command}</LisIItemText>
-                                            </LisIItem>
-                                            <LisIItem >
-                                                <LisIItemText className={classes.itemText}>Tags</LisIItemText>
-                                                <LisIItemText className={classes.itemValue}>{tags}</LisIItemText>
-                                            </LisIItem>
+                                            <ListItem>
+                                                <ListItemText className={classes.itemText}>Id:</ListItemText>
+                                                <ListItemText className={classes.itemValue}>{this.state.selectedExp}</ListItemText>
+                                            </ListItem>
+                                            <ListItem>
+                                                <ListItemText className={classes.itemText}>Status</ListItemText>
+                                                <ListItemText className={classes.itemValue}>{status}</ListItemText>
+                                            </ListItem>
+                                            <ListItem>
+                                                <ListItemText className={classes.itemText}>Command</ListItemText>
+                                                <ListItemText className={classes.itemValue}>{command}</ListItemText>
+                                            </ListItem>
+                                            <ListItem>
+                                                <ListItemText className={classes.itemText}>Tags</ListItemText>
+                                                <ListItemText className={classes.itemValue}>{tags}</ListItemText>
+                                            </ListItem>
 
                                         </List>
                                     </CardContent>
