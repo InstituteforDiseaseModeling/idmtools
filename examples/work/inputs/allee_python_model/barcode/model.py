@@ -607,9 +607,8 @@ def timeStep(strains,time, reservoir):
         
         # Also add new barcodes to reservoir
         # This becomes a probabilistic representation of the frequency of each strain
-        # reservoir = reservoir.append(newBarcodeDF[defaultColumns()],
-        #                              ignore_index=True, sort=False)
-        reservoir = reservoir.append(newBarcodeDF[defaultColumns()])
+        reservoir = reservoir.append(newBarcodeDF[defaultColumns()],
+                                     ignore_index=True, sort=False)
     
     # Kill off some entries in the reservoir
     reservoir = trimReservoir(reservoir, dailyDeaths)
@@ -777,9 +776,8 @@ def timeStepReservoir(strains,time, reservoir):
         
         # Also add new barcodes to reservoir
         # This becomes a probabilistic representation of the frequency of each strain
-        # reservoir = reservoir.append(newBarcodeDF[defaultColumns()],
-        #                              ignore_index=True, sort=False)
-        reservoir = reservoir.append(newBarcodeDF[defaultColumns()])
+        reservoir = reservoir.append(newBarcodeDF[defaultColumns()],
+                                     ignore_index=True, sort=False)
     
     # Kill off some entries in the reservoir
     reservoir = trimReservoir(reservoir, dailyDeaths)
