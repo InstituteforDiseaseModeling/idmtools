@@ -24,6 +24,7 @@ clean: ## Clean most of the temp-data from the project
 clean-all:  ## Deleting package info hides plugins so we only want to do that for packaging
 	@make clean
 	$(CLDIR) --dir-patterns "**/*.egg-info/"
+	@+$(IPY) "import os; os.chdir('idmtools_webui'); os.system('python build.py clean')"
 
 edv:
 	echo $(CWD)
