@@ -37,3 +37,7 @@ class UnsupportedPlatformType(Exception):
     Occurs when an item is not supported by a platform but is requested
     """
     pass
+
+
+class NoTaskFound(Exception):
+    pass

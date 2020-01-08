@@ -1,3 +1,4 @@
+import copy
 from dataclasses import dataclass, field
 from logging import getLogger
 from typing import List, Optional, Type
@@ -6,6 +7,7 @@ from idmtools.core.system_information import get_data_directory
 from idmtools.entities import IExperiment, IPlatform
 from idmtools.entities.iexperiment import IDockerExperiment, IWindowsExperiment, IDockerGPUExperiment, \
     IHostBinaryExperiment
+from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.utils.entities import get_dataclass_common_fields
 from idmtools_platform_local.infrastructure.docker_io import DockerIO
 from idmtools_platform_local.infrastructure.service_manager import DockerServiceManager
@@ -15,6 +17,10 @@ from idmtools_platform_local.platform_operations.simulation_operations import Lo
 logger = getLogger(__name__)
 
 op_defaults = dict(default=None, compare=False, metadata={"pickle_ignore": True})
+
+
+supported_types = [PlatformRequirements.DOCKER, PlatformRequirements.GPU, PlatformRequirements.SHELL,
+                   PlatformRequirements.NativeBinary, PlatformRequirements.LINUX]
 
 
 @dataclass
@@ -44,11 +50,13 @@ class LocalPlatform(IPlatform):
     # allows user to specify auto removal of docker worker containers
     auto_remove_worker_containers: bool = field(default=True)
 
+    # We use this to manage our docker containers
     _sm: Optional[DockerServiceManager] = field(**op_defaults)
     _do: DockerIO = field(**op_defaults)
 
     _experiments: LocalPlatformExperimentOperations = field(**op_defaults)
     _simulation: LocalPlatformSimulationOperations = field(**op_defaults)
+    _platform_supports: List[PlatformRequirements] = field(default_factory=lambda: copy.deepcopy(supported_types))
 
     def __post_init__(self):
         logger.debug("Setting up local platform")

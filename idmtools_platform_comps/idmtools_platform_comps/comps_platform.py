@@ -1,3 +1,4 @@
+import copy
 import json
 import logging
 import typing
@@ -7,14 +8,14 @@ from idmtools.core import CacheEnabled, ItemType
 from idmtools.entities import IPlatform
 from idmtools.entities.iexperiment import IExperiment, IGPUExperiment, IDockerExperiment, \
     ILinuxExperiment
-from typing import List
-
 from idmtools_platform_comps.comps_operations.asset_collection_operations import \
     CompsPlatformAssetCollectionOperations
 from idmtools_platform_comps.comps_operations.experiment_operations import CompsPlatformExperimentOperations
 from idmtools_platform_comps.comps_operations.simulation_operations import CompsPlatformSimulationOperations
 from idmtools_platform_comps.comps_operations.suite_operations import CompsPlatformSuiteOperations
 from idmtools_platform_comps.comps_operations.workflow_item_operations import CompsPlatformWorkflowItemOperations
+from idmtools.entities.platform_requirements import PlatformRequirements
+from typing import List
 
 logging.getLogger('COMPS.Data.Simulation').disabled = True
 logger = logging.getLogger(__name__)
@@ -29,6 +30,10 @@ class COMPSPriority:
 
 
 op_defaults = dict(default=None, compare=False, metadata=dict(pickle_ignore=True))
+
+
+supported_types = [PlatformRequirements.DOCKER, PlatformRequirements.PYTHON, PlatformRequirements.SHELL,
+                   PlatformRequirements.NativeBinary, PlatformRequirements.WINDOWS]
 
 
 @dataclass
@@ -47,6 +52,8 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     num_retires: int = field(default=0)
     num_cores: int = field(default=1)
     exclusive: bool = field(default=False)
+
+    _platform_supports: List[PlatformRequirements] = field(default_factory=lambda: copy.deepcopy(supported_types))
 
     _experiments: CompsPlatformExperimentOperations = field(**op_defaults)
     _simulations: CompsPlatformSimulationOperations = field(**op_defaults)

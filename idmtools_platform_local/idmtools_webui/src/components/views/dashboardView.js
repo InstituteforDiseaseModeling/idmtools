@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import { fetchExperiments } from "../../redux/action/experiment"
 import { fetchSimulations } from "../../redux/action/simulation"
 
-import {Card, CardContent, Typography, Divider, List, LisIItem, LisIItemText, Paper}  from "@material-ui/core";
+import {Card, CardContent, Typography, Divider, List, ListItem, ListItemText, Paper}  from "@material-ui/core";
 
 
 const styles = theme => ({
@@ -74,9 +74,9 @@ class Dashboard extends React.Component {
                         <Typography variant="h5" className={classes.cardTitle}>Local Experiments</Typography>
                         <Divider/>
                         <List>
-                            <LisIItem>
-                                <LisIItemText>Count:{expCount}</LisIItemText>
-                            </LisIItem>
+                            <ListItem>
+                                <ListItemText>Count:{expCount}</ListItemText>
+                            </ListItem>
                         </List>
                     </CardContent>
                 </Card>
@@ -87,15 +87,15 @@ class Dashboard extends React.Component {
                         <Divider/>
                         
                         <List>
-                            <LisIItem>
-                                <LisIItemText>Done:{simStatus.done}</LisIItemText>
-                            </LisIItem>
-                            <LisIItem>
-                                <LisIItemText>In progress:{simStatus['in progress']}</LisIItemText>
-                            </LisIItem>
-                            <LisIItem>
-                                <LisIItemText>Created:{simStatus.created}</LisIItemText>
-                            </LisIItem>
+                            <ListItem>
+                                <ListItemText>Done:{simStatus.done}</ListItemText>
+                            </ListItem>
+                            <ListItem>
+                                <ListItemText>In progress:{simStatus['in progress']}</ListItemText>
+                            </ListItem>
+                            <ListItem>
+                                <ListItemText>Created:{simStatus.created}</ListItemText>
+                            </ListItem>
                         </List>
                         
                     </CardContent>
@@ -106,12 +106,12 @@ class Dashboard extends React.Component {
                         <Typography variant="h5" className={classes.cardTitle}>COMPS Experiments</Typography>
                         <Divider/>
                         <List>
-                            <LisIItem>
-                                <LisIItemText>Completed:???</LisIItemText>
-                            </LisIItem>
-                            <LisIItem>
-                                <LisIItemText>Running:</LisIItemText>
-                            </LisIItem>
+                            <ListItem>
+                                <ListItemText>Completed:???</ListItemText>
+                            </ListItem>
+                            <ListItem>
+                                <ListItemText>Running:</ListItemText>
+                            </ListItem>
 
                         </List>
                     </CardContent>
@@ -123,12 +123,12 @@ class Dashboard extends React.Component {
                         <Typography variant="h5" className={classes.cardTitle}>COMPS Simulations</Typography>
                         <Divider/>
                         <List>
-                            <LisIItem>
-                                <LisIItemText>Completed:???</LisIItemText>
-                            </LisIItem>
-                            <LisIItem>
-                                <LisIItemText>Running:</LisIItemText>
-                            </LisIItem>
+                            <ListItem>
+                                <ListItemText>Completed:???</ListItemText>
+                            </ListItem>
+                            <ListItem>
+                                <ListItemText>Running:</ListItemText>
+                            </ListItem>
                         </List>
                     </CardContent>
                 </Card> */}
