@@ -8,6 +8,12 @@ class Asset:
     """
     A class representing an asset. An asset can either be related to a physical
     asset present on the computer or directly specified by a filename and content.
+
+    Args:
+        absolute_path: The absolute path of the asset. Optional if **filename** and **content** are given.
+        relative_path:  The relative path (compared to the simulation root folder).
+        filename: Name of the file. Optional if **absolute_path** is given.
+        content: The content of the file. Optional if **absolute_path** is given.
     """
 
     absolute_path: 'str' = field(default=None)
@@ -15,7 +21,7 @@ class Asset:
     filename: 'str' = field(default=None)
     content: 'Any' = field(default=None)
     persisted: 'bool' = field(default=False)
-    handler: 'Callable' = field(default=None)
+    handler: 'Callable' = field(default=str)
 
     def __post_init__(self):
         if not self.absolute_path and not (self.filename and self.content):
