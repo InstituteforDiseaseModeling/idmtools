@@ -1,4 +1,5 @@
 import hashlib
+import json
 import os
 from typing import TypeVar, Union, List, Callable, Any
 
@@ -48,7 +49,7 @@ class Asset:
         """
         if self._checksum is None:
             if self.content:
-                self._checksum = hashlib.md5(self.content).hexdigest()
+                self._checksum = hashlib.md5(json.dumps(self.content, sort_keys=False).encode('utf-8')).hexdigest()
             else:
                 with open(self.filename, 'rb') as checksum_file:
                     self._checksum = hashlib.md5(checksum_file.read()).hexdigest()
