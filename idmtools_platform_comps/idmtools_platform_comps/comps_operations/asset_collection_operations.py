@@ -20,7 +20,9 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
     def create(self, asset_collection: AssetCollection) -> Tuple[COMPSAssetCollection, UUID]:
         ac = COMPSAssetCollection()
         for asset in asset_collection:
-            if not asset.persisted:
+            # TODO: figure out persisted because we should use it to determine if we have uploaded a file already
+            # using checksum is not accurate and not all systems will support de-duplication
+            if asset.checksum is None:
                 ac.add_asset(AssetCollectionFile(file_name=asset.filename, relative_path=asset.relative_path),
                              data=asset.bytes)
             else: # We should already have this asset so we should have a md5sum
