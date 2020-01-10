@@ -1,5 +1,5 @@
 from dataclasses import field, dataclass
-from typing import Any, Type, Tuple
+from typing import Type, Tuple
 from uuid import UUID
 from COMPS.Data import AssetCollection as COMPSAssetCollection, QueryCriteria, AssetCollectionFile
 
@@ -24,10 +24,10 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
                 ac.add_asset(AssetCollectionFile(file_name=asset.filename, relative_path=asset.relative_path),
                              data=asset.bytes)
             else: # We should already have this asset so we should have a md5sum
-                if asset.md5_sum is None:
+                if asset.checksum is None:
                     raise Exception("md5sum is None for persisted file!")
                 ac.add_asset(AssetCollectionFile(file_name=asset.filename, relative_path=asset.relative_path,
-                                                 md5_checksum=asset.md5_sum))
+                                                 md5_checksum=asset.checksum))
         ac.save()
         asset_collection.uid = ac.id
         return ac, ac.id
@@ -37,7 +37,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         ac.uid = asset_collection.id
         ac.tags = asset_collection.tags
         for asset in asset_collection.assets:
-            a = Asset(relative_path=asset.relative_path, filename=asset.file_name, md5sum=asset.md5_checksum)
+            a = Asset(relative_path=asset.relative_path, filename=asset.file_name, checksum=asset.md5_checksum)
             a.persisted = True
             ac.assets.append(a)
 
