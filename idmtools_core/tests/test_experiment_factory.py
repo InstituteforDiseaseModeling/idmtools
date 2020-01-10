@@ -1,5 +1,6 @@
 import os
 
+from idmtools.assets import AssetCollection
 from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
 from idmtools.core.experiment_factory import experiment_factory
 from idmtools.core.platform_factory import Platform
@@ -30,6 +31,14 @@ class TestExperimentFactory(ITestWithPersistence):
         self.assertEqual(em.experiment.simulations[1].tags, {'p': 1})
 
         test_platform.cleanup()
+
+    def test_add_asset_collection_to_experiment(self):
+        base_path = os.path.abspath(os.path.join(COMMON_INPUT_PATH, "assets", "collections"))
+        experiment = experiment_factory.create("PythonExperiment", tags={"a": "1", "b": 2})
+        ac = AssetCollection.from_directory(assets_directory=base_path)
+        experiment.add_assets(ac)
+        for asset in ac:
+            self.assertIn(asset, experiment.assets)
 
     @windows_only
     def test_build_emod_experiment_from_factory(self):
