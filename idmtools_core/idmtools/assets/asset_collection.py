@@ -10,22 +10,6 @@ from idmtools.utils.filters.asset_filters import default_asset_file_filter
 from idmtools.assets import TAssetFilterList
 
 
-class AssetCollectionIterator:
-    """
-    Class allows iteration on an asset collection
-    """
-    def __init__(self, asset_collection: 'AssetCollection'):
-        self._asset_collection = asset_collection
-        self._index = 0
-
-    def __next__(self):
-        if self._index < len(self._asset_collection.assets):
-            result = self._asset_collection.assets[self._index]
-            self._index += 1
-            return result
-        raise StopIteration
-
-
 class AssetCollection(IEntity):
     """
     A class that represents a collection of assets.
@@ -226,9 +210,6 @@ class AssetCollection(IEntity):
         if asset:
             self.assets.remove(asset)
         return asset
-
-    def __iter__(self):
-        return AssetCollectionIterator(self)
 
     def extend(self, assets: List[Asset], fail_on_duplicate: bool = True) -> NoReturn:
         """
