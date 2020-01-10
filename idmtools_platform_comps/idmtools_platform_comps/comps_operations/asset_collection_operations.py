@@ -24,10 +24,10 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
                 ac.add_asset(AssetCollectionFile(file_name=asset.filename, relative_path=asset.relative_path),
                              data=asset.bytes)
             else: # We should already have this asset so we should have a md5sum
-                if asset.checksum is None:
+                if asset._checksum is None:
                     raise Exception("md5sum is None for persisted file!")
                 ac.add_asset(AssetCollectionFile(file_name=asset.filename, relative_path=asset.relative_path,
-                                                 md5_checksum=asset.checksum))
+                                                 md5_checksum=asset._checksum))
         ac.save()
         asset_collection.uid = ac.id
         return ac, ac.id
