@@ -1,13 +1,29 @@
 import copy
 import os
 from typing import List, NoReturn, TypeVar, Union
-from idmtools.assets import Asset
+from idmtools.assets import Asset, TAssetList
 from idmtools.assets.errors import DuplicatedAssetError
 from idmtools.core import FilterMode, ItemType
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.utils.file import scan_directory
 from idmtools.utils.filters.asset_filters import default_asset_file_filter
 from idmtools.assets import TAssetFilterList
+
+
+class AssetCollectionIterator:
+    """
+    Class allows iteration on an asset collection
+    """
+    def __init__(self, asset_collection: 'AssetCollection'):
+        self._asset_collection = asset_collection
+        self._index = 0
+
+    def __next__(self):
+        if self._index < len(self._asset_collection.assets):
+            result = self._asset_collection.assets[self._index]
+            self._index += 1
+            return result
+        raise StopIteration
 
 
 class AssetCollection(IEntity):
@@ -131,6 +147,21 @@ class AssetCollection(IEntity):
                 self.assets.remove(asset)
         self.assets.append(asset)
 
+    def add_assets(self, assets: Union[TAssetList, 'AssetCollection'], fail_on_duplicate: bool = True):
+        """
+        Add assets to a collection
+
+        Args:
+            assets: An list of assets as either list or a collection
+            fail_on_duplicate: Raise a **DuplicateAssetError** if an asset is duplicated.
+              If not, simply replace it.
+
+        Returns:
+
+        """
+        for asset in assets:
+            self.add_asset(asset)
+
     def add_or_replace_asset(self, asset: Asset):
         """
         Add or replaces an asset in a collection
@@ -195,6 +226,9 @@ class AssetCollection(IEntity):
         if asset:
             self.assets.remove(asset)
         return asset
+
+    def __iter__(self):
+        return AssetCollectionIterator(self)
 
     def extend(self, assets: List[Asset], fail_on_duplicate: bool = True) -> NoReturn:
         """
