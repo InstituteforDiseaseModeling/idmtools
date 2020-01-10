@@ -15,6 +15,7 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools.core import EntityStatus, ItemType
+from idmtools.core.experiment_factory import experiment_factory
 from idmtools_core.idmtools.assets.asset_collection import copy
 
 
@@ -343,26 +344,32 @@ class TestPythonExperiment(ITestWithPersistence):
         model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
         platform = Platform('COMPS2')
 
-        # Get an existing asset collection
-        collection_id = "951bda83-a5e9-e911-a2be-f0921c167861"  # Staging ac id from test_add_dirs_to_asset_comps test
-        ac = self.platform.get_item(collection_id, item_type=ItemType.ASSETCOLLECTION)
-        self.assertIsInstance(ac, AssetCollection)
+        pe = experiment_factory.create("PythonExperiment", name=self.case_name, model_path=model_path)
+        pe.tags = {"idmtools": "idmtools-automation", "a": "1", "b": 2}
 
-        # TODO: Can't do until able to get ac id from AssetCollection object
         # Get an existing asset collection (first create it for the test)
-        # ac = AssetCollection()
-        # assets_path = os.path.join(COMMON_INPUT_PATH, "python", "Assets")
-        # ac.add_directory(assets_directory=assets_path)
+        assets_path = os.path.join(COMMON_INPUT_PATH, "python", "Assets")
+        ac = AssetCollection.from_directory(assets_directory=assets_path)
+        # Then get an "existing asset" to use for the experiment
+        # TODO: Can't do until able to get ac id from AssetCollection object
         # ac = self.platform.get_item(ac.id, item_type=ItemType.ASSETCOLLECTION)
         # self.assertIsInstance(ac, AssetCollection)
+        pe.add_assets(ac)
+        for asset in ac:
+            self.assertIn(asset, pe.assets)
 
-        # TODO: cannot insert duplicate key row in dbo.AssetCollectionFile
-        pe = PythonExperiment(name=self.case_name, model_path=model_path, assets=ac)
-        pe.tags = {"idmtools": "idmtools-automation", "string_tag": "existing ac", "number_tag": 123}
+        # # Get an existing asset collection
+        # # TODO:  Cannot insert duplicate key row in object 'dbo.AssetCollectionFile'
+        # collection_id = "951bda83-a5e9-e911-a2be-f0921c167861"  # Staging ac id from test_add_dirs_to_asset_comps test
+        # ac = self.platform.get_item(collection_id, item_type=ItemType.ASSETCOLLECTION)
+        # self.assertIsInstance(ac, AssetCollection)
+        # pe.add_assets(ac)
+        # for asset in ac:
+        #     self.assertIn(asset, pe.assets)
+
         pe.base_simulation.envelope = "parameters"
         pe.base_simulation.set_parameter("a", 1)
         pe.base_simulation.set_parameter("b", 10)
-        # pe.assets(ac)
 
         sim = pe.simulation()
         builder = StandAloneSimulationsBuilder()
@@ -389,23 +396,20 @@ class TestPythonExperiment(ITestWithPersistence):
 
     @pytest.mark.comps
     def test_use_existing_ac_and_add_file_with_experiment(self):
-        model_path = os.path.join(COMMON_INPUT_PATH, "python", "Assets", "working_model.py")
+        model_path = os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py")
         platform = Platform('COMPS2')
         pe = PythonExperiment(name=self.case_name, model_path=model_path)
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "existing ac and create new ac", "number_tag": 123}
         pe.base_simulation.envelope = "parameters"
 
-        # Get an existing asset collection
-        collection_id = "951bda83-a5e9-e911-a2be-f0921c167861"  # Staging ac id from test_add_dirs_to_asset_comps test
-        ac = self.platform.get_item(collection_id, item_type=ItemType.ASSETCOLLECTION)
-        self.assertIsInstance(ac, AssetCollection)
-
-        # TODO: Can't do until able to get ac id from AssetCollection object
         # Get an existing asset collection (first create it for the test)
-        # ac = AssetCollection()
-        # assets_path = os.path.join(COMMON_INPUT_PATH, "python", "Assets", "MyExternalLibrary")
-        # ac.add_directory(assets_directory=assets_path, relative_path="MyExternalLibrary")
-        # ac = self.platform.get_item(ac.id, item_type=ItemType.ASSETCOLLECTION)
+        assets_path = os.path.join(COMMON_INPUT_PATH, "python", "Assets")
+        ac = AssetCollection.from_directory(assets_directory=assets_path)
+        # Then get an "existing asset" to use for the experiment
+        # TODO: Can't do until able to get ac id from AssetCollection object
+        # # Get an existing asset collection
+        # collection_id = "951bda83-a5e9-e911-a2be-f0921c167861"  # Staging ac id from test_add_dirs_to_asset_comps test
+        # ac = self.platform.get_item(collection_id, item_type=ItemType.ASSETCOLLECTION)
         # self.assertIsInstance(ac, AssetCollection)
 
         # Create new ac starting from an existing asset collection and add a file you need to run your experiment
@@ -415,7 +419,8 @@ class TestPythonExperiment(ITestWithPersistence):
         new_ac = self.platform.get_item(ids[0], item_type=ItemType.ASSETCOLLECTION)
         self.assertIsInstance(new_ac, AssetCollection)
         pe.add_assets(copy.deepcopy(new_ac.assets))
-        # pe.assets.add_assets(ac.assets)  # TODO: when refactor acs, do this instead
+        for asset in new_ac:
+            self.assertIn(asset, pe.assets)
 
         builder = ExperimentBuilder()
         builder.add_sweep_definition(setParam("min_x"), range(-2, 1))
