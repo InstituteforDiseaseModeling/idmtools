@@ -48,11 +48,13 @@ class Asset:
 
         """
         if self._checksum is None:
-            if self.content:
-                self._checksum = hashlib.md5(json.dumps(self.content, sort_keys=False).encode('utf-8')).hexdigest()
-            else:
-                with open(self.filename, 'rb') as checksum_file:
-                    self._checksum = hashlib.md5(checksum_file.read()).hexdigest()
+            # TODO determine best way to do this. At moment, the complication is we want the content as bytes
+            # or a string so we can calculate. Maybe we could use bytes property?
+            # for now, just return None
+            #if self.content:
+            #   self._checksum = hashlib.md5(json.dumps(self.content, sort_keys=False).encode('utf-8')).hexdigest()
+            return None
+
         return self._checksum
 
     @property
