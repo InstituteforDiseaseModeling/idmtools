@@ -339,6 +339,55 @@ class TestPythonExperiment(ITestWithPersistence):
                 context.exception.args[0]))
 
     @pytest.mark.comps
+    def test_use_existing_ac_with_experiment(self):
+        model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
+        platform = Platform('COMPS2')
+
+        # Get an existing asset collection
+        collection_id = "951bda83-a5e9-e911-a2be-f0921c167861"  # Staging ac id from test_add_dirs_to_asset_comps test
+        ac = self.platform.get_item(collection_id, item_type=ItemType.ASSETCOLLECTION)
+        self.assertIsInstance(ac, AssetCollection)
+
+        # TODO: Can't do until able to get ac id from AssetCollection object
+        # Get an existing asset collection (first create it for the test)
+        # ac = AssetCollection()
+        # assets_path = os.path.join(COMMON_INPUT_PATH, "python", "Assets")
+        # ac.add_directory(assets_directory=assets_path)
+        # ac = self.platform.get_item(ac.id, item_type=ItemType.ASSETCOLLECTION)
+        # self.assertIsInstance(ac, AssetCollection)
+
+        # TODO: cannot insert duplicate key row in dbo.AssetCollectionFile
+        pe = PythonExperiment(name=self.case_name, model_path=model_path, assets=ac)
+        pe.tags = {"idmtools": "idmtools-automation", "string_tag": "existing ac", "number_tag": 123}
+        pe.base_simulation.envelope = "parameters"
+        pe.base_simulation.set_parameter("a", 1)
+        pe.base_simulation.set_parameter("b", 10)
+        # pe.assets(ac)
+
+        sim = pe.simulation()
+        builder = StandAloneSimulationsBuilder()
+        builder.add_simulation(sim)
+        pe.builder = builder
+
+        em = ExperimentManager(experiment=pe, platform=platform)
+        em.run()
+        em.wait_till_done()
+        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
+        exp_id = em.experiment.uid
+        # validate results from comps
+        for simulation in Experiment.get(exp_id).get_simulations():
+            # validate output/config.json
+            assets = self.assert_valid_config_stdout_and_assets(simulation)
+            self.assertEqual(len(assets), 5)
+
+            expected_list = [{'filename': '__init__.py', 'relative_path': 'MyExternalLibrary'},
+                             {'filename': '__init__.py', 'relative_path': ''},
+                             {'filename': 'model.py', 'relative_path': ''},
+                             {'filename': 'temp.py', 'relative_path': 'MyLib'},
+                             {'filename': 'functions.py', 'relative_path': 'MyExternalLibrary'}]
+            self.validate_assets(assets, expected_list)
+
+    @pytest.mark.comps
     def test_use_existing_ac_and_add_file_with_experiment(self):
         model_path = os.path.join(COMMON_INPUT_PATH, "python", "Assets", "working_model.py")
         platform = Platform('COMPS2')
