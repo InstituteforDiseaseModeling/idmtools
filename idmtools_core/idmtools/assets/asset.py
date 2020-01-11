@@ -1,3 +1,5 @@
+import hashlib
+import json
 import os
 from typing import TypeVar, Union, List, Callable, Any
 
@@ -9,7 +11,7 @@ class Asset:
     """
 
     def __init__(self, absolute_path: 'str' = None, relative_path: 'str' = None, filename: 'str' = None,
-                 content: 'Any' = None, handler: 'Callable' = str):
+                 content: 'Any' = None, handler: 'Callable' = str, checksum: str = None):
         """
         A constructor.
 
@@ -18,6 +20,8 @@ class Asset:
             relative_path:  The relative path (compared to the simulation root folder).
             filename: Name of the file. Optional if **absolute_path** is given.
             content: The content of the file. Optional if **absolute_path** is given.
+            checksum: Optional. Useful in systems that allow single upload based on checksums and retrieving from those
+            systems
         """
 
         super().__init__()
@@ -30,9 +34,28 @@ class Asset:
         self._content = content
         self.persisted = False
         self.handler = handler
+        # We add this to allow systems who provide asset caching by MD5 opportunity to avoid re-uploading assets
+        self._checksum = checksum
 
     def __repr__(self):
         return f"<Asset: {os.path.join(self.relative_path, self.filename)} from {self.absolute_path}>"
+
+    @property
+    def checksum(self):
+        """
+
+        Returns:
+
+        """
+        #if self._checksum is None:
+            # TODO determine best way to do this. At moment, the complication is we want the content as bytes
+            # or a string so we can calculate. Maybe we could use bytes property?
+            # for now, just return None
+            #if self.content:
+            #   self._checksum = hashlib.md5(json.dumps(self.content, sort_keys=False).encode('utf-8')).hexdigest()
+        #    return None
+
+        return self._checksum
 
     @property
     def extension(self):

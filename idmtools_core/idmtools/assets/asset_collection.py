@@ -1,8 +1,9 @@
+import copy
 import os
 from typing import List, NoReturn, TypeVar, Union
-from idmtools.assets import Asset
+from idmtools.assets import Asset, TAssetList
 from idmtools.assets.errors import DuplicatedAssetError
-from idmtools.core import FilterMode
+from idmtools.core import FilterMode, ItemType
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.utils.file import scan_directory
 from idmtools.utils.filters.asset_filters import default_asset_file_filter
@@ -23,7 +24,8 @@ class AssetCollection(IEntity):
             assets: An optional list of assets to create the collection with.
         """
         super().__init__()
-        self.assets = assets or []
+        self.assets = copy.deepcopy(assets) or []
+        self.item_type = ItemType.ASSETCOLLECTION
 
     @classmethod
     def from_directory(cls, assets_directory: str, recursive: bool = True, flatten: bool = False,
@@ -128,6 +130,21 @@ class AssetCollection(IEntity):
                 # nothing guarantees that the content is the same. So remove and add the fresh one.
                 self.assets.remove(asset)
         self.assets.append(asset)
+
+    def add_assets(self, assets: Union[TAssetList, 'AssetCollection'], fail_on_duplicate: bool = True):
+        """
+        Add assets to a collection
+
+        Args:
+            assets: An list of assets as either list or a collection
+            fail_on_duplicate: Raise a **DuplicateAssetError** if an asset is duplicated.
+              If not, simply replace it.
+
+        Returns:
+
+        """
+        for asset in assets:
+            self.add_asset(asset)
 
     def add_or_replace_asset(self, asset: Asset):
         """
