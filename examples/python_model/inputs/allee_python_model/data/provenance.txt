@@ -1,0 +1,33 @@
+====
+
+Downloaded from online PNAS page for Daniels 2015 article. This data has been 
+processed by the authors by collecting genotyping results from samples 
+collected in the field. More details about the data are available in the 
+supplmental document provided on the same website: pnas.1505691112.sapp.pdf
+
+pnas.1505691112.sd01.csv
+pnas.1505691112.sd02.csv
+pnas.1505691112.sd03.csv
+
+
+====
+
+Provided to IDM by S Volkmann et al. Preprocessed and cleaned by J Proctor. 
+Redundant samples have been deleted in both files and tables have been joined 
+in BarcodeAndSpatialData.csv to provide spacetime metadata in one csv file. 
+Shared via dropbox to A Lee from J Proctor. 
+
+BarcodeAndSpatialData.csv
+Updated_Thies_2016_Modified.csv
+
+
+====
+
+Provided to IDM by S Volkmann et al. Shared via dropbox to A Lee from J Gerardin. 
+
+Zambia_SupplementalTables_20180806.csv
+
+
+====
+
+
