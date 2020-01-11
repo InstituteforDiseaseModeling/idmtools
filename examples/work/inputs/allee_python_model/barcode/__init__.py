@@ -1,2 +1,0 @@
-import barcode
-import data
