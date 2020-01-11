@@ -399,7 +399,8 @@ class TestPythonExperiment(ITestWithPersistence):
     def test_use_existing_ac_and_add_file_with_experiment(self):
         model_path = os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py")
         platform = Platform('COMPS2')
-        pe = PythonExperiment(name=self.case_name, model_path=model_path)
+        # pe = PythonExperiment(name=self.case_name, model_path=model_path)
+        pe = experiment_factory.create("PythonExperiment", name=self.case_name, model_path=model_path)
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "existing ac and create new ac", "number_tag": 123}
         pe.base_simulation.envelope = "parameters"
 
@@ -410,10 +411,10 @@ class TestPythonExperiment(ITestWithPersistence):
         # TODO: Can't do until able to get ac id from AssetCollection object
         # # Get an existing asset collection
         collection_id = "951bda83-a5e9-e911-a2be-f0921c167861"  # Staging ac id from test_add_dirs_to_asset_comps test
-        # ac = self.platform.get_item(collection_id, item_type=ItemType.ASSETCOLLECTION)
-        # self.assertIsInstance(ac, AssetCollection)
-        comps_ac: COMPSAssetCollection = platform.get_item(collection_id, item_type=ItemType.ASSETCOLLECTION, raw=False)
-        ac: AssetCollection = platform._assets.to_entity(comps_ac)
+        ac = self.platform.get_item(collection_id, item_type=ItemType.ASSETCOLLECTION)
+        self.assertIsInstance(ac, AssetCollection)
+        # comps_ac: COMPSAssetCollection = platform.get_item(collection_id, item_type=ItemType.ASSETCOLLECTION, raw=False)
+        # ac: COMPSAssetCollection = platform._assets.to_entity(comps_ac)
 
         # Create new ac starting from an existing asset collection and add a file you need to run your experiment
         new_ac = AssetCollection(ac.assets)
@@ -439,7 +440,7 @@ class TestPythonExperiment(ITestWithPersistence):
         for simulation in Experiment.get(exp_id).get_simulations():
             # validate output/config.json
             assets = self.assert_valid_new_assets(simulation)
-            self.assertEqual(len(assets), 6)
+            self.assertEqual(len(assets), 7)
 
             expected_list = [{'filename': '__init__.py', 'relative_path': 'MyExternalLibrary'},
                              {'filename': '__init__.py', 'relative_path': ''},
