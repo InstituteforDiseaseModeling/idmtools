@@ -110,7 +110,7 @@ class TestAssetsInComps(unittest.TestCase):
             self.assertEqual(asset_collection.assets[0]._file_name, 'test.json')
             self.assertEqual(asset_collection.assets[1]._file_name, 'test1.json')
 
-    # TODO: test is incomplete
+    # TODO: AssetCollection has no attribute tags
     # def test_create_asset_collection(self):
     #     ac = AssetCollection()
     #     assets_dir = os.path.join(COMMON_INPUT_PATH, "assets", "collections")
