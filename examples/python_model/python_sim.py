@@ -7,6 +7,7 @@
 # - Platform: To specify the platform you want to run your experiment on
 # - PythonExperiment: We want to run an experiment executing a Python script
 import os
+import sys
 from functools import partial
 
 from idmtools.builders import ExperimentBuilder
@@ -36,7 +37,7 @@ class setParam:
 # name: The name of the experiment
 # model_path: The path to the python file containing the model
 # For this example, we will use the model defined in inputs/python_model_with_deps/model.py.
-experiment = PythonExperiment(name="example_python_experiment",
+experiment = PythonExperiment(name=os.path.split(sys.argv[0])[1],
                               model_path=os.path.join("inputs", "python_model_with_deps", "Assets", "model.py"))
 experiment.tags["tag1"] = 1
 experiment.base_simulation.set_parameter("c", 0)

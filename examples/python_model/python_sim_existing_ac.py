@@ -1,4 +1,5 @@
 import os
+import sys
 
 from idmtools.assets import AssetCollection
 from idmtools.builders import ExperimentBuilder
@@ -24,7 +25,7 @@ platform = Platform('COMPS2')
 ac: AssetCollection = platform.get_item('bd80dd0c-1b31-ea11-a2be-f0921c167861',
                                                    item_type=ItemType.ASSETCOLLECTION, raw=False)
 
-python_experiment = PythonExperiment(name="example_python_sim_existing_ac",
+python_experiment = PythonExperiment(name=os.path.split(sys.argv[0])[1],
                                      model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"))
 
 # add the AssetCollection to python experiment
