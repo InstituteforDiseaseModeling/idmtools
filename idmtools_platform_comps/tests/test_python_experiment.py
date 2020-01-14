@@ -1,10 +1,11 @@
+import copy
 import json
 import os
 import pytest
 import unittest
 from functools import partial
 from operator import itemgetter
-from COMPS.Data import Experiment, QueryCriteria, AssetCollection as CompsAssetCollection
+from COMPS.Data import Experiment
 from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import ArmExperimentBuilder, ArmType, ExperimentBuilder, StandAloneSimulationsBuilder, SweepArm
 from idmtools.core.platform_factory import Platform
@@ -14,9 +15,7 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools.core import EntityStatus, ItemType
-from idmtools.core.experiment_factory import experiment_factory
-from idmtools_core.idmtools.assets.asset_collection import copy
-from COMPS.Data import AssetCollection as COMPSAssetCollection, QueryCriteria
+from COMPS.Data import QueryCriteria
 
 
 def param_update(simulation, param, value):
