@@ -4,7 +4,7 @@ import pytest
 import unittest
 from functools import partial
 from operator import itemgetter
-from COMPS.Data import Experiment, QueryCriteria
+from COMPS.Data import Experiment, QueryCriteria, AssetCollection as CompsAssetCollection
 from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import ArmExperimentBuilder, ArmType, ExperimentBuilder, StandAloneSimulationsBuilder, SweepArm
 from idmtools.core.platform_factory import Platform
@@ -246,6 +246,10 @@ class TestPythonExperiment(ITestWithPersistence):
         assets = asset_collection.assets
         return assets
 
+    def assert_same_asset_id(self, simulation):
+        collection_id = get_asset_collection_id_for_simulation_id(simulation.id)
+        return collection_id
+
     # Test will test pythonExperiment's assets parameter which adds only specific file under
     # tests/inputs/python/Assets/MyExternalLibrary to COMPS' Assets and add relative_path MyExternalLibrary in comps
     # Comps' Assets
@@ -344,7 +348,7 @@ class TestPythonExperiment(ITestWithPersistence):
         model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
         platform = Platform('COMPS2')
 
-        pe = experiment_factory.create("PythonExperiment", name=self.case_name, model_path=model_path)
+        pe = PythonExperiment(name=self.case_name, model_path=model_path)
         pe.tags = {"idmtools": "idmtools-automation", "a": "1", "b": 2}
 
         # Get an existing asset collection (first create it for the test)
@@ -391,7 +395,7 @@ class TestPythonExperiment(ITestWithPersistence):
     def test_use_existing_ac_and_add_file_with_experiment(self):
         model_path = os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py")
         platform = Platform('COMPS2')
-        pe = experiment_factory.create("PythonExperiment", name=self.case_name, model_path=model_path)
+        pe = PythonExperiment(name=self.case_name, model_path=model_path)
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "existing ac and create new ac", "number_tag": 123}
         pe.base_simulation.envelope = "parameters"
 
