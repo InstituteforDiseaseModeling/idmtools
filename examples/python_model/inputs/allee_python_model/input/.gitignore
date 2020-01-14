@@ -1,0 +1,8 @@
+#### Inputs for sims/runs (e.g. parameter grid files) will go here
+
+# Python
+
+#Data
+*.json
+
+
