@@ -21,9 +21,7 @@ from idmtools_models.python.python_experiment import PythonExperiment
 def param_update(simulation, param, value):
     return simulation.set_parameter(param, value)
 
-
 setA = partial(param_update, param="a")
-
 
 class setParam:
     def __init__(self, param):
@@ -38,14 +36,17 @@ class setParam:
 # model_path: The path to the python file containing the model
 # For this example, we will use the model defined in inputs/python_model_with_deps/model.py.
 experiment = PythonExperiment(name=os.path.split(sys.argv[0])[1],
-                              model_path=os.path.join("inputs", "python_model_with_deps", "Assets", "model.py"))
+                              model_path=os.path.join("inputs", "csv_inputs", "Assets", "model1.py"))
 experiment.tags["tag1"] = 1
+# add parameters in config.json file as top node
+experiment.base_simulation.envelope = "parameters"
+
 experiment.base_simulation.set_parameter("c", 0)
-experiment.assets.add_directory(assets_directory=os.path.join("inputs", "python_model_with_deps", "Assets"))
+experiment.assets.add_directory(assets_directory=os.path.join("inputs", "csv_inputs"))
 
 # Now that the experiment is created, we can add sweeps to it
 builder = ExperimentBuilder()
-builder.add_sweep_definition(setA, range(10))
+builder.add_sweep_definition(setA, range(3))
 builder.add_sweep_definition(setParam("b"), [1, 2, 3])
 
 experiment.add_builder(builder)

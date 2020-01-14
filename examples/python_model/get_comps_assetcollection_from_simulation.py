@@ -1,4 +1,5 @@
 import os
+import sys
 
 from idmtools.assets import AssetCollection
 from idmtools.builders import ExperimentBuilder
@@ -30,7 +31,7 @@ comps_ac = get_asset_collection_by_id(collection_id)
 ac: AssetCollection = platform._assets.to_entity(comps_ac)
 
 # create new python experiment in comps with this assetcollection
-python_experiment = PythonExperiment(name="example_get_comps_assetcollection_from_simulation",
+python_experiment = PythonExperiment(name=os.path.split(sys.argv[0])[1],
                                      model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"),
                                      assets=ac)
 

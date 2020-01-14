@@ -7,6 +7,7 @@
 # - Platform: To specify the platform you want to run your experiment on
 # - PythonExperiment: We want to run an experiment executing a Python script
 import os
+import sys
 from functools import partial
 from idmtools.builders import ExperimentBuilder
 from idmtools.core.platform_factory import Platform
@@ -23,7 +24,7 @@ def param_update(simulation, param, value):
 # name: The name of the experiment
 # model_path: The path to the python file containing the model
 # For this example, we will use the model defined in inputs/allee_python_model/model.py.
-pe = PythonExperiment(name="Allee python model example",
+pe = PythonExperiment(name=os.path.split(sys.argv[0])[1],
                       model_path=os.path.join("inputs", "allee_python_model", "run_emod_sweep.py"))
 pe.base_simulation.envelope = "parameters"
 # pe.retrieve_python_dependencies()
