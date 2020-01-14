@@ -24,7 +24,6 @@ def param_update(simulation, param, value):
 
 setA = partial(param_update, param="a")
 
-
 class setParam:
     def __init__(self, param):
         self.param = param

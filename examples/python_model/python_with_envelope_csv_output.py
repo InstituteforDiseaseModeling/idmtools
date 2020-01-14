@@ -21,9 +21,7 @@ from idmtools_models.python.python_experiment import PythonExperiment
 def param_update(simulation, param, value):
     return simulation.set_parameter(param, value)
 
-
 setA = partial(param_update, param="a")
-
 
 class setParam:
     def __init__(self, param):
