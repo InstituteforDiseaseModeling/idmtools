@@ -65,6 +65,15 @@ class TestAssets(unittest.TestCase):
         self.assertTrue('Impossible to create the asset without either absolute path or filename and content!' in str(
             context.exception.args[0]))
 
+    def test_assets_is_iterable(self):
+        ac = AssetCollection.from_directory(assets_directory=self.base_path)
+        items = []
+        for item in ac:
+            items.append(item)
+
+        for item in items:
+            self.assertIn(item, ac.assets)
+
     def test_assets_collection_from_dir(self):
         assets_to_find = [
             Asset(absolute_path=os.path.join(self.base_path, "d.txt")),

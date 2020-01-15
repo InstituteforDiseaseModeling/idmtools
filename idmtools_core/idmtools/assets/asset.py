@@ -16,13 +16,6 @@ class Asset:
         content: The content of the file. Optional if **absolute_path** is given.
     """
 
-    absolute_path: 'str' = field(default=None)
-    relative_path: 'str' = field(default=None)
-    filename: 'str' = field(default=None)
-    content: 'Any' = field(default=None)
-    persisted: 'bool' = field(default=False)
-    handler: 'Callable' = field(default=str)
-
     def __post_init__(self):
         if not self.absolute_path and not (self.filename and self.content):
             raise ValueError("Impossible to create the asset without either absolute path or filename and content!")
@@ -31,6 +24,23 @@ class Asset:
 
     def __repr__(self):
         return f"<Asset: {os.path.join(self.relative_path, self.filename)} from {self.absolute_path}>"
+
+    @property
+    def checksum(self):
+        """
+
+        Returns:
+
+        """
+        #if self._checksum is None:
+            # TODO determine best way to do this. At moment, the complication is we want the content as bytes
+            # or a string so we can calculate. Maybe we could use bytes property?
+            # for now, just return None
+            #if self.content:
+            #   self._checksum = hashlib.md5(json.dumps(self.content, sort_keys=False).encode('utf-8')).hexdigest()
+        #    return None
+
+        return self._checksum
 
     @property
     def extension(self):

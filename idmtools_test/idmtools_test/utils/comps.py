@@ -5,9 +5,15 @@ from COMPS.Data import QueryCriteria, Simulation as COMPSSimulation, Simulation
 
 from idmtools.core import EntityStatus, ExperimentBuilder
 from idmtools.entities import IExperiment
+from COMPS.Data import AssetCollection as CompsAssetCollection
 
 
 def get_asset_collection_id_for_simulation_id(sim_id):
+    """
+    Obtains COMPS AssetCollection id from a given simulation id.
+    :param sim_id: A simulation id to retrieve assetcollection id from
+    :return: COMPS AssetCollection id
+    """
     simulation = COMPSSimulation.get(sim_id, query_criteria=QueryCriteria().select(
         ['id', 'experiment_id']).select_children(
         ["files", "configuration"]))
@@ -16,7 +22,13 @@ def get_asset_collection_id_for_simulation_id(sim_id):
     return collection_id
 
 
-def get_asset_collection_by_id(collection_id, query_criteria=None):
+def get_asset_collection_by_id(collection_id, query_criteria=None) -> CompsAssetCollection:
+    """
+    Obtains COMPS AssetCollection from a given collection id.
+    :param collection_id: An asset collection id to retrieve assetcollection from
+    :param query_criteria: query_criteria
+    :return: COMPS AssetCollection
+    """
     query_criteria = query_criteria or QueryCriteria().select_children('assets')
     try:
         return Data.AssetCollection.get(collection_id, query_criteria)
