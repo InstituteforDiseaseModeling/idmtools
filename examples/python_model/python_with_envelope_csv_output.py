@@ -13,7 +13,6 @@ from functools import partial
 from idmtools.builders import ExperimentBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
-
 from idmtools_models.python.python_experiment import PythonExperiment
 
 
@@ -21,7 +20,9 @@ from idmtools_models.python.python_experiment import PythonExperiment
 def param_update(simulation, param, value):
     return simulation.set_parameter(param, value)
 
+
 setA = partial(param_update, param="a")
+
 
 class setParam:
     def __init__(self, param):
