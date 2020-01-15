@@ -14,6 +14,10 @@ class Asset:
         relative_path:  The relative path (compared to the simulation root folder).
         filename: Name of the file. Optional if **absolute_path** is given.
         content: The content of the file. Optional if **absolute_path** is given.
+        checksum: Optional. Useful in systems that allow single upload based on checksums and retrieving from those
+            systems
+
+            Note: we add this to allow systems who provide asset caching by MD5 opportunity to avoid re-uploading assets
     """
 
     absolute_path: 'str' = field(default=None)
