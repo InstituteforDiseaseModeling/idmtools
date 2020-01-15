@@ -16,6 +16,14 @@ class Asset:
         content: The content of the file. Optional if **absolute_path** is given.
     """
 
+    absolute_path: 'str' = field(default=None)
+    relative_path: 'str' = field(default=None)
+    filename: 'str' = field(default=None)
+    content: 'Any' = field(default=None)
+    persisted: 'bool' = field(default=False)
+    handler: 'Callable' = field(default=str)
+    checksum: 'str' = field(default=None)
+
     def __post_init__(self):
         if not self.absolute_path and not (self.filename and self.content):
             raise ValueError("Impossible to create the asset without either absolute path or filename and content!")
@@ -41,6 +49,10 @@ class Asset:
         #    return None
 
         return self._checksum
+
+    @checksum.setter
+    def checksum(self, checksum):
+        self._checksum = None if isinstance(checksum, property) else checksum
 
     @property
     def extension(self):
