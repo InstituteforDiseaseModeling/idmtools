@@ -11,7 +11,8 @@ from idmtools_test import COMMON_INPUT_PATH
 if __name__ == "__main__":
     platform = Platform('COMPS')
     experiment = EMODExperiment.from_default(name=os.path.split(sys.argv[0])[1], default=EMODSir(),
-                                             eradication_path=os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe"))
+                                             eradication_path=os.path.join(COMMON_INPUT_PATH, "emod",
+                                                                           "Eradication.exe"))
 
     experiment.base_simulation.load_files(config_path=os.path.join(COMMON_INPUT_PATH, "files", "config.json"),
                                           campaign_path=os.path.join(COMMON_INPUT_PATH, "files", "campaign.json"))
