@@ -371,7 +371,7 @@ class TestPythonExperiment(ITestWithPersistence):
         builder.add_simulation(sim)
         pe.builder = builder
 
-        em = ExperimentManager(experiment=pe, platform=platform)
+        em = ExperimentManager(experiment=pe, platform=self.platform)
         em.run()
         em.wait_till_done()
         self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
@@ -421,7 +421,7 @@ class TestPythonExperiment(ITestWithPersistence):
         builder.add_sweep_definition(setParam("max_x"), range(-2, 2))
         pe.add_builder(builder)
 
-        em = ExperimentManager(experiment=pe, platform=platform)
+        em = ExperimentManager(experiment=pe, platform=self.platform)
         em.run()
         em.wait_till_done()
         self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
