@@ -345,7 +345,6 @@ class TestPythonExperiment(ITestWithPersistence):
     @pytest.mark.comps
     def test_use_existing_ac_with_experiment(self):
         model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
-        platform = Platform('COMPS2')
 
         pe = PythonExperiment(name=self.case_name, model_path=model_path)
         pe.tags = {"idmtools": "idmtools-automation", "a": "1", "b": 2}
@@ -357,7 +356,7 @@ class TestPythonExperiment(ITestWithPersistence):
         comps_ac_id = ids[0]
 
         # Then get an "existing asset" to use for the experiment
-        ac: AssetCollection = platform.get_item(comps_ac_id, item_type=ItemType.ASSETCOLLECTION, raw=False)
+        ac: AssetCollection = self.platform.get_item(comps_ac_id, item_type=ItemType.ASSETCOLLECTION, raw=False)
         self.assertIsInstance(ac, AssetCollection)
         pe.add_assets(ac)
         for asset in ac:
@@ -393,7 +392,6 @@ class TestPythonExperiment(ITestWithPersistence):
     @pytest.mark.comps
     def test_use_existing_ac_and_add_file_with_experiment(self):
         model_path = os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py")
-        platform = Platform('COMPS2')
         pe = PythonExperiment(name=self.case_name, model_path=model_path)
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "existing ac and create new ac", "number_tag": 123}
         pe.base_simulation.envelope = "parameters"
@@ -405,7 +403,7 @@ class TestPythonExperiment(ITestWithPersistence):
         comps_ac_id = ids[0]
 
         # Then get an "existing asset" to use for the experiment
-        ac: AssetCollection = platform.get_item(comps_ac_id, item_type=ItemType.ASSETCOLLECTION, raw=False)
+        ac: AssetCollection = self.platform.get_item(comps_ac_id, item_type=ItemType.ASSETCOLLECTION, raw=False)
         self.assertIsInstance(ac, AssetCollection)
 
         # Create new ac starting from an existing asset collection and add a file you need to run your experiment
