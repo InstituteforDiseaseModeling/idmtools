@@ -1,9 +1,10 @@
 import os
+import copy
 import typing
 from typing import List, NoReturn, TypeVar, Union
 from idmtools.assets import Asset, TAssetList
 from idmtools.assets.errors import DuplicatedAssetError
-from idmtools.core import FilterMode
+from idmtools.core import FilterMode, ItemType
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.utils.file import scan_directory
 from idmtools.utils.filters.asset_filters import default_asset_file_filter
@@ -26,7 +27,8 @@ class AssetCollection(IEntity):
     assets: 'TAssetList' = field(default=None)
 
     def __post_init__(self):
-        self.assets = self.assets or []
+        self.assets = copy.deepcopy(self.assets) or []
+        self.item_type = ItemType.ASSETCOLLECTION
 
     @classmethod
     def from_directory(cls, assets_directory: str, recursive: bool = True, flatten: bool = False,
