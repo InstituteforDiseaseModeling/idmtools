@@ -1,3 +1,11 @@
+"""
+        This file demonstrates how to use StandAloneSimulationsBuilder in EMODExperiment's builder.
+
+        we create 10 simulations and for each simulation, we only update config values for:
+        'Enable_Immunity', 'Infectious_Period_Exponential', then add each updated simulation to builder
+        then we are adding the builder to EMODExperiment
+"""
+
 import os
 import sys
 
@@ -9,7 +17,7 @@ from idmtools_model_emod.defaults import EMODSir
 from idmtools_test import COMMON_INPUT_PATH
 
 if __name__ == "__main__":
-    platform = Platform('COMPS')
+    platform = Platform('COMPS2')
     experiment = EMODExperiment.from_default(name=os.path.split(sys.argv[0])[1], default=EMODSir(),
                                              eradication_path=os.path.join(COMMON_INPUT_PATH, "emod",
                                                                            "Eradication.exe"))

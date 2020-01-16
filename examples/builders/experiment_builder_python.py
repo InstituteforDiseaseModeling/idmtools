@@ -1,6 +1,18 @@
-# Test parameter "b" is depending on parameter "a"
-# a=[0,1,2,3,4] <--sweep parameter
-# b=[2,3,4,5,6]  <-- b = a + 2
+"""
+        This file demonstrates how to use ExperimentBuilder in PythonExperiment's builder.
+        We are then adding the builder to PythonExperiment.
+
+        Parameters for sweeping:
+            |__ a = [0,1,2,3,4]
+
+        Expect 5 sims with config parameters, note: "b" is not a sweep parameter, but it is depending on a's value:
+            sim1: {a:0, b:2}
+            sim2: {a:1, b:3}
+            sim3: {a:2, b:4}
+            sim4: {a:3, b:5}
+            sim5: {a:4, b:6}
+"""
+
 import os
 import sys
 from functools import partial
@@ -12,7 +24,7 @@ from idmtools_models.python import PythonExperiment
 from idmtools_test import COMMON_INPUT_PATH
 
 if __name__ == "__main__":
-    platform = Platform('COMPS')
+    platform = Platform('COMPS2')
     pe = PythonExperiment(name=os.path.split(sys.argv[0])[1],
                           model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
     pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}

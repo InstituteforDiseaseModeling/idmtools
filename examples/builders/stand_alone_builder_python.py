@@ -1,3 +1,11 @@
+"""
+        This file demonstrates how to use StandAloneSimulationsBuilder in PythonExperiment's builder.
+
+        we create 5 simulations and for each simulation, we set parameter 'a' = [0,4] and 'b' = a + 10:
+        then add each updated simulation to builder
+        then we are adding the builder to PythonExperiment
+"""
+
 import os
 import sys
 
@@ -9,7 +17,7 @@ from idmtools_models.python import PythonExperiment
 from idmtools_test import COMMON_INPUT_PATH
 
 if __name__ == "__main__":
-    platform = Platform('COMPS')
+    platform = Platform('COMPS2')
     model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
     ac = AssetCollection()
     assets_path = os.path.join(COMMON_INPUT_PATH, "python", "Assets")
