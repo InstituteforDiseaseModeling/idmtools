@@ -54,10 +54,10 @@ class TestAssets(unittest.TestCase):
         self.assertEqual(a.relative_path, "")
 
     def test_creat_asset_only_content(self):
-        with self.assertRaises(ValueError) as context:
-            a = Asset(content="blah")
-        self.assertTrue('Impossible to create the asset without either absolute path or filename and content!' in str(
-            context.exception.args[0]))
+        a = Asset(content="blah")
+        self.assertEqual(a.content, "blah")
+        self.assertIsNone(a.filename)
+        self.assertEqual(a.relative_path, "")
 
     def test_creat_asset_no_parameters(self):
         with self.assertRaises(ValueError) as context:
