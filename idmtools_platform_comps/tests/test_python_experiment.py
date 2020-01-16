@@ -409,7 +409,7 @@ class TestPythonExperiment(ITestWithPersistence):
         self.assertIsInstance(ac, AssetCollection)
 
         # Create new ac starting from an existing asset collection and add a file you need to run your experiment
-        new_ac = AssetCollection(ac.assets)
+        new_ac = AssetCollection(assets=ac.assets)
         new_ac.add_asset(Asset(relative_path=None, filename="test.json", content=json.dumps({"min_x": -2, "max_x": 2})))
         ids = self.platform.create_items([new_ac])
         new_ac = self.platform.get_item(ids[0], item_type=ItemType.ASSETCOLLECTION)
