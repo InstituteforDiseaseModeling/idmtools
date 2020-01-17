@@ -1,5 +1,6 @@
-import copy
 import os
+import copy
+import typing
 from typing import List, NoReturn, TypeVar, Union
 from idmtools.assets import Asset, TAssetList
 from idmtools.assets.errors import DuplicatedAssetError
@@ -8,14 +9,23 @@ from idmtools.core.interfaces.ientity import IEntity
 from idmtools.utils.file import scan_directory
 from idmtools.utils.filters.asset_filters import default_asset_file_filter
 from idmtools.assets import TAssetFilterList
+from dataclasses import dataclass, field
+
+if typing.TYPE_CHECKING:
+    from idmtools.assets import TAssetList
 
 
+@dataclass(repr=False)
 class AssetCollection(IEntity):
     """
     A class that represents a collection of assets.
+
+    Args:
+        assets: An optional list of assets to create the collection with.
     """
 
-    # region Constructors
+    assets: 'TAssetList' = field(default=None)
+
     def __init__(self, assets: List[Asset] = None):
         """
         A constructor.

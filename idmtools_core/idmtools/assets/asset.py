@@ -1,41 +1,38 @@
-import hashlib
-import json
 import os
+from dataclasses import dataclass, field
 from typing import TypeVar, Union, List, Callable, Any
 
 
+@dataclass(repr=False)
 class Asset:
     """
     A class representing an asset. An asset can either be related to a physical
     asset present on the computer or directly specified by a filename and content.
+
+    Args:
+        absolute_path: The absolute path of the asset. Optional if **filename** and **content** are given.
+        relative_path:  The relative path (compared to the simulation root folder).
+        filename: Name of the file. Optional if **absolute_path** is given.
+        content: The content of the file. Optional if **absolute_path** is given.
+        checksum: Optional. Useful in systems that allow single upload based on checksums and retrieving from those
+            systems
+
+            Note: we add this to allow systems who provide asset caching by MD5 opportunity to avoid re-uploading assets
     """
 
-    def __init__(self, absolute_path: 'str' = None, relative_path: 'str' = None, filename: 'str' = None,
-                 content: 'Any' = None, handler: 'Callable' = str, checksum: str = None):
-        """
-        A constructor.
+    absolute_path: 'str' = field(default=None)
+    relative_path: 'str' = field(default=None)
+    filename: 'str' = field(default=None)
+    content: 'Any' = field(default=None)
+    persisted: 'bool' = field(default=False)
+    handler: 'Callable' = field(default=str)
+    checksum: 'str' = field(default=None)
 
-        Args:
-            absolute_path: The absolute path of the asset. Optional if **filename** and **content** are given.
-            relative_path:  The relative path (compared to the simulation root folder).
-            filename: Name of the file. Optional if **absolute_path** is given.
-            content: The content of the file. Optional if **absolute_path** is given.
-            checksum: Optional. Useful in systems that allow single upload based on checksums and retrieving from those
-            systems
-        """
-
-        super().__init__()
-        if not absolute_path and (not filename and not content):
+    def __post_init__(self):
+        if not self.absolute_path and (not self.filename and not self.content):
             raise ValueError("Impossible to create the asset without either absolute path or filename and content!")
 
-        self.absolute_path = absolute_path
-        self.relative_path = relative_path
-        self.filename = filename or os.path.basename(self.absolute_path)
-        self._content = content
-        self.persisted = False
-        self.handler = handler
-        # We add this to allow systems who provide asset caching by MD5 opportunity to avoid re-uploading assets
-        self._checksum = checksum
+        self.filename = self.filename or (os.path.basename(self.absolute_path) if self.absolute_path else None)
 
     def __repr__(self):
         return f"<Asset: {os.path.join(self.relative_path, self.filename)} from {self.absolute_path}>"
@@ -43,9 +40,7 @@ class Asset:
     @property
     def checksum(self):
         """
-
         Returns:
-
         """
         #if self._checksum is None:
             # TODO determine best way to do this. At moment, the complication is we want the content as bytes
@@ -57,6 +52,10 @@ class Asset:
 
         return self._checksum
 
+    @checksum.setter
+    def checksum(self, checksum):
+        self._checksum = None if isinstance(checksum, property) else checksum
+
     @property
     def extension(self):
         return os.path.splitext(self.filename)[1].lstrip('.').lower()
@@ -67,7 +66,8 @@ class Asset:
 
     @relative_path.setter
     def relative_path(self, relative_path):
-        self._relative_path = relative_path.strip(" \\/") if relative_path else None
+        self._relative_path = relative_path.strip(" \\/") if not isinstance(relative_path,
+                                                                            property) and relative_path else None
 
     @property
     def bytes(self):
@@ -81,11 +81,15 @@ class Asset:
         Returns:
             The content of the file, either from the content attribute or by opening the absolute path.
         """
-        if not self._content:
+        if not self._content and self.absolute_path:
             with open(self.absolute_path, "rb") as fp:
                 self._content = fp.read()
 
         return self._content
+
+    @content.setter
+    def content(self, content):
+        self._content = None if isinstance(content, property) else content
 
     # region Equality and Hashing
     def __eq__(self, other):
