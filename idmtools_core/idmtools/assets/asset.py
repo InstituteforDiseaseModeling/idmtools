@@ -40,9 +40,7 @@ class Asset:
     @property
     def checksum(self):
         """
-
         Returns:
-
         """
         #if self._checksum is None:
             # TODO determine best way to do this. At moment, the complication is we want the content as bytes

@@ -1,10 +1,8 @@
 import json
 import os
 import unittest
-from functools import partial
-
 import pytest
-
+from functools import partial
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core import FilterMode
 from idmtools.assets.errors import DuplicatedAssetError
@@ -179,7 +177,7 @@ class TestAssets(unittest.TestCase):
     def test_asset_collection(self):
         a = Asset(relative_path="1", absolute_path=os.path.join(self.base_path, "1", "a.txt"))
 
-        ac1 = AssetCollection(assets=[a])
+        ac1 = AssetCollection([a])
         ac2 = AssetCollection()
 
         self.assertEqual(len(ac1.assets), 1)

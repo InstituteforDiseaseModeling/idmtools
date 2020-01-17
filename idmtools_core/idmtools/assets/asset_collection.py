@@ -26,8 +26,15 @@ class AssetCollection(IEntity):
 
     assets: 'TAssetList' = field(default=None)
 
-    def __post_init__(self):
-        self.assets = copy.deepcopy(self.assets) or []
+    def __init__(self, assets: List[Asset] = None):
+        """
+        A constructor.
+
+        Args:
+            assets: An optional list of assets to create the collection with.
+        """
+        super().__init__()
+        self.assets = copy.deepcopy(assets) or []
         self.item_type = ItemType.ASSETCOLLECTION
 
     @classmethod
