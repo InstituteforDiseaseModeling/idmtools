@@ -55,9 +55,12 @@ setup(
     keywords='modeling, IDM',
     name='idmtools',
     packages=find_packages(exclude=["tests"]),
+    entry_points=dict(idmtools_task=  # noqa: E251
+                      ["idmtools_task_command = idmtools.entities.command_task:CommandTaskSpecification"]
+                      ),
     test_suite='tests',
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='0.3.0',
+    version='0.3.0+nightly',
     zip_safe=False
 )

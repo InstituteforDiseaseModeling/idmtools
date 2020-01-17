@@ -37,7 +37,7 @@ ENV MAKE="make -j${WORKERS}"
 RUN Rscript -e "install.packages('devtools')"
 # For a stable environment, use specific versions of packages we use within our projectt
 RUN Rscript -e "devtools::install_version('argparse', version = '2.0.1')" && \
-    Rscript -e "devtools::install_version('deSolve', version = '1.24')"
+    Rscript -e "devtools::install_version('deSolve', version = '1.25')"
 
 # Our script that does smart user mapping
 COPY user_conf.sh /etc/cont-init.d/01-user_conf.sh

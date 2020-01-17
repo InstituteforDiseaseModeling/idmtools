@@ -1,14 +1,11 @@
 import os
 import shutil
 import tempfile
-import typing
 from dataclasses import dataclass, field
-from multiprocessing import current_process
+from multiprocessing import current_process, cpu_count
 from logging import getLogger, DEBUG
 from diskcache import Cache, DEFAULT_SETTINGS, FanoutCache
-
-if typing.TYPE_CHECKING:
-    from typing import Union
+from typing import Union
 
 MAX_CACHE_SIZE = int(2 ** 33)  # 8GB
 DEFAULT_SETTINGS["size_limit"] = MAX_CACHE_SIZE
@@ -22,9 +19,9 @@ class CacheEnabled:
     """
     Allows a class to leverage Diskcache and expose a cache property.
     """
-    _cache: 'Union[Cache, FanoutCache]' = field(default=None, init=False, compare=False,
-                                                metadata={"pickle_ignore": True})
-    _cache_directory: 'str' = field(default=None, init=False, compare=False)
+    _cache: Union[Cache, FanoutCache] = field(default=None, init=False, compare=False,
+                                              metadata={"pickle_ignore": True})
+    _cache_directory: str = field(default=None, init=False, compare=False)
 
     def __del__(self):
         self.cleanup_cache()
@@ -45,7 +42,11 @@ class CacheEnabled:
 
         # Create different cache depending on the options
         if shards:
-            self._cache = FanoutCache(self._cache_directory, shards=shards, timeout=0.1,
+            # set default timeout to grow with cpu count. In high thread environments, user hit timeouts
+            default_timeout = max(0.1, cpu_count()*0.0125)
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f"Setting cache timeout to {default_timeout}")
+            self._cache = FanoutCache(self._cache_directory, shards=shards, timeout=default_timeout,
                                       eviction_policy=eviction_policy)
         else:
             self._cache = Cache(self._cache_directory)
@@ -57,7 +58,10 @@ class CacheEnabled:
             return
 
         if self._cache is not None:
-            logger.debug(f"Cleaning up the cache at {self._cache_directory}")
+            try:
+                logger.debug(f"Cleaning up the cache at {self._cache_directory}")
+            except:  # Happens when things are shutting down
+                pass
             self._cache.close()
             del self._cache
 
@@ -77,7 +81,7 @@ class CacheEnabled:
                         pass
 
     @property
-    def cache(self):
+    def cache(self) -> Union[Cache, FanoutCache]:
         if self._cache is None:
             self.initialize_cache()
 

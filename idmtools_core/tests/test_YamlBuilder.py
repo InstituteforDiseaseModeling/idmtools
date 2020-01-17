@@ -17,15 +17,6 @@ setC = partial(param_update, param="c")
 setD = partial(param_update, param="d")
 
 
-def verify_simulation(simulation, expected_parameters, expected_values):
-    for value_set in expected_values:
-        for i, value in enumerate(list(value_set)):
-            if not simulation.parameters[expected_parameters[i]] == expected_values:
-                break
-        return True
-    return False
-
-
 class TestYamlBuilder(ITestWithPersistence):
 
     def setUp(self):

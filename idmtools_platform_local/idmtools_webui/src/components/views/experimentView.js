@@ -285,15 +285,15 @@ class ExperimentView extends React.Component {
                                                 <ListItemText className={classes.itemText}>Id:</ListItemText>
                                                 <ListItemText className={classes.itemValue}>{this.state.selectedExp}</ListItemText>
                                             </ListItem>
-                                            <ListItem >
+                                            <ListItem>
                                                 <ListItemText className={classes.itemText}>Status</ListItemText>
                                                 <ListItemText className={classes.itemValue}>{status}</ListItemText>
                                             </ListItem>
-                                            <ListItem >
+                                            <ListItem>
                                                 <ListItemText className={classes.itemText}>Command</ListItemText>
                                                 <ListItemText className={classes.itemValue}>{command}</ListItemText>
                                             </ListItem>
-                                            <ListItem >
+                                            <ListItem>
                                                 <ListItemText className={classes.itemText}>Tags</ListItemText>
                                                 <ListItemText className={classes.itemValue}>{tags}</ListItemText>
                                             </ListItem>

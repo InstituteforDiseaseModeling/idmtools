@@ -29,6 +29,15 @@ class TestAssets(unittest.TestCase):
         b = Asset(relative_path=None, filename="test.json", content=json.dumps({"a": 1, "b": 2}))
         self.assertEqual(a, b)
 
+    def test_assets_is_iterable(self):
+        ac = AssetCollection.from_directory(assets_directory=self.base_path)
+        items = []
+        for item in ac:
+            items.append(item)
+
+        for item in items:
+            self.assertIn(item, ac.assets)
+
     def test_assets_collection_from_dir(self):
         assets_to_find = [
             Asset(absolute_path=os.path.join(self.base_path, "d.txt")),

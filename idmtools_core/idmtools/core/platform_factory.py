@@ -1,7 +1,7 @@
-import ast
-import copy
 from dataclasses import fields
 from idmtools.config import IdmConfigParser
+from idmtools.entities import IPlatform
+from idmtools.utils.entities import validate_user_inputs_against_dataclass
 
 
 class Platform:
@@ -45,7 +45,7 @@ class Platform:
                              f"Supported platforms are {', '.join(cls._platforms.keys())}")
 
     @classmethod
-    def _create_from_block(cls, block: str, **kwargs):
+    def _create_from_block(cls, block: str, **kwargs) -> IPlatform:
         """
         Retrieve section entries from the INI configuration file by giving block.
 
@@ -58,7 +58,7 @@ class Platform:
         """
 
         # Read block details
-        section = IdmConfigParser.get_section(block, force=True)
+        section = IdmConfigParser.get_section(block)
 
         try:
             # Make sure block has type entry
@@ -80,23 +80,10 @@ class Platform:
         field_type = {f.name: f.type for f in fds}
 
         # Make data to the requested type
-        inputs = copy.deepcopy(section)
-        fs = set(field_type.keys()).intersection(set(section.keys()))
-        for fn in fs:
-            ft = field_type[fn]
-            if ft in (int, float, str):
-                inputs[fn] = ft(section[fn])
-            elif ft is bool:
-                inputs[fn] = ast.literal_eval(section[fn])
+        inputs = IdmConfigParser.retrieve_dict_config_block(field_type, section)
 
         # Make sure the user values have the requested type
-        fs_kwargs = set(field_type.keys()).intersection(set(kwargs.keys()))
-        for fn in fs_kwargs:
-            ft = field_type[fn]
-            if ft in (int, float, str):
-                kwargs[fn] = ft(kwargs[fn]) if kwargs[fn] is not None else kwargs[fn]
-            elif ft is bool:
-                kwargs[fn] = ast.literal_eval(kwargs[fn]) if isinstance(kwargs[fn], str) else kwargs[fn]
+        fs_kwargs = validate_user_inputs_against_dataclass(field_type, kwargs)
 
         # Update attr based on priority: #1 Code, #2 INI, #3 Default
         for fn in set(kwargs.keys()).intersection(set(field_name)):

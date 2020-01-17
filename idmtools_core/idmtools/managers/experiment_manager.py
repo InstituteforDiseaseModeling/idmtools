@@ -1,14 +1,9 @@
 import typing
 from logging import getLogger, DEBUG
 from idmtools.core import EntityStatus
-from idmtools.entities.iplatform import TPlatform
+from idmtools.entities import IExperiment, IPlatform, Suite
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.utils.entities import retrieve_experiment
-
-if typing.TYPE_CHECKING:
-    from idmtools.entities.iexperiment import TExperiment
-    from idmtools.entities.suite import TSuite
-
 
 logger = getLogger(__name__)
 
@@ -18,7 +13,7 @@ class ExperimentManager:
     Class that manages an experiment.
     """
 
-    def __init__(self, experiment: 'TExperiment', platform: TPlatform, suite: 'TSuite' = None):
+    def __init__(self, experiment: IExperiment, platform: IPlatform, suite: Suite = None):
         """
         A constructor.
 
