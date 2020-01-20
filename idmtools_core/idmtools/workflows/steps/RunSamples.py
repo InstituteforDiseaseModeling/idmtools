@@ -1,4 +1,4 @@
-from idmtools.entities import ExperimentBuilder
+from idmtools.builders import ExperimentBuilder
 from idmtools.managers import ExperimentManager
 from idmtools.workflows.IWorkflowStep import IWorkflowStep
 

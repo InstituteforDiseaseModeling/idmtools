@@ -1,10 +1,8 @@
 import json
 import os
 import unittest
-from functools import partial
-
 import pytest
-
+from functools import partial
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core import FilterMode
 from idmtools.assets.errors import DuplicatedAssetError
@@ -28,6 +26,51 @@ class TestAssets(unittest.TestCase):
         a = Asset(relative_path=None, filename="test.json", content=json.dumps({"a": 1, "b": 2}))
         b = Asset(relative_path=None, filename="test.json", content=json.dumps({"a": 1, "b": 2}))
         self.assertEqual(a, b)
+
+    def test_creat_asset_absolute_path(self):
+        a = Asset(absolute_path=os.path.join(self.base_path, "d.txt"))
+        self.assertEqual(a.content, b"")
+        self.assertEqual(a.filename, "d.txt")
+        self.assertEqual(a.relative_path, "")
+
+    def test_creat_asset_absolute_path_and_relative_path(self):
+        a = Asset(relative_path='2', absolute_path=os.path.join(self.base_path, "1", "a.txt"))
+        self.assertEqual(a.content, b"")
+        self.assertEqual(a.filename, "a.txt")
+        self.assertEqual(a.relative_path, "2")
+
+    def test_creat_asset_absolute_path_and_content(self):
+        a = Asset(absolute_path=os.path.join(self.base_path, "d.txt"), content="blah")
+        self.assertEqual(a.content, "blah")
+        self.assertEqual(a.filename, "d.txt")
+        self.assertEqual(a.relative_path, "")
+
+    def test_creat_asset_content_filename(self):
+        a = Asset(filename='test', content="blah")
+        self.assertEqual(a.content, "blah")
+        self.assertEqual(a.filename, "test")
+        self.assertEqual(a.relative_path, "")
+
+    def test_creat_asset_only_content(self):
+        a = Asset(content="blah")
+        self.assertEqual(a.content, "blah")
+        self.assertIsNone(a.filename)
+        self.assertEqual(a.relative_path, "")
+
+    def test_creat_asset_no_parameters(self):
+        with self.assertRaises(ValueError) as context:
+            a = Asset()
+        self.assertTrue('Impossible to create the asset without either absolute path or filename and content!' in str(
+            context.exception.args[0]))
+
+    def test_assets_is_iterable(self):
+        ac = AssetCollection.from_directory(assets_directory=self.base_path)
+        items = []
+        for item in ac:
+            items.append(item)
+
+        for item in items:
+            self.assertIn(item, ac.assets)
 
     def test_assets_collection_from_dir(self):
         assets_to_find = [
@@ -132,9 +175,6 @@ class TestAssets(unittest.TestCase):
         self.assertSetEqual(set(ac.assets), set(assets_to_find))
 
     def test_asset_collection(self):
-        from idmtools.assets import Asset
-        from idmtools.assets import AssetCollection
-
         a = Asset(relative_path="1", absolute_path=os.path.join(self.base_path, "1", "a.txt"))
 
         ac1 = AssetCollection([a])
@@ -143,7 +183,7 @@ class TestAssets(unittest.TestCase):
         self.assertEqual(len(ac1.assets), 1)
         self.assertEqual(len(ac2.assets), 0)
 
-        self.assertEqual(ac1, ac2)
+        self.assertNotEqual(ac1, ac2)
         self.assertNotEqual(ac1.assets, ac2.assets)
 
 
