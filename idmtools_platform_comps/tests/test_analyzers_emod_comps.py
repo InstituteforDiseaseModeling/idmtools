@@ -10,7 +10,7 @@ from idmtools.analysis.add_analyzer import AddAnalyzer
 from idmtools.analysis.analyze_manager import AnalyzeManager
 from idmtools.analysis.download_analyzer import DownloadAnalyzer
 from idmtools.builders import ExperimentBuilder
-from idmtools.core import ItemType
+from idmtools.core import ItemType, EntityStatus
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_model_emod.defaults import EMODSir
@@ -18,6 +18,9 @@ from idmtools_model_emod.emod_experiment import EMODExperiment
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import del_file, del_folder, load_csv_file
+from idmtools.analysis.tags_analyzer import TagsAnalyzer
+from idmtools.analysis.csv_analyzer import CSVAnalyzer
+from idmtools_platform_comps.comps_platform import COMPSPlatform
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 
@@ -245,3 +248,107 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         sims = self.p.get_children_by_object(comps_exp)
         for simulation in sims:
             self.assertTrue(os.path.exists(os.path.join('output', str(simulation.uid), "InsetChart.json")))
+
+    @pytest.mark.skip
+    # TODO: #575 convenience function to exclude failed sims
+    def test_tags_analyzer_emod_exp(self):
+        # delete output from previous run
+        del_folder("output")
+
+        # create a new empty 'output' dir
+        os.mkdir("output")
+
+        analyzers = [TagsAnalyzer()]
+
+        experiment_id = '36d8bfdc-83f6-e911-a2be-f0921c167861'  # staging exp id JSuresh's Magude exp
+
+        manager = AnalyzeManager(configuration={}, partial_analyze_ok=True, platform=self.p,
+                                 ids=[(experiment_id, ItemType.EXPERIMENT)],
+                                 analyzers=analyzers)
+        manager.analyze()
+
+        # verify results
+        # retrieve experiment from comps
+        comps_exp = self.p.get_item(item_id=experiment_id, item_type=ItemType.EXPERIMENT)
+        # sims = self.p.get_children_by_object(comps_exp)
+        succeeded_sims = {item.uid for item in self.p.get_children(comps_exp, ItemType.EXPERIMENT, force=True)
+                          if item.status == EntityStatus.SUCCEEDED}
+        for simulation in succeeded_sims:
+            self.assertTrue(os.path.exists(os.path.join('output', str(simulation.uid),
+                                                        "InsetChart.json")))
+
+    @pytest.mark.skip
+    @pytest.mark.long
+    # TODO: Issue #563 [WinError 87] The parameter is incorrect
+    def test_csv_analyzer_emod_exp(self):
+        # delete output from previous run
+        del_folder("output")
+
+        # create a new empty 'output' dir
+        os.mkdir("output")
+
+        filenames = ['output/ReportEventRecorder.csv']
+        analyzers = [CSVAnalyzer(filenames=filenames)]
+
+        experiment_id = '36d8bfdc-83f6-e911-a2be-f0921c167861'  # staging exp id JSuresh's Magude exp
+
+        manager = AnalyzeManager(configuration={}, partial_analyze_ok=True, platform=self.p,
+                                 ids=[(experiment_id, ItemType.EXPERIMENT)],
+                                 analyzers=analyzers)
+        manager.analyze()
+
+        # verify results
+        # retrieve experiment from comps
+        comps_exp = self.p.get_item(item_id=experiment_id, item_type=ItemType.EXPERIMENT)
+        sims = self.p.get_children_by_object(comps_exp)
+        for simulation in sims:
+            self.assertTrue(os.path.exists(os.path.join('output', str(simulation.uid),
+                                                        "InsetChart.json")))
+
+    def test_csv_analyzer_emod_exp_non_csv_error(self):
+        # delete output from previous run
+        del_folder("output")
+
+        # create a new empty 'output' dir
+        os.mkdir("output")
+
+        filenames = ['output/MalariaPatientReport.json']
+        analyzers = [CSVAnalyzer(filenames=filenames)]
+
+        experiment_id = '36d8bfdc-83f6-e911-a2be-f0921c167861'  # staging exp id JSuresh's Magude exp
+
+        manager = AnalyzeManager(configuration={}, partial_analyze_ok=True, platform=self.p,
+                                 ids=[(experiment_id, ItemType.EXPERIMENT)],
+                                 analyzers=analyzers)
+        manager.analyze()
+
+        # verify results
+        # retrieve experiment from comps
+        comps_exp = self.p.get_item(item_id=experiment_id, item_type=ItemType.EXPERIMENT)
+        sims = self.p.get_children_by_object(comps_exp)
+        for simulation in sims:
+            self.assertTrue(all([s.status == EntityStatus.FAILED for s in simulation]))
+            self.assertFalse(simulation.succeeded)
+
+    def test_multi_csv_analyzer_emod_exp(self):
+        # delete output from previous run
+        del_folder("output")
+
+        # create a new empty 'output' dir
+        os.mkdir("output")
+
+        filenames = ['output/a.csv', 'output/b.csv']
+        analyzers = [CSVAnalyzer(filenames=filenames)]
+
+        experiment_id = '1bddce22-0c37-ea11-a2be-f0921c167861'  # staging exp id PythonExperiment with 2 csv outputs
+
+        self.p = Platform('COMPS2')
+        manager = AnalyzeManager(configuration={}, partial_analyze_ok=True, platform=self.p,
+                                 ids=[(experiment_id, ItemType.EXPERIMENT)],
+                                 analyzers=analyzers)
+        manager.analyze()
+
+        comps_exp = self.p.get_item(item_id=experiment_id, item_type=ItemType.EXPERIMENT)
+        sims = self.p.get_children_by_object(comps_exp)
+        for simulation in sims:
+            self.assertTrue(simulation.succeeded)
