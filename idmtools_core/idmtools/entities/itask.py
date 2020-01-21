@@ -44,7 +44,7 @@ class ITask(IAssetsEnabled, metaclass=ABCMeta):
 
     def add_pre_creation_hook(self, hook: TTaskHook):
         """
-        Called before a simulation is created on a platform. Each hook recieves either a Simulation or WorkflowTask
+        Called before a simulation is created on a platform. Each hook receives either a Simulation or WorkflowTask
 
         Args:
             hook: Function to call on event
@@ -56,7 +56,7 @@ class ITask(IAssetsEnabled, metaclass=ABCMeta):
 
     def add_post_creation_hook(self, hook: TTaskHook):
         """
-        Called after a simulation has been created on a platform. Each hook recieves either a Simulation or WorkflowTask
+        Called after a simulation has been created on a platform. Each hook receives either a Simulation or WorkflowTask
 
         Args:
             hook: Function to call on event
