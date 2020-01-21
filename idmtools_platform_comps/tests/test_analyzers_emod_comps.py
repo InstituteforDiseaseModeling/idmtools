@@ -20,7 +20,6 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import del_file, del_folder, load_csv_file
 from idmtools.analysis.tags_analyzer import TagsAnalyzer
 from idmtools.analysis.csv_analyzer import CSVAnalyzer
-from idmtools_platform_comps.comps_platform import COMPSPlatform
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 
@@ -249,98 +248,75 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         for simulation in sims:
             self.assertTrue(os.path.exists(os.path.join('output', str(simulation.uid), "InsetChart.json")))
 
-    @pytest.mark.skip
-    # TODO: #575 convenience function to exclude failed sims
     def test_tags_analyzer_emod_exp(self):
+        experiment_id = '36d8bfdc-83f6-e911-a2be-f0921c167861'  # staging exp id JSuresh's Magude exp
+
         # delete output from previous run
-        del_folder("output")
+        del_folder(experiment_id)
 
         # create a new empty 'output' dir
-        os.mkdir("output")
+        os.mkdir(experiment_id)
 
         analyzers = [TagsAnalyzer()]
 
-        experiment_id = '36d8bfdc-83f6-e911-a2be-f0921c167861'  # staging exp id JSuresh's Magude exp
-
         manager = AnalyzeManager(configuration={}, partial_analyze_ok=True, platform=self.p,
                                  ids=[(experiment_id, ItemType.EXPERIMENT)],
                                  analyzers=analyzers)
         manager.analyze()
 
         # verify results
-        # retrieve experiment from comps
-        comps_exp = self.p.get_item(item_id=experiment_id, item_type=ItemType.EXPERIMENT)
-        # sims = self.p.get_children_by_object(comps_exp)
-        succeeded_sims = {item.uid for item in self.p.get_children(comps_exp, ItemType.EXPERIMENT, force=True)
-                          if item.status == EntityStatus.SUCCEEDED}
-        for simulation in succeeded_sims:
-            self.assertTrue(os.path.exists(os.path.join('output', str(simulation.uid),
-                                                        "InsetChart.json")))
+        self.assertTrue(os.path.exists(os.path.join(experiment_id, "tags.csv")))
 
-    @pytest.mark.skip
-    @pytest.mark.long
-    # TODO: Issue #563 [WinError 87] The parameter is incorrect
     def test_csv_analyzer_emod_exp(self):
+        experiment_id = '9311af40-1337-ea11-a2be-f0921c167861'  # staging exp id with csv from config
         # delete output from previous run
-        del_folder("output")
+        del_folder(experiment_id)
 
         # create a new empty 'output' dir
-        os.mkdir("output")
+        os.mkdir(experiment_id)
 
-        filenames = ['output/ReportEventRecorder.csv']
+        filenames = ['output/c.csv']
         analyzers = [CSVAnalyzer(filenames=filenames)]
 
-        experiment_id = '36d8bfdc-83f6-e911-a2be-f0921c167861'  # staging exp id JSuresh's Magude exp
-
         manager = AnalyzeManager(configuration={}, partial_analyze_ok=True, platform=self.p,
                                  ids=[(experiment_id, ItemType.EXPERIMENT)],
                                  analyzers=analyzers)
         manager.analyze()
 
         # verify results
-        # retrieve experiment from comps
-        comps_exp = self.p.get_item(item_id=experiment_id, item_type=ItemType.EXPERIMENT)
-        sims = self.p.get_children_by_object(comps_exp)
-        for simulation in sims:
-            self.assertTrue(os.path.exists(os.path.join('output', str(simulation.uid),
-                                                        "InsetChart.json")))
+        self.assertTrue(os.path.exists(os.path.join(experiment_id, "CSVAnalyzer.csv")))
 
     def test_csv_analyzer_emod_exp_non_csv_error(self):
+        experiment_id = '36d8bfdc-83f6-e911-a2be-f0921c167861'  # staging exp id JSuresh's Magude exp
+
         # delete output from previous run
-        del_folder("output")
+        del_folder(experiment_id)
 
         # create a new empty 'output' dir
-        os.mkdir("output")
+        os.mkdir(experiment_id)
 
         filenames = ['output/MalariaPatientReport.json']
         analyzers = [CSVAnalyzer(filenames=filenames)]
 
-        experiment_id = '36d8bfdc-83f6-e911-a2be-f0921c167861'  # staging exp id JSuresh's Magude exp
-
         manager = AnalyzeManager(configuration={}, partial_analyze_ok=True, platform=self.p,
                                  ids=[(experiment_id, ItemType.EXPERIMENT)],
                                  analyzers=analyzers)
         manager.analyze()
 
         # verify results
-        # retrieve experiment from comps
-        comps_exp = self.p.get_item(item_id=experiment_id, item_type=ItemType.EXPERIMENT)
-        sims = self.p.get_children_by_object(comps_exp)
-        for simulation in sims:
-            self.assertTrue(all([s.status == EntityStatus.FAILED for s in simulation]))
-            self.assertFalse(simulation.succeeded)
+        self.assertRaises(Exception, msg='Please ensure all filenames provided to CSVAnalyzer have a csv extension.')
 
     def test_multi_csv_analyzer_emod_exp(self):
+        experiment_id = '1bddce22-0c37-ea11-a2be-f0921c167861'  # staging exp id PythonExperiment with 2 csv outputs
+
         # delete output from previous run
-        del_folder("output")
+        del_folder(experiment_id)
 
         # create a new empty 'output' dir
-        os.mkdir("output")
+        os.mkdir(experiment_id)
 
         filenames = ['output/a.csv', 'output/b.csv']
         analyzers = [CSVAnalyzer(filenames=filenames)]
-
-        experiment_id = '1bddce22-0c37-ea11-a2be-f0921c167861'  # staging exp id PythonExperiment with 2 csv outputs
 
         self.p = Platform('COMPS2')
         manager = AnalyzeManager(configuration={}, partial_analyze_ok=True, platform=self.p,
@@ -348,7 +324,5 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
                                  analyzers=analyzers)
         manager.analyze()
 
-        comps_exp = self.p.get_item(item_id=experiment_id, item_type=ItemType.EXPERIMENT)
-        sims = self.p.get_children_by_object(comps_exp)
-        for simulation in sims:
-            self.assertTrue(simulation.succeeded)
+        # verify results
+        self.assertTrue(os.path.exists(os.path.join(experiment_id, "CSVAnalyzer.csv")))
