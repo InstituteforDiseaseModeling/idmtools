@@ -1,9 +1,14 @@
-import typing
+import copy
+from itertools import chain
 from logging import getLogger, DEBUG
-from idmtools.core import EntityStatus
-from idmtools.entities import IExperiment, IPlatform, Suite
+from typing import Set, Optional, Dict, Union
+from more_itertools import grouper
+from idmtools.core import EntityStatus, ExperimentBuilder, TExperimentBuilder
+from idmtools.entities import IPlatform, Suite, ISimulation
+from idmtools.entities.experiment import Experiment
+from idmtools.entities.itask import ITask
+from idmtools.entities.simulation import Simulation
 from idmtools.services.experiments import ExperimentPersistService
-from idmtools.utils.entities import retrieve_experiment
 
 logger = getLogger(__name__)
 
@@ -13,7 +18,11 @@ class ExperimentManager:
     Class that manages an experiment.
     """
 
-    def __init__(self, experiment: IExperiment, platform: IPlatform, suite: Suite = None):
+    def __init__(self, platform: IPlatform, base_task: Optional[ITask] = None,
+                 base_simulation: Optional[ISimulation] = None, experiment_name: Optional[str] = None,
+                 experiment_tags: Optional[Dict[str, str]] = None,
+                 experiment: Optional[Experiment] = None, suite: Optional[Suite] = None,
+                 builders: Union[Set[ExperimentBuilder], ExperimentBuilder] = None):
         """
         A constructor.
 
@@ -23,15 +32,137 @@ class ExperimentManager:
             suite: The suite to use
         """
         self.suite = suite
-        self.experiment = experiment
+        if base_simulation is None and base_task is None:
+            raise ValueError("Either an experiment, a base simulation, or a base task is required")
+
+        if experiment is None:
+            self.experiment = Experiment(name=experiment_name, tags=experiment_tags, platform=platform)
+        else:
+            self.experiment = experiment
+
+        if base_simulation is None:
+            self.base_simulation = Simulation(task=base_task, platform=platform)
+
+        task_type = type(base_task)
+        self.experiment.task_type = f'{task_type.__module__}.{task_type.__name__}'
         self.platform = platform
         self.experiment.platform = platform
+        builders = self._validate_builders(builders)
+        self.builders: Set[ExperimentBuilder] = builders if builders else set()
 
-    @classmethod
-    def from_experiment_id(cls, experiment_id, platform):
-        experiment = retrieve_experiment(experiment_id, platform, with_simulations=True)
-        em = cls(experiment, platform)
-        return em
+    @staticmethod
+    def _validate_builders(builders):
+        if builders and not isinstance(builders, set):
+            if isinstance(builders, list):
+                builders = set(builders)
+            elif isinstance(builders, ExperimentBuilder):
+                builders = []
+            else:
+                raise ValueError("Builders must be a list/set of builders or a single ExperimentBuilder")
+        return builders
+
+    def _new_simulation(self) -> Simulation:
+        """
+        Return a new simulation object.
+        The simulation will be copied from the base simulation of the experiment.
+
+        Returns:
+            The created simulation.
+        """
+        # TODO: the experiment should be frozen when the first simulation is created
+        sim = copy.deepcopy(self.base_simulation)
+        sim.task = copy.deepcopy(self.base_simulation.task)
+        sim.assets = copy.deepcopy(self.base_simulation.assets)
+        sim.platform = self.platform
+        sim.experiment = self.experiment
+        return sim
+
+    def _batch_simulations(self, batch_size=5):
+        # If no builders and no simulation, just return the base simulation
+        if not self.builders and not self.experiment.simulations:
+            yield (self._new_simulation(),)
+            return
+
+        # First consider the simulations of the experiment
+        if self.experiment.simulations:
+            for sim in self.experiment.simulations:
+                sim.platform = self.platform
+                sim.experiment = self.experiment
+
+            for groups in grouper(self.experiment.simulations, batch_size):
+                sims = []
+                for sim in filter(None, groups):
+                    sims.append(sim)
+                yield sims
+
+        # Then the builders
+        for groups in grouper(chain(*self.builders), batch_size):
+            sims = []
+            for simulation_functions in filter(None, groups):
+                simulation = self._new_simulation()
+                tags = {}
+
+                for func in simulation_functions:
+                    new_tags = func(simulation=simulation)
+                    if new_tags:
+                        tags.update(new_tags)
+
+                simulation.tags.update(tags)
+                sims.append(simulation)
+
+            yield sims
+
+    @property
+    def builder(self) -> TExperimentBuilder:
+
+        """
+        For backward-compatibility purposes.
+
+        Returns:
+            The last ``TExperimentBuilder``.
+        """
+        return list(self.builders)[-1] if self.builders and len(self.builders) > 0 else None
+
+    @builder.setter
+    def builder(self, builder: TExperimentBuilder) -> None:
+        """
+        For backward-compatibility purposes.
+
+        Args:
+            builder: The new builder to be used.
+
+        Returns:
+            None
+        """
+
+        # Make sure we only take the last builder assignment
+        if self.builders:
+            self.builders.clear()
+
+        self.add_builder(builder)
+
+    def add_builder(self, builder: TExperimentBuilder) -> None:
+        """
+        Add builder to builder collection.
+
+        Args:
+            builder: A builder to be added.
+
+        Returns:
+            None
+        """
+        from idmtools.builders import ExperimentBuilder
+
+        # Add builder validation
+        if not isinstance(builder, ExperimentBuilder):
+            raise Exception("Builder ({}) must have type of ExperimentBuilder!".format(builder))
+
+        # Initialize builders the first time
+        if self.builders is None:
+            self.builders = set()
+
+        # Add new builder to the collection
+        self.builders.add(builder)
 
     def create_suite(self):
         # If no suite present -> do nothing
@@ -64,7 +195,7 @@ class ExperimentManager:
         # Save the experiment
         ExperimentPersistService.save(self.experiment)
 
-    def simulation_batch_worker_thread(self, simulation_batch):
+    def _simulation_batch_worker_thread(self, simulation_batch):
         logger.debug(f'Create {len(simulation_batch)} simulations')
         for simulation in simulation_batch:
             simulation.pre_creation()
@@ -92,13 +223,13 @@ class ExperimentManager:
         _batch_size = int(_batch_size) if _batch_size else 10
 
         with ThreadPoolExecutor(max_workers=16) as executor:
-            results = executor.map(self.simulation_batch_worker_thread,  # noqa: F841
-                                   self.experiment.batch_simulations(batch_size=_batch_size))
+            results = executor.map(self._simulation_batch_worker_thread,  # noqa: F841
+                                   self._batch_simulations(batch_size=_batch_size))
 
         _sims = EntityContainer()
         for sim_batch in results:
             for simulation in sim_batch:
-                _sims.append(simulation.metadata)
+                _sims.append(simulation)
 
         self.experiment.simulations = _sims
 
@@ -131,7 +262,7 @@ class ExperimentManager:
         # Run
         self.start_experiment()
 
-    def wait_till_done(self, timeout: 'int' = 60 * 60 * 24, refresh_interval: 'int' = 5):
+    def wait_till_done(self, timeout: int = 60 * 60 * 24, refresh_interval: int = 5):
         """
         Wait for the experiment to be done.
 

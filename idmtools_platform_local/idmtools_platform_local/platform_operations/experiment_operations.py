@@ -10,6 +10,7 @@ from uuid import UUID
 from idmtools.assets import Asset
 from idmtools.core.experiment_factory import experiment_factory
 from idmtools.entities import IExperiment, ISimulation
+from idmtools.entities.experiment import Experiment
 from idmtools.entities.iexperiment import IDockerExperiment, IGPUExperiment
 from idmtools.entities.iplatform_metadata import IPlatformExperimentOperations
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
@@ -37,7 +38,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         experiment_dict = ExperimentsClient.get_one(str(experiment_id))
         return ExperimentDict(experiment_dict)
 
-    def create(self, experiment: IExperiment, **kwargs) -> Tuple[IExperiment, UUID]:
+    def create(self, experiment: Experiment, **kwargs) -> Tuple[Experiment, UUID]:
         """
         Create an experiment.
 
@@ -50,10 +51,10 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         """
         from idmtools_platform_local.internals.tasks.create_experiment import CreateExperimentTask
         from dramatiq.results import ResultTimeout
-        if not self.platform.is_supported_experiment(experiment):
-            raise ValueError("This experiment type is not support on the LocalPlatform.")
+        if not self.platform.are_requirements_met(experiment.platform_requirements):
+            raise ValueError("One of the requirements not supported by platform")
 
-        m = CreateExperimentTask.send(experiment.tags, experiment.simulation_type)
+        m = CreateExperimentTask.send(experiment.tags, experiment.task_type)
 
         # Create experiment is vulnerable to disconnects early on of redis errors. Lets do a retry on conditions
         start = time.time()
@@ -111,7 +112,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         """
         return None
 
-    def run_item(self, experiment: IExperiment):
+    def run_item(self, experiment: Experiment):
         """
         Run the experiment
         Args:
@@ -132,7 +133,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
                 logger.debug(f"Running simulation: {simulation.uid}")
                 RunTask.send(experiment.command.cmd, experiment.uid, simulation.uid)
 
-    def send_assets(self, experiment: IExperiment):
+    def send_assets(self, experiment: Experiment):
         """
 
          Sends assets for specified experiment

@@ -24,6 +24,10 @@ class Simulation(IAssetsEnabled, INamedEntity):
     def experiment(self) -> 'Experiment':
         return self.parent
 
+    @experiment.setter
+    def experiment(self, experiment: 'Experiment'):
+        self.parent = experiment
+
     def __repr__(self):
         return f"<Simulation: {self.uid} - Exp_id: {self.parent_id}>"
 
@@ -32,7 +36,7 @@ class Simulation(IAssetsEnabled, INamedEntity):
 
     def pre_creation(self):
         # Call all of our hooks
-        [x() for x in self.pre_creation_hooks]
+        [x(self) for x in self.pre_creation_hooks]
         if self.__class__ is not Simulation:
             # Add a tag to keep the Simulation class name
             self.tags["experiment_type"] = f'{self.__class__.__module__}.{self.__class__.__name__}'
@@ -58,8 +62,8 @@ class Simulation(IAssetsEnabled, INamedEntity):
         """
         Gather all the assets for the simulation.
         """
-        self.task.gather_assets()
-        self.assets += self.task.assets
+        self.task.gather_transient_assets()
+        self.assets.add_assets(self.task.transient_assets)
 
 
 # TODO Rename to T simulation once old simulation is one

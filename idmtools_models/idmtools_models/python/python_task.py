@@ -23,7 +23,7 @@ class PythonTask(ITask):
         if self.script_name is None:
             raise ValueError("Script name is required")
         cmd_str = f'{self.python_path} ./Assets/{os.path.basename(self.script_name)}'
-        self._task_log.info('Setting command line to %0', cmd_str)
+        self._task_log.info('Setting command line to %s', cmd_str)
         self.command = CommandLine(cmd_str)
 
     def retrieve_python_dependencies(self):
@@ -57,7 +57,7 @@ class PythonTask(ITask):
             AssetCollection
         """
         # ensure that assets is in collection
-        self._task_log.info('Adding Common asset from %0', self.script_name)
+        self._task_log.info('Adding Common asset from %s', self.script_name)
         self.common_assets.add_asset(Asset(absolute_path=self.script_name), fail_on_duplicate=False)
         return self.common_assets
 
@@ -75,7 +75,7 @@ class PythonTask(ITask):
         Reloads a python task from a simulation
 
         Args:
-            simulation: Simulation to teload
+            simulation: Simulation to reload
 
         Returns:
 

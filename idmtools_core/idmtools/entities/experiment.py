@@ -1,12 +1,12 @@
 import uuid
 from dataclasses import dataclass, field
 from logging import getLogger
-from typing import NoReturn
+from typing import NoReturn, Set
 from idmtools.core import ItemType
 from idmtools.core.interfaces.entity_container import EntityContainer
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.core.interfaces.inamed_entity import INamedEntity
-
+from idmtools.entities.platform_requirements import PlatformRequirements
 
 logger = getLogger(__name__)
 
@@ -25,6 +25,8 @@ class Experiment(IAssetsEnabled, INamedEntity):
     simulations: EntityContainer = field(default_factory=lambda: EntityContainer(), compare=False,
                                          metadata={"pickle_ignore": True})
     item_type: ItemType = field(default=ItemType.EXPERIMENT, compare=False, init=False)
+    task_type: str = field(default='idmtools.entities.command_task.CommandTask')
+    platform_requirements: Set[PlatformRequirements] = field(default_factory=set)
     frozen: bool = field(default=False, init=False)
 
     def __repr__(self):

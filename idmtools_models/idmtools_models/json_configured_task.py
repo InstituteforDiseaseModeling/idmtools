@@ -33,10 +33,10 @@ class JSONConfiguredTask(ITask):
         """
         if self.config_file_name is not None:
             params = {self.envelope: self.parameters} if self.envelope else self.parameters
-            self._task_log.info('Adding JSON Configured File %0', self.config_file_name)
+            self._task_log.info('Adding JSON Configured File %s', self.config_file_name)
             if logger.isEnabledFor(DEBUG):
                 logger.info(f'Generating {self.config_file_name} as an asset from JSONConfiguredTask')
-                self._task_log.debug('Writing Config %0', json.dumps(params))
+                self._task_log.debug('Writing Config %s', json.dumps(params))
             self.transient_assets.add_or_replace_asset(Asset(filename=self.config_file_name, content=json.dumps(params)))
         return self.transient_assets
 
@@ -77,7 +77,7 @@ class JSONConfiguredTask(ITask):
 
         """
         for k, p in values.items():
-            self._task_log.info('Setting parameter %0 to %1', k, p)
+            self._task_log.info('Setting parameter %s to %s', k, str(p))
         self.parameters.update(values)
 
     def reload_from_simulation(self, simulation: 'Simulation'):  # noqa: F821
