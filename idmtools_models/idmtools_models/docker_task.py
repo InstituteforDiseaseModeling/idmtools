@@ -4,6 +4,8 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone, timedelta
 from logging import getLogger
 from typing import Set, Optional, NoReturn
+
+from idmtools.assets import AssetCollection
 from idmtools.entities.itask import ITask
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools import __version__ as idmtools_version
@@ -32,9 +34,13 @@ class DockerTask(ITask):
         if self.build:
             self.build_image()
 
-    def gather_assets(self) -> NoReturn:
+    def gather_common_assets(self) -> AssetCollection:
         if self.image_name is None:
             raise ValueError("Image Name is required")
+        return self.common_assets
+
+    def gather_transient_assets(self) -> AssetCollection:
+        return self.transient_assets
 
     @optional_yaspin_load(text="Building docker image")
     def build_image(self, spinner=None, **extra_build_args):

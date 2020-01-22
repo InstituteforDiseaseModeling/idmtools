@@ -2,7 +2,7 @@ import json
 from dataclasses import dataclass, field
 from logging import getLogger, DEBUG
 from typing import Union, Dict, Any
-from idmtools.assets import Asset
+from idmtools.assets import Asset, AssetCollection
 from idmtools.entities.itask import ITask
 from idmtools.registry.task_specification import TaskSpecification
 
@@ -21,20 +21,28 @@ class JSONConfiguredTask(ITask):
 
     parameters: dict = field(default_factory=lambda: {})
     envelope: str = field(default=None)
+    # If we don't define this we assume static name the script consuming file will know
     config_file_name: str = field(default="config.json")
 
-    def gather_assets(self):
+    def gather_common_assets(self) -> AssetCollection:
+        return self.common_assets
+
+    def gather_transient_assets(self) -> AssetCollection:
         """
         Here we dump our config
         """
-        if logger.isEnabledFor(DEBUG):
-            logger.info(f'Generating {self.config_file_name} as an asset from JSONConfiguredTask')
-        params = {self.envelope: self.parameters} if self.envelope else self.parameters
-        self.assets.add_or_replace_asset(Asset(filename=self.config_file_name, content=json.dumps(params)))
+        if self.config_file_name is not None:
+            params = {self.envelope: self.parameters} if self.envelope else self.parameters
+            self._task_log.info('Adding JSON Configured File %0', self.config_file_name)
+            if logger.isEnabledFor(DEBUG):
+                logger.info(f'Generating {self.config_file_name} as an asset from JSONConfiguredTask')
+                self._task_log.debug('Writing Config %0', json.dumps(params))
+            self.transient_assets.add_or_replace_asset(Asset(filename=self.config_file_name, content=json.dumps(params)))
+        return self.transient_assets
 
     def update_parameter(self, key: TJSONConfigKeyType, value: TJSONConfigValueType):
         """
-        Update a parameter. The typehinting encourages JSON supported types
+        Update a parameter. The type hinting encourages JSON supported types
 
         Args:
             key: Config
@@ -43,6 +51,7 @@ class JSONConfiguredTask(ITask):
         Returns:
 
         """
+        self._task_log.info('Setting parameter %0 to %1', key, str(value))
         self.parameters[key] = value
 
     def get_parameter(self, key: TJSONConfigKeyType) -> TJSONConfigValueType:
@@ -67,6 +76,8 @@ class JSONConfiguredTask(ITask):
         Returns:
 
         """
+        for k, p in values.items():
+            self._task_log.info('Setting parameter %0 to %1', k, p)
         self.parameters.update(values)
 
     def reload_from_simulation(self, simulation: 'Simulation'):  # noqa: F821

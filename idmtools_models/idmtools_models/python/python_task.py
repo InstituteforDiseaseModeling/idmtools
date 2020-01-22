@@ -2,19 +2,17 @@ import os
 import subprocess
 import tempfile
 from dataclasses import dataclass, field
-from typing import NoReturn, Optional, Set
-from idmtools.assets import Asset
+from typing import Set
+from idmtools.assets import Asset, AssetCollection
 from idmtools.entities import CommandLine
 from idmtools.entities.itask import ITask
 from idmtools.entities.platform_requirements import PlatformRequirements
+from idmtools.entities.simulation import Simulation
 from idmtools.registry.task_specification import TaskSpecification
-from idmtools_models.json_configured_task import JSONConfiguredTask
 
 
 @dataclass()
 class PythonTask(ITask):
-    def reload_from_simulation(self, simulation: 'Simulation'):
-        pass
 
     script_name: str = None
     python_path: str = 'python'
@@ -24,7 +22,9 @@ class PythonTask(ITask):
         super().__post_init__()
         if self.script_name is None:
             raise ValueError("Script name is required")
-        self.command = CommandLine(f'{self.python_path} ./Assets/{os.path.basename(self.script_name)}')
+        cmd_str = f'{self.python_path} ./Assets/{os.path.basename(self.script_name)}'
+        self._task_log.info('Setting command line to %0', cmd_str)
+        self.command = CommandLine(cmd_str)
 
     def retrieve_python_dependencies(self):
         """
@@ -49,22 +49,39 @@ class PythonTask(ITask):
 
         return extra_libraries
 
-    def gather_assets(self) -> NoReturn:
-        self.assets.add_asset(Asset(absolute_path=self.script_name), fail_on_duplicate=False)
+    def gather_common_assets(self) -> AssetCollection:
+        """
+        Get the common assets. This should be a set of assets that are common to all tasks in an experiment
 
+        Returns:
+            AssetCollection
+        """
+        # ensure that assets is in collection
+        self._task_log.info('Adding Common asset from %0', self.script_name)
+        self.common_assets.add_asset(Asset(absolute_path=self.script_name), fail_on_duplicate=False)
+        return self.common_assets
 
-@dataclass
-class JSONConfiguredPythonTask(JSONConfiguredTask, PythonTask):
-    configfile_argument: Optional[str] = "--config"
+    def gather_transient_assets(self) -> AssetCollection:
+        """
+        Gather transient assets. Generally this is the simulation level assets
 
-    def __post_init__(self):
-        super().__post_init__()
-        if self.configfile_argument is not None:
-            self.command.add_option(self.configfile_argument, self.config_file_name)
+        Returns:
 
-    def gather_assets(self):
-        PythonTask.gather_assets(self)
-        JSONConfiguredTask.gather_assets(self)
+        """
+        return self.transient_assets
+
+    def reload_from_simulation(self, simulation: Simulation):
+        """
+        Reloads a python task from a simulation
+
+        Args:
+            simulation: Simulation to teload
+
+        Returns:
+
+        """
+        # We have no configs so nothing to reload
+        pass
 
 
 class PythonTaskSpecification(TaskSpecification):
@@ -74,12 +91,3 @@ class PythonTaskSpecification(TaskSpecification):
 
     def get_description(self) -> str:
         return "Defines a python script command"
-
-
-class JSONConfiguredPythonTaskSpecification(TaskSpecification):
-
-    def get(self, configuration: dict) -> JSONConfiguredPythonTask:
-        return JSONConfiguredPythonTask(**configuration)
-
-    def get_description(self) -> str:
-        return "Defines a python script that has a single JSON config file"
