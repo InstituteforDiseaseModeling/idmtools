@@ -17,12 +17,12 @@ if __name__ == '__main__':
     # Arg option for analyzer init are uid, working_dir, data in the method map (aka select_simulation_data),
     # and filenames
     # In this case, we want to provide a filename to analyze
-    filenames = ['output/ReportEventRecorder.csv']
+    filenames = ['output/c.csv']
     # Initialize the analyser class with the path of the output csv file
     analyzers = [CSVAnalyzer(filenames=filenames)]
 
     # Set the experiment id you want to analyze
-    experiment_id = '36d8bfdc-83f6-e911-a2be-f0921c167861'  # staging exp id JSuresh's Magude exp
+    experiment_id = '9311af40-1337-ea11-a2be-f0921c167861'  # staging exp id simple sim and csv example
 
     # Specify the id Type, in this case an Experiment on COMPS
     manager = AnalyzeManager(configuration={}, partial_analyze_ok=True, platform=platform,
