@@ -141,6 +141,28 @@ class AssetCollection(IEntity):
                 self.assets.remove(asset)
         self.assets.append(asset)
 
+    def __add__(self, other: Union[TAssetList, 'AssetCollection', Asset]) -> 'AssetCollection':
+        """
+        Allows using the a + b syntax when adding AssetCollections
+
+        Args:
+            other: Either a list of assets, an assetcollection, or an asset
+
+        Returns:
+            Returns AssetCollection
+        """
+        if not isinstance(other, (list, AssetCollection, Asset)):
+            raise ValueError('You can only items of type AssetCollections, List of Assets, or Assets to a '
+                             'AssetCollection')
+
+        na = AssetCollection()
+        na.add_assets(self)
+        if isinstance(other, Asset):
+            na.add_asset(other, True)
+        else:
+            na.add_assets(other)
+        return na
+
     def add_assets(self, assets: Union[TAssetList, 'AssetCollection'], fail_on_duplicate: bool = True):
         """
         Add assets to a collection

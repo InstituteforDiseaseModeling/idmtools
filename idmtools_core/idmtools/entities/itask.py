@@ -1,13 +1,12 @@
 import copy
+import time
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
-from logging import getLogger
-from typing import Set, NoReturn, Union, Callable, List, Optional
-from idmtools.assets import AssetCollection
-from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
+from logging import getLogger, Logger
+from typing import Set, NoReturn, Union, Callable, List
+from idmtools.assets import Asset, AssetCollection
 from idmtools.entities.command_line import CommandLine
 from idmtools.entities.platform_requirements import PlatformRequirements
-
 
 logger = getLogger(__name__)
 # Tasks can be allocated multiple ways
@@ -23,19 +22,24 @@ TTaskHook = Callable[[TTaskParent], NoReturn]
 
 
 @dataclass
-class ITask(IAssetsEnabled, metaclass=ABCMeta):
+class ITask(metaclass=ABCMeta):
     command: CommandLine = None
     # Informs platform to what is needed to run a task
-    platform_requirements: Set[PlatformRequirements] = field(default_factory=lambda: [])
+    platform_requirements: Set[PlatformRequirements] = field(default_factory=set)
 
     # We provide hooks as list to allow more user scripting extensibility
     __pre_creation_hooks: List[TTaskHook] = None
     __post_creation_hooks: List[TTaskHook] = None
     # This is optional experiment assets
     # That means that users can explicitly define experiment level assets when using a Experiment builders
-    experiment_assets: Optional[AssetCollection] = None
+    common_assets: AssetCollection = field(default_factory=AssetCollection)
+    transient_assets: AssetCollection = field(default_factory=AssetCollection)
+
+    # log to add to items to track provisioning of task
+    _task_log: Logger = None
 
     def __post_init__(self):
+        self._task_log = getLogger(f'{self.__class__.__name__ }_{time.time()}')
         if isinstance(self.command, str):
             self.command = CommandLine(self.command)
 
@@ -105,11 +109,21 @@ class ITask(IAssetsEnabled, metaclass=ABCMeta):
         [hook(parent) for hook in self.__post_creation_hooks]
 
     @abstractmethod
-    def gather_assets(self) -> NoReturn:
+    def gather_common_assets(self) -> AssetCollection:
+        """
+        Function called at runtime to gather all assets in the collection.
+        """
+        pass
+
+    @abstractmethod
+    def gather_transient_assets(self) -> AssetCollection:
         """
         Function called at runtime to gather all assets in the collection
         """
         pass
+
+    def gather_all_assets(self) -> AssetCollection:
+        return self.gather_common_assets() + self.gather_transient_assets()
 
     def copy_simulation(self, base_simulation: 'Simulation') -> 'Simulation':
         """
