@@ -17,6 +17,9 @@ from idmtools_platform_comps.comps_operations.workflow_item_operations import Co
 from idmtools.entities.platform_requirements import PlatformRequirements
 from typing import List
 
+from idmtools_platform_comps.ssmt_operations.work_item_operations import SSMTPlatformWorkItemOperations
+from idmtools_platform_comps.ssmt_operations.workflow_item_operations import SSMTPlatformWorkflowItemOperations
+
 logging.getLogger('COMPS.Data.Simulation').disabled = True
 logger = logging.getLogger(__name__)
 
@@ -31,12 +34,11 @@ class COMPSPriority:
 
 op_defaults = dict(default=None, compare=False, metadata=dict(pickle_ignore=True))
 
-
 supported_types = [PlatformRequirements.DOCKER, PlatformRequirements.PYTHON, PlatformRequirements.SHELL,
                    PlatformRequirements.NativeBinary, PlatformRequirements.WINDOWS]
 
 
-@dataclass
+@dataclass(repr=False)
 class COMPSPlatform(IPlatform, CacheEnabled):
     """
     Represents the platform allowing to run simulations on COMPS.
@@ -53,19 +55,21 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     num_cores: int = field(default=1)
     exclusive: bool = field(default=False)
 
-    _platform_supports: List[PlatformRequirements] = field(default_factory=lambda: copy.deepcopy(supported_types))
+    _platform_supports: List[PlatformRequirements] = field(default_factory=lambda: copy.deepcopy(supported_types),
+                                                           repr=False, init=False)
 
-    _experiments: CompsPlatformExperimentOperations = field(**op_defaults)
-    _simulations: CompsPlatformSimulationOperations = field(**op_defaults)
-    _suites: CompsPlatformSuiteOperations = field(**op_defaults)
-    _workflow_items: CompsPlatformWorkflowItemOperations = field(**op_defaults)
-    _assets: CompsPlatformAssetCollectionOperations = field(**op_defaults)
+    _experiments: CompsPlatformExperimentOperations = field(**op_defaults, repr=False, init=False)
+    _simulations: CompsPlatformSimulationOperations = field(**op_defaults, repr=False, init=False)
+    _suites: CompsPlatformSuiteOperations = field(**op_defaults, repr=False, init=False)
+    _workflow_items: CompsPlatformWorkflowItemOperations = field(**op_defaults, repr=False, init=False)
+    _work_items: SSMTPlatformWorkItemOperations = field(**op_defaults, repr=False, init=False)
+    _assets: CompsPlatformAssetCollectionOperations = field(**op_defaults, repr=False, init=False)
 
     def __post_init__(self):
         print("\nUser Login:")
         print(json.dumps({"endpoint": self.endpoint, "environment": self.environment}, indent=3))
         self.__init_interfaces()
-        self.supported_types = {ItemType.EXPERIMENT, ItemType.SIMULATION, ItemType.SUITE, ItemType.ASSETCOLLECTION}
+        self.supported_types = {ItemType.EXPERIMENT, ItemType.SIMULATION, ItemType.SUITE, ItemType.ASSETCOLLECTION, ItemType.WorkItem}
         super().__post_init__()
 
     def __init_interfaces(self):
@@ -74,6 +78,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         self._simulations = CompsPlatformSimulationOperations(platform=self)
         self._suites = CompsPlatformSuiteOperations(platform=self)
         self._workflow_items = CompsPlatformWorkflowItemOperations(platform=self)
+        self._workflow_items = SSMTPlatformWorkflowItemOperations(platform=self)
         self._assets = CompsPlatformAssetCollectionOperations(platform=self)
 
     def _login(self):
