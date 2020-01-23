@@ -2,7 +2,6 @@ import json
 
 try:
     # use idmtools image
-    # from idmtools.analysis.base_analyzer import BaseAnalyzer
     from idmtools.entities.ianalyzer import IAnalyzer as BaseAnalyzer
 except ImportError:
     # use dtk-tools image
