@@ -6,7 +6,7 @@ from os import cpu_count
 from typing import List, Dict, Any, Tuple, Type
 from uuid import UUID, uuid4
 from idmtools.entities import ISimulation
-from idmtools.entities.iplatform_metadata import IPlatformSimulationOperations
+from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
 
 
 @dataclass
@@ -17,7 +17,7 @@ class SlurmPLatformSimulationOperations(IPlatformSimulationOperations):
     def get(self, simulation_id: UUID, **kwargs) -> Any:
         raise NotImplementedError("Fetching experiments has not been implemented on the Slurm Platform")
 
-    def create(self, simulation: ISimulation, common_asset_dir = None) -> Tuple[Any, UUID]:
+    def platform_create(self, simulation: ISimulation, common_asset_dir = None) -> Tuple[Any, UUID]:
         if common_asset_dir is None:
             common_asset_dir = os.path.join(self.platform.job_directory, simulation.experiment.uid, 'Assets')
         simulation.uid = str(uuid4())

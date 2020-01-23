@@ -7,7 +7,7 @@ from idmtools_platform_comps.utils.general import convert_COMPS_status, get_asse
 
 from idmtools.core import ItemType
 from idmtools.entities import ISimulation
-from idmtools.entities.iplatform_metadata import IPlatformSimulationOperations
+from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
 
 
 @dataclass
@@ -23,7 +23,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         return COMPSSimulation.get(id=simulation_id,
                                    query_criteria=QueryCriteria().select(cols).select_children(children))
 
-    def create(self, simulation: ISimulation, **kwargs) -> Tuple[COMPSSimulation, UUID]:
+    def platform_create(self, simulation: ISimulation, **kwargs) -> Tuple[COMPSSimulation, UUID]:
         s = COMPSSimulation(name=simulation.experiment.name, experiment_id=simulation.parent_id,
                             configuration=Configuration(asset_collection_id=simulation.experiment.assets.uid))
         self.send_assets(simulation, s)

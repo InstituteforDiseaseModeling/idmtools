@@ -6,7 +6,7 @@ from uuid import UUID, uuid4
 import diskcache
 from idmtools.core import EntityStatus, UnknownItemException
 from idmtools.entities import IExperiment
-from idmtools.entities.iplatform_metadata import IPlatformExperimentOperations
+from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
 
 logger = getLogger(__name__)
 current_directory = os.path.dirname(os.path.realpath(__file__))

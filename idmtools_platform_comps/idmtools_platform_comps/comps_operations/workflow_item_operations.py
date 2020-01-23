@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import List, Dict, Any, Tuple, Type
 from uuid import UUID
-from idmtools.entities.iplatform_metadata import IPlatformWorkflowItemOperations
+from idmtools.entities.iplatform_ops.iplatform_workflowitem_operations import IPlatformWorkflowItemOperations
 from COMPS.Data import WorkItem, QueryCriteria, WorkItemFile
 from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools_platform_comps.utils.general import convert_COMPS_status, get_asset_for_comps_item
@@ -19,8 +19,8 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         children = children if children is not None else ["tags", "configuration"]
         return WorkItem.get(id=workflow_item_id, query_criteria=QueryCriteria().select(cols).select_children(children))
 
-    def create(self, workflow_item: IWorkflowItem, **kwargs) -> Tuple[Any, UUID]:
-        raise NotImplementedError("Getting Children is not yet supported for WorkItems")
+    def platform_create(self, workflow_item: IWorkflowItem, **kwargs) -> Tuple[Any, UUID]:
+        raise NotImplementedError("Creating workflow items is not supported")
 
     def get_parent(self, workflow_item: WorkItem, **kwargs) -> Any:
         return None

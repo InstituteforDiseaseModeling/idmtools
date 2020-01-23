@@ -7,7 +7,7 @@ import diskcache
 from pandas.tests.extension.numpy_.test_numpy_nested import np
 
 from idmtools.entities import ISimulation
-from idmtools.entities.iplatform_metadata import IPlatformSimulationOperations
+from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
 from idmtools_test.utils.test_simulation import TestSimulation
 
 current_directory = os.path.dirname(os.path.realpath(__file__))

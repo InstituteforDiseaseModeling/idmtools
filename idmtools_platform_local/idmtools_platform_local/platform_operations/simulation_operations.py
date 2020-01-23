@@ -7,7 +7,7 @@ from uuid import UUID
 from docker.models.containers import Container
 from idmtools.core import ItemType
 from idmtools.entities import ISimulation
-from idmtools.entities.iplatform_metadata import IPlatformSimulationOperations
+from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
 from idmtools_platform_local.client.simulations_client import SimulationsClient
 from idmtools_platform_local.platform_operations.uitils import local_status_to_common, SimulationDict, ExperimentDict
 
@@ -31,7 +31,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         return SimulationDict(SimulationsClient.get_one(str(simulation_id)))
 
-    def create(self, simulation: ISimulation, **kwargs) -> Tuple[Any, UUID]:
+    def platform_create(self, simulation: ISimulation, **kwargs) -> Tuple[Any, UUID]:
         """
         Create a simulation object
 

@@ -3,7 +3,7 @@ from typing import Any, List, Tuple, Union, Type
 from uuid import UUID
 from COMPS.Data import Suite as COMPSSuite, QueryCriteria, Experiment as COMPSExperiment, WorkItem
 from idmtools.entities import Suite
-from idmtools.entities.iplatform_metadata import IPlatformSuiteOperations
+from idmtools.entities.iplatform_ops.iplatform_suite_operations import IPlatformSuiteOperations
 
 
 @dataclass
@@ -20,7 +20,7 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
         s = COMPSSuite.get(id=str(suite_id), query_criteria=QueryCriteria().select(cols).select_children(children))
         return s
 
-    def create(self, suite: Suite, **kwargs) -> Tuple[COMPSSuite, UUID]:
+    def platform_create(self, suite: Suite, **kwargs) -> Tuple[COMPSSuite, UUID]:
         self.platform._login()
 
         # Create suite

@@ -12,7 +12,7 @@ from idmtools.core.experiment_factory import experiment_factory
 from idmtools.entities import IExperiment, ISimulation
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iexperiment import IDockerExperiment, IGPUExperiment
-from idmtools.entities.iplatform_metadata import IPlatformExperimentOperations
+from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
 from idmtools_platform_local.client.simulations_client import SimulationsClient
 from idmtools_platform_local.platform_operations.uitils import local_status_to_common, ExperimentDict, SimulationDict
@@ -38,7 +38,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         experiment_dict = ExperimentsClient.get_one(str(experiment_id))
         return ExperimentDict(experiment_dict)
 
-    def create(self, experiment: Experiment, **kwargs) -> Tuple[Experiment, UUID]:
+    def platform_create(self, experiment: Experiment, **kwargs) -> Tuple[Experiment, UUID]:
         """
         Create an experiment.
 

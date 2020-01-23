@@ -4,7 +4,7 @@ from uuid import UUID
 from COMPS.Data import AssetCollection as COMPSAssetCollection, QueryCriteria, AssetCollectionFile
 
 from idmtools.assets import AssetCollection, Asset
-from idmtools.entities.iplatform_metadata import IPlatformAssetCollectionOperations
+from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
 
 
 @dataclass
@@ -17,7 +17,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         children = children if children is not None else ["assets"]
         return COMPSAssetCollection.get(id=asset_collection_id, query_criteria=QueryCriteria().select_children(children))
 
-    def create(self, asset_collection: AssetCollection) -> Tuple[COMPSAssetCollection, UUID]:
+    def platform_create(self, asset_collection: AssetCollection, **kwargs) -> Tuple[COMPSAssetCollection, UUID]:
         ac = COMPSAssetCollection()
         for asset in asset_collection:
             # TODO: figure out persisted because we should use it to determine if we have uploaded a file already

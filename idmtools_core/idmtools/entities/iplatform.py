@@ -1,19 +1,24 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta
 from dataclasses import fields, field
 from itertools import groupby
-from logging import getLogger
+from logging import getLogger, DEBUG
 from uuid import UUID
 from idmtools.core import CacheEnabled, ItemType, UnknownItemException, EntityContainer, UnsupportedPlatformType
 from idmtools.core.interfaces.ientity import IEntity
+from idmtools.entities.experiment import Experiment
 from idmtools.entities.isimulation import ISimulation
+from idmtools.entities.itask import ITask
+from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.suite import Suite
-from idmtools.entities.iexperiment import IDockerExperiment, IGPUExperiment, IExperiment
-from idmtools.entities.iplatform_metadata import IPlatformExperimentOperations, \
-    IPlatformSimulationOperations, IPlatformSuiteOperations, IPlatformWorkflowItemOperations, \
-    IPlatformAssetCollectionOperations
+from idmtools.entities.iexperiment import IExperiment
+from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
+from idmtools.entities.iplatform_ops.iplatform_workflowitem_operations import IPlatformWorkflowItemOperations
+from idmtools.entities.iplatform_ops.iplatform_suite_operations import IPlatformSuiteOperations
+from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
+from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
 from idmtools.services.platforms import PlatformPersistService
-from idmtools.core.interfaces.iitem import IItem, IItemList
+from idmtools.core.interfaces.iitem import IItem
 from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set
 
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
@@ -483,8 +488,44 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     def are_requirements_met(self, requirements: Set[PlatformRequirements]) -> bool:
         return all([x in self._platform_supports for x in requirements])
 
-    def is_task_supported(self, task: 'ITask') -> bool:
+    def is_task_supported(self, task: ITask) -> bool:
         return self.are_requirements_met(task.platform_requirements)
+
+
+    def run(self, item: Union[Experiment, IWorkflowItem], display_progress: bool = True, wait_till_done: bool = False):
+        """
+        Runs an item on a platform
+
+        Args:
+            item:
+
+        Returns:
+
+        """
+        pass
+
+    def wait_till_done(self, item: Union[Experiment, IWorkflowItem], timeout: int = 60 * 60 * 24,
+                       refresh_interval: int = 5):
+        """
+        Wait for the experiment to be done.
+
+        Args:
+            item: Experiment/Workitem to wait on
+            refresh_interval: How long to wait between polling.
+            timeout: How long to wait before failing.
+        """
+        import time
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Refreshing simulation status")
+            self.refresh_status(item)
+            if item.done:
+                logger.debug("Experiment Done")
+                return
+            time.sleep(refresh_interval)
+        error_type = 'experiment' if isinstance(item, IExperiment) else 'workitem'
+        raise TimeoutError(f"Timeout of {timeout} seconds exceeded when monitoring {error_type} {item}")
 
 
 TPlatform = TypeVar("TPlatform", bound=IPlatform)

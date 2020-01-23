@@ -8,7 +8,7 @@ from idmtools.core import ItemType
 from idmtools.core.experiment_factory import experiment_factory
 from idmtools.entities import IExperiment
 from idmtools.entities.iexperiment import StandardExperiment
-from idmtools.entities.iplatform_metadata import IPlatformExperimentOperations
+from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
 from idmtools.utils.time import timestamp
 from idmtools_platform_comps.utils.general import clean_experiment_name, convert_COMPS_status
 
@@ -26,7 +26,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         return COMPSExperiment.get(id=experiment_id,
                                    query_criteria=QueryCriteria().select(cols).select_children(children))
 
-    def create(self, experiment: IExperiment, **kwargs) -> Tuple[COMPSExperiment, UUID]:
+    def platform_create(self, experiment: IExperiment, **kwargs) -> Tuple[COMPSExperiment, UUID]:
         if not self.platform.is_supported_experiment(experiment):
             raise ValueError("The specified experiment is not supported on this platform")
 

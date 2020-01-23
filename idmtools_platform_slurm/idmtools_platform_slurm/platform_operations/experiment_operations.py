@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import List, Any, Tuple, Type
 from uuid import UUID, uuid4
 from idmtools.entities import IExperiment
-from idmtools.entities.iplatform_metadata import IPlatformExperimentOperations
+from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
 from idmtools_platform_slurm.slurm_operations import SLURM_STATES
 
 
@@ -16,7 +16,7 @@ class SlurmPLatformExperimentOperations(IPlatformExperimentOperations):
     def get(self, experiment_id: UUID, **kwargs) -> Any:
         raise NotImplementedError("Fetching experiments has not been implemented on the Slurm Platform")
 
-    def create(self, experiment: IExperiment, **kwargs) -> Tuple[IExperiment, UUID]:
+    def platform_create(self, experiment: IExperiment, **kwargs) -> Tuple[IExperiment, UUID]:
         experiment.uid = str(uuid4())
         exp_dir = os.path.join(self.platform.job_directory, experiment.uid)
         self.platform._op_client.mk_directory(exp_dir)
