@@ -1,10 +1,5 @@
-
-
 from examples.ssmt.simple_analysis.analyzers.AdultVectorsAnalyzer import AdultVectorsAnalyzer
 from examples.ssmt.simple_analysis.analyzers.PopulationAnalyzer import PopulationAnalyzer
-
-# from analyzers.AdultVectorsAnalyzer import AdultVectorsAnalyzer
-# from analyzers.PopulationAnalyzer import PopulationAnalyzer
 from idmtools.ssmt.ssmt_analysis import SSMTAnalysis
 
 if __name__ == "__main__":

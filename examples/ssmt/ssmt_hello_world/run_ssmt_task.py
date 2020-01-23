@@ -1,4 +1,3 @@
-# from distutils.filelist import FileList
 from idmtools.assets.FileList import FileList
 from idmtools.core.platform_factory import Platform
 from idmtools.managers.work_item_manager import WorkItemManager
