@@ -41,3 +41,10 @@ class AdultVectorsAnalyzer(BaseAnalyzer):
             ax.plot(pop)
         ax.legend([s.id for s in all_data.keys()])
         fig.savefig(os.path.join(output_dir, "adult_vectors.png"))
+
+    def map(self, data: 'Any', item: 'IItem') -> 'Any':
+        return None
+
+    def reduce(self, all_data: dict) -> 'Any':
+        pass
+
