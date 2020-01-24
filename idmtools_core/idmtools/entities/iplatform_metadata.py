@@ -8,7 +8,8 @@ from uuid import UUID
 from idmtools.assets import AssetCollection
 from idmtools.core import CacheEnabled
 from idmtools.entities.iexperiment import IExperiment
-from idmtools.entities.isimulation import  ISimulation
+from idmtools.entities.isimulation import ISimulation
+from idmtools.entities.iwork_item import IWorkItem
 from idmtools.entities.suite import Suite
 from idmtools.entities.iworkflow_item import IWorkflowItem
 
@@ -643,3 +644,148 @@ class IPlatformAssetCollectionOperations(CacheEnabled, ABC):
             IDMTools suite object
         """
         return asset_collection
+
+
+
+@dataclass
+class IPlatformWorkItemOperations(CacheEnabled, ABC):
+    platform: 'IPlatform'
+    platform_type: Type
+
+    @abstractmethod
+    def get(self, work_item_id: UUID, **kwargs) -> Any:
+        """
+        Returns the platform representation of an WorkflowItem
+
+        Args:
+            workflow_item_id: Item id of WorkflowItems
+            **kwargs:
+
+        Returns:
+            Platform Representation of an work_item
+        """
+        pass
+
+    def batch_create(self, work_items: List[IWorkItem], **kwargs) -> List[Tuple[Any, UUID]]:
+        """
+        Provides a method to batch create workflow items
+
+        Args:
+            workflow_items: List of work items to create
+            **kwargs:
+
+        Returns:
+            List of tuples containing the create object and id of item that was created
+        """
+        ret = []
+        for wi in work_items:
+            ret.append(self.create(wi, **kwargs))
+        return ret
+
+    @abstractmethod
+    def create(self, workf_item: IWorkItem, **kwargs) -> Tuple[Any, UUID]:
+        """
+        Creates an workflow_item from an IDMTools workflow_item object
+
+        Args:
+            workflow_item: WorkflowItem to create
+            **kwargs: Optional arguments mainly for extensibility
+
+        Returns:
+            Created platform item and the UUID of said item
+        """
+        pass
+
+    @abstractmethod
+    def get_parent(self, work_item: Any, **kwargs) -> Any:
+        """
+        Returns the parent of item. If the platform doesn't support parents, you should throw a TopLevelItem error
+
+        Args:
+            work_item:
+            **kwargs:
+
+        Returns:
+
+        Raise:
+            TopLevelItem
+        """
+        pass
+
+    @abstractmethod
+    def get_children(self, work_item: Any, **kwargs) -> List[Any]:
+        """
+        Returns the children of an workflow_item object
+
+        Args:
+            work_item: WorkflowItem object
+            **kwargs: Optional arguments mainly for extensibility
+
+        Returns:
+            Children of work_item object
+        """
+        pass
+
+    def to_entity(self, work_item: Any, **kwargs) -> IWorkItem:
+        """
+        Converts the platform representation of workflow_item to idmtools representation
+
+        Args:
+            work_item:Platform workflow_item object
+
+        Returns:
+            IDMTools workflow_item object
+        """
+        return work_item
+
+    @abstractmethod
+    def refresh_status(self, work_item: IWorkItem):
+        """
+        Refresh status for workflow item
+        Args:
+            work_item: Item to refresh status for
+
+        Returns:
+            None
+        """
+        pass
+
+    @abstractmethod
+    def send_assets(self, work_item: Any):
+        """
+        Send assets for workflow item to platform
+
+        Args:
+            work_item: Item to send assets for
+
+        Returns:
+
+        """
+        pass
+
+    @abstractmethod
+    def get_assets(self, work_item: IWorkItem, files: List[str], **kwargs) -> Dict[str, bytearray]:
+        """
+        Load assets for workflow item
+        Args:
+            workflow_item: Item
+            files: List of files to load
+            **kwargs:
+
+        Returns:
+            Dictionary with filename as key and value as binary content
+        """
+        pass
+
+    @abstractmethod
+    def list_assets(self, work_item: IWorkItem) -> List[str]:
+        """
+        List files available  for workflow item
+
+        Args:
+            work_item: Workflow item
+
+        Returns:
+            List of filenames
+        """
+        pass

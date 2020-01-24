@@ -22,3 +22,4 @@ class ItemType(Enum):
     SIMULATION = auto()
     WORKFLOW_ITEM = auto()  # On Comps this is workitems
     ASSETCOLLECTION = auto()
+    WorkItem = auto()

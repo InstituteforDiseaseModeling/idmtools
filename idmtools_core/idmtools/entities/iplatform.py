@@ -1,17 +1,18 @@
 from abc import ABCMeta, abstractmethod
-from dataclasses import fields, field
+from dataclasses import dataclass, fields, field
 from itertools import groupby
 from logging import getLogger
 from uuid import UUID
 from idmtools.core import CacheEnabled, ItemType, UnknownItemException, EntityContainer, UnsupportedPlatformType
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.isimulation import ISimulation
+from idmtools.entities.iwork_item import IWorkItem
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.suite import Suite
 from idmtools.entities.iexperiment import IDockerExperiment, IGPUExperiment, IExperiment
 from idmtools.entities.iplatform_metadata import IPlatformExperimentOperations, \
     IPlatformSimulationOperations, IPlatformSuiteOperations, IPlatformWorkflowItemOperations, \
-    IPlatformAssetCollectionOperations
+    IPlatformAssetCollectionOperations, IPlatformWorkItemOperations
 from idmtools.services.platforms import PlatformPersistService
 from idmtools.core.interfaces.iitem import IItem, IItemList
 from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set
@@ -33,15 +34,18 @@ ITEM_TYPE_TO_OBJECT_INTERFACE = {
     ItemType.SIMULATION: '_simulations',
     ItemType.SUITE: '_suites',
     ItemType.WORKFLOW_ITEM: '_workflow_items',
+    ItemType.WorkItem: '_work_items',
     ItemType.ASSETCOLLECTION: '_assets'
 }
 STANDARD_TYPE_TO_INTERFACE = {
     IExperiment: ItemType.EXPERIMENT,
     ISimulation: ItemType.SIMULATION,
+    IWorkItem: ItemType.WorkItem,
     Suite: ItemType.SUITE
 }
 
 
+@dataclass(repr=False)
 class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     """
     Interface defining a platform.
@@ -62,6 +66,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     _simulations: IPlatformSimulationOperations = None
     _suites: IPlatformSuiteOperations = None
     _workflow_items: IPlatformWorkflowItemOperations = None
+    _work_items: IPlatformWorkItemOperations = None
     _assets: IPlatformAssetCollectionOperations = None
 
     @staticmethod
