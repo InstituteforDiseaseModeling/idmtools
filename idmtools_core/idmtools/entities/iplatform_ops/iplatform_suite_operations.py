@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Type, Any, List, Tuple, Dict, NoReturn
 from uuid import UUID
-
-from idmtools.entities import Suite
+from idmtools.core.enums import EntityStatus
+from idmtools.entities.suite import Suite
 
 
 @dataclass
@@ -67,7 +67,7 @@ class IPlatformSuiteOperations(ABC):
         """
         suite.post_creation()
 
-    def create(self, suite: Suite, do_pre: bool = True, do_post: bool = True, **kwargs):
+    def create(self, suite: Suite, do_pre: bool = True, do_post: bool = True, **kwargs) -> Tuple[Any, UUID]:
         """
         Creates an simulation from an IDMTools suite object. Also performs pre-creation and post-creation
         locally and on platform
@@ -81,6 +81,8 @@ class IPlatformSuiteOperations(ABC):
         Returns:
             Created platform item and the UUID of said item
         """
+        if suite.status == EntityStatus.CREATED:
+            return suite._platform_object, suite.uid
         if do_pre:
             self.pre_create(suite, **kwargs)
         ret = self.platform_create(suite, **kwargs)
@@ -99,6 +101,68 @@ class IPlatformSuiteOperations(ABC):
 
         Returns:
             Created platform item and the UUID of said item
+        """
+        pass
+
+    def pre_run_item(self, suite: Suite):
+        """
+        Trigger right before commissioning experiment on platform. This ensures that the item is created. It also
+            ensures that the children(simulations) have also been created
+
+        Args:
+            suite: Experiment to commission
+
+        Returns:
+
+        """
+        # ensure the item is created before running
+        # TODO what status are valid here? Create only?
+        if suite.status is None:
+            self.create(suite)
+
+        exps_to_commission = []
+        for exp in suite.experiments:
+            if exp.status is None:
+                exps_to_commission.append(exp)
+        if exps_to_commission:
+            self.platform.create_items(exps_to_commission)
+            self.platform.run_items(exps_to_commission)
+
+    def post_run_item(self, suite: Suite):
+        """
+        Trigger right after commissioning suite on platform.
+
+        Args:
+            suite: Experiment just commissioned
+
+        Returns:
+
+        """
+        pass
+
+    def run_item(self, suite: Suite):
+        """
+        Called during commissioning of an item. This should create the remote resource
+
+        Args:
+            workflow_item:
+
+        Returns:
+
+        """
+        self.pre_run_item(suite)
+        self.platform_run_item(suite)
+        self.post_run_item(suite)
+
+    def platform_run_item(self, workflow_item: Suite):
+        """
+        Called during commissioning of an item. This should perform what is needed to commission job on platform
+
+        Args:
+            workflow_item:
+
+        Returns:
+
         """
         pass
 

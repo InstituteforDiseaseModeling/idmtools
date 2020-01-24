@@ -2,7 +2,7 @@ import copy
 import collections
 from enum import Enum
 from itertools import product
-from idmtools.builders import ExperimentBuilder
+from idmtools.builders import SimulationBuilder
 
 
 class ArmType(Enum):
@@ -48,7 +48,7 @@ class SweepArm:
         self.sweep_functions = temp_sweep_functions
 
 
-class ArmExperimentBuilder(ExperimentBuilder):
+class ArmSimulationBuilder(SimulationBuilder):
     """
     Class that represents an experiment builder.
     """

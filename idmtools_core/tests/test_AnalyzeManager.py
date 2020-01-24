@@ -10,8 +10,10 @@ from idmtools.core.enums import EntityStatus, ItemType
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.ianalyzer import IAnalyzer
+from idmtools.entities.itask import task_to_experiment
 from idmtools.managers import ExperimentManager
-from idmtools_test.utils.tst_experiment import TstExperiment
+
+from idmtools_test.utils.test_task import TestTask
 
 
 @pytest.mark.analysis
@@ -32,9 +34,8 @@ class TestAnalyzeManager(unittest.TestCase):
 
     def setUp(self) -> None:
         self.platform = Platform('Test')
-        self.sample_experiment = TstExperiment()
-        em = ExperimentManager(self.sample_experiment, self.platform)
-        em.run()
+        self.sample_experiment = task_to_experiment(TestTask())
+        self.platform.run_items(self.sample_experiment)
         self.platform._simulations.set_simulation_status(self.sample_experiment.uid, status=EntityStatus.SUCCEEDED)
         self.configuration = {'max_processes': 2}
 

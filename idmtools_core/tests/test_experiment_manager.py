@@ -1,6 +1,6 @@
 import os
 import unittest
-from idmtools.builders import ExperimentBuilder
+from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools.services.experiments import ExperimentPersistService
@@ -41,7 +41,7 @@ class TestExperimentManager(ITestWithPersistence):
         p = Platform('Test')
         experiment = PythonExperiment(name="test_from_experiment",
                                       model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"))
-        builder = ExperimentBuilder()
+        builder = SimulationBuilder()
         builder.add_sweep_definition(lambda simulation, value: {"p": value}, range(0, 2))
         experiment.builder = builder
 
@@ -60,7 +60,7 @@ class TestExperimentManager(ITestWithPersistence):
         p.cleanup()
 
     def test_bad_experiment_builder(self):
-        builder = ExperimentBuilder()
+        builder = SimulationBuilder()
         with self.assertRaises(ValueError) as context:
             # test 'sim' (should be 'simulation') is bad parameter for add_sweep_definition()
             builder.add_sweep_definition(lambda sim, value: {"p": value}, range(0, 2))
@@ -68,7 +68,7 @@ class TestExperimentManager(ITestWithPersistence):
             context.exception.args[0]))
 
     def test_bad_experiment_builder1(self):
-        builder = ExperimentBuilder()
+        builder = SimulationBuilder()
         with self.assertRaises(ValueError) as context:
             # test 'sim' is bad extra parameter for add_sweep_definition()
             builder.add_sweep_definition(lambda simulation, sim, value: {"p": value}, range(0, 2))

@@ -3,9 +3,8 @@ from dataclasses import dataclass, field
 from idmtools.core import EntityStatus, ItemType, NoPlatformException
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.services.platforms import PlatformPersistService
-from idmtools.core import TTags
 from uuid import UUID
-from typing import NoReturn, List, Any
+from typing import NoReturn, List, Any, Dict
 
 
 @dataclass
@@ -18,7 +17,7 @@ class IEntity(IItem, metaclass=ABCMeta):
     parent_id: UUID = field(default=None, metadata={"md": True})
     _parent: 'IEntity' = field(default=None, compare=False, metadata={"pickle_ignore": True})
     status: EntityStatus = field(default=None, compare=False, metadata={"pickle_ignore": True})
-    tags: TTags = field(default_factory=lambda: {}, metadata={"md": True})
+    tags: Dict[str, Any] = field(default_factory=lambda: {}, metadata={"md": True})
     item_type: ItemType = field(default=None, compare=False)
     # Platform
     _platform_object: Any = field(default=None, compare=False, metadata={"pickle_ignore": True})

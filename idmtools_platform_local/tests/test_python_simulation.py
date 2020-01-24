@@ -3,7 +3,7 @@ import pytest
 from idmtools.core import EntityStatus, ItemType
 from operator import itemgetter
 from idmtools.assets import AssetCollection
-from idmtools.builders import ExperimentBuilder
+from idmtools.builders import SimulationBuilder
 from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
 from idmtools.core.platform_factory import Platform
@@ -33,7 +33,7 @@ class TestPythonSimulation(ITestWithPersistence):
             simulation.set_parameter("a", value)
             return {"a": value}
 
-        builder = ExperimentBuilder()
+        builder = SimulationBuilder()
         # Sweep parameter "a"
         builder.add_sweep_definition(param_a_update, range(0, 5))
 
@@ -82,7 +82,7 @@ class TestPythonSimulation(ITestWithPersistence):
             simulation.set_parameter("a", value)
             return {"a": value}
 
-        builder = ExperimentBuilder()
+        builder = SimulationBuilder()
         # Sweep parameter "a"
         builder.add_sweep_definition(param_a_update, range(0, 2))
         pe.builder = builder

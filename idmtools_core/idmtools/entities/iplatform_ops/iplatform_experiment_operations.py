@@ -2,9 +2,11 @@ from abc import ABC, abstractmethod
 from concurrent.futures import as_completed
 from concurrent.futures.thread import ThreadPoolExecutor
 from dataclasses import dataclass
+from types import GeneratorType
 from typing import Type, Any, NoReturn, Tuple, List, Dict
 from uuid import UUID
 
+from idmtools.core import EntityStatus
 from idmtools.entities import IExperiment
 
 
@@ -53,7 +55,8 @@ class IPlatformExperimentOperations(ABC):
         """
         experiment.post_creation()
 
-    def create(self, experiment: IExperiment, do_pre: bool = True, do_post: bool = True, **kwargs):
+    def create(self, experiment: IExperiment, do_pre: bool = True, do_post: bool = True, **kwargs) -> \
+            Tuple[IExperiment, UUID]:
         """
         Creates an experiment from an IDMTools simulation object. Also performs local/platform pre and post creation
         events
@@ -67,6 +70,8 @@ class IPlatformExperimentOperations(ABC):
         Returns:
             Created platform item and the UUID of said item
         """
+        if experiment.status is not None:
+            return experiment._platform_object, experiment.uid
         if do_pre:
             self.pre_create(experiment, **kwargs)
         ret = self.platform_create(experiment, **kwargs)
@@ -146,10 +151,59 @@ class IPlatformExperimentOperations(ABC):
         """
         return experiment
 
-    @abstractmethod
+    def pre_run_item(self, experiment: IExperiment):
+        """
+        Trigger right before commissioning experiment on platform. This ensures that the item is created. It also
+            ensures that the children(simulations) have also been created
+
+        Args:
+            experiment: Experiment to commission
+
+        Returns:
+
+        """
+        # ensure the item is created before running
+        # TODO what status are valid here? Create only?
+        if experiment.status is None:
+            self.create(experiment)
+
+        # check sims
+        if isinstance(experiment.simulations, GeneratorType):
+            self.platform.create_items(experiment.simulations)
+        elif len(experiment.simulations) == 0:
+            raise ValueError("You cannot have an experiment with now simulations")
+        self.platform.create_items(experiment.simulations)
+
+    def post_run_item(self, experiment: IExperiment):
+        """
+        Trigger right after commissioning experiment on platform.
+
+        Args:
+            experiment: Experiment just commissioned
+
+        Returns:
+
+        """
+        experiment.simulations.set_status(EntityStatus.RUNNING)
+
     def run_item(self, experiment: IExperiment):
         """
         Called during commissioning of an item. This should create the remote resource
+
+        Args:
+            experiment:
+
+        Returns:
+
+        """
+        self.pre_run_item(experiment)
+        self.platform_run_item(experiment)
+        self.post_run_item(experiment)
+
+    @abstractmethod
+    def platform_run_item(self, experiment: IExperiment):
+        """
+        Called during commissioning of an item. This should perform what is needed to commission job on platform
 
         Args:
             experiment:

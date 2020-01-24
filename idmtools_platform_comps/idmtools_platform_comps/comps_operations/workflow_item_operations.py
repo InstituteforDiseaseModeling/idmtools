@@ -9,6 +9,7 @@ from idmtools_platform_comps.utils.general import convert_COMPS_status, get_asse
 
 @dataclass
 class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
+
     platform: 'COMPSPlaform'  # noqa F821
     platform_type: Type = field(default=WorkItem)
 
@@ -46,3 +47,6 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
 
     def to_entity(self, workflow_item: Any, **kwargs) -> IWorkflowItem:
         raise NotImplementedError("Converting workitems to platform entities is not yet supported")
+
+    def platform_run_item(self, workflow_item: IWorkflowItem):
+        raise NotImplementedError("Running workflow items is not supported")

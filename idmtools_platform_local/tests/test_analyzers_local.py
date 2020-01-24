@@ -3,7 +3,7 @@ import time
 
 import pytest
 from idmtools.analysis.analyze_manager import AnalyzeManager
-from idmtools.builders import ExperimentBuilder
+from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import IAnalyzer
@@ -57,7 +57,7 @@ class TestAnalyzersLocal(ITestWithPersistence):
             simulation.set_parameter("a", value)
             return {"a": value}
 
-        builder = ExperimentBuilder()
+        builder = SimulationBuilder()
         # Sweep parameter "a"
         builder.add_sweep_definition(param_a_update, range(0, 5))
         pe.builder = builder

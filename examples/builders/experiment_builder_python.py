@@ -17,7 +17,7 @@ import os
 import sys
 from functools import partial
 
-from idmtools.builders import ExperimentBuilder
+from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
@@ -42,7 +42,7 @@ if __name__ == "__main__":
 
     setAB = partial(param_update_ab, param="a")
 
-    builder = ExperimentBuilder()
+    builder = SimulationBuilder()
     # Sweep parameter "a" and make "b" depends on "a"
     builder.add_sweep_definition(setAB, range(0, 5))
     pe.builder = builder

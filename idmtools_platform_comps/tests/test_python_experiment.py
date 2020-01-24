@@ -7,7 +7,7 @@ from functools import partial
 from operator import itemgetter
 from COMPS.Data import Experiment
 from idmtools.assets import Asset, AssetCollection
-from idmtools.builders import ArmExperimentBuilder, ArmType, ExperimentBuilder, StandAloneSimulationsBuilder, SweepArm
+from idmtools.builders import ArmSimulationBuilder, ArmType, SimulationBuilder, StandAloneSimulationsBuilder, SweepArm
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
@@ -55,7 +55,7 @@ class TestPythonExperiment(ITestWithPersistence):
 
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123, "KeyOnly": None}
         pe.base_simulation.set_parameter("c", "c-value")
-        builder = ExperimentBuilder()
+        builder = SimulationBuilder()
         # ------------------------------------------------------
         # Sweeping parameters:
         # first way to sweep parameter 'a' is to use param_update function
@@ -107,7 +107,7 @@ class TestPythonExperiment(ITestWithPersistence):
 
         setAB = partial(param_update_ab, param="a")
 
-        builder = ExperimentBuilder()
+        builder = SimulationBuilder()
         # Sweep parameter "a" and make "b" depends on "a"
         builder.add_sweep_definition(setAB, range(0, 5))
         pe.builder = builder
@@ -142,7 +142,7 @@ class TestPythonExperiment(ITestWithPersistence):
             simulation.set_parameter("a", value)
             return {"a": value}
 
-        builder = ExperimentBuilder()
+        builder = SimulationBuilder()
         # Sweep parameter "a"
         builder.add_sweep_definition(param_a_update, range(0, 2))
         pe.builder = builder
@@ -304,7 +304,7 @@ class TestPythonExperiment(ITestWithPersistence):
         pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123, "KeyOnly": None}
 
         arm = SweepArm(type=ArmType.cross)
-        builder = ArmExperimentBuilder()
+        builder = ArmSimulationBuilder()
         arm.add_sweep_definition(setA, 1)
         arm.add_sweep_definition(setB, [2, 3])
         arm.add_sweep_definition(setC, [4, 5])
@@ -331,7 +331,7 @@ class TestPythonExperiment(ITestWithPersistence):
         experiment.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         experiment.assets.add_directory(
             assets_directory=os.path.join(COMMON_INPUT_PATH, "python", "folder_dup_file"))
-        builder = ExperimentBuilder()
+        builder = SimulationBuilder()
         experiment.builder = builder
         em = ExperimentManager(experiment=experiment, platform=self.platform)
         with self.assertRaises(RuntimeError) as context:
@@ -416,7 +416,7 @@ class TestPythonExperiment(ITestWithPersistence):
         for asset in new_ac:
             self.assertIn(asset, pe.assets)
 
-        builder = ExperimentBuilder()
+        builder = SimulationBuilder()
         builder.add_sweep_definition(setParam("min_x"), range(-2, 1))
         builder.add_sweep_definition(setParam("max_x"), range(-2, 2))
         pe.add_builder(builder)

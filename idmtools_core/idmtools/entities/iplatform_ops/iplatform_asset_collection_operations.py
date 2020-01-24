@@ -5,6 +5,7 @@ from uuid import UUID
 
 from idmtools.assets import AssetCollection
 from idmtools.core import CacheEnabled
+from idmtools.entities.iplatform_ops.utils import batch_create_items
 
 
 @dataclass
@@ -52,6 +53,8 @@ class IPlatformAssetCollectionOperations(CacheEnabled, ABC):
         Returns:
             Created platform item and the UUID of said item
         """
+        if asset_collection.status is not None:
+            return asset_collection._platform_object, asset_collection.uid
         if do_pre:
             self.pre_create(asset_collection, **kwargs)
         ret = self.platform_create(asset_collection, **kwargs)
@@ -84,10 +87,7 @@ class IPlatformAssetCollectionOperations(CacheEnabled, ABC):
         Returns:
             List of tuples containing the create object and id of item that was created
         """
-        ret = []
-        for ac in asset_collections:
-            ret.append(self.create(ac, **kwargs))
-        return ret
+        return batch_create_items(asset_collections, self.create, **kwargs)
 
     @abstractmethod
     def get(self, asset_collection_id: UUID, **kwargs) -> Any:

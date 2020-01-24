@@ -1,7 +1,7 @@
 import os
 
 from idmtools.assets import AssetCollection
-from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
+from idmtools.builders import SimulationBuilder, StandAloneSimulationsBuilder
 from idmtools.core.experiment_factory import experiment_factory
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
@@ -18,7 +18,7 @@ class TestExperimentFactory(ITestWithPersistence):
         test_platform: TestPlatform = Platform('Test')
         experiment = experiment_factory.create("PythonExperiment", tags={"a": "1", "b": 2})
         experiment.model_path = os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py")
-        builder = ExperimentBuilder()
+        builder = SimulationBuilder()
         builder.add_sweep_definition(lambda simulation, value: {"p": value}, range(0, 2))
         experiment.builder = builder
 

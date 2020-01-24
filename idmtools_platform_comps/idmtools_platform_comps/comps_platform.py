@@ -5,7 +5,7 @@ import typing
 from dataclasses import dataclass, field
 from COMPS import Client
 from idmtools.core import CacheEnabled, ItemType
-from idmtools.entities import IPlatform
+from idmtools.entities.iplatform import IPlatform
 from idmtools.entities.iexperiment import IExperiment, IGPUExperiment, IDockerExperiment, \
     ILinuxExperiment
 from idmtools_platform_comps.comps_operations.asset_collection_operations import \

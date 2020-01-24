@@ -81,7 +81,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             return None
         return self.platform._suites.get(experiment.suite_id, **kwargs)
 
-    def run_item(self, experiment: IExperiment):
+    def platform_run_item(self, experiment: IExperiment):
         experiment.get_platform_object().commission()
 
     def send_assets(self, experiment: IExperiment):

@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from logging import getLogger
 from typing import List, Type
 from idmtools.core import ItemType
-from idmtools.entities import IPlatform
+from idmtools.entities.iplatform import IPlatform
 from idmtools.entities.iexperiment import IExperiment, ILinuxExperiment, IWindowsExperiment, \
     IGPUExperiment, IDockerExperiment
 from idmtools.entities.platform_requirements import PlatformRequirements

@@ -1,4 +1,4 @@
-from idmtools.builders import ExperimentBuilder
+from idmtools.builders import SimulationBuilder
 from idmtools.managers import ExperimentManager
 from idmtools.workflows.IWorkflowStep import IWorkflowStep
 
@@ -11,7 +11,7 @@ class RunSamples(IWorkflowStep):
         self.platform = platform
 
     def execute(self):
-        builder = ExperimentBuilder()
+        builder = SimulationBuilder()
         builder.add_sweep_definition(self.builder_function, self.inputs)
         self.base_experiment.builder = builder
 

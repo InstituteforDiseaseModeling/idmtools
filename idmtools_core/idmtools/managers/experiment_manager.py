@@ -3,8 +3,9 @@ from itertools import chain
 from logging import getLogger, DEBUG
 from typing import Set, Optional, Dict, Union
 from more_itertools import grouper
-from idmtools.core import EntityStatus, ExperimentBuilder, TExperimentBuilder
-from idmtools.entities import IPlatform, Suite, ISimulation
+from idmtools.core.enums import EntityStatus
+from idmtools.builders.simulation_builder import SimulationBuilder
+from idmtools.entities.iplatform import IPlatform, Suite, ISimulation
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.itask import ITask
 from idmtools.entities.simulation import Simulation
@@ -22,7 +23,7 @@ class ExperimentManager:
                  base_simulation: Optional[ISimulation] = None, experiment_name: Optional[str] = None,
                  experiment_tags: Optional[Dict[str, str]] = None,
                  experiment: Optional[Experiment] = None, suite: Optional[Suite] = None,
-                 builders: Union[Set[ExperimentBuilder], ExperimentBuilder] = None):
+                 builders: Union[Set[SimulationBuilder], SimulationBuilder] = None):
         """
         A constructor.
 
@@ -48,14 +49,14 @@ class ExperimentManager:
         self.platform = platform
         self.experiment.platform = platform
         builders = self._validate_builders(builders)
-        self.builders: Set[ExperimentBuilder] = builders if builders else set()
+        self.builders: Set[SimulationBuilder] = builders if builders else set()
 
     @staticmethod
     def _validate_builders(builders):
         if builders and not isinstance(builders, set):
             if isinstance(builders, list):
                 builders = set(builders)
-            elif isinstance(builders, ExperimentBuilder):
+            elif isinstance(builders, SimulationBuilder):
                 builders = []
             else:
                 raise ValueError("Builders must be a list/set of builders or a single ExperimentBuilder")
@@ -113,7 +114,7 @@ class ExperimentManager:
             yield sims
 
     @property
-    def builder(self) -> TExperimentBuilder:
+    def builder(self) -> SimulationBuilder:
 
         """
         For backward-compatibility purposes.
@@ -124,7 +125,7 @@ class ExperimentManager:
         return list(self.builders)[-1] if self.builders and len(self.builders) > 0 else None
 
     @builder.setter
-    def builder(self, builder: TExperimentBuilder) -> None:
+    def builder(self, builder: SimulationBuilder) -> None:
         """
         For backward-compatibility purposes.
 
@@ -141,7 +142,7 @@ class ExperimentManager:
 
         self.add_builder(builder)
 
-    def add_builder(self, builder: TExperimentBuilder) -> None:
+    def add_builder(self, builder: SimulationBuilder) -> None:
         """
         Add builder to builder collection.
 
@@ -151,10 +152,10 @@ class ExperimentManager:
         Returns:
             None
         """
-        from idmtools.builders import ExperimentBuilder
+        from idmtools.builders import SimulationBuilder
 
         # Add builder validation
-        if not isinstance(builder, ExperimentBuilder):
+        if not isinstance(builder, SimulationBuilder):
             raise Exception("Builder ({}) must have type of ExperimentBuilder!".format(builder))
 
         # Initialize builders the first time

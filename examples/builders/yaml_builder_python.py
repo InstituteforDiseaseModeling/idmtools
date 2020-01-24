@@ -36,7 +36,7 @@ import os
 import sys
 from functools import partial
 
-from idmtools.builders import YamlExperimentBuilder
+from idmtools.builders import YamlSimulationBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
@@ -60,7 +60,7 @@ if __name__ == "__main__":
 
     pe.base_simulation.set_parameter("c", "c-value")
 
-    yaml_builder = YamlExperimentBuilder()
+    yaml_builder = YamlSimulationBuilder()
     base_path = os.path.abspath(os.path.join(COMMON_INPUT_PATH, "builder"))
     file_path = os.path.join(base_path, 'sweeps.yaml')
     func_map = {'a': setA, 'b': setB, 'c': setC, 'd': setD}

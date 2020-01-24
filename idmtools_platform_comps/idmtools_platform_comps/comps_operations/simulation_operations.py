@@ -46,7 +46,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
     def get_parent(self, simulation: Any, **kwargs) -> COMPSExperiment:
         return self.platform._experiments.get(simulation.experiment_id, **kwargs) if simulation.experiment_id else None
 
-    def run_item(self, simulation: ISimulation):
+    def platform_run_item(self, simulation: ISimulation):
         pass
 
     def send_assets(self, simulation: ISimulation, comps_sim: COMPSSimulation = None):

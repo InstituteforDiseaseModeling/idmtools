@@ -9,7 +9,7 @@ from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.confg_local_runner_test import get_test_local_env_overrides
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
-from idmtools.builders import ExperimentBuilder
+from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
@@ -32,7 +32,7 @@ class TestLocalRunnerCLI(ITestWithPersistence):
             simulation.set_parameter("a", value)
             return {"a": value}
 
-        builder = ExperimentBuilder()
+        builder = SimulationBuilder()
         builder.add_sweep_definition(param_a_update, range(0, 5))
         cls.pe.builder = builder
 

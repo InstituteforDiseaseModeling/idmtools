@@ -2,7 +2,7 @@ import os
 import sys
 
 from idmtools.assets import AssetCollection
-from idmtools.builders import ExperimentBuilder
+from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
@@ -32,7 +32,7 @@ python_experiment = PythonExperiment(name=os.path.split(sys.argv[0])[1],
 python_experiment.add_assets(ac)
 
 # sweep parameter
-builder = ExperimentBuilder()
+builder = SimulationBuilder()
 builder.add_sweep_definition(setParam("min_x"), range(-2, 0))
 builder.add_sweep_definition(setParam("max_x"), range(1, 3))
 

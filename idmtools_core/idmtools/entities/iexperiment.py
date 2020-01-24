@@ -8,9 +8,8 @@ from itertools import chain
 from datetime import datetime, timezone, timedelta
 from dataclasses import dataclass, field, InitVar
 from logging import getLogger
-
 from more_itertools import grouper
-from idmtools.core import ItemType, TExperimentBuilder
+from idmtools.core.enums import ItemType
 from idmtools.core.interfaces.entity_container import EntityContainer
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.core.interfaces.inamed_entity import INamedEntity
@@ -71,7 +70,7 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         self.parent = suite
 
     @property
-    def builder(self) -> 'TExperimentBuilder':
+    def builder(self) -> 'SimulationBuilder':
 
         """
         For backward-compatibility purposes.
@@ -82,7 +81,7 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         return list(self.builders)[-1] if self.builders and len(self.builders) > 0 else None
 
     @builder.setter
-    def builder(self, builder: TExperimentBuilder) -> None:
+    def builder(self, builder: 'SimulationBuilder') -> None:
         """
         For backward-compatibility purposes.
 
@@ -99,7 +98,7 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
 
         self.add_builder(builder)
 
-    def add_builder(self, builder: TExperimentBuilder) -> None:
+    def add_builder(self, builder: 'SimulationBuilder') -> None:
         """
         Add builder to builder collection.
 
@@ -109,10 +108,10 @@ class IExperiment(IAssetsEnabled, INamedEntity, ABC):
         Returns:
             None
         """
-        from idmtools.builders import ExperimentBuilder
+        from idmtools.builders import SimulationBuilder
 
         # Add builder validation
-        if not isinstance(builder, ExperimentBuilder):
+        if not isinstance(builder, SimulationBuilder):
             raise Exception("Builder ({}) must have type of ExperimentBuilder!".format(builder))
 
         # Initialize builders the first time

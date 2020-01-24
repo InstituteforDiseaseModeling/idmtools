@@ -23,7 +23,7 @@ import os
 import sys
 from functools import partial
 
-from idmtools.builders import SweepArm, ArmType, ArmExperimentBuilder
+from idmtools.builders import SweepArm, ArmType, ArmSimulationBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
@@ -46,7 +46,7 @@ if __name__ == "__main__":
     pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123, "KeyOnly": None}
 
     arm1 = SweepArm(type=ArmType.cross)
-    builder = ArmExperimentBuilder()
+    builder = ArmSimulationBuilder()
     arm1.add_sweep_definition(setA, 1)
     arm1.add_sweep_definition(setB, [2, 3])
     arm1.add_sweep_definition(setC, [4, 5])

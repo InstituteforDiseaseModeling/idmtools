@@ -4,7 +4,7 @@ from functools import partial
 from config_update_parameters import config_update_params
 
 from idmtools.assets import AssetCollection, Asset
-from idmtools.builders import SweepArm, ArmType, ArmExperimentBuilder
+from idmtools.builders import SweepArm, ArmType, ArmSimulationBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_model_emod import EMODExperiment
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     set_x_Temporary_Larval_Habitat = partial(param_update, param="x_Temporary_Larval_Habitat")
     arm.add_sweep_definition(set_x_Temporary_Larval_Habitat, [0.1, 0.2])
 
-    builder = ArmExperimentBuilder()
+    builder = ArmSimulationBuilder()
     builder.add_arm(arm)
     e.builder = builder
     em = ExperimentManager(experiment=e, platform=platform)

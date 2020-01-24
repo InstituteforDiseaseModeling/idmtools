@@ -5,7 +5,7 @@ from functools import partial
 
 import pandas as pd
 
-from idmtools.builders import ExperimentBuilder
+from idmtools.builders import SimulationBuilder
 
 if typing.TYPE_CHECKING:
     from idmtools_model_emod import EMODSimulation
@@ -30,7 +30,7 @@ def param_update(simulation: 'EMODSimulation', param, value):
 
 
 def get_seed_experiment_builder(num_seed=4):
-    builder = ExperimentBuilder()
+    builder = SimulationBuilder()
     set_Run_Number = partial(param_update, param="Run_Number")
     builder.add_sweep_definition(set_Run_Number, range(num_seed))
     return builder

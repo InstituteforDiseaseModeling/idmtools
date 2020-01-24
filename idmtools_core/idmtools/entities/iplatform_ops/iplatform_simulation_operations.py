@@ -2,9 +2,9 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Type, Any, Tuple, List, Dict, NoReturn
 from uuid import UUID
-
-from idmtools.core import CacheEnabled
-from idmtools.entities import ISimulation
+from idmtools.core.cache_enabled import CacheEnabled
+from idmtools.entities.iplatform_ops.utils import batch_create_items
+from idmtools.entities.simulation import Simulation
 
 
 @dataclass
@@ -26,7 +26,7 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         """
         pass
 
-    def pre_create(self, simulation: ISimulation, **kwargs) -> NoReturn:
+    def pre_create(self, simulation: Simulation, **kwargs) -> NoReturn:
         """
         Run the platform/simulation post creation events
 
@@ -39,7 +39,7 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         """
         simulation.pre_creation()
 
-    def post_create(self, simulation: ISimulation, **kwargs) -> NoReturn:
+    def post_create(self, simulation: Simulation, **kwargs) -> NoReturn:
         """
         Run the platform/simulation post creation events
 
@@ -52,7 +52,7 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         """
         simulation.post_creation()
 
-    def create(self, simulation: ISimulation, do_pre: bool = True, do_post: bool = True, **kwargs):
+    def create(self, simulation: Simulation, do_pre: bool = True, do_post: bool = True, **kwargs) -> Tuple[Any, UUID]:
         """
         Creates an simulation from an IDMTools simulation object. Also performs pre-creation and post-creation
         locally and on platform
@@ -66,6 +66,8 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         Returns:
             Created platform item and the UUID of said item
         """
+        if simulation.status is not None:
+            return simulation._platform_object, simulation.uid
         if do_pre:
             self.pre_create(simulation, **kwargs)
         ret = self.platform_create(simulation, **kwargs)
@@ -74,7 +76,7 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         return ret
 
     @abstractmethod
-    def platform_create(self, simulation: ISimulation, **kwargs) -> Tuple[Any, UUID]:
+    def platform_create(self, simulation: Simulation, **kwargs) -> Tuple[Any, UUID]:
         """
         Creates an simulation on Platform from an IDMTools Simulation Object
 
@@ -87,7 +89,7 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         """
         pass
 
-    def batch_create(self, sims: List[ISimulation], **kwargs) -> List[Tuple[Any, UUID]]:
+    def batch_create(self, sims: List[Simulation], **kwargs) -> List[Tuple[Any, UUID]]:
         """
         Provides a method to batch create simulations
 
@@ -98,10 +100,7 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         Returns:
             List of tuples containing the create object and id of item that was created
         """
-        ret = []
-        for sim in sims:
-            ret.append(self.create(sim, **kwargs))
-        return ret
+        return batch_create_items(sims, self.create, **kwargs)
 
     @abstractmethod
     def get_parent(self, simulation: Any, **kwargs) -> Any:
@@ -119,7 +118,7 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         """
         pass
 
-    def to_entity(self, simulation: Any, **kwargs) -> ISimulation:
+    def to_entity(self, simulation: Any, **kwargs) -> Simulation:
         """
         Converts the platform representation of simulation to idmtools representation
 
@@ -131,8 +130,50 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         """
         return simulation
 
+    def pre_run_item(self, simulation: Simulation):
+        """
+        Trigger right before commissioning experiment on platform. This ensures that the item is created. It also
+            ensures that the children(simulations) have also been created
+
+        Args:
+            simulation: Experiment to commission
+
+        Returns:
+
+        """
+        # ensure the item is created before running
+        # TODO what status are valid here? Create only?
+        if simulation.status is None:
+            self.create(simulation)
+
+    def post_run_item(self, simulation: Simulation):
+        """
+        Trigger right after commissioning experiment on platform.
+
+        Args:
+            simulation: Experiment just commissioned
+
+        Returns:
+
+        """
+        pass
+
+    def run_item(self, simulation: Simulation):
+        """
+        Called during commissioning of an item. This should create the remote resource
+
+        Args:
+            simulation:
+
+        Returns:
+
+        """
+        self.pre_run_item(simulation)
+        self.platform_run_item(simulation)
+        self.post_run_item(simulation)
+
     @abstractmethod
-    def run_item(self, simulation: ISimulation):
+    def platform_run_item(self, simulation: Simulation):
         """
         Called during commissioning of an item. This should create the remote resource but not upload assets
 
@@ -149,7 +190,7 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         pass
 
     @abstractmethod
-    def refresh_status(self, simulation: ISimulation):
+    def refresh_status(self, simulation: Simulation):
         """
         Refresh status for simulation object
 
@@ -162,7 +203,7 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         pass
 
     @abstractmethod
-    def get_assets(self, simulation: ISimulation, files: List[str], **kwargs) -> Dict[str, bytearray]:
+    def get_assets(self, simulation: Simulation, files: List[str], **kwargs) -> Dict[str, bytearray]:
         """
         Get files from simulation
 
@@ -177,7 +218,7 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         pass
 
     @abstractmethod
-    def list_assets(self, simulation: ISimulation) -> List[str]:
+    def list_assets(self, simulation: Simulation) -> List[str]:
         """
         List available files for a simulation
 

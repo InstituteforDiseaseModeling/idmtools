@@ -4,7 +4,7 @@ import shutil
 from typing import NoReturn
 
 import numpy as np
-from idmtools.builders import ExperimentBuilder
+from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_models.r.r_experiment import RExperiment
@@ -65,7 +65,7 @@ experiment.tags["tag1"] = 1
 experiment.base_simulation.set_parameter("infections", 0.0001)
 
 
-builder = ExperimentBuilder()
+builder = SimulationBuilder()
 builder.add_sweep_definition(param_update, list(sum_to_n(1)))
 
 

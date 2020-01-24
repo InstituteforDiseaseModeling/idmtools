@@ -9,7 +9,7 @@
 import os
 import sys
 from functools import partial
-from idmtools.builders import ExperimentBuilder
+from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_models.python.python_experiment import PythonExperiment
@@ -46,7 +46,7 @@ class setParam:
         return param_update(simulation, self.param, value)
 
 # Now that the experiment is created, we can add sweeps to it and set additional params
-builder = ExperimentBuilder()
+builder = SimulationBuilder()
 builder.add_sweep_definition(setA, range(7850, 7855))
 pe.base_simulation.set_parameter("fname", "runNsim100.json")
 pe.base_simulation.set_parameter("customGrid", 1)

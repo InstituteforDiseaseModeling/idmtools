@@ -2,7 +2,7 @@ import os
 import unittest
 import pytest
 from COMPS.Data import Suite as CompsSuite, Experiment as CompsExperiment, Simulation as CompsSimulation
-from idmtools.builders import ExperimentBuilder
+from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import Suite
@@ -34,7 +34,7 @@ class TestExperimentSimulations(ITestWithPersistence):
         exp.base_simulation.set_parameter("Enable_Immunity", 0)
         # User builder to create simulations
         num_sims = 3
-        builder = ExperimentBuilder()
+        builder = SimulationBuilder()
         builder.add_sweep_definition(param_a_update, range(0, num_sims))
         exp.builder = builder
         return exp
@@ -58,7 +58,7 @@ class TestExperimentSimulations(ITestWithPersistence):
 
         # User builder to create simulations
         num_sims = 3
-        builder = ExperimentBuilder()
+        builder = SimulationBuilder()
         builder.add_sweep_definition(param_a_update, range(0, num_sims))
         exp.builder = builder
 

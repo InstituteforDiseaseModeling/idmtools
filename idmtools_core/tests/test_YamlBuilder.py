@@ -1,7 +1,7 @@
 import os
 from functools import partial
-from idmtools.builders.arm_experiment_builder import ArmType
-from idmtools.builders.yaml_experiment_builder import YamlExperimentBuilder
+from idmtools.builders.arm_simulation_builder import ArmType
+from idmtools.builders.yaml_simulation_builder import YamlSimulationBuilder
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.tst_experiment import TstExperiment
 from idmtools_test import COMMON_INPUT_PATH
@@ -21,7 +21,7 @@ class TestYamlBuilder(ITestWithPersistence):
 
     def setUp(self):
         super().setUp()
-        self.builder = YamlExperimentBuilder()
+        self.builder = YamlSimulationBuilder()
         self.base_path = os.path.abspath(os.path.join(COMMON_INPUT_PATH, "builder"))
 
     def tearDown(self):

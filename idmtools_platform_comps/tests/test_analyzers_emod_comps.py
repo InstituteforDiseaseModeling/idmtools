@@ -9,7 +9,7 @@ from COMPS.Data import Experiment
 from idmtools.analysis.add_analyzer import AddAnalyzer
 from idmtools.analysis.analyze_manager import AnalyzeManager
 from idmtools.analysis.download_analyzer import DownloadAnalyzer
-from idmtools.builders import ExperimentBuilder
+from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
@@ -53,7 +53,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
             simulation.set_parameter("Run_Number", value)
             return {"Run_Number": value}
 
-        self.builder = ExperimentBuilder()
+        self.builder = SimulationBuilder()
         # Sweep parameter "Run_Number"
         self.builder.add_sweep_definition(param_a_update, range(0, 2))
         e.builder = self.builder

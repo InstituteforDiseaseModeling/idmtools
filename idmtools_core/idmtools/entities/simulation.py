@@ -1,4 +1,4 @@
-from logging import getLogger
+from logging import getLogger, DEBUG
 from typing import List, Callable, NoReturn, Union, Mapping, Any, Type, TypeVar
 from dataclasses import dataclass, field
 from idmtools.core import ItemType, NoTaskFound
@@ -36,7 +36,12 @@ class Simulation(IAssetsEnabled, INamedEntity):
 
     def pre_creation(self):
         # Call all of our hooks
-        [x(self) for x in self.pre_creation_hooks]
+        for x in self.pre_creation_hooks:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f'Calling simulation pre-create hook named '
+                                 f'{x.__name__ if hasattr(x, "__name__") else str(x)}')
+            x(self)
+
         if self.__class__ is not Simulation:
             # Add a tag to keep the Simulation class name
             self.tags["experiment_type"] = f'{self.__class__.__module__}.{self.__class__.__name__}'

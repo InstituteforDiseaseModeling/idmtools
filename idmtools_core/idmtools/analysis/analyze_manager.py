@@ -7,7 +7,7 @@ from typing import NoReturn, List
 
 from idmtools.analysis.map_worker_entry import map_item
 from idmtools.core import CacheEnabled
-from idmtools.entities import IPlatform
+from idmtools.entities.iplatform import IPlatform
 from idmtools.utils.command_line import animation
 from idmtools.utils.language import on_off, verbose_timedelta
 

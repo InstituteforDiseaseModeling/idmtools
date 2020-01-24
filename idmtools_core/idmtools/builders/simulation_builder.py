@@ -2,11 +2,11 @@ import inspect
 from functools import partial
 from inspect import signature
 from itertools import product
+from typing import Callable, Any, List, Iterable, Union, Dict
+from idmtools.entities.simulation import Simulation
 
-from typing import Callable, Any, List, Iterable, Union
 
-
-class ExperimentBuilder:
+class SimulationBuilder:
     """
     Class that represents an experiment builder.
     """
@@ -17,7 +17,8 @@ class ExperimentBuilder:
         self.sweeps = []
         self.count = 1
 
-    def add_sweep_definition(self, function: 'Callable', values: 'Union[List[Any], Iterable]'):
+    def add_sweep_definition(self, function: Callable[[Simulation, Any], Dict[str, Any]],
+                             values: Union[List[Any], Iterable]):
         """
         Add a parameter sweep definition.
         A sweep definition is composed of a function and a list of values to call the function with.

@@ -31,9 +31,7 @@ class SlurmPLatformExperimentOperations(IPlatformExperimentOperations):
     def get_parent(self, experiment: Any, **kwargs) -> Any:
         return None
 
-    def run_item(self, experiment: IExperiment):
-        if not self.platform.is_supported_experiment(experiment):
-            raise ValueError("This experiment type is not supported on the LocalPlatform.")
+    def platform_run_item(self, experiment: IExperiment):
         for simulation in experiment.simulations:
             self.platform._simulations.run_item(simulation)
 

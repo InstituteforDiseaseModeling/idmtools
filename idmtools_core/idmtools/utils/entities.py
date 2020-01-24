@@ -1,3 +1,4 @@
+import ast
 import dataclasses
 import typing
 from idmtools.services.experiments import ExperimentPersistService
@@ -59,3 +60,5 @@ def validate_user_inputs_against_dataclass(field_type, field_value):
             field_value[fn] = ast.literal_eval(field_value[fn]) if isinstance(field_value[fn], str) else \
                 field_value[fn]
     return fs_kwargs
+
+

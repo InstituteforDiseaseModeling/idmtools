@@ -4,9 +4,10 @@ from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
 from logging import getLogger, Logger
 from typing import Set, NoReturn, Union, Callable, List
-from idmtools.assets import Asset, AssetCollection
+from idmtools.assets import  AssetCollection
 from idmtools.entities.command_line import CommandLine
 from idmtools.entities.platform_requirements import PlatformRequirements
+from idmtools.entities.simulation import Simulation
 
 logger = getLogger(__name__)
 # Tasks can be allocated multiple ways
@@ -23,13 +24,13 @@ TTaskHook = Callable[[TTaskParent], NoReturn]
 
 @dataclass
 class ITask(metaclass=ABCMeta):
-    command: CommandLine = None
+    command: Union[str, CommandLine] = field(default=None)
     # Informs platform to what is needed to run a task
     platform_requirements: Set[PlatformRequirements] = field(default_factory=set)
 
     # We provide hooks as list to allow more user scripting extensibility
-    __pre_creation_hooks: List[TTaskHook] = None
-    __post_creation_hooks: List[TTaskHook] = None
+    __pre_creation_hooks: List[TTaskHook] = field(default_factory=list)
+    __post_creation_hooks: List[TTaskHook] = field(default_factory=list)
     # This is optional experiment assets
     # That means that users can explicitly define experiment level assets when using a Experiment builders
     common_assets: AssetCollection = field(default_factory=AssetCollection)
@@ -138,3 +139,11 @@ class ITask(metaclass=ABCMeta):
         Optional hook that is called when loading simulations from a platform
         """
         raise NotImplementedError("Reloading task from a simulation is not supported")
+
+
+def task_to_experiment(task: ITask) -> 'Experiment':
+    from idmtools.entities.experiment import Experiment
+    sim = Simulation(task=task)
+    e = Experiment()
+    e.simulations.append(sim)
+    return e

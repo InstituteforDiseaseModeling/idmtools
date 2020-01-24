@@ -1,9 +1,9 @@
 import yaml
-from idmtools.builders import ArmExperimentBuilder
-from idmtools.builders.arm_experiment_builder import SweepArm, ArmType
+from idmtools.builders import ArmSimulationBuilder
+from idmtools.builders.arm_simulation_builder import SweepArm, ArmType
 
 
-class YamlExperimentBuilder(ArmExperimentBuilder):
+class YamlSimulationBuilder(ArmSimulationBuilder):
     """
     Class that represents an experiment builder.
     """

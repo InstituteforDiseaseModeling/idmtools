@@ -2,10 +2,10 @@ import pandas as pd
 import numpy as np
 from numbers import Number
 from itertools import product
-from idmtools.builders import ExperimentBuilder
+from idmtools.builders import SimulationBuilder
 
 
-class CsvExperimentBuilder(ExperimentBuilder):
+class CsvExperimentBuilder(SimulationBuilder):
     """
     Class that represents an experiment builder.
     """

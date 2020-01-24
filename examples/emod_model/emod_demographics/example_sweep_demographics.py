@@ -1,7 +1,7 @@
 import os
 import typing
 
-from idmtools.builders import ExperimentBuilder
+from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools.utils.collections import deep_set
@@ -56,7 +56,7 @@ def sweep_on_demographics_param() -> 'IExperiment':
                                   campaign_path=os.path.join(INPUT_PATH, "campaign.json"),
                                   demographics_paths=demo_files)
 
-    b = ExperimentBuilder()
+    b = SimulationBuilder()
     b.add_sweep_definition(replace_pfa_with_custom, (.1, .2, .5, .7))
     e.add_builder(b)
 
@@ -87,7 +87,7 @@ def sweep_on_demographics_files() -> 'IExperiment':
     for i in range(1, 6):
         e.demographics.add_demographics_from_dict(content=demog.content, filename=f"demographics_{i}.json")
 
-    b = ExperimentBuilder()
+    b = SimulationBuilder()
     b.add_sweep_definition(change_demog_overlay, range(1, 6))
     e.add_builder(b)
 

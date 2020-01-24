@@ -21,7 +21,7 @@ import os
 import sys
 from functools import partial
 
-from idmtools.builders import ExperimentBuilder
+from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_model_emod import EMODExperiment
@@ -46,7 +46,7 @@ if __name__ == "__main__":
         os.path.join(COMMON_INPUT_PATH, "files", "demographics.json"))
 
     # Sweep parameters
-    builder = ExperimentBuilder()
+    builder = SimulationBuilder()
     set_Run_Number = partial(param_update, param="Run_Number")
     builder.add_sweep_definition(set_Run_Number, range(5))
     experiment.tags = {'idmtools': 'create_serialization'}

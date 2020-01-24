@@ -82,6 +82,9 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
         Returns:
             Created platform item and the UUID of said item
         """
+
+        if workflow_item.status is not None:
+            return workflow_item._platform_object, workflow_item.uid
         if do_pre:
             self.pre_create(workflow_item, **kwargs)
         ret = self.platform_create(workflow_item, **kwargs)
@@ -100,6 +103,61 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
 
         Returns:
             Created platform item and the UUID of said item
+        """
+        pass
+
+    def pre_run_item(self, workflow_item: IWorkflowItem):
+        """
+        Trigger right before commissioning experiment on platform. This ensures that the item is created. It also
+            ensures that the children(simulations) have also been created
+
+        Args:
+            workflow_item: Experiment to commission
+
+        Returns:
+
+        """
+        # ensure the item is created before running
+        # TODO what status are valid here? Create only?
+        if workflow_item.status is None:
+            self.create(workflow_item)
+
+    def post_run_item(self, workflow_item: IWorkflowItem):
+        """
+        Trigger right after commissioning workflow item on platform.
+
+        Args:
+            workflow_item: Experiment just commissioned
+
+        Returns:
+
+        """
+        pass
+
+    def run_item(self, workflow_item: IWorkflowItem):
+        """
+        Called during commissioning of an item. This should create the remote resource
+
+        Args:
+            workflow_item:
+
+        Returns:
+
+        """
+        self.pre_run_item(workflow_item)
+        self.platform_run_item(workflow_item)
+        self.post_run_item(workflow_item)
+
+    @abstractmethod
+    def platform_run_item(self, workflow_item: IWorkflowItem):
+        """
+        Called during commissioning of an item. This should perform what is needed to commission job on platform
+
+        Args:
+            workflow_item:
+
+        Returns:
+
         """
         pass
 

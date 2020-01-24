@@ -66,8 +66,8 @@ class TestCopy(ITestWithPersistence):
         e = EMODExperiment.from_default(self.case_name, default=EMODSir(),
                                         eradication_path=DEFAULT_ERADICATION_PATH)
 
-        from idmtools.builders import ExperimentBuilder
-        builder = ExperimentBuilder()
+        from idmtools.builders import SimulationBuilder
+        builder = SimulationBuilder()
         builder.add_sweep_definition(setA, range(10))
         builder.add_sweep_definition(setParam("b"), [1, 2, 3])
 

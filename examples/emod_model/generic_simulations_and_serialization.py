@@ -3,7 +3,7 @@ from functools import partial
 
 from config_update_parameters import config_update_params
 
-from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
+from idmtools.builders import SimulationBuilder, StandAloneSimulationsBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
@@ -54,7 +54,7 @@ if __name__ == "__main__":
     sim.set_parameter("Simulation_Duration", end_day)
 
     # Sweep parameters
-    builder = ExperimentBuilder()
+    builder = SimulationBuilder()
     set_Run_Number = partial(param_update, param="Run_Number")
     builder.add_sweep_definition(set_Run_Number, range(num_seeds))
     e1.tags = {'idmtools': 'create_serialization'}

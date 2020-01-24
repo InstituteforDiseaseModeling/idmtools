@@ -10,7 +10,7 @@ import os
 import sys
 from functools import partial
 
-from idmtools.builders import ExperimentBuilder
+from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 
@@ -44,7 +44,7 @@ experiment.base_simulation.set_parameter("c", 0)
 experiment.assets.add_directory(assets_directory=os.path.join("inputs", "csv_inputs", "Assets"))
 
 # Now that the experiment is created, we can add sweeps to it
-builder = ExperimentBuilder()
+builder = SimulationBuilder()
 builder.add_sweep_definition(setA, range(3))
 builder.add_sweep_definition(setParam("b"), [1, 2, 3])
 

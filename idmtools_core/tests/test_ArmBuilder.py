@@ -1,7 +1,7 @@
 import itertools
 from functools import partial
 
-from idmtools.builders.arm_experiment_builder import ArmExperimentBuilder, SweepArm, ArmType
+from idmtools.builders.arm_simulation_builder import ArmSimulationBuilder, SweepArm, ArmType
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.tst_experiment import TstExperiment
 from idmtools_test.utils.utils import verify_simulation
@@ -19,7 +19,7 @@ class TestArmBuilder(ITestWithPersistence):
 
     def setUp(self):
         super().setUp()
-        self.builder = ArmExperimentBuilder()
+        self.builder = ArmSimulationBuilder()
 
     def tearDown(self):
         super().tearDown()
@@ -56,7 +56,7 @@ class TestArmBuilder(ITestWithPersistence):
 
         simulations = list(experiment.batch_simulations(20))[0]
 
-        builder2 = ArmExperimentBuilder()
+        builder2 = ArmSimulationBuilder()
 
         arm = SweepArm(type=ArmType.cross)
         arm.add_sweep_definition(setB, [1, 2, 3])

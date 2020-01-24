@@ -2,7 +2,7 @@ import json
 import re
 from collections import ChainMap
 
-from idmtools.builders import ExperimentBuilder
+from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_model_emod import EMODExperiment, IEMODDefault
@@ -169,7 +169,7 @@ if __name__ == "__main__":
         return {"Run_Number": value}
 
 
-    builder = ExperimentBuilder()
+    builder = SimulationBuilder()
     # Sweep parameter "Run_Number"
     builder.add_sweep_definition(param_a_update, range(3))
     e.builder = builder

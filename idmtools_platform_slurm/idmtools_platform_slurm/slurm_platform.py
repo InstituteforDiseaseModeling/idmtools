@@ -2,7 +2,7 @@ import typing
 from typing import Optional, List
 from dataclasses import dataclass, field
 from logging import getLogger
-from idmtools.entities import IPlatform
+from idmtools.entities.iplatform import IPlatform
 from idmtools.entities.iexperiment import IExperiment, IHostBinaryExperiment, IWindowsExperiment, \
     ILinuxExperiment, IDockerExperiment
 from idmtools_platform_slurm.platform_operations.experiment_operations import SlurmPLatformExperimentOperations

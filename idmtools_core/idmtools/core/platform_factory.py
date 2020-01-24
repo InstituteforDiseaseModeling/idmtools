@@ -1,6 +1,6 @@
 from dataclasses import fields
 from idmtools.config import IdmConfigParser
-from idmtools.entities import IPlatform
+from idmtools.entities.iplatform import IPlatform
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
 
 

@@ -5,7 +5,7 @@ import unittest
 from os import path
 import pytest
 from idmtools.core.platform_factory import Platform
-from idmtools.builders import ExperimentBuilder
+from idmtools.builders import SimulationBuilder
 from idmtools.core import EntityStatus
 from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment

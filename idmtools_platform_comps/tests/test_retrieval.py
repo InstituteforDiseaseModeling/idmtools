@@ -7,7 +7,7 @@ from COMPS.Data import Experiment as COMPSExperiment, Simulation as COMPSSimulat
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
-from idmtools.builders import ExperimentBuilder
+from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
@@ -35,7 +35,7 @@ class TestRetrieval(ITestWithPersistence):
         self.pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123, "KeyOnly": None}
 
         self.pe.base_simulation.set_parameter("c", "c-value")
-        builder = ExperimentBuilder()
+        builder = SimulationBuilder()
         builder.add_sweep_definition(setA, range(0, 2))
 
         self.pe.builder = builder

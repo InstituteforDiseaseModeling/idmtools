@@ -1,7 +1,7 @@
 import os
 import typing
 
-from idmtools.builders import ExperimentBuilder
+from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_model_emod import EMODExperiment
@@ -106,7 +106,7 @@ if __name__ == "__main__":
     # For each of them create a sweep on the seed and run
     for experiment_func in available_funcs:
         e = experiment_func()
-        b = ExperimentBuilder()
+        b = SimulationBuilder()
         b.add_sweep_definition(set_simulation_seed, range(num_seeds))
         e.add_builder(b)
         em = ExperimentManager(experiment=e, platform=platform)

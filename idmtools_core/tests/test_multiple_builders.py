@@ -3,8 +3,8 @@ from dataclasses import fields
 
 import numpy as np
 from functools import partial
-from idmtools.builders import ArmExperimentBuilder, SweepArm, ArmType
-from idmtools.builders import YamlExperimentBuilder
+from idmtools.builders import ArmSimulationBuilder, SweepArm, ArmType
+from idmtools.builders import YamlSimulationBuilder
 from idmtools.builders import CsvExperimentBuilder
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.tst_experiment import TstExperiment
@@ -26,8 +26,8 @@ class TestMultipleBuilders(ITestWithPersistence):
     def setUp(self):
         super().setUp()
         self.base_path = os.path.abspath(os.path.join(COMMON_INPUT_PATH, "builder"))
-        self.arm_builder = ArmExperimentBuilder()
-        self.yaml_builder = YamlExperimentBuilder()
+        self.arm_builder = ArmSimulationBuilder()
+        self.yaml_builder = YamlSimulationBuilder()
         self.csv_builder = CsvExperimentBuilder()
 
     def tearDown(self):
@@ -92,7 +92,7 @@ class TestMultipleBuilders(ITestWithPersistence):
         self.assertEqual(len(experiment.builders), 1)
 
         # test only the last builder has been added
-        self.assertTrue(isinstance(list(experiment.builders)[0], YamlExperimentBuilder))
+        self.assertTrue(isinstance(list(experiment.builders)[0], YamlSimulationBuilder))
 
     def test_validation(self):
         a = TstExperiment(name="test")

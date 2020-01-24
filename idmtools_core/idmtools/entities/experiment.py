@@ -1,7 +1,7 @@
 import uuid
 from dataclasses import dataclass, field
 from logging import getLogger
-from typing import NoReturn, Set
+from typing import NoReturn, Set, Union
 from idmtools.core import ItemType
 from idmtools.core.interfaces.entity_container import EntityContainer
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
@@ -22,12 +22,17 @@ class Experiment(IAssetsEnabled, INamedEntity):
         assets: The asset collection for assets global to this experiment.
     """
     suite_id: uuid = field(default=None)
-    simulations: EntityContainer = field(default_factory=lambda: EntityContainer(), compare=False,
-                                         metadata={"pickle_ignore": True})
+
     item_type: ItemType = field(default=ItemType.EXPERIMENT, compare=False, init=False)
     task_type: str = field(default='idmtools.entities.command_task.CommandTask')
     platform_requirements: Set[PlatformRequirements] = field(default_factory=set)
     frozen: bool = field(default=False, init=False)
+    __simulations: EntityContainer = field(default_factory=lambda: EntityContainer(),
+                                                  compare=False, metadata={"pickle_ignore": True})
+
+    def __post_init__(self):
+        super().__post_init__()
+        self.__simulations.parent = self
 
     def __repr__(self):
         return f"<Experiment: {self.uid} - {self.name} / Sim count {len(self.simulations) if self.simulations else 0}>"
@@ -60,6 +65,10 @@ class Experiment(IAssetsEnabled, INamedEntity):
     @property
     def succeeded(self):
         return all([s.succeeded for s in self.simulations])
+
+    @property
+    def simulations(self):
+        return self.__simulations
 
     @property
     def simulation_count(self):

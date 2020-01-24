@@ -3,7 +3,7 @@ from functools import partial
 
 import pytest
 from COMPS.Data import Experiment
-from idmtools.builders import ExperimentBuilder
+from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools.core import EntityStatus, ItemType
@@ -52,7 +52,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
 
         setAB = partial(param_update_ab, param="a")
 
-        builder = ExperimentBuilder()
+        builder = SimulationBuilder()
         # Sweep parameter "a" and make "b" depends on "a"
         builder.add_sweep_definition(setAB, range(0, 2))
         pe.builder = builder

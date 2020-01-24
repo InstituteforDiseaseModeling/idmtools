@@ -19,7 +19,7 @@ from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPla
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
 from idmtools.services.platforms import PlatformPersistService
 from idmtools.core.interfaces.iitem import IItem
-from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set
+from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set, Optional
 
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
 
@@ -406,7 +406,9 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
                 raise Exception(
                     f'Unable to create items of type: {item.item_type} for platform: {self.__class__.__name__}')
 
-    def run_items(self, items: List[IEntity]):
+    def run_items(self, items: Union[IEntity, List[IEntity]]):
+        if isinstance(items, IEntity):
+            items = [items]
         self._is_item_list_supported(items)
 
         for item in items:
@@ -490,19 +492,6 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     def is_task_supported(self, task: ITask) -> bool:
         return self.are_requirements_met(task.platform_requirements)
-
-
-    def run(self, item: Union[Experiment, IWorkflowItem], display_progress: bool = True, wait_till_done: bool = False):
-        """
-        Runs an item on a platform
-
-        Args:
-            item:
-
-        Returns:
-
-        """
-        pass
 
     def wait_till_done(self, item: Union[Experiment, IWorkflowItem], timeout: int = 60 * 60 * 24,
                        refresh_interval: int = 5):
