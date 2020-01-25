@@ -2,6 +2,8 @@ import os
 import pandas as pd
 import shutil
 
+from idmtools.entities.simulation import Simulation
+
 
 def del_folder(path):
     if os.path.exists(path):
@@ -31,10 +33,10 @@ def load_csv_file(filename, dir=None):
     return df
 
 
-def verify_simulation(simulation, expected_parameters, expected_values):
+def verify_simulation(simulation:Simulation, expected_parameters, expected_values):
     for value_set in expected_values:
         for i, value in enumerate(list(value_set)):
-            if not simulation.parameters[expected_parameters[i]] == expected_values:
+            if not simulation.task.parameters[expected_parameters[i]] == expected_values:
                 break
         return True
     return False

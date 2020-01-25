@@ -1,26 +1,28 @@
 import os
 from dataclasses import dataclass, field
 from logging import getLogger, DEBUG
+from threading import Lock
 from typing import List, Dict, Any, Tuple, Type
 from uuid import UUID, uuid4
-import diskcache
 from pandas.tests.extension.numpy_.test_numpy_nested import np
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
 from idmtools.entities.simulation import Simulation
+
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 data_path = os.path.abspath(os.path.join(current_directory, "..", "..", "data"))
 
 logger = getLogger(__name__)
+SIMULATION_LOCK = Lock()
 
 
 @dataclass
 class TestPlaformSimulationOperation(IPlatformSimulationOperations):
     platform_type: Type = Simulation
-    simulations: diskcache.Cache = field(default=None, compare=False, metadata={"pickle_ignore": True})
+    simulations: dict = field(default=None, compare=False, metadata={"pickle_ignore": True})
 
     def __post_init__(self):
-        self.simulations = diskcache.Cache(os.path.join(data_path, 'simulations_test'))
+        self.simulations = dict()
 
     def get(self, simulation_id: UUID, **kwargs) -> Any:
         obj = None
@@ -43,13 +45,14 @@ class TestPlaformSimulationOperation(IPlatformSimulationOperations):
         self._save_simulations_to_cache(experiment_id, [simulation])
         return simulation, simulation.uid
 
-    def _save_simulations_to_cache(self, experiment_id, simulations: List[Simulation]):
+    def _save_simulations_to_cache(self, experiment_id, simulations: List[Simulation], overwrite: bool = True):
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'Saving {len(simulations)} to Experiment {experiment_id}')
-        lock = diskcache.Lock(self.simulations, 'simulations-lock')
-        with lock:
-            existing_simulations = self.simulations.pop(experiment_id)
-            self.simulations[experiment_id] = existing_simulations + simulations
+        SIMULATION_LOCK.acquire()
+        existing_simulations = [] if overwrite else self.simulations.pop(experiment_id)
+        self.simulations[experiment_id] = existing_simulations + simulations
+        SIMULATION_LOCK.release()
+        logger.debug(f'Saved sims')
 
     def batch_create(self, sims: List[Simulation], **kwargs) -> List[Tuple[Any, UUID]]:
         simulations = []
@@ -88,7 +91,7 @@ class TestPlaformSimulationOperation(IPlatformSimulationOperations):
 
     def set_simulation_prob_status(self, experiment_uid, status):
         if logger.isEnabledFor(DEBUG):
-            logger.debug(f'Setting status for sims on exp {experiment_uid} to {status}')
+            logger.debug(f'Setting status for sim s on exp {experiment_uid} to {status}')
         simulations = self.simulations.get(experiment_uid)
         for simulation in simulations:
             new_status = np.random.choice(
@@ -96,13 +99,13 @@ class TestPlaformSimulationOperation(IPlatformSimulationOperations):
                 p=list(status.values())
             )
             simulation.status = new_status
-        self.simulations.set(experiment_uid, simulations)
+        self._save_simulations_to_cache(experiment_uid, simulations, True)
 
     def set_simulation_num_status(self, experiment_uid, status, number):
         simulations = self.simulations.get(experiment_uid)
         for simulation in simulations:
             simulation.status = status
-            self.simulations.set(experiment_uid, simulations)
             number -= 1
             if number <= 0:
-                return
+                break
+        self._save_simulations_to_cache(experiment_uid, simulations, True)
