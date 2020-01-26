@@ -1,12 +1,32 @@
 import copy
 from dataclasses import dataclass, field, fields
+from functools import partial
 from itertools import chain
 from typing import Set, Generator
+
 from more_itertools import grouper
+
 from idmtools.builders.simulation_builder import SimulationBuilder
 from idmtools.entities.itask import ITask
 from idmtools.entities.simulation import Simulation
+from idmtools.utils.collections import ResetGenerator
 from idmtools.utils.hashing import ignore_fields_in_dataclass_on_pickle
+
+
+def simulation_generator(builders, new_sim_func, batch_size=10):
+    # Then the builders
+    for groups in grouper(chain(*builders), batch_size):
+        for simulation_functions in filter(None, groups):
+            simulation = new_sim_func()
+            tags = {}
+
+            for func in simulation_functions:
+                new_tags = func(simulation=simulation)
+                if new_tags:
+                    tags.update(new_tags)
+
+            simulation.tags.update(tags)
+            yield simulation
 
 
 @dataclass(repr=False)
@@ -85,19 +105,8 @@ class TemplatedSimulations:
         display(self, experiment_table_display)
 
     def simulations(self) -> Generator[Simulation, None, None]:
-        # Then the builders
-        for groups in grouper(chain(*self.builders), 100):
-            for simulation_functions in filter(None, groups):
-                simulation = self.new_simulation()
-                tags = {}
-
-                for func in simulation_functions:
-                    new_tags = func(simulation=simulation)
-                    if new_tags:
-                        tags.update(new_tags)
-
-                simulation.tags.update(tags)
-                yield simulation
+        p = partial(simulation_generator, self.builders, self.new_simulation)
+        return ResetGenerator(p)
 
     def new_simulation(self):
         """

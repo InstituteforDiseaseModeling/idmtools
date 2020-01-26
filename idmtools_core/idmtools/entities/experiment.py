@@ -1,14 +1,20 @@
 import uuid
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, InitVar
 from logging import getLogger
-from typing import NoReturn, Set, Union
+from types import GeneratorType
+from typing import NoReturn, Set, Union, Iterator
+
 from idmtools.core import ItemType
 from idmtools.core.interfaces.entity_container import EntityContainer
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.core.interfaces.inamed_entity import INamedEntity
 from idmtools.entities.platform_requirements import PlatformRequirements
+from idmtools.entities.templated_simulation import TemplatedSimulations
+from idmtools.utils.collections import ParentIterator
 
 logger = getLogger(__name__)
+
+SUPPORTED_SIM_TYPE = Union[EntityContainer, GeneratorType, TemplatedSimulations, Iterator]
 
 
 @dataclass(repr=False)
@@ -27,11 +33,13 @@ class Experiment(IAssetsEnabled, INamedEntity):
     task_type: str = field(default='idmtools.entities.command_task.CommandTask')
     platform_requirements: Set[PlatformRequirements] = field(default_factory=set)
     frozen: bool = field(default=False, init=False)
-    __simulations: EntityContainer = field(default_factory=lambda: EntityContainer(),
-                                           compare=False)
+    simulations: InitVar[SUPPORTED_SIM_TYPE] = None
+    __simulations: Union[SUPPORTED_SIM_TYPE] = field(default_factory=lambda: EntityContainer(), compare=False)
 
-    def __post_init__(self):
+    def __post_init__(self, simulations):
         super().__post_init__()
+        if simulations is not None and not isinstance(simulations, property):
+            self.simulations = simulations
         self.__simulations.parent = self
 
     def __repr__(self):
@@ -53,6 +61,14 @@ class Experiment(IAssetsEnabled, INamedEntity):
         # Gather the assets
         self.gather_assets()
 
+        # TODO How to handle genreators?
+        if "task_type" not in self.tags and not isinstance(self.simulations, GeneratorType) and \
+                (not isinstance(self.simulations, ParentIterator) or
+                 (isinstance(self.simulations, ParentIterator)
+                  and not isinstance(self.simulations.items, TemplatedSimulations)
+                 )):
+            task_class = self.simulations[0].task.__class__
+            self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
         # to keep experiments clean, let's only do this is we have a special experiment class
         if self.__class__ is not Experiment:
             # Add a tag to keep the Experiment class name
@@ -68,7 +84,17 @@ class Experiment(IAssetsEnabled, INamedEntity):
 
     @property
     def simulations(self):
-        return self.__simulations
+        return ParentIterator(self.__simulations, parent=self)
+
+    @simulations.setter
+    def simulations(self, simulations: Union[SUPPORTED_SIM_TYPE]):
+        if isinstance(simulations, (GeneratorType, TemplatedSimulations, EntityContainer)):
+            self.__simulations = simulations
+        elif isinstance(simulations, (list, set)):
+            self.simulations = EntityContainer(simulations)
+        else:
+            raise ValueError("You can only set simulations to an EntityContainer, a Generator, a TemplatedSimulations "
+                             "or a List/Set of Simulations")
 
     @property
     def simulation_count(self):
