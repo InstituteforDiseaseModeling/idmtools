@@ -1,7 +1,9 @@
 import copy
 import unittest
 from typing import Any
+
 import pytest
+
 from idmtools.analysis.analyze_manager import AnalyzeManager
 from idmtools.analysis.download_analyzer import DownloadAnalyzer as SampleAnalyzer
 from idmtools.core.enums import EntityStatus, ItemType
@@ -32,10 +34,11 @@ class TestAnalyzeManager(unittest.TestCase):
 
     def setUp(self) -> None:
         self.platform = Platform('Test')
+        self.platform.cleanup()
         self.sample_experiment = task_to_experiment(TestTask())
         self.platform.run_items(self.sample_experiment)
         self.platform._simulations.set_simulation_status(self.sample_experiment.uid, status=EntityStatus.SUCCEEDED)
-        self.configuration = {'max_processes': 2}
+        self.configuration = {'max_processes': 1}
 
         self.analyze_manager = AnalyzeManager(self.platform)
         self.sample_analyzer = SampleAnalyzer()

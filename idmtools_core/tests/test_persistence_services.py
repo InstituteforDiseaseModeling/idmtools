@@ -1,4 +1,6 @@
+import pickle
 import unittest
+
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
@@ -6,7 +8,6 @@ from idmtools.services.experiments import ExperimentPersistService
 from idmtools.services.platforms import PlatformPersistService
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.test_task import TestTask
-import pickle
 
 
 class TestPersistenceServices(ITestWithPersistence):
@@ -25,7 +26,7 @@ class TestPersistenceServices(ITestWithPersistence):
         e2 = ExperimentPersistService.retrieve(e.uid)
         self.assertEqual(e, e2)
         # Simulations should not be persisted
-        self.assertEqual(e2.simulations, [])
+        self.assertEqual(list(e2.simulations), [])
 
         e3 = ExperimentPersistService.retrieve("Missing")
         self.assertIsNone(e3)

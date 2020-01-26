@@ -1,13 +1,14 @@
 import os
-from dataclasses import fields
-import numpy as np
 from functools import partial
+
+import numpy as np
+
 from idmtools.builders import ArmSimulationBuilder, SweepArm, ArmType
-from idmtools.builders import YamlSimulationBuilder
 from idmtools.builders import CsvExperimentBuilder
+from idmtools.builders import YamlSimulationBuilder
 from idmtools.entities.templated_simulation import TemplatedSimulations
-from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test import COMMON_INPUT_PATH
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.test_task import TestTask
 
 

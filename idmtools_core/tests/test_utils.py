@@ -1,10 +1,12 @@
 import unittest
+
 from idmtools.core import ExperimentNotFound, UnknownItemException
 from idmtools.core.platform_factory import Platform
+from idmtools.entities.itask import task_to_experiment
 from idmtools.services.experiments import ExperimentPersistService
 from idmtools.utils.entities import retrieve_experiment
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-from idmtools_test.utils.tst_experiment import TstExperiment
+from idmtools_test.utils.test_task import TestTask
 
 
 class TestUtils(ITestWithPersistence):
@@ -15,14 +17,14 @@ class TestUtils(ITestWithPersistence):
             retrieve_experiment("Missing", Platform('Test'))
 
         # Test correct retrieval
-        e = TstExperiment("test")
+        e = task_to_experiment(TestTask())
         ExperimentPersistService.save(e)
 
         e2 = retrieve_experiment(e.uid)
         self.assertEqual(e, e2)
 
         # test correct retrieval with platform
-        e = TstExperiment("test2")
+        e = task_to_experiment(TestTask(), dict(name="test2"))
         p = Platform('Test')
         p.create_items(items=[e])
 

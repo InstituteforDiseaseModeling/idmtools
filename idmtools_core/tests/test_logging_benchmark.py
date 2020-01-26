@@ -1,11 +1,12 @@
 import concurrent
+import os
 import sys
+import threading
 from concurrent.futures.process import ProcessPoolExecutor
 from concurrent.futures.thread import ThreadPoolExecutor
 from logging import DEBUG, getLogger
 from unittest import TestCase, skip
-import threading
-import os
+
 from idmtools.core.logging import setup_logging
 from idmtools_test.utils.decorators import run_test_in_n_seconds
 
@@ -20,6 +21,7 @@ def log_process_id():
 # Check if we have a debugger running. If we are, expect fifth of the performance, espcially the ProcessPoolExecutor
 # portions since that is quite slow in debugger
 LOG_TESTS_TO_RUN = 50000 if getattr(sys, 'gettrace', None) is None else 5000
+
 
 @skip
 class TestLoggingBenchmark(TestCase):

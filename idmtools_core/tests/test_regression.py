@@ -4,10 +4,13 @@ import unittest
 from idmtools.assets import AssetCollection
 from idmtools.builders import StandAloneSimulationsBuilder
 from idmtools.core.platform_factory import Platform
-from idmtools.managers import ExperimentManager
+from idmtools.entities.experiment import Experiment
+from idmtools.entities.itask import task_to_experiment
+from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python import PythonExperiment, PythonSimulation
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+from idmtools_test.utils.test_task import TestTask
 
 
 class TestPersistenceServices(ITestWithPersistence):
@@ -47,47 +50,45 @@ class TestPersistenceServices(ITestWithPersistence):
 
     def test_fix_138(self):
         # https://github.com/InstituteforDiseaseModeling/idmtools/issues/138
-        e = TstExperiment(name="test")
-        p = Platform('Test')
-        e.platform = p
+        ts = TemplatedSimulations(base_task=TestTask())
+        e = Experiment(simulations=ts)
         # Set a parameter in the base simulation
-        e.base_simulation.set_parameter("test", 0)
-        self.assertEqual(e.base_simulation.parameters["test"], 0)
+        ts.base_simulation.task.set_parameter("test", 0)
+        self.assertEqual(ts.base_simulation.task.parameters["test"], 0)
 
         # Create a standalone simulation
-        s = e.simulation()
-        s.set_parameter("test", 10)
-        self.assertEqual(s.parameters["test"], 10)
+        s = ts.new_simulation()
+        s.task.set_parameter("test", 10)
+        self.assertEqual(s.task.parameters["test"], 10)
 
         # Create a builder and add this simulation
         b = StandAloneSimulationsBuilder()
         b.add_simulation(s)
-        e.builder = b
+        ts.add_builder(b)
 
         # Make sure the simulation in the builder is correct
-        self.assertEqual(b.simulations[0].parameters["test"], 10)
+        self.assertEqual(b.simulations[0].task.parameters["test"], 10)
         self.assertEqual(b.simulations[0], s)
 
         # Run the experiment
-
-        em = ExperimentManager(e, platform=p)
-        em.run()
+        p = Platform("Test")
+        p.run_items(e)
 
         # Make sure the base simulation was left untouched
-        self.assertEqual(e.base_simulation.parameters["test"], 0)
-        self.assertEqual(s.parameters["test"], 10)
+        self.assertEqual(ts.base_simulation.task.parameters["test"], 0)
+        self.assertEqual(s.task.parameters["test"], 10)
 
         # Ensure that we actually ran with the correct parameter
-        print(p._simulations.simulations[em.experiment.uid])
-        self.assertEqual(p._simulations.simulations[em.experiment.uid][0].parameters["test"], 10, "Parameter in platform")
+        print(p._simulations.simulations[e.uid])
+        self.assertEqual(p._simulations.simulations[e.uid][0].task.parameters["test"], 10, "Parameter in platform")
         p.cleanup()
 
     def test_fix_170(self):
         # https://github.com/InstituteforDiseaseModeling/idmtools/issues/170
-        e = TstExperiment("Experiment")
+        e = task_to_experiment(TestTask())
         e.tags = {"test": 1}
         e.pre_creation()
-        self.assertEqual(e.tags.get("type"), "idmtools_test.utils.tst_experiment.TstExperiment")
+        self.assertEqual(e.tags.get("task_type"), "idmtools_test.utils.test_task.TestTask")
         self.assertEqual(e.tags.get("test"), 1)
 
 
