@@ -1,15 +1,16 @@
-import os
 import copy
+import os
 import typing
+from dataclasses import dataclass, field
 from typing import List, NoReturn, TypeVar, Union
+
 from idmtools.assets import Asset, TAssetList
+from idmtools.assets import TAssetFilterList
 from idmtools.assets.errors import DuplicatedAssetError
 from idmtools.core import FilterMode, ItemType
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.utils.file import scan_directory
 from idmtools.utils.filters.asset_filters import default_asset_file_filter
-from idmtools.assets import TAssetFilterList
-from dataclasses import dataclass, field
 
 if typing.TYPE_CHECKING:
     from idmtools.assets import TAssetList
@@ -176,7 +177,7 @@ class AssetCollection(IEntity):
 
         """
         for asset in assets:
-            self.add_asset(asset)
+            self.add_asset(asset, fail_on_duplicate)
 
     def add_or_replace_asset(self, asset: Asset):
         """
