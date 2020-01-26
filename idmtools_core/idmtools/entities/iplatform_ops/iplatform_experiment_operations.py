@@ -3,11 +3,11 @@ from concurrent.futures import as_completed
 from concurrent.futures.thread import ThreadPoolExecutor
 from dataclasses import dataclass
 from types import GeneratorType
-from typing import Type, Any, NoReturn, Tuple, List, Dict
+from typing import Type, Any, NoReturn, Tuple, List, Dict, Iterator, Union
 from uuid import UUID
 
 from idmtools.core import EntityStatus
-from idmtools.entities import IExperiment
+from idmtools.entities.experiment import Experiment
 
 
 @dataclass
@@ -29,7 +29,7 @@ class IPlatformExperimentOperations(ABC):
         """
         pass
 
-    def pre_create(self, experiment: IExperiment, **kwargs) -> NoReturn:
+    def pre_create(self, experiment: Experiment, **kwargs) -> NoReturn:
         """
         Run the platform/experiment post creation events
 
@@ -42,7 +42,7 @@ class IPlatformExperimentOperations(ABC):
         """
         experiment.pre_creation()
 
-    def post_create(self, experiment: IExperiment, **kwargs) -> NoReturn:
+    def post_create(self, experiment: Experiment, **kwargs) -> NoReturn:
         """
         Run the platform/experiment post creation events
 
@@ -55,8 +55,8 @@ class IPlatformExperimentOperations(ABC):
         """
         experiment.post_creation()
 
-    def create(self, experiment: IExperiment, do_pre: bool = True, do_post: bool = True, **kwargs) -> \
-            Tuple[IExperiment, UUID]:
+    def create(self, experiment: Experiment, do_pre: bool = True, do_post: bool = True, **kwargs) -> \
+            Union[Experiment, Any]:
         """
         Creates an experiment from an IDMTools simulation object. Also performs local/platform pre and post creation
         events
@@ -71,16 +71,16 @@ class IPlatformExperimentOperations(ABC):
             Created platform item and the UUID of said item
         """
         if experiment.status is not None:
-            return experiment._platform_object, experiment.uid
+            return experiment
         if do_pre:
             self.pre_create(experiment, **kwargs)
-        ret = self.platform_create(experiment, **kwargs)
+        experiment._platform_object = self.platform_create(experiment, **kwargs)
         if do_post:
             self.post_create(experiment, **kwargs)
-        return ret
+        return experiment
 
     @abstractmethod
-    def platform_create(self, experiment: IExperiment, **kwargs) -> Tuple[IExperiment, UUID]:
+    def platform_create(self, experiment: Experiment, **kwargs) -> Any:
         """
         Creates an experiment from an IDMTools experiment object
 
@@ -93,7 +93,7 @@ class IPlatformExperimentOperations(ABC):
         """
         pass
 
-    def batch_create(self, experiments: List[IExperiment], **kwargs) -> List[Tuple[Any, UUID]]:
+    def batch_create(self, experiments: List[Experiment], **kwargs) -> List[Tuple[Experiment]]:
         """
         Provides a method to batch create experiments
 
@@ -139,7 +139,7 @@ class IPlatformExperimentOperations(ABC):
         """
         pass
 
-    def to_entity(self, experiment: Any, **kwargs) -> IExperiment:
+    def to_entity(self, experiment: Any, **kwargs) -> Experiment:
         """
         Converts the platform representation of experiment to idmtools representation
 
@@ -151,7 +151,7 @@ class IPlatformExperimentOperations(ABC):
         """
         return experiment
 
-    def pre_run_item(self, experiment: IExperiment):
+    def pre_run_item(self, experiment: Experiment):
         """
         Trigger right before commissioning experiment on platform. This ensures that the item is created. It also
             ensures that the children(simulations) have also been created
@@ -168,13 +168,13 @@ class IPlatformExperimentOperations(ABC):
             self.create(experiment)
 
         # check sims
-        if isinstance(experiment.simulations, GeneratorType):
-            self.platform.create_items(experiment.simulations)
+        if isinstance(experiment.simulations, (GeneratorType, Iterator)):
+            experiment.simulations = self.platform.create_items(experiment.simulations)
         elif len(experiment.simulations) == 0:
             raise ValueError("You cannot have an experiment with now simulations")
         self.platform.create_items(experiment.simulations)
 
-    def post_run_item(self, experiment: IExperiment):
+    def post_run_item(self, experiment: Experiment):
         """
         Trigger right after commissioning experiment on platform.
 
@@ -186,7 +186,7 @@ class IPlatformExperimentOperations(ABC):
         """
         experiment.simulations.set_status(EntityStatus.RUNNING)
 
-    def run_item(self, experiment: IExperiment):
+    def run_item(self, experiment: Experiment):
         """
         Called during commissioning of an item. This should create the remote resource
 
@@ -201,7 +201,7 @@ class IPlatformExperimentOperations(ABC):
         self.post_run_item(experiment)
 
     @abstractmethod
-    def platform_run_item(self, experiment: IExperiment):
+    def platform_run_item(self, experiment: Experiment):
         """
         Called during commissioning of an item. This should perform what is needed to commission job on platform
 
@@ -226,7 +226,7 @@ class IPlatformExperimentOperations(ABC):
         pass
 
     @abstractmethod
-    def refresh_status(self, experiment: IExperiment):
+    def refresh_status(self, experiment: Experiment):
         """
         Refresh status for experiment object. This should update the object directly. For experiments it is best if
         all simulation states are updated as well
@@ -239,7 +239,7 @@ class IPlatformExperimentOperations(ABC):
         """
         pass
 
-    def get_assets(self, experiment: IExperiment, files: List[str], **kwargs) -> Dict[str, Dict[str, bytearray]]:
+    def get_assets(self, experiment: Experiment, files: List[str], **kwargs) -> Dict[str, Dict[str, bytearray]]:
         """
         Get files from experiment
 
@@ -256,7 +256,7 @@ class IPlatformExperimentOperations(ABC):
             ret[sim.uid] = self.platform._simulation.get_assets(sim, files, **kwargs)
         return ret
 
-    def list_assets(self, experiment: IExperiment) -> Dict[str, List[str]]:
+    def list_assets(self, experiment: Experiment) -> Dict[str, List[str]]:
         """
         List assets available for experiment
 

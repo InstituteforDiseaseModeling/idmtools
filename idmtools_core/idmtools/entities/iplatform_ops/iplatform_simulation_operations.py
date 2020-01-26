@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Type, Any, Tuple, List, Dict, NoReturn
+from typing import Type, Any, List, Dict, NoReturn, Union
 from uuid import UUID
+
 from idmtools.core.cache_enabled import CacheEnabled
 from idmtools.entities.iplatform_ops.utils import batch_create_items
 from idmtools.entities.simulation import Simulation
@@ -52,7 +53,8 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         """
         simulation.post_creation()
 
-    def create(self, simulation: Simulation, do_pre: bool = True, do_post: bool = True, **kwargs) -> Tuple[Any, UUID]:
+    def create(self, simulation: Simulation, do_pre: bool = True, do_post: bool = True, **kwargs) -> Union[
+        Simulation, Any]:
         """
         Creates an simulation from an IDMTools simulation object. Also performs pre-creation and post-creation
         locally and on platform
@@ -67,7 +69,7 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
             Created platform item and the UUID of said item
         """
         if simulation.status is not None:
-            return simulation._platform_object, simulation.uid
+            return simulation
         if do_pre:
             self.pre_create(simulation, **kwargs)
         ret = self.platform_create(simulation, **kwargs)
@@ -76,7 +78,7 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         return ret
 
     @abstractmethod
-    def platform_create(self, simulation: Simulation, **kwargs) -> Tuple[Any, UUID]:
+    def platform_create(self, simulation: Simulation, **kwargs) -> Any:
         """
         Creates an simulation on Platform from an IDMTools Simulation Object
 
@@ -89,7 +91,7 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         """
         pass
 
-    def batch_create(self, sims: List[Simulation], **kwargs) -> List[Tuple[Any, UUID]]:
+    def batch_create(self, sims: List[Simulation], **kwargs) -> List[Simulation]:
         """
         Provides a method to batch create simulations
 
