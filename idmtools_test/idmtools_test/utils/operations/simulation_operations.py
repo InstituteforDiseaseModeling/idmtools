@@ -2,12 +2,13 @@ import os
 from dataclasses import dataclass, field
 from logging import getLogger, DEBUG
 from threading import Lock
-from typing import List, Dict, Any, Tuple, Type
+from typing import List, Dict, Any, Type
 from uuid import UUID, uuid4
+
 from pandas.tests.extension.numpy_.test_numpy_nested import np
+
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
 from idmtools.entities.simulation import Simulation
-
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 data_path = os.path.abspath(os.path.join(current_directory, "..", "..", "data"))
@@ -19,10 +20,7 @@ SIMULATION_LOCK = Lock()
 @dataclass
 class TestPlaformSimulationOperation(IPlatformSimulationOperations):
     platform_type: Type = Simulation
-    simulations: dict = field(default=None, compare=False, metadata={"pickle_ignore": True})
-
-    def __post_init__(self):
-        self.simulations = dict()
+    simulations: dict = field(default_factory=dict, compare=False, metadata={"pickle_ignore": True})
 
     def get(self, simulation_id: UUID, **kwargs) -> Any:
         obj = None
@@ -38,14 +36,14 @@ class TestPlaformSimulationOperation(IPlatformSimulationOperations):
         obj.platform = self.platform
         return obj
 
-    def platform_create(self, simulation: Simulation, **kwargs) -> Tuple[Any, UUID]:
+    def platform_create(self, simulation: Simulation, **kwargs) -> Simulation:
         experiment_id = simulation.parent_id
         simulation.uid = uuid4()
 
         self._save_simulations_to_cache(experiment_id, [simulation])
-        return simulation, simulation.uid
+        return simulation
 
-    def _save_simulations_to_cache(self, experiment_id, simulations: List[Simulation], overwrite: bool = True):
+    def _save_simulations_to_cache(self, experiment_id, simulations: List[Simulation], overwrite: bool = False):
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'Saving {len(simulations)} to Experiment {experiment_id}')
         SIMULATION_LOCK.acquire()
@@ -54,19 +52,20 @@ class TestPlaformSimulationOperation(IPlatformSimulationOperations):
         SIMULATION_LOCK.release()
         logger.debug(f'Saved sims')
 
-    def batch_create(self, sims: List[Simulation], **kwargs) -> List[Tuple[Any, UUID]]:
+    def batch_create(self, sims: List[Simulation], **kwargs) -> List[Simulation]:
         simulations = []
         experiment_id = None
         for simulation in sims:
-            self.pre_create(simulation)
-            experiment_id = simulation.parent_id
-            simulation.uid = uuid4()
-            self.post_create(simulation)
-            simulations.append(simulation)
+            if simulation.status is None:
+                self.pre_create(simulation)
+                experiment_id = simulation.parent_id
+                simulation.uid = uuid4()
+                self.post_create(simulation)
+                simulations.append(simulation)
 
         if experiment_id:
             self._save_simulations_to_cache(experiment_id, simulations)
-        return [(s, s.uid) for s in simulations]
+        return sims
 
     def get_parent(self, simulation: Any, **kwargs) -> Any:
         return self.platform._experiments.experiments.get(simulation.parent_id)

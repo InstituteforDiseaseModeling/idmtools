@@ -2,9 +2,9 @@ import os
 from dataclasses import field, dataclass
 from logging import getLogger, DEBUG
 from threading import Lock
-from typing import List, Any, Tuple, Type
+from typing import List, Any, Type, Dict
 from uuid import UUID, uuid4
-import diskcache
+
 from idmtools.core import EntityStatus, UnknownItemException
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
@@ -18,10 +18,7 @@ EXPERIMENTS_LOCK = Lock()
 @dataclass
 class TestPlaformExperimentOperation(IPlatformExperimentOperations):
     platform_type: Type = Experiment
-    experiments: diskcache.Cache = field(default=None, compare=False, metadata={"pickle_ignore": True})
-
-    def __post_init__(self):
-        self.experiments = diskcache.Cache(os.path.join(data_path, 'experiments_test'))
+    experiments: Dict[str, Experiment] = field(default_factory=dict, compare=False, metadata={"pickle_ignore": True})
 
     def get(self, experiment_id: UUID, **kwargs) -> Experiment:
         e = self.experiments.get(experiment_id)
@@ -30,17 +27,17 @@ class TestPlaformExperimentOperation(IPlatformExperimentOperations):
         e.platform = self.platform
         return e
 
-    def platform_create(self, experiment: Experiment, **kwargs) -> Tuple[Experiment, UUID]:
+    def platform_create(self, experiment: Experiment, **kwargs) -> Experiment:
         if logger.isEnabledFor(DEBUG):
             logger.debug('Creating Experiment')
         uid = uuid4()
         experiment.uid = uid
         EXPERIMENTS_LOCK.acquire()
-        self.experiments.set(uid, experiment)
+        self.experiments[uid] = experiment
         EXPERIMENTS_LOCK.release()
         self.platform._simulations._save_simulations_to_cache(uid, list(), overwrite=True)
         logger.debug(f"Created Experiment {experiment.uid}")
-        return experiment, experiment.uid
+        return experiment
 
     def get_children(self, experiment: Experiment, **kwargs) -> List[Any]:
         return self.platform._simulations.simulations.get(experiment.uid)

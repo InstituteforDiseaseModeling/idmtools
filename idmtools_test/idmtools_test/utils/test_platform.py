@@ -3,10 +3,10 @@ import os
 from dataclasses import dataclass, field
 from logging import getLogger
 from typing import List, Type
+
 from idmtools.core import ItemType
+from idmtools.entities.iexperiment import IExperiment
 from idmtools.entities.iplatform import IPlatform
-from idmtools.entities.iexperiment import IExperiment, ILinuxExperiment, IWindowsExperiment, \
-    IGPUExperiment, IDockerExperiment
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.registry.platform_specification import example_configuration_impl, get_platform_impl, \
     get_platform_type_impl, PlatformSpecification
@@ -14,12 +14,9 @@ from idmtools.registry.plugin_specification import get_description_impl
 from idmtools_test.utils.operations.experiment_operations import TestPlaformExperimentOperation
 from idmtools_test.utils.operations.simulation_operations import TestPlaformSimulationOperation
 
-
 logger = getLogger(__name__)
 current_directory = os.path.dirname(os.path.realpath(__file__))
 data_path = os.path.abspath(os.path.join(current_directory, "..", "data"))
-
-logger = getLogger(__name__)
 
 supported_types = [PlatformRequirements.SHELL, PlatformRequirements.NativeBinary, PlatformRequirements.PYTHON,
                    PlatformRequirements.WINDOWS if os.name == "nt" else PlatformRequirements.LINUX]
@@ -47,14 +44,6 @@ class TestPlatform(IPlatform):
         self._experiments = TestPlaformExperimentOperation(self)
         self._simulations = TestPlaformSimulationOperation(self)
 
-    def supported_experiment_types(self) -> List[Type]:
-        os_ex = IWindowsExperiment if os.name == "nt" else ILinuxExperiment
-        return [IExperiment, os_ex]
-
-    def unsupported_experiment_types(self) -> List[Type]:
-        os_ex = IWindowsExperiment if os.name != "nt" else ILinuxExperiment
-        return [IGPUExperiment, IDockerExperiment, os_ex]
-
     def post_setstate(self):
         self.init_interfaces()
 
@@ -63,7 +52,8 @@ class TestPlatform(IPlatform):
         self._simulations.set_simulation_status(experiment.uid, EntityStatus.RUNNING)
 
     def cleanup(self):
-        pass
+        self._experiments.experiments = dict()
+        self._simulations.simulations = dict()
 
 
 TEST_PLATFORM_EXAMPLE_CONFIG = """

@@ -1,5 +1,6 @@
 import json
 from dataclasses import dataclass, field
+
 from idmtools.assets import Asset, AssetCollection
 from idmtools.entities import CommandLine
 from idmtools.entities.itask import ITask
@@ -37,7 +38,8 @@ class TestTask(ITask):
         pass
 
     def gather_transient_assets(self) -> AssetCollection:
-        self.transient_assets.add_asset(Asset("config.json", content=json.dumps(self.parameters)))
+        if not self.transient_assets.has_asset("config.json"):
+            self.transient_assets.add_asset(Asset("config.json", content=json.dumps(self.parameters)))
         return self.transient_assets
 
     def reload_from_simulation(self, simulation: 'Simulation'):
