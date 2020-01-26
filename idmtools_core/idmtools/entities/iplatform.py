@@ -2,25 +2,25 @@ from abc import ABCMeta
 from dataclasses import fields, field
 from itertools import groupby
 from logging import getLogger, DEBUG
+from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set, Iterator
 from uuid import UUID
+
 from idmtools.core import CacheEnabled, ItemType, UnknownItemException, EntityContainer, UnsupportedPlatformType
 from idmtools.core.interfaces.ientity import IEntity
+from idmtools.core.interfaces.iitem import IItem
 from idmtools.entities.experiment import Experiment
+from idmtools.entities.iexperiment import IExperiment
+from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
+from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
+from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
+from idmtools.entities.iplatform_ops.iplatform_suite_operations import IPlatformSuiteOperations
+from idmtools.entities.iplatform_ops.iplatform_workflowitem_operations import IPlatformWorkflowItemOperations
 from idmtools.entities.isimulation import ISimulation
 from idmtools.entities.itask import ITask
 from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.suite import Suite
-from idmtools.entities.iexperiment import IExperiment
-from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
-from idmtools.entities.iplatform_ops.iplatform_workflowitem_operations import IPlatformWorkflowItemOperations
-from idmtools.entities.iplatform_ops.iplatform_suite_operations import IPlatformSuiteOperations
-from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
-from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
 from idmtools.services.platforms import PlatformPersistService
-from idmtools.core.interfaces.iitem import IItem
-from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set, Optional
-
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
 
 logger = getLogger(__name__)
@@ -382,7 +382,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             self.cache.delete(cache_key)
         return cache_key
 
-    def create_items(self, items: List[IEntity]) -> List[UUID]:
+    def create_items(self, items: Union[List[IEntity], IEntity]) -> List[IEntity]:
         """
         Create items (simulations, experiments, or suites) on the platform. The function will batch the items based on
         type and call the self._create_batch for creation
@@ -391,14 +391,17 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         Returns:
             List of item IDs created.
         """
-        self._is_item_list_supported(items)
+        if isinstance(items, IEntity):
+            items = [items]
+        if not isinstance(items, Iterator):
+            self._is_item_list_supported(items)
 
-        ids = []
+        result = []
         for key, group in groupby(items, lambda x: x.item_type):
             interface = ITEM_TYPE_TO_OBJECT_INTERFACE[key]
-            group_ids = getattr(self, interface).batch_create(list(group))
-            ids.extend([i[1] for i in group_ids])
-        return ids
+            ni = getattr(self, interface).batch_create(list(group))
+            result.extend(ni)
+        return result
 
     def _is_item_list_supported(self, items: List[IEntity]):
         for item in items:

@@ -37,3 +37,11 @@ def verbose_timedelta(delta):
             break
     dhms.reverse()
     return ', '.join(dhms)
+
+
+def get_qualified_class_name(cls):
+    return f'{cls.__module__}.{cls.__name__}'
+
+
+def get_qualified_class_name_from_obj(obj):
+    return get_qualified_class_name(obj.__class__)

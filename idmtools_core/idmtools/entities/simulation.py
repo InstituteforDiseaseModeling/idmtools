@@ -1,10 +1,12 @@
+from dataclasses import dataclass, field
 from logging import getLogger, DEBUG
 from typing import List, Callable, NoReturn, Union, Mapping, Any, Type, TypeVar
-from dataclasses import dataclass, field
+
 from idmtools.core import ItemType, NoTaskFound
+from idmtools.core.enums import EntityStatus
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.core.interfaces.inamed_entity import INamedEntity
-
+from idmtools.utils.language import get_qualified_class_name_from_obj
 
 logger = getLogger(__name__)
 user_logger = getLogger('user')
@@ -35,6 +37,11 @@ class Simulation(IAssetsEnabled, INamedEntity):
         return id(self.uid)
 
     def pre_creation(self):
+        if self.task is None:
+            msg = 'Task is required for simulations'
+            user_logger.error(msg)
+            raise NoTaskFound(msg)
+
         # Call all of our hooks
         for x in self.pre_creation_hooks:
             if logger.isEnabledFor(DEBUG):
@@ -44,16 +51,27 @@ class Simulation(IAssetsEnabled, INamedEntity):
 
         if self.__class__ is not Simulation:
             # Add a tag to keep the Simulation class name
-            self.tags["experiment_type"] = f'{self.__class__.__module__}.{self.__class__.__name__}'
-            self.tags["simulation_type"] = f'{self.__class__.__module__}.{self.__class__.__name__}'
+            sn = get_qualified_class_name_from_obj(self)
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f'Setting Simulation Tag "simulation_type" to "{sn}"')
+            self.tags["simulation_type"] = sn
 
-        if self.task is None:
-            msg = 'Task is required for simulations'
-            user_logger.error(msg)
-            raise NoTaskFound(msg)
+        # Add a tag to for task
+        if self.parent and "task_type" not in self.parent.tags:
+            tn = get_qualified_class_name_from_obj(self.task)
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f'Setting Simulation Tag "task_type" to "{tn}"')
+            self.tags["task_type"] = tn
 
-        # Add a tag to keep the Simulation class name
-        self.tags["task_type"] = f'{self.task.__class__.__module__}.{self.task.__class__.__name__}'
+        if logger.isEnabledFor(DEBUG):
+            logger.debug('Calling task post creation')
+        self.task.pre_creation(self)
+
+    def post_creation(self) -> None:
+        if logger.isEnabledFor(DEBUG):
+            logger.debug('Calling task post creation')
+        self.task.post_creation(self)
+        self.status = EntityStatus.CREATED
 
     def pre_getstate(self):
         """
@@ -68,7 +86,7 @@ class Simulation(IAssetsEnabled, INamedEntity):
         Gather all the assets for the simulation.
         """
         self.task.gather_transient_assets()
-        self.assets.add_assets(self.task.transient_assets)
+        self.assets.add_assets(self.task.transient_assets, fail_on_duplicate=False)
 
 
 # TODO Rename to T simulation once old simulation is one
