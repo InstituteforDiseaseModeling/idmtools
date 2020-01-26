@@ -141,9 +141,11 @@ class ITask(metaclass=ABCMeta):
         raise NotImplementedError("Reloading task from a simulation is not supported")
 
 
-def task_to_experiment(task: ITask) -> 'Experiment':
+def task_to_experiment(task: ITask, experiment_kwargs=None) -> 'Experiment':
+    if experiment_kwargs is None:
+        experiment_kwargs = dict()
     from idmtools.entities.experiment import Experiment
     sim = Simulation(task=task)
-    e = Experiment()
+    e = Experiment(**experiment_kwargs)
     e.simulations.append(sim)
     return e

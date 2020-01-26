@@ -2,7 +2,8 @@ from unittest import TestCase
 import pytest
 from idmtools.builders import SimulationBuilder
 from idmtools.entities.command_task import CommandTask
-from idmtools.entities.templated_simulation import TemplatedSimulation
+
+from idmtools.entities.templated_simulation import TemplatedSimulations
 
 
 def print_sweep(simulation, value):
@@ -13,7 +14,7 @@ def print_sweep(simulation, value):
 @pytest.mark.tasks
 class TestTemplatedSimulation(TestCase):
     def test_generator(self):
-        ts = TemplatedSimulation(base_task=CommandTask(command='ls'))
+        ts = TemplatedSimulations(base_task=CommandTask(command='ls'))
         builder = SimulationBuilder()
         total = 10
         builder.add_sweep_definition(print_sweep, range(total))

@@ -28,7 +28,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
     platform_requirements: Set[PlatformRequirements] = field(default_factory=set)
     frozen: bool = field(default=False, init=False)
     __simulations: EntityContainer = field(default_factory=lambda: EntityContainer(),
-                                                  compare=False, metadata={"pickle_ignore": True})
+                                           compare=False)
 
     def __post_init__(self):
         super().__post_init__()

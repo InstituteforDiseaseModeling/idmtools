@@ -2,9 +2,7 @@ import copy
 import os
 import unittest.mock
 from functools import partial
-
 import pytest
-
 from idmtools_model_emod import EMODExperiment
 from idmtools_model_emod.defaults import EMODSir
 from idmtools_test import COMMON_INPUT_PATH

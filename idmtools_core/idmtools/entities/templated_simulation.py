@@ -1,16 +1,17 @@
 import copy
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields
 from itertools import chain
 from typing import Set, Generator
 from more_itertools import grouper
 from idmtools.builders.simulation_builder import SimulationBuilder
 from idmtools.entities.itask import ITask
 from idmtools.entities.simulation import Simulation
+from idmtools.utils.hashing import ignore_fields_in_dataclass_on_pickle
 
 
 @dataclass(repr=False)
-class TemplatedSimulation:
-    builders: Set[SimulationBuilder] = field(default_factory=lambda: set(), compare=False, metadata={"pickle_ignore": True})
+class TemplatedSimulations:
+    builders: Set[SimulationBuilder] = field(default_factory=lambda: set(), compare=False)
     base_simulation: Simulation = field(default=None, compare=False, metadata={"pickle_ignore": True})
     base_task: ITask = field(default=None)
 
@@ -75,6 +76,10 @@ class TemplatedSimulation:
         # Add new builder to the collection
         self.builders.add(builder)
 
+    @property
+    def pickle_ignore_fields(self):
+        return set(f.name for f in fields(self) if "pickle_ignore" in f.metadata and f.metadata["pickle_ignore"])
+
     def display(self):
         from idmtools.utils.display import display, experiment_table_display
         display(self, experiment_table_display)
@@ -109,3 +114,15 @@ class TemplatedSimulation:
 
     def __iter__(self):
         return self.simulations()
+
+    def __getstate__(self):
+        """
+        Ignore the fields in pickle_ignore_fields during pickling.
+        """
+        return ignore_fields_in_dataclass_on_pickle(self)
+
+    def __setstate__(self, state):
+        """
+        Add ignored fields back since they don't exist in the pickle
+        """
+        self.__dict__.update(state)

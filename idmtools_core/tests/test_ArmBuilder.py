@@ -1,7 +1,7 @@
 import itertools
 from functools import partial
 from idmtools.builders.arm_simulation_builder import ArmSimulationBuilder, SweepArm, ArmType
-from idmtools.entities.templated_simulation import TemplatedSimulation
+from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.test_task import TestTask
 from idmtools_test.utils.utils import verify_simulation
@@ -42,7 +42,7 @@ class TestArmBuilder(ITestWithPersistence):
             self.assertTrue(found)
 
     def get_templated_sim_builder(self):
-        templated_sim = TemplatedSimulation(base_task=TestTask())
+        templated_sim = TemplatedSimulations(base_task=TestTask())
         templated_sim.builder = self.builder
         return templated_sim
 
@@ -68,7 +68,7 @@ class TestArmBuilder(ITestWithPersistence):
         builder2.add_arm(arm)
 
         # convert template to a fully realized list
-        templated_sim2 = TemplatedSimulation(base_task=TestTask())
+        templated_sim2 = TemplatedSimulations(base_task=TestTask())
         templated_sim2.builder = builder2
 
         simulations2_cfgs = list([s.task.parameters for s in templated_sim2])

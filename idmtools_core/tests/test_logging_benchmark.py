@@ -21,7 +21,6 @@ def log_process_id():
 # portions since that is quite slow in debugger
 LOG_TESTS_TO_RUN = 50000 if getattr(sys, 'gettrace', None) is None else 5000
 
-
 @skip
 class TestLoggingBenchmark(TestCase):
     @classmethod

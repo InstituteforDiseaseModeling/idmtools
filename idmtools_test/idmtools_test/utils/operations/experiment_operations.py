@@ -1,17 +1,18 @@
 import os
 from dataclasses import field, dataclass
 from logging import getLogger, DEBUG
+from threading import Lock
 from typing import List, Any, Tuple, Type
 from uuid import UUID, uuid4
 import diskcache
 from idmtools.core import EntityStatus, UnknownItemException
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
-from idmtools_test.utils.operations.simulation_operations import SIMULATION_LOCK
 
 logger = getLogger(__name__)
 current_directory = os.path.dirname(os.path.realpath(__file__))
 data_path = os.path.abspath(os.path.join(current_directory, "..", "..", "data"))
+EXPERIMENTS_LOCK = Lock()
 
 
 @dataclass
@@ -34,7 +35,9 @@ class TestPlaformExperimentOperation(IPlatformExperimentOperations):
             logger.debug('Creating Experiment')
         uid = uuid4()
         experiment.uid = uid
+        EXPERIMENTS_LOCK.acquire()
         self.experiments.set(uid, experiment)
+        EXPERIMENTS_LOCK.release()
         self.platform._simulations._save_simulations_to_cache(uid, list(), overwrite=True)
         logger.debug(f"Created Experiment {experiment.uid}")
         return experiment, experiment.uid

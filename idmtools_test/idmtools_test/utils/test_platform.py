@@ -63,9 +63,7 @@ class TestPlatform(IPlatform):
         self._simulations.set_simulation_status(experiment.uid, EntityStatus.RUNNING)
 
     def cleanup(self):
-        for cache in [self._experiments.experiments, self._simulations.simulations]:
-            cache.clear()
-            cache.close()
+        pass
 
 
 TEST_PLATFORM_EXAMPLE_CONFIG = """

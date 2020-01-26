@@ -96,7 +96,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         return self.platform.get_item(simulation['experiment_id'], ItemType.EXPERIMENT, raw=True)
 
-    def run_item(self, simulation: ISimulation):
+    def platform_run_item(self, simulation: ISimulation):
         """
         On the local platform, simulations are ran by queue and commissioned through create
         Args:

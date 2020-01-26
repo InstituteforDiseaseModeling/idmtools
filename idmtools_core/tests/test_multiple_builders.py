@@ -1,18 +1,18 @@
 import os
 from dataclasses import fields
-
 import numpy as np
 from functools import partial
 from idmtools.builders import ArmSimulationBuilder, SweepArm, ArmType
 from idmtools.builders import YamlSimulationBuilder
 from idmtools.builders import CsvExperimentBuilder
+from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-from idmtools_test.utils.tst_experiment import TstExperiment
 from idmtools_test import COMMON_INPUT_PATH
+from idmtools_test.utils.test_task import TestTask
 
 
 def param_update(simulation, param, value):
-    return simulation.set_parameter(param, value)
+    return simulation.task.set_parameter(param, value)
 
 
 setA = partial(param_update, param="a")
@@ -52,12 +52,12 @@ class TestMultipleBuilders(ITestWithPersistence):
         self.arm_builder.add_arm(arm)
 
         # add individual builders
-        experiment = TstExperiment("test")
-        experiment.add_builder(self.yaml_builder)
-        experiment.add_builder(self.csv_builder)
-        experiment.add_builder(self.arm_builder)
+        template_sim = TemplatedSimulations(base_task=TestTask())
+        template_sim.add_builder(self.yaml_builder)
+        template_sim.add_builder(self.csv_builder)
+        template_sim.add_builder(self.arm_builder)
 
-        simulations = list(experiment.batch_simulations(50))[0]
+        simulations = list(template_sim)
 
         # test if we have correct number of simulations
         self.assertEqual(len(simulations), 10 + 5 + 6)
@@ -69,12 +69,12 @@ class TestMultipleBuilders(ITestWithPersistence):
         self.arm_builder.add_arm(arm)
 
         # add individual builders
-        experiment = TstExperiment("test")
-        experiment.add_builder(self.arm_builder)
-        experiment.add_builder(self.arm_builder)
+        template_sim = TemplatedSimulations(base_task=TestTask())
+        template_sim.add_builder(self.arm_builder)
+        template_sim.add_builder(self.arm_builder)
 
         # test if we have correct number of builders
-        self.assertEqual(len(experiment.builders), 1)
+        self.assertEqual(len(template_sim.builders), 1)
 
     def test_builder_property(self):
         arm = SweepArm(type=ArmType.cross)
@@ -83,23 +83,13 @@ class TestMultipleBuilders(ITestWithPersistence):
         self.arm_builder.add_arm(arm)
 
         # add individual builders
-        experiment = TstExperiment("test")
-        experiment.builder = self.arm_builder
-        experiment.builder = self.csv_builder
-        experiment.builder = self.yaml_builder
+        template_sim = TemplatedSimulations(base_task=TestTask())
+        template_sim.builder = self.arm_builder
+        template_sim.builder = self.csv_builder
+        template_sim.builder = self.yaml_builder
 
         # test if we have correct number of builders
-        self.assertEqual(len(experiment.builders), 1)
+        self.assertEqual(len(template_sim.builders), 1)
 
         # test only the last builder has been added
-        self.assertTrue(isinstance(list(experiment.builders)[0], YamlSimulationBuilder))
-
-    def test_validation(self):
-        a = TstExperiment(name="test")
-        self.assertSetEqual(a.pickle_ignore_fields, set(f.name for f in fields(a) if "pickle_ignore" in f.metadata and f.metadata["pickle_ignore"]))
-
-        with self.assertRaises(Exception):
-            a.builder = 1
-
-        # test no builder has been added
-        self.assertSetEqual(a.builders, set())
+        self.assertTrue(isinstance(list(template_sim.builders)[0], YamlSimulationBuilder))

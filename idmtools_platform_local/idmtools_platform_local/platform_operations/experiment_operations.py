@@ -112,7 +112,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         """
         return None
 
-    def run_item(self, experiment: Experiment):
+    def platform_run_item(self, experiment: Experiment):
         """
         Run the experiment
         Args:
