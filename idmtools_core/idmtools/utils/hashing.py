@@ -8,7 +8,9 @@ import io
 import pickle
 import types
 from dataclasses import fields, _MISSING_TYPE
-from logging import getLogger, DEBUG
+from logging import getLogger
+
+from idmtools.utils.collections import ParentIterator
 
 logger = getLogger(__name__)
 
@@ -64,23 +66,29 @@ class Hasher(Pickler):
             return self._hash.hexdigest()
 
     def save(self, obj):
-        if isinstance(obj, (types.MethodType, type({}.pop))):
-            # the Pickler cannot pickle instance methods; here we decompose
-            # them into components that make them uniquely identifiable
-            if hasattr(obj, '__func__'):
-                func_name = obj.__func__.__name__
-            else:
-                func_name = obj.__name__
-            inst = obj.__self__
-            if type(inst) == type(pickle):
-                obj = _MyHash(func_name, inst.__name__)
-            elif inst is None:
-                # type(None) or type(module) do not pickle
-                obj = _MyHash(func_name, inst)
-            else:
-                cls = obj.__self__.__class__
-                obj = _MyHash(func_name, inst, cls)
-        Pickler.save(self, obj)
+        import abc
+        if isinstance(obj, abc.ABCMeta):
+            pass
+        elif isinstance(obj, ParentIterator):
+            pass
+        else:
+            if isinstance(obj, (types.MethodType, type({}.pop))):
+                # the Pickler cannot pickle instance methods; here we decompose
+                # them into components that make them uniquely identifiable
+                if hasattr(obj, '__func__'):
+                    func_name = obj.__func__.__name__
+                else:
+                    func_name = obj.__name__
+                inst = obj.__self__
+                if type(inst) == type(pickle):
+                    obj = _MyHash(func_name, inst.__name__)
+                elif inst is None:
+                    # type(None) or type(module) do not pickle
+                    obj = _MyHash(func_name, inst)
+                else:
+                    cls = obj.__self__.__class__
+                    obj = _MyHash(func_name, inst, cls)
+            Pickler.save(self, obj)
 
     def memoize(self, obj):
         """
@@ -127,8 +135,6 @@ def ignore_fields_in_dataclass_on_pickle(item):
 
     # Update default with parent's pre-populated values
     if hasattr(item, 'pre_getstate'):
-        if logger.isEnabledFor(DEBUG):
-            logger.debug('Triggering pre_getstate')
         pre_state = item.pre_getstate()
         pre_state = pre_state or {}
         field_default.update(pre_state)
