@@ -3,7 +3,9 @@ from functools import partial
 from inspect import signature
 from itertools import product
 from typing import Callable, Any, List, Iterable, Union, Dict
+
 from idmtools.entities.simulation import Simulation
+from idmtools.utils.collections import duplicate_list_of_generators
 
 
 class SimulationBuilder:
@@ -88,4 +90,7 @@ class SimulationBuilder:
         self.count *= len(values)
 
     def __iter__(self):
-        yield from product(*self.sweeps)
+        old_sw, new_sw = duplicate_list_of_generators(self.sweeps)
+
+        yield from product(*old_sw)
+        self.sweeps = new_sw
