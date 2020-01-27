@@ -1,25 +1,30 @@
 import copy
 import json
 import os
-import pytest
 import unittest
 from functools import partial
 from operator import itemgetter
-from COMPS.Data import Experiment
+
+import pytest
+from COMPS.Data import Experiment as COMPSExperiment
+from COMPS.Data import QueryCriteria
+
 from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import ArmSimulationBuilder, ArmType, SimulationBuilder, StandAloneSimulationsBuilder, SweepArm
+from idmtools.core import EntityStatus, ItemType
 from idmtools.core.platform_factory import Platform
+from idmtools.entities.experiment import Experiment
+from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
-from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id
+from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools.core import EntityStatus, ItemType
-from COMPS.Data import QueryCriteria
+from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 
 def param_update(simulation, param, value):
-    return simulation.set_parameter(param, value)
+    return simulation.task.set_parameter(param, value)
 
 
 setA = partial(param_update, param="a")
@@ -51,10 +56,13 @@ class TestPythonExperiment(ITestWithPersistence):
 
     @pytest.mark.long
     def test_sweeps_with_partial_comps(self):
-        pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
 
-        pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123, "KeyOnly": None}
-        pe.base_simulation.set_parameter("c", "c-value")
+        e = Experiment(name=self.case_name,
+                       simulations=TemplatedSimulations(base_task=JSONConfiguredPythonTask(
+                           script_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
+                                                        ))
+        e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123, "KeyOnly": None}
+        e.simulations.base_simulation.task.set_parameter("c", "c-value")
         builder = SimulationBuilder()
         # ------------------------------------------------------
         # Sweeping parameters:
@@ -65,13 +73,12 @@ class TestPythonExperiment(ITestWithPersistence):
         builder.add_sweep_definition(setParam("b"), [i * i for i in range(1, 4, 2)])
         # ------------------------------------------------------
 
-        pe.builder = builder
+        e.simulations.builder = builder
 
-        em = ExperimentManager(experiment=pe, platform=self.platform)
-        em.run()
-        em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
-        experiment = Experiment.get(em.experiment.uid)
+        self.platform.run_items(e)
+        self.platform.wait_till_done(e)
+        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in e.simulations]))
+        experiment = COMPSExperiment.get(e.uid)
         print(experiment.id)
         exp_id = experiment.id
         # exp_id = "a727e802-d88b-e911-a2bb-f0921c167866"
@@ -115,7 +122,7 @@ class TestPythonExperiment(ITestWithPersistence):
         em.run()
         em.wait_till_done()
         self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
-        experiment = Experiment.get(em.experiment.uid)
+        experiment = COMPSExperiment.get(em.experiment.uid)
         print(experiment.id)
         exp_id = experiment.id
         self.validate_output(exp_id, 5)
@@ -153,7 +160,7 @@ class TestPythonExperiment(ITestWithPersistence):
         exp_id = em.experiment.uid
         # exp_id ='ef8e7f2f-a793-e911-a2bb-f0921c167866'
         count = 0
-        for simulation in Experiment.get(exp_id).get_simulations():
+        for simulation in COMPSExperiment.get(exp_id).get_simulations():
             # validate output/config.json
             config_string = simulation.retrieve_output_files(paths=["config.json"])
             config_parameters = json.loads(config_string[0].decode('utf-8'))['parameters']
@@ -206,7 +213,7 @@ class TestPythonExperiment(ITestWithPersistence):
         exp_id = em.experiment.uid
         # validate results from comps
         # exp_id ='eb7ce224-9993-e911-a2bb-f0921c167866'
-        for simulation in Experiment.get(exp_id).get_simulations():
+        for simulation in COMPSExperiment.get(exp_id).get_simulations():
             # validate output/config.json
             assets = self.assert_valid_config_stdout_and_assets(simulation)
             self.assertEqual(len(assets), 5)
@@ -276,7 +283,7 @@ class TestPythonExperiment(ITestWithPersistence):
         exp_id = em.experiment.uid
         # validate results from comps
         # exp_id ='a98090dc-ea92-e911-a2bb-f0921c167866'
-        for simulation in Experiment.get(exp_id).get_simulations():
+        for simulation in COMPSExperiment.get(exp_id).get_simulations():
             # validate output/config.json
             assets = self.assert_valid_config_stdout_and_assets(simulation)
             self.assertEqual(len(assets), 2)
@@ -377,7 +384,7 @@ class TestPythonExperiment(ITestWithPersistence):
         self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
         exp_id = em.experiment.uid
         # validate results from comps
-        for simulation in Experiment.get(exp_id).get_simulations():
+        for simulation in COMPSExperiment.get(exp_id).get_simulations():
             # validate output/config.json
             assets = self.assert_valid_config_stdout_and_assets(simulation)
             self.assertEqual(len(assets), 5)
@@ -427,7 +434,7 @@ class TestPythonExperiment(ITestWithPersistence):
         self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
         exp_id = em.experiment.uid
         # validate results from comps
-        for simulation in Experiment.get(exp_id).get_simulations():
+        for simulation in COMPSExperiment.get(exp_id).get_simulations():
             # validate output/config.json
             assets = self.assert_valid_new_assets(simulation)
             self.assertEqual(len(assets), 6)
@@ -442,7 +449,7 @@ class TestPythonExperiment(ITestWithPersistence):
 
     def validate_output(self, exp_id, expected_sim_count):
         sim_count = 0
-        for simulation in Experiment.get(exp_id).get_simulations():
+        for simulation in COMPSExperiment.get(exp_id).get_simulations():
             sim_count = sim_count + 1
             result_file_string = simulation.retrieve_output_files(paths=['output/result.json'])
             print(result_file_string)
@@ -454,7 +461,7 @@ class TestPythonExperiment(ITestWithPersistence):
 
     def validate_sim_tags(self, exp_id, expected_tags):
         tags = []
-        for simulation in Experiment.get(exp_id).get_simulations():
+        for simulation in COMPSExperiment.get(exp_id).get_simulations():
             tags.append(simulation.get(simulation.id, QueryCriteria().select_children('tags')).tags)
 
         sorted_tags = sorted(tags, key=itemgetter('a'))

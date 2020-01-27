@@ -1,9 +1,10 @@
 import os
 from dataclasses import dataclass, field
-from typing import Any, List, Tuple, Type
+from typing import Any, List, Type
 from uuid import UUID
-from COMPS.Data import Experiment as COMPSExperiment, QueryCriteria, AssetCollection as COMPSAssetCollection, \
-    AssetCollectionFile, Configuration
+
+from COMPS.Data import Experiment as COMPSExperiment, QueryCriteria, Configuration
+
 from idmtools.core import ItemType
 from idmtools.core.experiment_factory import experiment_factory
 from idmtools.entities import IExperiment
@@ -26,9 +27,8 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         return COMPSExperiment.get(id=experiment_id,
                                    query_criteria=QueryCriteria().select(cols).select_children(children))
 
-    def platform_create(self, experiment: IExperiment, **kwargs) -> Tuple[COMPSExperiment, UUID]:
-        if not self.platform.is_supported_experiment(experiment):
-            raise ValueError("The specified experiment is not supported on this platform")
+    def platform_create(self, experiment: IExperiment, **kwargs) -> COMPSExperiment:
+        # TODO check experiment task supported
 
         # Cleanup the name
         experiment_name = clean_experiment_name(experiment.name)
@@ -65,7 +65,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
 
         # Send the assets for the experiment
         self.send_assets(experiment)
-        return e, experiment.uid
+        return e
 
     def get_children(self, experiment: COMPSExperiment, **kwargs) -> List[Any]:
         cols = kwargs.get("cols")

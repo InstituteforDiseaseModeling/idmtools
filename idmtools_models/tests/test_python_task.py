@@ -1,5 +1,6 @@
 import os
 from unittest import TestCase
+
 import pytest
 
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
@@ -46,7 +47,7 @@ class TestPythonTask(TestCase):
 
     def test_json_python_argument(self):
         fpath = os.path.join(COMMON_INPUT_PATH, "python", "model1.py")
-        task = JSONConfiguredPythonTask(script_name=fpath)
+        task = JSONConfiguredPythonTask(script_path=fpath)
         task.gather_all_assets()
 
         self.assertEqual(str(task.command), f'python ./Assets/model1.py --config config.json')
@@ -56,7 +57,7 @@ class TestPythonTask(TestCase):
     def test_json_python_static_filename_no_argument(self):
         fpath = os.path.join(COMMON_INPUT_PATH, "python", "model1.py")
         # here we test a script that may have no configu
-        task = JSONConfiguredPythonTask(script_name=fpath, configfile_argument=None)
+        task = JSONConfiguredPythonTask(script_path=fpath, configfile_argument=None)
         task.gather_all_assets()
 
         self.assertEqual(str(task.command), f'python ./Assets/model1.py')
@@ -65,7 +66,7 @@ class TestPythonTask(TestCase):
 
     def test_different_python_path(self):
         fpath = os.path.join(COMMON_INPUT_PATH, "python", "model1.py")
-        task = JSONConfiguredPythonTask(script_name=fpath, configfile_argument=None, python_path='python3.8')
+        task = JSONConfiguredPythonTask(script_path=fpath, configfile_argument=None, python_path='python3.8')
         task.gather_all_assets()
 
         self.assertEqual(str(task.command), f'python3.8 ./Assets/model1.py')

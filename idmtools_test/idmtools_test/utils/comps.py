@@ -1,11 +1,12 @@
 import os
 
 from COMPS import Data
+from COMPS.Data import AssetCollection as CompsAssetCollection
 from COMPS.Data import QueryCriteria, Simulation as COMPSSimulation, Simulation
 
-from idmtools.core import EntityStatus, SimulationBuilder
+from idmtools.builders import SimulationBuilder
+from idmtools.core.enums import EntityStatus
 from idmtools.entities import IExperiment
-from COMPS.Data import AssetCollection as CompsAssetCollection
 
 
 def get_asset_collection_id_for_simulation_id(sim_id):

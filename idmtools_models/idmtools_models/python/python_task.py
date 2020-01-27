@@ -3,6 +3,7 @@ import subprocess
 import tempfile
 from dataclasses import dataclass, field
 from typing import Set
+
 from idmtools.assets import Asset, AssetCollection
 from idmtools.entities import CommandLine
 from idmtools.entities.itask import ITask
@@ -13,16 +14,15 @@ from idmtools.registry.task_specification import TaskSpecification
 
 @dataclass()
 class PythonTask(ITask):
-
-    script_name: str = None
+    script_path: str = None
     python_path: str = 'python'
     platform_requirements: Set[PlatformRequirements] = field(default_factory=lambda: [PlatformRequirements.PYTHON])
 
     def __post_init__(self):
         super().__post_init__()
-        if self.script_name is None:
+        if self.script_path is None:
             raise ValueError("Script name is required")
-        cmd_str = f'{self.python_path} ./Assets/{os.path.basename(self.script_name)}'
+        cmd_str = f'{self.python_path} ./Assets/{os.path.basename(self.script_path)}'
         self._task_log.info('Setting command line to %s', cmd_str)
         self.command = CommandLine(cmd_str)
 
@@ -36,7 +36,7 @@ class PythonTask(ITask):
         Returns:
             List of libraries required by the script
         """
-        model_folder = os.path.dirname(self.script_name)
+        model_folder = os.path.dirname(self.script_path)
 
         # Store the pipreqs file in a temporary directory
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -57,8 +57,8 @@ class PythonTask(ITask):
             AssetCollection
         """
         # ensure that assets is in collection
-        self._task_log.info('Adding Common asset from %s', self.script_name)
-        self.common_assets.add_asset(Asset(absolute_path=self.script_name), fail_on_duplicate=False)
+        self._task_log.info('Adding Common asset from %s', self.script_path)
+        self.common_assets.add_asset(Asset(absolute_path=self.script_path), fail_on_duplicate=False)
         return self.common_assets
 
     def gather_transient_assets(self) -> AssetCollection:

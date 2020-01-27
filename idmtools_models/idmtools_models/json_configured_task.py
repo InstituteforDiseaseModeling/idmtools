@@ -2,6 +2,7 @@ import json
 from dataclasses import dataclass, field
 from logging import getLogger, DEBUG
 from typing import Union, Dict, Any
+
 from idmtools.assets import Asset, AssetCollection
 from idmtools.entities.itask import ITask
 from idmtools.registry.task_specification import TaskSpecification
@@ -40,7 +41,7 @@ class JSONConfiguredTask(ITask):
             self.transient_assets.add_or_replace_asset(Asset(filename=self.config_file_name, content=json.dumps(params)))
         return self.transient_assets
 
-    def update_parameter(self, key: TJSONConfigKeyType, value: TJSONConfigValueType):
+    def set_parameter(self, key: TJSONConfigKeyType, value: TJSONConfigValueType):
         """
         Update a parameter. The type hinting encourages JSON supported types
 
@@ -51,7 +52,7 @@ class JSONConfiguredTask(ITask):
         Returns:
 
         """
-        self._task_log.info('Setting parameter %0 to %1', key, str(value))
+        self._task_log.info('Setting parameter %s to %s', key, str(value))
         self.parameters[key] = value
 
     def get_parameter(self, key: TJSONConfigKeyType) -> TJSONConfigValueType:

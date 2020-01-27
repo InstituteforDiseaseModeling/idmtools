@@ -1,6 +1,7 @@
 import json
 from dataclasses import dataclass, field
 from unittest import TestCase
+
 import pytest
 
 from idmtools.entities import CommandLine
@@ -27,7 +28,7 @@ class TestJSONConfiguredTask(TestCase):
 
     def test_config_asset_works(self):
         task = self.get_cat_command_task()
-        task.update_parameter('a', 1)
+        task.set_parameter('a', 1)
         task.gather_all_assets()
 
         self.assertEqual(str(task.command), 'cat config.json')
@@ -36,7 +37,7 @@ class TestJSONConfiguredTask(TestCase):
         self.assertDictEqual(json.loads(task.transient_assets.assets[0].content), {'a': 1})
 
         # test that we only keep one config
-        task.update_parameter('a', 2)
+        task.set_parameter('a', 2)
         task.gather_all_assets()
         self.assertEqual(len(task.transient_assets.assets), 1)
         self.assertDictEqual(json.loads(task.transient_assets.assets[0].content), {'a': 2})
@@ -52,7 +53,7 @@ class TestJSONConfiguredTask(TestCase):
 
     def test_derived_class(self):
         task = ExampleExtendedJSONConfiguredTask()
-        task.update_parameter('a', 23)
+        task.set_parameter('a', 23)
         task.gather_all_assets()
 
         self.assertEqual(str(task.command), 'python -m json.tool --infile my_config.json')
