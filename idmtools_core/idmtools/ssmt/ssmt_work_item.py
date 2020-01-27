@@ -3,14 +3,14 @@ from idmtools.core import TTags
 from dataclasses import dataclass, field
 from idmtools.core import ItemType
 from idmtools.assets.FileList import FileList
-from idmtools.entities.iwork_item import IWorkItem
+from idmtools.entities.iworkflow_item import IWorkflowItem
 from uuid import UUID
 
 from typing import NoReturn
 
 
 @dataclass
-class SSMTWorkItem(IWorkItem):
+class SSMTWorkItem(IWorkflowItem):
     """
     Idm SSMT Work Item
     """
@@ -25,7 +25,7 @@ class SSMTWorkItem(IWorkItem):
     wo_kwargs: dict = field(default_factory=lambda: {})
     related_experiments: list = field(default=None)
 
-    item_type: 'ItemType' = field(default=ItemType.WorkItem, compare=False, init=False)
+    item_type: 'ItemType' = field(default=ItemType.WORKFLOW_ITEM, compare=False, init=False)
 
     def __post_init__(self):
         self.tags = self.tags or {}
@@ -81,4 +81,4 @@ class SSMTWorkItem(IWorkItem):
         self.wo_kwargs = {}
 
 
-IWorkItemClass = typing.Type[SSMTWorkItem]
+IWorkflowItemClass = typing.Type[SSMTWorkItem]

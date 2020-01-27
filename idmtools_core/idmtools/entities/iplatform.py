@@ -6,7 +6,7 @@ from uuid import UUID
 from idmtools.core import CacheEnabled, ItemType, UnknownItemException, EntityContainer, UnsupportedPlatformType
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.isimulation import ISimulation
-from idmtools.entities.iwork_item import IWorkItem
+from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.suite import Suite
 from idmtools.entities.iexperiment import IDockerExperiment, IGPUExperiment, IExperiment
@@ -34,13 +34,12 @@ ITEM_TYPE_TO_OBJECT_INTERFACE = {
     ItemType.SIMULATION: '_simulations',
     ItemType.SUITE: '_suites',
     ItemType.WORKFLOW_ITEM: '_workflow_items',
-    ItemType.WorkItem: '_work_items',
     ItemType.ASSETCOLLECTION: '_assets'
 }
 STANDARD_TYPE_TO_INTERFACE = {
     IExperiment: ItemType.EXPERIMENT,
     ISimulation: ItemType.SIMULATION,
-    IWorkItem: ItemType.WorkItem,
+    IWorkflowItem: ItemType.WORKFLOW_ITEM,
     Suite: ItemType.SUITE
 }
 
@@ -66,7 +65,6 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     _simulations: IPlatformSimulationOperations = None
     _suites: IPlatformSuiteOperations = None
     _workflow_items: IPlatformWorkflowItemOperations = None
-    _work_items: IPlatformWorkItemOperations = None
     _assets: IPlatformAssetCollectionOperations = None
 
     @staticmethod
@@ -119,6 +117,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         # build item type map and determined supported features
         self.platform_type_map = dict()
         for item_type, interface in ITEM_TYPE_TO_OBJECT_INTERFACE.items():
+            print(item_type, "::", interface)
             if getattr(self, interface) is not None and getattr(self, interface).platform_type is not None:
                 self.platform_type_map[getattr(self, interface).platform_type] = item_type
 
@@ -332,7 +331,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             Parent or None
         """
         item_type, interface = self._get_operation_interface(platform_item)
-        if item_type not in [ItemType.EXPERIMENT, ItemType.SIMULATION, ItemType.WORKFLOW_ITEM]:
+        if item_type not in [ItemType.EXPERIMENT, ItemType.SIMULATION, ItemType.WORKFLOW_ITEM, ItemType.WorkItem]:
             raise ValueError("Currently only Experiments, Simulations and Work Items support parents")
         obj = getattr(self, interface).get_parent(platform_item, **kwargs)
         if obj is not None:

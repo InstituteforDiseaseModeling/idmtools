@@ -4,12 +4,10 @@ from concurrent.futures.thread import ThreadPoolExecutor
 from dataclasses import dataclass
 from typing import Any, List, Tuple, Type, Dict
 from uuid import UUID
-
 from idmtools.assets import AssetCollection
 from idmtools.core import CacheEnabled
 from idmtools.entities.iexperiment import IExperiment
 from idmtools.entities.isimulation import ISimulation
-from idmtools.entities.iwork_item import IWorkItem
 from idmtools.entities.suite import Suite
 from idmtools.entities.iworkflow_item import IWorkflowItem
 
@@ -666,7 +664,7 @@ class IPlatformWorkItemOperations(CacheEnabled, ABC):
         """
         pass
 
-    def batch_create(self, work_items: List[IWorkItem], **kwargs) -> List[Tuple[Any, UUID]]:
+    def batch_create(self, work_items: List[IWorkflowItem], **kwargs) -> List[Tuple[Any, UUID]]:
         """
         Provides a method to batch create workflow items
 
@@ -683,7 +681,7 @@ class IPlatformWorkItemOperations(CacheEnabled, ABC):
         return ret
 
     @abstractmethod
-    def create(self, workf_item: IWorkItem, **kwargs) -> Tuple[Any, UUID]:
+    def create(self, workf_item: IWorkflowItem, **kwargs) -> Tuple[Any, UUID]:
         """
         Creates an workflow_item from an IDMTools workflow_item object
 
@@ -726,7 +724,7 @@ class IPlatformWorkItemOperations(CacheEnabled, ABC):
         """
         pass
 
-    def to_entity(self, work_item: Any, **kwargs) -> IWorkItem:
+    def to_entity(self, work_item: Any, **kwargs) -> IWorkflowItem:
         """
         Converts the platform representation of workflow_item to idmtools representation
 
@@ -739,7 +737,7 @@ class IPlatformWorkItemOperations(CacheEnabled, ABC):
         return work_item
 
     @abstractmethod
-    def refresh_status(self, work_item: IWorkItem):
+    def refresh_status(self, work_item: IWorkflowItem):
         """
         Refresh status for workflow item
         Args:
@@ -764,7 +762,7 @@ class IPlatformWorkItemOperations(CacheEnabled, ABC):
         pass
 
     @abstractmethod
-    def get_assets(self, work_item: IWorkItem, files: List[str], **kwargs) -> Dict[str, bytearray]:
+    def get_assets(self, work_item: IWorkflowItem, files: List[str], **kwargs) -> Dict[str, bytearray]:
         """
         Load assets for workflow item
         Args:
@@ -778,7 +776,7 @@ class IPlatformWorkItemOperations(CacheEnabled, ABC):
         pass
 
     @abstractmethod
-    def list_assets(self, work_item: IWorkItem) -> List[str]:
+    def list_assets(self, work_item: IWorkflowItem) -> List[str]:
         """
         List files available  for workflow item
 
