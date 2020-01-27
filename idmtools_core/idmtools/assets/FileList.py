@@ -120,6 +120,9 @@ class FileList:
                     # add the file
                     self.add_file(os.path.join(root, f), relative_path=f_relative_path)
 
+    def __len__(self):
+        return len(self.files)
+
     def __iter__(self):
         return self.files.__iter__()
 
