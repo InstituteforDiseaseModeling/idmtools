@@ -1,12 +1,11 @@
 import json
-
 from COMPS.Data import WorkItemFile
 from dataclasses import dataclass, field
-
 from idmtools.assets import AssetCollection
 from idmtools.entities.iplatform_metadata import IPlatformWorkItemOperations
-from COMPS.Data.WorkItem import WorkItem as COMPSWorkItem, WorkItem, WorkerOrPluginKey, RelationType
+from COMPS.Data.WorkItem import WorkItem as COMPSWorkItem, WorkerOrPluginKey, RelationType
 from idmtools.entities.iwork_item import IWorkItem
+from idmtools.ssmt.ssmt_work_item import SSMTWorkItem
 from typing import Any, List, Tuple, Type, Dict
 from uuid import UUID
 
@@ -27,7 +26,7 @@ class SSMTPlatformWorkItemOperations(IPlatformWorkItemOperations):
         Returns:
             Platform Representation of an work_item
         """
-        wi = WorkItem.get(work_item_id)
+        wi = COMPSWorkItem.get(work_item_id)
         return wi
 
     def batch_create(self, work_items: List[IWorkItem], **kwargs) -> List[Tuple[Any, UUID]]:
@@ -61,14 +60,15 @@ class SSMTPlatformWorkItemOperations(IPlatformWorkItemOperations):
         if not work_item.asset_collection_id:
             # Create a collection with everything that is in asset_files
             if len(work_item.asset_files.files) > 0:
-                ac = AssetCollection(local_files=work_item.asset_files)
-                ac.prepare("HPC")
-                work_item.asset_collection_id = ac.collection_id
+                ac = AssetCollection(assets=work_item.asset_files)
+                self.platform.create_items([ac])
+                work_item.asset_collection_id = ac.uid
 
         # Create a WorkItem
-        wi = WorkItem(name=work_item.item_name,
-                      worker=WorkerOrPluginKey(self.platform.item_type, self.platform.plugin_key),
-                      environment_name=self.platform.environment, asset_collection_id=work_item.asset_collection_id)
+        wi = COMPSWorkItem(name=work_item.item_name,
+                           worker=WorkerOrPluginKey(self.platform.item_type, self.platform.plugin_key),
+                           environment_name=self.platform.environment,
+                           asset_collection_id=work_item.asset_collection_id)
 
         # set tags
         if work_item.tags:
@@ -117,9 +117,9 @@ class SSMTPlatformWorkItemOperations(IPlatformWorkItemOperations):
             None
         """
         wi = self.get(work_item.uid)
-        work_item.status = wi.state   # convert_COMPS_status(wi.state)
+        work_item.status = wi.state  # convert_COMPS_status(wi.state)
 
-    def get_parent(self, work_item: Any, **kwargs) -> Any:
+    def get_parent(self, work_item: COMPSWorkItem, **kwargs) -> Any:
         """
         Returns the parent of item. If the platform doesn't support parents, you should throw a TopLevelItem error
 
@@ -132,9 +132,9 @@ class SSMTPlatformWorkItemOperations(IPlatformWorkItemOperations):
         Raise:
             TopLevelItem
         """
-        pass
+        return None
 
-    def get_children(self, work_item: Any, **kwargs) -> List[Any]:
+    def get_children(self, work_item: COMPSWorkItem, **kwargs) -> List[Any]:
         """
         Returns the children of an workflow_item object
 
@@ -145,9 +145,9 @@ class SSMTPlatformWorkItemOperations(IPlatformWorkItemOperations):
         Returns:
             Children of work_item object
         """
-        pass
+        return None
 
-    def to_entity(self, work_item: Any, **kwargs) -> IWorkItem:
+    def to_entity(self, work_item: COMPSWorkItem, **kwargs) -> IWorkItem:
         """
         Converts the platform representation of workflow_item to idmtools representation
 
@@ -155,15 +155,29 @@ class SSMTPlatformWorkItemOperations(IPlatformWorkItemOperations):
             work_item:Platform workflow_item object
 
         Returns:
-            IDMTools workflow_item object
+            IDMTools SSMTWorkItem object
         """
-        return work_item
+        # Creat a SSMTWorkItem
+        obj = SSMTWorkItem()
+
+        # Set its correct attributes
+        obj.item_name = work_item.name
+        obj.uid = work_item.id
+        obj.command = work_item.command
+        obj.asset_collection_id = work_item.asset_collection_id
+        obj.asset_files = work_item.asset_files
+        obj.user_files = work_item.user_files
+        obj.wo_kwargs = work_item.wo_kwargs
+        obj.asset_files = work_item.asset_files
+        obj.tags = work_item.tags
+        obj.related_experiments = work_item.related_experiments
+        return obj
 
     def get_assets(self, work_item: IWorkItem, files: List[str], **kwargs) -> Dict[str, bytearray]:
         """
-        Load assets for workflow item
+        Load assets for work item
         Args:
-            workflow_item: Item
+            work_item: SSMTWorkItem
             files: List of files to load
             **kwargs:
 
@@ -172,6 +186,17 @@ class SSMTPlatformWorkItemOperations(IPlatformWorkItemOperations):
         """
         raise NotImplementedError("Fetching files for simulation is not currently implemented for SSMT")
 
+    def list_assets(self, work_item: IWorkItem) -> List[str]:
+        """
+        List files available  for work item
+
+        Args:
+            work_item: SSMTWorkItem
+
+        Returns:
+            List of filenames
+        """
+        raise NotImplementedError("Fetching files for simulation is not currently implemented for SSMT")
 
     def send_assets(self, work_item: Any):
         """
@@ -183,16 +208,4 @@ class SSMTPlatformWorkItemOperations(IPlatformWorkItemOperations):
         Returns:
 
         """
-        pass
-
-    def list_assets(self, work_item: IWorkItem) -> List[str]:
-        """
-        List files available  for workflow item
-
-        Args:
-            work_item: Workflow item
-
-        Returns:
-            List of filenames
-        """
-        pass
+        raise NotImplementedError("Fetching files for simulation is not currently implemented for SSMT")
