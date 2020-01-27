@@ -1,17 +1,18 @@
 from abc import ABCMeta, abstractmethod
-from dataclasses import fields, field
+from dataclasses import dataclass, fields, field
 from itertools import groupby
 from logging import getLogger
 from uuid import UUID
 from idmtools.core import CacheEnabled, ItemType, UnknownItemException, EntityContainer, UnsupportedPlatformType
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.isimulation import ISimulation
+from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.suite import Suite
 from idmtools.entities.iexperiment import IDockerExperiment, IGPUExperiment, IExperiment
 from idmtools.entities.iplatform_metadata import IPlatformExperimentOperations, \
     IPlatformSimulationOperations, IPlatformSuiteOperations, IPlatformWorkflowItemOperations, \
-    IPlatformAssetCollectionOperations
+    IPlatformAssetCollectionOperations, IPlatformWorkItemOperations
 from idmtools.services.platforms import PlatformPersistService
 from idmtools.core.interfaces.iitem import IItem, IItemList
 from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set
@@ -38,10 +39,12 @@ ITEM_TYPE_TO_OBJECT_INTERFACE = {
 STANDARD_TYPE_TO_INTERFACE = {
     IExperiment: ItemType.EXPERIMENT,
     ISimulation: ItemType.SIMULATION,
+    IWorkflowItem: ItemType.WORKFLOW_ITEM,
     Suite: ItemType.SUITE
 }
 
 
+@dataclass(repr=False)
 class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     """
     Interface defining a platform.
@@ -114,6 +117,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         # build item type map and determined supported features
         self.platform_type_map = dict()
         for item_type, interface in ITEM_TYPE_TO_OBJECT_INTERFACE.items():
+            print(item_type, "::", interface)
             if getattr(self, interface) is not None and getattr(self, interface).platform_type is not None:
                 self.platform_type_map[getattr(self, interface).platform_type] = item_type
 
@@ -327,7 +331,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             Parent or None
         """
         item_type, interface = self._get_operation_interface(platform_item)
-        if item_type not in [ItemType.EXPERIMENT, ItemType.SIMULATION, ItemType.WORKFLOW_ITEM]:
+        if item_type not in [ItemType.EXPERIMENT, ItemType.SIMULATION, ItemType.WORKFLOW_ITEM, ItemType.WorkItem]:
             raise ValueError("Currently only Experiments, Simulations and Work Items support parents")
         obj = getattr(self, interface).get_parent(platform_item, **kwargs)
         if obj is not None:
@@ -412,9 +416,10 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     def supported_experiment_types(self) -> List[Type]:
         """
         Returns a list of supported experiment types. These types should be either abstract or full classes that have
-            been derived from IExperiment
-        Returns:
+        been derived from IExperiment
 
+        Returns:
+            A list of supported experiment types.
         """
         return [IExperiment]
 
@@ -422,15 +427,17 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     def unsupported_experiment_types(self) -> List[Type]:
         """
         Returns a list of experiment types not supported by the platform. These types should be either abstract or full
-            classes that have been derived from IExperiment
+        classes that have been derived from IExperiment
+        
         Returns:
-
+            A list of experiment types not supported by the platform.
         """
         return [IDockerExperiment, IGPUExperiment]
 
     def is_supported_experiment(self, experiment: IExperiment) -> bool:
         """
         Determines if an experiment is supported by the specified platform.
+
         Args:
             experiment: Experiment to check
 
@@ -449,6 +456,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     def _convert_platform_item_to_entity(self, platform_item: Any, **kwargs) -> IEntity:
         """
         Convert an Native Platform Object to an idmtools object
+
         Args:
             platform_item:  Item to convert
             **kwargs: Optional items to be used in to_entity calls
@@ -471,7 +479,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         Args:
             item: Which item to flatten
 
-        Returns:List of leaves
+        Returns:
+            List of leaves
 
         """
         children = self.get_children(item.uid, item.item_type, force=True)
@@ -506,9 +515,10 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         Returns:
             For simulations, this returns a dictionary with filename as key and values being binary data from file or a
-                dict
+            dict.
+        
             For experiments, this returns a dictionary with key as sim id and then the values as a dict of the
-                simulations described above
+            simulations described above
         """
         if item.item_type not in self.platform_type_map.values():
             raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")

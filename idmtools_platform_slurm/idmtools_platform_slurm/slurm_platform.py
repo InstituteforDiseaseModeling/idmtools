@@ -10,35 +10,34 @@ from idmtools_platform_slurm.platform_operations.simulation_operations import Sl
 from idmtools_platform_slurm.slurm_operations import SlurmOperationalMode, SlurmOperations, \
     RemoteSlurmOperations, LocalSlurmOperations
 
-
 logger = getLogger(__name__)
 
 op_defaults = dict(default=None, compare=False, metadata={"pickle_ignore": True})
 
-@dataclass
-class SlurmPlatform(IPlatform):
 
-    job_directory: str = None
-    mode: SlurmOperationalMode = None
-    mail_type: Optional[str] = None
-    mail_user: Optional[str] = None
+@dataclass(repr=False)
+class SlurmPlatform(IPlatform):
+    job_directory: str = field(default=None)
+    mode: SlurmOperationalMode = field(default=None)
+    mail_type: Optional[str] = field(default=None)
+    mail_user: Optional[str] = field(default=None)
 
     # options for ssh mode
-    remote_host: Optional[str] = None
-    remote_port: int = 22
-    remote_user: Optional[str] = None
-    key_file: Optional[str] = None
+    remote_host: Optional[str] = field(default=None)
+    remote_port: int = field(default=22)
+    remote_user: Optional[str] = field(default=None)
+    key_file: Optional[str] = field(default=None)
 
-    _simulations: SlurmPLatformSimulationOperations = field(**op_defaults)
-    _experiments: SlurmPLatformExperimentOperations = field(**op_defaults)
-    _op_client: SlurmOperations = field(**op_defaults)
+    _simulations: SlurmPLatformSimulationOperations = field(**op_defaults, repr=False, init=False)
+    _experiments: SlurmPLatformExperimentOperations = field(**op_defaults, repr=False, init=False)
+    _op_client: SlurmOperations = field(**op_defaults, repr=False, init=False)
 
     def __post_init__(self):
         super().__post_init__()
         if self.job_directory is None:
             raise ValueError("Job Directory is required")
 
-        self.mode = SlurmOperationalMode[self.mode.upper()]
+        self.mode = SlurmOperationalMode[self.mode.upper()] if self.mode else self.mode
         self.__init_interfaces()
 
     def __init_interfaces(self):
@@ -50,6 +49,7 @@ class SlurmPlatform(IPlatform):
                                                     port=self.remote_port)
         else:
             self._op_client = LocalSlurmOperations()
+
         self._simulations = SlurmPLatformSimulationOperations(self)
         self._experiments = SlurmPLatformExperimentOperations(self)
 
@@ -76,4 +76,3 @@ class SlurmPlatform(IPlatform):
 
     def post_setstate(self):
         self.__init_interfaces()
-

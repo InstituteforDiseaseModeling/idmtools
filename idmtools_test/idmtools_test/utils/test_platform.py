@@ -14,7 +14,6 @@ from idmtools.registry.plugin_specification import get_description_impl
 from idmtools_test.utils.operations.experiment_operations import TestPlaformExperimentOperation
 from idmtools_test.utils.operations.simulation_operations import TestPlaformSimulationOperation
 
-
 logger = getLogger(__name__)
 current_directory = os.path.dirname(os.path.realpath(__file__))
 data_path = os.path.abspath(os.path.join(current_directory, "..", "data"))
@@ -31,10 +30,13 @@ class TestPlatform(IPlatform):
     Test platform simulating a working platform to use in the test suites.
     """
 
-    _experiments: TestPlaformExperimentOperation = field(default=None, compare=False, metadata={"pickle_ignore": True})
-    _simulations: TestPlaformSimulationOperation = field(default=None, compare=False, metadata={"pickle_ignore": True})
+    _experiments: TestPlaformExperimentOperation = field(default=None, compare=False, metadata={"pickle_ignore": True},
+                                                         repr=False, init=False)
+    _simulations: TestPlaformSimulationOperation = field(default=None, compare=False, metadata={"pickle_ignore": True},
+                                                         repr=False, init=False)
 
-    _platform_supports: List[PlatformRequirements] = field(default_factory=lambda: copy.deepcopy(supported_types))
+    _platform_supports: List[PlatformRequirements] = field(default_factory=lambda: copy.deepcopy(supported_types),
+                                                           repr=False, init=False)
 
     __test__ = False  # Hide from test discovery
 

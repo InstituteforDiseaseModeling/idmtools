@@ -47,7 +47,7 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
     def refresh_status(self, suite: Suite):
         pass
 
-    def to_entity(self, suite: Any, **kwargs) -> Suite:
+    def to_entity(self, suite: COMPSSuite, **kwargs) -> Suite:
         # Creat a suite
         obj = Suite()
 
