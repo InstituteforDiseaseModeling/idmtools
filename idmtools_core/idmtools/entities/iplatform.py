@@ -424,6 +424,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     def _convert_platform_item_to_entity(self, platform_item: Any, **kwargs) -> IEntity:
         """
         Convert an Native Platform Object to an idmtools object
+
         Args:
             platform_item:  Item to convert
             **kwargs: Optional items to be used in to_entity calls
@@ -446,7 +447,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         Args:
             item: Which item to flatten
 
-        Returns:List of leaves
+        Returns:
+            List of leaves
 
         """
         children = self.get_children(item.uid, item.item_type, force=True)
@@ -481,9 +483,10 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         Returns:
             For simulations, this returns a dictionary with filename as key and values being binary data from file or a
-                dict
+            dict.
+
             For experiments, this returns a dictionary with key as sim id and then the values as a dict of the
-                simulations described above
+            simulations described above
         """
         if item.item_type not in self.platform_type_map.values():
             raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")

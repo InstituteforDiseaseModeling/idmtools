@@ -245,3 +245,82 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         sims = self.p.get_children_by_object(comps_exp)
         for simulation in sims:
             self.assertTrue(os.path.exists(os.path.join('output', str(simulation.uid), "InsetChart.json")))
+
+    def test_tags_analyzer_emod_exp(self):
+        experiment_id = '36d8bfdc-83f6-e911-a2be-f0921c167861'  # staging exp id JSuresh's Magude exp
+
+        # delete output from previous run
+        del_folder(experiment_id)
+
+        # create a new empty 'output' dir
+        os.mkdir(experiment_id)
+
+        analyzers = [TagsAnalyzer()]
+
+        manager = AnalyzeManager(configuration={}, partial_analyze_ok=True, platform=self.p,
+                                 ids=[(experiment_id, ItemType.EXPERIMENT)],
+                                 analyzers=analyzers)
+        manager.analyze()
+
+        # verify results
+        self.assertTrue(os.path.exists(os.path.join(experiment_id, "tags.csv")))
+
+    def test_csv_analyzer_emod_exp(self):
+        experiment_id = '9311af40-1337-ea11-a2be-f0921c167861'  # staging exp id with csv from config
+        # delete output from previous run
+        del_folder(experiment_id)
+
+        # create a new empty 'output' dir
+        os.mkdir(experiment_id)
+
+        filenames = ['output/c.csv']
+        analyzers = [CSVAnalyzer(filenames=filenames)]
+
+        manager = AnalyzeManager(configuration={}, partial_analyze_ok=True, platform=self.p,
+                                 ids=[(experiment_id, ItemType.EXPERIMENT)],
+                                 analyzers=analyzers)
+        manager.analyze()
+
+        # verify results
+        self.assertTrue(os.path.exists(os.path.join(experiment_id, "CSVAnalyzer.csv")))
+
+    def test_csv_analyzer_emod_exp_non_csv_error(self):
+        experiment_id = '36d8bfdc-83f6-e911-a2be-f0921c167861'  # staging exp id JSuresh's Magude exp
+
+        # delete output from previous run
+        del_folder(experiment_id)
+
+        # create a new empty 'output' dir
+        os.mkdir(experiment_id)
+
+        filenames = ['output/MalariaPatientReport.json']
+        analyzers = [CSVAnalyzer(filenames=filenames)]
+
+        manager = AnalyzeManager(configuration={}, partial_analyze_ok=True, platform=self.p,
+                                 ids=[(experiment_id, ItemType.EXPERIMENT)],
+                                 analyzers=analyzers)
+        manager.analyze()
+
+        # verify results
+        self.assertRaises(Exception, msg='Please ensure all filenames provided to CSVAnalyzer have a csv extension.')
+
+    def test_multi_csv_analyzer_emod_exp(self):
+        experiment_id = '1bddce22-0c37-ea11-a2be-f0921c167861'  # staging exp id PythonExperiment with 2 csv outputs
+
+        # delete output from previous run
+        del_folder(experiment_id)
+
+        # create a new empty 'output' dir
+        os.mkdir(experiment_id)
+
+        filenames = ['output/a.csv', 'output/b.csv']
+        analyzers = [CSVAnalyzer(filenames=filenames)]
+
+        self.p = Platform('COMPS2')
+        manager = AnalyzeManager(configuration={}, partial_analyze_ok=True, platform=self.p,
+                                 ids=[(experiment_id, ItemType.EXPERIMENT)],
+                                 analyzers=analyzers)
+        manager.analyze()
+
+        # verify results
+        self.assertTrue(os.path.exists(os.path.join(experiment_id, "CSVAnalyzer.csv")))
