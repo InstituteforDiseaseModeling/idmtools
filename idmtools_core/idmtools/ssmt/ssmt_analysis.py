@@ -62,7 +62,7 @@ class SSMTAnalysis:
                           user_files=self.additional_files, asset_collection_id=self.asset_collection_id,
                           asset_files=self.asset_files, related_experiments=self.experiment_ids)
 
-        platform = Platform('SSMT')
+        platform = Platform('COMPS2')
 
         # Create WorkItemManager
         wim = WorkItemManager(wi, platform)
