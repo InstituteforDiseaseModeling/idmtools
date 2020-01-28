@@ -187,7 +187,7 @@ class AssetCollection(IEntity):
             asset: Asset to add or replace
 
         Returns:
-
+            None.
         """
         index = self.find_index_of_asset(asset.absolute_path, asset.filename)
         if index is not None:
@@ -198,13 +198,17 @@ class AssetCollection(IEntity):
     def get_one(self, **kwargs):
         """
         Get an asset out of the collection based on the filers passed.
-        Examples:
+
+        Examples::
+
             >>> a = AssetCollection()
             >>> a.get_one(filename="filename.txt")
+
         Args:
             **kwargs:  keyword argument representing the filters.
 
-        Returns: None or Asset if found
+        Returns: 
+            None or Asset if found.
 
         """
         try:
@@ -232,6 +236,7 @@ class AssetCollection(IEntity):
     def pop(self, **kwargs) -> Asset:
         """
         Get and delete an asset based on keywords.
+
         Args:
             **kwargs: Filter for the asset to pop.
 
@@ -297,13 +302,14 @@ class AssetCollection(IEntity):
     def find_index_of_asset(self, absolute_path: str = None, filename: str = None) -> Union[int, None]:
         """
         Finds the index of asset by path or filename
+
         Args:
             absolute_path: Path to search
             filename: Filename to search
 
         Returns:
-            Index number if found
-            None if not found
+            Index number if found.
+            None if not found.
         """
         for idx, asset in enumerate(self.assets):
             if filename and asset.filename == filename:
