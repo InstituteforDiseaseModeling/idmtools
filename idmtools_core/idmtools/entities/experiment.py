@@ -9,6 +9,7 @@ from idmtools.core import ItemType
 from idmtools.core.interfaces.entity_container import EntityContainer
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.core.interfaces.inamed_entity import INamedEntity
+from idmtools.entities.itask import ITask
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools.utils.collections import ParentIterator
@@ -36,6 +37,8 @@ class Experiment(IAssetsEnabled, INamedEntity):
     frozen: bool = field(default=False, init=False)
     simulations: InitVar[SUPPORTED_SIM_TYPE] = None
     __simulations: Union[SUPPORTED_SIM_TYPE] = field(default_factory=lambda: EntityContainer(), compare=False)
+
+    gather_common_assets_from_task: bool = field(default=False, compare=False)
 
     def __post_init__(self, simulations):
         super().__post_init__()
@@ -74,6 +77,9 @@ class Experiment(IAssetsEnabled, INamedEntity):
             if "task_type" not in self.tags:
                 task_class = self.simulations.items.base_task.__class__
                 self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
+        elif self.gather_common_assets_from_task:
+            for sim in self.simulations:
+                self.assets.add_assets(sim.task.gather_common_assets(), fail_on_duplicate=False)
 
         self.tags['idmtools'] = __version__
 
@@ -94,7 +100,15 @@ class Experiment(IAssetsEnabled, INamedEntity):
         if isinstance(simulations, (GeneratorType, TemplatedSimulations, EntityContainer)):
             self.__simulations = simulations
         elif isinstance(simulations, (list, set)):
-            self.simulations = EntityContainer(simulations)
+            from idmtools.entities.simulation import Simulation
+            self.simulations = EntityContainer()
+            for sim in simulations:
+                if isinstance(sim, ITask):
+                    self.simulations.append(sim.to_simulation())
+                elif isinstance(sim, Simulation):
+                    self.simulations.append(sim)
+                else:
+                    raise ValueError("Only list of tasks/simulations can be passed to experiment simulations")
         else:
             raise ValueError("You can only set simulations to an EntityContainer, a Generator, a TemplatedSimulations "
                              "or a List/Set of Simulations")

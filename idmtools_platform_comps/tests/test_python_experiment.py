@@ -18,7 +18,6 @@ from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
-from idmtools.managers import ExperimentManager
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id
@@ -141,15 +140,7 @@ class TestPythonExperiment(ITestWithPersistence):
     @pytest.mark.long
     @pytest.mark.comps
     def test_add_prefixed_relative_path_to_assets_comps(self):
-        model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
-        ac = AssetCollection()
-        assets_path = os.path.join(COMMON_INPUT_PATH, "python", "Assets", "MyExternalLibrary")
-        ac.add_directory(assets_directory=assets_path, relative_path="MyExternalLibrary")
-
-        task = JSONConfiguredPythonTask(script_path=model_path, envelope="parameters", parameters=dict(b=10))
-        e = Experiment(name=self.case_name, simulations=TemplatedSimulations(base_task=task), assets=ac)
-        # assets=AssetCollection.from_directory(assets_directory=assets_path, relative_path="MyExternalLibrary"))
-        e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
+        e = self.get_model_py_templated_experiment(dict(b=10))
 
         def param_a_update(simulation: Simulation, value) -> Dict[str, Any]:
             simulation.task.set_parameter("a", value)
@@ -184,6 +175,21 @@ class TestPythonExperiment(ITestWithPersistence):
                              {'filename': 'functions.py', 'relative_path': 'MyExternalLibrary'}]
             self.validate_assets(assets, expected_list)
 
+    def get_model_py_templated_experiment(self, default_parameters: dict = None,
+                                          assets_path: str = os.path.join(COMMON_INPUT_PATH, "python", "Assets",
+                                                                          "MyExternalLibrary"),
+                                          relative_path="MyExternalLibrary"):
+        if default_parameters is None:
+            default_parameters = dict()
+        model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
+        ac = AssetCollection()
+        ac.add_directory(assets_directory=assets_path, relative_path=relative_path)
+        task = JSONConfiguredPythonTask(script_path=model_path, envelope="parameters", parameters=default_parameters)
+        e = Experiment(name=self.case_name, simulations=TemplatedSimulations(base_task=task), assets=ac)
+        # assets=AssetCollection.from_directory(assets_directory=assets_path, relative_path="MyExternalLibrary"))
+        e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
+        return e
+
     # Test will test pythonExperiment's assets parameter which adds all files under tests/inputs/python/Assets to
     # COMPS' Assets folder and also test using StandAloneSimulationsBuilder builder to build simulations
     # Comps' Assets
@@ -197,30 +203,30 @@ class TestPythonExperiment(ITestWithPersistence):
     @pytest.mark.long
     @pytest.mark.comps
     def test_add_dirs_to_assets_comps(self):
-        model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
-        ac = AssetCollection()
-        assets_path = os.path.join(COMMON_INPUT_PATH, "python", "Assets")
-        ac.add_directory(assets_directory=assets_path)
-        pe = PythonExperiment(name=self.case_name, model_path=model_path, assets=ac)
-        pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
-        pe.base_simulation.envelope = "parameters"
+        e = self.get_model_py_templated_experiment(assets_path=os.path.join(COMMON_INPUT_PATH, "python", "Assets"),
+                                                   relative_path=None)
         # sim = pe.simulation() # uncomment this line when issue #138 gets fixed
-        sim = pe.simulation()
-        sim.set_parameter("a", 1)
-        sim.set_parameter("b", 10)
+        # TODO update this syntax in TC. We have better manual building methods for simulations
+        sim = e.simulations.new_simulation()
+        sim.task.set_parameter("a", 1)
+        sim.task.set_parameter("b", 10)
+
         builder = StandAloneSimulationsBuilder()
         builder.add_simulation(sim)
-        pe.builder = builder
-        em = ExperimentManager(experiment=pe, platform=self.platform)
-        em.run()
-        em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
-        exp_id = em.experiment.uid
+        e.simulations.add_builder(builder)
+
+        self.wait_on_experiment_and_check_sims_succeeded(e)
+
+        exp_id = e.uid
+        self.validate_model_py_relative_assets(exp_id)
+
+    def validate_model_py_relative_assets(self, exp_id, validate_config=True, validate_stdout=True):
         # validate results from comps
         # exp_id ='eb7ce224-9993-e911-a2bb-f0921c167866'
         for simulation in COMPSExperiment.get(exp_id).get_simulations():
             # validate output/config.json
-            assets = self.assert_valid_config_stdout_and_assets(simulation)
+            assets = self.assert_valid_config_stdout_and_assets(simulation, validate_config=validate_config,
+                                                                validate_stdout=validate_stdout)
             self.assertEqual(len(assets), 5)
 
             expected_list = [{'filename': '__init__.py', 'relative_path': 'MyExternalLibrary'},
@@ -230,14 +236,16 @@ class TestPythonExperiment(ITestWithPersistence):
                              {'filename': 'functions.py', 'relative_path': 'MyExternalLibrary'}]
             self.validate_assets(assets, expected_list)
 
-    def assert_valid_config_stdout_and_assets(self, simulation):
-        config_string = simulation.retrieve_output_files(paths=["config.json"])
-        config_parameters = json.loads(config_string[0].decode('utf-8'))['parameters']
-        self.assertEqual(config_parameters["a"], 1)
-        self.assertEqual(config_parameters["b"], 10)
-        # validate StdOut.txt
-        stdout = simulation.retrieve_output_files(paths=["StdOut.txt"])
-        self.assertEqual(stdout, [b"11\r\n{'a': 1, 'b': 10}\r\n"])
+    def assert_valid_config_stdout_and_assets(self, simulation, validate_config=True, validate_stdout=True):
+        if validate_config:
+            config_string = simulation.retrieve_output_files(paths=["config.json"])
+            config_parameters = json.loads(config_string[0].decode('utf-8'))['parameters']
+            self.assertEqual(config_parameters["a"], 1)
+            self.assertEqual(config_parameters["b"], 10)
+        if validate_stdout:
+            # validate StdOut.txt
+            stdout = simulation.retrieve_output_files(paths=["StdOut.txt"])
+            self.assertEqual(stdout, [b"11\r\n{'a': 1, 'b': 10}\r\n"])
         # validate Assets files
         collection_id = get_asset_collection_id_for_simulation_id(simulation.id)
         asset_collection = get_asset_collection_by_id(collection_id)
@@ -276,16 +284,15 @@ class TestPythonExperiment(ITestWithPersistence):
                   absolute_path=os.path.join(COMMON_INPUT_PATH, "python", "Assets", "MyExternalLibrary",
                                              "functions.py"))
         ac.add_asset(a)
-        pe = PythonExperiment(name=self.case_name, model_path=model_path, assets=ac)
-        pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
-        pe.base_simulation.set_parameter("a", 1)
-        pe.base_simulation.set_parameter("b", 10)
-        pe.base_simulation.envelope = "parameters"
-        em = ExperimentManager(experiment=pe, platform=self.platform)
-        em.run()
-        em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
-        exp_id = em.experiment.uid
+
+        base_task = JSONConfiguredPythonTask(parameters=dict(a=1, b=10), envelope="parameters", script_path=model_path)
+        e = Experiment(name=self.case_name, assets=ac, simulations=[base_task.to_simulation()],
+                       gather_common_assets_from_task=True)
+        e.tags = {"string_tag": "test", "number_tag": 123}
+
+        self.wait_on_experiment_and_check_sims_succeeded(e)
+
+        exp_id = e.uid
         # validate results from comps
         # exp_id ='a98090dc-ea92-e911-a2bb-f0921c167866'
         for simulation in COMPSExperiment.get(exp_id).get_simulations():
@@ -311,26 +318,33 @@ class TestPythonExperiment(ITestWithPersistence):
     @pytest.mark.comps
     @pytest.mark.long
     def test_sweep_in_arms_cross(self):
-        pe = PythonExperiment(name=self.case_name,
-                              model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
-        pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123, "KeyOnly": None}
 
-        arm = SweepArm(type=ArmType.cross)
+        base_task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
+        ts = TemplatedSimulations(base_task=base_task)
+
+        # create our ARM builder
         builder = ArmSimulationBuilder()
+        # create sweeep cross
+        arm = SweepArm(type=ArmType.cross)
         arm.add_sweep_definition(setA, 1)
         arm.add_sweep_definition(setB, [2, 3])
         arm.add_sweep_definition(setC, [4, 5])
         builder.add_arm(arm)
+
+        # add another cross arm
         arm = SweepArm(type=ArmType.cross)
         arm.add_sweep_definition(setA, [6, 7])
         arm.add_sweep_definition(setB, [2])
         builder.add_arm(arm)
-        pe.builder = builder
-        em = ExperimentManager(experiment=pe, platform=self.platform)
-        em.run()
-        em.wait_till_done()
-        exp_id = em.experiment.uid
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
+        # Add the builder to our templated sim
+        ts.add_builder(builder)
+
+        e = Experiment(name=self.case_name, simulations=ts, tags={
+            "string_tag": "test", "number_tag": 123, "KeyOnly": None
+        })
+
+        self.wait_on_experiment_and_check_sims_succeeded(e)
+        exp_id = e.uid
         self.validate_output(exp_id, 6)
         expected_tags = [{'a': '1', 'b': '2', 'c': '4'}, {'a': '1', 'b': '2', 'c': '5'}, {'a': '1', 'b': '3', 'c': '4'},
                          {'a': '1', 'b': '3', 'c': '5'}, {'a': '6', 'b': '2'}, {'a': '7', 'b': '2'}]
@@ -338,16 +352,14 @@ class TestPythonExperiment(ITestWithPersistence):
 
     @pytest.mark.comps
     def test_duplicate_asset_files_not_allowed(self):
-        experiment = PythonExperiment(name=self.case_name,
-                                      model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
-        experiment.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
+        script_path = os.path.join(COMMON_INPUT_PATH, "python", "model1.py")
+        experiment = Experiment(name=self.case_name,
+                                simulations=[JSONConfiguredPythonTask(script_path=script_path)],
+                                tags={"string_tag": "test", "number_tag": 123}, gather_common_assets_from_task=True)
         experiment.assets.add_directory(
             assets_directory=os.path.join(COMMON_INPUT_PATH, "python", "folder_dup_file"))
-        builder = SimulationBuilder()
-        experiment.builder = builder
-        em = ExperimentManager(experiment=experiment, platform=self.platform)
         with self.assertRaises(RuntimeError) as context:
-            em.run()
+            self.platform.run_items(experiment)
         self.assertTrue(
             "400 Bad Request - An error was encountered while attempting to save asset collection: Cannot insert "
             "duplicate key row in object 'dbo.AssetCollectionFile' with unique index "
@@ -357,88 +369,59 @@ class TestPythonExperiment(ITestWithPersistence):
     @pytest.mark.comps
     def test_use_existing_ac_with_experiment(self):
         model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
+        t = JSONConfiguredPythonTask(script_path=model_path, parameters=dict(a=1, b=10), envelope="parameters")
+        e = Experiment(name=self.case_name, simulations=[t], tags={"a": "1", "b": 10},
+                       gather_common_assets_from_task=True)
 
-        pe = PythonExperiment(name=self.case_name, model_path=model_path)
-        pe.tags = {"idmtools": "idmtools-automation", "a": "1", "b": 2}
+        ac = self.get_existing_python_asset_collection()
+        e.add_assets(ac)
+        for asset in ac:
+            self.assertIn(asset, e.assets)
 
+        self.wait_on_experiment_and_check_sims_succeeded(e)
+        exp_id = e.uid
+        # validate results from comps
+        self.validate_model_py_relative_assets(exp_id)
+
+    def get_existing_python_asset_collection(self):
         # Get an existing asset collection (first create it for the test)
         assets_path = os.path.join(COMMON_INPUT_PATH, "python", "Assets")
         ac = AssetCollection.from_directory(assets_directory=assets_path)
         ids = self.platform.create_items([ac])
-        comps_ac_id = ids[0]
-
+        comps_ac_id = ac.uid
         # Then get an "existing asset" to use for the experiment
         ac: AssetCollection = self.platform.get_item(comps_ac_id, item_type=ItemType.ASSETCOLLECTION, raw=False)
         self.assertIsInstance(ac, AssetCollection)
-        pe.add_assets(ac)
-        for asset in ac:
-            self.assertIn(asset, pe.assets)
-
-        pe.base_simulation.envelope = "parameters"
-        pe.base_simulation.set_parameter("a", 1)
-        pe.base_simulation.set_parameter("b", 10)
-
-        sim = pe.simulation()
-        builder = StandAloneSimulationsBuilder()
-        builder.add_simulation(sim)
-        pe.builder = builder
-
-        em = ExperimentManager(experiment=pe, platform=self.platform)
-        em.run()
-        em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
-        exp_id = em.experiment.uid
-        # validate results from comps
-        for simulation in COMPSExperiment.get(exp_id).get_simulations():
-            # validate output/config.json
-            assets = self.assert_valid_config_stdout_and_assets(simulation)
-            self.assertEqual(len(assets), 5)
-
-            expected_list = [{'filename': '__init__.py', 'relative_path': 'MyExternalLibrary'},
-                             {'filename': '__init__.py', 'relative_path': ''},
-                             {'filename': 'model.py', 'relative_path': ''},
-                             {'filename': 'temp.py', 'relative_path': 'MyLib'},
-                             {'filename': 'functions.py', 'relative_path': 'MyExternalLibrary'}]
-            self.validate_assets(assets, expected_list)
+        return ac
 
     @pytest.mark.comps
     def test_use_existing_ac_and_add_file_with_experiment(self):
         model_path = os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py")
-        pe = PythonExperiment(name=self.case_name, model_path=model_path)
-        pe.tags = {"idmtools": "idmtools-automation", "string_tag": "existing ac and create new ac", "number_tag": 123}
-        pe.base_simulation.envelope = "parameters"
-
-        # Get an existing asset collection (first create it for the test)
-        assets_path = os.path.join(COMMON_INPUT_PATH, "python", "Assets")
-        ac = AssetCollection.from_directory(assets_directory=assets_path)
-        ids = self.platform.create_items([ac])
-        comps_ac_id = ids[0]
-
-        # Then get an "existing asset" to use for the experiment
-        ac: AssetCollection = self.platform.get_item(comps_ac_id, item_type=ItemType.ASSETCOLLECTION, raw=False)
-        self.assertIsInstance(ac, AssetCollection)
-
-        # Create new ac starting from an existing asset collection and add a file you need to run your experiment
-        new_ac = AssetCollection(ac.assets)
-        new_ac.add_asset(Asset(relative_path=None, filename="test.json", content=json.dumps({"min_x": -2, "max_x": 2})))
-        ids = self.platform.create_items([new_ac])
-        new_ac = self.platform.get_item(ids[0], item_type=ItemType.ASSETCOLLECTION)
-        self.assertIsInstance(new_ac, AssetCollection)
-        pe.add_assets(copy.deepcopy(new_ac.assets))
-        for asset in new_ac:
-            self.assertIn(asset, pe.assets)
+        bt = JSONConfiguredPythonTask(script_path=model_path, envelope="parameters")
+        ts = TemplatedSimulations(base_task=bt)
 
         builder = SimulationBuilder()
         builder.add_sweep_definition(setParam("min_x"), range(-2, 1))
         builder.add_sweep_definition(setParam("max_x"), range(-2, 2))
-        pe.add_builder(builder)
+        ts.add_builder(builder)
 
-        em = ExperimentManager(experiment=pe, platform=self.platform)
-        em.run()
-        em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
-        exp_id = em.experiment.uid
-        # validate results from comps
+        e = Experiment(name=self.case_name, simulations=ts,
+                       tags={"string_tag": "existing ac and create new ac", "number_tag": 123})
+        ac = self.get_existing_python_asset_collection()
+
+        # Create new ac starting from an existing asset collection and add a file you need to run your experiment
+        new_ac = AssetCollection(ac.assets)
+        new_ac.add_asset(Asset(relative_path=None, filename="test.json", content=json.dumps({"min_x": -2, "max_x": 2})))
+        self.platform.create_items([new_ac])
+        new_ac = self.platform.get_item(new_ac.uid, item_type=ItemType.ASSETCOLLECTION)
+        self.assertIsInstance(new_ac, AssetCollection)
+        e.add_assets(copy.deepcopy(new_ac.assets))
+        for asset in new_ac:
+            self.assertIn(asset, e.assets)
+
+        self.wait_on_experiment_and_check_sims_succeeded(e)
+        exp_id = e.uid
+        # don't validate stdout since we it isn't the typical out since we use different parameters
         for simulation in COMPSExperiment.get(exp_id).get_simulations():
             # validate output/config.json
             assets = self.assert_valid_new_assets(simulation)
