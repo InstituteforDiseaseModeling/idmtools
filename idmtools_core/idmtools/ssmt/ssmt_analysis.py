@@ -28,9 +28,9 @@ class SSMTAnalysis:
         dir_path = os.path.dirname(os.path.realpath(__file__))
         self.additional_files.add_file(os.path.join(dir_path, "analyze_ssmt.py"))
 
-        # If there is a simtools.ini, send it along
-        if os.path.exists(os.path.join(os.getcwd(), "simtools.ini")):
-            self.additional_files.add_file(os.path.join(os.getcwd(), "simtools.ini"))
+        # If there is a idmtools.ini, send it along
+        if os.path.exists(os.path.join(os.getcwd(), "idmtools.ini")):
+            self.additional_files.add_file(os.path.join(os.getcwd(), "idmtools.ini"))
 
         # build analyzer args dict
         args_dict = {}
