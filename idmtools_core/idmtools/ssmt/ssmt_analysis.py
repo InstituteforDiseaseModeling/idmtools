@@ -3,15 +3,15 @@ import inspect
 import pickle
 import tempfile
 from idmtools.assets.FileList import FileList
-from idmtools.core.platform_factory import Platform
 from idmtools.managers.work_item_manager import WorkItemManager
 from idmtools.ssmt.ssmt_work_item import SSMTWorkItem
 
 
 class SSMTAnalysis:
 
-    def __init__(self, experiment_ids, analyzers, analyzers_args=None, analysis_name='WorkItem Test', tags=None,
+    def __init__(self, platform, experiment_ids, analyzers, analyzers_args=None, analysis_name='WorkItem Test', tags=None,
                  additional_files=None, asset_collection_id=None, asset_files=FileList()):
+        self.platform = platform
         self.experiment_ids = experiment_ids
         self.analyzers = analyzers
         self.analyzers_args = analyzers_args
@@ -62,10 +62,8 @@ class SSMTAnalysis:
                           user_files=self.additional_files, asset_collection_id=self.asset_collection_id,
                           asset_files=self.asset_files, related_experiments=self.experiment_ids)
 
-        platform = Platform('COMPS2')
-
         # Create WorkItemManager
-        wim = WorkItemManager(wi, platform)
+        wim = WorkItemManager(wi, self.platform)
 
         wim.process(check_status)
 
