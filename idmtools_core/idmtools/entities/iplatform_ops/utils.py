@@ -1,6 +1,6 @@
 from functools import partial
 from logging import getLogger, DEBUG
-from typing import List, Union, Generator, Iterable, Callable, Sized
+from typing import List, Union, Generator, Iterable, Callable
 
 from more_itertools import grouper
 
@@ -19,13 +19,11 @@ def item_batch_worker_thread(create_func: Callable, items: Union[List]):
     if logger.isEnabledFor(DEBUG):
         logger.debug(f'Create {len(items)}')
 
-    ids = []
+    ret = []
     for item in items:
-        ids = create_func(item)
+        ret.append(create_func(item))
 
-    for uid, item in zip(ids, items):
-        item.uid = uid
-    return items
+    return ret
 
 
 def batch_create_items(items: Union[Iterable, Generator], create_func: Callable, **kwargs):
@@ -34,7 +32,6 @@ def batch_create_items(items: Union[Iterable, Generator], create_func: Callable,
     """
     from idmtools.config import IdmConfigParser
     from concurrent.futures.thread import ThreadPoolExecutor
-    from idmtools.core import EntityContainer
 
     # Consider values from the block that Platform uses
     _max_workers = IdmConfigParser.get_option(None, "max_workers")
@@ -47,10 +44,10 @@ def batch_create_items(items: Union[Iterable, Generator], create_func: Callable,
 
     with ThreadPoolExecutor(max_workers=16) as executor:
         platform_partial = partial(item_batch_worker_thread, create_func, **kwargs)
-        results = executor.map(platform_partial,  batch_items(items, batch_size=_batch_size))
+        futures = executor.map(platform_partial, batch_items(items, batch_size=_batch_size))
 
-    results = EntityContainer()
-    for item_batch in results:
+    results = []
+    for item_batch in futures:
         for item in item_batch:
             results.append(item)
 

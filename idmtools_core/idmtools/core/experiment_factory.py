@@ -1,5 +1,6 @@
 from logging import getLogger
-from idmtools.entities import IExperiment
+
+from idmtools.entities.experiment import Experiment
 from idmtools.registry import model_specification
 
 logger = getLogger(__name__)
@@ -18,7 +19,7 @@ class ExperimentFactory:
             aliases[f'{spec.get_type().__module__}.{spec.get_type().__name__}'] = spec
         self._builders.update(aliases)
 
-    def create(self, key, fallback=None, **kwargs) -> IExperiment:  # noqa: F821
+    def create(self, key, fallback=None, **kwargs) -> Experiment:  # noqa: F821
         if key is None:
             key = self.DEFAULT_KEY
             logger.warning(f'No experiment type tag found, assuming type: {key}')

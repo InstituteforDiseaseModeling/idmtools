@@ -2,11 +2,11 @@ import json
 from dataclasses import dataclass, field
 
 from idmtools.assets import Asset
-from idmtools.entities import ISimulation
+from idmtools.entities.simulation import Simulation
 
 
 @dataclass(repr=False)
-class RSimulation(ISimulation):
+class RSimulation(Simulation):
     """
     Represents a R Simulation.
     This type of simulations have parameters and an eventual envelope.

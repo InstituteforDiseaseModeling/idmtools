@@ -63,7 +63,7 @@ class IPlatformAssetCollectionOperations(CacheEnabled, ABC):
         return ret
 
     @abstractmethod
-    def platform_create(self, asset_collection: AssetCollection, **kwargs) -> Tuple[Any, UUID]:
+    def platform_create(self, asset_collection: AssetCollection, **kwargs) -> Tuple[Any]:
         """
         Creates an workflow_item from an IDMTools AssetCollection object
 
@@ -76,7 +76,7 @@ class IPlatformAssetCollectionOperations(CacheEnabled, ABC):
         """
         pass
 
-    def batch_create(self, asset_collections: List[AssetCollection], **kwargs) -> List[Tuple[Any, UUID]]:
+    def batch_create(self, asset_collections: List[AssetCollection], **kwargs) -> List[AssetCollection]:
         """
         Provides a method to batch create asset collections items
 

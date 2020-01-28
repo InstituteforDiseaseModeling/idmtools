@@ -56,7 +56,7 @@ class IPlatformExperimentOperations(ABC):
         experiment.post_creation()
 
     def create(self, experiment: Experiment, do_pre: bool = True, do_post: bool = True, **kwargs) -> \
-            Union[Experiment, Any]:
+            Union[Experiment]:
         """
         Creates an experiment from an IDMTools simulation object. Also performs local/platform pre and post creation
         events
@@ -75,6 +75,7 @@ class IPlatformExperimentOperations(ABC):
         if do_pre:
             self.pre_create(experiment, **kwargs)
         experiment._platform_object = self.platform_create(experiment, **kwargs)
+        experiment.platform = self.platform
         if do_post:
             self.post_create(experiment, **kwargs)
         return experiment
@@ -172,7 +173,8 @@ class IPlatformExperimentOperations(ABC):
             experiment.simulations = self.platform.create_items(experiment.simulations)
         elif len(experiment.simulations) == 0:
             raise ValueError("You cannot have an experiment with now simulations")
-        self.platform.create_items(experiment.simulations)
+        else:
+            experiment.simulations = self.platform.create_items(experiment.simulations)
 
     def post_run_item(self, experiment: Experiment):
         """

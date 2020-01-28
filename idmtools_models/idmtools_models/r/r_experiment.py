@@ -3,13 +3,14 @@ from dataclasses import dataclass, field
 from typing import Optional, List
 
 from idmtools.assets.asset import Asset
-from idmtools.entities import CommandLine, IExperiment
+from idmtools.entities import CommandLine
+from idmtools.entities.experiment import Experiment
 from idmtools.entities.iexperiment import IDockerExperiment
 from idmtools_models.r.r_simulation import RSimulation
 
 
 @dataclass(repr=False)
-class RExperiment(IExperiment, IDockerExperiment):
+class RExperiment(Experiment, IDockerExperiment):
     image_name: str = field(default=None, metadata={"md": True})
     model_path: str = field(default=None, compare=False, metadata={"md": True})
     extra_libraries: list = field(default_factory=lambda: [], compare=False, metadata={"md": True})

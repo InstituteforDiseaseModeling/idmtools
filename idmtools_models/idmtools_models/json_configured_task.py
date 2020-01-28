@@ -54,6 +54,7 @@ class JSONConfiguredTask(ITask):
         """
         self._task_log.info('Setting parameter %s to %s', key, str(value))
         self.parameters[key] = value
+        return {key: value}
 
     def get_parameter(self, key: TJSONConfigKeyType) -> TJSONConfigValueType:
         """
@@ -80,6 +81,7 @@ class JSONConfiguredTask(ITask):
         for k, p in values.items():
             self._task_log.info('Setting parameter %s to %s', k, str(p))
         self.parameters.update(values)
+        return values
 
     def reload_from_simulation(self, simulation: 'Simulation'):  # noqa: F821
         if simulation.platform:

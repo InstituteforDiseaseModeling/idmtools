@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from logging import getLogger, DEBUG
 from typing import Any, List, Dict, Type
 from uuid import UUID
 
@@ -6,9 +7,12 @@ from COMPS.Data import Simulation as COMPSSimulation, QueryCriteria, Experiment 
     Configuration
 
 from idmtools.core import ItemType
+from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
 from idmtools.entities.simulation import Simulation
 from idmtools_platform_comps.utils.general import convert_COMPS_status, get_asset_for_comps_item
+
+logger = getLogger(__name__)
 
 
 @dataclass
@@ -24,24 +28,59 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         return COMPSSimulation.get(id=simulation_id,
                                    query_criteria=QueryCriteria().select(cols).select_children(children))
 
-    def platform_create(self, simulation: Simulation, **kwargs) -> COMPSSimulation:
-        s = COMPSSimulation(name=simulation.experiment.name, experiment_id=simulation.parent_id,
-                            configuration=Configuration(asset_collection_id=simulation.experiment.assets.uid))
-        self.send_assets(simulation, s)
-        s.set_tags(simulation.tags)
+    def platform_create(self, simulation: Simulation, num_cores: int = None, priority: str = None) -> COMPSSimulation:
+
+        s = self.__create_comps_sim(num_cores, priority, simulation)
         COMPSSimulation.save(s, save_semaphore=COMPSSimulation.get_save_semaphore())
         return s
 
-    def batch_create(self, sims: List[Simulation], **kwargs) -> List[COMPSSimulation]:
+    def __create_comps_sim(self, num_cores, priority, simulation, config: Configuration = None):
+        if config is None:
+            config = self.__get_comps_sim_config(num_cores, priority, simulation)
+        s = COMPSSimulation(name=simulation.experiment.name, experiment_id=simulation.parent_id,
+                            configuration=config)
+
+        self.send_assets(simulation, s)
+        s.set_tags(simulation.tags)
+        simulation._platform_object = self.platform
+        return s
+
+    def __get_comps_sim_config(self, num_cores, priority, simulation):
+        comps_configuration = dict()
+        if simulation.experiment.assets.count != 0:
+            comps_configuration['asset_collection_id'] = simulation.experiment.assets.uid
+        comps_exp: COMPSExperiment = simulation.parent.get_platform_object()
+        if num_cores is not None and num_cores != comps_exp.configuration.max_cores:
+            logger.info(f'Overriding cores for sim to {num_cores}')
+            comps_configuration['max_cores'] = num_cores
+            comps_configuration['min_cores'] = num_cores
+        if priority is not None and priority != comps_configuration.configuration.priority:
+            logger.info(f'Overriding priority for sim to {priority}')
+            comps_configuration['priority'] = priority
+        if comps_exp.configuration.executable_path != simulation.task.command.executable:
+            logger.info(f'Overriding executable_path for sim to {simulation.task.command.executable}')
+            comps_configuration['executable_path'] = simulation.task.command.executable
+        sim_task = simulation.task.command.arguments + " " + simulation.task.command.options
+        if comps_exp.configuration.simulation_input_args != sim_task:
+            logger.info(f'Overriding simulation_input_args for sim to {sim_task}')
+            comps_configuration['simulation_input_args'] = sim_task
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f'Simulation config: {str(comps_configuration)}')
+        return Configuration(**comps_configuration)
+
+    def batch_create(self, sims: List[Simulation], num_cores: int = None, priority: str = None) -> List[
+        COMPSSimulation]:
         created_simulations = []
         for simulation in sims:
-            s = COMPSSimulation(name=simulation.experiment.name, experiment_id=simulation.parent_id,
-                                configuration=Configuration(asset_collection_id=simulation.experiment.assets.uid))
-            simulation._platform_object = s
-            self.send_assets(simulation)
-            s.set_tags(simulation.tags)
-            created_simulations.append(s)
+            self.pre_create(simulation)
+            simulation.platform = self.platform
+            simulation._platform_object = self.__create_comps_sim(num_cores, priority, simulation)
+            created_simulations.append(simulation._platform_object)
         COMPSSimulation.save_all(None, save_semaphore=COMPSSimulation.get_save_semaphore())
+        for simulation in sims:
+            simulation.uid = simulation.get_platform_object().id
+            simulation.status = convert_COMPS_status(simulation.get_platform_object().state)
+            self.post_create(simulation)
         return sims
 
     def get_parent(self, simulation: Any, **kwargs) -> COMPSExperiment:
@@ -60,12 +99,14 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         s = COMPSSimulation.get(id=simulation.uid, query_criteria=QueryCriteria().select(['state']))
         simulation.status = convert_COMPS_status(s.state)
 
-    def to_entity(self, simulation: Any, **kwargs) -> Simulation:
+    def to_entity(self, simulation: Any, experiment: Experiment = None) -> Simulation:
         # Recreate the experiment if needed
-        experiment = kwargs.get('experiment') or self.platform.get_item(simulation.experiment_id,
-                                                                        item_type=ItemType.EXPERIMENT)
+        if experiment is None:
+            experiment = self.platform.get_item(simulation.experiment_id, item_type=ItemType.EXPERIMENT)
         # Get a simulation
-        obj = experiment.simulation()
+        obj = Simulation()
+        obj.parent = experiment
+        obj.experiment = experiment
         # Set its correct attributes
         obj.uid = simulation.id
         obj.tags = simulation.tags

@@ -4,26 +4,28 @@ import os
 import unittest
 from functools import partial
 from operator import itemgetter
+from typing import Any, Dict
 
 import pytest
 from COMPS.Data import Experiment as COMPSExperiment
 from COMPS.Data import QueryCriteria
 
+from idmtools import __version__
 from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import ArmSimulationBuilder, ArmType, SimulationBuilder, StandAloneSimulationsBuilder, SweepArm
 from idmtools.core import EntityStatus, ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
+from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools.managers import ExperimentManager
-from idmtools_models.python import PythonExperiment
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 
-def param_update(simulation, param, value):
+def param_update(simulation: Simulation, param: str, value: Any) -> Dict[str, any]:
     return simulation.task.set_parameter(param, value)
 
 
@@ -33,10 +35,10 @@ setC = partial(param_update, param="c")
 
 
 class setParam:
-    def __init__(self, param):
+    def __init__(self, param: str):
         self.param = param
 
-    def __call__(self, simulation, value):
+    def __call__(self, simulation: Simulation, value) -> Dict[str, any]:
         return param_update(simulation, self.param, value)
 
 
@@ -57,27 +59,21 @@ class TestPythonExperiment(ITestWithPersistence):
     @pytest.mark.long
     def test_sweeps_with_partial_comps(self):
 
-        e = Experiment(name=self.case_name,
-                       simulations=TemplatedSimulations(base_task=JSONConfiguredPythonTask(
-                           script_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
-                                                        ))
-        e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123, "KeyOnly": None}
-        e.simulations.base_simulation.task.set_parameter("c", "c-value")
+        e = self.get_model1_templated_experiment()
         builder = SimulationBuilder()
         # ------------------------------------------------------
         # Sweeping parameters:
         # first way to sweep parameter 'a' is to use param_update function
         builder.add_sweep_definition(setA, range(0, 2))
 
-        # second way to sweep parameter 'b' is to use class setParam which basiclly doing same thing as param_update mathod
+        # second way to sweep parameter 'b' is to use class setParam which basiclly doing same thing as param_update
+        # method
         builder.add_sweep_definition(setParam("b"), [i * i for i in range(1, 4, 2)])
         # ------------------------------------------------------
 
-        e.simulations.builder = builder
+        e.simulations.add_builder(builder)
 
-        self.platform.run_items(e)
-        self.platform.wait_till_done(e)
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in e.simulations]))
+        self.wait_on_experiment_and_check_sims_succeeded(e)
         experiment = COMPSExperiment.get(e.uid)
         print(experiment.id)
         exp_id = experiment.id
@@ -91,38 +87,49 @@ class TestPythonExperiment(ITestWithPersistence):
 
         # validate experiment tags
         actual_exp_tags = experiment.get(experiment.id, QueryCriteria().select_children('tags')).tags
-        expected_exp_tags = {'idmtools': 'idmtools-automation', 'number_tag': '123', 'string_tag': 'test',
-                             'KeyOnly': '', 'type': 'idmtools_models.python.python_experiment.PythonExperiment'}
+        expected_exp_tags = {'idmtools': __version__, 'number_tag': '123', 'string_tag': 'test',
+                             'KeyOnly': '',
+                             'task_type': 'idmtools_models.python.json_python_task.JSONConfiguredPythonTask'}
         self.assertDictEqual(expected_exp_tags, actual_exp_tags)
+
+    def wait_on_experiment_and_check_sims_succeeded(self, e):
+        self.platform.run_items(e)
+        self.platform.wait_till_done(e)
+        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in e.simulations]))
+
+    def get_model1_templated_experiment(self):
+        e = Experiment(name=self.case_name,
+                       simulations=TemplatedSimulations(base_task=JSONConfiguredPythonTask(
+                           script_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
+                       ))
+        e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123, "KeyOnly": None}
+        e.simulations.base_simulation.task.set_parameter("c", "c-value")
+        return e
 
     # Test parameter "b" set is depending on parameter "a"
     # a=[0,1,2,3,4] <--sweep parameter
     # b=[2,3,4,5,6]  <-- b = a + 2
     @pytest.mark.long
     def test_sweeps_2_related_parameters_comps(self):
-        pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
-        pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
+        e = self.get_model1_templated_experiment()
 
-        pe.base_simulation.set_parameter("c", "c-value")
-
-        def param_update_ab(simulation, param, value):
+        def param_update_ab(simulation: Simulation, param: str, value: Any) -> Dict[str, any]:
             # Set B within
             if param == "a":
-                simulation.set_parameter("b", value + 2)
+                simulation.task.set_parameter("b", value + 2)
 
-            return simulation.set_parameter(param, value)
+            return simulation.task.set_parameter(param, value)
 
         setAB = partial(param_update_ab, param="a")
 
         builder = SimulationBuilder()
         # Sweep parameter "a" and make "b" depends on "a"
         builder.add_sweep_definition(setAB, range(0, 5))
-        pe.builder = builder
-        em = ExperimentManager(experiment=pe, platform=self.platform)
-        em.run()
-        em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
-        experiment = COMPSExperiment.get(em.experiment.uid)
+        e.simulations.add_builder(builder)
+
+        self.wait_on_experiment_and_check_sims_succeeded(e)
+
+        experiment = COMPSExperiment.get(e.uid)
         print(experiment.id)
         exp_id = experiment.id
         self.validate_output(exp_id, 5)
@@ -138,26 +145,24 @@ class TestPythonExperiment(ITestWithPersistence):
         ac = AssetCollection()
         assets_path = os.path.join(COMMON_INPUT_PATH, "python", "Assets", "MyExternalLibrary")
         ac.add_directory(assets_directory=assets_path, relative_path="MyExternalLibrary")
-        pe = PythonExperiment(name=self.case_name, model_path=model_path, assets=ac)
+
+        task = JSONConfiguredPythonTask(script_path=model_path, envelope="parameters", parameters=dict(b=10))
+        e = Experiment(name=self.case_name, simulations=TemplatedSimulations(base_task=task), assets=ac)
         # assets=AssetCollection.from_directory(assets_directory=assets_path, relative_path="MyExternalLibrary"))
-        pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
-        pe.base_simulation.envelope = "parameters"
+        e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
 
-        pe.base_simulation.set_parameter("b", 10)
-
-        def param_a_update(simulation, value):
-            simulation.set_parameter("a", value)
+        def param_a_update(simulation: Simulation, value) -> Dict[str, Any]:
+            simulation.task.set_parameter("a", value)
             return {"a": value}
 
         builder = SimulationBuilder()
         # Sweep parameter "a"
         builder.add_sweep_definition(param_a_update, range(0, 2))
-        pe.builder = builder
-        em = ExperimentManager(experiment=pe, platform=self.platform)
-        em.run()
-        em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
-        exp_id = em.experiment.uid
+        e.simulations.add_builder(builder)
+
+        self.wait_on_experiment_and_check_sims_succeeded(e)
+
+        exp_id = e.uid
         # exp_id ='ef8e7f2f-a793-e911-a2bb-f0921c167866'
         count = 0
         for simulation in COMPSExperiment.get(exp_id).get_simulations():

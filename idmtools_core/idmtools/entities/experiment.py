@@ -4,6 +4,7 @@ from logging import getLogger
 from types import GeneratorType
 from typing import NoReturn, Set, Union, Iterator
 
+from idmtools import __version__
 from idmtools.core import ItemType
 from idmtools.core.interfaces.entity_container import EntityContainer
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
@@ -61,18 +62,20 @@ class Experiment(IAssetsEnabled, INamedEntity):
         # Gather the assets
         self.gather_assets()
 
-        # TODO How to handle genreators?
-        if "task_type" not in self.tags and not isinstance(self.simulations, GeneratorType) and \
-                (not isinstance(self.simulations, ParentIterator) or
-                 (isinstance(self.simulations, ParentIterator)
-                  and not isinstance(self.simulations.items, TemplatedSimulations)
-                 )):
-            task_class = self.simulations[0].task.__class__
-            self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
         # to keep experiments clean, let's only do this is we have a special experiment class
         if self.__class__ is not Experiment:
             # Add a tag to keep the Experiment class name
             self.tags["experiment_type"] = f'{self.__class__.__module__}.{self.__class__.__name__}'
+
+        # if it is a template, set task type on experiment
+        if isinstance(self.simulations, ParentIterator) and isinstance(self.simulations.items, TemplatedSimulations):
+            self.simulations.items.base_task.gather_common_assets()
+            self.assets.add_assets(self.simulations.items.base_task.common_assets)
+            if "task_type" not in self.tags:
+                task_class = self.simulations.items.base_task.__class__
+                self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
+
+        self.tags['idmtools'] = __version__
 
     @property
     def done(self):

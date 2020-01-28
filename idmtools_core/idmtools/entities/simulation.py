@@ -18,7 +18,7 @@ class Simulation(IAssetsEnabled, INamedEntity):
     Class that represents a generic simulation.
     This class needs to be implemented for each model type with specifics.
     """
-    task: 'ITask' = field(default_factory=None)
+    task: 'ITask' = field(default=None)
     item_type: 'ItemType' = field(default=ItemType.SIMULATION, compare=False)
     pre_creation_hooks: List[Callable[[], NoReturn]] = field(default_factory=lambda: [Simulation.gather_assets])
 
@@ -70,7 +70,8 @@ class Simulation(IAssetsEnabled, INamedEntity):
     def post_creation(self) -> None:
         if logger.isEnabledFor(DEBUG):
             logger.debug('Calling task post creation')
-        self.task.post_creation(self)
+        if self.task is not None:
+            self.task.post_creation(self)
         self.status = EntityStatus.CREATED
 
     def pre_getstate(self):

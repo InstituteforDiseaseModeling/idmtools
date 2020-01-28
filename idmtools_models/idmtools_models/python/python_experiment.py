@@ -4,13 +4,14 @@ import tempfile
 from dataclasses import dataclass, field
 
 from idmtools.assets.asset import Asset
-from idmtools.entities import CommandLine, IExperiment
+from idmtools.entities import CommandLine
+from idmtools.entities.experiment import Experiment
 from idmtools.entities.iexperiment import IDockerExperiment
 from idmtools_models.python.python_simulation import PythonSimulation
 
 
 @dataclass(repr=False)
-class PythonExperiment(IExperiment):
+class PythonExperiment(Experiment):
     model_path: str = field(default=None, compare=False, metadata={"md": True})
     extra_libraries: list = field(default_factory=lambda: [], compare=False, metadata={"md": True})
 
