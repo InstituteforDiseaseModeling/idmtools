@@ -2,12 +2,16 @@ from abc import ABC, abstractmethod
 from concurrent.futures import as_completed
 from concurrent.futures.thread import ThreadPoolExecutor
 from dataclasses import dataclass
+from logging import getLogger
 from types import GeneratorType
 from typing import Type, Any, NoReturn, Tuple, List, Dict, Iterator, Union
 from uuid import UUID
 
-from idmtools.core import EntityStatus
+from idmtools.core.enums import EntityStatus, ItemType
 from idmtools.entities.experiment import Experiment
+from idmtools.entities.iplatform_ops.utils import batch_create_items
+
+logger = getLogger(__name__)
 
 
 @dataclass
@@ -56,7 +60,7 @@ class IPlatformExperimentOperations(ABC):
         experiment.post_creation()
 
     def create(self, experiment: Experiment, do_pre: bool = True, do_post: bool = True, **kwargs) -> \
-            Union[Experiment, Any]:
+            Union[Experiment]:
         """
         Creates an experiment from an IDMTools simulation object. Also performs local/platform pre and post creation
         events
@@ -75,6 +79,7 @@ class IPlatformExperimentOperations(ABC):
         if do_pre:
             self.pre_create(experiment, **kwargs)
         experiment._platform_object = self.platform_create(experiment, **kwargs)
+        experiment.platform = self.platform
         if do_post:
             self.post_create(experiment, **kwargs)
         return experiment
@@ -93,21 +98,22 @@ class IPlatformExperimentOperations(ABC):
         """
         pass
 
-    def batch_create(self, experiments: List[Experiment], **kwargs) -> List[Tuple[Experiment]]:
+    def batch_create(self, experiments: List[Experiment], display_progress: bool = True, **kwargs) -> List[
+        Tuple[Experiment]]:
         """
         Provides a method to batch create experiments
 
         Args:
             experiments: List of experiments to create
+            display_progress: Show progress bar
             **kwargs:
 
         Returns:
             List of tuples containing the create object and id of item that was created
         """
-        ret = []
-        for exp in experiments:
-            ret.append(self.create(exp, **kwargs))
-        return ret
+        return batch_create_items(experiments, create_func=self.create, display_progress=display_progress,
+                                  progress_description="Creating Experiments",
+                                  **kwargs)
 
     @abstractmethod
     def get_children(self, experiment: Any, **kwargs) -> List[Any]:
@@ -168,11 +174,14 @@ class IPlatformExperimentOperations(ABC):
             self.create(experiment)
 
         # check sims
+        logger.debug("Ensuring simulations exist")
         if isinstance(experiment.simulations, (GeneratorType, Iterator)):
-            experiment.simulations = self.platform.create_items(experiment.simulations)
+            experiment.simulations = self.platform._create_items_of_type(experiment.simulations, ItemType.SIMULATION)
         elif len(experiment.simulations) == 0:
             raise ValueError("You cannot have an experiment with now simulations")
-        self.platform.create_items(experiment.simulations)
+        else:
+
+            experiment.simulations = self.platform._create_items_of_type(experiment.simulations, ItemType.SIMULATION)
 
     def post_run_item(self, experiment: Experiment):
         """

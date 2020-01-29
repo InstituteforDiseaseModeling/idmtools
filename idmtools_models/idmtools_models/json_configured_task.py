@@ -32,6 +32,12 @@ class JSONConfiguredTask(ITask):
     # cmd --config config.json
     command_line_argument_no_filename: bool = field(default=True)
 
+    def __post_init__(self):
+        super().__post_init__()
+        if self.parameters is not None and self.envelope is not None and self.envelope in self.parameters:
+            logger.debug(f'Loading parameters from envelope: {self.envelope}')
+            self.parameters = self.parameters[self.envelope]
+
     def gather_common_assets(self) -> AssetCollection:
         self.__dump_config(self.common_assets)
         return self.common_assets
@@ -65,6 +71,7 @@ class JSONConfiguredTask(ITask):
         """
         self._task_log.info('Setting parameter %s to %s', key, str(value))
         self.parameters[key] = value
+        return {key: value}
 
     def get_parameter(self, key: TJSONConfigKeyType) -> TJSONConfigValueType:
         """
@@ -91,6 +98,7 @@ class JSONConfiguredTask(ITask):
         for k, p in values.items():
             self._task_log.info('Setting parameter %s to %s', k, str(p))
         self.parameters.update(values)
+        return values
 
     def reload_from_simulation(self, simulation: 'Simulation'):  # noqa: F821
         if simulation.platform:
@@ -105,6 +113,9 @@ class JSONConfiguredTask(ITask):
                     self.command.add_argument(self.command_line_argument)
                 else:
                     self.command.add_option(self.command_line_argument, self.config_file_name)
+
+    def __repr__(self):
+        return f"<JSONConfiguredTask config:{self.config_file_name} parameters: {self.parameters}"
 
 
 class JSONConfiguredTaskSpecification(TaskSpecification):

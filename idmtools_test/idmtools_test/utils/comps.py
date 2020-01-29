@@ -6,7 +6,7 @@ from COMPS.Data import QueryCriteria, Simulation as COMPSSimulation, Simulation
 
 from idmtools.builders import SimulationBuilder
 from idmtools.core.enums import EntityStatus
-from idmtools.entities import IExperiment
+from idmtools.entities.experiment import Experiment
 
 
 def get_asset_collection_id_for_simulation_id(sim_id):
@@ -39,7 +39,7 @@ def get_asset_collection_by_id(collection_id, query_criteria=None) -> CompsAsset
 
 def sims_from_experiment(e):
     o = e
-    if isinstance(e, IExperiment):
+    if isinstance(e, Experiment):
         o = e.get_platform_object()
     return o.get_simulations(QueryCriteria().select(['id', 'state']).select_children('hpc_jobs'))
 

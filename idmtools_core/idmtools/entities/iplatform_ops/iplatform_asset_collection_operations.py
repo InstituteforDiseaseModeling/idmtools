@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, List, Tuple, Type, NoReturn
+from typing import Any, List, Type, NoReturn
 from uuid import UUID
 
 from idmtools.assets import AssetCollection
@@ -39,7 +39,7 @@ class IPlatformAssetCollectionOperations(CacheEnabled, ABC):
         """
         asset_collection.post_creation()
 
-    def create(self, asset_collection: AssetCollection, do_pre: bool = True, do_post: bool = True, **kwargs):
+    def create(self, asset_collection: AssetCollection, do_pre: bool = True, do_post: bool = True, **kwargs) -> Any:
         """
         Creates an AssetCollection from an IDMTools AssetCollection object. Also performs pre-creation and post-creation
         locally and on platform
@@ -54,7 +54,7 @@ class IPlatformAssetCollectionOperations(CacheEnabled, ABC):
             Created platform item and the UUID of said item
         """
         if asset_collection.status is not None:
-            return asset_collection._platform_object, asset_collection.uid
+            return asset_collection._platform_object
         if do_pre:
             self.pre_create(asset_collection, **kwargs)
         ret = self.platform_create(asset_collection, **kwargs)
@@ -63,7 +63,7 @@ class IPlatformAssetCollectionOperations(CacheEnabled, ABC):
         return ret
 
     @abstractmethod
-    def platform_create(self, asset_collection: AssetCollection, **kwargs) -> Tuple[Any, UUID]:
+    def platform_create(self, asset_collection: AssetCollection, **kwargs) -> Any:
         """
         Creates an workflow_item from an IDMTools AssetCollection object
 
@@ -76,18 +76,21 @@ class IPlatformAssetCollectionOperations(CacheEnabled, ABC):
         """
         pass
 
-    def batch_create(self, asset_collections: List[AssetCollection], **kwargs) -> List[Tuple[Any, UUID]]:
+    def batch_create(self, asset_collections: List[AssetCollection], display_progress: bool = True, **kwargs) -> \
+            List[AssetCollection]:
         """
         Provides a method to batch create asset collections items
 
         Args:
             asset_collections: List of asset collection items to create
+            display_progress: Show progress bar
             **kwargs:
 
         Returns:
             List of tuples containing the create object and id of item that was created
         """
-        return batch_create_items(asset_collections, self.create, **kwargs)
+        return batch_create_items(asset_collections, create_func=self.create, display_progress=display_progress,
+                                  progress_description="Uploading Assets", **kwargs)
 
     @abstractmethod
     def get(self, asset_collection_id: UUID, **kwargs) -> Any:

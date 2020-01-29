@@ -1,24 +1,27 @@
 from abc import ABCMeta
 from dataclasses import fields, field
+from functools import partial
 from itertools import groupby
 from logging import getLogger, DEBUG
 from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set, Iterator
 from uuid import UUID
 
-from idmtools.core import CacheEnabled, ItemType, UnknownItemException, EntityContainer, UnsupportedPlatformType
+from tqdm import tqdm
+
+from idmtools.core import CacheEnabled, UnknownItemException, EntityContainer, UnsupportedPlatformType
+from idmtools.core.enums import ItemType, EntityStatus
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.entities.experiment import Experiment
-from idmtools.entities.iexperiment import IExperiment
 from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
 from idmtools.entities.iplatform_ops.iplatform_suite_operations import IPlatformSuiteOperations
 from idmtools.entities.iplatform_ops.iplatform_workflowitem_operations import IPlatformWorkflowItemOperations
-from idmtools.entities.isimulation import ISimulation
 from idmtools.entities.itask import ITask
 from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools.entities.platform_requirements import PlatformRequirements
+from idmtools.entities.simulation import Simulation
 from idmtools.entities.suite import Suite
 from idmtools.services.platforms import PlatformPersistService
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
@@ -41,8 +44,8 @@ ITEM_TYPE_TO_OBJECT_INTERFACE = {
     ItemType.ASSETCOLLECTION: '_assets'
 }
 STANDARD_TYPE_TO_INTERFACE = {
-    IExperiment: ItemType.EXPERIMENT,
-    ISimulation: ItemType.SIMULATION,
+    Experiment: ItemType.EXPERIMENT,
+    Simulation: ItemType.SIMULATION,
     Suite: ItemType.SUITE
 }
 
@@ -398,18 +401,48 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         result = []
         for key, group in groupby(items, lambda x: x.item_type):
-            interface = ITEM_TYPE_TO_OBJECT_INTERFACE[key]
-            ni = getattr(self, interface).batch_create(list(group))
-            result.extend(ni)
+            result.extend(self._create_items_of_type(group, key))
         return result
 
+    def _create_items_of_type(self, items: Iterator[IEntity], item_type: ItemType):
+        """
+        Creates items of specific type using batches
+
+        Args:
+            items: Items to create
+            item_type: Item type to create
+
+        Returns:
+
+        """
+        interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item_type]
+        ni = getattr(self, interface).batch_create(items)
+        return ni
+
     def _is_item_list_supported(self, items: List[IEntity]):
+        """
+        Checks if all items in a list are supported by the platform
+
+        Args:
+            items: Items to verify
+
+        Returns:
+            True if items supported, false otherwise
+        """
         for item in items:
             if item.item_type not in self.platform_type_map.values():
                 raise Exception(
                     f'Unable to create items of type: {item.item_type} for platform: {self.__class__.__name__}')
 
     def run_items(self, items: Union[IEntity, List[IEntity]]):
+        """
+        Run items on the platform.
+        Args:
+            items:
+
+        Returns:
+
+        """
         if isinstance(items, IEntity):
             items = [items]
         self._is_item_list_supported(items)
@@ -499,8 +532,20 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     def is_task_supported(self, task: ITask) -> bool:
         return self.are_requirements_met(task.platform_requirements)
 
+    def __wait_till_callback(self, item, callback, timeout: int = 60 * 60 * 24, refresh_interval: int = 5):
+        import time
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Refreshing simulation status")
+            self.refresh_status(item)
+            if callback(item):
+                return
+            time.sleep(refresh_interval)
+        raise TimeoutError(f"Timeout of {timeout} seconds exceeded")
+
     def wait_till_done(self, item: Union[Experiment, IWorkflowItem], timeout: int = 60 * 60 * 24,
-                       refresh_interval: int = 5):
+                       refresh_interval: int = 5, progress=True):
         """
         Wait for the experiment to be done.
 
@@ -509,18 +554,27 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             refresh_interval: How long to wait between polling.
             timeout: How long to wait before failing.
         """
-        import time
-        start_time = time.time()
-        while time.time() - start_time < timeout:
-            if logger.isEnabledFor(DEBUG):
-                logger.debug("Refreshing simulation status")
-            self.refresh_status(item)
-            if item.done:
-                logger.debug("Experiment Done")
-                return
-            time.sleep(refresh_interval)
-        error_type = 'experiment' if isinstance(item, IExperiment) else 'workitem'
-        raise TimeoutError(f"Timeout of {timeout} seconds exceeded when monitoring {error_type} {item}")
+        if progress:
+            self.wait_till_done_progress(item, timeout, refresh_interval)
+        else:
+            self.__wait_till_callback(item, lambda e: e.done, timeout, refresh_interval)
+
+    def wait_till_done_progress(self, item: Experiment, timeout: int = 60 * 60 * 24,
+                                refresh_interval: int = 5):
+        def get_prog_bar(e: Experiment, prog: tqdm):
+            results = dict()
+
+            done = 0
+            for sim in e.simulations:
+                if sim.status in [EntityStatus.FAILED, EntityStatus.SUCCEEDED]:
+                    done += 1
+            if done > prog.last_print_n:
+                prog.update(done - prog.last_print_n)
+            return e.done
+
+        prog = tqdm([], total=len(item.simulations), desc="Waiting on Experiment to Finish running")
+        self.__wait_till_callback(item, partial(get_prog_bar, prog=prog), timeout, refresh_interval)
+
 
 
 TPlatform = TypeVar("TPlatform", bound=IPlatform)

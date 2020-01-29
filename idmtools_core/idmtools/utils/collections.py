@@ -50,8 +50,11 @@ class ParentIterator(typing.Iterator):
         return getattr(self.items, item)
 
     def __len__(self):
+        from idmtools.entities.templated_simulation import TemplatedSimulations
         if isinstance(self.items, typing.Sized):
             return len(self.items)
+        elif isinstance(self.items, TemplatedSimulations):
+            return sum([len(b) for b in self.items.builders])
         raise ValueError("Cannot get the length of a generator object")
 
     def append(self, item):
@@ -71,6 +74,9 @@ class ResetGenerator(typing.Iterator):
 
     def __iter__(self):
         return self
+
+    def next_gen(self):
+        return self.__next_gen
 
     def __next__(self):
         try:

@@ -3,7 +3,7 @@ from functools import partial
 
 import numpy as np
 
-from idmtools.builders import ArmSimulationBuilder, SweepArm, ArmType
+from idmtools.builders import ArmSimulationBuilder, SweepArm, ArmType, SimulationBuilder
 from idmtools.builders import CsvExperimentBuilder
 from idmtools.builders import YamlSimulationBuilder
 from idmtools.entities.templated_simulation import TemplatedSimulations
@@ -94,3 +94,20 @@ class TestMultipleBuilders(ITestWithPersistence):
 
         # test only the last builder has been added
         self.assertTrue(isinstance(list(template_sim.builders)[0], YamlSimulationBuilder))
+
+    def test_bad_experiment_builder(self):
+        builder = SimulationBuilder()
+        with self.assertRaises(ValueError) as context:
+            # test 'sim' (should be 'simulation') is bad parameter for add_sweep_definition()
+            builder.add_sweep_definition(lambda sim, value: {"p": value}, range(0, 2))
+        self.assertTrue('passed to SweepBuilder.add_sweep_definition needs to take a simulation argument!' in str(
+            context.exception.args[0]))
+
+    def test_bad_experiment_builder1(self):
+        builder = SimulationBuilder()
+        with self.assertRaises(ValueError) as context:
+            # test 'sim' is bad extra parameter for add_sweep_definition()
+            builder.add_sweep_definition(lambda simulation, sim, value: {"p": value}, range(0, 2))
+        self.assertTrue(
+            'passed to SweepBuilder.add_sweep_definition needs to only have simulation and exactly one free parameter.' in str(
+                context.exception.args[0]))

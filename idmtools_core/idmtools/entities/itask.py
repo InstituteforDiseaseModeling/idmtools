@@ -4,7 +4,8 @@ from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
 from logging import getLogger, Logger
 from typing import Set, NoReturn, Union, Callable, List
-from idmtools.assets import  AssetCollection
+
+from idmtools.assets import AssetCollection
 from idmtools.entities.command_line import CommandLine
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.simulation import Simulation
@@ -126,7 +127,7 @@ class ITask(metaclass=ABCMeta):
     def gather_all_assets(self) -> AssetCollection:
         return self.gather_common_assets() + self.gather_transient_assets()
 
-    def copy_simulation(self, base_simulation: 'Simulation') -> 'Simulation':
+    def copy_simulation(self, base_simulation: Simulation) -> Simulation:
         """
         Called when copying a simulation for batching. Override you your task has specific concerns when copying
          simulations.
@@ -134,11 +135,19 @@ class ITask(metaclass=ABCMeta):
         new_simulation = copy.deepcopy(base_simulation)
         return new_simulation
 
-    def reload_from_simulation(self, simulation: 'Simulation'):
+    def reload_from_simulation(self, simulation: Simulation):
         """
         Optional hook that is called when loading simulations from a platform
         """
         raise NotImplementedError("Reloading task from a simulation is not supported")
+
+    def to_simulation(self):
+        s = Simulation()
+        s.task = self
+        return s
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}"
 
 
 def task_to_experiment(task: ITask, experiment_kwargs=None) -> 'Experiment':

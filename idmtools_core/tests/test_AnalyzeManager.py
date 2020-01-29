@@ -11,7 +11,6 @@ from idmtools.core.interfaces.iitem import IItem
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.ianalyzer import IAnalyzer
-from idmtools.entities.itask import task_to_experiment
 from idmtools.entities.simulation import Simulation
 from idmtools_test.utils.test_task import TestTask
 
@@ -35,7 +34,7 @@ class TestAnalyzeManager(unittest.TestCase):
     def setUp(self) -> None:
         self.platform = Platform('Test')
         self.platform.cleanup()
-        self.sample_experiment = task_to_experiment(TestTask())
+        self.sample_experiment = Experiment.from_task(TestTask())
         self.platform.run_items(self.sample_experiment)
         self.platform._simulations.set_simulation_status(self.sample_experiment.uid, status=EntityStatus.SUCCEEDED)
         self.configuration = {'max_processes': 1}

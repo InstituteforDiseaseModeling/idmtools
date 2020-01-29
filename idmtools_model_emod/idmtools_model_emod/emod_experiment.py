@@ -1,7 +1,7 @@
+import collections
 import copy
 import hashlib
 import os
-import collections
 import stat
 import typing
 from abc import ABC
@@ -12,7 +12,8 @@ from urllib.parse import urlparse
 
 import requests
 
-from idmtools.entities import IExperiment, CommandLine
+from idmtools.entities import CommandLine
+from idmtools.entities.experiment import Experiment
 from idmtools.entities.iexperiment import IDockerExperiment, ILinuxExperiment, IHostBinaryExperiment
 from idmtools.utils.decorators import optional_yaspin_load
 from idmtools_model_emod.emod_file import DemographicsFiles, MigrationFiles, Dlls
@@ -25,7 +26,7 @@ logger = getLogger(__name__)
 
 
 @dataclass(repr=False)
-class IEMODExperiment(IExperiment, ABC):
+class IEMODExperiment(Experiment, ABC):
     eradication_path: str = field(default=None, compare=False, metadata={"md": True})
     demographics: collections.OrderedDict = field(default_factory=lambda: collections.OrderedDict())
     legacy_exe: 'bool' = field(default=False, metadata={"md": True})

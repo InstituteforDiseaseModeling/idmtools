@@ -5,6 +5,7 @@ from functools import partial
 
 import pytest
 from COMPS.Data import Experiment
+from pytest import skip
 
 from idmtools.analysis.add_analyzer import AddAnalyzer
 from idmtools.analysis.analyze_manager import AnalyzeManager
@@ -12,7 +13,6 @@ from idmtools.analysis.download_analyzer import DownloadAnalyzer
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
-from idmtools.managers import ExperimentManager
 from idmtools_model_emod.defaults import EMODSir
 from idmtools_model_emod.emod_experiment import EMODExperiment
 from idmtools_test import COMMON_INPUT_PATH
@@ -34,6 +34,7 @@ setD = partial(param_update, param="d")
 
 @pytest.mark.comps
 @pytest.mark.analysis
+@skip
 class TestAnalyzeManagerEmodComps(ITestWithPersistence):
 
     def setUp(self) -> None:

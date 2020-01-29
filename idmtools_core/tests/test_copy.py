@@ -2,12 +2,16 @@ import copy
 import os
 import unittest.mock
 from functools import partial
+
 import pytest
-from idmtools_model_emod import EMODExperiment
+
+from idmtools.assets import Asset
+from idmtools.entities.experiment import Experiment
+from idmtools.entities.simulation import Simulation
 from idmtools_model_emod.defaults import EMODSir
+from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-
 
 DEFAULT_CONFIG_PATH = os.path.join(COMMON_INPUT_PATH, "files", "config.json")
 DEFAULT_CAMPAIGN_JSON = os.path.join(COMMON_INPUT_PATH, "files", "campaign.json")
@@ -41,24 +45,24 @@ class TestCopy(ITestWithPersistence):
         super().tearDown()
 
     def test_deepcopy_assets(self):
-        e = EMODExperiment.from_default(self.case_name, default=EMODSir(),
-                                        eradication_path=DEFAULT_ERADICATION_PATH)
+        e = Experiment.from_task(JSONConfiguredPythonTask(script_path='blah.py'))
+        e.simulations[0].assets.add_asset(Asset(filename="config.json"))
 
         # test deepcopy of experiment
         e.pre_creation()
         ep = copy.deepcopy(e)
         self.assertEqual(len(ep.assets.assets), 0)
         ep.assets = copy.deepcopy(e.assets)
-        self.assertEqual(len(ep.assets.assets), 2)
+        self.assertEqual(len(ep.assets.assets), 1)
         self.assertEqual(e.assets, ep.assets)
 
         # test deepcopy of simulation
-        e.base_simulation.gather_assets()
-        sim = copy.deepcopy(e.base_simulation)
-        self.assertEqual(len(sim.assets.assets), 0)
-        sim.assets = copy.deepcopy(e.base_simulation.assets)
-        self.assertEqual(len(sim.assets.assets), 2)
-        self.assertEqual(e.base_simulation.assets, sim.assets)
+        sim: Simulation = e.simulations[0]
+        sim2 = copy.deepcopy(sim)
+        self.assertEqual(len(sim2.assets.assets), 0)
+        sim2.assets = copy.deepcopy(sim.assets)
+        self.assertEqual(len(sim.assets), 1)
+        self.assertEqual(sim.assets, sim.assets)
 
     def test_deepcopy_experiment(self):
         e = EMODExperiment.from_default(self.case_name, default=EMODSir(),

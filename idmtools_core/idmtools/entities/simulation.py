@@ -1,7 +1,8 @@
 from dataclasses import dataclass, field
 from logging import getLogger, DEBUG
-from typing import List, Callable, NoReturn, Union, Mapping, Any, Type, TypeVar
+from typing import List, Callable, NoReturn, Union, Mapping, Any, Type, TypeVar, Dict
 
+from idmtools.assets import AssetCollection
 from idmtools.core import ItemType, NoTaskFound
 from idmtools.core.enums import EntityStatus
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
@@ -18,7 +19,7 @@ class Simulation(IAssetsEnabled, INamedEntity):
     Class that represents a generic simulation.
     This class needs to be implemented for each model type with specifics.
     """
-    task: 'ITask' = field(default_factory=None)
+    task: 'ITask' = field(default=None)
     item_type: 'ItemType' = field(default=ItemType.SIMULATION, compare=False)
     pre_creation_hooks: List[Callable[[], NoReturn]] = field(default_factory=lambda: [Simulation.gather_assets])
 
@@ -57,7 +58,7 @@ class Simulation(IAssetsEnabled, INamedEntity):
             self.tags["simulation_type"] = sn
 
         # Add a tag to for task
-        if self.parent and "task_type" not in self.parent.tags:
+        if self.parent is None or "task_type" not in self.parent.tags:
             tn = get_qualified_class_name_from_obj(self.task)
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f'Setting Simulation Tag "task_type" to "{tn}"')
@@ -70,7 +71,8 @@ class Simulation(IAssetsEnabled, INamedEntity):
     def post_creation(self) -> None:
         if logger.isEnabledFor(DEBUG):
             logger.debug('Calling task post creation')
-        self.task.post_creation(self)
+        if self.task is not None:
+            self.task.post_creation(self)
         self.status = EntityStatus.CREATED
 
     def pre_getstate(self):
@@ -87,6 +89,11 @@ class Simulation(IAssetsEnabled, INamedEntity):
         """
         self.task.gather_transient_assets()
         self.assets.add_assets(self.task.transient_assets, fail_on_duplicate=False)
+
+    @classmethod
+    def from_task(cls, task: 'ITask', tags: Dict[str, Any] = None, asset_collection: AssetCollection = None):
+        return Simulation(task=task, tags=dict() if tags is None else tags,
+                          assets=asset_collection if asset_collection else AssetCollection())
 
 
 # TODO Rename to T simulation once old simulation is one

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Type, Any, List, Dict, NoReturn, Union
+from typing import Type, Any, List, Dict, NoReturn
 from uuid import UUID
 
 from idmtools.core.cache_enabled import CacheEnabled
@@ -53,8 +53,7 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         """
         simulation.post_creation()
 
-    def create(self, simulation: Simulation, do_pre: bool = True, do_post: bool = True, **kwargs) -> Union[
-        Simulation, Any]:
+    def create(self, simulation: Simulation, do_pre: bool = True, do_post: bool = True, **kwargs) -> Any:
         """
         Creates an simulation from an IDMTools simulation object. Also performs pre-creation and post-creation
         locally and on platform
@@ -91,18 +90,21 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         """
         pass
 
-    def batch_create(self, sims: List[Simulation], **kwargs) -> List[Simulation]:
+    def batch_create(self, sims: List[Simulation], display_progress: bool = True, **kwargs) -> List[Simulation]:
         """
         Provides a method to batch create simulations
 
         Args:
             sims: List of simulations to create
+            display_progress: Show progress bar
             **kwargs:
 
         Returns:
             List of tuples containing the create object and id of item that was created
         """
-        return batch_create_items(sims, self.create, **kwargs)
+        return batch_create_items(sims, create_func=self.create, display_progress=display_progress,
+                                  progress_description="Commissioning Simulations",
+                                  **kwargs)
 
     @abstractmethod
     def get_parent(self, simulation: Any, **kwargs) -> Any:

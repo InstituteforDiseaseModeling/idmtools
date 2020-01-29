@@ -2,14 +2,19 @@ import uuid
 from dataclasses import dataclass, field, InitVar
 from logging import getLogger
 from types import GeneratorType
-from typing import NoReturn, Set, Union, Iterator
+from typing import NoReturn, Set, Union, Iterator, Type, Dict, Any
 
+from idmtools import __version__
+from idmtools.assets import AssetCollection
 from idmtools.core import ItemType
 from idmtools.core.interfaces.entity_container import EntityContainer
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.core.interfaces.inamed_entity import INamedEntity
+from idmtools.entities.itask import ITask
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.templated_simulation import TemplatedSimulations
+from idmtools.registry.experiment_specification import ExperimentSpecification, get_model_impl, get_model_type_impl
+from idmtools.registry.plugin_specification import get_description_impl
 from idmtools.utils.collections import ParentIterator
 
 logger = getLogger(__name__)
@@ -36,6 +41,8 @@ class Experiment(IAssetsEnabled, INamedEntity):
     simulations: InitVar[SUPPORTED_SIM_TYPE] = None
     __simulations: Union[SUPPORTED_SIM_TYPE] = field(default_factory=lambda: EntityContainer(), compare=False)
 
+    gather_common_assets_from_task: bool = field(default=False, compare=False)
+
     def __post_init__(self, simulations):
         super().__post_init__()
         if simulations is not None and not isinstance(simulations, property):
@@ -61,18 +68,23 @@ class Experiment(IAssetsEnabled, INamedEntity):
         # Gather the assets
         self.gather_assets()
 
-        # TODO How to handle genreators?
-        if "task_type" not in self.tags and not isinstance(self.simulations, GeneratorType) and \
-                (not isinstance(self.simulations, ParentIterator) or
-                 (isinstance(self.simulations, ParentIterator)
-                  and not isinstance(self.simulations.items, TemplatedSimulations)
-                 )):
-            task_class = self.simulations[0].task.__class__
-            self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
         # to keep experiments clean, let's only do this is we have a special experiment class
         if self.__class__ is not Experiment:
             # Add a tag to keep the Experiment class name
             self.tags["experiment_type"] = f'{self.__class__.__module__}.{self.__class__.__name__}'
+
+        # if it is a template, set task type on experiment
+        if isinstance(self.simulations, ParentIterator) and isinstance(self.simulations.items, TemplatedSimulations):
+            self.simulations.items.base_task.gather_common_assets()
+            self.assets.add_assets(self.simulations.items.base_task.common_assets, fail_on_duplicate=False)
+            if "task_type" not in self.tags:
+                task_class = self.simulations.items.base_task.__class__
+                self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
+        elif self.gather_common_assets_from_task:
+            for sim in self.simulations:
+                self.assets.add_assets(sim.task.gather_common_assets(), fail_on_duplicate=False)
+
+        self.tags['idmtools'] = __version__
 
     @property
     def done(self):
@@ -91,7 +103,15 @@ class Experiment(IAssetsEnabled, INamedEntity):
         if isinstance(simulations, (GeneratorType, TemplatedSimulations, EntityContainer)):
             self.__simulations = simulations
         elif isinstance(simulations, (list, set)):
-            self.simulations = EntityContainer(simulations)
+            from idmtools.entities.simulation import Simulation
+            self.simulations = EntityContainer()
+            for sim in simulations:
+                if isinstance(sim, ITask):
+                    self.simulations.append(sim.to_simulation())
+                elif isinstance(sim, Simulation):
+                    self.simulations.append(sim)
+                else:
+                    raise ValueError("Only list of tasks/simulations can be passed to experiment simulations")
         else:
             raise ValueError("You can only set simulations to an EntityContainer, a Generator, a TemplatedSimulations "
                              "or a List/Set of Simulations")
@@ -116,6 +136,53 @@ class Experiment(IAssetsEnabled, INamedEntity):
         return {"assets": AssetCollection(), "simulations": EntityContainer()}
 
     def gather_assets(self) -> NoReturn:
-        # TODO assets gathering magic.... easy if we pre-populate our sims.. hard in generators
-        # we could let it be more user facing or wrapped by convenience functions per model
         pass
+
+    @classmethod
+    def from_task(cls, task, name: str = None, tags: Dict[str, Any] = None, assets: AssetCollection = None,
+                  gather_common_assets_from_task: bool = True) -> 'Experiment':
+        """
+        Creates an Experiment with one Simulation from a task
+
+        Args:
+            task: Task to use
+            name: Name of experiment
+            tags:
+            gather_common_assets_from_task: Whether we should attempt to gather assets from the Task object for the
+                experiment. With large amounts of tasks, this can be expensive as we loop through all
+        Returns:
+
+        """
+        if tags is None:
+            tags = dict()
+        e = Experiment(name=name, tags=tags, assets=AssetCollection() if assets is None else assets,
+                       gather_common_assets_from_task=gather_common_assets_from_task)
+        e.simulations = [task]
+        return e
+
+    @classmethod
+    def from_template(cls, template: TemplatedSimulations, name: str = None,
+                      tags: Dict[str, Any] = None) -> 'Experiment':
+        if tags is None:
+            tags = dict()
+        e = Experiment(name=name, tags=tags)
+        e.simulations = template
+        return e
+
+
+class ExperimentSpecification(ExperimentSpecification):
+
+    @get_description_impl
+    def get_description(self) -> str:
+        return "Provides access to the Local Platform to IDM Tools"
+
+    @get_model_impl
+    def get(self, configuration: dict) -> Experiment:  # noqa: F821
+        """
+        Experiment is going
+        """
+        return Experiment(**configuration)
+
+    @get_model_type_impl
+    def get_type(self) -> Type[Experiment]:
+        return Experiment

@@ -4,6 +4,7 @@ from typing import Type, Any, List, Tuple, Dict, NoReturn
 from uuid import UUID
 
 from idmtools.core import CacheEnabled
+from idmtools.entities.iplatform_ops.utils import batch_create_items
 from idmtools.entities.iworkflow_item import IWorkflowItem
 
 
@@ -26,21 +27,20 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
         """
         pass
 
-    def batch_create(self, workflow_items: List[IWorkflowItem], **kwargs) -> List[Tuple[Any, UUID]]:
+    def batch_create(self, workflow_items: List[IWorkflowItem], display_progress: bool = True, **kwargs) -> List[Any]:
         """
         Provides a method to batch create workflow items
 
         Args:
             workflow_items: List of worfklow items to create
+            display_progress: Whether to display progress bar
             **kwargs:
 
         Returns:
             List of tuples containing the create object and id of item that was created
         """
-        ret = []
-        for wi in workflow_items:
-            ret.append(self.create(wi, **kwargs))
-        return ret
+        return batch_create_items(workflow_items, create_func=self.create, display_progress=display_progress,
+                                  progress_description="Creating Suites", **kwargs)
 
     def pre_create(self, workflow_item: IWorkflowItem, **kwargs) -> NoReturn:
         """
@@ -68,7 +68,7 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
         """
         workflow_item.post_creation()
 
-    def create(self, workflow_item: IWorkflowItem, do_pre: bool = True, do_post: bool = True, **kwargs):
+    def create(self, workflow_item: IWorkflowItem, do_pre: bool = True, do_post: bool = True, **kwargs) -> Any:
         """
         Creates an workflow item from an IDMTools IWorkflowItem object. Also performs pre-creation and post-creation
         locally and on platform

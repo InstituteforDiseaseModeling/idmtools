@@ -10,10 +10,7 @@ import types
 from dataclasses import fields, _MISSING_TYPE
 from logging import getLogger
 
-from idmtools.utils.collections import ParentIterator
-
 logger = getLogger(__name__)
-
 Pickler = pickle._Pickler
 
 
@@ -66,6 +63,7 @@ class Hasher(Pickler):
             return self._hash.hexdigest()
 
     def save(self, obj):
+        from idmtools.utils.collections import ParentIterator
         import abc
         if isinstance(obj, abc.ABCMeta):
             pass

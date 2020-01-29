@@ -1,15 +1,13 @@
 import typing
-from dataclasses import dataclass, field, fields, _MISSING_TYPE
+from dataclasses import dataclass, field, fields
+from uuid import UUID
 
 from idmtools.utils.hashing import hash_obj, ignore_fields_in_dataclass_on_pickle
-
-if typing.TYPE_CHECKING:
-    from uuid import UUID
 
 
 @dataclass(repr=False)
 class IItem:
-    _uid: 'UUID' = field(default=None, metadata={"md": True})
+    _uid: UUID = field(default=None, metadata={"md": True})
 
     @property
     def uid(self):
