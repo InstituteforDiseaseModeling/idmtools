@@ -19,8 +19,8 @@ if __name__ == "__main__":
 
     tags = {'Demo': 'idmtools SSMTAnalysis', 'WorkItem type': 'Docker'}
 
-    args = dict(file_name="InsetChart.json", channels=['Adult Vectors'])
-    # args = [{'file_name': 'InsetChart.json'}, {'channels': 'Adult Vectors'}]
+    # args = dict(file_name="InsetChart.json", channels=['Adult Vectors'])
+    args = [{'file_name': 'InsetChart.json', 'channels': 'Adult Vectors'}]
 
     analysis = SSMTAnalysis(experiment_ids=[exp_id],
                             analyzers=[MyAnalyzer],
