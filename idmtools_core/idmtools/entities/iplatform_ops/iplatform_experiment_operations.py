@@ -2,13 +2,16 @@ from abc import ABC, abstractmethod
 from concurrent.futures import as_completed
 from concurrent.futures.thread import ThreadPoolExecutor
 from dataclasses import dataclass
+from logging import getLogger
 from types import GeneratorType
 from typing import Type, Any, NoReturn, Tuple, List, Dict, Iterator, Union
 from uuid import UUID
 
-from idmtools.core import EntityStatus
+from idmtools.core.enums import EntityStatus, ItemType
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.utils import batch_create_items
+
+logger = getLogger(__name__)
 
 
 @dataclass
@@ -171,12 +174,14 @@ class IPlatformExperimentOperations(ABC):
             self.create(experiment)
 
         # check sims
+        logger.debug("Ensuring simulations exist")
         if isinstance(experiment.simulations, (GeneratorType, Iterator)):
-            experiment.simulations = self.platform.create_items(experiment.simulations)
+            experiment.simulations = self.platform._create_items_of_type(experiment.simulations, ItemType.SIMULATION)
         elif len(experiment.simulations) == 0:
             raise ValueError("You cannot have an experiment with now simulations")
         else:
-            experiment.simulations = self.platform.create_items(experiment.simulations)
+
+            experiment.simulations = self.platform._create_items_of_type(experiment.simulations, ItemType.SIMULATION)
 
     def post_run_item(self, experiment: Experiment):
         """

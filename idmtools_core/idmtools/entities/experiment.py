@@ -135,8 +135,6 @@ class Experiment(IAssetsEnabled, INamedEntity):
         return {"assets": AssetCollection(), "simulations": EntityContainer()}
 
     def gather_assets(self) -> NoReturn:
-        # TODO assets gathering magic.... easy if we pre-populate our sims.. hard in generators
-        # we could let it be more user facing or wrapped by convenience functions per model
         pass
 
 

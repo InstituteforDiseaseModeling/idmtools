@@ -398,12 +398,34 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         result = []
         for key, group in groupby(items, lambda x: x.item_type):
-            interface = ITEM_TYPE_TO_OBJECT_INTERFACE[key]
-            ni = getattr(self, interface).batch_create(list(group))
-            result.extend(ni)
+            result.extend(self._create_items_of_type(group, key))
         return result
 
+    def _create_items_of_type(self, items: Iterator[IEntity], item_type: ItemType):
+        """
+        Creates items of specific type using batches
+
+        Args:
+            items: Items to create
+            item_type: Item type to create
+
+        Returns:
+
+        """
+        interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item_type]
+        ni = getattr(self, interface).batch_create(items)
+        return ni
+
     def _is_item_list_supported(self, items: List[IEntity]):
+        """
+        Checks if all items in a list are supported by the platform
+
+        Args:
+            items: Items to verify
+
+        Returns:
+            True if items supported, false otherwise
+        """
         for item in items:
             if item.item_type not in self.platform_type_map.values():
                 raise Exception(
