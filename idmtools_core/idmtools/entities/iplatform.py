@@ -13,16 +13,15 @@ from idmtools.core.enums import ItemType, EntityStatus
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.entities.experiment import Experiment
-from idmtools.entities.iexperiment import IExperiment
 from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
 from idmtools.entities.iplatform_ops.iplatform_suite_operations import IPlatformSuiteOperations
 from idmtools.entities.iplatform_ops.iplatform_workflowitem_operations import IPlatformWorkflowItemOperations
-from idmtools.entities.isimulation import ISimulation
 from idmtools.entities.itask import ITask
 from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools.entities.platform_requirements import PlatformRequirements
+from idmtools.entities.simulation import Simulation
 from idmtools.entities.suite import Suite
 from idmtools.services.platforms import PlatformPersistService
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
@@ -45,8 +44,8 @@ ITEM_TYPE_TO_OBJECT_INTERFACE = {
     ItemType.ASSETCOLLECTION: '_assets'
 }
 STANDARD_TYPE_TO_INTERFACE = {
-    IExperiment: ItemType.EXPERIMENT,
-    ISimulation: ItemType.SIMULATION,
+    Experiment: ItemType.EXPERIMENT,
+    Simulation: ItemType.SIMULATION,
     Suite: ItemType.SUITE
 }
 

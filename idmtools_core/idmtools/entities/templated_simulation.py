@@ -1,8 +1,8 @@
 import copy
-from dataclasses import dataclass, field, fields
+from dataclasses import dataclass, field, fields, InitVar
 from functools import partial
 from itertools import chain
-from typing import Set, Generator
+from typing import Set, Generator, Dict, Any
 
 from more_itertools import grouper
 
@@ -34,8 +34,9 @@ class TemplatedSimulations:
     builders: Set[SimulationBuilder] = field(default_factory=lambda: set(), compare=False)
     base_simulation: Simulation = field(default=None, compare=False, metadata={"pickle_ignore": True})
     base_task: ITask = field(default=None)
+    tags: InitVar[Dict] = None
 
-    def __post_init__(self):
+    def __post_init__(self, tags):
         if self.base_task is None and (self.base_simulation is None or self.base_simulation.task is None):
             raise ValueError("Either a base simulation or a base_task are required")
 
@@ -43,6 +44,9 @@ class TemplatedSimulations:
             self.base_simulation = Simulation(task=self.base_task)
         else:
             self.base_task = self.base_simulation.task
+
+        if tags and not isinstance(tags, property):
+            self.base_simulation.tags.update(tags)
 
     @property
     def builder(self) -> SimulationBuilder:
@@ -121,6 +125,14 @@ class TemplatedSimulations:
         sim.assets = copy.deepcopy(self.base_simulation.assets)
         return sim
 
+    @property
+    def tags(self):
+        return self.base_simulation.tags
+
+    @tags.setter
+    def tags(self, tags):
+        self.base_simulation.tags = tags
+
     def __iter__(self):
         return self.simulations()
 
@@ -135,3 +147,7 @@ class TemplatedSimulations:
         Add ignored fields back since they don't exist in the pickle
         """
         self.__dict__.update(state)
+
+    @classmethod
+    def from_task(cls, task: ITask, tags: Dict[str, Any] = None) -> 'TemplatedSimulations':
+        return TemplatedSimulations(base_task=task, tags=tags)

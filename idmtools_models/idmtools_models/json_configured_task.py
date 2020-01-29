@@ -25,6 +25,12 @@ class JSONConfiguredTask(ITask):
     # If we don't define this we assume static name the script consuming file will know
     config_file_name: str = field(default="config.json")
 
+    def __post_init__(self):
+        super().__post_init__()
+        if self.parameters is not None and self.envelope is not None and self.envelope in self.parameters:
+            logger.debug(f'Loading parameters from envelope: {self.envelope}')
+            self.parameters = self.parameters[self.envelope]
+
     def gather_common_assets(self) -> AssetCollection:
         return self.common_assets
 
@@ -86,6 +92,9 @@ class JSONConfiguredTask(ITask):
     def reload_from_simulation(self, simulation: 'Simulation'):  # noqa: F821
         if simulation.platform:
             simulation.platform.get_files(simulation, self.config_file_name)
+
+    def __repr__(self):
+        return f"<JSONConfiguredTask config:{self.config_file_name} parameters: {self.parameters}"
 
 
 class JSONConfiguredTaskSpecification(TaskSpecification):

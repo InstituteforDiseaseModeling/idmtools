@@ -146,6 +146,9 @@ class ITask(metaclass=ABCMeta):
         s.task = self
         return s
 
+    def __repr__(self):
+        return f"<{self.__class__.__name__}"
+
 
 def task_to_experiment(task: ITask, experiment_kwargs=None) -> 'Experiment':
     if experiment_kwargs is None:

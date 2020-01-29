@@ -6,21 +6,25 @@ from idmtools.builders import StandAloneSimulationsBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.itask import task_to_experiment
+from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
-from idmtools_models.python import PythonExperiment, PythonSimulation
+from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.test_task import TestTask
 
 
 class TestPersistenceServices(ITestWithPersistence):
+    def setUp(self) -> None:
+        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        print(self.case_name)
 
     def test_fix_107(self):
         # https://github.com/InstituteforDiseaseModeling/idmtools/issues/107
         assets_path = os.path.join(COMMON_INPUT_PATH, "regression", "107", "Assets")
-        pe = PythonExperiment(name="Test",
-                              model_path=os.path.join(assets_path, "model.py"),
-                              assets=AssetCollection.from_directory(assets_path))
+        sp = os.path.join(assets_path, "model.py")
+        pe = Experiment.from_task(name=self.case_name, task=JSONConfiguredPythonTask(script_path=sp),
+                                  assets=AssetCollection.from_directory(assets_path))
         pe.gather_assets()
         self.assertEqual(len(pe.assets.assets), 2)
         expected_files = ['model.py', '__init__.py']
@@ -30,11 +34,10 @@ class TestPersistenceServices(ITestWithPersistence):
     def test_fix_114(self):
         # https://github.com/InstituteforDiseaseModeling/idmtools/issues/114
         assets_path = os.path.join(COMMON_INPUT_PATH, "regression", "107", "Assets")
-        s = PythonSimulation(parameters={"a": 1})
-        e = PythonExperiment(name="Test",
-                             model_path=os.path.join(assets_path, "model.py"),
-                             base_simulation=s)
-        self.assertEqual(e.base_simulation, s)
+        sp = os.path.join(assets_path, "model.py")
+        s = Simulation.from_task(JSONConfiguredPythonTask(script_path=sp, parameters={"a": 1}))
+        ts = TemplatedSimulations(base_task=JSONConfiguredPythonTask(script_path=sp, parameters={"a": 1}))
+        self.assertEqual(ts.base_simulation, s)
 
     def test_fix_125(self):
         # https://github.com/InstituteforDiseaseModeling/idmtools/issues/125

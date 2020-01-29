@@ -1,18 +1,15 @@
 import itertools
 from functools import partial
+
 from idmtools.builders.arm_simulation_builder import ArmSimulationBuilder, SweepArm, ArmType
 from idmtools.entities.templated_simulation import TemplatedSimulations
+from idmtools.utils.configuration import update_task_with_set_parameter
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.test_task import TestTask
 from idmtools_test.utils.utils import verify_simulation
 
-
-def param_update(simulation, param, value):
-    return simulation.task.set_parameter(param, value)
-
-
-setA = partial(param_update, param="a")
-setB = partial(param_update, param="b")
+setA = partial(update_task_with_set_parameter, param="a")
+setB = partial(update_task_with_set_parameter, param="b")
 
 
 class TestArmBuilder(ITestWithPersistence):
@@ -96,6 +93,3 @@ class TestArmBuilder(ITestWithPersistence):
         for simulation in simulations:
             found = verify_simulation(simulation, ["a", "b"], expected_values)
             self.assertTrue(found)
-
-    def test_complex_scenario(self):
-        pass

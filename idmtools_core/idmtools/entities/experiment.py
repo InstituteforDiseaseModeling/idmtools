@@ -2,9 +2,10 @@ import uuid
 from dataclasses import dataclass, field, InitVar
 from logging import getLogger
 from types import GeneratorType
-from typing import NoReturn, Set, Union, Iterator, Type
+from typing import NoReturn, Set, Union, Iterator, Type, Dict, Any
 
 from idmtools import __version__
+from idmtools.assets import AssetCollection
 from idmtools.core import ItemType
 from idmtools.core.interfaces.entity_container import EntityContainer
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
@@ -136,6 +137,37 @@ class Experiment(IAssetsEnabled, INamedEntity):
 
     def gather_assets(self) -> NoReturn:
         pass
+
+    @classmethod
+    def from_task(cls, task, name: str = None, tags: Dict[str, Any] = None, assets: AssetCollection = None,
+                  gather_common_assets_from_task: bool = True) -> 'Experiment':
+        """
+        Creates an Experiment with one Simulation from a task
+
+        Args:
+            task: Task to use
+            name: Name of experiment
+            tags:
+            gather_common_assets_from_task: Whether we should attempt to gather assets from the Task object for the
+                experiment. With large amounts of tasks, this can be expensive as we loop through all
+        Returns:
+
+        """
+        if tags is None:
+            tags = dict()
+        e = Experiment(name=name, tags=tags, assets=AssetCollection() if assets is None else assets,
+                       gather_common_assets_from_task=gather_common_assets_from_task)
+        e.simulations = [task]
+        return e
+
+    @classmethod
+    def from_template(cls, template: TemplatedSimulations, name: str = None,
+                      tags: Dict[str, Any] = None) -> 'Experiment':
+        if tags is None:
+            tags = dict()
+        e = Experiment(name=name, tags=tags)
+        e.simulations = template
+        return e
 
 
 class ExperimentSpecification(ExperimentSpecification):
