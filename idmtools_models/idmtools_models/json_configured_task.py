@@ -24,22 +24,33 @@ class JSONConfiguredTask(ITask):
     envelope: str = field(default=None)
     # If we don't define this we assume static name the script consuming file will know
     config_file_name: str = field(default="config.json")
+    # is the config file a common asset or a transient. We default ot transient
+    is_config_command: bool = field(default=False)
+    command_line_argument: str = field(default=None)
+    # If command_line_argument is set, defines if we pass the filename after the argument
+    # for example, if the argument is --config and the config file name is config.json we would run the command as
+    # cmd --config config.json
+    command_line_argument_no_filename: bool = field(default=True)
 
     def gather_common_assets(self) -> AssetCollection:
+        self.__dump_config(self.common_assets)
         return self.common_assets
 
     def gather_transient_assets(self) -> AssetCollection:
         """
         Here we dump our config
         """
+        self.__dump_config(self.transient_assets)
+        return self.transient_assets
+
+    def __dump_config(self, assets):
         if self.config_file_name is not None:
             params = {self.envelope: self.parameters} if self.envelope else self.parameters
             self._task_log.info('Adding JSON Configured File %s', self.config_file_name)
             if logger.isEnabledFor(DEBUG):
                 logger.info(f'Generating {self.config_file_name} as an asset from JSONConfiguredTask')
                 self._task_log.debug('Writing Config %s', json.dumps(params))
-            self.transient_assets.add_or_replace_asset(Asset(filename=self.config_file_name, content=json.dumps(params)))
-        return self.transient_assets
+            assets.add_or_replace_asset(Asset(filename=self.config_file_name, content=json.dumps(params)))
 
     def set_parameter(self, key: TJSONConfigKeyType, value: TJSONConfigValueType):
         """
@@ -84,6 +95,16 @@ class JSONConfiguredTask(ITask):
     def reload_from_simulation(self, simulation: 'Simulation'):  # noqa: F821
         if simulation.platform:
             simulation.platform.get_files(simulation, self.config_file_name)
+
+    def pre_creation(self, parent: Union['Simulation', 'WorkflowItem']):
+        # Ensure our command line argument is added if configured
+        if self.command_line_argument:
+            if self.command_line_argument not in self.command.arguments:
+                # check if we should add filename with arg?
+                if self.command_line_argument_no_filename:
+                    self.command.add_argument(self.command_line_argument)
+                else:
+                    self.command.add_option(self.command_line_argument, self.config_file_name)
 
 
 class JSONConfiguredTaskSpecification(TaskSpecification):
