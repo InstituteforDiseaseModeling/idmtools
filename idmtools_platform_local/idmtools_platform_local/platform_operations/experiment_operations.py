@@ -9,10 +9,9 @@ from uuid import UUID
 
 from idmtools.assets import Asset
 from idmtools.core.experiment_factory import experiment_factory
-from idmtools.entities import IExperiment, ISimulation
 from idmtools.entities.experiment import Experiment
-from idmtools.entities.iexperiment import IDockerExperiment, IGPUExperiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
+from idmtools.entities.simulation import Simulation
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
 from idmtools_platform_local.client.simulations_client import SimulationsClient
 from idmtools_platform_local.platform_operations.uitils import local_status_to_common, ExperimentDict, SimulationDict
@@ -149,7 +148,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         worker = self.platform._sm.get('workers')
         list(map(functools.partial(self._send_asset_to_docker, path=path, worker=worker), experiment.assets))
 
-    def refresh_status(self, experiment: IExperiment):
+    def refresh_status(self, experiment: Experiment):
         """
         Refresh status of experiment
 
@@ -168,9 +167,9 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
                     logger.debug(f"Simulation {sim_status[0]['simulation_uid']}status: {sim_status[0]['status']}")
                 s.status = local_status_to_common(sim_status[0]['status'])
 
-    def to_entity(self, experiment: Dict, **kwargs) -> IExperiment:
+    def to_entity(self, experiment: Dict, **kwargs) -> Experiment:
         """
-        Convert an ExperimentDict to an IExperiment
+        Convert an ExperimentDict to an Experiment
 
         Args:
             experiment: Experiment to convert
@@ -183,7 +182,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         e.uid = experiment['experiment_id']
         return e
 
-    def _run_docker_sim(self, experiment: IDockerExperiment, simulation: ISimulation):
+    def _run_docker_sim(self, experiment: IDockerExperiment, simulation: Simulation):
         """
         Run a docker based simulation
 
@@ -196,7 +195,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         """
         from idmtools_platform_local.internals.tasks.docker_run import DockerRunTask, GPURunTask
         logger.debug(f"Preparing Docker Task Configuration for {experiment.uid}:{simulation.uid}")
-        is_gpu = isinstance(experiment, IGPUExperiment)
+        is_gpu = isinstance(experiment, GPUExperiment)
         run_cmd = GPURunTask if is_gpu else DockerRunTask
         docker_config = dict(
             image=experiment.image_name,
@@ -216,9 +215,9 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
 
         """
-        if isinstance(item, IExperiment):
+        if isinstance(item, Experiment):
             t_str = item.uid
-        elif isinstance(item, ISimulation):
+        elif isinstance(item, Simulation):
             t_str = f'{item.parent_id}/{item.uid}'
         else:
             raise NotImplementedError("Only launching experiments and simulations is supported")

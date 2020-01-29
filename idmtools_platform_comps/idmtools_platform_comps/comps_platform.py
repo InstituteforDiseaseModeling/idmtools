@@ -6,8 +6,6 @@ from dataclasses import dataclass, field
 from COMPS import Client
 from idmtools.core import CacheEnabled, ItemType
 from idmtools.entities.iplatform import IPlatform
-from idmtools.entities.iexperiment import IExperiment, IGPUExperiment, IDockerExperiment, \
-    ILinuxExperiment
 from idmtools_platform_comps.comps_operations.asset_collection_operations import \
     CompsPlatformAssetCollectionOperations
 from idmtools_platform_comps.comps_operations.experiment_operations import CompsPlatformExperimentOperations
@@ -81,12 +79,6 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             Client.auth_manager()
         except RuntimeError:
             Client.login(self.endpoint)
-
-    def supported_experiment_types(self) -> List[typing.Type]:
-        return [IExperiment]
-
-    def unsupported_experiment_types(self) -> List[typing.Type]:
-        return [IDockerExperiment, IGPUExperiment, ILinuxExperiment]
 
     def post_setstate(self):
         self.__init_interfaces()

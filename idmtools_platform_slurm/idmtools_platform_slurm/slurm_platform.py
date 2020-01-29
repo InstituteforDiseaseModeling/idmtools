@@ -3,8 +3,6 @@ from typing import Optional, List
 from dataclasses import dataclass, field
 from logging import getLogger
 from idmtools.entities.iplatform import IPlatform
-from idmtools.entities.iexperiment import IExperiment, IHostBinaryExperiment, IWindowsExperiment, \
-    ILinuxExperiment, IDockerExperiment
 from idmtools_platform_slurm.platform_operations.experiment_operations import SlurmPLatformExperimentOperations
 from idmtools_platform_slurm.platform_operations.simulation_operations import SlurmPLatformSimulationOperations
 from idmtools_platform_slurm.slurm_operations import SlurmOperationalMode, SlurmOperations, \
@@ -61,18 +59,6 @@ class SlurmPlatform(IPlatform):
         """
         # TODO Full Implementation
         return False
-
-    def supported_experiment_types(self) -> List[typing.Type]:
-        supported = [IExperiment, IHostBinaryExperiment, ILinuxExperiment]
-        if self.__has_singularity():
-            supported.append(IDockerExperiment)
-        return supported
-
-    def unsupported_experiment_types(self) -> List[typing.Type]:
-        supported = [IWindowsExperiment]
-        if not self.__has_singularity():
-            supported.append(IDockerExperiment)
-        return supported
 
     def post_setstate(self):
         self.__init_interfaces()

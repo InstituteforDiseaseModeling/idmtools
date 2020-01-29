@@ -5,7 +5,7 @@ from logging import getLogger
 from typing import List, Type
 
 from idmtools.core import ItemType
-from idmtools.entities.iexperiment import IExperiment
+from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform import IPlatform
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.registry.platform_specification import example_configuration_impl, get_platform_impl, \
@@ -47,7 +47,7 @@ class TestPlatform(IPlatform):
     def post_setstate(self):
         self.init_interfaces()
 
-    def run_simulations(self, experiment: IExperiment) -> None:
+    def run_simulations(self, experiment: Experiment) -> None:
         from idmtools.core import EntityStatus
         self._simulations.set_simulation_status(experiment.uid, EntityStatus.RUNNING)
 
