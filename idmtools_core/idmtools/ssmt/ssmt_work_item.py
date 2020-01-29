@@ -17,13 +17,16 @@ class SSMTWorkItem(IWorkflowItem):
 
     item_name: str = field(default="Idm SSMT Test")
     command: str = field(default=None)
-    item_id: UUID = field(default=None, init=False)
     tags: TTags = field(default_factory=lambda: {})
     asset_collection_id: UUID = field(default=None)
     asset_files: FileList = field(default=None)
     user_files: FileList = field(default=None)
     wo_kwargs: dict = field(default_factory=lambda: {})
     related_experiments: list = field(default=None)
+
+    work_item_type: str = field(default=None)
+    docker_image: str = field(default=None)
+    plugin_key: str = field(default=None)
 
     item_type: 'ItemType' = field(default=ItemType.WORKFLOW_ITEM, compare=False, init=False)
 

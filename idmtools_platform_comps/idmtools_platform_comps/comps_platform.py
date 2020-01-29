@@ -53,7 +53,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     num_cores: int = field(default=1)
     exclusive: bool = field(default=False)
 
-    item_type: str = field(default=None)
+    work_item_type: str = field(default=None)
     docker_image: str = field(default=None)
     plugin_key: str = field(default=None)
 
