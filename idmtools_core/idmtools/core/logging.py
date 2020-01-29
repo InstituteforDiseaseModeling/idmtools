@@ -1,10 +1,9 @@
-import sys
-from signal import SIGTERM, SIGINT, signal
-from logging import getLogger
 import logging
+import os
+from logging import getLogger
 from logging.handlers import QueueHandler, RotatingFileHandler, QueueListener
 from multiprocessing import Queue
-import os
+from signal import SIGTERM, SIGINT, signal
 from typing import NoReturn, Union
 
 import coloredlogs as coloredlogs
@@ -106,7 +105,7 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
 
 def exclude_logging_classes(items_to_exclude=None):
     if items_to_exclude is None:
-        items_to_exclude = ['urllib3', 'COMPS', 'paramiko']
+        items_to_exclude = ['urllib3', 'COMPS', 'paramiko', 'matplotlib']
     # remove comps by default
     for l in items_to_exclude:
         comps_logger = getLogger(l)

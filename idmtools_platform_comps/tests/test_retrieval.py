@@ -1,21 +1,24 @@
 import os
 import unittest
 from functools import partial
+from typing import Dict, Any
 
 import pytest
 from COMPS.Data import Experiment as COMPSExperiment, Simulation as COMPSSimulation
-from idmtools_test import COMMON_INPUT_PATH
-from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
-from idmtools.managers import ExperimentManager
-from idmtools_models.python import PythonExperiment
+from idmtools.entities.experiment import Experiment
+from idmtools.entities.simulation import Simulation
+from idmtools.entities.templated_simulation import TemplatedSimulations
+from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
+from idmtools_test import COMMON_INPUT_PATH
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 
-def param_update(simulation, param, value):
-    return simulation.set_parameter(param, value)
+def param_update(simulation: Simulation, param: str, value) -> Dict[str, Any]:
+    return simulation.task.set_parameter(param, value)
 
 
 setA = partial(param_update, param="a")
@@ -23,25 +26,24 @@ setA = partial(param_update, param="a")
 
 @pytest.mark.comps
 class TestRetrieval(ITestWithPersistence):
-    def setUp(self) -> None:
-        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
-        print(self.case_name)
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.case_name = os.path.basename(__file__) + "--" + cls.__name__
+        print(cls.case_name)
 
-        self.platform = Platform('COMPS2')
-        print(self.platform.uid)
-        self.pe = PythonExperiment(name=self.case_name,
-                                   model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
-
-        self.pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123, "KeyOnly": None}
-
-        self.pe.base_simulation.set_parameter("c", "c-value")
+        cls.platform = Platform('COMPS2')
+        print(cls.platform.uid)
+        bt = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"),
+                                      parameters=dict(c="c-value"))
+        ts = TemplatedSimulations(base_task=bt)
         builder = SimulationBuilder()
         builder.add_sweep_definition(setA, range(0, 2))
+        ts.add_builder(builder)
+        cls.pe = Experiment(name=cls.case_name, simulations=ts,
+                            tags=dict(string_tag="test", number_tag=123, KeyOnly=None))
 
-        self.pe.builder = builder
-
-        em = ExperimentManager(experiment=self.pe, platform=self.platform)
-        em.run()
+        cls.platform.run_items(cls.pe)
+        cls.platform.wait_till_done(cls.pe)
 
     def test_retrieve_experiment(self):
         exp = self.platform.get_item(self.pe.uid, ItemType.EXPERIMENT)

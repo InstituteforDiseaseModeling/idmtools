@@ -76,18 +76,21 @@ class IPlatformAssetCollectionOperations(CacheEnabled, ABC):
         """
         pass
 
-    def batch_create(self, asset_collections: List[AssetCollection], **kwargs) -> List[AssetCollection]:
+    def batch_create(self, asset_collections: List[AssetCollection], display_progress: bool = True, **kwargs) -> \
+            List[AssetCollection]:
         """
         Provides a method to batch create asset collections items
 
         Args:
             asset_collections: List of asset collection items to create
+            display_progress: Show progress bar
             **kwargs:
 
         Returns:
             List of tuples containing the create object and id of item that was created
         """
-        return batch_create_items(asset_collections, self.create, **kwargs)
+        return batch_create_items(asset_collections, create_func=self.create, display_progress=display_progress,
+                                  progress_description="Uploading Assets", **kwargs)
 
     @abstractmethod
     def get(self, asset_collection_id: UUID, **kwargs) -> Any:

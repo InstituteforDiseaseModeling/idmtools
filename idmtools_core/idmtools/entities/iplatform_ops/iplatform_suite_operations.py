@@ -2,7 +2,9 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Type, Any, List, Tuple, Dict, NoReturn
 from uuid import UUID
+
 from idmtools.core.enums import EntityStatus
+from idmtools.entities.iplatform_ops.utils import batch_create_items
 from idmtools.entities.suite import Suite
 
 
@@ -25,21 +27,21 @@ class IPlatformSuiteOperations(ABC):
         """
         pass
 
-    def batch_create(self, suites: List[Suite], **kwargs) -> List[Tuple[Any, UUID]]:
+    def batch_create(self, suites: List[Suite], display_progress: bool = True, **kwargs) -> List[Tuple[Any, UUID]]:
         """
         Provides a method to batch create suites
 
         Args:
+            display_progress: Display progress bar
             suites: List of suites to create
             **kwargs:
 
         Returns:
             List of tuples containing the create object and id of item that was created
         """
-        ret = []
-        for suite in suites:
-            ret.append(self.create(suite, **kwargs))
-        return ret
+        return batch_create_items(suites, create_func=self.create, display_progress=display_progress,
+                                  progress_description="Creating Suites",
+                                  **kwargs)
 
     def pre_create(self, suite: Suite, **kwargs) -> NoReturn:
         """

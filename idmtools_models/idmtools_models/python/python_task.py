@@ -2,6 +2,7 @@ import os
 import subprocess
 import tempfile
 from dataclasses import dataclass, field
+from logging import getLogger
 from typing import Set
 
 from idmtools.assets import Asset, AssetCollection
@@ -10,6 +11,8 @@ from idmtools.entities.itask import ITask
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.simulation import Simulation
 from idmtools.registry.task_specification import TaskSpecification
+
+logger = getLogger(__name__)
 
 
 @dataclass()
@@ -22,6 +25,12 @@ class PythonTask(ITask):
         super().__post_init__()
         if self.script_path is None:
             raise ValueError("Script name is required")
+        if os.path.exists(self.script_path):
+            self.script_path = os.path.abspath(self.script_path)
+        else:
+            # don't error if we can't find script. Maybe it is in the asset collection? but warn user
+            logger.warning(f'Cannot find script at {self.script_path}. If script does not exist in Assets '
+                           f'as {os.path.basename(self.script_path)}, execution could fail')
         cmd_str = f'{self.python_path} ./Assets/{os.path.basename(self.script_path)}'
         self._task_log.info('Setting command line to %s', cmd_str)
         self.command = CommandLine(cmd_str)

@@ -1,9 +1,10 @@
 from typing import Type
-from idmtools.registry.model_specification import ModelSpecification, get_model_impl, get_model_type_impl
+
+from idmtools.registry.experiment_specification import ExperimentSpecification, get_model_impl, get_model_type_impl
 from idmtools.registry.plugin_specification import get_description_impl
 
 
-class PythonExperimentSpec(ModelSpecification):
+class PythonExperimentSpec(ExperimentSpecification):
 
     @get_description_impl
     def get_description(self) -> str:

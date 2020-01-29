@@ -2,7 +2,7 @@ import uuid
 from dataclasses import dataclass, field, InitVar
 from logging import getLogger
 from types import GeneratorType
-from typing import NoReturn, Set, Union, Iterator
+from typing import NoReturn, Set, Union, Iterator, Type
 
 from idmtools import __version__
 from idmtools.core import ItemType
@@ -12,6 +12,8 @@ from idmtools.core.interfaces.inamed_entity import INamedEntity
 from idmtools.entities.itask import ITask
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.templated_simulation import TemplatedSimulations
+from idmtools.registry.experiment_specification import ExperimentSpecification, get_model_impl, get_model_type_impl
+from idmtools.registry.plugin_specification import get_description_impl
 from idmtools.utils.collections import ParentIterator
 
 logger = getLogger(__name__)
@@ -73,7 +75,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
         # if it is a template, set task type on experiment
         if isinstance(self.simulations, ParentIterator) and isinstance(self.simulations.items, TemplatedSimulations):
             self.simulations.items.base_task.gather_common_assets()
-            self.assets.add_assets(self.simulations.items.base_task.common_assets)
+            self.assets.add_assets(self.simulations.items.base_task.common_assets, fail_on_duplicate=False)
             if "task_type" not in self.tags:
                 task_class = self.simulations.items.base_task.__class__
                 self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
@@ -136,3 +138,21 @@ class Experiment(IAssetsEnabled, INamedEntity):
         # TODO assets gathering magic.... easy if we pre-populate our sims.. hard in generators
         # we could let it be more user facing or wrapped by convenience functions per model
         pass
+
+
+class ExperimentSpecification(ExperimentSpecification):
+
+    @get_description_impl
+    def get_description(self) -> str:
+        return "Provides access to the Local Platform to IDM Tools"
+
+    @get_model_impl
+    def get(self, configuration: dict) -> Experiment:  # noqa: F821
+        """
+        Experiment is going
+        """
+        return Experiment(**configuration)
+
+    @get_model_type_impl
+    def get_type(self) -> Type[Experiment]:
+        return Experiment

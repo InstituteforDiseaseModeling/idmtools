@@ -8,6 +8,7 @@ from uuid import UUID
 
 from idmtools.core import EntityStatus
 from idmtools.entities.experiment import Experiment
+from idmtools.entities.iplatform_ops.utils import batch_create_items
 
 
 @dataclass
@@ -94,21 +95,22 @@ class IPlatformExperimentOperations(ABC):
         """
         pass
 
-    def batch_create(self, experiments: List[Experiment], **kwargs) -> List[Tuple[Experiment]]:
+    def batch_create(self, experiments: List[Experiment], display_progress: bool = True, **kwargs) -> List[
+        Tuple[Experiment]]:
         """
         Provides a method to batch create experiments
 
         Args:
             experiments: List of experiments to create
+            display_progress: Show progress bar
             **kwargs:
 
         Returns:
             List of tuples containing the create object and id of item that was created
         """
-        ret = []
-        for exp in experiments:
-            ret.append(self.create(exp, **kwargs))
-        return ret
+        return batch_create_items(experiments, create_func=self.create, display_progress=display_progress,
+                                  progress_description="Creating Experiments",
+                                  **kwargs)
 
     @abstractmethod
     def get_children(self, experiment: Any, **kwargs) -> List[Any]:

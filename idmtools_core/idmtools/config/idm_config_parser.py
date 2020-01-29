@@ -1,8 +1,8 @@
-import os
 import copy
 import json
-from logging import getLogger
+import os
 from configparser import ConfigParser
+from logging import getLogger
 from typing import Dict, Any
 
 default_config = 'idmtools.ini'
@@ -181,7 +181,7 @@ class IdmConfigParser:
 
     @classmethod
     @initialization(error=False)
-    def get_option(cls, section: str = None, option: str = None, force=False) -> str:
+    def get_option(cls, section: str = None, option: str = None, force=False, fallback=None) -> str:
         """
         Get configuration value based on the INI section and option.
 
@@ -196,9 +196,9 @@ class IdmConfigParser:
             return None
 
         if section:
-            return cls._config.get(section, option, fallback=None)
+            return cls._config.get(section, option, fallback=fallback)
         else:
-            return cls._config.get(cls._block, option, fallback=None)
+            return cls._config.get(cls._block, option, fallback=fallback)
 
     @classmethod
     def ensure_init(cls, dir_path: str = '.', file_name: str = default_config, error: bool = False,
