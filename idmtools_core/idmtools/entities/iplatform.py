@@ -117,7 +117,6 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         # build item type map and determined supported features
         self.platform_type_map = dict()
         for item_type, interface in ITEM_TYPE_TO_OBJECT_INTERFACE.items():
-            print(item_type, "::", interface)
             if getattr(self, interface) is not None and getattr(self, interface).platform_type is not None:
                 self.platform_type_map[getattr(self, interface).platform_type] = item_type
 
