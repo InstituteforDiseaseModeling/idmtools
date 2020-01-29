@@ -17,8 +17,8 @@ from idmtools_platform_comps.utils.general import convert_COMPS_status, get_asse
 logger = getLogger(__name__)
 
 
-def comps_batch_worker(sims: List[Simulation], interface: 'CompsPlatformSimulationOperations', num_cores, priority) -> \
-List[COMPSSimulation]:
+def comps_batch_worker(sims: List[Simulation], interface: 'CompsPlatformSimulationOperations', num_cores,
+                       priority) -> List[COMPSSimulation]:
     if logger.isEnabledFor(DEBUG):
         logger.debug(f'Create {len(sims)}')
 

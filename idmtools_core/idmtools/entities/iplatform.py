@@ -1,11 +1,15 @@
 from abc import ABCMeta
 from dataclasses import fields, field
+from functools import partial
 from itertools import groupby
 from logging import getLogger, DEBUG
 from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set, Iterator
 from uuid import UUID
 
-from idmtools.core import CacheEnabled, ItemType, UnknownItemException, EntityContainer, UnsupportedPlatformType
+from tqdm import tqdm
+
+from idmtools.core import CacheEnabled, UnknownItemException, EntityContainer, UnsupportedPlatformType
+from idmtools.core.enums import ItemType, EntityStatus
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.entities.experiment import Experiment
@@ -432,6 +436,14 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
                     f'Unable to create items of type: {item.item_type} for platform: {self.__class__.__name__}')
 
     def run_items(self, items: Union[IEntity, List[IEntity]]):
+        """
+        Run items on the platform.
+        Args:
+            items:
+
+        Returns:
+
+        """
         if isinstance(items, IEntity):
             items = [items]
         self._is_item_list_supported(items)
@@ -521,8 +533,20 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     def is_task_supported(self, task: ITask) -> bool:
         return self.are_requirements_met(task.platform_requirements)
 
+    def __wait_till_callback(self, item, callback, timeout: int = 60 * 60 * 24, refresh_interval: int = 5):
+        import time
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Refreshing simulation status")
+            self.refresh_status(item)
+            if callback(item):
+                return
+            time.sleep(refresh_interval)
+        raise TimeoutError(f"Timeout of {timeout} seconds exceeded")
+
     def wait_till_done(self, item: Union[Experiment, IWorkflowItem], timeout: int = 60 * 60 * 24,
-                       refresh_interval: int = 5):
+                       refresh_interval: int = 5, progress=True):
         """
         Wait for the experiment to be done.
 
@@ -531,18 +555,27 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             refresh_interval: How long to wait between polling.
             timeout: How long to wait before failing.
         """
-        import time
-        start_time = time.time()
-        while time.time() - start_time < timeout:
-            if logger.isEnabledFor(DEBUG):
-                logger.debug("Refreshing simulation status")
-            self.refresh_status(item)
-            if item.done:
-                logger.debug("Experiment Done")
-                return
-            time.sleep(refresh_interval)
-        error_type = 'experiment' if isinstance(item, IExperiment) else 'workitem'
-        raise TimeoutError(f"Timeout of {timeout} seconds exceeded when monitoring {error_type} {item}")
+        if progress:
+            self.wait_till_done_progress(item, timeout, refresh_interval)
+        else:
+            self.__wait_till_callback(item, lambda e: e.done, timeout, refresh_interval)
+
+    def wait_till_done_progress(self, item: Experiment, timeout: int = 60 * 60 * 24,
+                                refresh_interval: int = 5):
+        def get_prog_bar(e: Experiment, prog: tqdm):
+            results = dict()
+
+            done = 0
+            for sim in e.simulations:
+                if sim.status in [EntityStatus.FAILED, EntityStatus.SUCCEEDED]:
+                    done += 1
+            if done > prog.last_print_n:
+                prog.update(done - prog.last_print_n)
+            return e.done
+
+        prog = tqdm([], total=len(item.simulations), desc="Waiting on Experiment to Finish running")
+        self.__wait_till_callback(item, partial(get_prog_bar, prog=prog), timeout, refresh_interval)
+
 
 
 TPlatform = TypeVar("TPlatform", bound=IPlatform)

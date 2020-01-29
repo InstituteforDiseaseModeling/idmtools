@@ -75,6 +75,9 @@ class ResetGenerator(typing.Iterator):
     def __iter__(self):
         return self
 
+    def next_gen(self):
+        return self.__next_gen
+
     def __next__(self):
         try:
             result = next(self.generator)

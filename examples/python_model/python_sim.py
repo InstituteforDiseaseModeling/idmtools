@@ -23,7 +23,7 @@ from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 # We have python model defined in "model.py" which has 3 parameters: a, b, c and supports
 # a json config from a file named "config".json. We want to sweep the parameters a for the values 0-2 and b for the
 # values 1-3 and keep c as value 0.
-# To accomplish this, we are going to proceed in 3 high-level steps
+# To accomplish this, we are going to proceed in a few high-level steps. See https://bit.ly/37DHUf0 for workflow
 # 1. Define our base task. This task is the common configuration across all our tasks. For us, that means some basic
 #    run info like script path as well as our parameter/value we don't plan on sweeping, c
 # 2. Then we will define our TemplateSimulations object that will use our task to build a series of simulations
@@ -49,8 +49,9 @@ ts.base_simulation.tags['tag1'] = 1
 # To do that we need to use a builder
 builder = SimulationBuilder()
 
-
 # When adding sweep definitions, you need to generally provide two items
+# See https://bit.ly/314j7xS for a diagram of how the Simulations are built using TemplateSimulations +
+# SimulationBuilders
 # 1. A callback function that will be called for every value in the sweep. This function will receive a Simulation
 #    object and a value. You then define how to use those within the simulation. Generally, you want to pass those
 #    to your task's configuration interface. In this example, we are using JSONConfiguredPythonTask which has a
