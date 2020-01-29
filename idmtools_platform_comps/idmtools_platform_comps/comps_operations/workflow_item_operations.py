@@ -4,11 +4,11 @@ from dataclasses import dataclass, field
 from typing import List, Dict, Any, Tuple, Type
 from uuid import UUID
 from idmtools.assets import AssetCollection
+from idmtools.core import ItemType
 from idmtools.entities.iplatform_metadata import IPlatformWorkflowItemOperations
 from COMPS.Data import WorkItem as COMPSWorkItem, WorkItemFile
 from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools.ssmt.ssmt_work_item import SSMTWorkItem
-from idmtools_platform_comps.utils.general import convert_COMPS_status, get_asset_for_comps_item
 
 
 @dataclass
@@ -67,22 +67,23 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
 
         # Create a WorkItem
         wi = COMPSWorkItem(name=work_item.item_name,
-                           worker=WorkerOrPluginKey(self.platform.item_type, self.platform.plugin_key),
+                           worker=WorkerOrPluginKey(work_item.work_item_type or self.platform.work_item_type,
+                                                    work_item.plugin_key or self.platform.plugin_key),
                            environment_name=self.platform.environment,
                            asset_collection_id=work_item.asset_collection_id)
 
         # set tags
+        wi.set_tags({})
         if work_item.tags:
             wi.set_tags(work_item.tags)
 
-        if wi.tags:
-            wi.tags.update({'WorkItem_Type': self.platform.item_type})
+        wi.tags.update({'WorkItem_Type': work_item.work_item_type or self.platform.work_item_type})
 
         # Add work order file
         wo = {
-            "WorkItem_Type": self.platform.item_type,
+            "WorkItem_Type": work_item.work_item_type or self.platform.work_item_type,
             "Execution": {
-                "ImageName": self.platform.docker_image,
+                "ImageName": work_item.docker_image or self.platform.docker_image,
                 "Command": work_item.command
             }
         }
@@ -109,6 +110,13 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         return work_item, wi.id
 
     def run_item(self, work_item: IWorkflowItem):
+        """
+        Start to rum COMPS WorkItem created from work_item
+        Args:
+            work_item: SSMTWorkItem
+
+        Returns: None
+        """
         work_item.get_platform_object().commission()
 
     def refresh_status(self, work_item: IWorkflowItem):
@@ -126,12 +134,11 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
     def get_parent(self, work_item: COMPSWorkItem, **kwargs) -> Any:
         """
         Returns the parent of item. If the platform doesn't support parents, you should throw a TopLevelItem error
-
         Args:
-            work_item:
-            **kwargs:
+            work_item: COMPS WorkItem
+            **kwargs: Optional arguments mainly for extensibility
 
-        Returns:
+        Returns: item parent
 
         Raise:
             TopLevelItem
@@ -167,24 +174,48 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         # Set its correct attributes
         obj.item_name = work_item.name
         obj.uid = work_item.id
-        obj.command = work_item.command
         obj.asset_collection_id = work_item.asset_collection_id
-        obj.asset_files = work_item.asset_files
-        obj.user_files = work_item.user_files
-        obj.wo_kwargs = work_item.wo_kwargs
-        obj.asset_files = work_item.asset_files
+        obj.user_files = work_item.files
         obj.tags = work_item.tags
-        obj.related_experiments = work_item.related_experiments
         return obj
 
-    def send_assets(self, workflow_item: SSMTWorkItem):
-        for asset in workflow_item.assets:
-            workflow_item.add_file(workitemfile=WorkItemFile(asset.filename, 'input'), data=asset.bytes)
+    def send_assets(self, workflow_item: IWorkflowItem):
+        """
+        Add asset as WorkItemFile
+        Args:
+            workflow_item: SSMTWorkItem
+
+        Returns: None
+        """
+        # for asset in workflow_item.assets:
+        #     workflow_item.add_file(workitemfile=WorkItemFile(asset.filename, 'input'), data=asset.bytes)
+        pass
 
     def list_assets(self, workflow_item: IWorkflowItem, **kwargs) -> List[str]:
-        item: SSMTWorkItem = workflow_item.get_platform_object(True, children=["files", "configuration"])
-        return item.files
+        """
+        Get list of asset files
+        Args:
+            workflow_item: SSMTWorkItem
+            **kwargs: Optional arguments mainly for extensibility
+
+        Returns: list of assets associated with WorkItem
+
+        """
+        # item: SSMTWorkItem = workflow_item.get_platform_object(True)
+        # return item.files
+        pass
 
     def get_assets(self, workflow_item: IWorkflowItem, files: List[str], **kwargs) -> Dict[str, bytearray]:
-        return get_asset_for_comps_item(self.platform, workflow_item, files, self.cache)
+        """
+        Retrieve files association with WorkItem
+        Args:
+            workflow_item: SSMTWorkItem
+            files: list of file paths
+            **kwargs: Optional arguments mainly for extensibility
 
+        Returns: dict with key/value: file_path/file_content
+        """
+        wi = self.platform.get_item(workflow_item.uid, ItemType.WORKFLOW_ITEM, raw=True)
+        byte_arrs = wi.retrieve_output_files(files)
+        ret = dict(zip(files, byte_arrs))
+        return ret
