@@ -61,13 +61,13 @@ class ClimateGenerationTest(unittest.TestCase):
         optional_args = '--id-ref default --node-col id --create-asset'
 
         # Prepare the work item (NOT to be modified).
-        docker_image = "weather-files:1.1"
+        docker_image = "weather-files:1.1"  # Specify the weather-tool docker image instead to use
         command_pattern = "python /app/generate_weather_asset_collection.py {} {} {} {}"
         command = command_pattern.format(points_file, start_date, end_date, optional_args)
         user_files = FileList(root=path_to_points_file, files_in_root=[points_file])
 
-        platform = Platform('COMPS2', docker_image=docker_image)  # Specify the weather-tool docker image instead to use
-        wi = SSMTWorkItem(item_name=self.wi_name, command=command, user_files=user_files,
+        platform = Platform('COMPS2')
+        wi = SSMTWorkItem(item_name=self.wi_name, docker_image=docker_image, command=command, user_files=user_files,
                           tags={'dtktools': self._testMethodName, 'WorkItem type': 'Docker', 'Command': command})
         wim = WorkItemManager(wi, platform)
         wim.process(check_status=True)
