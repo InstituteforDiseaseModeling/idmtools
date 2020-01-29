@@ -10,28 +10,13 @@ class LocalOS:
     class UnknownOS(Exception):
         pass
 
-    WINDOWS = 'win'
-    LINUX = 'lin'
-    MAC = 'mac'
-    ALL = (WINDOWS, LINUX, MAC)
-    OPERATING_SYSTEMS = {
-        'windows': {
-            'name': WINDOWS,
-            'username': getpass.getuser()
-        },
-        'linux': {
-            'name': LINUX,
-            'username': getpass.getuser()
-        },
-        'darwin': {
-            'name': MAC,
-            'username': getpass.getuser()
-        }
-    }
+    os_mapping = {'windows': 'win',
+                  'linux': 'lin',
+                  'darwin': 'mac'}
 
     _os = platform.system().lower()
-    if not _os in OPERATING_SYSTEMS.keys():
-        raise UnknownOS("Operating system %s is not currently supported." % platform.system())
+    if _os not in os_mapping:
+        raise UnknownOS("Operating system %s is not currently supported." % _os)
 
-    username = OPERATING_SYSTEMS[_os]['username']
-    name = OPERATING_SYSTEMS[_os]['name']
+    username = getpass.getuser()
+    name = os_mapping[_os]
