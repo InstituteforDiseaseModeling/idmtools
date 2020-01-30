@@ -18,7 +18,7 @@ class RTask(DockerTask):
         if self.script_name is None:
             raise ValueError("Script name is required")
         cmd_str = f'{self.r_path} ./Assets/{os.path.basename(self.script_name)}'
-        self._task_log.info('Setting command line to %0', cmd_str)
+        self._task_log.info('Setting command line to %s', cmd_str)
         self.command = CommandLine(cmd_str)
 
     def reload_from_simulation(self, simulation: Simulation):
@@ -31,7 +31,7 @@ class RTask(DockerTask):
 
         """
         super().gather_common_assets()
-        self._task_log.info('Adding Common asset from %0', self.script_name)
+        self._task_log.info('Adding Common asset from %s', self.script_name)
         self.common_assets.add_asset(Asset(absolute_path=self.script_name), fail_on_duplicate=False)
         return self.common_assets
 

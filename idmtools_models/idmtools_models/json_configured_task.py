@@ -25,7 +25,7 @@ class JSONConfiguredTask(ITask):
     # If we don't define this we assume static name the script consuming file will know
     config_file_name: str = field(default="config.json")
     # is the config file a common asset or a transient. We default ot transient
-    is_config_command: bool = field(default=False)
+    is_config_common: bool = field(default=False)
     command_line_argument: str = field(default=None)
     # If command_line_argument is set, defines if we pass the filename after the argument
     # for example, if the argument is --config and the config file name is config.json we would run the command as
@@ -39,7 +39,8 @@ class JSONConfiguredTask(ITask):
             self.parameters = self.parameters[self.envelope]
 
     def gather_common_assets(self) -> AssetCollection:
-        self.__dump_config(self.common_assets)
+        if self.is_config_common:
+            self.__dump_config(self.common_assets)
         return self.common_assets
 
     def gather_transient_assets(self) -> AssetCollection:
