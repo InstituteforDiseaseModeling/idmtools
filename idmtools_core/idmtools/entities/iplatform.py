@@ -1,3 +1,4 @@
+import os
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, fields, field
 from itertools import groupby
@@ -330,7 +331,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             Parent or None
         """
         item_type, interface = self._get_operation_interface(platform_item)
-        if item_type not in [ItemType.EXPERIMENT, ItemType.SIMULATION, ItemType.WORKFLOW_ITEM, ItemType.WorkItem]:
+        if item_type not in [ItemType.EXPERIMENT, ItemType.SIMULATION, ItemType.WORKFLOW_ITEM]:
             raise ValueError("Currently only Experiments, Simulations and Work Items support parents")
         obj = getattr(self, interface).get_parent(platform_item, **kwargs)
         if obj is not None:
@@ -523,6 +524,34 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
         return getattr(self, interface).get_assets(item, files)
+
+    def get_files_by_id(self, item_id: UUID, item_type: ItemType, files: Union[Set[str], List[str]],
+                        output: str = None) -> \
+            Union[Dict[str, Dict[str, bytearray]], Dict[str, bytearray]]:
+        """
+        Get files by item id (UUID)
+        Args:
+            item_id: COMPS Item, say, Simulation Id or WorkItem Id
+            item_type: Item Type
+            files: List of files to retrieve
+            output: save files to
+
+        Returns: dict with key/value: file_name/file_content
+        """
+        idm_item = self.get_item(item_id, item_type, raw=False)
+        ret = self.get_files(idm_item, files)
+
+        if output:
+            for ofi, ofc in ret.items():
+                file_path = os.path.join(output, item_id, ofi)
+                parent_path = os.path.dirname(file_path)
+                if not os.path.exists(parent_path):
+                    os.makedirs(parent_path)
+
+                with open(file_path, 'wb') as outfile:
+                    outfile.write(ofc)
+
+        return ret
 
     def is_task_supported(self, task: 'ITask') -> bool:
         return all([x in self._platform_supports for x in task.platform_requirements])
