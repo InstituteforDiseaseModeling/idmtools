@@ -331,7 +331,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             Parent or None
         """
         item_type, interface = self._get_operation_interface(platform_item)
-        if item_type not in [ItemType.EXPERIMENT, ItemType.SIMULATION, ItemType.WORKFLOW_ITEM, ItemType.WorkItem]:
+        if item_type not in [ItemType.EXPERIMENT, ItemType.SIMULATION, ItemType.WORKFLOW_ITEM]:
             raise ValueError("Currently only Experiments, Simulations and Work Items support parents")
         obj = getattr(self, interface).get_parent(platform_item, **kwargs)
         if obj is not None:
