@@ -38,7 +38,7 @@ class ITask(metaclass=ABCMeta):
     transient_assets: AssetCollection = field(default_factory=AssetCollection)
 
     # log to add to items to track provisioning of task
-    _task_log: Logger = None
+    _task_log: Logger = field(default_factory=lambda: getLogger(__name__), metadata=dict(pickle_ignore=True))
 
     def __post_init__(self):
         self._task_log = getLogger(f'{self.__class__.__name__ }_{time.time()}')
@@ -148,6 +148,26 @@ class ITask(metaclass=ABCMeta):
 
     def __repr__(self):
         return f"<{self.__class__.__name__}"
+
+    def pre_getstate(self):
+        """
+        Return default values for :meth:`~idmtools.interfaces.ientity.pickle_ignore_fields`.
+        Call before pickling.
+        """
+        return {"_task_log": None}
+
+    def post_setstate(self):
+        self._task_log = getLogger(__name__)
+
+    def __deepcopy__(self, memo):
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
+        for k, v in self.__dict__.items():
+            if k not in ['_task_log']:
+                setattr(result, k, copy.deepcopy(v, memo))
+        result._task_log = getLogger(__name__)
+        return result
 
 
 def task_to_experiment(task: ITask, experiment_kwargs=None) -> 'Experiment':
