@@ -11,6 +11,7 @@ LOCAL_PATH="$(realpath $(dirname '$0')/)"
 echo ${LOCAL_PATH}
 pip install py-make
 pymake setup-dev
+pip install PyComps==2.3.5b2 --index-url=https://idm_bamboo_user%40idmod.org:${bamboo.PasswordEArtifactory}@packages.idmod.org/api/pypi/pypi-staging/simple --no-cache-dir --force-reinstall
 
 echo "auto login..."
 python dev_scripts/create_auth_token_args.py --comps_url "$1" --username "$2" --password "$3"
