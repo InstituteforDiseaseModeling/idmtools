@@ -2,12 +2,12 @@ import os
 from collections import defaultdict
 from dataclasses import dataclass
 from logging import getLogger, DEBUG
-from typing import Dict, Any, Tuple, List, Set, Union
+from typing import Dict, List, Set, Union
 from uuid import UUID
 from docker.models.containers import Container
 from idmtools.core import ItemType
-from idmtools.entities import ISimulation
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
+from idmtools.entities.simulation import Simulation
 from idmtools_platform_local.client.simulations_client import SimulationsClient
 from idmtools_platform_local.platform_operations.uitils import local_status_to_common, SimulationDict, ExperimentDict
 
@@ -31,7 +31,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         return SimulationDict(SimulationsClient.get_one(str(simulation_id)))
 
-    def platform_create(self, simulation: ISimulation, **kwargs) -> Dict:
+    def platform_create(self, simulation: Simulation, **kwargs) -> Dict:
         """
         Create a simulation object
 
@@ -52,7 +52,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         self.send_assets(simulation)
         return s_dict
 
-    def batch_create(self, sims: List[ISimulation], **kwargs) -> List[SimulationDict]:
+    def batch_create(self, sims: List[Simulation], **kwargs) -> List[SimulationDict]:
         """
         Batch creation of simulations.
 
@@ -80,8 +80,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         result = self.platform._do.copy_multiple_to_container(worker, items)
         if not result:
             raise IOError("Coping of data for simulations failed.")
-        ids = [SimulationDict(dict(simulation_uid=id, experiment_id=sims[0].experiment.uid)) for id in ids]
-        return ids
+        return sims
 
     def get_parent(self, simulation: SimulationDict, **kwargs) -> ExperimentDict:
         """
@@ -96,7 +95,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         return self.platform.get_item(simulation['experiment_id'], ItemType.EXPERIMENT, raw=True)
 
-    def platform_run_item(self, simulation: ISimulation):
+    def platform_run_item(self, simulation: Simulation):
         """
         On the local platform, simulations are ran by queue and commissioned through create
         Args:
@@ -107,7 +106,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         pass
 
-    def send_assets(self, simulation: ISimulation, worker: Container = None):
+    def send_assets(self, simulation: Simulation, worker: Container = None):
         """
         Transfer assets to local sim folder for simulation
 
@@ -126,7 +125,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         items = self._assets_to_copy_multiple_list(path, simulation.assets)
         self.platform._do.copy_multiple_to_container(worker, items)
 
-    def refresh_status(self, simulation: ISimulation):
+    def refresh_status(self, simulation: Simulation):
         """
         Refresh status of a sim
 
@@ -139,7 +138,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         latest = self.get(simulation.uid)
         simulation.status = local_status_to_common(latest['status'])
 
-    def get_assets(self, simulation: ISimulation, files: List[str], **kwargs) -> Dict[str, bytearray]:
+    def get_assets(self, simulation: Simulation, files: List[str], **kwargs) -> Dict[str, bytearray]:
         """
         Get assets for a specific simulation
 
@@ -172,7 +171,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
 
         return ret
 
-    def list_assets(self, simulation: ISimulation) -> List[str]:
+    def list_assets(self, simulation: Simulation) -> List[str]:
         """
         List assets for a sim
 
@@ -184,7 +183,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         raise NotImplementedError("List assets is not yet supported on the LocalPlatform")
 
-    def to_entity(self, simulation: Dict, **kwargs) -> ISimulation:
+    def to_entity(self, simulation: Dict, **kwargs) -> Simulation:
         """
         Convert a sim dict object to an ISimulation
 

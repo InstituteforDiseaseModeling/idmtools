@@ -3,6 +3,8 @@ from idmtools.assets import AssetCollection
 from idmtools.builders import SimulationBuilder
 from idmtools.core.experiment_factory import experiment_factory
 from idmtools.core.platform_factory import Platform
+from idmtools.entities.templated_simulation import TemplatedSimulations
+from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.test_platform import TestPlatform
@@ -12,12 +14,13 @@ class TestExperimentFactory(ITestWithPersistence):
 
     def test_build_python_experiment_from_factory(self):
         test_platform: TestPlatform = Platform('Test')
-        experiment = experiment_factory.create("PythonExperiment", tags={"a": "1", "b": 2})
-        experiment.model_path = os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py")
+        experiment = experiment_factory.create("Experiment", tags={"a": "1", "b": 2})
+        script_path = os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py")
+        ts = TemplatedSimulations(base_task=JSONConfiguredPythonTask(script_path=script_path))
         builder = SimulationBuilder()
         builder.add_sweep_definition(lambda simulation, value: {"p": value}, range(0, 2))
-        experiment.builder = builder
-
+        ts.add_builder(builder)
+        experiment.simulations = ts
         test_platform.run_items(experiment)
 
         self.assertEqual(len(experiment.simulations), 2)

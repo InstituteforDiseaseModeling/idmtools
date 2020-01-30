@@ -1,7 +1,7 @@
 import copy
 import time
 from abc import ABCMeta, abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields
 from logging import getLogger, Logger
 from typing import Set, NoReturn, Union, Callable, List
 
@@ -9,6 +9,7 @@ from idmtools.assets import AssetCollection
 from idmtools.entities.command_line import CommandLine
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.simulation import Simulation
+from idmtools.utils.hashing import ignore_fields_in_dataclass_on_pickle
 
 logger = getLogger(__name__)
 # Tasks can be allocated multiple ways
@@ -38,7 +39,8 @@ class ITask(metaclass=ABCMeta):
     transient_assets: AssetCollection = field(default_factory=AssetCollection)
 
     # log to add to items to track provisioning of task
-    _task_log: Logger = field(default_factory=lambda: getLogger(__name__), metadata=dict(pickle_ignore=True))
+    _task_log: Logger = field(default_factory=lambda: getLogger(__name__), compare=False,
+                              metadata=dict(pickle_ignore=True))
 
     def __post_init__(self):
         self._task_log = getLogger(f'{self.__class__.__name__ }_{time.time()}')
@@ -158,6 +160,22 @@ class ITask(metaclass=ABCMeta):
 
     def post_setstate(self):
         self._task_log = getLogger(__name__)
+
+    @property
+    def pickle_ignore_fields(self):
+        return set(f.name for f in fields(self) if "pickle_ignore" in f.metadata and f.metadata["pickle_ignore"])
+
+    def __getstate__(self):
+        """
+        Ignore the fields in pickle_ignore_fields during pickling.
+        """
+        return ignore_fields_in_dataclass_on_pickle(self)
+
+    def __setstate__(self, state):
+        """
+        Add ignored fields back since they don't exist in the pickle
+        """
+        self.__dict__.update(state)
 
     def __deepcopy__(self, memo):
         cls = self.__class__

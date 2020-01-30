@@ -12,6 +12,8 @@ class TestTask(ITask):
     command: CommandLine = CommandLine('echo this is a test')
     parameters: dict = field(default_factory=lambda: {})
 
+    __test__ = False  # Hide from test discovery
+
     def set_parameter(self, name: str, value: any) -> dict:
         self.parameters[name] = value
         return {"name": value}

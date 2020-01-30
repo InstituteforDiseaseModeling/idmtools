@@ -88,7 +88,7 @@ class TestPersistenceServices(ITestWithPersistence):
 
     def test_fix_170(self):
         # https://github.com/InstituteforDiseaseModeling/idmtools/issues/170
-        e = task_to_experiment(TestTask())
+        e = Experiment.from_task(TestTask(), gather_common_assets_from_task=True)
         e.tags = {"test": 1}
         e.pre_creation()
         self.assertEqual(e.tags.get("task_type"), "idmtools_test.utils.test_task.TestTask")

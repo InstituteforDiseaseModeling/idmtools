@@ -94,3 +94,6 @@ class SimulationBuilder:
 
         yield from product(*old_sw)
         self.sweeps = new_sw
+
+    def __len__(self):
+        return self.count

@@ -8,7 +8,7 @@ import io
 import pickle
 import types
 from dataclasses import fields, _MISSING_TYPE
-from logging import getLogger
+from logging import getLogger, Logger
 
 logger = getLogger(__name__)
 Pickler = pickle._Pickler
@@ -68,6 +68,8 @@ class Hasher(Pickler):
         if isinstance(obj, abc.ABCMeta):
             pass
         elif isinstance(obj, ParentIterator):
+            pass
+        elif isinstance(obj, Logger):
             pass
         else:
             if isinstance(obj, (types.MethodType, type({}.pop))):

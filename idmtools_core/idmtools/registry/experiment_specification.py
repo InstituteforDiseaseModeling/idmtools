@@ -18,11 +18,12 @@ get_model_type_impl = pluggy.HookimplMarker(PLUGIN_REFERENCE_NAME)
 logger = getLogger(__name__)
 
 
-class ExperimentSpecification(PluginSpecification, ABC):
+class ExperimentPluginSpecification(PluginSpecification, ABC):
 
     @classmethod
     def get_name(cls) -> str:
-        return cls.__name__.replace('ModelSpecification', '').replace("ModelSpec", '').replace('Spec', '')
+        return cls.__name__.replace('ExperimentPluginSpecification', '').replace("ExperimentPluginSpec", '') \
+            .replace('PluginSpecification', '').replace('PluginSpec', '').replace('Specification', '')
 
     @get_model_spec
     def get(self, configuration: dict) -> 'Experiment':  # noqa: F821
@@ -44,11 +45,11 @@ class ExperimentSpecification(PluginSpecification, ABC):
 
 class ExperimentPlugins:
     def __init__(self) -> None:
-        self._plugins = typing.cast(typing.Dict[str, ExperimentSpecification],
-                                    load_plugin_map('idmtools_experiment', ExperimentSpecification))
+        self._plugins = typing.cast(typing.Dict[str, ExperimentPluginSpecification],
+                                    load_plugin_map('idmtools_experiment', ExperimentPluginSpecification))
 
-    def get_plugins(self) -> typing.Set[ExperimentSpecification]:
+    def get_plugins(self) -> typing.Set[ExperimentPluginSpecification]:
         return set(self._plugins.values())
 
-    def get_plugin_map(self) -> typing.Dict[str, ExperimentSpecification]:
+    def get_plugin_map(self) -> typing.Dict[str, ExperimentPluginSpecification]:
         return self._plugins

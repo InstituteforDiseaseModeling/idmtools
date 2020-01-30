@@ -1,8 +1,9 @@
+import copy
 import uuid
 from dataclasses import dataclass, field, InitVar
 from logging import getLogger
 from types import GeneratorType
-from typing import NoReturn, Set, Union, Iterator, Type, Dict, Any
+from typing import NoReturn, Set, Union, Iterator, Type, Dict, Any, List
 
 from idmtools import __version__
 from idmtools.assets import AssetCollection
@@ -13,7 +14,8 @@ from idmtools.core.interfaces.inamed_entity import INamedEntity
 from idmtools.entities.itask import ITask
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.templated_simulation import TemplatedSimulations
-from idmtools.registry.experiment_specification import ExperimentSpecification, get_model_impl, get_model_type_impl
+from idmtools.registry.experiment_specification import ExperimentPluginSpecification, get_model_impl, \
+    get_model_type_impl
 from idmtools.registry.plugin_specification import get_description_impl
 from idmtools.utils.collections import ParentIterator
 
@@ -80,9 +82,14 @@ class Experiment(IAssetsEnabled, INamedEntity):
             if "task_type" not in self.tags:
                 task_class = self.simulations.items.base_task.__class__
                 self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
+        elif self.gather_common_assets_from_task and isinstance(self.__simulations, List):
+            task_class = self.simulations[0].task.__class__
+            self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
         elif self.gather_common_assets_from_task:
             for sim in self.simulations:
-                self.assets.add_assets(sim.task.gather_common_assets(), fail_on_duplicate=False)
+                assets = sim.task.gather_common_assets()
+                if assets is not None:
+                    self.assets.add_assets(assets, fail_on_duplicate=False)
 
         self.tags['idmtools'] = __version__
 
@@ -169,8 +176,19 @@ class Experiment(IAssetsEnabled, INamedEntity):
         e.simulations = template
         return e
 
+    def __deepcopy__(self, memo):
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
+        for k, v in self.__dict__.items():
+            if k in ['_Experiment__simulations'] and isinstance(v, (GeneratorType, TemplatedSimulations)):
+                v = list(v)
+            setattr(result, k, copy.deepcopy(v, memo))
+        result._task_log = getLogger(__name__)
+        return result
 
-class ExperimentSpecification(ExperimentSpecification):
+
+class ExperimentSpecification(ExperimentPluginSpecification):
 
     @get_description_impl
     def get_description(self) -> str:

@@ -65,7 +65,7 @@ class TestPlaformSimulationOperation(IPlatformSimulationOperations):
 
         if experiment_id:
             self._save_simulations_to_cache(experiment_id, simulations)
-        return sims
+        return simulations
 
     def get_parent(self, simulation: Any, **kwargs) -> Any:
         return self.platform._experiments.experiments.get(simulation.parent_id)
