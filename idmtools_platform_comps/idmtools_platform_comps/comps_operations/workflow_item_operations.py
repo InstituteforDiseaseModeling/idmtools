@@ -22,7 +22,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
 
         Args:
             work_item_id: Item id of WorkItems
-            **kwargs:
+            **kwargs: Optional arguments mainly for extensibility
 
         Returns:
             Platform Representation of an work_item
@@ -36,7 +36,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
 
         Args:
             workflow_items: List of work items to create
-            **kwargs:
+            **kwargs: Optional arguments mainly for extensibility
 
         Returns:
             List of tuples containing the create object and id of item that was created
@@ -164,6 +164,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
 
         Args:
             work_item:Platform workflow_item object
+            **kwargs: Optional arguments mainly for extensibility
 
         Returns:
             IDMTools SSMTWorkItem object
@@ -217,5 +218,4 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         """
         wi = self.platform.get_item(workflow_item.uid, ItemType.WORKFLOW_ITEM, raw=True)
         byte_arrs = wi.retrieve_output_files(files)
-        ret = dict(zip(files, byte_arrs))
-        return ret
+        return dict(zip(files, byte_arrs))
