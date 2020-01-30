@@ -31,7 +31,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         return SimulationDict(SimulationsClient.get_one(str(simulation_id)))
 
-    def platform_create(self, simulation: ISimulation, **kwargs) -> Tuple[Any, UUID]:
+    def platform_create(self, simulation: ISimulation, **kwargs) -> Dict:
         """
         Create a simulation object
 
@@ -50,9 +50,9 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
                       tags=simulation.tags)
         simulation.uid = id
         self.send_assets(simulation)
-        return s_dict, id
+        return s_dict
 
-    def batch_create(self, sims: List[ISimulation], **kwargs) -> List[Tuple[Any, UUID]]:
+    def batch_create(self, sims: List[ISimulation], **kwargs) -> List[SimulationDict]:
         """
         Batch creation of simulations.
 
@@ -80,7 +80,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         result = self.platform._do.copy_multiple_to_container(worker, items)
         if not result:
             raise IOError("Coping of data for simulations failed.")
-        ids = [(SimulationDict(dict(simulation_uid=id, experiment_id=sims[0].experiment.uid)), id) for id in ids]
+        ids = [SimulationDict(dict(simulation_uid=id, experiment_id=sims[0].experiment.uid)) for id in ids]
         return ids
 
     def get_parent(self, simulation: SimulationDict, **kwargs) -> ExperimentDict:

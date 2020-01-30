@@ -1,9 +1,9 @@
 import os
 import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timezone, timedelta
 from logging import getLogger
-from typing import Set, Optional, NoReturn
+from typing import Optional
 
 from idmtools.assets import AssetCollection
 from idmtools.entities.itask import ITask
@@ -25,6 +25,7 @@ class DockerTask(ITask):
     # This should in the build_path directory
     Dockerfile: Optional[str] = None
     pull_before_build: bool = True
+    use_nvidia_run: bool = False
 
     __image_built: bool = False
 

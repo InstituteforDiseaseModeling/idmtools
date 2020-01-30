@@ -8,6 +8,7 @@ from typing import List, Any, Tuple, Dict, Container, NoReturn
 from uuid import UUID
 
 from idmtools.assets import Asset
+from idmtools.core.docker_task import DockerTask
 from idmtools.core.experiment_factory import experiment_factory
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
@@ -37,7 +38,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         experiment_dict = ExperimentsClient.get_one(str(experiment_id))
         return ExperimentDict(experiment_dict)
 
-    def platform_create(self, experiment: Experiment, **kwargs) -> Tuple[Experiment, UUID]:
+    def platform_create(self, experiment: Experiment, **kwargs) -> Dict:
         """
         Create an experiment.
 
@@ -82,7 +83,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         self.send_assets(experiment)
         if self.platform.launch_created_experiments_in_browser:
             self._launch_item_in_browser(experiment)
-        return experiment.uid
+        return self.from_experiment(experiment)
 
     def get_children(self, experiment: Dict, **kwargs) -> List[SimulationDict]:
         """
@@ -120,17 +121,14 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
 
         """
-        if not self.platform.is_supported_experiment(experiment):
-            raise ValueError("This experiment type is not support on the LocalPlatform.")
-        is_docker_type = isinstance(experiment, IDockerExperiment)
         for simulation in experiment.simulations:
             # if the task is docker, build the extra config
-            if is_docker_type:
-                self._run_docker_sim(experiment, simulation)
+            if isinstance(simulation.task, DockerTask):
+                self._run_docker_sim(experiment.uid, simulation.uid, simulation.task)
             else:
                 from idmtools_platform_local.internals.tasks.general_task import RunTask
                 logger.debug(f"Running simulation: {simulation.uid}")
-                RunTask.send(experiment.command.cmd, experiment.uid, simulation.uid)
+                RunTask.send(simulation.task.command.cmd, experiment.uid, simulation.uid)
 
     def send_assets(self, experiment: Experiment):
         """
@@ -167,6 +165,11 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
                     logger.debug(f"Simulation {sim_status[0]['simulation_uid']}status: {sim_status[0]['status']}")
                 s.status = local_status_to_common(sim_status[0]['status'])
 
+    @staticmethod
+    def from_experiment(experiment: Experiment) -> Dict:
+        e = dict(experiment_id=experiment.uid, tags=experiment.tags)
+        return e
+
     def to_entity(self, experiment: Dict, **kwargs) -> Experiment:
         """
         Convert an ExperimentDict to an Experiment
@@ -182,7 +185,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         e.uid = experiment['experiment_id']
         return e
 
-    def _run_docker_sim(self, experiment: IDockerExperiment, simulation: Simulation):
+    def _run_docker_sim(self, experiment_uid: UUID, simulation_uid: UUID, task: DockerTask):
         """
         Run a docker based simulation
 
@@ -194,17 +197,16 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
 
         """
         from idmtools_platform_local.internals.tasks.docker_run import DockerRunTask, GPURunTask
-        logger.debug(f"Preparing Docker Task Configuration for {experiment.uid}:{simulation.uid}")
-        is_gpu = isinstance(experiment, GPUExperiment)
-        run_cmd = GPURunTask if is_gpu else DockerRunTask
+        logger.debug(f"Preparing Docker Task Configuration for {experiment_uid}:{simulation_uid}")
+        run_cmd = GPURunTask if task.use_nvidia_run else DockerRunTask
         docker_config = dict(
-            image=experiment.image_name,
+            image=task.image_name,
             auto_remove=self.platform.auto_remove_worker_containers
         )
         # if we are running gpu, use nvidia runtime
-        if is_gpu:
+        if task.use_nvidia_run:
             docker_config['runtime'] = 'nvidia'
-        run_cmd.send(experiment.command.cmd, experiment.uid, simulation.uid, docker_config)
+        run_cmd.send(task.command.cmd, experiment_uid, simulation_uid, docker_config)
 
     def _launch_item_in_browser(self, item):
         """

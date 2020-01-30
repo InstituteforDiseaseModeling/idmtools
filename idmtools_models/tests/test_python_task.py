@@ -13,7 +13,7 @@ class TestPythonTask(TestCase):
 
     def test_simple_model(self):
         fpath = os.path.join(COMMON_INPUT_PATH, "python", "model1.py")
-        task = PythonTask(script_name=fpath)
+        task = PythonTask(script_path=fpath)
         task.gather_all_assets()
 
         self.assertEqual(str(task.command), f'python ./Assets/model1.py')

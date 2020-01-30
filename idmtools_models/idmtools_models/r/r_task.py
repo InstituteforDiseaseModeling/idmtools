@@ -3,7 +3,7 @@ from idmtools.assets import Asset, AssetCollection
 from idmtools.entities import CommandLine
 from idmtools.entities.simulation import Simulation
 from idmtools.registry.task_specification import TaskSpecification
-from idmtools_models.docker_task import DockerTask
+from idmtools.core.docker_task import DockerTask
 import os
 
 

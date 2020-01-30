@@ -39,6 +39,12 @@ class Suite(INamedEntity, ABC):
         from idmtools.utils.display import display, suite_table_display
         display(self, suite_table_display)
 
+    def pre_creation(self):
+        pass
+
+    def post_creation(self):
+        pass
+
     def __repr__(self):
         return f"<Suite {self.uid} - {len(self.experiments)} experiments>"
 

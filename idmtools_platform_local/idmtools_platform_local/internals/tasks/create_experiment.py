@@ -15,7 +15,6 @@ except ImportError:
     # We mainly want to do this to prevent importing of sqlalchemy on client side installs since it is not needed
     IntegrityError = EnvironmentError
 
-from idmtools.core import TTags, typing  # noqa: F401
 
 logger = logging.getLogger(__name__)
 EXPERIMENT_ID_LENGTH = 8
@@ -27,7 +26,7 @@ class CreateExperimentTask(GenericActor):
         store_results = True
         max_retries = 0
 
-    def perform(self, tags: 'TTags', task_type: str) -> str:
+    def perform(self, tags: typing.Dict[str, typing.Any]) -> str:
         """
         Creates an experiment.
             - Create the folder
@@ -42,9 +41,11 @@ class CreateExperimentTask(GenericActor):
         """
 
         retries = 0
+        data_path = None
+        uuid = None
         while retries <= 3:
             try:
-                data_path, uuid = self.get_uuid_and_data_path(task_type, tags)
+                data_path, uuid = self.get_uuid_and_data_path(tags)
                 break
             except IntegrityError:
                 retries += 1

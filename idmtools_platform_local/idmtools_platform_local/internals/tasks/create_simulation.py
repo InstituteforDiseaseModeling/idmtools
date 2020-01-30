@@ -2,6 +2,7 @@ import logging
 import os
 import typing
 from functools import partial
+from typing import Dict, Any
 import backoff as backoff
 from dramatiq import GenericActor
 import random
@@ -14,8 +15,6 @@ except ImportError:
     # We mainly want to do this to prevent importing of sqlalchemy on client side installs since it is not needed
     IntegrityError = EnvironmentError
 
-if typing.TYPE_CHECKING:
-    from idmtools.core import TTags
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +47,7 @@ class CreateSimulationTask(GenericActor):
         return uuid, data_path
 
     @staticmethod
-    def create_simulation(experiment_id: str, tags: 'TTags', session=None):
+    def create_simulation(experiment_id: str, tags: Dict[str, Any], session=None):
         # we only want to import this here so that clients don't need postgres/sqlalchemy packages
 
         uuid, data_path = CreateSimulationTask.get_uuid_and_data_path(experiment_id, session, tags)
@@ -68,7 +67,7 @@ class CreateSimulationTask(GenericActor):
 
         return uuid
 
-    def perform(self, experiment_id: str, tags: 'TTags') -> str:
+    def perform(self, experiment_id: str, tags: Dict[str, Any]) -> str:
         """
         Creates our simulation task
 
@@ -93,7 +92,7 @@ class CreateSimulationsTask(GenericActor):
         store_results = True
         max_retries = 0
 
-    def perform(self, experiment_id: str, tags: typing.List['TTags']) -> typing.List:
+    def perform(self, experiment_id: str, tags: typing.List[Dict[str, Any]]) -> typing.List:
         """
         Creates our simulation task
 
