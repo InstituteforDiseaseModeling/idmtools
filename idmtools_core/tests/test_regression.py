@@ -79,11 +79,7 @@ class TestPersistenceServices(ITestWithPersistence):
 
         # Make sure the base simulation was left untouched
         self.assertEqual(ts.base_simulation.task.parameters["test"], 0)
-        self.assertEqual(s.task.parameters["test"], 10)
 
-        # Ensure that we actually ran with the correct parameter
-        print(p._simulations.simulations[e.uid])
-        self.assertEqual(p._simulations.simulations[e.uid][0].task.parameters["test"], 10, "Parameter in platform")
         p.cleanup()
 
     def test_fix_170(self):
