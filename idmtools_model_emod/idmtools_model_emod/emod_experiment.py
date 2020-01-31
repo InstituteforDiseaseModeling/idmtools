@@ -14,7 +14,6 @@ import requests
 
 from idmtools.entities import CommandLine
 from idmtools.entities.experiment import Experiment
-from idmtools.entities.iexperiment import IDockerExperiment, ILinuxExperiment, IHostBinaryExperiment
 from idmtools.utils.decorators import optional_yaspin_load
 from idmtools_model_emod.emod_file import DemographicsFiles, MigrationFiles, Dlls
 from idmtools_model_emod.emod_simulation import EMODSimulation
@@ -155,32 +154,31 @@ class IEMODExperiment(Experiment, ABC):
 
         return simulation
 
-
-@dataclass(repr=False)
-class EMODExperiment(IEMODExperiment, IHostBinaryExperiment):
-    pass
-
-
-@dataclass(repr=False)
-class DockerEMODExperiment(IEMODExperiment, IDockerExperiment, ILinuxExperiment):
-    image_name: str = 'idm-docker-public.packages.idmod.org/idm/centos:dtk-runtime'
-
-    def __post_init__(self, simulation_type=EMODSimulation):
-        super().__post_init__(simulation_type)
-        if os.name != "nt" and self.eradication_path is not None and self.eradication_path.endswith(".exe"):
-            raise ValueError("You are attempting to use a Windows Eradication executable on a linux experiment")
-
-    @classmethod
-    def from_default(cls, name, default: 'IEMODDefault',
-                     image_name: str = 'idm-docker-public.packages.idmod.org/idm/centos:dtk-runtime',
-                     eradication_path=None):
-        exp = cls(name=name, eradication_path=eradication_path, image_name=image_name)
-
-        # Set the base simulation
-        default.process_simulation(exp.base_simulation)
-
-        # Add the demographics
-        for filename, content in default.demographics().items():
-            exp.demographics.add_demographics_from_dict(content=content, filename=filename)
-
-        return exp
+# @dataclass(repr=False)
+# class EMODExperiment(IEMODExperiment, IHostBinaryExperiment):
+#     pass
+#
+#
+# @dataclass(repr=False)
+# class DockerEMODExperiment(IEMODExperiment, IDockerExperiment, ILinuxExperiment):
+#     image_name: str = 'idm-docker-public.packages.idmod.org/idm/centos:dtk-runtime'
+#
+#     def __post_init__(self, simulation_type=EMODSimulation):
+#         super().__post_init__(simulation_type)
+#         if os.name != "nt" and self.eradication_path is not None and self.eradication_path.endswith(".exe"):
+#             raise ValueError("You are attempting to use a Windows Eradication executable on a linux experiment")
+#
+#     @classmethod
+#     def from_default(cls, name, default: 'IEMODDefault',
+#                      image_name: str = 'idm-docker-public.packages.idmod.org/idm/centos:dtk-runtime',
+#                      eradication_path=None):
+#         exp = cls(name=name, eradication_path=eradication_path, image_name=image_name)
+#
+#         # Set the base simulation
+#         default.process_simulation(exp.base_simulation)
+#
+#         # Add the demographics
+#         for filename, content in default.demographics().items():
+#             exp.demographics.add_demographics_from_dict(content=content, filename=filename)
+#
+#         return exp
