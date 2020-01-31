@@ -60,7 +60,7 @@ class CreateExperimentTask(GenericActor):
 
     @staticmethod
     @backoff.on_exception(backoff.constant, IntegrityError, max_tries=3, interval=0.02, jitter=None)
-    def get_uuid_and_data_path(simulation_type, tags):
+    def get_uuid_and_data_path(tags):
         # we only want to import this here so that clients don't need postgres/sqlalchemy packages
         from idmtools_platform_local.internals.workers.utils import create_or_update_status
         uuid = ''.join(random.choice(string.digits + string.ascii_uppercase) for _ in range(EXPERIMENT_ID_LENGTH))
@@ -68,5 +68,5 @@ class CreateExperimentTask(GenericActor):
             logger.debug('Creating experiment with id %s', uuid)
         # Update the database with experiment
         data_path = os.path.join(os.getenv("DATA_PATH", "/data"), uuid)
-        create_or_update_status(uuid, data_path, tags, extra_details=dict(simulation_type=simulation_type))
+        create_or_update_status(uuid, data_path, tags, extra_details=dict())
         return data_path, uuid

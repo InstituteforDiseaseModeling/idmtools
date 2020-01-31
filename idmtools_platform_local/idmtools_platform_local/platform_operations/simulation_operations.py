@@ -5,9 +5,12 @@ from logging import getLogger, DEBUG
 from typing import Dict, List, Set, Union
 from uuid import UUID
 from docker.models.containers import Container
+from tqdm import tqdm
+
 from idmtools.core import ItemType
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
 from idmtools.entities.simulation import Simulation
+from idmtools.utils.collections import ParentIterator
 from idmtools_platform_local.client.simulations_client import SimulationsClient
 from idmtools_platform_local.platform_operations.uitils import local_status_to_common, SimulationDict, ExperimentDict
 
@@ -68,19 +71,29 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         from idmtools_platform_local.internals.tasks.create_simulation import CreateSimulationsTask
         worker = self.platform._sm.get('workers')
 
-        m = CreateSimulationsTask.send(sims[0].experiment.uid, [s.tags for s in sims])
+        if isinstance(sims, ParentIterator):
+            parent_uid = sims.parent.uid
+        else:
+            parent_uid = sims[0].parent.uid
+
+        # first create the sim ids
+        m = CreateSimulationsTask.send(parent_uid, [s.tags for s in sims])
         ids = m.get_result(block=True, timeout=self.platform.default_timeout * 1000)
 
         items = dict()
+        final_sims = []
         # update our uids and then build a list of files to copy
-        for i, simulation in enumerate(sims):
+        for i, simulation in tqdm(enumerate(sims), total=len(sims), desc="Finding Simulations Assets"):
             simulation.uid = ids[i]
-            path = "/".join(["/data", simulation.experiment.uid, simulation.uid])
+            final_sims.append(simulation)
+            path = "/".join(["/data", parent_uid, simulation.uid])
+            simulation.pre_creation()
             items.update(self._assets_to_copy_multiple_list(path, simulation.assets))
+            simulation.post_creation()
         result = self.platform._do.copy_multiple_to_container(worker, items)
         if not result:
             raise IOError("Coping of data for simulations failed.")
-        return sims
+        return final_sims
 
     def get_parent(self, simulation: SimulationDict, **kwargs) -> ExperimentDict:
         """

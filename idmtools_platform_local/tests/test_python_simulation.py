@@ -38,9 +38,9 @@ class TestPythonSimulation(ITestWithPersistence):
         builder = SimulationBuilder()
         # Sweep parameter "a"
         builder.add_sweep_definition(param_a, range(0, 5))
-        e = Experiment.from_template(template=TemplatedSimulations(base_task=basetask, builders={builder}))
+        e = Experiment.from_template(template=TemplatedSimulations(base_task=basetask, builders={builder}), name=name)
 
-        wait_on_experiment_and_check_all_sim_status(self, e, self.platform)
+        wait_on_experiment_and_check_all_sim_status(self, e, platform)
 
         # validation
         self.assertEqual(e.name, name)
@@ -77,7 +77,7 @@ class TestPythonSimulation(ITestWithPersistence):
                                       name=self.case_name, assets=ac)
         pe.tags = {"string_tag": "test", "number_tag": 123}
 
-        wait_on_experiment_and_check_all_sim_status(self, e, self.platform)
+        wait_on_experiment_and_check_all_sim_status(self, pe, self.platform)
 
         with self.subTest('test_retrieve_experiment_restore_sims'):
             # test we can fetch the experiment as well

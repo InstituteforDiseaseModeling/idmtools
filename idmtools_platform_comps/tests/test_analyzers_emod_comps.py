@@ -14,7 +14,6 @@ from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools_model_emod.defaults import EMODSir
-from idmtools_model_emod.emod_experiment import EMODExperiment
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import del_file, del_folder, load_csv_file
@@ -34,7 +33,7 @@ setD = partial(param_update, param="d")
 
 @pytest.mark.comps
 @pytest.mark.analysis
-@skip
+@pytest.mark.skip
 class TestAnalyzeManagerEmodComps(ITestWithPersistence):
 
     def setUp(self) -> None:

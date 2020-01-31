@@ -7,6 +7,7 @@ from idmtools.core import ItemType, NoTaskFound
 from idmtools.core.enums import EntityStatus
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.core.interfaces.inamed_entity import INamedEntity
+from idmtools.entities.task_proxy import TaskProxy
 from idmtools.utils.language import get_qualified_class_name_from_obj
 
 logger = getLogger(__name__)
@@ -21,7 +22,10 @@ class Simulation(IAssetsEnabled, INamedEntity):
     """
     task: 'ITask' = field(default=None)
     item_type: 'ItemType' = field(default=ItemType.SIMULATION, compare=False)
-    pre_creation_hooks: List[Callable[[], NoReturn]] = field(default_factory=lambda: [Simulation.gather_assets])
+    pre_creation_hooks: List[Callable[[], NoReturn]] = field(default_factory=lambda: [Simulation.gather_assets]) \
+ \
+    # control whether we should replace the task with a proxy after creation
+    __replace_task_with_proxy: bool = field(default=False, init=False, compare=False)
 
     @property
     def experiment(self) -> 'Experiment':
@@ -73,6 +77,11 @@ class Simulation(IAssetsEnabled, INamedEntity):
             logger.debug('Calling task post creation')
         if self.task is not None:
             self.task.post_creation(self)
+
+        if self.__replace_task_with_proxy or (self.parent and self.parent.__replace_task_with_proxy):
+            if logger.isEnabledFor(DEBUG):
+                logger.debug('Replacing task with proxy')
+            self.task = TaskProxy.from_task(self.task)
         self.status = EntityStatus.CREATED
 
     def pre_getstate(self):

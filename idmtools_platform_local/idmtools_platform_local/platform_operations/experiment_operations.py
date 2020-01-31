@@ -7,6 +7,8 @@ from math import floor
 from typing import List, Any, Tuple, Dict, Container, NoReturn
 from uuid import UUID
 
+from tqdm import tqdm
+
 from idmtools.assets import Asset
 from idmtools.core.docker_task import DockerTask
 from idmtools.core.experiment_factory import experiment_factory
@@ -54,7 +56,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         if not self.platform.are_requirements_met(experiment.platform_requirements):
             raise ValueError("One of the requirements not supported by platform")
 
-        m = CreateExperimentTask.send(experiment.tags, experiment.task_type)
+        m = CreateExperimentTask.send(experiment.tags)
 
         # Create experiment is vulnerable to disconnects early on of redis errors. Lets do a retry on conditions
         start = time.time()
@@ -121,9 +123,9 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
 
         """
-        for simulation in experiment.simulations:
+        for simulation in tqdm(experiment.simulations, desc="Running Simulations"):
             # if the task is docker, build the extra config
-            if isinstance(simulation.task, DockerTask):
+            if simulation.task.is_docker:
                 self._run_docker_sim(experiment.uid, simulation.uid, simulation.task)
             else:
                 from idmtools_platform_local.internals.tasks.general_task import RunTask

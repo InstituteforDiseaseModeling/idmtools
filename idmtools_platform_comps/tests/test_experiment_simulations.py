@@ -3,7 +3,6 @@ import unittest
 
 import pytest
 from COMPS.Data import Suite as CompsSuite, Experiment as CompsExperiment, Simulation as CompsSimulation
-from pytest import skip
 
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType
@@ -24,7 +23,7 @@ def param_a_update(simulation, value):
     return {"Run_Number": value}
 
 
-@skip
+@pytest.mark.skip
 class TestExperimentSimulations(ITestWithPersistence):
 
     def get_sir_experiment(self, case_name):
@@ -49,7 +48,6 @@ class TestExperimentSimulations(ITestWithPersistence):
 
     @pytest.mark.emod
     @pytest.mark.comps
-    @skip
     def test_input_simulations(self):
         # Create an experiment
         exp = EMODExperiment.from_default(self.case_name, default=EMODSir(), eradication_path=DEFAULT_ERADICATION_PATH)
