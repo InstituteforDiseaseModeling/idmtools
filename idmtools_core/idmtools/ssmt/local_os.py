@@ -20,3 +20,7 @@ class LocalOS:
 
     username = getpass.getuser()
     name = os_mapping[_os]
+
+    @staticmethod
+    def is_window():
+        return LocalOS.name == 'win'
