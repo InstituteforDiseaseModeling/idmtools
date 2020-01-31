@@ -27,7 +27,7 @@ class TestPlatformSimulations(ITestWithPersistence):
         task = PythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "realpath_verify.py"))
         pe = Experiment.from_task(task, name=self.case_name, tags={"string_tag": "test", "number_tag": 123})
 
-        wait_on_experiment_and_check_all_sim_status(self, pe, self.platform)
+        wait_on_experiment_and_check_all_sim_status(self, pe, platform)
 
         files_to_preview = ['StdOut.txt', 'Assets/realpath_verify.py']
         files = platform.get_files(pe.simulations[0], files_to_preview)

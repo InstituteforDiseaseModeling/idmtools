@@ -67,9 +67,12 @@ def wait_on_experiment_and_check_all_sim_status(tc, experiment, platform=None,
     """
     platform.run_items(experiment)
     platform.wait_till_done(experiment)
-    tc.assertTrue(all([s.status == expected_status for s in experiment.simulations]))
-    if expected_status is EntityStatus.SUCCEEDED:
-        tc.assertTrue(experiment.done)
-        tc.assertTrue(experiment.succeeded)
-    elif expected_status is EntityStatus.FAILED:
-        tc.assertFalse(experiment.succeeded)
+    if isinstance(tc, type):
+        tc.assertTrue(tc, all([s.status == expected_status for s in experiment.simulations]))
+    else:
+        tc.assertTrue(all([s.status == expected_status for s in experiment.simulations]))
+        if expected_status is EntityStatus.SUCCEEDED:
+            tc.assertTrue(experiment.done)
+            tc.assertTrue(experiment.succeeded)
+        elif expected_status is EntityStatus.FAILED:
+            tc.assertFalse(experiment.succeeded)

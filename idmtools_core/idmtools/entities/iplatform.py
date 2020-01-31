@@ -235,7 +235,6 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         Returns:
             Children of platform object
         """
-        ent_opts = {}
         item_type, interface = self._get_operation_interface(item)
         if item_type in [ItemType.EXPERIMENT, ItemType.SUITE]:
             children = getattr(self, ITEM_TYPE_TO_OBJECT_INTERFACE[item_type]).get_children(item, **kwargs)
@@ -244,7 +243,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         if not raw:
             ret = []
             for e in children:
-                n = self._convert_platform_item_to_entity(e, **ent_opts)
+                n = self._convert_platform_item_to_entity(e, **kwargs)
                 if n._platform_object is None:
                     n._platform_object = e
                 ret.append(n)
@@ -291,8 +290,10 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             self.cache.delete(cache_key)
 
         if cache_key not in self.cache:
-            ce = self.get_item(item_id, raw=True, item_type=item_type)
-            children = self._get_children_for_platform_item(ce, raw=raw, **kwargs)
+            ce = self.get_item(item_id, raw=raw, item_type=item_type)
+            ce.platform = self
+            kwargs['parent'] = ce
+            children = self._get_children_for_platform_item(ce.get_platform_object(), raw=raw, **kwargs)
             self.cache.set(cache_key, children, expire=self._object_cache_expiration)
             return children
 

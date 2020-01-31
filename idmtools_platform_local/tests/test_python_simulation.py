@@ -72,12 +72,12 @@ class TestPythonSimulation(ITestWithPersistence):
         builder = SimulationBuilder()
         # Sweep parameter "a"
         builder.add_sweep_definition(param_a, range(0, 2))
-        task = JSONConfiguredPythonTask(script_path=model_path, envelope="parameters", parameters=dict(bv=10))
+        task = JSONConfiguredPythonTask(script_path=model_path, envelope="parameters", parameters=dict(b=10))
         pe = Experiment.from_template(template=TemplatedSimulations(base_task=task, builders={builder}),
                                       name=self.case_name, assets=ac)
         pe.tags = {"string_tag": "test", "number_tag": 123}
 
-        wait_on_experiment_and_check_all_sim_status(self, pe, self.platform)
+        wait_on_experiment_and_check_all_sim_status(self, pe, platform)
 
         with self.subTest('test_retrieve_experiment_restore_sims'):
             # test we can fetch the experiment as well

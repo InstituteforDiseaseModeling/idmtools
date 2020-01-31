@@ -35,7 +35,7 @@ class TestLocalRunnerCLI(ITestWithPersistence):
         builder.add_sweep_definition(param_a_update, range(0, 5))
         ts.add_builder(builder)
         cls.pe = Experiment.from_template(ts, name="python experiment", tags={"string_tag": "test", "number_tag": 123})
-        wait_on_experiment_and_check_all_sim_status(cls, cls.pe, cls.platform)
+        wait_on_experiment_and_check_all_sim_status(cls, cls.pe, platform)
 
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName

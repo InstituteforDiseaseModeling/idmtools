@@ -8,8 +8,10 @@ from docker.models.containers import Container
 from tqdm import tqdm
 
 from idmtools.core import ItemType
+from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
 from idmtools.entities.simulation import Simulation
+from idmtools.entities.task_proxy import TaskProxy
 from idmtools.utils.collections import ParentIterator
 from idmtools_platform_local.client.simulations_client import SimulationsClient
 from idmtools_platform_local.platform_operations.uitils import local_status_to_common, SimulationDict, ExperimentDict
@@ -196,19 +198,23 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         raise NotImplementedError("List assets is not yet supported on the LocalPlatform")
 
-    def to_entity(self, simulation: Dict, **kwargs) -> Simulation:
+    def to_entity(self, simulation: Dict, parent: Experiment = None, **kwargs) -> Simulation:
         """
         Convert a sim dict object to an ISimulation
 
         Args:
             simulation: simulation to convert
+            parent: optional experiment object
             **kwargs:
 
         Returns:
             ISimulation object
         """
-        experiment = self.platform.get_item(simulation["experiment_id"], ItemType.EXPERIMENT)
-        isim = experiment.simulation()
+        if parent is None:
+            parent = self.platform.get_item(simulation["experiment_id"], ItemType.EXPERIMENT)
+        isim = Simulation(task=TaskProxy())
+        isim.experiment = parent
+        isim.parent_id = simulation["experiment_id"]
         isim.uid = simulation['simulation_uid']
         isim.tags = simulation['tags']
         isim.status = local_status_to_common(simulation['status'])

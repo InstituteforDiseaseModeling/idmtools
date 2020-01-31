@@ -25,7 +25,7 @@ class Simulation(IAssetsEnabled, INamedEntity):
     pre_creation_hooks: List[Callable[[], NoReturn]] = field(default_factory=lambda: [Simulation.gather_assets]) \
  \
     # control whether we should replace the task with a proxy after creation
-    __replace_task_with_proxy: bool = field(default=False, init=False, compare=False)
+    __replace_task_with_proxy: bool = field(default=True, init=False, compare=False)
 
     @property
     def experiment(self) -> 'Experiment':
@@ -78,7 +78,7 @@ class Simulation(IAssetsEnabled, INamedEntity):
         if self.task is not None:
             self.task.post_creation(self)
 
-        if self.__replace_task_with_proxy or (self.parent and self.parent.__replace_task_with_proxy):
+        if self.__replace_task_with_proxy or (self.parent and self.parent._Experiment__replace_task_with_proxy):
             if logger.isEnabledFor(DEBUG):
                 logger.debug('Replacing task with proxy')
             self.task = TaskProxy.from_task(self.task)

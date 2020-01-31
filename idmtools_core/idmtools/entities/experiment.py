@@ -45,8 +45,8 @@ class Experiment(IAssetsEnabled, INamedEntity):
 
     gather_common_assets_from_task: bool = field(default=False, compare=False)
 
-    # control whether we should replace the task with a proxy after creation
-    __replace_task_with_proxy: bool = field(default=False, init=False, compare=False)
+    # control whether we should replace the task with a proxy after creation to conser
+    __replace_task_with_proxy: bool = field(default=True, init=False, compare=False)
 
     def __post_init__(self, simulations):
         super().__post_init__()
