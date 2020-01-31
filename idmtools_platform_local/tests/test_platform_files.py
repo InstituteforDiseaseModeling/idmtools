@@ -25,7 +25,8 @@ class TestPlatformSimulations(ITestWithPersistence):
         platform = Platform('Local')
 
         task = PythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "realpath_verify.py"))
-        pe = Experiment.from_task(task, name=self.case_name, tags={"string_tag": "test", "number_tag": 123})
+        pe = Experiment.from_task(task, name=self.case_name, tags={"string_tag": "test", "number_tag": 123},
+                                  gather_common_assets_from_task=True)
 
         wait_on_experiment_and_check_all_sim_status(self, pe, platform)
 

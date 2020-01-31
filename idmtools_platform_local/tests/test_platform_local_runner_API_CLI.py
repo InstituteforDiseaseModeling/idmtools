@@ -29,7 +29,8 @@ class TestLocalRunnerCLI(ITestWithPersistence):
     @classmethod
     def setUpClass(cls):
         platform = Platform('Local', **get_test_local_env_overrides())
-        task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
+        task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"),
+                                        configfile_argument=None)
         ts = TemplatedSimulations(base_task=task)
         builder = SimulationBuilder()
         builder.add_sweep_definition(param_a_update, range(0, 5))
@@ -43,15 +44,13 @@ class TestLocalRunnerCLI(ITestWithPersistence):
 
     def test_status_experimentClient_api(self):
         # Test 1: get_all experiments with experiment id and tags
-        experiment = ExperimentsClient.get_one(str(self.pe.uid),
-                                               tags=[('idmtools', 'idmtools-automation'), ('string_tag', 'test')])
+        experiment = ExperimentsClient.get_one(str(self.pe.uid), tags=[('string_tag', 'test')])
         self.assertEqual(experiment['experiment_id'], str(self.pe.uid))
         self.assertEqual(experiment['tags'], self.pe.tags)
         self.assertEqual(experiment['data_path'], '/data/' + str(self.pe.uid))
 
         # Test 2: get_one experiment with experiment id and tags
-        experiment1 = ExperimentsClient.get_one(str(self.pe.uid),
-                                                tags=[('idmtools', 'idmtools-automation'), ('string_tag', 'test')])
+        experiment1 = ExperimentsClient.get_one(str(self.pe.uid), tags=[('string_tag', 'test')])
         self.assertEqual(experiment1['experiment_id'], str(self.pe.uid))
         self.assertEqual(experiment1['tags'], self.pe.tags)
         self.assertEqual(experiment1['data_path'], '/data/' + str(self.pe.uid))
@@ -66,7 +65,7 @@ class TestLocalRunnerCLI(ITestWithPersistence):
             # self.assertEqual(simulations[0]['status'], s.status.value) # wait for bug fix
             self.assertEqual(simulations['tags'], s.tags)
             self.assertEqual(simulations['data_path'], '/data/' + str(self.pe.uid) + '/' + str(s.uid))
-            self.assertEqual(simulations['extra_details']['command'], 'python ./Assets/model1.py config.json')
+            self.assertEqual(simulations['extra_details']['command'], 'python ./Assets/model1.py')
 
             # Also test get_one with simulation id filter
             simulation = SimulationsClient.get_one(str(s.uid))
@@ -83,7 +82,7 @@ class TestLocalRunnerCLI(ITestWithPersistence):
             self.assertEqual(simulations['experiment_id'], str(self.pe.uid))
             self.assertEqual(simulations['tags'], s.tags)
             self.assertEqual(simulations['data_path'], '/data/' + str(self.pe.uid) + '/' + str(s.uid))
-            self.assertEqual(simulations['extra_details']['command'], 'python ./Assets/model1.py config.json')
+            self.assertEqual(simulations['extra_details']['command'], 'python ./Assets/model1.py')
 
         # Test 3: get_all simulations with experiment id as only filter
         simulations = SimulationsClient.get_all(experiment_id=str(self.pe.uid))
@@ -135,7 +134,7 @@ class TestLocalRunnerCLI(ITestWithPersistence):
         self.assertIn(str(self.pe.uid), output_experiment)
         self.assertIn("http://localhost:5000/data/" + str(self.pe.uid), output_experiment)
         self.assertIn(
-            "{'idmtools': 'idmtools-automation', 'string_tag': 'test', 'number_tag': 123, 'type': 'idmtools_models.python.PythonExperiment'}",
+            "{'string_tag': 'test', 'number_tag': 123, 'type': 'idmtools_models.python.PythonExperiment'}",
             output_experiment)
 
     # return list of simulation dir: [{'simulation_uid':sim_id, 'experiment_id', exp_id, 'tags': tags}]

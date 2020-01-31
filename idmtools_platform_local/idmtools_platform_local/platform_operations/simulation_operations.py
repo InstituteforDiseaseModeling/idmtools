@@ -79,11 +79,14 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
             parent_uid = sims[0].parent.uid
 
         # first create the sim ids
-        m = CreateSimulationsTask.send(parent_uid, [s.tags for s in sims])
+        m = CreateSimulationsTask.send(parent_uid, [s.tags for s in sims if s.status is None])
         ids = m.get_result(block=True, timeout=self.platform.default_timeout * 1000)
 
         items = dict()
         final_sims = []
+        # loop over array instead of parent iterator
+        if isinstance(sims, ParentIterator) and isinstance(sims.items, list):
+            sims = sims.items
         # update our uids and then build a list of files to copy
         for i, simulation in tqdm(enumerate(sims), total=len(sims), desc="Finding Simulations Assets"):
             simulation.uid = ids[i]
