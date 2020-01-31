@@ -170,7 +170,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item_type]
         return getattr(self, interface).get(item_id, **kwargs)
 
-    def get_item(self, item_id: UUID, item_type: ItemType = None,
+    def get_item(self, item_id: Union[str, UUID], item_type: ItemType = None,
                  force: bool = False, raw: bool = False, **kwargs) -> Any:
         """
         Retrieve an object from the platform.

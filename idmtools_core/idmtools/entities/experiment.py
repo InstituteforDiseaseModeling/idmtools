@@ -5,7 +5,6 @@ from logging import getLogger
 from types import GeneratorType
 from typing import NoReturn, Set, Union, Iterator, Type, Dict, Any, List
 
-from idmtools import __version__
 from idmtools.assets import AssetCollection
 from idmtools.core import ItemType
 from idmtools.core.interfaces.entity_container import EntityContainer
@@ -18,6 +17,7 @@ from idmtools.registry.experiment_specification import ExperimentPluginSpecifica
     get_model_type_impl
 from idmtools.registry.plugin_specification import get_description_impl
 from idmtools.utils.collections import ParentIterator
+from idmtools.utils.entities import get_default_tags
 
 logger = getLogger(__name__)
 
@@ -91,7 +91,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
                 if assets is not None:
                     self.assets.add_assets(assets, fail_on_duplicate=False)
 
-        self.tags['idmtools'] = __version__
+        self.tags.update(get_default_tags())
 
     @property
     def done(self):

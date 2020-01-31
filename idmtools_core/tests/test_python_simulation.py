@@ -8,8 +8,7 @@ import pytest
 from idmtools.assets import AssetCollection, Asset
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
-from idmtools.utils.configuration import update_task_with_set_parameter
-from idmtools_models.json_configured_task import JSONConfiguredTask
+from idmtools_models.json_configured_task import JSONConfiguredTask, update_task_with_set_parameter
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence

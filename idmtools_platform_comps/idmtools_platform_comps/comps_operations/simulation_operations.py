@@ -25,10 +25,11 @@ def comps_batch_worker(sims: List[Simulation], interface: 'CompsPlatformSimulati
     created_simulations = []
 
     for simulation in sims:
-        interface.pre_create(simulation)
-        simulation.platform = interface.platform
-        simulation._platform_object = interface.to_comps_sim(num_cores, priority, simulation)
-        created_simulations.append(simulation._platform_object)
+        if simulation.status is None:
+            interface.pre_create(simulation)
+            simulation.platform = interface.platform
+            simulation._platform_object = interface.to_comps_sim(num_cores, priority, simulation)
+            created_simulations.append(simulation._platform_object)
     COMPSSimulation.save_all(None, save_semaphore=COMPSSimulation.get_save_semaphore())
     for simulation in sims:
         simulation.uid = simulation.get_platform_object().id

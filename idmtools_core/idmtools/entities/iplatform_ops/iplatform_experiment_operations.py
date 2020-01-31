@@ -180,7 +180,6 @@ class IPlatformExperimentOperations(ABC):
         elif len(experiment.simulations) == 0:
             raise ValueError("You cannot have an experiment with now simulations")
         else:
-
             experiment.simulations = self.platform._create_items_of_type(experiment.simulations, ItemType.SIMULATION)
 
     def post_run_item(self, experiment: Experiment):
@@ -193,7 +192,7 @@ class IPlatformExperimentOperations(ABC):
         Returns:
 
         """
-        experiment.simulations.set_status(EntityStatus.RUNNING)
+        experiment.status = EntityStatus.RUNNING
 
     def run_item(self, experiment: Experiment):
         """
@@ -206,8 +205,9 @@ class IPlatformExperimentOperations(ABC):
 
         """
         self.pre_run_item(experiment)
-        self.platform_run_item(experiment)
-        self.post_run_item(experiment)
+        if experiment.status not in [EntityStatus.RUNNING]:
+            self.platform_run_item(experiment)
+            self.post_run_item(experiment)
 
     @abstractmethod
     def platform_run_item(self, experiment: Experiment):

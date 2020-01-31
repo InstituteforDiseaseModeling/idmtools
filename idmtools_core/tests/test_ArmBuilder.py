@@ -3,7 +3,7 @@ from functools import partial
 
 from idmtools.builders.arm_simulation_builder import ArmSimulationBuilder, SweepArm, ArmType
 from idmtools.entities.templated_simulation import TemplatedSimulations
-from idmtools.utils.configuration import update_task_with_set_parameter
+from idmtools_models.json_configured_task import update_task_with_set_parameter
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.test_task import TestTask
 from idmtools_test.utils.utils import verify_simulation

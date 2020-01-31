@@ -9,6 +9,7 @@ from idmtools.assets import TAssetFilterList
 from idmtools.assets.errors import DuplicatedAssetError
 from idmtools.core import FilterMode, ItemType
 from idmtools.core.interfaces.ientity import IEntity
+from idmtools.utils.entities import get_default_tags
 from idmtools.utils.file import scan_directory
 from idmtools.utils.filters.asset_filters import default_asset_file_filter
 
@@ -321,6 +322,12 @@ class AssetCollection(IEntity):
             if absolute_path and asset.absolute_path:
                 return idx
         return None
+
+    def pre_creation(self) -> None:
+        self.tags.update(get_default_tags())
+
+    def post_creation(self) -> None:
+        pass
 
 
 TAssetCollection = TypeVar("TAssetCollection", bound=AssetCollection)

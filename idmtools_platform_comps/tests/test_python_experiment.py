@@ -13,13 +13,15 @@ from COMPS.Data import QueryCriteria
 from idmtools import __version__
 from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import ArmSimulationBuilder, ArmType, SimulationBuilder, StandAloneSimulationsBuilder, SweepArm
-from idmtools.core import EntityStatus, ItemType
+from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
+from idmtools_test.utils.common_experiments import get_model1_templated_experiment, get_model_py_templated_experiment, \
+    wait_on_experiment_and_check_sims_succeeded
 from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
@@ -90,27 +92,14 @@ class TestPythonExperiment(ITestWithPersistence):
                              'KeyOnly': '',
                              'task_type': 'idmtools_models.python.json_python_task.JSONConfiguredPythonTask'}
         self.assertDictEqual(expected_exp_tags, actual_exp_tags)
-
-    def wait_on_experiment_and_check_sims_succeeded(self, e):
-        self.platform.run_items(e)
-        self.platform.wait_till_done(e)
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in e.simulations]))
-
-    def get_model1_templated_experiment(self):
-        e = Experiment(name=self.case_name,
-                       simulations=TemplatedSimulations(base_task=JSONConfiguredPythonTask(
-                           script_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
-                       ))
-        e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123, "KeyOnly": None}
-        e.simulations.base_simulation.task.set_parameter("c", "c-value")
-        return e
+        self.assertDictEqual(expected_exp_tags, actual_exp_tags)
 
     # Test parameter "b" set is depending on parameter "a"
     # a=[0,1,2,3,4] <--sweep parameter
     # b=[2,3,4,5,6]  <-- b = a + 2
     @pytest.mark.long
     def test_sweeps_2_related_parameters_comps(self):
-        e = self.get_model1_templated_experiment()
+        e = get_model1_templated_experiment(self.case_name)
 
         def param_update_ab(simulation: Simulation, param: str, value: Any) -> Dict[str, any]:
             # Set B within
@@ -126,7 +115,7 @@ class TestPythonExperiment(ITestWithPersistence):
         builder.add_sweep_definition(setAB, range(0, 5))
         e.simulations.add_builder(builder)
 
-        self.wait_on_experiment_and_check_sims_succeeded(e)
+        wait_on_experiment_and_check_sims_succeeded(self, e, self.platform)
 
         experiment = COMPSExperiment.get(e.uid)
         print(experiment.id)
@@ -140,7 +129,7 @@ class TestPythonExperiment(ITestWithPersistence):
     @pytest.mark.long
     @pytest.mark.comps
     def test_add_prefixed_relative_path_to_assets_comps(self):
-        e = self.get_model_py_templated_experiment(dict(b=10))
+        e = get_model_py_templated_experiment(self.case_name, dict(b=10))
 
         def param_a_update(simulation: Simulation, value) -> Dict[str, Any]:
             simulation.task.set_parameter("a", value)
@@ -151,7 +140,7 @@ class TestPythonExperiment(ITestWithPersistence):
         builder.add_sweep_definition(param_a_update, range(0, 2))
         e.simulations.add_builder(builder)
 
-        self.wait_on_experiment_and_check_sims_succeeded(e)
+        wait_on_experiment_and_check_sims_succeeded(self, e, self.platform)
 
         exp_id = e.uid
         # exp_id ='ef8e7f2f-a793-e911-a2bb-f0921c167866'
@@ -174,21 +163,6 @@ class TestPythonExperiment(ITestWithPersistence):
                              {'filename': 'model.py', 'relative_path': ''},
                              {'filename': 'functions.py', 'relative_path': 'MyExternalLibrary'}]
             self.validate_assets(assets, expected_list)
-
-    def get_model_py_templated_experiment(self, default_parameters: dict = None,
-                                          assets_path: str = os.path.join(COMMON_INPUT_PATH, "python", "Assets",
-                                                                          "MyExternalLibrary"),
-                                          relative_path="MyExternalLibrary"):
-        if default_parameters is None:
-            default_parameters = dict()
-        model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
-        ac = AssetCollection()
-        ac.add_directory(assets_directory=assets_path, relative_path=relative_path)
-        task = JSONConfiguredPythonTask(script_path=model_path, envelope="parameters", parameters=default_parameters)
-        e = Experiment(name=self.case_name, simulations=TemplatedSimulations(base_task=task), assets=ac)
-        # assets=AssetCollection.from_directory(assets_directory=assets_path, relative_path="MyExternalLibrary"))
-        e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
-        return e
 
     # Test will test pythonExperiment's assets parameter which adds all files under tests/inputs/python/Assets to
     # COMPS' Assets folder and also test using StandAloneSimulationsBuilder builder to build simulations
@@ -215,7 +189,7 @@ class TestPythonExperiment(ITestWithPersistence):
         builder.add_simulation(sim)
         e.simulations.add_builder(builder)
 
-        self.wait_on_experiment_and_check_sims_succeeded(e)
+        wait_on_experiment_and_check_sims_succeeded(self, e, self.platform)
 
         exp_id = e.uid
         self.validate_model_py_relative_assets(exp_id)
@@ -290,7 +264,7 @@ class TestPythonExperiment(ITestWithPersistence):
                        gather_common_assets_from_task=True)
         e.tags = {"string_tag": "test", "number_tag": 123}
 
-        self.wait_on_experiment_and_check_sims_succeeded(e)
+        wait_on_experiment_and_check_sims_succeeded(self, e, self.platform)
 
         exp_id = e.uid
         # validate results from comps
@@ -343,7 +317,7 @@ class TestPythonExperiment(ITestWithPersistence):
             "string_tag": "test", "number_tag": 123, "KeyOnly": None
         })
 
-        self.wait_on_experiment_and_check_sims_succeeded(e)
+        wait_on_experiment_and_check_sims_succeeded(self, e, self.platform)
         exp_id = e.uid
         self.validate_output(exp_id, 6)
         expected_tags = [{'a': '1', 'b': '2', 'c': '4'}, {'a': '1', 'b': '2', 'c': '5'}, {'a': '1', 'b': '3', 'c': '4'},
@@ -378,7 +352,7 @@ class TestPythonExperiment(ITestWithPersistence):
         for asset in ac:
             self.assertIn(asset, e.assets)
 
-        self.wait_on_experiment_and_check_sims_succeeded(e)
+        wait_on_experiment_and_check_sims_succeeded(self, e, self.platform)
         exp_id = e.uid
         # validate results from comps
         self.validate_model_py_relative_assets(exp_id)
@@ -419,7 +393,7 @@ class TestPythonExperiment(ITestWithPersistence):
         for asset in new_ac:
             self.assertIn(asset, e.assets)
 
-        self.wait_on_experiment_and_check_sims_succeeded(e)
+        wait_on_experiment_and_check_sims_succeeded(self, e, self.platform)
         exp_id = e.uid
         # don't validate stdout since we it isn't the typical out since we use different parameters
         for simulation in COMPSExperiment.get(exp_id).get_simulations():

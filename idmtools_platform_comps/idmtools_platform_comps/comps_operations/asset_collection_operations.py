@@ -31,6 +31,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
                                                  md5_checksum=asset.checksum))
         ac.save()
         asset_collection.uid = ac.id
+        asset_collection._platform_object = asset_collection
         return ac
 
     def to_entity(self, asset_collection: COMPSAssetCollection, **kwargs) -> AssetCollection:

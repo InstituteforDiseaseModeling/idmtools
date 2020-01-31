@@ -80,7 +80,7 @@ def setup_test_with_platform_and_simple_sweep(tst):
     print(tst.case_name)
 
     def setP(simulation, p):
-        return simulation.set_parameter("P", p)
+        return simulation.task.set_parameter("P", p)
 
     tst.builder = SimulationBuilder()
     tst.builder.add_sweep_definition(setP, [1, 2, 3])

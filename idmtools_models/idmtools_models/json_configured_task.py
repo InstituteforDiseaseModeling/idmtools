@@ -5,6 +5,7 @@ from typing import Union, Dict, Any
 
 from idmtools.assets import Asset, AssetCollection
 from idmtools.entities.itask import ITask
+from idmtools.entities.simulation import Simulation
 from idmtools.registry.task_specification import TaskSpecification
 
 TJSONConfigKeyType = Union[str, int, float]
@@ -126,3 +127,9 @@ class JSONConfiguredTaskSpecification(TaskSpecification):
 
     def get_description(self) -> str:
         return "Defines a general command that has a simple JSON based config"
+
+
+def update_task_with_set_parameter(simulation: Simulation, param: str, value: Any) -> Dict[str, Any]:
+    if not hasattr(simulation.task, 'set_parameter'):
+        raise ValueError("update_task_with_set_parameter can only be used on tasks with a set_parameter")
+    return simulation.task.set_parameter(param, value)
