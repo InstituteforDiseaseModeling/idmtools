@@ -167,11 +167,11 @@ class Experiment(IAssetsEnabled, INamedEntity):
         return e
 
     @classmethod
-    def from_template(cls, template: TemplatedSimulations, name: str = None,
+    def from_template(cls, template: TemplatedSimulations, name: str = None, assets: AssetCollection = None,
                       tags: Dict[str, Any] = None) -> 'Experiment':
         if tags is None:
             tags = dict()
-        e = Experiment(name=name, tags=tags)
+        e = Experiment(name=name, tags=tags, assets=AssetCollection() if assets is None else assets)
         e.simulations = template
         return e
 

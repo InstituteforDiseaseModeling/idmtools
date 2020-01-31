@@ -9,7 +9,7 @@ from idmtools.analysis.download_analyzer import DownloadAnalyzer
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
-from idmtools_test.utils.common_experiments import wait_on_experiment_and_check_sims_succeeded, \
+from idmtools_test.utils.common_experiments import wait_on_experiment_and_check_all_sim_status, \
     get_model1_templated_experiment
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import del_folder
@@ -44,7 +44,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         builder.add_sweep_definition(setAB, range(0, 2))
         pe.simulations.add_builder(builder)
 
-        wait_on_experiment_and_check_sims_succeeded(self, pe, self.p)
+        wait_on_experiment_and_check_all_sim_status(self, pe, self.p)
         experiment = COMPSExperiment.get(pe.uid)
         print(experiment.id)
         self.exp_id = experiment.id  # COMPS Experiment object, so .id

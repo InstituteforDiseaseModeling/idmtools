@@ -21,7 +21,7 @@ from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.common_experiments import get_model1_templated_experiment, get_model_py_templated_experiment, \
-    wait_on_experiment_and_check_sims_succeeded
+    wait_on_experiment_and_check_all_sim_status
 from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
@@ -69,7 +69,7 @@ class TestPythonExperiment(ITestWithPersistence):
 
         e.simulations.add_builder(builder)
 
-        wait_on_experiment_and_check_sims_succeeded(self, e, self.platform)
+        wait_on_experiment_and_check_all_sim_status(self, e, self.platform)
         experiment = COMPSExperiment.get(e.uid)
         print(experiment.id)
         exp_id = experiment.id
@@ -110,7 +110,7 @@ class TestPythonExperiment(ITestWithPersistence):
         builder.add_sweep_definition(setAB, range(0, 5))
         e.simulations.add_builder(builder)
 
-        wait_on_experiment_and_check_sims_succeeded(self, e, self.platform)
+        wait_on_experiment_and_check_all_sim_status(self, e, self.platform)
 
         experiment = COMPSExperiment.get(e.uid)
         print(experiment.id)
@@ -135,7 +135,7 @@ class TestPythonExperiment(ITestWithPersistence):
         builder.add_sweep_definition(param_a_update, range(0, 2))
         e.simulations.add_builder(builder)
 
-        wait_on_experiment_and_check_sims_succeeded(self, e, self.platform)
+        wait_on_experiment_and_check_all_sim_status(self, e, self.platform)
 
         exp_id = e.uid
         # exp_id ='ef8e7f2f-a793-e911-a2bb-f0921c167866'
@@ -185,7 +185,7 @@ class TestPythonExperiment(ITestWithPersistence):
         builder.add_simulation(sim)
         e.simulations.add_builder(builder)
 
-        wait_on_experiment_and_check_sims_succeeded(self, e, self.platform)
+        wait_on_experiment_and_check_all_sim_status(self, e, self.platform)
 
         exp_id = e.uid
         self.validate_model_py_relative_assets(exp_id)
@@ -260,7 +260,7 @@ class TestPythonExperiment(ITestWithPersistence):
                        gather_common_assets_from_task=True)
         e.tags = {"string_tag": "test", "number_tag": 123}
 
-        wait_on_experiment_and_check_sims_succeeded(self, e, self.platform)
+        wait_on_experiment_and_check_all_sim_status(self, e, self.platform)
 
         exp_id = e.uid
         # validate results from comps
@@ -313,7 +313,7 @@ class TestPythonExperiment(ITestWithPersistence):
             "string_tag": "test", "number_tag": 123, "KeyOnly": None
         })
 
-        wait_on_experiment_and_check_sims_succeeded(self, e, self.platform)
+        wait_on_experiment_and_check_all_sim_status(self, e, self.platform)
         exp_id = e.uid
         self.validate_output(exp_id, 6)
         expected_tags = [{'a': '1', 'b': '2', 'c': '4'}, {'a': '1', 'b': '2', 'c': '5'}, {'a': '1', 'b': '3', 'c': '4'},
@@ -348,7 +348,7 @@ class TestPythonExperiment(ITestWithPersistence):
         for asset in ac:
             self.assertIn(asset, e.assets)
 
-        wait_on_experiment_and_check_sims_succeeded(self, e, self.platform)
+        wait_on_experiment_and_check_all_sim_status(self, e, self.platform)
         exp_id = e.uid
         # validate results from comps
         self.validate_model_py_relative_assets(exp_id)
@@ -389,7 +389,7 @@ class TestPythonExperiment(ITestWithPersistence):
         for asset in new_ac:
             self.assertIn(asset, e.assets)
 
-        wait_on_experiment_and_check_sims_succeeded(self, e, self.platform)
+        wait_on_experiment_and_check_all_sim_status(self, e, self.platform)
         exp_id = e.uid
         # don't validate stdout since we it isn't the typical out since we use different parameters
         for simulation in COMPSExperiment.get(exp_id).get_simulations():

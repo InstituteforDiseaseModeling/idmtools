@@ -2,19 +2,24 @@ import os
 import re
 import subprocess
 import unittest
+from functools import partial
 from operator import itemgetter
 
 import pytest
-from idmtools_test import COMMON_INPUT_PATH
-from idmtools_test.utils.confg_local_runner_test import get_test_local_env_overrides
-from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform
-from idmtools.managers import ExperimentManager
-from idmtools_models.python import PythonExperiment
+from idmtools.entities.experiment import Experiment
+from idmtools.entities.templated_simulation import TemplatedSimulations
+from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
 from idmtools_platform_local.client.simulations_client import SimulationsClient
+from idmtools_test import COMMON_INPUT_PATH
+from idmtools_test.utils.common_experiments import wait_on_experiment_and_check_all_sim_status
+from idmtools_test.utils.confg_local_runner_test import get_test_local_env_overrides
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+
+param_a_update = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
 
 
 @pytest.mark.docker
@@ -24,21 +29,13 @@ class TestLocalRunnerCLI(ITestWithPersistence):
     @classmethod
     def setUpClass(cls):
         platform = Platform('Local', **get_test_local_env_overrides())
-        cls.pe = PythonExperiment(name="python experiment", model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
-
-        cls.pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
-
-        def param_a_update(simulation, value):
-            simulation.set_parameter("a", value)
-            return {"a": value}
-
+        task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
+        ts = TemplatedSimulations(base_task=task)
         builder = SimulationBuilder()
         builder.add_sweep_definition(param_a_update, range(0, 5))
-        cls.pe.builder = builder
-
-        em = ExperimentManager(experiment=cls.pe, platform=platform)
-        em.run()
-        em.wait_till_done()
+        ts.add_builder(builder)
+        cls.pe = Experiment.from_template(ts, name="python experiment", tags={"string_tag": "test", "number_tag": 123})
+        wait_on_experiment_and_check_all_sim_status(cls, cls.pe, cls.platform)
 
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName

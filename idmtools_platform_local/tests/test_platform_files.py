@@ -1,13 +1,15 @@
 import os
+
 import pytest
-from idmtools.core import EntityStatus
+
 from idmtools.core.platform_factory import Platform
-from idmtools.managers import ExperimentManager
-from idmtools_models.python import PythonExperiment
+from idmtools.entities.experiment import Experiment
+from idmtools_models.python.python_task import PythonTask
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+from idmtools_test.utils.common_experiments import wait_on_experiment_and_check_all_sim_status
 from idmtools_test.utils.confg_local_runner_test import get_test_local_env_overrides
 from idmtools_test.utils.decorators import restart_local_platform
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 
 @pytest.mark.docker
@@ -22,16 +24,10 @@ class TestPlatformSimulations(ITestWithPersistence):
     def test_fetch_simulation_files(self):
         platform = Platform('Local')
 
-        pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python",
-                                                                           "realpath_verify.py"))
+        task = PythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "realpath_verify.py"))
+        pe = Experiment.from_task(task, name=self.case_name, tags={"string_tag": "test", "number_tag": 123})
 
-        pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
-
-        em = ExperimentManager(experiment=pe, platform=platform)
-        em.run()
-        em.wait_till_done()
-
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
+        wait_on_experiment_and_check_all_sim_status(self, pe, self.platform)
 
         files_to_preview = ['StdOut.txt', 'Assets/realpath_verify.py']
         files = platform.get_files(pe.simulations[0], files_to_preview)

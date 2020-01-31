@@ -12,7 +12,7 @@ from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_platform_comps.comps_platform import COMPSPlatform
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools_test.utils.common_experiments import wait_on_experiment_and_check_sims_succeeded
+from idmtools_test.utils.common_experiments import wait_on_experiment_and_check_all_sim_status
 from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id, \
     setup_test_with_platform_and_simple_sweep
 
@@ -32,7 +32,7 @@ class TestAssetsInComps(unittest.TestCase):
         self.platform.run_items(experiment)
 
         # Start experiment
-        wait_on_experiment_and_check_sims_succeeded(self, experiment, self.platform)
+        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)
 
     def test_comps_asset_to_idmtools_asset(self):
         comps_ac: CompsAssetCollection = self.platform.get_item('2c62399b-1a31-ea11-a2be-f0921c167861',

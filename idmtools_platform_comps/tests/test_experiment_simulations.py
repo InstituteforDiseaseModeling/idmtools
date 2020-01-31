@@ -24,6 +24,7 @@ def param_a_update(simulation, value):
     return {"Run_Number": value}
 
 
+@skip
 class TestExperimentSimulations(ITestWithPersistence):
 
     def get_sir_experiment(self, case_name):
