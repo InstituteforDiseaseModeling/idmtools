@@ -13,9 +13,9 @@ from idmtools.entities.suite import Suite
 from idmtools.entities.iexperiment import IDockerExperiment, IGPUExperiment, IExperiment
 from idmtools.entities.iplatform_metadata import IPlatformExperimentOperations, \
     IPlatformSimulationOperations, IPlatformSuiteOperations, IPlatformWorkflowItemOperations, \
-    IPlatformAssetCollectionOperations, IPlatformWorkItemOperations
+    IPlatformAssetCollectionOperations
 from idmtools.services.platforms import PlatformPersistService
-from idmtools.core.interfaces.iitem import IItem, IItemList
+from idmtools.core.interfaces.iitem import IItem
 from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set
 
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
@@ -552,9 +552,6 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
                     outfile.write(ofc)
 
         return ret
-
-    def is_task_supported(self, task: 'ITask') -> bool:
-        return all([x in self._platform_supports for x in task.platform_requirements])
 
 
 TPlatform = TypeVar("TPlatform", bound=IPlatform)
