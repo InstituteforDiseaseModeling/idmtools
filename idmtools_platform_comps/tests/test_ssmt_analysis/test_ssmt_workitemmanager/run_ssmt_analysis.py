@@ -16,8 +16,9 @@ exp_id = "08fc74a7-b767-e911-a2b8-f0921c167865"  # exp id in comps2
 
 wi_name = "SSMT WorkItemManager Test"
 command = "python run_PopulationAnalyzer.py " + exp_id
-user_files = FileList(root='.', files_in_root=['PopulationAnalyzer.py', 'run_PopulationAnalyzer.py', 'run_ssmt_analysis.py'])
-# user_files.add_file(os.path.join(par_par_dir, "simtools.ini"))
+user_files = FileList(root='.',
+                      files_in_root=['PopulationAnalyzer.py', 'run_PopulationAnalyzer.py', 'run_ssmt_analysis.py'])
+
 
 if __name__ == "__main__":
     platform = Platform('COMPS2')
@@ -25,8 +26,7 @@ if __name__ == "__main__":
                       related_experiments=[exp_id])
     wim = WorkItemManager(wi, platform)
     wim.process(check_status=True)
-    #id = '1fa04ce5-8d5d-e911-9413-0050569e0ef3'
-    wi = WorkItem.get(wi.uid) #    wi = WorkItem.get() #
+    wi = WorkItem.get(wi.uid)
 
     barr_out = wi.retrieve_output_files(['results.json'])
     with open("results.json", 'wb') as file:

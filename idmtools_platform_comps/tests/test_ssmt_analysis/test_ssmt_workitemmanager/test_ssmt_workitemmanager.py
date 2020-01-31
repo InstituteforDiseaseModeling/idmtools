@@ -38,34 +38,6 @@ class RunAnalyzeTest(unittest.TestCase):
         self.wi_name = "SSMT WorkItemManager Test"
         self.tags = {'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}
 
-    #delete experiment after done testcases in this class
-    # @classmethod
-    # def tearDownClass(cls):
-    #     try:
-    #         e = Experiment.get(cls.exp_id)
-    #     except:
-    #         e = None
-    #     e.delete()
-    #
-    #     try:
-    #         Experiment.get(e.id)
-    #     except RuntimeError as e:
-    #         pass
-    #
-    # #delete workitem after test is done
-    # def tearDown(self):
-    #     try:
-    #
-    #         wi = WorkItem.get(self.workitem_id)
-    #     except:
-    #         wi = None
-    #     wi.delete()
-    #
-    #     try:
-    #         WorkItem.get(wi.id)
-    #     except RuntimeError as e:
-    #         pass
-
     #------------------------------------------
     # test load all required files to docker's current dir with user_files
     # then run analyzer in docker
