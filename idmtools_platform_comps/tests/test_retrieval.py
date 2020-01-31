@@ -1,7 +1,6 @@
 import os
 import unittest
 from functools import partial
-from typing import Dict, Any
 
 import pytest
 from COMPS.Data import Experiment as COMPSExperiment, Simulation as COMPSSimulation
@@ -10,18 +9,12 @@ from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
-from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
-
-def param_update(simulation: Simulation, param: str, value) -> Dict[str, Any]:
-    return simulation.task.set_parameter(param, value)
-
-
-setA = partial(param_update, param="a")
+setA = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
 
 
 @pytest.mark.comps

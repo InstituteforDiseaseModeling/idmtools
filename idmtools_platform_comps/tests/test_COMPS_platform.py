@@ -3,16 +3,14 @@ import json
 import os
 import unittest
 from os import path
+
 import pytest
-from idmtools.core.platform_factory import Platform
-from idmtools.builders import SimulationBuilder
+
 from idmtools.core import EntityStatus
-from idmtools.managers import ExperimentManager
-from idmtools_models.python import PythonExperiment
 from idmtools_platform_comps.comps_platform import COMPSPlatform
+from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.comps import assure_running_then_wait_til_done, setup_test_with_platform_and_simple_sweep
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-from idmtools_test import COMMON_INPUT_PATH
 
 current_directory = path.dirname(path.realpath(__file__))
 

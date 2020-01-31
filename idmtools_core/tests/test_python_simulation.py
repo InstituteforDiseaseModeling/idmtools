@@ -8,14 +8,14 @@ import pytest
 from idmtools.assets import AssetCollection, Asset
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
-from idmtools_models.json_configured_task import JSONConfiguredTask, update_task_with_set_parameter
+from idmtools_models.json_configured_task import JSONConfiguredTask
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
-setA = partial(update_task_with_set_parameter, param="a")
-setB = partial(update_task_with_set_parameter, param="b")
-setC = partial(update_task_with_set_parameter, param="c")
+setA = partial(JSONConfiguredTask.set_parameter_sweep_callback, param="a")
+setB = partial(JSONConfiguredTask.set_parameter_sweep_callback, param="b")
+setC = partial(JSONConfiguredTask.set_parameter_sweep_callback, param="c")
 
 
 class setParam:
@@ -23,7 +23,7 @@ class setParam:
         self.param = param
 
     def __call__(self, simulation, value):
-        return update_task_with_set_parameter(simulation, self.param, value)
+        return JSONConfiguredTask.set_parameter_sweep_callback(simulation, self.param, value)
 
 
 class TestPythonSimulation(ITestWithPersistence):

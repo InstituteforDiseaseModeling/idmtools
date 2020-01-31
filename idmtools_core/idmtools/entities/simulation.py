@@ -7,7 +7,6 @@ from idmtools.core import ItemType, NoTaskFound
 from idmtools.core.enums import EntityStatus
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.core.interfaces.inamed_entity import INamedEntity
-from idmtools.utils.entities import get_default_tags
 from idmtools.utils.language import get_qualified_class_name_from_obj
 
 logger = getLogger(__name__)
@@ -68,7 +67,6 @@ class Simulation(IAssetsEnabled, INamedEntity):
         if logger.isEnabledFor(DEBUG):
             logger.debug('Calling task post creation')
         self.task.pre_creation(self)
-        self.tags.update(get_default_tags())
 
     def post_creation(self) -> None:
         if logger.isEnabledFor(DEBUG):

@@ -1,18 +1,17 @@
 import os
 import unittest
+
 import pytest
 from COMPS.Data import Suite as CompsSuite, Experiment as CompsExperiment, Simulation as CompsSimulation
+from pytest import skip
+
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import Suite
-from idmtools.managers import ExperimentManager
-from idmtools_model_emod import EMODExperiment
-from idmtools_model_emod import EMODSimulation
 from idmtools_model_emod.defaults import EMODSir
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-
 
 DEFAULT_ERADICATION_PATH = os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe")
 DEFAULT_CONFIG_PATH = os.path.join(COMMON_INPUT_PATH, "files", "config.json")
@@ -49,6 +48,7 @@ class TestExperimentSimulations(ITestWithPersistence):
 
     @pytest.mark.emod
     @pytest.mark.comps
+    @skip
     def test_input_simulations(self):
         # Create an experiment
         exp = EMODExperiment.from_default(self.case_name, default=EMODSir(), eradication_path=DEFAULT_ERADICATION_PATH)
@@ -81,13 +81,6 @@ class TestExperimentSimulations(ITestWithPersistence):
         sims = em.experiment.simulations
 
         self.assertEqual(len(sims), num_sims + 2)
-
-    @pytest.mark.emod
-    def test_simulation_experiment(self):
-        exp = EMODExperiment()
-        sim = exp.simulation()
-
-        self.assertEqual(sim.experiment, exp)
 
     @pytest.mark.comps
     @pytest.mark.suite

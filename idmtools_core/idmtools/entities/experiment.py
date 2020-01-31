@@ -85,7 +85,6 @@ class Experiment(IAssetsEnabled, INamedEntity):
         elif self.gather_common_assets_from_task and isinstance(self.__simulations, List):
             task_class = self.simulations[0].task.__class__
             self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
-        elif self.gather_common_assets_from_task:
             for sim in self.simulations:
                 assets = sim.task.gather_common_assets()
                 if assets is not None:

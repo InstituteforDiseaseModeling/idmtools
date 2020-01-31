@@ -25,14 +25,9 @@ from idmtools_test.utils.common_experiments import get_model1_templated_experime
 from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
-
-def param_update(simulation: Simulation, param: str, value: Any) -> Dict[str, any]:
-    return simulation.task.set_parameter(param, value)
-
-
-setA = partial(param_update, param="a")
-setB = partial(param_update, param="b")
-setC = partial(param_update, param="c")
+setA = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
+setB = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="b")
+setC = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="c")
 
 
 class setParam:
@@ -40,7 +35,7 @@ class setParam:
         self.param = param
 
     def __call__(self, simulation: Simulation, value) -> Dict[str, any]:
-        return param_update(simulation, self.param, value)
+        return JSONConfiguredPythonTask.set_parameter_sweep_callback(simulation, self.param, value)
 
 
 @pytest.mark.comps
@@ -60,7 +55,7 @@ class TestPythonExperiment(ITestWithPersistence):
     @pytest.mark.long
     def test_sweeps_with_partial_comps(self):
 
-        e = self.get_model1_templated_experiment()
+        e = get_model1_templated_experiment(self.case_name)
         builder = SimulationBuilder()
         # ------------------------------------------------------
         # Sweeping parameters:
@@ -74,7 +69,7 @@ class TestPythonExperiment(ITestWithPersistence):
 
         e.simulations.add_builder(builder)
 
-        self.wait_on_experiment_and_check_sims_succeeded(e)
+        wait_on_experiment_and_check_sims_succeeded(self, e, self.platform)
         experiment = COMPSExperiment.get(e.uid)
         print(experiment.id)
         exp_id = experiment.id
@@ -177,8 +172,9 @@ class TestPythonExperiment(ITestWithPersistence):
     @pytest.mark.long
     @pytest.mark.comps
     def test_add_dirs_to_assets_comps(self):
-        e = self.get_model_py_templated_experiment(assets_path=os.path.join(COMMON_INPUT_PATH, "python", "Assets"),
-                                                   relative_path=None)
+        e = get_model_py_templated_experiment(self.case_name,
+                                              assets_path=os.path.join(COMMON_INPUT_PATH, "python", "Assets"),
+                                              relative_path=None)
         # sim = pe.simulation() # uncomment this line when issue #138 gets fixed
         # TODO update this syntax in TC. We have better manual building methods for simulations
         sim = e.simulations.new_simulation()

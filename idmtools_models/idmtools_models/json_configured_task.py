@@ -119,6 +119,12 @@ class JSONConfiguredTask(ITask):
     def __repr__(self):
         return f"<JSONConfiguredTask config:{self.config_file_name} parameters: {self.parameters}"
 
+    @staticmethod
+    def set_parameter_sweep_callback(simulation: Simulation, param: str, value: Any) -> Dict[str, Any]:
+        if not hasattr(simulation.task, 'set_parameter'):
+            raise ValueError("update_task_with_set_parameter can only be used on tasks with a set_parameter")
+        return simulation.task.set_parameter(param, value)
+
 
 class JSONConfiguredTaskSpecification(TaskSpecification):
 
@@ -127,9 +133,3 @@ class JSONConfiguredTaskSpecification(TaskSpecification):
 
     def get_description(self) -> str:
         return "Defines a general command that has a simple JSON based config"
-
-
-def update_task_with_set_parameter(simulation: Simulation, param: str, value: Any) -> Dict[str, Any]:
-    if not hasattr(simulation.task, 'set_parameter'):
-        raise ValueError("update_task_with_set_parameter can only be used on tasks with a set_parameter")
-    return simulation.task.set_parameter(param, value)
