@@ -553,6 +553,9 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         return ret
 
+    def is_task_supported(self, task: 'ITask') -> bool:
+        return all([x in self._platform_supports for x in task.platform_requirements])
 
+    
 TPlatform = TypeVar("TPlatform", bound=IPlatform)
 TPlatformClass = Type[TPlatform]
