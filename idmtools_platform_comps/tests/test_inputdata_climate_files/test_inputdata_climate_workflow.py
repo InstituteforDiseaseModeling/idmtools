@@ -24,11 +24,11 @@ intermediate_dir = os.path.join(current_dir, 'intermediate', 'climate')
 # if not os.path.exists(output_path): os.makedirs(output_path)
 
 
-class ClimateGenerationTest(unittest.TestCase):
+class InputDataWorkItemTests(unittest.TestCase):
 
     def setUp(self):
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
-        self.wi_name = "SSMT InputData Test: Climate Files"
+        self.wi_name = "InputData WorkItem Test: Climate Files"
         self.tags = {'idmtools': self._testMethodName, 'WorkItem type': 'InputData'}
         self.p = Platform('COMPS2')
         # default_config = configparser.ConfigParser()
