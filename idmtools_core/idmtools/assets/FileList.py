@@ -24,7 +24,7 @@ class FileList:
         # Make sure we have correct separator
         # os.path.normpath(f) would be best but is not working the same way on UNIX systems
         if files_in_root is not None:
-            if LocalOS.name == LocalOS.WINDOWS:
+            if LocalOS.is_window():
                 files_in_root = [os.path.normpath(f) for f in files_in_root]
             else:
                 files_in_root = [re.sub(r"[\\/]", os.sep, os.path.normpath(f)) for f in files_in_root]

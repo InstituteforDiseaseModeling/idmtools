@@ -51,6 +51,8 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     node_group: str = field(default="emod_abcd")
     num_retires: int = field(default=0)
     num_cores: int = field(default=1)
+    max_workers: int = field(default=16)
+    batch_size: int = field(default=10)
     exclusive: bool = field(default=False)
 
     work_item_type: str = field(default=None)

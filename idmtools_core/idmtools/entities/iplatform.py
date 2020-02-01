@@ -13,9 +13,9 @@ from idmtools.entities.suite import Suite
 from idmtools.entities.iexperiment import IDockerExperiment, IGPUExperiment, IExperiment
 from idmtools.entities.iplatform_metadata import IPlatformExperimentOperations, \
     IPlatformSimulationOperations, IPlatformSuiteOperations, IPlatformWorkflowItemOperations, \
-    IPlatformAssetCollectionOperations, IPlatformWorkItemOperations
+    IPlatformAssetCollectionOperations
 from idmtools.services.platforms import PlatformPersistService
-from idmtools.core.interfaces.iitem import IItem, IItemList
+from idmtools.core.interfaces.iitem import IItem
 from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set
 
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
@@ -541,7 +541,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         idm_item = self.get_item(item_id, item_type, raw=False)
         ret = self.get_files(idm_item, files)
 
-        if output:
+        if output and item_type in (ItemType.SIMULATION, ItemType.WORKFLOW_ITEM):
             for ofi, ofc in ret.items():
                 file_path = os.path.join(output, item_id, ofi)
                 parent_path = os.path.dirname(file_path)
@@ -556,6 +556,6 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     def is_task_supported(self, task: 'ITask') -> bool:
         return all([x in self._platform_supports for x in task.platform_requirements])
 
-
+    
 TPlatform = TypeVar("TPlatform", bound=IPlatform)
 TPlatformClass = Type[TPlatform]
