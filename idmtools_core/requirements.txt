@@ -1,6 +1,6 @@
 coloredlogs~=10.0
 diskcache==4.0.0
-marshmallow~=3.0.0rc6
+marshmallow~=3.3
 more-itertools~=7.0.0
 pandas==0.24.2
 pipreqs==0.4.9
