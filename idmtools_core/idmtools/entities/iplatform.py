@@ -543,7 +543,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         if output and item_type in (ItemType.SIMULATION, ItemType.WORKFLOW_ITEM):
             for ofi, ofc in ret.items():
-                file_path = os.path.join(output, item_id, ofi)
+                file_path = os.path.join(output, str(item_id), ofi)
                 parent_path = os.path.dirname(file_path)
                 if not os.path.exists(parent_path):
                     os.makedirs(parent_path)
