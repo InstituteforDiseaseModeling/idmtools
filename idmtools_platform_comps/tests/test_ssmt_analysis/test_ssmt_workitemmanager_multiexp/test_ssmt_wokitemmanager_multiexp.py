@@ -1,12 +1,8 @@
-from simtools.Analysis.AnalyzeManager import AnalyzeManager
 from COMPS.Data import Experiment
 import unittest
-import xmlrunner
-import os
 import json
-import sys
+import pytest
 
-import inspect
 from idmtools.assets.FileList import FileList
 from idmtools.core.platform_factory import Platform
 from idmtools.managers.work_item_manager import WorkItemManager
@@ -14,7 +10,7 @@ from idmtools.ssmt.ssmt_work_item import SSMTWorkItem
 import os
 from COMPS.Data.WorkItem import WorkItem
 
-from utils import del_file
+from idmtools_test.utils.utils import del_file
 
 
 class RunAnalyzeTest(unittest.TestCase):
@@ -28,11 +24,13 @@ class RunAnalyzeTest(unittest.TestCase):
     # test load all required files to docker's current dir with user_files
     # then run analyzer in docker
     #------------------------------------------
+    @pytest.mark.skip
+    #TODO: this won't work until a docker image with idmtools is deployed to the comps ssmt server
     def test_ssmt_workitemmanager_multiexp(self):
-        command = "python PopulationAnalyzer.py"
+        command = "python run_PopulationAnalyzer.py"
 
         # upload 2 files to docker's current folder as linked file
-        user_files = FileList(root='.', files_in_root=['PopulationAnalyzer.py'])
+        user_files = FileList(root='.', files_in_root=['PopulationAnalyzer.py', 'run_ssmt_analysis.py'])
 
         platform = Platform('COMPS2')
         wi = SSMTWorkItem(item_name=self.wi_name, command=command, user_files=user_files,

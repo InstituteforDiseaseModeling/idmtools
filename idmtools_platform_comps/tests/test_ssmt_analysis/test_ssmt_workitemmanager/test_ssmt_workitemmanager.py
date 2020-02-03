@@ -1,12 +1,9 @@
-from simtools.Analysis.AnalyzeManager import AnalyzeManager
 from COMPS.Data import Experiment
 import unittest
 import xmlrunner
-import os
 import json
 import sys
 
-import inspect
 from idmtools.assets.FileList import FileList
 from idmtools.core.platform_factory import Platform
 from idmtools.managers.work_item_manager import WorkItemManager
@@ -17,7 +14,7 @@ from COMPS.Data import WorkItem
 #sys.path.append('..\..\General')
 par_par_dir = os.path.normpath(os.path.join('..', os.pardir))
 sys.path.append(os.path.join(par_par_dir,'General'))
-from utils import del_file
+from idmtools_test.utils.utils import del_file
 
 
 class RunAnalyzeTest(unittest.TestCase):
