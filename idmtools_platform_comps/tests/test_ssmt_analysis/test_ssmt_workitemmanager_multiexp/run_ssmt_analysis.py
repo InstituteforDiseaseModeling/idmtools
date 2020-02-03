@@ -15,14 +15,14 @@ command = "python run_ssmt_analysis.py"
 user_files = FileList(root='.',
                       files_in_root=['PopulationAnalyzer.py', 'run_ssmt_analysis.py'])
 
-exp_id = ["a585c439-b37d-e911-a2bb-f0921c167866",
+exp_list = ["a585c439-b37d-e911-a2bb-f0921c167866",
           "7afc5160-e086-e911-a2bb-f0921c167866"]  # comps2 staging exp ids
 
 if __name__ == "__main__":
 
     platform = Platform('COMPS2')
     wi = SSMTWorkItem(item_name=wi_name, command=command, user_files=user_files,
-                      related_experiments=[exp_id])
+                      related_experiments=exp_list)
     wim = WorkItemManager(wi, platform)
     wim.process(check_status=True)
     wi = WorkItem.get(wi.uid)
