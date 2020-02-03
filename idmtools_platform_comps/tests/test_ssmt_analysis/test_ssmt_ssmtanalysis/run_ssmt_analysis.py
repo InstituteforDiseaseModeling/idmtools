@@ -8,6 +8,7 @@ import os
 from idmtools.ssmt.ssmt_analysis import SSMTAnalysis
 from test_ssmt_ssmtanalysis.MyAnalyzer import MyAnalyzer
 from idmtools.assets.FileList import FileList
+from idmtools.core.platform_factory import Platform
 
 par_par_dir = os.path.normpath(os.path.join('..', os.pardir))
 
@@ -22,7 +23,9 @@ if __name__ == "__main__":
     # args = dict(file_name="InsetChart.json", channels=['Adult Vectors'])
     args = [{'file_name': 'InsetChart.json', 'channels': 'Adult Vectors'}]
 
-    analysis = SSMTAnalysis(experiment_ids=[exp_id],
+    platform = Platform('COMPS2')
+    analysis = SSMTAnalysis(platform=platform,
+                            experiment_ids=[exp_id],
                             analyzers=[MyAnalyzer],
                             analyzers_args=args,
                             analysis_name="idmtools: run SSMTAnalysis with parameters",

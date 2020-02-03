@@ -28,6 +28,6 @@ if __name__ == "__main__":
     wim.process(check_status=True)
     wi = WorkItem.get(wi.uid)
 
-    barr_out = wi.retrieve_output_files(['results.json'])
-    with open("results.json", 'wb') as file:
+    barr_out = wi.retrieve_output_files(paths=['InsetChart.json'])
+    with open("InsetChart.json", 'wb') as file:
         file.write(barr_out[0])

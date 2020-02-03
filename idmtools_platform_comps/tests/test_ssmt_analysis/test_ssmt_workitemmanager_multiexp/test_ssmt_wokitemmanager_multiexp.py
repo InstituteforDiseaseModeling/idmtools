@@ -12,7 +12,7 @@ from idmtools.core.platform_factory import Platform
 from idmtools.managers.work_item_manager import WorkItemManager
 from idmtools.ssmt.ssmt_work_item import SSMTWorkItem
 import os
-from COMPS.Data import WorkItem
+from COMPS.Data.WorkItem import WorkItem
 
 from utils import del_file
 
@@ -29,10 +29,10 @@ class RunAnalyzeTest(unittest.TestCase):
     # then run analyzer in docker
     #------------------------------------------
     def test_ssmt_workitemmanager_multiexp(self):
-        command = "python analyzers.py"
+        command = "python PopulationAnalyzer.py"
 
         # upload 2 files to docker's current folder as linked file
-        user_files = FileList(root='.', files_in_root=['analyzers.py'])
+        user_files = FileList(root='.', files_in_root=['PopulationAnalyzer.py'])
 
         platform = Platform('COMPS2')
         wi = SSMTWorkItem(item_name=self.wi_name, command=command, user_files=user_files,
@@ -40,6 +40,10 @@ class RunAnalyzeTest(unittest.TestCase):
                                                "7afc5160-e086-e911-a2bb-f0921c167866"])
         wim = WorkItemManager(wi, platform)
         wim.process(check_status=True)
+
+        self.workitem_id = wi.uid
+        wi = WorkItem.get(self.workitem_id)
+
         self.validate(wi)
 
     #------------------------------------------
@@ -47,25 +51,25 @@ class RunAnalyzeTest(unittest.TestCase):
     #------------------------------------------
     def validate(self, wi, output_path=None):
         # # get workitem
-        self.workitem_id = wi.uid
-        wi = WorkItem.get(wi.uid)
+        self.workitem_id = wi.id
+        wi = WorkItem.get(self.workitem_id)
         print("workitem id :" + str(wi.id))
 
-        #delete results.json file first before same a new one
-        del_file("InsetChart.json")
-        # retrieve 'InsetChart.json' file from Output tab of workitem and save to local disk
+        # delete results.json file first before same a new one
+        del_file("results.json")
+        # retrieve 'results.json' file from Output tab of workitem and save to local disk
         if output_path is None:
-            barr_out = wi.retrieve_output_files(['InsertChart.json'])
+            barr_out = wi.retrieve_output_files(['results.json'])
         else:  # if output has folder, retriever from there
-            barr_out = wi.retrieve_output_files([os.path.join(output_path, 'InsertChart.json')])
+            barr_out = wi.retrieve_output_files([os.path.join(output_path, 'results.json')])
         with open("results.json", 'wb') as file:
             file.write(barr_out[0])
 
         # asset file exists
-        self.assertTrue(os.path.exists('InsertChart.json'))
+        self.assertTrue(os.path.exists('results.json'))
 
         # Compare values in results.json to each simulation's insetChart.json's Statistical Population
-        with open('InsertChart.json') as json_file:
+        with open('results.json') as json_file:
             data = json.load(json_file)
 
             for simulation in Experiment.get(self.exp_id).get_simulations():
