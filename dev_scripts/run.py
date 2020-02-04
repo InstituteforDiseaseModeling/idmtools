@@ -9,14 +9,13 @@ logger = getLogger(__name__)
 
 
 def setup_logging(working_dir):
-    logFormatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
-    rootLogger = logging.getLogger()
-    fileHandler = logging.FileHandler("%s/make.log" % os.path.abspath(working_dir))
-    fileHandler.setFormatter(logFormatter)
-    rootLogger.addHandler(fileHandler)
-    consoleHandler = logging.StreamHandler()
-    consoleHandler.setFormatter(logFormatter)
-    rootLogger.addHandler(consoleHandler)
+    log_formatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
+    file_handler = logging.FileHandler("%s/make.log" % os.path.abspath(working_dir))
+    file_handler.setFormatter(log_formatter)
+    logger.addHandler(file_handler)
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(log_formatter)
+    logger.addHandler(console_handler)
 
 
 if __name__ == '__main__':
@@ -48,7 +47,7 @@ if __name__ == '__main__':
         os.chdir(os.path.abspath(args.working_dir))
     logger.info(f'Running {args.ex}')
     try:
-        output = subprocess.check_output(args.ex)
+        output = subprocess.check_output(args.ex, shell=True)
         result = 0
     except subprocess.CalledProcessError as e:
         result = e.returncode
