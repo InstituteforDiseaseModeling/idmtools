@@ -33,7 +33,7 @@ Clone the repository:
 > git clone https://github.com/InstituteforDiseaseModeling/idmtools.git
 ```
 
-To setup your environment, you can run `python dev_scripts/bootstrap.py`. This will install all the tools. From then on you can use `pymake` to run common development tasks.
+To setup your environment, you can run `python dev_scripts/bootstrap.py`. This will install all the tools. From then on you can use `pymake` to run common development tasks. It is highly recommended you use install in  virtualenv to ensure your global python install is not disturbed. 
 
 There is a Makefile file available for most common development tasks. Here is a list of commands
 ```bash
