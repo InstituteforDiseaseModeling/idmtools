@@ -12,7 +12,7 @@ class CSVAnalyzer(IAnalyzer):
     # False to get the raw data in the :meth:`select_simulation_data`), and filenames
     # In this case, we want parse=True, and the filename(s) to analyze
     def __init__(self, filenames, parse=True):
-        super().__init__(parse, filenames=filenames)
+        super().__init__(parse=parse, filenames=filenames)
         # Raise exception early if files are not csv files
         if not all(['csv' in os.path.splitext(f)[1].lower() for f in self.filenames]):
             raise Exception('Please ensure all filenames provided to CSVAnalyzer have a csv extension.')
