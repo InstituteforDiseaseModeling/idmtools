@@ -112,6 +112,17 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         obj = experiment_factory.create(experiment.tags.get("type"), tags=experiment.tags, name=experiment.name,
                                         fallback=StandardExperiment)
 
+        # Convert all simulations
+        comps_sims = experiment.get_simulations()
+        # from idmtools.entities.iplatform import ITEM_TYPE_TO_OBJECT_INTERFACE
+        # interface = ITEM_TYPE_TO_OBJECT_INTERFACE[ItemType.SIMULATION]
+        # obj.simulations = [getattr(self.platform, interface).to_entity(s) for s in comps_sims]    # Cause recursive call...
+
+        # Temp workaround
+        from idmtools.entities.simulation import Simulation
+        from workflow.task import Task
+        obj.simulations = [Simulation(_uid=s.id, task=Task('test')) for s in comps_sims]
+
         # Set parent
         obj.parent = suite
 
