@@ -9,7 +9,7 @@ logger = getLogger(__name__)
 
 
 def execute(cmd):
-    popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True, shell=True)
+    popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
     for stdout_line in iter(popen.stdout.readline, ""):
         yield stdout_line
     popen.stdout.close()
@@ -19,14 +19,13 @@ def execute(cmd):
 
 
 def setup_logging(working_dir):
-    logFormatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
-    rootLogger = logging.getLogger()
-    fileHandler = logging.FileHandler("%s/make.log" % os.path.abspath(working_dir))
-    fileHandler.setFormatter(logFormatter)
-    rootLogger.addHandler(fileHandler)
-    consoleHandler = logging.StreamHandler()
-    consoleHandler.setFormatter(logFormatter)
-    rootLogger.addHandler(consoleHandler)
+    log_formatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
+    file_handler = logging.FileHandler("%s/make.log" % os.path.abspath(working_dir))
+    file_handler.setFormatter(log_formatter)
+    logger.addHandler(file_handler)
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(log_formatter)
+    logger.addHandler(console_handler)
 
 
 if __name__ == '__main__':
