@@ -8,6 +8,16 @@ import logging
 logger = getLogger(__name__)
 
 
+def execute(cmd):
+    popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True, shell=True)
+    for stdout_line in iter(popen.stdout.readline, ""):
+        yield stdout_line
+    popen.stdout.close()
+    return_code = popen.wait()
+    if return_code:
+        raise subprocess.CalledProcessError(return_code, cmd)
+
+
 def setup_logging(working_dir):
     logFormatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
     rootLogger = logging.getLogger()
@@ -48,11 +58,11 @@ if __name__ == '__main__':
         os.chdir(os.path.abspath(args.working_dir))
     logger.info(f'Running {args.ex}')
     try:
-        output = subprocess.check_output(args.ex)
+        for line in execute(args.ex):
+            logger.info(line)
         result = 0
     except subprocess.CalledProcessError as e:
+        logger.error(f'{e.cmd} did not succeed')
         result = e.returncode
-        output = e.output
         logger.debug(f'Return Code: {result}')
-    logger.debug('Command output: %s', output)
     sys.exit(result)
