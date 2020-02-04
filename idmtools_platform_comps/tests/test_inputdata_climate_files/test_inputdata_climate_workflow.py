@@ -29,7 +29,7 @@ class InputDataWorkItemTests(unittest.TestCase):
 
     def setUp(self):
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
-        self.wi_name = "InputData WorkItem Test: Climate Files"
+        self.wi_name = "idmtools InputData WorkItem Test: Climate Files"
         self.tags = {'idmtools': self._testMethodName, 'WorkItem type': 'InputData'}
         self.p = Platform('COMPS2')
         # default_config = configparser.ConfigParser()
@@ -37,16 +37,14 @@ class InputDataWorkItemTests(unittest.TestCase):
 
     #------------------------------------------
     # test generate inputdata climate files with comps work item
+    # create a wo.json from demo file first
     #------------------------------------------
-    @pytest.mark.skip
     @pytest.mark.comps
-    # TODO: to update once inputdata workitem support is added
-    def test_generate_inputdata_climate_files(self):
+    def test_generate_inputdata_climate_files_from_demo_file(self):
         climate_demog = os.path.join(intermediate_dir, 'Madagascar_Comoros_2.5arcmin_demographics_overlay.json')
-        # work_order_path = os.path.join(intermediate_dir, 'wo.json')
 
         # do not use 'upload' for Mode. it won't generate demographic workitem
-        data = {"WorkItem_Type": "InputDataWorker", "Project": 'IDM-Zambia', "ProjectRoot": "v2017", "Region": "",
+        data = {"WorkItem_Type": "InputDataWorker", "Project": 'IDM-Madagascar', "ProjectRoot": "v2017", "Region": "",
                 "IncludeNonPop": True, "Resolution": "150", "Parameters": ["tmean", "humid", "rain"], "StartYear": '2008',
                 "NumYears": '1', "NaNCheck": True, "Migration": True, "Mode": 'discrete'}
 
@@ -67,14 +65,16 @@ class InputDataWorkItemTests(unittest.TestCase):
             if len(self.getEntityIds(demo)) > 0:
                 data['EntityIds'] = self.getEntityIds(demo)
 
-        wo_str = json.dumps(data, default=lambda obj: '')
+        work_order_path = os.path.join(intermediate_dir, 'madagascar_wo.json')
 
-        inputdata_wi = SSMTWorkItem(item_name=self.wi_name, work_item_type='InputDataWorker')
-        inputdata_wi.add_work_order(data=wo_str.encode('utf-8'))
+        with open(work_order_path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False)
+
+        inputdata_wi = SSMTWorkItem(item_name=self.wi_name, work_item_type='InputDataWorker', tags=self.tags)
+        inputdata_wi.load_work_order(work_order_path)
         wim = WorkItemManager(inputdata_wi, self.p)
         wim.process(check_status=True)
-
-        return inputdata_wi
+        self.assertIsNotNone(inputdata_wi)
 
     def getEntityIds(self, demo):
         nlist = demo['Nodes']
@@ -82,3 +82,17 @@ class InputDataWorkItemTests(unittest.TestCase):
         for node in nlist:
             node_list.append(node['NodeID'])
         return node_list
+
+    #------------------------------------------
+    # test generate inputdata climate files with comps work item
+    # use an existing wo.json to generate the climate files
+    #------------------------------------------
+    @pytest.mark.comps
+    def test_generate_inputdata_climate_files_from_wo(self):
+        work_order_path = os.path.join(intermediate_dir, 'wo.json')
+
+        inputdata_wi = SSMTWorkItem(item_name=self.wi_name, work_item_type='InputDataWorker')
+        inputdata_wi.load_work_order(work_order_path)
+        wim = WorkItemManager(inputdata_wi, self.p)
+        wim.process(check_status=True)
+        self.assertIsNotNone(inputdata_wi)
