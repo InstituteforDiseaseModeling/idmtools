@@ -1,5 +1,5 @@
-from examples.ssmt.simple_analysis.analyzers.AdultVectorsAnalyzer import AdultVectorsAnalyzer
-from examples.ssmt.simple_analysis.analyzers.PopulationAnalyzer import PopulationAnalyzer
+from examples.workitem.ssmt.simple_analysis.analyzers.PopulationAnalyzer import PopulationAnalyzer
+from examples.workitem.ssmt.simple_analysis.analyzers.AdultVectorsAnalyzer import AdultVectorsAnalyzer
 from idmtools.core.platform_factory import Platform
 from idmtools.ssmt.ssmt_analysis import SSMTAnalysis
 

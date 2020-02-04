@@ -3,10 +3,9 @@ from idmtools.core.platform_factory import Platform
 from idmtools.managers.work_item_manager import WorkItemManager
 from idmtools.ssmt.ssmt_work_item import SSMTWorkItem
 
-wi_name = "InputDataWorker Hello 1"
+wi_name = "InputDataWorker sample 1"
 sim_id = "8db8ae8f-793c-ea11-a2be-f0921c167861"
 tags = {'SimulationId': sim_id}
-node_type = 'Points'
 
 if __name__ == "__main__":
     platform = Platform('COMPS2')
