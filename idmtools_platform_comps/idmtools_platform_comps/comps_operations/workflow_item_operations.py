@@ -80,14 +80,8 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         wi.tags.update({'WorkItem_Type': work_item.work_item_type or self.platform.work_item_type})
 
         # Add work order file
-        wo = {
-            "WorkItem_Type": work_item.work_item_type or self.platform.work_item_type,
-            "Execution": {
-                "ImageName": work_item.docker_image or self.platform.docker_image,
-                "Command": work_item.command
-            }
-        }
-        wo.update(work_item.wo_kwargs)
+        wo = work_item.get_base_work_order(self.platform)
+        wo.update(work_item.work_order)
         wi.add_work_order(data=json.dumps(wo).encode('utf-8'))
 
         # Add additional files
@@ -103,6 +97,26 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         if work_item.related_experiments:
             for exp_id in work_item.related_experiments:
                 wi.add_related_experiment(exp_id, RelationType.DependsOn)
+
+        # Sets the related simulations
+        if work_item.related_simulations:
+            for sim_id in work_item.related_simulations:
+                wi.add_related_simulation(sim_id, RelationType.DependsOn)
+
+        # Sets the related suites
+        if work_item.related_suites:
+            for suite_id in work_item.related_suites:
+                wi.add_related_suite(suite_id, RelationType.DependsOn)
+
+        # Sets the related work items
+        if work_item.related_work_items:
+            for wi_id in work_item.related_work_items:
+                wi.add_related_work_item(wi_id, RelationType.DependsOn)
+
+        # Sets the related asset collection
+        if work_item.related_asset_collections:
+            for ac_id in work_item.related_asset_collections:
+                wi.add_related_asset_collection(ac_id, RelationType.DependsOn)
 
         # Set the ID back in the object
         work_item.uid = wi.id
@@ -219,3 +233,23 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         wi = self.platform.get_item(workflow_item.uid, ItemType.WORKFLOW_ITEM, raw=True)
         byte_arrs = wi.retrieve_output_files(files)
         return dict(zip(files, byte_arrs))
+
+    def get_related_items(self, item: IWorkflowItem, relation_type: RelationType) -> Dict[str, List[Dict[str, str]]]:
+        """
+        Get related WorkItems, Suites, Experiments, Simulations and AssetCollections
+        Args:
+            item: SSMTWorkItem
+            relation_type: RelationType
+
+        Returns: Dict
+        """
+        wi = self.platform.get_item(item.uid, ItemType.WORKFLOW_ITEM, raw=True)
+
+        ret = {}
+        ret['work_item'] = wi.get_related_work_items(relation_type)
+        ret['suite'] = wi.get_related_suites(relation_type)
+        ret['experiment'] = wi.get_related_experiments(relation_type)
+        ret['simulation'] = wi.get_related_simulations(relation_type)
+        ret['asset_collection'] = wi.get_related_asset_collections(relation_type)
+
+        return ret
