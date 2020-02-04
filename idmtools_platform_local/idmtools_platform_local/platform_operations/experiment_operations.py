@@ -30,6 +30,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
     def get(self, experiment_id: UUID, **kwargs) -> ExperimentDict:
         """
         Get the experiment object by id
+
         Args:
             experiment_id: Id
             **kwargs:
@@ -105,6 +106,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
     def get_parent(self, experiment: Any, **kwargs) -> None:
         """
         Experiment on local platform have no parents so return None
+
         Args:
             experiment:
             **kwargs:
@@ -117,6 +119,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
     def platform_run_item(self, experiment: Experiment):
         """
         Run the experiment
+
         Args:
             experiment: experiment to run
 
@@ -135,7 +138,8 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
     def send_assets(self, experiment: Experiment):
         """
 
-         Sends assets for specified experiment
+        Sends assets for specified experiment
+        
         Args:
             experiment: Experiment to send assets for
 
@@ -213,6 +217,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
     def _launch_item_in_browser(self, item):
         """
         Launch experiment data page in a web browser
+        
         Args:
             item:
 
