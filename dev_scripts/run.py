@@ -4,6 +4,10 @@ import subprocess
 import sys
 from logging import getLogger
 import logging
+# on windows virtual env is not populated through pymake
+if sys.platform == "win32" and 'VIRTUAL_ENV' in os.environ:
+    sys.path.insert(0, os.environ['VIRTUAL_ENV'] + "\\Lib\\site-packages")
+import coloredlogs
 
 logger = getLogger(__name__)
 
@@ -25,10 +29,7 @@ def setup_logging(working_dir):
     file_handler.setFormatter(log_formatter)
     file_handler.setLevel(logging.DEBUG)
     logger.addHandler(file_handler)
-    console_handler = logging.StreamHandler()
-    console_handler.setFormatter(log_formatter)
-    console_handler.setLevel(logging.INFO)
-    logger.addHandler(console_handler)
+    coloredlogs.install(logger=logger, level=logging.INFO)
 
 
 if __name__ == '__main__':
@@ -53,6 +54,7 @@ if __name__ == '__main__':
             logger.info(f'Adding {os.path.abspath(p)} to the path')
             sys.path.insert(0, os.path.abspath(p))
 
+    logger.debug(f'Python: {sys.executable}')
     logger.debug('Environment: %s', str(os.environ))
 
     if args.working_dir:
@@ -61,7 +63,11 @@ if __name__ == '__main__':
     logger.info(f'Running {args.ex}')
     try:
         for line in execute(args.ex):
-            logger.info(line.strip())
+            # catch errors where possible
+            if "FAILED [" in line:
+                logger.error(line)
+            else:
+                logger.info(line.strip())
         result = 0
     except subprocess.CalledProcessError as e:
         logger.error(f'{e.cmd} did not succeed')
