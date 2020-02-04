@@ -1,5 +1,6 @@
 import os
 from abc import ABCMeta, abstractmethod
+from COMPS.Data.WorkItem import RelationType
 from dataclasses import dataclass, fields, field
 from itertools import groupby
 from logging import getLogger
@@ -428,7 +429,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         """
         Returns a list of experiment types not supported by the platform. These types should be either abstract or full
         classes that have been derived from IExperiment
-        
+
         Returns:
             A list of experiment types not supported by the platform.
         """
@@ -516,7 +517,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         Returns:
             For simulations, this returns a dictionary with filename as key and values being binary data from file or a
             dict.
-        
+
             For experiments, this returns a dictionary with key as sim id and then the values as a dict of the
             simulations described above
         """
@@ -543,7 +544,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         if output and item_type in (ItemType.SIMULATION, ItemType.WORKFLOW_ITEM):
             for ofi, ofc in ret.items():
-                file_path = os.path.join(output, item_id, ofi)
+                file_path = os.path.join(output, str(item_id), ofi)
                 parent_path = os.path.dirname(file_path)
                 if not os.path.exists(parent_path):
                     os.makedirs(parent_path)
@@ -553,9 +554,30 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         return ret
 
+    def get_related_items(self, item: IWorkflowItem, relation_type: RelationType) -> Dict[str, Dict[str, str]]:
+        """
+        Retrieve all related objects
+        Args:
+            item: SSMTWorkItem
+            relation_type: Depends or Create
+
+        Returns: dict with key the object type
+        """
+        if item.item_type != ItemType.WORKFLOW_ITEM:
+            raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
+        interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
+        return getattr(self, interface).get_related_items(item, relation_type)
+
     def is_task_supported(self, task: 'ITask') -> bool:
+        """
+        Check is all supported or not
+        Args:
+            task: Task object
+
+        Returns: True/False
+        """
         return all([x in self._platform_supports for x in task.platform_requirements])
 
-    
+
 TPlatform = TypeVar("TPlatform", bound=IPlatform)
 TPlatformClass = Type[TPlatform]

@@ -12,3 +12,5 @@ if __name__ == "__main__":
                             analysis_name="SSMT Analysis Simple 1")
 
     analysis.analyze(check_status=True)
+    wi = analysis.get_work_item()
+    print(wi)

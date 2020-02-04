@@ -20,6 +20,7 @@ class SSMTAnalysis:
         self.additional_files = additional_files or FileList()
         self.asset_collection_id = asset_collection_id
         self.asset_files = asset_files
+        self.wi = None
 
         self.validate_args()
 
@@ -58,12 +59,12 @@ class SSMTAnalysis:
         command += " {}".format(",".join(f"{inspect.getmodulename(inspect.getfile(a))}.{a.__name__}"
                                          for s in self.analyzers))
 
-        wi = SSMTWorkItem(item_name=self.analysis_name, command=command, tags=self.tags,
+        self.wi = SSMTWorkItem(item_name=self.analysis_name, command=command, tags=self.tags,
                           user_files=self.additional_files, asset_collection_id=self.asset_collection_id,
                           asset_files=self.asset_files, related_experiments=self.experiment_ids)
 
         # Create WorkItemManager
-        wim = WorkItemManager(wi, self.platform)
+        wim = WorkItemManager(self.wi, self.platform)
 
         wim.process(check_status)
 
@@ -84,3 +85,6 @@ class SSMTAnalysis:
         if len(self.analyzers) < len(self.analyzers_args):
             print("two list 'analyzers' and 'analyzers_args' must have the same length.")
             exit()
+
+    def get_work_item(self):
+        return self.wi
