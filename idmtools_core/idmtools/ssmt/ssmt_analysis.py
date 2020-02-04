@@ -85,3 +85,6 @@ class SSMTAnalysis:
         if len(self.analyzers) < len(self.analyzers_args):
             print("two list 'analyzers' and 'analyzers_args' must have the same length.")
             exit()
+
+    def get_work_item(self):
+        return self.wi
