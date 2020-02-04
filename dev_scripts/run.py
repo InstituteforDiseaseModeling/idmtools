@@ -19,12 +19,15 @@ def execute(cmd):
 
 
 def setup_logging(working_dir):
+    logger.setLevel(logging.DEBUG)
     log_formatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
     file_handler = logging.FileHandler("%s/make.log" % os.path.abspath(working_dir))
     file_handler.setFormatter(log_formatter)
+    file_handler.setLevel(logging.DEBUG)
     logger.addHandler(file_handler)
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(log_formatter)
+    console_handler.setLevel(logging.INFO)
     logger.addHandler(console_handler)
 
 
@@ -58,7 +61,7 @@ if __name__ == '__main__':
     logger.info(f'Running {args.ex}')
     try:
         for line in execute(args.ex):
-            logger.info(line)
+            logger.info(line.strip())
         result = 0
     except subprocess.CalledProcessError as e:
         logger.error(f'{e.cmd} did not succeed')
