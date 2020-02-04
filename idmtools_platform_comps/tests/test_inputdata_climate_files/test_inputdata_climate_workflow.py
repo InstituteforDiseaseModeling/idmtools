@@ -13,6 +13,7 @@ from idmtools.managers.work_item_manager import WorkItemManager
 from COMPS.Data import WorkItem, WorkItemFile
 from idmtools.core.platform_factory import Platform
 from COMPS.Data.WorkItem import WorkerOrPluginKey
+from idmtools.ssmt.ssmt_work_item import SSMTWorkItem
 
 # Set up the paths
 current_dir = os.path.dirname(os.path.realpath(__file__))
@@ -39,7 +40,7 @@ class InputDataWorkItemTests(unittest.TestCase):
     #------------------------------------------
     @pytest.mark.skip
     @pytest.mark.comps
-    # TODO: There is no work item implementation in idmtools currently... only SSMTWorkItems
+    # TODO: to update once inputdata workitem support is added
     def test_generate_inputdata_climate_files(self):
         climate_demog = os.path.join(intermediate_dir, 'Madagascar_Comoros_2.5arcmin_demographics_overlay.json')
         # work_order_path = os.path.join(intermediate_dir, 'wo.json')
@@ -65,19 +66,13 @@ class InputDataWorkItemTests(unittest.TestCase):
 
             if len(self.getEntityIds(demo)) > 0:
                 data['EntityIds'] = self.getEntityIds(demo)
-            name = data['Project']
-
-        # if Resolution:
-        #     data['Resolution'] = Resolution
 
         wo_str = json.dumps(data, default=lambda obj: '')
-        inputdata_wi = WorkItem(name='pyCOMPS: {} Input Data Request'.format(name),
-                                worker=WorkerOrPluginKey('InputDataWorker', '1.0.0.0_RELEASE'),
-                                environment_name=self.p)
-        inputdata_wi.add_work_order(data=wo_str.encode('utf-8'))
 
-        wif = WorkItemFile(os.path.basename(climate_demog), 'Demographics', 'Demographics file description')
-        inputdata_wi.add_file(wif, climate_demog)
+        inputdata_wi = SSMTWorkItem(item_name=self.wi_name, work_item_type='InputDataWorker')
+        inputdata_wi.add_work_order(data=wo_str.encode('utf-8'))
+        wim = WorkItemManager(inputdata_wi, self.p)
+        wim.process(check_status=True)
 
         return inputdata_wi
 
