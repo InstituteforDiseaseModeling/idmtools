@@ -91,9 +91,27 @@ To run a specific test, cd to the project directories test folder and run
 py.test test_emod.py::TestLocalPlatformEMOD::test_duplicated_eradication
 ```
 
-
 In addition, you can rerun just the failed test using either the top-level `pymake test-failed` rule or by using the 
 `--lf` switch on py.test
+
+### WSL2 on Windows Setup(Experimental)
+
+1. Enable Windows Features by running the following in a Windows Powershell
+   ```powershell
+   dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+   dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+    ```
+2. Restart
+3. 
+   a. If you do a Linux istro installed already through WSL run the following command in a powershell windows
+       ```powershell
+       wsl --set-version <Distro> 2
+       ```
+       You most likely want to run the following command ss well to ensure wsl2 is default going forward
+       ```powershell
+       wsl --set-default-version 2
+       ```
+   b. If you do not yet have a copy of linux installed through WSL, see  https://docs.microsoft.com/en-us/windows/wsl/install-win10#install-your-linux-distribution-of-choice
 
 # Troubleshooting the Development Environment
 

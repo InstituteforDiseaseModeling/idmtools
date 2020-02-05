@@ -9,6 +9,9 @@ if sys.platform == "win32" and 'VIRTUAL_ENV' in os.environ:
     sys.path.insert(0, os.environ['VIRTUAL_ENV'] + "\\Lib\\site-packages")
 import coloredlogs
 
+logging.addLevelName(15, 'VERBOSE')
+logging.addLevelName(35, 'SUCCESS')
+logging.addLevelName(50, 'CRITICAL')
 logger = getLogger(__name__)
 
 
@@ -64,9 +67,14 @@ if __name__ == '__main__':
     try:
         for line in execute(args.ex):
             # catch errors where possible
-            if "FAILED [" in line:
-                logger.error(line.strip())
-            elif "WARNING" in line:
+            if any([s in line for s in
+                    ["rollbackFailedOptional:", "extract:yarn:", "Using cache", "copying ", "creating idm", "optional dependency"]]):
+                logger.log(15, line.strip())
+            elif any([s in line for s in ["ERR!", "FAILED", "Error:", "Failed"]]):
+                logger.critical(line.strip())
+            elif any([s in line for s in ["Successfully", "SUCCESS"]]):
+                logger.log(35, line.strip())
+            elif any([s in line for s in ["WARNING", "SKIPPED"]]):
                 logger.warning(line.strip())
             else:
                 logger.info(line.strip())
