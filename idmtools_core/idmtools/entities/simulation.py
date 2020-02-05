@@ -75,7 +75,7 @@ class Simulation(IAssetsEnabled, INamedEntity):
     def post_creation(self) -> None:
         if logger.isEnabledFor(DEBUG):
             logger.debug('Calling task post creation')
-        if self.task is not None:
+        if self.task is not None and not isinstance(self.task, TaskProxy):
             self.task.post_creation(self)
 
         if self.__replace_task_with_proxy or (self.parent and self.parent._Experiment__replace_task_with_proxy):

@@ -114,14 +114,14 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         s = COMPSSimulation.get(id=simulation.uid, query_criteria=QueryCriteria().select(['state']))
         simulation.status = convert_COMPS_status(s.state)
 
-    def to_entity(self, simulation: Any, experiment: Experiment = None) -> Simulation:
+    def to_entity(self, simulation: Any, parent: Experiment = None) -> Simulation:
         # Recreate the experiment if needed
-        if experiment is None:
-            experiment = self.platform.get_item(simulation.experiment_id, item_type=ItemType.EXPERIMENT)
+        if parent is None:
+            parent = self.platform.get_item(simulation.experiment_id, item_type=ItemType.EXPERIMENT)
         # Get a simulation
         obj = Simulation()
-        obj.parent = experiment
-        obj.experiment = experiment
+        obj.parent = parent
+        obj.experiment = parent
         # Set its correct attributes
         obj.uid = simulation.id
         obj.tags = simulation.tags

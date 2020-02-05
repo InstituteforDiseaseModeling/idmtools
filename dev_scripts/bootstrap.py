@@ -1,7 +1,9 @@
 #!/usr/bin/env python
-
-import platform
+import logging
+import os
 import subprocess
+import sys
+from logging import getLogger
 from os.path import abspath, join, dirname
 
 # This scripts aids in setup of development environments by installing all the local packages
@@ -14,6 +16,18 @@ from os.path import abspath, join, dirname
 #
 # To use simply run
 # python bootstrap.py
+
+logger = getLogger("bootstrap")
+logger.setLevel(logging.DEBUG)
+log_formatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
+file_handler = logging.FileHandler("bootstrap.log")
+file_handler.setFormatter(log_formatter)
+file_handler.setLevel(logging.DEBUG)
+logger.addHandler(file_handler)
+console_handler = logging.StreamHandler(stream=sys.stdout)
+console_handler.setFormatter(log_formatter)
+console_handler.setLevel(logging.INFO)
+logger.addHandler(console_handler)
 
 base_directory = abspath(join(dirname(__file__), '..'))
 
@@ -34,8 +48,31 @@ packages = dict(
     idmtools_test=[]
 )
 
+
+def execute(cmd, cwd):
+    popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, shell=True,
+                             env=dict(os.environ), cwd=cwd)
+    for stdout_line in iter(popen.stdout.readline, ""):
+        yield stdout_line
+    popen.stdout.close()
+    return_code = popen.wait()
+    if return_code:
+        raise subprocess.CalledProcessError(return_code, cmd)
+
+
 # loop through and install our packages
 for package, extras in packages.items():
     extras_str = f"[{','.join(extras)}]" if extras else ''
-    print(f'Installing {package} with extras: {extras_str if extras_str else "None"} from {base_directory}')
-    result = subprocess.run(["pip", "install", "-e", f".{extras_str}", idmrepo], cwd=join(base_directory, package))
+    logger.info(f'Installing {package} with extras: {extras_str if extras_str else "None"} from {base_directory}')
+    try:
+        for line in execute(["pip", "install", "-e", f".{extras_str}", idmrepo], cwd=join(base_directory, package)):
+            # catch errors where possible
+            if "FAILED [" in line:
+                logger.error(line)
+            else:
+                logger.info(line.strip())
+        result = 0
+    except subprocess.CalledProcessError as e:
+        logger.error(f'{package} installed failed using {e.cmd} did not succeed')
+        result = e.returncode
+        logger.debug(f'Return Code: {result}')
