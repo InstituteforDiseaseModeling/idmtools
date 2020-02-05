@@ -542,15 +542,18 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         idm_item = self.get_item(item_id, item_type, raw=False)
         ret = self.get_files(idm_item, files)
 
-        if output and item_type in (ItemType.SIMULATION, ItemType.WORKFLOW_ITEM):
-            for ofi, ofc in ret.items():
-                file_path = os.path.join(output, str(item_id), ofi)
-                parent_path = os.path.dirname(file_path)
-                if not os.path.exists(parent_path):
-                    os.makedirs(parent_path)
+        if output:
+            if item_type not in (ItemType.SIMULATION, ItemType.WORKFLOW_ITEM):
+                print("Currently 'output' only supports Simulation and WorkItem!")
+            else:
+                for ofi, ofc in ret.items():
+                    file_path = os.path.join(output, str(item_id), ofi)
+                    parent_path = os.path.dirname(file_path)
+                    if not os.path.exists(parent_path):
+                        os.makedirs(parent_path)
 
-                with open(file_path, 'wb') as outfile:
-                    outfile.write(ofc)
+                    with open(file_path, 'wb') as outfile:
+                        outfile.write(ofc)
 
         return ret
 
