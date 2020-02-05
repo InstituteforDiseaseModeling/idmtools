@@ -6,7 +6,7 @@ Change exp_id and simtools.ini file server_endpoint and environment variables fo
 from idmtools.core.platform_factory import Platform
 from idmtools.managers.work_item_manager import WorkItemManager
 from idmtools.ssmt.ssmt_work_item import SSMTWorkItem
-from idmtools.assets.FileList import FileList
+from idmtools.assets.file_list import FileList
 import os
 from COMPS.Data import WorkItem
 

@@ -3,7 +3,7 @@ import json
 from idmtools.core import TTags
 from dataclasses import dataclass, field
 from idmtools.core import ItemType
-from idmtools.assets.FileList import FileList
+from idmtools.assets.file_list import FileList
 from idmtools.entities.iworkflow_item import IWorkflowItem
 from uuid import UUID
 

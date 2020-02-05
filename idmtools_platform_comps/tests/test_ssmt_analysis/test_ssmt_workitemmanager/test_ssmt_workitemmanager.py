@@ -5,7 +5,7 @@ import json
 import sys
 import pytest
 
-from idmtools.assets.FileList import FileList
+from idmtools.assets.file_list import FileList
 from idmtools.core.platform_factory import Platform
 from idmtools.managers.work_item_manager import WorkItemManager
 from idmtools.ssmt.ssmt_work_item import SSMTWorkItem
