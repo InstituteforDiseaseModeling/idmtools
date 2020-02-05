@@ -18,12 +18,11 @@ help:
 	$(PDS)get_help_from_makefile.py
 
 clean: ## Clean most of the temp-data from the project
-	$(CLDIR) --file-patterns "*.py[co],*.done,**/.coverage" \
+	$(CLDIR) --file-patterns "*.py[co],*.done,*.log,**/.coverage" \
 		--dir-patterns "**/__pycache__,**/htmlcov,**/.pytest_cache" --directories "dist,build,idmtools_webui/build"
 
 clean-all:  ## Deleting package info hides plugins so we only want to do that for packaging
 	@make clean
-	$(CLDIR) --file-patterns "*.log"
 	$(CLDIR) --dir-patterns "**/*.egg-info/"
 	@+$(IPY) "import os; os.chdir('idmtools_webui'); os.system('python build.py clean')"
 
