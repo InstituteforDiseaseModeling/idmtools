@@ -25,7 +25,7 @@ def execute(cmd):
 def setup_logging(working_dir):
     logger.setLevel(logging.DEBUG)
     log_formatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
-    file_handler = logging.FileHandler("%s/make.log" % os.path.abspath(working_dir))
+    file_handler = logging.FileHandler("%s/make.buildlog" % os.path.abspath(working_dir))
     file_handler.setFormatter(log_formatter)
     file_handler.setLevel(logging.DEBUG)
     logger.addHandler(file_handler)
@@ -65,7 +65,9 @@ if __name__ == '__main__':
         for line in execute(args.ex):
             # catch errors where possible
             if "FAILED [" in line:
-                logger.error(line)
+                logger.error(line.strip())
+            elif "WARNING" in line:
+                logger.warning(line.strip())
             else:
                 logger.info(line.strip())
         result = 0
