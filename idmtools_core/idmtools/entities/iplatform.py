@@ -57,17 +57,18 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     - Commissioning
     - File handling
     """
-    platform_type_map: Dict[Type, ItemType] = None
-    _object_cache_expiration: 'int' = 60
 
-    supported_types: Set[ItemType] = field(default_factory=lambda: set(), metadata={"pickle_ignore": True})
-    _platform_supports: List[PlatformRequirements] = field(default_factory=list)
+    platform_type_map: Dict[Type, ItemType] = field(default=None, repr=False, init=False)
+    _object_cache_expiration: 'int' = field(default=60, repr=False, init=False)
 
-    _experiments: IPlatformExperimentOperations = None
-    _simulations: IPlatformSimulationOperations = None
-    _suites: IPlatformSuiteOperations = None
-    _workflow_items: IPlatformWorkflowItemOperations = None
-    _assets: IPlatformAssetCollectionOperations = None
+    supported_types: Set[ItemType] = field(default_factory=lambda: set(), metadata={"pickle_ignore": False}, repr=False, init=False)
+    _platform_supports: List[PlatformRequirements] = field(default_factory=list, repr=False, init=False)
+
+    _experiments: IPlatformExperimentOperations = field(default=None, repr=False, init=False)
+    _simulations: IPlatformSimulationOperations = field(default=None, repr=False, init=False)
+    _suites: IPlatformSuiteOperations = field(default=None, repr=False, init=False)
+    _workflow_items: IPlatformWorkflowItemOperations = field(default=None, repr=False, init=False)
+    _assets: IPlatformAssetCollectionOperations = field(default=None, repr=False, init=False)
 
     @staticmethod
     def get_caller():
@@ -542,15 +543,18 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         idm_item = self.get_item(item_id, item_type, raw=False)
         ret = self.get_files(idm_item, files)
 
-        if output and item_type in (ItemType.SIMULATION, ItemType.WORKFLOW_ITEM):
-            for ofi, ofc in ret.items():
-                file_path = os.path.join(output, str(item_id), ofi)
-                parent_path = os.path.dirname(file_path)
-                if not os.path.exists(parent_path):
-                    os.makedirs(parent_path)
+        if output:
+            if item_type not in (ItemType.SIMULATION, ItemType.WORKFLOW_ITEM):
+                print("Currently 'output' only supports Simulation and WorkItem!")
+            else:
+                for ofi, ofc in ret.items():
+                    file_path = os.path.join(output, str(item_id), ofi)
+                    parent_path = os.path.dirname(file_path)
+                    if not os.path.exists(parent_path):
+                        os.makedirs(parent_path)
 
-                with open(file_path, 'wb') as outfile:
-                    outfile.write(ofc)
+                    with open(file_path, 'wb') as outfile:
+                        outfile.write(ofc)
 
         return ret
 
