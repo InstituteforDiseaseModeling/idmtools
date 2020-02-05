@@ -57,17 +57,18 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     - Commissioning
     - File handling
     """
-    platform_type_map: Dict[Type, ItemType] = None
-    _object_cache_expiration: 'int' = 60
 
-    supported_types: Set[ItemType] = field(default_factory=lambda: set(), metadata={"pickle_ignore": True})
-    _platform_supports: List[PlatformRequirements] = field(default_factory=list)
+    platform_type_map: Dict[Type, ItemType] = field(default=None, repr=False, init=False)
+    _object_cache_expiration: 'int' = field(default=60, repr=False, init=False)
 
-    _experiments: IPlatformExperimentOperations = None
-    _simulations: IPlatformSimulationOperations = None
-    _suites: IPlatformSuiteOperations = None
-    _workflow_items: IPlatformWorkflowItemOperations = None
-    _assets: IPlatformAssetCollectionOperations = None
+    supported_types: Set[ItemType] = field(default_factory=lambda: set(), metadata={"pickle_ignore": False}, repr=False, init=False)
+    _platform_supports: List[PlatformRequirements] = field(default_factory=list, repr=False, init=False)
+
+    _experiments: IPlatformExperimentOperations = field(default=None, repr=False, init=False)
+    _simulations: IPlatformSimulationOperations = field(default=None, repr=False, init=False)
+    _suites: IPlatformSuiteOperations = field(default=None, repr=False, init=False)
+    _workflow_items: IPlatformWorkflowItemOperations = field(default=None, repr=False, init=False)
+    _assets: IPlatformAssetCollectionOperations = field(default=None, repr=False, init=False)
 
     @staticmethod
     def get_caller():
