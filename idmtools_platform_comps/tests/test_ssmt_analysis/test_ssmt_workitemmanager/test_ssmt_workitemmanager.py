@@ -17,9 +17,9 @@ par_par_dir = os.path.normpath(os.path.join('..', os.pardir))
 sys.path.append(os.path.join(par_par_dir,'General'))
 from idmtools_test.utils.utils import del_file
 
-@pytest.mark.skip
+
 # TODO: these won't work until a docker image with idmtools is deployed to the comps ssmt server
-class RunAnalyzeTest(unittest.TestCase):
+class TestSsmtWorkItemEmod(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -42,6 +42,7 @@ class RunAnalyzeTest(unittest.TestCase):
     # test load all required files to docker's current dir with user_files
     # then run analyzer in docker
     #------------------------------------------
+    @pytest.mark.skip
     def test_ssmt_workitemmanager_user_files(self):
         expid = self.exp_id
         command = "python run_PopulationAnalyzer.py " + expid
@@ -60,6 +61,7 @@ class RunAnalyzeTest(unittest.TestCase):
     # test load all required files to docker 'Assets' folder with asset_files
     # then run analyer in docker
     #------------------------------------------
+    @pytest.mark.skip
     def test_ssmt_workitemmanager_asset_files(self):
         expid = self.exp_id
         command = "python Assets/run_PopulationAnalyzer.py " + expid
@@ -78,6 +80,7 @@ class RunAnalyzeTest(unittest.TestCase):
     # test another way to add files to docker with folder path under 'Assets' ie: Assets\analyzer
     # then run analyzer in docker
     # ------------------------------------------
+    @pytest.mark.skip
     def test_ssmt_workitemmanager_with_input_folder(self):
         expid = self.exp_id
         command = "python run_PopulationAnalyzer1.py " + expid
@@ -107,6 +110,7 @@ class RunAnalyzeTest(unittest.TestCase):
     # test write analyzer result to dir in docker and retrieve it from there to local
     # then run analyzer in docker
     # ------------------------------------------
+    @pytest.mark.skip
     def test_ssmt_workitemmanager_with_output_folder(self):
         expid = self.exp_id
         command = "python run_PopulationAnalyzer_with_output_folder.py " + expid

@@ -13,7 +13,7 @@ from COMPS.Data.WorkItem import WorkItem
 from idmtools_test.utils.utils import del_file
 
 
-class RunAnalyzeTest(unittest.TestCase):
+class TestSsmtWorkItemEmodMultiExp(unittest.TestCase):
 
     def setUp(self):
         print(self._testMethodName)
