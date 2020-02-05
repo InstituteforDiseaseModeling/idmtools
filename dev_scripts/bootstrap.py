@@ -20,7 +20,7 @@ from os.path import abspath, join, dirname
 logger = getLogger("bootstrap")
 logger.setLevel(logging.DEBUG)
 log_formatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
-file_handler = logging.FileHandler("bootstrap.log")
+file_handler = logging.FileHandler("bootstrap.buildlog")
 file_handler.setFormatter(log_formatter)
 file_handler.setLevel(logging.DEBUG)
 logger.addHandler(file_handler)
