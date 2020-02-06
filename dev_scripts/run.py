@@ -1,9 +1,10 @@
 import argparse
+import logging
 import os
 import subprocess
 import sys
 from logging import getLogger
-import logging
+
 # on windows virtual env is not populated through pymake
 if sys.platform == "win32" and 'VIRTUAL_ENV' in os.environ:
     sys.path.insert(0, os.environ['VIRTUAL_ENV'] + "\\Lib\\site-packages")
@@ -27,12 +28,13 @@ def execute(cmd):
 
 def setup_logging(working_dir):
     logger.setLevel(logging.DEBUG)
-    log_formatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
+    log_formatter = logging.Formatter("%(asctime)s [%(levelname)-5.5s]  %(message)s")
     file_handler = logging.FileHandler("%s/make.buildlog" % os.path.abspath(working_dir))
     file_handler.setFormatter(log_formatter)
     file_handler.setLevel(logging.DEBUG)
     logger.addHandler(file_handler)
-    coloredlogs.install(logger=logger, level=logging.INFO)
+    console_log_level = logging.DEBUG if 'BUILD_DEBUG' in os.environ else logging.INFO
+    coloredlogs.install(logger=logger, level=console_log_level, fmt=log_formatter)
 
 
 if __name__ == '__main__':
@@ -72,7 +74,7 @@ if __name__ == '__main__':
                 logger.log(15, line.strip())
             elif any([s in line for s in ["ERR!", "FAILED", "Error:", "Failed"]]):
                 logger.critical(line.strip())
-            elif any([s in line for s in ["Successfully", "SUCCESS"]]):
+            elif any([s in line for s in ["Successfully", "SUCCESS", "PASSED"]]):
                 logger.log(35, line.strip())
             elif any([s in line for s in ["WARNING", "SKIPPED"]]):
                 logger.warning(line.strip())

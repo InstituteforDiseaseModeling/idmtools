@@ -22,22 +22,24 @@ if sys.platform == "win32" and 'VIRTUAL_ENV' in os.environ:
 
 logger = getLogger("bootstrap")
 logger.setLevel(logging.DEBUG)
-log_formatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
+log_formatter = logging.Formatter("%(asctime)s [%(levelname)-5.5s]  %(message)s")
 file_handler = logging.FileHandler("bootstrap.buildlog")
 file_handler.setFormatter(log_formatter)
 file_handler.setLevel(logging.DEBUG)
 logger.addHandler(file_handler)
 # use colorful logs except the first time
+console_log_level = logging.DEBUG if 'BUILD_DEBUG' in os.environ else logging.INFO
 try:
     import coloredlogs
-    coloredlogs.install(logger=logger, level=logging.INFO)
+
+    coloredlogs.install(logger=logger, level=console_log_level, fmt=log_formatter)
     logging.addLevelName(15, 'VERBOSE')
     logging.addLevelName(35, 'SUCCESS')
     logging.addLevelName(50, 'CRITICAL')
 except ImportError:
     console_handler = logging.StreamHandler(stream=sys.stdout)
     console_handler.setFormatter(log_formatter)
-    console_handler.setLevel(logging.INFO)
+    console_handler.setLevel(console_log_level)
     logger.addHandler(console_handler)
 
 base_directory = abspath(join(dirname(__file__), '..'))

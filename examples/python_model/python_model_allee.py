@@ -33,7 +33,6 @@ with platform('COMPS2'):
         )
     )
 
-
     # Update and set simulation configuration parameters
     def param_update(simulation, param, value):
         return simulation.task.set_parameter(param, 'sweepR04_a_' + str(value) + '.json')
