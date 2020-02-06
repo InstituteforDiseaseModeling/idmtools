@@ -12,7 +12,7 @@ from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools.managers.work_item_manager import WorkItemManager
-from idmtools.ssmt.ssmt_work_item import SSMTWorkItem
+from idmtools.ssmt.ssmt_work_item import VisToolsWorkItem
 from idmtools_model_emod import EMODExperiment
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.utils import del_folder
@@ -35,10 +35,9 @@ class VisToolsWorkItemTests(unittest.TestCase):
         cls.p = Platform('COMPS2')
         cls.sim_id = str(cls.generate_sim(cls)[0].uid)
         node_type = 'Points'
-        data = {"WorkItem_Type": "VisTools", "SimulationId": "" + cls.sim_id + "", "NodesRepresentation": node_type}
+        data = {"SimulationId": "" + cls.sim_id + "", "NodesRepresentation": node_type}
         tags = {'SimulationId': cls.sim_id}
-        cls.wi = SSMTWorkItem(item_name="Test workitem", tags=tags, work_item_type='VisTools', work_order=data,
-                          related_simulations=[cls.sim_id])
+        cls.wi = VisToolsWorkItem(item_name="Test workitem", tags=tags, work_order=data, related_simulations=[cls.sim_id])
 
         wim = WorkItemManager(cls.wi, cls.p)
         wim.process(check_status=True)

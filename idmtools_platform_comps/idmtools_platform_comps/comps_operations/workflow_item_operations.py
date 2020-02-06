@@ -1,14 +1,14 @@
 import json
-from COMPS.Data.WorkItem import WorkerOrPluginKey, RelationType
+from uuid import UUID
+from idmtools.core import ItemType
 from dataclasses import dataclass, field
 from typing import List, Dict, Any, Tuple, Type
-from uuid import UUID
 from idmtools.assets import AssetCollection
-from idmtools.core import ItemType
 from idmtools.entities.iplatform_metadata import IPlatformWorkflowItemOperations
-from COMPS.Data import WorkItem as COMPSWorkItem, WorkItemFile
 from idmtools.entities.iworkflow_item import IWorkflowItem
-from idmtools.ssmt.ssmt_work_item import SSMTWorkItem
+from idmtools.ssmt.ssmt_work_item import GenericWorkItem
+from COMPS.Data import WorkItem as COMPSWorkItem, WorkItemFile
+from COMPS.Data.WorkItem import WorkerOrPluginKey, RelationType
 
 
 @dataclass
@@ -127,7 +127,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         """
         Start to rum COMPS WorkItem created from work_item
         Args:
-            work_item: SSMTWorkItem
+            work_item: workflow item
 
         Returns: None
         """
@@ -181,10 +181,10 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
             **kwargs: Optional arguments mainly for extensibility
 
         Returns:
-            IDMTools SSMTWorkItem object
+            IDMTools workflow item
         """
-        # Creat a SSMTWorkItem
-        obj = SSMTWorkItem()
+        # Creat a workflow item
+        obj = GenericWorkItem()
 
         # Set its correct attributes
         obj.item_name = work_item.name
@@ -198,7 +198,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         """
         Add asset as WorkItemFile
         Args:
-            workflow_item: SSMTWorkItem
+            workflow_item: workflow item
 
         Returns: None
         """
@@ -210,13 +210,13 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         """
         Get list of asset files
         Args:
-            workflow_item: SSMTWorkItem
+            workflow_item: workflow item
             **kwargs: Optional arguments mainly for extensibility
 
         Returns: list of assets associated with WorkItem
 
         """
-        # item: SSMTWorkItem = workflow_item.get_platform_object(True)
+        # item: IWorkflowItem = workflow_item.get_platform_object(True)
         # return item.files
         pass
 
@@ -224,7 +224,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         """
         Retrieve files association with WorkItem
         Args:
-            workflow_item: SSMTWorkItem
+            workflow_item: workflow item
             files: list of file paths
             **kwargs: Optional arguments mainly for extensibility
 
@@ -238,7 +238,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         """
         Get related WorkItems, Suites, Experiments, Simulations and AssetCollections
         Args:
-            item: SSMTWorkItem
+            item: workflow item
             relation_type: RelationType
 
         Returns: Dict

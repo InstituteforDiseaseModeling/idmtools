@@ -9,7 +9,7 @@ from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools.managers.work_item_manager import WorkItemManager
-from idmtools.ssmt.ssmt_work_item import SSMTWorkItem
+from idmtools.ssmt.ssmt_work_item import VisToolsWorkItem
 from idmtools_model_emod import EMODExperiment
 from idmtools_test import COMMON_INPUT_PATH
 
@@ -52,10 +52,9 @@ if __name__ == "__main__":
     sims = generate_sim()
     sim_id = str(sims[0].uid)
     node_type = 'Points'
-    data = {"WorkItem_Type": "VisTools", "SimulationId": "" + sim_id + "", "NodesRepresentation": node_type}
+    data = {"SimulationId": "" + sim_id + "", "NodesRepresentation": node_type}
     tags = {'SimulationId': sim_id}
-    wi = SSMTWorkItem(item_name="vistools", tags=tags, work_item_type='VisTools', work_order=data,
-                      related_simulations=[sim_id])
+    wi = VisToolsWorkItem(item_name="vistools", tags=tags, work_order=data, related_simulations=[sim_id])
 
     wim = WorkItemManager(wi, platform)
     wim.process(check_status=True)
