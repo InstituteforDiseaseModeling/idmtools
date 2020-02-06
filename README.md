@@ -121,4 +121,4 @@ In addition, you can rerun just the failed test using either the top-level `pyma
    beforehand using `docker login idm-docker-staging.packages.idmod.org`
 2. Docker image not found
    Rerun the `pymake setup-dev`
-3. Check build logs Detailed Build Logs are located within in package and tests directoery withing the package with the name make.buildlog
+3. Check build logs Detailed Build Logs are located within in package and tests directoery withing the package with the name make.buildlog. You can also increase the console log level to DEBUG by setting the environment variable BUILD_DEBUG to 1
