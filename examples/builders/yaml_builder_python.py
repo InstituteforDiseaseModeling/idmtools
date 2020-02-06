@@ -70,7 +70,7 @@ if __name__ == "__main__":
         # ts.base_simulations.tags['example'] 'yes'
         ts.add_builder(builder)
 
-        # define our experiment with its metadata
+        # define our experiment from our template and add some metadata to the experiment
         experiment = Experiment.from_template(ts,
                                               name=os.path.split(sys.argv[0])[1],
                                               tags={"string_tag": "test", "number_tag": 123}
