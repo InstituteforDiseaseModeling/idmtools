@@ -28,13 +28,13 @@ def execute(cmd):
 
 def setup_logging(working_dir):
     logger.setLevel(logging.DEBUG)
-    log_formatter = logging.Formatter("%(asctime)s [%(levelname)-5.5s]  %(message)s")
+    log_formatter = logging.Formatter("%(asctime)s [%(levelname)-8.8s]  %(message)s")
     file_handler = logging.FileHandler("%s/make.buildlog" % os.path.abspath(working_dir))
     file_handler.setFormatter(log_formatter)
     file_handler.setLevel(logging.DEBUG)
     logger.addHandler(file_handler)
     console_log_level = logging.DEBUG if 'BUILD_DEBUG' in os.environ else logging.INFO
-    coloredlogs.install(logger=logger, level=console_log_level, fmt=log_formatter)
+    coloredlogs.install(logger=logger, level=console_log_level, fmt="%(asctime)s [%(levelname)-8.8s]  %(message)s")
 
 
 if __name__ == '__main__':

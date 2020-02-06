@@ -32,7 +32,7 @@ console_log_level = logging.DEBUG if 'BUILD_DEBUG' in os.environ else logging.IN
 try:
     import coloredlogs
 
-    coloredlogs.install(logger=logger, level=console_log_level, fmt=log_formatter)
+    coloredlogs.install(logger=logger, level=console_log_level, fmt="%(asctime)s [%(levelname)-8.8s]  %(message)s")
     logging.addLevelName(15, 'VERBOSE')
     logging.addLevelName(35, 'SUCCESS')
     logging.addLevelName(50, 'CRITICAL')
