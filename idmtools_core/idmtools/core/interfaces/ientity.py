@@ -1,10 +1,11 @@
 from abc import ABCMeta
 from dataclasses import dataclass, field
+from typing import NoReturn, List, Any, Dict
+from uuid import UUID
+
 from idmtools.core import EntityStatus, ItemType, NoPlatformException
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.services.platforms import PlatformPersistService
-from uuid import UUID
-from typing import NoReturn, List, Any, Dict
 
 
 @dataclass
@@ -53,7 +54,7 @@ class IEntity(IItem, metaclass=ABCMeta):
             self.parent_id = self._parent = None
 
     @property
-    def platform(self):
+    def platform(self) -> 'IPlatform':
         if not self._platform and self.platform_id:
             self._platform = PlatformPersistService.retrieve(self.platform_id)
         return self._platform

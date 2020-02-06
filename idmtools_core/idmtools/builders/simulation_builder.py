@@ -7,6 +7,11 @@ from typing import Callable, Any, List, Iterable, Union, Dict
 from idmtools.entities.simulation import Simulation
 from idmtools.utils.collections import duplicate_list_of_generators
 
+TSweepFunction = Union[
+    Callable[[Simulation, Any], Dict[str, Any]],
+    partial
+]
+
 
 class SimulationBuilder:
     """
@@ -19,7 +24,7 @@ class SimulationBuilder:
         self.sweeps = []
         self.count = 1
 
-    def add_sweep_definition(self, function: Callable[[Simulation, Any], Dict[str, Any]],
+    def add_sweep_definition(self, function: TSweepFunction,
                              values: Union[List[Any], Iterable]):
         """
         Add a parameter sweep definition.

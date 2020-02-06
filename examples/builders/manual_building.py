@@ -5,15 +5,14 @@
         then add each updated simulation to builder
         then we are adding the builder to PythonExperiment
 """
-
+import copy
 import os
 import sys
 
 from idmtools.assets import AssetCollection
-from idmtools.builders import StandAloneSimulationsBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
-from idmtools.entities.templated_simulation import TemplatedSimulations
+from idmtools.entities.simulation import Simulation
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
 
@@ -22,29 +21,31 @@ if __name__ == "__main__":
     # define our platform
     platform = Platform('COMPS2')
 
+    # create experiment  object and define some extra assets
+    assets_path = os.path.join(COMMON_INPUT_PATH, "python", "Assets")
+    e = Experiment(name=os.path.split(sys.argv[0])[1],
+                   tags={"string_tag": "test", "number_tag": 123},
+                   assets=AssetCollection.from_directory(assets_path))
+
     # define paths to model and extra assets folder container more common assets
     model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
-    assets_path = os.path.join(COMMON_INPUT_PATH, "python", "Assets")
 
-    # define our base task
-    base_task = JSONConfiguredPythonTask(script_path=model_path,
-                                         envelope='parameters',
-                                         common_assets=AssetCollection.from_directory(assets_path))
+    # define our base task including the common assets. We could also add these assets to the experiment above
+    base_task = JSONConfiguredPythonTask(script_path=model_path, envelope='parameters')
 
-    # define that we want to build multiple simulations
-    ts = TemplatedSimulations(base_task=base_task)
+    base_simulation = Simulation.from_task(base_task)
 
-    # builder the simulations from the stand alone builder
-    builder = StandAloneSimulationsBuilder()
+    # now build our simulations
     for i in range(5):
-        sim = ts.new_simulation()
+        # first copy the simulation
+        sim = copy.deepcopy(base_simulation)
+        # configure it
         sim.task.set_parameter("a", i)
         sim.task.set_parameter("b", i + 10)
-        builder.add_simulation(sim)
-    ts.add_builder(builder)
+        # and add it to the simulations
+        e.simulations.append(sim)
 
-    # create experiment and wait
-    tags = {"string_tag": "test", "number_tag": 123}
-    e = Experiment.from_template(ts, name=os.path.split(sys.argv[0])[1], tags=tags)
+    # run the experiment
     e.run(platform=platform)
+    # wait on it
     e.wait()

@@ -6,7 +6,7 @@ from types import GeneratorType
 from typing import NoReturn, Set, Union, Iterator, Type, Dict, Any, List
 
 from idmtools.assets import AssetCollection
-from idmtools.core import ItemType, NoPlatformException
+from idmtools.core import ItemType, NoPlatformException, EntityStatus
 from idmtools.core.interfaces.entity_container import EntityContainer
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.core.interfaces.inamed_entity import INamedEntity
@@ -43,7 +43,8 @@ class Experiment(IAssetsEnabled, INamedEntity):
     simulations: InitVar[SUPPORTED_SIM_TYPE] = None
     __simulations: Union[SUPPORTED_SIM_TYPE] = field(default_factory=lambda: EntityContainer(), compare=False)
 
-    gather_common_assets_from_task: bool = field(default=False, compare=False)
+    # whether we should gather assets from the first task. This should be autodected based on simulations
+    gather_common_assets_from_task: bool = field(default=None, compare=False)
 
     # control whether we should replace the task with a proxy after creation to conser
     __replace_task_with_proxy: bool = field(default=True, init=False, compare=False)
@@ -52,6 +53,9 @@ class Experiment(IAssetsEnabled, INamedEntity):
         super().__post_init__()
         if simulations is not None and not isinstance(simulations, property):
             self.simulations = simulations
+
+        if self.gather_common_assets_from_task is None:
+            self.gather_common_assets_from_task = isinstance(self.simulations.items, EntityContainer)
         self.__simulations.parent = self
 
     def __repr__(self):
@@ -110,9 +114,11 @@ class Experiment(IAssetsEnabled, INamedEntity):
     @simulations.setter
     def simulations(self, simulations: Union[SUPPORTED_SIM_TYPE]):
         if isinstance(simulations, (GeneratorType, TemplatedSimulations, EntityContainer)):
+            self.gather_common_assets_from_task = isinstance(simulations, (GeneratorType, EntityContainer))
             self.__simulations = simulations
         elif isinstance(simulations, (list, set)):
             from idmtools.entities.simulation import Simulation
+            self.gather_common_assets_from_task = True
             self.simulations = EntityContainer()
             for sim in simulations:
                 if isinstance(sim, ITask):
@@ -189,7 +195,14 @@ class Experiment(IAssetsEnabled, INamedEntity):
         result._task_log = getLogger(__name__)
         return result
 
-    def run(self, platform: 'IPlatform' = None, **run_opts):
+    def run(self, wait_until_done: bool = False,
+            platform: 'idmtools.entities.iplatform.IPlatform' = None, **run_opts):
+        p = self.__check_for_platform_from_context(platform)
+        p.run_items(self, **run_opts)
+        if wait_until_done:
+            self.wait()
+
+    def __check_for_platform_from_context(self, platform) -> 'idmtools.entities.iplatform.IPlatform':
         if self.platform is None:
             # check context for current platform
             if platform is None:
@@ -198,7 +211,19 @@ class Experiment(IAssetsEnabled, INamedEntity):
                     raise NoPlatformException("No Platform defined on object, in current context, or passed to run")
                 platform = current_platform
             self.platform = platform
-        platform.run_items(self, **run_opts)
+        return self.platform
+
+    def wait(self, timeout: int = None, refresh_interval=None,
+             platform: 'idmtools.entities.iplatform.IPlatform' = None):
+        if self.status not in [EntityStatus.CREATED, EntityStatus.RUNNING]:
+            raise ValueError("The experiment cannot be waited for if it is not in Running/Created state")
+        opts = dict()
+        if timeout:
+            opts['timeout'] = timeout
+        if refresh_interval:
+            opts['refresh_interval'] = refresh_interval
+        p = self.__check_for_platform_from_context(platform)
+        p.wait_till_done_progress(self, **opts)
 
 
 class ExperimentSpecification(ExperimentPluginSpecification):

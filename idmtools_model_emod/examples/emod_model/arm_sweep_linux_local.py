@@ -2,13 +2,13 @@ import os
 from functools import partial
 
 from config_update_parameters import config_update_params
+from idmtools.managers import ExperimentManager
 
 from idmtools.assets import AssetCollection, Asset
 from idmtools.builders import SweepArm, ArmType, ArmSimulationBuilder
 from idmtools.core.platform_factory import Platform
-from idmtools.managers import ExperimentManager
-from idmtools_model_emod import EMODExperiment
 from idmtools_model_emod.defaults import EMODSir
+from idmtools_model_emod.emod_experiment import DockerEMODExperiment
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 BIN_PATH = os.path.join(current_directory, "bin")
@@ -25,16 +25,20 @@ def param_update(simulation, param, value):
 
 
 if __name__ == "__main__":
-    platform = Platform('COMPS2')
+    platform = Platform('Local')
 
+    emod_version = '2.20.0'
     ac = AssetCollection()
     a = Asset(absolute_path=os.path.join(INPUT_PATH, "single_node_demographics.json"))
     ac.add_asset(a)
-    e = EMODExperiment.from_default(expname, default=EMODSir(),
-                                    eradication_path=os.path.join(BIN_PATH, "Eradication.exe"))
+    e = DockerEMODExperiment.from_default(expname, default=EMODSir(),
+                                          image_name='idm-docker-public.packages.idmod.org/idm/centos:dtk-runtime',
+                                          eradication_path='https://github.com/InstituteforDiseaseModeling/'
+                                                           f'EMOD/releases/download/v{emod_version}/Eradication')
     e.add_assets(ac)
     simulation = e.base_simulation
     sim = config_update_params(simulation)
+    sim.set_parameter("Enable_Susceptibility_Scaling", 0)
     sim.set_parameter("Config_Name", "serializing sim")
 
     timesteps = [sim_duration * 365]
@@ -59,17 +63,3 @@ if __name__ == "__main__":
     em = ExperimentManager(experiment=e, platform=platform)
     em.run()
     em.wait_till_done()
-
-    ###
-    # Download analysis
-    ###
-
-    from idmtools.analysis.analyze_manager import AnalyzeManager
-    from idmtools.analysis.download_analyzer import DownloadAnalyzer
-
-    filenames = ['output\\InsetChart.json']
-    analyzers = [DownloadAnalyzer(filenames=filenames, output_path='download-e2eB')]
-
-    manager = AnalyzeManager(platform=platform, analyzers=analyzers)
-    manager.add_item(em.experiment)
-    manager.analyze()

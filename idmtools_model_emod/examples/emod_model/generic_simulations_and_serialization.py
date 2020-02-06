@@ -2,11 +2,11 @@ import os
 from functools import partial
 
 from config_update_parameters import config_update_params
+from idmtools.managers import ExperimentManager
 
 from idmtools.builders import SimulationBuilder, StandAloneSimulationsBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
-from idmtools.managers import ExperimentManager
 from idmtools_model_emod import EMODExperiment
 from idmtools_model_emod.defaults import EMODSir
 from idmtools_model_emod.generic.serialization import add_serialization_timesteps, load_serialized_population

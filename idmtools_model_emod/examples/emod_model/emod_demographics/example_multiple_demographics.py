@@ -1,9 +1,10 @@
 import os
 import typing
 
+from idmtools.managers import ExperimentManager
+
 from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform
-from idmtools.managers import ExperimentManager
 from idmtools_model_emod import EMODExperiment
 from idmtools_model_emod.defaults import EMODSir
 

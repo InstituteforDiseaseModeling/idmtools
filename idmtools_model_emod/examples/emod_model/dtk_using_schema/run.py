@@ -2,9 +2,10 @@ import json
 import re
 from collections import ChainMap
 
+from idmtools.managers import ExperimentManager
+
 from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform
-from idmtools.managers import ExperimentManager
 from idmtools_model_emod import EMODExperiment, IEMODDefault
 
 
