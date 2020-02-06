@@ -1,7 +1,7 @@
 {
 	"WorkItem_Type": "InputDataWorker",
 	"IdReference": "Gridded world grump30arcsec",
-	"ProjectRoot": "v2014",
+	"ProjectRoot": "v2017",
 	"Project": "IDM-Kenya",
 	"Region": "Rangwe",
 	"Mode": "patch",
