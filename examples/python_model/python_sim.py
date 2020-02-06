@@ -127,4 +127,4 @@ platform = Platform('COMPS2')
 platform.run_items(experiment)
 platform.wait_till_done(experiment)
 # use system status as the exit code
-sys.exit(experiment.succeeded)
+sys.exit(0 if experiment.succeeded else -1)

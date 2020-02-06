@@ -78,4 +78,4 @@ if __name__ == "__main__":
         # testing of the scripts
         experiment.run(wait_until_done=True)
         # use system status as the exit code
-        sys.exit(experiment.succeeded)
+        sys.exit(0 if experiment.succeeded else -1)

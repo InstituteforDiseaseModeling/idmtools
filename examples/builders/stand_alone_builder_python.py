@@ -52,4 +52,4 @@ if __name__ == "__main__":
     # testing of the scripts
     e.wait()
     # use system status as the exit code
-    sys.exit(e.succeeded)
+    sys.exit(0 if e.succeeded else -1)

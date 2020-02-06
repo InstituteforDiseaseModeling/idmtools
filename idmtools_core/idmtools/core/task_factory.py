@@ -39,6 +39,7 @@ class TaskFactory:
     def register(self, spec: TaskSpecification) -> NoReturn:
         """
         Register a TaskSpecification dynamically
+
         Args:
             spec: Specification to register
 
