@@ -40,3 +40,5 @@ with platform('COMPS'):
     em = Experiment.from_template(ts, name=os.path.split(sys.argv[0])[1])
     em.run()
     em.wait()
+    # use system status as the exit code
+    sys.exit(e.succeeded)

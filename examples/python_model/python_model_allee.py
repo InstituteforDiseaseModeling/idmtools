@@ -9,57 +9,54 @@
 import os
 import sys
 from functools import partial
+
+from idmtools.assets import AssetCollection
 from idmtools.builders import SimulationBuilder
-from idmtools.core.platform_factory import Platform
-from idmtools.managers import ExperimentManager
-from idmtools_models.python.python_experiment import PythonExperiment
-
-
-# Update and set simulation configuration parameters
-def param_update(simulation, param, value):
-    return simulation.set_parameter(param, 'sweepR04_a_' + str(value) + '.json')
-
-
-# Now create an experiment using PythonExperiment. This type of experiment takes:
-# name: The name of the experiment
-# model_path: The path to the python file containing the model
-# For this example, we will use the model defined in inputs/allee_python_model/model.py.
-pe = PythonExperiment(name=os.path.split(sys.argv[0])[1],
-                      model_path=os.path.join("inputs", "allee_python_model", "run_emod_sweep.py"))
-pe.base_simulation.envelope = "parameters"
-# pe.retrieve_python_dependencies()
-
-# Example of how to add tags to the Experiment
-pe.tags["tag1"] = "example from allee python model with idmtools"
-
-# Add your assets from a file directory to your Experiment
-pe.assets.add_directory(assets_directory=os.path.join("inputs", "allee_python_model"))
-
-setA = partial(param_update, param="infile")
-
-
-class setParam:
-    def __init__(self, param):
-        self.param = param
-
-    def __call__(self, simulation, value):
-        return param_update(simulation, self.param, value)
-
-# Now that the experiment is created, we can add sweeps to it and set additional params
-builder = SimulationBuilder()
-builder.add_sweep_definition(setA, range(7850, 7855))
-pe.base_simulation.set_parameter("fname", "runNsim100.json")
-pe.base_simulation.set_parameter("customGrid", 1)
-pe.base_simulation.set_parameter("nsims", 100)
-
-pe.builder = builder
-
+from idmtools.core.platform_factory import platform
 # In order to run the experiment, we need to create a `Platform` and an `ExperimentManager`.
 # The `Platform` defines where we want to run our simulation.
 # You can easily switch platforms by changing the Platform to for example 'Local'
-# platform = Platform('Local')
-platform = Platform('COMPS2')
+# with Platform('Local'):
+from idmtools.entities.experiment import Experiment
+from idmtools.entities.templated_simulation import TemplatedSimulations
+from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 
-em = ExperimentManager(experiment=pe, platform=platform)
-# The last step is to call run() on the ExperimentManager to run the simulations.
-em.run()
+with platform('COMPS2'):
+    base_task = JSONConfiguredPythonTask(
+        # specify the path to the script. This is most likely a scientific model
+        script_path=os.path.join("inputs", "allee_python_model", "run_emod_sweep.py"),
+        envelope='parameters',
+        parameters=dict(
+            fname="runNsim100.json",
+            customGrid=1,
+            nsims=100
+        )
+    )
+
+
+    # Update and set simulation configuration parameters
+    def param_update(simulation, param, value):
+        return simulation.task.set_parameter(param, 'sweepR04_a_' + str(value) + '.json')
+
+
+    setA = partial(param_update, param="infile")
+
+    # define our template
+    ts = TemplatedSimulations(base_task=base_task)
+    # Now that the experiment is created, we can add sweeps to it and set additional params
+    builder = SimulationBuilder()
+    builder.add_sweep_definition(setA, range(7850, 7855))
+    # add sweep builder to template
+    ts.add_builder(builder)
+
+    # create experiment
+    e = Experiment.from_template(
+        ts,
+        name=os.path.split(sys.argv[0])[1],
+        assets=AssetCollection.from_directory(os.path.join("inputs", "allee_python_model"))
+    )
+
+    e.run()
+    e.wait()
+    # use system status as the exit code
+    sys.exit(e.succeeded)

@@ -68,3 +68,5 @@ if __name__ == "__main__":
         # associated with an experiment are done. We do it in our examples to show feature and to enable
         # testing of the scripts
         experiment.wait()
+        # use system status as the exit code
+        sys.exit(experiment.succeeded)

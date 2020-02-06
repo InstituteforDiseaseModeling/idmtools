@@ -126,3 +126,5 @@ platform = Platform('COMPS2')
 # The last step is to call run() on the ExperimentManager to run the simulations.
 platform.run_items(experiment)
 platform.wait_till_done(experiment)
+# use system status as the exit code
+sys.exit(experiment.succeeded)

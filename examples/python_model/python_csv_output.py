@@ -51,3 +51,5 @@ with platform('COMPS2'):
     e.run()
     # and wait
     e.wait()
+    # use system status as the exit code
+    sys.exit(e.succeeded)
