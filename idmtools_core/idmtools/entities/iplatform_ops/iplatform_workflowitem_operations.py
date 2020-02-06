@@ -106,7 +106,7 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
         """
         pass
 
-    def pre_run_item(self, workflow_item: IWorkflowItem):
+    def pre_run_item(self, workflow_item: IWorkflowItem, **kwargs):
         """
         Trigger right before commissioning experiment on platform. This ensures that the item is created. It also
             ensures that the children(simulations) have also been created
@@ -122,7 +122,7 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
         if workflow_item.status is None:
             self.create(workflow_item)
 
-    def post_run_item(self, workflow_item: IWorkflowItem):
+    def post_run_item(self, workflow_item: IWorkflowItem, **kwargs):
         """
         Trigger right after commissioning workflow item on platform.
 
@@ -134,7 +134,7 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
         """
         pass
 
-    def run_item(self, workflow_item: IWorkflowItem):
+    def run_item(self, workflow_item: IWorkflowItem, **kwargs):
         """
         Called during commissioning of an item. This should create the remote resource
 
@@ -144,12 +144,12 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
         Returns:
 
         """
-        self.pre_run_item(workflow_item)
-        self.platform_run_item(workflow_item)
-        self.post_run_item(workflow_item)
+        self.pre_run_item(workflow_item, **kwargs)
+        self.platform_run_item(workflow_item, **kwargs)
+        self.post_run_item(workflow_item, **kwargs)
 
     @abstractmethod
-    def platform_run_item(self, workflow_item: IWorkflowItem):
+    def platform_run_item(self, workflow_item: IWorkflowItem, **kwargs):
         """
         Called during commissioning of an item. This should perform what is needed to commission job on platform
 
@@ -204,7 +204,7 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
         return workflow_item
 
     @abstractmethod
-    def refresh_status(self, workflow_item: IWorkflowItem):
+    def refresh_status(self, workflow_item: IWorkflowItem, **kwargs):
         """
         Refresh status for workflow item
         Args:
@@ -216,7 +216,7 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
         pass
 
     @abstractmethod
-    def send_assets(self, workflow_item: Any):
+    def send_assets(self, workflow_item: Any, **kwargs):
         """
         Send assets for workflow item to platform
 
@@ -243,7 +243,7 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
         pass
 
     @abstractmethod
-    def list_assets(self, workflow_item: IWorkflowItem) -> List[str]:
+    def list_assets(self, workflow_item: IWorkflowItem, **kwargs) -> List[str]:
         """
         List files available  for workflow item
 

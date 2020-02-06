@@ -4,7 +4,7 @@ import time
 from dataclasses import dataclass
 from logging import getLogger
 from math import floor
-from typing import List, Any, Tuple, Dict, Container, NoReturn
+from typing import List, Any, Dict, Container, NoReturn
 from uuid import UUID
 
 from tqdm import tqdm
@@ -116,7 +116,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         """
         return None
 
-    def platform_run_item(self, experiment: Experiment):
+    def platform_run_item(self, experiment: Experiment, **kwargs):
         """
         Run the experiment
 
@@ -135,7 +135,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
                 logger.debug(f"Running simulation: {simulation.uid}")
                 RunTask.send(simulation.task.command.cmd, experiment.uid, simulation.uid)
 
-    def send_assets(self, experiment: Experiment):
+    def send_assets(self, experiment: Experiment, **kwargs):
         """
 
         Sends assets for specified experiment
@@ -152,7 +152,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         worker = self.platform._sm.get('workers')
         list(map(functools.partial(self._send_asset_to_docker, path=path, worker=worker), experiment.assets))
 
-    def refresh_status(self, experiment: Experiment):
+    def refresh_status(self, experiment: Experiment, **kwargs):
         """
         Refresh status of experiment
 

@@ -1,7 +1,9 @@
 from dataclasses import dataclass, field
 from typing import Any, List, Tuple, Union, Type
 from uuid import UUID
+
 from COMPS.Data import Suite as COMPSSuite, QueryCriteria, Experiment as COMPSExperiment, WorkItem
+
 from idmtools.entities import Suite
 from idmtools.entities.iplatform_ops.iplatform_suite_operations import IPlatformSuiteOperations
 
@@ -44,7 +46,7 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
         children = suite.get_experiments(query_criteria=QueryCriteria().select(cols).select_children(children))
         return children
 
-    def refresh_status(self, suite: Suite):
+    def refresh_status(self, suite: Suite, **kwargs):
         pass
 
     def to_entity(self, suite: Any, **kwargs) -> Suite:

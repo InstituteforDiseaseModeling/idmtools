@@ -4,7 +4,9 @@ from logging import getLogger, DEBUG
 from threading import Lock
 from typing import List, Dict, Any, Type
 from uuid import UUID, uuid4
+
 import numpy as np
+
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
 from idmtools.entities.simulation import Simulation
 
@@ -68,19 +70,19 @@ class TestPlaformSimulationOperation(IPlatformSimulationOperations):
     def get_parent(self, simulation: Any, **kwargs) -> Any:
         return self.platform._experiments.experiments.get(simulation.parent_id)
 
-    def platform_run_item(self, simulation: Simulation):
+    def platform_run_item(self, simulation: Simulation, **kwargs):
         pass
 
-    def send_assets(self, simulation: Any):
+    def send_assets(self, simulation: Any, **kwargs):
         pass
 
-    def refresh_status(self, simulation: Simulation):
+    def refresh_status(self, simulation: Simulation, **kwargs):
         pass
 
     def get_assets(self, simulation: Simulation, files: List[str], **kwargs) -> Dict[str, bytearray]:
         return {}
 
-    def list_assets(self, simulation: Simulation) -> List[str]:
+    def list_assets(self, simulation: Simulation, **kwargs) -> List[str]:
         pass
 
     def set_simulation_status(self, experiment_uid, status):

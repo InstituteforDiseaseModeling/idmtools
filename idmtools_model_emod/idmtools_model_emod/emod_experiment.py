@@ -154,9 +154,10 @@ class IEMODExperiment(Experiment, ABC):
 
         return simulation
 
-# @dataclass(repr=False)
-# class EMODExperiment(IEMODExperiment, IHostBinaryExperiment):
-#     pass
+
+@dataclass(repr=False)
+class EMODExperiment(IEMODExperiment):
+    pass
 #
 #
 # @dataclass(repr=False)

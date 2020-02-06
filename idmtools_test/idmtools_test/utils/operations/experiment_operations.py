@@ -45,13 +45,13 @@ class TestPlaformExperimentOperation(IPlatformExperimentOperations):
     def get_parent(self, experiment: Any, **kwargs) -> Any:
         return None
 
-    def platform_run_item(self, experiment: Experiment):
+    def platform_run_item(self, experiment: Experiment, **kwargs):
         self.platform._simulations.set_simulation_status(experiment.uid, EntityStatus.RUNNING)
 
-    def send_assets(self, experiment: Any):
+    def send_assets(self, experiment: Any, **kwargs):
         pass
 
-    def refresh_status(self, experiment: Experiment):
+    def refresh_status(self, experiment: Experiment, **kwargs):
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'Refreshing status for Experiment: {experiment.uid}')
         for simulation in self.platform._simulations.simulations.get(experiment.uid):
@@ -61,5 +61,5 @@ class TestPlaformExperimentOperation(IPlatformExperimentOperations):
                     esim.status = simulation.status
                     break
 
-    def list_assets(self, experiment: Experiment) -> List[str]:
+    def list_assets(self, experiment: Experiment, **kwargs) -> List[str]:
         pass

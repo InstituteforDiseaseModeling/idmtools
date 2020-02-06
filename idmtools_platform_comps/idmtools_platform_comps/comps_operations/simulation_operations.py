@@ -101,25 +101,26 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
     def get_parent(self, simulation: Any, **kwargs) -> COMPSExperiment:
         return self.platform._experiments.get(simulation.experiment_id, **kwargs) if simulation.experiment_id else None
 
-    def platform_run_item(self, simulation: Simulation):
+    def platform_run_item(self, simulation: Simulation, **kwargs):
         pass
 
-    def send_assets(self, simulation: Simulation, comps_sim: COMPSSimulation = None):
+    def send_assets(self, simulation: Simulation, comps_sim: COMPSSimulation = None, **kwargs):
         if comps_sim is None:
             comps_sim = simulation.get_platform_object()
         for asset in simulation.assets:
             comps_sim.add_file(simulationfile=SimulationFile(asset.filename, 'input'), data=asset.bytes)
 
-    def refresh_status(self, simulation: Simulation):
+    def refresh_status(self, simulation: Simulation, **kwargs):
         s = COMPSSimulation.get(id=simulation.uid, query_criteria=QueryCriteria().select(['state']))
         simulation.status = convert_COMPS_status(s.state)
 
-    def to_entity(self, simulation: Any, parent: Experiment = None) -> Simulation:
+    def to_entity(self, simulation: Any, parent: Experiment = None, **kwargs) -> Simulation:
         # Recreate the experiment if needed
         if parent is None:
             parent = self.platform.get_item(simulation.experiment_id, item_type=ItemType.EXPERIMENT)
         # Get a simulation
         obj = Simulation()
+        obj.platform = self.platform
         obj.parent = parent
         obj.experiment = parent
         # Set its correct attributes
@@ -131,6 +132,6 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
     def get_assets(self, simulation: Simulation, files: List[str], **kwargs) -> Dict[str, bytearray]:
         return get_asset_for_comps_item(self.platform, simulation, files, self.cache)
 
-    def list_assets(self, simulation: Simulation) -> List[str]:
+    def list_assets(self, simulation: Simulation, **kwargs) -> List[str]:
         comps_sim: COMPSSimulation = simulation.get_platform_object(True, children=["files", "configuration"])
         return comps_sim.files

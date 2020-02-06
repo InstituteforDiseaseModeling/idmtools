@@ -182,7 +182,7 @@ class IPlatformExperimentOperations(ABC):
         else:
             experiment.simulations = self.platform._create_items_of_type(experiment.simulations, ItemType.SIMULATION)
 
-    def post_run_item(self, experiment: Experiment):
+    def post_run_item(self, experiment: Experiment, **kwargs):
         """
         Trigger right after commissioning experiment on platform.
 
@@ -194,7 +194,7 @@ class IPlatformExperimentOperations(ABC):
         """
         experiment.status = EntityStatus.RUNNING
 
-    def run_item(self, experiment: Experiment):
+    def run_item(self, experiment: Experiment, **kwargs):
         """
         Called during commissioning of an item. This should create the remote resource
 
@@ -204,13 +204,13 @@ class IPlatformExperimentOperations(ABC):
         Returns:
 
         """
-        self.pre_run_item(experiment)
+        self.pre_run_item(experiment, **kwargs)
         if experiment.status not in [EntityStatus.RUNNING]:
-            self.platform_run_item(experiment)
-            self.post_run_item(experiment)
+            self.platform_run_item(experiment, **kwargs)
+            self.post_run_item(experiment, **kwargs)
 
     @abstractmethod
-    def platform_run_item(self, experiment: Experiment):
+    def platform_run_item(self, experiment: Experiment, **kwargs):
         """
         Called during commissioning of an item. This should perform what is needed to commission job on platform
 
@@ -223,7 +223,7 @@ class IPlatformExperimentOperations(ABC):
         pass
 
     @abstractmethod
-    def send_assets(self, experiment: Any):
+    def send_assets(self, experiment: Any, **kwargs):
         """
         Transfer Experiment assets to the platform.
         Args:
@@ -235,7 +235,7 @@ class IPlatformExperimentOperations(ABC):
         pass
 
     @abstractmethod
-    def refresh_status(self, experiment: Experiment):
+    def refresh_status(self, experiment: Experiment, **kwargs):
         """
         Refresh status for experiment object. This should update the object directly. For experiments it is best if
         all simulation states are updated as well
@@ -265,7 +265,7 @@ class IPlatformExperimentOperations(ABC):
             ret[sim.uid] = self.platform._simulation.get_assets(sim, files, **kwargs)
         return ret
 
-    def list_assets(self, experiment: Experiment) -> Dict[str, List[str]]:
+    def list_assets(self, experiment: Experiment, **kwargs) -> Dict[str, List[str]]:
         """
         List assets available for experiment
 
@@ -279,7 +279,7 @@ class IPlatformExperimentOperations(ABC):
         with ThreadPoolExecutor() as pool:
             futures = dict()
             for sim in experiment.simulations:
-                future = pool.submit(self.platform._simulations.list_assets, sim)
+                future = pool.submit(self.platform._simulations.list_assets, sim, **kwargs)
                 futures[future] = sim
 
             for future in as_completed(futures):

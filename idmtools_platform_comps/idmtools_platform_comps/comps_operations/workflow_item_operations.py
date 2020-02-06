@@ -1,8 +1,10 @@
 from dataclasses import dataclass, field
 from typing import List, Dict, Any, Tuple, Type
 from uuid import UUID
-from idmtools.entities.iplatform_ops.iplatform_workflowitem_operations import IPlatformWorkflowItemOperations
+
 from COMPS.Data import WorkItem, QueryCriteria, WorkItemFile
+
+from idmtools.entities.iplatform_ops.iplatform_workflowitem_operations import IPlatformWorkflowItemOperations
 from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools_platform_comps.utils.general import convert_COMPS_status, get_asset_for_comps_item
 
@@ -29,12 +31,12 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
     def get_children(self, workflow_item: WorkItem, **kwargs) -> List[Any]:
         raise NotImplementedError("Getting Children is not yet supported for WorkItems")
 
-    def refresh_status(self, workflow_item: IWorkflowItem):
+    def refresh_status(self, workflow_item: IWorkflowItem, **kwargs):
         s = WorkItem.get(id=workflow_item.uid, query_criteria=QueryCriteria().select(['state']))
         workflow_item.status = convert_COMPS_status(s.state)
         # TODO get children status possibly?
 
-    def send_assets(self, workflow_item: WorkItem):
+    def send_assets(self, workflow_item: WorkItem, **kwargs):
         for asset in workflow_item.assets:
             workflow_item.add_file(workitemfile=WorkItemFile(asset.filename, 'input'), data=asset.bytes)
 
@@ -48,5 +50,5 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
     def to_entity(self, workflow_item: Any, **kwargs) -> IWorkflowItem:
         raise NotImplementedError("Converting workitems to platform entities is not yet supported")
 
-    def platform_run_item(self, workflow_item: IWorkflowItem):
+    def platform_run_item(self, workflow_item: IWorkflowItem, **kwargs):
         raise NotImplementedError("Running workflow items is not supported")

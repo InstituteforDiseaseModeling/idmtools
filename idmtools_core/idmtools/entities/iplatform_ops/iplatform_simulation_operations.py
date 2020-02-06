@@ -134,7 +134,7 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         """
         return simulation
 
-    def pre_run_item(self, simulation: Simulation):
+    def pre_run_item(self, simulation: Simulation, **kwargs):
         """
         Trigger right before commissioning experiment on platform. This ensures that the item is created. It also
             ensures that the children(simulations) have also been created
@@ -148,9 +148,9 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         # ensure the item is created before running
         # TODO what status are valid here? Create only?
         if simulation.status is None:
-            self.create(simulation)
+            self.create(simulation, **kwargs)
 
-    def post_run_item(self, simulation: Simulation):
+    def post_run_item(self, simulation: Simulation, **kwargs):
         """
         Trigger right after commissioning experiment on platform.
 
@@ -162,7 +162,7 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         """
         pass
 
-    def run_item(self, simulation: Simulation):
+    def run_item(self, simulation: Simulation, **kwargs):
         """
         Called during commissioning of an item. This should create the remote resource
 
@@ -172,12 +172,12 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         Returns:
 
         """
-        self.pre_run_item(simulation)
-        self.platform_run_item(simulation)
-        self.post_run_item(simulation)
+        self.pre_run_item(simulation, **kwargs)
+        self.platform_run_item(simulation, **kwargs)
+        self.post_run_item(simulation, **kwargs)
 
     @abstractmethod
-    def platform_run_item(self, simulation: Simulation):
+    def platform_run_item(self, simulation: Simulation, **kwargs):
         """
         Called during commissioning of an item. This should create the remote resource but not upload assets
 
@@ -190,11 +190,11 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         pass
 
     @abstractmethod
-    def send_assets(self, simulation: Any):
+    def send_assets(self, simulation: Any, **kwargs):
         pass
 
     @abstractmethod
-    def refresh_status(self, simulation: Simulation):
+    def refresh_status(self, simulation: Simulation, **kwargs):
         """
         Refresh status for simulation object
 
@@ -222,7 +222,7 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         pass
 
     @abstractmethod
-    def list_assets(self, simulation: Simulation) -> List[str]:
+    def list_assets(self, simulation: Simulation, **kwargs) -> List[str]:
         """
         List available files for a simulation
 

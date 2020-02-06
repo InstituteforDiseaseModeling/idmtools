@@ -435,7 +435,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
                 raise Exception(
                     f'Unable to create items of type: {item.item_type} for platform: {self.__class__.__name__}')
 
-    def run_items(self, items: Union[IEntity, List[IEntity]]):
+    def run_items(self, items: Union[IEntity, List[IEntity]], **kwargs):
         """
         Run items on the platform.
         Args:
@@ -450,7 +450,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         for item in items:
             interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
-            getattr(self, interface).run_item(item)
+            getattr(self, interface).run_item(item, **kwargs)
 
     def __repr__(self):
         return f"<Platform {self.__class__.__name__} - id: {self.uid}>"

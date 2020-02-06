@@ -109,12 +109,12 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             return None
         return self.platform._suites.get(experiment.suite_id, **kwargs)
 
-    def platform_run_item(self, experiment: Experiment):
+    def platform_run_item(self, experiment: Experiment, **kwargs):
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'Commissioning experiment: {experiment.uid}')
         experiment.get_platform_object().commission()
 
-    def send_assets(self, experiment: Experiment):
+    def send_assets(self, experiment: Experiment, **kwargs):
         if experiment.assets.count == 0:
             logger.warning('Experiment has not assets')
 
@@ -126,7 +126,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         e.configuration = Configuration(asset_collection_id=ac.id)
         e.save()
 
-    def refresh_status(self, experiment: Experiment):
+    def refresh_status(self, experiment: Experiment, **kwargs):
         simulations = self.get_children(experiment.get_platform_object(), force=True, cols=["id", "state"], children=[])
         for s in simulations:
             experiment.simulations.set_status_for_item(s.id, convert_COMPS_status(s.state))

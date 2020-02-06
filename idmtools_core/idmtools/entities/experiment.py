@@ -6,7 +6,7 @@ from types import GeneratorType
 from typing import NoReturn, Set, Union, Iterator, Type, Dict, Any, List
 
 from idmtools.assets import AssetCollection
-from idmtools.core import ItemType
+from idmtools.core import ItemType, NoPlatformException
 from idmtools.core.interfaces.entity_container import EntityContainer
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.core.interfaces.inamed_entity import INamedEntity
@@ -188,6 +188,17 @@ class Experiment(IAssetsEnabled, INamedEntity):
             setattr(result, k, copy.deepcopy(v, memo))
         result._task_log = getLogger(__name__)
         return result
+
+    def run(self, platform: 'IPlatform' = None, **run_opts):
+        if self.platform is None:
+            # check context for current platform
+            if platform is None:
+                from idmtools.core.platform_factory import current_platform
+                if current_platform is None:
+                    raise NoPlatformException("No Platform defined on object, in current context, or passed to run")
+                platform = current_platform
+            self.platform = platform
+        platform.run_items(self, **run_opts)
 
 
 class ExperimentSpecification(ExperimentPluginSpecification):

@@ -9,9 +9,10 @@
 import os
 import sys
 
+from idmtools.managers import ExperimentManager
+
 from idmtools.builders import StandAloneSimulationsBuilder
 from idmtools.core.platform_factory import Platform
-from idmtools.managers import ExperimentManager
 from idmtools_model_emod import EMODExperiment
 from idmtools_model_emod.defaults import EMODSir
 from idmtools_test import COMMON_INPUT_PATH

@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from logging import getLogger, DEBUG
 from typing import Dict, List, Set, Union
 from uuid import UUID
+
 from docker.models.containers import Container
 from tqdm import tqdm
 
@@ -113,7 +114,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         return self.platform.get_item(simulation['experiment_id'], ItemType.EXPERIMENT, raw=True)
 
-    def platform_run_item(self, simulation: Simulation):
+    def platform_run_item(self, simulation: Simulation, **kwargs):
         """
         On the local platform, simulations are ran by queue and commissioned through create
         Args:
@@ -124,7 +125,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         pass
 
-    def send_assets(self, simulation: Simulation, worker: Container = None):
+    def send_assets(self, simulation: Simulation, worker: Container = None, **kwargs):
         """
         Transfer assets to local sim folder for simulation
 
@@ -143,7 +144,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         items = self._assets_to_copy_multiple_list(path, simulation.assets)
         self.platform._do.copy_multiple_to_container(worker, items)
 
-    def refresh_status(self, simulation: Simulation):
+    def refresh_status(self, simulation: Simulation, **kwargs):
         """
         Refresh status of a sim
 
@@ -189,7 +190,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
 
         return ret
 
-    def list_assets(self, simulation: Simulation) -> List[str]:
+    def list_assets(self, simulation: Simulation, **kwargs) -> List[str]:
         """
         List assets for a sim
 

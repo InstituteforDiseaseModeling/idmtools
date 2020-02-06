@@ -106,7 +106,7 @@ class IPlatformSuiteOperations(ABC):
         """
         pass
 
-    def pre_run_item(self, suite: Suite):
+    def pre_run_item(self, suite: Suite, **kwargs):
         """
         Trigger right before commissioning experiment on platform. This ensures that the item is created. It also
             ensures that the children(simulations) have also been created
@@ -127,10 +127,10 @@ class IPlatformSuiteOperations(ABC):
             if exp.status is None:
                 exps_to_commission.append(exp)
         if exps_to_commission:
-            self.platform.create_items(exps_to_commission)
-            self.platform.run_items(exps_to_commission)
+            self.platform.create_items(exps_to_commission, **kwargs)
+            self.platform.run_items(exps_to_commission, **kwargs)
 
-    def post_run_item(self, suite: Suite):
+    def post_run_item(self, suite: Suite, **kwargs):
         """
         Trigger right after commissioning suite on platform.
 
@@ -142,7 +142,7 @@ class IPlatformSuiteOperations(ABC):
         """
         pass
 
-    def run_item(self, suite: Suite):
+    def run_item(self, suite: Suite, **kwargs):
         """
         Called during commissioning of an item. This should create the remote resource
 
@@ -156,12 +156,12 @@ class IPlatformSuiteOperations(ABC):
         self.platform_run_item(suite)
         self.post_run_item(suite)
 
-    def platform_run_item(self, workflow_item: Suite):
+    def platform_run_item(self, suite: Suite, **kwargs):
         """
         Called during commissioning of an item. This should perform what is needed to commission job on platform
 
         Args:
-            workflow_item:
+            suite:
 
         Returns:
 
@@ -211,7 +211,7 @@ class IPlatformSuiteOperations(ABC):
         return suite
 
     @abstractmethod
-    def refresh_status(self, experiment: Suite):
+    def refresh_status(self, experiment: Suite, **kwargs):
         """
         Refresh status of suite
         Args:
