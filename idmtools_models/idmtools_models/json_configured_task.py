@@ -1,5 +1,6 @@
 import json
 from dataclasses import dataclass, field
+from functools import partial
 from logging import getLogger, DEBUG
 from typing import Union, Dict, Any
 
@@ -124,6 +125,10 @@ class JSONConfiguredTask(ITask):
         if not hasattr(simulation.task, 'set_parameter'):
             raise ValueError("update_task_with_set_parameter can only be used on tasks with a set_parameter")
         return simulation.task.set_parameter(param, value)
+
+    @classmethod
+    def set_parameter_partial(cls, parameter: str):
+        return partial(cls.set_parameter_sweep_callback, param=parameter)
 
 
 class JSONConfiguredTaskSpecification(TaskSpecification):

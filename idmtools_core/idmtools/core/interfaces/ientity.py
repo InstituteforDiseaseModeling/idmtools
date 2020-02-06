@@ -34,14 +34,17 @@ class IEntity(IItem, metaclass=ABCMeta):
     def post_creation(self) -> None:
         self.status = EntityStatus.CREATED
 
-    @staticmethod
-    def from_id(item_id: Union[str, UUID], platform: 'IPlatform' = None) -> 'IEntity':
+    @classmethod
+    def from_id(cls, item_id: Union[str, UUID], platform: 'IPlatform' = None) -> 'IEntity':
         if platform is None:
             from idmtools.core.platform_factory import current_platform
             if current_platform is None:
                 raise ValueError("You have to specify a platfrom to load the asset collection from")
             platform = current_platform
-        return platform.get_item(item_id, ItemType.ASSETCOLLECTION)
+        if cls.item_type is None:
+            raise EnvironmentError("ItemType is None. This is most likely a badly derived IEntity "
+                                   "that doesn't run set the default item type on the class")
+        return platform.get_item(item_id, cls.item_type)
 
     @property
     def parent(self):

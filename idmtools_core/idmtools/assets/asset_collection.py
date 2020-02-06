@@ -27,6 +27,7 @@ class AssetCollection(IEntity):
     """
 
     assets: 'TAssetList' = field(default=None)
+    item_type: ItemType = field(default=ItemType.ASSETCOLLECTION, compare=False)
 
     def __init__(self, assets: List[Asset] = None):
         """
@@ -37,7 +38,6 @@ class AssetCollection(IEntity):
         """
         super().__init__()
         self.assets = copy.deepcopy(assets) or []
-        self.item_type = ItemType.ASSETCOLLECTION
 
     @classmethod
     def from_directory(cls, assets_directory: str, recursive: bool = True, flatten: bool = False,

@@ -22,8 +22,7 @@ class Simulation(IAssetsEnabled, INamedEntity):
     """
     task: 'ITask' = field(default=None)
     item_type: 'ItemType' = field(default=ItemType.SIMULATION, compare=False)
-    pre_creation_hooks: List[Callable[[], NoReturn]] = field(default_factory=lambda: [Simulation.gather_assets]) \
- \
+    pre_creation_hooks: List[Callable[[], NoReturn]] = field(default_factory=lambda: [Simulation.gather_assets])
     # control whether we should replace the task with a proxy after creation
     __replace_task_with_proxy: bool = field(default=True, init=False, compare=False)
 

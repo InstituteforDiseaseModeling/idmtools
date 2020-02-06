@@ -67,7 +67,7 @@ class PythonTask(ITask):
         """
         # ensure that assets is in collection
         self._task_log.info('Adding Common asset from %s', self.script_path)
-        self.common_assets.add_asset(Asset(absolute_path=self.script_path), fail_on_duplicate=False)
+        self.common_assets.add_or_replace_asset(Asset(absolute_path=self.script_path))
         return self.common_assets
 
     def gather_transient_assets(self) -> AssetCollection:
