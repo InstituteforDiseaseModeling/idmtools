@@ -64,3 +64,4 @@ if __name__ == "__main__":
                                               tags={"string_tag": "test", "number_tag": 123, "KeyOnly": None})
         # run the experiment
         experiment.run()
+        experiment.wait()
