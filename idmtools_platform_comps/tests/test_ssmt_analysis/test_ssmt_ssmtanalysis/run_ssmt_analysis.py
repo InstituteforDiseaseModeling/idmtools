@@ -7,7 +7,7 @@ Its role is to collect the experiment ids and analyzers (w/o paramenters) and ru
 import os
 from idmtools.ssmt.ssmt_analysis import SSMTAnalysis
 from test_ssmt_ssmtanalysis.MyAnalyzer import MyAnalyzer
-from idmtools.assets.FileList import FileList
+from idmtools.assets.file_list import FileList
 from idmtools.core.platform_factory import Platform
 
 par_par_dir = os.path.normpath(os.path.join('..', os.pardir))

@@ -1,7 +1,7 @@
 import time
 from COMPS.Data.WorkItem import WorkItemState
 from idmtools.entities import IPlatform
-from idmtools.ssmt.ssmt_work_item import SSMTWorkItem
+from idmtools.ssmt.idm_work_item import SSMTWorkItem
 
 
 class WorkItemManager:

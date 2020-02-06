@@ -3,10 +3,10 @@ import os
 import unittest
 import xmlrunner
 
-from idmtools.assets.FileList import FileList
+from idmtools.assets.file_list import FileList
 from idmtools.core.platform_factory import Platform
 from idmtools.managers.work_item_manager import WorkItemManager
-from idmtools.ssmt.ssmt_work_item import SSMTWorkItem
+from idmtools.ssmt.idm_work_item import SSMTWorkItem
 from COMPS.Data.WorkItem import WorkItem, RelationType
 from COMPS.Data import QueryCriteria, AssetCollection
 from COMPS.Client import Client

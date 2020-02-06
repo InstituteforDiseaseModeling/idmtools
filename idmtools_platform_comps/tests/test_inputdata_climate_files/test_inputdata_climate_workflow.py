@@ -13,7 +13,7 @@ from idmtools.managers.work_item_manager import WorkItemManager
 from COMPS.Data import WorkItem, WorkItemFile
 from idmtools.core.platform_factory import Platform
 from COMPS.Data.WorkItem import WorkerOrPluginKey
-from idmtools.ssmt.ssmt_work_item import SSMTWorkItem
+from idmtools.ssmt.idm_work_item import SSMTWorkItem, InputDataWorkItem
 
 # Set up the paths
 current_dir = os.path.dirname(os.path.realpath(__file__))
@@ -44,7 +44,7 @@ class InputDataWorkItemTests(unittest.TestCase):
         climate_demog = os.path.join(intermediate_dir, 'Madagascar_Comoros_2.5arcmin_demographics_overlay.json')
 
         # do not use 'upload' for Mode. it won't generate demographic workitem
-        data = {"WorkItem_Type": "InputDataWorker", "Project": 'IDM-Madagascar', "ProjectRoot": "v2017", "Region": "",
+        data = {"Project": 'IDM-Madagascar', "ProjectRoot": "v2017", "Region": "",
                 "IncludeNonPop": True, "Resolution": "150", "Parameters": ["tmean", "humid", "rain"], "StartYear": '2008',
                 "NumYears": '1', "NaNCheck": True, "Migration": True, "Mode": 'discrete'}
 
@@ -70,7 +70,7 @@ class InputDataWorkItemTests(unittest.TestCase):
         with open(work_order_path, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False)
 
-        inputdata_wi = SSMTWorkItem(item_name=self.wi_name, work_item_type='InputDataWorker', tags=self.tags)
+        inputdata_wi = InputDataWorkItem(item_name=self.wi_name, tags=self.tags)
         inputdata_wi.load_work_order(work_order_path)
         wim = WorkItemManager(inputdata_wi, self.p)
         wim.process(check_status=True)
@@ -91,7 +91,7 @@ class InputDataWorkItemTests(unittest.TestCase):
     def test_generate_inputdata_climate_files_from_wo(self):
         work_order_path = os.path.join(intermediate_dir, 'wo.json')
 
-        inputdata_wi = SSMTWorkItem(item_name=self.wi_name, work_item_type='InputDataWorker')
+        inputdata_wi = InputDataWorkItem(item_name=self.wi_name)
         inputdata_wi.load_work_order(work_order_path)
         wim = WorkItemManager(inputdata_wi, self.p)
         wim.process(check_status=True)
