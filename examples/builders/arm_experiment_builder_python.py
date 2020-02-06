@@ -64,4 +64,7 @@ if __name__ == "__main__":
                                               tags={"string_tag": "test", "number_tag": 123, "KeyOnly": None})
         # run the experiment
         experiment.run()
+        # in most real scenarios, you probably do not want to wait as this will wait until all simulations
+        # associated with an experiment are done. We do it in our examples to show feature and to enable
+        # testing of the scripts
         experiment.wait()

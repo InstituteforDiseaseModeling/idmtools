@@ -47,4 +47,7 @@ if __name__ == "__main__":
     tags = {"string_tag": "test", "number_tag": 123}
     e = Experiment.from_template(ts, name=os.path.split(sys.argv[0])[1], tags=tags)
     e.run(platform=platform)
+    # in most real scenarios, you probably do not want to wait as this will wait until all simulations
+    # associated with an experiment are done. We do it in our examples to show feature and to enable
+    # testing of the scripts
     e.wait()

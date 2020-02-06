@@ -48,4 +48,7 @@ if __name__ == "__main__":
     # run the experiment
     e.run(platform=platform)
     # wait on it
+    # in most real scenarios, you probably do not want to wait as this will wait until all simulations
+    # associated with an experiment are done. We do it in our examples to show feature and to enable
+    # testing of the scripts
     e.wait()
