@@ -72,7 +72,7 @@ if __name__ == '__main__':
             if any([s in line for s in
                     ["rollbackFailedOptional:", "extract:yarn:", "Using cache", "copying ", "creating idm", "optional dependency"]]):
                 logger.log(15, line.strip())
-            elif any([s in line for s in ["ERR!", "FAILED", "Error:", "Failed"]]):
+            elif any([s in line for s in ["ERR!", "ERROR", "FAILED", "Error:", "Failed"]]):
                 logger.critical(line.strip())
             elif any([s in line for s in ["Successfully", "SUCCESS", "PASSED"]]):
                 logger.log(35, line.strip())
