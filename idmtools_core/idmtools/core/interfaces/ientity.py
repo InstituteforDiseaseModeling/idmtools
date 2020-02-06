@@ -1,6 +1,6 @@
 from abc import ABCMeta
 from dataclasses import dataclass, field
-from typing import NoReturn, List, Any, Dict
+from typing import NoReturn, List, Any, Dict, Union
 from uuid import UUID
 
 from idmtools.core import EntityStatus, ItemType, NoPlatformException
@@ -33,6 +33,15 @@ class IEntity(IItem, metaclass=ABCMeta):
 
     def post_creation(self) -> None:
         self.status = EntityStatus.CREATED
+
+    @staticmethod
+    def from_id(item_id: Union[str, UUID], platform: 'IPlatform' = None) -> 'IEntity':
+        if platform is None:
+            from idmtools.core.platform_factory import current_platform
+            if current_platform is None:
+                raise ValueError("You have to specify a platfrom to load the asset collection from")
+            platform = current_platform
+        return platform.get_item(item_id, ItemType.ASSETCOLLECTION)
 
     @property
     def parent(self):

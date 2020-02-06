@@ -7,7 +7,7 @@ from typing import List, NoReturn, TypeVar, Union
 from idmtools.assets import Asset, TAssetList
 from idmtools.assets import TAssetFilterList
 from idmtools.assets.errors import DuplicatedAssetError
-from idmtools.core import FilterMode, ItemType, UUID
+from idmtools.core import FilterMode, ItemType
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.utils.entities import get_default_tags
 from idmtools.utils.file import scan_directory
@@ -38,15 +38,6 @@ class AssetCollection(IEntity):
         super().__init__()
         self.assets = copy.deepcopy(assets) or []
         self.item_type = ItemType.ASSETCOLLECTION
-
-    @staticmethod
-    def from_id(item_id: Union[str, UUID], platform: 'IPlatform' = None) -> 'AssetCollection':
-        if platform is None:
-            from idmtools.core.platform_factory import current_platform
-            if current_platform is None:
-                raise ValueError("You have to specify a platfrom to load the asset collection from")
-            platform = current_platform
-        return platform.get_item(item_id, ItemType.ASSETCOLLECTION)
 
     @classmethod
     def from_directory(cls, assets_directory: str, recursive: bool = True, flatten: bool = False,
