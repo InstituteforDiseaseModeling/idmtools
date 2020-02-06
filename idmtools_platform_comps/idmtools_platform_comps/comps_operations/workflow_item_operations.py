@@ -6,7 +6,7 @@ from typing import List, Dict, Any, Tuple, Type
 from idmtools.assets import AssetCollection
 from idmtools.entities.iplatform_metadata import IPlatformWorkflowItemOperations
 from idmtools.entities.iworkflow_item import IWorkflowItem
-from idmtools.ssmt.ssmt_work_item import GenericWorkItem
+from idmtools.ssmt.idm_work_item import GenericWorkItem
 from COMPS.Data import WorkItem as COMPSWorkItem, WorkItemFile
 from COMPS.Data.WorkItem import WorkerOrPluginKey, RelationType
 

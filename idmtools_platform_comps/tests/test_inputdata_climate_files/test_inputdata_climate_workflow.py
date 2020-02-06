@@ -13,7 +13,7 @@ from idmtools.managers.work_item_manager import WorkItemManager
 from COMPS.Data import WorkItem, WorkItemFile
 from idmtools.core.platform_factory import Platform
 from COMPS.Data.WorkItem import WorkerOrPluginKey
-from idmtools.ssmt.ssmt_work_item import SSMTWorkItem, InputDataWorkItem
+from idmtools.ssmt.idm_work_item import SSMTWorkItem, InputDataWorkItem
 
 # Set up the paths
 current_dir = os.path.dirname(os.path.realpath(__file__))

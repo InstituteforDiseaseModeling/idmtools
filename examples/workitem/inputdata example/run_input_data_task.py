@@ -1,7 +1,7 @@
 import os
 from idmtools.core.platform_factory import Platform
 from idmtools.managers.work_item_manager import WorkItemManager
-from idmtools.ssmt.ssmt_work_item import InputDataWorkItem
+from idmtools.ssmt.idm_work_item import InputDataWorkItem
 
 wi_name = "InputDataWorker sample 1"
 sim_id = "8db8ae8f-793c-ea11-a2be-f0921c167861"

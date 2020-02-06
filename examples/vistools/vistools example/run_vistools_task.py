@@ -1,6 +1,6 @@
 from idmtools.core.platform_factory import Platform
 from idmtools.managers.work_item_manager import WorkItemManager
-from idmtools.ssmt.ssmt_work_item import VisToolsWorkItem
+from idmtools.ssmt.idm_work_item import VisToolsWorkItem
 
 wi_name = "Vistools sample 1"
 # Change to your simulation
