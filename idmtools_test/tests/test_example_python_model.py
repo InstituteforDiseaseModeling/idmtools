@@ -1,8 +1,6 @@
 import os
 from unittest import TestCase
-
 import pytest
-
 from idmtools_test.utils.utils import test_example_folder
 
 examples_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'examples'))
