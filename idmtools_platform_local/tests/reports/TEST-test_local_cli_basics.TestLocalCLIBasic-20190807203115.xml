@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite errors="0" failures="0" file="test_local_cli_basics.py"
+           name="test_local_cli_basics.TestLocalCLIBasic-20190807203115" skipped="0" tests="3" time="45.016"
+           timestamp="2019-08-07T20:34:39">
+    <testcase classname="test_local_cli_basics.TestLocalCLIBasic" file="test_local_cli_basics.py" line="58"
+              name="test_docker" time="44.146" timestamp="2019-08-07T20:34:38">
+        <system-out>
+            <![CDATA[
+[K2019-08-07 20:34:19,466 INFO sqlalchemy.engine.base.Engine select version()
+2019-08-07 20:34:19,467 INFO sqlalchemy.engine.base.Engine {}
+2019-08-07 20:34:19,470 INFO sqlalchemy.engine.base.Engine select current_schema()
+2019-08-07 20:34:19,472 INFO sqlalchemy.engine.base.Engine {}
+2019-08-07 20:34:19,481 INFO sqlalchemy.engine.base.Engine SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
+2019-08-07 20:34:19,482 INFO sqlalchemy.engine.base.Engine {}
+2019-08-07 20:34:19,487 INFO sqlalchemy.engine.base.Engine SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
+2019-08-07 20:34:19,488 INFO sqlalchemy.engine.base.Engine {}
+2019-08-07 20:34:19,490 INFO sqlalchemy.engine.base.Engine show standard_conforming_strings
+2019-08-07 20:34:19,491 INFO sqlalchemy.engine.base.Engine {}
+2019-08-07 20:34:19,502 INFO sqlalchemy.engine.base.Engine select relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where pg_catalog.pg_table_is_visible(c.oid) and relname=%(name)s
+2019-08-07 20:34:19,503 INFO sqlalchemy.engine.base.Engine {'name': 'job_status'}
+2019-08-07 20:34:19,514 INFO sqlalchemy.engine.base.Engine 
+            SELECT EXISTS (
+                SELECT * FROM pg_catalog.pg_type t
+                WHERE t.typname = %(typname)s
+                AND pg_type_is_visible(t.oid)
+                )
+                
+2019-08-07 20:34:19,515 INFO sqlalchemy.engine.base.Engine {'typname': 'status'}
+2019-08-07 20:34:19,522 INFO sqlalchemy.engine.base.Engine CREATE TYPE status AS ENUM ('created', 'in_progress', 'canceled', 'failed', 'done')
+2019-08-07 20:34:19,523 INFO sqlalchemy.engine.base.Engine {}
+2019-08-07 20:34:19,528 INFO sqlalchemy.engine.base.Engine COMMIT
+2019-08-07 20:34:19,545 INFO sqlalchemy.engine.base.Engine 
+            SELECT EXISTS (
+                SELECT * FROM pg_catalog.pg_type t
+                WHERE t.typname = %(typname)s
+                AND pg_type_is_visible(t.oid)
+                )
+                
+2019-08-07 20:34:19,547 INFO sqlalchemy.engine.base.Engine {'typname': 'status'}
+2019-08-07 20:34:19,564 INFO sqlalchemy.engine.base.Engine 
+CREATE TABLE job_status (
+	uuid VARCHAR NOT NULL, 
+	parent_uuid VARCHAR, 
+	status status NOT NULL, 
+	data_path VARCHAR NOT NULL, 
+	tags JSON, 
+	extra_details JSON, 
+	created TIMESTAMP WITH TIME ZONE DEFAULT now(), 
+	updated TIMESTAMP WITH TIME ZONE, 
+	PRIMARY KEY (uuid), 
+	UNIQUE (uuid)
+)
+
+
+2019-08-07 20:34:19,568 INFO sqlalchemy.engine.base.Engine {}
+2019-08-07 20:34:19,583 INFO sqlalchemy.engine.base.Engine COMMIT
+2019-08-07 20:34:19,606 INFO sqlalchemy.engine.base.Engine BEGIN (implicit)
+2019-08-07 20:34:19,614 INFO sqlalchemy.engine.base.Engine SELECT job_status.uuid AS job_status_uuid, job_status.parent_uuid AS job_status_parent_uuid, job_status.status AS job_status_status, job_status.data_path AS job_status_data_path, job_status.tags AS job_status_tags, job_status.extra_details AS job_status_extra_details, job_status.created AS job_status_created, job_status.updated AS job_status_updated 
+FROM job_status 
+WHERE job_status.uuid = %(uuid_1)s 
+ LIMIT %(param_1)s
+2019-08-07 20:34:19,616 INFO sqlalchemy.engine.base.Engine {'uuid_1': 'AAAAA', 'param_1': 1}
+2019-08-07 20:34:19,629 INFO sqlalchemy.engine.base.Engine INSERT INTO job_status (uuid, parent_uuid, status, data_path, tags, extra_details, created, updated) VALUES (%(uuid)s, %(parent_uuid)s, %(status)s, %(data_path)s, %(tags)s, %(extra_details)s, %(created)s, %(updated)s)
+2019-08-07 20:34:19,632 INFO sqlalchemy.engine.base.Engine {'uuid': 'AAAAA', 'parent_uuid': None, 'status': 'created', 'data_path': '/data/AAAAA', 'tags': '{"a": "b", "c": "d"}', 'extra_details': '{}', 'created': datetime.datetime(2019, 8, 8, 3, 34, 19, 628391), 'updated': None}
+2019-08-07 20:34:19,636 INFO sqlalchemy.engine.base.Engine COMMIT
+2019-08-07 20:34:19,646 INFO sqlalchemy.engine.base.Engine BEGIN (implicit)
+2019-08-07 20:34:19,650 INFO sqlalchemy.engine.base.Engine SELECT job_status.uuid AS job_status_uuid, job_status.parent_uuid AS job_status_parent_uuid, job_status.status AS job_status_status, job_status.extra_details AS job_status_extra_details, job_status.created AS job_status_created, job_status.updated AS job_status_updated 
+FROM job_status 
+WHERE job_status.uuid = %(param_1)s
+2019-08-07 20:34:19,651 INFO sqlalchemy.engine.base.Engine {'param_1': 'AAAAA'}
+2019-08-07 20:34:19,665 INFO sqlalchemy.engine.base.Engine UPDATE job_status SET data_path=%(data_path)s, tags=%(tags)s, extra_details=%(extra_details)s, updated=now() WHERE job_status.uuid = %(job_status_uuid)s
+2019-08-07 20:34:19,666 INFO sqlalchemy.engine.base.Engine {'data_path': '/data/AAAAA', 'tags': '{"a": "b", "c": "d"}', 'extra_details': '{"simulation_type": "Python"}', 'job_status_uuid': 'AAAAA'}
+2019-08-07 20:34:19,683 INFO sqlalchemy.engine.base.Engine COMMIT
+2019-08-07 20:34:19,697 INFO sqlalchemy.engine.base.Engine BEGIN (implicit)
+2019-08-07 20:34:19,702 INFO sqlalchemy.engine.base.Engine SELECT job_status.uuid AS job_status_uuid, job_status.parent_uuid AS job_status_parent_uuid, job_status.status AS job_status_status, job_status.data_path AS job_status_data_path, job_status.tags AS job_status_tags, job_status.extra_details AS job_status_extra_details, job_status.created AS job_status_created, job_status.updated AS job_status_updated 
+FROM job_status 
+WHERE job_status.uuid = %(uuid_1)s 
+ LIMIT %(param_1)s
+2019-08-07 20:34:19,703 INFO sqlalchemy.engine.base.Engine {'uuid_1': 'BBBBB', 'param_1': 1}
+2019-08-07 20:34:19,715 INFO sqlalchemy.engine.base.Engine INSERT INTO job_status (uuid, parent_uuid, status, data_path, tags, extra_details, created, updated) VALUES (%(uuid)s, %(parent_uuid)s, %(status)s, %(data_path)s, %(tags)s, %(extra_details)s, %(created)s, %(updated)s)
+2019-08-07 20:34:19,716 INFO sqlalchemy.engine.base.Engine {'uuid': 'BBBBB', 'parent_uuid': None, 'status': 'created', 'data_path': '/data/BBBBB', 'tags': '{"e": "f", "g": "h"}', 'extra_details': '{}', 'created': datetime.datetime(2019, 8, 8, 3, 34, 19, 715426), 'updated': None}
+2019-08-07 20:34:19,722 INFO sqlalchemy.engine.base.Engine COMMIT
+2019-08-07 20:34:19,737 INFO sqlalchemy.engine.base.Engine BEGIN (implicit)
+2019-08-07 20:34:19,742 INFO sqlalchemy.engine.base.Engine SELECT job_status.uuid AS job_status_uuid, job_status.parent_uuid AS job_status_parent_uuid, job_status.status AS job_status_status, job_status.extra_details AS job_status_extra_details, job_status.created AS job_status_created, job_status.updated AS job_status_updated 
+FROM job_status 
+WHERE job_status.uuid = %(param_1)s
+2019-08-07 20:34:19,743 INFO sqlalchemy.engine.base.Engine {'param_1': 'BBBBB'}
+2019-08-07 20:34:19,750 INFO sqlalchemy.engine.base.Engine UPDATE job_status SET data_path=%(data_path)s, tags=%(tags)s, extra_details=%(extra_details)s, updated=now() WHERE job_status.uuid = %(job_status_uuid)s
+2019-08-07 20:34:19,756 INFO sqlalchemy.engine.base.Engine {'data_path': '/data/BBBBB', 'tags': '{"e": "f", "g": "h"}', 'extra_details': '{"simulation_type": "Python"}', 'job_status_uuid': 'BBBBB'}
+2019-08-07 20:34:19,760 INFO sqlalchemy.engine.base.Engine COMMIT
+2019-08-07 20:34:19,772 INFO sqlalchemy.engine.base.Engine BEGIN (implicit)
+2019-08-07 20:34:19,779 INFO sqlalchemy.engine.base.Engine SELECT job_status.uuid AS job_status_uuid, job_status.parent_uuid AS job_status_parent_uuid, job_status.status AS job_status_status, job_status.data_path AS job_status_data_path, job_status.tags AS job_status_tags, job_status.extra_details AS job_status_extra_details, job_status.created AS job_status_created, job_status.updated AS job_status_updated 
+FROM job_status 
+WHERE job_status.uuid = %(uuid_1)s 
+ LIMIT %(param_1)s
+2019-08-07 20:34:19,780 INFO sqlalchemy.engine.base.Engine {'uuid_1': 'CCCCC', 'param_1': 1}
+2019-08-07 20:34:19,795 INFO sqlalchemy.engine.base.Engine INSERT INTO job_status (uuid, parent_uuid, status, data_path, tags, extra_details, created, updated) VALUES (%(uuid)s, %(parent_uuid)s, %(status)s, %(data_path)s, %(tags)s, %(extra_details)s, %(created)s, %(updated)s)
+2019-08-07 20:34:19,796 INFO sqlalchemy.engine.base.Engine {'uuid': 'CCCCC', 'parent_uuid': 'BBBBB', 'status': 'created', 'data_path': '/data/CCCCC', 'tags': '{"i": "j", "k": "l"}', 'extra_details': '{}', 'created': datetime.datetime(2019, 8, 8, 3, 34, 19, 793765), 'updated': None}
+2019-08-07 20:34:19,802 INFO sqlalchemy.engine.base.Engine COMMIT
+2019-08-07 20:34:19,809 INFO sqlalchemy.engine.base.Engine BEGIN (implicit)
+2019-08-07 20:34:19,814 INFO sqlalchemy.engine.base.Engine SELECT job_status.uuid AS job_status_uuid, job_status.parent_uuid AS job_status_parent_uuid, job_status.status AS job_status_status, job_status.extra_details AS job_status_extra_details, job_status.created AS job_status_created, job_status.updated AS job_status_updated 
+FROM job_status 
+WHERE job_status.uuid = %(param_1)s
+2019-08-07 20:34:19,815 INFO sqlalchemy.engine.base.Engine {'param_1': 'CCCCC'}
+2019-08-07 20:34:19,825 INFO sqlalchemy.engine.base.Engine UPDATE job_status SET data_path=%(data_path)s, tags=%(tags)s, extra_details=%(extra_details)s, updated=now() WHERE job_status.uuid = %(job_status_uuid)s
+2019-08-07 20:34:19,827 INFO sqlalchemy.engine.base.Engine {'data_path': '/data/CCCCC', 'tags': '{"i": "j", "k": "l"}', 'extra_details': '{"simulation_type": "Python"}', 'job_status_uuid': 'CCCCC'}
+2019-08-07 20:34:19,831 INFO sqlalchemy.engine.base.Engine COMMIT
+2019-08-07 20:34:19,843 INFO sqlalchemy.engine.base.Engine BEGIN (implicit)
+2019-08-07 20:34:19,848 INFO sqlalchemy.engine.base.Engine SELECT job_status.uuid AS job_status_uuid, job_status.parent_uuid AS job_status_parent_uuid, job_status.status AS job_status_status, job_status.data_path AS job_status_data_path, job_status.tags AS job_status_tags, job_status.extra_details AS job_status_extra_details, job_status.created AS job_status_created, job_status.updated AS job_status_updated 
+FROM job_status 
+WHERE job_status.uuid = %(uuid_1)s 
+ LIMIT %(param_1)s
+2019-08-07 20:34:19,849 INFO sqlalchemy.engine.base.Engine {'uuid_1': 'DDDDD', 'param_1': 1}
+2019-08-07 20:34:19,857 INFO sqlalchemy.engine.base.Engine INSERT INTO job_status (uuid, parent_uuid, status, data_path, tags, extra_details, created, updated) VALUES (%(uuid)s, %(parent_uuid)s, %(status)s, %(data_path)s, %(tags)s, %(extra_details)s, %(created)s, %(updated)s)
+2019-08-07 20:34:19,861 INFO sqlalchemy.engine.base.Engine {'uuid': 'DDDDD', 'parent_uuid': None, 'status': 'created', 'data_path': '/data/DDDD', 'tags': '{"e": "f", "c": "d"}', 'extra_details': '{}', 'created': datetime.datetime(2019, 8, 8, 3, 34, 19, 856533), 'updated': None}
+2019-08-07 20:34:19,867 INFO sqlalchemy.engine.base.Engine COMMIT
+2019-08-07 20:34:19,877 INFO sqlalchemy.engine.base.Engine BEGIN (implicit)
+2019-08-07 20:34:19,882 INFO sqlalchemy.engine.base.Engine SELECT job_status.uuid AS job_status_uuid, job_status.parent_uuid AS job_status_parent_uuid, job_status.status AS job_status_status, job_status.extra_details AS job_status_extra_details, job_status.created AS job_status_created, job_status.updated AS job_status_updated 
+FROM job_status 
+WHERE job_status.uuid = %(param_1)s
+2019-08-07 20:34:19,883 INFO sqlalchemy.engine.base.Engine {'param_1': 'DDDDD'}
+2019-08-07 20:34:19,892 INFO sqlalchemy.engine.base.Engine UPDATE job_status SET data_path=%(data_path)s, tags=%(tags)s, extra_details=%(extra_details)s, updated=now() WHERE job_status.uuid = %(job_status_uuid)s
+2019-08-07 20:34:19,893 INFO sqlalchemy.engine.base.Engine {'data_path': '/data/DDDD', 'tags': '{"e": "f", "c": "d"}', 'extra_details': '{"simulation_type": "Python"}', 'job_status_uuid': 'DDDDD'}
+2019-08-07 20:34:19,899 INFO sqlalchemy.engine.base.Engine COMMIT
+2019-08-07 20:34:19,915 INFO sqlalchemy.engine.base.Engine BEGIN (implicit)
+2019-08-07 20:34:19,923 INFO sqlalchemy.engine.base.Engine SELECT job_status.uuid AS job_status_uuid, job_status.parent_uuid AS job_status_parent_uuid, job_status.status AS job_status_status, job_status.data_path AS job_status_data_path, job_status.tags AS job_status_tags, job_status.extra_details AS job_status_extra_details, job_status.created AS job_status_created, job_status.updated AS job_status_updated 
+FROM job_status 
+WHERE job_status.uuid = %(uuid_1)s 
+ LIMIT %(param_1)s
+2019-08-07 20:34:19,924 INFO sqlalchemy.engine.base.Engine {'uuid_1': 'EEEEE', 'param_1': 1}
+2019-08-07 20:34:19,939 INFO sqlalchemy.engine.base.Engine INSERT INTO job_status (uuid, parent_uuid, status, data_path, tags, extra_details, created, updated) VALUES (%(uuid)s, %(parent_uuid)s, %(status)s, %(data_path)s, %(tags)s, %(extra_details)s, %(created)s, %(updated)s)
+2019-08-07 20:34:19,940 INFO sqlalchemy.engine.base.Engine {'uuid': 'EEEEE', 'parent_uuid': 'DDDDD', 'status': 'done', 'data_path': '/data/EEEEE', 'tags': '{"i": "j", "k": "l"}', 'extra_details': '{}', 'created': datetime.datetime(2019, 8, 8, 3, 34, 19, 938738), 'updated': None}
+2019-08-07 20:34:19,950 INFO sqlalchemy.engine.base.Engine COMMIT
+2019-08-07 20:34:19,958 INFO sqlalchemy.engine.base.Engine BEGIN (implicit)
+2019-08-07 20:34:19,963 INFO sqlalchemy.engine.base.Engine SELECT job_status.uuid AS job_status_uuid, job_status.parent_uuid AS job_status_parent_uuid, job_status.status AS job_status_status, job_status.extra_details AS job_status_extra_details, job_status.created AS job_status_created, job_status.updated AS job_status_updated 
+FROM job_status 
+WHERE job_status.uuid = %(param_1)s
+2019-08-07 20:34:19,964 INFO sqlalchemy.engine.base.Engine {'param_1': 'EEEEE'}
+2019-08-07 20:34:19,976 INFO sqlalchemy.engine.base.Engine UPDATE job_status SET data_path=%(data_path)s, tags=%(tags)s, extra_details=%(extra_details)s, updated=now() WHERE job_status.uuid = %(job_status_uuid)s
+2019-08-07 20:34:19,977 INFO sqlalchemy.engine.base.Engine {'data_path': '/data/EEEEE', 'tags': '{"i": "j", "k": "l"}', 'extra_details': '{"simulation_type": "Python"}', 'job_status_uuid': 'EEEEE'}
+2019-08-07 20:34:19,984 INFO sqlalchemy.engine.base.Engine COMMIT
+2019-08-07 20:34:19,998 INFO sqlalchemy.engine.base.Engine BEGIN (implicit)
+2019-08-07 20:34:20,005 INFO sqlalchemy.engine.base.Engine SELECT job_status.uuid AS job_status_uuid, job_status.parent_uuid AS job_status_parent_uuid, job_status.status AS job_status_status, job_status.data_path AS job_status_data_path, job_status.tags AS job_status_tags, job_status.extra_details AS job_status_extra_details, job_status.created AS job_status_created, job_status.updated AS job_status_updated 
+FROM job_status 
+WHERE job_status.uuid = %(uuid_1)s 
+ LIMIT %(param_1)s
+2019-08-07 20:34:20,006 INFO sqlalchemy.engine.base.Engine {'uuid_1': 'FFFFF', 'param_1': 1}
+2019-08-07 20:34:20,024 INFO sqlalchemy.engine.base.Engine INSERT INTO job_status (uuid, parent_uuid, status, data_path, tags, extra_details, created, updated) VALUES (%(uuid)s, %(parent_uuid)s, %(status)s, %(data_path)s, %(tags)s, %(extra_details)s, %(created)s, %(updated)s)
+2019-08-07 20:34:20,026 INFO sqlalchemy.engine.base.Engine {'uuid': 'FFFFF', 'parent_uuid': 'DDDDD', 'status': 'done', 'data_path': '/data/FFFFF', 'tags': '{"i": "j", "k": "l"}', 'extra_details': '{}', 'created': datetime.datetime(2019, 8, 8, 3, 34, 20, 23666), 'updated': None}
+2019-08-07 20:34:20,035 INFO sqlalchemy.engine.base.Engine COMMIT
+2019-08-07 20:34:20,044 INFO sqlalchemy.engine.base.Engine BEGIN (implicit)
+2019-08-07 20:34:20,050 INFO sqlalchemy.engine.base.Engine SELECT job_status.uuid AS job_status_uuid, job_status.parent_uuid AS job_status_parent_uuid, job_status.status AS job_status_status, job_status.extra_details AS job_status_extra_details, job_status.created AS job_status_created, job_status.updated AS job_status_updated 
+FROM job_status 
+WHERE job_status.uuid = %(param_1)s
+2019-08-07 20:34:20,052 INFO sqlalchemy.engine.base.Engine {'param_1': 'FFFFF'}
+2019-08-07 20:34:20,065 INFO sqlalchemy.engine.base.Engine UPDATE job_status SET data_path=%(data_path)s, tags=%(tags)s, extra_details=%(extra_details)s, updated=now() WHERE job_status.uuid = %(job_status_uuid)s
+2019-08-07 20:34:20,067 INFO sqlalchemy.engine.base.Engine {'data_path': '/data/FFFFF', 'tags': '{"i": "j", "k": "l"}', 'extra_details': '{"simulation_type": "Python"}', 'job_status_uuid': 'FFFFF'}
+2019-08-07 20:34:20,076 INFO sqlalchemy.engine.base.Engine COMMIT
+
+]]>        </system-out>
+        <system-err>
+            <![CDATA[]]>        </system-err>
+    </testcase>
+    <testcase classname="test_local_cli_basics.TestLocalCLIBasic" file="test_local_cli_basics.py" line="48"
+              name="test_load" time="0.422" timestamp="2019-08-07T20:34:39">
+        <system-out>
+            <![CDATA[]]>        </system-out>
+        <system-err>
+            <![CDATA[]]>        </system-err>
+    </testcase>
+    <testcase classname="test_local_cli_basics.TestLocalCLIBasic" file="test_local_cli_basics.py" line="54"
+              name="test_status" time="0.448" timestamp="2019-08-07T20:34:39">
+        <system-out>
+            <![CDATA[<Result SystemExit(-1)>
+]]>        </system-out>
+        <system-err>
+            <![CDATA[]]>        </system-err>
+    </testcase>
+</testsuite>

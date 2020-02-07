@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite errors="2" failures="0" file="unittest/suite.py" name="unittest.suite._ErrorHolder-20190807082558"
+           skipped="0" tests="2" time="0.000" timestamp="0001-01-01T00:00:00">
+    <testcase classname="setUpClass (test_local_runner_API_CLI" file="test_tasks.py" line="53"
+              name="TestLocalRunnerCLI)" time="0.000" timestamp="0001-01-01T00:00:00">
+        <error message="reload() argument must be a module" type="TypeError">
+            <![CDATA[Traceback (most recent call last):
+  File "/home/clinton/development/work/idmtools/idmtools_platform_local/tests/test_local_runner_API_CLI.py", line 28, in setUpClass
+    reset_local_broker()
+  File "/home/clinton/development/work/idmtools/idmtools_test/idmtools_test/utils/confg_local_runner_test.py", line 27, in reset_local_broker
+    reload('idmtools_platform_local.workers.brokers')
+  File "/usr/lib/python3.7/importlib/__init__.py", line 140, in reload
+    raise TypeError("reload() argument must be a module")
+TypeError: reload() argument must be a module
+]]>        </error>
+        <system-out>
+            <![CDATA[]]>        </system-out>
+        <system-err>
+            <![CDATA[]]>        </system-err>
+    </testcase>
+    <testcase classname="setUpClass (test_python_simulation" file="test_api.py" line="77" name="TestPythonSimulation)"
+              time="0.000" timestamp="0001-01-01T00:00:00">
+        <error message="reload() argument must be a module" type="TypeError">
+            <![CDATA[Traceback (most recent call last):
+  File "/home/clinton/development/work/idmtools/idmtools_platform_local/tests/test_python_simulation.py", line 20, in setUpClass
+    reset_local_broker()
+  File "/home/clinton/development/work/idmtools/idmtools_test/idmtools_test/utils/confg_local_runner_test.py", line 27, in reset_local_broker
+    reload('idmtools_platform_local.workers.brokers')
+  File "/usr/lib/python3.7/importlib/__init__.py", line 140, in reload
+    raise TypeError("reload() argument must be a module")
+TypeError: reload() argument must be a module
+]]>        </error>
+        <system-out>
+            <![CDATA[]]>        </system-out>
+        <system-err>
+            <![CDATA[]]>        </system-err>
+    </testcase>
+</testsuite>

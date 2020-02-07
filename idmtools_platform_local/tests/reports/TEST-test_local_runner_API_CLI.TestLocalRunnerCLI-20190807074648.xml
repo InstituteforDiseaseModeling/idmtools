@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite errors="0" failures="0" file="test_local_runner_API_CLI.py"
+           name="test_local_runner_API_CLI.TestLocalRunnerCLI-20190807074648" skipped="3" tests="3" time="0.145"
+           timestamp="2019-08-07T07:47:01">
+    <testcase classname="test_local_runner_API_CLI.TestLocalRunnerCLI" file="test_local_runner_API_CLI.py" line="102"
+              name="test_local_runner_cli" time="0.055" timestamp="2019-08-07T07:47:01">
+        <skipped message="No Docker testing" type="skip"/>
+        <system-out>
+            <![CDATA[]]>        </system-out>
+        <system-err>
+            <![CDATA[]]>        </system-err>
+    </testcase>
+    <testcase classname="test_local_runner_API_CLI.TestLocalRunnerCLI" file="test_local_runner_API_CLI.py" line="49"
+              name="test_status_experimentClient_api" time="0.032" timestamp="2019-08-07T07:47:01">
+        <skipped message="No Docker testing" type="skip"/>
+        <system-out>
+            <![CDATA[]]>        </system-out>
+        <system-err>
+            <![CDATA[]]>        </system-err>
+    </testcase>
+    <testcase classname="test_local_runner_API_CLI.TestLocalRunnerCLI" file="test_local_runner_API_CLI.py" line="67"
+              name="test_status_simulationClient_api" time="0.058" timestamp="2019-08-07T07:47:01">
+        <skipped message="No Docker testing" type="skip"/>
+        <system-out>
+            <![CDATA[]]>        </system-out>
+        <system-err>
+            <![CDATA[]]>        </system-err>
+    </testcase>
+</testsuite>

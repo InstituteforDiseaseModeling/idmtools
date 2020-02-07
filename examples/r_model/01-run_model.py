@@ -79,7 +79,6 @@ def param_update(simulation: Simulation, value: Tuple[float, float, float]) -> D
 
 # the image_name is the same name of the image we tagged when we built our Dockerfile.
 # since we used docker-compose, it is the image options in the definition of the service
-
 with platform("Local"):
     base_task = JSONConfiguredRTask(
         # path to R Script

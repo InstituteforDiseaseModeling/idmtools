@@ -1,15 +1,16 @@
 import os
 import re
 import sys
+import unicodedata
 from dataclasses import dataclass
 from datetime import datetime, timezone, timedelta
-from logging import getLogger, DEBUG
 from typing import Optional
 
 from tqdm import tqdm
 
 from idmtools import __version__ as idmtools_version
 from idmtools.assets import AssetCollection, json
+from idmtools.core.logging import getLogger
 from idmtools.entities.itask import ITask
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.registry.task_specification import TaskSpecification
@@ -20,7 +21,6 @@ user_logger = getLogger('user')
 
 @dataclass
 class DockerTask(ITask):
-
     image_name: str = None
     # Optional config to build the docker image
     build: bool = False
@@ -69,16 +69,25 @@ class DockerTask(ITask):
                 build_config.update(extra_build_args)
             logger.debug(f"Build configuration used: {str(build_config)}")
             self.__image_built = True
-            prog = tqdm(desc='Building docker image', total=10)
+            prog = tqdm(
+                desc='Building docker image',
+                total=10,
+                bar_format='Building Docker Image: |{bar}| {percentage:3.0f}% [{n_fmt}/{total_fmt}] [{elapsed}] {desc}'
+            )
             try:
-
+                build_step = None
+                # regular expression to grab progress
                 progress_grep = re.compile(r'Step ([0-9]+)/([0-9]+) : (.*)')
+                # regular expression to filter out ansi codes
+                ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
                 for line in client.api.build(**build_config):
                     line = json.loads(line)
-                    if logger.isEnabledFor(DEBUG):
-                        logger.debug('Raw Docker Output', line)
                     if 'stream' in line:
-                        line = line['stream'].strip()
+                        line = line['stream']
+                        line = ansi_escape.sub('', line).strip()
+                        # strip unicode data
+                        line = "".join(ch for ch in line if unicodedata.category(ch)[0] != "C")
+                        logger.debug('Raw Docker Output: %s', line)
                         if line:
                             grps = progress_grep.match(line)
                             if grps:
@@ -90,7 +99,14 @@ class DockerTask(ITask):
                                     line = grps.group(3)
                                 except:
                                     pass
-                                prog.set_description(line.strip())
+                                prog.set_description(line)
+                                build_step = line
+                            # update build step with output
+                            elif build_step:
+
+                                if len(line) > 40:
+                                    line = line[:40]
+                                prog.set_description(f'{build_step}: {line}')
                     elif 'status' in line:
                         line = line['status'].strip()
                         prog.set_description(line)

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite errors="0" failures="2" file="test_api.py" name="test_api.TestAPI-20190807074648" skipped="1" tests="5"
+           time="1.748" timestamp="2019-08-07T07:47:03">
+    <testcase classname="test_api.TestAPI" file="test_api.py" line="66" name="test_fetch_one_experiment_works"
+              time="0.483" timestamp="2019-08-07T07:47:03">
+        <system-out>
+            <![CDATA[]]>        </system-out>
+        <system-err>
+            <![CDATA[]]>        </system-err>
+    </testcase>
+    <testcase classname="test_api.TestAPI" file="test_api.py" line="99" name="test_fetch_one_simulation_works"
+              time="0.211" timestamp="2019-08-07T07:47:03">
+        <system-out>
+            <![CDATA[]]>        </system-out>
+        <system-err>
+            <![CDATA[]]>        </system-err>
+    </testcase>
+    <testcase classname="test_api.TestAPI" file="test_api.py" line="47" name="test_fetch_experiments" time="0.790"
+              timestamp="2019-08-07T07:47:02">
+        <failure message="'108HXO6W' != 'AAAAA'
+- 108HXO6W
++ AAAAA
+" type="AssertionError">
+            <![CDATA[Traceback (most recent call last):
+  File "/home/clinton/development/work/idmtools/idmtools_platform_local/tests/test_api.py", line 58, in test_fetch_experiments
+    self.assertEqual(data[0]['experiment_id'], 'AAAAA')
+AssertionError: '108HXO6W' != 'AAAAA'
+- 108HXO6W
++ AAAAA
+
+]]>        </failure>
+        <system-out>
+            <![CDATA[]]>        </system-out>
+        <system-err>
+            <![CDATA[]]>        </system-err>
+    </testcase>
+    <testcase classname="test_api.TestAPI" file="test_api.py" line="76" name="test_fetch_simulations" time="0.223"
+              timestamp="2019-08-07T07:47:03">
+        <failure message="'A0V4JHA1' != 'CCCCC'
+- A0V4JHA1
++ CCCCC
+" type="AssertionError">
+            <![CDATA[Traceback (most recent call last):
+  File "/home/clinton/development/work/idmtools/idmtools_platform_local/tests/test_api.py", line 87, in test_fetch_simulations
+    self.assertEqual(data[0]['simulation_uid'], 'CCCCC')
+AssertionError: 'A0V4JHA1' != 'CCCCC'
+- A0V4JHA1
++ CCCCC
+
+]]>        </failure>
+        <system-out>
+            <![CDATA[]]>        </system-out>
+        <system-err>
+            <![CDATA[]]>        </system-err>
+    </testcase>
+    <testcase classname="test_api.TestAPI" file="test_api.py" line="110" name="test_experiment_filtering" time="0.040"
+              timestamp="2019-08-07T07:47:01">
+        <skipped message="No Docker testing" type="skip"/>
+        <system-out>
+            <![CDATA[]]>        </system-out>
+        <system-err>
+            <![CDATA[]]>        </system-err>
+    </testcase>
+</testsuite>

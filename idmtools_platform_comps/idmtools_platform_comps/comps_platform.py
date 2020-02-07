@@ -1,9 +1,14 @@
 import copy
 import json
 import logging
-import typing
 from dataclasses import dataclass, field
+
+# COMPS sometimes messes up our logger so backup handler in case
+handlers = [x for x in logging.getLogger().handlers]
 from COMPS import Client
+
+r = logging.getLogger()
+r.handlers = handlers
 from idmtools.core import CacheEnabled, ItemType
 from idmtools.entities.iplatform import IPlatform
 from idmtools_platform_comps.comps_operations.asset_collection_operations import \
@@ -15,7 +20,6 @@ from idmtools_platform_comps.comps_operations.workflow_item_operations import Co
 from idmtools.entities.platform_requirements import PlatformRequirements
 from typing import List
 
-logging.getLogger('COMPS.Data.Simulation').disabled = True
 logger = logging.getLogger(__name__)
 
 

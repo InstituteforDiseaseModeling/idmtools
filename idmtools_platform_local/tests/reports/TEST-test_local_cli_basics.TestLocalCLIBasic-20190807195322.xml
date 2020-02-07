@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite errors="0" failures="0" file="test_local_cli_basics.py"
+           name="test_local_cli_basics.TestLocalCLIBasic-20190807195322" skipped="1" tests="3" time="0.140"
+           timestamp="2019-08-07T19:53:23">
+    <testcase classname="test_local_cli_basics.TestLocalCLIBasic" file="test_local_cli_basics.py" line="48"
+              name="test_load" time="0.068" timestamp="2019-08-07T19:53:23">
+        <system-out>
+            <![CDATA[]]>        </system-out>
+        <system-err>
+            <![CDATA[]]>        </system-err>
+    </testcase>
+    <testcase classname="test_local_cli_basics.TestLocalCLIBasic" file="test_local_cli_basics.py" line="54"
+              name="test_status" time="0.065" timestamp="2019-08-07T19:53:23">
+        <system-out>
+            <![CDATA[<Result okay>
+]]>        </system-out>
+        <system-err>
+            <![CDATA[]]>        </system-err>
+    </testcase>
+    <testcase classname="test_local_cli_basics.TestLocalCLIBasic" file="test_local_cli_basics.py" line="58"
+              name="test_docker" time="0.007" timestamp="2019-08-07T19:53:23">
+        <skipped message="No Docker testing" type="skip"/>
+        <system-out>
+            <![CDATA[]]>        </system-out>
+        <system-err>
+            <![CDATA[]]>        </system-err>
+    </testcase>
+</testsuite>

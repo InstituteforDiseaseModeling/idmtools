@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite errors="0" failures="0" file="test_docker_operations.py"
+           name="test_docker_operations.TestDockerOperations-20190807195322" skipped="4" tests="4" time="0.004"
+           timestamp="2019-08-07T19:53:23">
+    <testcase classname="test_docker_operations.TestDockerOperations" file="test_docker_operations.py" line="30"
+              name="test_create_db_starts" time="0.001" timestamp="2019-08-07T19:53:23">
+        <skipped message="No Docker testing" type="skip"/>
+        <system-out>
+            <![CDATA[]]>        </system-out>
+        <system-err>
+            <![CDATA[]]>        </system-err>
+    </testcase>
+    <testcase classname="test_docker_operations.TestDockerOperations" file="test_docker_operations.py" line="24"
+              name="test_create_redis_starts" time="0.000" timestamp="2019-08-07T19:53:23">
+        <skipped message="No Docker testing" type="skip"/>
+        <system-out>
+            <![CDATA[]]>        </system-out>
+        <system-err>
+            <![CDATA[]]>        </system-err>
+    </testcase>
+    <testcase classname="test_docker_operations.TestDockerOperations" file="test_docker_operations.py" line="40"
+              name="test_create_stack_starts" time="0.002" timestamp="2019-08-07T19:53:23">
+        <skipped message="No Docker testing" type="skip"/>
+        <system-out>
+            <![CDATA[]]>        </system-out>
+        <system-err>
+            <![CDATA[]]>        </system-err>
+    </testcase>
+    <testcase classname="test_docker_operations.TestDockerOperations" file="test_docker_operations.py" line="62"
+              name="test_port_taken_has_coherent_error" time="0.001" timestamp="2019-08-07T19:53:23">
+        <skipped message="No Docker testing" type="skip"/>
+        <system-out>
+            <![CDATA[]]>        </system-out>
+        <system-err>
+            <![CDATA[]]>        </system-err>
+    </testcase>
+</testsuite>

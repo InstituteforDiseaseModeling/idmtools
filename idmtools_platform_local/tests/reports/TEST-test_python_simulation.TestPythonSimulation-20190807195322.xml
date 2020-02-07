@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite errors="0" failures="0" file="test_python_simulation.py"
+           name="test_python_simulation.TestPythonSimulation-20190807195322" skipped="2" tests="2" time="0.004"
+           timestamp="2019-08-07T19:53:23">
+    <testcase classname="test_python_simulation.TestPythonSimulation" file="test_python_simulation.py" line="64"
+              name="test_add_prefixed_relative_path_to_assets_local" time="0.002" timestamp="2019-08-07T19:53:23">
+        <skipped message="No Docker testing" type="skip"/>
+        <system-out>
+            <![CDATA[]]>        </system-out>
+        <system-err>
+            <![CDATA[]]>        </system-err>
+    </testcase>
+    <testcase classname="test_python_simulation.TestPythonSimulation" file="test_python_simulation.py" line="27"
+              name="test_direct_sweep_one_parameter_local" time="0.003" timestamp="2019-08-07T19:53:23">
+        <skipped message="No Docker testing" type="skip"/>
+        <system-out>
+            <![CDATA[]]>        </system-out>
+        <system-err>
+            <![CDATA[]]>        </system-err>
+    </testcase>
+</testsuite>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite errors="0" failures="0" file="test_docker_operations.py"
+           name="test_docker_operations.TestDockerOperations-20190807195348" skipped="0" tests="4" time="37.468"
+           timestamp="2019-08-07T19:57:20">
+    <testcase classname="test_docker_operations.TestDockerOperations" file="test_docker_operations.py" line="30"
+              name="test_create_db_starts" time="13.969" timestamp="2019-08-07T19:56:57">
+        <system-out>
+            <![CDATA[
+[K]]>        </system-out>
+        <system-err>
+            <![CDATA[]]>        </system-err>
+    </testcase>
+    <testcase classname="test_docker_operations.TestDockerOperations" file="test_docker_operations.py" line="24"
+              name="test_create_redis_starts" time="1.392" timestamp="2019-08-07T19:56:58">
+        <system-out>
+            <![CDATA[
+[K]]>        </system-out>
+        <system-err>
+            <![CDATA[]]>        </system-err>
+    </testcase>
+    <testcase classname="test_docker_operations.TestDockerOperations" file="test_docker_operations.py" line="40"
+              name="test_create_stack_starts" time="15.020" timestamp="2019-08-07T19:57:13">
+        <system-out>
+            <![CDATA[]]>        </system-out>
+        <system-err>
+            <![CDATA[]]>        </system-err>
+    </testcase>
+    <testcase classname="test_docker_operations.TestDockerOperations" file="test_docker_operations.py" line="62"
+              name="test_port_taken_has_coherent_error" time="7.087" timestamp="2019-08-07T19:57:20">
+        <system-out>
+            <![CDATA[
+[K]]>        </system-out>
+        <system-err>
+            <![CDATA[]]>        </system-err>
+    </testcase>
+</testsuite>

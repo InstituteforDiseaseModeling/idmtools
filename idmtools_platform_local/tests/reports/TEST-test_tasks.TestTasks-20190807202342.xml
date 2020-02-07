@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite errors="0" failures="0" file="test_tasks.py" name="test_tasks.TestTasks-20190807202342" skipped="0" tests="3"
+           time="0.514" timestamp="2019-08-07T20:23:42">
+    <testcase classname="test_tasks.TestTasks" file="test_tasks.py" line="29" name="test_create_experiment" time="0.044"
+              timestamp="2019-08-07T20:23:42">
+        <system-out>
+            <![CDATA[/tmp/tmp_qlwv_0p/data
+]]>        </system-out>
+        <system-err>
+            <![CDATA[]]>        </system-err>
+    </testcase>
+    <testcase classname="test_tasks.TestTasks" file="test_tasks.py" line="43" name="test_create_simulation" time="0.013"
+              timestamp="2019-08-07T20:23:42">
+        <system-out>
+            <![CDATA[]]>        </system-out>
+        <system-err>
+            <![CDATA[]]>        </system-err>
+    </testcase>
+    <testcase classname="test_tasks.TestTasks" file="test_tasks.py" line="58" name="test_run_task" time="0.457"
+              timestamp="2019-08-07T20:23:42">
+        <system-out>
+            <![CDATA[]]>        </system-out>
+        <system-err>
+            <![CDATA[]]>        </system-err>
+    </testcase>
+</testsuite>

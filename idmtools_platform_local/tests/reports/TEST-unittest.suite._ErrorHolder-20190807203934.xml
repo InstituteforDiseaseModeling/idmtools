@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite errors="1" failures="0" file="unittest/suite.py" name="unittest.suite._ErrorHolder-20190807203934"
+           skipped="0" tests="1" time="0.000" timestamp="0001-01-01T00:00:00">
+    <testcase classname="setUpClass (test_local_runner_API_CLI" file="test_tasks.py" line="58"
+              name="TestLocalRunnerCLI)" time="0.000" timestamp="0001-01-01T00:00:00">
+        <error message="CreateSimulationTask('F4I1N9OM', {'a': 0})" type="ResultTimeout">
+            <![CDATA[Traceback (most recent call last):
+  File "/home/clinton/development/work/idmtools/idmtools_platform_local/tests/test_local_runner_API_CLI.py", line 43, in setUpClass
+    em.run()
+  File "/home/clinton/development/work/idmtools/idmtools_core/idmtools/managers/ExperimentManager.py", line 95, in run
+    self.create_simulations()
+  File "/home/clinton/development/work/idmtools/idmtools_core/idmtools/managers/ExperimentManager.py", line 74, in create_simulations
+    for sim_batch in results:
+  File "/usr/lib/python3.7/concurrent/futures/_base.py", line 586, in result_iterator
+    yield fs.pop().result()
+  File "/usr/lib/python3.7/concurrent/futures/_base.py", line 425, in result
+    return self.__get_result()
+  File "/usr/lib/python3.7/concurrent/futures/_base.py", line 384, in __get_result
+    raise self._exception
+  File "/usr/lib/python3.7/concurrent/futures/thread.py", line 57, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/home/clinton/development/work/idmtools/idmtools_core/idmtools/managers/ExperimentManager.py", line 56, in simulation_batch_worker_thread
+    ids = self.platform.create_simulations(simulation_batch)
+  File "/home/clinton/development/work/idmtools/idmtools_platform_local/idmtools_platform_local/local_platform.py", line 156, in create_simulations
+    sid = m.get_result(block=True, timeout=self.default_timeout * 1000)
+  File "/home/clinton/.virtualenvs/idmtools/lib/python3.7/site-packages/dramatiq/message.py", line 147, in get_result
+    return backend.get_result(self, block=block, timeout=timeout)
+  File "/home/clinton/.virtualenvs/idmtools/lib/python3.7/site-packages/dramatiq/results/backends/redis.py", line 81, in get_result
+    raise ResultTimeout(message)
+dramatiq.results.errors.ResultTimeout: CreateSimulationTask('F4I1N9OM', {'a': 0})
+]]>        </error>
+        <system-out>
+            <![CDATA[INI File Used: /home/clinton/development/work/idmtools/idmtools.ini
+[Local_Staging]: the following Config Settings are not used:
+ - extra1 = 1
+ - extra2 = 2
+
+[K]]>        </system-out>
+        <system-err>
+            <![CDATA[2019-08-07 20:39:35 sahara docker.utils.config[5365] DEBUG Trying paths: ['/home/clinton/.docker/config.json', '/home/clinton/.dockercfg']
+2019-08-07 20:39:35 sahara docker.utils.config[5365] DEBUG Found file at path: /home/clinton/.docker/config.json
+2019-08-07 20:39:35 sahara docker.auth[5365] DEBUG Found 'auths' section
+2019-08-07 20:39:35 sahara docker.auth[5365] DEBUG Found entry (registry='docker.packages.idmod.org', username='ccollins@idmod.org')
+2019-08-07 20:39:35 sahara docker.auth[5365] DEBUG Found entry (registry='iazdvfil01.azurecr.io', username='iazdvfil01')
+2019-08-07 20:39:35 sahara docker.auth[5365] DEBUG Found entry (registry='idm-docker-production.packages.idmod.org', username='ccollins@idmod.org')
+2019-08-07 20:39:35 sahara docker.auth[5365] DEBUG Found entry (registry='idm-docker-staging.packages.idmod.org', username='ccollins@idmod.org')
+2019-08-07 20:39:35 sahara idmtools_platform_local.docker.DockerOperations[5365] DEBUG Ensuring redis is running
+2019-08-07 20:39:36 sahara idmtools_platform_local.docker.DockerOperations[5365] DEBUG Redis Config: {'name': 'idmtools_redis', 'hostname': 'redis', 'image': 'redis:5.0.4-alpine', 'ports': {6379: 6379}, 'volumes': {'/home/clinton/development/work/idmtools/idmtools_platform_local/tests/.local_data/redis-data': {'bind': '/data', 'mode': 'rw'}}, 'user': '1000:1000', 'restart_policy': {'MaximumRetryCount': 15, 'name': 'on-failure'}, 'detach': True, 'labels': {'idmtools_version': '0.1.0+nightly0'}, 'mem_limit': '128m', 'mem_reservation': '64m'}
+2019-08-07 20:39:36 sahara idmtools_platform_local.docker.DockerOperations[5365] DEBUG Redis Container Config {'name': 'idmtools_redis', 'hostname': 'redis', 'image': 'redis:5.0.4-alpine', 'ports': {6379: 6379}, 'volumes': {'/home/clinton/development/work/idmtools/idmtools_platform_local/tests/.local_data/redis-data': {'bind': '/data', 'mode': 'rw'}}, 'user': '1000:1000', 'restart_policy': {'MaximumRetryCount': 15, 'name': 'on-failure'}, 'detach': True, 'labels': {'idmtools_version': '0.1.0+nightly0'}, 'mem_limit': '128m', 'mem_reservation': '64m'}
+2019-08-07 20:39:37 sahara idmtools_platform_local.docker.DockerOperations[5365] DEBUG Ensuring postgres is running
+2019-08-07 20:39:37 sahara idmtools_platform_local.docker.DockerOperations[5365] DEBUG Postgres Config: {'name': 'idmtools_postgres', 'image': 'postgres:11.4', 'ports': {5432: 5432}, 'volumes': {'idmtools_local_postgres': {'bind': '/var/lib/postgresql/data', 'mode': 'rw'}}, 'hostname': 'postgres', 'environment': ['POSTGRES_USER=idmtools', 'POSTGRES_PASSWORD=idmtools'], 'restart_policy': {'MaximumRetryCount': 15, 'name': 'on-failure'}, 'detach': True, 'labels': {'idmtools_version': '0.1.0+nightly0'}, 'mem_limit': '64m', 'mem_reservation': '32m'}
+2019-08-07 20:39:37 sahara idmtools_platform_local.docker.DockerOperations[5365] DEBUG Postgres Container Config {'name': 'idmtools_postgres', 'image': 'postgres:11.4', 'ports': {5432: 5432}, 'volumes': {'idmtools_local_postgres': {'bind': '/var/lib/postgresql/data', 'mode': 'rw'}}, 'hostname': 'postgres', 'environment': ['POSTGRES_USER=idmtools', 'POSTGRES_PASSWORD=idmtools'], 'restart_policy': {'MaximumRetryCount': 15, 'name': 'on-failure'}, 'detach': True, 'labels': {'idmtools_version': '0.1.0+nightly0'}, 'mem_limit': '64m', 'mem_reservation': '32m'}
+2019-08-07 20:39:43 sahara idmtools_platform_local.docker.DockerOperations[5365] DEBUG Ensuring worker is running
+2019-08-07 20:39:43 sahara idmtools_platform_local.docker.DockerOperations[5365] DEBUG Creating working container
+2019-08-07 20:39:43 sahara idmtools_platform_local.docker.DockerOperations[5365] DEBUG Worker Config: {'name': 'idmtools_workers', 'hostname': 'idmtools', 'image': 'idm-docker-staging.packages.idmod.org/idmtools_local_workers:latest', 'ports': {5000: 5000}, 'links': {'idmtools_redis': 'redis', 'idmtools_postgres': 'postgres'}, 'volumes': {'/home/clinton/development/work/idmtools/idmtools_platform_local/tests/.local_data/workers': {'bind': '/data', 'mode': 'rw'}, '/var/run/docker.sock': {'bind': '/var/run/docker.sock', 'mode': 'rw'}}, 'runtime': None, 'environment': ['REDIS_URL=redis://redis:6379', 'CURRENT_UID=1000:1000'], 'restart_policy': {'MaximumRetryCount': 15, 'name': 'on-failure'}, 'detach': True, 'labels': {'idmtools_version': '0.1.0+nightly0'}, 'mem_limit': '128m', 'mem_reservation': '64m'}
+2019-08-07 20:39:43 sahara idmtools_platform_local.docker.DockerOperations[5365] DEBUG Worker Container Config {'name': 'idmtools_workers', 'hostname': 'idmtools', 'image': 'idm-docker-staging.packages.idmod.org/idmtools_local_workers:latest', 'ports': {5000: 5000}, 'links': {'idmtools_redis': 'redis', 'idmtools_postgres': 'postgres'}, 'volumes': {'/home/clinton/development/work/idmtools/idmtools_platform_local/tests/.local_data/workers': {'bind': '/data', 'mode': 'rw'}, '/var/run/docker.sock': {'bind': '/var/run/docker.sock', 'mode': 'rw'}}, 'runtime': None, 'environment': ['REDIS_URL=redis://redis:6379', 'CURRENT_UID=1000:1000'], 'restart_policy': {'MaximumRetryCount': 15, 'name': 'on-failure'}, 'detach': True, 'labels': {'idmtools_version': '0.1.0+nightly0'}, 'mem_limit': '128m', 'mem_reservation': '64m'}
+2019-08-07 20:39:44 sahara dramatiq.broker.RedisBroker[5365] DEBUG Enqueueing message '9bd86431-5763-4306-ba63-71fb4316c6cc' on queue 'default'.
+2019-08-07 20:39:45 sahara idmtools_platform_local.docker.DockerOperations[5365] DEBUG Ensuring worker is running
+2019-08-07 20:39:46 sahara idmtools_platform_local.docker.DockerOperations[5365] DEBUG Ensuring worker is running
+2019-08-07 20:39:46 sahara idmtools_platform_local.local_platform[5365] DEBUG Creating directory /data/F4I1N9OM/Assets result: ExecResult(exit_code=0, output=b'')
+2019-08-07 20:39:46 sahara idmtools_platform_local.docker.DockerOperations[5365] DEBUG Ensuring worker is running
+2019-08-07 20:39:46 sahara idmtools_platform_local.docker.DockerOperations[5365] DEBUG Copying /home/clinton/development/work/idmtools/idmtools_test/idmtools_test/inputs/python/model1.py to docker container 8316eccdbabf66940102e559a5d18a967c74c6f0c418357a2d396a61a3159ac0:/data/F4I1N9OM/Assets
+2019-08-07 20:39:46 sahara idmtools_platform_local.docker.DockerOperations[5365] DEBUG Copying /home/clinton/development/work/idmtools/idmtools_test/idmtools_test/inputs/python/model1.py to tar stream
+2019-08-07 20:39:46 sahara root[5365] DEBUG Saving be309a07243024b0b3dcab2aa6e8d90f to platforms
+2019-08-07 20:39:47 sahara root[5365] DEBUG Saving F4I1N9OM to experiments
+]]>        </system-err>
+    </testcase>
+</testsuite>
