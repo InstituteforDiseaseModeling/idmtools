@@ -22,6 +22,7 @@ class TestSSMTAnalysis(ITestWithPersistence):
         print(self.case_name)
         self.platform = Platform('COMPS2')
 
+    # test using SSMTAnalysis to run PopulationAnalyzer in comps's SSMT DockerWorker
     def test_ssmt_analysis_PopulationAnalyzer(self):
         experiment_id = "8bb8ae8f-793c-ea11-a2be-f0921c167861"
         analysis = SSMTAnalysis(platform=self.platform,
@@ -36,7 +37,6 @@ class TestSSMTAnalysis(ITestWithPersistence):
         # validate output files
         local_output_path = "output"
         del_folder(local_output_path)
-        # wi_uid = "cd578e83-2b49-ea11-a2be-f0921c167861"
         out_filenames = ["output/population.png", "output/population.json", "WorkOrder.json"]
         ret = self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
 
@@ -51,6 +51,7 @@ class TestSSMTAnalysis(ITestWithPersistence):
         self.assertEqual(execution['Command'],
                          "python analyze_ssmt.py " + experiment_id + " PopulationAnalyzer.PopulationAnalyzer")
 
+    # test using SSMTAnalysis to run multiple analyzers in comps's SSMT DockerWorker
     def test_ssmt_analysis_multiple_analyzers(self):
         experiment_id = "8bb8ae8f-793c-ea11-a2be-f0921c167861"
         analysis = SSMTAnalysis(platform=self.platform,
@@ -65,7 +66,6 @@ class TestSSMTAnalysis(ITestWithPersistence):
         # validate output files
         local_output_path = "output"
         del_folder(local_output_path)
-        # wi_uid = "cd578e83-2b49-ea11-a2be-f0921c167861"
         out_filenames = ["output/population.png", "output/population.json",
                          "output/adult_vectors.json", "output/adult_vectors.png", "WorkOrder.json"]
         ret = self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames,
@@ -86,6 +86,7 @@ class TestSSMTAnalysis(ITestWithPersistence):
                          "python analyze_ssmt.py " + experiment_id +
                          " PopulationAnalyzer.PopulationAnalyzer,AdultVectorsAnalyzer.AdultVectorsAnalyzer")
 
+    # test using SSMTAnalysis to run multiple experiments in comps's SSMT DockerWorker
     def test_ssmt_analysis_multiple_experiments(self):
         exp_id1 = "8bb8ae8f-793c-ea11-a2be-f0921c167861"
         exp_id2 = "4ea96af7-1549-ea11-a2be-f0921c167861"
@@ -102,7 +103,6 @@ class TestSSMTAnalysis(ITestWithPersistence):
         # validate output files
         local_output_path = "output"
         del_folder(local_output_path)
-        # wi_uid = "cd578e83-2b49-ea11-a2be-f0921c167861"
         out_filenames = ["output/population.png", "output/population.json", "WorkOrder.json"]
         ret = self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
 

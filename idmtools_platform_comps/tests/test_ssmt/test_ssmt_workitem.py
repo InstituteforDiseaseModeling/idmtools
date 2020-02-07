@@ -11,10 +11,6 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import del_folder
 
 
-# sys.path.insert(0, os.path.join(os.path.dirname(__file__), "inputs"))
-# from PopulationAnalyzer import PopulationAnalyzer
-# from AdultVectorsAnalyzer import AdultVectorsAnalyzer
-
 @pytest.mark.comps
 class TestSSMTWorkItem(ITestWithPersistence):
 
@@ -23,6 +19,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         print(self.case_name)
         self.platform = Platform('COMPS2')
 
+    # test using SSMTWormItem to run PopulationAnalyzer in comps's SSMT DockerWorker
     def test_ssmt_workitem_PopulationAnalyzer(self):
         # load local ("inputs") PopulationAnalyzer.py and run_dtktools_PopulationAnalyzer.py
         # to COMPS's assets
@@ -45,7 +42,6 @@ class TestSSMTWorkItem(ITestWithPersistence):
         # validate output files
         local_output_path = "output"
         del_folder(local_output_path)
-        # wi_uid = "cd578e83-2b49-ea11-a2be-f0921c167861"
         out_filenames = ["output/population.png", "output/population.json", "WorkOrder.json"]
         ret = self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
 
@@ -60,6 +56,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         self.assertEqual(execution['Command'],
                          "python Assets/run_dtktools_PopulationAnalyzer.py " + experiment_id)
 
+    # test using SSMTWormItem to run multiple analyzers in comps's SSMT DockerWorker
     def test_ssmt_workitem_multiple_analyzers(self):
         # different way to load files to comps than above test case
 
@@ -87,14 +84,12 @@ class TestSSMTWorkItem(ITestWithPersistence):
         # validate output files
         local_output_path = "output"
         del_folder(local_output_path)
-        # wi_uid = "cd578e83-2b49-ea11-a2be-f0921c167861"
         out_filenames = ["output/population.png", "output/population.json", "WorkOrder.json"]
         ret = self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
 
         # validate output files
         local_output_path = "output_ssmt"
         del_folder(local_output_path)
-        # wi_uid = "cd578e83-2b49-ea11-a2be-f0921c167861"
         out_filenames = ["output/population.png", "output/population.json",
                          "output/adult_vectors.json", "output/adult_vectors.png", "WorkOrder.json"]
         ret = self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames,
@@ -114,6 +109,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         self.assertEqual(execution['Command'],
                          "python run_dtktools_multiple_analyers.py " + experiment_id)
 
+    # test using SSMTWormItem to run multiple experiments in comps's SSMT DockerWorker
     def test_ssmt_workitem_multiple_experiments(self):
         exp_id1 = "8bb8ae8f-793c-ea11-a2be-f0921c167861"
         exp_id2 = "4ea96af7-1549-ea11-a2be-f0921c167861"
@@ -137,7 +133,6 @@ class TestSSMTWorkItem(ITestWithPersistence):
         # validate output files
         local_output_path = "output"
         del_folder(local_output_path)
-        # wi_uid = "cd578e83-2b49-ea11-a2be-f0921c167861"
         out_filenames = ["output/population.png", "output/population.json", "WorkOrder.json"]
         ret = self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
 

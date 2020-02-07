@@ -14,6 +14,7 @@ from idmtools_test.utils.utils import del_folder
 
 from examples import EXAMPLES_PATH
 
+# import analyzers from current dir's inputs dir
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "inputs"))
 from SimpleAnalyzer import SimpleAnalyzer
 from CSVAnalyzer import CSVAnalyzer
@@ -30,6 +31,9 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
         self.platform = Platform('COMPS2')
         self.tags = {'test': 123}
 
+    # test SSMTWorkItem with simple python script "hello.py"
+    # "hello.py" will run in comps's workitem worker like running it in local:
+    # python hello.py
     def test_ssmt_workitem_python(self):
         command = "python hello.py"
         python_files = os.path.join(EXAMPLES_PATH, "ssmt", "hello_world", "files")
@@ -37,16 +41,19 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
         wi = SSMTWorkItem(item_name=self.case_name, command=command, user_files=user_files, tags=self.tags)
         wim = WorkItemManager(wi, self.platform)
         wim.process(check_status=True)
-        # validate output files
-        local_output_path = "output"
-        del_folder(local_output_path)
-        # wi_uid = "cd578e83-2b49-ea11-a2be-f0921c167861"
-        out_filenames = ["hello.py", "WorkOrder.json"]
+
+        # verify workitem output files
+        local_output_path = "output"  # local output dir
+        del_folder(local_output_path)  # delete existing folder before run validation
+        out_filenames = ["hello.py", "WorkOrder.json"]  # files to retrieve from workitem dir
         ret = self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
 
         file_path = os.path.join(local_output_path, str(wi.uid))
+        # verify that we do retrieved the correct files from comps' workitem to local
         self.assertTrue(os.path.exists(os.path.join(file_path, "hello.py")))
         self.assertTrue(os.path.exists(os.path.join(file_path, "WorkOrder.json")))
+
+        # verify that WorkOrder.json content is correct
         worker_order = json.load(open(os.path.join(file_path, "WorkOrder.json"), 'r'))
         print(worker_order)
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
@@ -54,6 +61,7 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
         self.assertEqual(execution['Command'],
                          "python hello.py")
 
+    # Test SimpleAnalyzer with SSMTAnalysis which analyzes python experiment's results
     def test_ssmt_workitem_python_simple_analyzer(self):
         experiment_id = "9311af40-1337-ea11-a2be-f0921c167861"
         analysis = SSMTAnalysis(platform=self.platform,
@@ -64,9 +72,10 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
 
         analysis.analyze(check_status=True)
         wi = analysis.get_work_item()
+
+        # verify workitem result
         local_output_path = "output"
         del_folder(local_output_path)
-        # wi_uid = "cd578e83-2b49-ea11-a2be-f0921c167861"
         out_filenames = ["output/aggregated_config.json", "WorkOrder.json"]
         ret = self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
 
@@ -80,6 +89,7 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
         self.assertEqual(execution['Command'],
                          "python analyze_ssmt.py " + experiment_id + " SimpleAnalyzer.SimpleAnalyzer")
 
+    # Test CSVAnalyzer with SSMTAnalysis which analyzes python experiment's results
     def test_ssmt_workitem_python_csv_analyzer(self):
         experiment_id = "9311af40-1337-ea11-a2be-f0921c167861"
         analysis = SSMTAnalysis(platform=self.platform,
@@ -91,9 +101,10 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
 
         analysis.analyze(check_status=True)
         wi = analysis.get_work_item()
+
+        # verify workitem result
         local_output_path = "output"
         del_folder(local_output_path)
-        # wi_uid = "cd578e83-2b49-ea11-a2be-f0921c167861"
         out_filenames = ["output/aggregated_c.csv", "WorkOrder.json"]
         ret = self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
 
