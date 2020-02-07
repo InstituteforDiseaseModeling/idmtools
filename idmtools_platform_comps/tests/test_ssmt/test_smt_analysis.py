@@ -22,13 +22,15 @@ class TestSSMTAnalysis(ITestWithPersistence):
         print(self.case_name)
         self.platform = Platform('COMPS2')
 
+
     def test_ssmt_analysis_PopulationAnalyzer(self):
         experiment_id = "8bb8ae8f-793c-ea11-a2be-f0921c167861"
         analysis = SSMTAnalysis(platform=self.platform,
                                 experiment_ids=[experiment_id],
                                 analyzers=[PopulationAnalyzer],
                                 analyzers_args=[{'name': 'anything'}],
-                                analysis_name=self.case_name)
+                                analysis_name=self.case_name,
+                                tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'})
 
         analysis.analyze(check_status=True)
         wi = analysis.get_work_item()
@@ -57,7 +59,8 @@ class TestSSMTAnalysis(ITestWithPersistence):
                                 experiment_ids=[experiment_id],
                                 analyzers=[PopulationAnalyzer, AdultVectorsAnalyzer],
                                 analyzers_args=[{'name': 'anything'}, {'name': "adult test"}],
-                                analysis_name=self.case_name)
+                                analysis_name=self.case_name,
+                                tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'})
 
         analysis.analyze(check_status=True)
         wi = analysis.get_work_item()
@@ -94,7 +97,8 @@ class TestSSMTAnalysis(ITestWithPersistence):
                                 experiment_ids=experiment_id,
                                 analyzers=[PopulationAnalyzer],
                                 analyzers_args=[{'name': 'anything'}],
-                                analysis_name=self.case_name)
+                                analysis_name=self.case_name,
+                                tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'})
 
         analysis.analyze(check_status=True)
         wi = analysis.get_work_item()

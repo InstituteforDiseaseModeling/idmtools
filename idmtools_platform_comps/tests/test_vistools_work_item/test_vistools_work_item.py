@@ -36,8 +36,8 @@ class VisToolsWorkItemTests(unittest.TestCase):
         cls.sim_id = str(cls.generate_sim(cls)[0].uid)
         node_type = 'Points'
         data = {"SimulationId": "" + cls.sim_id + "", "NodesRepresentation": node_type}
-        tags = {'SimulationId': cls.sim_id}
-        cls.wi = VisToolsWorkItem(item_name="Test workitem", tags=tags, work_order=data, related_simulations=[cls.sim_id])
+        tags = {'idmtools': cls._testMethodName, 'WorkItem type': 'VisTools', 'SimulationId': cls.sim_id}
+        cls.wi = VisToolsWorkItem(item_name=cls.case_name, tags=tags, work_order=data, related_simulations=[cls.sim_id])
 
         wim = WorkItemManager(cls.wi, cls.p)
         wim.process(check_status=True)
@@ -458,9 +458,10 @@ class VisToolsWorkItemTests(unittest.TestCase):
         self.assertTrue(response.status_code < 400)
 
     def generate_sim(self):
+        self.case_name = os.path.basename(__file__)
         assets_path = os.path.join(DEFAULT_INPUT_PATH, "Assets")
         ac = AssetCollection.from_directory(assets_directory=assets_path)
-        e = EMODExperiment.from_files("vistools test sim",
+        e = EMODExperiment.from_files(name=self.case_name,
                                       eradication_path=DEFAULT_ERADICATION_PATH,
                                       config_path=DEFAULT_CONFIG_PATH,
                                       campaign_path=DEFAULT_CAMPAIGN_JSON,

@@ -22,6 +22,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
         self.platform = Platform('COMPS2')
+        self.tags = {'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}
 
     def test_ssmt_workitem_PopulationAnalyzer(self):
         # load local ("inputs") PopulationAnalyzer.py and run_dtktools_PopulationAnalyzer.py
@@ -33,12 +34,11 @@ class TestSSMTWorkItem(ITestWithPersistence):
         # load local "input" foleer simtools.ini to current dir in Comps workitem
         user_files = FileList()
         user_files.add_file(os.path.join("inputs", "simtools.ini"))
-        tags = {'test': 123}
 
         experiment_id = "8bb8ae8f-793c-ea11-a2be-f0921c167861"
         command = "python Assets/run_dtktools_PopulationAnalyzer.py " + experiment_id
         wi = SSMTWorkItem(item_name=self.case_name, command=command, asset_files=asset_files, user_files=user_files,
-                          tags=tags)
+                          tags=self.tags)
         wim = WorkItemManager(wi, self.platform)
         wim.process(check_status=True)
 
@@ -75,12 +75,11 @@ class TestSSMTWorkItem(ITestWithPersistence):
 
         # load local "input" foleer simtools.ini to current dir in Comps workitem
         user_files.add_file(os.path.join("inputs", "simtools.ini"))
-        tags = {'test': 123}
 
         experiment_id = "8bb8ae8f-793c-ea11-a2be-f0921c167861"
         command = "python run_dtktools_multiple_analyers.py " + experiment_id
         wi = SSMTWorkItem(item_name=self.case_name, command=command, user_files=user_files,
-                          tags=tags)
+                          tags=self.tags)
         wim = WorkItemManager(wi, self.platform)
         wim.process(check_status=True)
 
@@ -126,11 +125,10 @@ class TestSSMTWorkItem(ITestWithPersistence):
         # load local "input" foleer simtools.ini to current dir in Comps workitem
         user_files = FileList()
         user_files.add_file(os.path.join("inputs", "simtools.ini"))
-        tags = {'test': 123}
 
         command = "python Assets/run_dtktools_multiple_exps.py " + exp_id1 + " " + exp_id2
         wi = SSMTWorkItem(item_name=self.case_name, command=command, asset_files=asset_files, user_files=user_files,
-                          tags=tags)
+                          tags=self.tags)
         wim = WorkItemManager(wi, self.platform)
         wim.process(check_status=True)
 
