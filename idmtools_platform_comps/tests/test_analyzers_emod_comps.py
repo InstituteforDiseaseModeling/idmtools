@@ -5,12 +5,13 @@ from functools import partial
 
 import pytest
 from COMPS.Data import Experiment
-
 from idmtools.analysis.add_analyzer import AddAnalyzer
 from idmtools.analysis.analyze_manager import AnalyzeManager
+from idmtools.analysis.csv_analyzer import CSVAnalyzer
 from idmtools.analysis.download_analyzer import DownloadAnalyzer
+from idmtools.analysis.tags_analyzer import TagsAnalyzer
 from idmtools.builders import ExperimentBuilder
-from idmtools.core import ItemType, EntityStatus
+from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools_model_emod.defaults import EMODSir
@@ -18,8 +19,6 @@ from idmtools_model_emod.emod_experiment import EMODExperiment
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import del_file, del_folder, load_csv_file
-from idmtools.analysis.tags_analyzer import TagsAnalyzer
-from idmtools.analysis.csv_analyzer import CSVAnalyzer
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 
@@ -296,15 +295,15 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         os.mkdir(experiment_id)
 
         filenames = ['output/MalariaPatientReport.json']
-        analyzers = [CSVAnalyzer(filenames=filenames)]
+        with self.assertRaises(Exception) as context:
+            analyzers = [CSVAnalyzer(filenames=filenames)]
+            manager = AnalyzeManager(configuration={}, partial_analyze_ok=True, platform=self.p,
+                                     ids=[(experiment_id, ItemType.EXPERIMENT)],
+                                     analyzers=analyzers)
+            manager.analyze()
 
-        manager = AnalyzeManager(configuration={}, partial_analyze_ok=True, platform=self.p,
-                                 ids=[(experiment_id, ItemType.EXPERIMENT)],
-                                 analyzers=analyzers)
-        manager.analyze()
-
-        # verify results
-        self.assertRaises(Exception, msg='Please ensure all filenames provided to CSVAnalyzer have a csv extension.')
+        self.assertIn('Please ensure all filenames provided to CSVAnalyzer have a csv extension.',
+                      context.exception.args[0])
 
     def test_multi_csv_analyzer_emod_exp(self):
         experiment_id = '1bddce22-0c37-ea11-a2be-f0921c167861'  # staging exp id PythonExperiment with 2 csv outputs
