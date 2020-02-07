@@ -29,7 +29,9 @@ def param_update(simulation, param, value):
     return simulation.set_parameter(param, value)
 
 
-class VisToolsWorkItemTests(unittest.TestCase):
+@pytest.mark.comps
+class TestVisToolsWorkItem(unittest.TestCase):
+
     @classmethod
     def setUpClass(cls):
         cls.p = Platform('COMPS2')
@@ -38,7 +40,6 @@ class VisToolsWorkItemTests(unittest.TestCase):
         data = {"SimulationId": "" + cls.sim_id + "", "NodesRepresentation": node_type}
         tags = {'idmtools': cls._testMethodName, 'WorkItem type': 'VisTools', 'SimulationId': cls.sim_id}
         cls.wi = VisToolsWorkItem(item_name=cls.case_name, tags=tags, work_order=data, related_simulations=[cls.sim_id])
-
         wim = WorkItemManager(cls.wi, cls.p)
         wim.process(check_status=True)
 
@@ -48,7 +49,6 @@ class VisToolsWorkItemTests(unittest.TestCase):
     # ------------------------------------------
     # test vistools workitem and outpur
     # ------------------------------------------
-    @pytest.mark.comps
     def test_vistools_work_item_and_output(self):
         print(self.case_name)
 
@@ -64,19 +64,18 @@ class VisToolsWorkItemTests(unittest.TestCase):
         self.assertEqual(temp_dict["SimulationId"], self.sim_id)
         self.assertEqual(temp_dict["NodesRepresentation"], "Points")
 
-        #validate file get download to local
+        # validate file get download to local
         self.assertTrue(os.path.exists(os.path.join(output_path, str(self.wi.uid), "WorkOrder.json")))
 
         # Validate another way to retriever workitem output
         ret = self.p.get_files(self.wi, out_filenames)
         temp = ret["WorkOrder.json"]
         temp_dict = ast.literal_eval(temp.decode('utf-8'))
-        #temp_dict = json.loads(temp[0].decode('utf-8'))
+        # temp_dict = json.loads(temp[0].decode('utf-8'))
         self.assertEqual(temp_dict["WorkItem_Type"], "VisTools")
         self.assertEqual(temp_dict["SimulationId"], self.sim_id)
         self.assertEqual(temp_dict["NodesRepresentation"], "Points")
 
-    @pytest.mark.comps
     def test_vistools_output_in_simulation(self):
         print(self.case_name)
         # get comps's simulation object
@@ -123,7 +122,7 @@ class VisToolsWorkItemTests(unittest.TestCase):
         # decoding the JSON string to dictionary
         d = json.loads(result[p + "/visset.json"].decode('utf-8'))
 
-         # Testcase2: Validate all fields in visset.json file:
+        # Testcase2: Validate all fields in visset.json file:
         visset_name = d["name"]
         self.assertEqual(d["timestepCount"], 4380)
         self.assertEqual(d["targetClient"], 'Geospatial')
@@ -362,7 +361,6 @@ class VisToolsWorkItemTests(unittest.TestCase):
         # decoding to dictionary
         vtassetmap_dic = json.loads(vtassetmap[0].decode('utf-8'))
         self.assertTrue(len(vtassetmap_dic) == 19)
-
 
         self.assertTrue(
             str(vtassetmap_dic['/' + visset_name + '/output/BinnedReport.json']).endswith('/BinnedReport.json'))
