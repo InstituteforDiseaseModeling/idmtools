@@ -120,8 +120,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
 
         # Temp workaround
         from idmtools.entities.simulation import Simulation
-        from workflow.task import Task
-        obj.simulations = [Simulation(_uid=s.id, task=Task('test')) for s in comps_sims]
+        obj.simulations = [Simulation(_uid=s.id, task=None) for s in comps_sims]
 
         # Set parent
         obj.parent = suite
