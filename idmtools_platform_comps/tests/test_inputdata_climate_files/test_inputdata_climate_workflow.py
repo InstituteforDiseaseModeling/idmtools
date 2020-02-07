@@ -7,33 +7,24 @@ import json
 import unittest
 import pytest
 import xmlrunner
-import configparser
 
 from idmtools.managers.work_item_manager import WorkItemManager
-from COMPS.Data import WorkItem, WorkItemFile
 from idmtools.core.platform_factory import Platform
-from COMPS.Data.WorkItem import WorkerOrPluginKey
-from idmtools.ssmt.idm_work_item import SSMTWorkItem, InputDataWorkItem
+from idmtools.ssmt.idm_work_item import InputDataWorkItem
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 # Set up the paths
 current_dir = os.path.dirname(os.path.realpath(__file__))
 output_path = os.path.join(current_dir, 'output')
-intermediate_dir = os.path.join(current_dir, 'intermediate', 'climate')
-
-# # Make sure we have directory created
-# if not os.path.exists(intermediate_dir): os.makedirs(intermediate_dir)
-# if not os.path.exists(output_path): os.makedirs(output_path)
+intermediate_dir = os.path.join(current_dir, 'inputs')
 
 
-class InputDataWorkItemTests(unittest.TestCase):
+class InputDataWorkItemTests(ITestWithPersistence):
 
     def setUp(self):
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
-        self.wi_name = "idmtools InputData WorkItem Test: Climate Files"
         self.tags = {'idmtools': self._testMethodName, 'WorkItem type': 'InputData'}
         self.p = Platform('COMPS2')
-        # default_config = configparser.ConfigParser()
-        # self.comps_env = default_config['COMPS2']['env']
 
     #------------------------------------------
     # test generate inputdata climate files with comps work item
@@ -70,7 +61,7 @@ class InputDataWorkItemTests(unittest.TestCase):
         with open(work_order_path, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False)
 
-        inputdata_wi = InputDataWorkItem(item_name=self.wi_name, tags=self.tags)
+        inputdata_wi = InputDataWorkItem(item_name=self.case_name, tags=self.tags)
         inputdata_wi.load_work_order(work_order_path)
         wim = WorkItemManager(inputdata_wi, self.p)
         wim.process(check_status=True)
@@ -91,8 +82,12 @@ class InputDataWorkItemTests(unittest.TestCase):
     def test_generate_inputdata_climate_files_from_wo(self):
         work_order_path = os.path.join(intermediate_dir, 'wo.json')
 
-        inputdata_wi = InputDataWorkItem(item_name=self.wi_name)
+        inputdata_wi = InputDataWorkItem(item_name=self.case_name)
         inputdata_wi.load_work_order(work_order_path)
         wim = WorkItemManager(inputdata_wi, self.p)
         wim.process(check_status=True)
         self.assertIsNotNone(inputdata_wi)
+
+
+if __name__ == "__main__":
+    unittest.main(testRunner=xmlrunner.XMLTestRunner(output='reports'))

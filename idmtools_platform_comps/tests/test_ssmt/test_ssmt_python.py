@@ -29,7 +29,7 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
         self.platform = Platform('COMPS2')
-        self.tags = {'test': 123}
+        self.tags = {'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}
 
     # test SSMTWorkItem with simple python script "hello.py"
     # "hello.py" will run in comps's workitem worker like running it in local:
@@ -68,7 +68,8 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
                                 experiment_ids=[experiment_id],
                                 analyzers=[SimpleAnalyzer],
                                 analyzers_args=[{'filenames': ['config.json']}],
-                                analysis_name=self.case_name)
+                                analysis_name=self.case_name,
+                                tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'})
 
         analysis.analyze(check_status=True)
         wi = analysis.get_work_item()
@@ -97,7 +98,8 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
                                 analyzers=[CSVAnalyzer],
                                 analyzers_args=[{'filenames': ['output/c.csv'],
                                                  'parse': True}],
-                                analysis_name=self.case_name)
+                                analysis_name=self.case_name,
+                                tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'})
 
         analysis.analyze(check_status=True)
         wi = analysis.get_work_item()
