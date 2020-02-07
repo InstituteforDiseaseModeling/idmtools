@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List, Callable, NoReturn
+from typing import List, Callable
 
 from idmtools.assets import AssetCollection
 from idmtools.entities.itask import ITask
@@ -24,13 +24,13 @@ class CommandTask(ITask):
         ac = AssetCollection()
         for x in self.gather_common_asset_hooks:
             ac += x(self)
-        return x
+        return ac
 
     def gather_transient_assets(self) -> AssetCollection:
         ac = AssetCollection()
         for x in self.gather_transient_asset_hooks:
             ac += x(self)
-        return x
+        return ac
 
     def reload_from_simulation(self, simulation: 'Simulation'):
         pass

@@ -1,10 +1,11 @@
+import os
 from dataclasses import field, dataclass
+
 from idmtools.assets import Asset, AssetCollection
+from idmtools.core.docker_task import DockerTask
 from idmtools.entities import CommandLine
 from idmtools.entities.simulation import Simulation
 from idmtools.registry.task_specification import TaskSpecification
-from idmtools.core.docker_task import DockerTask
-import os
 
 
 @dataclass
@@ -32,7 +33,7 @@ class RTask(DockerTask):
         """
         super().gather_common_assets()
         self._task_log.info('Adding Common asset from %s', self.script_name)
-        self.common_assets.add_asset(Asset(absolute_path=self.script_name), fail_on_duplicate=False)
+        self.common_assets.add_or_replace_asset(Asset(absolute_path=self.script_name))
         return self.common_assets
 
     def gather_transient_assets(self) -> AssetCollection:

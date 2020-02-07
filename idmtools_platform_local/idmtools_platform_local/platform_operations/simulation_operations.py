@@ -51,10 +51,18 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         from idmtools_platform_local.internals.tasks.create_simulation import CreateSimulationTask
 
         m = CreateSimulationTask.send(simulation.experiment.uid, simulation.tags)
-        id = m.get_result(block=True, timeout=self.platform.default_timeout * 1000)
-        s_dict = dict(simulation_uid=id, experiment_id=simulation.experiment.uid, status='CREATED',
-                      tags=simulation.tags)
-        simulation.uid = id
+        if logger.isEnabledFor(DEBUG):
+            logger.debug('Creating Simulation ID and directories')
+        sim_id = m.get_result(block=True, timeout=self.platform.default_timeout * 1000)
+        if logger.isEnabledFor(DEBUG):
+            logger.debug('Simulation ID created')
+        s_dict = dict(
+            simulation_uid=sim_id,
+            experiment_id=simulation.experiment.uid,
+            status='CREATED',
+            tags=simulation.tags
+        )
+        simulation.uid = sim_id
         self.send_assets(simulation)
         return s_dict
 
@@ -96,6 +104,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
             simulation.pre_creation()
             items.update(self._assets_to_copy_multiple_list(path, simulation.assets))
             simulation.post_creation()
+        # copy files to container
         result = self.platform._do.copy_multiple_to_container(worker, items)
         if not result:
             raise IOError("Coping of data for simulations failed.")

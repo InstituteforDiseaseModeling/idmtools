@@ -1,18 +1,21 @@
 import os
+import re
 import sys
 from dataclasses import dataclass
 from datetime import datetime, timezone, timedelta
-from logging import getLogger
+from logging import getLogger, DEBUG
 from typing import Optional
 
-from idmtools.assets import AssetCollection
+from tqdm import tqdm
+
+from idmtools import __version__ as idmtools_version
+from idmtools.assets import AssetCollection, json
 from idmtools.entities.itask import ITask
 from idmtools.entities.platform_requirements import PlatformRequirements
-from idmtools import __version__ as idmtools_version
 from idmtools.registry.task_specification import TaskSpecification
-from idmtools.utils.decorators import optional_yaspin_load
 
 logger = getLogger(__name__)
+user_logger = getLogger('user')
 
 
 @dataclass
@@ -43,7 +46,6 @@ class DockerTask(ITask):
     def gather_transient_assets(self) -> AssetCollection:
         return self.transient_assets
 
-    @optional_yaspin_load(text="Building docker image")
     def build_image(self, spinner=None, **extra_build_args):
         if not self.__image_built:
             import docker
@@ -55,22 +57,51 @@ class DockerTask(ITask):
                 self.build_path = os.getcwd()
 
             client = docker.client.from_env()
-            build_config = dict(path=self.build_path, dockerfile=self.Dockerfile, tag=self.image_name,
-                                labels=dict(
-                                    buildstamp=f'built-by idmtools {idmtools_version}',
-                                    builddate=str(datetime.now(timezone(timedelta(hours=-8)))))
-                                )
+            build_config = dict(
+                path=self.build_path,
+                dockerfile=self.Dockerfile,
+                tag=self.image_name,
+                labels=dict(
+                    uildstamp=f'built-by idmtools {idmtools_version}',
+                    builddate=str(datetime.now(timezone(timedelta(hours=-8)))))
+            )
             if extra_build_args:
                 build_config.update(extra_build_args)
             logger.debug(f"Build configuration used: {str(build_config)}")
             self.__image_built = True
+            prog = tqdm(desc='Building docker image', total=10)
             try:
-                result = client.images.build(**build_config)
-                logger.info(f'Build Successful of {result[0].tag} ({result[0].id})')
+
+                progress_grep = re.compile(r'Step ([0-9]+)/([0-9]+) : (.*)')
+                for line in client.api.build(**build_config):
+                    line = json.loads(line)
+                    if logger.isEnabledFor(DEBUG):
+                        logger.debug('Raw Docker Output', line)
+                    if 'stream' in line:
+                        line = line['stream'].strip()
+                        if line:
+                            grps = progress_grep.match(line)
+                            if grps:
+                                try:
+                                    step = int(grps.group(1))
+                                    total_steps = int(grps.group(2))
+                                    prog.n = step
+                                    prog.total = total_steps
+                                    line = grps.group(3)
+                                except:
+                                    pass
+                                prog.set_description(line.strip())
+                    elif 'status' in line:
+                        line = line['status'].strip()
+                        prog.set_description(line)
+
+                logger.info(f'Build Successful)')
             except BuildError as e:
                 logger.info(f"Build failed for {self.image_name} with message {e.msg}")
                 logger.info(f'Build log: {e.build_log}')
                 sys.exit(-1)
+            finally:
+                prog.close()
 
     def reload_from_simulation(self, simulation: 'Simulation'):
         pass

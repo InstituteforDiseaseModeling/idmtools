@@ -173,6 +173,15 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
 
     @staticmethod
     def from_experiment(experiment: Experiment) -> Dict:
+        """
+        Create a experiment dictionary from Experiment object
+
+        Args:
+            experiment: Experiment object
+
+        Returns:
+            Experiment as a local platform dict
+        """
         e = dict(experiment_id=experiment.uid, tags=experiment.tags)
         return e
 
@@ -188,6 +197,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
             object as an IExperiment object
         """
         e = experiment_factory.create(experiment['tags'].get("type"), tags=experiment['tags'])
+        e.platform = self.platform
         e.uid = experiment['experiment_id']
         return e
 
