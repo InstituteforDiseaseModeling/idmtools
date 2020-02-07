@@ -64,11 +64,11 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     supported_types: Set[ItemType] = field(default_factory=lambda: set(), repr=False, init=False)
     _platform_supports: List[PlatformRequirements] = field(default_factory=list, repr=False, init=False)
 
-    _experiments: IPlatformExperimentOperations = field(default=None, repr=False, init=False)
-    _simulations: IPlatformSimulationOperations = field(default=None, repr=False, init=False)
-    _suites: IPlatformSuiteOperations = field(default=None, repr=False, init=False)
-    _workflow_items: IPlatformWorkflowItemOperations = field(default=None, repr=False, init=False)
-    _assets: IPlatformAssetCollectionOperations = field(default=None, repr=False, init=False)
+    _experiments: IPlatformExperimentOperations = field(default=None, repr=False, init=False, compare=False)
+    _simulations: IPlatformSimulationOperations = field(default=None, repr=False, init=False, compare=False)
+    _suites: IPlatformSuiteOperations = field(default=None, repr=False, init=False, compare=False)
+    _workflow_items: IPlatformWorkflowItemOperations = field(default=None, repr=False, init=False, compare=False)
+    _assets: IPlatformAssetCollectionOperations = field(default=None, repr=False, init=False, compare=False)
 
     @staticmethod
     def get_caller():
