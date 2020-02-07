@@ -12,8 +12,6 @@ from idmtools.ssmt.ssmt_analysis import SSMTAnalysis
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import del_folder
 
-from examples import EXAMPLES_PATH
-
 # import analyzers from current dir's inputs dir
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "inputs"))
 from SimpleAnalyzer import SimpleAnalyzer
@@ -36,8 +34,9 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
     # python hello.py
     def test_ssmt_workitem_python(self):
         command = "python hello.py"
-        python_files = os.path.join(EXAMPLES_PATH, "ssmt", "hello_world", "files")
-        user_files = FileList(root=python_files)
+        user_files = FileList()
+        user_files.add_file(os.path.join("inputs", "hello.py"))
+
         wi = SSMTWorkItem(item_name=self.case_name, command=command, user_files=user_files, tags=self.tags)
         wim = WorkItemManager(wi, self.platform)
         wim.process(check_status=True)
