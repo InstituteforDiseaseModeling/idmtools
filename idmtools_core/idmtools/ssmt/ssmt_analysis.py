@@ -57,7 +57,7 @@ class SSMTAnalysis:
         command += " {}".format(",".join(self.experiment_ids))
         # Add the analyzers
         command += " {}".format(",".join(f"{inspect.getmodulename(inspect.getfile(a))}.{a.__name__}"
-                                         for s in self.analyzers))
+                                         for a in self.analyzers))
 
         self.wi = SSMTWorkItem(item_name=self.analysis_name, command=command, tags=self.tags,
                           user_files=self.additional_files, asset_collection_id=self.asset_collection_id,

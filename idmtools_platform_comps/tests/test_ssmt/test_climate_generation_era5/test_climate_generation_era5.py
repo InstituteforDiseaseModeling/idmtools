@@ -10,12 +10,13 @@ from idmtools.ssmt.idm_work_item import SSMTWorkItem
 from COMPS.Data.WorkItem import WorkItem, RelationType
 from COMPS.Data import QueryCriteria, AssetCollection
 from COMPS.Client import Client
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 outdir_path = os.path.join(current_directory, 'climate')
 
 
-class ClimateGenerationTest(unittest.TestCase):
+class ClimateGenerationTest(ITestWithPersistence):
 
     @classmethod
     def setUpClass(cls):
