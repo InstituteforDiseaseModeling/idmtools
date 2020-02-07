@@ -371,12 +371,20 @@ examples/**/.pytest_cache/
 examples/analyzers/download/
 examples/download/
 examples/generic_sim/download-e2eB/
+examples/**/task.diskcache/
+examples/ssmt/**/output/
+examples/vistools/**/workitem_output/
+
 idmtools_core/tests/data
 idmtools_core/tests/reports/
 idmtools_platform_comps/tests/inputs/analyzers/population.csv
 idmtools_platform_comps/tests/inputs/analyzers/population.png
 idmtools_platform_comps/tests/inputs/analyzers/timeseries.csv
 idmtools_platform_comps/tests/inputs/analyzers/timeseries.png
+idmtools_platform_comps/tests/test_vistools_work_item/output_simulation/
+idmtools_platform_comps/tests/test_vistools_work_item/output_workitem/
+idmtools_platform_comps/**/task.diskcache/
+idmtools_platform_comps/tests/test_ssmt/output/
 idmtools_platform_comps/tests/output/
 idmtools_platform_local/internals/ui/static/*
 
