@@ -390,7 +390,10 @@ idmtools_platform_local/internals/ui/static/*
 idmtools_platform_comps/tests/test_vistools/output_workitem/
 idmtools_platform_comps/tests/test_vistools/output_simulation/
 idmtools_platform_comps/tests/test_ssmt/output_ssmt/
-
+idmtools_platform_comps/tests/test_ssmt/inputs/climate/dtk_*
+idmtools_platform_comps/tests/output_tag/
+idmtools_platform_comps/tests/output_csv/
+idmtools_platform_comps/tests/output_ssmt/
 idmtools_platform_local/idmtools_webui/build
 idmtools_platform_local/idmtools_platform_local/internals/ui/static/
 idmtools_test/idmtools_test/data/

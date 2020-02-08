@@ -247,15 +247,13 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         for simulation in sims:
             self.assertTrue(os.path.exists(os.path.join('output', str(simulation.uid), "InsetChart.json")))
 
+    @pytest.mark.long
     def test_tags_analyzer_emod_exp(self):
         experiment_id = '36d8bfdc-83f6-e911-a2be-f0921c167861'  # staging exp id JSuresh's Magude exp
 
         # delete output from previous run
-        del_folder(experiment_id)
-
-        # create a new empty 'output' dir
-        os.mkdir(experiment_id)
-
+        output_dir = "output_tag"
+        del_folder(output_dir)
         analyzers = [TagsAnalyzer()]
 
         manager = AnalyzeManager(configuration={}, partial_analyze_ok=True, platform=self.p,
@@ -264,16 +262,13 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         manager.analyze()
 
         # verify results
-        self.assertTrue(os.path.exists(os.path.join(experiment_id, "tags.csv")))
+        self.assertTrue(os.path.exists(os.path.join(output_dir, "tags.csv")))
 
     def test_csv_analyzer_emod_exp(self):
         experiment_id = '9311af40-1337-ea11-a2be-f0921c167861'  # staging exp id with csv from config
         # delete output from previous run
-        del_folder(experiment_id)
-
-        # create a new empty 'output' dir
-        os.mkdir(experiment_id)
-
+        output_dir = "output_csv"
+        del_folder(output_dir)
         filenames = ['output/c.csv']
         analyzers = [CSVAnalyzer(filenames=filenames)]
 
@@ -283,17 +278,14 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         manager.analyze()
 
         # verify results
-        self.assertTrue(os.path.exists(os.path.join(experiment_id, "CSVAnalyzer.csv")))
+        self.assertTrue(os.path.exists(os.path.join(output_dir, "CSVAnalyzer.csv")))
 
     def test_csv_analyzer_emod_exp_non_csv_error(self):
         experiment_id = '36d8bfdc-83f6-e911-a2be-f0921c167861'  # staging exp id JSuresh's Magude exp
 
         # delete output from previous run
-        del_folder(experiment_id)
-
-        # create a new empty 'output' dir
-        os.mkdir(experiment_id)
-
+        output_dir = "output_csv"
+        del_folder(output_dir)
         filenames = ['output/MalariaPatientReport.json']
         with self.assertRaises(Exception) as context:
             analyzers = [CSVAnalyzer(filenames=filenames)]
@@ -309,10 +301,8 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         experiment_id = '1bddce22-0c37-ea11-a2be-f0921c167861'  # staging exp id PythonExperiment with 2 csv outputs
 
         # delete output from previous run
-        del_folder(experiment_id)
-
-        # create a new empty 'output' dir
-        os.mkdir(experiment_id)
+        output_dir = "output_csv"
+        del_folder(output_dir)
 
         filenames = ['output/a.csv', 'output/b.csv']
         analyzers = [CSVAnalyzer(filenames=filenames)]
@@ -324,4 +314,4 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         manager.analyze()
 
         # verify results
-        self.assertTrue(os.path.exists(os.path.join(experiment_id, "CSVAnalyzer.csv")))
+        self.assertTrue(os.path.exists(os.path.join(output_dir, "CSVAnalyzer.csv")))

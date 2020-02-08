@@ -30,6 +30,7 @@ def param_update(simulation, param, value):
 
 
 @pytest.mark.comps
+@pytest.mark.long
 class TestVisToolsWorkItem(unittest.TestCase):
 
     @classmethod
@@ -38,8 +39,8 @@ class TestVisToolsWorkItem(unittest.TestCase):
         cls.sim_id = str(cls.generate_sim(cls)[0].uid)
         node_type = 'Points'
         data = {"SimulationId": "" + cls.sim_id + "", "NodesRepresentation": node_type}
-        tags = {'idmtools': cls._testMethodName, 'WorkItem type': 'VisTools', 'SimulationId': cls.sim_id}
-        cls.wi = VisToolsWorkItem(item_name=cls.case_name, tags=tags, work_order=data, related_simulations=[cls.sim_id])
+        tags = {'idmtools': "vistool test", 'WorkItem type': 'VisTools', 'SimulationId': cls.sim_id}
+        cls.wi = VisToolsWorkItem(item_name="vistools test", tags=tags, work_order=data, related_simulations=[cls.sim_id])
         wim = WorkItemManager(cls.wi, cls.p)
         wim.process(check_status=True)
 

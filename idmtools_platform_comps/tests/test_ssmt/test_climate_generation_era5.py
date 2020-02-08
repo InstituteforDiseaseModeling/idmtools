@@ -11,22 +11,21 @@ from COMPS.Data.WorkItem import WorkItem, RelationType
 from COMPS.Data import QueryCriteria, AssetCollection
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
-current_directory = os.path.dirname(os.path.realpath(__file__))
-input_outdir_path = os.path.join(current_directory, "inputs", "climate")
-
 
 class ClimateGenerationTest(ITestWithPersistence):
 
     def setUp(self):
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        self.input_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "inputs")
 
     #------------------------------------------
     # test generate ERA5 climate files
     #------------------------------------------
     @pytest.mark.comps
+    @pytest.mark.long
     def test_generate_era5_climate_files(self):
         # A .csv or a demographics file containing input coordinates
-        path_to_points_file = input_outdir_path
+        path_to_points_file = os.path.join(self.input_file_path, "climate")
         points_file = 'site_details.csv'
 
         # Start/end dates in one of the formats: year (2015) or year and day-of-year (2015032) or year-month-day (20150201)
@@ -65,7 +64,7 @@ class ClimateGenerationTest(ITestWithPersistence):
 
             for acf in ac.assets:
                 # write them to climate dir to use to run DTK test
-                fn = os.path.join(input_outdir_path, acf.file_name)
+                fn = os.path.join(path_to_points_file, acf.file_name)
                 print('   Writing ' + fn)
 
                 with open(fn, 'wb') as outfile:

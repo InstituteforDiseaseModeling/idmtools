@@ -13,9 +13,9 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import del_folder
 
 # import analyzers from current dir's inputs dir
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "inputs"))
-from SimpleAnalyzer import SimpleAnalyzer
-from CSVAnalyzer import CSVAnalyzer
+# sys.path.insert(0, os.path.join(os.path.dirname(__file__), "inputs"))
+# from SimpleAnalyzer import SimpleAnalyzer
+# from CSVAnalyzer import CSVAnalyzer
 
 
 
@@ -28,6 +28,8 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
         print(self.case_name)
         self.platform = Platform('COMPS2')
         self.tags = {'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}
+        self.input_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "inputs")
+
 
     # test SSMTWorkItem with simple python script "hello.py"
     # "hello.py" will run in comps's workitem worker like running it in local:
@@ -35,7 +37,7 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
     def test_ssmt_workitem_python(self):
         command = "python hello.py"
         user_files = FileList()
-        user_files.add_file(os.path.join("inputs", "hello.py"))
+        user_files.add_file(os.path.join(self.input_file_path, "hello.py"))
 
         wi = SSMTWorkItem(item_name=self.case_name, command=command, user_files=user_files, tags=self.tags)
         wim = WorkItemManager(wi, self.platform)
@@ -62,6 +64,9 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
 
     # Test SimpleAnalyzer with SSMTAnalysis which analyzes python experiment's results
     def test_ssmt_workitem_python_simple_analyzer(self):
+        sys.path.insert(0, self.input_file_path)
+        from SimpleAnalyzer import SimpleAnalyzer
+
         experiment_id = "9311af40-1337-ea11-a2be-f0921c167861"
         analysis = SSMTAnalysis(platform=self.platform,
                                 experiment_ids=[experiment_id],
@@ -91,6 +96,8 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
 
     # Test CSVAnalyzer with SSMTAnalysis which analyzes python experiment's results
     def test_ssmt_workitem_python_csv_analyzer(self):
+        sys.path.insert(0, self.input_file_path)
+        from CSVAnalyzer import CSVAnalyzer
         experiment_id = "9311af40-1337-ea11-a2be-f0921c167861"
         analysis = SSMTAnalysis(platform=self.platform,
                                 experiment_ids=[experiment_id],

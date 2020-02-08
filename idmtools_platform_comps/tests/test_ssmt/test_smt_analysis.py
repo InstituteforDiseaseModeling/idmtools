@@ -9,10 +9,6 @@ from idmtools.ssmt.ssmt_analysis import SSMTAnalysis
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import del_folder
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "inputs"))
-from PopulationAnalyzer import PopulationAnalyzer
-from AdultVectorsAnalyzer import AdultVectorsAnalyzer
-
 
 @pytest.mark.comps
 class TestSSMTAnalysis(ITestWithPersistence):
@@ -21,9 +17,12 @@ class TestSSMTAnalysis(ITestWithPersistence):
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
         self.platform = Platform('COMPS2')
+        self.input_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "inputs")
 
     # test using SSMTAnalysis to run PopulationAnalyzer in comps's SSMT DockerWorker
     def test_ssmt_analysis_PopulationAnalyzer(self):
+        sys.path.append(self.input_file_path)
+        from PopulationAnalyzer import PopulationAnalyzer
         experiment_id = "8bb8ae8f-793c-ea11-a2be-f0921c167861"
         analysis = SSMTAnalysis(platform=self.platform,
                                 experiment_ids=[experiment_id],
@@ -54,6 +53,10 @@ class TestSSMTAnalysis(ITestWithPersistence):
 
     # test using SSMTAnalysis to run multiple analyzers in comps's SSMT DockerWorker
     def test_ssmt_analysis_multiple_analyzers(self):
+        sys.path.insert(0, self.input_file_path)
+        from PopulationAnalyzer import PopulationAnalyzer
+        from AdultVectorsAnalyzer import AdultVectorsAnalyzer
+
         experiment_id = "8bb8ae8f-793c-ea11-a2be-f0921c167861"
         analysis = SSMTAnalysis(platform=self.platform,
                                 experiment_ids=[experiment_id],
@@ -90,6 +93,9 @@ class TestSSMTAnalysis(ITestWithPersistence):
 
     # test using SSMTAnalysis to run multiple experiments in comps's SSMT DockerWorker
     def test_ssmt_analysis_multiple_experiments(self):
+        sys.path.insert(0, self.input_file_path)
+        from PopulationAnalyzer import PopulationAnalyzer
+
         exp_id1 = "8bb8ae8f-793c-ea11-a2be-f0921c167861"
         exp_id2 = "4ea96af7-1549-ea11-a2be-f0921c167861"
         experiment_id = [exp_id1, exp_id2]

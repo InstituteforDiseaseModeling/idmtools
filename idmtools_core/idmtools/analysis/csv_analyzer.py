@@ -17,6 +17,10 @@ class CSVAnalyzer(IAnalyzer):
         if not all(['csv' in os.path.splitext(f)[1].lower() for f in self.filenames]):
             raise Exception('Please ensure all filenames provided to CSVAnalyzer have a csv extension.')
 
+    def initialize(self):
+        if not os.path.exists(os.path.join(self.working_dir, "output_csv")):
+            os.mkdir(os.path.join(self.working_dir, "output_csv"))
+
     # Map is called to get for each simulation a data object (all the metadata of the simulations) and simulation object
     def map(self, data, simulation):
         # If there are 1 to many csv files, concatenate csv data columns into one dataframe
@@ -36,8 +40,7 @@ class CSVAnalyzer(IAnalyzer):
         results.index = results.index.droplevel(1)  # Remove default index
 
         # Make a directory labeled the exp id to write the csv results to
-        os.makedirs(exp_id, exist_ok=True)
         # NOTE: If running twice with different filename, the output files will collide
-        results.to_csv(os.path.join(exp_id, self.__class__.__name__+'.csv'))
+        results.to_csv(os.path.join("output_csv", self.__class__.__name__+'.csv'))
 
 

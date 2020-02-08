@@ -19,18 +19,20 @@ class TestSSMTWorkItem(ITestWithPersistence):
         print(self.case_name)
         self.platform = Platform('COMPS2')
         self.tags = {'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}
+        self.input_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "inputs")
+        #self.input_file_path = os.path.join(os.path.dirname(__file__), "inputs")
 
     # test using SSMTWormItem to run PopulationAnalyzer in comps's SSMT DockerWorker
     def test_ssmt_workitem_PopulationAnalyzer(self):
         # load local ("inputs") PopulationAnalyzer.py and run_dtktools_PopulationAnalyzer.py
         # to COMPS's assets
         asset_files = FileList()
-        asset_files.add_file(os.path.join("inputs", 'PopulationAnalyzer.py'))
-        asset_files.add_file(os.path.join("inputs", 'run_dtktools_PopulationAnalyzer.py'))
+        asset_files.add_file(os.path.join(self.input_file_path, 'PopulationAnalyzer.py'))
+        asset_files.add_file(os.path.join(self.input_file_path, 'run_dtktools_PopulationAnalyzer.py'))
 
         # load local "input" foleer simtools.ini to current dir in Comps workitem
         user_files = FileList()
-        user_files.add_file(os.path.join("inputs", "simtools.ini"))
+        user_files.add_file(os.path.join(self.input_file_path, "simtools.ini"))
 
         experiment_id = "8bb8ae8f-793c-ea11-a2be-f0921c167861"
         command = "python Assets/run_dtktools_PopulationAnalyzer.py " + experiment_id
@@ -66,12 +68,12 @@ class TestSSMTWorkItem(ITestWithPersistence):
         # run_dtktools_multiple_analyers.py
         # to COMPS's workitem current dir
         user_files = FileList()
-        user_files.add_file(os.path.join("inputs", 'PopulationAnalyzer.py'))
-        user_files.add_file(os.path.join("inputs", 'AdultVectorsAnalyzer.py'))
-        user_files.add_file(os.path.join("inputs", 'run_dtktools_multiple_analyers.py'))
+        user_files.add_file(os.path.join(self.input_file_path, 'PopulationAnalyzer.py'))
+        user_files.add_file(os.path.join(self.input_file_path, 'AdultVectorsAnalyzer.py'))
+        user_files.add_file(os.path.join(self.input_file_path, 'run_dtktools_multiple_analyers.py'))
 
         # load local "input" foleer simtools.ini to current dir in Comps workitem
-        user_files.add_file(os.path.join("inputs", "simtools.ini"))
+        user_files.add_file(os.path.join(self.input_file_path, "simtools.ini"))
 
         experiment_id = "8bb8ae8f-793c-ea11-a2be-f0921c167861"
         command = "python run_dtktools_multiple_analyers.py " + experiment_id
@@ -115,12 +117,12 @@ class TestSSMTWorkItem(ITestWithPersistence):
         # load local ("inputs") PopulationAnalyzer.py and run_dtktools_PopulationAnalyzer.py
         # to COMPS's assets
         asset_files = FileList()
-        asset_files.add_file(os.path.join("inputs", 'PopulationAnalyzer.py'))
-        asset_files.add_file(os.path.join("inputs", 'run_dtktools_multiple_exps.py'))
+        asset_files.add_file(os.path.join(self.input_file_path, 'PopulationAnalyzer.py'))
+        asset_files.add_file(os.path.join(self.input_file_path, 'run_dtktools_multiple_exps.py'))
 
         # load local "input" foleer simtools.ini to current dir in Comps workitem
         user_files = FileList()
-        user_files.add_file(os.path.join("inputs", "simtools.ini"))
+        user_files.add_file(os.path.join(self.input_file_path, "simtools.ini"))
 
         command = "python Assets/run_dtktools_multiple_exps.py " + exp_id1 + " " + exp_id2
         wi = SSMTWorkItem(item_name=self.case_name, command=command, asset_files=asset_files, user_files=user_files,

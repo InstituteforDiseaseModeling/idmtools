@@ -31,6 +31,7 @@ class InputDataWorkItemTests(ITestWithPersistence):
     # create a wo.json from demo file first
     #------------------------------------------
     @pytest.mark.comps
+    @pytest.mark.long
     def test_generate_inputdata_climate_files_from_demo_file(self):
         climate_demog = os.path.join(intermediate_dir, 'Madagascar_Comoros_2.5arcmin_demographics_overlay.json')
 
@@ -79,6 +80,7 @@ class InputDataWorkItemTests(ITestWithPersistence):
     # use an existing wo.json to generate the climate files
     #------------------------------------------
     @pytest.mark.comps
+    @pytest.mark.long
     def test_generate_inputdata_climate_files_from_wo(self):
         work_order_path = os.path.join(intermediate_dir, 'wo.json')
 
