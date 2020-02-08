@@ -28,14 +28,14 @@ class TestSSMTWorkItem(ITestWithPersistence):
         # to COMPS's assets
         asset_files = FileList()
         asset_files.add_file(os.path.join(self.input_file_path, 'PopulationAnalyzer.py'))
-        asset_files.add_file(os.path.join(self.input_file_path, 'run_dtktools_PopulationAnalyzer.py'))
+        asset_files.add_file(os.path.join(self.input_file_path, 'run_PopulationAnalyzer.py'))
 
         # load local "input" foleer simtools.ini to current dir in Comps workitem
         user_files = FileList()
         user_files.add_file(os.path.join(self.input_file_path, "simtools.ini"))
 
         experiment_id = "8bb8ae8f-793c-ea11-a2be-f0921c167861"
-        command = "python Assets/run_dtktools_PopulationAnalyzer.py " + experiment_id
+        command = "python Assets/run_PopulationAnalyzer.py " + experiment_id
         wi = SSMTWorkItem(item_name=self.case_name, command=command, asset_files=asset_files, user_files=user_files,
                           tags=self.tags)
         wim = WorkItemManager(wi, self.platform)
@@ -56,7 +56,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
         self.assertEqual(execution['Command'],
-                         "python Assets/run_dtktools_PopulationAnalyzer.py " + experiment_id)
+                         "python Assets/run_PopulationAnalyzer.py " + experiment_id)
 
     # test using SSMTWormItem to run multiple analyzers in comps's SSMT DockerWorker
     def test_ssmt_workitem_multiple_analyzers(self):
@@ -70,13 +70,13 @@ class TestSSMTWorkItem(ITestWithPersistence):
         user_files = FileList()
         user_files.add_file(os.path.join(self.input_file_path, 'PopulationAnalyzer.py'))
         user_files.add_file(os.path.join(self.input_file_path, 'AdultVectorsAnalyzer.py'))
-        user_files.add_file(os.path.join(self.input_file_path, 'run_dtktools_multiple_analyers.py'))
+        user_files.add_file(os.path.join(self.input_file_path, 'run_multiple_analyers.py'))
 
         # load local "input" foleer simtools.ini to current dir in Comps workitem
         user_files.add_file(os.path.join(self.input_file_path, "simtools.ini"))
 
         experiment_id = "8bb8ae8f-793c-ea11-a2be-f0921c167861"
-        command = "python run_dtktools_multiple_analyers.py " + experiment_id
+        command = "python run_multiple_analyers.py " + experiment_id
         wi = SSMTWorkItem(item_name=self.case_name, command=command, user_files=user_files,
                           tags=self.tags)
         wim = WorkItemManager(wi, self.platform)
@@ -108,7 +108,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
         self.assertEqual(execution['Command'],
-                         "python run_dtktools_multiple_analyers.py " + experiment_id)
+                         "python run_multiple_analyers.py " + experiment_id)
 
     # test using SSMTWormItem to run multiple experiments in comps's SSMT DockerWorker
     def test_ssmt_workitem_multiple_experiments(self):
@@ -118,13 +118,13 @@ class TestSSMTWorkItem(ITestWithPersistence):
         # to COMPS's assets
         asset_files = FileList()
         asset_files.add_file(os.path.join(self.input_file_path, 'PopulationAnalyzer.py'))
-        asset_files.add_file(os.path.join(self.input_file_path, 'run_dtktools_multiple_exps.py'))
+        asset_files.add_file(os.path.join(self.input_file_path, 'run_multiple_exps.py'))
 
         # load local "input" foleer simtools.ini to current dir in Comps workitem
         user_files = FileList()
         user_files.add_file(os.path.join(self.input_file_path, "simtools.ini"))
 
-        command = "python Assets/run_dtktools_multiple_exps.py " + exp_id1 + " " + exp_id2
+        command = "python Assets/run_multiple_exps.py " + exp_id1 + " " + exp_id2
         wi = SSMTWorkItem(item_name=self.case_name, command=command, asset_files=asset_files, user_files=user_files,
                           tags=self.tags)
         wim = WorkItemManager(wi, self.platform)
@@ -145,4 +145,4 @@ class TestSSMTWorkItem(ITestWithPersistence):
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
         self.assertEqual(execution['Command'],
-                         "python Assets/run_dtktools_multiple_exps.py " + exp_id1 + " " + exp_id2)
+                         "python Assets/run_multiple_exps.py " + exp_id1 + " " + exp_id2)

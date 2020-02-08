@@ -4,7 +4,13 @@ from sys import argv
 
 sys.path.append(os.path.dirname(__file__))
 
-from simtools.Analysis.AnalyzeManager import AnalyzeManager
+try:
+    # use idmtool image
+    from idmtools.analysis.analyze_manager import AnalyzeManager
+except ImportError:
+    # use dtk-tools image
+    from simtools.Analysis.AnalyzeManager import AnalyzeManager
+
 from PopulationAnalyzer import PopulationAnalyzer
 
 if __name__ == "__main__":
