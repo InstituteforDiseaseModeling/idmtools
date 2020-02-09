@@ -2,7 +2,7 @@ import copy
 from dataclasses import dataclass, field, fields, InitVar
 from functools import partial
 from itertools import chain
-from typing import Set, Generator, Dict, Any
+from typing import Set, Generator, Dict, Any, List
 
 from more_itertools import grouper
 
@@ -13,7 +13,9 @@ from idmtools.utils.collections import ResetGenerator
 from idmtools.utils.hashing import ignore_fields_in_dataclass_on_pickle
 
 
-def simulation_generator(builders, new_sim_func, batch_size=10):
+def simulation_generator(builders, new_sim_func, additional_sims=None, batch_size=10):
+    if additional_sims:
+        additional_sims = []
     # Then the builders
     for groups in grouper(chain(*builders), batch_size):
         for simulation_functions in filter(None, groups):
@@ -28,13 +30,17 @@ def simulation_generator(builders, new_sim_func, batch_size=10):
             simulation.tags.update(tags)
             yield simulation
 
+    for sim in additional_sims:
+        yield sim
+
 
 @dataclass(repr=False)
 class TemplatedSimulations:
-    builders: Set[SimulationBuilder] = field(default_factory=lambda: set(), compare=False)
+    builders: Set[SimulationBuilder] = field(default_factory=set, compare=False)
     base_simulation: Simulation = field(default=None, compare=False, metadata={"pickle_ignore": True})
     base_task: ITask = field(default=None)
     tags: InitVar[Dict] = None
+    __extra_simulations: List[Simulation] = field(default_factory=list)
 
     def __post_init__(self, tags):
         if self.base_task is None and (self.base_simulation is None or self.base_simulation.task is None):
@@ -109,8 +115,22 @@ class TemplatedSimulations:
         display(self, experiment_table_display)
 
     def simulations(self) -> Generator[Simulation, None, None]:
-        p = partial(simulation_generator, self.builders, self.new_simulation)
+        p = partial(simulation_generator, self.builders, self.new_simulation, self.__extra_simulations)
         return ResetGenerator(p)
+
+    def add_simulation(self, simulation: Simulation):
+        """
+        Add a simulation that was built outside template engine to template generator. This is useful we you can build
+        most simulations through a template but need a some that cannot. This is especially true for large simulation
+        sets
+
+        Args:
+            simulation: Simulation to add
+
+        Returns:
+
+        """
+        self.__extra_simulations.append(simulation)
 
     def new_simulation(self):
         """
