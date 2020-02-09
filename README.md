@@ -39,9 +39,10 @@ When setting up your environment for the first time, you can use the following i
 2) Create a virtualenv. On Windows, please use venv to create the environment
    `python -m venv idmtools`
    On Unix(Mac/Linux) you can use venv or virtualenv
-3) If you are on windows, run `pip install py-make --upgrade --force-reinstall`
-4) Run `docker login idm-docker-staging.idmod.org`
-5) Then run `python dev_scripts/bootstrap.py`. This will install all the tools. 
+3) Activate the virtualenv
+4) If you are on windows, run `pip install py-make --upgrade --force-reinstall`
+5) Run `docker login idm-docker-staging.idmod.org`
+6) Then run `python dev_scripts/bootstrap.py`. This will install all the tools. 
 
 ### General Use
 After the first install almost everything you need as a developer is part of the makefiles. There is a Makefile is every project directory. There is also a makefile at the top-level of the project.
