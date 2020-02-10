@@ -4,7 +4,9 @@ import time
 import unittest
 from functools import wraps
 from typing import Callable
+
 import docker
+
 # The following decorators are used to control test
 # To allow for different use cases(dev, test, packaging, etc)
 # We have switches that should allow a rich set of possible
@@ -96,4 +98,18 @@ def restart_local_platform(silent=True, stop_before=True, stop_after=True, dump_
                     do.cleanup(True)
             return result
         return wrapper
+    return decorate
+
+
+def grab_inputs_to_files(only_args_kwargs=None, capure_out=False):
+    only_args_kwargs = dict()
+
+    def decorate(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            result = func(*args, **kwargs)
+            return result
+
+        return wrapper
+
     return decorate
