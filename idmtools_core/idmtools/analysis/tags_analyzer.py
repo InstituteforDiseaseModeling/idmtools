@@ -15,6 +15,10 @@ class TagsAnalyzer(IAnalyzer):
         super().__init__(uid, working_dir, parse)
         self.exp_id = None
 
+    def initialize(self):
+        if not os.path.exists(os.path.join(self.working_dir, "output_tag")):
+            os.mkdir(os.path.join(self.working_dir, "output_tag"))
+
     # Map is called to get for each simulation a data object (all the metadata of the simulations) and simulation object
     def map(self, data, simulation):
         df = pd.DataFrame(columns=simulation.tags.keys())  # Create a dataframe with the simulation tag keys
@@ -26,5 +30,4 @@ class TagsAnalyzer(IAnalyzer):
     def reduce(self, all_data):
         exp_id = str(next(iter(all_data.keys())).experiment.uid)  # Set the exp id from the first sim data
         results = pd.concat(list(all_data.values()), axis=0)  # Combine a list of all the sims tag values
-        os.makedirs(exp_id, exist_ok=True)  # Make a directory labeled the exp id to write the tags to a csv
-        results.to_csv(os.path.join(exp_id, 'tags.csv'))  # Write the sim tags to a csv
+        results.to_csv(os.path.join("output_tag", 'tags.csv'))  # Write the sim tags to a csv
