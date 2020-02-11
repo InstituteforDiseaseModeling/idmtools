@@ -333,6 +333,8 @@ class AnalyzeManager(CacheEnabled):
         n_items = len(self._items)
         n_processes = min(self.max_processes, max(n_items, 1))
 
+        logger.info(f'Analyzing {n_items}')
+
         # Initialize the cache
         logger.debug("Initializing Analysis Cache")
         self.initialize_cache(shards=n_processes * 2, eviction_policy='none')

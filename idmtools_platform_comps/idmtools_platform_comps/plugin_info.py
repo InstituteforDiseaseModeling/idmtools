@@ -18,6 +18,11 @@ node_group = emod_abcd
 num_retires = 0
 num_cores = 1
 exclusive = False
+max_workers = 16
+batch_size = 10
+work_item_type = DockerWorker
+docker_image = ubuntu18.04_python3.6_dtk-tools1.0b6
+plugin_key = 1.0.0.0_RELEASE
 """
 
 logger = getLogger(__name__)

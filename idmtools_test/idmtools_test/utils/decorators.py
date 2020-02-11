@@ -3,10 +3,8 @@ import platform
 import time
 import unittest
 from functools import wraps
-from typing import Callable
-
+from typing import Callable, Union, Any
 import docker
-
 # The following decorators are used to control test
 # To allow for different use cases(dev, test, packaging, etc)
 # We have switches that should allow a rich set of possible
@@ -101,13 +99,33 @@ def restart_local_platform(silent=True, stop_before=True, stop_after=True, dump_
     return decorate
 
 
-def grab_inputs_to_files(only_args_kwargs=None, capure_out=False):
-    only_args_kwargs = dict()
+def dump_output(output_directory: Union[str, Callable[[Callable], str]],
+                procress_data_func: Callable = None,
+                capture_output: bool = False):
+    import pickle
+    if isinstance(output_directory, str):
+        os.makedirs(output_directory, exist_ok=True)
 
     def decorate(func):
+        # create directory for function output
+        # if we have a function for directory naming, call it
+        if callable(output_directory):
+            out = output_directory(func)
+        else:
+            out = os.path.abspath(os.path.join(".", func.__name__, "input"))
+
         @wraps(func)
         def wrapper(*args, **kwargs):
+            # if output directory is a
+            for name, a in [('args', args), ('kwargs', kwargs)]:
+                if len(a):
+                    input_file_out = os.path.join(out, f'{int(round(time.time() * 1000))}_{name}.pkl')
+                    with open(input_file_out, 'bw') as o:
+                        pickle.dump(args, o)
+            os.makedirs(out)
             result = func(*args, **kwargs)
+            if capture_output:
+
             return result
 
         return wrapper

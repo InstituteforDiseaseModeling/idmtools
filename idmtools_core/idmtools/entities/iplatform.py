@@ -5,7 +5,7 @@ from itertools import groupby
 from logging import getLogger, DEBUG
 from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set, Iterator
 from uuid import UUID
-
+from dataclasses import dataclass
 from tqdm import tqdm
 
 from idmtools.core import CacheEnabled, UnknownItemException, EntityContainer, UnsupportedPlatformType
@@ -46,10 +46,12 @@ ITEM_TYPE_TO_OBJECT_INTERFACE = {
 STANDARD_TYPE_TO_INTERFACE = {
     Experiment: ItemType.EXPERIMENT,
     Simulation: ItemType.SIMULATION,
+    IWorkflowItem: ItemType.WORKFLOW_ITEM,
     Suite: ItemType.SUITE
 }
 
 
+@dataclass(repr=False)
 class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     """
     Interface defining a platform.
@@ -60,17 +62,17 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     - Commissioning
     - File handling
     """
-    platform_type_map: Dict[Type, ItemType] = None
-    _object_cache_expiration: 'int' = 60
+    platform_type_map: Dict[Type, ItemType] = field(default=None, repr=False, init=False)
+    _object_cache_expiration: 'int' = field(default=60, repr=False, init=False)
 
-    supported_types: Set[ItemType] = field(default_factory=lambda: set(), metadata={"pickle_ignore": True})
-    _platform_supports: List[PlatformRequirements] = field(default_factory=list)
+    supported_types: Set[ItemType] = field(default_factory=lambda: set(), repr=False, init=False)
+    _platform_supports: List[PlatformRequirements] = field(default_factory=list, repr=False, init=False)
 
-    _experiments: IPlatformExperimentOperations = None
-    _simulations: IPlatformSimulationOperations = None
-    _suites: IPlatformSuiteOperations = None
-    _workflow_items: IPlatformWorkflowItemOperations = None
-    _assets: IPlatformAssetCollectionOperations = None
+    _experiments: IPlatformExperimentOperations = field(default=None, repr=False, init=False, compare=False)
+    _simulations: IPlatformSimulationOperations = field(default=None, repr=False, init=False, compare=False)
+    _suites: IPlatformSuiteOperations = field(default=None, repr=False, init=False, compare=False)
+    _workflow_items: IPlatformWorkflowItemOperations = field(default=None, repr=False, init=False, compare=False)
+    _assets: IPlatformAssetCollectionOperations = field(default=None, repr=False, init=False, compare=False)
 
     @staticmethod
     def get_caller():
@@ -575,6 +577,51 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         prog = tqdm([], total=len(item.simulations), desc="Waiting on Experiment to Finish running")
         self.__wait_till_callback(item, partial(get_prog_bar, prog=prog), timeout, refresh_interval)
+
+    def get_related_items(self, item: IWorkflowItem, relation_type: RelationType) -> Dict[str, Dict[str, str]]:
+        """
+        Retrieve all related objects
+        Args:
+            item: SSMTWorkItem
+            relation_type: Depends or Create
+
+        Returns: dict with key the object type
+        """
+        if item.item_type != ItemType.WORKFLOW_ITEM:
+            raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
+        interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
+        return getattr(self, interface).get_related_items(item, relation_type)
+
+    def get_files_by_id(self, item_id: UUID, item_type: ItemType, files: Union[Set[str], List[str]],
+                        output: str = None) -> \
+            Union[Dict[str, Dict[str, bytearray]], Dict[str, bytearray]]:
+        """
+        Get files by item id (UUID)
+        Args:
+            item_id: COMPS Item, say, Simulation Id or WorkItem Id
+            item_type: Item Type
+            files: List of files to retrieve
+            output: save files to
+
+        Returns: dict with key/value: file_name/file_content
+        """
+        idm_item = self.get_item(item_id, item_type, raw=False)
+        ret = self.get_files(idm_item, files)
+
+        if output:
+            if item_type not in (ItemType.SIMULATION, ItemType.WORKFLOW_ITEM):
+                print("Currently 'output' only supports Simulation and WorkItem!")
+            else:
+                for ofi, ofc in ret.items():
+                    file_path = os.path.join(output, str(item_id), ofi)
+                    parent_path = os.path.dirname(file_path)
+                    if not os.path.exists(parent_path):
+                        os.makedirs(parent_path)
+
+                    with open(file_path, 'wb') as outfile:
+                        outfile.write(ofc)
+
+        return ret
 
 
 

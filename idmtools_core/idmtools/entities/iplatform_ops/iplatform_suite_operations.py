@@ -236,5 +236,6 @@ class IPlatformSuiteOperations(ABC):
         """
         ret = dict()
         for exp in suite.experiments:
-            ret[exp.uid] = self.platform._experiments.get_assets(exp, files, **kwargs)
+            e = self.platform.get_item(exp.uid, ItemType.EXPERIMENT)
+            ret[str(exp.uid)] = self.platform.get_files(e, files, **kwargs)
         return ret
