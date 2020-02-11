@@ -1,7 +1,7 @@
 import os
 import re
 from idmtools.assets import Asset as AssetFile
-from idmtools.ssmt.local_os import LocalOS
+from idmtools.utils.local_os import LocalOS
 
 
 class FileList:

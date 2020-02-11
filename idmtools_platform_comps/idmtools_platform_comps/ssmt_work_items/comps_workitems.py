@@ -1,10 +1,9 @@
-import typing
 from dataclasses import dataclass, field
-from idmtools.entities.iworkflow_item import IWorkflowItem
+from idmtools_platform_comps.ssmt_work_items.icomps_workflowitem import ICOMPSWorkflowItem
 
 
 @dataclass
-class SSMTWorkItem(IWorkflowItem):
+class SSMTWorkItem(ICOMPSWorkflowItem):
     """
     Idm SSMTWorkItem
     """
@@ -30,7 +29,7 @@ class SSMTWorkItem(IWorkflowItem):
 
 
 @dataclass
-class InputDataWorkItem(IWorkflowItem):
+class InputDataWorkItem(ICOMPSWorkflowItem):
     """
     Idm InputDataWorkItem
     """
@@ -41,7 +40,7 @@ class InputDataWorkItem(IWorkflowItem):
 
 
 @dataclass
-class VisToolsWorkItem(IWorkflowItem):
+class VisToolsWorkItem(ICOMPSWorkflowItem):
     """
     Idm VisToolsWorkItem
     """
@@ -49,17 +48,3 @@ class VisToolsWorkItem(IWorkflowItem):
     def __post_init__(self):
         super().__post_init__()
         self.work_item_type = self.work_item_type or 'VisTools'
-
-
-@dataclass
-class GenericWorkItem(IWorkflowItem):
-    """
-    Idm GenericWorkItem
-    """
-    pass
-
-
-ISSMTWorkItemClass = typing.Type[SSMTWorkItem]
-IInputDataWorkItemClass = typing.Type[InputDataWorkItem]
-IVisToolsWorkItemClass = typing.Type[VisToolsWorkItem]
-IGenericWorkItemClass = typing.Type[GenericWorkItem]

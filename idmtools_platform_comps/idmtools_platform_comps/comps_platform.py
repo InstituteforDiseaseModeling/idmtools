@@ -2,11 +2,9 @@ import copy
 import json
 import logging
 from dataclasses import dataclass, field
-
 # COMPS sometimes messes up our logger so backup handler in case
 handlers = [x for x in logging.getLogger().handlers]
 from COMPS import Client
-
 r = logging.getLogger()
 r.handlers = handlers
 from idmtools.core import CacheEnabled, ItemType

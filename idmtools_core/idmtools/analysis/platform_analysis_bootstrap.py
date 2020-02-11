@@ -19,7 +19,7 @@ sys.path.append(os.path.dirname(__file__))
 if __name__ == "__main__":
     if len(sys.argv) < 3:
         raise Exception(
-            "The script needs to be called with `python analyze_ssmt.py <experiment_ids> <analyzers>.\n{}".format(
+            "The script needs to be called with `python platform_analysis_bootstrap.py <experiment_ids> <analyzers>.\n{}".format(
                 " ".join(sys.argv)))
 
     # Get the experiments and analyzers

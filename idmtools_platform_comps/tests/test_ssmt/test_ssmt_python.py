@@ -7,8 +7,8 @@ from idmtools.assets.file_list import FileList
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.managers.work_item_manager import WorkItemManager
-from idmtools.ssmt.idm_work_item import SSMTWorkItem
-from idmtools.ssmt.ssmt_analysis import SSMTAnalysis
+from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
+from idmtools.analysis.platform_anaylsis import PlatformAnalysis
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import del_folder
 
@@ -67,12 +67,12 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
         from SimpleAnalyzer import SimpleAnalyzer
 
         experiment_id = "9311af40-1337-ea11-a2be-f0921c167861"
-        analysis = SSMTAnalysis(platform=self.platform,
-                                experiment_ids=[experiment_id],
-                                analyzers=[SimpleAnalyzer],
-                                analyzers_args=[{'filenames': ['config.json']}],
-                                analysis_name=self.case_name,
-                                tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'})
+        analysis = PlatformAnalysis(platform=self.platform,
+                                    experiment_ids=[experiment_id],
+                                    analyzers=[SimpleAnalyzer],
+                                    analyzers_args=[{'filenames': ['config.json']}],
+                                    analysis_name=self.case_name,
+                                    tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'})
 
         analysis.analyze(check_status=True)
         wi = analysis.get_work_item()
@@ -91,20 +91,20 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
         self.assertEqual(execution['Command'],
-                         "python analyze_ssmt.py " + experiment_id + " SimpleAnalyzer.SimpleAnalyzer")
+                         "python platform_analysis_bootstrap.py " + experiment_id + " SimpleAnalyzer.SimpleAnalyzer")
 
     # Test CSVAnalyzer with SSMTAnalysis which analyzes python experiment's results
     def test_ssmt_workitem_python_csv_analyzer(self):
         sys.path.insert(0, self.input_file_path)
         from CSVAnalyzer import CSVAnalyzer
         experiment_id = "9311af40-1337-ea11-a2be-f0921c167861"
-        analysis = SSMTAnalysis(platform=self.platform,
-                                experiment_ids=[experiment_id],
-                                analyzers=[CSVAnalyzer],
-                                analyzers_args=[{'filenames': ['output/c.csv'],
+        analysis = PlatformAnalysis(platform=self.platform,
+                                    experiment_ids=[experiment_id],
+                                    analyzers=[CSVAnalyzer],
+                                    analyzers_args=[{'filenames': ['output/c.csv'],
                                                  'parse': True}],
-                                analysis_name=self.case_name,
-                                tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'})
+                                    analysis_name=self.case_name,
+                                    tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'})
 
         analysis.analyze(check_status=True)
         wi = analysis.get_work_item()
@@ -123,4 +123,4 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
         self.assertEqual(execution['Command'],
-                         "python analyze_ssmt.py " + experiment_id + " CSVAnalyzer.CSVAnalyzer")
+                         "python platform_analysis_bootstrap.py " + experiment_id + " CSVAnalyzer.CSVAnalyzer")

@@ -6,7 +6,7 @@ from idmtools.assets.file_list import FileList
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.managers.work_item_manager import WorkItemManager
-from idmtools.ssmt.idm_work_item import SSMTWorkItem
+from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import del_folder
 

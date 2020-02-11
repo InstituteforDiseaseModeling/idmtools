@@ -6,7 +6,7 @@ import pytest
 from idmtools.assets.file_list import FileList
 from idmtools.core.platform_factory import Platform
 from idmtools.managers.work_item_manager import WorkItemManager
-from idmtools.ssmt.idm_work_item import SSMTWorkItem
+from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
 from COMPS.Data.WorkItem import WorkItem, RelationType
 from COMPS.Data import QueryCriteria, AssetCollection
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence

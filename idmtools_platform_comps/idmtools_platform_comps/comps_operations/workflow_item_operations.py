@@ -6,7 +6,7 @@ from uuid import UUID
 from COMPS.Data import WorkItem as COMPSWorkItem, WorkItemFile
 from COMPS.Data.WorkItem import WorkerOrPluginKey, RelationType
 from idmtools.assets import AssetCollection
-from idmtools.ssmt.idm_work_item import GenericWorkItem
+from idmtools_platform_comps.ssmt_work_items.comps_workitems import GenericWorkItem
 from idmtools.core import ItemType
 from idmtools.entities.iplatform_ops.iplatform_workflowitem_operations import IPlatformWorkflowItemOperations
 from idmtools.entities.iworkflow_item import IWorkflowItem

@@ -10,7 +10,7 @@ import xmlrunner
 
 from idmtools.managers.work_item_manager import WorkItemManager
 from idmtools.core.platform_factory import Platform
-from idmtools.ssmt.idm_work_item import InputDataWorkItem
+from idmtools_platform_comps.ssmt_work_items.comps_workitems import InputDataWorkItem
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 # Set up the paths

@@ -1,5 +1,4 @@
 import os
-import sys
 from functools import partial
 
 from idmtools.assets import AssetCollection
@@ -8,7 +7,7 @@ from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
 from idmtools.managers.work_item_manager import WorkItemManager
-from idmtools.ssmt.idm_work_item import VisToolsWorkItem
+from idmtools_platform_comps.ssmt_work_items.comps_workitems import VisToolsWorkItem
 from idmtools_model_emod import EMODExperiment
 from idmtools_test import COMMON_INPUT_PATH
 

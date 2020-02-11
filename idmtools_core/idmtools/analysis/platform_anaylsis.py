@@ -4,10 +4,10 @@ import pickle
 import tempfile
 from idmtools.assets.file_list import FileList
 from idmtools.managers.work_item_manager import WorkItemManager
-from idmtools.ssmt.idm_work_item import SSMTWorkItem
+from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
 
 
-class SSMTAnalysis:
+class PlatformAnalysis:
 
     def __init__(self, platform, experiment_ids, analyzers, analyzers_args=None, analysis_name='WorkItem Test',
                  tags=None,
@@ -26,9 +26,9 @@ class SSMTAnalysis:
         self.validate_args()
 
     def analyze(self, check_status=True):
-        # Add the analyze_ssmt.py file to the collection
+        # Add the platform_analysis_bootstrap.py file to the collection
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        self.additional_files.add_file(os.path.join(dir_path, "analyze_ssmt.py"))
+        self.additional_files.add_file(os.path.join(dir_path, "platform_analysis_bootstrap.py"))
 
         # If there is a idmtools.ini, send it along
         if os.path.exists(os.path.join(os.getcwd(), "idmtools.ini")):
@@ -53,7 +53,7 @@ class SSMTAnalysis:
             self.additional_files.add_file(inspect.getfile(a))
 
         # Create the command
-        command = "python analyze_ssmt.py"
+        command = "python platform_analysis_bootstrap.py"
         # Add the experiments
         command += " {}".format(",".join(self.experiment_ids))
         # Add the analyzers
