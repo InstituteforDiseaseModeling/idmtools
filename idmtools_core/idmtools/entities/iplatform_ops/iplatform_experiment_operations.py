@@ -262,7 +262,7 @@ class IPlatformExperimentOperations(ABC):
         """
         ret = dict()
         for sim in experiment.simulations:
-            ret[sim.uid] = self.platform._simulation.get_assets(sim, files, **kwargs)
+            ret[sim.uid] = self.platform._simulations.get_assets(sim, files, **kwargs)
         return ret
 
     def list_assets(self, experiment: Experiment, **kwargs) -> Dict[str, List[str]]:
