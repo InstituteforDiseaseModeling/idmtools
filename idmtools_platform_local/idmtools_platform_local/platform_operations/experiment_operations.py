@@ -6,9 +6,7 @@ from logging import getLogger
 from math import floor
 from typing import List, Any, Dict, Container, NoReturn
 from uuid import UUID
-
 from tqdm import tqdm
-
 from idmtools.assets import Asset
 from idmtools.core.docker_task import DockerTask
 from idmtools.core.experiment_factory import experiment_factory
@@ -139,7 +137,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         """
 
         Sends assets for specified experiment
-        
+
         Args:
             experiment: Experiment to send assets for
 
@@ -227,7 +225,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
     def _launch_item_in_browser(self, item):
         """
         Launch experiment data page in a web browser
-        
+
         Args:
             item:
 

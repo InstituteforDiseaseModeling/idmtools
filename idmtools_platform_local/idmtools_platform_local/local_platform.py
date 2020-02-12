@@ -1,7 +1,7 @@
 import copy
 from dataclasses import dataclass, field
 from logging import getLogger
-from typing import List, Optional, Type
+from typing import List, Optional
 from idmtools.core import ItemType
 from idmtools.core.system_information import get_data_directory
 from idmtools.entities.iplatform import IPlatform

@@ -2,7 +2,6 @@ import logging
 import os
 import random
 import string
-from dataclasses import InitVar
 import typing as typing
 
 import backoff
@@ -34,7 +33,6 @@ class CreateExperimentTask(GenericActor):
             - Return the UUID of the newly created experiment
         Args:
             tags (TTags): Tags for the experiment to be created
-            simulation_type(InitVar[TSimulationClass]): Type of simulation we are creating
 
         Returns:
             (str) Id of created experiment
