@@ -1,6 +1,5 @@
 import os
 from dataclasses import field, dataclass
-
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core.docker_task import DockerTask
 from idmtools.entities import CommandLine
@@ -53,4 +52,3 @@ class RTaskSpecification(TaskSpecification):
 
     def get_description(self) -> str:
         return "Defines a R script command"
-
