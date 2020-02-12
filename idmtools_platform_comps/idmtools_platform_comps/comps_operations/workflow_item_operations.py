@@ -1,190 +1,90 @@
-import json
-from COMPS.Data.WorkItem import WorkerOrPluginKey, RelationType
-from dataclasses import dataclass, field
-from typing import List, Dict, Any, Tuple, Type
-from uuid import UUID
-from idmtools.assets import AssetCollection
-from idmtools.entities.iplatform_metadata import IPlatformWorkflowItemOperations
-from COMPS.Data import WorkItem as COMPSWorkItem, WorkItemFile
-from idmtools.entities.iworkflow_item import IWorkflowItem
-from idmtools.ssmt.ssmt_work_item import SSMTWorkItem
-from idmtools_platform_comps.utils.general import convert_COMPS_status, get_asset_for_comps_item
+import os
+import inspect
+import pickle
+import tempfile
+from idmtools.assets.file_list import FileList
+from idmtools.managers.work_item_manager import WorkItemManager
+from idmtools.ssmt.idm_work_item import SSMTWorkItem
 
 
-@dataclass
-class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
-    platform: 'COMPSPlaform'  # noqa F821
-    platform_type: Type = field(default=COMPSWorkItem)
+class SSMTAnalysis:
 
-    def get(self, work_item_id: UUID, **kwargs) -> Any:
-        """
-        Returns the platform representation of an WorkItem
+    def __init__(self, platform, experiment_ids, analyzers, analyzers_args=None, analysis_name='WorkItem Test', tags=None,
+                 additional_files=None, asset_collection_id=None, asset_files=FileList()):
+        self.platform = platform
+        self.experiment_ids = experiment_ids
+        self.analyzers = analyzers
+        self.analyzers_args = analyzers_args
+        self.analysis_name = analysis_name
+        self.tags = tags
+        self.additional_files = additional_files or FileList()
+        self.asset_collection_id = asset_collection_id
+        self.asset_files = asset_files
+        self.wi = None
 
-        Args:
-            work_item_id: Item id of WorkItems
-            **kwargs:
+        self.validate_args()
 
-        Returns:
-            Platform Representation of an work_item
-        """
-        wi = COMPSWorkItem.get(work_item_id)
-        return wi
+    def analyze(self, check_status=True):
+        # Add the analyze_ssmt.py file to the collection
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        self.additional_files.add_file(os.path.join(dir_path, "analyze_ssmt.py"))
 
-    def batch_create(self, work_items: List[IWorkflowItem], **kwargs) -> List[Tuple[Any, UUID]]:
-        """
-        Provides a method to batch create workflow items
+        # If there is a idmtools.ini, send it along
+        if os.path.exists(os.path.join(os.getcwd(), "idmtools.ini")):
+            self.additional_files.add_file(os.path.join(os.getcwd(), "idmtools.ini"))
 
-        Args:
-            workflow_items: List of work items to create
-            **kwargs:
+        # build analyzer args dict
+        args_dict = {}
+        a_args = zip(self.analyzers, self.analyzers_args)
+        for a, g in a_args:
+            args_dict[f"{inspect.getmodulename(inspect.getfile(a))}.{a.__name__}"] = g
 
-        Returns:
-            List of tuples containing the create object and id of item that was created
-        """
-        ret = []
-        for wi in work_items:
-            ret.append(self.create(wi, **kwargs))
-        return ret
+        # save pickle file as a temp file
+        temp_dir = tempfile.mkdtemp()
+        temp_file = os.path.join(temp_dir, "analyzer_args.pkl")
+        pickle.dump(args_dict, open(temp_file, 'wb'))
 
-    def create(self, work_item: IWorkflowItem, **kwargs) -> Tuple[Any, UUID]:
-        """
-        Creates an workflow_item from an IDMTools work_item object
+        # Add analyzer args pickle as additional file
+        self.additional_files.add_file(temp_file)
 
-        Args:
-            work_item: WorkflowItem to create
-            **kwargs: Optional arguments mainly for extensibility
+        # Add all the analyzers files
+        for a in self.analyzers:
+            self.additional_files.add_file(inspect.getfile(a))
 
-        Returns:
-            Created platform item and the UUID of said item
-        """
-        # Collect asset files
-        if not work_item.asset_collection_id:
-            # Create a collection with everything that is in asset_files
-            if len(work_item.asset_files.files) > 0:
-                ac = AssetCollection(assets=work_item.asset_files)
-                self.platform.create_items([ac])
-                work_item.asset_collection_id = ac.uid
+        # Create the command
+        command = "python analyze_ssmt.py"
+        # Add the experiments
+        command += " {}".format(",".join(self.experiment_ids))
+        # Add the analyzers
+        command += " {}".format(",".join(f"{inspect.getmodulename(inspect.getfile(a))}.{a.__name__}"
+                                         for a in self.analyzers))
 
-        # Create a WorkItem
-        wi = COMPSWorkItem(name=work_item.item_name,
-                           worker=WorkerOrPluginKey(self.platform.item_type, self.platform.plugin_key),
-                           environment_name=self.platform.environment,
-                           asset_collection_id=work_item.asset_collection_id)
+        self.wi = SSMTWorkItem(item_name=self.analysis_name, command=command, tags=self.tags,
+                          user_files=self.additional_files, asset_collection_id=self.asset_collection_id,
+                          asset_files=self.asset_files, related_experiments=self.experiment_ids)
 
-        # set tags
-        if work_item.tags:
-            wi.set_tags(work_item.tags)
+        # Create WorkItemManager
+        wim = WorkItemManager(self.wi, self.platform)
 
-        if wi.tags:
-            wi.tags.update({'WorkItem_Type': self.platform.item_type})
+        wim.process(check_status)
 
-        # Add work order file
-        wo = {
-            "WorkItem_Type": self.platform.item_type,
-            "Execution": {
-                "ImageName": self.platform.docker_image,
-                "Command": work_item.command
-            }
-        }
-        wo.update(work_item.wo_kwargs)
-        wi.add_work_order(data=json.dumps(wo).encode('utf-8'))
+        # remove temp file
+        os.remove(temp_file)
 
-        # Add additional files
-        for af in work_item.user_files:
-            wi_file = WorkItemFile(af.filename, "input")
-            wi.add_file(wi_file, af.absolute_path)
+    def validate_args(self):
+        if self.analyzers_args is None:
+            self.analyzers_args = [{}] * len(self.analyzers)
+            return
 
-        # Save the work-item to the server
-        wi.save()
-        wi.refresh()
+        self.analyzers_args = [g if g is not None else {} for g in self.analyzers_args]
 
-        # Sets the related experiments
-        if work_item.related_experiments:
-            for exp_id in work_item.related_experiments:
-                wi.add_related_experiment(exp_id, RelationType.DependsOn)
+        if len(self.analyzers_args) < len(self.analyzers):
+            self.analyzers_args = self.analyzers_args + [{}] * (len(self.analyzers) - len(self.analyzers_args))
+            return
 
-        # Set the ID back in the object
-        work_item.uid = wi.id
+        if len(self.analyzers) < len(self.analyzers_args):
+            print("two list 'analyzers' and 'analyzers_args' must have the same length.")
+            exit()
 
-        return work_item, wi.id
-
-    def run_item(self, work_item: IWorkflowItem):
-        work_item.get_platform_object().commission()
-
-    def refresh_status(self, work_item: IWorkflowItem):
-        """
-        Refresh status for workflow item
-        Args:
-            work_item: Item to refresh status for
-
-        Returns:
-            None
-        """
-        wi = self.get(work_item.uid)
-        work_item.status = wi.state  # convert_COMPS_status(wi.state)
-
-    def get_parent(self, work_item: COMPSWorkItem, **kwargs) -> Any:
-        """
-        Returns the parent of item. If the platform doesn't support parents, you should throw a TopLevelItem error
-
-        Args:
-            work_item:
-            **kwargs:
-
-        Returns:
-
-        Raise:
-            TopLevelItem
-        """
-        return None
-
-    def get_children(self, work_item: COMPSWorkItem, **kwargs) -> List[Any]:
-        """
-        Returns the children of an workflow_item object
-
-        Args:
-            work_item: WorkflowItem object
-            **kwargs: Optional arguments mainly for extensibility
-
-        Returns:
-            Children of work_item object
-        """
-        return None
-
-    def to_entity(self, work_item: COMPSWorkItem, **kwargs) -> IWorkflowItem:
-        """
-        Converts the platform representation of workflow_item to idmtools representation
-
-        Args:
-            work_item:Platform workflow_item object
-
-        Returns:
-            IDMTools SSMTWorkItem object
-        """
-        # Creat a SSMTWorkItem
-        obj = SSMTWorkItem()
-
-        # Set its correct attributes
-        obj.item_name = work_item.name
-        obj.uid = work_item.id
-        obj.command = work_item.command
-        obj.asset_collection_id = work_item.asset_collection_id
-        obj.asset_files = work_item.asset_files
-        obj.user_files = work_item.user_files
-        obj.wo_kwargs = work_item.wo_kwargs
-        obj.asset_files = work_item.asset_files
-        obj.tags = work_item.tags
-        obj.related_experiments = work_item.related_experiments
-        return obj
-
-    def send_assets(self, workflow_item: SSMTWorkItem):
-        for asset in workflow_item.assets:
-            workflow_item.add_file(workitemfile=WorkItemFile(asset.filename, 'input'), data=asset.bytes)
-
-    def list_assets(self, workflow_item: IWorkflowItem, **kwargs) -> List[str]:
-        item: SSMTWorkItem = workflow_item.get_platform_object(True, children=["files", "configuration"])
-        return item.files
-
-    def get_assets(self, workflow_item: IWorkflowItem, files: List[str], **kwargs) -> Dict[str, bytearray]:
-        return get_asset_for_comps_item(self.platform, workflow_item, files, self.cache)
-
+    def get_work_item(self):
+        return self.wi

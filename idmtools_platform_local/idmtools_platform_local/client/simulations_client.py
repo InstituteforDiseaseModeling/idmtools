@@ -59,6 +59,7 @@ class SimulationsClient(BaseClient):
     def cancel(cls, id: str) -> Dict[str, Any]:
         """
         Marks a simulation to be canceled. Canceled jobs are only truly canceled when the queue message is processed
+        
         Args:
             id (st):
 

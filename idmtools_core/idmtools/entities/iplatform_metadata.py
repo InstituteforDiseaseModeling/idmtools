@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import Any, List, Tuple, Type, Dict
 from uuid import UUID
 from idmtools.assets import AssetCollection
-from idmtools.core import CacheEnabled
+from idmtools.core import CacheEnabled, ItemType
 from idmtools.entities.iexperiment import IExperiment
 from idmtools.entities.isimulation import ISimulation
 from idmtools.entities.suite import Suite
@@ -79,7 +79,7 @@ class IPlatformExperimentOperations(ABC):
     def get_parent(self, experiment: Any, **kwargs) -> Any:
         """
         Returns the parent of item. If the platform doesn't support parents, you should throw a TopLevelItem error
-        
+
         Args:
             experiment:
             **kwargs:
@@ -94,9 +94,9 @@ class IPlatformExperimentOperations(ABC):
     def to_entity(self, experiment: Any, **kwargs) -> IExperiment:
         """
         Converts the platform representation of experiment to idmtools representation
-        
+
         Args:
-            experiment:Platform experiment object 
+            experiment:Platform experiment object
 
         Returns:
             IDMTools experiment object
@@ -107,15 +107,15 @@ class IPlatformExperimentOperations(ABC):
     def run_item(self, experiment: IExperiment):
         """
         Called during commissioning of an item. This should create the remote resource
-        
+
         Args:
-            experiment: 
+            experiment:
 
         Returns:
 
         """
         pass
-    
+
     @abstractmethod
     def send_assets(self, experiment: Any):
         """
@@ -156,7 +156,7 @@ class IPlatformExperimentOperations(ABC):
         """
         ret = dict()
         for sim in experiment.simulations:
-            ret[sim.uid] = self.platform._simulation.get_assets(sim, files, **kwargs)
+            ret[str(sim.uid)] = self.platform._simulations.get_assets(sim, files, **kwargs)
         return ret
 
     def list_assets(self, experiment: IExperiment) -> Dict[str, List[str]]:
@@ -251,7 +251,7 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         Converts the platform representation of simulation to idmtools representation
 
         Args:
-            simulation:Platform simulation object 
+            simulation:Platform simulation object
 
         Returns:
             IDMTools simulation object
@@ -270,7 +270,7 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
 
         """
         pass
-    
+
     @abstractmethod
     def send_assets(self, simulation: Any):
         pass
@@ -401,7 +401,7 @@ class IPlatformSuiteOperations(ABC):
         Converts the platform representation of suite to idmtools representation
 
         Args:
-            suite:Platform suite object 
+            suite:Platform suite object
 
         Returns:
             IDMTools suite object
@@ -434,7 +434,8 @@ class IPlatformSuiteOperations(ABC):
         """
         ret = dict()
         for exp in suite.experiments:
-            ret[exp.uid] = self.platform._experiments.get_assets(exp, files, **kwargs)
+            e = self.platform.get_item(exp.uid, ItemType.EXPERIMENT)
+            ret[str(exp.uid)] = self.platform.get_files(e, files, **kwargs)
         return ret
 
 
@@ -517,6 +518,7 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
         """
         pass
 
+    @abstractmethod
     def to_entity(self, workflow_item: Any, **kwargs) -> IWorkflowItem:
         """
         Converts the platform representation of workflow_item to idmtools representation

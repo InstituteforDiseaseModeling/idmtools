@@ -1,97 +1,90 @@
-import copy
-import json
-import logging
-import typing
-from dataclasses import dataclass, field
-from COMPS import Client
-from idmtools.core import CacheEnabled, ItemType
-from idmtools.entities import IPlatform
-from idmtools.entities.iexperiment import IExperiment, IGPUExperiment, IDockerExperiment, \
-    ILinuxExperiment
-from idmtools_platform_comps.comps_operations.asset_collection_operations import \
-    CompsPlatformAssetCollectionOperations
-from idmtools_platform_comps.comps_operations.experiment_operations import CompsPlatformExperimentOperations
-from idmtools_platform_comps.comps_operations.simulation_operations import CompsPlatformSimulationOperations
-from idmtools_platform_comps.comps_operations.suite_operations import CompsPlatformSuiteOperations
-from idmtools_platform_comps.comps_operations.workflow_item_operations import CompsPlatformWorkflowItemOperations
-from idmtools.entities.platform_requirements import PlatformRequirements
-from typing import List
+import os
+import inspect
+import pickle
+import tempfile
+from idmtools.assets.file_list import FileList
+from idmtools.managers.work_item_manager import WorkItemManager
+from idmtools.ssmt.idm_work_item import SSMTWorkItem
 
 
-logging.getLogger('COMPS.Data.Simulation').disabled = True
-logger = logging.getLogger(__name__)
+class SSMTAnalysis:
 
+    def __init__(self, platform, experiment_ids, analyzers, analyzers_args=None, analysis_name='WorkItem Test', tags=None,
+                 additional_files=None, asset_collection_id=None, asset_files=FileList()):
+        self.platform = platform
+        self.experiment_ids = experiment_ids
+        self.analyzers = analyzers
+        self.analyzers_args = analyzers_args
+        self.analysis_name = analysis_name
+        self.tags = tags
+        self.additional_files = additional_files or FileList()
+        self.asset_collection_id = asset_collection_id
+        self.asset_files = asset_files
+        self.wi = None
 
-class COMPSPriority:
-    Lowest = "Lowest"
-    BelowNormal = "BelowNormal"
-    Normal = "Normal"
-    AboveNormal = "AboveNormal"
-    Highest = "Highest"
+        self.validate_args()
 
+    def analyze(self, check_status=True):
+        # Add the analyze_ssmt.py file to the collection
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        self.additional_files.add_file(os.path.join(dir_path, "analyze_ssmt.py"))
 
-op_defaults = dict(default=None, compare=False, metadata=dict(pickle_ignore=True))
+        # If there is a idmtools.ini, send it along
+        if os.path.exists(os.path.join(os.getcwd(), "idmtools.ini")):
+            self.additional_files.add_file(os.path.join(os.getcwd(), "idmtools.ini"))
 
-supported_types = [PlatformRequirements.DOCKER, PlatformRequirements.PYTHON, PlatformRequirements.SHELL,
-                   PlatformRequirements.NativeBinary, PlatformRequirements.WINDOWS]
+        # build analyzer args dict
+        args_dict = {}
+        a_args = zip(self.analyzers, self.analyzers_args)
+        for a, g in a_args:
+            args_dict[f"{inspect.getmodulename(inspect.getfile(a))}.{a.__name__}"] = g
 
+        # save pickle file as a temp file
+        temp_dir = tempfile.mkdtemp()
+        temp_file = os.path.join(temp_dir, "analyzer_args.pkl")
+        pickle.dump(args_dict, open(temp_file, 'wb'))
 
-@dataclass(repr=False)
-class COMPSPlatform(IPlatform, CacheEnabled):
-    """
-    Represents the platform allowing to run simulations on COMPS.
-    """
+        # Add analyzer args pickle as additional file
+        self.additional_files.add_file(temp_file)
 
-    MAX_SUBDIRECTORY_LENGTH = 35  # avoid maxpath issues on COMPS
+        # Add all the analyzers files
+        for a in self.analyzers:
+            self.additional_files.add_file(inspect.getfile(a))
 
-    endpoint: str = field(default="https://comps2.idmod.org")
-    environment: str = field(default="Bayesian")
-    priority: str = field(default=COMPSPriority.Lowest)
-    simulation_root: str = field(default="$COMPS_PATH(USER)\\output")
-    node_group: str = field(default="emod_abcd")
-    num_retires: int = field(default=0)
-    num_cores: int = field(default=1)
-    exclusive: bool = field(default=False)
+        # Create the command
+        command = "python analyze_ssmt.py"
+        # Add the experiments
+        command += " {}".format(",".join(self.experiment_ids))
+        # Add the analyzers
+        command += " {}".format(",".join(f"{inspect.getmodulename(inspect.getfile(a))}.{a.__name__}"
+                                         for a in self.analyzers))
 
-    item_type: str = field(default=None)
-    docker_image: str = field(default=None)
-    plugin_key: str = field(default=None)
+        self.wi = SSMTWorkItem(item_name=self.analysis_name, command=command, tags=self.tags,
+                          user_files=self.additional_files, asset_collection_id=self.asset_collection_id,
+                          asset_files=self.asset_files, related_experiments=self.experiment_ids)
 
-    _platform_supports: List[PlatformRequirements] = field(default_factory=lambda: copy.deepcopy(supported_types),
-                                                           repr=False, init=False)
+        # Create WorkItemManager
+        wim = WorkItemManager(self.wi, self.platform)
 
-    _experiments: CompsPlatformExperimentOperations = field(**op_defaults, repr=False, init=False)
-    _simulations: CompsPlatformSimulationOperations = field(**op_defaults, repr=False, init=False)
-    _suites: CompsPlatformSuiteOperations = field(**op_defaults, repr=False, init=False)
-    _workflow_items: CompsPlatformWorkflowItemOperations = field(**op_defaults, repr=False, init=False)
-    _assets: CompsPlatformAssetCollectionOperations = field(**op_defaults, repr=False, init=False)
+        wim.process(check_status)
 
-    def __post_init__(self):
-        print("\nUser Login:")
-        print(json.dumps({"endpoint": self.endpoint, "environment": self.environment}, indent=3))
-        self.__init_interfaces()
-        self.supported_types = {ItemType.EXPERIMENT, ItemType.SIMULATION, ItemType.SUITE, ItemType.ASSETCOLLECTION, ItemType.WORKFLOW_ITEM}
-        super().__post_init__()
+        # remove temp file
+        os.remove(temp_file)
 
-    def __init_interfaces(self):
-        self._login()
-        self._experiments = CompsPlatformExperimentOperations(platform=self)
-        self._simulations = CompsPlatformSimulationOperations(platform=self)
-        self._suites = CompsPlatformSuiteOperations(platform=self)
-        self._workflow_items = CompsPlatformWorkflowItemOperations(platform=self)
-        self._assets = CompsPlatformAssetCollectionOperations(platform=self)
+    def validate_args(self):
+        if self.analyzers_args is None:
+            self.analyzers_args = [{}] * len(self.analyzers)
+            return
 
-    def _login(self):
-        try:
-            Client.auth_manager()
-        except RuntimeError:
-            Client.login(self.endpoint)
+        self.analyzers_args = [g if g is not None else {} for g in self.analyzers_args]
 
-    def supported_experiment_types(self) -> List[typing.Type]:
-        return [IExperiment]
+        if len(self.analyzers_args) < len(self.analyzers):
+            self.analyzers_args = self.analyzers_args + [{}] * (len(self.analyzers) - len(self.analyzers_args))
+            return
 
-    def unsupported_experiment_types(self) -> List[typing.Type]:
-        return [IDockerExperiment, IGPUExperiment, ILinuxExperiment]
+        if len(self.analyzers) < len(self.analyzers_args):
+            print("two list 'analyzers' and 'analyzers_args' must have the same length.")
+            exit()
 
-    def post_setstate(self):
-        self.__init_interfaces()
+    def get_work_item(self):
+        return self.wi
