@@ -1,5 +1,6 @@
 import os
 from unittest import TestCase
+
 import pytest
 from idmtools.assets import Asset, AssetCollection
 from idmtools.entities.command_task import CommandTask
@@ -11,7 +12,7 @@ class TestTasks(TestCase):
 
     def test_command_requires_command(self):
         with self.assertRaises(ValueError) as ex:
-            task = CommandTask()
+            task = CommandTask()  # noqa F841
         self.assertEqual("Command is required", ex.exception.args[0])
 
     def test_command_init_from_str_(self):
@@ -47,7 +48,7 @@ class TestTasks(TestCase):
         task = self.get_cat_command()
         test_global = 0
 
-        def update_x_callback(task):
+        def update_x_callback(task):  # noqa F841
             global test_global
             test_global += 1
             return AssetCollection()

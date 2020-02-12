@@ -186,13 +186,3 @@ class ITask(metaclass=ABCMeta):
                 setattr(result, k, copy.deepcopy(v, memo))
         result._task_log = getLogger(__name__)
         return result
-
-
-def task_to_experiment(task: ITask, experiment_kwargs=None) -> 'Experiment':
-    if experiment_kwargs is None:
-        experiment_kwargs = dict()
-    from idmtools.entities.experiment import Experiment
-    sim = Simulation(task=task)
-    e = Experiment(**experiment_kwargs)
-    e.simulations.append(sim)
-    return e

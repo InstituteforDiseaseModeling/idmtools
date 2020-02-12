@@ -4,12 +4,10 @@ import unittest.mock
 from functools import partial
 
 import pytest
-
 from idmtools.assets import Asset
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
-from idmtools_model_emod.defaults import EMODSir
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence

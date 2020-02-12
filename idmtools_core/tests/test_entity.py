@@ -2,9 +2,10 @@ import copy
 import pickle
 import unittest
 from dataclasses import dataclass, field, fields
+
 from idmtools.builders import SimulationBuilder
 from idmtools.core.interfaces.ientity import IEntity
-from idmtools.entities.itask import task_to_experiment
+from idmtools.entities.experiment import Experiment
 from idmtools.entities.suite import Suite
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
@@ -50,9 +51,6 @@ class TestEntity(ITestWithPersistence):
         self.assertEqual(a, b)
 
     def test_pickle_ignore(self):
-        from idmtools.assets import AssetCollection
-        from idmtools.core import EntityContainer
-
         a = TemplatedSimulations(base_task=TestTask())
 
         self.assertSetEqual(a.pickle_ignore_fields, set(f.name for f in fields(a) if "pickle_ignore" in f.metadata and f.metadata["pickle_ignore"]))
@@ -93,8 +91,8 @@ class TestEntity(ITestWithPersistence):
         s = Suite(name="test")
         self.assertEqual(s.name, "test")
 
-        s.experiments.append(task_to_experiment(TestTask(), dict(name='t1')))
-        s.experiments.append(task_to_experiment(TestTask(), dict(name='t1')))
+        s.experiments.append(Experiment.from_task(TestTask(), name='t1'))
+        s.experiments.append(Experiment.from_task(TestTask(), name='t2'))
         self.assertEqual(len(s.experiments), 2)
 
 
