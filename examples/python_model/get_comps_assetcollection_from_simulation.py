@@ -41,4 +41,4 @@ with platform('COMPS'):
     em.run()
     em.wait()
     # use system status as the exit code
-    sys.exit(e.succeeded)
+    sys.exit(em.succeeded)

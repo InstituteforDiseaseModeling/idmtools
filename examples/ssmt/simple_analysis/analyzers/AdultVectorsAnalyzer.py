@@ -1,9 +1,13 @@
 import json
 import os
+from typing import Any, Dict
+from uuid import UUID
+from idmtools.core.interfaces.iitem import IItem
+from idmtools.entities.simulation import Simulation
 
 try:
     # use idmtools image
-    from idmtools.entities.ianalyzer import IAnalyzer as BaseAnalyzer
+    from idmtools.entities.ianalyzer import BaseAnalyzer
 except ImportError:
     # use dtk-tools image
     from simtools.Analysis.BaseAnalyzers.BaseAnalyzer import BaseAnalyzer
@@ -23,7 +27,7 @@ class AdultVectorsAnalyzer(BaseAnalyzer):
         if not os.path.exists(os.path.join(self.working_dir, "output")):
             os.mkdir(os.path.join(self.working_dir, "output"))
 
-    def select_simulation_data(self, data, simulation):
+    def select_simulation_data(self, data: Dict[str, Any], simulation: Simulation):
         return data[self.filenames[0]]["Channels"]["Adult Vectors"]["Data"]
 
     def finalize(self, all_data):
@@ -42,8 +46,8 @@ class AdultVectorsAnalyzer(BaseAnalyzer):
         ax.legend([s.id for s in all_data.keys()])
         fig.savefig(os.path.join(output_dir, "adult_vectors.png"))
 
-    def map(self, data: 'Any', item: 'IItem') -> 'Any':
+    def map(self, data: Any, item: IItem) -> Any:
         return None
 
-    def reduce(self, all_data: dict) -> 'Any':
+    def reduce(self, all_data: Dict[UUID, Any]) -> Any:
         pass
