@@ -9,7 +9,6 @@ from typing import Any, Dict
 import pytest
 from COMPS.Data import Experiment as COMPSExperiment
 from COMPS.Data import QueryCriteria
-
 from idmtools import __version__
 from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import ArmSimulationBuilder, ArmType, SimulationBuilder, StandAloneSimulationsBuilder, SweepArm

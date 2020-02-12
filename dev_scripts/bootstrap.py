@@ -3,8 +3,10 @@ import logging
 import os
 import subprocess
 import sys
+import unicodedata
 from logging import getLogger
 from os.path import abspath, join, dirname
+
 # on windows virtual env is not populated through pymake
 if sys.platform == "win32" and 'VIRTUAL_ENV' in os.environ:
     sys.path.insert(0, os.environ['VIRTUAL_ENV'] + "\\Lib\\site-packages")
@@ -55,7 +57,7 @@ packages = dict(
     idmtools_cli=default_install,
     idmtools_platform_local=data_class_default + ['workers', 'ui'],
     idmtools_platform_comps=data_class_default,
-    #idmtools_model_emod=data_class_default + ['bamboo'],
+    # idmtools_model_emod=data_class_default + ['bamboo'],
     idmtools_models=data_class_default,
     idmtools_platform_slurm=data_class_default,
     idmtools_test=[]
@@ -72,6 +74,8 @@ def execute(cmd, cwd):
         raise subprocess.CalledProcessError(return_code, cmd)
 
 
+escapes = ''.join([chr(char) for char in range(1, 32)])
+translator = str.maketrans('', '', escapes)
 # loop through and install our packages
 for package, extras in packages.items():
     extras_str = f"[{','.join(extras)}]" if extras else ''
@@ -86,7 +90,8 @@ for package, extras in packages.items():
             elif any([s in line for s in ["WARNING", "SKIPPED"]]):
                 logger.warning(line.strip())
             else:
-                logger.debug(line.strip())
+                line = line.strip().translate(translator)
+                logger.debug("".join(ch for ch in line if unicodedata.category(ch)[0] != "C"))
         result = 0
     except subprocess.CalledProcessError as e:
         logger.critical(f'{package} installed failed using {e.cmd} did not succeed')

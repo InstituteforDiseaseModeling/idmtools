@@ -6,7 +6,6 @@ from typing import List, Dict, Any, Type
 from uuid import UUID, uuid4
 
 import numpy as np
-
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
 from idmtools.entities.simulation import Simulation
 

@@ -3,7 +3,6 @@ import shutil
 import subprocess
 
 import pandas as pd
-
 from idmtools.entities.simulation import Simulation
 
 

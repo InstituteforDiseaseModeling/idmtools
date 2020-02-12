@@ -1,12 +1,11 @@
 from abc import ABCMeta
+from dataclasses import dataclass
 from dataclasses import fields, field
 from functools import partial
 from itertools import groupby
 from logging import getLogger, DEBUG
 from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set, Iterator
 from uuid import UUID
-from dataclasses import dataclass
-from tqdm import tqdm
 
 from idmtools.core import CacheEnabled, UnknownItemException, EntityContainer, UnsupportedPlatformType
 from idmtools.core.enums import ItemType, EntityStatus
@@ -21,10 +20,12 @@ from idmtools.entities.iplatform_ops.iplatform_workflowitem_operations import IP
 from idmtools.entities.itask import ITask
 from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools.entities.platform_requirements import PlatformRequirements
+from idmtools.entities.relation_type import RelationType
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.suite import Suite
 from idmtools.services.platforms import PlatformPersistService
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
+from tqdm import tqdm
 
 logger = getLogger(__name__)
 

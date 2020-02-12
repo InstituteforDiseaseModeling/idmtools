@@ -6,6 +6,7 @@ from types import GeneratorType
 from typing import NoReturn, Set, Union, Iterator, Type, Dict, Any, List
 
 from idmtools.assets import AssetCollection
+from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType, NoPlatformException, EntityStatus
 from idmtools.core.interfaces.entity_container import EntityContainer
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
@@ -74,6 +75,12 @@ class Experiment(IAssetsEnabled, INamedEntity):
         display(self, experiment_table_display)
 
     def pre_creation(self) -> None:
+        """
+        Experiment pre_creation callback
+
+        Returns:
+
+        """
         # Gather the assets
         self.gather_assets()
 
@@ -101,10 +108,22 @@ class Experiment(IAssetsEnabled, INamedEntity):
 
     @property
     def done(self):
+        """
+        Return if an experiment has finished executing
+
+        Returns:
+            True if all simulations have ran, False otherwise
+        """
         return all([s.done for s in self.simulations])
 
     @property
-    def succeeded(self):
+    def succeeded(self) -> bool:
+        """
+        Return if an experiment has succeeded. An experiment is succeeded when all simulations have succeeded
+
+        Returns:
+            True if all simulations have succeeded, False otherwise
+        """
         return all([s.succeeded for s in self.simulations])
 
     @property
@@ -113,6 +132,15 @@ class Experiment(IAssetsEnabled, INamedEntity):
 
     @simulations.setter
     def simulations(self, simulations: Union[SUPPORTED_SIM_TYPE]):
+        """
+        Set the simulations object
+
+        Args:
+            simulations:
+
+        Returns:
+
+        """
         if isinstance(simulations, (GeneratorType, TemplatedSimulations, EntityContainer)):
             self.gather_common_assets_from_task = isinstance(simulations, (GeneratorType, EntityContainer))
             self.__simulations = simulations
@@ -132,10 +160,21 @@ class Experiment(IAssetsEnabled, INamedEntity):
                              "or a List/Set of Simulations")
 
     @property
-    def simulation_count(self):
+    def simulation_count(self) -> int:
+        """
+        Return the total simulations
+        Returns:
+
+        """
         return len(self.simulations)
 
-    def refresh_simulations(self):
+    def refresh_simulations(self) -> NoReturn:
+        """
+        Refresh the simulations from the platform
+
+        Returns:
+
+        """
         from idmtools.core import ItemType
         self.simulations = self.platform.get_children(self.uid, ItemType.EXPERIMENT, force=True)
 
@@ -170,21 +209,74 @@ class Experiment(IAssetsEnabled, INamedEntity):
         """
         if tags is None:
             tags = dict()
+        if name is None:
+            name = task.__class__.__name__
         e = Experiment(name=name, tags=tags, assets=AssetCollection() if assets is None else assets,
                        gather_common_assets_from_task=gather_common_assets_from_task)
         e.simulations = [task]
         return e
 
     @classmethod
+    def from_builder(cls, builders: Union[SimulationBuilder, List[SimulationBuilder]], base_task: ITask,
+                     name: str = None,
+                     assets: AssetCollection = None, tags: Dict[str, Any] = None) -> 'Experiment':
+        """
+        Creates an experiment from a SimulationBuilder object(or list of builders
+
+        Args:
+            builders: List of builder to create experiment from
+            base_task: Base task to use as template
+            name: Experiment name
+            assets: Experiment level assets
+            tags: Experiment tags
+
+        Returns:
+            Experiment object from the builders
+        """
+        ts = TemplatedSimulations(base_task=base_task)
+        if not isinstance(builders, list):
+            builders = [builders]
+        for builder in builders:
+            ts.add_builder(builder)
+        if name is None:
+            name = base_task.__class__.__name__
+            if len(builders) == 1:
+                name += " " + builders[0].__class__.__name__
+        return cls.from_template(ts, name=name, tags=tags, assets=assets)
+
+    @classmethod
     def from_template(cls, template: TemplatedSimulations, name: str = None, assets: AssetCollection = None,
                       tags: Dict[str, Any] = None) -> 'Experiment':
+        """
+        Creates an Experiment from a TemplatedSimulation object
+
+        Args:
+            template: TemplatedSimulation object
+            name: Experiment name
+            assets: Experiment level assets
+            tags: Tags
+
+        Returns:
+            Experiment object from the TemplatedSimulation object
+        """
         if tags is None:
             tags = dict()
+        if name is None:
+            name = template.base_task.__class__.__name__
         e = Experiment(name=name, tags=tags, assets=AssetCollection() if assets is None else assets)
         e.simulations = template
         return e
 
     def __deepcopy__(self, memo):
+        """
+        Deep copy for experiments. It converts generators and templates to realized lists to allow copying
+
+        Args:
+            memo: The memo object used for copying
+
+        Returns:
+            Copied experiment
+        """
         cls = self.__class__
         result = cls.__new__(cls)
         memo[id(self)] = result
@@ -195,14 +287,36 @@ class Experiment(IAssetsEnabled, INamedEntity):
         result._task_log = getLogger(__name__)
         return result
 
-    def run(self, wait_until_done: bool = False,
-            platform: 'idmtools.entities.iplatform.IPlatform' = None, **run_opts):
+    def run(self, wait_until_done: bool = False, platform: 'idmtools.entities.iplatform.IPlatform' = None,
+            **run_opts) -> NoReturn:
+        """
+        Runs an experiment on a platform
+
+        Args:
+            wait_until_done: Whether we should wait on experiment to finish running as well. Defaults to False
+            platform: Platform object to use. If not specified, we first check object for platform object then the current context
+            **run_opts: Options to pass to the platform
+
+        Returns:
+            None
+        """
         p = self.__check_for_platform_from_context(platform)
         p.run_items(self, **run_opts)
         if wait_until_done:
             self.wait()
 
     def __check_for_platform_from_context(self, platform) -> 'idmtools.entities.iplatform.IPlatform':
+        """
+        Try to determine platform of current object from self or current platform
+
+        Args:
+            platform: Passed in platform object
+
+        Raises:
+            NoPlatformException: when no platform is on current context
+        Returns:
+            Platform object
+        """
         if self.platform is None:
             # check context for current platform
             if platform is None:
@@ -215,6 +329,17 @@ class Experiment(IAssetsEnabled, INamedEntity):
 
     def wait(self, timeout: int = None, refresh_interval=None,
              platform: 'idmtools.entities.iplatform.IPlatform' = None):
+        """
+        Wait on an experiment to finish running
+
+        Args:
+            timeout: Timeout to wait
+            refresh_interval: How often to refresh object
+            platform: Platform. If not specified, we try to determine this from context
+
+        Returns:
+
+        """
         if self.status not in [EntityStatus.CREATED, EntityStatus.RUNNING]:
             raise ValueError("The experiment cannot be waited for if it is not in Running/Created state")
         opts = dict()

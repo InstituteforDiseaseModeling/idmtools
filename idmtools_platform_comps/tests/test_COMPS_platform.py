@@ -5,7 +5,7 @@ import unittest
 from os import path
 
 import pytest
-
+from idmtools.builders import SimulationBuilder
 from idmtools.core import EntityStatus
 from idmtools.entities.experiment import Experiment
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
@@ -117,7 +117,11 @@ class TestCOMPSPlatform(ITestWithPersistence):
 
     @pytest.mark.long
     def test_status_retrieval_mixed(self):
-        experiment = self.get_working_model_experiment(script='mixed_model.py')
+        model_path = os.path.join(COMMON_INPUT_PATH, "compsplatform", 'mixed_model.py')
+        task = JSONConfiguredPythonTask(script_path=model_path)
+        builder = SimulationBuilder()
+        builder.add_sweep_definition(JSONConfiguredPythonTask.set_parameter_partial('P'), range(3))
+        experiment = Experiment.from_builder(builder, task, name='Mixed Model')
         self.platform.run_items(experiment)
         self.platform.wait_till_done(experiment)
         self.assertTrue(experiment.done)
@@ -126,6 +130,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
         if len(experiment.simulations) == 0:
             raise Exception('NO CHILDREN')
 
+        self.assertEqual(len(experiment.simulations), 3)
         for s in experiment.simulations:
             self.assertTrue((s.tags["P"] == 2 and s.status == EntityStatus.FAILED) or  # noqa: W504
                             (s.status == EntityStatus.SUCCEEDED))

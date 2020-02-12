@@ -2,11 +2,10 @@ import os
 from dataclasses import dataclass, field
 from itertools import tee
 from logging import getLogger, DEBUG
-from typing import Any, List, Type, Generator
+from typing import Any, List, Type, Generator, NoReturn
 from uuid import UUID
 
 from COMPS.Data import Experiment as COMPSExperiment, QueryCriteria, Configuration
-
 from idmtools.core import ItemType
 from idmtools.core.experiment_factory import experiment_factory
 from idmtools.entities import CommandLine
@@ -32,6 +31,11 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         children = children if children is not None else ["tags", "configuration"]
         return COMPSExperiment.get(id=experiment_id,
                                    query_criteria=QueryCriteria().select(cols).select_children(children))
+
+    def pre_create(self, experiment: Experiment, **kwargs) -> NoReturn:
+        if experiment.name is None:
+            raise ValueError("Experiment name is required on COMPS")
+        super().pre_create(experiment, **kwargs)
 
     def platform_create(self, experiment: Experiment, num_cores: int = None, executable_path: str = None,
                         command_arg: str = None, priority: str = None) -> COMPSExperiment:
