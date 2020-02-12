@@ -9,6 +9,7 @@ from urllib.parse import urlparse
 version = open('../VERSION').read().strip()
 if '+nightly' in version:
     version = version.replace('+nightly', '.nightly')
+print(f'PIP URL: {sys.argv[1]}')
 uri = urlparse(sys.argv[1])
 
 cmd = ['docker', 'build', '--network=host', '--build-arg', f'PYPIURL={sys.argv[1]}', '--build-arg',

@@ -4,7 +4,7 @@ BASE_PIP_URL="packages.idmod.org/api/pypi/idm-pypi-"
 STAGING_PIP_URL?="https://$(BASE_PIP_URL)staging/simple"
 PRODUCTION_PIP_URL?="https://$(BASE_PIP_URL)production/simple"
 PY?=python
-PDS=$(PY) ../dev_scripts/
+PDS=$(PY) ../../dev_scripts/
 PDR=$(PDS)run.py
 CLDIR=$(PDS)clean_dir.py
 CWD=$($(IPY) "import os; print(os.getcwd())")
@@ -23,17 +23,18 @@ clean: ## Clean most of the temp-data from the project
 clean-all:  ## Deleting package info hides plugins so we only want to do that for packaging
 	@make clean
 	$(CLDIR) --dir-patterns "**/*.egg-info/"
+	docker rmi idmtools_comps_ssmt_worker
 
 docker-local: ## Build our docker image using the local pypi
 	# This job is most useful when actively developing changes to the local_platform internals(tasks, api, cli) or
 	# upstream changes that effect those areas(models and core). Otherwise, installing from latest in the nightly
 	# should suffice for development
 	# ensure pypi local is up
-	$(PDR) -w '../dev_scripts/local_pypi' -ex 'docker-compose up -d'
-	$(PDR) -w '../idmtools_core' -ex 'pymake release-local'
-	$(PDR) -w '../idmtools_models' -ex 'pymake release-local'
-	$(PDR) -w '../idmtools_comps' -ex 'pymake release-local'
-	@pymake release-local
+	$(PDR) -w '../../dev_scripts/local_pypi' -ex 'docker-compose up -d'
+	# ensure our packages are built
+	$(PDR) -w '../../idmtools_core' -ex 'pymake release-local'
+	$(PDR) -w '../../idmtools_models' -ex 'pymake release-local'
+	$(PDR) -w '../../idmtools_platform_comps' -ex 'pymake release-local'
 	python build_docker_image.py http://localhost:7171/
 
 docker-local-no-cache:## Build our docker image using the local pypi
@@ -41,9 +42,11 @@ docker-local-no-cache:## Build our docker image using the local pypi
 	# upstream changes that effect those areas(models and core). Otherwise, installing from latest in the nightly
 	# should suffice for development
 	# ensure pypi local is up
-	$(PDR) -w '../dev_scripts/local_pypi' -ex 'docker-compose up -d'
-	$(PDR) -w '../idmtools_core' -ex 'pymake release-local'
-	@pymake release-local
+	$(PDR) -w '../../dev_scripts/local_pypi' -ex 'docker-compose up -d'
+	# ensure our packages are built
+	$(PDR) -w '../../idmtools_core' -ex 'pymake release-local'
+	$(PDR) -w '../../idmtools_models' -ex 'pymake release-local'
+	$(PDR) -w '../../idmtools_platform_comps' -ex 'pymake release-local'
 	python build_docker_image.py http://localhost:7171/ no-cache
 
 docker-staging: ## Build our docker image using staging pypi
