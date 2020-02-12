@@ -1,18 +1,15 @@
 import os
 import typing
+from typing import NoReturn
 
-from idmtools_test.utils.test_asset import Asset
+from idmtools.assets import TAssetList, TAssetFilterList, TAsset
 from idmtools.assets.errors import DuplicatedAssetError
 from idmtools.core import FilterMode
 from idmtools.core.interfaces.ientity import IEntity
+from idmtools.frozen.frozen_utils import IFrozen
 from idmtools.utils.file import scan_directory
 from idmtools.utils.filters.asset_filters import default_asset_file_filter
-
-if typing.TYPE_CHECKING:
-    from idmtools.assets import TAssetList, TAsset, TAssetFilterList
-    from typing import NoReturn
-
-from idmtools.frozen.frozen_utils import IFrozen
+from idmtools_test.utils.test_asset import Asset
 
 
 class AssetCollection(IEntity, IFrozen):
@@ -36,10 +33,10 @@ class AssetCollection(IEntity, IFrozen):
                        filters: 'TAssetFilterList' = None, filters_mode: 'FilterMode' = FilterMode.OR,  # noqa: F821
                        relative_path: str = None) -> 'TAssetCollection':
         """
-        Fill up an :class:`AssetCollection` from the specified directory. See 
-        :meth:`~AssetCollection.assets_from_directory` for arguments.
+        Fill up an :class:`AssetCollection` from the specified directory. See
+         :meth:`~AssetCollection.assets_from_directory` for arguments.
 
-        Returns: 
+        Returns:
             A created :class:`AssetCollection` object.
         """
         assets = cls.assets_from_directory(assets_directory, recursive, flatten, filters, filters_mode, relative_path)
@@ -57,10 +54,11 @@ class AssetCollection(IEntity, IFrozen):
 
         Args:
             assets_directory: The root directory of the assets.
-            recursive: True to recursively traverse the subdirectory. 
+            recursive: True to recursively traverse the subdirectory.
             flatten: Put all the files in root regardless of whether they were in a subdirectory or not.
-            filters: A list of filters to apply to the assets. The filters are functions taking an :class:`~idmtools.assets.asset.Asset` 
-                as argument and returning true or false. True adds the asset to the collection; False filters 
+            filters: A list of filters to apply to the assets. The filters are functions taking an
+                :class:`~idmtools.assets.asset.Asset`
+                as argument and returning true or false. True adds the asset to the collection; False filters
                 it out. See :meth:`~idmtools.utils.filters.asset_filters`.
             filters_mode: When given multiple filters, either OR or AND the results.
             forced_relative_path: Prefix a relative path to the path created from the root directory.
@@ -72,7 +70,7 @@ class AssetCollection(IEntity, IFrozen):
             Given the previous example, if flatten is also set to True, the following relative_path will be set:
             /1.txt and /b.txt
 
-        Returns: 
+        Returns:
             A list of assets.
         """
         found_assets = []
@@ -123,7 +121,7 @@ class AssetCollection(IEntity, IFrozen):
 
         Args:
            asset: An :class:`~idmtools.assets.asset.Asset` object to add.
-           fail_on_duplicate: Raise a **DuplicateAssetError** if an asset is duplicated. 
+           fail_on_duplicate: Raise a **DuplicateAssetError** if an asset is duplicated.
               If not, simply replace it.
         """
         if asset in self.assets:
@@ -199,7 +197,8 @@ class AssetCollection(IEntity, IFrozen):
         self.assets.clear()
 
     def set_all_persisted(self):
-        for a in self: a.persisted = True
+        for a in self:
+            a.persisted = True
 
     @property
     def count(self):

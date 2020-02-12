@@ -3,7 +3,6 @@ import os
 from COMPS import Data
 from COMPS.Data import AssetCollection as CompsAssetCollection
 from COMPS.Data import QueryCriteria, Simulation as COMPSSimulation, Simulation
-
 from idmtools.builders import SimulationBuilder
 from idmtools.core.enums import EntityStatus
 from idmtools.entities.experiment import Experiment

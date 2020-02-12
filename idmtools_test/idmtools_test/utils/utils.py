@@ -34,7 +34,7 @@ def load_csv_file(filename, dir=None):
     return df
 
 
-def verify_simulation(simulation:Simulation, expected_parameters, expected_values):
+def verify_simulation(simulation: Simulation, expected_parameters, expected_values):
     for value_set in expected_values:
         for i, value in enumerate(list(value_set)):
             if not simulation.task.parameters[expected_parameters[i]] == expected_values:
