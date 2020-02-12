@@ -57,4 +57,17 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
         obj.description = suite.description
         obj.tags = suite.tags
         obj.comps_suite = suite
+
+        # Convert all simulations
+        comps_exps = suite.get_experiments()
+        # from idmtools.entities.iplatform import ITEM_TYPE_TO_OBJECT_INTERFACE
+        # from idmtools.core import ItemType
+        # interface = ITEM_TYPE_TO_OBJECT_INTERFACE[ItemType.EXPERIMENT]
+        # obj.experiments = [getattr(self.platform, interface).to_entity(s) for s in comps_exps]    # Cause recursive call...
+
+        # Temp workaround
+        from idmtools.entities.experiment import Experiment
+        obj.experiments = [Experiment(_uid=e.id) for e in comps_exps]
+
+
         return obj

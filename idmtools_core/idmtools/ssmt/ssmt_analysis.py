@@ -2,16 +2,16 @@ import os
 import inspect
 import pickle
 import tempfile
-from idmtools.assets.FileList import FileList
-from idmtools.core.platform_factory import Platform
+from idmtools.assets.file_list import FileList
 from idmtools.managers.work_item_manager import WorkItemManager
-from idmtools.ssmt.ssmt_work_item import SSMTWorkItem
+from idmtools.ssmt.idm_work_item import SSMTWorkItem
 
 
 class SSMTAnalysis:
 
-    def __init__(self, experiment_ids, analyzers, analyzers_args=None, analysis_name='WorkItem Test', tags=None,
+    def __init__(self, platform, experiment_ids, analyzers, analyzers_args=None, analysis_name='WorkItem Test', tags=None,
                  additional_files=None, asset_collection_id=None, asset_files=FileList()):
+        self.platform = platform
         self.experiment_ids = experiment_ids
         self.analyzers = analyzers
         self.analyzers_args = analyzers_args
@@ -20,6 +20,7 @@ class SSMTAnalysis:
         self.additional_files = additional_files or FileList()
         self.asset_collection_id = asset_collection_id
         self.asset_files = asset_files
+        self.wi = None
 
         self.validate_args()
 
@@ -28,9 +29,9 @@ class SSMTAnalysis:
         dir_path = os.path.dirname(os.path.realpath(__file__))
         self.additional_files.add_file(os.path.join(dir_path, "analyze_ssmt.py"))
 
-        # If there is a simtools.ini, send it along
-        if os.path.exists(os.path.join(os.getcwd(), "simtools.ini")):
-            self.additional_files.add_file(os.path.join(os.getcwd(), "simtools.ini"))
+        # If there is a idmtools.ini, send it along
+        if os.path.exists(os.path.join(os.getcwd(), "idmtools.ini")):
+            self.additional_files.add_file(os.path.join(os.getcwd(), "idmtools.ini"))
 
         # build analyzer args dict
         args_dict = {}
@@ -56,16 +57,14 @@ class SSMTAnalysis:
         command += " {}".format(",".join(self.experiment_ids))
         # Add the analyzers
         command += " {}".format(",".join(f"{inspect.getmodulename(inspect.getfile(a))}.{a.__name__}"
-                                         for s in self.analyzers))
+                                         for a in self.analyzers))
 
-        wi = SSMTWorkItem(item_name=self.analysis_name, command=command, tags=self.tags,
+        self.wi = SSMTWorkItem(item_name=self.analysis_name, command=command, tags=self.tags,
                           user_files=self.additional_files, asset_collection_id=self.asset_collection_id,
                           asset_files=self.asset_files, related_experiments=self.experiment_ids)
 
-        platform = Platform('COMPS2')
-
         # Create WorkItemManager
-        wim = WorkItemManager(wi, platform)
+        wim = WorkItemManager(self.wi, self.platform)
 
         wim.process(check_status)
 
@@ -86,3 +85,6 @@ class SSMTAnalysis:
         if len(self.analyzers) < len(self.analyzers_args):
             print("two list 'analyzers' and 'analyzers_args' must have the same length.")
             exit()
+
+    def get_work_item(self):
+        return self.wi
