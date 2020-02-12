@@ -1,12 +1,13 @@
 import ntpath
-from typing import List, Dict, NoReturn
+from typing import List, Dict
 from uuid import UUID
-from COMPS.Data.Simulation import SimulationState
+
 from COMPS.Data import Simulation
+from COMPS.Data.Simulation import SimulationState
+from idmtools.core import EntityStatus, ItemType
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.iplatform import IPlatform
 from requests import RequestException
-from idmtools.core import EntityStatus, ItemType
 
 
 def fatal_code(e: Exception) -> bool:
@@ -24,8 +25,16 @@ def fatal_code(e: Exception) -> bool:
     return False
 
 
+def convert_comps_status(comps_status: SimulationState) -> EntityStatus:
+    """
+    Convert status from COMPS to IDMTools
 
-def convert_COMPS_status(comps_status):
+    Args:
+        comps_status: Status in Comps
+
+    Returns:
+        EntityStatus
+    """
     if comps_status == SimulationState.Succeeded:
         return EntityStatus.SUCCEEDED
     elif comps_status in (SimulationState.Canceled, SimulationState.CancelRequested, SimulationState.Failed):
@@ -48,7 +57,18 @@ def clean_experiment_name(experiment_name: str) -> str:
     return experiment_name
 
 
-def get_file_from_collection(platform, collection_id: UUID, file_path: str) -> NoReturn:
+def get_file_from_collection(platform: IPlatform, collection_id: UUID, file_path: str) -> bytearray:
+    """
+    Retrieve a file from an asset collection
+
+    Args:
+        platform: Platform object to use
+        collection_id: Asset Collection ID
+        file_path: Path within collection
+
+    Returns:
+        Object Byte Array
+    """
     print(f"Cache miss for {collection_id} {file_path}")
 
     # retrieve the collection
@@ -64,6 +84,18 @@ def get_file_from_collection(platform, collection_id: UUID, file_path: str) -> N
 
 
 def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str], cache=None) -> Dict[str, bytearray]:
+    """
+    Retrieve assets from an Entity(Simulation, Experiment, WorkItem)
+
+    Args:
+        platform: Platform Object to use
+        item: Item to fetch assets from
+        files: List of file names to retrieve
+        cache: Cache object to use
+
+    Returns:
+        Dictionary in structure of filename -> bytearray
+    """
     # Retrieve comps item
     if item.platform is None:
         item.platform = platform

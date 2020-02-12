@@ -6,13 +6,12 @@ from uuid import UUID
 
 from COMPS.Data import Simulation as COMPSSimulation, QueryCriteria, Experiment as COMPSExperiment, SimulationFile, \
     Configuration
-
 from idmtools.core import ItemType
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
 from idmtools.entities.iplatform_ops.utils import batch_create_items
 from idmtools.entities.simulation import Simulation
-from idmtools_platform_comps.utils.general import convert_COMPS_status, get_asset_for_comps_item
+from idmtools_platform_comps.utils.general import convert_comps_status, get_asset_for_comps_item
 
 logger = getLogger(__name__)
 
@@ -33,7 +32,7 @@ def comps_batch_worker(sims: List[Simulation], interface: 'CompsPlatformSimulati
     COMPSSimulation.save_all(None, save_semaphore=COMPSSimulation.get_save_semaphore())
     for simulation in sims:
         simulation.uid = simulation.get_platform_object().id
-        simulation.status = convert_COMPS_status(simulation.get_platform_object().state)
+        simulation.status = convert_comps_status(simulation.get_platform_object().state)
         interface.post_create(simulation)
     return sims
 
@@ -92,10 +91,11 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             logger.debug(f'Simulation config: {str(comps_configuration)}')
         return Configuration(**comps_configuration)
 
-    def batch_create(self, sims: List[Simulation], num_cores: int = None, priority: str = None) -> List[
-        COMPSSimulation]:
+    def batch_create(self, sims: List[Simulation], num_cores: int = None, priority: str = None) -> \
+            List[COMPSSimulation]:
         thread_func = partial(comps_batch_worker, interface=self, num_cores=num_cores, priority=priority)
-        return batch_create_items(sims, batch_worker_thread_func=thread_func,
+        return batch_create_items(sims,
+                                  batch_worker_thread_func=thread_func,
                                   progress_description="Creating Simulations on Comps")
 
     def get_parent(self, simulation: Any, **kwargs) -> COMPSExperiment:
@@ -112,7 +112,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
 
     def refresh_status(self, simulation: Simulation, **kwargs):
         s = COMPSSimulation.get(id=simulation.uid, query_criteria=QueryCriteria().select(['state']))
-        simulation.status = convert_COMPS_status(s.state)
+        simulation.status = convert_comps_status(s.state)
 
     def to_entity(self, simulation: Any, parent: Experiment = None, **kwargs) -> Simulation:
         # Recreate the experiment if needed
@@ -126,7 +126,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         # Set its correct attributes
         obj.uid = simulation.id
         obj.tags = simulation.tags
-        obj.status = convert_COMPS_status(simulation.state)
+        obj.status = convert_comps_status(simulation.state)
         return obj
 
     def get_assets(self, simulation: Simulation, files: List[str], **kwargs) -> Dict[str, bytearray]:

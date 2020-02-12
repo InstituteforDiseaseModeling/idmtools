@@ -14,7 +14,7 @@ from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPla
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools.utils.collections import ParentIterator
 from idmtools.utils.time import timestamp
-from idmtools_platform_comps.utils.general import clean_experiment_name, convert_COMPS_status
+from idmtools_platform_comps.utils.general import clean_experiment_name, convert_comps_status
 
 logger = getLogger(__name__)
 
@@ -138,7 +138,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
     def refresh_status(self, experiment: Experiment, **kwargs):
         simulations = self.get_children(experiment.get_platform_object(), force=True, cols=["id", "state"], children=[])
         for s in simulations:
-            experiment.simulations.set_status_for_item(s.id, convert_COMPS_status(s.state))
+            experiment.simulations.set_status_for_item(s.id, convert_comps_status(s.state))
 
     def to_entity(self, experiment: COMPSExperiment, **kwargs) -> Experiment:
         # Recreate the suite if needed

@@ -5,14 +5,12 @@ from functools import partial
 
 import pytest
 from COMPS.Data import Experiment
-from pytest import skip
-
 from idmtools.analysis.add_analyzer import AddAnalyzer
 from idmtools.analysis.analyze_manager import AnalyzeManager
 from idmtools.analysis.csv_analyzer import CSVAnalyzer
 from idmtools.analysis.download_analyzer import DownloadAnalyzer
-from idmtools.builders import SimulationBuilder
 from idmtools.analysis.tags_analyzer import TagsAnalyzer
+from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools_model_emod.defaults import EMODSir

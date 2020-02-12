@@ -7,7 +7,7 @@ from operator import itemgetter
 from typing import Any, Dict
 
 import pytest
-from COMPS.Data import Experiment as COMPSExperiment
+from COMPS.Data import Experiment as COMPSExperiment, AssetCollection as COMPSAssetCollection
 from COMPS.Data import QueryCriteria
 from idmtools import __version__
 from idmtools.assets import Asset, AssetCollection
@@ -356,7 +356,10 @@ class TestPythonExperiment(ITestWithPersistence):
         # Get an existing asset collection (first create it for the test)
         assets_path = os.path.join(COMMON_INPUT_PATH, "python", "Assets")
         ac = AssetCollection.from_directory(assets_directory=assets_path)
-        ids = self.platform.create_items([ac])
+        items = self.platform.create_items([ac])
+        self.assertEqual(len(items), 1)
+        # TODO fix return of create
+        self.assertIsInstance(items[0], COMPSAssetCollection)
         comps_ac_id = ac.uid
         # Then get an "existing asset" to use for the experiment
         ac: AssetCollection = self.platform.get_item(comps_ac_id, item_type=ItemType.ASSETCOLLECTION, raw=False)

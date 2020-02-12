@@ -37,6 +37,7 @@ class AssetCollection(IEntity):
             assets: An optional list of assets to create the collection with.
         """
         super().__init__()
+        self.item_type = ItemType.ASSETCOLLECTION
         self.assets = copy.deepcopy(assets) or []
 
     @classmethod

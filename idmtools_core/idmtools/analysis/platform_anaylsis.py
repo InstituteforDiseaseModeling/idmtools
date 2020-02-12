@@ -1,9 +1,9 @@
-import os
 import inspect
+import os
 import pickle
 import tempfile
+
 from idmtools.assets.file_list import FileList
-from idmtools.managers.work_item_manager import WorkItemManager
 from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
 
 
@@ -64,10 +64,8 @@ class PlatformAnalysis:
                                user_files=self.additional_files, asset_collection_id=self.asset_collection_id,
                                asset_files=self.asset_files, related_experiments=self.experiment_ids)
 
-        # Create WorkItemManager
-        wim = WorkItemManager(self.wi, self.platform)
-
-        wim.process(check_status)
+        # Run the workitem
+        self.wi.run(True, platform=self.platform)
 
         # remove temp file
         os.remove(temp_file)

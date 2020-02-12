@@ -1,3 +1,4 @@
+# flake8: noqa E402
 import copy
 import json
 import logging
@@ -85,10 +86,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         self._assets = CompsPlatformAssetCollectionOperations(platform=self)
 
     def _login(self):
-        try:
-            Client.auth_manager()
-        except RuntimeError:
-            Client.login(self.endpoint)
+        Client.login(self.endpoint)
 
     def post_setstate(self):
         self.__init_interfaces()
