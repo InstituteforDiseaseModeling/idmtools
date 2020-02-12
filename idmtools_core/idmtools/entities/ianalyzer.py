@@ -1,10 +1,8 @@
 import typing
-
 from abc import ABCMeta, abstractmethod
 from typing import Any, NoReturn
 
-if typing.TYPE_CHECKING:
-    from idmtools.core.interfaces.iitem import IItem, IItemList
+from idmtools.core.interfaces.iitem import IItem, IItemList
 
 
 class IAnalyzer(metaclass=ABCMeta):
@@ -39,7 +37,7 @@ class IAnalyzer(metaclass=ABCMeta):
         """
         pass
 
-    def per_group(self, items: 'IItemList') -> NoReturn:
+    def per_group(self, items: IItemList) -> NoReturn:
         """
         Call once before running the apply on the items.
 
@@ -53,7 +51,7 @@ class IAnalyzer(metaclass=ABCMeta):
         """
         pass
 
-    def filter(self, item: 'IItem') -> bool:
+    def filter(self, item: IItem) -> bool:
         """
         Decide whether the analyzer should process a simulation.
 
@@ -66,7 +64,7 @@ class IAnalyzer(metaclass=ABCMeta):
         return True
 
     @abstractmethod
-    def map(self, data: 'Any', item: 'IItem') -> 'Any':
+    def map(self, data: Any, item: IItem) -> Any:
         """
         In parallel for each simulation, consume raw data from filenames and emit selected data.
 
@@ -80,7 +78,7 @@ class IAnalyzer(metaclass=ABCMeta):
         return None
 
     @abstractmethod
-    def reduce(self, all_data: dict) -> 'Any':
+    def reduce(self, all_data: dict) -> Any:
         """
         Combine the :meth:`map` data for a set of items into an aggregate result.
 
