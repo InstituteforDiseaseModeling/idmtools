@@ -73,7 +73,7 @@ class SimulationsClient(BaseClient):
             if logger.isEnabledFor(logging.DEBUG):
                 logging.debug(
                     f'Updating  {cls.base_url if simulation_id is None else cls.base_url + "/" + simulation_id}'
-                              f'Response Status Code: {response.status_code}. Response Content: {response.text}')
+                    f'Response Status Code: {response.status_code}. Response Content: {response.text}')
             raise RuntimeError(f'Could not fetch simulations from IDMs Local '
                                f'URL {cls.base_url if simulation_id is None else cls.base_url + "/" + simulation_id}')
         result = response.json()
