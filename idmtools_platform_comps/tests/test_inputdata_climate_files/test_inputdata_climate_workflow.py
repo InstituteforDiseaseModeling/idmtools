@@ -7,8 +7,6 @@ import json
 import unittest
 import pytest
 import xmlrunner
-
-from idmtools.managers.work_item_manager import WorkItemManager
 from idmtools.core.platform_factory import Platform
 from idmtools_platform_comps.ssmt_work_items.comps_workitems import InputDataWorkItem
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
@@ -65,8 +63,7 @@ class InputDataWorkItemTests(ITestWithPersistence):
 
         inputdata_wi = InputDataWorkItem(item_name=self.case_name, tags=self.tags)
         inputdata_wi.load_work_order(work_order_path)
-        wim = WorkItemManager(inputdata_wi, self.p)
-        wim.process(check_status=True)
+        inputdata_wi.run(True, platform=self.p)
         self.assertIsNotNone(inputdata_wi)
 
     def getEntityIds(self, demo):

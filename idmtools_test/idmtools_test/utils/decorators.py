@@ -62,10 +62,8 @@ def run_test_in_n_seconds(n: int, print_elapsed_time: bool = False) -> Callable:
 
 
 def restart_local_platform(silent=True, stop_before=True, stop_after=True, dump_logs=True, *args, **kwargs):
-    global client
-    if client is None:
-        import docker
-        client = docker.from_env()
+    import docker
+    client = docker.from_env()
     from idmtools_platform_local.infrastructure.service_manager import DockerServiceManager
     from idmtools_platform_local.infrastructure.docker_io import DockerIO
     from idmtools_platform_local.cli.utils import get_service_info

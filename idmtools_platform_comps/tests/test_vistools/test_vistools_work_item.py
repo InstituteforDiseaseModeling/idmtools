@@ -7,15 +7,12 @@ from functools import partial
 
 import pytest
 from idmtools.assets import AssetCollection
-from idmtools.builders import ExperimentBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
-from idmtools.managers import ExperimentManager
-from idmtools.managers.work_item_manager import WorkItemManager
 from idmtools_platform_comps.ssmt_work_items.comps_workitems import VisToolsWorkItem
-from idmtools_model_emod import EMODExperiment
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.utils import del_folder
+
 
 DEFAULT_INPUT_PATH = os.path.join(COMMON_INPUT_PATH, "malaria_brazil_central_west_spatial")
 DEFAULT_ERADICATION_PATH = os.path.join(DEFAULT_INPUT_PATH, "Assets", "Eradication.exe")
@@ -42,8 +39,7 @@ class TestVisToolsWorkItem(unittest.TestCase):
         tags = {'idmtools': "vistool test", 'WorkItem type': 'VisTools', 'SimulationId': cls.sim_id}
         cls.wi = VisToolsWorkItem(item_name="vistools test", tags=tags, work_order=data,
                                   related_simulations=[cls.sim_id])
-        wim = WorkItemManager(cls.wi, cls.p)
-        wim.process(check_status=True)
+        cls.wi.run(True, platform=cls.p)
 
     def setUp(self):
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName

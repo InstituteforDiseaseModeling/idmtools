@@ -2,10 +2,8 @@ import os
 import unittest
 import xmlrunner
 import pytest
-
 from idmtools.assets.file_list import FileList
 from idmtools.core.platform_factory import Platform
-from idmtools.managers.work_item_manager import WorkItemManager
 from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
 from COMPS.Data.WorkItem import WorkItem, RelationType
 from COMPS.Data import QueryCriteria, AssetCollection
@@ -41,11 +39,15 @@ class ClimateGenerationTest(ITestWithPersistence):
         command = command_pattern.format(points_file, start_date, end_date, optional_args)
         user_files = FileList(root=path_to_points_file, files_in_root=[points_file])
 
-        platform = Platform('COMPS2')
-        wi = SSMTWorkItem(item_name=self.case_name, docker_image=docker_image, command=command, user_files=user_files,
-                          tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker', 'Command': command})
-        wim = WorkItemManager(wi, platform)
-        wim.process(check_status=True)
+        with Platform('COMPS2'):
+            wi = SSMTWorkItem(item_name=self.case_name, docker_image=docker_image, command=command,
+                              user_files=user_files,
+                              tags={'idmtools_test': self._testMethodName,
+                                    'WorkItem type': 'Docker',
+                                    'Command': command
+                                    }
+                              )
+            wi.run(True)
 
         # Get the work item, related asset collection, and assets
         wi_id = wi.uid
