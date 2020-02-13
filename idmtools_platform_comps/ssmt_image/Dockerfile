@@ -55,6 +55,7 @@ ADD pip.conf /etc/pip.conf
 # make the PIP index configurable so we can build against staging, production, or a local PyPI server
 ARG PYPIURL=https://packages.idmod.org/api/pypi/pypi-staging/simple
 ARG PYPIHOST=packages.idmod.org
+ARG SSMT_VERSION
 
 # Install the packages
 RUN pip3 install --upgrade pip --index-url=https://pypi.python.org/simple && \
