@@ -11,7 +11,7 @@ LOCAL_PATH="$(realpath $(dirname '$0')/)"
 echo ${LOCAL_PATH}
 pip install py-make
 pymake setup-dev
-pip install PyComps==2.3.5b3 --index-url=https://idm_bamboo_user@idmod.org:${bamboo.PasswordEArtifactory}@packages.idmod.org/api/pypi/pypi-staging/simple --no-cache-dir --force-reinstall
+pip install PyComps==2.3.5 --index-url=https://idm_bamboo_user@idmod.org:${bamboo.PasswordEArtifactory}@packages.idmod.org/api/pypi/pypi-staging/simple --no-cache-dir --force-reinstall
 
 echo "pip list..."
 pip list
