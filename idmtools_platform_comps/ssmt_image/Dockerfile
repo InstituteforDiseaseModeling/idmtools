@@ -42,7 +42,7 @@ RUN apt-get update && \
     xz-utils \
     llvm \
     # r packages to support analysis in R
-    r-base
+    r-base \
     # clean up temporary data
     && apt-get clean && \
     mkdir -p /root/.pip && \

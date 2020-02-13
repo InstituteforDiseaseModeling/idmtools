@@ -33,7 +33,7 @@ if response.status_code == 200:
     last_version = images[0]
     if base_version in last_version:
         version_parts = last_version.split('.')
-        version_parts[-1] = int(version_parts[-1]) + 1
+        version_parts[-1] = str(int(version_parts[-1]) + 1)
         version = '.'.join(version_parts)
     else:
         version = f'{base_version}.0'
