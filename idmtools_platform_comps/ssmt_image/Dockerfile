@@ -30,8 +30,6 @@ CMD source /root/bootstrap.sh
 ENV DEBIAN_FRONTEND=noninteractive
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 
-RUN ln -s /usr/bin/pip3 /usr/bin/pip
-RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 COPY bootstrap.sh /root/bootstrap.sh
 CMD source /root/bootstrap.sh
