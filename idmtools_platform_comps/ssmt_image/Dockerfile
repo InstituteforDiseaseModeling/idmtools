@@ -8,29 +8,10 @@ ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 # Install dependencies
 RUN apt-get update && \
     apt-get install -y \
-    wget \
-    bzip2 \
-    ca-certificates \
-    build-essential \
-    curl \
-    pkg-config \
-    python3-dev \
-    python3-pip \
-    unzip \
-    software-properties-common \
+    xz-utils \
     llvm \
     # r packages to support analysis in R
-    r-base \
-    r-cran-curl \
-    r-cran-dplyr \
-    r-cran-epi \
-    r-cran-epibasix \
-    r-cran-epicalc \
-    r-cran-epir \
-    r-cran-epitools \
-    r-cran-gplots \
-    r-cran-plotrix \
-    r-cran-plyr \
+    r-base
     # clean up temporary data
     && apt-get clean && \
     mkdir -p /root/.pip && \
@@ -42,7 +23,7 @@ ADD requirements.txt /tmp/
 # set default index to IDM Pip Prod(Caching and internal packages IDMTools may depend on like pyComps
 ADD pip.conf /etc/pip.conf
 
-# make the PIP index configurable
+# make the PIP index configurable so we can build against staging, production, or a local PyPI server
 ARG PYPIURL=https://packages.idmod.org/api/pypi/pypi-staging/simple
 ARG PYPIHOST=packages.idmod.org
 
