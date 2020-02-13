@@ -47,7 +47,8 @@ print(f'PIP URL: {sys.argv[1]}')
 uri = urlparse(sys.argv[1])
 
 cmd = ['docker', 'build', '--network=host', '--build-arg', f'PYPIURL={sys.argv[1]}', '--build-arg',
-       f'PYPIHOST={uri.hostname}', '--build-arg', version, '--tag', f'{DOCKER_REPO}/{IMAGE_NAME}:{version}', '.']
+       f'PYPIHOST={uri.hostname}', '--build-arg', f'SSMT_VERSION={version}', '--tag',
+       f'{DOCKER_REPO}/{IMAGE_NAME}:{version}', '.']
 if len(sys.argv) == 3 and sys.argv[2] == "no-cache":
     cmd.insert(2, "--no-cache")
 print(f'Running: {" ".join(cmd)}')
