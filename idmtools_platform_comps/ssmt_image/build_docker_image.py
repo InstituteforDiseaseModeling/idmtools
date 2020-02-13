@@ -53,5 +53,5 @@ print(f'Running: {" ".join(cmd)}')
 p = subprocess.Popen(" ".join(cmd), cwd=os.path.abspath(os.path.dirname(__file__)), shell=True)
 p.wait()
 if p.returncode == 0:
-    os.system(f'docker tag {DOCKER_REPO}/{IMAGE_NAME}:{version} {DOCKER_REPO}/{IMAGE_NAME}:{version[:2]}')
+    os.system(f'docker tag {DOCKER_REPO}/{IMAGE_NAME}:{version} {DOCKER_REPO}/{IMAGE_NAME}:{version[:-2]}')
 sys.exit(p.returncode)
