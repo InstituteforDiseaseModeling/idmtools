@@ -14,6 +14,7 @@ if p_version.major == 3:
         sys.path.append(str(Path(os.path.join(assets_dir, './MyExternalLibrary/Python36')).resolve().absolute()))
 else:
     print("Sorry, this model only support Python 3.6 and 3.7")
+    sys.exit(1)
 import dtk_nodedemog as nd
 import dtk_generic_intrahost as gi
 from config_sim import configure_simulation
@@ -31,7 +32,7 @@ class Constant():
     infectiousness = "infectiousness"
     immunity = "immunity"
 
-class Persion():
+class Person():
     def __init__(self, mcw, age, gender, id):
         self.mcw = mcw
         self.age = age
@@ -45,7 +46,10 @@ class SEIR():
                  outbreak_timestep=0, outbreak_demographic_coverage=0.01, outbreak_ignore_immunity=True,
                  other_config_params: dict = None):
         """
-        Define a SEIR model with the following parameters
+        Define a simple SEIR model with the following parameters.
+        Although this example disables fertility and mortality(natual or disease related), it's possible to
+        enable vital dynamics in this model. It supports all fertility and mortality features in DTK with user
+        defined birth callback and mortality callback methods.
         :param config_template: template file for configuration
         :param simulation_duration: number of time step for one simulation
         :param initial_population: number of initial population
@@ -72,7 +76,7 @@ class SEIR():
 
     def create_person_callback( self, mcw, age, gender ):
             new_id = gi.create( (gender, age, mcw) )
-            person = Persion(mcw, age, gender, new_id)
+            person = Person(mcw, age, gender, new_id)
             if new_id in self.human_pop:
                 raise Exception(" individual {0} is already created.".format(new_id))
             else:

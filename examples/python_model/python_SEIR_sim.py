@@ -49,11 +49,11 @@ if __name__ == '__main__':
     # 1. first let's define our base task. Normally, you want to do set any assets/configurations you want across the
     # all the different Simulations we are going to build for our experiment. Here we load config file from a template json
     # file and rename the config_file_name(default value is config.json)
-    parameters = json.load(open(os.path.join("inputs", "ye_seir_model", "Assets", "templates", 'nd_template.json'), 'r'))
+    parameters = json.load(open(os.path.join("inputs", "ye_seir_model", "Assets", "templates", 'seir_configuration_template.json'), 'r'))
     parameters[ConfigParameters.Base_Infectivity_Distribution] = ConfigParameters.GAUSSIAN_DISTRIBUTION
     task = JSONConfiguredPythonTask(script_path=os.path.join("inputs", "ye_seir_model", "Assets", "SEIR_model.py"),
                                     parameters=parameters,
-                                    config_file_name="nd_template.json")
+                                    config_file_name="seir_configuration_template.json")
     # We define arguments/value for simulation duration that we don't want to sweep as an option for the task.
     task.command.add_option("--duration", 40)
 
