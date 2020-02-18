@@ -5,3 +5,4 @@ pyarrow
 tables
 rpy2
 numba
+matplotlib
