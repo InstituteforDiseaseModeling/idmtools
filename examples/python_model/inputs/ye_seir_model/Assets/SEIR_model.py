@@ -45,13 +45,13 @@ class SEIR():
                  outbreak_timestep=0, outbreak_demographic_coverage=0.01, outbreak_ignore_immunity=True,
                  other_config_params: dict = None):
         """
-        Define a SEIR model with the following parameeters
+        Define a SEIR model with the following parameters
         :param config_template: template file for configuration
         :param simulation_duration: number of time step for one simulation
         :param initial_population: number of initial population
         :param outbreak_timestep: the day to start distributing the outbreak
         :param outbreak_demographic_coverage: the fraction of individuals that will receive the outbreak
-        :param outbreak_ignore_immunity: iIndividuals will be force-infected regardless of actual immunity level when set to true
+        :param outbreak_ignore_immunity: individuals will be force-infected regardless of actual immunity level when set to true
         :param other_config_params: other parameter/value pairs in config.json
         """
         self.human_pop = {} # dictionary of individual objects at run time
