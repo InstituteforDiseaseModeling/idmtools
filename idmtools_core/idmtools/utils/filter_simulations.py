@@ -9,7 +9,11 @@ class FilterItem:
     @staticmethod
     def filter_item(platform: IPlatform, item: IEntity, skip_sims=[], max_simulations: int = None, **kwargs):
         """
-        Filter simulations from Experiment or Suite
+        Filter simulations from Experiment or Suite, by default it filter status with Succeeded.
+        If user wants to filter by other status, it also can be done, for example:
+                filter_item(platform, exp, status=EntityStatus.FAILED
+        If user wants to filter by tags, it also can be done, for example:
+                filter_item(platform, exp, tags={'Run_Number': '2'})
         Args:
             platform:
             item:
