@@ -60,6 +60,13 @@ class TestSimulations(ITestWithPersistence):
         sims = FilterItem.filter_item(self.platform, exp, max_simulations=1)
         self.assertEqual(len(sims), 1)
 
+    def test_filter_experiment_skip(self):
+        # Filter from Experiment
+        exp_id = '06da767c-f249-ea11-a2be-f0921c167861'  # 2/5 succeed
+        sims = FilterItem.filter_item_by_id(self.platform, exp_id, ItemType.EXPERIMENT,
+                                            skip_sims=['0ada767c-f249-ea11-a2be-f0921c167861'], max_simulations=5)
+        self.assertEqual(len(sims), 1)
+
 
 if __name__ == '__main__':
     unittest.main()

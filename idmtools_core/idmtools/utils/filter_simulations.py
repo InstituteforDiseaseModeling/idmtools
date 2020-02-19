@@ -7,12 +7,13 @@ from idmtools.entities.iplatform import IPlatform
 class FilterItem:
 
     @staticmethod
-    def filter_item(platform: IPlatform, item: IEntity, max_simulations: int = None, **kwargs):
+    def filter_item(platform: IPlatform, item: IEntity, skip_sims=[], max_simulations: int = None, **kwargs):
         """
         Filter simulations from Experiment or Suite
         Args:
             platform:
             item:
+            skip_sims: list of sim ids
             max_simulations:
             kwargs: extra filters
 
@@ -39,7 +40,6 @@ class FilterItem:
 
         # get all possible simulations
         potential_sims = platform.flatten_item(item=item)
-        print(potential_sims)
 
         # filter by status
         status = kwargs.get("status", EntityStatus.SUCCEEDED)
@@ -49,21 +49,25 @@ class FilterItem:
         tags = kwargs.get("tags", {})
         sims_tags_filtered = [sim for sim in sims_status_filtered if match_tags(sim, tags)]
 
+        # filter sims
+        sims_id_filtered = [sim for sim in sims_tags_filtered if str(sim.uid) not in skip_sims]
+
         # consider max_simulations for return
-        sims_final = sims_tags_filtered[0:max_simulations if max_simulations else len(sims_tags_filtered)]
+        sims_final = sims_id_filtered[0:max_simulations if max_simulations else len(sims_id_filtered)]
 
         # only return uid
         return [s.uid for s in sims_final]
 
     @classmethod
     def filter_item_by_id(cls, platform: IPlatform, item_id: UUID, item_type: ItemType = ItemType.EXPERIMENT,
-                          max_simulations: int = None, **kwargs):
+                          skip_sims=[], max_simulations: int = None, **kwargs):
         """
         Filter simulations from Experiment or Suite
         Args:
             platform: COMPSPlatform
             item_id: Experiment/Suite id
             item_type:  Experiment or Suite
+            skip_sims: list of sim ids
             max_simulations: #sims to be returned
             kwargs: extra filters
 
@@ -76,4 +80,4 @@ class FilterItem:
         item = platform.get_item(item_id, item_type, raw=False)
 
         # filter simulations
-        return cls.filter_item(platform, item, max_simulations, **kwargs)
+        return cls.filter_item(platform, item, skip_sims, max_simulations, **kwargs)
