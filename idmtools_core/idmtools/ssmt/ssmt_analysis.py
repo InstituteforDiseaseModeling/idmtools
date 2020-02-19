@@ -3,6 +3,7 @@ import inspect
 import pickle
 import tempfile
 from idmtools.assets.file_list import FileList
+from idmtools.config import IdmConfigParser
 from idmtools.managers.work_item_manager import WorkItemManager
 from idmtools.ssmt.idm_work_item import SSMTWorkItem
 
@@ -58,6 +59,8 @@ class SSMTAnalysis:
         # Add the analyzers
         command += " {}".format(",".join(f"{inspect.getmodulename(inspect.getfile(a))}.{a.__name__}"
                                          for a in self.analyzers))
+        # Add platform
+        command += " {}".format(IdmConfigParser._block)
 
         self.wi = SSMTWorkItem(item_name=self.analysis_name, command=command, tags=self.tags,
                           user_files=self.additional_files, asset_collection_id=self.asset_collection_id,
