@@ -18,12 +18,11 @@ logger = getLogger(__name__)
 
 op_defaults = dict(default=None, compare=False, metadata={"pickle_ignore": True})
 
-
 supported_types = [PlatformRequirements.DOCKER, PlatformRequirements.GPU, PlatformRequirements.SHELL,
                    PlatformRequirements.NativeBinary, PlatformRequirements.LINUX]
 
 
-@dataclass
+@dataclass(repr=False)
 class LocalPlatform(IPlatform):
     """
     Represents the platform allowing to run simulations locally.
@@ -51,12 +50,13 @@ class LocalPlatform(IPlatform):
     auto_remove_worker_containers: bool = field(default=True)
 
     # We use this to manage our docker containers
-    _sm: Optional[DockerServiceManager] = field(**op_defaults)
-    _do: DockerIO = field(**op_defaults)
+    _sm: Optional[DockerServiceManager] = field(**op_defaults, repr=False, init=False)
+    _do: DockerIO = field(**op_defaults, repr=False, init=False)
 
-    _experiments: LocalPlatformExperimentOperations = field(**op_defaults)
-    _simulation: LocalPlatformSimulationOperations = field(**op_defaults)
-    _platform_supports: List[PlatformRequirements] = field(default_factory=lambda: copy.deepcopy(supported_types))
+    _experiments: LocalPlatformExperimentOperations = field(**op_defaults, repr=False, init=False)
+    _simulation: LocalPlatformSimulationOperations = field(**op_defaults, repr=False, init=False)
+    _platform_supports: List[PlatformRequirements] = field(default_factory=lambda: copy.deepcopy(supported_types),
+                                                           repr=False, init=False)
 
     def __post_init__(self):
         logger.debug("Setting up local platform")
