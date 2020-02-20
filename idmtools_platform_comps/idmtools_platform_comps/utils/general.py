@@ -24,13 +24,24 @@ def fatal_code(e: Exception) -> bool:
     return False
 
 
-
 def convert_COMPS_status(comps_status):
     if comps_status == SimulationState.Succeeded:
         return EntityStatus.SUCCEEDED
     elif comps_status in (SimulationState.Canceled, SimulationState.CancelRequested, SimulationState.Failed):
         return EntityStatus.FAILED
     elif comps_status == SimulationState.Created:
+        return EntityStatus.CREATED
+    else:
+        return EntityStatus.RUNNING
+
+
+def convert_COMPS_WorkItem_status(wi_status):
+    from COMPS.Data.WorkItem import WorkItemState
+    if wi_status == WorkItemState.Succeeded:
+        return EntityStatus.SUCCEEDED
+    elif wi_status in (WorkItemState.Canceled, WorkItemState.CancelRequested, WorkItemState.Failed):
+        return EntityStatus.FAILED
+    elif wi_status == WorkItemState.Created:
         return EntityStatus.CREATED
     else:
         return EntityStatus.RUNNING
