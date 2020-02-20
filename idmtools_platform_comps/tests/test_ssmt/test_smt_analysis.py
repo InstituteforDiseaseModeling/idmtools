@@ -16,6 +16,7 @@ from AdultVectorsAnalyzer import AdultVectorsAnalyzer
 
 
 @pytest.mark.comps
+@pytest.mark.ssmt
 class TestSSMTAnalysis(ITestWithPersistence):
 
     def setUp(self) -> None:

@@ -11,7 +11,8 @@ from COMPS.Data.WorkItem import WorkItem, RelationType
 from COMPS.Data import QueryCriteria, AssetCollection
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
-
+@pytest.mark.ssmt
+@pytest.mark.comps
 class ClimateGenerationTest(ITestWithPersistence):
 
     def setUp(self):
