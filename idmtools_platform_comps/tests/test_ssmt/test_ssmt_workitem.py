@@ -12,7 +12,6 @@ from idmtools_test.utils.utils import del_folder
 
 
 @pytest.mark.comps
-@pytest.mark.ling
 class TestSSMTWorkItem(ITestWithPersistence):
 
     def setUp(self) -> None:

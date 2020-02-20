@@ -18,7 +18,6 @@ current_dir = os.path.dirname(os.path.realpath(__file__))
 output_path = os.path.join(current_dir, 'output')
 intermediate_dir = os.path.join(current_dir, 'inputs')
 
-@pytest.mark.ling
 class InputDataWorkItemTests(ITestWithPersistence):
 
     def setUp(self):

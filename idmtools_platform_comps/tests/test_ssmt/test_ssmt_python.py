@@ -20,7 +20,6 @@ from CSVAnalyzer import CSVAnalyzer
 
 
 @pytest.mark.comps
-@pytest.mark.ling
 class TestSSMTWorkItemPythonExp(ITestWithPersistence):
 
     def setUp(self):
