@@ -143,7 +143,8 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
             None
         """
         wi = self.get(work_item.uid)
-        work_item.status = wi.state  # convert_COMPS_status(wi.state)
+        from idmtools_platform_comps.utils.general import convert_COMPS_WorkItem_status
+        work_item.status = convert_COMPS_WorkItem_status(wi.state)
 
     def get_parent(self, work_item: COMPSWorkItem, **kwargs) -> Any:
         """
