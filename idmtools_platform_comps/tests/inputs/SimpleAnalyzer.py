@@ -1,13 +1,7 @@
 import json
 import os
 
-try:
-    # use idmtools image
-    from idmtools.entities.ianalyzer import IAnalyzer as BaseAnalyzer
-except ImportError:
-    # use dtk-tools image
-    from simtools.Analysis.BaseAnalyzers.BaseAnalyzer import BaseAnalyzer
-
+from idmtools.entities.ianalyzer import IAnalyzer as BaseAnalyzer
 
 class SimpleAnalyzer(BaseAnalyzer):
 

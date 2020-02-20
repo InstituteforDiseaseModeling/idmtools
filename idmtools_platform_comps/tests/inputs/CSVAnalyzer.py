@@ -3,12 +3,8 @@
 # First, import some necessary system and idmtools packages.
 import os
 import pandas as pd
-try:
-    # use idmtools image
-    from idmtools.entities.ianalyzer import IAnalyzer as BaseAnalyzer
-except ImportError:
-    # use dtk-tools image
-    from simtools.Analysis.BaseAnalyzers.BaseAnalyzer import BaseAnalyzer
+from idmtools.entities.ianalyzer import IAnalyzer as BaseAnalyzer
+
 
 # Create a class for the analyzer
 class CSVAnalyzer(BaseAnalyzer):
@@ -33,7 +29,7 @@ class CSVAnalyzer(BaseAnalyzer):
 
     # In reduce, we are printing the simulation and result data filtered in map
     def reduce(self, all_data):
-
+        output_dir = os.path.join(self.working_dir, "output")
         # Let's hope the first simulation is representative
         first_sim = next(iter(all_data.keys()))  # Iterate over the dataframe keys
         exp_id = str(first_sim.experiment.uid)  # Set the exp id from the first sim data
@@ -43,10 +39,8 @@ class CSVAnalyzer(BaseAnalyzer):
                             names=['SimId'])  # Label the index keys you create with the names option
         results.index = results.index.droplevel(1)  # Remove default index
 
-        # Make a directory labeled the exp id to write the csv results to
-        os.makedirs(exp_id, exist_ok=True)
         # NOTE: If running twice with different filename, the output files will collide
-        results.to_csv(os.path.join(exp_id, self.__class__.__name__+'.csv'))
+        results.to_csv(os.path.join(output_dir, 'aggregated_c.csv'))
 
     #dtk-tools analyzer
     def select_simulation_data(self, data, simulation):

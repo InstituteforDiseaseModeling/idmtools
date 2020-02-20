@@ -11,12 +11,13 @@ from COMPS.Data.WorkItem import WorkItem, RelationType
 from COMPS.Data import QueryCriteria, AssetCollection
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
-
+@pytest.mark.ssmt
+@pytest.mark.comps
 class ClimateGenerationTest(ITestWithPersistence):
 
     def setUp(self):
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
-        self.input_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "inputs")
+        self.input_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "inputs")
 
     #------------------------------------------
     # test generate ERA5 climate files

@@ -2,21 +2,11 @@ import json
 import os
 import pandas as pd
 
-# uncomment following lines with idmtools image of ssmt
-# from idmtools.analysis.analyze_manager import AnalyzeManager
-# from idmtools.core import ItemType
-# from idmtools.core.platform_factory import Platform
-
-try:
-    # use idmtools image
-    from idmtools.entities.ianalyzer import IAnalyzer as BaseAnalyzer
-except ImportError:
-    # use dtk-tools image
-    from simtools.Analysis.BaseAnalyzers.BaseAnalyzer import BaseAnalyzer
-
+from idmtools.entities.ianalyzer import IAnalyzer as BaseAnalyzer
 import matplotlib as mpl
 
 mpl.use('Agg')
+
 
 class PopulationAnalyzer(BaseAnalyzer):
 
