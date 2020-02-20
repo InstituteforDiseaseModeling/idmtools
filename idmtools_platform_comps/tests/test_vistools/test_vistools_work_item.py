@@ -6,6 +6,7 @@ from datetime import date, timedelta
 from functools import partial
 
 import pytest
+
 from idmtools.assets import AssetCollection
 from idmtools.builders import ExperimentBuilder
 from idmtools.core import ItemType
@@ -40,7 +41,8 @@ class TestVisToolsWorkItem(unittest.TestCase):
         node_type = 'Points'
         data = {"SimulationId": "" + cls.sim_id + "", "NodesRepresentation": node_type}
         tags = {'idmtools': "vistool test", 'WorkItem type': 'VisTools', 'SimulationId': cls.sim_id}
-        cls.wi = VisToolsWorkItem(item_name="vistools test", tags=tags, work_order=data, related_simulations=[cls.sim_id])
+        cls.wi = VisToolsWorkItem(item_name="test_vistools_work_item.py", tags=tags, work_order=data,
+                                  related_simulations=[cls.sim_id])
         wim = WorkItemManager(cls.wi, cls.p)
         wim.process(check_status=True)
 

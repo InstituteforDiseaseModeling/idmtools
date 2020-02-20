@@ -21,7 +21,7 @@ with open('ui_requirements.txt') as requirements_file:
 
 
 setup_requirements = []
-server_requirements = ['uwsgi==2.0.18','Werkzeug==0.16.1']
+server_requirements = ['uwsgi==2.0.18']
 test_requirements = ['pytest', 'pytest-runner', 'pytest-timeout', 'pytest-cache']
 
 # Only install uwsgi on python 3.7
