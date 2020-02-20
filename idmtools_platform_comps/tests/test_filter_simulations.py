@@ -18,7 +18,7 @@ class TestSimulations(ITestWithPersistence):
 
     def _run_create_test_experiments(self):
         """
-        create suite and experiement with 5 simulations. 2 succeed ones and 3 failed ones
+        create suite and experiment with 5 simulations. 2 succeed ones and 3 failed ones
         :return: ExperimentManager
         """
         def param_update(simulation, param, value):
