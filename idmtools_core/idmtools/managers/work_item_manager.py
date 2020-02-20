@@ -65,10 +65,13 @@ class WorkItemManager:
             state = self.wi.status
             states = [WorkItemState.Succeeded, WorkItemState.Failed, WorkItemState.Canceled]
             while state not in states and time.clock() - start < timeout:
-                time.sleep(5)
                 self.refresh_status()
                 state = self.wi.status
                 print('State -> {} '.format(state.name))
+                if self.wi.done:
+                    print("WorkItem Done!")
+                    return
+                time.sleep(5)
         else:
             print('WorkItem created in {}.'.format(self.platform.endpoint))
 
