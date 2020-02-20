@@ -84,8 +84,7 @@ class InputDataWorkItemTests(ITestWithPersistence):
 
         inputdata_wi = InputDataWorkItem(item_name=self.case_name)
         inputdata_wi.load_work_order(work_order_path)
-        wim = WorkItemManager(inputdata_wi, self.p)
-        wim.process(check_status=True)
+        inputdata_wi.run(True, platform=self.p)
         self.assertIsNotNone(inputdata_wi)
 
 
