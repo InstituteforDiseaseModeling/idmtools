@@ -31,6 +31,7 @@ def param_update(simulation, param, value):
 
 @pytest.mark.comps
 @pytest.mark.long
+@pytest.mark.ling
 class TestVisToolsWorkItem(unittest.TestCase):
 
     @classmethod
