@@ -25,14 +25,14 @@ class TestSimulations(ITestWithPersistence):
             return simulation.set_parameter(param, value)
         setA = partial(param_update, param="Run_Number")
 
-        experiment = PythonExperiment(name="test_experiments",
+        experiment = PythonExperiment(name="test_filter_simulations.py--test_experiment",
                                       model_path=os.path.join(COMMON_INPUT_PATH, "python_experiments", "model.py"))
         builder = ExperimentBuilder()
         builder.add_sweep_definition(setA, range(5))
 
         experiment.add_builder(builder)
 
-        suite = Suite(name='Idm Suite')
+        suite = Suite(name='test_filter_simulations.py--test suite')
         suite.update_tags({'name': 'test', 'fetch': 123})
         em = ExperimentManager(platform=self.platform, experiment=experiment, suite=suite)
         em.run()
