@@ -43,7 +43,9 @@ class SSMTAnalysis:
         # save pickle file as a temp file
         temp_dir = tempfile.mkdtemp()
         temp_file = os.path.join(temp_dir, "analyzer_args.pkl")
-        pickle.dump(args_dict, open(temp_file, 'wb'))
+        file = open(temp_file, 'wb')
+        pickle.dump(args_dict, file)
+        file.close()
 
         # Add analyzer args pickle as additional file
         self.additional_files.add_file(temp_file)

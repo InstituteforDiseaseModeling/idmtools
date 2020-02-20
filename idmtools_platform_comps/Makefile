@@ -40,6 +40,9 @@ test-long: ## Run any tests that takes more than 30s
 test-no-long: ## Run any tests that takes less than 30s
 	$(FULL_TEST_CMD) -m "not long"'
 
+test-ling: ## Run any tests that takes less than 30s
+	$(FULL_TEST_CMD) -m "ling"'
+
 test-comps: ## Run our comps tests
 	$(FULL_TEST_CMD) -m "comps"'
 
