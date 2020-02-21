@@ -13,12 +13,13 @@ from idmtools_test.utils.utils import del_folder
 
 
 # import analyzers from current dir's inputs dir
-# sys.path.insert(0, os.path.join(os.path.dirname(__file__), "inputs"))
-# from SimpleAnalyzer import SimpleAnalyzer
-# from CSVAnalyzer import CSVAnalyzer
-
+analyzer_path = os.path.join(os.path.dirname(__file__), "..", "inputs")
+sys.path.insert(0, analyzer_path)
+from SimpleAnalyzer import SimpleAnalyzer
+from CSVAnalyzer import CSVAnalyzer
 
 @pytest.mark.comps
+@pytest.mark.ssmt
 class TestSSMTWorkItemPythonExp(ITestWithPersistence):
 
     def setUp(self):
@@ -27,7 +28,7 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
         print(self.case_name)
         self.platform = Platform('COMPS2')
         self.tags = {'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}
-        self.input_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "inputs")
+        self.input_file_path = analyzer_path
 
     # test SSMTWorkItem with simple python script "hello.py"
     # "hello.py" will run in comps's workitem worker like running it in local:
@@ -61,8 +62,6 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
 
     # Test SimpleAnalyzer with SSMTAnalysis which analyzes python experiment's results
     def test_ssmt_workitem_python_simple_analyzer(self):
-        sys.path.insert(0, self.input_file_path)
-        from SimpleAnalyzer import SimpleAnalyzer
 
         experiment_id = "9311af40-1337-ea11-a2be-f0921c167861"
         analysis = PlatformAnalysis(platform=self.platform,
@@ -89,12 +88,11 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
         self.assertEqual(execution['Command'],
-                         "python platform_analysis_bootstrap.py " + experiment_id + " SimpleAnalyzer.SimpleAnalyzer")
+                         "python platform_analysis_bootstrap.py " + experiment_id +
+                         " SimpleAnalyzer.SimpleAnalyzer COMPS2")
 
     # Test CSVAnalyzer with SSMTAnalysis which analyzes python experiment's results
     def test_ssmt_workitem_python_csv_analyzer(self):
-        sys.path.insert(0, self.input_file_path)
-        from CSVAnalyzer import CSVAnalyzer
         experiment_id = "9311af40-1337-ea11-a2be-f0921c167861"
         analysis = PlatformAnalysis(platform=self.platform,
                                     experiment_ids=[experiment_id],
@@ -121,4 +119,4 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
         self.assertEqual(execution['Command'],
-                         "python platform_analysis_bootstrap.py " + experiment_id + " CSVAnalyzer.CSVAnalyzer")
+                         "python platform_analysis_bootstrap.py " + experiment_id + " CSVAnalyzer.CSVAnalyzer COMPS2")

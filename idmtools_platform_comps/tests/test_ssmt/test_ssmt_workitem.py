@@ -10,6 +10,7 @@ from idmtools_test.utils.utils import del_folder
 
 
 @pytest.mark.comps
+@pytest.mark.ssmt
 class TestSSMTWorkItem(ITestWithPersistence):
 
     def setUp(self) -> None:
@@ -17,8 +18,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         print(self.case_name)
         self.platform = Platform('COMPS2')
         self.tags = {'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}
-        self.input_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "inputs")
-        # self.input_file_path = os.path.join(os.path.dirname(__file__), "inputs")
+        self.input_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "inputs")
 
     # test using SSMTWormItem to run PopulationAnalyzer in comps's SSMT DockerWorker
     def test_ssmt_workitem_PopulationAnalyzer(self):
@@ -68,9 +68,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         user_files.add_file(os.path.join(self.input_file_path, 'PopulationAnalyzer.py'))
         user_files.add_file(os.path.join(self.input_file_path, 'AdultVectorsAnalyzer.py'))
         user_files.add_file(os.path.join(self.input_file_path, 'run_multiple_analyers.py'))
-
-        # load local "input" foleer simtools.ini to current dir in Comps workitem
-        user_files.add_file(os.path.join(self.input_file_path, "simtools.ini"))
+        user_files.add_file(os.path.join(self.input_file_path, 'idmtools.ini'))
 
         experiment_id = "8bb8ae8f-793c-ea11-a2be-f0921c167861"
         command = "python run_multiple_analyers.py " + experiment_id
@@ -110,6 +108,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
     def test_ssmt_workitem_multiple_experiments(self):
         exp_id1 = "8bb8ae8f-793c-ea11-a2be-f0921c167861"
         exp_id2 = "4ea96af7-1549-ea11-a2be-f0921c167861"
+
         # load local ("inputs") PopulationAnalyzer.py and run_dtktools_PopulationAnalyzer.py
         # to COMPS's assets
         asset_files = FileList()

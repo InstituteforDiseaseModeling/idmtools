@@ -18,7 +18,10 @@ from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import del_file, del_folder, load_csv_file
 
-current_directory = os.path.dirname(os.path.realpath(__file__))
+analyzer_path = os.path.join(os.path.dirname(__file__), "inputs")
+sys.path.insert(0, analyzer_path)
+from PopulationAnalyzer1 import PopulationAnalyzer
+from TimeseriesAnalyzer import TimeseriesAnalyzer
 
 
 def param_update(simulation, param, value):
@@ -39,7 +42,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
-        self.p = Platform('COMPS2')
+        self.platform = Platform('COMPS2')
 
     def create_experiment(self):
 
@@ -57,7 +60,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         # Sweep parameter "Run_Number"
         self.builder.add_sweep_definition(param_a_update, range(0, 2))
         e.builder = self.builder
-        em = ExperimentManager(experiment=e, platform=self.p)
+        em = ExperimentManager(experiment=e, platform=self.platform)
         em.run()
         em.wait_till_done()
         self.assertTrue(e.succeeded)
@@ -74,7 +77,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         filenames = ['StdOut.txt']
         analyzers = [AddAnalyzer(filenames=filenames)]
 
-        am = AnalyzeManager(platform=self.p, ids=[(self.exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
+        am = AnalyzeManager(platform=self.platform, ids=[(self.exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
 
     @pytest.mark.long
@@ -90,7 +93,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         filenames = ['output/InsetChart.json', 'config.json']
         analyzers = [DownloadAnalyzer(filenames=filenames, output_path='output')]
 
-        am = AnalyzeManager(platform=self.p, ids=[(self.exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
+        am = AnalyzeManager(platform=self.platform, ids=[(self.exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
 
         for simulation in Experiment.get(self.exp_id).get_simulations():
@@ -113,12 +116,11 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
 
         exp_list = [('6f693627-6de5-e911-a2be-f0921c167861', ItemType.EXPERIMENT),
                     ('1991ec0d-6ce5-e911-a2be-f0921c167861', ItemType.EXPERIMENT)]  # comps2 staging
-        am = AnalyzeManager(platform=self.p, ids=exp_list, analyzers=analyzers)
+        am = AnalyzeManager(platform=self.platform, ids=exp_list, analyzers=analyzers)
         am.analyze()
 
     @pytest.mark.long
     def test_population_analyzer(self):
-        analyzer_path = os.path.join(os.path.dirname(__file__), "inputs", "analyzers")
         del_file(os.path.join(analyzer_path, 'population.csv'))
         del_file(os.path.join(analyzer_path, 'population.png'))
         self.create_experiment()
@@ -126,11 +128,9 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         # self.exp_id = uuid.UUID("fc59240c-07db-e911-a2be-f0921c167861")
         filenames = ['output/InsetChart.json']
 
-        sys.path.insert(0, analyzer_path)
-        from PopulationAnalyzer import PopulationAnalyzer
-        analyzers = [PopulationAnalyzer(filenames=filenames)]
+        analyzers = [PopulationAnalyzer(filenames)]
 
-        am = AnalyzeManager(platform=self.p, ids=[(self.exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
+        am = AnalyzeManager(platform=self.platform, ids=[(self.exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
 
         # -----------------------------------------------------------------------------------------------------
@@ -157,20 +157,16 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
 
     @pytest.mark.long
     def test_timeseries_analyzer_with_filter(self):
-        analyzer_path = os.path.join(os.path.dirname(__file__), "inputs", "analyzers")
         del_file(os.path.join(analyzer_path, 'timeseries.csv'))
         del_file(os.path.join(analyzer_path, 'timeseries.png'))
 
         self.create_experiment()
 
         filenames = ['output/InsetChart.json']
-        sys.path.insert(0, analyzer_path)
-        from TimeseriesAnalyzer import TimeseriesAnalyzer
-
         analyzers = [TimeseriesAnalyzer(filenames=filenames)]
 
         # self.exp_id = uuid.UUID("fc59240c-07db-e911-a2be-f0921c167861")
-        am = AnalyzeManager(platform=self.p, ids=[(self.exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
+        am = AnalyzeManager(platform=self.platform, ids=[(self.exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
 
         # ------------------------------------------------------------------------------
@@ -215,7 +211,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
 
         exp_id = ('f48e09d4-acd9-e911-a2be-f0921c167861', ItemType.EXPERIMENT)  # comps2
 
-        am = AnalyzeManager(platform=self.p, ids=[exp_id], analyzers=analyzers)
+        am = AnalyzeManager(platform=self.platform, ids=[exp_id], analyzers=analyzers)
         am.analyze()
 
         for simulation in Experiment.get(exp_id[0]).get_simulations():
@@ -233,16 +229,16 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
 
         suite_id = 'e00296a6-0200-ea11-a2be-f0921c167861'
         suite_list = [(suite_id, ItemType.SUITE)]  # comps2 staging
-        am = AnalyzeManager(platform=self.p, ids=suite_list, analyzers=analyzers)
+        am = AnalyzeManager(platform=self.platform, ids=suite_list, analyzers=analyzers)
         am.analyze()
 
         # verify results:
         # retrieve suite from comps
-        comps_suite = self.p.get_item(item_id=suite_id, item_type=ItemType.SUITE)
+        comps_suite = self.platform.get_item(item_id=suite_id, item_type=ItemType.SUITE)
         # retrieve experiment from suite
-        exps = self.p.get_children_by_object(comps_suite)
-        comps_exp = self.p.get_item(item_id=exps[0].uid, item_type=ItemType.EXPERIMENT)
-        sims = self.p.get_children_by_object(comps_exp)
+        exps = self.platform.get_children_by_object(comps_suite)
+        comps_exp = self.platform.get_item(item_id=exps[0].uid, item_type=ItemType.EXPERIMENT)
+        sims = self.platform.get_children_by_object(comps_exp)
         for simulation in sims:
             self.assertTrue(os.path.exists(os.path.join('output', str(simulation.uid), "InsetChart.json")))
 
@@ -255,7 +251,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         del_folder(output_dir)
         analyzers = [TagsAnalyzer()]
 
-        manager = AnalyzeManager(configuration={}, partial_analyze_ok=True, platform=self.p,
+        manager = AnalyzeManager(platform=self.platform, partial_analyze_ok=True,
                                  ids=[(experiment_id, ItemType.EXPERIMENT)],
                                  analyzers=analyzers)
         manager.analyze()
@@ -271,7 +267,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         filenames = ['output/c.csv']
         analyzers = [CSVAnalyzer(filenames=filenames)]
 
-        manager = AnalyzeManager(configuration={}, partial_analyze_ok=True, platform=self.p,
+        manager = AnalyzeManager(platform=self.platform, partial_analyze_ok=True,
                                  ids=[(experiment_id, ItemType.EXPERIMENT)],
                                  analyzers=analyzers)
         manager.analyze()
@@ -288,7 +284,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         filenames = ['output/MalariaPatientReport.json']
         with self.assertRaises(Exception) as context:
             analyzers = [CSVAnalyzer(filenames=filenames)]
-            manager = AnalyzeManager(configuration={}, partial_analyze_ok=True, platform=self.p,
+            manager = AnalyzeManager(platform=self.platform, partial_analyze_ok=True,
                                      ids=[(experiment_id, ItemType.EXPERIMENT)],
                                      analyzers=analyzers)
             manager.analyze()
@@ -306,8 +302,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         filenames = ['output/a.csv', 'output/b.csv']
         analyzers = [CSVAnalyzer(filenames=filenames)]
 
-        self.p = Platform('COMPS2')
-        manager = AnalyzeManager(configuration={}, partial_analyze_ok=True, platform=self.p,
+        manager = AnalyzeManager(platform=self.platform, partial_analyze_ok=True,
                                  ids=[(experiment_id, ItemType.EXPERIMENT)],
                                  analyzers=analyzers)
         manager.analyze()

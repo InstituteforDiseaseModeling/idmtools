@@ -52,6 +52,9 @@ test-emod: ## Run our emod tests
 test-python: ## Run our python tests
 	$(FULL_TEST_CMD) -m "python"'
 
+test-ssmt: ## Run our python tests
+	$(FULL_TEST_CMD) -m "ssmt"'
+
 coverage: ## Generate a code-coverage report
 	@make clean
 	# We have to run in our tests folder to use the proper config
@@ -68,12 +71,20 @@ coverage-all: ## Generate a code-coverage report using all tests
 	coverage report -m
 	coverage html -i
 	$(PDS)/launch_dir_in_browser.py htmlcov/index.html
-	
-# Release related rules
 
+# Release related rules
 release-local: ## package and upload a release to http://localhost:7171
 	@make dist
 	twine upload --verbose --repository-url http://localhost:7171 -u admin -p admin dist/*
+
+ssmt-image-local:  ## Build SSMT Docker image using Local PyPi
+	$(PDR) -w './ssmt_image' -ex 'pymake docker-local'
+
+ssmt-image-staging:  ## Build SSMT Docker image using Staging PyPi
+	$(PDR) -w './ssmt_image' -ex 'pymake docker-staging'
+
+ssmt-image-release-staging:  ## Build SSMT Docker image using Staging PyPi and Publish to Staging
+	$(PDR) -w './ssmt_image' -ex 'pymake docker-release-staging'
 
 dist: ## build our package
 	@make clean

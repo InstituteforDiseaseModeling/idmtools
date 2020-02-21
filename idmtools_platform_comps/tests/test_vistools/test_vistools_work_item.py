@@ -6,6 +6,7 @@ from datetime import date, timedelta
 from functools import partial
 
 import pytest
+
 from idmtools.assets import AssetCollection
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
@@ -33,11 +34,12 @@ class TestVisToolsWorkItem(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.p = Platform('COMPS2')
-        cls.sim_id = str(cls.generate_sim(cls)[0].uid)
+        #cls.sim_id = str(cls.generate_sim(cls)[0].uid)
+        cls.sim_id = "aa283def-2454-ea11-a2bf-f0921c167862"
         node_type = 'Points'
         data = {"SimulationId": "" + cls.sim_id + "", "NodesRepresentation": node_type}
         tags = {'idmtools': "vistool test", 'WorkItem type': 'VisTools', 'SimulationId': cls.sim_id}
-        cls.wi = VisToolsWorkItem(item_name="vistools test", tags=tags, work_order=data,
+        cls.wi = VisToolsWorkItem(item_name="test_vistools_work_item.py", tags=tags, work_order=data,
                                   related_simulations=[cls.sim_id])
         cls.wi.run(True, platform=cls.p)
 
@@ -453,24 +455,24 @@ class TestVisToolsWorkItem(unittest.TestCase):
         response = requests.get(vtassetmap_dic['/' + visset_name + '/' + p + '/vt_preprocess.py'])
         self.assertTrue(response.status_code < 400)
 
-    def generate_sim(self):
-        self.case_name = os.path.basename(__file__)
-        assets_path = os.path.join(DEFAULT_INPUT_PATH, "Assets")
-        ac = AssetCollection.from_directory(assets_directory=assets_path)
-        e = EMODExperiment.from_files(name=self.case_name,
-                                      eradication_path=DEFAULT_ERADICATION_PATH,
-                                      config_path=DEFAULT_CONFIG_PATH,
-                                      campaign_path=DEFAULT_CAMPAIGN_JSON,
-                                      demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)
-        e.legacy_exe = True
-        e.add_assets(ac)
-
-        builder = ExperimentBuilder()
-        set_Run_Number = partial(param_update, param="Run_Number")
-        builder.add_sweep_definition(set_Run_Number, range(1))
-        e.add_builder(builder)
-        em = ExperimentManager(experiment=e, platform=self.p)
-        em.run()
-        em.wait_till_done()
-        simulations = self.p.get_children(em.experiment.uid, ItemType.EXPERIMENT, force=True)
-        return simulations
+    # def generate_sim(self):
+    #     self.case_name = os.path.basename(__file__)
+    #     assets_path = os.path.join(DEFAULT_INPUT_PATH, "Assets")
+    #     ac = AssetCollection.from_directory(assets_directory=assets_path)
+    #     e = EMODExperiment.from_files(name=self.case_name,
+    #                                   eradication_path=DEFAULT_ERADICATION_PATH,
+    #                                   config_path=DEFAULT_CONFIG_PATH,
+    #                                   campaign_path=DEFAULT_CAMPAIGN_JSON,
+    #                                   demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)
+    #     e.legacy_exe = True
+    #     e.add_assets(ac)
+    #
+    #     builder = ExperimentBuilder()
+    #     set_Run_Number = partial(param_update, param="Run_Number")
+    #     builder.add_sweep_definition(set_Run_Number, range(1))
+    #     e.add_builder(builder)
+    #     em = ExperimentManager(experiment=e, platform=self.p)
+    #     em.run()
+    #     em.wait_till_done()
+    #     simulations = self.p.get_children(em.experiment.uid, ItemType.EXPERIMENT, force=True)
+    #     return simulations

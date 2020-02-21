@@ -1,5 +1,4 @@
 from idmtools.core.platform_factory import Platform
-from idmtools.managers.work_item_manager import WorkItemManager
 from idmtools_platform_comps.ssmt_work_items.comps_workitems import VisToolsWorkItem
 
 wi_name = "Vistools sample 1"
@@ -15,6 +14,4 @@ if __name__ == "__main__":
     # wi.set_work_order(data)
     # Or directly pass work_order
     wi = VisToolsWorkItem(item_name=wi_name, tags=tags, work_order=data, related_simulations=[sim_id])
-
-    wim = WorkItemManager(wi, platform)
-    wim.process(check_status=True)
+    wi.run(True, platform=platform)

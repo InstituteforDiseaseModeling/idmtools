@@ -5,6 +5,7 @@ import tempfile
 
 from idmtools.assets.file_list import FileList
 from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
+from idmtools.config import IdmConfigParser
 
 
 class PlatformAnalysis:
@@ -43,7 +44,9 @@ class PlatformAnalysis:
         # save pickle file as a temp file
         temp_dir = tempfile.mkdtemp()
         temp_file = os.path.join(temp_dir, "analyzer_args.pkl")
-        pickle.dump(args_dict, open(temp_file, 'wb'))
+        file = open(temp_file, 'wb')
+        pickle.dump(args_dict, file)
+        file.close()
 
         # Add analyzer args pickle as additional file
         self.additional_files.add_file(temp_file)
@@ -59,6 +62,8 @@ class PlatformAnalysis:
         # Add the analyzers
         command += " {}".format(",".join(f"{inspect.getmodulename(inspect.getfile(a))}.{a.__name__}"
                                          for a in self.analyzers))
+        # Add platform
+        command += " {}".format(IdmConfigParser._block)
 
         self.wi = SSMTWorkItem(item_name=self.analysis_name, command=command, tags=self.tags,
                                user_files=self.additional_files, asset_collection_id=self.asset_collection_id,
