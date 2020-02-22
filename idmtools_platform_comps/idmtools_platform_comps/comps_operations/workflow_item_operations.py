@@ -10,6 +10,7 @@ from idmtools.core import ItemType
 from idmtools.entities.generic_workitem import GenericWorkItem
 from idmtools.entities.iplatform_ops.iplatform_workflowitem_operations import IPlatformWorkflowItemOperations
 from idmtools.entities.iworkflow_item import IWorkflowItem
+from idmtools_platform_comps.utils.general import convert_comps_workitem_status
 
 
 @dataclass
@@ -99,7 +100,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
 
         return work_item
 
-    def run_item(self, work_item: IWorkflowItem, **kwargs):
+    def platform_run_item(self, work_item: IWorkflowItem, **kwargs):
         """
         Start to rum COMPS WorkItem created from work_item
         Args:
@@ -146,7 +147,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
                     None
                 """
         wi = self.get(workflow_item.uid)
-        workflow_item.status = wi.state  # convert_COMPS_status(wi.state)
+        workflow_item.status = convert_comps_workitem_status(wi.state)  # convert_COMPS_status(wi.state)
 
     def send_assets(self, workflow_item: IWorkflowItem, **kwargs):
         """
@@ -211,8 +212,8 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         obj.tags = work_item.tags
         return obj
 
-    def platform_run_item(self, workflow_item: IWorkflowItem, **kwargs):
-        raise NotImplementedError("Running workflow items is not supported")
+    # def platform_run_item(self, workflow_item: IWorkflowItem, **kwargs):
+    #     raise NotImplementedError("Running workflow items is not supported")
 
     def get_related_items(self, item: IWorkflowItem, relation_type: RelationType) -> Dict[str, List[Dict[str, str]]]:
         """

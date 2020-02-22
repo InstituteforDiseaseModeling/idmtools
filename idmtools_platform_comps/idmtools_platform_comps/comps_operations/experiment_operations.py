@@ -5,7 +5,7 @@ from logging import getLogger, DEBUG
 from typing import Any, List, Type, Generator, NoReturn
 from uuid import UUID
 
-from COMPS.Data import Experiment as COMPSExperiment, QueryCriteria, Configuration
+from COMPS.Data import Experiment as COMPSExperiment, QueryCriteria, Configuration, Suite as COMPSSuite
 from idmtools.core import ItemType
 from idmtools.core.experiment_factory import experiment_factory
 from idmtools.entities import CommandLine
@@ -140,15 +140,19 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         for s in simulations:
             experiment.simulations.set_status_for_item(s.id, convert_comps_status(s.state))
 
-    def to_entity(self, experiment: COMPSExperiment, **kwargs) -> Experiment:
+    def to_entity(self, experiment: COMPSExperiment, parent: COMPSSuite = None, **kwargs) -> Experiment:
         # Recreate the suite if needed
         if experiment.suite_id is None:
             suite = kwargs.get('suite')
         else:
-            suite = kwargs.get('suite') or self.platform.get_item(experiment.suite_id, item_type=ItemType.SUITE)
+            if parent:
+                suite = parent
+            else:
+                suite = kwargs.get('suite') or self.platform.get_item(experiment.suite_id, item_type=ItemType.SUITE)
 
         # Create an experiment
-        obj = experiment_factory.create(experiment.tags.get("type"), tags=experiment.tags, name=experiment.name,
+        experiment_type = experiment.tags.get("type") if experiment.tags is not None else ""
+        obj = experiment_factory.create(experiment_type, tags=experiment.tags, name=experiment.name,
                                         fallback=Experiment)
 
         # Convert all simulations

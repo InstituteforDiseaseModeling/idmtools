@@ -6,7 +6,7 @@ from idmtools.entities.itask import ITask
 from idmtools.registry.task_specification import TaskSpecification
 
 
-@dataclass
+@dataclass()
 class CommandTask(ITask):
     gather_common_asset_hooks: List[Callable[[], AssetCollection]] = field(default_factory=list)
     gather_transient_asset_hooks: List[Callable[[], AssetCollection]] = field(default_factory=list)
@@ -30,6 +30,7 @@ class CommandTask(ITask):
         ac = AssetCollection()
         for x in self.gather_transient_asset_hooks:
             ac += x(self)
+        #self.transient_assets = ac   # this will make other case fail
         return ac
 
     def reload_from_simulation(self, simulation: 'Simulation'):

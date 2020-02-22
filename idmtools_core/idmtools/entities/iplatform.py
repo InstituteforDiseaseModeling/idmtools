@@ -564,20 +564,28 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         else:
             self.__wait_till_callback(item, lambda e: e.done, timeout, refresh_interval)
 
-    def wait_till_done_progress(self, item: Experiment, timeout: int = 60 * 60 * 24,
+    def wait_till_done_progress(self, item: Union[Experiment, IWorkflowItem], timeout: int = 60 * 60 * 24,
                                 refresh_interval: int = 5):
-        def get_prog_bar(e: Experiment, prog: tqdm):
+        def get_prog_bar(e: Union[Experiment, IWorkflowItem], prog: tqdm,
+                         done_st=None):
+            if done_st is None:
+                done_st = [EntityStatus.FAILED, EntityStatus.SUCCEEDED]
+            if prog is None:
+                return e.status in done_st if isinstance(e, IWorkflowItem) else e.done
+
             results = dict()
 
             done = 0
             for sim in e.simulations:
-                if sim.status in [EntityStatus.FAILED, EntityStatus.SUCCEEDED]:
+                if sim.status in done_st:
                     done += 1
             if done > prog.last_print_n:
                 prog.update(done - prog.last_print_n)
             return e.done
-
-        prog = tqdm([], total=len(item.simulations), desc="Waiting on Experiment to Finish running")
+        if isinstance(item, Experiment):
+            prog = tqdm([], total=len(item.simulations), desc="Waiting on Experiment to Finish running")
+        else:
+            prog = None
         self.__wait_till_callback(item, partial(get_prog_bar, prog=prog), timeout, refresh_interval)
 
     def get_related_items(self, item: IWorkflowItem, relation_type: RelationType) -> Dict[str, Dict[str, str]]:

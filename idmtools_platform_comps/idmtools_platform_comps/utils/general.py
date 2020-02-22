@@ -4,6 +4,7 @@ from uuid import UUID
 
 from COMPS.Data import Simulation
 from COMPS.Data.Simulation import SimulationState
+from COMPS.Data.WorkItem import WorkItemState
 from idmtools.core import EntityStatus, ItemType
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.iplatform import IPlatform
@@ -40,6 +41,38 @@ def convert_comps_status(comps_status: SimulationState) -> EntityStatus:
     elif comps_status in (SimulationState.Canceled, SimulationState.CancelRequested, SimulationState.Failed):
         return EntityStatus.FAILED
     elif comps_status == SimulationState.Created:
+        return EntityStatus.CREATED
+    else:
+        return EntityStatus.RUNNING
+
+
+def convert_comps_workitem_status(comps_status: WorkItemState) -> EntityStatus:
+    """
+    Convert status from COMPS to IDMTools
+    Created = 0                # WorkItem has been saved to the database
+    CommissionRequested = 5    # WorkItem is ready to be processed by the next available worker of the correct type
+    Commissioned = 10          # WorkItem has been commissioned to a worker of the correct type and is beginning execution
+    Validating = 30            # WorkItem is being validated
+    Running = 40               # WorkItem is currently running
+    Waiting = 50               # WorkItem is waiting for dependent items to complete
+    ResumeRequested = 60       # Dependent items have completed and WorkItem is ready to be processed by the next available worker of the correct type
+    CancelRequested = 80       # WorkItem cancellation was requested
+    Canceled = 90              # WorkItem was successfully canceled
+    Resumed = 100              # WorkItem has been claimed by a worker of the correct type and is resuming
+    Canceling = 120            # WorkItem is in the process of being canceled by the worker
+    Succeeded = 130            # WorkItem completed successfully
+    Failed = 140               # WorkItem failed
+    Args:
+        comps_status: Status in Comps
+
+    Returns:
+        EntityStatus
+    """
+    if comps_status == WorkItemState.Succeeded:
+        return EntityStatus.SUCCEEDED
+    elif comps_status in (WorkItemState.Canceled, WorkItemState.CancelRequested, WorkItemState.Failed):
+        return EntityStatus.FAILED
+    elif comps_status == [WorkItemState.Created, WorkItemState.Resumed, WorkItemState.CommissionRequested, WorkItemState.Commissioned]:
         return EntityStatus.CREATED
     else:
         return EntityStatus.RUNNING
