@@ -9,6 +9,7 @@ from COMPS.Data.WorkItem import WorkItem, RelationType
 from COMPS.Data import QueryCriteria, AssetCollection
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
+
 @pytest.mark.ssmt
 @pytest.mark.comps
 class ClimateGenerationTest(ITestWithPersistence):
@@ -40,15 +41,11 @@ class ClimateGenerationTest(ITestWithPersistence):
         command = command_pattern.format(points_file, start_date, end_date, optional_args)
         user_files = FileList(root=path_to_points_file, files_in_root=[points_file])
 
-        with Platform('COMPS2'):
-            wi = SSMTWorkItem(item_name=self.case_name, docker_image=docker_image, command=command,
-                              user_files=user_files,
-                              tags={'idmtools_test': self._testMethodName,
-                                    'WorkItem type': 'Docker',
-                                    'Command': command
-                                    }
-                              )
-            wi.run(True)
+        platform = Platform('COMPS2')
+        wi = SSMTWorkItem(item_name=self.case_name, docker_image=docker_image, command=command, user_files=user_files,
+                          tags={'idmtools_test': self._testMethodName, 'WorkItem type': 'Docker', 'Command': command}
+                          )
+        wi.run(True, platform=platform)
 
         # Get the work item, related asset collection, and assets
         wi_id = wi.uid

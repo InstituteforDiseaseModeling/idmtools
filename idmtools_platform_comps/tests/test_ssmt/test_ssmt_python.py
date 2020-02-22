@@ -15,8 +15,9 @@ from idmtools_test.utils.utils import del_folder
 # import analyzers from current dir's inputs dir
 analyzer_path = os.path.join(os.path.dirname(__file__), "..", "inputs")
 sys.path.insert(0, analyzer_path)
-from SimpleAnalyzer import SimpleAnalyzer
-from CSVAnalyzer import CSVAnalyzer
+from SimpleAnalyzer import SimpleAnalyzer  # noqa
+from CSVAnalyzer import CSVAnalyzer  # noqa
+
 
 @pytest.mark.comps
 @pytest.mark.ssmt
@@ -45,7 +46,7 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
         local_output_path = "output"  # local output dir
         del_folder(local_output_path)  # delete existing folder before run validation
         out_filenames = ["hello.py", "WorkOrder.json"]  # files to retrieve from workitem dir
-        ret = self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
+        self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
 
         file_path = os.path.join(local_output_path, str(wi.uid))
         # verify that we do retrieved the correct files from comps' workitem to local
@@ -78,7 +79,7 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
         local_output_path = "output"
         del_folder(local_output_path)
         out_filenames = ["output/aggregated_config.json", "WorkOrder.json"]
-        ret = self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
+        self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
 
         file_path = os.path.join(local_output_path, str(wi.uid))
         self.assertTrue(os.path.exists(os.path.join(file_path, "output", "aggregated_config.json")))
@@ -88,8 +89,7 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
         self.assertEqual(execution['Command'],
-                         "python platform_analysis_bootstrap.py " + experiment_id +
-                         " SimpleAnalyzer.SimpleAnalyzer COMPS2")
+                         "python platform_analysis_bootstrap.py " + experiment_id + " SimpleAnalyzer.SimpleAnalyzer COMPS2")
 
     # Test CSVAnalyzer with SSMTAnalysis which analyzes python experiment's results
     def test_ssmt_workitem_python_csv_analyzer(self):
@@ -97,8 +97,7 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
         analysis = PlatformAnalysis(platform=self.platform,
                                     experiment_ids=[experiment_id],
                                     analyzers=[CSVAnalyzer],
-                                    analyzers_args=[{'filenames': ['output/c.csv'],
-                                                 'parse': True}],
+                                    analyzers_args=[{'filenames': ['output/c.csv'], 'parse': True}],
                                     analysis_name=self.case_name,
                                     tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'})
 
@@ -109,7 +108,7 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
         local_output_path = "output"
         del_folder(local_output_path)
         out_filenames = ["output/aggregated_c.csv", "WorkOrder.json"]
-        ret = self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
+        self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
 
         file_path = os.path.join(local_output_path, str(wi.uid))
         self.assertTrue(os.path.exists(os.path.join(file_path, "output", "aggregated_c.csv")))

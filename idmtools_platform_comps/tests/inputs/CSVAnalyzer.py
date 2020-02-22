@@ -1,4 +1,3 @@
-import json
 import os
 import pandas as pd
 from typing import Any
@@ -34,10 +33,6 @@ class CSVAnalyzer(BaseAnalyzer):
     # In reduce, we are printing the simulation and result data filtered in map
     def reduce(self, all_data: dict) -> Any:
         output_dir = os.path.join(self.working_dir, "output")
-        # Let's hope the first simulation is representative
-        first_sim = next(iter(all_data.keys()))  # Iterate over the dataframe keys
-        exp_id = str(first_sim.experiment.uid)  # Set the exp id from the first sim data
-
         results = pd.concat(list(all_data.values()), axis=0,  # Combine a list of all the sims csv data column values
                             keys=[str(k.uid) for k in all_data.keys()],  # Add a hierarchical index with the keys option
                             names=['SimId'])  # Label the index keys you create with the names option
@@ -45,4 +40,3 @@ class CSVAnalyzer(BaseAnalyzer):
 
         # NOTE: If running twice with different filename, the output files will collide
         results.to_csv(os.path.join(output_dir, 'aggregated_c.csv'))
-

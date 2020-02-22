@@ -11,8 +11,8 @@ from idmtools_test.utils.utils import del_folder
 
 analyzer_path = os.path.join(os.path.dirname(__file__), "..", "inputs")
 sys.path.insert(0, analyzer_path)
-from PopulationAnalyzer import PopulationAnalyzer
-from AdultVectorsAnalyzer import AdultVectorsAnalyzer
+from PopulationAnalyzer import PopulationAnalyzer  # noqa
+from AdultVectorsAnalyzer import AdultVectorsAnalyzer  # noqa
 
 
 @pytest.mark.comps
@@ -41,7 +41,7 @@ class TestSSMTAnalysis(ITestWithPersistence):
         local_output_path = "output"
         del_folder(local_output_path)
         out_filenames = ["output/population.png", "output/population.json", "WorkOrder.json"]
-        ret = self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
+        self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
 
         file_path = os.path.join(local_output_path, str(wi.uid))
         self.assertTrue(os.path.exists(os.path.join(file_path, "output", "population.png")))
@@ -52,8 +52,7 @@ class TestSSMTAnalysis(ITestWithPersistence):
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
         self.assertEqual(execution['Command'],
-                         "python platform_analysis_bootstrap.py " + experiment_id +
-                         " PopulationAnalyzer.PopulationAnalyzer COMPS2")
+                         "python platform_analysis_bootstrap.py " + experiment_id + " PopulationAnalyzer.PopulationAnalyzer COMPS2")
 
     # test using SSMTAnalysis to run multiple analyzers in comps's SSMT DockerWorker
     def test_ssmt_analysis_multiple_analyzers(self):
@@ -73,8 +72,8 @@ class TestSSMTAnalysis(ITestWithPersistence):
         del_folder(local_output_path)
         out_filenames = ["output/population.png", "output/population.json",
                          "output/adult_vectors.json", "output/adult_vectors.png", "WorkOrder.json"]
-        ret = self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames,
-                                            local_output_path)
+        self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames,
+                                      local_output_path)
 
         file_path = os.path.join(local_output_path, str(wi.uid))
         self.assertTrue(os.path.exists(os.path.join(file_path, "output", "population.png")))
@@ -88,8 +87,7 @@ class TestSSMTAnalysis(ITestWithPersistence):
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
         self.assertEqual(execution['Command'],
-                         "python platform_analysis_bootstrap.py " + experiment_id +
-                         " PopulationAnalyzer.PopulationAnalyzer,AdultVectorsAnalyzer.AdultVectorsAnalyzer COMPS2")
+                         "python platform_analysis_bootstrap.py " + experiment_id + " PopulationAnalyzer.PopulationAnalyzer,AdultVectorsAnalyzer.AdultVectorsAnalyzer COMPS2")
 
     # test using SSMTAnalysis to run multiple experiments in comps's SSMT DockerWorker
     def test_ssmt_analysis_multiple_experiments(self):
@@ -110,7 +108,7 @@ class TestSSMTAnalysis(ITestWithPersistence):
         local_output_path = "output"
         del_folder(local_output_path)
         out_filenames = ["output/population.png", "output/population.json", "WorkOrder.json"]
-        ret = self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
+        self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
 
         file_path = os.path.join(local_output_path, str(wi.uid))
         self.assertTrue(os.path.exists(os.path.join(file_path, "output", "population.png")))
@@ -121,5 +119,4 @@ class TestSSMTAnalysis(ITestWithPersistence):
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
         self.assertEqual(execution['Command'],
-                         "python platform_analysis_bootstrap.py " + exp_id1 + "," + exp_id2 +
-                         " PopulationAnalyzer.PopulationAnalyzer COMPS2")
+                         "python platform_analysis_bootstrap.py " + exp_id1 + "," + exp_id2 + " PopulationAnalyzer.PopulationAnalyzer COMPS2")

@@ -30,7 +30,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
 
         # load local "input" foleer simtools.ini to current dir in Comps workitem
         user_files = FileList()
-        user_files.add_file(os.path.join(self.input_file_path, "simtools.ini"))
+        user_files.add_file(os.path.join(self.input_file_path, "idmtools.ini"))
 
         experiment_id = "8bb8ae8f-793c-ea11-a2be-f0921c167861"
         command = "python Assets/run_PopulationAnalyzer.py " + experiment_id
@@ -42,7 +42,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         local_output_path = "output"
         del_folder(local_output_path)
         out_filenames = ["output/population.png", "output/population.json", "WorkOrder.json"]
-        ret = self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
+        self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
 
         file_path = os.path.join(local_output_path, str(wi.uid))
         self.assertTrue(os.path.exists(os.path.join(file_path, "output", "population.png")))
@@ -80,15 +80,14 @@ class TestSSMTWorkItem(ITestWithPersistence):
         local_output_path = "output"
         del_folder(local_output_path)
         out_filenames = ["output/population.png", "output/population.json", "WorkOrder.json"]
-        ret = self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
+        self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
 
         # validate output files
         local_output_path = "output_ssmt"
         del_folder(local_output_path)
         out_filenames = ["output/population.png", "output/population.json",
                          "output/adult_vectors.json", "output/adult_vectors.png", "WorkOrder.json"]
-        ret = self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames,
-                                            local_output_path)
+        self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
 
         file_path = os.path.join(local_output_path, str(wi.uid))
         self.assertTrue(os.path.exists(os.path.join(file_path, "output", "population.png")))
@@ -117,7 +116,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
 
         # load local "input" foleer simtools.ini to current dir in Comps workitem
         user_files = FileList()
-        user_files.add_file(os.path.join(self.input_file_path, "simtools.ini"))
+        user_files.add_file(os.path.join(self.input_file_path, "idmtools.ini"))
 
         command = "python Assets/run_multiple_exps.py " + exp_id1 + " " + exp_id2
         wi = SSMTWorkItem(item_name=self.case_name, command=command, asset_files=asset_files, user_files=user_files,
@@ -128,7 +127,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         local_output_path = "output"
         del_folder(local_output_path)
         out_filenames = ["output/population.png", "output/population.json", "WorkOrder.json"]
-        ret = self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
+        self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
 
         file_path = os.path.join(local_output_path, str(wi.uid))
         self.assertTrue(os.path.exists(os.path.join(file_path, "output", "population.png")))

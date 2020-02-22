@@ -4,24 +4,32 @@ import sys
 from functools import partial
 
 import pytest
-from COMPS.Data import Experiment
+from COMPS.Data import Experiment as COMPSExperiment
 from idmtools.analysis.add_analyzer import AddAnalyzer
 from idmtools.analysis.analyze_manager import AnalyzeManager
 from idmtools.analysis.csv_analyzer import CSVAnalyzer
 from idmtools.analysis.download_analyzer import DownloadAnalyzer
 from idmtools.analysis.tags_analyzer import TagsAnalyzer
+from idmtools.assets import Asset
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
-from idmtools_model_emod.defaults import EMODSir
+from idmtools.entities.command_task import CommandTask
+from idmtools.entities.experiment import Experiment
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import del_file, del_folder, load_csv_file
 
 analyzer_path = os.path.join(os.path.dirname(__file__), "inputs")
 sys.path.insert(0, analyzer_path)
-from PopulationAnalyzer1 import PopulationAnalyzer
-from TimeseriesAnalyzer import TimeseriesAnalyzer
+from PopulationAnalyzer1 import PopulationAnalyzer # noqa
+from TimeseriesAnalyzer import TimeseriesAnalyzer # noqa
+
+DEFAULT_INPUT_PATH = os.path.join(COMMON_INPUT_PATH)
+DEFAULT_ERADICATION_PATH = os.path.join(DEFAULT_INPUT_PATH, "emod", "Eradication.exe")
+DEFAULT_CONFIG_PATH = os.path.join(DEFAULT_INPUT_PATH, "emod_files", "config.json")
+DEFAULT_CAMPAIGN_PATH = os.path.join(DEFAULT_INPUT_PATH, "emod_files", "campaign.json")
+DEFAULT_DEMO_PATH = os.path.join(DEFAULT_INPUT_PATH, "emod_files", "demographics.json")
 
 
 def param_update(simulation, param, value):
@@ -36,47 +44,62 @@ setD = partial(param_update, param="d")
 
 @pytest.mark.comps
 @pytest.mark.analysis
-@pytest.mark.skip
 class TestAnalyzeManagerEmodComps(ITestWithPersistence):
+
+    def generate_experiment(self):
+
+        command = "Assets/Eradication.exe --config config.json --input-path ./Assets"
+        task = CommandTask(command=command)
+        with open(DEFAULT_CONFIG_PATH, 'r') as cin:
+            task.config = json.load(cin)
+            # task.config["parameters"]["Demographics_Filenames"][0] = "Assets/" + task.config["parameters"]["Demographics_Filenames"][0]
+            task.config["parameters"]["Campaign_Filename"] = "Assets/" + task.config["parameters"]["Campaign_Filename"]
+
+        def save_config(task):
+            return Asset(filename='config.json', content=json.dumps(task.config))
+        # task.gather_transient_asset_hooks.append(save_config)
+        task.transient_assets.add_asset(save_config(task))
+
+        def update_param(simulation, param, value):
+            simulation.task.config[param] = value
+            return{param: value}
+
+        set_run_number = partial(update_param, param="Run_Number")
+
+        # add eradication.exe to current dir in comps
+        eradication_asset = Asset(absolute_path=DEFAULT_ERADICATION_PATH)
+        task.common_assets.add_asset(eradication_asset)
+
+        # add config.json/campaign/demographic.json to current dir in comps
+        campaign_asset = Asset(absolute_path=DEFAULT_CAMPAIGN_PATH)
+        demo_asset = Asset(absolute_path=DEFAULT_DEMO_PATH)
+
+        task.common_assets.add_asset(campaign_asset)
+        task.common_assets.add_asset(demo_asset)
+
+        builder = SimulationBuilder()
+        builder.add_sweep_definition(set_run_number, range(0, 2))
+        # create experiment from task
+        experiment = Experiment.from_builder(builder, task, name="test_analyzers_emod_comps.py")
+
+        self.platform.run_items(experiment)
+        self.platform.wait_till_done(experiment)
+        self.exp_id = experiment.uid
+
+    @classmethod
+    def setUpClass(cls):
+        cls.platform = Platform('COMPS2')
+        cls.generate_experiment(cls)
 
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
-        self.platform = Platform('COMPS2')
-
-    def create_experiment(self):
-
-        e = EMODExperiment.from_default(self.case_name, default=EMODSir(),
-                                        eradication_path=os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe"))
-        e.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
-
-        e.base_simulation.set_parameter("Enable_Immunity", 0)
-
-        def param_a_update(simulation, value):
-            simulation.set_parameter("Run_Number", value)
-            return {"Run_Number": value}
-
-        self.builder = SimulationBuilder()
-        # Sweep parameter "Run_Number"
-        self.builder.add_sweep_definition(param_a_update, range(0, 2))
-        e.builder = self.builder
-        em = ExperimentManager(experiment=e, platform=self.platform)
-        em.run()
-        em.wait_till_done()
-        self.assertTrue(e.succeeded)
-        self.exp_id = em.experiment.uid
-
-        # Uncomment out if you do not want to regenerate exp and sims
-        # self.exp_id = '9eacbb9a-5ecf-e911-a2bb-f0921c167866' #comps2 staging
 
     @pytest.mark.long
     def test_AddAnalyzer(self):
-
-        self.create_experiment()
-
         filenames = ['StdOut.txt']
         analyzers = [AddAnalyzer(filenames=filenames)]
-
+        # self.generate_experiment()
         am = AnalyzeManager(platform=self.platform, ids=[(self.exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
 
@@ -88,7 +111,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         # create a new empty 'output' dir
         os.mkdir("output")
 
-        self.create_experiment()
+        # self.generate_experiment()
 
         filenames = ['output/InsetChart.json', 'config.json']
         analyzers = [DownloadAnalyzer(filenames=filenames, output_path='output')]
@@ -96,7 +119,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         am = AnalyzeManager(platform=self.platform, ids=[(self.exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
 
-        for simulation in Experiment.get(self.exp_id).get_simulations():
+        for simulation in COMPSExperiment.get(self.exp_id).get_simulations():
             self.assert_sim_has_config_and_inset_chart(simulation)
 
     def assert_sim_has_config_and_inset_chart(self, simulation):
@@ -123,7 +146,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
     def test_population_analyzer(self):
         del_file(os.path.join(analyzer_path, 'population.csv'))
         del_file(os.path.join(analyzer_path, 'population.png'))
-        self.create_experiment()
+        # self.generate_experiment()
 
         # self.exp_id = uuid.UUID("fc59240c-07db-e911-a2be-f0921c167861")
         filenames = ['output/InsetChart.json']
@@ -141,7 +164,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         sim_count = 1
         expected_sim_ids = []
         actual_sim_ids_in_comps = []
-        for simulation in Experiment.get(self.exp_id).get_simulations():
+        for simulation in COMPSExperiment.get(self.exp_id).get_simulations():
             insetchart_dict = self.assert_has_inset(actual_sim_ids_in_comps, df, expected_sim_ids, sim_count,
                                                     simulation)
             population_data = insetchart_dict['Channels']['Statistical Population']['Data']
@@ -160,7 +183,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         del_file(os.path.join(analyzer_path, 'timeseries.csv'))
         del_file(os.path.join(analyzer_path, 'timeseries.png'))
 
-        self.create_experiment()
+        # self.generate_experiment()
 
         filenames = ['output/InsetChart.json']
         analyzers = [TimeseriesAnalyzer(filenames=filenames)]
@@ -176,7 +199,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         sim_count = 1
         expected_sim_ids = []
         actual_sim_ids_in_comps = []
-        for simulation in Experiment.get(self.exp_id).get_simulations():
+        for simulation in COMPSExperiment.get(self.exp_id).get_simulations():
             insetchart_dict = self.assert_has_inset(actual_sim_ids_in_comps, df, expected_sim_ids, sim_count,
                                                     simulation)
             infected_json_from_file = insetchart_dict['Channels']['Infected']['Data']
@@ -214,7 +237,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         am = AnalyzeManager(platform=self.platform, ids=[exp_id], analyzers=analyzers)
         am.analyze()
 
-        for simulation in Experiment.get(exp_id[0]).get_simulations():
+        for simulation in COMPSExperiment.get(exp_id[0]).get_simulations():
             self.assert_sim_has_config_and_inset_chart(simulation)
 
     def test_download_analyzer_suite(self):
