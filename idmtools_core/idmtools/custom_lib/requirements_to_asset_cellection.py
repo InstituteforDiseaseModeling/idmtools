@@ -1,6 +1,5 @@
 import os
 import json
-import time
 import hashlib
 from dataclasses import dataclass, field
 from idmtools.assets import Asset
@@ -10,7 +9,6 @@ from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
 from COMPS.Data.AssetCollection import AssetCollection as COMPSAssetCollection
 from COMPS.Data import QueryCriteria
-from typing import TypeVar, Union, List, Callable, Any
 
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 REQUIREMENT_FILE = 'requirements_updated.txt'
@@ -39,7 +37,8 @@ class RequirementsToAssetCollection:
             The md5 of the requirements.
         """
         if not self._checksum:
-            self._checksum = hashlib.md5(self.requirements.encode('utf-8')).hexdigest()
+            req_content = '\n'.join(self.requirements)
+            self._checksum = hashlib.md5(req_content.encode('utf-8')).hexdigest()
 
         return self._checksum
 
@@ -50,37 +49,29 @@ class RequirementsToAssetCollection:
             The md5 of the requirements.
         """
         if not self._requirements:
-            req_list = self.validate_requirements()
-            self._requirements = '\n'.join(req_list)
+            self._requirements = self.validate_requirements()
 
         return self._requirements
 
     def save_updated_requirements(self):
+        req_content = '\n'.join(self.requirements)
         with open(REQUIREMENT_FILE, 'w') as outfile:
-            outfile.write(self.requirements)
+            outfile.write(req_content)
 
     def is_requirements_changed(self):
         file_path = REQUIREMENT_FILE
         previous_md5 = '' if not os.path.exists(file_path) else open(file_path, 'r').read()
         previous_md5 = hashlib.md5(previous_md5.encode('utf-8')).hexdigest()
 
-        # checksum = self.get_requirements_md5()
         return not (previous_md5 == self.checksum)
 
     def retrieve_ac_by_tag(self, md5_check=None):
-        # md5_str = md5_check or self.get_requirements_md5()
         md5_str = md5_check or self.checksum
-
-        # Testing
-        # md5_str = 'f973a83c4db279c0fc8eaa9da3c21628'
         print('md5_str: ', md5_str)
-
-        # platform = Platform('COMPS2')
 
         # check if ac with tag idmtools-requirements-md5 = my_md5 exists
         ac_list = COMPSAssetCollection.get(
             query_criteria=QueryCriteria().select_children('tags').where_tag([f'{MD5_KEY}={md5_str}']))
-        # print(ac_list)
 
         # if it exists, get ac and return it
         if len(ac_list) > 0:
@@ -90,18 +81,9 @@ class RequirementsToAssetCollection:
     def retrieve_ac_by_wi(self, wi_id):
         from COMPS.Data import WorkItem
 
-        # Testing
-        # wi_id = 'fd5d1151-874f-ea11-a2be-f0921c167861'
-        # platform = Platform('COMPS2')
-        # wi = platform.get_item(wi_id, ItemType.WORKFLOW_ITEM, raw=True)
-
         wi = WorkItem.get(wi_id)
-
         barr = wi.retrieve_output_files(['ac_info.txt'])
-        # print(barr)
-
-        ac_id = barr[0].decode("utf-8")  # encoding = 'utf-8'  str(barr[0], encoding)
-        # print(ac_id)
+        ac_id = barr[0].decode("utf-8")
 
         ac = COMPSAssetCollection.get(ac_id)
         return ac
@@ -109,9 +91,9 @@ class RequirementsToAssetCollection:
     def run(self):
         # Check if ac with md5 exists
         ac = self.retrieve_ac_by_tag()
-        # print(ac)
+
         if ac:
-            return ac.id  # or return ac
+            return ac.id
 
         # Create Experiment to install custom requirements
         exp = self.run_experiment_to_install_lib()
@@ -120,9 +102,6 @@ class RequirementsToAssetCollection:
         if exp is None:
             print('Failed to install requirements!')
             exit()
-
-        # make sure work item not created at the same time with above experiment
-        # time.sleep(3)
 
         # Create a WorkItem to create asset collection
         wi = self.run_wi_to_create_ac(exp.uid)
@@ -160,7 +139,6 @@ class RequirementsToAssetCollection:
         from idmtools.managers.work_item_manager import WorkItemManager
         from idmtools.ssmt.idm_work_item import SSMTWorkItem
 
-        # md5_str = self.get_requirements_md5()
         md5_str = self.checksum
         print('md5_str: ', md5_str)
 
@@ -190,7 +168,7 @@ class RequirementsToAssetCollection:
 
         release_versions = [ver for ver in all_releases if not parse(ver).is_prerelease]
         latest_version = release_versions[0]
-        # print(latest_version)
+
         return latest_version
 
     def validate_requirements(self):
@@ -201,7 +179,6 @@ class RequirementsToAssetCollection:
         if self.requirements_path:
             with open(self.requirements_path, 'r') as fd:
                 for cnt, line in enumerate(fd):
-                    # print("Line {}: {}".format(cnt, line))
                     line = line.strip()
                     if line.startswith('#'):
                         comment_list.append(line)
@@ -209,20 +186,15 @@ class RequirementsToAssetCollection:
 
                     req = pkg_resources.Requirement.parse(line)
                     req_dict[req.name] = req.specs
-                    # print(req.name, req.specs)
 
         # pkg_list will overwrite pkg in requirement file
         if self.pkg_list:
             for pkg in self.pkg_list:
                 req = pkg_resources.Requirement.parse(pkg)
                 req_dict[req.name] = req.specs
-                # print(req.name, req.specs)
 
         missing_version_dict = {k: v for k, v in req_dict.items() if len(v) == 0 or v[0][1] == ''}
         has_version_dict = {k: v for k, v in req_dict.items() if k not in missing_version_dict}
-        # print(req_dict)
-        # print(has_version_dict)
-        # print(missing_version_dict)
 
         update_req_list = []
         for k, v in has_version_dict.items():
@@ -234,20 +206,8 @@ class RequirementsToAssetCollection:
             latest = self.get_latest_version(k)
             update_req_list.append(f"{k}{v[0][0] if len(v) > 0 else '=='}{latest}")
 
-        print(update_req_list)
-        print(comment_list)
-
-        # add commented packages
-        # update_req_list.extend(comment_list)
-
-        # # write updated requirements to file requirements_updated.txt
-        # if save_to_file:
-        #     with open('requirements_updated.txt', 'w') as outfile:
-        #         outfile.write(str('\n'.join(update_req_list)))
-
-        # [TODO]:
-        # 1. print missing_version packages
-        # 2. print updated versions for those packages
+        # print(update_req_list)
+        # print(comment_list)
 
         return update_req_list
 
