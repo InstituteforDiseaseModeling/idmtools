@@ -6,13 +6,13 @@ from idmtools_models.python import PythonExperiment
 from idmtools.custom_lib.requirements_to_asset_cellection import RequirementsToAssetCollection
 
 
-def run_example_astor(ac_id):
+def run_example(ac_id):
     print(f'run example with ac: {ac_id}')
 
     platform = Platform('COMPS2')
     ac = platform.get_item(ac_id, item_type=ItemType.ASSETCOLLECTION, raw=False)
 
-    experiment = PythonExperiment(name="Simple Experiment Demo", model_path=os.path.join("model_astor.py"), assets=ac)
+    experiment = PythonExperiment(name="Simple Experiment Demo", model_path=os.path.join("model_file.py"), assets=ac)
     em = ExperimentManager(experiment=experiment, platform=platform)
     em.run()
     em.wait_till_done()
@@ -27,7 +27,7 @@ def main():
     print('ac_id: ', ac_id)
 
     if ac_id:
-        run_example_astor(ac_id)
+        run_example(ac_id)
     else:
         print('Failed to generate asset collection!')
 
