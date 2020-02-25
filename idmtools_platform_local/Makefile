@@ -31,7 +31,7 @@ edv:
 
 # Dev and test related rules
 lint: ## check style with flake8
-	$(PDR) -w '..' -ex 'flake8 --ignore=E501 $(PACKAGE_NAME)'
+	$(PDR) -w '..' -ex 'flake8 --ignore=E501,W291 $(PACKAGE_NAME)'
 
 test: ## Run our tests
 	$(FULL_TEST_CMD) -m "not comps and not docker"'

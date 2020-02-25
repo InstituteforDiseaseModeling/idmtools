@@ -1,4 +1,6 @@
-from typing import Tuple, List, Mapping, Union, Iterable
+import typing
+from itertools import tee
+from typing import Tuple, List, Mapping, Union, Iterable, Generator
 
 from more_itertools import take
 
@@ -25,68 +27,79 @@ def cut_iterable_to(obj: Iterable, to: int) -> Tuple[Union[List, Mapping], int]:
     return slice, remaining
 
 
-####
-# DicDeep v2
-# https://github.com/mbello/dict-deep/blob/master/dict_deep/dict_deep.py
-def deep_get(d, key, default: callable = None, getter: callable = None, sep: str = '.'):
-    getter = __getter(getter, default)
-    keys = __keys(key, sep)
+class ParentIterator(typing.Iterator):
+    def __init__(self, lst, parent: 'IEntity'):
+        self.items = lst
+        self.__iter = iter(self.items) if not isinstance(self.items, (typing.Iterator, Generator)) else self.items
+        self.parent = parent
 
-    for k in keys:
-        d = getter(d, k)
+    def __iter__(self):
+        return self
 
-    return d
+    def __next__(self):
+        i = next(self.__iter)
+        i._parent = self.parent
+        if hasattr(i, 'parent_id') and self.parent.uid is not None:
+            i.parent_id = self.parent.uid
+        return i
 
+    def __getitem__(self, item):
+        return self.items[item]
 
-def deep_set(d, key, value, default: callable = None, getter: callable = None, setter: callable = None, sep: str = '.'):
-    keys = __keys(key, sep)
-    getter = __getter(getter, default)
-    setter = __setter(setter)
+    def __getattr__(self, item):
+        return getattr(self.items, item)
 
-    for i in range(len(keys) - 1):
-        d = getter(d, keys[i])
+    def __len__(self):
+        from idmtools.entities.templated_simulation import TemplatedSimulations
+        if isinstance(self.items, typing.Sized):
+            return len(self.items)
+        elif isinstance(self.items, TemplatedSimulations):
+            return sum([len(b) for b in self.items.builders])
+        raise ValueError("Cannot get the length of a generator object")
 
-    setter(d, keys[-1], value)
-
-
-def deep_del(d: dict, key, getter: callable = None, deleter: callable = None, sep: str = '.'):
-    keys = __keys(key, sep)
-    getter = getter if getter is not None else lambda o, k: o.get(k)
-
-    for i in range(len(keys) - 1):
-        if d is None:
-            return False, None
-        d = getter(d, keys[i])
-
-    if d is not None and isinstance(d, dict) and keys[-1] in d:
-        retval = getter(d, keys[-1])
-        if deleter is None:
-            del d[keys[-1]]
-        else:
-            deleter(d, keys[-1])
-        return True, retval
-    else:
-        return False, None
+    def append(self, item):
+        if isinstance(self.items, (list, set)):
+            self.items.append(item)
+            return
+        raise ValueError("Items doesn't support appending")
 
 
-def __keys(key, sep: str):
-    if isinstance(key, str):
-        return key.split(sep=sep)
-    else:
-        return list(key)
+class ResetGenerator(typing.Iterator):
+    """Iterator that counts upward forever."""
+
+    def __init__(self, generator_init):
+        self.generator_init = generator_init
+        self.generator = generator_init()
+        self.generator, self.__next_gen = tee(self.generator)
+
+    def __iter__(self):
+        return self
+
+    def next_gen(self):
+        return self.__next_gen
+
+    def __next__(self):
+        try:
+            result = next(self.generator)
+        except StopIteration:
+            self.generator, self.__next_gen = tee(self.__next_gen)
+            raise StopIteration
+        return result
 
 
-def __getter(getter: callable, default: callable):
-    if getter is not None:
-        return getter
-    elif default is not None:
-        return lambda o, k: o.setdefault(k, default())
-    else:
-        return lambda o, k: o[k]
+def duplicate_list_of_generators(lst: List[Generator]):
+    """
+    Copy a list of iterators using tee
+    Args:
+        lst: List of generators
 
-
-def __setter(setter: callable):
-    def __default_setter(o, k, v):
-        o[k] = v
-
-    return setter if setter is not None else __default_setter
+    Returns:
+        Tuple with duplicate of iterators
+    """
+    new_sw = []
+    old_sw = []
+    for sw in lst:
+        o, n = tee(sw)
+        new_sw.append(n)
+        old_sw.append(o)
+    return old_sw, new_sw

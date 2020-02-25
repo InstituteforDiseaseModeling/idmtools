@@ -4,9 +4,9 @@ from abc import ABC, abstractmethod
 
 import pytest
 
-from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
+from idmtools.builders import SimulationBuilder, StandAloneSimulationsBuilder
 from idmtools.core.platform_factory import Platform
-from idmtools.entities import IPlatform
+from idmtools.entities.iplatform import IPlatform
 from idmtools.managers import ExperimentManager
 from idmtools_model_emod.defaults import EMODSir
 from idmtools_model_emod.emod_experiment import EMODExperiment, DockerEMODExperiment, IEMODExperiment
@@ -79,7 +79,7 @@ class EMODPlatformTest(ABC):
             simulation.set_parameter("Run_Number", value)
             return {"Run_Number": value}
 
-        builder = ExperimentBuilder()
+        builder = SimulationBuilder()
         # Sweep parameter "Run_Number"
         builder.add_sweep_definition(param_a_update, range(0, 2))
         e.builder = builder
@@ -131,7 +131,7 @@ class EMODPlatformTest(ABC):
             simulation.set_parameter("Run_Number", value)
             return {"Run_Number": value}
 
-        builder = ExperimentBuilder()
+        builder = SimulationBuilder()
         # Sweep parameter "Run_Number"
         builder.add_sweep_definition(param_a_update, range(0, 20))
         e.builder = builder

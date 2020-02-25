@@ -17,35 +17,53 @@ import os
 import sys
 from functools import partial
 
-from idmtools.builders import ExperimentBuilder
-from idmtools.core.platform_factory import Platform
-from idmtools.managers import ExperimentManager
-from idmtools_models.python import PythonExperiment
+from idmtools.builders import SimulationBuilder
+from idmtools.core.platform_factory import platform
+from idmtools.entities.experiment import Experiment
+from idmtools.entities.templated_simulation import TemplatedSimulations
+from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
 
+
+# define a custom sweep callback that sets b to a + 2
+def param_update_ab(simulation, param, value):
+    # Set B within
+    if param == "a":
+        simulation.task.set_parameter("b", value + 2)
+
+    return simulation.task.set_parameter(param, value)
+
+
 if __name__ == "__main__":
-    platform = Platform('COMPS2')
-    pe = PythonExperiment(name=os.path.split(sys.argv[0])[1],
-                          model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
-    pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
+    # define what platform we want to use. Here we use a context manager but if you prefer you can
+    # use objects such as Platform('COMPS2') instead
+    with platform('COMPS2'):
+        # define our base task
+        base_task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"),
+                                             parameters=dict(c='c-value'))
 
-    pe.base_simulation.set_parameter("c", "c-value")
+        # define our input csv sweep
+        builder = SimulationBuilder()
+        # Sweep parameter "a" and make "b" depends on "a"
+        setAB = partial(param_update_ab, param="a")
+        builder.add_sweep_definition(setAB, range(0, 5))
 
+        # now define we want to create a series of simulations using the base task and the sweep
+        ts = TemplatedSimulations.from_task(base_task, tags=dict(c='c-value'))
+        ts.add_builder(builder)
 
-    def param_update_ab(simulation, param, value):
-        # Set B within
-        if param == "a":
-            simulation.set_parameter("b", value + 2)
+        # define our experiment with its metadata
+        experiment = Experiment.from_template(ts,
+                                              name=os.path.split(sys.argv[0])[1],
+                                              tags={"string_tag": "test", "number_tag": 123}
+                                              )
 
-        return simulation.set_parameter(param, value)
-
-
-    setAB = partial(param_update_ab, param="a")
-
-    builder = ExperimentBuilder()
-    # Sweep parameter "a" and make "b" depends on "a"
-    builder.add_sweep_definition(setAB, range(0, 5))
-    pe.builder = builder
-    em = ExperimentManager(experiment=pe, platform=platform)
-    em.run()
-    em.wait_till_done()
+        # run experiment
+        experiment.run()
+        # wait until done with longer interval
+        # in most real scenarios, you probably do not want to wait as this will wait until all simulations
+        # associated with an experiment are done. We do it in our examples to show feature and to enable
+        # testing of the scripts
+        experiment.wait(refresh_interval=10)
+        # use system status as the exit code
+        sys.exit(0 if experiment.succeeded else -1)

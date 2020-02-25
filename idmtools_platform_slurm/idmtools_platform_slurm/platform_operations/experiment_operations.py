@@ -3,20 +3,20 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import List, Any, Tuple, Type
 from uuid import UUID, uuid4
-from idmtools.entities import IExperiment
-from idmtools.entities.iplatform_metadata import IPlatformExperimentOperations
+from idmtools.entities.experiment import Experiment
+from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
 from idmtools_platform_slurm.slurm_operations import SLURM_STATES
 
 
 @dataclass
 class SlurmPLatformExperimentOperations(IPlatformExperimentOperations):
     platform: 'SlurmPlatform'
-    platform_type: Type = IExperiment
+    platform_type: Type = Experiment
 
     def get(self, experiment_id: UUID, **kwargs) -> Any:
         raise NotImplementedError("Fetching experiments has not been implemented on the Slurm Platform")
 
-    def create(self, experiment: IExperiment, **kwargs) -> Tuple[IExperiment, UUID]:
+    def platform_create(self, experiment: Experiment, **kwargs) -> Tuple[Experiment, UUID]:
         experiment.uid = str(uuid4())
         exp_dir = os.path.join(self.platform.job_directory, experiment.uid)
         self.platform._op_client.mk_directory(exp_dir)
@@ -31,19 +31,17 @@ class SlurmPLatformExperimentOperations(IPlatformExperimentOperations):
     def get_parent(self, experiment: Any, **kwargs) -> Any:
         return None
 
-    def run_item(self, experiment: IExperiment):
-        if not self.platform.is_supported_experiment(experiment):
-            raise ValueError("This experiment type is not supported on the LocalPlatform.")
+    def platform_run_item(self, experiment: Experiment):
         for simulation in experiment.simulations:
             self.platform._simulations.run_item(simulation)
 
-    def send_assets(self, experiment: IExperiment):
+    def send_assets(self, experiment: Experiment):
         for asset in experiment.assets:
             exp_asset_dir = os.path.join(self.platform.job_directory, experiment.uid, 'Assets')
             self.platform._op_client.mk_directory(exp_asset_dir)
             self.platform._op_client.copy_asset(asset, exp_asset_dir)
 
-    def refresh_status(self, experiment: IExperiment):
+    def refresh_status(self, experiment: Experiment):
         states = defaultdict(int)
         sim_states = self.platform._op_client.experiment_status(experiment)
         for s in experiment.simulations:
@@ -51,5 +49,5 @@ class SlurmPLatformExperimentOperations(IPlatformExperimentOperations):
                 s.status = SLURM_STATES[sim_states[s.uid]]
             states[s.status] += 1
 
-    def list_assets(self, experiment: IExperiment) -> List[str]:
+    def list_assets(self, experiment: Experiment) -> List[str]:
         raise NotImplementedError("Listing assets has not been implemented on the Slurm Platform")

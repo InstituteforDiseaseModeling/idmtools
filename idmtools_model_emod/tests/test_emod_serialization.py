@@ -9,10 +9,10 @@ current_directory = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(current_directory)
 
 import pytest
-from idmtools.builders import ExperimentBuilder, StandAloneSimulationsBuilder
+from idmtools.builders import SimulationBuilder, StandAloneSimulationsBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
-from idmtools.entities import IPlatform
+from idmtools.entities.iplatform import IPlatform
 from idmtools.managers import ExperimentManager
 from idmtools_model_emod.defaults import EMODSir
 from idmtools_model_emod.emod_experiment import EMODExperiment, IEMODExperiment
@@ -82,7 +82,7 @@ class EMODPlatformTest(ABC):
 
         sim.tags = {'role': 'serializer', 'idmtools': 'single serialization test'}
 
-        builder = ExperimentBuilder()
+        builder = SimulationBuilder()
         set_Run_Number = partial(param_update, param="Run_Number")
         builder.add_sweep_definition(set_Run_Number, range(num_seeds))
         e1.tags = {'idmtools': 'create serialization', 'exp1': 'tag1'}

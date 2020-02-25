@@ -3,26 +3,22 @@ import json
 import os
 import unittest
 from datetime import date, timedelta
-from functools import partial
-
 import pytest
-from idmtools.assets import AssetCollection
-from idmtools.builders import ExperimentBuilder
+
+from idmtools.assets import AssetCollection, Asset
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
-from idmtools.managers import ExperimentManager
-from idmtools.managers.work_item_manager import WorkItemManager
-from idmtools.ssmt.idm_work_item import VisToolsWorkItem
-from idmtools_model_emod import EMODExperiment
+from idmtools.entities.command_task import CommandTask
+from idmtools.entities.experiment import Experiment
+from idmtools_platform_comps.ssmt_work_items.comps_workitems import VisToolsWorkItem
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.utils import del_folder
+
 
 DEFAULT_INPUT_PATH = os.path.join(COMMON_INPUT_PATH, "malaria_brazil_central_west_spatial")
 DEFAULT_ERADICATION_PATH = os.path.join(DEFAULT_INPUT_PATH, "Assets", "Eradication.exe")
 DEFAULT_CONFIG_PATH = os.path.join(DEFAULT_INPUT_PATH, "config.json")
-DEFAULT_CAMPAIGN_JSON = os.path.join(DEFAULT_INPUT_PATH, "campaign.json")
-DEFAULT_DEMOGRAPHICS_JSON = os.path.join(DEFAULT_INPUT_PATH,
-                                         "Brazil_Central_West_Brazil_Central_West_2.5arcmin_demographics.json")
+DEFAULT_CAMPAIGN_PATH = os.path.join(DEFAULT_INPUT_PATH, "campaign.json")
 
 
 def param_update(simulation, param, value):
@@ -33,16 +29,50 @@ def param_update(simulation, param, value):
 @pytest.mark.long
 class TestVisToolsWorkItem(unittest.TestCase):
 
+    def generate_sim(self):
+        command = "Assets/Eradication.exe --config config.json --input-path ./Assets"
+        task = CommandTask(command=command)
+
+        # add Eradication.exe to Assets dir in comps
+        # ast = Asset(absolute_path=DEFAULT_ERADICATION_PATH)
+        # task.common_assets.add_asset(ast)  #
+
+        # add eradication.exe to current dir in comps
+        eradication_asset = Asset(absolute_path=DEFAULT_ERADICATION_PATH)
+        task.transient_assets.add_asset(eradication_asset)
+
+        # add config.json to current dir in comps
+        config_asset = Asset(absolute_path=DEFAULT_CONFIG_PATH)
+        task.transient_assets.add_asset(config_asset)
+
+        # add campaign.json to current dir in comps
+        campaign_asset = Asset(absolute_path=DEFAULT_CAMPAIGN_PATH)
+        task.transient_assets.add_asset(campaign_asset)
+
+        # add all files from local dir to assetcollection
+        assets_path = os.path.join(DEFAULT_INPUT_PATH, "Assets")
+        ac = AssetCollection.from_directory(assets_directory=assets_path)
+
+        # create experiment from task
+        experiment = Experiment.from_task(task, name="test_vistools_work_item.py--experiment", assets=ac)
+
+        self.platform.run_items(experiment)
+        self.platform.wait_till_done(experiment)
+
+        # return first simulation
+        simulations = self.platform.get_children(experiment.uid, ItemType.EXPERIMENT, force=True)
+        return simulations
+
     @classmethod
     def setUpClass(cls):
-        cls.p = Platform('COMPS2')
+        cls.platform = Platform('COMPS2')
         cls.sim_id = str(cls.generate_sim(cls)[0].uid)
         node_type = 'Points'
         data = {"SimulationId": "" + cls.sim_id + "", "NodesRepresentation": node_type}
         tags = {'idmtools': "vistool test", 'WorkItem type': 'VisTools', 'SimulationId': cls.sim_id}
-        cls.wi = VisToolsWorkItem(item_name="vistools test", tags=tags, work_order=data, related_simulations=[cls.sim_id])
-        wim = WorkItemManager(cls.wi, cls.p)
-        wim.process(check_status=True)
+        cls.wi = VisToolsWorkItem(item_name="test_vistools_work_item.py", tags=tags, work_order=data,
+                                  related_simulations=[cls.sim_id])
+        cls.wi.run(True, platform=cls.platform)
 
     def setUp(self):
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
@@ -58,7 +88,7 @@ class TestVisToolsWorkItem(unittest.TestCase):
         del_folder(output_path)
 
         out_filenames = ["WorkOrder.json"]
-        ret = self.p.get_files_by_id(self.wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, output_path)
+        ret = self.platform.get_files_by_id(self.wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, output_path)
         temp = ret["WorkOrder.json"]
         temp_dict = ast.literal_eval(temp.decode('utf-8'))
         self.assertEqual(temp_dict["WorkItem_Type"], "VisTools")
@@ -69,7 +99,7 @@ class TestVisToolsWorkItem(unittest.TestCase):
         self.assertTrue(os.path.exists(os.path.join(output_path, str(self.wi.uid), "WorkOrder.json")))
 
         # Validate another way to retriever workitem output
-        ret = self.p.get_files(self.wi, out_filenames)
+        ret = self.platform.get_files(self.wi, out_filenames)
         temp = ret["WorkOrder.json"]
         temp_dict = ast.literal_eval(temp.decode('utf-8'))
         # temp_dict = json.loads(temp[0].decode('utf-8'))
@@ -80,7 +110,7 @@ class TestVisToolsWorkItem(unittest.TestCase):
     def test_vistools_output_in_simulation(self):
         print(self.case_name)
         # get comps's simulation object
-        sim = self.p.get_item(self.sim_id, item_type=ItemType.SIMULATION, raw=True)
+        sim = self.platform.get_item(self.sim_id, item_type=ItemType.SIMULATION, raw=True)
 
         # get Vis-Tools dynamic folder in simulation output  which is Vis-Tools/md5.
         # to get this md5 info, we need to call:
@@ -116,7 +146,7 @@ class TestVisToolsWorkItem(unittest.TestCase):
         output_path = "output_simulation"
         del_folder(output_path)
         out_filenames = [p + "/visset.json"]
-        result = self.p.get_files_by_id(self.sim_id, ItemType.SIMULATION, out_filenames, output_path)
+        result = self.platform.get_files_by_id(self.sim_id, ItemType.SIMULATION, out_filenames, output_path)
         # validate file visset.json  get download to local
         self.assertTrue(os.path.exists(os.path.join(output_path, str(self.sim_id), p, "visset.json")))
 
@@ -361,7 +391,7 @@ class TestVisToolsWorkItem(unittest.TestCase):
 
         # decoding to dictionary
         vtassetmap_dic = json.loads(vtassetmap[0].decode('utf-8'))
-        self.assertTrue(len(vtassetmap_dic) == 19)
+        self.assertTrue(len(vtassetmap_dic) == 20)
 
         self.assertTrue(
             str(vtassetmap_dic['/' + visset_name + '/output/BinnedReport.json']).endswith('/BinnedReport.json'))
@@ -456,24 +486,25 @@ class TestVisToolsWorkItem(unittest.TestCase):
         response = requests.get(vtassetmap_dic['/' + visset_name + '/' + p + '/vt_preprocess.py'])
         self.assertTrue(response.status_code < 400)
 
-    def generate_sim(self):
-        self.case_name = os.path.basename(__file__)
-        assets_path = os.path.join(DEFAULT_INPUT_PATH, "Assets")
-        ac = AssetCollection.from_directory(assets_directory=assets_path)
-        e = EMODExperiment.from_files(name=self.case_name,
-                                      eradication_path=DEFAULT_ERADICATION_PATH,
-                                      config_path=DEFAULT_CONFIG_PATH,
-                                      campaign_path=DEFAULT_CAMPAIGN_JSON,
-                                      demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)
-        e.legacy_exe = True
-        e.add_assets(ac)
-
-        builder = ExperimentBuilder()
-        set_Run_Number = partial(param_update, param="Run_Number")
-        builder.add_sweep_definition(set_Run_Number, range(1))
-        e.add_builder(builder)
-        em = ExperimentManager(experiment=e, platform=self.p)
-        em.run()
-        em.wait_till_done()
-        simulations = self.p.get_children(em.experiment.uid, ItemType.EXPERIMENT, force=True)
-        return simulations
+    # def generate_sim(self):
+    #     Old way to create EMODExpierment
+    #     self.case_name = os.path.basename(__file__)
+    #     assets_path = os.path.join(DEFAULT_INPUT_PATH, "Assets")
+    #     ac = AssetCollection.from_directory(assets_directory=assets_path)
+    #     e = EMODExperiment.from_files(name=self.case_name,
+    #                                   eradication_path=DEFAULT_ERADICATION_PATH,
+    #                                   config_path=DEFAULT_CONFIG_PATH,
+    #                                   campaign_path=DEFAULT_CAMPAIGN_JSON,
+    #                                   demographics_paths=DEFAULT_DEMOGRAPHICS_JSON)
+    #     e.legacy_exe = True
+    #     e.add_assets(ac)
+    #
+    #     builder = ExperimentBuilder()
+    #     set_Run_Number = partial(param_update, param="Run_Number")
+    #     builder.add_sweep_definition(set_Run_Number, range(1))
+    #     e.add_builder(builder)
+    #     em = ExperimentManager(experiment=e, platform=self.p)
+    #     em.run()
+    #     em.wait_till_done()
+    #     simulations = self.p.get_children(em.experiment.uid, ItemType.EXPERIMENT, force=True)
+    #     return simulations

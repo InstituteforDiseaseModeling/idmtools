@@ -1,11 +1,10 @@
-import json
 from abc import ABC
-from idmtools.core import TTags
 from dataclasses import dataclass, field
-from idmtools.core import ItemType
-from idmtools.assets.file_list import FileList
+from typing import NoReturn, Dict, Any
 from uuid import UUID
-from typing import NoReturn
+
+from idmtools.assets.file_list import FileList
+from idmtools.core import ItemType
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.core.interfaces.inamed_entity import INamedEntity
 
@@ -17,37 +16,26 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, ABC):
     """
 
     item_name: str = field(default="Idm WorkItem Test")
-    tags: TTags = field(default_factory=lambda: {})
+    tags: Dict[str, Any] = field(default_factory=lambda: {})
     asset_collection_id: UUID = field(default=None)
     asset_files: FileList = field(default=None)
     user_files: FileList = field(default=None)
-    work_order: dict = field(default_factory=lambda: {})
     related_experiments: list = field(default=None)
     related_simulations: list = field(default=None)
     related_suites: list = field(default=None)
     related_work_items: list = field(default=None)
     related_asset_collections: list = field(default=None)
     work_item_type: str = field(default=None)
-    plugin_key: str = field(default=None)
 
     item_type: 'ItemType' = field(default=ItemType.WORKFLOW_ITEM, compare=False, init=False)
 
     def __post_init__(self):
         self.tags = self.tags or {}
-        self.work_order = self.work_order or {}
         self.asset_files = self.asset_files or FileList()
         self.user_files = self.user_files or FileList()
 
     def __repr__(self):
         return f"<WorkItem {self.uid}>"
-
-    def get_base_work_order(self, platform):
-        wi_type = self.work_item_type or platform.work_item_type
-        base_wo = {"WorkItem_Type": wi_type}
-        return base_wo
-
-    def load_work_order(self, wo_file):
-        self.work_order = json.load(open(wo_file, 'rb'))
 
     def gather_assets(self) -> NoReturn:
         """
@@ -65,26 +53,6 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, ABC):
         """
         self.user_files.add_asset_file(af)
 
-    def set_work_order(self, wo):
-        """
-        Update wo for the name with value
-        Args:
-            wo: user wo
-        Returns: None
-        """
-        self.work_order = wo
-
-    def update_work_order(self, name, value):
-        """
-        Update wo for the name with value
-        Args:
-            name: wo arg name
-            value: wo arg value
-
-        Returns: None
-        """
-        self.work_order[name] = value
-
     def clear_user_files(self):
         """
         Clear all existing user files
@@ -93,11 +61,45 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, ABC):
         """
         self.user_files = FileList()
 
-    def clear_wo_args(self):
-        """
-        Clear all existing wo args
+    def __check_for_platform(self, platform: 'IPlatform'):
+        from idmtools.core.platform_factory import current_platform
+        if platform is not None:
+            self.platform = platform
+        if self.platform is None:
+            if current_platform is None:
+                raise ValueError("Platform is required to run item")
+            self.platform = current_platform
 
-        Returns: None
+    def run(self, wait_on_done: bool = False, wait_on_done_progress: bool = True, platform: 'IPlatform' = None):
+        """
+        Run the item on specified platform
+
+        Args:
+            wait_on_done: Should we wait on item to finish running? Default is false
+            wait_on_done_progress: When waiting, should we try to show progress
+            platform: optional platform object
+
+        Returns:
 
         """
-        self.work_order = {}
+        self.__check_for_platform(platform)
+        self.platform.run_items([self])
+        if wait_on_done:
+            self.wait(wait_on_done_progress)
+
+    def wait(self, wait_on_done_progress: bool = True, platform: 'IPlatform' = None):
+        """
+        Wait on item to finish
+
+        Args:
+            wait_on_done_progress: Should we show progress as we wait?
+            platform: Optional platform object
+
+        Returns:
+
+        """
+        self.__check_for_platform(platform)
+        if wait_on_done_progress:
+            self.platform.wait_till_done_progress(self)
+        else:
+            self.platform.wait_till_done(self)

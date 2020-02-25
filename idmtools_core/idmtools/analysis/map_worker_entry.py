@@ -2,7 +2,7 @@ import itertools
 import traceback
 from logging import getLogger, DEBUG
 from idmtools.core.interfaces.ientity import IEntity
-from idmtools.entities import IPlatform
+from idmtools.entities.iplatform import IPlatform
 from idmtools.utils.file_parser import FileParser
 from typing import NoReturn
 from idmtools.core.interfaces.iitem import IItem

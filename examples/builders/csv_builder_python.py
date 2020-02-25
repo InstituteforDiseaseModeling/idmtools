@@ -29,39 +29,53 @@
 import os
 import sys
 from functools import partial
+
 import numpy as np
 
 from idmtools.builders import CsvExperimentBuilder
-from idmtools.core.platform_factory import Platform
-from idmtools.managers import ExperimentManager
-from idmtools_models.python import PythonExperiment
+from idmtools.core.platform_factory import platform
+from idmtools.entities.experiment import Experiment
+from idmtools.entities.templated_simulation import TemplatedSimulations
+from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
 
-
-def param_update(simulation, param, value):
-    return simulation.set_parameter(param, value)
-
-
-setA = partial(param_update, param="a")
-setB = partial(param_update, param="b")
-setC = partial(param_update, param="c")
-setD = partial(param_update, param="d")
+# define function partials to be used during sweeps
+setA = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
+setB = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="b")
+setC = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="c")
+setD = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="d")
 
 if __name__ == "__main__":
-    platform = Platform('COMPS2')
-    pe = PythonExperiment(name=os.path.split(sys.argv[0])[1],
-                          model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
-    pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
+    # define what platform we want to use. Here we use a context manager but if you prefer you can
+    # use objects such as Platform('COMPS2') instead
+    with platform('COMPS2'):
+        # define our base task
+        base_task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"),
+                                             parameters=dict(c='c-value'))
+        # define our input csv sweep
+        base_path = os.path.abspath(os.path.join(COMMON_INPUT_PATH, "builder"))
+        file_path = os.path.join(base_path, 'sweeps.csv')
+        builder = CsvExperimentBuilder()
+        func_map = {'a': setA, 'b': setB, 'c': setC, 'd': setD}
+        type_map = {'a': np.int, 'b': np.int, 'c': np.int, 'd': np.int}
+        builder.add_sweeps_from_file(file_path, func_map, type_map)
 
-    pe.base_simulation.set_parameter("c", "c-value")
+        # now define we want to create a series of simulations using the base task and the sweep
+        ts = TemplatedSimulations.from_task(base_task)
+        # optionally we could update the base simulation metdata here
+        # ts.base_simulations.tags['example'] 'yes'
+        ts.add_builder(builder)
 
-    builder = CsvExperimentBuilder()
-    base_path = os.path.abspath(os.path.join(COMMON_INPUT_PATH, "builder"))
-    file_path = os.path.join(base_path, 'sweeps.csv')
-    func_map = {'a': setA, 'b': setB, 'c': setC, 'd': setD}
-    type_map = {'a': np.int, 'b': np.int, 'c': np.int, 'd': np.int}
-    builder.add_sweeps_from_file(file_path, func_map, type_map)
-    pe.builder = builder
-    em = ExperimentManager(experiment=pe, platform=platform)
-    em.run()
-    em.wait_till_done()
+        # define our experiment with its metadata
+        experiment = Experiment.from_template(ts,
+                                              name=os.path.split(sys.argv[0])[1],
+                                              tags={"string_tag": "test", "number_tag": 123}
+                                              )
+
+        # run the experiment and wait. By default run does not wait
+        # in most real scenarios, you probably do not want to wait as this will wait until all simulations
+        # associated with an experiment are done. We do it in our examples to show feature and to enable
+        # testing of the scripts
+        experiment.run(wait_until_done=True)
+        # use system status as the exit code
+        sys.exit(0 if experiment.succeeded else -1)

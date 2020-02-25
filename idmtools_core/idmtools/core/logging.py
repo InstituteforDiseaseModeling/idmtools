@@ -1,10 +1,10 @@
-import sys
-from signal import SIGTERM, SIGINT, signal
-from logging import getLogger
+import atexit
 import logging
+import os
+from logging import getLogger
 from logging.handlers import QueueHandler, RotatingFileHandler, QueueListener
 from multiprocessing import Queue
-import os
+from signal import SIGTERM, SIGINT, signal
 from typing import NoReturn, Union
 
 import coloredlogs as coloredlogs
@@ -23,7 +23,8 @@ class IDMQueueListener(QueueListener):
         if you want to use timeouts or work with custom queue implementations.
         """
         try:
-            return self.queue.get(block)
+            result = self.queue.get(block)
+            return result
         except EOFError:
             return None
 
@@ -31,7 +32,7 @@ class IDMQueueListener(QueueListener):
 class IDMQueueHandler(QueueHandler):
     def prepare(self, record):
         try:
-            super().prepare(record)
+            return super().prepare(record)
         except ImportError:
             pass
 
@@ -74,6 +75,7 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
             format_str = '%(asctime)s.%(msecs)d %(funcName)s: [%(levelname)s] - %(message)s'
         formatter = logging.Formatter(format_str)
         file_handler = RotatingFileHandler(log_filename, maxBytes=(2 ** 20) * 10, backupCount=5)
+        file_handler.setLevel(logging.DEBUG)
         file_handler.setFormatter(formatter)
 
         exclude_logging_classes()
@@ -82,6 +84,7 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
             # Remove all handlers associated with the root logger object.
             for handler in logging.root.handlers[:]:
                 logging.root.removeHandler(handler)
+            root.setLevel(logging.DEBUG if os.getenv('IDM_TOOLS_DEBUG', False) else level)
         except KeyError as e:  # noqa F841
             pass
         # set root the use send log messages to a queue by default
@@ -89,18 +92,21 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
         root.addHandler(queue_handler)
 
         if console:
-            coloredlogs.install(level='DEBUG')
+            coloredlogs.install(level=level)
+        else:
+            # install colored logs for user logger only
+            coloredlogs.install(logger=getLogger('user'), level=logging.INFO, fmt='%(asctime)s.%(msecs)d: %(message)s')
 
         # see https://docs.python.org/3/library/logging.handlers.html#queuelistener
         # setup file logger handler that rotates after 10 mb of logging and keeps 5 copies
 
         # now attach a listener to the logging queue and redirect all messages to our handler
-        listener = IDMQueueListener(logging_queue, file_handler)
-        listener.start()
-        # register a stop signal
-        register_stop_logger_signal_handler(listener)
+        if listener is None:
+            listener = IDMQueueListener(logging_queue, file_handler)
+            listener.start()
+            # register a stop signal
+            register_stop_logger_signal_handler(listener)
 
-    exclude_logging_classes()
     return listener
 
 
@@ -109,8 +115,8 @@ def exclude_logging_classes(items_to_exclude=None):
         items_to_exclude = ['urllib3', 'COMPS', 'paramiko']
     # remove comps by default
     for l in items_to_exclude:
-        comps_logger = getLogger(l)
-        comps_logger.setLevel(logging.WARN)
+        other_logger = getLogger(l)
+        other_logger.setLevel(logging.WARN)
 
 
 def register_stop_logger_signal_handler(listener) -> NoReturn:
@@ -129,3 +135,5 @@ def register_stop_logger_signal_handler(listener) -> NoReturn:
 
     for s in [SIGINT, SIGTERM]:
         signal(s, stop_logger)
+
+    atexit.register(stop_logger)

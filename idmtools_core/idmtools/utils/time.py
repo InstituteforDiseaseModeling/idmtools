@@ -11,5 +11,5 @@ def timestamp(time=None):
     import datetime
     if not time:
         time = datetime.datetime.utcnow()
-    timestamp = time.strftime('%Y%m%d_%H%M%S')
-    return timestamp
+    ts = time.strftime('%Y%m%d_%H%M%S')
+    return ts

@@ -2,25 +2,25 @@ import os
 import unittest
 import xmlrunner
 import pytest
-
 from idmtools.assets.file_list import FileList
 from idmtools.core.platform_factory import Platform
-from idmtools.managers.work_item_manager import WorkItemManager
-from idmtools.ssmt.idm_work_item import SSMTWorkItem
+from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
 from COMPS.Data.WorkItem import WorkItem, RelationType
 from COMPS.Data import QueryCriteria, AssetCollection
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 
+@pytest.mark.ssmt
+@pytest.mark.comps
 class ClimateGenerationTest(ITestWithPersistence):
 
     def setUp(self):
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
-        self.input_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "inputs")
+        self.input_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "inputs")
 
-    #------------------------------------------
+    # ------------------------------------------
     # test generate ERA5 climate files
-    #------------------------------------------
+    # ------------------------------------------
     @pytest.mark.comps
     @pytest.mark.long
     def test_generate_era5_climate_files(self):
@@ -43,9 +43,9 @@ class ClimateGenerationTest(ITestWithPersistence):
 
         platform = Platform('COMPS2')
         wi = SSMTWorkItem(item_name=self.case_name, docker_image=docker_image, command=command, user_files=user_files,
-                          tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker', 'Command': command})
-        wim = WorkItemManager(wi, platform)
-        wim.process(check_status=True)
+                          tags={'idmtools_test': self._testMethodName, 'WorkItem type': 'Docker', 'Command': command}
+                          )
+        wi.run(True, platform=platform)
 
         # Get the work item, related asset collection, and assets
         wi_id = wi.uid
@@ -72,9 +72,9 @@ class ClimateGenerationTest(ITestWithPersistence):
 
         self.validate(wi)
 
-    #------------------------------------------
+    # ------------------------------------------
     # test getting the climate files and saving them local for the DTK run test
-    #------------------------------------------
+    # ------------------------------------------
     # def test_retrieve_climate_files(self, wim):
     #     # Get workitem
     #     self.workitem_id = wi.uid

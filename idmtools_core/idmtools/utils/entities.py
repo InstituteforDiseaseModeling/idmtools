@@ -1,11 +1,12 @@
+import ast
 import dataclasses
 import typing
-from idmtools.services.experiments import ExperimentPersistService
+
 from idmtools.core import ExperimentNotFound, UUID, ItemType
-from idmtools.entities.iexperiment import IExperiment
+from idmtools.services.experiments import ExperimentPersistService
 
 
-def retrieve_experiment(experiment_id: UUID, platform: 'IPlatform' = None, with_simulations=False) -> IExperiment:
+def retrieve_experiment(experiment_id: UUID, platform: 'IPlatform' = None, with_simulations=False) -> 'Experiment':
     experiment = ExperimentPersistService.retrieve(experiment_id)
 
     if not experiment:
@@ -59,3 +60,13 @@ def validate_user_inputs_against_dataclass(field_type, field_value):
             field_value[fn] = ast.literal_eval(field_value[fn]) if isinstance(field_value[fn], str) else \
                 field_value[fn]
     return fs_kwargs
+
+
+def get_default_tags() -> typing.Dict[str, str]:
+    """
+    Get common default tags. Currently this is the version of idmtools
+    Returns:
+
+    """
+    from idmtools import __version__
+    return dict(idmtools=__version__)

@@ -1,16 +1,22 @@
 import os
 from dataclasses import dataclass, field
-from typing import Any, List, Tuple, Type
+from itertools import tee
+from logging import getLogger, DEBUG
+from typing import Any, List, Type, Generator, NoReturn
 from uuid import UUID
-from COMPS.Data import Experiment as COMPSExperiment, QueryCriteria, AssetCollection as COMPSAssetCollection, \
-    AssetCollectionFile, Configuration
+
+from COMPS.Data import Experiment as COMPSExperiment, QueryCriteria, Configuration, Suite as COMPSSuite
 from idmtools.core import ItemType
 from idmtools.core.experiment_factory import experiment_factory
-from idmtools.entities import IExperiment
-from idmtools.entities.iexperiment import StandardExperiment
-from idmtools.entities.iplatform_metadata import IPlatformExperimentOperations
+from idmtools.entities import CommandLine
+from idmtools.entities.experiment import Experiment
+from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
+from idmtools.entities.templated_simulation import TemplatedSimulations
+from idmtools.utils.collections import ParentIterator
 from idmtools.utils.time import timestamp
-from idmtools_platform_comps.utils.general import clean_experiment_name, convert_COMPS_status
+from idmtools_platform_comps.utils.general import clean_experiment_name, convert_comps_status
+
+logger = getLogger(__name__)
 
 
 @dataclass
@@ -26,9 +32,14 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         return COMPSExperiment.get(id=experiment_id,
                                    query_criteria=QueryCriteria().select(cols).select_children(children))
 
-    def create(self, experiment: IExperiment, **kwargs) -> Tuple[COMPSExperiment, UUID]:
-        if not self.platform.is_supported_experiment(experiment):
-            raise ValueError("The specified experiment is not supported on this platform")
+    def pre_create(self, experiment: Experiment, **kwargs) -> NoReturn:
+        if experiment.name is None:
+            raise ValueError("Experiment name is required on COMPS")
+        super().pre_create(experiment, **kwargs)
+
+    def platform_create(self, experiment: Experiment, num_cores: int = None, executable_path: str = None,
+                        command_arg: str = None, priority: str = None) -> COMPSExperiment:
+        # TODO check experiment task supported
 
         # Cleanup the name
         experiment_name = clean_experiment_name(experiment.name)
@@ -36,18 +47,39 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         # Define the subdirectory
         subdirectory = experiment_name[0:self.platform.MAX_SUBDIRECTORY_LENGTH] + '_' + timestamp()
 
-        config = Configuration(
-            environment_name=self.platform.environment,
-            simulation_input_args=experiment.command.arguments + " " + experiment.command.options,
-            working_directory_root=os.path.join(self.platform.simulation_root, subdirectory).replace('\\', '/'),
-            executable_path=experiment.command.executable,
-            node_group_name=self.platform.node_group,
-            maximum_number_of_retries=self.platform.num_retires,
-            priority=self.platform.priority,
-            min_cores=self.platform.num_cores,
-            max_cores=self.platform.num_cores,
-            exclusive=self.platform.exclusive
-        )
+        exp_command: CommandLine = None
+        if isinstance(experiment.simulations, Generator):
+            sim_gen1, sim_gen2 = tee(experiment.simulations)
+            experiment.simulations = sim_gen2
+            exp_command = next(sim_gen1).task.command
+        elif isinstance(experiment.simulations, ParentIterator) and isinstance(experiment.simulations.items,
+                                                                               TemplatedSimulations):
+            exp_command = experiment.simulations.items.base_task.command
+            # TODO generators
+        else:
+            exp_command = experiment.simulations[0].task.command
+
+        if command_arg is None:
+            command_arg = exp_command.arguments + " " + exp_command.options
+
+        if executable_path is None:
+            executable_path = exp_command.executable
+        comps_config = dict(environment_name=self.platform.environment,
+                            simulation_input_args=command_arg,
+                            working_directory_root=os.path.join(self.platform.simulation_root, subdirectory).replace(
+                                '\\', '/'),
+                            executable_path=executable_path,
+                            node_group_name=self.platform.node_group,
+                            maximum_number_of_retries=self.platform.num_retires,
+                            priority=self.platform.priority if priority is None else priority,
+                            min_cores=self.platform.num_cores if num_cores is None else num_cores,
+                            max_cores=self.platform.num_cores if num_cores is None else num_cores,
+                            exclusive=self.platform.exclusive
+                            )
+
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f'COMPS Experiment Configs: {str(comps_config)}')
+        config = Configuration(**comps_config)
 
         e = COMPSExperiment(name=experiment_name,
                             configuration=config,
@@ -65,7 +97,12 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
 
         # Send the assets for the experiment
         self.send_assets(experiment)
-        return e, experiment.uid
+        return e
+
+    def post_run_item(self, experiment: Experiment, **kwargs):
+        super().post_run_item(experiment, **kwargs)
+        print(f'The running experiment can be viewed at {self.platform.endpoint}/#explore/'
+              f'Simulations?filters=ExperimentId={experiment.uid}')
 
     def get_children(self, experiment: COMPSExperiment, **kwargs) -> List[Any]:
         cols = kwargs.get("cols")
@@ -81,14 +118,16 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             return None
         return self.platform._suites.get(experiment.suite_id, **kwargs)
 
-    def run_item(self, experiment: IExperiment):
+    def platform_run_item(self, experiment: Experiment, **kwargs):
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f'Commissioning experiment: {experiment.uid}')
         experiment.get_platform_object().commission()
 
-    def send_assets(self, experiment: IExperiment):
+    def send_assets(self, experiment: Experiment, **kwargs):
         if experiment.assets.count == 0:
-            return
+            logger.warning('Experiment has not assets')
 
-        ac, aid = self.platform._assets.create(experiment.assets)
+        ac = self.platform._assets.create(experiment.assets)
         print("Asset collection for experiment: {}".format(ac.id))
 
         # associate the assets with the experiment in COMPS
@@ -96,21 +135,25 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         e.configuration = Configuration(asset_collection_id=ac.id)
         e.save()
 
-    def refresh_status(self, experiment: IExperiment):
+    def refresh_status(self, experiment: Experiment, **kwargs):
         simulations = self.get_children(experiment.get_platform_object(), force=True, cols=["id", "state"], children=[])
         for s in simulations:
-            experiment.simulations.set_status_for_item(s.id, convert_COMPS_status(s.state))
+            experiment.simulations.set_status_for_item(s.id, convert_comps_status(s.state))
 
-    def to_entity(self, experiment: COMPSExperiment, **kwargs) -> IExperiment:
+    def to_entity(self, experiment: COMPSExperiment, parent: COMPSSuite = None, **kwargs) -> Experiment:
         # Recreate the suite if needed
         if experiment.suite_id is None:
             suite = kwargs.get('suite')
         else:
-            suite = kwargs.get('suite') or self.platform.get_item(experiment.suite_id, item_type=ItemType.SUITE)
+            if parent:
+                suite = parent
+            else:
+                suite = kwargs.get('suite') or self.platform.get_item(experiment.suite_id, item_type=ItemType.SUITE)
 
         # Create an experiment
-        obj = experiment_factory.create(experiment.tags.get("type"), tags=experiment.tags, name=experiment.name,
-                                        fallback=StandardExperiment)
+        experiment_type = experiment.tags.get("type") if experiment.tags is not None else ""
+        obj = experiment_factory.create(experiment_type, tags=experiment.tags, name=experiment.name,
+                                        fallback=Experiment)
 
         # Convert all simulations
         comps_sims = experiment.get_simulations()

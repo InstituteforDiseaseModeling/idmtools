@@ -23,7 +23,7 @@ clean-all:  ## Deleting package info hides plugins so we only want to do that fo
 	$(CLDIR) --dir-patterns "**/*.egg-info/"
 
 lint: ## check style with flake8
-	flake8 --ignore=E501 $(PACKAGE_NAME) tests
+	flake8 --ignore=E501,W291 $(PACKAGE_NAME) tests
 
 test: ## Run our tests
 	$(FULL_TEST_CMD) -m "not comps and not docker"'
@@ -51,6 +51,9 @@ test-emod: ## Run our emod tests
 
 test-python: ## Run our python tests
 	$(FULL_TEST_CMD) -m "python"'
+
+test-ssmt: ## Run our python tests
+	$(FULL_TEST_CMD) -m "ssmt"'
 
 coverage: ## Generate a code-coverage report
 	@make clean

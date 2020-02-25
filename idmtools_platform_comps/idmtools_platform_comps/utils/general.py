@@ -1,12 +1,14 @@
 import ntpath
-from typing import List, Dict, NoReturn
+from typing import List, Dict
 from uuid import UUID
-from COMPS.Data.Simulation import SimulationState
+
 from COMPS.Data import Simulation
+from COMPS.Data.Simulation import SimulationState
+from COMPS.Data.WorkItem import WorkItemState
+from idmtools.core import EntityStatus, ItemType
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.iplatform import IPlatform
 from requests import RequestException
-from idmtools.core import EntityStatus, ItemType
 
 
 def fatal_code(e: Exception) -> bool:
@@ -24,7 +26,16 @@ def fatal_code(e: Exception) -> bool:
     return False
 
 
-def convert_COMPS_status(comps_status):
+def convert_comps_status(comps_status: SimulationState) -> EntityStatus:
+    """
+    Convert status from COMPS to IDMTools
+
+    Args:
+        comps_status: Status in Comps
+
+    Returns:
+        EntityStatus
+    """
     if comps_status == SimulationState.Succeeded:
         return EntityStatus.SUCCEEDED
     elif comps_status in (SimulationState.Canceled, SimulationState.CancelRequested, SimulationState.Failed):
@@ -35,13 +46,33 @@ def convert_COMPS_status(comps_status):
         return EntityStatus.RUNNING
 
 
-def convert_COMPS_WorkItem_status(wi_status):
-    from COMPS.Data.WorkItem import WorkItemState
-    if wi_status == WorkItemState.Succeeded:
+def convert_comps_workitem_status(comps_status: WorkItemState) -> EntityStatus:
+    """
+    Convert status from COMPS to IDMTools
+    Created = 0                # WorkItem has been saved to the database
+    CommissionRequested = 5    # WorkItem is ready to be processed by the next available worker of the correct type
+    Commissioned = 10          # WorkItem has been commissioned to a worker of the correct type and is beginning execution
+    Validating = 30            # WorkItem is being validated
+    Running = 40               # WorkItem is currently running
+    Waiting = 50               # WorkItem is waiting for dependent items to complete
+    ResumeRequested = 60       # Dependent items have completed and WorkItem is ready to be processed by the next available worker of the correct type
+    CancelRequested = 80       # WorkItem cancellation was requested
+    Canceled = 90              # WorkItem was successfully canceled
+    Resumed = 100              # WorkItem has been claimed by a worker of the correct type and is resuming
+    Canceling = 120            # WorkItem is in the process of being canceled by the worker
+    Succeeded = 130            # WorkItem completed successfully
+    Failed = 140               # WorkItem failed
+    Args:
+        comps_status: Status in Comps
+
+    Returns:
+        EntityStatus
+    """
+    if comps_status == WorkItemState.Succeeded:
         return EntityStatus.SUCCEEDED
-    elif wi_status in (WorkItemState.Canceled, WorkItemState.CancelRequested, WorkItemState.Failed):
+    elif comps_status in (WorkItemState.Canceled, WorkItemState.CancelRequested, WorkItemState.Failed):
         return EntityStatus.FAILED
-    elif wi_status == WorkItemState.Created:
+    elif comps_status == [WorkItemState.Created, WorkItemState.Resumed, WorkItemState.CommissionRequested, WorkItemState.Commissioned]:
         return EntityStatus.CREATED
     else:
         return EntityStatus.RUNNING
@@ -59,7 +90,18 @@ def clean_experiment_name(experiment_name: str) -> str:
     return experiment_name
 
 
-def get_file_from_collection(platform, collection_id: UUID, file_path: str) -> NoReturn:
+def get_file_from_collection(platform: IPlatform, collection_id: UUID, file_path: str) -> bytearray:
+    """
+    Retrieve a file from an asset collection
+
+    Args:
+        platform: Platform object to use
+        collection_id: Asset Collection ID
+        file_path: Path within collection
+
+    Returns:
+        Object Byte Array
+    """
     print(f"Cache miss for {collection_id} {file_path}")
 
     # retrieve the collection
@@ -75,6 +117,18 @@ def get_file_from_collection(platform, collection_id: UUID, file_path: str) -> N
 
 
 def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str], cache=None) -> Dict[str, bytearray]:
+    """
+    Retrieve assets from an Entity(Simulation, Experiment, WorkItem)
+
+    Args:
+        platform: Platform Object to use
+        item: Item to fetch assets from
+        files: List of file names to retrieve
+        cache: Cache object to use
+
+    Returns:
+        Dictionary in structure of filename -> bytearray
+    """
     # Retrieve comps item
     if item.platform is None:
         item.platform = platform

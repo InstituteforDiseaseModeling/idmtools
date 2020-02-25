@@ -1,3 +1,4 @@
+import copy
 import unittest
 from typing import Any
 
@@ -5,13 +6,13 @@ import pytest
 
 from idmtools.analysis.analyze_manager import AnalyzeManager
 from idmtools.analysis.download_analyzer import DownloadAnalyzer as SampleAnalyzer
-from idmtools.builders import StandAloneSimulationsBuilder
 from idmtools.core.enums import EntityStatus, ItemType
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.core.platform_factory import Platform
+from idmtools.entities.experiment import Experiment
 from idmtools.entities.ianalyzer import IAnalyzer
-from idmtools.managers import ExperimentManager
-from idmtools_test.utils.tst_experiment import TstExperiment
+from idmtools.entities.simulation import Simulation
+from idmtools_test.utils.test_task import TestTask
 
 
 @pytest.mark.analysis
@@ -32,11 +33,11 @@ class TestAnalyzeManager(unittest.TestCase):
 
     def setUp(self) -> None:
         self.platform = Platform('Test')
-        self.sample_experiment = TstExperiment()
-        em = ExperimentManager(self.sample_experiment, self.platform)
-        em.run()
+        self.platform.cleanup()
+        self.sample_experiment = Experiment.from_task(TestTask())
+        self.platform.run_items(self.sample_experiment)
         self.platform._simulations.set_simulation_status(self.sample_experiment.uid, status=EntityStatus.SUCCEEDED)
-        self.configuration = {'max_processes': 2}
+        self.configuration = {'max_processes': 1}
 
         self.analyze_manager = AnalyzeManager(self.platform)
         self.sample_analyzer = SampleAnalyzer()
@@ -81,13 +82,11 @@ class TestAnalyzeManager(unittest.TestCase):
                             'none': (0, None, 0),
                             'some': (1, None, 1)}
 
-        test_exp = TstExperiment()
-        b = StandAloneSimulationsBuilder()
-        b.add_simulation(test_exp.simulation())
-        b.add_simulation(test_exp.simulation())
-        em = ExperimentManager(test_exp, self.platform)
-        test_exp.builders.add(b)
-        em.run()
+        test_exp = Experiment()
+        base_sim = Simulation(task=TestTask())
+        for i in range(2):
+            test_exp.simulations.append(copy.deepcopy(base_sim))
+        self.platform.run_items(test_exp)
 
         # all ready
         for test_name, results in results_expected.items():

@@ -2,16 +2,17 @@ import os
 import unittest
 from functools import partial
 
+from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType, EntityStatus
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import Suite
-from idmtools.managers import ExperimentManager
+from idmtools.entities.experiment import Experiment
+from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools.utils.filter_simulations import FilterItem
 
-from idmtools_models.python import PythonExperiment
+from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-from idmtools.builders import ExperimentBuilder
 
 
 class TestSimulations(ITestWithPersistence):
@@ -22,29 +23,34 @@ class TestSimulations(ITestWithPersistence):
         :return: ExperimentManager
         """
         def param_update(simulation, param, value):
-            return simulation.set_parameter(param, value)
+            return simulation.task.set_parameter(param, value)
         setA = partial(param_update, param="Run_Number")
 
-        experiment = PythonExperiment(name="test_filter_simulations.py--test_experiment",
-                                      model_path=os.path.join(COMMON_INPUT_PATH, "python_experiments", "model.py"))
-        builder = ExperimentBuilder()
+        task = JSONConfiguredPythonTask(
+            script_path=os.path.join(COMMON_INPUT_PATH, "python_experiments", "model.py"))
+        ts = TemplatedSimulations(base_task=task)
+        # We can define common metadata like tags across all the simulations using the base_simulation object
+        ts.base_simulation.tags['tag1'] = 1
+
+        # Since we have our templated simulation object now, let's define our sweeps
+        # To do that we need to use a builder
+        builder = SimulationBuilder()
         builder.add_sweep_definition(setA, range(5))
-
-        experiment.add_builder(builder)
-
+        ts.add_builder(builder)
+        experiment = Experiment(name="test_filter_simulations.py--test_experiment", simulations=ts)
         suite = Suite(name='test_filter_simulations.py--test suite')
         suite.update_tags({'name': 'test', 'fetch': 123})
-        em = ExperimentManager(platform=self.platform, experiment=experiment, suite=suite)
-        em.run()
-        em.wait_till_done()
-        return em
+        self.platform.create_items([suite])
+        suite.add_experiment(experiment)
+        self.platform.run_items(experiment)
+        self.platform.wait_till_done(experiment)
+        return suite
 
     @classmethod
     def setUpClass(cls):
         cls.platform = Platform('COMPS2')
-        em: ExperimentManager = cls._run_create_test_experiments(cls)
-        cls.experiment = em.experiment
-        cls.suite = em.suite
+        cls.suite = cls._run_create_test_experiments(cls)
+        cls.experiment = cls.suite.experiments[0]
 
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName

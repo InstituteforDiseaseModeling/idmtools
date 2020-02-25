@@ -1,52 +1,29 @@
 import json
-from uuid import UUID
-from idmtools.core import ItemType
 from dataclasses import dataclass, field
 from typing import List, Dict, Any, Tuple, Type
-from idmtools.assets import AssetCollection
-from idmtools.entities.iplatform_metadata import IPlatformWorkflowItemOperations
-from idmtools.entities.iworkflow_item import IWorkflowItem
-from idmtools.ssmt.idm_work_item import GenericWorkItem
+from uuid import UUID
+
 from COMPS.Data import WorkItem as COMPSWorkItem, WorkItemFile
 from COMPS.Data.WorkItem import WorkerOrPluginKey, RelationType
+from idmtools.assets import AssetCollection
+from idmtools.core import ItemType
+from idmtools.entities.generic_workitem import GenericWorkItem
+from idmtools.entities.iplatform_ops.iplatform_workflowitem_operations import IPlatformWorkflowItemOperations
+from idmtools.entities.iworkflow_item import IWorkflowItem
+from idmtools_platform_comps.utils.general import convert_comps_workitem_status
 
 
 @dataclass
 class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
+
     platform: 'COMPSPlaform'  # noqa F821
     platform_type: Type = field(default=COMPSWorkItem)
 
-    def get(self, work_item_id: UUID, **kwargs) -> Any:
-        """
-        Returns the platform representation of an WorkItem
-
-        Args:
-            work_item_id: Item id of WorkItems
-            **kwargs: Optional arguments mainly for extensibility
-
-        Returns:
-            Platform Representation of an work_item
-        """
-        wi = COMPSWorkItem.get(work_item_id)
+    def get(self, workflow_item_id: UUID, **kwargs) -> COMPSWorkItem:
+        wi = COMPSWorkItem.get(workflow_item_id)
         return wi
 
-    def batch_create(self, work_items: List[IWorkflowItem], **kwargs) -> List[Tuple[Any, UUID]]:
-        """
-        Provides a method to batch create workflow items
-
-        Args:
-            workflow_items: List of work items to create
-            **kwargs: Optional arguments mainly for extensibility
-
-        Returns:
-            List of tuples containing the create object and id of item that was created
-        """
-        ret = []
-        for wi in work_items:
-            ret.append(self.create(wi, **kwargs))
-        return ret
-
-    def create(self, work_item: IWorkflowItem, **kwargs) -> Tuple[Any, UUID]:
+    def platform_create(self, work_item: IWorkflowItem, **kwargs) -> Tuple[Any]:
         """
         Creates an workflow_item from an IDMTools work_item object
 
@@ -121,9 +98,9 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         # Set the ID back in the object
         work_item.uid = wi.id
 
-        return work_item, wi.id
+        return work_item
 
-    def run_item(self, work_item: IWorkflowItem):
+    def platform_run_item(self, work_item: IWorkflowItem, **kwargs):
         """
         Start to rum COMPS WorkItem created from work_item
         Args:
@@ -133,20 +110,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         """
         work_item.get_platform_object().commission()
 
-    def refresh_status(self, work_item: IWorkflowItem):
-        """
-        Refresh status for workflow item
-        Args:
-            work_item: Item to refresh status for
-
-        Returns:
-            None
-        """
-        wi = self.get(work_item.uid)
-        from idmtools_platform_comps.utils.general import convert_COMPS_WorkItem_status
-        work_item.status = convert_COMPS_WorkItem_status(wi.state)
-
-    def get_parent(self, work_item: COMPSWorkItem, **kwargs) -> Any:
+    def get_parent(self, work_item: IWorkflowItem, **kwargs) -> Any:
         """
         Returns the parent of item. If the platform doesn't support parents, you should throw a TopLevelItem error
         Args:
@@ -160,7 +124,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         """
         return None
 
-    def get_children(self, work_item: COMPSWorkItem, **kwargs) -> List[Any]:
+    def get_children(self, work_item: IWorkflowItem, **kwargs) -> List[Any]:
         """
         Returns the children of an workflow_item object
 
@@ -173,36 +137,26 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         """
         return None
 
-    def to_entity(self, work_item: COMPSWorkItem, **kwargs) -> IWorkflowItem:
+    def refresh_status(self, workflow_item: IWorkflowItem, **kwargs):
         """
-        Converts the platform representation of workflow_item to idmtools representation
+                Refresh status for workflow item
+                Args:
+                    work_item: Item to refresh status for
 
-        Args:
-            work_item:Platform workflow_item object
-            **kwargs: Optional arguments mainly for extensibility
+                Returns:
+                    None
+                """
+        wi = self.get(workflow_item.uid)
+        workflow_item.status = convert_comps_workitem_status(wi.state)  # convert_COMPS_status(wi.state)
 
-        Returns:
-            IDMTools workflow item
+    def send_assets(self, workflow_item: IWorkflowItem, **kwargs):
         """
-        # Creat a workflow item
-        obj = GenericWorkItem()
+                Add asset as WorkItemFile
+                Args:
+                    workflow_item: workflow item
 
-        # Set its correct attributes
-        obj.item_name = work_item.name
-        obj.uid = work_item.id
-        obj.asset_collection_id = work_item.asset_collection_id
-        obj.user_files = work_item.files
-        obj.tags = work_item.tags
-        return obj
-
-    def send_assets(self, workflow_item: IWorkflowItem):
-        """
-        Add asset as WorkItemFile
-        Args:
-            workflow_item: workflow item
-
-        Returns: None
-        """
+                Returns: None
+                """
         # for asset in workflow_item.assets:
         #     workflow_item.add_file(workitemfile=WorkItemFile(asset.filename, 'input'), data=asset.bytes)
         pass
@@ -234,6 +188,32 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         wi = self.platform.get_item(workflow_item.uid, ItemType.WORKFLOW_ITEM, raw=True)
         byte_arrs = wi.retrieve_output_files(files)
         return dict(zip(files, byte_arrs))
+
+    def to_entity(self, work_item: COMPSWorkItem, **kwargs) -> IWorkflowItem:
+        """
+        Converts the platform representation of workflow_item to idmtools representation
+
+        Args:
+            work_item:Platform workflow_item object
+            **kwargs: Optional arguments mainly for extensibility
+
+        Returns:
+            IDMTools workflow item
+                """
+        # Creat a workflow item
+        obj = GenericWorkItem()
+
+        # Set its correct attributes
+        obj.item_name = work_item.name
+        obj.platform = self.platform
+        obj.uid = work_item.id
+        obj.asset_collection_id = work_item.asset_collection_id
+        obj.user_files = work_item.files
+        obj.tags = work_item.tags
+        return obj
+
+    # def platform_run_item(self, workflow_item: IWorkflowItem, **kwargs):
+    #     raise NotImplementedError("Running workflow items is not supported")
 
     def get_related_items(self, item: IWorkflowItem, relation_type: RelationType) -> Dict[str, List[Dict[str, str]]]:
         """

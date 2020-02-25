@@ -1,25 +1,32 @@
 import os
-from abc import ABCMeta, abstractmethod
-from COMPS.Data.WorkItem import RelationType
-from dataclasses import dataclass, fields, field
+from abc import ABCMeta
+from dataclasses import dataclass
+from dataclasses import fields, field
+from functools import partial
 from itertools import groupby
-from logging import getLogger
+from logging import getLogger, DEBUG
+from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set, Iterator
 from uuid import UUID
-from idmtools.core import CacheEnabled, ItemType, UnknownItemException, EntityContainer, UnsupportedPlatformType
+
+from idmtools.core import CacheEnabled, UnknownItemException, EntityContainer, UnsupportedPlatformType
+from idmtools.core.enums import ItemType, EntityStatus
 from idmtools.core.interfaces.ientity import IEntity
-from idmtools.entities.isimulation import ISimulation
+from idmtools.core.interfaces.iitem import IItem
+from idmtools.entities.experiment import Experiment
+from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
+from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
+from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
+from idmtools.entities.iplatform_ops.iplatform_suite_operations import IPlatformSuiteOperations
+from idmtools.entities.iplatform_ops.iplatform_workflowitem_operations import IPlatformWorkflowItemOperations
+from idmtools.entities.itask import ITask
 from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools.entities.platform_requirements import PlatformRequirements
+from idmtools.entities.relation_type import RelationType
+from idmtools.entities.simulation import Simulation
 from idmtools.entities.suite import Suite
-from idmtools.entities.iexperiment import IDockerExperiment, IGPUExperiment, IExperiment
-from idmtools.entities.iplatform_metadata import IPlatformExperimentOperations, \
-    IPlatformSimulationOperations, IPlatformSuiteOperations, IPlatformWorkflowItemOperations, \
-    IPlatformAssetCollectionOperations
 from idmtools.services.platforms import PlatformPersistService
-from idmtools.core.interfaces.iitem import IItem
-from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set
-
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
+from tqdm import tqdm
 
 logger = getLogger(__name__)
 
@@ -39,8 +46,8 @@ ITEM_TYPE_TO_OBJECT_INTERFACE = {
     ItemType.ASSETCOLLECTION: '_assets'
 }
 STANDARD_TYPE_TO_INTERFACE = {
-    IExperiment: ItemType.EXPERIMENT,
-    ISimulation: ItemType.SIMULATION,
+    Experiment: ItemType.EXPERIMENT,
+    Simulation: ItemType.SIMULATION,
     IWorkflowItem: ItemType.WORKFLOW_ITEM,
     Suite: ItemType.SUITE
 }
@@ -57,7 +64,6 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     - Commissioning
     - File handling
     """
-
     platform_type_map: Dict[Type, ItemType] = field(default=None, repr=False, init=False)
     _object_cache_expiration: 'int' = field(default=60, repr=False, init=False)
 
@@ -168,7 +174,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item_type]
         return getattr(self, interface).get(item_id, **kwargs)
 
-    def get_item(self, item_id: UUID, item_type: ItemType = None,
+    def get_item(self, item_id: Union[str, UUID], item_type: ItemType = None,
                  force: bool = False, raw: bool = False, **kwargs) -> Any:
         """
         Retrieve an object from the platform.
@@ -233,7 +239,6 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         Returns:
             Children of platform object
         """
-        ent_opts = {}
         item_type, interface = self._get_operation_interface(item)
         if item_type in [ItemType.EXPERIMENT, ItemType.SUITE]:
             children = getattr(self, ITEM_TYPE_TO_OBJECT_INTERFACE[item_type]).get_children(item, **kwargs)
@@ -242,7 +247,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         if not raw:
             ret = []
             for e in children:
-                n = self._convert_platform_item_to_entity(e, **ent_opts)
+                n = self._convert_platform_item_to_entity(e, **kwargs)
                 if n._platform_object is None:
                     n._platform_object = e
                 ret.append(n)
@@ -289,8 +294,10 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             self.cache.delete(cache_key)
 
         if cache_key not in self.cache:
-            ce = self.get_item(item_id, raw=True, item_type=item_type)
-            children = self._get_children_for_platform_item(ce, raw=raw, **kwargs)
+            ce = self.get_item(item_id, raw=raw, item_type=item_type)
+            ce.platform = self
+            kwargs['parent'] = ce
+            children = self._get_children_for_platform_item(ce.get_platform_object(), raw=raw, **kwargs)
             self.cache.set(cache_key, children, expire=self._object_cache_expiration)
             return children
 
@@ -383,7 +390,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             self.cache.delete(cache_key)
         return cache_key
 
-    def create_items(self, items: List[IEntity]) -> List[UUID]:
+    def create_items(self, items: Union[List[IEntity], IEntity]) -> List[IEntity]:
         """
         Create items (simulations, experiments, or suites) on the platform. The function will batch the items based on
         type and call the self._create_batch for creation
@@ -392,65 +399,62 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         Returns:
             List of item IDs created.
         """
-        self._is_item_list_supported(items)
+        if isinstance(items, IEntity):
+            items = [items]
+        if not isinstance(items, Iterator):
+            self._is_item_list_supported(items)
 
-        ids = []
+        result = []
         for key, group in groupby(items, lambda x: x.item_type):
-            interface = ITEM_TYPE_TO_OBJECT_INTERFACE[key]
-            group_ids = getattr(self, interface).batch_create(list(group))
-            ids.extend([i[1] for i in group_ids])
-        return ids
+            result.extend(self._create_items_of_type(group, key))
+        return result
+
+    def _create_items_of_type(self, items: Iterator[IEntity], item_type: ItemType):
+        """
+        Creates items of specific type using batches
+
+        Args:
+            items: Items to create
+            item_type: Item type to create
+
+        Returns:
+
+        """
+        interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item_type]
+        ni = getattr(self, interface).batch_create(items)
+        return ni
 
     def _is_item_list_supported(self, items: List[IEntity]):
+        """
+        Checks if all items in a list are supported by the platform
+
+        Args:
+            items: Items to verify
+
+        Returns:
+            True if items supported, false otherwise
+        """
         for item in items:
             if item.item_type not in self.platform_type_map.values():
                 raise Exception(
                     f'Unable to create items of type: {item.item_type} for platform: {self.__class__.__name__}')
 
-    def run_items(self, items: List[IEntity]):
+    def run_items(self, items: Union[IEntity, List[IEntity]], **kwargs):
+        """
+        Run items on the platform.
+        Args:
+            items:
+
+        Returns:
+
+        """
+        if isinstance(items, IEntity):
+            items = [items]
         self._is_item_list_supported(items)
 
         for item in items:
             interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
-            getattr(self, interface).run_item(item)
-
-    @abstractmethod
-    def supported_experiment_types(self) -> List[Type]:
-        """
-        Returns a list of supported experiment types. These types should be either abstract or full classes that have
-        been derived from IExperiment
-
-        Returns:
-            A list of supported experiment types.
-        """
-        return [IExperiment]
-
-    @abstractmethod
-    def unsupported_experiment_types(self) -> List[Type]:
-        """
-        Returns a list of experiment types not supported by the platform. These types should be either abstract or full
-        classes that have been derived from IExperiment
-
-        Returns:
-            A list of experiment types not supported by the platform.
-        """
-        return [IDockerExperiment, IGPUExperiment]
-
-    def is_supported_experiment(self, experiment: IExperiment) -> bool:
-        """
-        Determines if an experiment is supported by the specified platform.
-
-        Args:
-            experiment: Experiment to check
-
-        Returns:
-            True is experiment is supported, otherwise, false
-        """
-        ex_types = set(self.supported_experiment_types())
-        if any([isinstance(experiment, t) for t in ex_types]):
-            unsupported_types = self.unsupported_experiment_types()
-            return not any([isinstance(experiment, t) for t in unsupported_types])
-        return False
+            getattr(self, interface).run_item(item, **kwargs)
 
     def __repr__(self):
         return f"<Platform {self.__class__.__name__} - id: {self.uid}>"
@@ -527,6 +531,77 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
         return getattr(self, interface).get_assets(item, files)
 
+    def are_requirements_met(self, requirements: Set[PlatformRequirements]) -> bool:
+        return all([x in self._platform_supports for x in requirements])
+
+    def is_task_supported(self, task: ITask) -> bool:
+        return self.are_requirements_met(task.platform_requirements)
+
+    def __wait_till_callback(self, item, callback, timeout: int = 60 * 60 * 24, refresh_interval: int = 5):
+        import time
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Refreshing simulation status")
+            self.refresh_status(item)
+            if callback(item):
+                return
+            time.sleep(refresh_interval)
+        raise TimeoutError(f"Timeout of {timeout} seconds exceeded")
+
+    def wait_till_done(self, item: Union[Experiment, IWorkflowItem], timeout: int = 60 * 60 * 24,
+                       refresh_interval: int = 5, progress=True):
+        """
+        Wait for the experiment to be done.
+
+        Args:
+            item: Experiment/Workitem to wait on
+            refresh_interval: How long to wait between polling.
+            timeout: How long to wait before failing.
+        """
+        if progress:
+            self.wait_till_done_progress(item, timeout, refresh_interval)
+        else:
+            self.__wait_till_callback(item, lambda e: e.done, timeout, refresh_interval)
+
+    def wait_till_done_progress(self, item: Union[Experiment, IWorkflowItem], timeout: int = 60 * 60 * 24,
+                                refresh_interval: int = 5):
+        def get_prog_bar(e: Union[Experiment, IWorkflowItem], prog: tqdm,
+                         done_st=None):
+            if done_st is None:
+                done_st = [EntityStatus.FAILED, EntityStatus.SUCCEEDED]
+            if prog is None:
+                return e.status in done_st if isinstance(e, IWorkflowItem) else e.done
+
+            results = dict()
+
+            done = 0
+            for sim in e.simulations:
+                if sim.status in done_st:
+                    done += 1
+            if done > prog.last_print_n:
+                prog.update(done - prog.last_print_n)
+            return e.done
+        if isinstance(item, Experiment):
+            prog = tqdm([], total=len(item.simulations), desc="Waiting on Experiment to Finish running")
+        else:
+            prog = None
+        self.__wait_till_callback(item, partial(get_prog_bar, prog=prog), timeout, refresh_interval)
+
+    def get_related_items(self, item: IWorkflowItem, relation_type: RelationType) -> Dict[str, Dict[str, str]]:
+        """
+        Retrieve all related objects
+        Args:
+            item: SSMTWorkItem
+            relation_type: Depends or Create
+
+        Returns: dict with key the object type
+        """
+        if item.item_type != ItemType.WORKFLOW_ITEM:
+            raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
+        interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
+        return getattr(self, interface).get_related_items(item, relation_type)
+
     def get_files_by_id(self, item_id: UUID, item_type: ItemType, files: Union[Set[str], List[str]],
                         output: str = None) -> \
             Union[Dict[str, Dict[str, bytearray]], Dict[str, bytearray]]:
@@ -558,29 +633,6 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         return ret
 
-    def get_related_items(self, item: IWorkflowItem, relation_type: RelationType) -> Dict[str, Dict[str, str]]:
-        """
-        Retrieve all related objects
-        Args:
-            item: SSMTWorkItem
-            relation_type: Depends or Create
-
-        Returns: dict with key the object type
-        """
-        if item.item_type != ItemType.WORKFLOW_ITEM:
-            raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
-        interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
-        return getattr(self, interface).get_related_items(item, relation_type)
-
-    def is_task_supported(self, task: 'ITask') -> bool:
-        """
-        Check is all supported or not
-        Args:
-            task: Task object
-
-        Returns: True/False
-        """
-        return all([x in self._platform_supports for x in task.platform_requirements])
 
 
 TPlatform = TypeVar("TPlatform", bound=IPlatform)

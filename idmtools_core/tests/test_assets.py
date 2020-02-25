@@ -1,11 +1,12 @@
 import json
 import os
 import unittest
-import pytest
 from functools import partial
+
+import pytest
 from idmtools.assets import Asset, AssetCollection
-from idmtools.core import FilterMode
 from idmtools.assets.errors import DuplicatedAssetError
+from idmtools.core import FilterMode
 from idmtools.utils.filters.asset_filters import asset_in_directory, file_name_is
 from idmtools_test import COMMON_INPUT_PATH
 
@@ -59,7 +60,7 @@ class TestAssets(unittest.TestCase):
 
     def test_creat_asset_no_parameters(self):
         with self.assertRaises(ValueError) as context:
-            a = Asset()
+            a = Asset()  # noqa F841
         self.assertTrue('Impossible to create the asset without either absolute path or filename and content!' in str(
             context.exception.args[0]))
 

@@ -1,12 +1,10 @@
 import copy
 from dataclasses import dataclass, field
 from logging import getLogger
-from typing import List, Optional, Type
+from typing import List, Optional
 from idmtools.core import ItemType
 from idmtools.core.system_information import get_data_directory
-from idmtools.entities import IExperiment, IPlatform
-from idmtools.entities.iexperiment import IDockerExperiment, IWindowsExperiment, IDockerGPUExperiment, \
-    IHostBinaryExperiment
+from idmtools.entities.iplatform import IPlatform
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.utils.entities import get_dataclass_common_fields
 from idmtools_platform_local.infrastructure.docker_io import DockerIO
@@ -80,12 +78,6 @@ class LocalPlatform(IPlatform):
     def cleanup(self, delete_data: bool = False, shallow_delete: bool = False, tear_down_brokers: bool = False):
         self._sm.cleanup(delete_data, tear_down_brokers=tear_down_brokers)
         self._do.cleanup(delete_data, shallow_delete=shallow_delete)
-
-    def supported_experiment_types(self) -> List[Type]:
-        return [IExperiment, IDockerExperiment, IDockerGPUExperiment]
-
-    def unsupported_experiment_types(self) -> List[Type]:
-        return [IWindowsExperiment, IHostBinaryExperiment]
 
     def post_setstate(self):
         self.__init_interfaces()

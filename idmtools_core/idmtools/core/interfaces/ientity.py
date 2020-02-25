@@ -1,11 +1,11 @@
 from abc import ABCMeta
 from dataclasses import dataclass, field
+from typing import NoReturn, List, Any, Dict, Union
+from uuid import UUID
+
 from idmtools.core import EntityStatus, ItemType, NoPlatformException
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.services.platforms import PlatformPersistService
-from idmtools.core import TTags
-from uuid import UUID
-from typing import NoReturn, List, Any
 
 
 @dataclass
@@ -18,7 +18,7 @@ class IEntity(IItem, metaclass=ABCMeta):
     parent_id: UUID = field(default=None, metadata={"md": True})
     _parent: 'IEntity' = field(default=None, compare=False, metadata={"pickle_ignore": True})
     status: EntityStatus = field(default=None, compare=False, metadata={"pickle_ignore": True})
-    tags: TTags = field(default_factory=lambda: {}, metadata={"md": True})
+    tags: Dict[str, Any] = field(default_factory=lambda: {}, metadata={"md": True})
     item_type: ItemType = field(default=None, compare=False)
     # Platform
     _platform_object: Any = field(default=None, compare=False, metadata={"pickle_ignore": True})
@@ -33,6 +33,18 @@ class IEntity(IItem, metaclass=ABCMeta):
 
     def post_creation(self) -> None:
         self.status = EntityStatus.CREATED
+
+    @classmethod
+    def from_id(cls, item_id: Union[str, UUID], platform: 'IPlatform' = None) -> 'IEntity':
+        if platform is None:
+            from idmtools.core.platform_factory import current_platform
+            if current_platform is None:
+                raise ValueError("You have to specify a platfrom to load the asset collection from")
+            platform = current_platform
+        if cls.item_type is None:
+            raise EnvironmentError("ItemType is None. This is most likely a badly derived IEntity "
+                                   "that doesn't run set the default item type on the class")
+        return platform.get_item(item_id, cls.item_type)
 
     @property
     def parent(self):
@@ -54,7 +66,7 @@ class IEntity(IItem, metaclass=ABCMeta):
             self.parent_id = self._parent = None
 
     @property
-    def platform(self):
+    def platform(self) -> 'IPlatform':
         if not self._platform and self.platform_id:
             self._platform = PlatformPersistService.retrieve(self.platform_id)
         return self._platform

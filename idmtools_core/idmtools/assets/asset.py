@@ -1,6 +1,6 @@
 import os
 from dataclasses import dataclass, field
-from typing import TypeVar, Union, List, Callable, Any
+from typing import TypeVar, Union, List, Callable, Any, Optional
 
 
 @dataclass(repr=False)
@@ -20,13 +20,13 @@ class Asset:
             Note: we add this to allow systems who provide asset caching by MD5 opportunity to avoid re-uploading assets
     """
 
-    absolute_path: 'str' = field(default=None)
-    relative_path: 'str' = field(default=None)
-    filename: 'str' = field(default=None)
-    content: 'Any' = field(default=None)
-    persisted: 'bool' = field(default=False)
-    handler: 'Callable' = field(default=str)
-    checksum: 'str' = field(default=None)
+    absolute_path: Optional[str] = field(default=None)
+    relative_path: Optional[str] = field(default=None)
+    filename: Optional[str] = field(default=None)
+    content: Optional[Any] = field(default=None)
+    persisted: bool = field(default=False)
+    handler: Callable = field(default=str)
+    checksum: Optional[str] = field(default=None)
 
     def __post_init__(self):
         if not self.absolute_path and (not self.filename and not self.content):
