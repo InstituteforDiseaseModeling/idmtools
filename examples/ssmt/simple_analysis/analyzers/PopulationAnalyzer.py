@@ -9,9 +9,7 @@ except ImportError:
     from simtools.Analysis.BaseAnalyzers.BaseAnalyzer import BaseAnalyzer
 
 import matplotlib as mpl
-
 mpl.use('Agg')
-
 
 class PopulationAnalyzer(BaseAnalyzer):
 
@@ -43,8 +41,22 @@ class PopulationAnalyzer(BaseAnalyzer):
         ax.legend([s.id for s in all_data.keys()])
         fig.savefig(os.path.join(output_dir, "population.png"))
 
-    def map(self, data: 'Any', item: 'IItem') -> 'Any':
-        return None
+    def initialize(self):
+        if not os.path.exists(os.path.join(self.working_dir, "output")):
+            os.mkdir(os.path.join(self.working_dir, "output"))
 
-    def reduce(self, all_data: dict) -> 'Any':
-        pass
+    # idmtools analyzer
+    def map(self, data: 'Any', item: 'IItem') -> 'Any':
+        return data[self.filenames[0]]["Channels"]["Statistical Population"]["Data"]
+
+    def reduce(self, all_data: dict) ->'Any':
+        output_dir = os.path.join(self.working_dir, "output")
+        with open(os.path.join(output_dir, "population.json"), "w") as fp:
+            json.dump({str(s.uid): v for s, v in all_data.items()}, fp)
+        import matplotlib.pyplot as plt
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        for pop in list(all_data.values()):
+            ax.plot(pop)
+        ax.legend([str(s.uid) for s in all_data.keys()])
+        fig.savefig(os.path.join(output_dir, "population.png"))

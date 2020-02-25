@@ -9,7 +9,7 @@ user_files = FileList(root='files')
 tags = {'test': 123}
 
 if __name__ == "__main__":
-    platform = Platform('COMPS2')
+    platform = Platform('SSMT')
     wi = SSMTWorkItem(item_name=wi_name, command=command, user_files=user_files, tags=tags)
     wim = WorkItemManager(wi, platform)
     wim.process(check_status=True)
