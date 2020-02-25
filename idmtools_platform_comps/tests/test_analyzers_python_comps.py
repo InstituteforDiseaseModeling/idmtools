@@ -104,3 +104,30 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
             for simulation in Experiment.get(exp_id[0]).get_simulations():
                 self.assertTrue(os.path.exists(os.path.join('output', str(simulation.id), "config.json")))
                 self.assertTrue(os.path.exists(os.path.join('output', str(simulation.id), "result.json")))
+
+    def test_analyzer_filter_by_tags(self):
+        # delete output from previous run
+        del_folder("output")
+
+        # create a new empty 'output' dir
+        os.mkdir("output")
+
+        # exp_list = [('69cab2fe-a252-ea11-a2bf-f0921c167862', ItemType.EXPERIMENT),
+        #             ('86df9616-a352-ea11-a2bf-f0921c167862', ItemType.EXPERIMENT)]
+        #
+        # exp_id = '69cab2fe-a252-ea11-a2bf-f0921c167862'
+        # exp = self.p.get_item(exp_id, ItemType.EXPERIMENT, raw=False)
+
+        # create python exp sweeping a, b, c params
+        self.create_experiment()
+        # then run TagsFilterAnalyzer to analyze the sims tags
+        filenames = ['output/result.json']
+        analyzers = [TagsFilterAnalyzer(filenames=filenames, output_path='output')]
+
+        # exp = self.p.get_item(self.exp_id, ItemType.EXPERIMENT, raw=False)
+        am = AnalyzeManager(platform=self.p, ids=[(self.exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
+        am.analyze()
+        # for exp_id in exp_list:
+        # for simulation in Experiment.get(self.exp_id[0]).get_simulations():
+        for simulation in Experiment.get(self.exp_id).get_simulations():
+            self.assertTrue(os.path.exists(os.path.join('output', str(simulation.id), "result.json")))

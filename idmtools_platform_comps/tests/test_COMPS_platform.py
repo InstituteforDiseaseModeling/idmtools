@@ -9,6 +9,7 @@ from idmtools.builders import ExperimentBuilder
 from idmtools.core import EntityStatus
 from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
+from idmtools.utils.filter_simulations import FilterItem
 from idmtools_platform_comps.comps_platform import COMPSPlatform
 from idmtools_test.utils.comps import assure_running_then_wait_til_done, setup_test_with_platform_and_simple_sweep
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
@@ -167,6 +168,18 @@ class TestCOMPSPlatform(ITestWithPersistence):
             self.assertEqual(em.experiment.simulations[i].tags["P"], str(i + 1))
             # self.assertDictEqual(em.experiment.simulations[i].tags, experiment.simulations[i].tags)
             self.assertEqual(em.experiment.simulations[i].status, experiment.simulations[i].status)
+
+    @pytest.mark.long
+    def test_filter_status_for_succeeded_sims(self):
+        experiment = PythonExperiment(name=self.case_name,
+                                      model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "mixed_model.py"))
+        self._run_and_test_experiment(experiment)
+        self.assertTrue(experiment.done)
+        self.assertFalse(experiment.succeeded)
+
+        # only get back the succeeded sims
+        sims = FilterItem.filter_item(self.platform, experiment, status=EntityStatus.SUCCEEDED)
+        self.assertEqual(len(sims), 2)
 
 
 if __name__ == '__main__':
