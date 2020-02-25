@@ -1,10 +1,9 @@
-try: # since cli is not required but we always try to load file, wrap in try except
+try:  # since cli is not required but we always try to load file, wrap in try except
     from typing import NoReturn
 
     from idmtools.registry.plugin_specification import get_description_impl
     from idmtools_cli.iplatform_cli import IPlatformCLI, PlatformCLISpecification, get_platform_cli_impl, \
         get_additional_commands_impl
-
 
     class CompsCLI(IPlatformCLI):
 
@@ -16,7 +15,6 @@ try: # since cli is not required but we always try to load file, wrap in try exc
 
         def get_platform_information(self) -> dict:
             pass
-
 
     class COMPSCLISpecification(PlatformCLISpecification):
 

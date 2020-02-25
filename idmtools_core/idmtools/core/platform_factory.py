@@ -1,7 +1,12 @@
+from contextlib import contextmanager
 from dataclasses import fields
+from logging import getLogger
+
 from idmtools.config import IdmConfigParser
-from idmtools.entities import IPlatform
+from idmtools.entities.iplatform import IPlatform
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
+
+logger = getLogger(__name__)
 
 
 class Platform:
@@ -111,3 +116,27 @@ class Platform:
 
         # Now create Platform using the data with the correct data types
         return platform_cls(**inputs)
+
+
+# The current platform
+current_platform_stack = []
+current_platform: IPlatform = None
+
+
+@contextmanager
+def platform(*args, **kwds):
+    global current_platform
+    logger.debug(f'Acquiring platform context with options: {str(*args)}')
+    current_platform = Platform(*args, **kwds)
+    try:
+        # check if we are already in a platform context and if so add to stack
+        if current_platform is not None:
+            current_platform_stack.append(current_platform)
+        yield current_platform
+    finally:
+        # Code to release resource, e.g.:
+        logger.debug('Un-setting current platform context')
+        del current_platform
+        # check if there is other platforms on the stack and set if so
+        if len(current_platform_stack):
+            current_platform = current_platform_stack.pop()

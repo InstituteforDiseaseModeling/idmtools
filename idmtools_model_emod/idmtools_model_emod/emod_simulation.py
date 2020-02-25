@@ -3,14 +3,14 @@ from dataclasses import dataclass, field
 from typing import Optional, Any, NoReturn
 
 from idmtools.assets import Asset
-from idmtools.entities import ISimulation
+from idmtools.entities.simulation import Simulation
 from idmtools.utils.json import load_json_file
 from idmtools_model_emod.emod_file import DemographicsFiles, MigrationFiles
 from idmtools_model_emod.interventions import EMODEmptyCampaign
 
 
 @dataclass(repr=False)
-class EMODSimulation(ISimulation):
+class EMODSimulation(Simulation):
     config: dict = field(default_factory=lambda: {})
     campaign: dict = field(default_factory=lambda: EMODEmptyCampaign.campaign())
     demographics: DemographicsFiles = field(default_factory=lambda: DemographicsFiles())

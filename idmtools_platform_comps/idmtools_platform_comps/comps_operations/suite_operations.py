@@ -1,9 +1,10 @@
 from dataclasses import dataclass, field
 from typing import Any, List, Tuple, Union, Type
 from uuid import UUID
+
 from COMPS.Data import Suite as COMPSSuite, QueryCriteria, Experiment as COMPSExperiment, WorkItem
 from idmtools.entities import Suite
-from idmtools.entities.iplatform_metadata import IPlatformSuiteOperations
+from idmtools.entities.iplatform_ops.iplatform_suite_operations import IPlatformSuiteOperations
 
 
 @dataclass
@@ -20,7 +21,7 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
         s = COMPSSuite.get(id=str(suite_id), query_criteria=QueryCriteria().select(cols).select_children(children))
         return s
 
-    def create(self, suite: Suite, **kwargs) -> Tuple[COMPSSuite, UUID]:
+    def platform_create(self, suite: Suite, **kwargs) -> Tuple[COMPSSuite, UUID]:
         self.platform._login()
 
         # Create suite
@@ -44,7 +45,7 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
         children = suite.get_experiments(query_criteria=QueryCriteria().select(cols).select_children(children))
         return children
 
-    def refresh_status(self, suite: Suite):
+    def refresh_status(self, suite: Suite, **kwargs):
         pass
 
     def to_entity(self, suite: COMPSSuite, **kwargs) -> Suite:
@@ -58,16 +59,9 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
         obj.tags = suite.tags
         obj.comps_suite = suite
 
-        # Convert all simulations
+        # Convert all experiments
         comps_exps = suite.get_experiments()
-        # from idmtools.entities.iplatform import ITEM_TYPE_TO_OBJECT_INTERFACE
-        # from idmtools.core import ItemType
-        # interface = ITEM_TYPE_TO_OBJECT_INTERFACE[ItemType.EXPERIMENT]
-        # obj.experiments = [getattr(self.platform, interface).to_entity(s) for s in comps_exps]    # Cause recursive call...
-
-        # Temp workaround
-        from idmtools.entities.experiment import Experiment
-        obj.experiments = [Experiment(_uid=e.id) for e in comps_exps]
-
-
+        obj.experiments = []
+        for exp in comps_exps:
+            obj.experiments.append(self.platform._experiments.to_entity(exp, parent=obj))
         return obj

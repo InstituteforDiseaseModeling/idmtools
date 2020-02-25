@@ -1,5 +1,8 @@
 import json
 import os
+from typing import Any
+
+from idmtools.core.interfaces.iitem import IItem
 
 try:
     # use idmtools image
@@ -42,10 +45,10 @@ class PopulationAnalyzer(BaseAnalyzer):
             os.mkdir(os.path.join(self.working_dir, "output"))
 
     # idmtools analyzer
-    def map(self, data: 'Any', item: 'IItem') -> 'Any':
+    def map(self, data: Any, item: IItem) -> Any:
         return data[self.filenames[0]]["Channels"]["Statistical Population"]["Data"]
 
-    def reduce(self, all_data: dict) -> 'Any':
+    def reduce(self, all_data: dict) -> Any:
         output_dir = os.path.join(self.working_dir, "output")
         with open(os.path.join(output_dir, "population.json"), "w") as fp:
             json.dump({str(s.uid): v for s, v in all_data.items()}, fp)

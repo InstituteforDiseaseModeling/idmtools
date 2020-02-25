@@ -1,7 +1,7 @@
 import os
 from idmtools.core import EntityStatus
 from operator import itemgetter
-from idmtools.builders import ExperimentBuilder
+from idmtools.builders import SimulationBuilder
 from idmtools.managers import ExperimentManager
 from idmtools_models.python import PythonExperiment
 from idmtools.core.platform_factory import Platform
@@ -30,7 +30,7 @@ class TestPythonSimulation(ITestWithPersistence):
             simulation.set_parameter("a", value)
             return {"a": value}
 
-        builder = ExperimentBuilder()
+        builder = SimulationBuilder()
         # Sweep parameter "a"
         builder.add_sweep_definition(param_a_update, range(0, 5))
         pe.builder = builder

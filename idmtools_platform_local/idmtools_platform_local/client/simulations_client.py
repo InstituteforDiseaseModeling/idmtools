@@ -36,12 +36,12 @@ class SimulationsClient(BaseClient):
         return result
 
     @classmethod
-    def get_one(cls, id: str, experiment_id: Optional[str] = None, status: Optional[Status] = None,
+    def get_one(cls, simulation_id: str, experiment_id: Optional[str] = None, status: Optional[Status] = None,
                 tags: Optional[List[Tuple[str, str]]] = None)\
             -> Dict[str, Any]:
         """
          Args:
-            id (str):  ID of the simulation
+            simulation_id (str):  ID of the simulation
             experiment_id (Optional[str]): ID of experiments
             status (Optional[Status]): Optional status
             tags (Optional[List[Tuple[str, str]]]): List of tags/values to filter experiment by
@@ -51,29 +51,30 @@ class SimulationsClient(BaseClient):
         """
         args = cls._get_arguments(tags)
         args.update(dict(experiment_id=experiment_id))
-        response = cls.get(f'{cls.path_url}/{id}', params=args)
-        result = cls._validate_response(response, 'Simulations', id=id)
+        response = cls.get(f'{cls.path_url}/{simulation_id}', params=args)
+        result = cls._validate_response(response, 'Simulations', id=simulation_id)
         return result
 
     @classmethod
-    def cancel(cls, id: str) -> Dict[str, Any]:
+    def cancel(cls, simulation_id: str) -> Dict[str, Any]:
         """
         Marks a simulation to be canceled. Canceled jobs are only truly canceled when the queue message is processed
-        
+
         Args:
-            id (st):
+            simulation_id (st):
 
         Returns:
 
         """
-        data = cls.get_one(id)
+        data = cls.get_one(simulation_id)
         data['status'] = 'canceled'
-        response = cls.put(f'{cls.path_url}/{id}', data=data)
+        response = cls.put(f'{cls.path_url}/{simulation_id}', data=data)
         if response.status_code != 200:
             if logger.isEnabledFor(logging.DEBUG):
-                logging.debug(f'Updating  {cls.base_url if id is None else cls.base_url + "/" + id}'
-                              f'Response Status Code: {response.status_code}. Response Content: {response.text}')
+                logging.debug(
+                    f'Updating  {cls.base_url if simulation_id is None else cls.base_url + "/" + simulation_id}'
+                    f'Response Status Code: {response.status_code}. Response Content: {response.text}')
             raise RuntimeError(f'Could not fetch simulations from IDMs Local '
-                               f'URL {cls.base_url if id is None else cls.base_url + "/" + id}')
+                               f'URL {cls.base_url if simulation_id is None else cls.base_url + "/" + simulation_id}')
         result = response.json()
         return result

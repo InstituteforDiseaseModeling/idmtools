@@ -1,7 +1,7 @@
 import typing
 
 if typing.TYPE_CHECKING:
-    from idmtools.core import IEntity
+    from idmtools.core.interfaces.ientity import IEntity
     from typing import List
 
 
@@ -21,3 +21,4 @@ class EntityContainer(list):
                 return
 
         raise Exception(f"Item with id {item_id} not found in the container")
+

@@ -3,10 +3,10 @@ import os
 import time
 import unittest.mock
 from importlib import reload
-import docker
-import pytest
 from operator import itemgetter
 
+import docker
+import pytest
 from sqlalchemy.exc import OperationalError
 
 from idmtools_platform_local.internals.workers.database import reset_db

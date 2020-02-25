@@ -1,16 +1,23 @@
 import os
-import pytest
-from idmtools.core import EntityStatus, ItemType
+from functools import partial
 from operator import itemgetter
+
+import pytest
+
 from idmtools.assets import AssetCollection
-from idmtools.builders import ExperimentBuilder
-from idmtools.managers import ExperimentManager
-from idmtools_models.python import PythonExperiment
+from idmtools.builders import SimulationBuilder
+from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
+from idmtools.entities.experiment import Experiment
+from idmtools.entities.templated_simulation import TemplatedSimulations
+from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+from idmtools_test.utils.common_experiments import wait_on_experiment_and_check_all_sim_status
 from idmtools_test.utils.confg_local_runner_test import get_test_local_env_overrides
 from idmtools_test.utils.decorators import restart_local_platform
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+
+param_a = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
 
 
 @pytest.mark.docker
@@ -26,34 +33,24 @@ class TestPythonSimulation(ITestWithPersistence):
     def test_direct_sweep_one_parameter_local(self):
         platform = Platform('Local')
         name = self.case_name
-        pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
+        basetask = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
 
-        pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
-
-        def param_a_update(simulation, value):
-            simulation.set_parameter("a", value)
-            return {"a": value}
-
-        builder = ExperimentBuilder()
+        builder = SimulationBuilder()
         # Sweep parameter "a"
-        builder.add_sweep_definition(param_a_update, range(0, 5))
-        pe.builder = builder
+        builder.add_sweep_definition(param_a, range(0, 5))
+        e = Experiment.from_template(template=TemplatedSimulations(base_task=basetask, builders={builder}), name=name)
 
-        em = ExperimentManager(experiment=pe, platform=platform)
-        em.run()
-        em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
+        wait_on_experiment_and_check_all_sim_status(self, e, platform)
+
         # validation
-        self.assertEqual(pe.name, name)
-        self.assertEqual(pe.simulation_count, 5)
-        self.assertIsNotNone(pe.uid)
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
-        self.assertTrue(pe.succeeded)
+        self.assertEqual(e.name, name)
+        self.assertEqual(e.simulation_count, 5)
+        self.assertIsNotNone(e.uid)
 
         # validate tags
         tags = []
-        for simulation in pe.simulations:
-            self.assertEqual(simulation.experiment.uid, pe.uid)
+        for simulation in e.simulations:
+            self.assertEqual(simulation.experiment.uid, e.uid)
             tags.append(simulation.tags)
         expected_tags = [{'a': 0}, {'a': 1}, {'a': 2}, {'a': 3}, {'a': 4}]
         sorted_tags = sorted(tags, key=itemgetter('a'))
@@ -72,32 +69,21 @@ class TestPythonSimulation(ITestWithPersistence):
         ac.add_directory(assets_directory=assets_path, relative_path="MyExternalLibrary")
         # assets_path = os.path.join(COMMON_INPUT_PATH, "python", "Assets")
         # ac.add_directory(assets_directory=assets_path)
-        pe = PythonExperiment(name=self.case_name, model_path=model_path, assets=ac)
-        pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
-        pe.base_simulation.envelope = "parameters"
-
-        pe.base_simulation.set_parameter("b", 10)
-        pe.base_simulation.envelope = "parameters"
-
-        def param_a_update(simulation, value):
-            simulation.set_parameter("a", value)
-            return {"a": value}
-
-        builder = ExperimentBuilder()
+        builder = SimulationBuilder()
         # Sweep parameter "a"
-        builder.add_sweep_definition(param_a_update, range(0, 2))
-        pe.builder = builder
-        em = ExperimentManager(experiment=pe, platform=platform)
-        em.run()
-        em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
+        builder.add_sweep_definition(param_a, range(0, 2))
+        task = JSONConfiguredPythonTask(script_path=model_path, envelope="parameters", parameters=dict(b=10))
+        pe = Experiment.from_template(template=TemplatedSimulations(base_task=task, builders={builder}),
+                                      name=self.case_name, assets=ac)
+        pe.tags = {"string_tag": "test", "number_tag": 123}
+
+        wait_on_experiment_and_check_all_sim_status(self, pe, platform)
 
         with self.subTest('test_retrieve_experiment_restore_sims'):
             # test we can fetch the experiment as well
             oe = platform.get_item(pe.uid, ItemType.EXPERIMENT)
             oe.refresh_simulations()
             self.assertEqual(pe.uid, oe.uid)
-            self.assertEqual(pe.simulation_type, oe.simulation_type)
             self.assertEqual(len(pe.simulations), len(oe.simulations))
             sim_ids_pe = set([s.uid for s in pe.simulations])
             sim_ids_oe = set([s.uid for s in oe.simulations])

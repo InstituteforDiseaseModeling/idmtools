@@ -3,16 +3,16 @@ import sys
 import time
 from logging import getLogger, DEBUG
 from multiprocessing.pool import Pool
-from typing import NoReturn, List
+from typing import NoReturn, List, Dict
+from uuid import UUID
 
 from idmtools.analysis.map_worker_entry import map_item
 from idmtools.core import CacheEnabled
-from idmtools.entities import IPlatform
+from idmtools.core.interfaces.ientity import IEntity
+from idmtools.entities.ianalyzer import TAnalyzer
+from idmtools.entities.iplatform import IPlatform
 from idmtools.utils.command_line import animation
 from idmtools.utils.language import on_off, verbose_timedelta
-
-from idmtools.entities.ianalyzer import TAnalyzer
-from idmtools.core.interfaces.ientity import IEntity
 
 logger = getLogger(__name__)
 
@@ -53,6 +53,7 @@ class AnalyzeManager(CacheEnabled):
         self.configuration = configuration or {}
         self.platform = platform
         self.max_processes = self.configuration.get('max_threads', os.cpu_count())
+        logger.debug(f'AnalyzeManager set to {self.max_processes}')
 
         # analyze at most this many items, regardless of how many have been given
         self.max_items_to_analyze = max_items
@@ -68,10 +69,15 @@ class AnalyzeManager(CacheEnabled):
         # Take the provided ids and determine the full set of unique root items (e.g. simulations) in them to analyze
         logger.debug("Load information about items from platform")
         ids = list(set(ids or list()))  # uniquify
-        items = [platform.get_item(oid, otype, force=True) for oid, otype in ids]
+        items: List[IEntity] = []
+        for oid, otype in ids:
+            logger.debug(f'Getting metadata for {oid} and {otype}')
+            result = platform.get_item(oid, otype, force=True)
+            items.append(result)
         self.potential_items: List[IEntity] = []
 
         for i in items:
+            logger.debug(f'Flattening items for {i.uid}')
             self.potential_items.extend(platform.flatten_item(item=i))
         logger.debug(f"Potential items to analyze: {len(self.potential_items)}")
         self._items = dict()  # filled in later by _get_items_to_analyze
@@ -92,7 +98,7 @@ class AnalyzeManager(CacheEnabled):
 
         self.potential_items.extend(self.platform.flatten_item(item=item))
 
-    def _get_items_to_analyze(self) -> dict:
+    def _get_items_to_analyze(self) -> Dict[UUID, IEntity]:
         """
         Get a list of items derived from :meth:`self._items` that are available to analyze.
 
@@ -147,6 +153,7 @@ class AnalyzeManager(CacheEnabled):
         if len(unique_uids) < len(self.analyzers):
             for i in range(len(self.analyzers)):
                 self.analyzers[i].uid += f'-{i}'
+                logger.debug(f'Analyzer {i.__class__} id set to {self.analyzers[i].uid}')
 
     def _initialize_analyzers(self) -> NoReturn:
         """
@@ -316,7 +323,7 @@ class AnalyzeManager(CacheEnabled):
             print('No items were provided; cannot run analysis.')
             return False
         # trim processing to those items that are ready and match requested limits
-        self._items = self._get_items_to_analyze()
+        self._items: Dict[UUID, IEntity] = self._get_items_to_analyze()
 
         if len(self._items) == 0:
             print('No items are ready; cannot run analysis.')
@@ -325,6 +332,8 @@ class AnalyzeManager(CacheEnabled):
         # initialize mapping results cache/storage
         n_items = len(self._items)
         n_processes = min(self.max_processes, max(n_items, 1))
+
+        logger.info(f'Analyzing {n_items}')
 
         # Initialize the cache
         logger.debug("Initializing Analysis Cache")

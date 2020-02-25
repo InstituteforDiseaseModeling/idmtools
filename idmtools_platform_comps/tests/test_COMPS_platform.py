@@ -3,16 +3,17 @@ import json
 import os
 import unittest
 from os import path
+
 import pytest
-from idmtools.core.platform_factory import Platform
-from idmtools.builders import ExperimentBuilder
+from idmtools.builders import SimulationBuilder
 from idmtools.core import EntityStatus
-from idmtools.managers import ExperimentManager
-from idmtools_models.python import PythonExperiment
+from idmtools.entities.experiment import Experiment
+from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_platform_comps.comps_platform import COMPSPlatform
+from idmtools_test import COMMON_INPUT_PATH
+from idmtools_test.utils.common_experiments import wait_on_experiment_and_check_all_sim_status
 from idmtools_test.utils.comps import assure_running_then_wait_til_done, setup_test_with_platform_and_simple_sweep
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-from idmtools_test import COMMON_INPUT_PATH
 
 current_directory = path.dirname(path.realpath(__file__))
 
@@ -29,12 +30,8 @@ class TestCOMPSPlatform(ITestWithPersistence):
     @pytest.mark.long
     def test_output_files_retrieval(self):
         config = {"a": 1, "b": 2}
-        experiment = PythonExperiment(name=self.case_name,
-                                      model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"))
-        experiment.base_simulation.parameters = config
-        em = ExperimentManager(experiment, platform=self.platform)
-        em.run()
-        em.wait_till_done()
+        experiment = self.get_working_model_experiment(config)
+        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)
 
         from idmtools.utils.entities import retrieve_experiment
         experiment = retrieve_experiment(experiment.uid, platform=self.platform, with_simulations=True)
@@ -67,6 +64,14 @@ class TestCOMPSPlatform(ITestWithPersistence):
         files_needed = ["Assets/bad.py", "bad.json"]
         with self.assertRaises(RuntimeError):
             self.platform.get_files(item=experiment.simulations[0], files=files_needed)
+
+    def get_working_model_experiment(self, config=None, script="working_model.py") -> Experiment:
+        if config is None:
+            config = dict()
+        model_path = os.path.join(COMMON_INPUT_PATH, "compsplatform", script)
+        task = JSONConfiguredPythonTask(script_path=model_path, parameters=config)
+        experiment = Experiment.from_task(task, name=self.case_name)
+        return experiment
 
     def _run_and_test_experiment(self, experiment):
         experiment.platform = self.platform
@@ -101,40 +106,40 @@ class TestCOMPSPlatform(ITestWithPersistence):
 
     @pytest.mark.long
     def test_status_retrieval_succeeded(self):
-        experiment = PythonExperiment(name=self.case_name,
-                                      model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"))
-        self._run_and_test_experiment(experiment)
-        print([s.status for s in experiment.simulations])
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in experiment.simulations]))
+        experiment = self.get_working_model_experiment()
+        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)
 
     @pytest.mark.long
     def test_status_retrieval_failed(self):
-        experiment = PythonExperiment(name=self.case_name,
-                                      model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "failing_model.py"))
-        self._run_and_test_experiment(experiment)
-        self.assertTrue(all([s.status == EntityStatus.FAILED for s in experiment.simulations]))
-        self.assertFalse(experiment.succeeded)
+        experiment = self.get_working_model_experiment(script='failing_model.py')
+        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform,
+                                                    expected_status=EntityStatus.FAILED)
 
     @pytest.mark.long
     def test_status_retrieval_mixed(self):
-        experiment = PythonExperiment(name=self.case_name,
-                                      model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "mixed_model.py"))
-        self._run_and_test_experiment(experiment)
+        model_path = os.path.join(COMMON_INPUT_PATH, "compsplatform", 'mixed_model.py')
+        task = JSONConfiguredPythonTask(script_path=model_path)
+        builder = SimulationBuilder()
+        builder.add_sweep_definition(JSONConfiguredPythonTask.set_parameter_partial('P'), range(3))
+        experiment = Experiment.from_builder(builder, task, name='Mixed Model')
+        self.platform.run_items(experiment)
+        self.platform.wait_till_done(experiment)
         self.assertTrue(experiment.done)
         self.assertFalse(experiment.succeeded)
 
         if len(experiment.simulations) == 0:
             raise Exception('NO CHILDREN')
 
+        self.assertEqual(len(experiment.simulations), 3)
         for s in experiment.simulations:
             self.assertTrue((s.tags["P"] == 2 and s.status == EntityStatus.FAILED) or  # noqa: W504
                             (s.status == EntityStatus.SUCCEEDED))
 
     @pytest.mark.long
     def test_from_experiment(self):
-        experiment = PythonExperiment(name=self.case_name,
-                                      model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"))
-        self._run_and_test_experiment(experiment)
+        experiment = self.get_working_model_experiment()
+        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)
+
         experiment2 = copy.deepcopy(experiment)
         experiment2.platform = self.platform
 
@@ -146,27 +151,6 @@ class TestCOMPSPlatform(ITestWithPersistence):
         self.assertEqual(len(experiment.simulations), len(experiment2.simulations))
         self.assertTrue(experiment2.done)
         self.assertTrue(experiment2.succeeded)
-
-    @pytest.mark.long
-    def test_experiment_manager(self):
-        experiment = PythonExperiment(name=self.case_name,
-                                      model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"))
-        experiment.platform = self.platform
-        self._run_and_test_experiment(experiment)
-        em = ExperimentManager.from_experiment_id(experiment.uid, self.platform)
-
-        # Verify new ExperimentManager contains correct info
-        # For experiment in newly created em, it only restore same experiment id ro pythonexperiment
-        # For simulations in newly created em, simulation id/tags/status should be retrieved to pythonsimulation
-        self.assertEqual(em.experiment.base_simulation, experiment.base_simulation)
-        self.assertEqual(em.experiment.uid, experiment.uid)
-        self.assertEqual(em.experiment.tags, experiment.tags)
-        self.assertEqual(em.platform, self.platform)
-        for i in range(len(em.experiment.simulations)):
-            self.assertEqual(em.experiment.simulations[i].uid, experiment.simulations[i].uid)
-            self.assertEqual(em.experiment.simulations[i].tags["P"], str(i + 1))
-            # self.assertDictEqual(em.experiment.simulations[i].tags, experiment.simulations[i].tags)
-            self.assertEqual(em.experiment.simulations[i].status, experiment.simulations[i].status)
 
 
 if __name__ == '__main__':

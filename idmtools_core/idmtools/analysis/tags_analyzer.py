@@ -28,6 +28,5 @@ class TagsAnalyzer(IAnalyzer):
 
     # In reduce, we are printing the simulation and result data filtered in map
     def reduce(self, all_data):
-        exp_id = str(next(iter(all_data.keys())).experiment.uid)  # Set the exp id from the first sim data
         results = pd.concat(list(all_data.values()), axis=0)  # Combine a list of all the sims tag values
         results.to_csv(os.path.join("output_tag", 'tags.csv'))  # Write the sim tags to a csv

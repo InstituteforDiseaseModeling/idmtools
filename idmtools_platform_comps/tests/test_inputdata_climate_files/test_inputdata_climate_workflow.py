@@ -7,16 +7,15 @@ import json
 import unittest
 import pytest
 import xmlrunner
-
-from idmtools.managers.work_item_manager import WorkItemManager
 from idmtools.core.platform_factory import Platform
-from idmtools.ssmt.idm_work_item import InputDataWorkItem
+from idmtools_platform_comps.ssmt_work_items.comps_workitems import InputDataWorkItem
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 # Set up the paths
 current_dir = os.path.dirname(os.path.realpath(__file__))
 output_path = os.path.join(current_dir, 'output')
 intermediate_dir = os.path.join(current_dir, 'inputs')
+
 
 class InputDataWorkItemTests(ITestWithPersistence):
 
@@ -25,10 +24,10 @@ class InputDataWorkItemTests(ITestWithPersistence):
         self.tags = {'idmtools': self._testMethodName, 'WorkItem type': 'InputData'}
         self.p = Platform('COMPS2')
 
-    #------------------------------------------
+    # ------------------------------------------
     # test generate inputdata climate files with comps work item
     # create a wo.json from demo file first
-    #------------------------------------------
+    # ------------------------------------------
     @pytest.mark.comps
     @pytest.mark.long
     def test_generate_inputdata_climate_files_from_demo_file(self):
@@ -36,7 +35,8 @@ class InputDataWorkItemTests(ITestWithPersistence):
 
         # do not use 'upload' for Mode. it won't generate demographic workitem
         data = {"Project": 'IDM-Madagascar', "ProjectRoot": "v2017", "Region": "",
-                "IncludeNonPop": True, "Resolution": "150", "Parameters": ["tmean", "humid", "rain"], "StartYear": '2008',
+                "IncludeNonPop": True, "Resolution": "150", "Parameters": ["tmean", "humid", "rain"],
+                "StartYear": '2008',
                 "NumYears": '1', "NaNCheck": True, "Migration": True, "Mode": 'discrete'}
 
         with open(climate_demog) as demo_file:
@@ -63,8 +63,7 @@ class InputDataWorkItemTests(ITestWithPersistence):
 
         inputdata_wi = InputDataWorkItem(item_name=self.case_name, tags=self.tags)
         inputdata_wi.load_work_order(work_order_path)
-        wim = WorkItemManager(inputdata_wi, self.p)
-        wim.process(check_status=True)
+        inputdata_wi.run(True, platform=self.p)
         self.assertIsNotNone(inputdata_wi)
 
     def getEntityIds(self, demo):
@@ -74,10 +73,10 @@ class InputDataWorkItemTests(ITestWithPersistence):
             node_list.append(node['NodeID'])
         return node_list
 
-    #------------------------------------------
+    # ------------------------------------------
     # test generate inputdata climate files with comps work item
     # use an existing wo.json to generate the climate files
-    #------------------------------------------
+    # ------------------------------------------
     @pytest.mark.comps
     @pytest.mark.long
     def test_generate_inputdata_climate_files_from_wo(self):
@@ -85,8 +84,7 @@ class InputDataWorkItemTests(ITestWithPersistence):
 
         inputdata_wi = InputDataWorkItem(item_name=self.case_name)
         inputdata_wi.load_work_order(work_order_path)
-        wim = WorkItemManager(inputdata_wi, self.p)
-        wim.process(check_status=True)
+        inputdata_wi.run(True, platform=self.p)
         self.assertIsNotNone(inputdata_wi)
 
 

@@ -23,41 +23,50 @@ import os
 import sys
 from functools import partial
 
-from idmtools.builders import SweepArm, ArmType, ArmExperimentBuilder
-from idmtools.core.platform_factory import Platform
-from idmtools.managers import ExperimentManager
-from idmtools_models.python import PythonExperiment
+from idmtools.builders import SweepArm, ArmType, ArmSimulationBuilder
+from idmtools.core.platform_factory import platform
+from idmtools.entities.experiment import Experiment
+from idmtools.entities.templated_simulation import TemplatedSimulations
+from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
 
-
-def param_update(simulation, param, value):
-    return simulation.set_parameter(param, value)
-
-
-setA = partial(param_update, param="a")
-setB = partial(param_update, param="b")
-setC = partial(param_update, param="c")
+# define specific callbacks for a, b, and c
+setA = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
+setB = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="b")
+setC = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="c")
 
 
 if __name__ == "__main__":
-    platform = Platform('COMPS2')
-    pe = PythonExperiment(name=os.path.split(sys.argv[0])[1],
-                          model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
-    pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123, "KeyOnly": None}
+    with platform('COMPS2'):
+        base_task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
+        # define that we are going to create multiple simulations from this task
+        ts = TemplatedSimulations(base_task=base_task)
 
-    arm1 = SweepArm(type=ArmType.cross)
-    builder = ArmExperimentBuilder()
-    arm1.add_sweep_definition(setA, 1)
-    arm1.add_sweep_definition(setB, [2, 3])
-    arm1.add_sweep_definition(setC, [4, 5])
-    builder.add_arm(arm1)
+        # define our first sweep Sweep Arm
+        arm1 = SweepArm(type=ArmType.cross)
+        builder = ArmSimulationBuilder()
+        arm1.add_sweep_definition(setA, 1)
+        arm1.add_sweep_definition(setB, [2, 3])
+        arm1.add_sweep_definition(setC, [4, 5])
+        builder.add_arm(arm1)
 
-    # adding more simulations with sweeping
-    arm2 = SweepArm(type=ArmType.cross)
-    arm2.add_sweep_definition(setA, [6, 7])
-    arm2.add_sweep_definition(setB, [2])
-    builder.add_arm(arm2)
-    pe.builder = builder
-    em = ExperimentManager(experiment=pe, platform=platform)
-    em.run()
-    em.wait_till_done()
+        # adding more simulations with sweeping
+        arm2 = SweepArm(type=ArmType.cross)
+        arm2.add_sweep_definition(setA, [6, 7])
+        arm2.add_sweep_definition(setB, [2])
+        builder.add_arm(arm2)
+
+        # add our builders to our template
+        ts.add_builder(builder)
+
+        # create experiment from the template
+        experiment = Experiment.from_template(ts, name=os.path.split(sys.argv[0])[1],
+                                              tags={"string_tag": "test", "number_tag": 123, "KeyOnly": None})
+        # run the experiment
+        experiment.run()
+        # in most real scenarios, you probably do not want to wait as this will wait until all simulations
+        # associated with an experiment are done. We do it in our examples to show feature and to enable
+        # testing of the scripts
+        experiment.wait()
+        # use system status as the exit code
+        sys.exit(0 if experiment.succeeded else -1)

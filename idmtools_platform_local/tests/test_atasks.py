@@ -37,7 +37,7 @@ class TestTasks(TestCase):
 
     def setUp(self) -> None:
         from idmtools_platform_local.internals.tasks.create_experiment import CreateExperimentTask
-        self.experiment_id = CreateExperimentTask.perform(dict(a='b', c='d'), "s")
+        self.experiment_id = CreateExperimentTask.perform(dict(a='b', c='d'))
         print(os.environ["DATA_PATH"])
 
     def test_create_experiment(self, mock_db):

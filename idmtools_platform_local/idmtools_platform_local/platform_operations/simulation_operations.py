@@ -2,12 +2,18 @@ import os
 from collections import defaultdict
 from dataclasses import dataclass
 from logging import getLogger, DEBUG
-from typing import Dict, Any, Tuple, List, Set, Union
+from typing import Dict, List, Set, Union
 from uuid import UUID
+
 from docker.models.containers import Container
+from tqdm import tqdm
+
 from idmtools.core import ItemType
-from idmtools.entities import ISimulation
-from idmtools.entities.iplatform_metadata import IPlatformSimulationOperations
+from idmtools.entities.experiment import Experiment
+from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
+from idmtools.entities.simulation import Simulation
+from idmtools.entities.task_proxy import TaskProxy
+from idmtools.utils.collections import ParentIterator
 from idmtools_platform_local.client.simulations_client import SimulationsClient
 from idmtools_platform_local.platform_operations.uitils import local_status_to_common, SimulationDict, ExperimentDict
 
@@ -31,7 +37,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         return SimulationDict(SimulationsClient.get_one(str(simulation_id)))
 
-    def create(self, simulation: ISimulation, **kwargs) -> Tuple[Any, UUID]:
+    def platform_create(self, simulation: Simulation, **kwargs) -> Dict:
         """
         Create a simulation object
 
@@ -45,14 +51,22 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         from idmtools_platform_local.internals.tasks.create_simulation import CreateSimulationTask
 
         m = CreateSimulationTask.send(simulation.experiment.uid, simulation.tags)
-        id = m.get_result(block=True, timeout=self.platform.default_timeout * 1000)
-        s_dict = dict(simulation_uid=id, experiment_id=simulation.experiment.uid, status='CREATED',
-                      tags=simulation.tags)
-        simulation.uid = id
+        if logger.isEnabledFor(DEBUG):
+            logger.debug('Creating Simulation ID and directories')
+        sim_id = m.get_result(block=True, timeout=self.platform.default_timeout * 1000)
+        if logger.isEnabledFor(DEBUG):
+            logger.debug('Simulation ID created')
+        s_dict = dict(
+            simulation_uid=sim_id,
+            experiment_id=simulation.experiment.uid,
+            status='CREATED',
+            tags=simulation.tags
+        )
+        simulation.uid = sim_id
         self.send_assets(simulation)
-        return s_dict, id
+        return s_dict
 
-    def batch_create(self, sims: List[ISimulation], **kwargs) -> List[Tuple[Any, UUID]]:
+    def batch_create(self, sims: List[Simulation], **kwargs) -> List[SimulationDict]:
         """
         Batch creation of simulations.
 
@@ -68,20 +82,33 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         from idmtools_platform_local.internals.tasks.create_simulation import CreateSimulationsTask
         worker = self.platform._sm.get('workers')
 
-        m = CreateSimulationsTask.send(sims[0].experiment.uid, [s.tags for s in sims])
+        if isinstance(sims, ParentIterator):
+            parent_uid = sims.parent.uid
+        else:
+            parent_uid = sims[0].parent.uid
+
+        # first create the sim ids
+        m = CreateSimulationsTask.send(parent_uid, [s.tags for s in sims if s.status is None])
         ids = m.get_result(block=True, timeout=self.platform.default_timeout * 1000)
 
         items = dict()
+        final_sims = []
+        # loop over array instead of parent iterator
+        if isinstance(sims, ParentIterator) and isinstance(sims.items, list):
+            sims = sims.items
         # update our uids and then build a list of files to copy
-        for i, simulation in enumerate(sims):
+        for i, simulation in tqdm(enumerate(sims), total=len(sims), desc="Finding Simulations Assets"):
             simulation.uid = ids[i]
-            path = "/".join(["/data", simulation.experiment.uid, simulation.uid])
+            final_sims.append(simulation)
+            path = "/".join(["/data", parent_uid, simulation.uid])
+            simulation.pre_creation()
             items.update(self._assets_to_copy_multiple_list(path, simulation.assets))
+            simulation.post_creation()
+        # copy files to container
         result = self.platform._do.copy_multiple_to_container(worker, items)
         if not result:
             raise IOError("Coping of data for simulations failed.")
-        ids = [(SimulationDict(dict(simulation_uid=id, experiment_id=sims[0].experiment.uid)), id) for id in ids]
-        return ids
+        return final_sims
 
     def get_parent(self, simulation: SimulationDict, **kwargs) -> ExperimentDict:
         """
@@ -96,7 +123,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         return self.platform.get_item(simulation['experiment_id'], ItemType.EXPERIMENT, raw=True)
 
-    def run_item(self, simulation: ISimulation):
+    def platform_run_item(self, simulation: Simulation, **kwargs):
         """
         On the local platform, simulations are ran by queue and commissioned through create
         Args:
@@ -107,7 +134,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         pass
 
-    def send_assets(self, simulation: ISimulation, worker: Container = None):
+    def send_assets(self, simulation: Simulation, worker: Container = None, **kwargs):
         """
         Transfer assets to local sim folder for simulation
 
@@ -126,7 +153,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         items = self._assets_to_copy_multiple_list(path, simulation.assets)
         self.platform._do.copy_multiple_to_container(worker, items)
 
-    def refresh_status(self, simulation: ISimulation):
+    def refresh_status(self, simulation: Simulation, **kwargs):
         """
         Refresh status of a sim
 
@@ -139,7 +166,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         latest = self.get(simulation.uid)
         simulation.status = local_status_to_common(latest['status'])
 
-    def get_assets(self, simulation: ISimulation, files: List[str], **kwargs) -> Dict[str, bytearray]:
+    def get_assets(self, simulation: Simulation, files: List[str], **kwargs) -> Dict[str, bytearray]:
         """
         Get assets for a specific simulation
 
@@ -172,7 +199,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
 
         return ret
 
-    def list_assets(self, simulation: ISimulation) -> List[str]:
+    def list_assets(self, simulation: Simulation, **kwargs) -> List[str]:
         """
         List assets for a sim
 
@@ -184,19 +211,23 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         raise NotImplementedError("List assets is not yet supported on the LocalPlatform")
 
-    def to_entity(self, simulation: Dict, **kwargs) -> ISimulation:
+    def to_entity(self, simulation: Dict, parent: Experiment = None, **kwargs) -> Simulation:
         """
         Convert a sim dict object to an ISimulation
 
         Args:
             simulation: simulation to convert
+            parent: optional experiment object
             **kwargs:
 
         Returns:
             ISimulation object
         """
-        experiment = self.platform.get_item(simulation["experiment_id"], ItemType.EXPERIMENT)
-        isim = experiment.simulation()
+        if parent is None:
+            parent = self.platform.get_item(simulation["experiment_id"], ItemType.EXPERIMENT)
+        isim = Simulation(task=TaskProxy())
+        isim.experiment = parent
+        isim.parent_id = simulation["experiment_id"]
         isim.uid = simulation['simulation_uid']
         isim.tags = simulation['tags']
         isim.status = local_status_to_common(simulation['status'])

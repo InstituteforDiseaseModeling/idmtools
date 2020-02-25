@@ -1,8 +1,9 @@
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
+from typing import NoReturn
+
+from idmtools.assets import TAsset, TAssetList
 from idmtools.assets.asset_collection import AssetCollection
-from typing import NoReturn, Union
-from idmtools.assets import TAssetCollection, TAsset, TAssetList
 
 
 @dataclass

@@ -1,6 +1,9 @@
 import unittest
+
 from idmtools.core.interfaces.ientity import IEntity
+from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+from idmtools_test.utils.test_task import TestTask
 
 
 class TestDictionary(ITestWithPersistence):
@@ -34,41 +37,39 @@ class TestDictionary(ITestWithPersistence):
         self.assertEqual(a, c)
 
     def test_simulation_tags(self):
-        from idmtools_model_emod import EMODExperiment
+        ts = TemplatedSimulations.from_task(TestTask())
 
-        e = EMODExperiment()
-        sim1 = e.simulation()
-        sim2 = e.simulation()
+        sim1 = ts.new_simulation()
+        sim2 = ts.new_simulation()
 
         sim1.tags = {"a": 1, "b": 2}
         sim2.tags = {"b": 2, "a": 1}
         self.assertEqual(sim1, sim2)
 
-        sim3 = e.simulation()
+        sim3 = ts.new_simulation()
         sim3.tags = {"a": 2, "b": 2}
         self.assertNotEqual(sim1, sim3)
 
-        sim4 = e.simulation()
+        sim4 = ts.new_simulation()
         sim4.tags = {"a": 1, "b": 2, "c": 3}
         self.assertNotEqual(sim1, sim4)
 
-        sim5 = e.simulation()
+        sim5 = ts.new_simulation()
         sim5.tags = {"a": 1, "c": 3, "b": 2}
         self.assertEqual(sim4, sim5)
 
-        sim6 = e.simulation()
-        sim7 = e.simulation()
+        sim6 = ts.new_simulation()
+        sim7 = ts.new_simulation()
 
         sim6.tags = {"a": 1, "b": [2]}
         sim7.tags = {"b": [2], "a": 1}
         self.assertEqual(sim6, sim7)
 
     def test_simulation_tags_complex(self):
-        from idmtools_model_emod import EMODExperiment
+        ts = TemplatedSimulations.from_task(TestTask())
 
-        e = EMODExperiment()
-        sim6 = e.simulation()
-        sim7 = e.simulation()
+        sim6 = ts.new_simulation()
+        sim7 = ts.new_simulation()
 
         sim6.tags = {"a": 1, "b": {"e": 3, "f": 4}}
         sim7.tags = {"b": {"f": 4, "e": 3}, "a": 1}
@@ -96,8 +97,8 @@ class TestDictionary(ITestWithPersistence):
             "b": [1, 7]
         }
 
-        sim8 = e.simulation()
-        sim9 = e.simulation()
+        sim8 = ts.new_simulation()
+        sim9 = ts.new_simulation()
 
         sim8.tags = d1
         sim9.tags = d2

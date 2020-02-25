@@ -49,9 +49,7 @@ setup(
     include_package_data=True,
     keywords='modeling, IDM',
     name='idmtools_model_emod',
-    entry_points=dict(idmtools_model=  # noqa: E251
-                      ["idmtools_model_emod = idmtools_model_emod.emod_experiment_spec:EMODExperimentSpec"]
-                      ),
+    entry_points=dict(),
     packages=find_packages(),
     setup_requires=setup_requirements,
     test_suite='tests',

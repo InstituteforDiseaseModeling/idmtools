@@ -1,15 +1,13 @@
 import typing
-from dataclasses import dataclass, field, fields, _MISSING_TYPE
+from dataclasses import dataclass, field, fields
+from uuid import UUID
 
-from idmtools.utils.hashing import hash_obj
-
-if typing.TYPE_CHECKING:
-    from uuid import UUID
+from idmtools.utils.hashing import hash_obj, ignore_fields_in_dataclass_on_pickle
 
 
 @dataclass(repr=False)
 class IItem:
-    _uid: 'UUID' = field(default=None, metadata={"md": True})
+    _uid: UUID = field(default=None, metadata={"md": True})
 
     @property
     def uid(self):
@@ -68,27 +66,7 @@ class IItem:
         """
         Ignore the fields in pickle_ignore_fields during pickling.
         """
-        state = self.__dict__.copy()
-        attrs = set(vars(self).keys())
-
-        # Retrieve fields default values
-        fds = fields(self)
-        field_default = {f.name: f.default for f in fds}
-
-        # Update default with parent's pre-populated values
-        pre_state = self.pre_getstate()
-        pre_state = pre_state or {}
-        field_default.update(pre_state)
-
-        # Don't pickle ignore_pickle fields: set values to default
-        for field_name in attrs.intersection(self.pickle_ignore_fields):
-            if field_name in state:
-                if isinstance(field_default[field_name], _MISSING_TYPE):
-                    state[field_name] = None
-                else:
-                    state[field_name] = field_default[field_name]
-
-        return state
+        return ignore_fields_in_dataclass_on_pickle(self)
 
     def __setstate__(self, state):
         """

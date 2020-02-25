@@ -1,15 +1,17 @@
-import os
 import copy
+import os
 import typing
+from dataclasses import dataclass, field
 from typing import List, NoReturn, TypeVar, Union
+
 from idmtools.assets import Asset, TAssetList
+from idmtools.assets import TAssetFilterList
 from idmtools.assets.errors import DuplicatedAssetError
 from idmtools.core import FilterMode, ItemType
 from idmtools.core.interfaces.ientity import IEntity
+from idmtools.utils.entities import get_default_tags
 from idmtools.utils.file import scan_directory
 from idmtools.utils.filters.asset_filters import default_asset_file_filter
-from idmtools.assets import TAssetFilterList
-from dataclasses import dataclass, field
 
 if typing.TYPE_CHECKING:
     from idmtools.assets import TAssetList
@@ -25,6 +27,7 @@ class AssetCollection(IEntity):
     """
 
     assets: 'TAssetList' = field(default=None)
+    item_type: ItemType = field(default=ItemType.ASSETCOLLECTION, compare=False)
 
     def __init__(self, assets: List[Asset] = None):
         """
@@ -34,8 +37,8 @@ class AssetCollection(IEntity):
             assets: An optional list of assets to create the collection with.
         """
         super().__init__()
-        self.assets = copy.deepcopy(assets) or []
         self.item_type = ItemType.ASSETCOLLECTION
+        self.assets = copy.deepcopy(assets) or []
 
     @classmethod
     def from_directory(cls, assets_directory: str, recursive: bool = True, flatten: bool = False,
@@ -141,6 +144,28 @@ class AssetCollection(IEntity):
                 self.assets.remove(asset)
         self.assets.append(asset)
 
+    def __add__(self, other: Union[TAssetList, 'AssetCollection', Asset]) -> 'AssetCollection':
+        """
+        Allows using the a + b syntax when adding AssetCollections
+
+        Args:
+            other: Either a list of assets, an assetcollection, or an asset
+
+        Returns:
+            Returns AssetCollection
+        """
+        if not isinstance(other, (list, AssetCollection, Asset)):
+            raise ValueError('You can only items of type AssetCollections, List of Assets, or Assets to a '
+                             'AssetCollection')
+
+        na = AssetCollection()
+        na.add_assets(self)
+        if isinstance(other, Asset):
+            na.add_asset(other, True)
+        else:
+            na.add_assets(other)
+        return na
+
     def add_assets(self, assets: Union[TAssetList, 'AssetCollection'], fail_on_duplicate: bool = True):
         """
         Add assets to a collection
@@ -154,7 +179,7 @@ class AssetCollection(IEntity):
 
         """
         for asset in assets:
-            self.add_asset(asset)
+            self.add_asset(asset, fail_on_duplicate)
 
     def add_or_replace_asset(self, asset: Asset):
         """
@@ -298,6 +323,12 @@ class AssetCollection(IEntity):
             if absolute_path and asset.absolute_path:
                 return idx
         return None
+
+    def pre_creation(self) -> None:
+        self.tags.update(get_default_tags())
+
+    def post_creation(self) -> None:
+        pass
 
 
 TAssetCollection = TypeVar("TAssetCollection", bound=AssetCollection)

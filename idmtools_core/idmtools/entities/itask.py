@@ -1,13 +1,15 @@
 import copy
+import time
 from abc import ABCMeta, abstractmethod
-from dataclasses import dataclass, field
-from logging import getLogger
-from typing import Set, NoReturn, Union, Callable, List, Optional
+from dataclasses import dataclass, field, fields
+from logging import getLogger, Logger
+from typing import Set, NoReturn, Union, Callable, List
+
 from idmtools.assets import AssetCollection
-from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.entities.command_line import CommandLine
 from idmtools.entities.platform_requirements import PlatformRequirements
-
+from idmtools.entities.simulation import Simulation
+from idmtools.utils.hashing import ignore_fields_in_dataclass_on_pickle
 
 logger = getLogger(__name__)
 # Tasks can be allocated multiple ways
@@ -23,19 +25,25 @@ TTaskHook = Callable[[TTaskParent], NoReturn]
 
 
 @dataclass
-class ITask(IAssetsEnabled, metaclass=ABCMeta):
-    command: CommandLine = None
+class ITask(metaclass=ABCMeta):
+    command: Union[str, CommandLine] = field(default=None)
     # Informs platform to what is needed to run a task
-    platform_requirements: Set[PlatformRequirements] = field(default_factory=lambda: [])
+    platform_requirements: Set[PlatformRequirements] = field(default_factory=set)
 
     # We provide hooks as list to allow more user scripting extensibility
-    __pre_creation_hooks: List[TTaskHook] = None
-    __post_creation_hooks: List[TTaskHook] = None
+    __pre_creation_hooks: List[TTaskHook] = field(default_factory=list)
+    __post_creation_hooks: List[TTaskHook] = field(default_factory=list)
     # This is optional experiment assets
     # That means that users can explicitly define experiment level assets when using a Experiment builders
-    experiment_assets: Optional[AssetCollection] = None
+    common_assets: AssetCollection = field(default_factory=AssetCollection)
+    transient_assets: AssetCollection = field(default_factory=AssetCollection)
+
+    # log to add to items to track provisioning of task
+    _task_log: Logger = field(default_factory=lambda: getLogger(__name__), compare=False,
+                              metadata=dict(pickle_ignore=True))
 
     def __post_init__(self):
+        self._task_log = getLogger(f'{self.__class__.__name__ }_{time.time()}')
         if isinstance(self.command, str):
             self.command = CommandLine(self.command)
 
@@ -44,7 +52,7 @@ class ITask(IAssetsEnabled, metaclass=ABCMeta):
 
     def add_pre_creation_hook(self, hook: TTaskHook):
         """
-        Called before a simulation is created on a platform. Each hook recieves either a Simulation or WorkflowTask
+        Called before a simulation is created on a platform. Each hook receives either a Simulation or WorkflowTask
 
         Args:
             hook: Function to call on event
@@ -56,7 +64,7 @@ class ITask(IAssetsEnabled, metaclass=ABCMeta):
 
     def add_post_creation_hook(self, hook: TTaskHook):
         """
-        Called after a simulation has been created on a platform. Each hook recieves either a Simulation or WorkflowTask
+        Called after a simulation has been created on a platform. Each hook receives either a Simulation or WorkflowTask
 
         Args:
             hook: Function to call on event
@@ -105,13 +113,23 @@ class ITask(IAssetsEnabled, metaclass=ABCMeta):
         [hook(parent) for hook in self.__post_creation_hooks]
 
     @abstractmethod
-    def gather_assets(self) -> NoReturn:
+    def gather_common_assets(self) -> AssetCollection:
+        """
+        Function called at runtime to gather all assets in the collection.
+        """
+        pass
+
+    @abstractmethod
+    def gather_transient_assets(self) -> AssetCollection:
         """
         Function called at runtime to gather all assets in the collection
         """
         pass
 
-    def copy_simulation(self, base_simulation: 'Simulation') -> 'Simulation':
+    def gather_all_assets(self) -> AssetCollection:
+        return self.gather_common_assets() + self.gather_transient_assets()
+
+    def copy_simulation(self, base_simulation: Simulation) -> Simulation:
         """
         Called when copying a simulation for batching. Override you your task has specific concerns when copying
          simulations.
@@ -119,8 +137,52 @@ class ITask(IAssetsEnabled, metaclass=ABCMeta):
         new_simulation = copy.deepcopy(base_simulation)
         return new_simulation
 
-    def reload_from_simulation(self, simulation: 'Simulation'):
+    def reload_from_simulation(self, simulation: Simulation):
         """
         Optional hook that is called when loading simulations from a platform
         """
         raise NotImplementedError("Reloading task from a simulation is not supported")
+
+    def to_simulation(self):
+        s = Simulation()
+        s.task = self
+        return s
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}"
+
+    def pre_getstate(self):
+        """
+        Return default values for :meth:`~idmtools.interfaces.ientity.pickle_ignore_fields`.
+        Call before pickling.
+        """
+        return {"_task_log": None}
+
+    def post_setstate(self):
+        self._task_log = getLogger(__name__)
+
+    @property
+    def pickle_ignore_fields(self):
+        return set(f.name for f in fields(self) if "pickle_ignore" in f.metadata and f.metadata["pickle_ignore"])
+
+    def __getstate__(self):
+        """
+        Ignore the fields in pickle_ignore_fields during pickling.
+        """
+        return ignore_fields_in_dataclass_on_pickle(self)
+
+    def __setstate__(self, state):
+        """
+        Add ignored fields back since they don't exist in the pickle
+        """
+        self.__dict__.update(state)
+
+    def __deepcopy__(self, memo):
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
+        for k, v in self.__dict__.items():
+            if k not in ['_task_log']:
+                setattr(result, k, copy.deepcopy(v, memo))
+        result._task_log = getLogger(__name__)
+        return result

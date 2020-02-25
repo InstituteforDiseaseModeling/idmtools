@@ -19,7 +19,7 @@ clean-all:  ## Deleting package info hides plugins so we only want to do that fo
 # Dev and test related rules
 
 lint: ## check style with flake8
-	@+$(IPY) "import os; os.chdir('..'); os.system('flake8 --ignore=E501 idmtools_test')"
+	@+$(IPY) "import os; os.chdir('..'); os.system('flake8 --ignore=E501,W291 idmtools_test')"
 
 test: ## Run our tests
 	@+$(IPY) "print('No Tests')"

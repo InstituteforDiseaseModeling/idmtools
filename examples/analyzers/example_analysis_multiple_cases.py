@@ -3,9 +3,10 @@
 # The 2nd example demonstrates how to use filter in an analyzer
 
 # First, import some necessary system and idmtools packages.
+from typing import Dict, Any
 from idmtools.analysis.analyze_manager import AnalyzeManager
 from idmtools.core import ItemType
-
+from idmtools.core.interfaces.iitem import IItem
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import IAnalyzer
 
@@ -40,16 +41,16 @@ class ExampleAnalyzer2(IAnalyzer):
         super().__init__(uid, working_dir, parse, filenames=["config.json"])
 
     # Filter for simulations with a particular tag value greater than a value
-    def filter(self, simulation: 'TSimulation') -> bool:
+    def filter(self, simulation: IItem) -> bool:
         return int(simulation.tags.get("b")) > 5
 
     # Map is called to get for each simulation a data object (all the metadata of the simulations) and simulation object
-    def map(self, data, simulation):
+    def map(self, data: Dict[str, Any], simulation: IItem):
         result = data[self.filenames[0]]
         return result
 
     # In reduce, we are printing the simulation and result data filtered in map
-    def reduce(self, all_data):
+    def reduce(self, all_data: Dict[IItem, Any]):
         for simulation, result in all_data.items():
             print(simulation)
             print(result)
