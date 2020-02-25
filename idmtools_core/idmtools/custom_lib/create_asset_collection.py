@@ -31,16 +31,16 @@ def get_data(url):
 
     resp = Client.get(url[i:])
     byte_str = resp.content
-
-    # print(byte_str)
     return byte_str
 
 
 def main():
     print(sys.argv)
 
-    # if len(sys.argv) < 3:
-    #     raise Exception("The script needs to be called with `python <model.py> <experiment_id>'.\n{}".format(" ".join(sys.argv)))
+    if len(sys.argv) < 3:
+        raise Exception(
+            "The script needs to be called with `python <model.py> <experiment_id> <md5_str> <endpoint>'.\n{}".format(
+                " ".join(sys.argv)))
 
     # Get the experiments
     exp_id = sys.argv[1]
@@ -55,27 +55,25 @@ def main():
     print('endpoint: ', endpoint)
 
     client = Client()
-    # client.login('https://comps2.idmod.org')  # [TODO]:
     client.login(endpoint)
 
     # Retrieve the first simulation of the experiment
     comps_sim = get_first_simulation_of_experiment(exp_id)
     print('sim_id: ', comps_sim.id)
 
+    # Build files metadata
     asset_files = build_asset_file_list(comps_sim, prefix='Libraries/')
-
     print('asset files count: ', len(asset_files))
-    max_files = 10
-    print(asset_files[0:max_files])
 
-    # asset_files = FileList(root='output', files_in_root=[])
-    # ac = COMPSAssetCollection(local_files=asset_files)
-    # ac.prepare("HPC")
+    # Output files
+    max_files = 10
+    print('Display the fist 10 files:\n', asset_files[0:max_files])
 
     ac = AssetCollection()
     tags = {MD5_KEY: md5_str}
     ac.set_tags(tags)
 
+    # Create asset collection
     path_to_ac = 'Libraries'
     for af in asset_files:
         dirpath = af['path_from_root']
@@ -84,6 +82,7 @@ def main():
 
     ac.save()
 
+    # Outpur ac id
     print('ac_id: ', ac.id)
 
     # write ac_id to file ac_info.txt

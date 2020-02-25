@@ -19,7 +19,7 @@ def install_packages_from_requirements(requirements_file=REQUIREMENT_FILE, pytho
     else:
         if type(python_paths) is not list:
             python_paths = [python_paths]
-        # env = dict(PYTHONPATH=os.pathsep.join(python_paths))
+
         env = dict(os.environ)
         env['PYTHONPATH'] = os.pathsep.join(python_paths)
 
@@ -53,7 +53,6 @@ if __name__ == "__main__":
     print('CURRENT_DIRECTORY: \n', CURRENT_DIRECTORY)
     print('LIB_PATH: \n', LIB_PATH)
     print("Adding {} to the system path".format(full_path))
-    # exit()  # Zdu: testing...
 
     if not os.path.exists(full_path):
         os.makedirs(full_path)
