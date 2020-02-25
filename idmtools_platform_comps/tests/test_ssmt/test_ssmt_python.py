@@ -132,7 +132,7 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
         self.assertEqual(execution['Command'],
-                         "python analyze_ssmt.py " + experiment_id + " CSVAnalyzer.CSVAnalyzer")
+                         "python analyze_ssmt.py " + experiment_id + " CSVAnalyzer.CSVAnalyzer COMPS2")
 
     # test SSMTWorkItem where waiting for sims to complete first
     @pytest.mark.long
