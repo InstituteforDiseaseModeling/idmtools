@@ -30,7 +30,8 @@ class CommandTask(ITask):
         ac = AssetCollection()
         for x in self.gather_transient_asset_hooks:
             ac += x(self)
-        #self.transient_assets = ac   # this will make other case fail
+        if len(ac.assets) != 0:
+            self.transient_assets = ac
         return ac
 
     def reload_from_simulation(self, simulation: 'Simulation'):
