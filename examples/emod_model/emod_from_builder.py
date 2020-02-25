@@ -32,7 +32,7 @@ def generate_experiment():
         return Asset(filename='config.json', content=json.dumps(task.config))
 
     task.gather_transient_asset_hooks.append(save_config)
-    #task.transient_assets.add_asset(save_config(task))
+    # task.transient_assets.add_asset(save_config(task))
 
     def update_param(simulation, param, value):
         simulation.task.config[param] = value
