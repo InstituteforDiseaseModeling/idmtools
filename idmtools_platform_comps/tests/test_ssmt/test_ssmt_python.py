@@ -89,7 +89,7 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
         self.assertEqual(execution['Command'],
-                         "python platform_analysis_bootstrap.py " + experiment_id + " SimpleAnalyzer.SimpleAnalyzer COMPS2")
+                         "python platform_analysis_bootstrap.py " + experiment_id + " SimpleAnalyzer.SimpleAnalyzer comps2")
 
     # Test CSVAnalyzer with SSMTAnalysis which analyzes python experiment's results
     def test_ssmt_workitem_python_csv_analyzer(self):
@@ -118,4 +118,4 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
         self.assertEqual(execution['Command'],
-                         "python platform_analysis_bootstrap.py " + experiment_id + " CSVAnalyzer.CSVAnalyzer COMPS2")
+                         "python platform_analysis_bootstrap.py " + experiment_id + " CSVAnalyzer.CSVAnalyzer comps2")
