@@ -3,10 +3,10 @@ import os
 from dataclasses import dataclass, field
 from logging import getLogger
 from typing import List, Type
+
 from idmtools.core import ItemType
-from idmtools.entities import IPlatform
-from idmtools.entities.iexperiment import IExperiment, ILinuxExperiment, IWindowsExperiment, \
-    IGPUExperiment, IDockerExperiment
+from idmtools.entities.experiment import Experiment
+from idmtools.entities.iplatform import IPlatform
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.registry.platform_specification import example_configuration_impl, get_platform_impl, \
     get_platform_type_impl, PlatformSpecification
@@ -17,8 +17,6 @@ from idmtools_test.utils.operations.simulation_operations import TestPlaformSimu
 logger = getLogger(__name__)
 current_directory = os.path.dirname(os.path.realpath(__file__))
 data_path = os.path.abspath(os.path.join(current_directory, "..", "data"))
-
-logger = getLogger(__name__)
 
 supported_types = [PlatformRequirements.SHELL, PlatformRequirements.NativeBinary, PlatformRequirements.PYTHON,
                    PlatformRequirements.WINDOWS if os.name == "nt" else PlatformRequirements.LINUX]
@@ -49,25 +47,16 @@ class TestPlatform(IPlatform):
         self._experiments = TestPlaformExperimentOperation(self)
         self._simulations = TestPlaformSimulationOperation(self)
 
-    def supported_experiment_types(self) -> List[Type]:
-        os_ex = IWindowsExperiment if os.name == "nt" else ILinuxExperiment
-        return [IExperiment, os_ex]
-
-    def unsupported_experiment_types(self) -> List[Type]:
-        os_ex = IWindowsExperiment if os.name != "nt" else ILinuxExperiment
-        return [IGPUExperiment, IDockerExperiment, os_ex]
-
     def post_setstate(self):
         self.init_interfaces()
 
-    def run_simulations(self, experiment: IExperiment) -> None:
+    def run_simulations(self, experiment: Experiment) -> None:
         from idmtools.core import EntityStatus
         self._simulations.set_simulation_status(experiment.uid, EntityStatus.RUNNING)
 
     def cleanup(self):
-        for cache in [self._experiments.experiments, self._simulations.simulations]:
-            cache.clear()
-            cache.close()
+        self._experiments.experiments = dict()
+        self._simulations.simulations = dict()
 
 
 TEST_PLATFORM_EXAMPLE_CONFIG = """

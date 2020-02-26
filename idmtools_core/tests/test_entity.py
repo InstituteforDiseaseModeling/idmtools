@@ -2,11 +2,14 @@ import copy
 import pickle
 import unittest
 from dataclasses import dataclass, field, fields
-from idmtools.builders import ExperimentBuilder
+
+from idmtools.builders import SimulationBuilder
 from idmtools.core.interfaces.ientity import IEntity
+from idmtools.entities.experiment import Experiment
 from idmtools.entities.suite import Suite
+from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-from idmtools_test.utils.tst_experiment import TstExperiment
+from idmtools_test.utils.test_task import TestTask
 
 
 @dataclass
@@ -48,17 +51,14 @@ class TestEntity(ITestWithPersistence):
         self.assertEqual(a, b)
 
     def test_pickle_ignore(self):
-        from idmtools.assets import AssetCollection
-        from idmtools.core import EntityContainer
+        a = TemplatedSimulations(base_task=TestTask())
 
-        a = TstExperiment(name="test")
         self.assertSetEqual(a.pickle_ignore_fields, set(f.name for f in fields(a) if "pickle_ignore" in f.metadata and f.metadata["pickle_ignore"]))
-        a.builder = ExperimentBuilder()
+        a.add_builder(SimulationBuilder())
 
         b = pickle.loads(pickle.dumps(a))
-        self.assertSetEqual(b.builders, set())
-        self.assertEqual(b.assets, AssetCollection())
-        self.assertEqual(b.simulations, EntityContainer())
+        self.assertIsNotNone(b.builders)
+        self.assertEqual(len(b.builders), 1)
 
         s = Suite(name="test")
         self.assertSetEqual(s.pickle_ignore_fields, set(f.name for f in fields(s) if "pickle_ignore" in f.metadata and f.metadata["pickle_ignore"]))
@@ -91,8 +91,8 @@ class TestEntity(ITestWithPersistence):
         s = Suite(name="test")
         self.assertEqual(s.name, "test")
 
-        s.experiments.append(TstExperiment("t1"))
-        s.experiments.append(TstExperiment("t2"))
+        s.experiments.append(Experiment.from_task(TestTask(), name='t1'))
+        s.experiments.append(Experiment.from_task(TestTask(), name='t2'))
         self.assertEqual(len(s.experiments), 2)
 
 

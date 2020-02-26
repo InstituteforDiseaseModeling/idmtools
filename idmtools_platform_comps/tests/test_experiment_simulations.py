@@ -1,18 +1,15 @@
 import os
 import unittest
+
 import pytest
 from COMPS.Data import Suite as CompsSuite, Experiment as CompsExperiment, Simulation as CompsSimulation
-from idmtools.builders import ExperimentBuilder
+
+from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import Suite
-from idmtools.managers import ExperimentManager
-from idmtools_model_emod import EMODExperiment
-from idmtools_model_emod import EMODSimulation
-from idmtools_model_emod.defaults import EMODSir
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-
 
 DEFAULT_ERADICATION_PATH = os.path.join(COMMON_INPUT_PATH, "emod", "Eradication.exe")
 DEFAULT_CONFIG_PATH = os.path.join(COMMON_INPUT_PATH, "files", "config.json")
@@ -25,6 +22,7 @@ def param_a_update(simulation, value):
     return {"Run_Number": value}
 
 
+@pytest.mark.skip
 class TestExperimentSimulations(ITestWithPersistence):
 
     def get_sir_experiment(self, case_name):
@@ -34,7 +32,7 @@ class TestExperimentSimulations(ITestWithPersistence):
         exp.base_simulation.set_parameter("Enable_Immunity", 0)
         # User builder to create simulations
         num_sims = 3
-        builder = ExperimentBuilder()
+        builder = SimulationBuilder()
         builder.add_sweep_definition(param_a_update, range(0, num_sims))
         exp.builder = builder
         return exp
@@ -58,7 +56,7 @@ class TestExperimentSimulations(ITestWithPersistence):
 
         # User builder to create simulations
         num_sims = 3
-        builder = ExperimentBuilder()
+        builder = SimulationBuilder()
         builder.add_sweep_definition(param_a_update, range(0, num_sims))
         exp.builder = builder
 
@@ -81,13 +79,6 @@ class TestExperimentSimulations(ITestWithPersistence):
         sims = em.experiment.simulations
 
         self.assertEqual(len(sims), num_sims + 2)
-
-    @pytest.mark.emod
-    def test_simulation_experiment(self):
-        exp = EMODExperiment()
-        sim = exp.simulation()
-
-        self.assertEqual(sim.experiment, exp)
 
     @pytest.mark.comps
     @pytest.mark.suite

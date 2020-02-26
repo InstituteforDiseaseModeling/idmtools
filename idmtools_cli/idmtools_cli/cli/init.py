@@ -1,10 +1,11 @@
 import itertools
+import json
 import logging
 import os
-from logging import getLogger
 import urllib.request
-import json
+from logging import getLogger
 from typing import Dict, List
+
 from idmtools.config import IdmConfigParser
 from idmtools.registry.plugin_specification import ProjectTemplate
 from idmtools_cli.cli import cli
@@ -53,7 +54,7 @@ def get_project_list() -> Dict[str, ProjectTemplate]:
     Returns:
 
     """
-    from idmtools.registry.model_specification import ModelPlugins
+    from idmtools.registry.experiment_specification import ExperimentPlugins
     from idmtools.registry.platform_specification import PlatformPlugins
 
     # fetch
@@ -62,7 +63,7 @@ def get_project_list() -> Dict[str, ProjectTemplate]:
     with open(os.path.join(f_dir, 'common_project_templates.json'), 'rb') as fin:
         items.extend(ProjectTemplate.read_templates_from_json_stream(fin))
 
-    for pm in [ModelPlugins().get_plugins(), PlatformPlugins().get_plugins()]:
+    for pm in [ExperimentPlugins().get_plugins(), PlatformPlugins().get_plugins()]:
         items.extend(list(itertools.chain(*map(lambda pl: pl.get_project_templates(), pm))))
 
     # check for values in config

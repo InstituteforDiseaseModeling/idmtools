@@ -3,13 +3,10 @@ import json
 import os
 import sys
 
-import pandas
-
 if __name__ == "__main__":
     current_directory = os.path.abspath(os.getcwd())
     with open("config.json", 'r') as fp:
         config_dict = json.load(fp)
-
 
     os.makedirs(os.path.join(current_directory, "output"))
     with open(os.path.join(current_directory, "output", "a.csv"), 'w') as fpa:

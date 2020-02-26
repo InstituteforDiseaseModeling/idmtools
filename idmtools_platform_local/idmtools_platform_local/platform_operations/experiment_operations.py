@@ -4,14 +4,15 @@ import time
 from dataclasses import dataclass
 from logging import getLogger
 from math import floor
-from typing import List, Any, Tuple, Dict, Container, NoReturn
+from typing import List, Any, Dict, Container, NoReturn
 from uuid import UUID
-
+from tqdm import tqdm
 from idmtools.assets import Asset
+from idmtools.core.docker_task import DockerTask
 from idmtools.core.experiment_factory import experiment_factory
-from idmtools.entities import IExperiment, ISimulation
-from idmtools.entities.iexperiment import IDockerExperiment, IGPUExperiment
-from idmtools.entities.iplatform_metadata import IPlatformExperimentOperations
+from idmtools.entities.experiment import Experiment
+from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
+from idmtools.entities.simulation import Simulation
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
 from idmtools_platform_local.client.simulations_client import SimulationsClient
 from idmtools_platform_local.platform_operations.uitils import local_status_to_common, ExperimentDict, SimulationDict
@@ -38,7 +39,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         experiment_dict = ExperimentsClient.get_one(str(experiment_id))
         return ExperimentDict(experiment_dict)
 
-    def create(self, experiment: IExperiment, **kwargs) -> Tuple[IExperiment, UUID]:
+    def platform_create(self, experiment: Experiment, **kwargs) -> Dict:
         """
         Create an experiment.
 
@@ -51,10 +52,10 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         """
         from idmtools_platform_local.internals.tasks.create_experiment import CreateExperimentTask
         from dramatiq.results import ResultTimeout
-        if not self.platform.is_supported_experiment(experiment):
-            raise ValueError("This experiment type is not support on the LocalPlatform.")
+        if not self.platform.are_requirements_met(experiment.platform_requirements):
+            raise ValueError("One of the requirements not supported by platform")
 
-        m = CreateExperimentTask.send(experiment.tags, experiment.simulation_type)
+        m = CreateExperimentTask.send(experiment.tags)
 
         # Create experiment is vulnerable to disconnects early on of redis errors. Lets do a retry on conditions
         start = time.time()
@@ -83,7 +84,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         self.send_assets(experiment)
         if self.platform.launch_created_experiments_in_browser:
             self._launch_item_in_browser(experiment)
-        return experiment.uid
+        return self.from_experiment(experiment)
 
     def get_children(self, experiment: Dict, **kwargs) -> List[SimulationDict]:
         """
@@ -113,7 +114,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         """
         return None
 
-    def run_item(self, experiment: IExperiment):
+    def platform_run_item(self, experiment: Experiment, **kwargs):
         """
         Run the experiment
 
@@ -123,23 +124,20 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
 
         """
-        if not self.platform.is_supported_experiment(experiment):
-            raise ValueError("This experiment type is not support on the LocalPlatform.")
-        is_docker_type = isinstance(experiment, IDockerExperiment)
-        for simulation in experiment.simulations:
+        for simulation in tqdm(experiment.simulations, desc="Running Simulations"):
             # if the task is docker, build the extra config
-            if is_docker_type:
-                self._run_docker_sim(experiment, simulation)
+            if simulation.task.is_docker:
+                self._run_docker_sim(experiment.uid, simulation.uid, simulation.task)
             else:
                 from idmtools_platform_local.internals.tasks.general_task import RunTask
                 logger.debug(f"Running simulation: {simulation.uid}")
-                RunTask.send(experiment.command.cmd, experiment.uid, simulation.uid)
+                RunTask.send(simulation.task.command.cmd, experiment.uid, simulation.uid)
 
-    def send_assets(self, experiment: IExperiment):
+    def send_assets(self, experiment: Experiment, **kwargs):
         """
 
         Sends assets for specified experiment
-        
+
         Args:
             experiment: Experiment to send assets for
 
@@ -152,7 +150,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         worker = self.platform._sm.get('workers')
         list(map(functools.partial(self._send_asset_to_docker, path=path, worker=worker), experiment.assets))
 
-    def refresh_status(self, experiment: IExperiment):
+    def refresh_status(self, experiment: Experiment, **kwargs):
         """
         Refresh status of experiment
 
@@ -171,9 +169,23 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
                     logger.debug(f"Simulation {sim_status[0]['simulation_uid']}status: {sim_status[0]['status']}")
                 s.status = local_status_to_common(sim_status[0]['status'])
 
-    def to_entity(self, experiment: Dict, **kwargs) -> IExperiment:
+    @staticmethod
+    def from_experiment(experiment: Experiment) -> Dict:
         """
-        Convert an ExperimentDict to an IExperiment
+        Create a experiment dictionary from Experiment object
+
+        Args:
+            experiment: Experiment object
+
+        Returns:
+            Experiment as a local platform dict
+        """
+        e = dict(experiment_id=experiment.uid, tags=experiment.tags)
+        return e
+
+    def to_entity(self, experiment: Dict, **kwargs) -> Experiment:
+        """
+        Convert an ExperimentDict to an Experiment
 
         Args:
             experiment: Experiment to convert
@@ -183,10 +195,11 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
             object as an IExperiment object
         """
         e = experiment_factory.create(experiment['tags'].get("type"), tags=experiment['tags'])
+        e.platform = self.platform
         e.uid = experiment['experiment_id']
         return e
 
-    def _run_docker_sim(self, experiment: IDockerExperiment, simulation: ISimulation):
+    def _run_docker_sim(self, experiment_uid: UUID, simulation_uid: UUID, task: DockerTask):
         """
         Run a docker based simulation
 
@@ -198,31 +211,30 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
 
         """
         from idmtools_platform_local.internals.tasks.docker_run import DockerRunTask, GPURunTask
-        logger.debug(f"Preparing Docker Task Configuration for {experiment.uid}:{simulation.uid}")
-        is_gpu = isinstance(experiment, IGPUExperiment)
-        run_cmd = GPURunTask if is_gpu else DockerRunTask
+        logger.debug(f"Preparing Docker Task Configuration for {experiment_uid}:{simulation_uid}")
+        run_cmd = GPURunTask if task.use_nvidia_run else DockerRunTask
         docker_config = dict(
-            image=experiment.image_name,
+            image=task.image_name,
             auto_remove=self.platform.auto_remove_worker_containers
         )
         # if we are running gpu, use nvidia runtime
-        if is_gpu:
+        if task.use_nvidia_run:
             docker_config['runtime'] = 'nvidia'
-        run_cmd.send(experiment.command.cmd, experiment.uid, simulation.uid, docker_config)
+        run_cmd.send(task.command.cmd, experiment_uid, simulation_uid, docker_config)
 
     def _launch_item_in_browser(self, item):
         """
         Launch experiment data page in a web browser
-        
+
         Args:
             item:
 
         Returns:
 
         """
-        if isinstance(item, IExperiment):
+        if isinstance(item, Experiment):
             t_str = item.uid
-        elif isinstance(item, ISimulation):
+        elif isinstance(item, Simulation):
             t_str = f'{item.parent_id}/{item.uid}'
         else:
             raise NotImplementedError("Only launching experiments and simulations is supported")

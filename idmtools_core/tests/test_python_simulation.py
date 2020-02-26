@@ -1,23 +1,21 @@
+import io
 import os
+import unittest.mock
 from functools import partial
 
 import pytest
 
 from idmtools.assets import AssetCollection, Asset
-from idmtools_models.python import PythonExperiment, PythonSimulation
+from idmtools.entities.experiment import Experiment
+from idmtools.entities.simulation import Simulation
+from idmtools_models.json_configured_task import JSONConfiguredTask
+from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-import io
-import unittest.mock
 
-
-def param_update(simulation, param, value):
-    return simulation.set_parameter(param, value)
-
-
-setA = partial(param_update, param="a")
-setB = partial(param_update, param="b")
-setC = partial(param_update, param="c")
+setA = partial(JSONConfiguredTask.set_parameter_sweep_callback, param="a")
+setB = partial(JSONConfiguredTask.set_parameter_sweep_callback, param="b")
+setC = partial(JSONConfiguredTask.set_parameter_sweep_callback, param="c")
 
 
 class setParam:
@@ -25,7 +23,7 @@ class setParam:
         self.param = param
 
     def __call__(self, simulation, value):
-        return param_update(simulation, self.param, value)
+        return JSONConfiguredTask.set_parameter_sweep_callback(simulation, self.param, value)
 
 
 class TestPythonSimulation(ITestWithPersistence):
@@ -34,53 +32,53 @@ class TestPythonSimulation(ITestWithPersistence):
         print(self.case_name)
 
     def test_retrieve_extra_libraries(self):
-        ps = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model.py"))
+        ps = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model.py"))
         self.assertTrue("numpy" in ps.retrieve_python_dependencies()[0])
 
-    def test_add_class_tag(self):
-        ps = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model.py"))
+    def test_add_task_tag(self):
+        ps = Simulation(task=JSONConfiguredTask(parameters={"a": 1}, envelope="config", command="ls"))
         # The tag for type is added at runtime during the pre_creation event
         ps.pre_creation()
-        self.assertEqual(ps.tags.get('type'), "idmtools_models.python.python_experiment.PythonExperiment")
+        self.assertEqual(ps.tags.get('task_type'), 'idmtools_models.json_configured_task.JSONConfiguredTask')
 
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     def test_envelope(self, mock_stdout):
         import json
         # No envelope
-        p = PythonSimulation(parameters={"a": 1})
+        p = JSONConfiguredTask(parameters={"a": 1})
 
         self.assertEqual(p.parameters, {"a": 1})
-        p.gather_assets()
-        self.assertEqual(p.assets.assets[0].bytes, str.encode(json.dumps({"a": 1})))
+        p.gather_transient_assets()
+        self.assertEqual(p.transient_assets.assets[0].bytes, str.encode(json.dumps({"a": 1})))
 
         # Envelope
-        p = PythonSimulation(parameters={"a": 1}, envelope="config")
+        p = JSONConfiguredTask(parameters={"a": 1}, envelope="config")
 
         self.assertEqual(p.parameters, {"a": 1})
-        p.gather_assets()
-        self.assertEqual(p.assets.assets[0].bytes, str.encode(json.dumps({"config": {"a": 1}})))
+        p.gather_transient_assets()
+        self.assertEqual(p.transient_assets.assets[0].bytes, str.encode(json.dumps({"config": {"a": 1}})))
 
         # Envelope already set in parameters
-        p = PythonSimulation(parameters={"config": {"a": 1}}, envelope="config")
+        p = JSONConfiguredTask(parameters={"config": {"a": 1}}, envelope="config")
         self.assertEqual(p.parameters, {"a": 1})
-        p.gather_assets()
-        self.assertEqual(p.assets.assets[0].bytes, str.encode(json.dumps({"config": {"a": 1}})))
+        p.gather_transient_assets()
+        self.assertEqual(p.transient_assets.assets[0].bytes, str.encode(json.dumps({"config": {"a": 1}})))
 
         # Envelope already set in parameters but no envelope parameter
-        p = PythonSimulation(parameters={"config": {"a": 1}})
+        p = JSONConfiguredTask(parameters={"config": {"a": 1}})
         self.assertEqual(p.parameters, {"config": {"a": 1}})
-        p.gather_assets()
-        self.assertEqual(p.assets.assets[0].bytes, str.encode(json.dumps({"config": {"a": 1}})))
+        p.gather_transient_assets()
+        self.assertEqual(p.transient_assets.assets[0].bytes, str.encode(json.dumps({"config": {"a": 1}})))
 
-        print(p)  # verify __repr__method in ISumulation
-        self.assertIn("<Simulation: " + p.uid + " - Exp_id: None>", mock_stdout.getvalue())
+        print(p)  # verify __repr__method in ITask
+        self.assertIn("JSONConfiguredTask config", mock_stdout.getvalue())
 
     @pytest.mark.python
     @pytest.mark.assets
     def test_add_assets_to_python_experiment(self):
         ac = self.create_functions_asset_collection()
-        pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model.py"),
-                              assets=ac)
+        sp = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
+        pe = Experiment.from_task(name=self.case_name, task=JSONConfiguredPythonTask(script_path=sp), assets=ac)
         pe.pre_creation()
         assets_to_find = [
             Asset(relative_path='MyExternalLibrary', filename="functions.py"),
@@ -103,7 +101,8 @@ class TestPythonSimulation(ITestWithPersistence):
     @pytest.mark.python
     def test_add_assets_after_python_experiment_created(self):
         ac = self.create_functions_asset_collection()
-        pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model.py"))
+        sp = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
+        pe = Experiment.from_task(name=self.case_name, task=JSONConfiguredPythonTask(script_path=sp))
         pe.add_assets(ac)
         pe.pre_creation()
         assets_to_find = [

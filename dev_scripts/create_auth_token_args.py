@@ -17,7 +17,7 @@ class StaticCredentialPrompt(CredentialPrompt):
         self._times_prompted = self._times_prompted + 1
         if self._times_prompted > 3:
             raise RuntimeError('Failure authenticating')
-        print("Authenticated")
+        print("Hit here")
         return {'Username': self.username, 'Password': self.password}
 
 

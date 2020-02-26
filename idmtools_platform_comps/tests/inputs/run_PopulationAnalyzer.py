@@ -7,7 +7,7 @@ from idmtools.core.platform_factory import Platform
 from idmtools.analysis.analyze_manager import AnalyzeManager
 
 sys.path.append(os.path.dirname(__file__))
-from PopulationAnalyzer import PopulationAnalyzer
+from PopulationAnalyzer import PopulationAnalyzer  # noqa
 
 if __name__ == "__main__":
     platform = Platform('SSMT')

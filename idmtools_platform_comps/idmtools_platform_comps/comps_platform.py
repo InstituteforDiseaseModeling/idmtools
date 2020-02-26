@@ -1,13 +1,15 @@
+# flake8: noqa E402
 import copy
 import json
 import logging
-import typing
 from dataclasses import dataclass, field
+# COMPS sometimes messes up our logger so backup handler in case
+handlers = [x for x in logging.getLogger().handlers]
 from COMPS import Client
+r = logging.getLogger()
+r.handlers = handlers
 from idmtools.core import CacheEnabled, ItemType
-from idmtools.entities import IPlatform
-from idmtools.entities.iexperiment import IExperiment, IGPUExperiment, IDockerExperiment, \
-    ILinuxExperiment
+from idmtools.entities.iplatform import IPlatform
 from idmtools_platform_comps.comps_operations.asset_collection_operations import \
     CompsPlatformAssetCollectionOperations
 from idmtools_platform_comps.comps_operations.experiment_operations import CompsPlatformExperimentOperations
@@ -17,8 +19,6 @@ from idmtools_platform_comps.comps_operations.workflow_item_operations import Co
 from idmtools.entities.platform_requirements import PlatformRequirements
 from typing import List
 
-
-logging.getLogger('COMPS.Data.Simulation').disabled = True
 logger = logging.getLogger(__name__)
 
 
@@ -55,6 +55,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     batch_size: int = field(default=10)
     exclusive: bool = field(default=False)
 
+    # TODO What are these for?
     work_item_type: str = field(default=None)
     docker_image: str = field(default=None)
     plugin_key: str = field(default=None)
@@ -72,7 +73,8 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         print("\nUser Login:")
         print(json.dumps({"endpoint": self.endpoint, "environment": self.environment}, indent=3))
         self.__init_interfaces()
-        self.supported_types = {ItemType.EXPERIMENT, ItemType.SIMULATION, ItemType.SUITE, ItemType.ASSETCOLLECTION, ItemType.WORKFLOW_ITEM}
+        self.supported_types = {ItemType.EXPERIMENT, ItemType.SIMULATION, ItemType.SUITE, ItemType.ASSETCOLLECTION,
+                                ItemType.WORKFLOW_ITEM}
         super().__post_init__()
 
     def __init_interfaces(self):
@@ -84,16 +86,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         self._assets = CompsPlatformAssetCollectionOperations(platform=self)
 
     def _login(self):
-        try:
-            Client.auth_manager()
-        except RuntimeError:
-            Client.login(self.endpoint)
-
-    def supported_experiment_types(self) -> List[typing.Type]:
-        return [IExperiment]
-
-    def unsupported_experiment_types(self) -> List[typing.Type]:
-        return [IDockerExperiment, IGPUExperiment, ILinuxExperiment]
+        Client.login(self.endpoint)
 
     def post_setstate(self):
         self.__init_interfaces()

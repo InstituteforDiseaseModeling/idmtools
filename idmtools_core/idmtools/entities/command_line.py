@@ -23,6 +23,9 @@ class CommandLine:
     def executable(self):
         return self._executable
 
+    def add_argument(self, arg):
+        self._args.append(arg)
+
     def add_option(self, option, value):
         self._options[option] = value
 

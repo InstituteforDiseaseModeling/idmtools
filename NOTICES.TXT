@@ -1,0 +1,44 @@
+The idmtools project is leveraging the following open source technologies:
+
+Python/coloredlogs	https://pypi.org/project/coloredlogs/	MIT
+Python/diskcache	https://pypi.org/project/diskcache/	Apache 2.0
+Python/marshmallow	https://pypi.org/project/marshmallow/	MIT
+Python/more-itertools	https://pypi.org/project/more-itertools/	MIT
+Python/pandas	https://pypi.org/project/pandas/	BSD
+Python/pipreqs	https://pypi.org/project/pipreqs/	Apache Software License
+Python/pluggy	https://pypi.org/project/pluggy/	MIT
+Python/PyYaml	https://pypi.org/project/PyYAML/	MIT
+Python/tabulate	https://pypi.org/project/tabulate/	MIT
+Python/click	https://pypi.org/project/click/	BSD
+Python/colorama	https://pypi.org/project/colorama/	BSD
+Python/cookiecutter	https://pypi.org/project/cookiecutter/	BSD
+Python/pyperclip	https://pypi.org/project/pyperclip/	BSD
+Python/tqdm	https://pypi.org/project/tqdm/	MIT
+Python/yaspin	https://pypi.org/project/yaspin/	MIT
+Python/backoff	https://pypi.org/project/backoff/	MIT
+Python/humanfriendly	https://pypi.org/project/humanfriendly/	MIT
+Python/docker	https://pypi.org/project/docker/	Apache 2.0
+Python/dramatiq	https://pypi.org/project/dramatiq/	LGPLv3+
+Python/gevent	https://pypi.org/project/gevent/	MIT
+Python/requests	https://pypi.org/project/requests/	Apache 2.0
+Python/sqlalchemy	https://pypi.org/project/SQLAlchemy/	MIT
+Python/flask	https://pypi.org/project/Flask/	BSD-3-clause
+Python/stringcase	https://pypi.org/project/stringcase/	MIT
+@amcharts/amcharts4	https://www.npmjs.com/package/@amcharts/amcharts4	Linkware license (https://github.com/amcharts/amcharts4/blob/master/dist/script/LICENSE)
+@material-ui/core	https://www.npmjs.com/package/@material-ui/core	MIT
+@material-ui/icons	https://www.npmjs.com/package/@material-ui/icons	MIT
+moment	https://www.npmjs.com/package/moment	MIT
+react	https://www.npmjs.com/package/react	MIT
+react-dom	https://www.npmjs.com/package/react-dom	MIT
+react-redux	https://www.npmjs.com/package/react-redux	MIT
+react-router-dom	https://www.npmjs.com/package/react-router-dom	MIT
+react-scripts	https://www.npmjs.com/package/react-scripts	MIT
+react-splitter-layout	https://www.npmjs.com/package/react-splitter-layout	MIT
+redux	https://www.npmjs.com/package/redux	MIT
+redux-thunk	https://www.npmjs.com/package/redux-thunk	MIT
+reselect	https://www.npmjs.com/package/reselect	MIT
+yarn	https://www.npmjs.com/package/yarn	BSD-2-Clause
+Docker	https://www.docker.com/	Apache 2.0 license
+Nginx	https://nginx.org/	BSD-2-Clause
+PostgreSQL	https://www.postgresql.org/	MIT
+Redis	https://redis.io/	BSD-3-Clause

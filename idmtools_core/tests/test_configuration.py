@@ -31,6 +31,12 @@ class TestConfig(ITestWithPersistence):
         self.assertIn("WARNING: File 'aaaaa' Not Found!", mock_stdout.getvalue())
 
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
+    def test_section_found_case_independent(self, mock_stdout):
+        insensitive = IdmConfigParser().get_section('CoMpS')
+        sensitive = IdmConfigParser().get_section('COMPS')
+        self.assertEqual(insensitive, sensitive)
+
+    @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     def test_section_not_found(self, mock_stdout):
         with self.assertRaises(ValueError) as context:
             IdmConfigParser().get_section('NotReallyASection')

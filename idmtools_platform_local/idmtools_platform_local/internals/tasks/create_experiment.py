@@ -2,7 +2,6 @@ import logging
 import os
 import random
 import string
-from dataclasses import InitVar
 import typing as typing
 
 import backoff
@@ -15,8 +14,6 @@ except ImportError:
     # We mainly want to do this to prevent importing of sqlalchemy on client side installs since it is not needed
     IntegrityError = EnvironmentError
 
-if typing.TYPE_CHECKING:
-    from idmtools.core import TTags, TSimulationClass, typing  # noqa: F401
 
 logger = logging.getLogger(__name__)
 EXPERIMENT_ID_LENGTH = 8
@@ -28,7 +25,7 @@ class CreateExperimentTask(GenericActor):
         store_results = True
         max_retries = 0
 
-    def perform(self, tags: 'TTags', simulation_type: InitVar['TSimulationClass']) -> str:
+    def perform(self, tags: typing.Dict[str, typing.Any]) -> str:
         """
         Creates an experiment.
             - Create the folder
@@ -36,16 +33,17 @@ class CreateExperimentTask(GenericActor):
             - Return the UUID of the newly created experiment
         Args:
             tags (TTags): Tags for the experiment to be created
-            simulation_type(InitVar[TSimulationClass]): Type of simulation we are creating
 
         Returns:
             (str) Id of created experiment
         """
 
         retries = 0
+        data_path = None
+        uuid = None
         while retries <= 3:
             try:
-                data_path, uuid = self.get_uuid_and_data_path(simulation_type, tags)
+                data_path, uuid = self.get_uuid_and_data_path(tags)
                 break
             except IntegrityError:
                 retries += 1
@@ -60,7 +58,7 @@ class CreateExperimentTask(GenericActor):
 
     @staticmethod
     @backoff.on_exception(backoff.constant, IntegrityError, max_tries=3, interval=0.02, jitter=None)
-    def get_uuid_and_data_path(simulation_type, tags):
+    def get_uuid_and_data_path(tags):
         # we only want to import this here so that clients don't need postgres/sqlalchemy packages
         from idmtools_platform_local.internals.workers.utils import create_or_update_status
         uuid = ''.join(random.choice(string.digits + string.ascii_uppercase) for _ in range(EXPERIMENT_ID_LENGTH))
@@ -68,5 +66,5 @@ class CreateExperimentTask(GenericActor):
             logger.debug('Creating experiment with id %s', uuid)
         # Update the database with experiment
         data_path = os.path.join(os.getenv("DATA_PATH", "/data"), uuid)
-        create_or_update_status(uuid, data_path, tags, extra_details=dict(simulation_type=simulation_type))
+        create_or_update_status(uuid, data_path, tags, extra_details=dict())
         return data_path, uuid

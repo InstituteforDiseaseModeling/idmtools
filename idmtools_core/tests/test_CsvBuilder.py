@@ -2,13 +2,14 @@ import os
 import numpy as np
 from functools import partial
 from idmtools.builders import CsvExperimentBuilder
+from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-from idmtools_test.utils.tst_experiment import TstExperiment
+from idmtools_test.utils.test_task import TestTask
 
 
 def param_update(simulation, param, value):
-    return simulation.set_parameter(param, value)
+    return simulation.task.set_parameter(param, value)
 
 
 setA = partial(param_update, param="a")
@@ -35,10 +36,10 @@ class TestCsvBuilder(ITestWithPersistence):
 
         # expected_values = list(itertools.product(range(5), [1, 2, 3]))
 
-        experiment = TstExperiment("test")
-        experiment.builder = self.builder
+        templated_sim = TemplatedSimulations(base_task=TestTask())
+        templated_sim.builder = self.builder
 
-        simulations = list(experiment.batch_simulations(10))[0]
+        simulations = list(templated_sim)
 
         # Test if we have correct number of simulations
         self.assertEqual(len(simulations), 5)

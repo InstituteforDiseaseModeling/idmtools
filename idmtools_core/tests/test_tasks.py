@@ -1,13 +1,19 @@
 import os
 from unittest import TestCase
+
 import pytest
-from idmtools.assets import Asset
+from idmtools.assets import Asset, AssetCollection
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.simulation import Simulation
 
 
 @pytest.mark.tasks
 class TestTasks(TestCase):
+
+    def test_command_requires_command(self):
+        with self.assertRaises(ValueError) as ex:
+            task = CommandTask()  # noqa F841
+        self.assertEqual("Command is required", ex.exception.args[0])
 
     def test_command_init_from_str_(self):
         example_command, task = self.get_ls_command_task()
@@ -22,7 +28,7 @@ class TestTasks(TestCase):
     @staticmethod
     def get_cat_command():
         task = CommandTask(command='cat pytest.ini')
-        task.add_asset(Asset('./pytest.ini'))
+        task.common_assets.add_asset(Asset('./pytest.ini'))
         return task
 
     # TODO fix as part of rewrite of tasks
@@ -35,18 +41,19 @@ class TestTasks(TestCase):
     def test_assets_on_tasks(self):
         task = self.get_cat_command()
 
-        self.assertIn(task.assets.assets[0].absolute_path, os.path.join(os.path.dirname(__file__), './pytest.ini'))
+        self.assertIn(task.common_assets.assets[0].absolute_path, os.path.join(os.path.dirname(__file__), './pytest.ini'))
 
     def test_command_task_custom_hooks(self):
         global test_global
         task = self.get_cat_command()
         test_global = 0
 
-        def update_x_callback():
+        def update_x_callback(task):  # noqa F841
             global test_global
             test_global += 1
-        task.gather_asset_hooks.append(update_x_callback)
-        task.gather_assets()
+            return AssetCollection()
+        task.gather_common_asset_hooks.append(update_x_callback)
+        task.gather_common_assets()
         self.assertEqual(test_global, 1)
 
         def update_sim(simulation):

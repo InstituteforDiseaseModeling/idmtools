@@ -1,9 +1,9 @@
 from functools import partial
 
-from idmtools.builders import ExperimentBuilder
+from idmtools.builders import SimulationBuilder
 
 
-class StandAloneSimulationsBuilder(ExperimentBuilder):
+class StandAloneSimulationsBuilder(SimulationBuilder):
     def __init__(self):
         super().__init__()
         self.simulations = []

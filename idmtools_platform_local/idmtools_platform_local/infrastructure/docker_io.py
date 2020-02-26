@@ -11,6 +11,8 @@ from io import BytesIO
 from logging import getLogger
 from typing import BinaryIO, Dict, NoReturn, Optional, Union, Any
 from docker.models.containers import Container
+from tqdm import tqdm
+
 from idmtools.core.system_information import get_data_directory
 from idmtools.utils.decorators import ParallelizeDecorator
 from idmtools_platform_local.infrastructure.postgres import PostgresContainer
@@ -169,7 +171,7 @@ class DockerIO:
                                    files: Dict[str, Dict[str, Any]],
                                    join_on_copy: bool = True):
         results = []
-        for dest_path, sub_files in files.items():
+        for dest_path, sub_files in tqdm(files.items(), desc="Copying Assets to Local Platform"):
             for fn in sub_files:
                 results.append(self.copy_to_container(container, destination_path=dest_path, **fn))
 

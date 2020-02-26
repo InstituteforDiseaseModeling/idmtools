@@ -1,12 +1,10 @@
 import json
 import os
-
 import pytest
 from idmtools.assets.file_list import FileList
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
-from idmtools.managers.work_item_manager import WorkItemManager
-from idmtools.ssmt.idm_work_item import SSMTWorkItem
+from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import del_folder
 
@@ -38,14 +36,13 @@ class TestSSMTWorkItem(ITestWithPersistence):
         command = "python Assets/run_PopulationAnalyzer.py " + experiment_id
         wi = SSMTWorkItem(item_name=self.case_name, command=command, asset_files=asset_files, user_files=user_files,
                           tags=self.tags)
-        wim = WorkItemManager(wi, self.platform)
-        wim.process(check_status=True)
+        wi.run(True, platform=self.platform)
 
         # validate output files
         local_output_path = "output"
         del_folder(local_output_path)
         out_filenames = ["output/population.png", "output/population.json", "WorkOrder.json"]
-        ret = self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
+        self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
 
         file_path = os.path.join(local_output_path, str(wi.uid))
         self.assertTrue(os.path.exists(os.path.join(file_path, "output", "population.png")))
@@ -77,22 +74,20 @@ class TestSSMTWorkItem(ITestWithPersistence):
         command = "python run_multiple_analyers.py " + experiment_id
         wi = SSMTWorkItem(item_name=self.case_name, command=command, user_files=user_files,
                           tags=self.tags)
-        wim = WorkItemManager(wi, self.platform)
-        wim.process(check_status=True)
+        wi.run(True, platform=self.platform)
 
         # validate output files
         local_output_path = "output"
         del_folder(local_output_path)
         out_filenames = ["output/population.png", "output/population.json", "WorkOrder.json"]
-        ret = self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
+        self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
 
         # validate output files
         local_output_path = "output_ssmt"
         del_folder(local_output_path)
         out_filenames = ["output/population.png", "output/population.json",
                          "output/adult_vectors.json", "output/adult_vectors.png", "WorkOrder.json"]
-        ret = self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames,
-                                            local_output_path)
+        self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
 
         file_path = os.path.join(local_output_path, str(wi.uid))
         self.assertTrue(os.path.exists(os.path.join(file_path, "output", "population.png")))
@@ -126,14 +121,13 @@ class TestSSMTWorkItem(ITestWithPersistence):
         command = "python Assets/run_multiple_exps.py " + exp_id1 + " " + exp_id2
         wi = SSMTWorkItem(item_name=self.case_name, command=command, asset_files=asset_files, user_files=user_files,
                           tags=self.tags)
-        wim = WorkItemManager(wi, self.platform)
-        wim.process(check_status=True)
+        wi.run(True, platform=self.platform)
 
         # validate output files
         local_output_path = "output"
         del_folder(local_output_path)
         out_filenames = ["output/population.png", "output/population.json", "WorkOrder.json"]
-        ret = self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
+        self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
 
         file_path = os.path.join(local_output_path, str(wi.uid))
         self.assertTrue(os.path.exists(os.path.join(file_path, "output", "population.png")))

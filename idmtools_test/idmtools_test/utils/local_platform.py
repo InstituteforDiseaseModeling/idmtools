@@ -24,5 +24,3 @@ def create_test_data():
     create_or_update_status('FFFFF', '/data/FFFFF', dict(i='j', k='l'), parent_uuid='DDDDD',
                             status=Status.done,
                             extra_details=dict(simulation_type='Python'))
-
-
