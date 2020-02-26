@@ -132,6 +132,13 @@ class IdmConfigParser:
         cls._config = ConfigParser()
         cls._config.read(ini_file)
 
+        # in order to have case-insensitive section names, we add the lowercase version of all sections if not present
+        sections = cls._config.sections()
+        for section in sections:
+            lowercase_version = section.lower()
+            if not cls._config.has_section(section=lowercase_version):
+                cls._config._sections[lowercase_version] = cls._config._sections[section]
+
         # setup logging
         log_config = cls.get_section('Logging')
         valid_options = ['level', 'log_filename', 'console']
@@ -152,32 +159,14 @@ class IdmConfigParser:
         if not cls.found_ini():
             return {}
 
-        block_name = section
-        if not cls.has_section(block_name):
-            raise ValueError(f"Block '{block_name}' doesn't exist!")
+        original_case_section = section
+        lower_case_section = section.lower()
+        if not cls.has_section(section=lower_case_section):
+            raise ValueError(f"Block '{original_case_section}' doesn't exist!")
 
-        section = cls._config.items(block_name)
-        cls._block = block_name
-        return dict(section)
-
-    @classmethod
-    @initialization(error=True)
-    def get_block(cls, block_name: str = None) -> Dict[str, str]:
-        """
-        Call from platform factory and retrieve INI section values.
-
-        Args:
-            block_name: The INI section name where we retrieve all fields.
-
-        Returns:
-            All fields as a dictionary.
-        """
-        if not cls.has_section(block_name):
-            raise ValueError(f"Block '{block_name}' doesn't exist!")
-
-        section = cls._config.items(block_name)
-        cls._block = block_name
-        return dict(section)
+        section_item = cls._config.items(lower_case_section)
+        cls._block = lower_case_section
+        return dict(section_item)
 
     @classmethod
     @initialization(error=False)
@@ -270,7 +259,7 @@ class IdmConfigParser:
     @classmethod
     @initialization(error=False)
     def has_section(cls, section):
-        return cls._config.has_section(section)
+        return cls._config.has_section(section.lower())
 
     @classmethod
     @initialization

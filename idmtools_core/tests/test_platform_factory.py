@@ -15,8 +15,8 @@ class TestPlatformFactory(ITestWithPersistence):
     def tearDown(self):
         super().tearDown()
 
-    def test_get_block(self):
-        entries = IdmConfigParser.get_block('COMPS2')
+    def test_get_section(self):
+        entries = IdmConfigParser.get_section('COMPS2')
         self.assertEqual(entries['endpoint'], 'https://comps2.idmod.org')
 
     def test_block_not_exits(self):
