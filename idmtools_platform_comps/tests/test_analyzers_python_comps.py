@@ -2,29 +2,19 @@ import os
 from functools import partial
 
 import pytest
-from COMPS.Data import Experiment
-from idmtools.builders import ExperimentBuilder
-from idmtools.core.platform_factory import Platform
-from idmtools.managers import ExperimentManager
-from idmtools.core import EntityStatus, ItemType
-from idmtools_models.python import PythonExperiment
-from idmtools_test import COMMON_INPUT_PATH
+from COMPS.Data import Experiment as COMPSExperiment
+
 from idmtools.analysis.analyze_manager import AnalyzeManager
 from idmtools.analysis.download_analyzer import DownloadAnalyzer
+from idmtools.builders import SimulationBuilder
+from idmtools.core import ItemType
+from idmtools.core.platform_factory import Platform
+from idmtools_test.utils.common_experiments import wait_on_experiment_and_check_all_sim_status, \
+    get_model1_templated_experiment
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import del_folder
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
-
-
-def param_update(simulation, param, value):
-    return simulation.set_parameter(param, value)
-
-
-setA = partial(param_update, param="a")
-setB = partial(param_update, param="b")
-setC = partial(param_update, param="c")
-setD = partial(param_update, param="d")
 
 
 @pytest.mark.analysis
@@ -38,29 +28,24 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         self.p = Platform('COMPS2')
 
     def create_experiment(self):
-        pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
-        pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
-
-        pe.base_simulation.set_parameter("c", "c-value")
+        pe = get_model1_templated_experiment(self.case_name)
 
         def param_update_ab(simulation, param, value):
             # Set B within
             if param == "a":
-                simulation.set_parameter("b", value + 2)
+                simulation.task.set_parameter("b", value + 2)
 
-            return simulation.set_parameter(param, value)
+            return simulation.task.set_parameter(param, value)
 
         setAB = partial(param_update_ab, param="a")
 
-        builder = ExperimentBuilder()
+        builder = SimulationBuilder()
         # Sweep parameter "a" and make "b" depends on "a"
         builder.add_sweep_definition(setAB, range(0, 2))
-        pe.builder = builder
-        em = ExperimentManager(experiment=pe, platform=self.p)
-        em.run()
-        em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
-        experiment = Experiment.get(em.experiment.uid)
+        pe.simulations.add_builder(builder)
+
+        wait_on_experiment_and_check_all_sim_status(self, pe, self.p)
+        experiment = COMPSExperiment.get(pe.uid)
         print(experiment.id)
         self.exp_id = experiment.id  # COMPS Experiment object, so .id
 
@@ -81,7 +66,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         am = AnalyzeManager(platform=self.p, ids=[(self.exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
 
-        for simulation in Experiment.get(self.exp_id).get_simulations():
+        for simulation in COMPSExperiment.get(self.exp_id).get_simulations():
             self.assertTrue(os.path.exists(os.path.join('output', str(simulation.id), "config.json")))
             self.assertTrue(os.path.exists(os.path.join('output', str(simulation.id), "result.json")))
 
@@ -101,6 +86,6 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         am = AnalyzeManager(platform=self.p, ids=exp_list, analyzers=analyzers)
         am.analyze()
         for exp_id in exp_list:
-            for simulation in Experiment.get(exp_id[0]).get_simulations():
+            for simulation in COMPSExperiment.get(exp_id[0]).get_simulations():
                 self.assertTrue(os.path.exists(os.path.join('output', str(simulation.id), "config.json")))
                 self.assertTrue(os.path.exists(os.path.join('output', str(simulation.id), "result.json")))

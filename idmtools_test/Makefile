@@ -19,7 +19,7 @@ clean-all:  ## Deleting package info hides plugins so we only want to do that fo
 # Dev and test related rules
 
 lint: ## check style with flake8
-	@+$(IPY) "import os; os.chdir('..'); os.system('flake8 --ignore=E501 idmtools_test')"
+	@+$(IPY) "import os; os.chdir('..'); os.system('flake8 --ignore=E501,W291 idmtools_test')"
 
 test: ## Run our tests
 	@+$(IPY) "print('No Tests')"
@@ -58,6 +58,9 @@ dist: ## build our package
 release-staging: ## perform a release to staging
 	@make dist
 	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/idm-pypi-staging/ dist/*
+
+bump-release: ## bump the release version.
+	bump2version release --commit
 
 # Use before release-staging-release-commit to confirm next version.
 bump-release-dry-run: ## perform a release to staging and bump the minor version.

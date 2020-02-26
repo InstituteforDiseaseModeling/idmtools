@@ -1,19 +1,18 @@
 import os
 import sys
 import time
-import typing
 from logging import getLogger, DEBUG
 from multiprocessing.pool import Pool
-from typing import NoReturn
+from typing import NoReturn, List, Dict
+from uuid import UUID
 
 from idmtools.analysis.map_worker_entry import map_item
 from idmtools.core import CacheEnabled
+from idmtools.core.interfaces.ientity import IEntity
+from idmtools.entities.ianalyzer import TAnalyzer
+from idmtools.entities.iplatform import IPlatform
 from idmtools.utils.command_line import animation
 from idmtools.utils.language import on_off, verbose_timedelta
-
-if typing.TYPE_CHECKING:
-    from idmtools.entities.ianalyzer import TAnalyzer
-    from idmtools.core.interfaces.ientity import TEntity
 
 logger = getLogger(__name__)
 
@@ -48,12 +47,13 @@ class AnalyzeManager(CacheEnabled):
     class ItemsNotReady(Exception):
         pass
 
-    def __init__(self, platform, configuration=None, ids=None, analyzers=None, working_dir=os.getcwd(),
+    def __init__(self, platform: IPlatform, configuration=None, ids=None, analyzers=None, working_dir=os.getcwd(),
                  partial_analyze_ok=False, max_items=None, verbose=True, force_manager_working_directory=False):
         super().__init__()
         self.configuration = configuration or {}
         self.platform = platform
         self.max_processes = self.configuration.get('max_threads', os.cpu_count())
+        logger.debug(f'AnalyzeManager set to {self.max_processes}')
 
         # analyze at most this many items, regardless of how many have been given
         self.max_items_to_analyze = max_items
@@ -69,10 +69,15 @@ class AnalyzeManager(CacheEnabled):
         # Take the provided ids and determine the full set of unique root items (e.g. simulations) in them to analyze
         logger.debug("Load information about items from platform")
         ids = list(set(ids or list()))  # uniquify
-        items = [platform.get_item(oid, otype, force=True) for oid, otype in ids]
-        self.potential_items = []
+        items: List[IEntity] = []
+        for oid, otype in ids:
+            logger.debug(f'Getting metadata for {oid} and {otype}')
+            result = platform.get_item(oid, otype, force=True)
+            items.append(result)
+        self.potential_items: List[IEntity] = []
 
         for i in items:
+            logger.debug(f'Flattening items for {i.uid}')
             self.potential_items.extend(platform.flatten_item(item=i))
         logger.debug(f"Potential items to analyze: {len(self.potential_items)}")
         self._items = dict()  # filled in later by _get_items_to_analyze
@@ -80,7 +85,7 @@ class AnalyzeManager(CacheEnabled):
         self.analyzers = analyzers or list()
         self.verbose = verbose
 
-    def add_item(self, item: 'TEntity') -> NoReturn:
+    def add_item(self, item: IEntity) -> NoReturn:
         """
         Add an additional item for analysis.
 
@@ -93,7 +98,7 @@ class AnalyzeManager(CacheEnabled):
 
         self.potential_items.extend(self.platform.flatten_item(item=item))
 
-    def _get_items_to_analyze(self) -> 'dict':
+    def _get_items_to_analyze(self) -> Dict[UUID, IEntity]:
         """
         Get a list of items derived from :meth:`self._items` that are available to analyze.
 
@@ -125,7 +130,7 @@ class AnalyzeManager(CacheEnabled):
 
         return can_analyze
 
-    def add_analyzer(self, analyzer: 'TAnalyzer') -> NoReturn:
+    def add_analyzer(self, analyzer: TAnalyzer) -> NoReturn:
         """
         Add another analyzer to use on the items to be analyzed.
 
@@ -148,6 +153,7 @@ class AnalyzeManager(CacheEnabled):
         if len(unique_uids) < len(self.analyzers):
             for i in range(len(self.analyzers)):
                 self.analyzers[i].uid += f'-{i}'
+                logger.debug(f'Analyzer {i.__class__} id set to {self.analyzers[i].uid}')
 
     def _initialize_analyzers(self) -> NoReturn:
         """
@@ -171,7 +177,7 @@ class AnalyzeManager(CacheEnabled):
         # make sure each analyzer in self.analyzers has a unique uid
         self._update_analyzer_uids()
 
-    def _check_exception(self) -> 'bool':
+    def _check_exception(self) -> bool:
         """
         Determines if an exception has occurred in the processing of items, printing any related information.
 
@@ -190,7 +196,7 @@ class AnalyzeManager(CacheEnabled):
             ex = False
         return ex
 
-    def _print_configuration(self, n_items: 'int', n_processes: 'int') -> NoReturn:
+    def _print_configuration(self, n_items: int, n_processes: int) -> NoReturn:
         """
         Display some information about an ongoing analysis.
 
@@ -215,7 +221,7 @@ class AnalyzeManager(CacheEnabled):
                 print(' | (Directory map: {}' % on_off(analyzer.need_dir_map))
         print(' | Pool of {} analyzing process(es)'.format(n_processes))
 
-    def _run_and_wait_for_mapping(self, worker_pool: 'Pool', start_time: 'float') -> 'bool':
+    def _run_and_wait_for_mapping(self, worker_pool: Pool, start_time: float) -> bool:
         """
         Run and manage the mapping call on each item.
 
@@ -261,7 +267,7 @@ class AnalyzeManager(CacheEnabled):
         logger.debug(f"Result fetching status: : {results.successful()}")
         return True
 
-    def _run_and_wait_for_reducing(self, worker_pool: 'Pool') -> 'dict':
+    def _run_and_wait_for_reducing(self, worker_pool: Pool) -> dict:
         """
         Run and manage the reduce call on the combined item results (by analyzer).
 
@@ -295,7 +301,7 @@ class AnalyzeManager(CacheEnabled):
                 logger.debug("Finished finalizing results")
         return finalize_results
 
-    def analyze(self) -> 'bool':
+    def analyze(self) -> bool:
         """
         Process the provided items with the provided analyzers. This is the main driver method of
         :class:`AnalyzeManager`.
@@ -317,7 +323,7 @@ class AnalyzeManager(CacheEnabled):
             print('No items were provided; cannot run analysis.')
             return False
         # trim processing to those items that are ready and match requested limits
-        self._items = self._get_items_to_analyze()
+        self._items: Dict[UUID, IEntity] = self._get_items_to_analyze()
 
         if len(self._items) == 0:
             print('No items are ready; cannot run analysis.')
@@ -326,6 +332,8 @@ class AnalyzeManager(CacheEnabled):
         # initialize mapping results cache/storage
         n_items = len(self._items)
         n_processes = min(self.max_processes, max(n_items, 1))
+
+        logger.info(f'Analyzing {n_items}')
 
         # Initialize the cache
         logger.debug("Initializing Analysis Cache")

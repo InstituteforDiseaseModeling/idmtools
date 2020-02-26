@@ -6,7 +6,6 @@ from idmtools.core.interfaces.inamed_entity import INamedEntity
 from idmtools.core import ItemType, EntityContainer
 
 if typing.TYPE_CHECKING:
-    from idmtools.entities.iexperiment import TExperiment
     from typing import NoReturn
 
 
@@ -24,7 +23,7 @@ class Suite(INamedEntity, ABC):
     item_type: 'ItemType' = field(default=ItemType.SUITE, compare=False, init=False)
     description: str = field(default=None, compare=False)
 
-    def add_experiment(self, experiment: 'TExperiment') -> 'NoReturn':
+    def add_experiment(self, experiment: 'Experiment') -> 'NoReturn':
         """
         Add an experiment to the suite
         Args:
@@ -40,9 +39,14 @@ class Suite(INamedEntity, ABC):
         from idmtools.utils.display import display, suite_table_display
         display(self, suite_table_display)
 
+    def pre_creation(self):
+        pass
+
+    def post_creation(self):
+        pass
+
     def __repr__(self):
         return f"<Suite {self.uid} - {len(self.experiments)} experiments>"
 
 
-TSuite = typing.TypeVar("TSuite", bound=Suite)
-TSuiteClass = typing.Type[TSuite]
+ISuiteClass = typing.Type[Suite]

@@ -1,15 +1,20 @@
 import json
 import os
-import pytest
 import unittest
-from COMPS.Data import Experiment
+
+import pytest
+from COMPS.Data import Experiment as COMPSExperiment, AssetCollection as CompsAssetCollection
+
 from idmtools.assets import Asset, AssetCollection
-from idmtools.builders import ExperimentBuilder
-from idmtools.core import EntityStatus
-from idmtools.core.platform_factory import Platform
-from idmtools_models.python import PythonExperiment
+from idmtools.core import ItemType
+from idmtools.entities.experiment import Experiment
+from idmtools.entities.templated_simulation import TemplatedSimulations
+from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
+from idmtools_platform_comps.comps_platform import COMPSPlatform
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id
+from idmtools_test.utils.common_experiments import wait_on_experiment_and_check_all_sim_status
+from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id, \
+    setup_test_with_platform_and_simple_sweep
 
 
 @pytest.mark.comps
@@ -18,62 +23,45 @@ class TestAssetsInComps(unittest.TestCase):
 
     def setUp(self) -> None:
         self.base_path = os.path.abspath(os.path.join(COMMON_INPUT_PATH, "assets", "collections"))
-        self.platform = Platform('COMPS2')
-        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
-        print(self.case_name)
-
-        def setP(simulation, p):
-            return simulation.set_parameter("P", p)
-
-        self.builder = ExperimentBuilder()
-        self.builder.add_sweep_definition(setP, [1, 2, 3])
+        self.platform: COMPSPlatform = None
+        setup_test_with_platform_and_simple_sweep(self)
 
     def _run_and_test_experiment(self, experiment):
-        experiment.builder = self.builder
-        experiment.platform = self.platform
+        experiment.simulations.add_builder(self.builder)
 
-        # Create experiment on platform
-        experiment.pre_creation()
-        self.platform.create_items(items=[experiment])
-
-        for simulation_batch in experiment.batch_simulations(batch_size=10):
-            # Create the simulations on the platform
-            for simulation in simulation_batch:
-                simulation.pre_creation()
-
-            ids = self.platform.create_items(items=simulation_batch)
-
-            for uid, simulation in zip(ids, simulation_batch):
-                simulation.uid = uid
-                simulation.post_creation()
-
-                experiment.simulations.append(simulation.metadata)
-                experiment.simulations.set_status(EntityStatus.CREATED)
-
-                from idmtools.entities import ISimulation
-                simulation.__class__ = ISimulation
-
-        self.platform.refresh_status(item=experiment)
-
-        # Test if we have all simulations at status CREATED
-        self.assertFalse(experiment.done)
-        self.assertTrue(all([s.status == EntityStatus.CREATED for s in experiment.simulations]))
+        self.platform.run_items(experiment)
 
         # Start experiment
-        self.platform.run_items(items=[experiment])
-        self.platform.refresh_status(item=experiment)
-        self.assertFalse(experiment.done)
-        self.assertTrue(all([s.status == EntityStatus.RUNNING for s in experiment.simulations]))
+        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)
 
-        # Wait till done
-        import time
-        start_time = time.time()
-        while time.time() - start_time < 180:
-            self.platform.refresh_status(item=experiment)
-            if experiment.done:
-                break
-            time.sleep(3)
-        self.assertTrue(experiment.done)
+    def test_comps_asset_to_idmtools_asset(self):
+        comps_ac: CompsAssetCollection = self.platform.get_item('2c62399b-1a31-ea11-a2be-f0921c167861',
+                                                                item_type=ItemType.ASSETCOLLECTION, raw=True)
+        ac: AssetCollection = self.platform._assets.to_entity(comps_ac)
+        self.assertIsInstance(ac, AssetCollection)
+
+        filenames_comps = sorted([f'{a.relative_path}{a.file_name}' if a.relative_path else f'{a.file_name}' for a in comps_ac.assets])
+        filenames = sorted([f'{a.relative_path}{a.filename}' for a in ac.assets])
+        self.assertEqual(filenames_comps, filenames)
+
+    def test_create_asset_collection_from_existing_collection(self):
+        ac = self.platform.get_item('2c62399b-1a31-ea11-a2be-f0921c167861', item_type=ItemType.ASSETCOLLECTION)
+        self.assertIsInstance(ac, AssetCollection)
+        new_ac = AssetCollection(ac.assets)
+        new_ac.add_asset(Asset(relative_path=None, filename="test.json", content=json.dumps({"a": 9, "b": 2})))
+        ids = self.platform.create_items([new_ac])
+        new_ac = self.platform.get_item(ids[0].id, item_type=ItemType.ASSETCOLLECTION)
+        self.assertIsInstance(new_ac, AssetCollection)
+
+        filenames = set(sorted([f'{a.relative_path}{a.filename}' for a in ac.assets]))
+        new_filenames = set(sorted([f'{a.relative_path}{a.filename}' for a in new_ac.assets]))
+
+        # we should have one additional file
+        self.assertEqual(len(filenames) + 1, len(new_filenames))
+        # all files from original asset should be in new asset
+        self.assertTrue(all([f'{a.relative_path}{a.filename}' in filenames for a in ac]))
+        # the only difference should be test.json
+        self.assertEqual({'test.json'}, new_filenames - filenames)
 
     @pytest.mark.long
     def test_md5_hashing_for_same_file_contents(self):
@@ -83,24 +71,25 @@ class TestAssetsInComps(unittest.TestCase):
         ac = AssetCollection()
         ac.add_asset(a)
         ac.add_asset(b)
-        ac.tags = {"idmtools": "idmtools-automation", "string_tag": "testACtag", "number_tag": 123, "KeyOnly": None}
+        ac.tags = {"string_tag": "testACtag", "number_tag": 123, "KeyOnly": None}
 
-        pe = PythonExperiment(name=self.case_name,
-                              model_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"),
-                              assets=ac)
-        pe.tags = {"idmtools": "idmtools-automation"}
-        pe.platform = self.platform
+        model_path = os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py")
+
+        task = JSONConfiguredPythonTask(script_path=model_path)
+        templated_simulations = TemplatedSimulations(base_task=task)
+        pe = Experiment(name=self.case_name, simulations=templated_simulations, assets=ac)
+
         self._run_and_test_experiment(pe)
         exp_id = pe.uid
         # exp_id = 'ae077ddd-668d-e911-a2bb-f0921c167866'
-        for simulation in Experiment.get(exp_id).get_simulations():
+        for simulation in COMPSExperiment.get(exp_id).get_simulations():
             collection_id = get_asset_collection_id_for_simulation_id(simulation.id)
             asset_collection = get_asset_collection_by_id(collection_id)
             self.assertEqual(asset_collection.assets[0]._md5_checksum, asset_collection.assets[1]._md5_checksum)
             self.assertEqual(asset_collection.assets[0]._file_name, 'test.json')
             self.assertEqual(asset_collection.assets[1]._file_name, 'test1.json')
 
-    # TODO: test is incomplete
+    # TODO: AssetCollection has no attribute tags
     # def test_create_asset_collection(self):
     #     ac = AssetCollection()
     #     assets_dir = os.path.join(COMMON_INPUT_PATH, "assets", "collections")

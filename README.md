@@ -25,29 +25,43 @@ You can also install just the individual packages to create minimal environments
 ## Pre-requisites
 - Python 3.6/3.7 x64
 - Docker(Required for the local platform)
+  On Windows, please use Docker Desktop 2.1.0.5 or 2.2.0.1
 
 ## Development Environment Setup
 
-Clone the repository:
-```bash
-> git clone https://github.com/InstituteforDiseaseModeling/idmtools.git
-```
+When setting up your environment for the first time, you can use the following instructions
 
-To setup your environment, you can run `python dev_scripts/bootstrap.py`. This will install all the tools. From then on you can use `pymake` to run common development tasks.
+### First Time Setup
+1) Clone the repository:
+   ```bash
+   > git clone https://github.com/InstituteforDiseaseModeling/idmtools.git
+   ```
+2) Create a virtualenv. On Windows, please use venv to create the environment
+   `python -m venv idmtools`
+   On Unix(Mac/Linux) you can use venv or virtualenv
+3) Activate the virtualenv
+4) If you are on windows, run `pip install py-make --upgrade --force-reinstall`
+5) Run `docker login idm-docker-staging.idmod.org`
+6) Then run `python dev_scripts/bootstrap.py`. This will install all the tools. 
 
-There is a Makefile file available for most common development tasks. Here is a list of commands
+### General Use
+After the first install almost everything you need as a developer is part of the makefiles. There is a Makefile is every project directory. There is also a makefile at the top-level of the project.
+
+To use the makefiles you can explore the available commands by running `make help`. On Windows, use `pymake help` 
+
+Here are a list of common commands
+
 ```bash
 setup-dev   -   Setup dev environment(assumes you already have a virtualenv)
 clean       -   Clean up temporary files
+clean-all   -   Deep clean project
 lint        -   Lint package and tests
 test        -   Run Unit tests
 test-all    -   Run Tests that require docker and external systems
 coverage    -   Run tests and generate coverage report that is shown in browser
 ```
-On Windows, you can use `pymake` instead of `make`
 
-Use will also need to ensure you have logged in to the staging docker repo using
-`docker login idm-docker-staging.idmod.org`
+Some packages have unique build related commands, specifically the local platform. Use `make help` to identify specific commands
 
 ### IDE/Runtime Setup
 For development purpose, it is important to add the following folders as to your `PYTHONPATH` (In PyCharm, right click and `Mark Directoy as > Source Root`):
@@ -78,9 +92,27 @@ To run a specific test, cd to the project directories test folder and run
 py.test test_emod.py::TestLocalPlatformEMOD::test_duplicated_eradication
 ```
 
-
 In addition, you can rerun just the failed test using either the top-level `pymake test-failed` rule or by using the 
 `--lf` switch on py.test
+
+### WSL2 on Windows Setup(Experimental)
+
+1. Enable Windows Features by running the following in a Windows Powershell
+   ```powershell
+   dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+   dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+    ```
+2. Restart
+3. 
+   a. If you do a Linux istro installed already through WSL run the following command in a powershell windows
+       ```powershell
+       wsl --set-version <Distro> 2
+       ```
+       You most likely want to run the following command ss well to ensure wsl2 is default going forward
+       ```powershell
+       wsl --set-default-version 2
+       ```
+   b. If you do not yet have a copy of linux installed through WSL, see  https://docs.microsoft.com/en-us/windows/wsl/install-win10#install-your-linux-distribution-of-choice
 
 # Troubleshooting the Development Environment
 
@@ -88,6 +120,6 @@ In addition, you can rerun just the failed test using either the top-level `pyma
 
    Idmtools currently does not prompt users for docker credentials. Because of this you must login
    beforehand using `docker login idm-docker-staging.packages.idmod.org`
-2.  Docker image not found
-
-   Check that the idmt
+2. Docker image not found
+   Rerun the `pymake setup-dev`
+3. Check build logs Detailed Build Logs are located within in package and tests directoery withing the package with the name make.buildlog. You can also increase the console log level to DEBUG by setting the environment variable BUILD_DEBUG to 1

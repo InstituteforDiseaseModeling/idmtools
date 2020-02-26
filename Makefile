@@ -22,6 +22,7 @@ setup-dev:  ## Setup packages in dev mode
 
 lint: ## check style with flake8
 	$(MAKEALL) --parallel lint
+	flake8 --ignore=E501,W291 examples
 
 test: ## Run our tests
 	$(MAKEALL) --parallel test

@@ -5,6 +5,7 @@ import os
 import subprocess
 import sys
 from urllib.parse import urlparse
+
 version = open('VERSION').read().strip()
 if '+nightly' in version:
     version = version.replace('+nightly', '.nightly')
@@ -16,6 +17,6 @@ cmd = ['docker', 'build', '--network=host', '--build-arg', f'PYPIURL={sys.argv[1
 if len(sys.argv) == 3 and sys.argv[2] == "no-cache":
     cmd.insert(2, "--no-cache")
 print(f'Running: {" ".join(cmd)}')
-p = subprocess.Popen(" ".join(cmd),  cwd=os.path.abspath(os.path.dirname(__file__)), shell=True)
+p = subprocess.Popen(" ".join(cmd), cwd=os.path.abspath(os.path.dirname(__file__)), shell=True)
 p.wait()
 sys.exit(p.returncode)

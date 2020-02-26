@@ -1,5 +1,4 @@
 from unittest import TestCase
-
 from idmtools.registry.platform_specification import PlatformPlugins
 
 

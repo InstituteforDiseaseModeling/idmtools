@@ -38,11 +38,11 @@ setup(
     setup_requires=setup_requirements,
     entry_points=dict(idmtools_platform=  # noqa: E251
                       ["idmtools_platform_test = idmtools_test.utils.test_platform:TestPlatformSpecification"],
-                      idmtools_model=  # noqa: E251
-                      ["idmtools_model_test = idmtools_test.utils.tst_experiment_spec:TstExperimentSpec"]
+                      idmtools_task=  # noqa: E251
+                      ["idmtools_model_test = idmtools_test.utils.test_task:TestTaskSpecification"]
                       ),
     test_suite='tests',
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='0.3.0',
+    version='0.3.0+nightly',
     zip_safe=False
 )

@@ -12,8 +12,7 @@ GROUPID=${id_array[1]}
 ROOT=${ROOT:=FALSE}
 UMASK=${UMASK:=022}
 
-echo "$USER"
-echo "$CURRENT_UID"
+echo "User: $USER with id $CURRENT_UID"
 
 if [[ "$USERID" -ne 1000 ]]
 ## Configure user with a different USERID if requested.

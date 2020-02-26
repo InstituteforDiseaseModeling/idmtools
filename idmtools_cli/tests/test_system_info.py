@@ -1,16 +1,10 @@
-import unittest
 import getpass
+import unittest
+
 from idmtools_test.utils.cli import get_subcommands_from_help_result, run_command
 
 
 class TestSystemInfoBasics(unittest.TestCase):
-    @staticmethod
-    def run_command(*args, start_command=None, base_command=None):
-        if start_command is None:
-            start_command = []
-        if base_command:
-            start_command.append(base_command)
-        return run_command(*args, start_command=start_command)
 
     def test_help(self):
         """
@@ -18,7 +12,7 @@ class TestSystemInfoBasics(unittest.TestCase):
         a) info --help is a valid command within the cli
         b) Help provides our expected output and options
         """
-        result = self.run_command('info', '--help')
+        result = run_command('info', '--help')
         self.assertEqual(0, result.exit_code)
         # Check for our help string
         self.assertIn('Troubleshooting and debugging information', result.output)
@@ -33,7 +27,7 @@ class TestSystemInfoBasics(unittest.TestCase):
         a) info plugins --help is a valid command within the cli
         b) Help provides our expected output and options
         """
-        result = self.run_command('info', 'plugins', '--help')
+        result = run_command('info', 'plugins', '--help')
         self.assertEqual(0, result.exit_code)
         # Check for our help string
         self.assertIn('Commands to get information about installed IDM-Tools plugins', result.output)
@@ -56,7 +50,7 @@ class TestSystemInfoBasics(unittest.TestCase):
         ]
         for command, help_str in subcommands:
             with self.subTest(f"test_plugins_{command}_help"):
-                result = self.run_command('info', 'plugins', command, '--help')
+                result = run_command('info', 'plugins', command, '--help')
                 self.assertEqual(0, result.exit_code)
                 # Check for our help string
                 self.assertIn(help_str, result.output)
@@ -67,7 +61,7 @@ class TestSystemInfoBasics(unittest.TestCase):
         a) info plugins cli is a valid command within the cli
         b) Help provides our expected output and options
         """
-        result = self.run_command('info', 'plugins', 'cli')
+        result = run_command('info', 'plugins', 'cli')
         # Check we got a success
         self.assertEqual(0, result.exit_code)
         # check for our table header
@@ -80,7 +74,7 @@ class TestSystemInfoBasics(unittest.TestCase):
         a) info plugins platform is a valid command within the cli
         b) Help provides our expected output and options
         """
-        result = self.run_command('info', 'plugins', 'platform')
+        result = run_command('info', 'plugins', 'platform')
         # Check we got a success
         self.assertEqual(0, result.exit_code)
         # check for our table header
@@ -93,7 +87,7 @@ class TestSystemInfoBasics(unittest.TestCase):
         a) info system --help is a valid command within the cli
         b) Help provides our expected output and options
         """
-        result = self.run_command('info', 'system', '--help')
+        result = run_command('info', 'system', '--help')
         self.assertEqual(0, result.exit_code)
         # Check for our help string
         self.assertIn('Provide an output with details about your current execution platform', result.output)
@@ -104,7 +98,7 @@ class TestSystemInfoBasics(unittest.TestCase):
         a) info system is a valid command within the cli
         b) Help provides our expected output and options
         """
-        result = self.run_command('info', 'system')
+        result = run_command('info', 'system')
         self.assertEqual(0, result.exit_code)
 
         self.assertIn(f'user: {getpass.getuser()}', result.output)

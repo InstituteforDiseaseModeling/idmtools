@@ -24,13 +24,14 @@ clean: ## Clean most of the temp-data from the project
 clean-all:  ## Deleting package info hides plugins so we only want to do that for packaging
 	@make clean
 	$(CLDIR) --dir-patterns "**/*.egg-info/"
+	@+$(IPY) "import os; os.chdir('idmtools_webui'); os.system('python build.py clean')"
 
 edv:
 	echo $(CWD)
 
 # Dev and test related rules
 lint: ## check style with flake8
-	$(PDR) -w '..' -ex 'flake8 --ignore=E501 $(PACKAGE_NAME)'
+	$(PDR) -w '..' -ex 'flake8 --ignore=E501,W291 $(PACKAGE_NAME)'
 
 test: ## Run our tests
 	$(FULL_TEST_CMD) -m "not comps and not docker"'
@@ -121,6 +122,9 @@ dist: ## build our package
 start-webui: ## start the webserver
 	$(PDR) -w 'idmtools_webui' -ex yarn
 	$(PDR) -w 'idmtools_webui' -ex 'yarn start'
+
+ui-yarn-upgrade:
+	@+$(IPY) "import os; os.chdir('idmtools_webui'); os.system('python build.py upgrade')"
 
 build-ui: ## build ui
 	$(CLDIR) --directories "idmtools_platform_local/internals/ui/static,idmtools_webui/build"

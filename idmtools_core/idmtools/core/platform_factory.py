@@ -1,7 +1,12 @@
-import ast
-import copy
+from contextlib import contextmanager
 from dataclasses import fields
+from logging import getLogger
+
 from idmtools.config import IdmConfigParser
+from idmtools.entities.iplatform import IPlatform
+from idmtools.utils.entities import validate_user_inputs_against_dataclass
+
+logger = getLogger(__name__)
 
 
 class Platform:
@@ -45,7 +50,7 @@ class Platform:
                              f"Supported platforms are {', '.join(cls._platforms.keys())}")
 
     @classmethod
-    def _create_from_block(cls, block: str, **kwargs):
+    def _create_from_block(cls, block: str, **kwargs) -> IPlatform:
         """
         Retrieve section entries from the INI configuration file by giving block.
 
@@ -58,7 +63,7 @@ class Platform:
         """
 
         # Read block details
-        section = IdmConfigParser.get_section(block, force=True)
+        section = IdmConfigParser.get_section(block)
 
         try:
             # Make sure block has type entry
@@ -80,23 +85,10 @@ class Platform:
         field_type = {f.name: f.type for f in fds}
 
         # Make data to the requested type
-        inputs = copy.deepcopy(section)
-        fs = set(field_type.keys()).intersection(set(section.keys()))
-        for fn in fs:
-            ft = field_type[fn]
-            if ft in (int, float, str):
-                inputs[fn] = ft(section[fn])
-            elif ft is bool:
-                inputs[fn] = ast.literal_eval(section[fn])
+        inputs = IdmConfigParser.retrieve_dict_config_block(field_type, section)
 
         # Make sure the user values have the requested type
-        fs_kwargs = set(field_type.keys()).intersection(set(kwargs.keys()))
-        for fn in fs_kwargs:
-            ft = field_type[fn]
-            if ft in (int, float, str):
-                kwargs[fn] = ft(kwargs[fn]) if kwargs[fn] is not None else kwargs[fn]
-            elif ft is bool:
-                kwargs[fn] = ast.literal_eval(kwargs[fn]) if isinstance(kwargs[fn], str) else kwargs[fn]
+        fs_kwargs = validate_user_inputs_against_dataclass(field_type, kwargs)
 
         # Update attr based on priority: #1 Code, #2 INI, #3 Default
         for fn in set(kwargs.keys()).intersection(set(field_name)):
@@ -124,3 +116,27 @@ class Platform:
 
         # Now create Platform using the data with the correct data types
         return platform_cls(**inputs)
+
+
+# The current platform
+current_platform_stack = []
+current_platform: IPlatform = None
+
+
+@contextmanager
+def platform(*args, **kwds):
+    global current_platform
+    logger.debug(f'Acquiring platform context with options: {str(*args)}')
+    current_platform = Platform(*args, **kwds)
+    try:
+        # check if we are already in a platform context and if so add to stack
+        if current_platform is not None:
+            current_platform_stack.append(current_platform)
+        yield current_platform
+    finally:
+        # Code to release resource, e.g.:
+        logger.debug('Un-setting current platform context')
+        del current_platform
+        # check if there is other platforms on the stack and set if so
+        if len(current_platform_stack):
+            current_platform = current_platform_stack.pop()

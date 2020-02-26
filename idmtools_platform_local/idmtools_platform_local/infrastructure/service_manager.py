@@ -72,7 +72,8 @@ class DockerServiceManager:
     def cleanup(self, delete_data: bool = False, tear_down_brokers: bool = False) -> NoReturn:
         """
         Stops the containers and removes the network. Optionally the postgres data container can be deleted as well
-            as closing any active Redis connections
+        as closing any active Redis connections
+
         Args:
             delete_data: Delete postgres data
             tear_down_brokers: True to close redis brokers, false otherwise
@@ -158,7 +159,8 @@ class DockerServiceManager:
                               sleep_after: Union[int, float] = 0.5) -> bool:
         """
         Polls list of port attributes(eg postgres_port, redis_port and checks if they are currently open. We use this
-            to verify postgres/redis are ready for our workers
+        to verify postgres/redis are ready for our workers
+
         Args:
             ports: List of port attributes
             wait_between_tries: Time between port checks

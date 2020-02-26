@@ -1,9 +1,11 @@
 from typing import Type
-from idmtools.registry.model_specification import ModelSpecification, get_model_impl, get_model_type_impl
+
+from idmtools.registry.experiment_specification import ExperimentPluginSpecification, get_model_impl, \
+    get_model_type_impl
 from idmtools.registry.plugin_specification import get_description_impl
 
 
-class EMODExperimentSpec(ModelSpecification):
+class EMODExperimentSpec(ExperimentPluginSpecification):
 
     @get_description_impl
     def get_description(self) -> str:
