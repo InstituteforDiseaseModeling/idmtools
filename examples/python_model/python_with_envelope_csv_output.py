@@ -25,8 +25,10 @@ with platform('COMPS2'):
         # set default parameters
         parameters=dict(c=0),
         # set a parameter envelope
-        envelope="parameters")
-
+        envelope="parameters",
+        # add some experiment level assets
+        common_assets=AssetCollection.from_directory(os.path.join("inputs", "csv_inputs"))
+    )
 
     ts = TemplatedSimulations(base_task=base_task)
 
@@ -37,11 +39,8 @@ with platform('COMPS2'):
 
     ts.add_builder(builder)
 
-    # add additional common assets
-    common_assets = AssetCollection.from_directory(relative_path="MyExternalLibrary",
-                                                   assets_directory=os.path.join("inputs", "csv_inputs",
-                                                                                 "MyExternalLibrary"))
-    e = Experiment.from_template(ts, name=os.path.split(sys.argv[0])[1], tags=dict(tag1=1), assets=common_assets)
+    e = Experiment.from_template(ts, name=os.path.split(sys.argv[0])[1], tags=dict(tag1=1))
+
     e.run(wait_until_done=True)
     # use system status as the exit code
     sys.exit(0 if e.succeeded else -1)

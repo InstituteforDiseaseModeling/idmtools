@@ -264,8 +264,9 @@ class AnalyzeManager(CacheEnabled):
             logger.debug("Terminating workerpool")
             worker_pool.terminate()
             return False
-        logger.debug(f"Result fetching status: : {results.successful()}")
-        return True
+        status = results.get()
+        logger.debug(f"Result fetching status: : {status}")
+        return status
 
     def _run_and_wait_for_reducing(self, worker_pool: Pool) -> dict:
         """
