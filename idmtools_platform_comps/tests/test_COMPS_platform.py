@@ -4,7 +4,6 @@ import os
 import unittest
 from os import path
 import pytest
-import pytest
 from idmtools.builders import SimulationBuilder
 from idmtools.core import EntityStatus
 from idmtools.entities.experiment import Experiment
@@ -14,7 +13,6 @@ from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.common_experiments import wait_on_experiment_and_check_all_sim_status
 from idmtools_test.utils.comps import assure_running_then_wait_til_done, setup_test_with_platform_and_simple_sweep
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-from idmtools.utils.filter_simulations import FilterItem
 
 current_directory = path.dirname(path.realpath(__file__))
 
