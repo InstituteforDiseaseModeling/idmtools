@@ -264,7 +264,7 @@ class AnalyzeManager(CacheEnabled):
             logger.debug("Terminating workerpool")
             worker_pool.terminate()
             return False
-        status = results.get()
+        status = results.successful()
         logger.debug(f"Result fetching status: : {status}")
         return status
 
