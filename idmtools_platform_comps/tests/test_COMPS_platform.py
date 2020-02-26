@@ -153,22 +153,6 @@ class TestCOMPSPlatform(ITestWithPersistence):
         self.assertTrue(experiment2.done)
         self.assertTrue(experiment2.succeeded)
 
-    @pytest.mark.long
-    def test_filter_status_for_succeeded_sims(self):
-        model_path = os.path.join(COMMON_INPUT_PATH, "compsplatform", 'mixed_model.py')
-        task = JSONConfiguredPythonTask(script_path=model_path)
-        builder = SimulationBuilder()
-        builder.add_sweep_definition(JSONConfiguredPythonTask.set_parameter_partial('P'), range(3))
-        experiment = Experiment.from_builder(builder, task, name='Mixed Model')
-        self.platform.run_items(experiment)
-        self.platform.wait_till_done(experiment)
-        self.assertTrue(experiment.done)
-        self.assertFalse(experiment.succeeded)
-
-        # only get back the succeeded sims
-        sims = FilterItem.filter_item(self.platform, experiment, status=EntityStatus.SUCCEEDED)
-        self.assertEqual(len(sims), 2)
-
 
 if __name__ == '__main__':
     unittest.main()
