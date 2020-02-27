@@ -113,7 +113,6 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         am = AnalyzeManager(platform=platform, ids=[(exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
 
-        for simulation in Experiment.get(exp_id).get_simulations():
-            # self.assertTrue(os.path.exists(os.path.join('output', str(simulation.id), "result.json")))
+        for simulation in COMPSExperiment.get(exp_id).get_simulations():
             # verify results
             self.assertTrue(os.path.exists(os.path.join("output", "b_match.csv")))
