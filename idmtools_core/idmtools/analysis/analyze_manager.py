@@ -353,10 +353,10 @@ class AnalyzeManager(CacheEnabled):
                            initializer=pool_worker_initializer,
                            initargs=(map_item, self.analyzers, self.cache, self.platform))
 
-        success = self._run_and_wait_for_mapping(worker_pool=worker_pool, start_time=start_time)
-        logger.debug(f"Success: {success}")
-        if not success:
-            return success
+        map_results = self._run_and_wait_for_mapping(worker_pool=worker_pool, start_time=start_time)
+        logger.debug(f"Success: {map_results}")
+        if not map_results:
+            return map_results
 
         # At this point we have results for the individual items in self.cache.
         # Call the analyzer reduce methods
