@@ -7,9 +7,10 @@ from COMPS import Client
 
 MD5_KEY = 'idmtools-requirements-md5'
 AC_FILE = 'ac_info.txt'
+LIBRARY_ROOT = 'Libraries/'
 
 
-def build_asset_file_list(comps_sim, prefix='Libraries/'):
+def build_asset_file_list(comps_sim, prefix=LIBRARY_ROOT):
     """
     Utility function to build all library files
     Args:
