@@ -10,6 +10,14 @@ AC_FILE = 'ac_info.txt'
 
 
 def build_asset_file_list(comps_sim, prefix='Libraries/'):
+    """
+    Utility function to build all library files
+    Args:
+        comps_sim: given simulation
+        prefix: used to identify library files
+
+    Returns: file paths as a list
+    """
     metadata = comps_sim.retrieve_output_file_info([])
     output_folder = [{'friendly_name': m.friendly_name, 'path_from_root': m.path_from_root, 'url': m.url} for m in
                      metadata if m.path_from_root.startswith(prefix)]
@@ -17,6 +25,13 @@ def build_asset_file_list(comps_sim, prefix='Libraries/'):
 
 
 def get_first_simulation_of_experiment(exp_id):
+    """
+    Retrieve the first simulation from an experiment
+    Args:
+        exp_id: use input (experiment id)
+
+    Returns: list of files paths
+    """
     comps_exp = Experiment.get(exp_id)
     comps_sims = comps_exp.get_simulations()
     comps_sim = comps_sims[0]
@@ -25,6 +40,12 @@ def get_first_simulation_of_experiment(exp_id):
 
 
 def get_data(url):
+    """
+    Get content of a file
+    Args:
+        url: file location
+    Returns: file content as byte string
+    """
     i = url.find('/asset/')
     if i == -1:
         raise RuntimeError('Unable to parse asset url: ' + url)

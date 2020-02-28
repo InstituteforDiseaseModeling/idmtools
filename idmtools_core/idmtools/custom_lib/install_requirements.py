@@ -13,6 +13,10 @@ REQUIREMENT_FILE = 'requirements_updated.txt'
 def install_packages_from_requirements(requirements_file=REQUIREMENT_FILE, python_paths=None):
     """
     Install our packages to a local directory
+    Args:
+        requirements_file: requirements file
+        python_paths: system Python path
+    Returns: None
     """
     if python_paths is None:
         env = dict()
@@ -33,6 +37,11 @@ def install_packages_from_requirements(requirements_file=REQUIREMENT_FILE, pytho
 
 
 def get_pip_command():
+    """
+    Utility to retrieve right pip command
+    Returns: str
+    Note: is is not used as COMPS can't find pip
+    """
     from distutils import spawn
 
     for pip in PIP_COMMANDS:

@@ -48,49 +48,22 @@ class RequirementsToAssetCollection:
     def requirements(self):
         """
         Returns:
-            The md5 of the requirements.
+            Consolidated requirements.
         """
         if not self._requirements:
             self._requirements = self.validate_requirements()
 
         return self._requirements
 
-    def save_updated_requirements(self):
-        req_content = '\n'.join(self.requirements)
-        with open(REQUIREMENT_FILE, 'w') as outfile:
-            outfile.write(req_content)
-
-    def is_requirements_changed(self):
-        file_path = REQUIREMENT_FILE
-        previous_md5 = '' if not os.path.exists(file_path) else open(file_path, 'r').read()
-        previous_md5 = hashlib.md5(previous_md5.encode('utf-8')).hexdigest()
-
-        return not (previous_md5 == self.checksum)
-
-    def retrieve_ac_by_tag(self, md5_check=None):
-        md5_str = md5_check or self.checksum
-        print('md5_str: ', md5_str)
-
-        # check if ac with tag idmtools-requirements-md5 = my_md5 exists
-        ac_list = COMPSAssetCollection.get(
-            query_criteria=QueryCriteria().select_children('tags').where_tag([f'{MD5_KEY}={md5_str}']))
-
-        # if it exists, get ac and return it
-        if len(ac_list) > 0:
-            ac = ac_list[0]
-            return ac
-
-    def retrieve_ac_by_wi(self, wi_id):
-        from COMPS.Data import WorkItem
-
-        wi = WorkItem.get(wi_id)
-        barr = wi.retrieve_output_files(['ac_info.txt'])
-        ac_id = barr[0].decode("utf-8")
-
-        ac = COMPSAssetCollection.get(ac_id)
-        return ac
-
     def run(self):
+        """
+        The working logic of this utility:
+            1. check if asset collection exists for given requirements, return ac id if exists
+            2. create an Experiment to install the requirements on COMPS
+            3. create a WorkItem to create a Asset Collection
+            4. the Experiment and WorkItem Succeeded, return new ac id
+        Returns: return ac id based on the requirements
+        """
         # Check if ac with md5 exists
         ac = self.retrieve_ac_by_tag()
 
@@ -121,7 +94,65 @@ class RequirementsToAssetCollection:
         if ac:
             return ac.id
 
+    def save_updated_requirements(self):
+        """
+        Save consolidated requirements to a file requirements_updated.txt
+        Returns:
+
+        """
+        req_content = '\n'.join(self.requirements)
+        with open(REQUIREMENT_FILE, 'w') as outfile:
+            outfile.write(req_content)
+
+    def is_requirements_changed(self):
+        """
+        Check if requirements has been changed or not
+        Returns: bool
+        """
+        file_path = REQUIREMENT_FILE
+        previous_md5 = '' if not os.path.exists(file_path) else open(file_path, 'r').read()
+        previous_md5 = hashlib.md5(previous_md5.encode('utf-8')).hexdigest()
+
+        return not (previous_md5 == self.checksum)
+
+    def retrieve_ac_by_tag(self, md5_check=None):
+        """
+        Retrieve comps asset collection given ac tag
+        Args:
+            md5_check: also can use custom md5 string as search tag
+        Returns: comps asset collection
+        """
+        md5_str = md5_check or self.checksum
+        print('md5_str: ', md5_str)
+
+        # check if ac with tag idmtools-requirements-md5 = my_md5 exists
+        ac_list = COMPSAssetCollection.get(
+            query_criteria=QueryCriteria().select_children('tags').where_tag([f'{MD5_KEY}={md5_str}']))
+
+        # if it exists, get ac and return it
+        if len(ac_list) > 0:
+            ac = ac_list[0]
+            return ac
+
+    def retrieve_ac_by_wi(self, wi_id):
+        """
+        Retrieve comps asset collection given ac id
+        Returns: comps asset collection
+        """
+        from COMPS.Data import WorkItem
+
+        wi = WorkItem.get(wi_id)
+        barr = wi.retrieve_output_files(['ac_info.txt'])
+        ac_id = barr[0].decode("utf-8")
+
+        ac = COMPSAssetCollection.get(ac_id)
+        return ac
+
     def run_experiment_to_install_lib(self):
+        """
+        Create an Experiment which will run another py script to install requirements
+        Returns: Experiment created
+        """
         self.save_updated_requirements()
 
         exp_name = "install custom requirements"
@@ -137,6 +168,12 @@ class RequirementsToAssetCollection:
             return experiment
 
     def run_wi_to_create_ac(self, exp_id):
+        """
+        Create an WorkItem which will run another py script to create new asset collection
+        Args:
+            exp_id: the Experiment id (which installed requirements)
+        Returns: work item created
+        """
         from idmtools.assets.file_list import FileList
         from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
 
@@ -158,6 +195,12 @@ class RequirementsToAssetCollection:
             return wi
 
     def get_latest_version(self, pkg_name):
+        """
+        Utility to get the latest version for a given package name
+        Args:
+            pkg_name: package name given
+        Returns: the latest version of ven package
+        """
         from urllib import request
         from pkg_resources import parse_version
         from packaging.version import parse
@@ -172,6 +215,12 @@ class RequirementsToAssetCollection:
         return latest_version
 
     def validate_requirements(self):
+        """
+        Combine requiremtns and dynamic requirements (a list):
+          - get the latest version of package if version is not provided
+          - dynamic requirements will overwrites the requirements file
+        Returns: the consolidated requirements (as a list)
+        """
         import pkg_resources
 
         req_dict = {}
@@ -214,7 +263,6 @@ class RequirementsToAssetCollection:
     def wait_till_done(self, item: IItem, timeout: 'int' = 60 * 60 * 24, refresh_interval: 'int' = 5):
         """
         Wait for the experiment to be done.
-
         Args:
             refresh_interval: How long to wait between polling.
             timeout: How long to wait before failing.
