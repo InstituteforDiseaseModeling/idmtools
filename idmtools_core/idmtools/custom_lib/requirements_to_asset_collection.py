@@ -133,23 +133,6 @@ class RequirementsToAssetCollection:
             ac = ac_list[0]
             return ac
 
-    def retrieve_ac_by_wi(self, wi_id):
-        """
-        Retrieve comps asset collection given ac id
-        Returns: comps asset collection
-
-        Note: this is backup function in case filter ac by tags not working.
-              Not used right now!
-        """
-        from COMPS.Data import WorkItem
-
-        wi = WorkItem.get(wi_id)
-        barr = wi.retrieve_output_files(['ac_info.txt'])
-        ac_id = barr[0].decode("utf-8")
-
-        ac = COMPSAssetCollection.get(ac_id)
-        return ac
-
     def run_experiment_to_install_lib(self):
         """
         Create an Experiment which will run another py script to install requirements

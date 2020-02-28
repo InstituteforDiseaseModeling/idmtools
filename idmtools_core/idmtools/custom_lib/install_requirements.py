@@ -5,8 +5,6 @@ import traceback
 
 CURRENT_DIRECTORY = os.getcwd()
 LIB_PATH = os.path.join(CURRENT_DIRECTORY, 'Libraries')
-
-PIP_COMMANDS = ['pip3', 'pip3.7', 'pip3.6', 'pip']
 REQUIREMENT_FILE = 'requirements_updated.txt'
 
 
@@ -27,31 +25,9 @@ def install_packages_from_requirements(requirements_file=REQUIREMENT_FILE, pytho
         env = dict(os.environ)
         env['PYTHONPATH'] = os.pathsep.join(python_paths)
 
-    # get right pip command
-    # PIP_COMMAND = get_pip_command()
-    PIP_COMMAND = "pip"
-
     print("Running pip install -r {} to tmp directory".format(requirements_file))
-    subprocess.check_call([sys.executable, "-m", PIP_COMMAND, "install", "--prefix", LIB_PATH, "-r", requirements_file],
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "--prefix", LIB_PATH, "-r", requirements_file],
                           env=env)
-
-
-def get_pip_command():
-    """
-    Utility to retrieve right pip command
-    Returns: str
-
-    Note: is is not used as COMPS can't find pip
-    """
-    from distutils import spawn
-
-    for pip in PIP_COMMANDS:
-        if spawn.find_executable(pip):
-            return pip
-
-    # If we get to this point, no pip was found -> exception
-    raise OSError("pip could not be found on this system.\n"
-                  "Make sure Python is installed correctly and pip is in the PATH")
 
 
 if __name__ == "__main__":
