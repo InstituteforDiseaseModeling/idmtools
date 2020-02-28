@@ -61,8 +61,7 @@ class RequirementsToAssetCollection:
             1. check if asset collection exists for given requirements, return ac id if exists
             2. create an Experiment to install the requirements on COMPS
             3. create a WorkItem to create a Asset Collection
-            4. the Experiment and WorkItem Succeeded, return new ac id
-        Returns: return ac id based on the requirements
+        Returns: return ac id based on the requirements if Experiment and WorkItem Succeeded
         """
         # Check if ac with md5 exists
         ac = self.retrieve_ac_by_tag()
@@ -129,7 +128,7 @@ class RequirementsToAssetCollection:
         ac_list = COMPSAssetCollection.get(
             query_criteria=QueryCriteria().select_children('tags').where_tag([f'{MD5_KEY}={md5_str}']))
 
-        # if it exists, get ac and return it
+        # if exists, get ac and return it
         if len(ac_list) > 0:
             ac = ac_list[0]
             return ac
@@ -138,6 +137,9 @@ class RequirementsToAssetCollection:
         """
         Retrieve comps asset collection given ac id
         Returns: comps asset collection
+
+        Note: this is backup function in case filter ac by tags not working.
+              Not used right now!
         """
         from COMPS.Data import WorkItem
 
@@ -247,11 +249,9 @@ class RequirementsToAssetCollection:
 
         update_req_list = []
         for k, v in has_version_dict.items():
-            # print(k, ': ', v)
             update_req_list.append(f'{k}{v[0][0]}{v[0][1]}')
 
         for k, v in missing_version_dict.items():
-            # print(k, ': ', v)
             latest = self.get_latest_version(k)
             update_req_list.append(f"{k}{v[0][0] if len(v) > 0 else '=='}{latest}")
 

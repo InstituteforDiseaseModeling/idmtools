@@ -103,7 +103,7 @@ def main():
 
     ac.save()
 
-    # Outpur ac id
+    # Output ac
     print('ac_id: ', ac.id)
 
     # write ac_id to file ac_info.txt

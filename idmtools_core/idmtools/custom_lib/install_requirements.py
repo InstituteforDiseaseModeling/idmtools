@@ -40,6 +40,7 @@ def get_pip_command():
     """
     Utility to retrieve right pip command
     Returns: str
+
     Note: is is not used as COMPS can't find pip
     """
     from distutils import spawn
@@ -71,11 +72,6 @@ if __name__ == "__main__":
 
     try:
         install_packages_from_requirements(f'Assets/{REQUIREMENT_FILE}', sys.path)
-        print('Check directory: \n', os.path.abspath('.'))
-        print(
-            'Asset size: {} mb'.format(sum(os.path.getsize(f) for f in os.listdir('.') if os.path.isfile(f)) / 2 ** 20))
-
-
     except Exception as e:
         tb = traceback.format_exc()
         print(tb)
