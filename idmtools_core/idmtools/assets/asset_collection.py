@@ -327,6 +327,8 @@ class AssetCollection(IEntity):
     def pre_creation(self) -> None:
         if self.tags:
             self.tags.update(get_default_tags())
+        else:
+            self.tags = get_default_tags()
 
     def post_creation(self) -> None:
         pass
