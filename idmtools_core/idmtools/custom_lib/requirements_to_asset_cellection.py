@@ -4,14 +4,16 @@ import hashlib
 from dataclasses import dataclass, field
 from idmtools.assets import Asset
 from idmtools.core.interfaces.iitem import IItem
-from idmtools.entities import IPlatform
-from idmtools.managers import ExperimentManager
-from idmtools_models.python import PythonExperiment
 from COMPS.Data.AssetCollection import AssetCollection as COMPSAssetCollection
 from COMPS.Data import QueryCriteria
+from idmtools.entities.experiment import Experiment
+from idmtools.entities.iplatform import IPlatform
+from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 REQUIREMENT_FILE = 'requirements_updated.txt'
+MODEL_LOAD_LIB = "install_requirements.py"
+MODEL_CREATE_AC = 'create_asset_collection.py'
 MD5_KEY = 'idmtools-requirements-md5'
 
 
@@ -122,13 +124,13 @@ class RequirementsToAssetCollection:
     def run_experiment_to_install_lib(self):
         self.save_updated_requirements()
 
-        experiment = PythonExperiment(name="experiment to install custom requirements",
-                                      model_path=os.path.join(CURRENT_DIRECTORY, "install_requirements.py"))
+        exp_name = "install custom requirements"
+        task = JSONConfiguredPythonTask(script_path=os.path.join(CURRENT_DIRECTORY, MODEL_LOAD_LIB))
+        experiment = Experiment(name=exp_name, simulations=[task.to_simulation()])
         experiment.add_asset(Asset(REQUIREMENT_FILE))
         experiment.tags = {MD5_KEY: self.checksum}
-        em = ExperimentManager(experiment=experiment, platform=self.platform)
-        em.run()
-        # ret = em.wait_till_done()
+
+        self.platform.run_items(experiment)
         self.wait_till_done(experiment)
 
         if experiment.succeeded:
@@ -136,22 +138,20 @@ class RequirementsToAssetCollection:
 
     def run_wi_to_create_ac(self, exp_id):
         from idmtools.assets.file_list import FileList
-        from idmtools.managers.work_item_manager import WorkItemManager
-        from idmtools.ssmt.idm_work_item import SSMTWorkItem
+        from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
 
         md5_str = self.checksum
         print('md5_str: ', md5_str)
 
         wi_name = "wi to create ac"
-        command = f"python create_asset_collection.py {exp_id} {md5_str} {self.platform.endpoint}"
-        user_files = FileList(root=CURRENT_DIRECTORY, files_in_root=['create_asset_collection.py'])
+        command = f"python {MODEL_CREATE_AC} {exp_id} {md5_str} {self.platform.endpoint}"
+        user_files = FileList(root=CURRENT_DIRECTORY, files_in_root=[MODEL_CREATE_AC])
         tags = {MD5_KEY: self.checksum}
 
         wi = SSMTWorkItem(item_name=wi_name, command=command, user_files=user_files, tags=tags,
                           related_experiments=[exp_id])
-        wim = WorkItemManager(wi, self.platform)
-        wim.process(check_status=False)
 
+        wi.run(False, platform=self.platform)
         self.wait_till_done(wi)
 
         if wi.succeeded:

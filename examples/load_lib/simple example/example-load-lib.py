@@ -1,27 +1,34 @@
 import os
-from idmtools.core import ItemType
+from idmtools.assets import AssetCollection
 from idmtools.core.platform_factory import Platform
-from idmtools.managers import ExperimentManager
-from idmtools_models.python import PythonExperiment
+from idmtools.entities.experiment import Experiment
+from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools.custom_lib.requirements_to_asset_cellection import RequirementsToAssetCollection
 
 
 def run_example(ac_id):
     print(f'run example with ac: {ac_id}')
 
-    platform = Platform('COMPS2')
-    ac = platform.get_item(ac_id, item_type=ItemType.ASSETCOLLECTION, raw=False)
+    exp_name = "run_example_use_ac"
 
-    experiment = PythonExperiment(name="Simple Experiment Demo", model_path=os.path.join("model_file.py"), assets=ac)
-    em = ExperimentManager(experiment=experiment, platform=platform)
-    em.run()
-    em.wait_till_done()
+    platform = Platform('COMPS2')
+    common_assets = AssetCollection.from_id(ac_id, platform=platform)
+    task = JSONConfiguredPythonTask(script_path=os.path.abspath("model_file.py"), common_assets=common_assets)
+    experiment = Experiment(name=exp_name, simulations=[task.to_simulation()])
+    experiment.tags = {'ac_id': str(ac_id)}
+
+    platform.run_items(experiment)
+    platform.wait_till_done(experiment)
+
+    if experiment.succeeded:
+        print('Experiment is complete!')
+    else:
+        print('Failed to run example!')
 
 
 def main():
     platform = Platform('COMPS2')
-    pl = RequirementsToAssetCollection(platform, requirements_path='./requirements.txt',
-                                       pkg_list=['astor'])
+    pl = RequirementsToAssetCollection(platform, requirements_path='./requirements.txt', pkg_list=['astor==0.8.0'])
 
     ac_id = pl.run()
     print('ac_id: ', ac_id)
