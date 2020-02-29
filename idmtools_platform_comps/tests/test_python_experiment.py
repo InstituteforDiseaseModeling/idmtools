@@ -1,6 +1,7 @@
 import copy
 import json
 import os
+import sys
 import unittest
 from functools import partial
 from operator import itemgetter
@@ -308,9 +309,11 @@ class TestPythonExperiment(ITestWithPersistence):
         # Add the builder to our templated sim
         ts.add_builder(builder)
 
-        e = Experiment(name=self.case_name, simulations=ts, tags={
+        e = Experiment(name=self.case_name, simulations=ts)
+        tags = {
             "string_tag": "test", "number_tag": 123, "KeyOnly": None
-        })
+        }
+        e.tags = tags
 
         wait_on_experiment_and_check_all_sim_status(self, e, self.platform)
         exp_id = e.uid
@@ -338,9 +341,11 @@ class TestPythonExperiment(ITestWithPersistence):
     @pytest.mark.comps
     def test_use_existing_ac_with_experiment(self):
         model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
+        tags = {"a": "1", "b": 10}
         t = JSONConfiguredPythonTask(script_path=model_path, parameters=dict(a=1, b=10), envelope="parameters")
-        e = Experiment(name=self.case_name, simulations=[t], tags={"a": "1", "b": 10},
-                       gather_common_assets_from_task=True)
+        ts = TemplatedSimulations(base_task=t)
+        ts.tags = tags
+        e = Experiment(name=self.case_name, simulations=ts, gather_common_assets_from_task=True)
 
         ac = self.get_existing_python_asset_collection()
         e.add_assets(ac)
@@ -376,9 +381,10 @@ class TestPythonExperiment(ITestWithPersistence):
         builder.add_sweep_definition(setParam("min_x"), range(-2, 1))
         builder.add_sweep_definition(setParam("max_x"), range(-2, 2))
         ts.add_builder(builder)
+        tags = {"string_tag": "existing ac and create new ac", "number_tag": 123}
+        ts.tags = tags
 
-        e = Experiment(name=self.case_name, simulations=ts,
-                       tags={"string_tag": "existing ac and create new ac", "number_tag": 123})
+        e = Experiment(name=self.case_name, simulations=ts)
         ac = self.get_existing_python_asset_collection()
 
         # Create new ac starting from an existing asset collection and add a file you need to run your experiment
@@ -406,6 +412,69 @@ class TestPythonExperiment(ITestWithPersistence):
                              {'filename': 'working_model.py', 'relative_path': ''},
                              {'filename': 'test.json', 'relative_path': ''}]
             self.validate_assets(assets, expected_list)
+
+    # test SSMTWorkItem where waiting for sims to complete first
+    @pytest.mark.long
+    @pytest.mark.comps
+    # TODO: won't work until merge Ye's SEIR model
+    # def test_ssmt_workitem_waiting_for_sims_to_finish(self):
+    def test_ssmt_seir_model_analysis(self):
+        # ------------------------------------------------------
+        # First run the experiment
+        # ------------------------------------------------------
+        script_path = os.path.join(COMMON_INPUT_PATH, "python", "ye_seir_model", "Assets", "SEIR_model.py")
+        assets_path = os.path.join(COMMON_INPUT_PATH, "python", "ye_seir_model", "Assets")
+        tags = {"idmtools": "idmtools-automation", "simulation_name_tag": "SEIR_Model"}
+
+        parameters = json.load(open(os.path.join(assets_path, 'templates\config.json'), 'r'))
+        parameters[ConfigParameters.Base_Infectivity_Distribution] = ConfigParameters.GAUSSIAN_DISTRIBUTION
+        task = JSONConfiguredPythonTask(script_path=script_path, parameters=parameters, config_file_name='config.json')
+        task.command.add_option("--duration", 40)
+
+        # now create a TemplatedSimulation builder
+        ts = TemplatedSimulations(base_task=task)
+        ts.base_simulation.tags['simulation_name_tag'] = "SEIR_Model"
+
+        # now define our sweeps
+        builder = SimulationBuilder()
+
+        # utility function to update parameters
+        def param_update(simulation: Simulation, param: str, value: Any) -> Dict[str, Any]:
+            return simulation.task.set_parameter(param, value)
+
+        set_base_infectivity_gaussian_mean = partial(param_update,
+                                                     param=ConfigParameters.Base_Infectivity_Gaussian_Mean)
+
+        class setParam:
+            def __init__(self, param):
+                self.param = param
+
+            def __call__(self, simulation, value):
+                return simulation.task.set_parameter(self.param, value)
+
+        builder.add_sweep_definition(setParam(ConfigParameters.Base_Infectivity_Gaussian_Std_Dev), [0.3, 1])
+
+        ts.add_builder(builder)
+        ts.tags = tags
+
+        # now we can create our experiment using our template builder
+        # TODO: AttributeError: type object 'Experiment' has no attribute 'from_template'
+        # experiment = Experiment.from_template(ts, name=self.case_name, tags=tags, assets=common_assets)
+
+        experiment = Experiment(name=self.case_name, simulations=ts)
+        experiment.tags = tags
+
+        experiment.assets.add_directory(assets_directory=assets_path)
+
+        # set platform and run simulations
+        platform = Platform('COMPS2')
+        platform.run_items(experiment)
+        platform.wait_till_done(experiment)
+
+        # check experiment status and only move to analyzer test if experiment succeeded
+        if not experiment.succeeded:
+            print(f"Experiment {experiment.uid} failed.\n")
+            sys.exit(-1)
 
     def validate_output(self, exp_id, expected_sim_count):
         sim_count = 0
@@ -438,6 +507,16 @@ class TestPythonExperiment(ITestWithPersistence):
         expected_list_sorted = sorted(expected_list, key=itemgetter('filename', 'relative_path'))
         actual_list_sorted = sorted(actual_list, key=itemgetter('filename', 'relative_path'))
         self.assertEqual(expected_list_sorted, actual_list_sorted)
+
+
+# Define some constant string used in this example
+class ConfigParameters:
+    Infectious_Period_Constant = "Infectious_Period_Constant"
+    Base_Infectivity_Constant = "Base_Infectivity_Constant"
+    Base_Infectivity_Distribution = "Base_Infectivity_Distribution"
+    GAUSSIAN_DISTRIBUTION = "GAUSSIAN_DISTRIBUTION"
+    Base_Infectivity_Gaussian_Mean = "Base_Infectivity_Gaussian_Mean"
+    Base_Infectivity_Gaussian_Std_Dev = "Base_Infectivity_Gaussian_Std_Dev"
 
 
 if __name__ == '__main__':

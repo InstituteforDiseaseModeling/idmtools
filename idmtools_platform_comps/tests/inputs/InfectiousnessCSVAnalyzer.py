@@ -1,5 +1,3 @@
-# Example of two csv analyzers to concatenate csv results into one csv and plot the data from your experiment
-
 # First, import some necessary system and idmtools packages.
 import os
 from sys import platform
@@ -10,6 +8,8 @@ if platform == "linux" or platform == "linux2":
 import matplotlib.pyplot as plt
 import pandas as pd
 from idmtools.entities.ianalyzer import IAnalyzer as BaseAnalyzer
+from idmtools.core import ItemType
+from idmtools.core.platform_factory import Platform
 
 
 # # Create a class for a base CSV analyzer
@@ -23,6 +23,7 @@ from idmtools.entities.ianalyzer import IAnalyzer as BaseAnalyzer
 
 # Create a class for individual level analyzer
 class InfectiousnessCSVAnalyzer(BaseAnalyzer):
+
     def __init__(self, filenames, channel="infectiousness", filter_by='is_infected'):
         super().__init__(filenames=filenames)
         self.channel = channel
@@ -46,7 +47,10 @@ class InfectiousnessCSVAnalyzer(BaseAnalyzer):
     def reduce(self, all_data):
         # Let's hope the first simulation is representative
         first_sim = next(iter(all_data.keys()))  # Iterate over the dataframe keys
-        exp_id = str(first_sim.experiment.uid)  # Set the exp id from the first sim data
+        # exp_id = str(first_sim.experiment.uid)  # Set the exp id from the first sim data
+        platform = Platform('COMPS2')
+        exp_id = platform.get_parent(first_sim.uid, ItemType.SIMULATION)  # Set the exp id from the first sim data
+
 
         keys = []
         for k in all_data.keys():
