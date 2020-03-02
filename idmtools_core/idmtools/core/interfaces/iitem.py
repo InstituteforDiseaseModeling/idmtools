@@ -18,6 +18,10 @@ class IItem:
         self._uid = uid
 
     @property
+    def id(self):
+        return str(self.uid)
+
+    @property
     def metadata(self):
         attrs = set(vars(self).keys())
         obj_dict = {k: getattr(self, k) for k in attrs.intersection(self.metadata_fields)}
