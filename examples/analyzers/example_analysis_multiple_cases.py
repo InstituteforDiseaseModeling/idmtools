@@ -116,3 +116,9 @@ if __name__ == "__main__":
     #case #5: analyzer with simulation
     manager5 = AnalyzeManager(platform=platform, ids=[simulation_tuple], analyzers=analyzers)
     manager5.analyze()
+
+    #case #6: analyzer with exclude id
+    analyzers = [ExampleAnalyzer()]
+    exclude_ids = ["13052582-83da-e911-a2be-f0921c167861", "12052582-83da-e911-a2be-f0921c167861"]
+    manager6 = AnalyzeManager(platform=platform, ids=[experiment_tuple], analyzers=analyzers, exclude_ids=exclude_ids)
+    manager6.analyze()
