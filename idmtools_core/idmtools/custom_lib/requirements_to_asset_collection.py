@@ -179,11 +179,12 @@ class RequirementsToAssetCollection:
         if wi.succeeded:
             return wi
 
-    def get_latest_version(self, pkg_name):
+    def get_latest_version(self, pkg_name, display_all=False):
         """
         Utility to get the latest version for a given package name
         Args:
             pkg_name: package name given
+            display_all: determine if output all package releases
         Returns: the latest version of ven package
         """
         from urllib import request
@@ -193,6 +194,9 @@ class RequirementsToAssetCollection:
         url = f'https://pypi.python.org/pypi/{pkg_name}/json'
         releases = json.loads(request.urlopen(url).read())['releases']
         all_releases = sorted(releases, key=parse_version, reverse=True)
+
+        if display_all:
+            print(all_releases)
 
         release_versions = [ver for ver in all_releases if not parse(ver).is_prerelease]
         latest_version = release_versions[0]
