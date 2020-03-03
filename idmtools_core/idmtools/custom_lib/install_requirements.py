@@ -4,7 +4,7 @@ import subprocess
 import traceback
 
 CURRENT_DIRECTORY = os.getcwd()
-LIB_PATH = os.path.join(CURRENT_DIRECTORY, 'Libraries')
+LIB_PATH = os.path.join(CURRENT_DIRECTORY, 'Libraries', 'site_packages')
 REQUIREMENT_FILE = 'requirements_updated.txt'
 
 
@@ -26,8 +26,7 @@ def install_packages_from_requirements(requirements_file=REQUIREMENT_FILE, pytho
         env['PYTHONPATH'] = os.pathsep.join(python_paths)
 
     print("Running pip install -r {} to tmp directory".format(requirements_file))
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "--prefix", LIB_PATH, "-r", requirements_file],
-                          env=env)
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "-t", LIB_PATH, "-r", requirements_file], env=env)
 
 
 if __name__ == "__main__":
