@@ -4,10 +4,10 @@ import ast
 import inspect
 
 CURRENT_DIRECTORY = os.path.dirname(__file__)
-LIB_PATH = os.path.join(CURRENT_DIRECTORY, 'site_packages')  # Need to site_packages level!!!
-# LIB_PATH = LIB_PATH.replace('\\', '/')        # optional
+LIBRARY_PATH = os.path.join(CURRENT_DIRECTORY, 'site_packages')  # Need to site_packages level!!!
+# LIBRARY_PATH = LIB_PATH.replace('\\', '/')        # optional
 
-sys.path.insert(0, LIB_PATH)  # Very Important!
+sys.path.insert(0, LIBRARY_PATH)  # Very Important!
 print(sys.path)
 
 import astor
