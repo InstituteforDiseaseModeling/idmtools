@@ -4,7 +4,7 @@ import subprocess
 import traceback
 
 CURRENT_DIRECTORY = os.getcwd()
-LIB_PATH = os.path.join(CURRENT_DIRECTORY, 'Libraries', 'site_packages')
+LIBRARY_PATH = os.path.join(CURRENT_DIRECTORY, 'Libraries', 'site_packages')
 REQUIREMENT_FILE = 'requirements_updated.txt'
 
 
@@ -26,17 +26,17 @@ def install_packages_from_requirements(requirements_file=REQUIREMENT_FILE, pytho
         env['PYTHONPATH'] = os.pathsep.join(python_paths)
 
     print("Running pip install -r {} to tmp directory".format(requirements_file))
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "-t", LIB_PATH, "-r", requirements_file], env=env)
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "-t", LIBRARY_PATH, "-r", requirements_file], env=env)
 
 
 if __name__ == "__main__":
     if sys.platform == "win32":
-        full_path = os.path.join(LIB_PATH, 'lib', 'site-packages')
+        full_path = os.path.join(LIBRARY_PATH, 'lib', 'site-packages')
     else:
-        full_path = os.path.join(LIB_PATH, 'lib', 'python{}'.format(sys.version[:3]), 'site-packages')
+        full_path = os.path.join(LIBRARY_PATH, 'lib', 'python{}'.format(sys.version[:3]), 'site-packages')
 
     print('CURRENT_DIRECTORY: \n', CURRENT_DIRECTORY)
-    print('LIB_PATH: \n', LIB_PATH)
+    print('LIBRARY_PATH: \n', LIBRARY_PATH)
     print("Adding {} to the system path".format(full_path))
 
     if not os.path.exists(full_path):
