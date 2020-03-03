@@ -273,8 +273,9 @@ class AnalyzeManager(CacheEnabled):
             logger.debug("Terminating workerpool")
             worker_pool.terminate()
             return False
-        logger.debug(f"Result fetching status: : {results.successful()}")
-        return True
+        status = results.successful()
+        logger.debug(f"Result fetching status: : {status}")
+        return status
 
     def _run_and_wait_for_reducing(self, worker_pool: Pool) -> dict:
         """
@@ -361,10 +362,10 @@ class AnalyzeManager(CacheEnabled):
                            initializer=pool_worker_initializer,
                            initargs=(map_item, self.analyzers, self.cache, self.platform))
 
-        success = self._run_and_wait_for_mapping(worker_pool=worker_pool, start_time=start_time)
-        logger.debug(f"Success: {success}")
-        if not success:
-            return success
+        map_results = self._run_and_wait_for_mapping(worker_pool=worker_pool, start_time=start_time)
+        logger.debug(f"Success: {map_results}")
+        if not map_results:
+            return map_results
 
         # At this point we have results for the individual items in self.cache.
         # Call the analyzer reduce methods
