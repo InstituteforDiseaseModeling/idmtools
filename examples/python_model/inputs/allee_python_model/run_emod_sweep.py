@@ -3,6 +3,14 @@ import sys
 import warnings
 import time
 
+
+CURRENT_DIRECTORY = os.path.dirname(__file__)
+LIBRARY_PATH = os.path.join(CURRENT_DIRECTORY, 'site_packages')  # Need to site_packages level!!!
+# LIBRARY_PATH = LIBRARY_PATH.replace('\\', '/')        # optional
+
+sys.path.insert(0, LIBRARY_PATH)  # Very Important!
+print(sys.path)
+
 import json
 import argparse
 
