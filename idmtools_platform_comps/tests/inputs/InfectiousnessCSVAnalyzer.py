@@ -12,15 +12,6 @@ from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 
 
-# # Create a class for a base CSV analyzer
-# class CSVAnalyzer(BaseAnalyzer):
-#     def __init__(self, filenames, uid=None, working_dir=None, parse=True):
-#         super().__init__(uid, working_dir, parse, filenames=filenames)
-#         # Raise exception early if files are not csv files
-#         if not all(['csv' in os.path.splitext(f)[1].lower() for f in self.filenames]):
-#             raise Exception('Please ensure all filenames provided to CSVAnalyzer have a csv extension.')
-
-
 # Create a class for individual level analyzer
 class InfectiousnessCSVAnalyzer(BaseAnalyzer):
 
