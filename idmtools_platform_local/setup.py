@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""The setup script."""
+"""The setup script for the idmtools_platform_local module, which provides ability to run models locally using docker
+containers to IDM-Tools."""
 import os
 import sys
 
@@ -21,7 +22,7 @@ with open('ui_requirements.txt') as requirements_file:
 
 
 setup_requirements = []
-server_requirements = ['uwsgi==2.0.18','Werkzeug==0.16.1']
+server_requirements = ['uwsgi==2.0.18', 'Werkzeug==0.16.1']
 test_requirements = ['pytest', 'pytest-runner', 'pytest-timeout', 'pytest-cache']
 
 # Only install uwsgi on python 3.7
@@ -41,12 +42,15 @@ if sys.version_info[1] == 6:
     requirements.append('dataclasses')
 
 authors = [
-    ("Sharon Chen", "'schen@idmod.org"),
+    ("Ross Carter", 'rcarter@idmod.org'),
+    ("Sharon Chen", 'shchen@idmod.org'),
     ("Clinton Collins", 'ccollins@idmod.org'),
     ("Zhaowei Du", "zdu@idmod.org"),
-    ("Mary Fisher", 'mfisher@idmod.org'),
+    ("Mary Fisher", 'mafisher@idmod.org'),
+    ("Mandy Izzo", 'mizzo@idmod.org'),
     ("Clark Kirkman IV", 'ckirkman@idmod.org'),
-    ("Benoit Raybaud", "braybaud@idmod.org")
+    ("Benoit Raybaud", "braybaud@idmod.org"),
+    ("Jen Schripsema", "jschripsema@idmod.org")
 ]
 
 setup(

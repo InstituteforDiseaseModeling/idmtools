@@ -45,30 +45,8 @@ class SimFilterAnalyzerById(IAnalyzer):
         df = pd.DataFrame(columns=simulation.tags.keys())  # Create a dataframe with the simulation tag keys
         df.loc[str(simulation.uid)] = list(simulation.tags.values())  # Get a list of the sim tag values
         df.index.name = 'SimId'  # Label the index keys you create with the names option
-
-        match_results_dict = {}
-        results = data[self.filenames[0]]
-        results_dict = ast.literal_eval(results.decode('utf-8'))
-        for key, value in results_dict.items():
-            if key == "b":
-                match_results_dict[key] = value
-
-        s = df.ix[:, 1].map(match_results_dict)
-        lens = s.astype(str).str.len()
-        match_results_df = pd.DataFrame({
-            'key': df['b'].keys,
-            'value': df['b'].values.repeat(lens)
-
-        })
-        print(match_results_df)
-        return match_results_df
+        return df
 
     def reduce(self, all_data):
-        b_result_list = []
-
-        for sim, sim_data in all_data.items():
-            b_result_list.append(sim_data)
-
-        b_results_df = pd.DataFrame.from_records(b_result_list, columns=['SimId', 'key', 'value'])
-        b_results_df.to_csv(os.path.join("output", 'b_match.csv'),
-                            index_label='index')  # Write the matched sim results to a csv
+        results = pd.concat(list(all_data.values()), axis=0)  # Combine a list of all the sims tag values
+        results.to_csv(os.path.join("output", 'b_match.csv'))  # Write the sim tags to a csv

@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""The setup script."""
+"""The setup script for the idmtools_platform_slurm, which provides users the ability to run against
+the Slurm platform."""
 import sys
 
 from setuptools import setup, find_packages

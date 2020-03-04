@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""The setup script."""
+"""The setup script for the idmtools_test module to run extended tests and provide demo date for IDM-Tools tests."""
 
 from setuptools import setup, find_packages
 
@@ -15,6 +15,7 @@ setup_requirements = []
 
 authors = [
     ("Sharon Chen", "'schen@idmod.org"),
+    ("Ye Chen", 'yechen@idmod.org'),
     ("Clinton Collins", 'ccollins@idmod.org'),
     ("Zhaowei Du", "zdu@idmod.org"),
     ("Mary Fisher", 'mfisher@idmod.org'),

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""The setup script."""
+"""The setup script for the idmtools_cli, the command line utility platform for idmtools."""
 
 from setuptools import setup, find_packages
 
