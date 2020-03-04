@@ -330,7 +330,6 @@ class AssetCollection(IEntity):
         else:
             self.tags = get_default_tags()
 
-
     def post_creation(self) -> None:
         pass
 

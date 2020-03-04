@@ -81,13 +81,17 @@ class TestAssetsInComps(unittest.TestCase):
 
         self._run_and_test_experiment(pe)
         exp_id = pe.uid
-        # exp_id = 'ae077ddd-668d-e911-a2bb-f0921c167866'
+        #exp_id = 'ae077ddd-668d-e911-a2bb-f0921c167866'
+        count = 0
+        test_assetcollection = []
         for simulation in COMPSExperiment.get(exp_id).get_simulations():
             collection_id = get_asset_collection_id_for_simulation_id(simulation.id)
             asset_collection = get_asset_collection_by_id(collection_id)
-            self.assertEqual(asset_collection.assets[0]._md5_checksum, asset_collection.assets[1]._md5_checksum)
-            self.assertEqual(asset_collection.assets[0]._file_name, 'test.json')
-            self.assertEqual(asset_collection.assets[1]._file_name, 'test1.json')
+            if "test" in asset_collection.assets[count]._file_name:
+                test_assetcollection.append(asset_collection.assets[count])
+            count = count + 1
+
+        self.assertEqual(test_assetcollection[0]._md5_checksum, test_assetcollection[1]._md5_checksum)
 
     # TODO: AssetCollection has no attribute tags
     # def test_create_asset_collection(self):
