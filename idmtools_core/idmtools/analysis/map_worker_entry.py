@@ -82,7 +82,7 @@ def _get_mapped_data_for_item(item: IEntity, analyzers: TAnalyzerList, cache: Ca
             logger.debug(f'Parsing content for {analyzer.uid}')
             try:
                 data = {filename: FileParser.parse(filename, content)
-                        for filename, content in file_data.items()}
+                        for filename, content in file_data.items() if filename in analyzer.filenames}
             except Exception as e:
                 logger.error(e)
                 _set_exception(step="data parsing",
@@ -91,7 +91,7 @@ def _get_mapped_data_for_item(item: IEntity, analyzers: TAnalyzerList, cache: Ca
                 return False
         else:
             # If the analyzer doesnt wish to parse, give the raw data
-            data = file_data
+            data = {filename: content for filename, content in file_data.items() if filename in analyzer.filenames}
 
         # run the mapping routine for this analyzer and item
         try:
