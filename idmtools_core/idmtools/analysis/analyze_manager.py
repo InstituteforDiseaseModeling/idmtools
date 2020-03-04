@@ -48,7 +48,8 @@ class AnalyzeManager(CacheEnabled):
         pass
 
     def __init__(self, platform: IPlatform, configuration=None, ids=None, analyzers=None, working_dir=os.getcwd(),
-                 partial_analyze_ok=False, max_items=None, verbose=True, force_manager_working_directory=False):
+                 partial_analyze_ok=False, max_items=None, verbose=True, force_manager_working_directory=False,
+                 exclude_ids=None):
         super().__init__()
         self.configuration = configuration or {}
         self.platform = platform
@@ -79,7 +80,15 @@ class AnalyzeManager(CacheEnabled):
         for i in items:
             logger.debug(f'Flattening items for {i.uid}')
             self.potential_items.extend(platform.flatten_item(item=i))
+
+        # These are leaf items to be ignored in analysis. Make sure they are UUID and then prune them from analysis.
+        self.exclude_ids = exclude_ids or []
+        for index, id in enumerate(self.exclude_ids):
+            self.exclude_ids[index] = id if isinstance(id, UUID) else UUID(id)
+        self.potential_items = [item for item in self.potential_items if item.uid not in self.exclude_ids]
+
         logger.debug(f"Potential items to analyze: {len(self.potential_items)}")
+
         self._items = dict()  # filled in later by _get_items_to_analyze
 
         self.analyzers = analyzers or list()
@@ -264,8 +273,9 @@ class AnalyzeManager(CacheEnabled):
             logger.debug("Terminating workerpool")
             worker_pool.terminate()
             return False
-        logger.debug(f"Result fetching status: : {results.successful()}")
-        return True
+        status = results.successful()
+        logger.debug(f"Result fetching status: : {status}")
+        return status
 
     def _run_and_wait_for_reducing(self, worker_pool: Pool) -> dict:
         """
@@ -352,10 +362,10 @@ class AnalyzeManager(CacheEnabled):
                            initializer=pool_worker_initializer,
                            initargs=(map_item, self.analyzers, self.cache, self.platform))
 
-        success = self._run_and_wait_for_mapping(worker_pool=worker_pool, start_time=start_time)
-        logger.debug(f"Success: {success}")
-        if not success:
-            return success
+        map_results = self._run_and_wait_for_mapping(worker_pool=worker_pool, start_time=start_time)
+        logger.debug(f"Success: {map_results}")
+        if not map_results:
+            return map_results
 
         # At this point we have results for the individual items in self.cache.
         # Call the analyzer reduce methods

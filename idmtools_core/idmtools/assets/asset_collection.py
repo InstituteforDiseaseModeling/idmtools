@@ -320,12 +320,15 @@ class AssetCollection(IEntity):
                 elif absolute_path is None:
                     return idx
 
-            if absolute_path and asset.absolute_path:
+            if absolute_path == asset.absolute_path:
                 return idx
         return None
 
     def pre_creation(self) -> None:
-        self.tags.update(get_default_tags())
+        if self.tags:
+            self.tags.update(get_default_tags())
+        else:
+            self.tags = get_default_tags()
 
     def post_creation(self) -> None:
         pass
