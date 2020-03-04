@@ -236,11 +236,11 @@ class RequirementsToAssetCollection:
 
         update_req_list = []
         for k, v in has_version_dict.items():
-            update_req_list.append(f'{k}{v[0][0]}{v[0][1]}')
+            update_req_list.append(f'{k}=={v[0][1]}')
 
         for k, v in missing_version_dict.items():
             latest = self.get_latest_version(k)
-            update_req_list.append(f"{k}{v[0][0] if len(v) > 0 else '=='}{latest}")
+            update_req_list.append(f"{k}=={latest}")
 
         # print(update_req_list)
         # print(comment_list)
