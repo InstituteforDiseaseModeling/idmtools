@@ -8,7 +8,7 @@ LIBRARY_PATH = os.path.join(CURRENT_DIRECTORY, 'Libraries', 'site_packages')
 REQUIREMENT_FILE = 'requirements_updated.txt'
 
 
-def install_packages_from_requirements(requirements_file=REQUIREMENT_FILE, python_paths=None):
+def install_packages_from_requirements(python_paths=None):
     """
     Install our packages to a local directory
     Args:
@@ -25,8 +25,10 @@ def install_packages_from_requirements(requirements_file=REQUIREMENT_FILE, pytho
         env = dict(os.environ)
         env['PYTHONPATH'] = os.pathsep.join(python_paths)
 
-    print("Running pip install -r {} to tmp directory".format(requirements_file))
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "-t", LIBRARY_PATH, "-r", requirements_file], env=env)
+    print("Running pip install -r {} to tmp directory".format(REQUIREMENT_FILE))
+    subprocess.check_call(
+        [sys.executable, "-m", "pip", "install", "-t", LIBRARY_PATH, "-r", f"Assets/{REQUIREMENT_FILE}"],
+        env=env)
 
 
 if __name__ == "__main__":
@@ -46,7 +48,7 @@ if __name__ == "__main__":
     tb = None
 
     try:
-        install_packages_from_requirements(f'Assets/{REQUIREMENT_FILE}', sys.path)
+        install_packages_from_requirements(sys.path)
     except Exception as e:
         tb = traceback.format_exc()
         print(tb)
