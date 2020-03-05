@@ -11,8 +11,8 @@ from idmtools_test.utils.utils import del_folder
 
 analyzer_path = os.path.join(os.path.dirname(__file__), "..", "inputs")
 sys.path.insert(0, analyzer_path)
-from PopulationAnalyzer import PopulationAnalyzer  # noqa
-from AdultVectorsAnalyzer import AdultVectorsAnalyzer  # noqa
+from population_analyzer import PopulationAnalyzer  # noqa
+from adult_vectors_analyzer import AdultVectorsAnalyzer  # noqa
 
 
 @pytest.mark.comps

@@ -14,10 +14,10 @@ from idmtools.core import ItemType
 # import analyzers from current dir's inputs dir
 analyzer_path = os.path.join(os.path.dirname(__file__), "..", "inputs")
 sys.path.insert(0, analyzer_path)
-from SimpleAnalyzer import SimpleAnalyzer  # noqa
-from CSVAnalyzer import CSVAnalyzer  # noqa
-from InfectiousnessCSVAnalyzer import InfectiousnessCSVAnalyzer  # noqa
-from NodeCSVAnalyzer import NodeCSVAnalyzer  # noqa
+from simple_analyzer import SimpleAnalyzer  # noqa
+from csv_analyzer import CSVAnalyzer  # noqa
+from infectiousness_csv_analyzer import InfectiousnessCSVAnalyzer  # noqa
+from node_csv_analyzer import NodeCSVAnalyzer  # noqa
 
 
 @pytest.mark.comps
