@@ -20,8 +20,8 @@ current_directory = os.path.dirname(os.path.realpath(__file__))
 # import analyzers from current dir's inputs dir
 analyzer_path = os.path.join(os.path.dirname(__file__), "inputs")
 sys.path.insert(0, analyzer_path)
-from SimFilterAnalyzer import SimFilterAnalyzer
-from SimFilterAnalyzerById import SimFilterAnalyzerById
+from sim_filter_analyzer import SimFilterAnalyzer
+from sim_filter_analyzer_by_id import SimFilterAnalyzerById
 
 
 @pytest.mark.analysis
@@ -60,7 +60,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         # self.exp_id = '9eacbb9a-5ecf-e911-a2bb-f0921c167866' #comps2 staging
 
     @pytest.mark.long
-    def test_DownloadAnalyzer(self):
+    def test_download_analyzer(self):
         # delete output from previous run
         del_folder("output")
 

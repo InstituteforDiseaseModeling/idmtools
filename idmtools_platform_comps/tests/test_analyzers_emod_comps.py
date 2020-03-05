@@ -22,8 +22,8 @@ from idmtools_test.utils.utils import del_file, del_folder, load_csv_file
 
 analyzer_path = os.path.join(os.path.dirname(__file__), "inputs")
 sys.path.insert(0, analyzer_path)
-from PopulationAnalyzer1 import PopulationAnalyzer # noqa
-from TimeseriesAnalyzer import TimeseriesAnalyzer # noqa
+from population_analyzer1 import PopulationAnalyzer # noqa
+from timeseries_analyzer import TimeseriesAnalyzer # noqa
 
 DEFAULT_INPUT_PATH = os.path.join(COMMON_INPUT_PATH)
 DEFAULT_ERADICATION_PATH = os.path.join(DEFAULT_INPUT_PATH, "emod", "Eradication.exe")
@@ -96,7 +96,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         print(self.case_name)
 
     @pytest.mark.long
-    def test_AddAnalyzer(self):
+    def test_add_analyzer(self):
         filenames = ['StdOut.txt']
         analyzers = [AddAnalyzer(filenames=filenames)]
         # self.generate_experiment()
@@ -104,7 +104,7 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
         am.analyze()
 
     @pytest.mark.long
-    def test_DownloadAnalyzer(self):
+    def test_download_analyzer(self):
         # delete output from previous run
         del_folder("output")
 
