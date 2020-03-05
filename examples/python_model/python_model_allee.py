@@ -17,10 +17,10 @@ from idmtools.core.platform_factory import Platform
 # The `Platform` defines where we want to run our simulation.
 # You can easily switch platforms by changing the Platform to for example 'Local'
 # with Platform('Local'):
-from idmtools.custom_lib.requirements_to_asset_collection import RequirementsToAssetCollection
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
+from idmtools_platform_comps.utils.custom_lib.requirements_to_asset_collection import RequirementsToAssetCollection
 
 platform = Platform('COMPS2')
 
