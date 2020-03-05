@@ -32,7 +32,7 @@ class RequirementsToAssetCollection:
 
         self.requirements_path = os.path.abspath(self.requirements_path) if self.requirements_path else None
         self.pkg_list = self.pkg_list or []
-        self.extra_wheels = self.extra_wheels or []
+        self.extra_wheels = [os.path.abspath(whl) for whl in self.extra_wheels] if self.extra_wheels else []
 
     @property
     def checksum(self):
@@ -136,15 +136,8 @@ class RequirementsToAssetCollection:
             return ac
 
     def add_wheels_to_assets(self, experiment):
-        self.extra_wheels = [os.path.abspath(whl) for whl in self.extra_wheels]
         for whl in self.extra_wheels:
-            # abs_path = os.path.abspath(whl)
             a = Asset(filename=os.path.basename(whl), absolute_path=whl)
-            experiment.add_asset(a)
-
-        if self.extra_wheels:
-            whl_content = '\n'.join([f"Assets/{os.path.basename(whl)}" for whl in self.extra_wheels])
-            a = Asset(filename='extra_wheels.txt', content=whl_content)
             experiment.add_asset(a)
 
     def run_experiment_to_install_lib(self):
@@ -256,6 +249,9 @@ class RequirementsToAssetCollection:
         for k, v in missing_version_dict.items():
             latest = self.get_latest_version(k)
             update_req_list.append(f"{k}=={latest}")
+
+        if self.extra_wheels:
+            update_req_list.extend([f"Assets/{os.path.basename(whl)}" for whl in self.extra_wheels])
 
         # print(update_req_list)
         # print(comment_list)
