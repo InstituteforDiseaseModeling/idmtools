@@ -6,8 +6,12 @@ import inspect
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 LIBRARY_PATH = os.path.join(CURRENT_DIRECTORY, 'site_packages')  # Need to site_packages level!!!
 
-# we will search 'astor' package from Assets/site_package first then other system path
-# that is why we need inset to sys.path index '0', instead of appending to the end in sys path
+"""
+sys.path.insert(0, LIBRARY_PATH) will search packages from experiment's 'Assets/site_packages' first,
+then default HPC python site_packages.
+"astor" package does not exist in comps, so we use custom_lib to upload to experiment's Assets/site_packages directory
+Please go to examples/load_lib/example-load-lib.py to see how we upload 'astor' package to comps
+"""
 sys.path.insert(0, LIBRARY_PATH)  # Very Important!
 print(sys.path)
 

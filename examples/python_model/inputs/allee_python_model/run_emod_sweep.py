@@ -6,8 +6,15 @@ import time
 
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 LIBRARY_PATH = os.path.join(CURRENT_DIRECTORY, 'site_packages')  # Need to site_packages level!!!
-# LIBRARY_PATH = LIBRARY_PATH.replace('\\', '/')        # optional
 
+"""
+sys.path.insert(0, LIBRARY_PATH) will search packages from experiment's 'Assets/site_packages' first,
+then default HPC python site_packages.
+Because some packages on current HPC may be out of date, so we use custom_lib utility to upload specific package to 
+your experiment's Assets/site_packages directory. 
+For example, pandas package in current HPC node is version '0.20.0', but this script requires newer version of pandas
+Please go to examples/python_model/python_model_allee.py to see how to upload specific pandas package with experiment
+"""
 sys.path.insert(0, LIBRARY_PATH)  # Very Important!
 print(sys.path)
 

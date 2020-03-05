@@ -42,7 +42,7 @@ def run_pip_list():
     model_asset = Asset(absolute_path=os.path.join("inputs", "task_model", "run.bat"))
     ac.add_asset(model_asset)
     # create experiment from task
-    experiment = Experiment.from_task(task, name="run_test", assets=ac)
+    experiment = Experiment.from_task(task, name="run_pip_list", assets=ac)
 
     platform.run_items(experiment)
     platform.wait_till_done(experiment)
