@@ -5,7 +5,7 @@ from idmtools.assets import AssetCollection
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
-from idmtools_platform_comps.utils.custom_lib.requirements_to_asset_collection import RequirementsToAssetCollection
+from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import RequirementsToAssetCollection
 
 
 def run_example(ac_id):
