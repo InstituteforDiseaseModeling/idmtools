@@ -22,7 +22,7 @@ class TestExperiments(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
-        self.platform = Platform("COMPS")
+        self.platform = Platform("COMPS2")
 
     @unittest.skipIf(not os.getenv('WAIT_FOR_BUG_FIX', '0') == '1', reason="eradication load 2 times")
     def test_emod_experiment_endpointsanalyzer_example(self):
