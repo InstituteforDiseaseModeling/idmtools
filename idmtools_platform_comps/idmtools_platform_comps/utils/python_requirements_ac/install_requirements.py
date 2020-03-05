@@ -29,8 +29,10 @@ def install_packages_from_requirements(python_paths=None):
     print("Running pip install -r {} to tmp directory".format(REQUIREMENT_FILE))
     subprocess.check_call([sys.executable, "-m", "pip", "install", "-t", LIBRARY_PATH, "-r", f"Assets/{REQUIREMENT_FILE}"],
                           env=env)
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "-t", LIBRARY_PATH, "-r", f"Assets/{EXTRA_WHEELS}"],
-                          env=env)
+
+    if os.path.exists(f"Assets/{EXTRA_WHEELS}"):
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "-t", LIBRARY_PATH, "-r", f"Assets/{EXTRA_WHEELS}"],
+                              env=env)
 
 
 if __name__ == "__main__":
