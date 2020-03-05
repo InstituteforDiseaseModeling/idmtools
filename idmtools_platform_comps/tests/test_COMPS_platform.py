@@ -14,6 +14,7 @@ from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.common_experiments import wait_on_experiment_and_check_all_sim_status
 from idmtools_test.utils.comps import assure_running_then_wait_til_done, setup_test_with_platform_and_simple_sweep
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+from idmtools.utils.filter_simulations import FilterItem
 
 current_directory = path.dirname(path.realpath(__file__))
 
@@ -151,6 +152,22 @@ class TestCOMPSPlatform(ITestWithPersistence):
         self.assertEqual(len(experiment.simulations), len(experiment2.simulations))
         self.assertTrue(experiment2.done)
         self.assertTrue(experiment2.succeeded)
+
+    @pytest.mark.long
+    def test_filter_status_for_succeeded_sims(self):
+        model_path = os.path.join(COMMON_INPUT_PATH, "compsplatform", 'mixed_model.py')
+        task = JSONConfiguredPythonTask(script_path=model_path)
+        builder = SimulationBuilder()
+        builder.add_sweep_definition(JSONConfiguredPythonTask.set_parameter_partial('P'), range(3))
+        experiment = Experiment.from_builder(builder, task, name='Mixed Model')
+        self.platform.run_items(experiment)
+        self.platform.wait_till_done(experiment)
+        self.assertTrue(experiment.done)
+        self.assertFalse(experiment.succeeded)
+
+        # only get back the succeeded sims
+        sims = FilterItem.filter_item(self.platform, experiment, status=EntityStatus.SUCCEEDED)
+        self.assertEqual(len(sims), 2)
 
 
 if __name__ == '__main__':

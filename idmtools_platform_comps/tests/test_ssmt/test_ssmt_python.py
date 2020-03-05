@@ -5,18 +5,19 @@ import sys
 import pytest
 from idmtools.analysis.platform_anaylsis import PlatformAnalysis
 from idmtools.assets.file_list import FileList
-from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import del_folder
-
+from idmtools.core import ItemType
 
 # import analyzers from current dir's inputs dir
 analyzer_path = os.path.join(os.path.dirname(__file__), "..", "inputs")
 sys.path.insert(0, analyzer_path)
 from SimpleAnalyzer import SimpleAnalyzer  # noqa
 from CSVAnalyzer import CSVAnalyzer  # noqa
+from InfectiousnessCSVAnalyzer import InfectiousnessCSVAnalyzer  # noqa
+from NodeCSVAnalyzer import NodeCSVAnalyzer  # noqa
 
 
 @pytest.mark.comps
@@ -119,3 +120,36 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
         execution = worker_order['Execution']
         self.assertEqual(execution['Command'],
                          "python platform_analysis_bootstrap.py " + experiment_id + " CSVAnalyzer.CSVAnalyzer comps2")
+
+    # test SSMTWorkItem where waiting for sims to complete first
+    @pytest.mark.long
+    @pytest.mark.comps
+    def test_ssmt_seir_model_analysis(self):
+        exp_id = '9311af40-1337-ea11-a2be-f0921c167861'  # comps2 staging exp id
+        filenames = {'filenames': ['output/individual.csv']}
+        filenames_2 = {'filenames': ['output/node.csv']}
+        analysis = PlatformAnalysis(platform=self.platform,
+                                    experiment_ids=[exp_id],
+                                    analyzers=[InfectiousnessCSVAnalyzer, NodeCSVAnalyzer],
+                                    analyzers_args=[filenames, filenames_2],
+                                    analysis_name=self.case_name,
+                                    tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'})
+
+        analysis.analyze(check_status=True)
+        wi = analysis.get_work_item()
+
+        # Verify workitem results
+        local_output_path = "output"
+        del_folder(local_output_path)
+        out_filenames = ["output/individual.csv", "output/node.csv"]
+        ret = self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
+
+        file_path = os.path.join(local_output_path, str(wi.uid))
+        self.assertTrue(os.path.exists(os.path.join(file_path, "output", "individual.csv")))
+        self.assertTrue(os.path.exists(os.path.join(file_path, "output", "node.csv")))
+        worker_order = json.load(open(os.path.join(file_path, "WorkOrder.json"), 'r'))
+        print(worker_order)
+        self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
+        execution = worker_order['Execution']
+        self.assertEqual(execution['Command'],
+                         "python platform_analysis_bootstrap.py " + exp_id + " InfectiousnessCSVAnalyzer.InfectiousnessCSVAnalyzer, NodeCSVAnalyzer.NodeCSVAnalyzer comps2")

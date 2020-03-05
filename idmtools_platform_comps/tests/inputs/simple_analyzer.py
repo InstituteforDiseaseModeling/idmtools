@@ -13,7 +13,6 @@ class SimpleAnalyzer(BaseAnalyzer):
         if not os.path.exists(os.path.join(self.working_dir, "output")):
             os.mkdir(os.path.join(self.working_dir, "output"))
 
-    # idmtools
     def map(self, data, simulation):
         return data['config.json']
 

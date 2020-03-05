@@ -1,4 +1,5 @@
 import os
+import sys
 from functools import partial
 
 import pytest
@@ -15,6 +16,12 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import del_folder
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
+
+# import analyzers from current dir's inputs dir
+analyzer_path = os.path.join(os.path.dirname(__file__), "inputs")
+sys.path.insert(0, analyzer_path)
+from sim_filter_analyzer import SimFilterAnalyzer
+from sim_filter_analyzer_by_id import SimFilterAnalyzerById
 
 
 @pytest.mark.analysis
@@ -53,7 +60,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         # self.exp_id = '9eacbb9a-5ecf-e911-a2bb-f0921c167866' #comps2 staging
 
     @pytest.mark.long
-    def test_DownloadAnalyzer(self):
+    def test_download_analyzer(self):
         # delete output from previous run
         del_folder("output")
 
@@ -89,3 +96,45 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
             for simulation in COMPSExperiment.get(exp_id[0]).get_simulations():
                 self.assertTrue(os.path.exists(os.path.join('output', str(simulation.id), "config.json")))
                 self.assertTrue(os.path.exists(os.path.join('output', str(simulation.id), "result.json")))
+
+    def test_analyzer_filter_sims(self):
+        # delete output from previous run
+        del_folder("output")
+
+        # create a new empty 'output' dir
+        os.mkdir("output")
+
+        exp_id = '69cab2fe-a252-ea11-a2bf-f0921c167862'
+
+        # then run SimFilterAnalyzer to analyze the sims tags
+        filenames = ['output/result.json']
+        analyzers = [SimFilterAnalyzer(filenames=filenames, output_path='output')]
+
+        platform = Platform('comps2')
+        am = AnalyzeManager(platform=platform, ids=[(exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
+        am.analyze()
+
+        for simulation in COMPSExperiment.get(exp_id).get_simulations():
+            # verify results
+            self.assertTrue(os.path.exists(os.path.join("output", "b_match.csv")))
+
+    def test_analyzer_filter_sims_by_id(self):
+        # delete output from previous run
+        del_folder("output")
+
+        # create a new empty 'output' dir
+        os.mkdir("output")
+
+        exp_id = '69cab2fe-a252-ea11-a2bf-f0921c167862'
+
+        # then run SimFilterAnalyzer to analyze the sims tags
+        filenames = ['output/result.json']
+        analyzers = [SimFilterAnalyzerById(filenames=filenames, output_path='output')]
+
+        platform = Platform('COMPS2')
+        am = AnalyzeManager(platform=platform, ids=[(exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
+        am.analyze()
+
+        for simulation in COMPSExperiment.get(exp_id).get_simulations():
+            # verify results
+            self.assertTrue(os.path.exists(os.path.join("output", "b_match.csv")))

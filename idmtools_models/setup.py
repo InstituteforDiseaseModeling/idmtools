@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""The setup script."""
+"""The setup script for the idmtools_models platform, core tools for other models such as Python and R models."""
 
 from setuptools import setup, find_packages
 
@@ -18,12 +18,15 @@ test_requirements = ['pytest', 'pytest-runner', 'pytest-timeout', 'pytest-cache'
 extras = dict(test=test_requirements, packaging=build_requirements)
 
 authors = [
-    ("Sharon Chen", "'schen@idmod.org"),
+    ("Ross Carter", 'rcarter@idmod.org'),
+    ("Sharon Chen", 'shchen@idmod.org'),
     ("Clinton Collins", 'ccollins@idmod.org'),
     ("Zhaowei Du", "zdu@idmod.org"),
-    ("Mary Fisher", 'mfisher@idmod.org'),
+    ("Mary Fisher", 'mafisher@idmod.org'),
+    ("Mandy Izzo", 'mizzo@idmod.org'),
     ("Clark Kirkman IV", 'ckirkman@idmod.org'),
-    ("Benoit Raybaud", "braybaud@idmod.org")
+    ("Benoit Raybaud", "braybaud@idmod.org"),
+    ("Jen Schripsema", "jschripsema@idmod.org")
 ]
 
 setup(
