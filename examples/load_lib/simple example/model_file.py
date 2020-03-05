@@ -5,8 +5,9 @@ import inspect
 
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 LIBRARY_PATH = os.path.join(CURRENT_DIRECTORY, 'site_packages')  # Need to site_packages level!!!
-# LIBRARY_PATH = LIBRARY_PATH.replace('\\', '/')        # optional
 
+# we will search 'astor' package from Assets/site_package first then other system path
+# that is why we need inset to sys.path index '0', instead of appending to the end in sys path
 sys.path.insert(0, LIBRARY_PATH)  # Very Important!
 print(sys.path)
 
