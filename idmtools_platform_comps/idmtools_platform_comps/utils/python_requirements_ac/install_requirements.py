@@ -6,7 +6,6 @@ import traceback
 CURRENT_DIRECTORY = os.getcwd()
 LIBRARY_PATH = os.path.join(CURRENT_DIRECTORY, 'Libraries', 'site_packages')
 REQUIREMENT_FILE = 'requirements_updated.txt'
-EXTRA_WHEELS = 'extra_wheels.txt'
 
 
 def install_packages_from_requirements(python_paths=None):
