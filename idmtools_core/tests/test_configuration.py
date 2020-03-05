@@ -45,7 +45,7 @@ class TestConfig(ITestWithPersistence):
     @pytest.mark.comps
     @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
     def test_simple_comps_platform_use_config(self, mock_login):
-        platform = Platform("COMPS")
+        platform = Platform("COMPS2")
         self.assertEqual(platform.endpoint, 'https://comps2.idmod.org')
         self.assertEqual(platform.environment, 'Bayesian')
         self.assertEqual(mock_login.call_count, 1)
@@ -53,7 +53,7 @@ class TestConfig(ITestWithPersistence):
     @pytest.mark.comps
     @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
     def test_simple_comps_platform_use_code(self, mock_login):
-        platform = Platform("COMPS", endpoint='https://abc', environment='Bayesian')
+        platform = Platform("COMPS2", endpoint='https://abc', environment='Bayesian')
         self.assertEqual(platform.endpoint, 'https://abc')
         self.assertEqual(platform.environment, 'Bayesian')
         self.assertEqual(mock_login.call_count, 1)
