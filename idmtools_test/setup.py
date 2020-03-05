@@ -14,12 +14,12 @@ with open('requirements.txt') as requirements_file:
 setup_requirements = []
 
 authors = [
-    ("Sharon Chen", "'schen@idmod.org"),
-    ("Ye Chen", 'yechen@idmod.org'),
-    ("Clinton Collins", 'ccollins@idmod.org'),
+    ("Sharon Chen", "schen@idmod.org"),
+    ("Ye Chen", "yechen@idmod.org"),
+    ("Clinton Collins", "ccollins@idmod.org"),
     ("Zhaowei Du", "zdu@idmod.org"),
-    ("Mary Fisher", 'mfisher@idmod.org'),
-    ("Clark Kirkman IV", 'ckirkman@idmod.org'),
+    ("Mary Fisher", "mfisher@idmod.org"),
+    ("Clark Kirkman IV", "ckirkman@idmod.org"),
     ("Benoit Raybaud", "braybaud@idmod.org")
 ]
 
