@@ -52,7 +52,7 @@ class TestSSMTAnalysis(ITestWithPersistence):
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
         self.assertEqual(execution['Command'],
-                         "python platform_analysis_bootstrap.py " + experiment_id + " PopulationAnalyzer.PopulationAnalyzer comps2")
+                         "python platform_analysis_bootstrap.py " + experiment_id + " population_analyzer.PopulationAnalyzer comps2")
 
     # test using SSMTAnalysis to run multiple analyzers in comps's SSMT DockerWorker
     def test_ssmt_analysis_multiple_analyzers(self):
@@ -87,7 +87,7 @@ class TestSSMTAnalysis(ITestWithPersistence):
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
         self.assertEqual(execution['Command'],
-                         "python platform_analysis_bootstrap.py " + experiment_id + " PopulationAnalyzer.PopulationAnalyzer,AdultVectorsAnalyzer.AdultVectorsAnalyzer comps2")
+                         "python platform_analysis_bootstrap.py " + experiment_id + " population_analyzer.PopulationAnalyzer,AdultVectorsAnalyzer.AdultVectorsAnalyzer comps2")
 
     # test using SSMTAnalysis to run multiple experiments in comps's SSMT DockerWorker
     def test_ssmt_analysis_multiple_experiments(self):
@@ -119,4 +119,4 @@ class TestSSMTAnalysis(ITestWithPersistence):
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
         self.assertEqual(execution['Command'],
-                         "python platform_analysis_bootstrap.py " + exp_id1 + "," + exp_id2 + " PopulationAnalyzer.PopulationAnalyzer comps2")
+                         "python platform_analysis_bootstrap.py " + exp_id1 + "," + exp_id2 + " population_analyzer.PopulationAnalyzer comps2")
