@@ -24,6 +24,7 @@ from idmtools_test.utils.common_experiments import get_model1_templated_experime
     wait_on_experiment_and_check_all_sim_status
 from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+from idmtools.custom_lib.requirements_to_asset_collection import RequirementsToAssetCollection
 
 setA = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
 setB = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="b")
@@ -462,6 +463,70 @@ class TestPythonExperiment(ITestWithPersistence):
 
         # set platform and run simulations
         platform = Platform('COMPS2')
+        platform.run_items(experiment)
+        platform.wait_till_done(experiment)
+
+        # check experiment status and only move to analyzer test if experiment succeeded
+        if not experiment.succeeded:
+            print(f"Experiment {experiment.uid} failed.\n")
+            sys.exit(-1)
+
+    @pytest.mark.long
+    @pytest.mark.comps
+    def test_ssmt_seir_model_exp_with_load_ac_utility(self):
+        # ------------------------------------------------------
+        # First load custom assets using the utility
+        # ------------------------------------------------------
+        platform = Platform('COMPS2')
+        requirements_path = os.path.join(COMMON_INPUT_PATH, "python", "ye_seir_model", "Assets", "requirements.txt")
+        ac_lib = RequirementsToAssetCollection(platform, requirements_path=requirements_path)
+
+        ac_id = ac_lib.run()
+        custom_ac = AssetCollection.from_id(ac_id, platform=platform)
+        # ------------------------------------------------------
+        # Run the experiment
+        # ------------------------------------------------------
+        script_path = os.path.join(COMMON_INPUT_PATH, "python", "ye_seir_model", "Assets", "SEIR_model.py")
+        assets_path = os.path.join(COMMON_INPUT_PATH, "python", "ye_seir_model", "Assets")
+        tags = {"idmtools": "idmtools-automation", "simulation_name_tag": "SEIR_Model"}
+
+        parameters = json.load(open(os.path.join(assets_path, 'templates\config.json'), 'r'))
+        parameters[ConfigParameters.Base_Infectivity_Distribution] = ConfigParameters.GAUSSIAN_DISTRIBUTION
+        task = JSONConfiguredPythonTask(script_path=script_path, parameters=parameters, config_file_name='config.json',
+                                        common_assets=custom_ac)
+        task.command.add_option("--duration", 40)
+
+        # now create a TemplatedSimulation builder
+        ts = TemplatedSimulations(base_task=task)
+        ts.base_simulation.tags['simulation_name_tag'] = "SEIR_Model"
+
+        # now define our sweeps
+        builder = SimulationBuilder()
+
+        # utility function to update parameters
+        def param_update(simulation: Simulation, param: str, value: Any) -> Dict[str, Any]:
+            return simulation.task.set_parameter(param, value)
+
+        set_base_infectivity_gaussian_mean = partial(param_update,
+                                                     param=ConfigParameters.Base_Infectivity_Gaussian_Mean)
+
+        class setParam:
+            def __init__(self, param):
+                self.param = param
+
+            def __call__(self, simulation, value):
+                return simulation.task.set_parameter(self.param, value)
+
+        builder.add_sweep_definition(setParam(ConfigParameters.Base_Infectivity_Gaussian_Std_Dev), [0.3, 1])
+
+        ts.add_builder(builder)
+        ts.tags = tags
+
+        # now we can create our experiment using our template builder
+        experiment = Experiment.from_template(ts, name=self.case_name,
+                                              assets=AssetCollection.from_directory(assets_path))
+
+        # set platform and run simulations
         platform.run_items(experiment)
         platform.wait_till_done(experiment)
 
