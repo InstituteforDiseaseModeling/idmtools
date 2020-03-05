@@ -415,7 +415,7 @@ class TestPythonExperiment(ITestWithPersistence):
 
     @pytest.mark.long
     @pytest.mark.comps
-    def test_ssmt_seir_model_analysis(self):
+    def test_ssmt_seir_model_experiment(self):
         # ------------------------------------------------------
         # First run the experiment
         # ------------------------------------------------------
