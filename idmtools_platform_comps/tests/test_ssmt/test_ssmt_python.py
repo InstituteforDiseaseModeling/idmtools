@@ -90,7 +90,7 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
         self.assertEqual(execution['Command'],
-                         "python platform_analysis_bootstrap.py " + experiment_id + " SimpleAnalyzer.SimpleAnalyzer comps2")
+                         "python platform_analysis_bootstrap.py " + experiment_id + " simple_analyzer.SimpleAnalyzer comps2")
 
     # Test CSVAnalyzer with SSMTAnalysis which analyzes python experiment's results
     def test_ssmt_workitem_python_csv_analyzer(self):
@@ -119,7 +119,7 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
         self.assertEqual(execution['Command'],
-                         "python platform_analysis_bootstrap.py " + experiment_id + " CSVAnalyzer.CSVAnalyzer comps2")
+                         "python platform_analysis_bootstrap.py " + experiment_id + " csv_analyzer.CSVAnalyzer comps2")
 
     # test SSMTWorkItem where waiting for sims to complete first
     @pytest.mark.long
@@ -152,4 +152,4 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
         self.assertEqual(execution['Command'],
-                         "python platform_analysis_bootstrap.py " + exp_id + " InfectiousnessCSVAnalyzer.InfectiousnessCSVAnalyzer, NodeCSVAnalyzer.NodeCSVAnalyzer comps2")
+                         "python platform_analysis_bootstrap.py " + exp_id + " infectiousness_csv_analyzer.InfectiousnessCSVAnalyzer, NodeCSVAnalyzer.NodeCSVAnalyzer comps2")
