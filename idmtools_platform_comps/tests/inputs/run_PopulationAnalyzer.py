@@ -10,7 +10,7 @@ sys.path.append(os.path.dirname(__file__))
 from PopulationAnalyzer import PopulationAnalyzer  # noqa
 
 if __name__ == "__main__":
-    platform = Platform('SSMT')
+    platform = Platform('COMPS2')
     analyzers = [PopulationAnalyzer()]
     if len(sys.argv) >= 1:
         print(argv[1])

@@ -15,7 +15,7 @@ class ICOMPSWorkflowItem(IWorkflowItem, ABC):
     item_name: str = field(default="Idm WorkItem Test")
     work_order: dict = field(default_factory=lambda: {})
     work_item_type: str = field(default=None)
-    plugin_key: str = field(default=None)
+    plugin_key: str = field(default="1.0.0.0_RELEASE")
 
     def __post_init__(self):
         super().__post_init__()
