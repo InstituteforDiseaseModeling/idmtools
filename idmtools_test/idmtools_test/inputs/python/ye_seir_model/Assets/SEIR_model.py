@@ -229,7 +229,7 @@ if __name__ == "__main__":
     parser.add_argument('-d', '--duration', default=10, help="simulation duration(number of time steps)(default to 10)")
     parser.add_argument('-p', '--population', default=1000, help="number of initial population(default to 100)")
     parser.add_argument('-o', '--outbreak', default=0, help="outbreak time step(default to 0)")
-    parser.add_argument('-c', '--outbreak_coverage', default=0.01,
+    parser.add_argument('-b', '--outbreak_coverage', default=0.01,
                         help="demographic coverage for outbreak(default to 0.1)")
     parser.add_argument('-i', '--outbreak_ignore_immunity',
                         help="if outbreak ignore the immunity status(default to True)", action='store_true')

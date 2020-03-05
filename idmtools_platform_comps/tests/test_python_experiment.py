@@ -413,11 +413,8 @@ class TestPythonExperiment(ITestWithPersistence):
                              {'filename': 'test.json', 'relative_path': ''}]
             self.validate_assets(assets, expected_list)
 
-    # test SSMTWorkItem where waiting for sims to complete first
     @pytest.mark.long
     @pytest.mark.comps
-    # TODO: won't work until merge Ye's SEIR model
-    # def test_ssmt_workitem_waiting_for_sims_to_finish(self):
     def test_ssmt_seir_model_analysis(self):
         # ------------------------------------------------------
         # First run the experiment
@@ -458,9 +455,6 @@ class TestPythonExperiment(ITestWithPersistence):
         ts.tags = tags
 
         # now we can create our experiment using our template builder
-        # TODO: AttributeError: type object 'Experiment' has no attribute 'from_template'
-        # experiment = Experiment.from_template(ts, name=self.case_name, tags=tags, assets=common_assets)
-
         experiment = Experiment(name=self.case_name, simulations=ts)
         experiment.tags = tags
 
