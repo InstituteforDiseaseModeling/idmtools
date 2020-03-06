@@ -346,7 +346,7 @@ class TestPythonExperiment(ITestWithPersistence):
         t = JSONConfiguredPythonTask(script_path=model_path, parameters=dict(a=1, b=10), envelope="parameters")
         ts = TemplatedSimulations(base_task=t)
         ts.tags = tags
-        e = Experiment(name=self.case_name, simulations=ts, gather_common_assets_from_task=True)
+        e = Experiment(name=self.case_name, simulations=[ts.new_simulation()], gather_common_assets_from_task=True)
 
         ac = self.get_existing_python_asset_collection()
         e.add_assets(ac)
@@ -424,7 +424,9 @@ class TestPythonExperiment(ITestWithPersistence):
         assets_path = os.path.join(COMMON_INPUT_PATH, "python", "ye_seir_model", "Assets")
         tags = {"idmtools": "idmtools-automation", "simulation_name_tag": "SEIR_Model"}
 
-        parameters = json.load(open(os.path.join(assets_path, 'templates\config.json'), 'r'))
+        parameters = json.load(
+            open(os.path.join(assets_path, "templates", 'config.json'),
+                 'r'))
         parameters[ConfigParameters.Base_Infectivity_Distribution] = ConfigParameters.GAUSSIAN_DISTRIBUTION
         task = JSONConfiguredPythonTask(script_path=script_path, parameters=parameters, config_file_name='config.json')
         task.command.add_option("--duration", 40)

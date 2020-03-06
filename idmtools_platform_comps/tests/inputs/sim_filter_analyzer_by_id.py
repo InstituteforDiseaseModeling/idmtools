@@ -48,5 +48,5 @@ class SimFilterAnalyzerById(IAnalyzer):
         return df
 
     def reduce(self, all_data):
-        results = pd.concat(list(all_data.values()), axis=0)  # Combine a list of all the sims tag values
-        results.to_csv(os.path.join("output", 'b_match.csv'))  # Write the sim tags to a csv
+        results = pd.concat(list(all_data.values()), axis=0, sort=False)  # Combine a list of all the sims tag values
+        results.to_csv(os.path.join("output", 'result.csv'))  # Write the sim tags to a csv

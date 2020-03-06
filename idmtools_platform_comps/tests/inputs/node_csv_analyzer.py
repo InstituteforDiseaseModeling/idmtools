@@ -31,7 +31,7 @@ class NodeCSVAnalyzer(BaseAnalyzer):
     def reduce(self, all_data):
         # Let's hope the first simulation is representative
         first_sim = next(iter(all_data.keys()))  # Iterate over the dataframe keys
-        exp_id = str(first_sim.experiment.uid)  # Get the exp id from the first sim data
+        exp_id = first_sim.experiment.id  # Set the exp id from the first sim data
 
         results = pd.concat(list(all_data.values()), axis=0,  # Combine a list of all the sims csv data column values
                             keys=[str(k.uid) for k in all_data.keys()],  # Add a hierarchical index with the keys option
