@@ -40,17 +40,7 @@ class SimFilterAnalyzer(IAnalyzer):
         return k
 
     def filter(self, simulation):
-        # filter a particular sim from the analysis
-        platform = Platform('COMPS2')
-        exps = platform.get_parent_by_object(simulation)
-        exp_uid = exps.uid
-        python_exp_id = exps.parent_id
-        print("parent id:" + str(python_exp_id))
-
-        # sim to filter
-        sim_id = 'e6f2b1dc-7053-ea11-a2bf-f0921c167862'
-        sims = FilterItem.filter_item_by_id(platform, exp_uid, ItemType.EXPERIMENT, skip_sims=[sim_id])
-        return sims
+        return int(simulation.tags.get("b")) == 2
 
     def map(self, data, simulation):
         results = data[self.filenames[0]]

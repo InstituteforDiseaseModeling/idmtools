@@ -27,14 +27,14 @@ extras = dict(test=test_requirements, packaging=build_requirements, bamboo=bambo
 extras['all'] = list(itertools.chain(extras.values()))
 
 authors = [
-    ("Ross Carter", 'rcarter@idmod.org'),
-    ("Sharon Chen", 'shchen@idmod.org'),
-    ("Ye Chen", 'yechen@idmod.org'),
-    ("Clinton Collins", 'ccollins@idmod.org'),
+    ("Ross Carter", "rcarter@idmod.org"),
+    ("Sharon Chen", "shchen@idmod.org"),
+    ("Ye Chen", "yechen@idmod.org"),
+    ("Clinton Collins", "ccollins@idmod.org"),
     ("Zhaowei Du", "zdu@idmod.org"),
-    ("Mary Fisher", 'mafisher@idmod.org'),
-    ("Mandy Izzo", 'mizzo@idmod.org'),
-    ("Clark Kirkman IV", 'ckirkman@idmod.org'),
+    ("Mary Fisher", "mafisher@idmod.org"),
+    ("Mandy Izzo", "mizzo@idmod.org"),
+    ("Clark Kirkman IV", "ckirkman@idmod.org"),
     ("Benoit Raybaud", "braybaud@idmod.org"),
     ("Jen Schripsema", "jschripsema@idmod.org")
 ]

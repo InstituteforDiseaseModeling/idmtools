@@ -23,14 +23,14 @@ if sys.version_info[1] == 6:
     requirements.append('dataclasses')
 
 authors = [
-    ("Ross Carter", 'rcarter@idmod.org'),
-    ("Sharon Chen", 'shchen@idmod.org'),
-    ("Ye Chen", 'yechen@idmod.org'),
-    ("Clinton Collins", 'ccollins@idmod.org'),
+    ("Ross Carter", "rcarter@idmod.org"),
+    ("Sharon Chen", "shchen@idmod.org"),
+    ("Ye Chen", "yechen@idmod.org"),
+    ("Clinton Collins", "ccollins@idmod.org"),
     ("Zhaowei Du", "zdu@idmod.org"),
-    ("Mary Fisher", 'mafisher@idmod.org'),
-    ("Mandy Izzo", 'mizzo@idmod.org'),
-    ("Clark Kirkman IV", 'ckirkman@idmod.org'),
+    ("Mary Fisher", "mafisher@idmod.org"),
+    ("Mandy Izzo", "mizzo@idmod.org"),
+    ("Clark Kirkman IV", "ckirkman@idmod.org"),
     ("Benoit Raybaud", "braybaud@idmod.org"),
     ("Jen Schripsema", "jschripsema@idmod.org")
 ]

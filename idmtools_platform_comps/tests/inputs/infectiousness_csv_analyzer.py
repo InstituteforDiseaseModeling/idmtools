@@ -8,8 +8,6 @@ if platform == "linux" or platform == "linux2":
 import matplotlib.pyplot as plt
 import pandas as pd
 from idmtools.entities.ianalyzer import IAnalyzer as BaseAnalyzer
-from idmtools.core import ItemType
-from idmtools.core.platform_factory import Platform
 
 
 # Create a class for individual level analyzer
@@ -38,11 +36,7 @@ class InfectiousnessCSVAnalyzer(BaseAnalyzer):
     def reduce(self, all_data):
         # Let's hope the first simulation is representative
         first_sim = next(iter(all_data.keys()))  # Iterate over the dataframe keys
-        # exp_id = str(first_sim.experiment.uid)  # Set the exp id from the first sim data
-        platform = Platform('COMPS2')
-        exp_id = platform.get_parent(first_sim.uid, ItemType.SIMULATION)  # Set the exp id from the first sim data
-
-
+        exp_id = first_sim.experiment.id  # Set the exp id from the first sim data
         keys = []
         for k in all_data.keys():
             if 'simulation_name_tag' in k.tags:

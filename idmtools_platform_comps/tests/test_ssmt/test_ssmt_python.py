@@ -14,10 +14,10 @@ from idmtools.core import ItemType
 # import analyzers from current dir's inputs dir
 analyzer_path = os.path.join(os.path.dirname(__file__), "..", "inputs")
 sys.path.insert(0, analyzer_path)
-from SimpleAnalyzer import SimpleAnalyzer  # noqa
-from CSVAnalyzer import CSVAnalyzer  # noqa
-from InfectiousnessCSVAnalyzer import InfectiousnessCSVAnalyzer  # noqa
-from NodeCSVAnalyzer import NodeCSVAnalyzer  # noqa
+from simple_analyzer import SimpleAnalyzer  # noqa
+from csv_analyzer import CSVAnalyzer  # noqa
+from infectiousness_csv_analyzer import InfectiousnessCSVAnalyzer  # noqa
+from node_csv_analyzer import NodeCSVAnalyzer  # noqa
 
 
 @pytest.mark.comps
@@ -90,7 +90,8 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
         self.assertEqual(execution['Command'],
-                         "python platform_analysis_bootstrap.py " + experiment_id + " SimpleAnalyzer.SimpleAnalyzer comps2")
+                         "python platform_analysis_bootstrap.py " + experiment_id +
+                         " simple_analyzer.SimpleAnalyzer comps2")
 
     # Test CSVAnalyzer with SSMTAnalysis which analyzes python experiment's results
     def test_ssmt_workitem_python_csv_analyzer(self):
@@ -119,13 +120,11 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
         self.assertEqual(execution['Command'],
-                         "python platform_analysis_bootstrap.py " + experiment_id + " CSVAnalyzer.CSVAnalyzer comps2")
+                         "python platform_analysis_bootstrap.py " + experiment_id + " csv_analyzer.CSVAnalyzer comps2")
 
-    # test SSMTWorkItem where waiting for sims to complete first
-    @pytest.mark.long
     @pytest.mark.comps
     def test_ssmt_seir_model_analysis(self):
-        exp_id = '9311af40-1337-ea11-a2be-f0921c167861'  # comps2 staging exp id
+        exp_id = 'a980f265-995e-ea11-a2bf-f0921c167862'  # comps2 staging exp id
         filenames = {'filenames': ['output/individual.csv']}
         filenames_2 = {'filenames': ['output/node.csv']}
         analysis = PlatformAnalysis(platform=self.platform,
@@ -141,15 +140,16 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
         # Verify workitem results
         local_output_path = "output"
         del_folder(local_output_path)
-        out_filenames = ["output/individual.csv", "output/node.csv"]
+        out_filenames = [exp_id + "/InfectiousnessCSVAnalyzer.csv", exp_id + "/NodeCSVAnalyzer.csv", "WorkOrder.json"]
         ret = self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
 
         file_path = os.path.join(local_output_path, str(wi.uid))
-        self.assertTrue(os.path.exists(os.path.join(file_path, "output", "individual.csv")))
-        self.assertTrue(os.path.exists(os.path.join(file_path, "output", "node.csv")))
+        self.assertTrue(os.path.exists(os.path.join(file_path, exp_id, "InfectiousnessCSVAnalyzer.csv")))
+        self.assertTrue(os.path.exists(os.path.join(file_path, exp_id, "NodeCSVAnalyzer.csv")))
         worker_order = json.load(open(os.path.join(file_path, "WorkOrder.json"), 'r'))
         print(worker_order)
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
         self.assertEqual(execution['Command'],
-                         "python platform_analysis_bootstrap.py " + exp_id + " InfectiousnessCSVAnalyzer.InfectiousnessCSVAnalyzer, NodeCSVAnalyzer.NodeCSVAnalyzer comps2")
+                         "python platform_analysis_bootstrap.py " + exp_id +
+                         " infectiousness_csv_analyzer.InfectiousnessCSVAnalyzer,node_csv_analyzer.NodeCSVAnalyzer comps2")
