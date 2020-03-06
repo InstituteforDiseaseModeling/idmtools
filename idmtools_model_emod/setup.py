@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""The setup script."""
+"""The setup script for the idmtools_model_emod platform to support EMOD model users."""
 import itertools
 
 from setuptools import setup, find_packages
@@ -27,12 +27,16 @@ extras = dict(test=test_requirements, packaging=build_requirements, bamboo=bambo
 extras['all'] = list(itertools.chain(extras.values()))
 
 authors = [
-    ("Sharon Chen", "'schen@idmod.org"),
-    ("Clinton Collins", 'ccollins@idmod.org'),
+    ("Ross Carter", "rcarter@idmod.org"),
+    ("Sharon Chen", "shchen@idmod.org"),
+    ("Ye Chen", "yechen@idmod.org"),
+    ("Clinton Collins", "ccollins@idmod.org"),
     ("Zhaowei Du", "zdu@idmod.org"),
-    ("Mary Fisher", 'mfisher@idmod.org'),
-    ("Clark Kirkman IV", 'ckirkman@idmod.org'),
-    ("Benoit Raybaud", "braybaud@idmod.org")
+    ("Mary Fisher", "mafisher@idmod.org"),
+    ("Mandy Izzo", "mizzo@idmod.org"),
+    ("Clark Kirkman IV", "ckirkman@idmod.org"),
+    ("Benoit Raybaud", "braybaud@idmod.org"),
+    ("Jen Schripsema", "jschripsema@idmod.org")
 ]
 
 setup(
