@@ -2,6 +2,7 @@ import os
 import sys
 from functools import partial
 
+import pandas as pd
 import pytest
 from COMPS.Data import Experiment as COMPSExperiment
 
@@ -114,9 +115,14 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         am = AnalyzeManager(platform=platform, ids=[(exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
 
-        for simulation in COMPSExperiment.get(exp_id).get_simulations():
-            # verify results
-            self.assertTrue(os.path.exists(os.path.join("output", "b_match.csv")))
+        # validate result
+        file_path = os.path.join("output", "b_match.csv")
+        self.assertTrue(os.path.exists(file_path))
+        df = pd.read_csv(file_path, names=['index', 'key', 'value'], header=None)
+        self.assertTrue(df['key'].values[1:5].size == 4)
+        self.assertTrue(df['key'].values[1:5].all() == 'b')
+        self.assertTrue(df['value'].values[1:5].size == 4)
+        self.assertTrue(df['value'].values[1:5].all() == '2')
 
     def test_analyzer_filter_sims_by_id(self):
         # delete output from previous run
@@ -135,6 +141,13 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         am = AnalyzeManager(platform=platform, ids=[(exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
 
-        for simulation in COMPSExperiment.get(exp_id).get_simulations():
-            # verify results
-            self.assertTrue(os.path.exists(os.path.join("output", "b_match.csv")))
+        # validate result
+        file_path = os.path.join("output", "result.csv")
+        self.assertTrue(os.path.exists(file_path))
+        # validate content of output.csv
+        df = pd.read_csv(file_path, names=['SimId', 'a', 'b', 'c'], header=None)
+        self.assertTrue(df['SimId'].values[1:7].size == 6)
+        self.assertTrue(df['a'].values[1:7].size == 6)
+        self.assertTrue(df['b'].values[1:7].size == 6)
+        self.assertTrue(df['c'].values[1:7].size == 6)
+
