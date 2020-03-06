@@ -27,7 +27,9 @@ class COVID19SSMT(SSMTWorkItem):
         self.asset_files.add_path(covid_abm_path, relative_path="pyPackages/covid_abm", recursive=True)
 
         # Create and add the run file
-        run_file_content = f"export PYTHONPATH=./Assets/pyPackages\npython3 {os.path.basename(run_script)}"
+        run_file_content = f"export PYTHONPATH=./Assets/pyPackages\n" \
+                           f"python3 {os.path.basename(run_script)}"
+
         self.user_files.add_asset_file(Asset(filename="run.sh", content=run_file_content))
 
         # Add the user script
