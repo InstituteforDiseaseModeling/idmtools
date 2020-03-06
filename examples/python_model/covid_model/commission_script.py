@@ -1,6 +1,7 @@
 from covid_ssmt import COVID19SSMT
 from idmtools.core.platform_factory import Platform
 
+
 # Create a platform to run the workitem
 platform = Platform('COMPS2')
 
