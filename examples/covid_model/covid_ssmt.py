@@ -16,7 +16,7 @@ class COVID19SSMT(SSMTWorkItem):
         self.docker_image = "ubuntu18.04_python3.6_covid-abm"
 
         # Add the model to the pyPackages
-        self.asset_files.add_path(covid_abm_path, relative_path="pyPackages", recursive=True)
+        self.asset_files.add_path(covid_abm_path, relative_path="pyPackages/covid_abm", recursive=True)
 
         # Create and add the run file
         run_file_content = f"export PYTHONPATH=./Assets/pyPackages\npython3 {os.path.basename(run_script)}"
