@@ -22,7 +22,6 @@ from . import parameters as cov_pars, poisson_stats as cov_ps, utils as cov_ut
 __all__ = ['ParsObj', 'Person', 'Sim', 'single_run', 'multi_run']
 
 
-
 #%% Define classes
 class ParsObj(sc.prettyobj):
     '''
