@@ -27,6 +27,11 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
             else:  # We should already have this asset so we should have a md5sum
                 ac.add_asset(AssetCollectionFile(file_name=asset.filename, relative_path=asset.relative_path,
                                                  md5_checksum=asset.checksum))
+
+        # Add tags
+        if asset_collection.tags:
+            ac.set_tags(asset_collection.tags)
+
         ac.save()
         asset_collection.uid = ac.id
         asset_collection._platform_object = asset_collection
