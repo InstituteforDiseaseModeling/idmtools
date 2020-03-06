@@ -1,10 +1,11 @@
 import json
 from dataclasses import dataclass, field
-from typing import List, Dict, Any, Tuple, Type
+from typing import Any, Dict, List, Tuple, Type
 from uuid import UUID
 
 from COMPS.Data import WorkItem as COMPSWorkItem, WorkItemFile
-from COMPS.Data.WorkItem import WorkerOrPluginKey, RelationType
+from COMPS.Data.WorkItem import RelationType, WorkerOrPluginKey
+
 from idmtools.assets import AssetCollection
 from idmtools.core import ItemType
 from idmtools.entities.generic_workitem import GenericWorkItem
@@ -64,7 +65,11 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         # Add additional files
         for af in work_item.user_files:
             wi_file = WorkItemFile(af.filename, "input")
-            wi.add_file(wi_file, af.absolute_path)
+            # Either the file has an absolute path or content
+            if af.absolute_path:
+                wi.add_file(wi_file, af.absolute_path)
+            else:
+                wi.add_file(wi_file, data=af.bytes)
 
         # Save the work-item to the server
         wi.save()
