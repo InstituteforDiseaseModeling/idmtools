@@ -14,7 +14,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
 
     def get(self, asset_collection_id: UUID, **kwargs) -> COMPSAssetCollection:
         children = kwargs.get('children')
-        children = children if children is not None else ["assets"]
+        children = children if children is not None else ["assets", "tags"]
         return COMPSAssetCollection.get(id=asset_collection_id, query_criteria=QueryCriteria().select_children(children))
 
     def platform_create(self, asset_collection: AssetCollection, **kwargs) -> COMPSAssetCollection:
