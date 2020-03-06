@@ -8,7 +8,7 @@ from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 
 sys.path.append(os.path.dirname(__file__))
-from PopulationAnalyzer import PopulationAnalyzer  # noqa
+from population_analyzer import PopulationAnalyzer  # noqa
 
 if __name__ == "__main__":
     platform = Platform('COMPS2')

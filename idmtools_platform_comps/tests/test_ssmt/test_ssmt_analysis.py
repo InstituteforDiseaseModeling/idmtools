@@ -11,8 +11,8 @@ from idmtools_test.utils.utils import del_folder
 
 analyzer_path = os.path.join(os.path.dirname(__file__), "..", "inputs")
 sys.path.insert(0, analyzer_path)
-from PopulationAnalyzer import PopulationAnalyzer  # noqa
-from AdultVectorsAnalyzer import AdultVectorsAnalyzer  # noqa
+from population_analyzer import PopulationAnalyzer  # noqa
+from adult_vectors_analyzer import AdultVectorsAnalyzer  # noqa
 
 
 @pytest.mark.comps
@@ -26,7 +26,8 @@ class TestSSMTAnalysis(ITestWithPersistence):
 
     # test using SSMTAnalysis to run PopulationAnalyzer in comps's SSMT DockerWorker
     def test_ssmt_analysis_PopulationAnalyzer(self):
-        experiment_id = "8bb8ae8f-793c-ea11-a2be-f0921c167861"
+        experiment_id = "8bb8ae8f-793c-ea11-a2be-f0921c167861"  # comps2
+        #experiment_id ="a30a21c0-9752-ea11-941d-0050569e0ef3"  # idmtvapp17
         analysis = PlatformAnalysis(platform=self.platform,
                                     experiment_ids=[experiment_id],
                                     analyzers=[PopulationAnalyzer],
@@ -47,16 +48,19 @@ class TestSSMTAnalysis(ITestWithPersistence):
         self.assertTrue(os.path.exists(os.path.join(file_path, "output", "population.png")))
         self.assertTrue(os.path.exists(os.path.join(file_path, "output", "population.json")))
         self.assertTrue(os.path.exists(os.path.join(file_path, "WorkOrder.json")))
-        worker_order = json.load(open(os.path.join(file_path, "WorkOrder.json"), 'r'))
-        print(worker_order)
-        self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
-        execution = worker_order['Execution']
-        self.assertEqual(execution['Command'],
-                         "python platform_analysis_bootstrap.py " + experiment_id + " PopulationAnalyzer.PopulationAnalyzer comps2")
+        with open(os.path.join(file_path, "WorkOrder.json"), 'r') as f:
+            worker_order = json.load(f)
+            print(worker_order)
+            self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
+            execution = worker_order['Execution']
+            self.assertEqual(execution['Command'],
+                            "python platform_analysis_bootstrap.py " + experiment_id +
+                            " population_analyzer.PopulationAnalyzer comps2")
 
     # test using SSMTAnalysis to run multiple analyzers in comps's SSMT DockerWorker
     def test_ssmt_analysis_multiple_analyzers(self):
-        experiment_id = "8bb8ae8f-793c-ea11-a2be-f0921c167861"
+        experiment_id = "8bb8ae8f-793c-ea11-a2be-f0921c167861"  # comps2
+        #experiment_id ="a30a21c0-9752-ea11-941d-0050569e0ef3"  # idmtvapp17
         analysis = PlatformAnalysis(platform=self.platform,
                                     experiment_ids=[experiment_id],
                                     analyzers=[PopulationAnalyzer, AdultVectorsAnalyzer],
@@ -82,17 +86,21 @@ class TestSSMTAnalysis(ITestWithPersistence):
         self.assertTrue(os.path.exists(os.path.join(file_path, "output", "adult_vectors.json")))
 
         self.assertTrue(os.path.exists(os.path.join(file_path, "WorkOrder.json")))
-        worker_order = json.load(open(os.path.join(file_path, "WorkOrder.json"), 'r'))
-        print(worker_order)
-        self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
-        execution = worker_order['Execution']
-        self.assertEqual(execution['Command'],
-                         "python platform_analysis_bootstrap.py " + experiment_id + " PopulationAnalyzer.PopulationAnalyzer,AdultVectorsAnalyzer.AdultVectorsAnalyzer comps2")
+        with open(os.path.join(file_path, "WorkOrder.json"), 'r') as f:
+            worker_order = json.load(f)
+            print(worker_order)
+            self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
+            execution = worker_order['Execution']
+            self.assertEqual(execution['Command'],
+                         "python platform_analysis_bootstrap.py " + experiment_id +
+                         " population_analyzer.PopulationAnalyzer,adult_vectors_analyzer.AdultVectorsAnalyzer comps2")
 
     # test using SSMTAnalysis to run multiple experiments in comps's SSMT DockerWorker
     def test_ssmt_analysis_multiple_experiments(self):
-        exp_id1 = "8bb8ae8f-793c-ea11-a2be-f0921c167861"
-        exp_id2 = "4ea96af7-1549-ea11-a2be-f0921c167861"
+        exp_id1 = "8bb8ae8f-793c-ea11-a2be-f0921c167861"  # comps2
+        exp_id2 = "4ea96af7-1549-ea11-a2be-f0921c167861"  # comps2
+        # exp_id1 = 'a30a21c0-9752-ea11-941d-0050569e0ef3' # idmtvapp17
+        # exp_id2 ='cb87f0e2-9652-ea11-941d-0050569e0ef3' # idmtvapp17
         experiment_id = [exp_id1, exp_id2]
         analysis = PlatformAnalysis(platform=self.platform,
                                     experiment_ids=experiment_id,
@@ -114,9 +122,11 @@ class TestSSMTAnalysis(ITestWithPersistence):
         self.assertTrue(os.path.exists(os.path.join(file_path, "output", "population.png")))
         self.assertTrue(os.path.exists(os.path.join(file_path, "output", "population.json")))
         self.assertTrue(os.path.exists(os.path.join(file_path, "WorkOrder.json")))
-        worker_order = json.load(open(os.path.join(file_path, "WorkOrder.json"), 'r'))
-        print(worker_order)
-        self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
-        execution = worker_order['Execution']
-        self.assertEqual(execution['Command'],
-                         "python platform_analysis_bootstrap.py " + exp_id1 + "," + exp_id2 + " PopulationAnalyzer.PopulationAnalyzer comps2")
+        with open(os.path.join(file_path, "WorkOrder.json"), 'r') as f:
+            worker_order = json.load(f)
+            print(worker_order)
+            self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
+            execution = worker_order['Execution']
+            self.assertEqual(execution['Command'],
+                            "python platform_analysis_bootstrap.py " + exp_id1 + "," + exp_id2 +
+                            " population_analyzer.PopulationAnalyzer comps2")

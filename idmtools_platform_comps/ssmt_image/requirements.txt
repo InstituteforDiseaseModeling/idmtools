@@ -6,3 +6,4 @@ tables
 rpy2
 numba
 matplotlib
+scipy
