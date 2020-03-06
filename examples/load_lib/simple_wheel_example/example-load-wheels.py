@@ -42,9 +42,6 @@ def main():
     pl = RequirementsToAssetCollection(platform, requirements_path='./requirements.txt', pkg_list=['astor==0.8.0'],
                                        extra_wheels=['seaborn-0.7.1-py2.py3-none-any.whl', 'lz4-0.18.1-cp36-cp36m-win_amd64.whl'])
 
-    pl.run_experiment_to_install_lib()
-    exit()
-
     ac_id = pl.run()
     print('ac_id: ', ac_id)
 
