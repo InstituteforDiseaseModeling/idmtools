@@ -345,7 +345,7 @@ class TestPythonExperiment(ITestWithPersistence):
         t = JSONConfiguredPythonTask(script_path=model_path, parameters=dict(a=1, b=10), envelope="parameters")
         ts = TemplatedSimulations(base_task=t)
         ts.tags = tags
-        e = Experiment(name=self.case_name, simulations=ts, gather_common_assets_from_task=True)
+        e = Experiment(name=self.case_name, simulations=[ts.new_simulation()], gather_common_assets_from_task=True)
 
         ac = self.get_existing_python_asset_collection()
         e.add_assets(ac)
