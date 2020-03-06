@@ -22,6 +22,7 @@ class RequirementsToAssetCollection:
     platform: IPlatform = field(default=None)
     requirements_path: str = field(default=None)
     pkg_list: list = field(default=None)
+    extra_wheels: list = field(default=None)
     _checksum: str = field(default=None, init=False)
     _requirements: str = field(default=None, init=False)
 
@@ -31,6 +32,7 @@ class RequirementsToAssetCollection:
 
         self.requirements_path = os.path.abspath(self.requirements_path) if self.requirements_path else None
         self.pkg_list = self.pkg_list or []
+        self.extra_wheels = [os.path.abspath(whl) for whl in self.extra_wheels] if self.extra_wheels else []
 
     @property
     def checksum(self):
@@ -87,8 +89,6 @@ class RequirementsToAssetCollection:
 
         # get ac or return ad_id
         ac = self.retrieve_ac_by_tag()
-        if ac is None:
-            ac = self.retrieve_ac_by_wi(wi.uid)
 
         if ac:
             return ac.id
@@ -133,6 +133,11 @@ class RequirementsToAssetCollection:
             ac = ac_list[0]
             return ac
 
+    def add_wheels_to_assets(self, experiment):
+        for whl in self.extra_wheels:
+            a = Asset(filename=os.path.basename(whl), absolute_path=whl)
+            experiment.add_asset(a)
+
     def run_experiment_to_install_lib(self):
         """
         Create an Experiment which will run another py script to install requirements
@@ -145,6 +150,7 @@ class RequirementsToAssetCollection:
         experiment = Experiment(name=exp_name, simulations=[task.to_simulation()])
         experiment.add_asset(Asset(REQUIREMENT_FILE))
         experiment.tags = {MD5_KEY: self.checksum}
+        self.add_wheels_to_assets(experiment)
 
         self.platform.run_items(experiment)
         self.wait_till_done(experiment)
@@ -241,6 +247,9 @@ class RequirementsToAssetCollection:
         for k, v in missing_version_dict.items():
             latest = self.get_latest_version(k)
             update_req_list.append(f"{k}=={latest}")
+
+        if self.extra_wheels:
+            update_req_list.extend([f"Assets/{os.path.basename(whl)}" for whl in self.extra_wheels])
 
         # print(update_req_list)
         # print(comment_list)
