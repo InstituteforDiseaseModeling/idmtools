@@ -40,7 +40,8 @@ class TestAssetsInComps(unittest.TestCase):
         ac: AssetCollection = self.platform._assets.to_entity(comps_ac)
         self.assertIsInstance(ac, AssetCollection)
 
-        filenames_comps = sorted([f'{a.relative_path}{a.file_name}' if a.relative_path else f'{a.file_name}' for a in comps_ac.assets])
+        filenames_comps = sorted(
+            [f'{a.relative_path}{a.file_name}' if a.relative_path else f'{a.file_name}' for a in comps_ac.assets])
         filenames = sorted([f'{a.relative_path}{a.filename}' for a in ac.assets])
         self.assertEqual(filenames_comps, filenames)
 
@@ -81,7 +82,7 @@ class TestAssetsInComps(unittest.TestCase):
 
         self._run_and_test_experiment(pe)
         exp_id = pe.uid
-        #exp_id = 'ae077ddd-668d-e911-a2bb-f0921c167866'
+        # exp_id = 'ae077ddd-668d-e911-a2bb-f0921c167866'
         count = 0
         test_assetcollection = []
         for simulation in COMPSExperiment.get(exp_id).get_simulations():
@@ -102,6 +103,38 @@ class TestAssetsInComps(unittest.TestCase):
     #     ac.tags = {"idmtools": "idmtools-automation", "string_tag": "testACtag", "number_tag": 123, "KeyOnly": None}
     #
     #     self.assertSetEqual(set(ac.assets), set(AssetCollection.tags))
+
+    def test_creat_ac_with_tags_1(self):
+        a = Asset(relative_path=None, filename="test.json", content=json.dumps({"a": 1, "b": 2}))
+        b = Asset(relative_path=None, filename="test1.json", content=json.dumps({"a": 1, "b": 2}))
+
+        ac = AssetCollection(tags={"string_tag": "testACtag", "number_tag": 123, "KeyOnly": None})
+        ac.add_asset(a)
+        ac.add_asset(b)
+        ac.update_tags({"number_tag": 321})
+
+        ids = self.platform.create_items(ac)
+        new_ac = self.platform.get_item(ids[0].id, item_type=ItemType.ASSETCOLLECTION)
+
+        self.assertIsInstance(new_ac, AssetCollection)
+        self.assertEqual(new_ac.tags["number_tag"], "321")
+
+    def test_creat_ac_with_tags_2(self):
+        a = Asset(relative_path=None, filename="test.json", content=json.dumps({"a": 1, "b": 2}))
+        b = Asset(relative_path=None, filename="test1.json", content=json.dumps({"a": 1, "b": 2}))
+
+        ac = AssetCollection()
+        ac.add_asset(a)
+        ac.add_asset(b)
+
+        ac.set_tags({"string_tag": "testACtag", "number_tag": 123, "KeyOnly": None})
+        ac.update_tags({"number_tag": 321})
+
+        ids = self.platform.create_items(ac)
+        new_ac = self.platform.get_item(ids[0].id, item_type=ItemType.ASSETCOLLECTION)
+
+        self.assertIsInstance(new_ac, AssetCollection)
+        self.assertEqual(new_ac.tags["number_tag"], "321")
 
 
 if __name__ == '__main__':
