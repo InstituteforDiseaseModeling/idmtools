@@ -89,8 +89,6 @@ class RequirementsToAssetCollection:
 
         # get ac or return ad_id
         ac = self.retrieve_ac_by_tag()
-        if ac is None:
-            ac = self.retrieve_ac_by_wi(wi.uid)
 
         if ac:
             return ac.id
