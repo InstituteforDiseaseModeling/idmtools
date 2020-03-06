@@ -7,6 +7,14 @@ from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
 
 @dataclass
 class COVID19SSMT(SSMTWorkItem):
+    """
+    Class to enable running the covid_abm model on SSMT.
+    We are inheriting from SSMTWorkItem to run the covid_abm simulations in a SSMT Work Item and adding a few features:
+    - Allowing the user to give the covid_abm model path to automatically upload it along with the simulations
+    - Allowing the user to provide a script to run on the worker
+
+    We also automatically set the correct docker image containing all the dependencies for the covid_abm model.
+    """
     covid_abm_path: InitVar[str] = None
     run_script: InitVar[str] = None
 

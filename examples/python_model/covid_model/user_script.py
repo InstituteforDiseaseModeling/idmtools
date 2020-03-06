@@ -1,6 +1,7 @@
-'''
-Simple script for running the Covid-19 agent-based model
-'''
+"""
+Simple script for running the Covid-19 agent-based model.
+This script runs 100 simulations in a pool of 48 processes.
+"""
 
 import multiprocessing as mp
 import time
@@ -9,15 +10,11 @@ import covid_abm
 
 
 def run_sim(seed):
-    # print('{} - start: {}'.format(str(seed), datetime.datetime.now().time()))
     simstart = time.time()
     sim = covid_abm.Sim()
     sim.set_seed(seed)  # 4 ok, 5 ok, 6 good
     sim.run(verbose=0)
     sim.likelihood(verbose=0)
-    # if do_plot:
-    # sim.plot(do_save=do_save)
-    # print('{} - end: {}'.format(str(seed), datetime.datetime.now().time()))
     print('{} - total sim time: {}'.format(str(seed), time.time() - simstart))
 
     return (seed, sim)
