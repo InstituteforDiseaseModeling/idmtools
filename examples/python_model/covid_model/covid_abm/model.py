@@ -11,12 +11,6 @@ import sciris as sc
 from . import utils as cov_ut
 from . import parameters as cov_pars
 from . import poisson_stats as cov_ps
-# %% Imports
-import numpy as np  # Needed for a few things not provided by pl
-import pylab as pl
-import sciris as sc
-
-from . import parameters as cov_pars, poisson_stats as cov_ps, utils as cov_ut
 
 # Specify all externally visible functions this file defines
 __all__ = ['ParsObj', 'Person', 'Sim', 'single_run', 'multi_run']
