@@ -179,7 +179,7 @@ class RequirementsToAssetCollection:
         wi = SSMTWorkItem(item_name=wi_name, command=command, user_files=user_files, tags=tags,
                           related_experiments=[exp_id])
 
-        wi.run(False, platform=self.platform)
+        self.platform.run_items(wi)
         self.wait_till_done(wi)
 
         if wi.succeeded:

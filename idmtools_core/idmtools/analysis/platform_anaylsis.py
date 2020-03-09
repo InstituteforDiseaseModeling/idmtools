@@ -70,7 +70,8 @@ class PlatformAnalysis:
                                asset_files=self.asset_files, related_experiments=self.experiment_ids)
 
         # Run the workitem
-        self.wi.run(True, platform=self.platform)
+        self.platform.run_items(self.wi)
+        self.platform.wait_till_done(self.wi)
 
         # remove temp file
         os.remove(temp_file)

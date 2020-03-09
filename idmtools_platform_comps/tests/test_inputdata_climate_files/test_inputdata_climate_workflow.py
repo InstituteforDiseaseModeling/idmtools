@@ -63,7 +63,8 @@ class InputDataWorkItemTests(ITestWithPersistence):
 
         inputdata_wi = InputDataWorkItem(item_name=self.case_name, tags=self.tags)
         inputdata_wi.load_work_order(work_order_path)
-        inputdata_wi.run(True, platform=self.p)
+        self.p.run_items(inputdata_wi)
+        self.p.wait_till_done(inputdata_wi)
         self.assertIsNotNone(inputdata_wi)
 
     def getEntityIds(self, demo):
@@ -84,7 +85,9 @@ class InputDataWorkItemTests(ITestWithPersistence):
 
         inputdata_wi = InputDataWorkItem(item_name=self.case_name)
         inputdata_wi.load_work_order(work_order_path)
-        inputdata_wi.run(True, platform=self.p)
+        self.p.run_items(inputdata_wi)
+        self.p.wait_till_done(inputdata_wi)
+
         self.assertIsNotNone(inputdata_wi)
 
 

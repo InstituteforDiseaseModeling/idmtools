@@ -72,7 +72,8 @@ class TestVisToolsWorkItem(unittest.TestCase):
         tags = {'idmtools': "vistool test", 'WorkItem type': 'VisTools', 'SimulationId': cls.sim_id}
         cls.wi = VisToolsWorkItem(item_name="test_vistools_work_item.py", tags=tags, work_order=data,
                                   related_simulations=[cls.sim_id])
-        cls.wi.run(True, platform=cls.platform)
+        cls.platform.run_items(cls.wi)
+        cls.platform.wait_till_done(cls.wi)
 
     def setUp(self):
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
