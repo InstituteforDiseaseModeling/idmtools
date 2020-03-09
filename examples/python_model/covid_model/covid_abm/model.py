@@ -11,9 +11,16 @@ import sciris as sc
 from . import utils as cov_ut
 from . import parameters as cov_pars
 from . import poisson_stats as cov_ps
+# %% Imports
+import numpy as np  # Needed for a few things not provided by pl
+import pylab as pl
+import sciris as sc
+
+from . import parameters as cov_pars, poisson_stats as cov_ps, utils as cov_ut
 
 # Specify all externally visible functions this file defines
 __all__ = ['ParsObj', 'Person', 'Sim', 'single_run', 'multi_run']
+
 
 
 #%% Define classes
@@ -25,16 +32,16 @@ class ParsObj(sc.prettyobj):
     def __init__(self, pars):
         self.update_pars(pars)
         self.results_keys = ['t',
-                             'n_susceptible',
-                             'n_exposed',
-                             'n_infectious',
+                             'n_susceptible', 
+                             'n_exposed', 
+                             'n_infectious', 
                              'n_recovered',
-                             'infections',
-                             'tests',
-                             'diagnoses',
+                             'infections', 
+                             'tests', 
+                             'diagnoses', 
                              'recoveries',
-                             'cum_exposed',
-                             'cum_tested',
+                             'cum_exposed', 
+                             'cum_tested', 
                              'cum_diagnosed',
                              'evac_diagnoses',]
         return
@@ -161,6 +168,7 @@ class Sim(ParsObj):
 
         # Create the seed infections
         for i in range(seed_infections):
+            self.people[i].susceptible = False
             self.people[i].exposed = True
             self.people[i].infectious = True
             self.people[i].date_exposed = 0
@@ -247,8 +255,8 @@ class Sim(ParsObj):
                                     target_person.susceptible = False
                                     target_person.exposed = True
                                     target_person.date_exposed = t
-                                    incub_dist = round(pl.normal(person.pars['incub'], person.pars['incub_std']))
-                                    dur_dist = round(pl.normal(person.pars['dur'], person.pars['dur_std']))
+                                    incub_dist = round(pl.normal(target_person.pars['incub'], target_person.pars['incub_std']))
+                                    dur_dist = round(pl.normal(target_person.pars['dur'], target_person.pars['dur_std']))
                                     target_person.date_infectious = t + incub_dist
                                     target_person.date_recovered = target_person.date_infectious + dur_dist
                                     if verbose>=2:
@@ -414,14 +422,14 @@ class Sim(ParsObj):
         # Plot everything
         colors = sc.gridcolors(5)
         to_plot = sc.odict({ # TODO
-            'Total counts': sc.odict({'n_susceptible':'Number susceptible',
-                                      'n_exposed':'Number exposed',
+            'Total counts': sc.odict({'n_susceptible':'Number susceptible', 
+                                      'n_exposed':'Number exposed', 
                                       'n_infectious':'Number infectious',
                                       'cum_diagnosed':'Number diagnosed',
                                     }),
             'Daily counts': sc.odict({'infections':'New infections',
                                       'tests':'Number of tests',
-                                      'diagnoses':'New diagnoses',
+                                      'diagnoses':'New diagnoses', 
                                      }),
             })
 
