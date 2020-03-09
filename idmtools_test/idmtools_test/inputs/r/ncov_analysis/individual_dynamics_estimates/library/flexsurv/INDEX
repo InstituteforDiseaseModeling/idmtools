@@ -1,0 +1,56 @@
+GenF                    Generalized F distribution
+GenF.orig               Generalized F distribution (original
+                        parameterisation)
+GenGamma                Generalized gamma distribution
+GenGamma.orig           Generalized gamma distribution (original
+                        parameterisation)
+Gompertz                The Gompertz distribution
+Llogis                  The log-logistic distribution
+Survspline              Royston/Parmar spline survival distribution
+WeibullPH               Weibull distribution in proportional hazards
+                        parameterisation
+basis                   Natural cubic spline basis
+bc                      Breast cancer survival data
+bos                     Bronchiolitis obliterans syndrome after lung
+                        transplants
+coef.flexsurvreg        Extract model coefficients from fitted flexible
+                        survival models
+flexsurv-package        flexsurv: Flexible parametric survival and
+                        multi-state models
+flexsurvreg             Flexible parametric regression for
+                        time-to-event data
+flexsurvspline          Flexible survival regression using the
+                        Royston/Parmar spline model.
+hexp                    Hazard and cumulative hazard functions
+lines.flexsurvreg       Add fitted flexible survival curves to a plot
+mean_exp                Mean and restricted mean survival functions
+model.frame.flexsurvreg
+                        Extract original data from 'flexsurvreg'
+                        objects.
+msfit.flexsurvreg       Cumulative intensity function for parametric
+                        multi-state models
+normboot.flexsurvreg    Simulate from the asymptotic normal
+                        distribution of parameter estimates.
+pars.fmsm               Transition-specific parameters in a flexible
+                        parametric multi-state model
+plot.flexsurvreg        Plots of fitted flexible survival models
+pmatrix.fs              Transition probability matrix from a
+                        fully-parametric, time-inhomogeneous Markov
+                        multi-state model
+pmatrix.simfs           Transition probability matrix from a
+                        fully-parametric, semi-Markov multi-state model
+qgeneric                Generic function to find quantiles of a
+                        distribution
+rmst_generic            Generic function to find restricted mean
+                        survival of a distribution
+sim.fmsm                Simulate paths through a fully parametric
+                        semi-Markov multi-state model
+summary.flexsurvreg     Summaries of fitted flexible survival models
+totlos.fs               Total length of stay in particular states for a
+                        fully-parametric, time-inhomogeneous Markov
+                        multi-state model
+totlos.simfs            Expected total length of stay in specific
+                        states, from a fully-parametric, semi-Markov
+                        multi-state model
+unroll.function         Convert a function with matrix arguments to a
+                        function with vector arguments.

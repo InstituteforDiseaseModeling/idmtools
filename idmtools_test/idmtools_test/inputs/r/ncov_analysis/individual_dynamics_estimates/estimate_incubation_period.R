@@ -1,11 +1,19 @@
 # estimate incubation period
 
-library(tidyverse)
-library(survival)
-library(flexsurv)
-library(survminer)
-library(cowplot)
-library(gridExtra)
+# install packages
+install.packages("tidyverse")
+install.packages("survival")
+install.packages("flexsurv")
+install.packages("ggplot2")
+install.packages("gridExtra")
+
+library(tidyverse, lib.loc="/usr/bin/R/site-library/")
+library(survival, lib.loc="/usr/bin/R/site-library/")
+library(flexsurv, lib.loc="/usr/bin/R/site-library/")
+library(ggplot2, lib.loc="/usr/bin/R/site-library/")
+#library(survminer)
+#library(cowplot)
+library(gridExtra, lib.loc="/usr/bin/R/site-library/")
 
 
 linelist <- read.csv('./Data/Kudos to DXY.cn Last update_ 01_25_2020,  11_30 am (EST) - Line-list.csv', header=TRUE)

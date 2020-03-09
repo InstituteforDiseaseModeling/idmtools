@@ -131,10 +131,13 @@ class TestRExperiment(ITestWithPersistence):
             print(f"Experiment {experiment.uid} failed.\n")
             sys.exit(-1)
 
-    @pytest.mark.skip
+    # @pytest.mark.skip
     # TODO: need correct RScript path
     def test_r_ssmt_workitem_add_ac_from_path(self):
         ac_lib_path = os.path.join(COMMON_INPUT_PATH, "r", "ncov_analysis")
+
+        # Use Lauren's AC with most common R libraries - it's missing some required libraries
+        # ac_id = "26b0bfaa-4f57-ea11-a2bf-f0921c167862"
 
         # load assets to COMPS's assets
         asset_files = FileList()
@@ -145,7 +148,9 @@ class TestRExperiment(ITestWithPersistence):
         user_files.add_file(os.path.join(self.input_file_path, "idmtools.ini"))
 
         self.tags = {'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}
-        command = "/usr/bin/Rscript estimate_incubation_period.R"
+        command = "/usr/bin/Rscript Assets/ncov_analysis/individual_dynamics_estimates/estimate_incubation_period.R"
         wi = SSMTWorkItem(item_name=self.case_name, command=command, asset_files=asset_files, user_files=user_files,
                           tags=self.tags, docker_image="ubuntu1804_r")
         wi.run(True, platform=self.platform)
+
+
