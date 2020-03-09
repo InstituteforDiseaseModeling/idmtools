@@ -45,7 +45,8 @@ class ClimateGenerationTest(ITestWithPersistence):
         wi = SSMTWorkItem(item_name=self.case_name, docker_image=docker_image, command=command, user_files=user_files,
                           tags={'idmtools_test': self._testMethodName, 'WorkItem type': 'Docker', 'Command': command}
                           )
-        wi.run(True, platform=platform)
+        platform.run_items(wi)
+        platform.wait_till_done(wi)
 
         # Get the work item, related asset collection, and assets
         wi_id = wi.uid

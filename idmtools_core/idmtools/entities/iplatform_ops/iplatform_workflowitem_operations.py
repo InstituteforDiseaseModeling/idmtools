@@ -88,6 +88,7 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
         if do_pre:
             self.pre_create(workflow_item, **kwargs)
         ret = self.platform_create(workflow_item, **kwargs)
+        workflow_item.platform = self.platform
         if do_post:
             self.post_create(workflow_item, **kwargs)
         return ret

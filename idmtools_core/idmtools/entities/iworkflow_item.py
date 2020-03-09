@@ -70,36 +70,3 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, ABC):
                 raise ValueError("Platform is required to run item")
             self.platform = current_platform
 
-    def run(self, wait_on_done: bool = False, wait_on_done_progress: bool = True, platform: 'IPlatform' = None):
-        """
-        Run the item on specified platform
-
-        Args:
-            wait_on_done: Should we wait on item to finish running? Default is false
-            wait_on_done_progress: When waiting, should we try to show progress
-            platform: optional platform object
-
-        Returns:
-
-        """
-        self.__check_for_platform(platform)
-        self.platform.run_items([self])
-        if wait_on_done:
-            self.wait(wait_on_done_progress)
-
-    def wait(self, wait_on_done_progress: bool = True, platform: 'IPlatform' = None):
-        """
-        Wait on item to finish
-
-        Args:
-            wait_on_done_progress: Should we show progress as we wait?
-            platform: Optional platform object
-
-        Returns:
-
-        """
-        self.__check_for_platform(platform)
-        if wait_on_done_progress:
-            self.platform.wait_till_done_progress(self)
-        else:
-            self.platform.wait_till_done(self)
