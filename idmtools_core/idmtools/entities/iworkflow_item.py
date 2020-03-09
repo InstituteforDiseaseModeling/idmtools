@@ -70,6 +70,7 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, ABC):
                 raise ValueError("Platform is required to run item")
             self.platform = current_platform
 
+
     def run(self, wait_on_done: bool = False, wait_on_done_progress: bool = True, platform: 'IPlatform' = None):
         """
         Run the item on specified platform
