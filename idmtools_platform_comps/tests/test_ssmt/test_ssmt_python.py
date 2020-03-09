@@ -18,7 +18,7 @@ from simple_analyzer import SimpleAnalyzer  # noqa
 from csv_analyzer import CSVAnalyzer  # noqa
 from infectiousness_csv_analyzer import InfectiousnessCSVAnalyzer  # noqa
 from node_csv_analyzer import NodeCSVAnalyzer  # noqa
-
+from idmtools.analysis.analyze_manager import AnalyzeManager
 
 @pytest.mark.comps
 @pytest.mark.ssmt
