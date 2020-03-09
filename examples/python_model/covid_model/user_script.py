@@ -1,7 +1,7 @@
 """
 Simple script for running the Covid-19 agent-based model
 """
-
+import json
 import multiprocessing as mp
 import time
 
@@ -27,11 +27,19 @@ if __name__ == "__main__":
     with mp.Pool() as p:
         results = p.map(run_sim, range(100))
 
+    results_json = []
     for seed, sim in results:
         print()
         print("Ran simulation (seed {}):".format(seed))
         print("\t{}".format('\n\t'.join([k + ": " + str(v) for k, v in sim.summary_stats().items()])))
+        results_json.append({
+            **sim.summary_stats(),
+            "likelihood": sim.likelihood(verbose=0),
+            "seed": seed
+        })
         print("\tLikelihood: {}".format(sim.likelihood(verbose=0)))
 
+    with open("output.json", "w") as fp:
+        json.dump(results_json, fp)
     print()
     print('total run time: {}'.format(time.time() - start))
