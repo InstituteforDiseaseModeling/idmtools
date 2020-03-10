@@ -1,9 +1,7 @@
 import os
 import sys
-from unittest import TestCase
 import pytest
 from idmtools_models.r.json_r_task import JSONConfiguredRTask
-from idmtools_models.r.r_task import RTask
 from idmtools_test import COMMON_INPUT_PATH
 
 from idmtools.core.platform_factory import Platform
@@ -11,8 +9,6 @@ from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 from idmtools.assets import AssetCollection
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-from idmtools.assets.file_list import FileList
-from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
 
 
 @pytest.mark.tasks
@@ -22,7 +18,7 @@ class TestRExperiment(ITestWithPersistence):
     def setUp(self) -> None:
         self.platform = Platform('COMPS2')
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
-        self.input_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "inputs")
+        self.input_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 
     def validate_common_assets(self, fpath, task):
         """
@@ -130,27 +126,3 @@ class TestRExperiment(ITestWithPersistence):
         if not experiment.succeeded:
             print(f"Experiment {experiment.uid} failed.\n")
             sys.exit(-1)
-
-    # @pytest.mark.skip
-    # TODO: need correct RScript path
-    def test_r_ssmt_workitem_add_ac_from_path(self):
-        ac_lib_path = os.path.join(COMMON_INPUT_PATH, "r", "ncov_analysis")
-
-        # Use Lauren's AC with most common R libraries - it's missing some required libraries
-        # ac_id = "26b0bfaa-4f57-ea11-a2bf-f0921c167862"
-
-        # load assets to COMPS's assets
-        asset_files = FileList()
-        asset_files.add_path(ac_lib_path, relative_path="ncov_analysis", recursive=True)
-
-        # load local "input" foleer simtools.ini to current dir in Comps workitem
-        user_files = FileList()
-        user_files.add_file(os.path.join(self.input_file_path, "idmtools.ini"))
-
-        self.tags = {'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}
-        command = "/usr/bin/Rscript Assets/ncov_analysis/individual_dynamics_estimates/estimate_incubation_period.R"
-        wi = SSMTWorkItem(item_name=self.case_name, command=command, asset_files=asset_files, user_files=user_files,
-                          tags=self.tags, docker_image="ubuntu1804_r")
-        wi.run(True, platform=self.platform)
-
-

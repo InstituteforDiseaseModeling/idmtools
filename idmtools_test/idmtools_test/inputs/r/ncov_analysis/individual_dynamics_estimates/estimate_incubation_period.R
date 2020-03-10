@@ -1,22 +1,24 @@
 # estimate incubation period
 
-# install packages
-install.packages("tidyverse")
-install.packages("survival")
-install.packages("flexsurv")
-install.packages("ggplot2")
-install.packages("gridExtra")
+# library(tidyverse, lib.loc="./Assets/ncov_analysis/individual_dynamics_estimates/library")
+# library(survival, lib.loc="./Assets/ncov_analysis/individual_dynamics_estimates/library")
+# library(flexsurv, lib.loc="./Assets/ncov_analysis/individual_dynamics_estimates/library")
+# library(ggplot2, lib.loc="./Assets/ncov_analysis/individual_dynamics_estimates/library")
+# #library(survminer)
+# #library(cowplot)
+# library(gridExtra, lib.loc="./Assets/ncov_analysis/individual_dynamics_estimates/library")
+system('apt-get update -y libcurl4-openssl-dev libxml2-dev libssl-dev --fix-missing')
 
-library(tidyverse, lib.loc="/usr/bin/R/site-library/")
-library(survival, lib.loc="/usr/bin/R/site-library/")
-library(flexsurv, lib.loc="/usr/bin/R/site-library/")
-library(ggplot2, lib.loc="/usr/bin/R/site-library/")
-#library(survminer)
-#library(cowplot)
-library(gridExtra, lib.loc="/usr/bin/R/site-library/")
+packages = c("tidyverse","survival","flexsurv","ggplot2","gridExtra")
+for(i in packages){
+  if(!require(i, character.only = T)){
+    install.packages(i)
+    library(i, character.only = T)
+  }
+}
 
 
-linelist <- read.csv('./Data/Kudos to DXY.cn Last update_ 01_25_2020,  11_30 am (EST) - Line-list.csv', header=TRUE)
+linelist <- read.csv('./Assets/Kudos to DXY.cn Last update_ 01_25_2020,  11_30 am (EST) - Line-list.csv', header=TRUE)
 linelist$date <- as.Date(linelist$date)
 linelist$symptom_onset <- as.Date(linelist$symptom_onset)
 linelist$hosp_visit_date <- as.Date(linelist$hosp_visit_date)
