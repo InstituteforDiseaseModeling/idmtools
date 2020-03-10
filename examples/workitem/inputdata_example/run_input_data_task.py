@@ -10,4 +10,5 @@ if __name__ == "__main__":
     platform = Platform('COMPS2')
     wi = InputDataWorkItem(item_name=wi_name, tags=tags)
     wi.load_work_order(os.path.join('..', 'files', 'inputdataworker_workorder.json'))
-    wi.run(True, platform=platform)
+    platform.run_items(wi)
+    platform.wait_till_done(wi)

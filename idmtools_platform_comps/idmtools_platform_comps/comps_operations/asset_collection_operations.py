@@ -14,7 +14,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
 
     def get(self, asset_collection_id: UUID, **kwargs) -> COMPSAssetCollection:
         children = kwargs.get('children')
-        children = children if children is not None else ["assets"]
+        children = children if children is not None else ["assets", "tags"]
         return COMPSAssetCollection.get(id=asset_collection_id, query_criteria=QueryCriteria().select_children(children))
 
     def platform_create(self, asset_collection: AssetCollection, **kwargs) -> COMPSAssetCollection:
@@ -27,6 +27,11 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
             else:  # We should already have this asset so we should have a md5sum
                 ac.add_asset(AssetCollectionFile(file_name=asset.filename, relative_path=asset.relative_path,
                                                  md5_checksum=asset.checksum))
+
+        # Add tags
+        if asset_collection.tags:
+            ac.set_tags(asset_collection.tags)
+
         ac.save()
         asset_collection.uid = ac.id
         asset_collection._platform_object = asset_collection
