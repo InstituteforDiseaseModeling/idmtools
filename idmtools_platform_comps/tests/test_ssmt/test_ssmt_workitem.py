@@ -143,6 +143,35 @@ class TestSSMTWorkItem(ITestWithPersistence):
         self.assertEqual(execution['Command'],
                          "python Assets/run_multiple_exps.py " + exp_id1 + " " + exp_id2)
 
+    def test_ssmt_seir_model_analysis_single_script(self):
+        exp_id = 'a980f265-995e-ea11-a2bf-f0921c167862'  # comps2 staging exp id
+
+        user_files = FileList()
+        user_files.add_file(os.path.join(self.input_file_path, 'custom_csv_analyzer.py'))
+        user_files.add_file(os.path.join(self.input_file_path, 'run_multiple_analyzers_single_script.py'))
+        user_files.add_file(os.path.join(self.input_file_path, 'idmtools.ini'))
+
+        command = "python run_multiple_analyzers_single_script.py "
+        wi = SSMTWorkItem(item_name=self.case_name, command=command, user_files=user_files,
+                          tags=self.tags)
+        wi.run(True, platform=self.platform)
+
+        # Verify workitem results
+        local_output_path = "output"
+        del_folder(local_output_path)
+        out_filenames = [exp_id + "/InfectiousnessCSVAnalyzer.csv", exp_id + "/NodeCSVAnalyzer.csv", "WorkOrder.json"]
+        ret = self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
+
+        file_path = os.path.join(local_output_path, str(wi.uid))
+        self.assertTrue(os.path.exists(os.path.join(file_path, exp_id, "InfectiousnessCSVAnalyzer.csv")))
+        self.assertTrue(os.path.exists(os.path.join(file_path, exp_id, "NodeCSVAnalyzer.csv")))
+        worker_order = json.load(open(os.path.join(file_path, "WorkOrder.json"), 'r'))
+        print(worker_order)
+        self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
+        execution = worker_order['Execution']
+        self.assertEqual(execution['Command'],
+                         "python run_multiple_analyzers_single_script.py ")
+
     def test_get_files(self):
         wi_id = '63b1822e-1e62-ea11-a2bf-f0921c167862'
         wi = self.platform.get_item(wi_id, ItemType.WORKFLOW_ITEM, raw=False)
