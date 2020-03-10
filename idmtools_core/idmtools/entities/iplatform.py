@@ -510,7 +510,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
         getattr(self, interface).refresh_status(item)
 
-    def get_files(self, item: IEntity, files: Union[Set[str], List[str]]) -> \
+    def get_files(self, item: IEntity, files: Union[Set[str], List[str]], output: str = None) -> \
             Union[Dict[str, Dict[str, bytearray]], Dict[str, bytearray]]:
         """
         Get files for a platform entity
@@ -518,6 +518,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         Args:
             item: Item to fetch files for
             files: List of file names to get
+            output: save files to
 
         Returns:
             For simulations, this returns a dictionary with filename as key and values being binary data from file or a
@@ -529,7 +530,38 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         if item.item_type not in self.platform_type_map.values():
             raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
-        return getattr(self, interface).get_assets(item, files)
+        ret = getattr(self, interface).get_assets(item, files)
+
+        if output:
+            if item.item_type not in (ItemType.SIMULATION, ItemType.WORKFLOW_ITEM):
+                print("Currently 'output' only supports Simulation and WorkItem!")
+            else:
+                for ofi, ofc in ret.items():
+                    file_path = os.path.join(output, str(item.uid), ofi)
+                    parent_path = os.path.dirname(file_path)
+                    if not os.path.exists(parent_path):
+                        os.makedirs(parent_path)
+
+                    with open(file_path, 'wb') as outfile:
+                        outfile.write(ofc)
+
+        return ret
+
+    def get_files_by_id(self, item_id: UUID, item_type: ItemType, files: Union[Set[str], List[str]],
+                        output: str = None) -> \
+            Union[Dict[str, Dict[str, bytearray]], Dict[str, bytearray]]:
+        """
+        Get files by item id (UUID)
+        Args:
+            item_id: COMPS Item, say, Simulation Id or WorkItem Id
+            item_type: Item Type
+            files: List of files to retrieve
+            output: save files to
+
+        Returns: dict with key/value: file_name/file_content
+        """
+        idm_item = self.get_item(item_id, item_type, raw=False)
+        return self.get_files(idm_item, files, output)
 
     def are_requirements_met(self, requirements: Set[PlatformRequirements]) -> bool:
         return all([x in self._platform_supports for x in requirements])
@@ -582,6 +614,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             if done > prog.last_print_n:
                 prog.update(done - prog.last_print_n)
             return e.done
+
         if isinstance(item, Experiment):
             prog = tqdm([], total=len(item.simulations), desc="Waiting on Experiment to Finish running")
         else:
@@ -601,38 +634,6 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
         return getattr(self, interface).get_related_items(item, relation_type)
-
-    def get_files_by_id(self, item_id: UUID, item_type: ItemType, files: Union[Set[str], List[str]],
-                        output: str = None) -> \
-            Union[Dict[str, Dict[str, bytearray]], Dict[str, bytearray]]:
-        """
-        Get files by item id (UUID)
-        Args:
-            item_id: COMPS Item, say, Simulation Id or WorkItem Id
-            item_type: Item Type
-            files: List of files to retrieve
-            output: save files to
-
-        Returns: dict with key/value: file_name/file_content
-        """
-        idm_item = self.get_item(item_id, item_type, raw=False)
-        ret = self.get_files(idm_item, files)
-
-        if output:
-            if item_type not in (ItemType.SIMULATION, ItemType.WORKFLOW_ITEM):
-                print("Currently 'output' only supports Simulation and WorkItem!")
-            else:
-                for ofi, ofc in ret.items():
-                    file_path = os.path.join(output, str(item_id), ofi)
-                    parent_path = os.path.dirname(file_path)
-                    if not os.path.exists(parent_path):
-                        os.makedirs(parent_path)
-
-                    with open(file_path, 'wb') as outfile:
-                        outfile.write(ofc)
-
-        return ret
-
 
 
 TPlatform = TypeVar("TPlatform", bound=IPlatform)
