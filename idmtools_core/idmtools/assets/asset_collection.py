@@ -2,7 +2,7 @@ import copy
 import os
 import typing
 from dataclasses import dataclass, field
-from typing import List, NoReturn, TypeVar, Union
+from typing import List, NoReturn, TypeVar, Union, Any, Dict
 
 from idmtools.assets import Asset, TAssetList
 from idmtools.assets import TAssetFilterList
@@ -29,16 +29,17 @@ class AssetCollection(IEntity):
     assets: 'TAssetList' = field(default=None)
     item_type: ItemType = field(default=ItemType.ASSETCOLLECTION, compare=False)
 
-    def __init__(self, assets: List[Asset] = None):
+    def __init__(self, assets: List[Asset] = None, tags: Dict[str, Any] = {}):
         """
         A constructor.
 
-        Args:
-            assets: An optional list of assets to create the collection with.
+        Args: assets: An optional list of assets to create the collection with.
+        tags: dict: tags associated with asset collection
         """
         super().__init__()
         self.item_type = ItemType.ASSETCOLLECTION
         self.assets = copy.deepcopy(assets) or []
+        self.tags = self.tags or {}
 
     @classmethod
     def from_directory(cls, assets_directory: str, recursive: bool = True, flatten: bool = False,
@@ -332,6 +333,12 @@ class AssetCollection(IEntity):
 
     def post_creation(self) -> None:
         pass
+
+    def set_tags(self, tags: Dict[str, Any]):
+        self.tags = tags
+
+    def add_tags(self, tags: Dict[str, Any]):
+        self.tags.update(tags)
 
 
 TAssetCollection = TypeVar("TAssetCollection", bound=AssetCollection)

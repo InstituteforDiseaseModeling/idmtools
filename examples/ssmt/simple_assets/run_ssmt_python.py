@@ -10,3 +10,7 @@ if __name__ == "__main__":
     platform = Platform('COMPS2')
     wi = SSMTWorkItem(item_name=wi_name, command=command, asset_files=asset_files)
     wi.run(True, platform=platform)
+
+    # user can also run wi with platform as following
+    # platform.run_items(wi)
+    # platform.wait_till_done(wi)
