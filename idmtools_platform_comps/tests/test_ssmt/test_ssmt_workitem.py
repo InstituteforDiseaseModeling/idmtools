@@ -28,7 +28,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         asset_files.add_file(os.path.join(self.input_file_path, 'population_analyzer.py'))
         asset_files.add_file(os.path.join(self.input_file_path, 'run_population_analyzer.py'))
 
-        # load local "input" foleer simtools.ini to current dir in Comps workitem
+        # load local "input" folder idmtools.ini to current dir in Comps workitem
         user_files = FileList()
         user_files.add_file(os.path.join(self.input_file_path, "idmtools.ini"))
 
@@ -116,7 +116,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         asset_files.add_file(os.path.join(self.input_file_path, 'population_analyzer.py'))
         asset_files.add_file(os.path.join(self.input_file_path, 'run_multiple_exps.py'))
 
-        # load local "input" foleer simtools.ini to current dir in Comps workitem
+        # load local "input" folder idmtools.ini to current dir in Comps workitem
         user_files = FileList()
         user_files.add_file(os.path.join(self.input_file_path, "idmtools.ini"))
 
