@@ -21,6 +21,7 @@ base_version = open('../VERSION').read().strip()
 if 'bamboo_UserArtifactory' in os.environ:
     username = os.environ['bamboo_UserArtifactory']
 else:
+    print("Username:")
     username = input('Username:')
 if 'bamboo_PasswordArtifactory' in os.environ:
     password = os.environ['bamboo_PasswordArtifactory']
