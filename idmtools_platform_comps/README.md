@@ -8,3 +8,16 @@ test        -   Run All tests
 coverage    -   Run tests and generate coverage report that is shown in browser
 ```
 On Windows, you can use `pymake` instead of `make`
+
+# Building SSMT Docker Image
+
+To build the SSMT Docker image, follow these steps
+
+1. ```bash
+   docker login docker-production.packages.idmod.org
+   ```
+2. ```bash
+   make ssmt-image-local
+   ```
+
+You can also build using `make ssmt-image-staging` to tag the resulting image with a staging version
