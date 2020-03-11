@@ -1,6 +1,7 @@
 import json
 import os
 import unittest
+import uuid
 
 import pytest
 from COMPS.Data import Experiment as COMPSExperiment, AssetCollection as CompsAssetCollection
@@ -72,7 +73,7 @@ class TestAssetsInComps(unittest.TestCase):
         ac = AssetCollection()
         ac.add_asset(a)
         ac.add_asset(b)
-        ac.tags = {"string_tag": "testACtag", "number_tag": 123, "KeyOnly": None}
+        ac.set_tags = {"string_tag": "testACtag", "number_tag": 123, "KeyOnly": None}
 
         model_path = os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py")
 
@@ -94,17 +95,19 @@ class TestAssetsInComps(unittest.TestCase):
 
         self.assertEqual(test_assetcollection[0]._md5_checksum, test_assetcollection[1]._md5_checksum)
 
-    # TODO: AssetCollection has no attribute tags
-    # def test_create_asset_collection(self):
-    #     ac = AssetCollection()
-    #     assets_dir = os.path.join(COMMON_INPUT_PATH, "assets", "collections")
-    #     ac.assets_from_directory(assets_dir)
-    #     # add tags to ACs - can't currently do this
-    #     ac.tags = {"idmtools": "idmtools-automation", "string_tag": "testACtag", "number_tag": 123, "KeyOnly": None}
-    #
-    #     self.assertSetEqual(set(ac.assets), set(AssetCollection.tags))
+    def test_create_ac_from_directory_with_tags(self):
+        ac = AssetCollection()
+        assets_dir = os.path.join(COMMON_INPUT_PATH, "assets", "collections")
+        ac.add_directory(assets_dir)
+        ac.update_tags({"idmtools": "idmtools-automation", "string_tag": "testACtag", "number_tag": 123,
+                          "KeyOnly": None})
 
-    def test_creat_ac_with_tags_1(self):
+        ids = self.platform.create_items(ac)
+        new_ac = self.platform.get_item(ids[0].id, item_type=ItemType.ASSETCOLLECTION)
+
+        self.assertEqual(new_ac.tags["string_tag"], "testACtag")
+
+    def test_create_ac_with_tags_1(self):
         a = Asset(relative_path=None, filename="test.json", content=json.dumps({"a": 1, "b": 2}))
         b = Asset(relative_path=None, filename="test1.json", content=json.dumps({"a": 1, "b": 2}))
 
