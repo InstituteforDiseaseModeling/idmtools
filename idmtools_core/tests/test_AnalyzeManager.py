@@ -1,9 +1,7 @@
 import copy
 import unittest
 from typing import Any
-
 import pytest
-
 from idmtools.analysis.analyze_manager import AnalyzeManager
 from idmtools.analysis.download_analyzer import DownloadAnalyzer as SampleAnalyzer
 from idmtools.core.enums import EntityStatus, ItemType
@@ -41,6 +39,18 @@ class TestAnalyzeManager(unittest.TestCase):
 
         self.analyze_manager = AnalyzeManager(self.platform)
         self.sample_analyzer = SampleAnalyzer()
+
+    def test_can_analyze_failed_item(self):
+        se = Experiment.from_task(TestTask())
+        self.platform.run_items(se)
+        self.platform._simulations.set_simulation_status(se.uid, status=EntityStatus.FAILED)
+        self.configuration = {'max_processes': 1}
+
+        self.analyze_manager = AnalyzeManager(self.platform)
+        self.sample_analyzer = SampleAnalyzer()
+        am = AnalyzeManager(self.platform, ids=[(se.uid, ItemType.EXPERIMENT)], analyze_failed_items=True)
+        items_to_analyze = am._get_items_to_analyze()
+        self.assertEqual(len(items_to_analyze), 1)
 
     # verify add_item() works
     def test_add_item(self):
