@@ -19,6 +19,8 @@ test_requirements = ['pytest', 'pytest-runner', 'numpy==1.16.4', 'xmlrunner', 'p
 # check for python 3.6
 if sys.version_info[1] == 6:
     requirements.append('dataclasses')
+elif sys.version_info[0] == 3 and sys.version_info[1] == 7 and sys.version_info[2] < 3:
+    raise EnvironmentError("Python 3.7 requires 3.7.3 or higher")
 
 extras = {
     'test': test_requirements,
