@@ -184,3 +184,28 @@ class TestSSMTWorkItem(ITestWithPersistence):
         self.assertTrue(os.path.exists(os.path.join(file_path, "output", "population.png")))
         self.assertTrue(os.path.exists(os.path.join(file_path, "output", "population.json")))
         self.assertTrue(os.path.exists(os.path.join(file_path, "WorkOrder.json")))
+
+    def test_get_wi_with_query_criteria_1(self):
+        wi_id = '5e2fc03d-2162-ea11-a2bf-f0921c167862'
+
+        cols = ["id", "name", "asset_collection_id"]
+        children = ["tags", "files"]
+
+        platform = Platform('COMPS2')
+        wi = platform.get_item(wi_id, ItemType.WORKFLOW_ITEM, columns=cols, children=children)
+        self.assertIsNotNone(wi.item_name)
+        self.assertIsNotNone(wi.asset_collection_id)
+        self.assertIsNotNone(wi.tags)
+        self.assertIsNotNone(wi.user_files)
+
+    def test_get_wi_with_query_criteria_2(self):
+        wi_id = '5e2fc03d-2162-ea11-a2bf-f0921c167862'
+
+        cols = ["id", "name"]
+        children = []
+
+        platform = Platform('COMPS2')
+        wi = platform.get_item(wi_id, ItemType.WORKFLOW_ITEM, columns=cols, children=children)
+        self.assertIsNone(wi.asset_collection_id)
+        self.assertIsNone(wi.tags)
+        self.assertIsNone(wi.user_files)
