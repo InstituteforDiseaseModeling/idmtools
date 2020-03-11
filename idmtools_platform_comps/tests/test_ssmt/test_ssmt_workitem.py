@@ -1,11 +1,13 @@
 import json
 import os
+import sys
 import pytest
 from idmtools.assets.file_list import FileList
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+from idmtools.analysis.analyze_manager import AnalyzeManager
 from idmtools_test.utils.utils import del_folder
 
 
@@ -28,7 +30,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         asset_files.add_file(os.path.join(self.input_file_path, 'population_analyzer.py'))
         asset_files.add_file(os.path.join(self.input_file_path, 'run_population_analyzer.py'))
 
-        # load local "input" foleer simtools.ini to current dir in Comps workitem
+        # load local "input" folder simtools.ini to current dir in Comps workitem
         user_files = FileList()
         user_files.add_file(os.path.join(self.input_file_path, "idmtools.ini"))
 
@@ -116,7 +118,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         asset_files.add_file(os.path.join(self.input_file_path, 'population_analyzer.py'))
         asset_files.add_file(os.path.join(self.input_file_path, 'run_multiple_exps.py'))
 
-        # load local "input" foleer simtools.ini to current dir in Comps workitem
+        # load local "input" folder simtools.ini to current dir in Comps workitem
         user_files = FileList()
         user_files.add_file(os.path.join(self.input_file_path, "idmtools.ini"))
 
@@ -214,3 +216,39 @@ class TestSSMTWorkItem(ITestWithPersistence):
         self.assertTrue(os.path.exists(os.path.join(file_path, "output", "population.png")))
         self.assertTrue(os.path.exists(os.path.join(file_path, "output", "population.json")))
         self.assertTrue(os.path.exists(os.path.join(file_path, "WorkOrder.json")))
+
+    def test_csv_analyzer_analyze_work_item_output(self):
+        # to COMPS's assets
+        asset_files = FileList()
+        asset_files.add_file(os.path.join(self.input_file_path, 'csv_analyzer.py'))
+        asset_files.add_file(os.path.join(self.input_file_path, 'run_csv_analyzer.py'))
+
+        # load local "input" folder simtools.ini to current dir in Comps workitem
+        user_files = FileList()
+        user_files.add_file(os.path.join(self.input_file_path, "idmtools.ini"))
+
+        experiment_id = '9311af40-1337-ea11-a2be-f0921c167861'  # staging comps2 exp id
+        command = "python Assets/run_csv_analyzer.py " + experiment_id
+        wi = SSMTWorkItem(item_name=self.case_name, command=command, asset_files=asset_files, user_files=user_files,
+                          tags=self.tags)
+        self.platform.run_items(wi)
+        self.platform.wait_till_done(wi)
+
+        local_output_path = "output_csv"
+        del_folder(local_output_path)
+        out_filenames = ["output_csv/CSVAnalyzer.csv"]
+        self.platform.get_files_by_id(wi.id, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
+
+        # Now let's look at the work item results analyzing locally
+        # Ideally you would initialize a new analyzer class with the path of the output csv file
+        # For now just re-running it through the csv_analyzer
+        from idmtools_core.idmtools.analysis.csv_analyzer import CSVAnalyzer
+        analyzers = [CSVAnalyzer(filenames=out_filenames)]
+
+        platform = Platform('COMPS2')
+        # Specify the id Type, in this case an WorkItem on COMPS
+        manager = AnalyzeManager(configuration={}, partial_analyze_ok=True, platform=platform,
+                                 ids=[(wi.uid, ItemType.WORKFLOW_ITEM)],
+                                 analyzers=analyzers)
+        # Analyze
+        manager.analyze()
