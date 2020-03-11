@@ -19,5 +19,6 @@ To build the SSMT Docker image, follow these steps
 2. ```bash
    make ssmt-image-local
    ```
+3. When prompted, enter your IDMOD username and password
 
 You can also build using `make ssmt-image-staging` to tag the resulting image with a staging version
