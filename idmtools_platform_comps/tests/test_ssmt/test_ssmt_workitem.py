@@ -28,7 +28,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         asset_files.add_file(os.path.join(self.input_file_path, 'population_analyzer.py'))
         asset_files.add_file(os.path.join(self.input_file_path, 'run_population_analyzer.py'))
 
-        # load local "input" foleer simtools.ini to current dir in Comps workitem
+        # load local "input" folder idmtools.ini to current dir in Comps workitem
         user_files = FileList()
         user_files.add_file(os.path.join(self.input_file_path, "idmtools.ini"))
 
@@ -116,7 +116,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         asset_files.add_file(os.path.join(self.input_file_path, 'population_analyzer.py'))
         asset_files.add_file(os.path.join(self.input_file_path, 'run_multiple_exps.py'))
 
-        # load local "input" foleer simtools.ini to current dir in Comps workitem
+        # load local "input" folder idmtools.ini to current dir in Comps workitem
         user_files = FileList()
         user_files.add_file(os.path.join(self.input_file_path, "idmtools.ini"))
 
@@ -142,3 +142,45 @@ class TestSSMTWorkItem(ITestWithPersistence):
         execution = worker_order['Execution']
         self.assertEqual(execution['Command'],
                          "python Assets/run_multiple_exps.py " + exp_id1 + " " + exp_id2)
+
+    def test_get_files(self):
+        wi_id = '63b1822e-1e62-ea11-a2bf-f0921c167862'
+        wi = self.platform.get_item(wi_id, ItemType.WORKFLOW_ITEM, raw=False)
+
+        out_filenames = ["output/population.png", "output/population.json", "WorkOrder.json"]
+        ret = self.platform.get_files(wi, out_filenames)
+        self.assertListEqual(list(ret.keys()), out_filenames)
+
+    def test_get_files_output(self):
+        wi_id = '63b1822e-1e62-ea11-a2bf-f0921c167862'
+        wi = self.platform.get_item(wi_id, ItemType.WORKFLOW_ITEM, raw=False)
+
+        local_output_path = "output"
+        del_folder(local_output_path)
+        out_filenames = ["output/population.png", "output/population.json", "WorkOrder.json"]
+        self.platform.get_files(wi, out_filenames, local_output_path)
+
+        file_path = os.path.join(local_output_path, str(wi.uid))
+        self.assertTrue(os.path.exists(os.path.join(file_path, "output", "population.png")))
+        self.assertTrue(os.path.exists(os.path.join(file_path, "output", "population.json")))
+        self.assertTrue(os.path.exists(os.path.join(file_path, "WorkOrder.json")))
+
+    def test_get_files_from_id(self):
+        wi_id = '63b1822e-1e62-ea11-a2bf-f0921c167862'
+
+        out_filenames = ["output/population.png", "output/population.json", "WorkOrder.json"]
+        ret = self.platform.get_files_by_id(wi_id, ItemType.WORKFLOW_ITEM, out_filenames)
+        self.assertListEqual(list(ret.keys()), out_filenames)
+
+    def test_get_files_from_id_output(self):
+        wi_id = '63b1822e-1e62-ea11-a2bf-f0921c167862'
+
+        local_output_path = "output"
+        del_folder(local_output_path)
+        out_filenames = ["output/population.png", "output/population.json", "WorkOrder.json"]
+        self.platform.get_files_by_id(wi_id, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
+
+        file_path = os.path.join(local_output_path, str(wi_id))
+        self.assertTrue(os.path.exists(os.path.join(file_path, "output", "population.png")))
+        self.assertTrue(os.path.exists(os.path.join(file_path, "output", "population.json")))
+        self.assertTrue(os.path.exists(os.path.join(file_path, "WorkOrder.json")))
