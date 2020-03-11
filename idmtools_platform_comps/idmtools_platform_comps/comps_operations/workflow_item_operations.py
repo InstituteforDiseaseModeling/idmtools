@@ -1,10 +1,11 @@
 import json
 from dataclasses import dataclass, field
-from typing import List, Dict, Any, Tuple, Type
+from typing import Any, Dict, List, Tuple, Type
 from uuid import UUID
 
-from COMPS.Data import WorkItem as COMPSWorkItem, WorkItemFile, QueryCriteria
-from COMPS.Data.WorkItem import WorkerOrPluginKey, RelationType
+from COMPS.Data import QueryCriteria, WorkItem as COMPSWorkItem, WorkItemFile
+from COMPS.Data.WorkItem import RelationType, WorkerOrPluginKey
+
 from idmtools.assets import AssetCollection
 from idmtools.core import ItemType
 from idmtools.entities.generic_workitem import GenericWorkItem
@@ -214,6 +215,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         obj.asset_collection_id = work_item.asset_collection_id
         obj.user_files = work_item.files
         obj.tags = work_item.tags
+        obj.status = convert_comps_workitem_status(work_item.state)
         return obj
 
     # def platform_run_item(self, workflow_item: IWorkflowItem, **kwargs):
