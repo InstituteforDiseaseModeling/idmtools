@@ -33,9 +33,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
         config = {"a": 1, "b": 2}
         experiment = self.get_working_model_experiment(config)
         wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)
-
-        from idmtools.utils.entities import retrieve_experiment
-        experiment = retrieve_experiment(experiment.uid, platform=self.platform, with_simulations=True)
+        experiment = Experiment.from_id(experiment.id, self.platform)
         files_needed = ["config.json", "Assets\\working_model.py"]
         self.platform.get_files(item=experiment.simulations[0], files=files_needed)
 
