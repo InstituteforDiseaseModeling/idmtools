@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+
 from idmtools.entities.iworkflow_item import IWorkflowItem
 
 
@@ -7,4 +8,5 @@ class GenericWorkItem(IWorkflowItem):
     """
     Idm GenericWorkItem
     """
-    pass
+    def __hash__(self):
+        return hash(self.id)

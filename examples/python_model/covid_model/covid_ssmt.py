@@ -38,3 +38,6 @@ class COVID19SSMT(SSMTWorkItem):
 
         # Set the command
         self.command = "./run.sh"
+
+    def __hash__(self):
+        return hash(self.id)

@@ -218,6 +218,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         obj.asset_collection_id = work_item.asset_collection_id
         obj.user_files = work_item.files
         obj.tags = work_item.tags
+        obj.status = convert_comps_workitem_status(work_item.state)
         return obj
 
     # def platform_run_item(self, workflow_item: IWorkflowItem, **kwargs):
