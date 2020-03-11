@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from typing import List, Dict, Any, Tuple, Type
 from uuid import UUID
 
-from COMPS.Data import WorkItem as COMPSWorkItem, WorkItemFile
+from COMPS.Data import WorkItem as COMPSWorkItem, WorkItemFile, QueryCriteria
 from COMPS.Data.WorkItem import WorkerOrPluginKey, RelationType
 from idmtools.assets import AssetCollection
 from idmtools.core import ItemType
@@ -20,8 +20,12 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
     platform_type: Type = field(default=COMPSWorkItem)
 
     def get(self, workflow_item_id: UUID, **kwargs) -> COMPSWorkItem:
-        wi = COMPSWorkItem.get(workflow_item_id)
-        return wi
+        cols = kwargs.get('columns')
+        children = kwargs.get('children')
+        cols = cols or ["id", "name"]
+        children = children if children is not None else ["tags"]
+
+        return COMPSWorkItem.get(workflow_item_id, query_criteria=QueryCriteria().select(cols).select_children(children))
 
     def platform_create(self, work_item: IWorkflowItem, **kwargs) -> Tuple[Any]:
         """
@@ -146,7 +150,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
                 Returns:
                     None
                 """
-        wi = self.get(workflow_item.uid)
+        wi = self.get(workflow_item.uid, columns=["id", "state"], children=[])
         workflow_item.status = convert_comps_workitem_status(wi.state)  # convert_COMPS_status(wi.state)
 
     def send_assets(self, workflow_item: IWorkflowItem, **kwargs):
