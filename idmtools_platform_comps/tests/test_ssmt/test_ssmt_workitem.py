@@ -193,6 +193,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
 
         platform = Platform('COMPS2')
         wi = platform.get_item(wi_id, ItemType.WORKFLOW_ITEM, columns=cols, children=children)
+        self.assertIsNotNone(wi.item_name)
         self.assertIsNotNone(wi.asset_collection_id)
         self.assertIsNotNone(wi.tags)
         self.assertIsNotNone(wi.user_files)
