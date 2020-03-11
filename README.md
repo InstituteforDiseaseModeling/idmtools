@@ -64,7 +64,11 @@ coverage    -   Run tests and generate coverage report that is shown in browser
 Some packages have unique build related commands, specifically the local platform. Use `make help` to identify specific commands
 
 ### IDE/Runtime Setup
-For development purpose, it is important to add the following folders as to your `PYTHONPATH` (In PyCharm, right click and `Mark Directoy as > Source Root`):
+
+For source completion and indexing, set the package paths in your IDE. In PyCharm, select the following directories then right-click and select `Mark Directory as -> Source Root`.
+![Mark Directory as Sources Root](development_documentation/mark_directory_as_source.png)
+
+The directories that should be added as source roots are
 - `idmtools/idmtools_core`
 - `idmtools/idmtools_cli`
 - `idmtools/idmtools_platform_local`
