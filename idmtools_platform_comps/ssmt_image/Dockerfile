@@ -1,5 +1,3 @@
-## Start from the official Ubuntu 18.4 image
-## TODO Change to COMPS base image tag once image is in artifactory
 FROM docker-production.packages.idmod.org/comps/ssmt/ubuntu18.04_ssmt_base:latest
 
 # Install dependencies
