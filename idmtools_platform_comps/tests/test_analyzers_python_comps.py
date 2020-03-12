@@ -111,8 +111,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         filenames = ['output/result.json']
         analyzers = [SimFilterAnalyzer(filenames=filenames, output_path='output')]
 
-        platform = Platform('comps2')
-        am = AnalyzeManager(platform=platform, ids=[(exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
+        am = AnalyzeManager(platform=self.p, ids=[(exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
 
         # validate result
@@ -137,8 +136,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         filenames = ['output/result.json']
         analyzers = [SimFilterAnalyzerById(filenames=filenames, output_path='output')]
 
-        platform = Platform('COMPS2')
-        am = AnalyzeManager(platform=platform, ids=[(exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
+        am = AnalyzeManager(platform=self.p, ids=[(exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
 
         # validate result
@@ -151,3 +149,30 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         self.assertTrue(df['b'].values[1:7].size == 6)
         self.assertTrue(df['c'].values[1:7].size == 6)
 
+    def test_analyzer_with_failed_sims(self):
+        experiment_id = 'c3e4ef50-ee63-ea11-a2bf-f0921c167862'  # staging experiment includes 5 sims with 3 failed sims
+
+        # delete output from previous run
+        output_dir = "output"
+        del_folder(output_dir)
+        filenames = ["stdErr.txt"]
+        analyzers = [DownloadAnalyzer(filenames=filenames)]
+        manager = AnalyzeManager(platform=self.p, partial_analyze_ok=True,
+                                 ids=[(experiment_id, ItemType.EXPERIMENT)],
+                                 analyzers=analyzers, analyze_failed_items=True)
+        manager.analyze()
+
+        # validation
+        for simulation in self.p.get_children(experiment_id, ItemType.EXPERIMENT):
+            file = os.path.join("output", str(simulation.id), "stdErr.txt")
+            # make sure we have download all stdErr.txt files from all sims including failed ones
+            self.assertTrue(os.path.exists(file))
+            # make sure we have analyzer results for failed simulations
+            if simulation.id == "c6e4ef50-ee63-ea11-a2bf-f0921c167862" \
+                    or simulation.id == "c8e4ef50-ee63-ea11-a2bf-f0921c167862" \
+                    or simulation.id == "c4e4ef50-ee63-ea11-a2bf-f0921c167862":
+                contents = ""
+                with open(file) as f:
+                    for line in f.readlines():
+                        contents += line
+                self.assertIn("Traceback (most recent call last)", contents)

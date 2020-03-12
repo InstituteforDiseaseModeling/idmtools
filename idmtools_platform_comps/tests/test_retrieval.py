@@ -62,22 +62,20 @@ class TestRetrieval(ITestWithPersistence):
         self.assertIsNone(comps_experiment.tags)
         self.assertEqual(self.pe.uid, comps_experiment.id)
 
-    @unittest.skip
     def test_retrieve_simulation(self):
         base = self.pe.simulations[0]
         sim = self.platform.get_item(base.uid, ItemType.SIMULATION)
-
         # Test attributes
         self.assertEqual(sim.uid, base.uid)
         self.assertEqual(sim.name, base.name)
-        self.assertEqual({k: str(v or '') for k, v in base.tags.items()}, sim.tags)
+        self.assertEqual({k: str(v) for k, v in base.tags.items()}, sim.tags)
 
         # Test the raw retrieval
         comps_simulation: COMPSSimulation = self.platform.get_item(base.uid, ItemType.SIMULATION, raw=True)
         self.assertIsInstance(comps_simulation, COMPSSimulation)
         self.assertEqual(base.uid, comps_simulation.id)
-        self.assertEqual(base.name, comps_simulation.name)
-        self.assertEqual({k: str(v or '') for k, v in base.tags.items()}, comps_simulation.tags)
+        self.assertEqual(self.case_name, comps_simulation.name)
+        self.assertEqual({k: str(v) for k, v in base.tags.items()}, comps_simulation.tags)
 
     def test_parent(self):
         parent_exp = self.platform.get_parent(self.pe.simulations[0].uid, ItemType.SIMULATION)
