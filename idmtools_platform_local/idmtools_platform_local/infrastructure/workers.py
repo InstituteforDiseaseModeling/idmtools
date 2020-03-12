@@ -19,7 +19,7 @@ def get_worker_image_default():
     # determine default docker to use
     # we first check if it is nightly. Nightly will ALWAYS use staging
     if "nightly" in __version__:
-        docker_repo = 'docker-staging.packages.idmod.org'
+        docker_repo = 'idm-docker-staging.packages.idmod.org'
     # otherwise we let the user have come control by default to docker-public
     else:
         docker_repo = f'{os.getenv("DOCKER_REPO", "docker-public")}.packages.idmod.org'
