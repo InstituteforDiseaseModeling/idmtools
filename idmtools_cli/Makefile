@@ -7,7 +7,7 @@ PDR=$(PDS)run.py
 CLDIR=$(PDS)clean_dir.py
 CWD=$($(IPY) "import os; print(os.getcwd())")
 TEST_COMMAND=py.test --durations=3 -v --junitxml=test_results.xml
-TEST_RUN_OPTS=-e DOCKER_REPO=idm-docker-staging NO_SPINNER=1
+TEST_RUN_OPTS=-e DOCKER_REPO=docker-staging NO_SPINNER=1
 FULL_TEST_CMD=$(PDR) -w 'tests' $(TEST_RUN_OPTS) -ex '$(TEST_COMMAND)
 COVERAGE_CMD=$(PDR) -w 'tests' $(TEST_RUN_OPTS) -p . ../ -ex 'coverage run --omit="*/test*,*/setup.py" --source ../,../../idmtools_core,../../idmtools_models,../../idmtools_model_emod -m pytest
 

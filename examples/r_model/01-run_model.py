@@ -88,7 +88,7 @@ with platform("Local"):
         # should we build the R image before attempting to run
         build=True,
         # what docker image name should we save/load
-        image_name='idm-docker-staging.idmod.org/idmtools_r_model_example:latest',
+        image_name='idm-docker-staging.idmod.org/idmtools/r_model_example:latest',
         # default parameters
         parameters=dict(infections=0.0001)
     )
