@@ -1,4 +1,5 @@
 import json
+import typing
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Tuple, Type
 from uuid import UUID
@@ -13,11 +14,13 @@ from idmtools.entities.iplatform_ops.iplatform_workflowitem_operations import IP
 from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools_platform_comps.utils.general import convert_comps_workitem_status
 
+if typing.TYPE_CHECKING:
+    from idmtools_platform_comps.comps_platform import COMPSPlatform
 
 @dataclass
 class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
 
-    platform: 'COMPSPlaform'  # noqa F821
+    platform: 'COMPSPlatform'  # noqa F821
     platform_type: Type = field(default=COMPSWorkItem)
 
     def get(self, workflow_item_id: UUID, **kwargs) -> COMPSWorkItem:
@@ -69,7 +72,11 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         # Add additional files
         for af in work_item.user_files:
             wi_file = WorkItemFile(af.filename, "input")
-            wi.add_file(wi_file, af.absolute_path)
+            # Either the file has an absolute path or content
+            if af.absolute_path:
+                wi.add_file(wi_file, af.absolute_path)
+            else:
+                wi.add_file(wi_file, data=af.bytes)
 
         # Save the work-item to the server
         wi.save()
