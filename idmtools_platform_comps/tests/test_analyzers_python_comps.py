@@ -167,12 +167,17 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
             file = os.path.join("output", str(simulation.id), "stdErr.txt")
             # make sure we have download all stdErr.txt files from all sims including failed ones
             self.assertTrue(os.path.exists(file))
-            # make sure we have analyzer results for failed simulations
+            # make sure download analyzer results are correct
+            # read 'output/stdErr.txt' file content
+            contents = ""
+            with open(file) as f:
+                for line in f.readlines():
+                    contents += line
+            # for failed simulations, check stdErr.txt file content
             if simulation.id == "c6e4ef50-ee63-ea11-a2bf-f0921c167862" \
                     or simulation.id == "c8e4ef50-ee63-ea11-a2bf-f0921c167862" \
                     or simulation.id == "c4e4ef50-ee63-ea11-a2bf-f0921c167862":
-                contents = ""
-                with open(file) as f:
-                    for line in f.readlines():
-                        contents += line
                 self.assertIn("Traceback (most recent call last)", contents)
+            # for successful simulations, make sure stdErr.txt is empty
+            else:
+                self.assertEqual("", contents)
