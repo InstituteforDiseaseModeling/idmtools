@@ -90,7 +90,7 @@ bump-release: ## bump the release version.
 	bump2version release --commit
 
 # Use before release-staging-release-commit to confirm next version.
-bump-release-dry-run: ## perform a release to staging and bump the minor version.
+bump-release-dry-run: ## bump the release version. (dry run)
 	bump2version release --dry-run --allow-dirty --verbose
 
 bump-patch: ## bump the patch version
@@ -99,8 +99,14 @@ bump-patch: ## bump the patch version
 bump-minor: ## bump the minor version
 	bump2version minor --commit
 
-bump-patch-dry-run: ## bump the patch version
+bump-major: ## bump the major version
+	bump2version major --commit
+
+bump-patch-dry-run: ## bump the patch version(dry run)
 	bump2version patch --dry-run --allow-dirty --verbose
 
-bump-minor-dry-run: ## bump the minor version
+bump-minor-dry-run: ## bump the minor version(dry run)
 	bump2version minor --dry-run --allow-dirty --verbose
+
+bump-major-dry-run: ## bump the major version(dry run)
+	bump2version major --dry-run --allow-dirty --verbose

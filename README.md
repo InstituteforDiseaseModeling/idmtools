@@ -41,7 +41,7 @@ When setting up your environment for the first time, you can use the following i
    On Unix(Mac/Linux) you can use venv or virtualenv
 3) Activate the virtualenv
 4) If you are on windows, run `pip install py-make --upgrade --force-reinstall`
-5) Run `docker login idm-docker-staging.idmod.org`
+5) Run `docker login docker-staging.idmod.org`
 6) Then run `python dev_scripts/bootstrap.py`. This will install all the tools. 
 
 ### General Use
@@ -123,7 +123,7 @@ In addition, you can rerun just the failed test using either the top-level `pyma
 1. Docker Auth issues.
 
    Idmtools currently does not prompt users for docker credentials. Because of this you must login
-   beforehand using `docker login idm-docker-staging.packages.idmod.org`
+   beforehand using `docker login docker-staging.packages.idmod.org`
 2. Docker image not found
    Rerun the `pymake setup-dev`
 3. Check build logs Detailed Build Logs are located within in package and tests directoery withing the package with the name make.buildlog. You can also increase the console log level to DEBUG by setting the environment variable BUILD_DEBUG to 1

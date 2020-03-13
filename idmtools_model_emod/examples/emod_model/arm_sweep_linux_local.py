@@ -32,7 +32,7 @@ if __name__ == "__main__":
     a = Asset(absolute_path=os.path.join(INPUT_PATH, "single_node_demographics.json"))
     ac.add_asset(a)
     e = DockerEMODExperiment.from_default(expname, default=EMODSir(),
-                                          image_name='idm-docker-public.packages.idmod.org/idm/centos:dtk-runtime',
+                                          image_name='docker-public.packages.idmod.org/idm/centos:dtk-runtime',
                                           eradication_path='https://github.com/InstituteforDiseaseModeling/'
                                                            f'EMOD/releases/download/v{emod_version}/Eradication')
     e.add_assets(ac)
