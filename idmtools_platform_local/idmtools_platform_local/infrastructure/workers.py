@@ -22,7 +22,7 @@ def get_worker_image_default():
         docker_repo = 'idm-docker-staging.packages.idmod.org'
     # otherwise we let the user have come control by default to docker-public
     else:
-        docker_repo = f'{os.getenv("DOCKER_REPO", "docker-public")}.packages.idmod.org'
+        docker_repo = f'{os.getenv("DOCKER_REPO", "docker-production")}.packages.idmod.org'
 
     if logger.isEnabledFor(DEBUG):
         logger.debug(f"Default docker repo set to: {docker_repo}")
