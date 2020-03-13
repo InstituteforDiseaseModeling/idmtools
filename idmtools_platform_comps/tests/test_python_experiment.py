@@ -24,7 +24,8 @@ from idmtools_test.utils.common_experiments import get_model1_templated_experime
     wait_on_experiment_and_check_all_sim_status
 from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-from idmtools.custom_lib.requirements_to_asset_collection import RequirementsToAssetCollection
+from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import \
+    RequirementsToAssetCollection
 
 setA = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
 setB = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="b")
