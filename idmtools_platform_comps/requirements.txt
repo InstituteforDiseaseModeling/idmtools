@@ -1,5 +1,4 @@
 backoff~=1.8.1
-humanfriendly~=8.1
 idmtools~=1.0.0
 pyCOMPS~=2.3.6
 tqdm~=4.39
