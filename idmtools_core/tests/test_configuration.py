@@ -31,14 +31,21 @@ class TestConfig(ITestWithPersistence):
         self.assertIn("WARNING: File 'aaaaa' Not Found!", mock_stdout.getvalue())
 
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
+    def test_section_found_case_independent(self, mock_stdout):
+        insensitive = IdmConfigParser().get_section('CoMpS')
+        sensitive = IdmConfigParser().get_section('COMPS')
+        self.assertEqual(insensitive, sensitive)
+
+    @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     def test_section_not_found(self, mock_stdout):
-        IdmConfigParser().get_section('NotReallyASection')
-        self.assertIn("WARNING: Section 'NotReallyASection' Not Found!", mock_stdout.getvalue())
+        with self.assertRaises(ValueError) as context:
+            IdmConfigParser().get_section('NotReallyASection')
+        self.assertIn("Block 'NotReallyASection' doesn't exist!", context.exception.args[0])
 
     @pytest.mark.comps
     @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
     def test_simple_comps_platform_use_config(self, mock_login):
-        platform = Platform("COMPS")
+        platform = Platform("COMPS2")
         self.assertEqual(platform.endpoint, 'https://comps2.idmod.org')
         self.assertEqual(platform.environment, 'Bayesian')
         self.assertEqual(mock_login.call_count, 1)
@@ -46,7 +53,7 @@ class TestConfig(ITestWithPersistence):
     @pytest.mark.comps
     @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
     def test_simple_comps_platform_use_code(self, mock_login):
-        platform = Platform("COMPS", endpoint='https://abc', environment='Bayesian')
+        platform = Platform("COMPS2", endpoint='https://abc', environment='Bayesian')
         self.assertEqual(platform.endpoint, 'https://abc')
         self.assertEqual(platform.environment, 'Bayesian')
         self.assertEqual(mock_login.call_count, 1)
@@ -100,6 +107,17 @@ class TestConfig(ITestWithPersistence):
         IdmConfigParser.ensure_init()
         max_workers = IdmConfigParser.get_option("COMMON", 'max_workers')
         self.assertIsNone(max_workers)
+        # with self.assertRaises(Exception) as context:
+        #     max_workers = IdmConfigParser.get_option("COMMON", 'max_workers')
+        # self.assertIn('Config file NOT FOUND or IS Empty', context.exception.args[0])
+
+        # self.assertIsNone(max_workers)
+
+    def test_has_idmtools_common(self):
+        IdmConfigParser(file_name="idmtools_NotExist.ini")
+        IdmConfigParser.ensure_init(force=True)
+        max_workers = IdmConfigParser.get_option("COMMON", 'max_workers')
+        self.assertEqual(int(max_workers), 16)
 
     @pytest.mark.comps
     @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)

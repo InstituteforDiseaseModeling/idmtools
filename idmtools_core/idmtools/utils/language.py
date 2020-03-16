@@ -1,7 +1,17 @@
 from collections.abc import Iterable
+from typing import Type
 
 
-def on_off(test):
+def on_off(test) -> str:
+    """
+    Print on or off depending on boolean state of test
+
+    Args:
+        test: Boolean/object to check state
+
+    Returns:
+        On or off
+    """
     return "on" if test else "off"
 
 
@@ -37,3 +47,37 @@ def verbose_timedelta(delta):
             break
     dhms.reverse()
     return ', '.join(dhms)
+
+
+def get_qualified_class_name(cls: Type) -> str:
+    """
+    Return the full class name for an object
+
+    Args:
+        cls: Class object to get name
+
+    Returns:
+
+    """
+    return f'{cls.__module__}.{cls.__name__}'
+
+
+def get_qualified_class_name_from_obj(obj: object) -> str:
+    """
+    Return the full class name from object
+
+    Args:
+        obj: Object
+
+    Example:
+        ```
+        a = Platform('COMPS')
+        class_name = get_qualified_class_name(a)
+        print(class_name)
+        'idmtools_platform_comps.comps_platform.COMPSPlatform'
+        ```
+
+    Returns:
+        Full module path to class of object
+    """
+    return get_qualified_class_name(obj.__class__)

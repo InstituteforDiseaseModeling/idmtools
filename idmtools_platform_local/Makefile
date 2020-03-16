@@ -24,13 +24,14 @@ clean: ## Clean most of the temp-data from the project
 clean-all:  ## Deleting package info hides plugins so we only want to do that for packaging
 	@make clean
 	$(CLDIR) --dir-patterns "**/*.egg-info/"
+	@+$(IPY) "import os; os.chdir('idmtools_webui'); os.system('python build.py clean')"
 
 edv:
 	echo $(CWD)
 
 # Dev and test related rules
 lint: ## check style with flake8
-	$(PDR) -w '..' -ex 'flake8 --ignore=E501 $(PACKAGE_NAME)'
+	$(PDR) -w '..' -ex 'flake8 --ignore=E501,W291 $(PACKAGE_NAME)'
 
 test: ## Run our tests
 	$(FULL_TEST_CMD) -m "not comps and not docker"'
@@ -122,6 +123,9 @@ start-webui: ## start the webserver
 	$(PDR) -w 'idmtools_webui' -ex yarn
 	$(PDR) -w 'idmtools_webui' -ex 'yarn start'
 
+ui-yarn-upgrade:
+	@+$(IPY) "import os; os.chdir('idmtools_webui'); os.system('python build.py upgrade')"
+
 build-ui: ## build ui
 	$(CLDIR) --directories "idmtools_platform_local/internals/ui/static,idmtools_webui/build"
 	@+$(IPY) "import os; os.chdir('idmtools_webui'); os.system('python build.py')"
@@ -135,7 +139,7 @@ bump-release: ## bump the release version.
 	bump2version release --commit
 
 # Use before release-staging-release-commit to confirm next version.
-bump-release-dry-run: ## perform a release to staging and bump the minor version.
+bump-release-dry-run: ## bump the release version. (dry run)
 	bump2version release --dry-run --allow-dirty --verbose
 
 bump-patch: ## bump the patch version
@@ -144,8 +148,14 @@ bump-patch: ## bump the patch version
 bump-minor: ## bump the minor version
 	bump2version minor --commit
 
-bump-patch-dry-run: ## bump the patch version
+bump-major: ## bump the major version
+	bump2version major --commit
+
+bump-patch-dry-run: ## bump the patch version(dry run)
 	bump2version patch --dry-run --allow-dirty --verbose
 
-bump-minor-dry-run: ## bump the minor version
+bump-minor-dry-run: ## bump the minor version(dry run)
 	bump2version minor --dry-run --allow-dirty --verbose
+
+bump-major-dry-run: ## bump the major version(dry run)
+	bump2version major --dry-run --allow-dirty --verbose

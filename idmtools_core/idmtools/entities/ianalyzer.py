@@ -1,10 +1,11 @@
-import typing
-
 from abc import ABCMeta, abstractmethod
-from typing import Any, NoReturn
+from logging import getLogger
+from typing import Any, NoReturn, List, TypeVar, Dict, Optional, Union
+from idmtools.core.interfaces.iitem import IItem, IItemList
+from idmtools.entities.iworkflow_item import IWorkflowItem
+from idmtools.entities.simulation import Simulation
 
-if typing.TYPE_CHECKING:
-    from idmtools.core.interfaces.iitem import TItem, TItemList
+logger = getLogger(__name__)
 
 
 class IAnalyzer(metaclass=ABCMeta):
@@ -14,7 +15,8 @@ class IAnalyzer(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def __init__(self, uid=None, working_dir=None, parse=True, filenames=None):
+    def __init__(self, uid=None, working_dir: Optional[str] = None, parse: bool = True,
+                 filenames: Optional[List[str]] = None):
         """
         A constructor.
 
@@ -39,7 +41,7 @@ class IAnalyzer(metaclass=ABCMeta):
         """
         pass
 
-    def per_group(self, items: 'TItemList') -> NoReturn:
+    def per_group(self, items: IItemList) -> NoReturn:
         """
         Call once before running the apply on the items.
 
@@ -53,7 +55,7 @@ class IAnalyzer(metaclass=ABCMeta):
         """
         pass
 
-    def filter(self, item: 'TItem') -> bool:
+    def filter(self, item: Union[IWorkflowItem, Simulation]) -> bool:
         """
         Decide whether the analyzer should process a simulation.
 
@@ -66,7 +68,7 @@ class IAnalyzer(metaclass=ABCMeta):
         return True
 
     @abstractmethod
-    def map(self, data: 'Any', item: 'TItem') -> 'Any':
+    def map(self, data: Dict[str, Any], item: Union[IWorkflowItem, Simulation]) -> Any:
         """
         In parallel for each simulation, consume raw data from filenames and emit selected data.
 
@@ -80,7 +82,7 @@ class IAnalyzer(metaclass=ABCMeta):
         return None
 
     @abstractmethod
-    def reduce(self, all_data: dict) -> 'Any':
+    def reduce(self, all_data: Dict[Union[IWorkflowItem, Simulation], Any]) -> Any:
         """
         Combine the :meth:`map` data for a set of items into an aggregate result.
 
@@ -96,5 +98,14 @@ class IAnalyzer(metaclass=ABCMeta):
         pass
 
 
-TAnalyzer = typing.TypeVar("TAnalyzer", bound=IAnalyzer)
-TAnalyzerList = typing.List[TAnalyzer]
+# Alias IAnalyzer for computability with old code but print a deprecation warning
+
+class BaseAnalyzer(IAnalyzer, metaclass=ABCMeta):
+    def __init__(self, uid=None, working_dir: Optional[str] = None, parse: bool = True,
+                 filenames: Optional[List[str]] = None):
+        logger.warning('Base analyzer name will soon be deprecated in favor of IAnalyzer')
+        super().__init__(uid, working_dir, parse, filenames)
+
+
+TAnalyzer = TypeVar("TAnalyzer", bound=IAnalyzer)
+TAnalyzerList = List[TAnalyzer]

@@ -1,11 +1,12 @@
 import concurrent
+import os
 import sys
+import threading
 from concurrent.futures.process import ProcessPoolExecutor
 from concurrent.futures.thread import ThreadPoolExecutor
 from logging import DEBUG, getLogger
 from unittest import TestCase, skip
-import threading
-import os
+
 from idmtools.core.logging import setup_logging
 from idmtools_test.utils.decorators import run_test_in_n_seconds
 

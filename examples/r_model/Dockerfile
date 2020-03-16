@@ -1,5 +1,7 @@
 FROM r-base:3.6.1
 
+# Define version of S6
+# S6 allows us to define events and manage common concerns when running a container
 ARG S6_VERSION
 ENV S6_VERSION=${S6_VERSION:-v1.22.1.0} \
     S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
@@ -15,8 +17,11 @@ RUN apt-get update && apt-get install -y \
     && groupmod -g 999 docker \
     && (find / -group 1000 -exec chgrp -h docker {} \; || true) \
     && (find / -user 1000 -exec chown -h docker {} \; || true) \
+    # add an idmtools user
     && useradd -s /bin/bash idmtools \
+    # set the password
     && echo "idmtools:idmtools" | chpasswd \
+    # mkdir home directory, data directory, and an ap directory
     && mkdir /home/idmtools /data /app \
     && chown -R idmtools:idmtools /home/idmtools /data /app \
     # We add the s6 overlay kit which helps us manager permissions
@@ -31,20 +36,21 @@ RUN apt-get update && apt-get install -y \
 # Set default make to parallel build
 ARG WORKERS=2
 ENV MAKE="make -j${WORKERS}"
+
 # install dev tools.
 # this increases the final build size but also gives use the ability to install specific versions of packages
 # which is overall more stable
 RUN Rscript -e "install.packages('devtools')"
 # For a stable environment, use specific versions of packages we use within our projectt
 RUN Rscript -e "devtools::install_version('argparse', version = '2.0.1')" && \
-    Rscript -e "devtools::install_version('deSolve', version = '1.24')"
+    Rscript -e "devtools::install_version('deSolve', version = '1.25')"
 
 # Our script that does smart user mapping
-COPY user_conf.sh /etc/cont-init.d/01-user_conf.sh
-COPY user_init.sh /
+COPY docker_scripts/user_conf.sh /etc/cont-init.d/01-user_conf.sh
+COPY docker_scripts/user_init.sh /
 
 WORKDIR /app
-COPY user_conf.sh /app
+COPY docker_scripts/user_conf.sh /app
 RUN chmod +x /user_init.sh /app/user_conf.sh
-COPY model.R example.json /app/
+COPY model/model.R example.json /app/
 ENTRYPOINT ["/user_init.sh"]

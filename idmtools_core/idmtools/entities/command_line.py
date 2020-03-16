@@ -1,3 +1,4 @@
+from shlex import shlex
 from typing import TypeVar, Dict, Any, List
 from dataclasses import dataclass, field
 
@@ -22,6 +23,12 @@ class CommandLine:
     def executable(self):
         return self._executable
 
+    def add_argument(self, arg):
+        self._args.append(arg)
+
+    def add_option(self, option, value):
+        self._options[option] = value
+
     @property
     def options(self):
         options = []
@@ -42,6 +49,9 @@ class CommandLine:
     @property
     def cmd(self):
         return ' '.join(filter(None, [self.executable, self.options, self.arguments]))
+
+    def __str__(self):
+        return self.cmd
 
 
 TCommandLine = TypeVar("TCommandLine", bound=CommandLine)

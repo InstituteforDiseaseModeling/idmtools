@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""The setup script."""
+"""The setup script for the idmtools_models platform, core tools for other models such as Python and R models."""
+import sys
 
 from setuptools import setup, find_packages
 
@@ -17,13 +18,20 @@ test_requirements = ['pytest', 'pytest-runner', 'pytest-timeout', 'pytest-cache'
 
 extras = dict(test=test_requirements, packaging=build_requirements)
 
+# check for python 3.7
+if sys.version_info[0] == 3 and sys.version_info[1] == 7 and sys.version_info[2] < 3:
+    raise EnvironmentError("Python 3.7 requires 3.7.3 or higher")
+
 authors = [
-    ("Sharon Chen", "'schen@idmod.org"),
-    ("Clinton Collins", 'ccollins@idmod.org'),
+    ("Ross Carter", "rcarter@idmod.org"),
+    ("Sharon Chen", "shchen@idmod.org"),
+    ("Clinton Collins", "ccollins@idmod.org"),
     ("Zhaowei Du", "zdu@idmod.org"),
-    ("Mary Fisher", 'mfisher@idmod.org'),
-    ("Clark Kirkman IV", 'ckirkman@idmod.org'),
-    ("Benoit Raybaud", "braybaud@idmod.org")
+    ("Mary Fisher", "mafisher@idmod.org"),
+    ("Mandy Izzo", "mizzo@idmod.org"),
+    ("Clark Kirkman IV", "ckirkman@idmod.org"),
+    ("Benoit Raybaud", "braybaud@idmod.org"),
+    ("Jen Schripsema", "jschripsema@idmod.org")
 ]
 
 setup(
@@ -40,15 +48,20 @@ setup(
     include_package_data=True,
     keywords='modeling, IDM',
     name='idmtools_models',
-    entry_points=dict(idmtools_model=  # noqa: E251
-                      ["idmtools_model_python = idmtools_models.python.python_experiment_spec:PythonExperimentSpec",
-                       "idmtools_model_r = idmtools_models.r.r_experiment_spec:RExperimentSpec"]
+    entry_points=dict(idmtools_task=
+                      ["idmtools_task_python = idmtools_models.python.python_task:PythonTaskSpecification",
+                       "idmtools_task_python_json = idmtools_models.python.python_task:JSONConfiguredPythonTaskSpecification",
+                       "idmtools_task_r = idmtools_models.r.r_task:RTaskSpecification",
+                       "idmtools_task_r_json = idmtools_models.r.r_task:JSONConfiguredRTaskSpecification",
+                       "idmtools_task_json = idmtools_models.json_configured_task:JSONConfiguredTaskSpecification",
+                       "idmtools_docker = idmtools_models.docker_task:DockerTaskSpecification"
+                       ]
                       ),
     packages=find_packages(),
     setup_requires=setup_requirements,
     test_suite='tests',
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='0.3.0',
+    version='1.0.0',
     zip_safe=False,
 )

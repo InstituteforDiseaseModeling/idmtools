@@ -1,30 +1,28 @@
 import os
+import sys
 from functools import partial
 
+import pandas as pd
 import pytest
-from COMPS.Data import Experiment
-from idmtools.builders import ExperimentBuilder
-from idmtools.core.platform_factory import Platform
-from idmtools.managers import ExperimentManager
-from idmtools.core import EntityStatus, ItemType
-from idmtools_models.python import PythonExperiment
-from idmtools_test import COMMON_INPUT_PATH
+from COMPS.Data import Experiment as COMPSExperiment
+
 from idmtools.analysis.analyze_manager import AnalyzeManager
 from idmtools.analysis.download_analyzer import DownloadAnalyzer
+from idmtools.builders import SimulationBuilder
+from idmtools.core import ItemType
+from idmtools.core.platform_factory import Platform
+from idmtools_test.utils.common_experiments import wait_on_experiment_and_check_all_sim_status, \
+    get_model1_templated_experiment
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import del_folder
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 
-
-def param_update(simulation, param, value):
-    return simulation.set_parameter(param, value)
-
-
-setA = partial(param_update, param="a")
-setB = partial(param_update, param="b")
-setC = partial(param_update, param="c")
-setD = partial(param_update, param="d")
+# import analyzers from current dir's inputs dir
+analyzer_path = os.path.join(os.path.dirname(__file__), "inputs")
+sys.path.insert(0, analyzer_path)
+from sim_filter_analyzer import SimFilterAnalyzer
+from sim_filter_analyzer_by_id import SimFilterAnalyzerById
 
 
 @pytest.mark.analysis
@@ -38,29 +36,24 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         self.p = Platform('COMPS2')
 
     def create_experiment(self):
-        pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
-        pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
-
-        pe.base_simulation.set_parameter("c", "c-value")
+        pe = get_model1_templated_experiment(self.case_name)
 
         def param_update_ab(simulation, param, value):
             # Set B within
             if param == "a":
-                simulation.set_parameter("b", value + 2)
+                simulation.task.set_parameter("b", value + 2)
 
-            return simulation.set_parameter(param, value)
+            return simulation.task.set_parameter(param, value)
 
         setAB = partial(param_update_ab, param="a")
 
-        builder = ExperimentBuilder()
+        builder = SimulationBuilder()
         # Sweep parameter "a" and make "b" depends on "a"
         builder.add_sweep_definition(setAB, range(0, 2))
-        pe.builder = builder
-        em = ExperimentManager(experiment=pe, platform=self.p)
-        em.run()
-        em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
-        experiment = Experiment.get(em.experiment.uid)
+        pe.simulations.add_builder(builder)
+
+        wait_on_experiment_and_check_all_sim_status(self, pe, self.p)
+        experiment = COMPSExperiment.get(pe.uid)
         print(experiment.id)
         self.exp_id = experiment.id  # COMPS Experiment object, so .id
 
@@ -68,7 +61,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         # self.exp_id = '9eacbb9a-5ecf-e911-a2bb-f0921c167866' #comps2 staging
 
     @pytest.mark.long
-    def test_DownloadAnalyzer(self):
+    def test_download_analyzer(self):
         # delete output from previous run
         del_folder("output")
 
@@ -81,7 +74,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         am = AnalyzeManager(platform=self.p, ids=[(self.exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
 
-        for simulation in Experiment.get(self.exp_id).get_simulations():
+        for simulation in COMPSExperiment.get(self.exp_id).get_simulations():
             self.assertTrue(os.path.exists(os.path.join('output', str(simulation.id), "config.json")))
             self.assertTrue(os.path.exists(os.path.join('output', str(simulation.id), "result.json")))
 
@@ -101,6 +94,90 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         am = AnalyzeManager(platform=self.p, ids=exp_list, analyzers=analyzers)
         am.analyze()
         for exp_id in exp_list:
-            for simulation in Experiment.get(exp_id[0]).get_simulations():
+            for simulation in COMPSExperiment.get(exp_id[0]).get_simulations():
                 self.assertTrue(os.path.exists(os.path.join('output', str(simulation.id), "config.json")))
                 self.assertTrue(os.path.exists(os.path.join('output', str(simulation.id), "result.json")))
+
+    def test_analyzer_filter_sims(self):
+        # delete output from previous run
+        del_folder("output")
+
+        # create a new empty 'output' dir
+        os.mkdir("output")
+
+        exp_id = '69cab2fe-a252-ea11-a2bf-f0921c167862'
+
+        # then run SimFilterAnalyzer to analyze the sims tags
+        filenames = ['output/result.json']
+        analyzers = [SimFilterAnalyzer(filenames=filenames, output_path='output')]
+
+        am = AnalyzeManager(platform=self.p, ids=[(exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
+        am.analyze()
+
+        # validate result
+        file_path = os.path.join("output", "b_match.csv")
+        self.assertTrue(os.path.exists(file_path))
+        df = pd.read_csv(file_path, names=['index', 'key', 'value'], header=None)
+        self.assertTrue(df['key'].values[1:5].size == 4)
+        self.assertTrue(df['key'].values[1:5].all() == 'b')
+        self.assertTrue(df['value'].values[1:5].size == 4)
+        self.assertTrue(df['value'].values[1:5].all() == '2')
+
+    def test_analyzer_filter_sims_by_id(self):
+        # delete output from previous run
+        del_folder("output")
+
+        # create a new empty 'output' dir
+        os.mkdir("output")
+
+        exp_id = '69cab2fe-a252-ea11-a2bf-f0921c167862'
+
+        # then run SimFilterAnalyzer to analyze the sims tags
+        filenames = ['output/result.json']
+        analyzers = [SimFilterAnalyzerById(filenames=filenames, output_path='output')]
+
+        am = AnalyzeManager(platform=self.p, ids=[(exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
+        am.analyze()
+
+        # validate result
+        file_path = os.path.join("output", "result.csv")
+        self.assertTrue(os.path.exists(file_path))
+        # validate content of output.csv
+        df = pd.read_csv(file_path, names=['SimId', 'a', 'b', 'c'], header=None)
+        self.assertTrue(df['SimId'].values[1:7].size == 6)
+        self.assertTrue(df['a'].values[1:7].size == 6)
+        self.assertTrue(df['b'].values[1:7].size == 6)
+        self.assertTrue(df['c'].values[1:7].size == 6)
+
+    def test_analyzer_with_failed_sims(self):
+        experiment_id = 'c3e4ef50-ee63-ea11-a2bf-f0921c167862'  # staging experiment includes 5 sims with 3 failed sims
+
+        # delete output from previous run
+        output_dir = "output"
+        del_folder(output_dir)
+        filenames = ["stdErr.txt"]
+        analyzers = [DownloadAnalyzer(filenames=filenames)]
+        manager = AnalyzeManager(platform=self.p, partial_analyze_ok=True,
+                                 ids=[(experiment_id, ItemType.EXPERIMENT)],
+                                 analyzers=analyzers, analyze_failed_items=True)
+        manager.analyze()
+
+        # validation
+        for simulation in self.p.get_children(experiment_id, ItemType.EXPERIMENT):
+            file = os.path.join("output", str(simulation.id), "stdErr.txt")
+            # make sure we have download all stdErr.txt files from all sims including failed ones
+            self.assertTrue(os.path.exists(file))
+            # make sure download analyzer results are correct
+            # read 'output/stdErr.txt' file content
+            contents = ""
+            with open(file) as f:
+                for line in f.readlines():
+                    contents += line
+            # for failed simulations, check stdErr.txt file content
+            if simulation.id == "c6e4ef50-ee63-ea11-a2bf-f0921c167862" \
+                    or simulation.id == "c8e4ef50-ee63-ea11-a2bf-f0921c167862" \
+                    or simulation.id == "c4e4ef50-ee63-ea11-a2bf-f0921c167862":
+                self.assertIn("Traceback (most recent call last)", contents)
+            # for successful simulations, make sure stdErr.txt is empty
+            else:
+                self.assertEqual("", contents)

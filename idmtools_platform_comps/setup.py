@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""The setup script."""
+"""The setup script for the idmtools_platform_comps platform, for users who use the COMPS platform for IDM-Tools."""
 import sys
 
 from setuptools import setup, find_packages
@@ -23,12 +23,16 @@ if sys.version_info[1] == 6:
     requirements.append('dataclasses')
 
 authors = [
-    ("Sharon Chen", "'schen@idmod.org"),
-    ("Clinton Collins", 'ccollins@idmod.org'),
+    ("Ross Carter", "rcarter@idmod.org"),
+    ("Sharon Chen", "shchen@idmod.org"),
+    ("Ye Chen", "yechen@idmod.org"),
+    ("Clinton Collins", "ccollins@idmod.org"),
     ("Zhaowei Du", "zdu@idmod.org"),
-    ("Mary Fisher", 'mfisher@idmod.org'),
-    ("Clark Kirkman IV", 'ckirkman@idmod.org'),
-    ("Benoit Raybaud", "braybaud@idmod.org")
+    ("Mary Fisher", "mafisher@idmod.org"),
+    ("Mandy Izzo", "mizzo@idmod.org"),
+    ("Clark Kirkman IV", "ckirkman@idmod.org"),
+    ("Benoit Raybaud", "braybaud@idmod.org"),
+    ("Jen Schripsema", "jschripsema@idmod.org")
 ]
 
 setup(
@@ -47,12 +51,11 @@ setup(
     setup_requires=setup_requirements,
     test_suite='tests',
     entry_points=dict(idmtools_platform=  # noqa: E251
-                      ["idmtools_platform_comps = idmtools_platform_comps.plugin_info:COMPSPlatformSpecification"],
-                      idmtools_platform_cli=  # noqa: E251
-                      ["idmtools_platform_cli_comps = idmtools_platform_comps.comps_cli:COMPSCLISpecification"]
+                      ["idmtools_platform_comps = idmtools_platform_comps.plugin_info:COMPSPlatformSpecification",
+                       "idmtools_platform_ssmt = idmtools_platform_comps.plugin_info:SSMTPlatformSpecification"]
                       ),
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='0.3.0',
+    version='1.0.0',
     zip_safe=False,
 )

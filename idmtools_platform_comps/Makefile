@@ -23,7 +23,7 @@ clean-all:  ## Deleting package info hides plugins so we only want to do that fo
 	$(CLDIR) --dir-patterns "**/*.egg-info/"
 
 lint: ## check style with flake8
-	flake8 --ignore=E501 $(PACKAGE_NAME) tests
+	flake8 --ignore=E501,W291 $(PACKAGE_NAME) tests
 
 test: ## Run our tests
 	$(FULL_TEST_CMD) -m "not comps and not docker"'
@@ -52,6 +52,9 @@ test-emod: ## Run our emod tests
 test-python: ## Run our python tests
 	$(FULL_TEST_CMD) -m "python"'
 
+test-ssmt: ## Run our python tests
+	$(FULL_TEST_CMD) -m "ssmt"'
+
 coverage: ## Generate a code-coverage report
 	@make clean
 	# We have to run in our tests folder to use the proper config
@@ -68,12 +71,20 @@ coverage-all: ## Generate a code-coverage report using all tests
 	coverage report -m
 	coverage html -i
 	$(PDS)/launch_dir_in_browser.py htmlcov/index.html
-	
-# Release related rules
 
+# Release related rules
 release-local: ## package and upload a release to http://localhost:7171
 	@make dist
 	twine upload --verbose --repository-url http://localhost:7171 -u admin -p admin dist/*
+
+ssmt-image-local:  ## Build SSMT Docker image using Local PyPi
+	$(PDR) -w './ssmt_image' -ex 'pymake docker-local'
+
+ssmt-image-staging:  ## Build SSMT Docker image using Staging PyPi
+	$(PDR) -w './ssmt_image' -ex 'pymake docker-staging'
+
+ssmt-image-release-staging:  ## Build SSMT Docker image using Staging PyPi and Publish to Staging
+	$(PDR) -w './ssmt_image' -ex 'pymake docker-release-staging'
 
 dist: ## build our package
 	@make clean
@@ -83,8 +94,11 @@ release-staging: ## perform a release to staging
 	@make dist
 	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/idm-pypi-staging/ dist/*
 
+bump-release: ## bump the release version.
+	bump2version release --commit
+
 # Use before release-staging-release-commit to confirm next version.
-bump-release-dry-run: ## perform a release to staging and bump the minor version.
+bump-release-dry-run: ## bump the release version. (dry run)
 	bump2version release --dry-run --allow-dirty --verbose
 
 bump-patch: ## bump the patch version
@@ -93,8 +107,14 @@ bump-patch: ## bump the patch version
 bump-minor: ## bump the minor version
 	bump2version minor --commit
 
-bump-patch-dry-run: ## bump the patch version
+bump-major: ## bump the major version
+	bump2version major --commit
+
+bump-patch-dry-run: ## bump the patch version(dry run)
 	bump2version patch --dry-run --allow-dirty --verbose
 
-bump-minor-dry-run: ## bump the minor version
+bump-minor-dry-run: ## bump the minor version(dry run)
 	bump2version minor --dry-run --allow-dirty --verbose
+
+bump-major-dry-run: ## bump the major version(dry run)
+	bump2version major --dry-run --allow-dirty --verbose

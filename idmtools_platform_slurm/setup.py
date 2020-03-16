@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""The setup script."""
+"""The setup script for the idmtools_platform_slurm, which provides users the ability to run against
+the Slurm platform."""
 import sys
 
 from setuptools import setup, find_packages
@@ -22,11 +23,11 @@ if sys.version_info[1] == 6:
     requirements.append('dataclasses')
 
 authors = [
-    ("Sharon Chen", "'schen@idmod.org"),
-    ("Clinton Collins", 'ccollins@idmod.org'),
+    ("Sharon Chen", "schen@idmod.org"),
+    ("Clinton Collins", "ccollins@idmod.org"),
     ("Zhaowei Du", "zdu@idmod.org"),
-    ("Mary Fisher", 'mfisher@idmod.org'),
-    ("Clark Kirkman IV", 'ckirkman@idmod.org'),
+    ("Mary Fisher", "mfisher@idmod.org"),
+    ("Clark Kirkman IV", "ckirkman@idmod.org"),
     ("Benoit Raybaud", "braybaud@idmod.org")
 ]
 
@@ -50,6 +51,6 @@ setup(
     test_suite='tests',
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='0.2.0+nightly',
+    version='1.0.0',
     zip_safe=False,
 )

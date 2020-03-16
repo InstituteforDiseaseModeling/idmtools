@@ -23,7 +23,7 @@ clean-all:  ## Deleting package info hides plugins so we only want to do that fo
 	$(CLDIR) --dir-patterns "**/*.egg-info/"
 
 lint: ## check style with flake8
-	flake8 --ignore=E501 $(PACKAGE_NAME) tests
+	flake8 --ignore=E501,W291 $(PACKAGE_NAME) tests
 
 test: ## Run our tests
 	$(FULL_TEST_CMD) -m "not comps and not docker"'
@@ -82,8 +82,11 @@ release-staging: ## perform a release to staging
 	@make dist
 	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/idm-pypi-staging/ dist/*
 
+bump-release: ## bump the release version.
+	bump2version release --commit
+
 # Use before release-staging-release-commit to confirm next version.
-bump-release-dry-run: ## perform a release to staging and bump the minor version.
+bump-release-dry-run: ## bump the release version. (dry run)
 	bump2version release --dry-run --allow-dirty --verbose
 
 bump-patch: ## bump the patch version
@@ -92,8 +95,14 @@ bump-patch: ## bump the patch version
 bump-minor: ## bump the minor version
 	bump2version minor --commit
 
-bump-patch-dry-run: ## bump the patch version
+bump-major: ## bump the major version
+	bump2version major --commit
+
+bump-patch-dry-run: ## bump the patch version(dry run)
 	bump2version patch --dry-run --allow-dirty --verbose
 
-bump-minor-dry-run: ## bump the minor version
+bump-minor-dry-run: ## bump the minor version(dry run)
 	bump2version minor --dry-run --allow-dirty --verbose
+
+bump-major-dry-run: ## bump the major version(dry run)
+	bump2version major --dry-run --allow-dirty --verbose

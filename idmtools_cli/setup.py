@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""The setup script."""
+"""The setup script for the idmtools_cli, the command line utility platform for idmtools."""
 
 from setuptools import setup, find_packages
 
@@ -22,11 +22,11 @@ extras = {
 }
 
 authors = [
-    ("Sharon Chen", "'schen@idmod.org"),
-    ("Clinton Collins", 'ccollins@idmod.org'),
+    ("Sharon Chen", "schen@idmod.org"),
+    ("Clinton Collins", "ccollins@idmod.org"),
     ("Zhaowei Du", "zdu@idmod.org"),
-    ("Mary Fisher", 'mfisher@idmod.org'),
-    ("Clark Kirkman IV", 'ckirkman@idmod.org'),
+    ("Mary Fisher", "mfisher@idmod.org"),
+    ("Clark Kirkman IV", "ckirkman@idmod.org"),
     ("Benoit Raybaud", "braybaud@idmod.org")
 ]
 
@@ -50,6 +50,6 @@ setup(
     entry_points={"console_scripts": ["idmtools=idmtools_cli.main:main"]},
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='0.3.0',
+    version='1.0.0',
     zip_safe=False
 )

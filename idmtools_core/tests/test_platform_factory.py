@@ -15,8 +15,8 @@ class TestPlatformFactory(ITestWithPersistence):
     def tearDown(self):
         super().tearDown()
 
-    def test_get_block(self):
-        entries = IdmConfigParser.get_block('COMPS2')
+    def test_get_section(self):
+        entries = IdmConfigParser.get_section('COMPS2')
         self.assertEqual(entries['endpoint'], 'https://comps2.idmod.org')
 
     def test_block_not_exits(self):
@@ -85,7 +85,7 @@ class TestPlatformFactory(ITestWithPersistence):
         self.assertEqual(mock_login.call_count, 1)
         members = platform.__dict__
 
-        field_name = {f.name for f in fields(platform)}
+        field_name = {f.name for f in fields(platform) if f.init}
         keys = field_name.intersection(members.keys())
         kwargs = {key: members[key] for key in keys if not key.startswith('_')}
 
@@ -99,7 +99,7 @@ class TestPlatformFactory(ITestWithPersistence):
         platform = Platform('Custom_Local', **get_test_local_env_overrides())
         members = platform.__dict__
 
-        field_name = {f.name for f in fields(platform)}
+        field_name = {f.name for f in fields(platform) if f.init}
         keys = field_name.intersection(members.keys())
         kwargs = {key: members[key] for key in keys if not key.startswith('_')}
 
@@ -112,7 +112,7 @@ class TestPlatformFactory(ITestWithPersistence):
         platform = Platform('Test')
         members = platform.__dict__
 
-        field_name = {f.name for f in fields(platform)}
+        field_name = {f.name for f in fields(platform) if f.init}
         keys = field_name.intersection(members.keys())
         kwargs = {key: members[key] for key in keys if not key.startswith('_')}
 

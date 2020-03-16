@@ -12,6 +12,9 @@ echo ${LOCAL_PATH}
 pip install py-make
 pymake setup-dev
 
+echo "pip list..."
+pip list
+
 echo "auto login..."
 python dev_scripts/create_auth_token_args.py --comps_url "$1" --username "$2" --password "$3"
 #python dev_scripts/create_auth_token_args.py --comps_url "https://comps2.idmod.org" --username "shchen" --password "Password123"

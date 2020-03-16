@@ -7,7 +7,7 @@ PDR=$(PDS)run.py
 CLDIR=$(PDS)clean_dir.py
 CWD=$($(IPY) "import os; print(os.getcwd())")
 TEST_COMMAND=py.test --durations=10 -v --junitxml=test_results.xml
-TEST_RUN_OPTS=-e DOCKER_REPO=idm-docker-staging NO_SPINNER=1
+TEST_RUN_OPTS=-e DOCKER_REPO=docker-staging NO_SPINNER=1
 FULL_TEST_CMD=$(PDR) -w 'tests' $(TEST_RUN_OPTS) -ex '$(TEST_COMMAND)
 COVERAGE_CMD=$(PDR) -w 'tests' $(TEST_RUN_OPTS) -p . ../ -ex 'coverage run --omit="*/test*,*/setup.py" --source ../,../../idmtools_core,../../idmtools_platform_local,../../idmtools_platform_comps,../../idmtools_models,../../idmtools_model_emod -m pytest
 
@@ -23,7 +23,7 @@ clean-all:  ## Deleting package info hides plugins so we only want to do that fo
 	$(CLDIR) --dir-patterns "**/*.egg-info/"
 
 lint: ## check style with flake8
-	flake8 --ignore=E501 $(PACKAGE_NAME) tests
+	flake8 --ignore=E501,W291 $(PACKAGE_NAME) tests
 
 test: ## Run our tests
 	$(FULL_TEST_CMD) -m "not comps and not docker"'
@@ -83,8 +83,11 @@ release-staging: ## perform a release to staging
 	@make dist
 	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/idm-pypi-staging/ dist/*
 
+bump-release: ## bump the release version.
+	bump2version release --commit
+
 # Use before release-staging-release-commit to confirm next version.
-bump-release-dry-run: ## perform a release to staging and bump the minor version.
+bump-release-dry-run: ## bump the release version. (dry run)
 	bump2version release --dry-run --allow-dirty --verbose
 
 bump-patch: ## bump the patch version
@@ -93,8 +96,14 @@ bump-patch: ## bump the patch version
 bump-minor: ## bump the minor version
 	bump2version minor --commit
 
-bump-patch-dry-run: ## bump the patch version
+bump-major: ## bump the major version
+	bump2version major --commit
+
+bump-patch-dry-run: ## bump the patch version(dry run)
 	bump2version patch --dry-run --allow-dirty --verbose
 
-bump-minor-dry-run: ## bump the minor version
+bump-minor-dry-run: ## bump the minor version(dry run)
 	bump2version minor --dry-run --allow-dirty --verbose
+
+bump-major-dry-run: ## bump the major version(dry run)
+	bump2version major --dry-run --allow-dirty --verbose

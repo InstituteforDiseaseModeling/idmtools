@@ -22,6 +22,7 @@ setup-dev:  ## Setup packages in dev mode
 
 lint: ## check style with flake8
 	$(MAKEALL) --parallel lint
+	flake8 --ignore=E501,W291 examples
 
 test: ## Run our tests
 	$(MAKEALL) --parallel test
@@ -89,8 +90,14 @@ bump-patch: ## bump the patch version
 bump-minor: ## bump the minor version
 	$(MAKEALL) bump-minor
 
-bump-patch-dry-run: ## bump the patch version
+bump-major: ## bump the major version
+	$(MAKEALL) bump-major
+
+bump-patch-dry-run: ## bump the patch version(dry run)
 	$(MAKEALL) bump-patch-dry-run
 
-bump-minor-dry-run: ## bump the minor version
+bump-minor-dry-run: ## bump the minor version(dry run)
 	$(MAKEALL) bump-minor-dry-run
+
+bump-major-dry-run: ## bump the minor version(dry run)
+	$(MAKEALL) bump-major-dry-run
