@@ -429,7 +429,8 @@ class TestPythonExperiment(ITestWithPersistence):
             open(os.path.join(assets_path, "templates", 'config.json'),
                  'r'))
         parameters[ConfigParameters.Base_Infectivity_Distribution] = ConfigParameters.GAUSSIAN_DISTRIBUTION
-        task = JSONConfiguredPythonTask(script_path=script_path, parameters=parameters, config_file_name='config.json')
+        task = JSONConfiguredPythonTask(python_path='python3', script_path=script_path, parameters=parameters,
+                                        config_file_name='config.json')
         task.command.add_option("--duration", 40)
 
         # now create a TemplatedSimulation builder
