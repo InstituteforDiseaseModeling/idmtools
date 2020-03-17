@@ -1,7 +1,9 @@
 import os
 from logging import getLogger
-
+from typing import Dict, Any, Union
 from idmtools.entities.ianalyzer import IAnalyzer
+from idmtools.entities.iworkflow_item import IWorkflowItem
+from idmtools.entities.simulation import Simulation
 
 logger = getLogger(__name__)
 
@@ -48,7 +50,17 @@ class DownloadAnalyzer(IAnalyzer):
         """
         return os.path.join(self.output_path, str(item.uid))
 
-    def map(self, data, item):
+    def map(self, data: Dict[str, Any], item: Union[IWorkflowItem, Simulation]):
+        """
+        Write the downloaded data to the path
+
+        Args:
+            data:
+            item:
+
+        Returns:
+
+        """
         # Create a folder for the current simulation/item
         sim_folder = self.get_sim_folder(item)
         os.makedirs(sim_folder, exist_ok=True)
@@ -57,7 +69,6 @@ class DownloadAnalyzer(IAnalyzer):
         for filename in self.filenames:
             file_path = os.path.join(sim_folder, os.path.basename(filename))
 
+            logger.debug(f'Writing to path: {file_path}')
             with open(file_path, 'wb') as outfile:
                 outfile.write(data[filename])
-
-            logger.debug(f'Writing to path: {file_path}')

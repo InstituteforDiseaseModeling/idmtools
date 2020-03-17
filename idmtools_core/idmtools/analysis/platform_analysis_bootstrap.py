@@ -6,24 +6,17 @@ import os
 import pickle
 import sys
 from pydoc import locate
-
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
-
-try:
-    # use idmtools image
-    from idmtools.analysis.analyze_manager import AnalyzeManager
-except ImportError:
-    # use dtk-tools image
-    from simtools.Analysis.AnalyzeManager import AnalyzeManager
+from idmtools.analysis.analyze_manager import AnalyzeManager
 
 sys.path.append(os.path.dirname(__file__))
 
 if __name__ == "__main__":
     if len(sys.argv) < 4:
         raise Exception(
-            "The script needs to be called with `python platform_analysis_bootstrap.py <experiment_ids> <analyzers> platform_block.\n{}".format(
-                " ".join(sys.argv)))
+            "The script needs to be called with `python platform_analysis_bootstrap.py <experiment_ids> <analyzers> "
+            "platform_block.\n{}".format(" ".join(sys.argv)))
 
     # Get the experiments, analyzers and platform
     experiments = sys.argv[1].split(",")

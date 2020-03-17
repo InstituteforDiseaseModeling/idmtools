@@ -3,5 +3,5 @@ services:
   gpu_model:
     build:
       context: .
-    image: idm-docker-staging.idmod.org/idmtools_gpu_example
+    image: idm-docker-staging.idmod.org/idmtools/gpu_example
     runtime: nvidia
