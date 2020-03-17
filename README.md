@@ -41,14 +41,24 @@ When setting up your environment for the first time, you can use the following i
    On Unix(Mac/Linux) you can use venv or virtualenv
 3) Activate the virtualenv
 4) If you are on windows, run `pip install py-make --upgrade --force-reinstall`
+<<<<<<< HEAD
 5) Run `docker login idm-docker-staging.idmod.org`
+=======
+5) Run `docker login docker-staging.idmod.org`
+>>>>>>> e7b34ab804c26378190b2c54af1b1dc306a4e7de
 6) Then run `python dev_scripts/bootstrap.py`. This will install all the tools. 
 
 ### General Use
 After the first install almost everything you need as a developer is part of the makefiles. There is a Makefile is every project directory. There is also a makefile at the top-level of the project.
+<<<<<<< HEAD
 
 To use the makefiles you can explore the available commands by running `make help`. On Windows, use `pymake help` 
 
+=======
+
+To use the makefiles you can explore the available commands by running `make help`. On Windows, use `pymake help` 
+
+>>>>>>> e7b34ab804c26378190b2c54af1b1dc306a4e7de
 Here are a list of common commands
 
 ```bash
@@ -64,7 +74,11 @@ coverage    -   Run tests and generate coverage report that is shown in browser
 Some packages have unique build related commands, specifically the local platform. Use `make help` to identify specific commands
 
 ### IDE/Runtime Setup
-For development purpose, it is important to add the following folders as to your `PYTHONPATH` (In PyCharm, right click and `Mark Directoy as > Source Root`):
+
+For source completion and indexing, set the package paths in your IDE. In PyCharm, select the following directories then right-click and select `Mark Directory as -> Source Root`.
+![Mark Directory as Sources Root](development_documentation/mark_directory_as_source.png)
+
+The directories that should be added as source roots are
 - `idmtools/idmtools_core`
 - `idmtools/idmtools_cli`
 - `idmtools/idmtools_platform_local`
@@ -119,7 +133,11 @@ In addition, you can rerun just the failed test using either the top-level `pyma
 1. Docker Auth issues.
 
    Idmtools currently does not prompt users for docker credentials. Because of this you must login
+<<<<<<< HEAD
    beforehand using `docker login idm-docker-staging.packages.idmod.org`
+=======
+   beforehand using `docker login docker-staging.packages.idmod.org`
+>>>>>>> e7b34ab804c26378190b2c54af1b1dc306a4e7de
 2. Docker image not found
    Rerun the `pymake setup-dev`
 3. Check build logs Detailed Build Logs are located within in package and tests directoery withing the package with the name make.buildlog. You can also increase the console log level to DEBUG by setting the environment variable BUILD_DEBUG to 1

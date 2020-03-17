@@ -1,6 +1,7 @@
 import json
 import os
 import sys
+
 import pytest
 from idmtools.assets.file_list import FileList
 from idmtools.core import ItemType
@@ -30,7 +31,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         asset_files.add_file(os.path.join(self.input_file_path, 'population_analyzer.py'))
         asset_files.add_file(os.path.join(self.input_file_path, 'run_population_analyzer.py'))
 
-        # load local "input" folder simtools.ini to current dir in Comps workitem
+        # load local "input" folder idmtools.ini to current dir in Comps workitem
         user_files = FileList()
         user_files.add_file(os.path.join(self.input_file_path, "idmtools.ini"))
 
@@ -118,7 +119,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         asset_files.add_file(os.path.join(self.input_file_path, 'population_analyzer.py'))
         asset_files.add_file(os.path.join(self.input_file_path, 'run_multiple_exps.py'))
 
-        # load local "input" folder simtools.ini to current dir in Comps workitem
+        # load local "input" folder idmtools.ini to current dir in Comps workitem
         user_files = FileList()
         user_files.add_file(os.path.join(self.input_file_path, "idmtools.ini"))
 
@@ -252,3 +253,28 @@ class TestSSMTWorkItem(ITestWithPersistence):
                                  analyzers=analyzers)
         # Analyze
         manager.analyze()
+
+    def test_get_wi_with_query_criteria_1(self):
+        wi_id = '5e2fc03d-2162-ea11-a2bf-f0921c167862'
+
+        cols = ["id", "name", "asset_collection_id"]
+        children = ["tags", "files"]
+
+        platform = Platform('COMPS2')
+        wi = platform.get_item(wi_id, ItemType.WORKFLOW_ITEM, columns=cols, children=children)
+        self.assertIsNotNone(wi.item_name)
+        self.assertIsNotNone(wi.asset_collection_id)
+        self.assertIsNotNone(wi.tags)
+        self.assertIsNotNone(wi.user_files)
+
+    def test_get_wi_with_query_criteria_2(self):
+        wi_id = '5e2fc03d-2162-ea11-a2bf-f0921c167862'
+
+        cols = ["id", "name"]
+        children = []
+
+        platform = Platform('COMPS2')
+        wi = platform.get_item(wi_id, ItemType.WORKFLOW_ITEM, columns=cols, children=children)
+        self.assertIsNone(wi.asset_collection_id)
+        self.assertIsNone(wi.tags)
+        self.assertIsNone(wi.user_files)

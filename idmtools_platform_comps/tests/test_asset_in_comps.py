@@ -1,7 +1,6 @@
 import json
 import os
 import unittest
-import uuid
 
 import pytest
 from COMPS.Data import Experiment as COMPSExperiment, AssetCollection as CompsAssetCollection

@@ -5,9 +5,9 @@ from logging import getLogger, DEBUG
 from multiprocessing.pool import Pool
 from typing import NoReturn, List, Dict
 from uuid import UUID
-
 from idmtools.analysis.map_worker_entry import map_item
-from idmtools.core import CacheEnabled
+from idmtools.core.cache_enabled import CacheEnabled
+from idmtools.core.enums import EntityStatus
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.ianalyzer import TAnalyzer
 from idmtools.entities.iplatform import IPlatform
@@ -49,12 +49,14 @@ class AnalyzeManager(CacheEnabled):
 
     def __init__(self, platform: IPlatform, configuration=None, ids=None, analyzers=None, working_dir=os.getcwd(),
                  partial_analyze_ok=False, max_items=None, verbose=True, force_manager_working_directory=False,
-                 exclude_ids=None):
+                 exclude_ids=None, analyze_failed_items=False):
         super().__init__()
         self.configuration = configuration or {}
         self.platform = platform
         self.max_processes = self.configuration.get('max_threads', os.cpu_count())
         logger.debug(f'AnalyzeManager set to {self.max_processes}')
+
+        self.analyze_failed_items = analyze_failed_items
 
         # analyze at most this many items, regardless of how many have been given
         self.max_items_to_analyze = max_items
@@ -125,7 +127,10 @@ class AnalyzeManager(CacheEnabled):
             if item.succeeded:
                 can_analyze[item.uid] = item
             else:
-                cannot_analyze[item.uid] = item
+                if self.analyze_failed_items and item.status == EntityStatus.FAILED:
+                    can_analyze[item.uid] = item
+                else:
+                    cannot_analyze[item.uid] = item
 
         # now consider item limiting arguments
         if self.partial_analyze_ok:

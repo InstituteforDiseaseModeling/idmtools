@@ -1,6 +1,7 @@
 import ast
 import dataclasses
 import typing
+<<<<<<< HEAD
 
 from idmtools.core import ExperimentNotFound, UUID, ItemType
 from idmtools.services.experiments import ExperimentPersistService
@@ -26,6 +27,8 @@ def retrieve_experiment(experiment_id: UUID, platform: 'IPlatform' = None, with_
         experiment.refresh_simulations()
 
     return experiment
+=======
+>>>>>>> e7b34ab804c26378190b2c54af1b1dc306a4e7de
 
 
 def get_dataclass_common_fields(src, dest, exclude_none: bool = True) -> typing.Dict:

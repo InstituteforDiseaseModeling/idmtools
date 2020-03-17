@@ -12,15 +12,18 @@ from urllib.parse import urlparse
 BASE_REPO = 'packages.idmod.org'
 REPO_KEY = 'idm-docker-staging'
 DOCKER_REPO = f'{REPO_KEY}.{BASE_REPO}'
-IMAGE_NAME = 'idmtools_comps_ssmt_worker'
+IMAGE_NAME = 'idmtools/comps_ssmt_worker'
 BASE_IMAGE_NAME = f'{DOCKER_REPO}/{IMAGE_NAME}'
 
 base_version = open('../VERSION').read().strip()
+
+print("Please be sure you are logged into the docker-production.packages.idmod.org Docker Repo")
 
 # determine next version by querying artifactory
 if 'bamboo_UserArtifactory' in os.environ:
     username = os.environ['bamboo_UserArtifactory']
 else:
+    print("Username:")
     username = input('Username:')
 if 'bamboo_PasswordArtifactory' in os.environ:
     password = os.environ['bamboo_PasswordArtifactory']
