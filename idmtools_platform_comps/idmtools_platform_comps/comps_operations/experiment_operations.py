@@ -70,7 +70,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
                                 '\\', '/'),
                             executable_path=executable_path,
                             node_group_name=self.platform.node_group,
-                            maximum_number_of_retries=self.platform.num_retires,
+                            maximum_number_of_retries=self.platform.num_retries,
                             priority=self.platform.priority if priority is None else priority,
                             min_cores=self.platform.num_cores if num_cores is None else num_cores,
                             max_cores=self.platform.num_cores if num_cores is None else num_cores,
