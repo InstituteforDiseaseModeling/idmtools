@@ -41,28 +41,14 @@ When setting up your environment for the first time, you can use the following i
    On Unix(Mac/Linux) you can use venv or virtualenv
 3) Activate the virtualenv
 4) If you are on windows, run `pip install py-make --upgrade --force-reinstall`
-<<<<<<< HEAD
-<<<<<<< HEAD
-5) Run `docker login idm-docker-staging.idmod.org`
-=======
 5) Run `docker login docker-staging.idmod.org`
->>>>>>> e7b34ab804c26378190b2c54af1b1dc306a4e7de
-=======
-5) Run `docker login docker-staging.idmod.org`
->>>>>>> a8289087eb0fc6076ae3f15a013a510ed3939c8f
 6) Then run `python dev_scripts/bootstrap.py`. This will install all the tools. 
 
 ### General Use
 After the first install almost everything you need as a developer is part of the makefiles. There is a Makefile is every project directory. There is also a makefile at the top-level of the project.
-<<<<<<< HEAD
 
 To use the makefiles you can explore the available commands by running `make help`. On Windows, use `pymake help` 
 
-=======
-
-To use the makefiles you can explore the available commands by running `make help`. On Windows, use `pymake help` 
-
->>>>>>> e7b34ab804c26378190b2c54af1b1dc306a4e7de
 Here are a list of common commands
 
 ```bash
