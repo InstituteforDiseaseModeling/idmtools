@@ -255,8 +255,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         analyzers = [DownloadAnalyzer(filenames=out_filenames, output_path=local_output_path)]
 
         # Specify the id Type, in this case an WorkItem on COMPS
-        manager = AnalyzeManager(configuration={}, partial_analyze_ok=True, platform=self.platform,
-                                 ids=[(wi.uid, ItemType.WORKFLOW_ITEM)],
+        manager = AnalyzeManager(platform=self.platform, ids=[(wi.uid, ItemType.WORKFLOW_ITEM)],
                                  analyzers=analyzers)
         # Analyze
         manager.analyze()
