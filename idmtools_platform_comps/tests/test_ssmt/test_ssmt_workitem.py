@@ -146,9 +146,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         self.assertEqual(execution['Command'],
                          "python Assets/run_multiple_exps.py " + exp_id1 + " " + exp_id2)
 
-    @pytest.mark.skip
     @pytest.mark.comps
-    # TODO: Issue 663 - SSMT PlatformAnalysis cannot put 2 analyzers in same file as main entry
     def test_ssmt_seir_model_analysis_single_script(self):
         exp_id = 'a980f265-995e-ea11-a2bf-f0921c167862'  # comps2 staging exp id
 
