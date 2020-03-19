@@ -482,12 +482,11 @@ class TestPythonExperiment(ITestWithPersistence):
         # ------------------------------------------------------
         # First load custom assets using the utility
         # ------------------------------------------------------
-        platform = Platform('COMPS2')
         requirements_path = os.path.join(COMMON_INPUT_PATH, "python", "ye_seir_model", "Assets", "requirements.txt")
-        ac_lib = RequirementsToAssetCollection(platform, requirements_path=requirements_path)
+        ac_lib = RequirementsToAssetCollection(self.platform, requirements_path=requirements_path)
 
         ac_id = ac_lib.run()
-        custom_ac = AssetCollection.from_id(ac_id, platform=platform)
+        custom_ac = AssetCollection.from_id(ac_id, platform=self.platform)
         # ------------------------------------------------------
         # Run the experiment
         # ------------------------------------------------------
@@ -532,8 +531,8 @@ class TestPythonExperiment(ITestWithPersistence):
                                               assets=AssetCollection.from_directory(assets_path))
 
         # set platform and run simulations
-        platform.run_items(experiment)
-        platform.wait_till_done(experiment)
+        self.platform.run_items(experiment)
+        self.platform.wait_till_done(experiment)
 
         # check experiment status
         wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)
