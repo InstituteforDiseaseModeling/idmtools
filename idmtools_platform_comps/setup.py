@@ -52,20 +52,10 @@ setup(
     test_suite='tests',
     entry_points=dict(idmtools_platform=  # noqa: E251
                       ["idmtools_platform_comps = idmtools_platform_comps.plugin_info:COMPSPlatformSpecification",
-<<<<<<< HEAD
-                       "idmtools_platform_ssmt = idmtools_platform_comps.plugin_info:SSMTPlatformSpecification"],
-                      idmtools_platform_cli=  # noqa: E251
-                      ["idmtools_platform_cli_comps = idmtools_platform_comps.comps_cli:COMPSCLISpecification"]
-                      ),
-    extras_require=extras,
-    url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='0.3.0+nightly',
-=======
                        "idmtools_platform_ssmt = idmtools_platform_comps.plugin_info:SSMTPlatformSpecification"]
                       ),
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='1.0.0',
->>>>>>> e7b34ab804c26378190b2c54af1b1dc306a4e7de
+    version='1.0.0+nightly',
     zip_safe=False,
 )

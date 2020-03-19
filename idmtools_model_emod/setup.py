@@ -59,10 +59,6 @@ setup(
     test_suite='tests',
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-<<<<<<< HEAD
-    version='0.3.0+nightly',
-=======
     version='1.0.0',
->>>>>>> e7b34ab804c26378190b2c54af1b1dc306a4e7de
     zip_safe=False,
 )
