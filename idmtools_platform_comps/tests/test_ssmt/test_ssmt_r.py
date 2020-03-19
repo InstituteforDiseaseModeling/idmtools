@@ -2,6 +2,7 @@ import os
 import sys
 import pytest
 import json
+
 from idmtools_test import COMMON_INPUT_PATH
 
 from idmtools.core.platform_factory import Platform
@@ -9,7 +10,7 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools.assets.file_list import FileList
 from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
 from idmtools.core import ItemType
-from idmtools_core.idmtools.utils.dropbox_location import get_dropbox_location
+from idmtools.utils.dropbox_location import get_dropbox_location
 from idmtools_test.utils.utils import del_folder
 
 

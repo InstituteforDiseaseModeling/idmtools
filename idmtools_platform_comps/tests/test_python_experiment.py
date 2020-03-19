@@ -26,6 +26,7 @@ from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id,
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import \
     RequirementsToAssetCollection
+from idmtools_test.utils.shared_functions import validate_output, validate_sim_tags
 
 setA = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
 setB = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="b")
@@ -78,10 +79,10 @@ class TestPythonExperiment(ITestWithPersistence):
         # exp_id = "a727e802-d88b-e911-a2bb-f0921c167866"
 
         # validation each simulation output to compare output/config.json is equal to config.json
-        self.validate_output(exp_id, 4)
+        validate_output(self,exp_id, 4)
 
         expected_tags = [{'a': '0', 'b': '1'}, {'a': '0', 'b': '9'}, {'a': '1', 'b': '1'}, {'a': '1', 'b': '9'}]
-        self.validate_sim_tags(exp_id, expected_tags)
+        validate_sim_tags(self, exp_id, expected_tags)
 
         # validate experiment tags
         actual_exp_tags = experiment.get(experiment.id, QueryCriteria().select_children('tags')).tags
@@ -117,11 +118,11 @@ class TestPythonExperiment(ITestWithPersistence):
         experiment = COMPSExperiment.get(e.uid)
         print(experiment.id)
         exp_id = experiment.id
-        self.validate_output(exp_id, 5)
+        validate_output(self, exp_id, 5)
 
         # validate b is not in tag since it is not sweep parameter, it just depend on sweep parameter
         expected_tags = [{'a': '0'}, {'a': '1'}, {'a': '2'}, {'a': '3'}, {'a': '4'}]
-        self.validate_sim_tags(exp_id, expected_tags)
+        validate_sim_tags(self, exp_id, expected_tags)
 
     @pytest.mark.long
     @pytest.mark.comps
@@ -319,10 +320,10 @@ class TestPythonExperiment(ITestWithPersistence):
 
         wait_on_experiment_and_check_all_sim_status(self, e, self.platform)
         exp_id = e.uid
-        self.validate_output(exp_id, 6)
+        validate_output(self, exp_id, 6)
         expected_tags = [{'a': '1', 'b': '2', 'c': '4'}, {'a': '1', 'b': '2', 'c': '5'}, {'a': '1', 'b': '3', 'c': '4'},
                          {'a': '1', 'b': '3', 'c': '5'}, {'a': '6', 'b': '2'}, {'a': '7', 'b': '2'}]
-        self.validate_sim_tags(exp_id, expected_tags)
+        validate_sim_tags(self, exp_id, expected_tags)
 
     @pytest.mark.comps
     def test_duplicate_asset_files_not_allowed(self):
@@ -541,17 +542,6 @@ class TestPythonExperiment(ITestWithPersistence):
         exp_id = experiment.id
         self.validate_custom_output(exp_id, 2)
 
-    def validate_output(self, exp_id, expected_sim_count):
-        sim_count = 0
-        for simulation in COMPSExperiment.get(exp_id).get_simulations():
-            sim_count = sim_count + 1
-            result_file_string = simulation.retrieve_output_files(paths=['output/result.json'])
-            print(result_file_string)
-            config_string = simulation.retrieve_output_files(paths=['config.json'])
-            print(config_string)
-            self.assertEqual(result_file_string, config_string)
-
-        self.assertEqual(sim_count, expected_sim_count)
 
     def validate_custom_output(self, exp_id, expected_sim_count):
         sim_count = 0
@@ -563,15 +553,6 @@ class TestPythonExperiment(ITestWithPersistence):
             self.assertEqual(len(expected_csv_output_2), 1)
 
         self.assertEqual(sim_count, expected_sim_count)
-
-    def validate_sim_tags(self, exp_id, expected_tags):
-        tags = []
-        for simulation in COMPSExperiment.get(exp_id).get_simulations():
-            tags.append(simulation.get(simulation.id, QueryCriteria().select_children('tags')).tags)
-
-        sorted_tags = sorted(tags, key=itemgetter('a'))
-        sorted_expected_tags = sorted(expected_tags, key=itemgetter('a'))
-        self.assertEqual(sorted_tags, sorted_expected_tags)
 
     def validate_assets(self, assets, expected_list):
         actual_list = []

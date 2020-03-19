@@ -1,31 +1,21 @@
-import copy
-import json
 import os
-import sys
-import unittest
 from functools import partial
-from operator import itemgetter
-from typing import Any, Dict
+from typing import Dict
 
 import pytest
-from COMPS.Data import Experiment as COMPSExperiment, AssetCollection as COMPSAssetCollection
+from COMPS.Data import Experiment as COMPSExperiment
 from COMPS.Data import QueryCriteria
 from idmtools import __version__
-from idmtools.assets import Asset, AssetCollection
-from idmtools.builders import ArmSimulationBuilder, ArmType, SimulationBuilder, StandAloneSimulationsBuilder, SweepArm
-from idmtools.core import ItemType
+from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools_test.utils.common_experiments import get_model1_templated_experiment, get_model_py_templated_experiment, \
-    wait_on_experiment_and_check_all_sim_status
-from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id
+from idmtools_test.utils.common_experiments import wait_on_experiment_and_check_all_sim_status
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import \
-    RequirementsToAssetCollection
+from idmtools_test.utils.shared_functions import validate_sim_tags, validate_output
 
 setA = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
 setB = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="b")
@@ -76,10 +66,10 @@ class TestCOMPSSlurmExperiment(ITestWithPersistence):
         # exp_id = "a727e802-d88b-e911-a2bb-f0921c167866"
 
         # validation each simulation output to compare output/config.json is equal to config.json
-        self.validate_output(exp_id, 4)
+        validate_output(self, exp_id, 4)
 
         expected_tags = [{'a': '0', 'b': '1'}, {'a': '0', 'b': '9'}, {'a': '1', 'b': '1'}, {'a': '1', 'b': '9'}]
-        self.validate_sim_tags(exp_id, expected_tags)
+        validate_sim_tags(self, exp_id, expected_tags)
 
         # validate experiment tags
         actual_exp_tags = experiment.get(experiment.id, QueryCriteria().select_children('tags')).tags
