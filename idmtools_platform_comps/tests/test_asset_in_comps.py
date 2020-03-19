@@ -72,7 +72,7 @@ class TestAssetsInComps(unittest.TestCase):
         ac = AssetCollection()
         ac.add_asset(a)
         ac.add_asset(b)
-        ac.set_tags = {"string_tag": "testACtag", "number_tag": 123, "KeyOnly": None}
+        ac.tags = {"string_tag": "testACtag", "number_tag": 123, "KeyOnly": None}
 
         model_path = os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py")
 

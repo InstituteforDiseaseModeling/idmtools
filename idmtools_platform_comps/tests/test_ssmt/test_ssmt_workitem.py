@@ -246,9 +246,8 @@ class TestSSMTWorkItem(ITestWithPersistence):
         from idmtools_core.idmtools.analysis.csv_analyzer import CSVAnalyzer
         analyzers = [CSVAnalyzer(filenames=out_filenames)]
 
-        platform = Platform('COMPS2')
         # Specify the id Type, in this case an WorkItem on COMPS
-        manager = AnalyzeManager(configuration={}, partial_analyze_ok=True, platform=platform,
+        manager = AnalyzeManager(configuration={}, partial_analyze_ok=True, platform=self.platform,
                                  ids=[(wi.uid, ItemType.WORKFLOW_ITEM)],
                                  analyzers=analyzers)
         # Analyze
@@ -260,8 +259,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         cols = ["id", "name", "asset_collection_id"]
         children = ["tags", "files"]
 
-        platform = Platform('COMPS2')
-        wi = platform.get_item(wi_id, ItemType.WORKFLOW_ITEM, columns=cols, children=children)
+        wi = self.platform.get_item(wi_id, ItemType.WORKFLOW_ITEM, columns=cols, children=children)
         self.assertIsNotNone(wi.item_name)
         self.assertIsNotNone(wi.asset_collection_id)
         self.assertIsNotNone(wi.tags)
@@ -273,8 +271,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         cols = ["id", "name"]
         children = []
 
-        platform = Platform('COMPS2')
-        wi = platform.get_item(wi_id, ItemType.WORKFLOW_ITEM, columns=cols, children=children)
+        wi = self.platform.get_item(wi_id, ItemType.WORKFLOW_ITEM, columns=cols, children=children)
         self.assertIsNone(wi.asset_collection_id)
         self.assertIsNone(wi.tags)
         self.assertIsNone(wi.user_files)

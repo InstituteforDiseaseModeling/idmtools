@@ -429,7 +429,7 @@ class TestPythonExperiment(ITestWithPersistence):
             open(os.path.join(assets_path, "templates", 'config.json'),
                  'r'))
         parameters[ConfigParameters.Base_Infectivity_Distribution] = ConfigParameters.GAUSSIAN_DISTRIBUTION
-        task = JSONConfiguredPythonTask(python_path='python3', script_path=script_path, parameters=parameters,
+        task = JSONConfiguredPythonTask(script_path=script_path, parameters=parameters,
                                         config_file_name='config.json')
         task.command.add_option("--duration", 40)
 
@@ -466,14 +466,15 @@ class TestPythonExperiment(ITestWithPersistence):
         experiment.assets.add_directory(assets_directory=assets_path)
 
         # set platform and run simulations
-        platform = Platform('COMPS2')
-        platform.run_items(experiment)
-        platform.wait_till_done(experiment)
+        self.platform.run_items(experiment)
+        self.platform.wait_till_done(experiment)
 
-        # check experiment status and only move to analyzer test if experiment succeeded
-        if not experiment.succeeded:
-            print(f"Experiment {experiment.uid} failed.\n")
-            sys.exit(-1)
+        # check experiment status
+        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)
+
+        # validate sim outputs
+        exp_id = experiment.id
+        self.validate_custom_output(exp_id, 2)
 
     @pytest.mark.long
     @pytest.mark.comps
@@ -534,10 +535,12 @@ class TestPythonExperiment(ITestWithPersistence):
         platform.run_items(experiment)
         platform.wait_till_done(experiment)
 
-        # check experiment status and only move to analyzer test if experiment succeeded
-        if not experiment.succeeded:
-            print(f"Experiment {experiment.uid} failed.\n")
-            sys.exit(-1)
+        # check experiment status
+        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)
+
+        # validate sim outputs
+        exp_id = experiment.id
+        self.validate_custom_output(exp_id, 2)
 
     def validate_output(self, exp_id, expected_sim_count):
         sim_count = 0
@@ -548,6 +551,17 @@ class TestPythonExperiment(ITestWithPersistence):
             config_string = simulation.retrieve_output_files(paths=['config.json'])
             print(config_string)
             self.assertEqual(result_file_string, config_string)
+
+        self.assertEqual(sim_count, expected_sim_count)
+
+    def validate_custom_output(self, exp_id, expected_sim_count):
+        sim_count = 0
+        for simulation in COMPSExperiment.get(exp_id).get_simulations():
+            sim_count = sim_count + 1
+            expected_csv_output_1 = simulation.retrieve_output_files(paths=['output/individual.csv'])
+            expected_csv_output_2 = simulation.retrieve_output_files(paths=['output/node.csv'])
+            self.assertEqual(len(expected_csv_output_1), 1)
+            self.assertEqual(len(expected_csv_output_2), 1)
 
         self.assertEqual(sim_count, expected_sim_count)
 
