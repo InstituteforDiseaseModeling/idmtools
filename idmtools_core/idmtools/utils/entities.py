@@ -3,6 +3,7 @@ import dataclasses
 import typing
 <<<<<<< HEAD
 
+<<<<<<< HEAD
 from idmtools.core import ExperimentNotFound, UUID, ItemType
 from idmtools.services.experiments import ExperimentPersistService
 
@@ -30,6 +31,8 @@ def retrieve_experiment(experiment_id: UUID, platform: 'IPlatform' = None, with_
 =======
 >>>>>>> e7b34ab804c26378190b2c54af1b1dc306a4e7de
 
+=======
+>>>>>>> a8289087eb0fc6076ae3f15a013a510ed3939c8f
 
 def get_dataclass_common_fields(src, dest, exclude_none: bool = True) -> typing.Dict:
     """
