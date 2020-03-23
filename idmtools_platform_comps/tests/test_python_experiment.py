@@ -419,6 +419,16 @@ class TestPythonExperiment(ITestWithPersistence):
     @pytest.mark.long
     @pytest.mark.comps
     def test_seir_model_experiment(self):
+        # Define some constant string used in this example
+        class ConfigParameters:
+            Infectious_Period_Constant = "Infectious_Period_Constant"
+            Base_Infectivity_Constant = "Base_Infectivity_Constant"
+            Base_Infectivity_Distribution = "Base_Infectivity_Distribution"
+            GAUSSIAN_DISTRIBUTION = "GAUSSIAN_DISTRIBUTION"
+            Base_Infectivity_Gaussian_Mean = "Base_Infectivity_Gaussian_Mean"
+            Base_Infectivity_Gaussian_Std_Dev = "Base_Infectivity_Gaussian_Std_Dev"
+
+
         # ------------------------------------------------------
         # First run the experiment
         # ------------------------------------------------------
@@ -477,73 +487,6 @@ class TestPythonExperiment(ITestWithPersistence):
         exp_id = experiment.id
         self.validate_custom_output(exp_id, 2)
 
-    @pytest.mark.long
-    @pytest.mark.comps
-    def test_ssmt_seir_model_exp_with_load_ac_utility(self):
-        # ------------------------------------------------------
-        # First load custom assets using the utility
-        # ------------------------------------------------------
-        requirements_path = os.path.join(COMMON_INPUT_PATH, "python", "ye_seir_model", "Assets", "requirements.txt")
-        ac_lib = RequirementsToAssetCollection(self.platform, requirements_path=requirements_path)
-
-        ac_id = ac_lib.run()
-        custom_ac = AssetCollection.from_id(ac_id, platform=self.platform)
-        # ------------------------------------------------------
-        # Run the experiment
-        # ------------------------------------------------------
-        script_path = os.path.join(COMMON_INPUT_PATH, "python", "ye_seir_model", "Assets", "SEIR_model.py")
-        assets_path = os.path.join(COMMON_INPUT_PATH, "python", "ye_seir_model", "Assets")
-        tags = {"idmtools": "idmtools-automation", "simulation_name_tag": "SEIR_Model"}
-
-        with open(os.path.join(assets_path, 'templates', 'config.json'), 'r') as f:
-            parameters = json.load(f)
-            parameters[ConfigParameters.Base_Infectivity_Distribution] = ConfigParameters.GAUSSIAN_DISTRIBUTION
-        task = JSONConfiguredPythonTask(script_path=script_path, parameters=parameters, config_file_name='config.json',
-                                        common_assets=custom_ac)
-        task.command.add_option("--duration", 40)
-
-        # now create a TemplatedSimulation builder
-        ts = TemplatedSimulations(base_task=task)
-        ts.base_simulation.tags['simulation_name_tag'] = "SEIR_Model"
-
-        # now define our sweeps
-        builder = SimulationBuilder()
-
-        # utility function to update parameters
-        def param_update(simulation: Simulation, param: str, value: Any) -> Dict[str, Any]:
-            return simulation.task.set_parameter(param, value)
-
-        set_base_infectivity_gaussian_mean = partial(param_update,
-                                                     param=ConfigParameters.Base_Infectivity_Gaussian_Mean)
-
-        class setParam:
-            def __init__(self, param):
-                self.param = param
-
-            def __call__(self, simulation, value):
-                return simulation.task.set_parameter(self.param, value)
-
-        builder.add_sweep_definition(setParam(ConfigParameters.Base_Infectivity_Gaussian_Std_Dev), [0.3, 1])
-
-        ts.add_builder(builder)
-        ts.tags = tags
-
-        # now we can create our experiment using our template builder
-        experiment = Experiment.from_template(ts, name=self.case_name,
-                                              assets=AssetCollection.from_directory(assets_path))
-
-        # set platform and run simulations
-        self.platform.run_items(experiment)
-        self.platform.wait_till_done(experiment)
-
-        # check experiment status
-        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)
-
-        # validate sim outputs
-        exp_id = experiment.id
-        self.validate_custom_output(exp_id, 2)
-
-
     def validate_custom_output(self, exp_id, expected_sim_count):
         sim_count = 0
         for simulation in COMPSExperiment.get(exp_id).get_simulations():
@@ -565,17 +508,6 @@ class TestPythonExperiment(ITestWithPersistence):
         expected_list_sorted = sorted(expected_list, key=itemgetter('filename', 'relative_path'))
         actual_list_sorted = sorted(actual_list, key=itemgetter('filename', 'relative_path'))
         self.assertEqual(expected_list_sorted, actual_list_sorted)
-
-
-# Define some constant string used in this example
-class ConfigParameters:
-    Infectious_Period_Constant = "Infectious_Period_Constant"
-    Base_Infectivity_Constant = "Base_Infectivity_Constant"
-    Base_Infectivity_Distribution = "Base_Infectivity_Distribution"
-    GAUSSIAN_DISTRIBUTION = "GAUSSIAN_DISTRIBUTION"
-    Base_Infectivity_Gaussian_Mean = "Base_Infectivity_Gaussian_Mean"
-    Base_Infectivity_Gaussian_Std_Dev = "Base_Infectivity_Gaussian_Std_Dev"
-
 
 if __name__ == '__main__':
     unittest.main()
