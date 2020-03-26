@@ -27,6 +27,8 @@ else
 fi
 cat ~/.pypirc
 
+export TWINE_USERNAME="${bamboo_UserArtifactory}"
+export TWINE_PASSWORD="${$bamboo_PasswordArtifactory}"
 echo "Login to docker"
 docker login idm-docker-staging.packages.idmod.org -u "${bamboo_UserArtifactory}" -p "${bamboo_PasswordArtifactory}"
 
