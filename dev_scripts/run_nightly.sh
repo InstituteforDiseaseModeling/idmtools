@@ -15,21 +15,22 @@ pip install py-make twine bump2version twine
 echo "Setting up pypirc"
 cp "${SRC_DIR}/.pypirc" ~/.pypirc
 cat ~/.pypirc
-echo "Replacing <username> with ${bamboo_UserArtifactory@Q}"
+echo "Replacing <username> with ${bamboo_UserArtifactory}"
 sed -i "s|<username>|${bamboo_UserArtifactory}|" ~/.pypirc
 # we could end up with characters in our password that conflict with our sed replacement
 # instead of trying to escape, which bash is not good at, we just check for a series of characters
 # presence and then use an appriote sed expression
 if [[ "$bamboo_PasswordArtifactory" == *"|"* ]]; then
-  sed -i "s/<password>/${bamboo_PasswordArtifactory@Q}/" ~/.pypirc
+  sed -i "s/<password>/${bamboo_PasswordArtifactory}/" ~/.pypirc
 else
-  sed -i "s|<password>|${bamboo_PasswordArtifactory@Q}|" ~/.pypirc
+  sed -i "s|<password>|${bamboo_PasswordArtifactory}|" ~/.pypirc
 fi
+cat ~/.pypirc
 
 echo "Login to docker"
-docker login idm-docker-staging.packages.idmod.org -u "${bamboo_UserArtifactory@Q}" -p "${bamboo_PasswordArtifactory@Q}"
+docker login idm-docker-staging.packages.idmod.org -u "${bamboo_UserArtifactory}" -p "${bamboo_PasswordArtifactory@Q}"
 
-export STAGING_PIP_URL=https://$(urlencode ${bamboo_UserArtifactory@Q}):$(urlencode ${bamboo_PasswordArtifactory@Q})@packages.idmod.org/api/pypi/idm-pypi-staging/simple
+export STAGING_PIP_URL=https://$(urlencode ${bamboo_UserArtifactory}):$(urlencode ${bamboo_PasswordArtifactory})@packages.idmod.org/api/pypi/idm-pypi-staging/simple
 echo "Release to staging"
 pymake release-staging
 
