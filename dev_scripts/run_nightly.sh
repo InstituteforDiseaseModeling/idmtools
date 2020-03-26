@@ -28,7 +28,7 @@ fi
 cat ~/.pypirc
 
 echo "Login to docker"
-docker login idm-docker-staging.packages.idmod.org -u "${bamboo_UserArtifactory}" -p "${bamboo_PasswordArtifactory@Q}"
+docker login idm-docker-staging.packages.idmod.org -u "${bamboo_UserArtifactory}" -p "${bamboo_PasswordArtifactory}"
 
 export STAGING_PIP_URL=https://$(urlencode ${bamboo_UserArtifactory}):$(urlencode ${bamboo_PasswordArtifactory})@packages.idmod.org/api/pypi/idm-pypi-staging/simple
 echo "Release to staging"
