@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """The setup script for the idmtools_models platform, core tools for other models such as Python and R models."""
+import sys
 
 from setuptools import setup, find_packages
 
@@ -16,6 +17,10 @@ setup_requirements = []
 test_requirements = ['pytest', 'pytest-runner', 'pytest-timeout', 'pytest-cache'] + build_requirements
 
 extras = dict(test=test_requirements, packaging=build_requirements)
+
+# check for python 3.7
+if sys.version_info[0] == 3 and sys.version_info[1] == 7 and sys.version_info[2] < 3:
+    raise EnvironmentError("Python 3.7 requires 3.7.3 or higher")
 
 authors = [
     ("Ross Carter", "rcarter@idmod.org"),
@@ -57,6 +62,6 @@ setup(
     test_suite='tests',
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='0.3.0+nightly',
+    version='1.0.0+nightly',
     zip_safe=False,
 )

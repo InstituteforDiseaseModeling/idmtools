@@ -124,7 +124,7 @@ class TestConfig(ITestWithPersistence):
     def test_idmtools_path(self, login_mock):
         IdmConfigParser(os.path.join(COMMON_INPUT_PATH, "configuration"), "idmtools_test.ini")
         platform = Platform('COMPS')
-        self.assertEqual(platform.num_retires, int(IdmConfigParser.get_option('COMPS', 'num_retires')))
+        self.assertEqual(platform.num_retries, int(IdmConfigParser.get_option('COMPS', 'num_retries')))
 
         file_path = os.path.join(COMMON_INPUT_PATH, "configuration", "idmtools_test.ini")
         self.assertEqual(IdmConfigParser.get_config_path(), os.path.abspath(file_path))
