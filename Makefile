@@ -4,6 +4,7 @@ PY=python
 PDS=$(PY) dev_scripts/
 MAKEALL=$(PDS)run_pymake_on_all.py
 PDR=$(PDS)run.py
+CLDIR=$(PDS)clean_dir.py
 
 help:
 	$(PDS)get_help_from_makefile.py
@@ -11,10 +12,13 @@ help:
 clean: ## Clean all our jobs
 	$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
 	$(MAKEALL) --parallel clean
+	$(CLDIR) --file-patterns "**/*.log"
+
 
 clean-all: ## Clean all our jobs
 	$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
 	$(MAKEALL) --parallel clean-all
+	$(CLDIR) --file-patterns "**/*.buildlog"
 
 setup-dev:  ## Setup packages in dev mode
 	python dev_scripts/bootstrap.py
