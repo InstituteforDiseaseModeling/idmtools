@@ -14,6 +14,7 @@ pip install py-make twine bump2version twine
 
 echo "Setting up pypirc"
 cp "${SRC_DIR}/.pypirc" ~/.pypirc
+cat ~/.pypirc
 echo "Replacing <username> with ${bamboo_UserArtifactory@Q}"
 sed -i "s|<username>|${bamboo_UserArtifactory}|" ~/.pypirc
 # we could end up with characters in our password that conflict with our sed replacement
