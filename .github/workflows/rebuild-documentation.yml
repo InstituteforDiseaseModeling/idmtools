@@ -28,6 +28,6 @@ jobs:
             build-command: "make latexpdf"
       - name: Upload Documentation Artifacts
         uses: actions/upload-artifact@v1
-          with:
-            name: DocumentationHTML
-            path: Documentation/idm-tools/_build/html/
+        with:
+          name: DocumentationHTML
+          path: Documentation/idm-tools/_build/html/
