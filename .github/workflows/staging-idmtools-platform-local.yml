@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v2
       # build the UI First
       - uses: borales/actions-yarn@v2.0.0
-          working-directory: idmtools_platform_local/idmtools_webui
+        working-directory: idmtools_platform_local/idmtools_webui
           with:
             cmd: install # will run `yarn install` command
       - uses: borales/actions-yarn@v2.0.0
