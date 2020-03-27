@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v2
       # build the UI First
       - name: Install NPM Packages
-        uses: bahmutov/npm-install@1
+        uses: bahmutov/npm-install@v1.4.0
         with:
           working-directory: idmtools_platform_local/idmtools_webui
       - name: Build UI
