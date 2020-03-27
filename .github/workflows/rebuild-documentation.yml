@@ -14,18 +14,14 @@ jobs:
       - name: Checkout Documentation
         uses: actions/checkout@v2
         with:
-          repository: git@github.com:InstituteforDiseaseModeling/Documentation.git
+          repository: InstituteforDiseaseModeling/Documentation
           path: 'Documentation'
           token: ${{ secrets.IDMTOOLS_TOKEN }}
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install sphinx-rtd-theme sphinxcontrib-napoleon beautifulsoup4
       - name: Install dependencies
         uses: ammaraskar/sphinx-action@master
         with:
           docs-folder: "Documentation/"
-          pre-build-command: "apt-get update -y && apt-get install -y latexmk texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended plantuml"
+          pre-build-command: "apt-get update -y && apt-get install -y latexmk texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended plantuml && pip install sphinx-rtd-theme sphinxcontrib-napoleon beautifulsoup4"
           build-command: "make latexpdf"
       - name: Upload Documentation Artifacts
         uses: actions/upload-artifact@v1
