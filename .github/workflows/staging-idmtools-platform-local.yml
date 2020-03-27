@@ -19,8 +19,8 @@ jobs:
       # build the UI First
       - name: Install NPM Packages
         uses: bahmutov/npm-install@1.4.0
-          with:
-            working-directory: idmtools_platform_local/idmtools_webui
+        with:
+          working-directory: idmtools_platform_local/idmtools_webui
       - name: Build UI
         run: react-scripts build
         working-directory: idmtools_platform_local/idmtools_webui
