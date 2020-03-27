@@ -17,14 +17,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       # build the UI First
-      - uses: borales/actions-yarn@v2.0.0
-        with:
-          working-directory: idmtools_platform_local/idmtools_webui
-          cmd: install # will run `yarn install` command
-      - uses: borales/actions-yarn@v2.0.0
-        with:
-          working-directory: idmtools_platform_local/idmtools_webui
-          cmd: build # will run `yarn build` command
+      - name: Install NPM Packages
+        uses: bahmutov/npm-install@1.4.0
+          with:
+            working-directory: idmtools_platform_local/idmtools_webui
+      - name: Build UI
+        run: react-scripts build
+        working-directory: idmtools_platform_local/idmtools_webui
       # Now that the UI has been built, remove existing UI
       - name: Removing existing UI
         run: rm -rf idmtools_platform_local/idmtools_platform_local/internals/ui/static/*
