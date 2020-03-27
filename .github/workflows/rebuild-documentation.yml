@@ -22,10 +22,10 @@ jobs:
           pip install sphinx-rtd-theme sphinxcontrib-napoleon beautifulsoup4
       - name: Install dependencies
         uses: ammaraskar/sphinx-action@master
-          with:
-            docs-folder: "Documentation/"
-            pre-build-command: "apt-get update -y && apt-get install -y latexmk texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended plantuml"
-            build-command: "make latexpdf"
+        with:
+          docs-folder: "Documentation/"
+          pre-build-command: "apt-get update -y && apt-get install -y latexmk texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended plantuml"
+          build-command: "make latexpdf"
       - name: Upload Documentation Artifacts
         uses: actions/upload-artifact@v1
         with:
