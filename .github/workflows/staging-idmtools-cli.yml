@@ -7,7 +7,7 @@ on:
     branches:
       # only run this on
       - dev
-      - 561-night`ly-builds
+      - 561-nightly-builds
     paths:
       - 'idmtools_cli/**'
 
