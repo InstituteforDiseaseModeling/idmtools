@@ -1,3 +1,12 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Development Tips](#development-tips)
+- [Building SSMT Docker Image](#building-ssmt-docker-image)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Development Tips
 
 There is a Makefile file available for most common development tasks. Here is a list of commands
