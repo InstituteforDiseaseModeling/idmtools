@@ -13,4 +13,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: technote-space/toc-generator@v2
-        TARGET_PATHS: .
+        with:
+          TARGET_PATHS: .
