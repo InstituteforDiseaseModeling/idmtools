@@ -13,9 +13,9 @@ jobs:
           path: 'idmtools'
       - name: Checkout Documentation
         uses: actions/checkout@v2
-          with:
-            repository: git@github.com:InstituteforDiseaseModeling/Documentation.git
-            path: 'Documentation'
+        with:
+          repository: git@github.com:InstituteforDiseaseModeling/Documentation.git
+          path: 'Documentation'
       - name: Install dependencies
           run: |
             python -m pip install --upgrade pip
