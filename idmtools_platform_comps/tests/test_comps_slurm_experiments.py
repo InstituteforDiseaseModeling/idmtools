@@ -94,19 +94,15 @@ class TestCOMPSSlurmExperiment(ITestWithPersistence):
         # ye_seir_model assets path
         assets_path = os.path.join(COMMON_INPUT_PATH, "python", "ye_seir_model", "Assets")
 
-        # Create pandas common asset collection in COMPS
-        # pl = RequirementsToAssetCollection(self.platform,
-        #                                    requirements_path=os.path.join(assets_path,
-        #                                                                   "requirements.txt"))
-
-        # TODO: Issue - results in subprocess.CalledProcessError on pip install
         pl = RequirementsToAssetCollection(self.platform,
                                            requirements_path=os.path.join(assets_path, 'requirements.txt'),
                                            pkg_list=['pandas==0.24.2'],
                                            extra_wheels=[os.path.join(assets_path,
                                                                       'dtk_generic_intrahost-0.1.5-cp36-cp36m-linux_x86_64.whl'),
                                                          os.path.join(assets_path,
-                                                                      'dtk_nodedemog-0.1.5-cp36-cp36m-linux_x86_64.whl')])
+                                                                      'dtk_nodedemog-0.1.5-cp36-cp36m-linux_x86_64.whl'),
+                                                         os.path.join(assets_path,
+                                                                      'dtk_vaccine_intervention-0.0.5-cp36-cp36m-linux_x86_64.whl')])
 
         ac_id = pl.run()
         pandas_assets = AssetCollection.from_id(ac_id, platform=self.platform)
