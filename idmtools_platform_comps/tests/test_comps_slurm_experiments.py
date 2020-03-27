@@ -95,23 +95,31 @@ class TestCOMPSSlurmExperiment(ITestWithPersistence):
         assets_path = os.path.join(COMMON_INPUT_PATH, "python", "ye_seir_model", "Assets")
 
         # Create pandas common asset collection in COMPS
-        # TODO: Need a requirements to ac for linux for SLURM - this won't work
         # pl = RequirementsToAssetCollection(self.platform,
         #                                    requirements_path=os.path.join(assets_path,
         #                                                                   "requirements.txt"))
 
-        # ac_id = pl.run()
-        # pandas_assets = AssetCollection.from_id(ac_id, platform=self.platform)
+        # TODO: Issue - results in subprocess.CalledProcessError on pip install
+        pl = RequirementsToAssetCollection(self.platform,
+                                           requirements_path=os.path.join(assets_path, 'requirements.txt'),
+                                           pkg_list=['pandas==0.24.2'],
+                                           extra_wheels=[os.path.join(assets_path,
+                                                                      'dtk_generic_intrahost-0.1.5-cp36-cp36m-linux_x86_64.whl'),
+                                                         os.path.join(assets_path,
+                                                                      'dtk_nodedemog-0.1.5-cp36-cp36m-linux_x86_64.whl')])
 
-        # TODO: COMPS Bug 4270 Cannot insert duplicate key row error
-        # uncomment import "idmtools.assets import AssetCollection, Asset" to test this
-        ac = AssetCollection()
-        ac.add_directory(assets_directory=assets_path)
-        ids = self.platform.create_items(ac)
-        new_ac = self.platform.get_item(ids[0].id, item_type=ItemType.ASSETCOLLECTION)
-        ac_id = new_ac.id
-        print(str(ac_id))
+        ac_id = pl.run()
         pandas_assets = AssetCollection.from_id(ac_id, platform=self.platform)
+
+        # # TODO: COMPS Bug 4270 Cannot insert duplicate key row error
+        # # uncomment import "idmtools.assets import AssetCollection, Asset" to test this
+        # ac = AssetCollection()
+        # ac.add_directory(assets_directory=assets_path)
+        # ids = self.platform.create_items(ac)
+        # new_ac = self.platform.get_item(ids[0].id, item_type=ItemType.ASSETCOLLECTION)
+        # ac_id = new_ac.id
+        # print(str(ac_id))
+        # pandas_assets = AssetCollection.from_id(ac_id, platform=self.platform)
 
         # # for good measure, test with COMPS AC, no idmtools layer
         # from COMPS.Data import AssetCollection, AssetCollectionFile
