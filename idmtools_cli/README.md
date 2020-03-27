@@ -1,3 +1,15 @@
+![Upload idmtools-cli to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-cli%20to%20Staging/badge.svg)
+# idmtools-cli
+
+<!-- START doctoc -->
+<!-- END doctoc -->
+
+## Installing
+
+```bash
+pip install idmtools-cli --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+```
+
 # Development Tips
 
 There is a Makefile file available for most common development tasks. Here is a list of commands
