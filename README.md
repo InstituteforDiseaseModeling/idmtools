@@ -9,8 +9,21 @@
 
 # IDM Modeling Tools
 
-<!-- START doctoc -->
-<!-- END doctoc -->
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Installation](#installation)
+  - [Pre-requisites](#pre-requisites)
+  - [Development Environment Setup](#development-environment-setup)
+    - [First Time Setup](#first-time-setup)
+    - [General Use](#general-use)
+    - [IDE/Runtime Setup](#ideruntime-setup)
+    - [Running specific tests from the command line](#running-specific-tests-from-the-command-line)
+    - [WSL2 on Windows Setup(Experimental)](#wsl2-on-windows-setupexperimental)
+- [Troubleshooting the Development Environment](#troubleshooting-the-development-environment)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Installation 
 The recommended install is to use
