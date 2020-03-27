@@ -28,7 +28,7 @@ jobs:
           pip install setuptools wheel twine bump2version
       - name: Bump build
         working-directory: idmtools_cli
-        run: bump2version build --commit
+        run: bump2version build --commit --allow-dirty
       - name: Build and publish
         working-directory: idmtools_cli
         env:
