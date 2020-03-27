@@ -1,6 +1,11 @@
 
 ![Upload idmtools-core to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-core%20to%20Staging/badge.svg)
-![Upload idmtools-platform-local to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-platform-local%20to%20Staging/badge.svg)
+![Upload idmtools-cli to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-cli%20to%20Staging/badge.svg)
+![Upload idmtools-models to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-models%20to%20Staging/badge.svg)
+![Upload idmtools-platform-comps to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-platform-comps%20to%20Staging/badge.svg)
+![Upload idmtools-platform-local to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-platform-local%20to%20Staging/badge.svg)\
+![Upload idmtools-platform-slurm to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-platform-slurm%20to%20Staging/badge.svg)
+![Upload idmtools-test to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-test%20to%20Staging/badge.svg)
 
 # IDM Modeling Tools
 
