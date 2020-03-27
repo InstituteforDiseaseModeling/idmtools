@@ -12,7 +12,7 @@ on:
       - 'idmtools_platform_local/**'
 
 jobs:
-  build-ui:
+  build-local-platform:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -26,9 +26,9 @@ jobs:
         working-directory: idmtools_platform_local/idmtools_webui
       # Now that the UI has been built, remove existing UI
       - name: Removing existing UI
-        run: rm -rf idmtools_platform_local/idmtools_platform_local/internals/ui/static/*
+        run: rm -rf idmtools_platform_local/idmtools_platform_local/internals/ui/static
       - name: Copying new UI
-        run: cp -r idmtools_platform_local/idmtools_webui/build/* idmtools_platform_local/idmtools_platform_local/internals/ui/static/
+        run: cp -r idmtools_platform_local/idmtools_webui/build idmtools_platform_local/idmtools_platform_local/internals/ui/static
       # Now create our python package
       - name: Set up Python
         uses: actions/setup-python@v1
