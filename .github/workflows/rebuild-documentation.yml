@@ -21,7 +21,7 @@ jobs:
         uses: ammaraskar/sphinx-action@0.4
         with:
           docs-folder: "Documentation/idm-tools"
-          pre-build-command: "apt-get update -y && apt-get install -y plantuml && pip install sphinx-rtd-theme sphinxcontrib-napoleon beautifulsoup4"
+          pre-build-command: "mkdir -p /usr/share/man/man1 && apt-get update -y && apt-get install -y plantuml && pip3 install sphinx-rtd-theme sphinxcontrib-napoleon beautifulsoup4"
           build-command: "make html"
       - name: Upload Documentation Artifacts
         uses: actions/upload-artifact@v1
