@@ -1,3 +1,10 @@
+![Upload idmtools-models to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-models%20to%20Staging/badge.svg)
+
+# idmtools-models
+
+<!-- START doctoc -->
+<!-- END doctoc -->
+
 # Development Tips
 
 There is a Makefile file available for most common development tasks. Here is a list of commands
