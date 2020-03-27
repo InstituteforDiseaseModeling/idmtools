@@ -66,7 +66,7 @@ Some packages have unique build related commands, specifically the local platfor
 ### IDE/Runtime Setup
 
 For source completion and indexing, set the package paths in your IDE. In PyCharm, select the following directories then right-click and select `Mark Directory as -> Source Root`.
-![Mark Directory as Sources Root](development_documentation/mark_directory_as_source.png)
+![Mark Directory as Sources Root](documentation/images/mark_directory_as_source.png)
 
 The directories that should be added as source roots are
 - `idmtools/idmtools_core`

@@ -1,0 +1,6 @@
+sphinx-rtd-theme
+sphinxcontrib-napoleon
+beautifulsoup4
+sphinxcontrib-plantuml
+sphinx
+plantuml
