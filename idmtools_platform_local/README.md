@@ -1,27 +1,18 @@
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
+![Upload idmtools-platform-local to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-platform-local%20to%20Staging/badge.svg)
 
-- [IDM Tools Local Runner](#idm-tools-local-runner)
-  - [Module Organization](#module-organization)
-- [Running the Local Runner](#running-the-local-runner)
-- [Using the UI](#using-the-ui)
-- [Using the local website](#using-the-local-website)
-- [Development Tips](#development-tips)
-  - [Understanding the components](#understanding-the-components)
-  - [Debugging the workers](#debugging-the-workers)
-    - [Debug configuration](#debug-configuration)
-      - [Script Path](#script-path)
-      - [Script Arguments](#script-arguments)
-        - [Script Environment](#script-environment)
-  - [Troubleshooting Tests](#troubleshooting-tests)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
-# IDM Tools Local Runner
+# idmtools-platform-local
 
 The IDM Tool Local Runner allows execution of tasks in a local docker container and provides a platform that is
 somewhat similar to COMPS, though much more limited
+
+<!-- START doctoc -->
+<!-- END doctoc -->
+
+## Installing
+
+```bash
+pip install idmtools-platform-local --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+```
 
 ## Module Organization
 
