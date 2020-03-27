@@ -3,7 +3,7 @@ name: "Rebuild documentation"
 on: push
 
 jobs:
-  deploy:
+  rebuild-documentation:
 
     runs-on: ubuntu-latest
 
@@ -16,6 +16,7 @@ jobs:
         with:
           repository: git@github.com:InstituteforDiseaseModeling/Documentation.git
           path: 'Documentation'
+          token: ${{ secrets.IDMTOOLS_TOKEN }}
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
