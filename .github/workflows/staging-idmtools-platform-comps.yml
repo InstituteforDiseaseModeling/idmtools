@@ -1,6 +1,6 @@
 # This workflows will upload a Python Package using Twine when a release is created
 
-name: Upload idmtools-core to Staging
+name: Upload idmtools-platform-comps to Staging
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
       - dev
       - 561-nightly-builds
     paths:
-      - 'idmtools_core/**'
+      - 'idmtools_platform_comps/**'
 
 jobs:
   deploy:
@@ -27,7 +27,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install setuptools wheel twine
       - name: Build and publish
-        working-directory: idmtools_core
+        working-directory: idmtools_platform_comps
         env:
           TWINE_REPOSITORY_URL: https://packages.idmod.org/api/pypi/idm-pypi-staging/
           TWINE_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
