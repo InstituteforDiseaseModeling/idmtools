@@ -2,8 +2,20 @@
 
 # idmtools-cli
 
-<!-- START doctoc -->
-<!-- END doctoc -->
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+  - [Installing](#installing)
+- [Development Tips](#development-tips)
+- [Using the CLI](#using-the-cli)
+  - [Experiment commands](#experiment-commands)
+    - [Status](#status)
+    - [Delete](#delete)
+  - [Simulation Commands](#simulation-commands)
+  - [Status](#status-1)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Installing
 
