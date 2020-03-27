@@ -19,11 +19,11 @@ jobs:
       # build the UI First
       - uses: borales/actions-yarn@v2.0.0
         working-directory: idmtools_platform_local/idmtools_webui
-          with:
-            cmd: install # will run `yarn install` command
+        with:
+          cmd: install # will run `yarn install` command
       - uses: borales/actions-yarn@v2.0.0
-          with:
-            cmd: build # will run `yarn build` command
+        with:
+          cmd: build # will run `yarn build` command
       # Now that the UI has been built, remove existing UI
       - name: Removing existing UI
         run: rm -rf idmtools_platform_local/idmtools_platform_local/internals/ui/static/*
