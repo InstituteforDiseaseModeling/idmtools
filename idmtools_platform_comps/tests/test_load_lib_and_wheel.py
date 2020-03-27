@@ -136,3 +136,65 @@ class TestLoadLibWheel(ITestWithPersistence):
         self.platform.get_files_by_id(sims[0].id, ItemType.SIMULATION, out_filenames, local_output_path)
         self.assertTrue(os.path.exists(os.path.join(local_output_path, sims[0].id, "tips.png")))
 
+    @pytest.mark.skip(reason="bug #716 -- need to fix python_task.py in idmtools_model/python")
+    @pytest.mark.long
+    @pytest.mark.comps
+    def test_exp_with_load_pytest_lib_slurm(self):
+        # ------------------------------------------------------
+        # First load 'zipp' package (note: comps does not have 'zipp' package)
+        # ------------------------------------------------------
+        platform = Platform('SLURM', node_group=None)
+        requirements_path = os.path.join(model_path, 'requirements1.txt')
+        pl = RequirementsToAssetCollection(platform, requirements_path=requirements_path)
+        ac_id = pl.run()
+        common_assets = AssetCollection.from_id(ac_id, platform=platform)
+
+        # create python task with script 'zipp_file_slurm.py', task is doing this in comps: "python ./Assets/zipp_file_slurm.py"
+        script_path = os.path.join(model_path, 'model_file.py')
+        task = JSONConfiguredPythonTask(script_path=script_path, common_assets=common_assets)
+
+        # create experiment with 1 base simulation with python task
+        experiment = Experiment(name=self.case_name, simulations=[task.to_simulation()])
+        experiment.tags = {'ac_id': str(ac_id)}
+
+        platform.run_items(experiment)
+        platform.wait_till_done(experiment)
+
+        # Make sure this experiment succeeded
+        self.assertTrue(experiment.succeeded)
+
+    @pytest.mark.skip(reason="bug #716 -- need to fix python_task.py in idmtools_model/python")
+    @pytest.mark.long
+    @pytest.mark.comps
+    def test_exp_with_load_zipp_lib_slurm(self):
+        # ------------------------------------------------------
+        # First load 'zipp' package (note: comps does not have 'zipp' package)
+        # ------------------------------------------------------
+        platform = Platform('SLURM', node_group=None)
+        requirements_path = os.path.join(model_path, 'requirements.txt')
+        pl = RequirementsToAssetCollection(platform, requirements_path=requirements_path)
+        ac_id = pl.run()
+        common_assets = AssetCollection.from_id(ac_id, platform=platform)
+
+        # create python task with script 'zipp_file_slurm.py', task is doing this in comps: "python ./Assets/zipp_file_slurm.py"
+        script_path = os.path.join(model_path, 'zipp_file_slurm.py')
+        task = JSONConfiguredPythonTask(script_path=script_path, common_assets=common_assets)
+
+        # create experiment with 1 base simulation with python task
+        experiment = Experiment(name=self.case_name, simulations=[task.to_simulation()])
+        experiment.tags = {'ac_id': str(ac_id)}
+
+        platform.run_items(experiment)
+        platform.wait_till_done(experiment)
+
+        # Make sure this experiment succeeded
+        self.assertTrue(experiment.succeeded)
+        # verify result
+        sims = self.platform.get_children_by_object(experiment)
+        local_output_path = "output"
+        del_folder(local_output_path)
+        out_filenames = ["StdErr.txt"]
+        self.platform.get_files_by_id(sims[0].id, ItemType.SIMULATION, out_filenames, local_output_path)
+        self.assertTrue(os.path.exists(os.path.join(local_output_path, sims[0].id, "StdErr.txt")))
+        contents = Path(os.path.join(local_output_path, sims[0].id, "StdErr.txt")).read_text()
+        self.assertIn("ModuleNotFoundError: No module named 'zipp'", contents)
