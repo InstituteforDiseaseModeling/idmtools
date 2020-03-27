@@ -29,7 +29,7 @@ jobs:
         run: rm -rf idmtools_platform_local/idmtools_platform_local/internals/ui/static
       - name: Copying new UI
         run: cp -r idmtools_platform_local/idmtools_webui/build idmtools_platform_local/idmtools_platform_local/internals/ui/static
-      - name:List UI Files
+      - name: List UI Files
         run: ls -al idmtools_platform_local/idmtools_platform_local/internals/ui/static
       # Now create our python package
       - name: Set up Python
