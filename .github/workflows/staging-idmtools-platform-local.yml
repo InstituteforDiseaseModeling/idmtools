@@ -22,7 +22,7 @@ jobs:
         with:
           working-directory: idmtools_platform_local/idmtools_webui
       - name: Build UI
-        run: react-scripts build
+        run: npm run build
         working-directory: idmtools_platform_local/idmtools_webui
       # Now that the UI has been built, remove existing UI
       - name: Removing existing UI
