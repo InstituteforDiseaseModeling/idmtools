@@ -107,4 +107,5 @@ build-docs: ## build docs(only works on linux at moment due to make.bat not runn
 
 build-docs-server: ## builds docs and launch a webserver
 	@make build-docs
+	@+$(IPY) "print('Serving documentation @ server at http://localhost:8000 . Ctrl + C Will Stop Server')"
 	$(PDR) -w 'documentation/_build/html' -ex 'python3 -m http.server'
