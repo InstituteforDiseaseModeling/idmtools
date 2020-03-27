@@ -1,4 +1,10 @@
+
+![Upload idmtools-core to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-core%20to%20Staging/badge.svg)
+
 # IDM Modeling Tools
+
+<!-- START doctoc -->
+<!-- END doctoc -->
 
 # Installation 
 The recommended install is to use
