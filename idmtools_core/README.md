@@ -9,6 +9,7 @@
 
 ```bash
 pip install idmtools --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+```
 
 # Development Tips
 

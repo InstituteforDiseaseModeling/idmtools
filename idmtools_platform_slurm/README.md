@@ -1,3 +1,10 @@
+![Upload idmtools-platform-slurm to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-platform-slurm%20to%20Staging/badge.svg)
+
+# idmtools-platform-slurm
+
+<!-- START doctoc -->
+<!-- END doctoc -->
+
 # Development Tips
 
 There is a Makefile file available for most common development tasks. Here is a list of commands

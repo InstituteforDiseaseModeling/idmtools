@@ -5,6 +5,12 @@
 <!-- START doctoc -->
 <!-- END doctoc -->
 
+## Installing
+
+```bash
+pip install idmtools-models --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+```
+
 # Development Tips
 
 There is a Makefile file available for most common development tasks. Here is a list of commands
