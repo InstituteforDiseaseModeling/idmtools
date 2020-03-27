@@ -1,6 +1,6 @@
 # This workflows will upload a Python Package using Twine when a release is created
 
-name: Upload idmtools-platform-local to Staging
+name: "Staging: idmtools-platform-local"
 
 on:
   push:
