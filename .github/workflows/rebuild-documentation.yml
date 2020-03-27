@@ -20,7 +20,7 @@ jobs:
       - name: Install dependencies
         uses: ammaraskar/sphinx-action@0.4
         with:
-          docs-folder: "Documentation/"
+          docs-folder: "Documentation/idm-tools"
           pre-build-command: "apt-get update -y && apt-get install -y latexmk texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended plantuml && pip install sphinx-rtd-theme sphinxcontrib-napoleon beautifulsoup4"
           build-command: "make html"
       - name: Upload Documentation Artifacts
