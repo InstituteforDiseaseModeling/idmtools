@@ -11,8 +11,7 @@ on:
       - 'idmtools_platform_slurm/**'
 
 jobs:
-  deploy:
-
+  deploy-slurm-staging:
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, 'Bump version: ')"
     steps:
