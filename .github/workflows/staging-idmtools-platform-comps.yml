@@ -7,7 +7,6 @@ on:
     branches:
       # only run this on
       - dev
-      - 561-nightly-builds
     paths:
       - 'idmtools_platform_comps/**'
 
@@ -34,6 +33,7 @@ jobs:
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
+          branch: ${{ github.ref }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and publish
         working-directory: idmtools_platform_comps
