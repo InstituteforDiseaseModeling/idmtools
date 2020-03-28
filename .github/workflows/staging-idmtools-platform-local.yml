@@ -46,6 +46,10 @@ jobs:
       - name: Bump build
         working-directory: idmtools_platform_local
         run: bump2version build --commit --allow-dirty
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and publish
         working-directory: idmtools_platform_local
         env:
