@@ -3,4 +3,4 @@ sphinxcontrib-napoleon
 beautifulsoup4
 sphinxcontrib-plantuml
 sphinx
-plantuml
+plantweb

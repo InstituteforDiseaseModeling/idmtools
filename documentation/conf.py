@@ -35,10 +35,10 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinxcontrib.napoleon',
     'sphinx.ext.todo',
-    'sphinxcontrib.plantuml'
+    'plantweb.directive'
 ]
 
-plantuml = 'python3 -m plantuml'
+plantuml = 'plantweb'
 
 autodoc_default_options = {
     'member-order': 'bysource',
