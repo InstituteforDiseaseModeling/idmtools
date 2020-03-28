@@ -34,8 +34,11 @@ extensions = [
     'sphinx.ext.githubpages',
     'sphinx.ext.autodoc',
     'sphinxcontrib.napoleon',
-    'sphinx.ext.todo'
+    'sphinx.ext.todo',
+    'sphinxcontrib.plantuml'
 ]
+
+plantuml = 'python3 -m plantuml'
 
 autodoc_default_options = {
     'member-order': 'bysource',
@@ -52,10 +55,7 @@ autodoc_mock_imports = ['shapefile',
                         'MenuForm',
                         'osm2nx'
                         ]
-suppress_warnings = ['ref.term'
-                     ]
 
-plantuml = "python3 plantuml"
 
 napoleon_google_docstring = True
 # napoleon_numpy_docstring = True
@@ -78,7 +78,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'IDM-Tools'
-copyright = u'2019, Intellectual Ventures Management, LLC (IVM). All rights reserved'
+copyright = u'2020, Intellectual Ventures Management, LLC (IVM). All rights reserved'
 author = u'Institute for Disease Modeling'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -145,7 +145,7 @@ todo_include_todos = False
 # RST epilog is added to the end of every topic. Useful for replace
 # directives to use across the docset.
 
-rst_epilog = "\n.. include:: variables.txt"
+rst_epilog = "\n.. include:: /variables.txt"
 
 # -- Options for HTML output ----------------------------------------------
 
@@ -182,7 +182,7 @@ html_logo = "images/IDM_white.png"
 # the docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
 #
-html_favicon = "favicon.ico"
+html_favicon = "images/favicon.ico"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

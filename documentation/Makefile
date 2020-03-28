@@ -2,10 +2,10 @@
 #
 
 # You can set these variables from the command line.
-SPHINXOPTS    = -t tools -W
+SPHINXOPTS    = -t tools 
 INTERNALOPTS  = -t internal
 SPHINXBUILD   = sphinx-build
-INDEXBUILD    = python scripts/gti.py
+INDEXBUILD    = python $(BUILDDIR)/../scripts/gti.py
 URLPREFIX	  = "."
 PAPER         =
 BUILDDIR      = _build

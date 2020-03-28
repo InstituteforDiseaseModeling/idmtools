@@ -1,17 +1,15 @@
-====================
-Model-specific tools
-====================
+======================
+|IT_s| models package
+======================
 
-This can be renamed; placeholder doc for contents of the "models_collection" folder, where the
-model-specific utilities are located (eg. dtk config-builder type stuff)
+The following modules provide functionality specific to varous models,
+such as those written in Python or R.
 
-
+Modules
+-------
 
 .. toctree::
 
-   dtk
-   python
-
-
-.. this will also include CMS, R (custom models), pymod, etc
-
+	idmtools_models.python
+	idmtools_models.r
+	idmtools_models.json_configured_task

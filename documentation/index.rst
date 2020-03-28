@@ -2,40 +2,60 @@
 Welcome to |IT_s|
 =================
 
-|IT_l| is a set of python tools...
+|IT_l| is a collection of Python scripts and utilities created to streamline user interactions with
+disease models. This framework provides the user with tools necessary to complete projects, starting
+from the creation of input files (if required), to calibration of the model to data, to commissioning
+and running simulations, through the analysis of results. Modelers can use |IT_s| to run models
+locally or send suites of simulations to an HPC or other computing source. This framework is
+free, open-source, and model agnostic: it can be used to interact with a variety of models,
+such as custom models written in R or Python, or IDM's own |EMOD_s|.
+
+
+|IT_s| workflow
+===============
+
+.. high level overview of what the tools do
+
+|IT_s| includes a variety of options for each step of the modeling process. Because of this, the
+tool suite was developed in a modular fashion, so that users can select the utilities they wish
+to use. In order to simplify the desired workflow, facilitate the modeling process, and make the
+model (and its results) reusable and sharable, |IT_s| allows the user to create :term:`assets`.
+Assets can be added at any level of the process, from running a specific task, through creating
+a simulation, to creating a :term:`experiment`. This allows the user to create inputs based on their
+specific needs: they can be transient, or sharable across multiple simulations.
+
+Exact workflows for using |IT_s| is user-dependent, and can include any of the tasks listed below.
+To help new users get started, a series of Coookie-cutter projects have been added, designed to
+guide modelers through necessary tasks. See :doc:`cookiecutters` for the available templates.
+
+
 
 
 .. toctree::
    :maxdepth: 3
    :titlesonly:
 
-   overview
    installation
-   core
-   local
-   models
-   examples
+   platforms
+   create-sims
+   run-sims
+   parameter-sweeps
+   calibrate
+   analyzers
+   reports
+   plots
+   serialization
+   cookiecutters
    reference
+   cli
    glossary
 
 
-.. we'll want to figure out how to organize the high-level TOC, since we want topics to be
-.. FINDABLE, but also to have the repo organization make sense. Currently (as of 6-12-19), repo has:
-.. examples (examples and jupyter notebooks)
-.. idmtools_core (this is wehre a lot of the actual services will be, such as calibration)
-.. idmtools_local_runner (the service to run things locally)
-.. idmtools_models_collection (which contains python and dtk stuff at this point. Where model-specific utils located, eg config-builder)
 
-
-.. not sure how all of the nesting will work. For example: for ANALYZERS, will this be a high-level
-.. topic, or will it get nested in the "dtk" section under models (for the custom utilities)?
-.. as of now, have calibration under "core," analyzers, sweeps, run, create, etc under "models/dtk"
-
-.. currently don't have anything set up for the API reference docs, but added in a placeholder file
 
 .. not sure what to do with catalyst. Not included yet.
 
+.. nothing done with STAMP yet; not sure if it will be some sort of "plug-in" to the tools or totally standalone
 
-.. we will want to keep an eye on the "local platform" stuff--since it's an entire section of the repo,
-.. I pulled it out for top level TOC placement. However, if that's for ease of code and not something
-.. more complicated, let's take Jen's suggestion and nest it within each model
+.. Nothing here for EMOD API. We'll want to put it *somewhere* and likely have a landing page for it here...
+

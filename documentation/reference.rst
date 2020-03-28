@@ -8,4 +8,7 @@ API reference
 
 
 
-.. need to set up the api reference
+   core
+   models
+   platform_comps
+   platform_local

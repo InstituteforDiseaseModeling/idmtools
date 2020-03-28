@@ -1,16 +1,28 @@
-=======================
-Core tool functionality
-=======================
+===================
+|IT_s| core package
+===================
 
-JUST A PLACEHOLDER DOC. RENAME
+The modules in the the **idmtools** package comprise the base functionality of |IT_s|, such as
+creating assets, workflows, utilities, etc. This functionality can be used with any of the supported
+models.
 
-
+Submodules
+----------
 
 .. toctree::
-   :maxdepth: 3
-   :titlesonly:
 
-   calibrate
+   idmtools.analysis
+   idmtools.assets
+   idmtools.builders
+   idmtools.config
+   idmtools.core
+   idmtools.entities
+   idmtools.frozen
+   idmtools.registry
+   idmtools.services
+   idmtools.utils
+
+
 
 
 

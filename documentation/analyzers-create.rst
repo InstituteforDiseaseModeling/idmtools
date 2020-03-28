@@ -1,93 +1,83 @@
-=========================
-Creating custom analyzers
-=========================
+==================
+Create an analyzer
+==================
 
-You can create customer analyzers for analysis of the simulation output results by extending the :py:class:`simtools.Analysis.BaseAnalyzers.BaseAnalyzer` class or any of the other base analyzer classes included with |DT|:
+You can use built-in analyzers included with |IT_s| to help with creating a new analyzer. The following list some of these analyzers:
 
-* :py:class:`~simtools.Analysis.BaseAnalyzers.BaseCacheAnalyzer`
-* :py:class:`~simtools.Analysis.BaseAnalyzers.BaseCalibrationAnalyzer`
-* :py:class:`~simtools.Analysis.BaseAnalyzers.DownloadAnalyzer`
-* :py:class:`~simtools.Analysis.BaseAnalyzers.DownloadAnalyzerTPI`
-* :py:class:`~simtools.Analysis.BaseAnalyzers.InsetChartAnalyzer`
-* :py:class:`~simtools.Analysis.BaseAnalyzers.SimulationDirectoryMapAnalyzer`
+.. uml::
 
-The following documents the steps for creating a new population analyzer class by extending the :py:class:`~simtools.Analysis.BaseAnalyzers.BaseAnalyzer` class and then using the 
-:py:class:`simtools.Analysis.AnalyzeManager` class for analyzing the results returned from the 
-newly created **PopulationAnalyzer** class::
+    @startuml
+    abstract class IAnalyzer        
+    IAnalyzer <|-- AddAnalyzer
+    IAnalyzer <|-- CSVAnalyzer
+    IAnalyzer <|-- DownloadAnalyzer
+    IAnalyzer <|-- TagsAnalyzer
+    @enduml
 
-        from simtools.Analysis.BaseAnalyzers import BaseAnalyzer
-        from simtools.Analysis.AnalyzeManager import AnalyzeManager
+For more information about these built-in analyzers, see:
 
+* :py:class:`~idmtools.analysis.add_analyzer.AddAnalyzer`
+* :py:class:`~idmtools.analysis.csv_analyzer.CSVAnalyzer`
+* :py:class:`~idmtools.analysis.download_analyzer.DownloadAnalyzer`
+* :py:class:`~idmtools.analysis.tags_analyzer.TagsAnalyzer`
 
-        class PopulationAnalyzer(BaseAnalyzer):
-            def __init__(self):
-                super().__init__(filenames=['output\\InsetChart.json'])
+To create an analyzer methods from the :py:class:`~idmtools.entities.ianalyzer.IAnalyzer` abstract class are used:
 
-            def select_simulation_data(self, data, simulation):
-                return data[self.filenames[0]]["Channels"]["Statistical Population"]["Data"]
+.. uml::
 
-            def finalize(self, all_data):
-                import matplotlib.pyplot as plt
-                for pop in list(all_data.values()):
-                    plt.plot(pop)
-                plt.legend([s.id for s in all_data.keys()])
-                plt.show()
+    @startuml
+    abstract class IAnalyzer {
+    +initialize()
+    +per_group()
+    +filter()
+    +map()
+    +reduce()
+    +destroy()
+    }
+    @enduml
 
+All analyzers must also call the :py:class:`~idmtools.analysis.analyze_manager.AnalyzeManager` class for analysis management:
 
-        if __name__ == "__main__":
-            am = AnalyzeManager('latest', analyzers=PopulationAnalyzer())
-            am.analyze()
+.. uml::
 
+    @startuml
+    abstract class IAnalyzer        
+    IAnalyzer <|-- Analyzers
+    Analyzers *-- AnalyzeManager  
+    @enduml
 
-#.  Create **PopulationAnalyzer** class to inherit from :py:class:`~simtools.Analysis.BaseAnalyzers.BaseAnalyzer` class::
+The following python code and comments, from the :py:class:`~idmtools.analysis.csv_analyzer.CSVAnalyzer` class, is an example of how to create an analyzer for analysis of .csv output files from simulations::
 
-        from simtools.Analysis.BaseAnalyzers import BaseAnalyzer
-        class PopulationAnalyzer(BaseAnalyzer):
+    class CSVAnalyzer(IAnalyzer):
+    # Arg option for analyzer init are uid, working_dir, parse (True to leverage the :class:`OutputParser`;
+    # False to get the raw data in the :meth:`select_simulation_data`), and filenames
+    # In this case, we want parse=True, and the filename(s) to analyze
+    def __init__(self, filenames, parse=True):
+        super().__init__(parse=parse, filenames=filenames)
+        # Raise exception early if files are not csv files
+        if not all(['csv' in os.path.splitext(f)[1].lower() for f in self.filenames]):
+            raise Exception('Please ensure all filenames provided to CSVAnalyzer have a csv extension.')
 
-#.  Initialize an instance of the :py:class:`~simtools.Analysis.BaseAnalyzers.BaseAnalyzer` class by calling the **__init__** constructor method and pass in parameters to **self**, representing the class instance of **PopulationAnalyzer**::
+    def initialize(self):
+        if not os.path.exists(os.path.join(self.working_dir, "output_csv")):
+            os.mkdir(os.path.join(self.working_dir, "output_csv"))
 
-        class PopulationAnalyzer(BaseAnalyzer):
-            def __init__(self):
-                super().__init__(filenames=['output\\InsetChart.json'])
+    # Map is called to get for each simulation a data object (all the metadata of the simulations) and simulation object
+    def map(self, data, simulation):
+        # If there are 1 to many csv files, concatenate csv data columns into one dataframe
+        concatenated_df = pd.concat(list(data.values()), axis=0, ignore_index=True, sort=True)
+        return concatenated_df
 
-The parameter, **filenames**, points to the simulation output path and specifies the files to download for analysis. In this example it points to a relative path in |COMPS_s| and to download InsetChart.json. For more information about InsetChart.json, see `Output files`_ .
+    # In reduce, we are printing the simulation and result data filtered in map
+    def reduce(self, all_data):
 
-3.  For each **simulation**, select parsed **data** from data dictionary and return the selected data (Statistical Population)::
+        results = pd.concat(list(all_data.values()), axis=0,  # Combine a list of all the sims csv data column values
+                            keys=[str(k.uid) for k in all_data.keys()],  # Add a hierarchical index with the keys option
+                            names=['SimId'])  # Label the index keys you create with the names option
+        results.index = results.index.droplevel(1)  # Remove default index
 
-        class PopulationAnalyzer(BaseAnalyzer):
-            def select_simulation_data(self, data, simulation):
-                return data[self.filenames[0]]["Channels"]["Statistical Population"]["Data"]
+        # Make a directory labeled the exp id to write the csv results to
+        # NOTE: If running twice with different filename, the output files will collide
+        results.to_csv(os.path.join("output_csv", self.__class__.__name__ + '.csv'))
 
-In this example the returned data is the parsed data from the **Statistical Population** channel, as shown in the following screenshot from Debugger mode in PyCharm:
-
-.. image:: images/data-dict.png
-				:scale: 75%
-
-4.  For the data in the **all_data** data dictionary, which contains the combined population data from each of the simulations, plot (using the Matplotlib plotting library) the population values for each simulation run in the experiment::
-
-        def finalize(self, all_data):
-            import matplotlib.pyplot as plt
-            for pop in list(all_data.values()):
-                plt.plot(pop)
-            plt.legend([s.id for s in all_data.keys()])
-            plt.show()
-
-In this example a total of 5 simulations and their population values are included in the **all_data** data dictionary, as shown in the screenshot from Debugger mode in PyCharm:
-
-.. image:: images/alldata-dict.png
-				:scale: 75%
-
-5.  Use the **PopulationAnalyzer** class, inheriting from :py:class:`~simtools.Analysis.AnalyzeManager`, to analyze the data::
-
-        from simtools.Analysis.AnalyzeManager import AnalyzeManager
-
-        if __name__ == "__main__":
-            am = AnalyzeManager('latest', analyzers=PopulationAnalyzer())
-            am.analyze()
-
-In this example, the population data from each of the 5 simulations are plotted using Matplotlib:
-
-.. image:: images/alldata-plot.png
-				:scale: 80%
-
-.. _Output files: www.idmod.org/docs/general/software-outputs.html
+You can quickly see this analyzer in use by running the included :py:class:`~idmtools.examples.analyzers.example_analysis_CSVAnalyzer` example class.

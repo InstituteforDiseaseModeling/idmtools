@@ -5,10 +5,10 @@ REM Command file for Sphinx documentation
 if "%SPHINXBUILD%" == "" (
 	set SPHINXBUILD=sphinx-build
 )
-set SPHINXOPTS=-t tools -W 
+set SPHINXOPTS=-t tools -W
 set INTERNALOPTS=-t internal
 set BUILDDIR=_build
-set INDEXBUILD=python scripts/gti.py
+set INDEXBUILD=python %BUILDDIR%/../scripts/gti.py
 set URLPREFIX="."
 set ALLSPHINXOPTS=-d %BUILDDIR%/doctrees %SPHINXOPTS% .
 set I18NSPHINXOPTS=%SPHINXOPTS% .
