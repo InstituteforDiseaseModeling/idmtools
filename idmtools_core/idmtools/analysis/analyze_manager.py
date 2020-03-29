@@ -3,13 +3,13 @@ import sys
 import time
 from logging import getLogger, DEBUG
 from multiprocessing.pool import Pool
-from typing import NoReturn, List, Dict
+from typing import NoReturn, List, Dict, Tuple, Optional
 from uuid import UUID
 from idmtools.analysis.map_worker_entry import map_item
 from idmtools.core.cache_enabled import CacheEnabled
-from idmtools.core.enums import EntityStatus
+from idmtools.core.enums import EntityStatus, ItemType
 from idmtools.core.interfaces.ientity import IEntity
-from idmtools.entities.ianalyzer import TAnalyzer
+from idmtools.entities.ianalyzer import IAnalyzer
 from idmtools.entities.iplatform import IPlatform
 from idmtools.utils.command_line import animation
 from idmtools.utils.language import on_off, verbose_timedelta
@@ -17,7 +17,7 @@ from idmtools.utils.language import on_off, verbose_timedelta
 logger = getLogger(__name__)
 
 
-def pool_worker_initializer(func, analyzers, cache, platform) -> NoReturn:
+def pool_worker_initializer(func, analyzers, cache, platform: IPlatform) -> NoReturn:
     """
     Initialize the pool worker, which allows the process pool to associate the analyzers, cache, and
     path mapping to the function executed to retrieve data. Using an initializer improves performance.
@@ -47,9 +47,25 @@ class AnalyzeManager(CacheEnabled):
     class ItemsNotReady(Exception):
         pass
 
-    def __init__(self, platform: IPlatform, configuration=None, ids=None, analyzers=None, working_dir=os.getcwd(),
-                 partial_analyze_ok=False, max_items=None, verbose=True, force_manager_working_directory=False,
-                 exclude_ids=None, analyze_failed_items=False):
+    def __init__(self, platform: IPlatform, configuration: dict=None, ids: Tuple[UUID, ItemType]=None, analyzers: List[IAnalyzer]=None, working_dir: str=os.getcwd(),
+                 partial_analyze_ok: bool=False, max_items: Optional[int]=None, verbose:bool =True, force_manager_working_directory: bool=False,
+                 exclude_ids: List[UUID]=None, analyze_failed_items: bool=False):
+        """
+        Initialize the AnalyzeManager
+
+        Args:
+            platform (IPlatform): Platform
+            configuration (dict, optional): Initial Configuration. Defaults to None.
+            ids (Tuple[UUID, ItemType], optional): List of ids as pair of Tuple and ItemType. Defaults to None.
+            analyzers (List[IAnalyzer], optional): List of Analyzers. Defaults to None.
+            working_dir (str, optional): The working directory. Defaults to os.getcwd().
+            partial_analyze_ok (bool, optional): Whether partial analysis is ok. When this is True, Experiments in progress or Failed can be analyzed. Defaults to False.
+            max_items (int, optional): Max Items to analyze. Useful when developing and testing an Analyzer. Defaults to None.
+            verbose (bool, optional): Print extra information about analysis. Defaults to True.
+            force_manager_working_directory (bool, optional): [description]. Defaults to False.
+            exclude_ids (List[UUID], optional): [description]. Defaults to None.
+            analyze_failed_items (bool, optional): Allows analyzing of failed items. Useful when you are trying to aggregate items that have failed. Defaults to False.
+        """
         super().__init__()
         self.configuration = configuration or {}
         self.platform = platform
@@ -144,7 +160,7 @@ class AnalyzeManager(CacheEnabled):
 
         return can_analyze
 
-    def add_analyzer(self, analyzer: TAnalyzer) -> NoReturn:
+    def add_analyzer(self, analyzer: IAnalyzer) -> NoReturn:
         """
         Add another analyzer to use on the items to be analyzed.
 
