@@ -12,7 +12,7 @@ Examples
 For Python modelers, we have multiple examples of how to do your parameter sweeps for Python models.
 
 python_model.python_sim
-########
+#######################
 
 :py:class:`~python_model.python_sim`
 
@@ -145,7 +145,7 @@ Now add the sweep to our builder:
 
 
 python_model.python_SEIR_sim
-########
+############################
 
 :py:class:`~python_model.python_SEIR_sim`
 
@@ -158,6 +158,7 @@ In this example, we will demonstrate how to run a python experiment with JSON Co
 First, import some necessary system and idmtools packages:
 
 .. code-block:: python
+
     import os
     import sys
     import json
@@ -191,6 +192,7 @@ Define some constant string used in this example:
 Script need to be in a main block, other wise AnalyzerManager will have issue with multi threads in Windows OS.
 
 .. code-block:: python
+
     if __name__ == '__main__':
 
 We have python model defined in "SEIR_model.py" which takes several arguments like "--duration" and "--outbreak_coverage", and supports a json config from a file named "nd_template.json". We want to sweep some arguments passed in to "SEIR_model.py" and some parameters in "nd_template.json".
@@ -215,6 +217,7 @@ To accomplish this, we are going to proceed in a few high-level steps. See https
 1. First, let's define our base task. Normally, you want to do set any assets/configurations you want across the all the different Simulations we are going to build for our experiment. Here we load config file from a template json file and rename the config_file_name (default value is config.json).
 
 .. code-block:: python
+
     parameters = json.load(open(os.path.join("inputs", "ye_seir_model", "Assets", "templates", 'seir_configuration_template.json'), 'r'))
     parameters[ConfigParameters.Base_Infectivity_Distribution] = ConfigParameters.GAUSSIAN_DISTRIBUTION
     task = JSONConfiguredPythonTask(script_path=os.path.join("inputs", "ye_seir_model", "Assets", "SEIR_model.py"),
@@ -225,15 +228,18 @@ To accomplish this, we are going to proceed in a few high-level steps. See https
 We define arguments/value for simulation duration that we don't want to sweep as an option for the task.
 
 .. code-block:: python
+
     task.command.add_option("--duration", 40)
 
 2. Now, let's use this task to create a TemplatedSimulation builder. This will build new simulations from sweep builders we will define later. We can also use it to manipulate the base_task or the base_simulation
 .. code-block:: python
+
     ts = TemplatedSimulations(base_task=task)
 
 We can define common metadata like tags across all the simulations using the base_simulation object
 
 .. code-block:: python
+
     ts.base_simulation.tags['simulation_name_tag'] = "SEIR_Model"
 
 3. Since we have our templated simulation object now, let's define our sweeps.
@@ -241,6 +247,7 @@ We can define common metadata like tags across all the simulations using the bas
 To do that we need to use a builder:
 
 .. code-block:: python
+
     builder = SimulationBuilder()
 
 When adding sweep definitions, you need to generally provide two items.
@@ -256,6 +263,7 @@ SimulationBuilders
 Since our models uses a json config let's define an utility function that will update a single parameter at a time on the model and add that param/value pair as a tag on our simulation.
 
 .. code-block:: python
+
     def param_update(simulation: Simulation, param: str, value: Any) -> Dict[str, Any]:
         """
         This function is called during sweeping allowing us to pass the generated sweep values to our Task Configuration
@@ -282,6 +290,7 @@ An alternative to using partial is define a class that store the param and is ca
 First define our class. The trick here is we overload __call__ so that after we create the class, and calls to the instance will be relayed to the task in a fashion identical to the param_update function above. It is generally not best practice to define a class like this in the body of our main script so it is advised to place this in a library or at the very least the top of your file.
 
 .. code-block:: python
+
     class setParam:
         def __init__(self, param):
             self.param = param
@@ -291,6 +300,7 @@ First define our class. The trick here is we overload __call__ so that after we 
 
 Now add our sweep on a list:
 .. code-block:: python
+
     builder.add_sweep_definition(setParam(ConfigParameters.Base_Infectivity_Gaussian_Std_Dev), [0.3, 1])
 
 Using the same methodologies, we can sweep on option/arguments that pass to our Python model. You can uncomment the following code to enable it.
@@ -298,6 +308,7 @@ Using the same methodologies, we can sweep on option/arguments that pass to our 
 3.3 First method:
 
 .. code-block:: python
+
     # def option_update(simulation: Simulation, option: str, value: Any) -> Dict[str, Any]:
     #     simulation.task.command.add_option(option, value)
     #     return {option: value}
@@ -315,18 +326,27 @@ Using the same methodologies, we can sweep on option/arguments that pass to our 
     # builder.add_sweep_definition(setOption("--population"), [1000, 4000])
 
 4. Add our builder to the template simulations
+
 .. code-block:: python
+
     ts.add_builder(builder)
 
 5. Now we can create our Experiment using our template builder
+
 .. code-block:: python
+
     experiment = Experiment(name=os.path.split(sys.argv[0])[1], simulations=ts)
 
 Add our own custom tag to simulation
+
 .. code-block:: python
+
     experiment.tags['experiment_name_tag'] = "SEIR_Model"
+
 And maybe some custom Experiment Level Assets
+
 .. code-block:: python
+
     experiment.assets.add_directory(assets_directory=os.path.join("inputs", "ye_seir_model", "Assets"))
 
 6. In order to run the experiment, we need to create a `Platform`.
@@ -334,42 +354,56 @@ And maybe some custom Experiment Level Assets
 The `Platform` defines where we want to run our simulation.
 
 You can easily switch platforms by changing the Platform to for example 'Local'
+
 .. code-block:: python
+
     platform = Platform('COMPS2')
 
 The last step is to call run() on the ExperimentManager to run the simulations.
+
 .. code-block:: python
+
     platform.run_items(experiment)
     platform.wait_till_done(experiment)
 
 Check experiment status, only move to Analyzer step if experiment succeeded.
+
 .. code-block:: python
+
     if not experiment.succeeded:
         print(f"Experiment {experiment.uid} failed.\n")
         sys.exit(-1)
 
 7. Now let's look at the experiment results. Here are two outputs we want to analyze.
+
 .. code-block:: python
+
     filenames = ['output/individual.csv']
     filenames_2 = ['output/node.csv']
 
 Initialize two analyser classes with the path of the output csv file
+
 .. code-block:: python
+
     analyzers = [InfectiousnessCSVAnalyzer(filenames=filenames), NodeCSVAnalyzer(filenames=filenames_2)]
 
 Specify the id Type, in this case an Experiment on COMPS
+
 .. code-block:: python
+
     manager = AnalyzeManager(configuration={}, partial_analyze_ok=True, platform=platform,
                              ids=[(experiment.uid, ItemType.EXPERIMENT)],
                              analyzers=analyzers)
+
 Now analyze:
+
 .. code-block:: python
+
     manager.analyze()
     sys.exit(0)
 
-
 python_model.python_model_allee
-########
+###############################
 
 :py:class:`~python_model.python_model_allee`
 
@@ -380,7 +414,9 @@ First, import some necessary system and idmtools packages.
 - ExperimentManager: To manage our experiment
 - Platform: To specify the platform you want to run your experiment on
 - PythonExperiment: We want to run an experiment executing a Python script
+
 .. code-block:: python
+
     import os
     import sys
     from functools import partial
@@ -388,6 +424,7 @@ First, import some necessary system and idmtools packages.
     from idmtools.assets import AssetCollection
     from idmtools.builders import SimulationBuilder
     from idmtools.core.platform_factory import Platform
+
 In order to run the experiment, we need to create a `Platform` and an `ExperimentManager`.
 
 The `Platform` defines where we want to run our simulation.
@@ -395,6 +432,7 @@ The `Platform` defines where we want to run our simulation.
 You can easily switch platforms by changing the Platform to for example 'Local' with Platform('Local'):
 
 .. code-block:: python
+
     from idmtools.entities.experiment import Experiment
     from idmtools.entities.templated_simulation import TemplatedSimulations
     from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
@@ -423,6 +461,7 @@ You can easily switch platforms by changing the Platform to for example 'Local' 
 Update and set simulation configuration parameters.
 
 .. code-block:: python
+
     def param_update(simulation, param, value):
         return simulation.task.set_parameter(param, 'sweepR04_a_' + str(value) + '.json')
 
@@ -431,21 +470,26 @@ Update and set simulation configuration parameters.
 Define our template:
 
 .. code-block:: python
+
     ts = TemplatedSimulations(base_task=base_task)
 
 Now that the experiment is created, we can add sweeps to it and set additional params
 
 .. code-block:: python
+
     builder = SimulationBuilder()
     builder.add_sweep_definition(setA, range(7850, 7855))
 
 Add sweep builder to template:
 
 .. code-block:: python
+
     ts.add_builder(builder)
 
 Create experiment:
+
 .. code-block:: python
+
     e = Experiment.from_template(
         ts,
         name=os.path.split(sys.argv[0])[1],
@@ -455,5 +499,7 @@ Create experiment:
     platform.run_items(e)
 
 Use system status as the exit code:
+
 .. code-block:: python
+
     sys.exit(0 if e.succeeded else -1)
