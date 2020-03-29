@@ -126,7 +126,7 @@ class ArmSimulationBuilder(SimulationBuilder):
          - 0.1
 
     Examples:
-        .. literalinclude:: ../examples/builders/arm_builder_python.py
+        .. literalinclude:: ../examples/builders/arm_experiment_builder_python.py
     """
 
     def __init__(self):
