@@ -62,6 +62,8 @@ external:
 
 .PHONY: html
 html:
+	rm -rf temp
+	sphinx-apidoc --no-toc -o . ../idmtools_core/idmtools
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(INTERNALOPTS) $(BUILDDIR)/html
 	$(INDEXBUILD) -i $(BUILDDIR)/html -o $(BUILDDIR)/html/_static/tipuesearch/tipuesearch_content.js -u $(URLPREFIX)
 	@echo

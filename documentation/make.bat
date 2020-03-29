@@ -89,6 +89,7 @@ if "%1" == "external" (
 )
 
 if "%1" == "html" (
+    sphinx-apidoc --no-toc -o . ../idmtools_core/idmtools
 	%SPHINXBUILD% -b html %ALLSPHINXOPTS% %INTERNALOPTS% %BUILDDIR%/html
 	if errorlevel 1 exit /b 1
 	%INDEXBUILD% -i %BUILDDIR%/html -o %BUILDDIR%/html/_static/tipuesearch/tipuesearch_content.js -u %URLPREFIX%
