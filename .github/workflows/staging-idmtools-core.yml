@@ -33,7 +33,8 @@ jobs:
         uses: ad-m/github-push-action@master
         with:
           branch: ${{ github.ref }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # use customer token on push for now because of protected branch
+          github_token: ${{ secrets.IDMTOOLS_TOKEN }}
       - name: Build and publish
         working-directory: idmtools_core
         env:
