@@ -155,22 +155,18 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
                          "python platform_analysis_bootstrap.py " + exp_id +
                          " infectiousness_csv_analyzer.InfectiousnessCSVAnalyzer,node_csv_analyzer.NodeCSVAnalyzer comps2")
 
-    @pytest.mark.skip
     @pytest.mark.comps
-    # TODO: Issue 663 SSMT PlatformAnalysis cannot put 2 analyzers in same file as main entry
     def test_ssmt_seir_model_analysis_single_script(self):
         exp_id = 'a980f265-995e-ea11-a2bf-f0921c167862'  # comps2 staging exp id
-        # filenames = {'filenames': ['output/individual.csv']}
-        # filenames_2 = {'filenames': ['output/node.csv']}
-        filenames = ['output/individual.csv']
-        filenames_2 = ['output/node.csv']
+        filenames = {'filenames': ['output/individual.csv']}
+        filenames_2 = {'filenames': ['output/node.csv']}
+
         # Initialize two analyser classes with the path of the output csv file
         from custom_csv_analyzer import InfectiousnessCSVAnalyzer, NodeCSVAnalyzer
-        analyzers = [InfectiousnessCSVAnalyzer(filenames=filenames), NodeCSVAnalyzer(filenames=filenames_2)]
+        analyzers = [InfectiousnessCSVAnalyzer, NodeCSVAnalyzer]
         analysis = PlatformAnalysis(platform=self.platform,
                                     experiment_ids=[exp_id],
                                     analyzers=analyzers,
-                                    # analyzers=[InfectiousnessCSVAnalyzer, NodeCSVAnalyzer],
                                     analyzers_args=[filenames, filenames_2],
                                     analysis_name=self.case_name,
                                     tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'})
