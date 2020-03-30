@@ -17,6 +17,7 @@ class ExampleAnalyzer(IAnalyzer):
 
     # In reduce, we are printing the simulation and result data filtered in map
     def reduce(self, all_data):
+        print("ExampleAnalyzer")
         for simulation, result in all_data.items():
             print(simulation)
             print(result)
@@ -35,6 +36,7 @@ class ExampleAnalyzer2(IAnalyzer):
         return result
 
     def reduce(self, all_data: Dict[IItem, Any]):
+        print("ExampleAnalyzer2")
         for simulation, result in all_data.items():
             print(simulation)
             print(result)
@@ -48,7 +50,7 @@ if __name__ == "__main__":
     analysis = PlatformAnalysis(platform=platform,
                                 experiment_ids=[experiment_id],
                                 analyzers=analyzers,
-                                analyzers_args=[{'filenames': 'output/result.json'}, {'filenames': 'config.json'}],
+                                analyzers_args=[{'filenames': ['output/result.json']}, {'filenames': ['config.json']}],
                                 analysis_name=os.path.split(sys.argv[0])[1])
     analysis.analyze(check_status=True)
     wi = analysis.get_work_item()
