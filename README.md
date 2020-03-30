@@ -1,11 +1,11 @@
 
-![Upload idmtools-core to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-core%20to%20Staging/badge.svg)
-![Upload idmtools-cli to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-cli%20to%20Staging/badge.svg)
-![Upload idmtools-models to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-models%20to%20Staging/badge.svg)
-![Upload idmtools-platform-comps to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-platform-comps%20to%20Staging/badge.svg)
-![Upload idmtools-platform-local to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-platform-local%20to%20Staging/badge.svg)\
-![Upload idmtools-platform-slurm to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-platform-slurm%20to%20Staging/badge.svg)
-![Upload idmtools-test to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-test%20to%20Staging/badge.svg)
+![Staging: idmtools-core](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Staging:%20idmtools-core/badge.svg?branch=dev)
+![Staging: idmtools-cli](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Staging:%20idmtools-cli/badge.svg?branch=dev)
+![Staging: idmtools-models](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Staging:%20idmtools-models/badge.svg?branch=dev)
+![Staging: idmtools-platform-comps](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Staging:%20idmtools-platform-comps/badge.svg?branch=dev)
+![Staging: idmtools-platform-local](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Staging:%20idmtools-platform-local/badge.svg?branch=dev)
+![Staging: idmtools-platform-slurm](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Staging:%20idmtools-platform-slurm/badge.svg?branch=dev)
+![Staging: idmtools-test](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Staging:%20idmtools-test/badge.svg?branch=dev)
 
 # IDM Modeling Tools
 
