@@ -26,7 +26,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
     def get(self, workflow_item_id: UUID, **kwargs) -> COMPSWorkItem:
         cols = kwargs.get('columns')
         children = kwargs.get('children')
-        cols = cols or ["id", "name"]
+        cols = cols or ["id", "name", "state"]
         children = children if children is not None else ["tags"]
 
         return COMPSWorkItem.get(workflow_item_id, query_criteria=QueryCriteria().select(cols).select_children(children))
