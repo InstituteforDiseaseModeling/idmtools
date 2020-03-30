@@ -27,8 +27,10 @@ class RequirementsToAssetCollection:
     _requirements: str = field(default=None, init=False)
 
     def __post_init__(self):
-        if not self.requirements_path and (not self.pkg_list or len(self.pkg_list) == 0):
-            raise ValueError("Impossible to proceed without either requirements path or with package list!")
+        if not self.requirements_path and (not self.pkg_list or len(self.pkg_list) == 0) and (
+                not self.extra_wheels or len(self.extra_wheels) == 0):
+            raise ValueError(
+                "Impossible to proceed without either requirements path or with package list or extra wheels!")
 
         self.requirements_path = os.path.abspath(self.requirements_path) if self.requirements_path else None
         self.pkg_list = self.pkg_list or []
@@ -193,19 +195,13 @@ class RequirementsToAssetCollection:
             display_all: determine if output all package releases
         Returns: the latest version of ven package
         """
-        from urllib import request
-        from pkg_resources import parse_version
-        from packaging.version import parse
+        from idmtools_platform_comps.utils.package_version import get_latest_version_from_pypi
+        from idmtools_platform_comps.utils.package_version import get_latest_package_version_from_artifactory
 
-        url = f'https://pypi.python.org/pypi/{pkg_name}/json'
-        releases = json.loads(request.urlopen(url).read())['releases']
-        all_releases = sorted(releases, key=parse_version, reverse=True)
+        latest_version = get_latest_package_version_from_artifactory(pkg_name, display_all)
 
-        if display_all:
-            print(all_releases)
-
-        release_versions = [ver for ver in all_releases if not parse(ver).is_prerelease]
-        latest_version = release_versions[0]
+        if not latest_version:
+            latest_version = get_latest_version_from_pypi(pkg_name, display_all)
 
         return latest_version
 
