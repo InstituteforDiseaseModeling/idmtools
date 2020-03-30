@@ -1,6 +1,36 @@
+
+![Upload idmtools-core to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-core%20to%20Staging/badge.svg)
+![Upload idmtools-cli to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-cli%20to%20Staging/badge.svg)
+![Upload idmtools-models to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-models%20to%20Staging/badge.svg)
+![Upload idmtools-platform-comps to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-platform-comps%20to%20Staging/badge.svg)
+![Upload idmtools-platform-local to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-platform-local%20to%20Staging/badge.svg)\
+![Upload idmtools-platform-slurm to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-platform-slurm%20to%20Staging/badge.svg)
+![Upload idmtools-test to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-test%20to%20Staging/badge.svg)
+
 # IDM Modeling Tools
 
-# Installation 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [User Installation](#user-installation)
+  - [Recommended install](#recommended-install)
+  - [Advanced Install](#advanced-install)
+  - [Pre-requisites](#pre-requisites)
+  - [Additional Resources](#additional-resources)
+- [Development Environment Setup](#development-environment-setup)
+  - [First Time Setup](#first-time-setup)
+  - [General Use](#general-use)
+  - [IDE/Runtime Setup](#ideruntime-setup)
+  - [Running specific tests from the command line](#running-specific-tests-from-the-command-line)
+  - [WSL2 on Windows Setup(Experimental)](#wsl2-on-windows-setupexperimental)
+  - [Troubleshooting the Development Environment](#troubleshooting-the-development-environment)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+# User Installation
+
+## Recommended install
 The recommended install is to use
 ```bash
 pip install idmtools[full] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
@@ -13,6 +43,7 @@ pip install idmtools[idm] --index-url=https://packages.idmod.org/api/pypi/pypi-p
 ```
 This will install the core tools, the cli, the comps, support for EMOD models, and python models
 
+## Advanced Install
 You can also install just the individual packages to create minimal environments
 
 - `pip install idmtools --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Core package
@@ -27,11 +58,15 @@ You can also install just the individual packages to create minimal environments
 - Docker(Required for the local platform)
   On Windows, please use Docker Desktop 2.1.0.5 or 2.2.0.1
 
-## Development Environment Setup
+## Additional Resources
+
+Official Documentation is located at https://institutefordiseasemodeling.github.io/Documentation/idm-tools/
+
+# Development Environment Setup
 
 When setting up your environment for the first time, you can use the following instructions
 
-### First Time Setup
+## First Time Setup
 1) Clone the repository:
    ```bash
    > git clone https://github.com/InstituteforDiseaseModeling/idmtools.git
@@ -44,7 +79,7 @@ When setting up your environment for the first time, you can use the following i
 5) Run `docker login docker-staging.idmod.org`
 6) Then run `python dev_scripts/bootstrap.py`. This will install all the tools. 
 
-### General Use
+## General Use
 After the first install almost everything you need as a developer is part of the makefiles. There is a Makefile is every project directory. There is also a makefile at the top-level of the project.
 
 To use the makefiles you can explore the available commands by running `make help`. On Windows, use `pymake help` 
@@ -63,7 +98,7 @@ coverage    -   Run tests and generate coverage report that is shown in browser
 
 Some packages have unique build related commands, specifically the local platform. Use `make help` to identify specific commands
 
-### IDE/Runtime Setup
+## IDE/Runtime Setup
 
 For source completion and indexing, set the package paths in your IDE. In PyCharm, select the following directories then right-click and select `Mark Directory as -> Source Root`.
 ![Mark Directory as Sources Root](development_documentation/mark_directory_as_source.png)
@@ -77,7 +112,7 @@ The directories that should be added as source roots are
 - `idmtools/idmtools_models`
 - `idmtools/idmtools_test`
 
-### Running specific tests from the command line
+## Running specific tests from the command line
 
 To run a select set of tests, you can use the `run_all.py` python script
 
@@ -99,7 +134,7 @@ py.test test_emod.py::TestLocalPlatformEMOD::test_duplicated_eradication
 In addition, you can rerun just the failed test using either the top-level `pymake test-failed` rule or by using the 
 `--lf` switch on py.test
 
-### WSL2 on Windows Setup(Experimental)
+## WSL2 on Windows Setup(Experimental)
 
 1. Enable Windows Features by running the following in a Windows Powershell
    ```powershell
@@ -118,7 +153,7 @@ In addition, you can rerun just the failed test using either the top-level `pyma
        ```
    b. If you do not yet have a copy of linux installed through WSL, see  https://docs.microsoft.com/en-us/windows/wsl/install-win10#install-your-linux-distribution-of-choice
 
-# Troubleshooting the Development Environment
+## Troubleshooting the Development Environment
 
 1. Docker Auth issues.
 
