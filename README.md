@@ -51,7 +51,7 @@ You can also install just the individual packages to create minimal environments
 - `pip install idmtools-platform-comps --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Support for COMPS
 - `pip install idmtools-platform-local --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Support for Local Platform
 - `pip install idmtools-models --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Python and generic models
-- `pip install idmtools-model-dtk --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - EMOD Model support
+- `pip install idmtools-model-emod --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - EMOD Model support
 
 ## Pre-requisites
 - Python 3.6/3.7 x64
