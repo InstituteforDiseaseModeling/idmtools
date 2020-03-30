@@ -8,7 +8,6 @@ from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
 
-
 with platform('COMPS2'):
     base_task = JSONConfiguredPythonTask(
         script_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"),

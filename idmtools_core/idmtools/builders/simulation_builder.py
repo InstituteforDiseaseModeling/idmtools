@@ -16,6 +16,9 @@ TSweepFunction = Union[
 class SimulationBuilder:
     """
     Class that represents an experiment builder.
+
+    Examples:
+        .. literalinclude:: ../examples/builders/simulation_builder.py
     """
     # The keyword searched in the function used for sweeps
     SIMULATION_ATTR = 'simulation'

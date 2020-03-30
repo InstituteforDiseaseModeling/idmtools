@@ -63,7 +63,6 @@ Using builders
 --------------
 In this release, to support parameter sweeps for models, we have the following builders to assist you:
     #. SimulationBuilder - you set your sweep parameters in your scripts and it generates a config.json file with your sweeps for your experiment/simulations to use
-    #. StandAloneSimulationBuilder - use this when you just want to test one simulation
     #. CSVExperimentBuilder - you can use a CSV file to do your parameter sweeps
     #. YamlSimulationBuilder - you can use a Yaml file to do your parameter sweeps
     #. Arm Builder for cross and pair parameters, which allows you to cross parameters, like you cross your arms.
