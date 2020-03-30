@@ -2,7 +2,7 @@
 #
 
 # You can set these variables from the command line.
-SPHINXOPTS    = -t tools 
+SPHINXOPTS    =
 INTERNALOPTS  = -t internal
 SPHINXBUILD   = sphinx-build
 INDEXBUILD    = python $(BUILDDIR)/../scripts/gti.py
