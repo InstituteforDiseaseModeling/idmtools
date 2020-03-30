@@ -1,3 +1,23 @@
+![Upload idmtools-platform-comps to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-platform-comps%20to%20Staging/badge.svg)
+
+# idmtools-platform-comps
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+  - [Installing](#installing)
+- [Development Tips](#development-tips)
+- [Building SSMT Docker Image](#building-ssmt-docker-image)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## Installing
+
+```bash
+pip install idmtools-platform-comps --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+```
+
 # Development Tips
 
 There is a Makefile file available for most common development tasks. Here is a list of commands
