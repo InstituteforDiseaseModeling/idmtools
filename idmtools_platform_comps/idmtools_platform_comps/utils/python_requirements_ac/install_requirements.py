@@ -6,8 +6,7 @@ import traceback
 CURRENT_DIRECTORY = os.getcwd()
 LIBRARY_PATH = os.path.join(CURRENT_DIRECTORY, 'Libraries', 'site_packages')
 REQUIREMENT_FILE = 'requirements_updated.txt'
-
-URL_INDEX = 'https://packages.idmod.org/artifactory/api/pypi/pypi-production/simple'
+INDEX_URL = 'https://packages.idmod.org/artifactory/api/pypi/pypi-production/simple'
 
 
 def install_packages_from_requirements(python_paths=None):
@@ -29,8 +28,8 @@ def install_packages_from_requirements(python_paths=None):
 
     print("Running pip install -r {} to tmp directory".format(REQUIREMENT_FILE))
     subprocess.check_call(
-        [sys.executable, "-m", "pip", "install", "-t", LIBRARY_PATH, "-r", f"Assets/{REQUIREMENT_FILE}"], "-i",
-        f"{URL_INDEX}", env=env)
+        [sys.executable, "-m", "pip", "install", "-t", LIBRARY_PATH, "-r", f"Assets/{REQUIREMENT_FILE}", "-i",
+         f"{INDEX_URL}"], env=env)
 
 
 if __name__ == "__main__":
