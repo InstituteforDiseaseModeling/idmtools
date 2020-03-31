@@ -14,7 +14,7 @@ class IEntity(IItem, metaclass=ABCMeta):
     Interface for all entities in the system.
     """
     platform_id: UUID = field(default=None, compare=False, metadata={"md": True})
-    _platform: 'IPlatform' = field(default=None, compare=False, metadata={"pickle_ignore": True})
+    _platform: 'IPlatform' = field(default=None, compare=False, metadata={"pickle_ignore": True})  # noqa E821
     parent_id: UUID = field(default=None, metadata={"md": True})
     _parent: 'IEntity' = field(default=None, compare=False, metadata={"pickle_ignore": True})
     status: EntityStatus = field(default=None, compare=False, metadata={"pickle_ignore": True})
@@ -35,7 +35,7 @@ class IEntity(IItem, metaclass=ABCMeta):
         self.status = EntityStatus.CREATED
 
     @classmethod
-    def from_id(cls, item_id: Union[str, UUID], platform: 'IPlatform' = None) -> 'IEntity':
+    def from_id(cls, item_id: Union[str, UUID], platform: 'IPlatform' = None) -> 'IEntity':  # noqa E821
         if platform is None:
             from idmtools.core.platform_factory import current_platform
             if current_platform is None:
@@ -66,7 +66,7 @@ class IEntity(IItem, metaclass=ABCMeta):
             self.parent_id = self._parent = None
 
     @property
-    def platform(self) -> 'IPlatform':
+    def platform(self) -> 'IPlatform':  # noqa E821
         if not self._platform and self.platform_id:
             self._platform = PlatformPersistService.retrieve(self.platform_id)
         return self._platform

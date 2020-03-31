@@ -10,7 +10,7 @@ from idmtools.entities.iworkflow_item import IWorkflowItem
 
 @dataclass
 class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
-    platform: 'IPlatform'
+    platform: 'IPlatform'  # noqa: F821
     platform_type: Type
 
     @abstractmethod

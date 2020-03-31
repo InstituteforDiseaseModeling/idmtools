@@ -28,7 +28,7 @@ def cut_iterable_to(obj: Iterable, to: int) -> Tuple[Union[List, Mapping], int]:
 
 
 class ParentIterator(typing.Iterator):
-    def __init__(self, lst, parent: 'IEntity'):
+    def __init__(self, lst, parent: 'IEntity'):  # noqa F821
         self.items = lst
         self.__iter = iter(self.items) if not isinstance(self.items, (typing.Iterator, Generator)) else self.items
         self.parent = parent

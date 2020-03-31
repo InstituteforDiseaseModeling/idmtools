@@ -88,7 +88,7 @@ class Platform:
         inputs = IdmConfigParser.retrieve_dict_config_block(field_type, section)
 
         # Make sure the user values have the requested type
-        fs_kwargs = validate_user_inputs_against_dataclass(field_type, kwargs)
+        fs_kwargs = validate_user_inputs_against_dataclass(field_type, kwargs)  # noqa: F841
 
         # Update attr based on priority: #1 Code, #2 INI, #3 Default
         for fn in set(kwargs.keys()).intersection(set(field_name)):
@@ -136,7 +136,8 @@ def platform(*args, **kwds):
     finally:
         # Code to release resource, e.g.:
         logger.debug('Un-setting current platform context')
-        del current_platform
+        old_current_platform = current_platform
         # check if there is other platforms on the stack and set if so
         if len(current_platform_stack):
             current_platform = current_platform_stack.pop()
+        del old_current_platform

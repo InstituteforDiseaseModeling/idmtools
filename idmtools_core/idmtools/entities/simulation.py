@@ -20,18 +20,18 @@ class Simulation(IAssetsEnabled, INamedEntity):
     Class that represents a generic simulation.
     This class needs to be implemented for each model type with specifics.
     """
-    task: 'ITask' = field(default=None)
+    task: 'ITask' = field(default=None)  # noqa: F821
     item_type: 'ItemType' = field(default=ItemType.SIMULATION, compare=False)
     pre_creation_hooks: List[Callable[[], NoReturn]] = field(default_factory=lambda: [Simulation.gather_assets])
     # control whether we should replace the task with a proxy after creation
     __replace_task_with_proxy: bool = field(default=True, init=False, compare=False)
 
     @property
-    def experiment(self) -> 'Experiment':
+    def experiment(self) -> 'Experiment':  # noqa: F821
         return self.parent
 
     @experiment.setter
-    def experiment(self, experiment: 'Experiment'):
+    def experiment(self, experiment: 'Experiment'):  # noqa: F821
         self.parent = experiment
 
     def __repr__(self):
@@ -50,7 +50,7 @@ class Simulation(IAssetsEnabled, INamedEntity):
         for x in self.pre_creation_hooks:
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f'Calling simulation pre-create hook named '
-                                 f'{x.__name__ if hasattr(x, "__name__") else str(x)}')
+                             f'{x.__name__ if hasattr(x, "__name__") else str(x)}')
             x(self)
 
         if self.__class__ is not Simulation:
@@ -99,7 +99,8 @@ class Simulation(IAssetsEnabled, INamedEntity):
         self.assets.add_assets(self.task.transient_assets, fail_on_duplicate=False)
 
     @classmethod
-    def from_task(cls, task: 'ITask', tags: Dict[str, Any] = None, asset_collection: AssetCollection = None):
+    def from_task(cls, task: 'ITask', tags: Dict[str, Any] = None,
+                  asset_collection: AssetCollection = None):  # noqa: F821
         return Simulation(task=task, tags=dict() if tags is None else tags,
                           assets=asset_collection if asset_collection else AssetCollection())
 

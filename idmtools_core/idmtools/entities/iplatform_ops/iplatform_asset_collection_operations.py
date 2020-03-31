@@ -10,7 +10,7 @@ from idmtools.entities.iplatform_ops.utils import batch_create_items
 
 @dataclass
 class IPlatformAssetCollectionOperations(CacheEnabled, ABC):
-    platform: 'IPlatform'
+    platform: 'IPlatform'  # noqa: F821
     platform_type: Type
 
     def pre_create(self, asset_collection: AssetCollection, **kwargs) -> NoReturn:
