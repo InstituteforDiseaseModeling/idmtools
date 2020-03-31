@@ -1,3 +1,28 @@
+![Staging: idmtools-cli](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Staging:%20idmtools-cli/badge.svg?branch=dev)
+
+# idmtools-cli
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+  - [Installing](#installing)
+- [Development Tips](#development-tips)
+- [Using the CLI](#using-the-cli)
+  - [Experiment commands](#experiment-commands)
+    - [Status](#status)
+    - [Delete](#delete)
+  - [Simulation Commands](#simulation-commands)
+  - [Status](#status-1)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## Installing
+
+```bash
+pip install idmtools-cli --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+```
+
 # Development Tips
 
 There is a Makefile file available for most common development tasks. Here is a list of commands
