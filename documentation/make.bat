@@ -5,7 +5,7 @@ REM Command file for Sphinx documentation
 if "%SPHINXBUILD%" == "" (
 	set SPHINXBUILD=sphinx-build
 )
-set SPHINXOPTS=-t tools -W
+set SPHINXOPTS=-W
 set INTERNALOPTS=-t internal
 set BUILDDIR=_build
 set INDEXBUILD=python %BUILDDIR%/../scripts/gti.py
@@ -89,7 +89,10 @@ if "%1" == "external" (
 )
 
 if "%1" == "html" (
-    sphinx-apidoc --no-toc -o . ../idmtools_core/idmtools
+	del modules.rst >nul 2>&1
+	del idmtools_index.rst >nul 2>&1 
+    sphinx-apidoc -f -e -o . ../idmtools_core/idmtools
+	REN modules.rst idmtools_index.rst
 	%SPHINXBUILD% -b html %ALLSPHINXOPTS% %INTERNALOPTS% %BUILDDIR%/html
 	if errorlevel 1 exit /b 1
 	%INDEXBUILD% -i %BUILDDIR%/html -o %BUILDDIR%/html/_static/tipuesearch/tipuesearch_content.js -u %URLPREFIX%

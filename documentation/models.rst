@@ -13,3 +13,4 @@ Modules
 	idmtools_models.python
 	idmtools_models.r
 	idmtools_models.json_configured_task
+	dtk

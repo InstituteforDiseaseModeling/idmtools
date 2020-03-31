@@ -138,9 +138,8 @@ Now add the sweep to our builder:
     builder.add_sweep_definition(setA, range(3))
 
 
-.. literalinclude:: python_sim.py
+.. literalinclude:: ../examples/python_model/python_sim.py
     :language: python
-    :emphasize-lines:
     :linenos:
 
 

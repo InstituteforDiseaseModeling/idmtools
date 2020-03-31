@@ -8,7 +8,7 @@ API reference
 
 
 
-   core
+   idmtools_index
    models
    platform_comps
    platform_local

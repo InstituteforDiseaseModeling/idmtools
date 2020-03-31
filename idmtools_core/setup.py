@@ -62,7 +62,8 @@ setup(
     entry_points=dict(
         idmtools_experiment=["idmtools_experiment = idmtools.entities.experiment:ExperimentSpecification"],
         idmtools_task=  # noqa: E251
-                      ["idmtools_task_command = idmtools.entities.command_task:CommandTaskSpecification"]
+                      ["idmtools_task_command = idmtools.entities.command_task:CommandTaskSpecification",
+                      "idmtools_task_docker = idmtools.core.docker_task:DockerTaskSpecification"]
         ),
     test_suite='tests',
     extras_require=extras,
