@@ -37,6 +37,7 @@ guide modelers through necessary tasks. See :doc:`cookiecutters` for the availab
 
    installation
    packages-overview.rst
+   configuration
    platforms
    create-sims
    run-sims
