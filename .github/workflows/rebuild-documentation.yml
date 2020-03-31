@@ -23,4 +23,4 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: DocumentationHTML
-          path: Documentation/idm-tools/_build/html/
+          path: documentation/_build/html/
