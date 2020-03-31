@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from logging import getLogger
 from typing import Any, NoReturn, List, TypeVar, Dict, Optional, Union
-from idmtools.core.interfaces.iitem import IItem, IItemList
+from idmtools.core.interfaces.iitem import IItemList
 from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools.entities.simulation import Simulation
 

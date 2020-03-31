@@ -1,4 +1,4 @@
-![Upload idmtools-core to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-core%20to%20Staging/badge.svg)
+![Staging: idmtools-core](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Staging:%20idmtools-core/badge.svg?branch=dev)
 
 # idmtools-core
 
@@ -26,4 +26,5 @@ lint        -   Lint package and tests
 test        -   Run All tests
 coverage    -   Run tests and generate coverage report that is shown in browser
 ```
+
 On Windows, you can use `pymake` instead of `make`

@@ -1,4 +1,4 @@
-![Upload idmtools-platform-slurm to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-platform-slurm%20to%20Staging/badge.svg)
+![Staging: idmtools-platform-slurm](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Staging:%20idmtools-platform-slurm/badge.svg?branch=dev)
 
 # idmtools-platform-slurm
 
