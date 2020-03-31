@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from logging import getLogger
 import pluggy
-from typing import Dict, List, Union
+from typing import List, Union
 
 PLUGIN_REFERENCE_NAME = 'idmtools_plugins'
 get_description_spec = pluggy.HookspecMarker(PLUGIN_REFERENCE_NAME)

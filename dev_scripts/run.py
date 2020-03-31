@@ -8,7 +8,7 @@ from logging import getLogger
 # on windows virtual env is not populated through pymake
 if sys.platform == "win32" and 'VIRTUAL_ENV' in os.environ:
     sys.path.insert(0, os.environ['VIRTUAL_ENV'] + "\\Lib\\site-packages")
-import coloredlogs
+import coloredlogs  # noqa: E402
 
 logging.addLevelName(15, 'VERBOSE')
 logging.addLevelName(35, 'SUCCESS')
@@ -70,7 +70,8 @@ if __name__ == '__main__':
         for line in execute(args.ex):
             # catch errors where possible
             if any([s in line for s in
-                    ["rollbackFailedOptional:", "extract:yarn:", "Using cache", "copying ", "creating idm", "optional dependency"]]):
+                    ["rollbackFailedOptional:", "extract:yarn:", "Using cache", "copying ", "creating idm",
+                     "optional dependency"]]):
                 logger.log(15, line.strip())
             elif any([s in line for s in ["ERR!", "ERROR", "FAILED", "Error:", "Failed"]]):
                 logger.critical(line.strip())
