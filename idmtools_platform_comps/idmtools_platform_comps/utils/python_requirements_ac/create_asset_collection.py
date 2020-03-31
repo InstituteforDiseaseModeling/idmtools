@@ -100,7 +100,7 @@ def main():
     for af in asset_files:
         dirpath = af['path_from_root']
         rp = os.path.relpath(dirpath, path_to_ac) if dirpath != path_to_ac else ''
-        rp = os.path.join('site_packages', rp)      # add all under site_packages
+        rp = os.path.join('site_packages', rp)      # add all libray under site_packages
         ac.add_asset(AssetCollectionFile(af['friendly_name'], rp), data=get_data(af['url']))
 
     ac.save()

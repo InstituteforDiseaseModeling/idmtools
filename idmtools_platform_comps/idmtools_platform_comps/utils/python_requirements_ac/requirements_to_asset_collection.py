@@ -29,8 +29,7 @@ class RequirementsToAssetCollection:
     _requirements: str = field(default=None, init=False)
 
     def __post_init__(self):
-        if not self.requirements_path and (not self.pkg_list or len(self.pkg_list) == 0) and (
-                not self.extra_wheels or len(self.extra_wheels) == 0):
+        if not any([self.requirements_path, self.pkg_list, self.extra_wheels]):
             raise ValueError(
                 "Impossible to proceed without either requirements path or with package list or extra wheels!")
 
@@ -254,9 +253,6 @@ class RequirementsToAssetCollection:
 
         if self.extra_wheels:
             update_req_list.extend([f"Assets/{os.path.basename(whl)}" for whl in self.extra_wheels])
-
-        # print(update_req_list)
-        # print(comment_list)
 
         return update_req_list
 

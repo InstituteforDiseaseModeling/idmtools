@@ -16,7 +16,6 @@ class LinkHTMLParser(HTMLParser):
             return
 
         attr = dict(attrs)
-        # print(attr)
         v = attr['href']
         v = v.rstrip('/')
         self.pkg_version.append(v)
@@ -30,13 +29,10 @@ def get_latest_version_from_pypi(pkg_name, display_all=False):
         display_all: determine if output all package releases
     Returns: the latest version of ven package
     """
-    from requests import HTTPError
     url = f'https://pypi.python.org/pypi/{pkg_name}/json'
     try:
         releases = json.loads(request.urlopen(url).read())['releases']
     except Exception as ex:
-        # print(ex)
-        # print(f'{pkg_name} Not Found.')
         return None
 
     all_releases = sorted(releases, key=parse_version, reverse=True)
@@ -48,18 +44,6 @@ def get_latest_version_from_pypi(pkg_name, display_all=False):
     latest_version = release_versions[0]
 
     return latest_version
-
-
-def get_latest_version_from_pypi_try(pkg_name, display_all=False):
-    """
-    Utility to get the latest version for a given package name
-    Args:
-        pkg_name: package name given
-        display_all: determine if output all package releases
-    Returns: the latest version of ven package
-    """
-    pkg_url = f'https://pypi.python.org/pypi/{pkg_name}/json'
-    return get_latest_version_from_site(pkg_url, display_all)
 
 
 def get_latest_package_version_from_artifactory(pkg_name, display_all=False):
