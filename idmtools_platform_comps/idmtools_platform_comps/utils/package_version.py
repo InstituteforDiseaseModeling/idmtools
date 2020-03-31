@@ -76,20 +76,6 @@ def get_latest_package_version_from_artifactory(pkg_name, display_all=False):
     return get_latest_version_from_site(pkg_url, display_all)
 
 
-def get_latest_ssmt_image_version_from_artifactory(pkg_name='comps_ssmt_worker', display_all=False):
-    """
-    Utility to get the latest version for a given package name
-    Args:
-        pkg_name: package name given
-        display_all: determine if output all package releases
-    Returns: the latest version of ven package
-    """
-
-    pkg_path = 'https://packages.idmod.org/artifactory/list/idm-docker-public/idmtools/'
-    pkg_url = os.path.join(pkg_path, pkg_name)
-    return get_latest_version_from_site(pkg_url, display_all)
-
-
 def get_latest_version_from_site(pkg_url, display_all=False):
     """
     Utility to get the latest version for a given package name
@@ -106,22 +92,12 @@ def get_latest_version_from_site(pkg_url, display_all=False):
 
     htmlStr = resp.text
 
-
-    # try:
-    #     htmlStr = request.urlopen(pkg_url).read().decode('utf-8')
-    # except Exception as ex:
-    #     # print(ex)
-    #     # print(f'{pkg_name} Not Found.')
-    #     return None
-
     parser = LinkHTMLParser()
     parser.feed(htmlStr)
     releases = parser.pkg_version
-    # print(releases)
     releases = [v for v in releases if not v.startswith('.')]
 
     all_releases = sorted(releases, key=parse_version, reverse=True)
-    # print(all_releases)
 
     if display_all:
         print(all_releases)
