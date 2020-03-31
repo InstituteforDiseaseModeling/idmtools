@@ -1,5 +1,5 @@
 import os
-import json
+from logging import getLogger, DEBUG
 import hashlib
 from dataclasses import dataclass, field
 from idmtools.assets import Asset
@@ -15,6 +15,8 @@ REQUIREMENT_FILE = 'requirements_updated.txt'
 MODEL_LOAD_LIB = "install_requirements.py"
 MODEL_CREATE_AC = 'create_asset_collection.py'
 MD5_KEY = 'idmtools-requirements-md5'
+
+logger = getLogger(__name__)
 
 
 @dataclass(repr=False)
@@ -75,18 +77,22 @@ class RequirementsToAssetCollection:
 
         # Create Experiment to install custom requirements
         exp = self.run_experiment_to_install_lib()
-        print('\nexp: ', exp.uid)
+        if logger.isEnabledFor(DEBUG):
+            logger.debug('\nexp: ', exp.uid)
 
         if exp is None:
-            print('Failed to install requirements!')
+            if logger.isEnabledFor(DEBUG):
+                logger.debug('Failed to install requirements!')
             exit()
 
         # Create a WorkItem to create asset collection
         wi = self.run_wi_to_create_ac(exp.uid)
-        print('\nwi: ', wi.uid)
+        if logger.isEnabledFor(DEBUG):
+            logger.debug('\nwi: ', wi.uid)
 
         if wi is None:
-            print('Failed to create asset collection!')
+            if logger.isEnabledFor(DEBUG):
+                logger.debug('Failed to create asset collection!')
             exit()
 
         # get ac or return ad_id
@@ -124,7 +130,8 @@ class RequirementsToAssetCollection:
         Returns: comps asset collection
         """
         md5_str = md5_check or self.checksum
-        print('md5_str: ', md5_str)
+        if logger.isEnabledFor(DEBUG):
+            logger.debug('md5_str: ', md5_str)
 
         # check if ac with tag idmtools-requirements-md5 = my_md5 exists
         ac_list = COMPSAssetCollection.get(
@@ -171,7 +178,8 @@ class RequirementsToAssetCollection:
         from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
 
         md5_str = self.checksum
-        print('md5_str: ', md5_str)
+        if logger.isEnabledFor(DEBUG):
+            logger.debug('md5_str: ', md5_str)
 
         wi_name = "wi to create ac"
         command = f"python {MODEL_CREATE_AC} {exp_id} {md5_str} {self.platform.endpoint}"
