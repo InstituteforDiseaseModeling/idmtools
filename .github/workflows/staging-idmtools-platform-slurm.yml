@@ -26,11 +26,6 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: '3.7'
-      - name: Bump build
-        working-directory: idmtools_platform_slurm
-        run: |
-          bump2version build --commit --allow-dirty
-          git pull
       - name: Build and publish
         working-directory: idmtools_platform_slurm
         env:
