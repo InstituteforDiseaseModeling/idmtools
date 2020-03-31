@@ -26,7 +26,7 @@ class CacheEnabled:
     def __del__(self):
         self.cleanup_cache()
 
-    def initialize_cache(self, shards: Optional[int]=None, eviction_policy=None):
+    def initialize_cache(self, shards: Optional[int] = None, eviction_policy = None):
         """
         Initialize cache
         
@@ -65,11 +65,6 @@ class CacheEnabled:
             return
 
         if self._cache is not None:
-            try:
-                logger.debug(f"Cleaning up the cache at {self._cache_directory}")
-            # Happens when things are shutting down
-            except:  # noqa E722
-                pass
             self._cache.close()
             del self._cache
 
