@@ -1,4 +1,4 @@
-![Upload idmtools-cli to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-cli%20to%20Staging/badge.svg)
+![Staging: idmtools-cli](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Staging:%20idmtools-cli/badge.svg?branch=dev)
 
 # idmtools-cli
 

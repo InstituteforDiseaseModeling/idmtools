@@ -7,7 +7,6 @@ import pytest
 from COMPS.Data import Experiment
 
 from idmtools.core.platform_factory import Platform
-from idmtools.builders import StandAloneSimulationsBuilder
 from idmtools.managers import ExperimentManager
 from idmtools_model_emod import EMODExperiment
 
@@ -44,7 +43,6 @@ class TestExperiments(ITestWithPersistence):
         asset_collection.add_directory(assets_directory=os.path.join(COMMON_INPUT_PATH, "custom"))
         experiment.add_assets(asset_collection)
 
-        builder = StandAloneSimulationsBuilder()
         for i in range(2):
             simulation = experiment.simulation()
             simulation.set_parameter("Enable_Immunity", 0)

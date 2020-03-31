@@ -48,7 +48,7 @@ setup(
     include_package_data=True,
     keywords='modeling, IDM',
     name='idmtools_models',
-    entry_points=dict(idmtools_task=
+    entry_points=dict(idmtools_task=  # noqa E521
                       ["idmtools_task_python = idmtools_models.python.python_task:PythonTaskSpecification",
                        "idmtools_task_python_json = idmtools_models.python.python_task:JSONConfiguredPythonTaskSpecification",
                        "idmtools_task_r = idmtools_models.r.r_task:RTaskSpecification",

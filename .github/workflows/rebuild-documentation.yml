@@ -13,22 +13,14 @@ jobs:
     if: "!contains(github.event.head_commit.message, 'Bump version: ')"
     steps:
       - uses: actions/checkout@v2
-        with:
-          path: 'idmtools'
-      - name: Checkout Documentation
-        uses: actions/checkout@v2
-        with:
-          repository: InstituteforDiseaseModeling/Documentation
-          path: 'Documentation'
-          token: ${{ secrets.IDMTOOLS_TOKEN }}
       - name: Install dependencies
         uses: ammaraskar/sphinx-action@0.4
         with:
-          docs-folder: "Documentation/idm-tools"
-          pre-build-command: "mkdir -p /usr/share/man/man1 && apt-get update -y && apt-get install -y plantuml && pip3 install sphinx-rtd-theme sphinxcontrib-napoleon beautifulsoup4 sphinxcontrib-plantuml"
+          docs-folder: "documentation"
+          pre-build-command: "pip install -r requirements.txt"
           build-command: "make html"
       - name: Upload Documentation Artifacts
         uses: actions/upload-artifact@v1
         with:
           name: DocumentationHTML
-          path: Documentation/idm-tools/_build/html/
+          path: documentation/_build/html/

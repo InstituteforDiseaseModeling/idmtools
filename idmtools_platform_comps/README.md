@@ -1,4 +1,4 @@
-![Upload idmtools-platform-comps to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-platform-comps%20to%20Staging/badge.svg)
+![Staging: idmtools-platform-comps](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Staging:%20idmtools-platform-comps/badge.svg?branch=dev)
 
 # idmtools-platform-comps
 

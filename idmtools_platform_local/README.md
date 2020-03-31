@@ -1,4 +1,4 @@
-![Upload idmtools-platform-local to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-platform-local%20to%20Staging/badge.svg)
+![Staging: idmtools-platform-local](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Staging:%20idmtools-platform-local/badge.svg?branch=dev)
 
 # idmtools-platform-local
 

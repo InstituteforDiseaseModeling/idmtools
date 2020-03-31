@@ -396,3 +396,4 @@ idmtools_model_emod/tests/reload_sim_download/
 idmtools_model_emod/tests/serialized_file_download/
 
 **.buildlog
+documentation/_build

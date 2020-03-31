@@ -50,7 +50,7 @@ if __name__ == "__main__":
 
     try:
         install_packages_from_requirements(sys.path)
-    except Exception as e:
+    except Exception:
         tb = traceback.format_exc()
         print(tb)
     finally:
