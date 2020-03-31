@@ -10,7 +10,7 @@ from idmtools.entities.simulation import Simulation
 
 @dataclass
 class IPlatformSimulationOperations(CacheEnabled, ABC):
-    platform: 'IPlatform'
+    platform: 'IPlatform'  # noqa: F821
     platform_type: Type
 
     @abstractmethod

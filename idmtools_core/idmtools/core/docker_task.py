@@ -97,7 +97,7 @@ class DockerTask(ITask):
                                     prog.n = step
                                     prog.total = total_steps
                                     line = grps.group(3)
-                                except:
+                                except:  # noqa E722
                                     pass
                                 prog.set_description(line)
                                 build_step = line
@@ -119,7 +119,7 @@ class DockerTask(ITask):
             finally:
                 prog.close()
 
-    def reload_from_simulation(self, simulation: 'Simulation'):
+    def reload_from_simulation(self, simulation: 'Simulation'):  # noqa E821
         pass
 
 
