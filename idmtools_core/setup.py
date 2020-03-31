@@ -70,4 +70,3 @@ setup(
     version='1.0.0+nightly',
     zip_safe=False
 )
-
