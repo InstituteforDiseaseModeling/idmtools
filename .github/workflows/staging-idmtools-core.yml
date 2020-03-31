@@ -28,12 +28,15 @@ jobs:
           git config --global user.name "idmtools@idmod.org"
       - name: Bump build
         working-directory: idmtools_core
-        run: bump2version build --commit --allow-dirty
+        run: |
+          bump2version build --commit --allow-dirty
+          git pull
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
           branch: ${{ github.ref }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # use customer token on push for now because of protected branch
+          github_token: ${{ secrets.IDMTOOLS_TOKEN }}
       - name: Build and publish
         working-directory: idmtools_core
         env:
