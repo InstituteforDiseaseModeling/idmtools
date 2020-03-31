@@ -1,0 +1,17 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Generate Table of Contents in Markdown
+
+on:
+  push:
+    paths:
+      - '**.md'
+
+jobs:
+  generateTOC:
+    name: TOC Generator
+    runs-on: ubuntu-latest
+    steps:
+      - uses: technote-space/toc-generator@v2
+        with:
+          TARGET_PATHS: .

@@ -1,0 +1,26 @@
+name: "Rebuild documentation"
+
+on:
+  push:
+    paths:
+      - '**.py'
+      - 'documentation/**'
+
+jobs:
+  rebuild-documentation:
+
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'Bump version: ')"
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        uses: ammaraskar/sphinx-action@0.4
+        with:
+          docs-folder: "documentation"
+          pre-build-command: "pip install -r requirements.txt"
+          build-command: "make html"
+      - name: Upload Documentation Artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: DocumentationHTML
+          path: documentation/_build/html/

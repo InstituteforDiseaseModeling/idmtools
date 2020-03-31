@@ -61,6 +61,13 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, ABC):
         """
         self.user_files = FileList()
 
+    def pre_creation(self) -> None:
+        """
+        Called before the actual creation of the entity.
+        """
+        files_to_be_removed = ('comps_log.log', 'idmtools.log')
+        self.user_files.files = [f for f in self.user_files.files if f.filename.lower() not in files_to_be_removed]
+
     def __check_for_platform(self, platform: 'IPlatform'):
         from idmtools.core.platform_factory import current_platform
         if platform is not None:
