@@ -77,23 +77,23 @@ class RequirementsToAssetCollection:
 
         # Create Experiment to install custom requirements
         exp = self.run_experiment_to_install_lib()
-        if logger.isEnabledFor(DEBUG):
-            logger.debug('\nexp: ', exp.uid)
-
         if exp is None:
             if logger.isEnabledFor(DEBUG):
                 logger.debug('Failed to install requirements!')
-            exit()
+            raise Exception('Failed to install requirements!')
+
+        if logger.isEnabledFor(DEBUG):
+            logger.debug('\nexp: ', exp.uid)
 
         # Create a WorkItem to create asset collection
         wi = self.run_wi_to_create_ac(exp.uid)
-        if logger.isEnabledFor(DEBUG):
-            logger.debug('\nwi: ', wi.uid)
-
         if wi is None:
             if logger.isEnabledFor(DEBUG):
                 logger.debug('Failed to create asset collection!')
-            exit()
+            raise Exception(f'Failed to create asset collection from experiment: {exp.uid}')
+
+        if logger.isEnabledFor(DEBUG):
+            logger.debug('\nwi: ', wi.uid)
 
         # get ac or return ad_id
         ac = self.retrieve_ac_by_tag()
