@@ -99,8 +99,8 @@ class Simulation(IAssetsEnabled, INamedEntity):
         self.assets.add_assets(self.task.transient_assets, fail_on_duplicate=False)
 
     @classmethod
-    def from_task(cls, task: 'ITask', tags: Dict[str, Any] = None,
-                  asset_collection: AssetCollection = None):  # noqa: F821
+    def from_task(cls, task: 'ITask', tags: Dict[str, Any] = None,  # noqa E821
+                  asset_collection: AssetCollection = None):
         return Simulation(task=task, tags=dict() if tags is None else tags,
                           assets=asset_collection if asset_collection else AssetCollection())
 
