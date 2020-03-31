@@ -20,7 +20,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install setuptools wheel twine bump2version
           git config --global user.name "IDM Tools"
-          git config --global user.name "idmtools@idmod.org"
+          git config --global user.email "idmtools@idmod.org"
       - uses: actions/checkout@v2
       - name: Set up Python
         uses: actions/setup-python@v1
@@ -31,11 +31,6 @@ jobs:
         run: |
           bump2version build --commit --allow-dirty
           git pull
-      - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          branch: ${{ github.ref }}
-          github_token: ${{ secrets.IDMTOOLS_TOKEN }}
       - name: Build and publish
         working-directory: idmtools_platform_slurm
         env:
