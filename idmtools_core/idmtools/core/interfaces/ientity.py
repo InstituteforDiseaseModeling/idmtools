@@ -84,7 +84,7 @@ class IEntity(IItem, metaclass=ABCMeta):
             raise NoPlatformException("The object has no platform set...")
 
         if self._platform_object is None or force:
-             self._platform_object = self.platform.get_item(self.uid, self.item_type, raw=True, force=force, **kwargs)
+            self._platform_object = self.platform.get_item(self.uid, self.item_type, raw=True, force=force, **kwargs)
         return self._platform_object
 
     @property
