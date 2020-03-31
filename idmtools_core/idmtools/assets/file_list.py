@@ -65,7 +65,8 @@ class FileList:
             af = AssetFile(filename=file_name, relative_path=relative_path, absolute_path=absolute_path)
             self.add_asset_file(af)
         except Exception as e:
-            if not self.ignore_missing: raise e
+            if not self.ignore_missing:
+                raise e
 
     def add_path(self, path, files_in_dir=None, relative_path=None, recursive=False):
         """
@@ -100,18 +101,21 @@ class FileList:
             for root, subdirs, files in os.walk(path):
                 # Little safety to not go too deep
                 depth = root[len(path) + len(os.path.sep):].count(os.path.sep)
-                if depth > self.max_depth: continue
+                if depth > self.max_depth:
+                    continue
 
                 # Add the files in the current dir
                 for f in files:
                     # Find the file relative path compared to the root folder
                     # If the relative_path is . -> change it into ''
                     f_relative_path = os.path.normpath(os.path.relpath(root, path))
-                    if f_relative_path == '.': f_relative_path = ''
+                    if f_relative_path == '.':
+                        f_relative_path = ''
 
                     # if files_in_dir specified -> skip the ones not included
                     if files_in_dir is not None and f not in files_in_dir and os.path.join(f_relative_path,
-                                                                                           f) not in files_in_dir: continue
+                                                                                           f) not in files_in_dir:
+                        continue
 
                     # if we want to force a relative path -> force it
                     if relative_path is not None:

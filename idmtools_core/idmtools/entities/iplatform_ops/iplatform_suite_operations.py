@@ -3,14 +3,14 @@ from dataclasses import dataclass
 from typing import Type, Any, List, Tuple, Dict, NoReturn
 from uuid import UUID
 
-from idmtools.core.enums import EntityStatus
+from idmtools.core.enums import EntityStatus, ItemType
 from idmtools.entities.iplatform_ops.utils import batch_create_items
 from idmtools.entities.suite import Suite
 
 
 @dataclass
 class IPlatformSuiteOperations(ABC):
-    platform: 'IPlatform'
+    platform: 'IPlatform'  # noqa: F821
     platform_type: Type
 
     @abstractmethod
