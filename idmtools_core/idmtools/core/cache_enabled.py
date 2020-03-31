@@ -58,10 +58,6 @@ class CacheEnabled:
             return
 
         if self._cache is not None:
-            try:
-                logger.debug(f"Cleaning up the cache at {self._cache_directory}")
-            except:  # Happens when things are shutting down
-                pass
             self._cache.close()
             del self._cache
 

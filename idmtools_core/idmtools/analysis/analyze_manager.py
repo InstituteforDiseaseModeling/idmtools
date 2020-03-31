@@ -31,6 +31,8 @@ def pool_worker_initializer(func, analyzers, cache, platform) -> NoReturn:
     Returns:
         None
     """
+    from idmtools.core.logging import exclude_logging_classes
+    exclude_logging_classes()
     func.analyzers = analyzers
     func.cache = cache
     func.platform = platform
