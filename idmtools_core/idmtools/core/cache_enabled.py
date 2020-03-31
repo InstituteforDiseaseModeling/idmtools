@@ -29,7 +29,7 @@ class CacheEnabled:
     def initialize_cache(self, shards: Optional[int] = None, eviction_policy = None):
         """
         Initialize cache
-        
+
         Args:
             shards (Optional[int], optional): How many shards. It is best to set this when multi-procressing Defaults to None.
             eviction_policy ([type], optional): See Diskcache docs. Defaults to None.
