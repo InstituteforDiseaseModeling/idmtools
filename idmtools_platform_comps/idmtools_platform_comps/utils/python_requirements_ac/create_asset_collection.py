@@ -7,7 +7,7 @@ from COMPS import Client
 
 MD5_KEY = 'idmtools-requirements-md5'
 AC_FILE = 'ac_info.txt'
-LIBRARY_ROOT = 'Libraries/'
+LIBRARY_ROOT = 'L/'
 
 
 def build_asset_file_list(comps_sim, prefix=LIBRARY_ROOT):
@@ -84,7 +84,7 @@ def main():
     print('sim_id: ', comps_sim.id)
 
     # Build files metadata
-    asset_files = build_asset_file_list(comps_sim, prefix='Libraries/')
+    asset_files = build_asset_file_list(comps_sim, prefix='L/')
     print('asset files count: ', len(asset_files))
 
     # Output files
@@ -96,10 +96,11 @@ def main():
     ac.set_tags(tags)
 
     # Create asset collection
-    path_to_ac = 'Libraries'
+    path_to_ac = 'L'
     for af in asset_files:
         dirpath = af['path_from_root']
         rp = os.path.relpath(dirpath, path_to_ac) if dirpath != path_to_ac else ''
+        rp = os.path.join('site_packages', rp)      # add all under site_packages
         ac.add_asset(AssetCollectionFile(af['friendly_name'], rp), data=get_data(af['url']))
 
     ac.save()
