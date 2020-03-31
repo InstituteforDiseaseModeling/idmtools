@@ -17,6 +17,7 @@ from idmtools_platform_comps.utils.general import convert_comps_workitem_status
 if typing.TYPE_CHECKING:
     from idmtools_platform_comps.comps_platform import COMPSPlatform
 
+
 @dataclass
 class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
 

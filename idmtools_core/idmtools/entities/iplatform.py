@@ -605,8 +605,6 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             if prog is None:
                 return e.status in done_st if isinstance(e, IWorkflowItem) else e.done
 
-            results = dict()
-
             done = 0
             for sim in e.simulations:
                 if sim.status in done_st:
