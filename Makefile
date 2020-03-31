@@ -4,6 +4,7 @@ PY=python
 PDS=$(PY) dev_scripts/
 MAKEALL=$(PDS)run_pymake_on_all.py
 PDR=$(PDS)run.py
+CLDIR=$(PDS)clean_dir.py
 
 help:
 	$(PDS)get_help_from_makefile.py
@@ -11,10 +12,13 @@ help:
 clean: ## Clean all our jobs
 	$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
 	$(MAKEALL) --parallel clean
+	$(CLDIR) --file-patterns "**/*.log"
+
 
 clean-all: ## Clean all our jobs
 	$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
 	$(MAKEALL) --parallel clean-all
+	$(CLDIR) --file-patterns "**/*.buildlog"
 
 setup-dev:  ## Setup packages in dev mode
 	python dev_scripts/bootstrap.py
@@ -101,3 +105,11 @@ bump-minor-dry-run: ## bump the minor version(dry run)
 
 bump-major-dry-run: ## bump the minor version(dry run)
 	$(MAKEALL) bump-major-dry-run
+
+build-docs: ## build docs(only works on linux at moment due to make.bat not running by default)
+	$(PDR) -wd 'documentation' -ex 'make html'
+
+build-docs-server: ## builds docs and launch a webserver
+	@make build-docs
+	@+$(IPY) "print('Serving documentation @ server at http://localhost:8000 . Ctrl + C Will Stop Server')"
+	$(PDR) -wd 'documentation/_build/html' -ex 'python -m http.server'

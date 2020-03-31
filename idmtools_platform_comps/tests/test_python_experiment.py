@@ -12,7 +12,7 @@ from COMPS.Data import Experiment as COMPSExperiment, AssetCollection as COMPSAs
 from COMPS.Data import QueryCriteria
 from idmtools import __version__
 from idmtools.assets import Asset, AssetCollection
-from idmtools.builders import ArmSimulationBuilder, ArmType, SimulationBuilder, StandAloneSimulationsBuilder, SweepArm
+from idmtools.builders import ArmSimulationBuilder, ArmType, SimulationBuilder, SweepArm
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
@@ -163,7 +163,7 @@ class TestPythonExperiment(ITestWithPersistence):
             self.validate_assets(assets, expected_list)
 
     # Test will test pythonExperiment's assets parameter which adds all files under tests/inputs/python/Assets to
-    # COMPS' Assets folder and also test using StandAloneSimulationsBuilder builder to build simulations
+    # COMPS' Assets folder
     # Comps' Assets
     #   |--MyLib
     #       |--temp.py
@@ -184,9 +184,7 @@ class TestPythonExperiment(ITestWithPersistence):
         sim.task.set_parameter("a", 1)
         sim.task.set_parameter("b", 10)
 
-        builder = StandAloneSimulationsBuilder()
-        builder.add_simulation(sim)
-        e.simulations.add_builder(builder)
+        e.simulations = [sim]
 
         wait_on_experiment_and_check_all_sim_status(self, e, self.platform)
 

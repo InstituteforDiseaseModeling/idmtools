@@ -1,6 +1,7 @@
 import argparse
 import os
 
+
 def parse_help_from_make(filename):
     with open(filename, 'r') as make_in:
         lines = make_in.readlines()

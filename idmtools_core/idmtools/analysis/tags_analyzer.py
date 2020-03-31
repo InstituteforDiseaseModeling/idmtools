@@ -8,6 +8,13 @@ from idmtools.entities import IAnalyzer
 
 # Create a class for the analyzer
 class TagsAnalyzer(IAnalyzer):
+    """
+    Provides an analyzer for CSV output
+
+    Examples:
+        .. literalinclude:: ../examples/analyzers/example_analysis_TagsAnalyzer.py
+    """
+
     # Arg option for analyzer init are uid, working_dir, parse (True to leverage the :class:`OutputParser`;
     # False to get the raw data in the :meth:`select_simulation_data`), and filenames
     # In this case, we want uid, working_dir, and parse=True

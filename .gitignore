@@ -397,3 +397,4 @@ idmtools_model_emod/tests/serialized_file_download/
 idmtools_platform_comps/tests/requirements_updated.txt
 
 **.buildlog
+documentation/_build

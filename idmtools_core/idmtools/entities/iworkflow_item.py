@@ -68,7 +68,7 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, ABC):
         files_to_be_removed = ('comps_log.log', 'idmtools.log')
         self.user_files.files = [f for f in self.user_files.files if f.filename.lower() not in files_to_be_removed]
 
-    def __check_for_platform(self, platform: 'IPlatform'):
+    def __check_for_platform(self, platform: 'IPlatform'):  # noqa: F821
         from idmtools.core.platform_factory import current_platform
         if platform is not None:
             self.platform = platform
@@ -77,8 +77,8 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, ABC):
                 raise ValueError("Platform is required to run item")
             self.platform = current_platform
 
-
-    def run(self, wait_on_done: bool = False, wait_on_done_progress: bool = True, platform: 'IPlatform' = None):
+    def run(self, wait_on_done: bool = False, wait_on_done_progress: bool = True,
+            platform: 'IPlatform' = None):  # noqa: F821
         """
         Run the item on specified platform
 
@@ -95,7 +95,7 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, ABC):
         if wait_on_done:
             self.wait(wait_on_done_progress)
 
-    def wait(self, wait_on_done_progress: bool = True, platform: 'IPlatform' = None):
+    def wait(self, wait_on_done_progress: bool = True, platform: 'IPlatform' = None):  # noqa: F821
         """
         Wait on item to finish
 

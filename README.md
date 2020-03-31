@@ -1,11 +1,16 @@
 
-![Upload idmtools-core to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-core%20to%20Staging/badge.svg)
-![Upload idmtools-cli to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-cli%20to%20Staging/badge.svg)
-![Upload idmtools-models to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-models%20to%20Staging/badge.svg)
-![Upload idmtools-platform-comps to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-platform-comps%20to%20Staging/badge.svg)
-![Upload idmtools-platform-local to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-platform-local%20to%20Staging/badge.svg)\
-![Upload idmtools-platform-slurm to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-platform-slurm%20to%20Staging/badge.svg)
-![Upload idmtools-test to Staging](https://github.com/devclinton/idmtools/workflows/Upload%20idmtools-test%20to%20Staging/badge.svg)
+# Packages Status
+![Staging: idmtools-core](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Staging:%20idmtools-core/badge.svg?branch=dev)
+![Staging: idmtools-cli](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Staging:%20idmtools-cli/badge.svg?branch=dev)
+![Staging: idmtools-models](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Staging:%20idmtools-models/badge.svg?branch=dev)
+![Staging: idmtools-platform-comps](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Staging:%20idmtools-platform-comps/badge.svg?branch=dev)
+![Staging: idmtools-platform-local](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Staging:%20idmtools-platform-local/badge.svg?branch=dev)
+![Staging: idmtools-platform-slurm](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Staging:%20idmtools-platform-slurm/badge.svg?branch=dev)
+![Staging: idmtools-test](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Staging:%20idmtools-test/badge.svg?branch=dev)
+
+# Other status
+![Dev: Rebuild documentation](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Rebuild%20documentation/badge.svg?branch=dev)
+![Lint](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Lint/badge.svg?branch=dev)
 
 # IDM Modeling Tools
 
@@ -51,7 +56,7 @@ You can also install just the individual packages to create minimal environments
 - `pip install idmtools-platform-comps --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Support for COMPS
 - `pip install idmtools-platform-local --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Support for Local Platform
 - `pip install idmtools-models --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Python and generic models
-- `pip install idmtools-model-dtk --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - EMOD Model support
+- `pip install idmtools-model-emod --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - EMOD Model support
 
 ## Pre-requisites
 - Python 3.6/3.7 x64
@@ -101,7 +106,7 @@ Some packages have unique build related commands, specifically the local platfor
 ## IDE/Runtime Setup
 
 For source completion and indexing, set the package paths in your IDE. In PyCharm, select the following directories then right-click and select `Mark Directory as -> Source Root`.
-![Mark Directory as Sources Root](development_documentation/mark_directory_as_source.png)
+![Mark Directory as Sources Root](documentation/images/mark_directory_as_source.png)
 
 The directories that should be added as source roots are
 - `idmtools/idmtools_core`
