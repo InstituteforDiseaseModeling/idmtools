@@ -42,7 +42,8 @@ plantuml = 'plantweb'
 
 autodoc_default_options = {
     'member-order': 'bysource',
-    'members': None
+    'members': None,
+    'exclude-members': '__all__'
 }
 
 autodoc_mock_imports = ['shapefile',
@@ -53,7 +54,10 @@ autodoc_mock_imports = ['shapefile',
                         '_curses',
                         'ConfigParser',
                         'MenuForm',
-                        'osm2nx'
+                        'osm2nx',
+                        'pika',
+                        'create_experiment',
+                        'dramatiq'
                         ]
 
 

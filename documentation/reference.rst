@@ -9,6 +9,6 @@ API reference
 
 
    idmtools_index
-   models
-   platform_comps
-   platform_local
+   idmtools_models_index
+   idmtools_platform_comps_index
+   idmtools_platform_local_index
