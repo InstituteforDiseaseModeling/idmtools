@@ -4,7 +4,7 @@ Global parameters
 The idmtool.ini file includes some global parameters that drive features within |IT_s|. These primarily control features around workers
 and threads and are defined within the [COMMON] section of idmtool.ini. Most likely, you will not need to change these.
 
-The following includes an example of the [COMMON] setion of idmtools.ini with the default settings::
+The following includes an example of the [COMMON] section of idmtools.ini with the default settings::
 
     [COMMON]
     max_threads = 16
