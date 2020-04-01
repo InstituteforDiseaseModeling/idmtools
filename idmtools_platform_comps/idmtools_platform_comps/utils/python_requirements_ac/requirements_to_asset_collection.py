@@ -111,17 +111,6 @@ class RequirementsToAssetCollection:
         with open(REQUIREMENT_FILE, 'w') as outfile:
             outfile.write(req_content)
 
-    def is_requirements_changed(self):
-        """
-        Check if requirements has been changed or not
-        Returns: bool
-        """
-        file_path = REQUIREMENT_FILE
-        previous_md5 = '' if not os.path.exists(file_path) else open(file_path, 'r').read()
-        previous_md5 = hashlib.md5(previous_md5.encode('utf-8')).hexdigest()
-
-        return not (previous_md5 == self.checksum)
-
     def retrieve_ac_by_tag(self, md5_check=None):
         """
         Retrieve comps asset collection given ac tag
