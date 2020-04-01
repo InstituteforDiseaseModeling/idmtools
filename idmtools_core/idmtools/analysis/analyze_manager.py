@@ -3,7 +3,7 @@ import sys
 import time
 from logging import getLogger, DEBUG
 from multiprocessing.pool import Pool
-from typing import NoReturn, List, Dict, Tuple, Optional
+from typing import NoReturn, List, Dict, Tuple, Optional, Union
 from uuid import UUID
 from idmtools.analysis.map_worker_entry import map_item
 from idmtools.core.cache_enabled import CacheEnabled
@@ -49,9 +49,11 @@ class AnalyzeManager(CacheEnabled):
     class ItemsNotReady(Exception):
         pass
 
-    def __init__(self, platform: IPlatform, configuration: dict = None, ids: Tuple[UUID, ItemType] = None, analyzers: List[IAnalyzer] = None, working_dir: str = os.getcwd(),
-                 partial_analyze_ok: bool = False, max_items: Optional[int] = None, verbose: bool = True, force_manager_working_directory: bool = False,
-                 exclude_ids: List[UUID] = None, analyze_failed_items: bool = False):
+    def __init__(self, platform: IPlatform, configuration: dict = None, ids: Tuple[UUID, ItemType] = None,
+                 analyzers: List[IAnalyzer] = None, working_dir: str = os.getcwd(),
+                 partial_analyze_ok: bool = False, max_items: Optional[int] = None, verbose: bool = True,
+                 force_manager_working_directory: bool = False,
+                 exclude_ids: List[Union[str, UUID]] = None, analyze_failed_items: bool = False):
         """
         Initialize the AnalyzeManager
 

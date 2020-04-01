@@ -38,11 +38,6 @@ authors = [
     ("Jen Schripsema", "jschripsema@idmod.org")
 ]
 
-# check for python 3.6
-if sys.version_info[1] == 6:
-    requirements.append('dataclasses')
-
-print(requirements)
 
 setup(
     author=[author[0] for author in authors],
@@ -62,9 +57,12 @@ setup(
     entry_points=dict(
         idmtools_experiment=["idmtools_experiment = idmtools.entities.experiment:ExperimentSpecification"],
         idmtools_task=  # noqa: E251
-                      ["idmtools_task_command = idmtools.entities.command_task:CommandTaskSpecification"]
-        ),
+        ["idmtools_task_command = idmtools.entities.command_task:CommandTaskSpecification"]
+    ),
     test_suite='tests',
+    setup_requirements=[
+        'dataclasses>=0.6;python_version<"3.7"'
+    ],
     python_requires='>=3.6.*, !=3.7.0, !=3.7.1, !=3.7.2',
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
