@@ -21,7 +21,7 @@ class LinkHTMLParser(HTMLParser):
         self.pkg_version.append(v)
 
 
-def get_latest_version_from_pypi(pkg_name, display_all=False):
+def get_latest_package_version_from_pypi(pkg_name, display_all=False):
     """
     Utility to get the latest version for a given package name
     Args:

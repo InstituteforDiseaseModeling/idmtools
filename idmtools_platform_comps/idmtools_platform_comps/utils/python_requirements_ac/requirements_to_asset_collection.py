@@ -202,13 +202,13 @@ class RequirementsToAssetCollection:
             display_all: determine if output all package releases
         Returns: the latest version of ven package
         """
-        from idmtools_platform_comps.utils.package_version import get_latest_version_from_pypi
+        from idmtools_platform_comps.utils.package_version import get_latest_package_version_from_pypi
         from idmtools_platform_comps.utils.package_version import get_latest_package_version_from_artifactory
 
         latest_version = get_latest_package_version_from_artifactory(pkg_name, display_all)
 
         if not latest_version:
-            latest_version = get_latest_version_from_pypi(pkg_name, display_all)
+            latest_version = get_latest_package_version_from_pypi(pkg_name, display_all)
 
         return latest_version
 
