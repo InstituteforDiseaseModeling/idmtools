@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from multiprocessing import current_process, cpu_count
 from logging import getLogger, DEBUG
 from diskcache import Cache, DEFAULT_SETTINGS, FanoutCache
-from typing import Union
+from typing import Union, Optional
 
 MAX_CACHE_SIZE = int(2 ** 33)  # 8GB
 DEFAULT_SETTINGS["size_limit"] = MAX_CACHE_SIZE
@@ -26,7 +26,14 @@ class CacheEnabled:
     def __del__(self):
         self.cleanup_cache()
 
-    def initialize_cache(self, shards=None, eviction_policy=None):
+    def initialize_cache(self, shards: Optional[int] = None, eviction_policy=None):
+        """
+        Initialize cache
+
+        Args:
+            shards (Optional[int], optional): How many shards. It is best to set this when multi-procressing Defaults to None.
+            eviction_policy ([type], optional): See Diskcache docs. Defaults to None.
+        """
         logger.debug(f"Initializing the cache with {shards or 0} shards and {eviction_policy or 'none'} policy.")
         if self._cache:
             logger.warning("CacheEnabled class is calling `initialize_cache()` with a cache already initialized: "
