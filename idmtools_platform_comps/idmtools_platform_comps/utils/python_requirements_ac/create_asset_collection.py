@@ -7,10 +7,10 @@ from COMPS import Client
 
 MD5_KEY = 'idmtools-requirements-md5'
 AC_FILE = 'ac_info.txt'
-LIBRARY_ROOT = 'L/'
+LIBRARY_ROOT_PREFIX = 'L/'
 
 
-def build_asset_file_list(comps_sim, prefix=LIBRARY_ROOT):
+def build_asset_file_list(comps_sim, prefix=LIBRARY_ROOT_PREFIX):
     """
     Utility function to build all library files
     Args:
@@ -84,7 +84,7 @@ def main():
     print('sim_id: ', comps_sim.id)
 
     # Build files metadata
-    asset_files = build_asset_file_list(comps_sim, prefix='L/')
+    asset_files = build_asset_file_list(comps_sim, prefix=LIBRARY_ROOT_PREFIX)
     print('asset files count: ', len(asset_files))
 
     # Output files

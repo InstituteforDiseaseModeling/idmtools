@@ -4,7 +4,8 @@ import subprocess
 import traceback
 
 CURRENT_DIRECTORY = os.getcwd()
-LIBRARY_PATH = os.path.join(CURRENT_DIRECTORY, 'L')
+LIBRARY_ROOT = 'L'
+LIBRARY_PATH = os.path.join(CURRENT_DIRECTORY, LIBRARY_ROOT)
 REQUIREMENT_FILE = 'requirements_updated.txt'
 INDEX_URL = 'https://packages.idmod.org/artifactory/api/pypi/pypi-production/simple'
 
