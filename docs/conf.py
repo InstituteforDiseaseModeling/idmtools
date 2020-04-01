@@ -36,7 +36,7 @@ extensions = [
     'sphinxcontrib.napoleon',
     'sphinx.ext.todo',
     'plantweb.directive',
-    'sphinx_click.ext'
+    'sphinxcontrib.programoutput'
 ]
 
 plantuml = 'plantweb'
@@ -58,7 +58,9 @@ autodoc_mock_imports = ['shapefile',
                         'osm2nx',
                         'pika',
                         'create_experiment',
-                        'dramatiq'
+                        'create_simulation',
+                        'dramatiq',
+                        'docker_run'
                         ]
 
 

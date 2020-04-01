@@ -62,11 +62,23 @@ external:
 
 .PHONY: html
 html:
-	rm modules.rst 
-	rm idmtools_index.rst
-    sphinx-apidoc -f -e -o . ../idmtools_core/idmtools
+	-rm modules.rst
+	-rm idmtools_index.rst
+	sphinx-apidoc -f -e -o . ../idmtools_core/idmtools
 	mv modules.rst idmtools_index.rst
-	sphinx-apidoc --no-toc -o . ../idmtools_core/idmtools
+
+	-rm idmtools_models_index.rst
+	sphinx-apidoc -f -e -o . ../idmtools_models/idmtools_models
+	mv modules.rst idmtools_models_index.rst
+
+	-rm idmtools_platform_comps_index.rst
+	sphinx-apidoc -f -e -o . ../idmtools_platform_comps/idmtools_platform_comps
+	mv modules.rst idmtools_platform_comps_index.rst
+
+	-rm idmtools_platform_local_index.rst
+	SPHINX_APIDOC_OPTIONS=members,undoc-members,show-inheritance,ignore-module-all sphinx-apidoc -f -e -o . ../idmtools_platform_local/idmtools_platform_local
+	mv modules.rst idmtools_platform_local_index.rst
+
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(INTERNALOPTS) $(BUILDDIR)/html
 	$(INDEXBUILD) -i $(BUILDDIR)/html -o $(BUILDDIR)/html/_static/tipuesearch/tipuesearch_content.js -u $(URLPREFIX)
 	@echo

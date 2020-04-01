@@ -2,6 +2,6 @@
 Troubleshooting
 ===============
 
-...To see the list of troubleshooting commands type the following at a command prompt::
+...To see the list of troubleshooting commands type the following at a command prompt
 
-        idmtools info --help
+.. command-output:: idmtools info --help
