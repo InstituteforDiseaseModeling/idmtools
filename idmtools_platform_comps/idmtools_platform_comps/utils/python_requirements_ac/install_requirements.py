@@ -33,21 +33,21 @@ def install_packages_from_requirements(python_paths=None):
 
 
 if __name__ == "__main__":
+    print('CURRENT_DIRECTORY: \n', CURRENT_DIRECTORY)
+    print('LIBRARY_PATH: \n', LIBRARY_PATH)
+
     if sys.platform == "win32":
         full_path = os.path.join(LIBRARY_PATH, 'lib', 'site-packages')
     else:
         full_path = os.path.join(LIBRARY_PATH, 'lib', 'python{}'.format(sys.version[:3]), 'site-packages')
 
-    print('CURRENT_DIRECTORY: \n', CURRENT_DIRECTORY)
-    print('LIBRARY_PATH: \n', LIBRARY_PATH)
-    print("Adding {} to the system path".format(full_path))
-
     if not os.path.exists(full_path):
         os.makedirs(full_path)
 
+    print("Adding {} to the system path".format(full_path))
     sys.path.insert(1, full_path)
-    tb = None
 
+    tb = None
     try:
         install_packages_from_requirements(sys.path)
     except Exception:
