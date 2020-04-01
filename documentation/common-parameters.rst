@@ -1,4 +1,4 @@
-Global Parameters
+Global parameters
 =================
 
 The idmtool.ini file includes some global parameters that drive features within |IT_s|. These primarily control features around workers
