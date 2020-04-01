@@ -260,9 +260,8 @@ class TestSSMTWorkItem(ITestWithPersistence):
         # Analyze
         manager.analyze()
 
-        # validate analyzer result. Uncomment following line once bug #702 fixed
-        #self.assertTrue(os.path.exists(os.path.join(local_output_path, wi.id, "CSVAnalyzer.csv")))
-
+        # validate analyzer result.
+        self.assertTrue(os.path.exists(os.path.join(local_output_path, wi.id, "CSVAnalyzer.csv")))
 
     def test_get_wi_with_query_criteria_1(self):
         wi_id = '5e2fc03d-2162-ea11-a2bf-f0921c167862'
