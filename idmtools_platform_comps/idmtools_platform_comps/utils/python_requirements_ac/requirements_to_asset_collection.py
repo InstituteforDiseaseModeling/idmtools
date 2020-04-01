@@ -56,7 +56,7 @@ class RequirementsToAssetCollection:
             Consolidated requirements.
         """
         if not self._requirements:
-            self._requirements = self.validate_requirements()
+            self._requirements = self.consolidate_requirements()
 
         return self._requirements
 
@@ -202,7 +202,7 @@ class RequirementsToAssetCollection:
 
         return latest_version
 
-    def validate_requirements(self):
+    def consolidate_requirements(self):
         """
         Combine requiremtns and dynamic requirements (a list):
           - get the latest version of package if version is not provided
