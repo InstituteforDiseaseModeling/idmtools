@@ -398,3 +398,6 @@ idmtools_model_emod/tests/serialized_file_download/
 **.buildlog
 documentation/_build
 documentation/idmtools.*
+documentation/idmtools*index.rst
+documentation/idmtools_models*.rst
+documentation/idmtools_platform*.rst

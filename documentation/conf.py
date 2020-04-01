@@ -35,7 +35,8 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinxcontrib.napoleon',
     'sphinx.ext.todo',
-    'plantweb.directive'
+    'plantweb.directive',
+    'sphinx_click.ext'
 ]
 
 plantuml = 'plantweb'

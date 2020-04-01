@@ -14,6 +14,10 @@ CLI reference
    
 |IDM_s| includes a command-line interface (CLI) with options and commands to assist with getting started, managing and monitoring, and troubleshooting simulations and experiements. After you've installed |IDM_s| you can view the available options and commands by typing the following at a command prompt::
 
-        idmtools --help
+.. click:: idmtools_cli.cli:cli
+  :prog: idmtools
+  :show-nested:
 
-
+.. click:: idmtools_cli.cli.init:init
+  :prog: idmtools
+  :show-nested:
