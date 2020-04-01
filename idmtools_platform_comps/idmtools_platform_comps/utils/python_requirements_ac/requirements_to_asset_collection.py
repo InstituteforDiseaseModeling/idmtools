@@ -63,6 +63,7 @@ class RequirementsToAssetCollection:
             1. check if asset collection exists for given requirements, return ac id if exists
             2. create an Experiment to install the requirements on COMPS
             3. create a WorkItem to create a Asset Collection
+
         Returns: return ac id based on the requirements if Experiment and WorkItem Succeeded
         """
         # Check if ac with md5 exists
@@ -214,6 +215,7 @@ class RequirementsToAssetCollection:
         Combine requiremtns and dynamic requirements (a list):
           - get the latest version of package if version is not provided
           - dynamic requirements will overwrites the requirements file
+          
         Returns: the consolidated requirements (as a list)
         """
         import pkg_resources

@@ -5,7 +5,7 @@ REM Command file for Sphinx documentation
 if "%SPHINXBUILD%" == "" (
 	set SPHINXBUILD=sphinx-build
 )
-set SPHINXOPTS=-t tools -W
+set SPHINXOPTS=-W
 set INTERNALOPTS=-t internal
 set BUILDDIR=_build
 set INDEXBUILD=python %BUILDDIR%/../scripts/gti.py
@@ -89,7 +89,24 @@ if "%1" == "external" (
 )
 
 if "%1" == "html" (
-    sphinx-apidoc --no-toc -o . ../idmtools_core/idmtools
+	set SPHINX_APIDOC_OPTIONS=members,undoc-members,show-inheritance,ignore-module-all
+	del modules.rst >nul 2>&1
+	del idmtools_index.rst >nul 2>&1 
+    sphinx-apidoc -f -e -o . ../idmtools_core/idmtools
+	REN modules.rst idmtools_index.rst
+	del modules.rst >nul 2>&1
+	del idmtools_models_index.rst >nul 2>&1 
+	sphinx-apidoc -f -e -o . ../idmtools_models/idmtools_models
+	REN modules.rst idmtools_models_index.rst
+
+	del idmtools_platform_comps_index.rst >nul 2>&1 
+	sphinx-apidoc -f -e -o . ../idmtools_platform_comps/idmtools_platform_comps
+	REN modules.rst idmtools_platform_comps_index.rst
+
+	del idmtools_platform_local_index.rst >nul 2>&1 
+	sphinx-apidoc -f -e -o . ../idmtools_platform_local/idmtools_platform_local
+	REN modules.rst idmtools_platform_local_index.rst
+
 	%SPHINXBUILD% -b html %ALLSPHINXOPTS% %INTERNALOPTS% %BUILDDIR%/html
 	if errorlevel 1 exit /b 1
 	%INDEXBUILD% -i %BUILDDIR%/html -o %BUILDDIR%/html/_static/tipuesearch/tipuesearch_content.js -u %URLPREFIX%
