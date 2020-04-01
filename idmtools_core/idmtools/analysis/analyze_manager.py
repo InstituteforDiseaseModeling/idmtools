@@ -49,7 +49,8 @@ class AnalyzeManager(CacheEnabled):
     class ItemsNotReady(Exception):
         pass
 
-    def __init__(self, platform: IPlatform, configuration: dict = None, ids: Tuple[UUID, ItemType] = None,
+    def __init__(self, platform: IPlatform, configuration: dict = None,
+                 ids: List[Tuple[Union[str, UUID], ItemType]] = None,
                  analyzers: List[IAnalyzer] = None, working_dir: str = os.getcwd(),
                  partial_analyze_ok: bool = False, max_items: Optional[int] = None, verbose: bool = True,
                  force_manager_working_directory: bool = False,
