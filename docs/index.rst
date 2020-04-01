@@ -49,7 +49,7 @@ guide modelers through necessary tasks. See :doc:`cookiecutters` for the availab
    serialization
    cookiecutters
    reference
-   cli
+   cli_index
    glossary
 
 

@@ -4,9 +4,9 @@ Platforms
 
 |IT_s| currently supports running on the following platforms:
 
-| **COMPS**: |COMPS_l| is a high performance computing cluster used by employees and collaborators at |IDM_s|. To support running simulations and analysis on |COMPS_s|, |IT_s| includes the following modules: :doc:`platform_comps`.
+| **COMPS**: |COMPS_l| is a high performance computing cluster used by employees and collaborators at |IDM_s|. To support running simulations and analysis on |COMPS_s|, |IT_s| includes the following modules: :doc:`idmtools_platform_comps_index`.
 
-| **Local**: You can also run simulations and analysis locally on your computer, rather than on a remote high-performance computer (HPC). For more information about these modules, see :doc:`platform_local`.
+| **Local**: You can also run simulations and analysis locally on your computer, rather than on a remote high-performance computer (HPC). For more information about these modules, see :doc:`idmtools_platform_local_index`.
 
 You can use the **idmtools.ini** file to configure platform specific settings, as the following examples shows for |COMPS_s|::
 

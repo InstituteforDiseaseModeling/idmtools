@@ -7,7 +7,7 @@ from tabulate import tabulate
 
 from idmtools.core.system_information import get_system_information
 from idmtools.registry.platform_specification import PlatformPlugins
-from idmtools_cli.cli import cli
+from idmtools_cli.cli.entrypoint import cli
 from idmtools_cli.cli.experiment import supported_platforms
 
 logger = getLogger(__name__)

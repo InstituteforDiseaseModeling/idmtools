@@ -107,9 +107,9 @@ bump-major-dry-run: ## bump the minor version(dry run)
 	$(MAKEALL) bump-major-dry-run
 
 build-docs: ## build docs(only works on linux at moment due to make.bat not running by default)
-	$(PDR) -wd 'documentation' -ex 'make html'
+	$(PDR) -wd 'docs' -ex 'make html'
 
 build-docs-server: ## builds docs and launch a webserver
 	@make build-docs
 	@+$(IPY) "print('Serving documentation @ server at http://localhost:8000 . Ctrl + C Will Stop Server')"
-	$(PDR) -wd 'documentation/_build/html' -ex 'python -m http.server'
+	$(PDR) -wd 'docs/_build/html' -ex 'python -m http.server'
