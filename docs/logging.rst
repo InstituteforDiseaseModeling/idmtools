@@ -1,6 +1,7 @@
 Logging
 =======
 
+
 |IT_s| includes built-in logging, which is configured in the [LOGGING] section of the idmtools.ini file, and includes the following parameters: *level*, *console*, and *log_filename*. Default settings are shown in the following example::
 
     [LOGGING]

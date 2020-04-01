@@ -1,6 +1,7 @@
 Global Parameters
 =================
 
+
 The idmtool.ini file includes some global parameters that drive features within |IT_s|. These primarily control features around workers
 and threads and are defined within the [COMMON] section of idmtool.ini. Most likely, you will not need to change these.
 
