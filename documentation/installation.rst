@@ -43,4 +43,5 @@ see the links below for instructions.
 
     basic-installation
     dev-installation
+    configuration
 
