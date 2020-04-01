@@ -82,17 +82,17 @@ class RequirementsToAssetCollection:
             raise Exception('Failed to install requirements!')
 
         if logger.isEnabledFor(DEBUG):
-            logger.debug('\nexp: ', exp.uid)
+            logger.debug(f'\nexp: {exp.uid}')
 
         # Create a WorkItem to create asset collection
         wi = self.run_wi_to_create_ac(exp.uid)
         if wi is None:
             if logger.isEnabledFor(DEBUG):
-                logger.debug('Failed to create asset collection!')
+                logger.debug(f'Failed to create asset collection from experiment: {exp.uid}')
             raise Exception(f'Failed to create asset collection from experiment: {exp.uid}')
 
         if logger.isEnabledFor(DEBUG):
-            logger.debug('\nwi: ', wi.uid)
+            logger.debug(f'\nwi: {wi.uid}')
 
         # get ac or return ad_id
         ac = self.retrieve_ac_by_tag()
@@ -130,7 +130,7 @@ class RequirementsToAssetCollection:
         """
         md5_str = md5_check or self.checksum
         if logger.isEnabledFor(DEBUG):
-            logger.debug('md5_str: ', md5_str)
+            logger.debug(f'md5_str: {md5_str}')
 
         # check if ac with tag idmtools-requirements-md5 = my_md5 exists
         ac_list = COMPSAssetCollection.get(
@@ -178,7 +178,7 @@ class RequirementsToAssetCollection:
 
         md5_str = self.checksum
         if logger.isEnabledFor(DEBUG):
-            logger.debug('md5_str: ', md5_str)
+            logger.debug(f'md5_str: {md5_str}')
 
         wi_name = "wi to create ac"
         command = f"python {MODEL_CREATE_AC} {exp_id} {md5_str} {self.platform.endpoint}"
