@@ -23,7 +23,7 @@ class Suite(INamedEntity, ABC):
     item_type: 'ItemType' = field(default=ItemType.SUITE, compare=False, init=False)
     description: str = field(default=None, compare=False)
 
-    def add_experiment(self, experiment: 'Experiment') -> 'NoReturn':
+    def add_experiment(self, experiment: 'Experiment') -> 'NoReturn':  # noqa: F821
         """
         Add an experiment to the suite
         Args:

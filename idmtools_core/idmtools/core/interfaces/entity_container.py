@@ -21,4 +21,3 @@ class EntityContainer(list):
                 return
 
         raise Exception(f"Item with id {item_id} not found in the container")
-

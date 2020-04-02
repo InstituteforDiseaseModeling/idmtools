@@ -1,7 +1,7 @@
 import click
 
 from idmtools.core.platform_factory import Platform
-from idmtools_cli.cli import cli
+from idmtools_cli.cli.entrypoint import cli
 from idmtools_platform_comps.comps_platform import COMPSPlatform
 
 pass_comps = click.make_pass_decorator(COMPSPlatform)

@@ -10,7 +10,7 @@ from idmtools_platform_slurm.slurm_operations import SLURM_STATES
 
 @dataclass
 class SlurmPLatformExperimentOperations(IPlatformExperimentOperations):
-    platform: 'SlurmPlatform'
+    platform: 'SlurmPlatform'  # noqa: F821
     platform_type: Type = Experiment
 
     def get(self, experiment_id: UUID, **kwargs) -> Any:

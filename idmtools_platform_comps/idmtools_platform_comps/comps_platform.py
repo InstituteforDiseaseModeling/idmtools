@@ -49,7 +49,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     priority: str = field(default=COMPSPriority.Lowest)
     simulation_root: str = field(default="$COMPS_PATH(USER)\\output")
     node_group: str = field(default="emod_abcd")
-    num_retires: int = field(default=0)
+    num_retries: int = field(default=0)
     num_cores: int = field(default=1)
     max_workers: int = field(default=16)
     batch_size: int = field(default=10)

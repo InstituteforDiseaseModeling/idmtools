@@ -2,7 +2,6 @@ import os
 import unittest
 
 from idmtools.assets import AssetCollection
-from idmtools.builders import StandAloneSimulationsBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
@@ -49,37 +48,6 @@ class TestPersistenceServices(ITestWithPersistence):
         ac.add_directory(assets_directory=os.path.join(COMMON_INPUT_PATH, "regression", "125", "Assets2"),
                          relative_path="MyExternalLibrary")
         self.assertTrue(all([a.relative_path.startswith("MyExternalLibrary") for a in ac]))
-
-    def test_fix_138(self):
-        # https://github.com/InstituteforDiseaseModeling/idmtools/issues/138
-        ts = TemplatedSimulations(base_task=TestTask())
-        e = Experiment(simulations=ts)
-        # Set a parameter in the base simulation
-        ts.base_simulation.task.set_parameter("test", 0)
-        self.assertEqual(ts.base_simulation.task.parameters["test"], 0)
-
-        # Create a standalone simulation
-        s = ts.new_simulation()
-        s.task.set_parameter("test", 10)
-        self.assertEqual(s.task.parameters["test"], 10)
-
-        # Create a builder and add this simulation
-        b = StandAloneSimulationsBuilder()
-        b.add_simulation(s)
-        ts.add_builder(b)
-
-        # Make sure the simulation in the builder is correct
-        self.assertEqual(b.simulations[0].task.parameters["test"], 10)
-        self.assertEqual(b.simulations[0], s)
-
-        # Run the experiment
-        p = Platform("Test")
-        p.run_items(e)
-
-        # Make sure the base simulation was left untouched
-        self.assertEqual(ts.base_simulation.task.parameters["test"], 0)
-
-        p.cleanup()
 
     def test_fix_170(self):
         # https://github.com/InstituteforDiseaseModeling/idmtools/issues/170

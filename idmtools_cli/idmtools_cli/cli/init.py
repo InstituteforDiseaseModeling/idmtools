@@ -8,7 +8,7 @@ from typing import Dict, List
 
 from idmtools.config import IdmConfigParser
 from idmtools.registry.plugin_specification import ProjectTemplate
-from idmtools_cli.cli import cli
+from idmtools_cli.cli.entrypoint import cli
 
 logger = getLogger(__name__)
 
