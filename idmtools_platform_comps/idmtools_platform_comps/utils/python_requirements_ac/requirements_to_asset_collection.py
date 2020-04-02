@@ -24,18 +24,18 @@ class RequirementsToAssetCollection:
     platform: IPlatform = field(default=None)
     requirements_path: str = field(default=None)
     pkg_list: list = field(default=None)
-    extra_wheels: list = field(default=None)
+    local_wheels: list = field(default=None)
     _checksum: str = field(default=None, init=False)
     _requirements: str = field(default=None, init=False)
 
     def __post_init__(self):
-        if not any([self.requirements_path, self.pkg_list, self.extra_wheels]):
+        if not any([self.requirements_path, self.pkg_list, self.local_wheels]):
             raise ValueError(
-                "Impossible to proceed without either requirements path or with package list or extra wheels!")
+                "Impossible to proceed without either requirements path or with package list or local wheels!")
 
         self.requirements_path = os.path.abspath(self.requirements_path) if self.requirements_path else None
         self.pkg_list = self.pkg_list or []
-        self.extra_wheels = [os.path.abspath(whl) for whl in self.extra_wheels] if self.extra_wheels else []
+        self.local_wheels = [os.path.abspath(whl) for whl in self.local_wheels] if self.local_wheels else []
 
     @property
     def checksum(self):
@@ -132,7 +132,7 @@ class RequirementsToAssetCollection:
             return ac
 
     def add_wheels_to_assets(self, experiment):
-        for whl in self.extra_wheels:
+        for whl in self.local_wheels:
             a = Asset(filename=os.path.basename(whl), absolute_path=whl)
             experiment.add_asset(a)
 
@@ -242,8 +242,8 @@ class RequirementsToAssetCollection:
             latest = self.get_latest_version(k)
             update_req_list.append(f"{k}=={latest}")
 
-        if self.extra_wheels:
-            update_req_list.extend([f"Assets/{os.path.basename(whl)}" for whl in self.extra_wheels])
+        if self.local_wheels:
+            update_req_list.extend([f"Assets/{os.path.basename(whl)}" for whl in self.local_wheels])
 
         return update_req_list
 
