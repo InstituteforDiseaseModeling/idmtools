@@ -1,5 +1,5 @@
 import os
-import json
+from logging import getLogger, DEBUG
 import hashlib
 from dataclasses import dataclass, field
 from idmtools.assets import Asset
@@ -16,6 +16,8 @@ MODEL_LOAD_LIB = "install_requirements.py"
 MODEL_CREATE_AC = 'create_asset_collection.py'
 MD5_KEY = 'idmtools-requirements-md5'
 
+logger = getLogger(__name__)
+
 
 @dataclass(repr=False)
 class RequirementsToAssetCollection:
@@ -27,8 +29,9 @@ class RequirementsToAssetCollection:
     _requirements: str = field(default=None, init=False)
 
     def __post_init__(self):
-        if not self.requirements_path and (not self.pkg_list or len(self.pkg_list) == 0):
-            raise ValueError("Impossible to proceed without either requirements path or with package list!")
+        if not any([self.requirements_path, self.pkg_list, self.extra_wheels]):
+            raise ValueError(
+                "Impossible to proceed without either requirements path or with package list or extra wheels!")
 
         self.requirements_path = os.path.abspath(self.requirements_path) if self.requirements_path else None
         self.pkg_list = self.pkg_list or []
@@ -53,7 +56,7 @@ class RequirementsToAssetCollection:
             Consolidated requirements.
         """
         if not self._requirements:
-            self._requirements = self.validate_requirements()
+            self._requirements = self.consolidate_requirements()
 
         return self._requirements
 
@@ -74,19 +77,23 @@ class RequirementsToAssetCollection:
 
         # Create Experiment to install custom requirements
         exp = self.run_experiment_to_install_lib()
-        print('\nexp: ', exp.uid)
-
         if exp is None:
-            print('Failed to install requirements!')
-            exit()
+            if logger.isEnabledFor(DEBUG):
+                logger.debug('Failed to install requirements!')
+            raise Exception('Failed to install requirements!')
+
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f'\nexp: {exp.uid}')
 
         # Create a WorkItem to create asset collection
         wi = self.run_wi_to_create_ac(exp.uid)
-        print('\nwi: ', wi.uid)
-
         if wi is None:
-            print('Failed to create asset collection!')
-            exit()
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f'Failed to create asset collection from experiment: {exp.uid}')
+            raise Exception(f'Failed to create asset collection from experiment: {exp.uid}')
+
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f'\nwi: {wi.uid}')
 
         # get ac or return ad_id
         ac = self.retrieve_ac_by_tag()
@@ -104,17 +111,6 @@ class RequirementsToAssetCollection:
         with open(REQUIREMENT_FILE, 'w') as outfile:
             outfile.write(req_content)
 
-    def is_requirements_changed(self):
-        """
-        Check if requirements has been changed or not
-        Returns: bool
-        """
-        file_path = REQUIREMENT_FILE
-        previous_md5 = '' if not os.path.exists(file_path) else open(file_path, 'r').read()
-        previous_md5 = hashlib.md5(previous_md5.encode('utf-8')).hexdigest()
-
-        return not (previous_md5 == self.checksum)
-
     def retrieve_ac_by_tag(self, md5_check=None):
         """
         Retrieve comps asset collection given ac tag
@@ -123,7 +119,8 @@ class RequirementsToAssetCollection:
         Returns: comps asset collection
         """
         md5_str = md5_check or self.checksum
-        print('md5_str: ', md5_str)
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f'md5_str: {md5_str}')
 
         # check if ac with tag idmtools-requirements-md5 = my_md5 exists
         ac_list = COMPSAssetCollection.get(
@@ -170,7 +167,8 @@ class RequirementsToAssetCollection:
         from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
 
         md5_str = self.checksum
-        print('md5_str: ', md5_str)
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f'md5_str: {md5_str}')
 
         wi_name = "wi to create ac"
         command = f"python {MODEL_CREATE_AC} {exp_id} {md5_str} {self.platform.endpoint}"
@@ -194,23 +192,17 @@ class RequirementsToAssetCollection:
             display_all: determine if output all package releases
         Returns: the latest version of ven package
         """
-        from urllib import request
-        from pkg_resources import parse_version
-        from packaging.version import parse
+        from idmtools_platform_comps.utils.package_version import get_latest_package_version_from_pypi
+        from idmtools_platform_comps.utils.package_version import get_latest_package_version_from_artifactory
 
-        url = f'https://pypi.python.org/pypi/{pkg_name}/json'
-        releases = json.loads(request.urlopen(url).read())['releases']
-        all_releases = sorted(releases, key=parse_version, reverse=True)
+        latest_version = get_latest_package_version_from_artifactory(pkg_name, display_all)
 
-        if display_all:
-            print(all_releases)
-
-        release_versions = [ver for ver in all_releases if not parse(ver).is_prerelease]
-        latest_version = release_versions[0]
+        if not latest_version:
+            latest_version = get_latest_package_version_from_pypi(pkg_name, display_all)
 
         return latest_version
 
-    def validate_requirements(self):
+    def consolidate_requirements(self):
         """
         Combine requiremtns and dynamic requirements (a list):
           - get the latest version of package if version is not provided
@@ -252,9 +244,6 @@ class RequirementsToAssetCollection:
 
         if self.extra_wheels:
             update_req_list.extend([f"Assets/{os.path.basename(whl)}" for whl in self.extra_wheels])
-
-        # print(update_req_list)
-        # print(comment_list)
 
         return update_req_list
 
