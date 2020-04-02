@@ -2,7 +2,6 @@
 Installation
 ============
 
-
 You can install |IT_l| in two different ways. If you intend to use |IT_s| as
 |IDM_s| builds it, follow the instructions in :doc:`basic-installation`.
 However, if you intend to modify the |IT_s| source code to add new
