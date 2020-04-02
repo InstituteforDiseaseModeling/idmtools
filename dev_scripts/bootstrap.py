@@ -104,5 +104,5 @@ for package, extras in packages.items():
         result = e.returncode
         logger.debug(f'Return Code: {result}')
 
-for line in execute(["pip", "install", "-r", "requirements.txt"], cwd=join(base_directory, 'documentation')):
+for line in execute(["pip", "install", "-r", "requirements.txt"], cwd=join(base_directory, 'docs')):
     process_output(line)

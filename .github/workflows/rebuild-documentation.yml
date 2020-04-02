@@ -1,10 +1,10 @@
-name: "Rebuild documentation"
+name: "Rebuild docs"
 
 on:
   push:
     paths:
       - '**.py'
-      - 'documentation/**'
+      - 'docs/**'
 
 jobs:
   rebuild-documentation:
@@ -16,11 +16,11 @@ jobs:
       - name: Install dependencies
         uses: ammaraskar/sphinx-action@0.4
         with:
-          docs-folder: "documentation"
+          docs-folder: "docs"
           pre-build-command: "pip install -r requirements.txt"
           build-command: "make html"
       - name: Upload Documentation Artifacts
         uses: actions/upload-artifact@v1
         with:
           name: DocumentationHTML
-          path: documentation/_build/html/
+          path: docs/_build/html/
