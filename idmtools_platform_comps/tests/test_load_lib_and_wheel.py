@@ -13,7 +13,6 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import \
     RequirementsToAssetCollection
 
-# import analyzers from current dir's inputs dir
 from idmtools_test.utils.utils import del_folder
 
 model_path = os.path.join(os.path.dirname(__file__), "inputs", "simple_load_lib_example")
@@ -198,3 +197,59 @@ class TestLoadLibWheel(ITestWithPersistence):
         self.assertTrue(os.path.exists(os.path.join(local_output_path, sims[0].id, "StdErr.txt")))
         contents = Path(os.path.join(local_output_path, sims[0].id, "StdErr.txt")).read_text()
         self.assertIn("ModuleNotFoundError: No module named 'zipp'", contents)
+
+    @pytest.mark.long
+    @pytest.mark.comps
+    def test_exp_load_wheel_from_aritifactory(self):
+        # ------------------------------------------------------
+        # First load custom wheel with RequirementsToAssetCollection
+        # ------------------------------------------------------
+        requirements_path = os.path.join(model_path, 'requirements3.txt')
+        pl = RequirementsToAssetCollection(self.platform, requirements_path=requirements_path)
+        ac_id = pl.run()
+        common_assets = AssetCollection.from_id(ac_id, platform=self.platform)
+
+        # create python task with script 'seaborn_file.py', task is doing this in comps: "python ./Assets/seaborn_file.py"
+        script_path = os.path.join(model_path, 'seaborn_file.py')
+        task = JSONConfiguredPythonTask(script_path=script_path, common_assets=common_assets)
+
+        ac = AssetCollection()
+        model_asset = Asset(absolute_path=os.path.join(model_path, "tips.csv"))
+        ac.add_asset(model_asset)
+        # create experiment with 1 base simulation with python task
+        experiment = Experiment(name=self.case_name, simulations=[task.to_simulation()], assets=ac)
+        experiment.tags = {'ac_id': str(ac_id)}
+
+        self.platform.run_items(experiment)
+        self.platform.wait_till_done(experiment)
+
+        # Make sure this experiment succeeded
+        self.assertTrue(experiment.succeeded)
+
+    @pytest.mark.long
+    @pytest.mark.comps
+    def test_regenerate_ac(self):
+        # ------------------------------------------------------
+        # First load custom wheel with RequirementsToAssetCollection
+        # ------------------------------------------------------
+        requirements_path = os.path.join(model_path, 'requirements3.txt')
+        pl = RequirementsToAssetCollection(self.platform, requirements_path=requirements_path)
+        ac_id = pl.run(rerun=True)
+        common_assets = AssetCollection.from_id(ac_id, platform=self.platform)
+
+        # create python task with script 'seaborn_file.py', task is doing this in comps: "python ./Assets/seaborn_file.py"
+        script_path = os.path.join(model_path, 'seaborn_file.py')
+        task = JSONConfiguredPythonTask(script_path=script_path, common_assets=common_assets)
+
+        ac = AssetCollection()
+        model_asset = Asset(absolute_path=os.path.join(model_path, "tips.csv"))
+        ac.add_asset(model_asset)
+        # create experiment with 1 base simulation with python task
+        experiment = Experiment(name=self.case_name, simulations=[task.to_simulation()], assets=ac)
+        experiment.tags = {'ac_id': str(ac_id)}
+
+        self.platform.run_items(experiment)
+        self.platform.wait_till_done(experiment)
+
+        # Make sure this experiment succeeded
+        self.assertTrue(experiment.succeeded)
