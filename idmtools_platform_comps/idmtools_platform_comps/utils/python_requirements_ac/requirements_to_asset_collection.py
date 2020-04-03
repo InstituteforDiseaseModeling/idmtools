@@ -215,7 +215,7 @@ class RequirementsToAssetCollection:
         Combine requiremtns and dynamic requirements (a list):
           - get the latest version of package if version is not provided
           - dynamic requirements will overwrites the requirements file
-          
+
         Returns: the consolidated requirements (as a list)
         """
         import pkg_resources
