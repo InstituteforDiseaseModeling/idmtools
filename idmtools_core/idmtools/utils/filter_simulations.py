@@ -21,7 +21,7 @@ class FilterItem:
         .. code-block:: python
 
                 filter_item(platform, exp, tags={'Run_Number': '2'})
-                
+
         Args:
             platform:
             item:
