@@ -167,3 +167,11 @@ In addition, you can rerun just the failed test using either the top-level `pyma
 2. Docker image not found
    Rerun the `pymake setup-dev`
 3. Check build logs Detailed Build Logs are located within in package and tests directoery withing the package with the name make.buildlog. You can also increase the console log level to DEBUG by setting the environment variable BUILD_DEBUG to 1
+
+# Reporting an Issue
+
+You can report an issue directly on GitHub or by emailing [idmtools-issue@idmod.org](mailto:idmtools-issue@idmod.org). Please include steps to reproduce the issue
+
+# Requesting a feature 
+
+You can request a feature but opening a ticket on the repo or by emailing [idmtools-feature@idmod.org](mailto:idmtools-feature@idmod.org)
