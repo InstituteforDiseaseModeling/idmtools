@@ -60,7 +60,7 @@ class RequirementsToAssetCollection:
 
         return self._requirements
 
-    def run(self):
+    def run(self, rerun=False):
         """
         The working logic of this utility:
             1. check if asset collection exists for given requirements, return ac id if exists
@@ -72,7 +72,7 @@ class RequirementsToAssetCollection:
         # Check if ac with md5 exists
         ac = self.retrieve_ac_by_tag()
 
-        if ac:
+        if ac and not rerun:
             return ac.id
 
         # Create Experiment to install custom requirements
