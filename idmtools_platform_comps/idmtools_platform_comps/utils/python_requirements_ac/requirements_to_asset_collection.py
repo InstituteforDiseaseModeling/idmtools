@@ -128,6 +128,7 @@ class RequirementsToAssetCollection:
 
         # if exists, get ac and return it
         if len(ac_list) > 0:
+            ac_list = sorted(ac_list, key=lambda t: t.date_created, reverse=True)
             ac = ac_list[0]
             return ac
 
