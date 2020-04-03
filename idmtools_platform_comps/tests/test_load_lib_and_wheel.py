@@ -106,8 +106,8 @@ class TestLoadLibWheel(ITestWithPersistence):
         # First load custom wheel with RequirementsToAssetCollection
         # ------------------------------------------------------
         requirements_path = os.path.join(model_path, 'requirements1.txt')
-        extra_wheels_path = [os.path.join(model_path, 'seaborn-0.7.1-py2.py3-none-any.whl')]
-        pl = RequirementsToAssetCollection(self.platform, requirements_path=requirements_path, extra_wheels=extra_wheels_path)
+        local_wheels_path = [os.path.join(model_path, 'seaborn-0.7.1-py2.py3-none-any.whl')]
+        pl = RequirementsToAssetCollection(self.platform, requirements_path=requirements_path, local_wheels=local_wheels_path)
         ac_id = pl.run()
         common_assets = AssetCollection.from_id(ac_id, platform=self.platform)
 
