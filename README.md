@@ -30,6 +30,8 @@
   - [Running specific tests from the command line](#running-specific-tests-from-the-command-line)
   - [WSL2 on Windows Setup(Experimental)](#wsl2-on-windows-setupexperimental)
   - [Troubleshooting the Development Environment](#troubleshooting-the-development-environment)
+- [Reporting an Issue](#reporting-an-issue)
+- [Requesting a feature](#requesting-a-feature)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
