@@ -9,7 +9,7 @@ current_directory = os.getcwd()
 p_version = sys.version_info
 if p_version.major == 3:
     if p_version.minor == 7:
-        sys.path.append( str(Path(os.path.join(assets_dir, './MyExternalLibrary/Python37')).resolve().absolute()) )
+        sys.path.append(str(Path(os.path.join(assets_dir, './MyExternalLibrary/Python37')).resolve().absolute()))
     elif p_version.minor == 6:
         sys.path.append(str(Path(os.path.join(assets_dir, './MyExternalLibrary/Python36')).resolve().absolute()))
 else:
@@ -31,6 +31,7 @@ class Constant():
     infections = "infections"
     infectiousness = "infectiousness"
     immunity = "immunity"
+
 
 class Person():
     def __init__(self, mcw, age, gender, id):
@@ -58,7 +59,7 @@ class SEIR():
         :param outbreak_ignore_immunity: individuals will be force-infected regardless of actual immunity level when set to true
         :param other_config_params: other parameter/value pairs in config.json
         """
-        self.human_pop = {} # dictionary of individual objects at run time
+        self.human_pop = {}  # dictionary of individual objects at run time
         self.well_mixed_contagion_pool = []
         self.statistical_population = []
         self.num_infected = []
@@ -74,13 +75,13 @@ class SEIR():
         self.outbreak_ignore_immunity = outbreak_ignore_immunity
         self.other_config_params = other_config_params
 
-    def create_person_callback( self, mcw, age, gender ):
-            new_id = gi.create( (gender, age, mcw) )
-            person = Person(mcw, age, gender, new_id)
-            if new_id in self.human_pop:
-                raise Exception(" individual {0} is already created.".format(new_id))
-            else:
-                self.human_pop[new_id] = person
+    def create_person_callback(self, mcw, age, gender):
+        new_id = gi.create((gender, age, mcw))
+        person = Person(mcw, age, gender, new_id)
+        if new_id in self.human_pop:
+            raise Exception(" individual {0} is already created.".format(new_id))
+        else:
+            self.human_pop[new_id] = person
 
     def expose_callback(self, action, prob, individual_id):
         random_draw = random.random()
@@ -121,7 +122,7 @@ class SEIR():
         """
         This is the method to run the SEIR model and generate output files.
         """
-        print( "\tWe cleared out human_pop. Should get populated via populate_from_files and callback..." )
+        print("\tWe cleared out human_pop. Should get populated via populate_from_files and callback...")
         gi.reset()
         nd.reset()
         self.human_pop = {}
@@ -220,8 +221,10 @@ class SEIR():
 if __name__ == "__main__":
     # execute only if run as a script
     import argparse
+
     parser = argparse.ArgumentParser()
-    parser.add_argument('-C', '--config', default="nd_template.json", help="config file name(default to nd_template.json)")
+    parser.add_argument('-C', '--config', default="nd_template.json",
+                        help="config file name(default to nd_template.json)")
     parser.add_argument('-d', '--duration', default=10, help="simulation duration(number of time steps)(default to 10)")
     parser.add_argument('-p', '--population', default=1000, help="number of initial population(default to 100)")
     parser.add_argument('-o', '--outbreak', default=0, help="outbreak time step(default to 0)")
@@ -240,4 +243,3 @@ if __name__ == "__main__":
     model.run()
     # The local platform needs to know the resulting status of a work item. We provide it through a return code
     sys.exit(0)
-
