@@ -218,6 +218,9 @@ class RequirementsToAssetCollection:
             with open(self.requirements_path, 'r') as fd:
                 for cnt, line in enumerate(fd):
                     line = line.strip()
+                    if line == '':
+                        continue
+
                     if line.startswith('#'):
                         comment_list.append(line)
                         continue
