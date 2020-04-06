@@ -83,8 +83,8 @@ html:
 	cp idmtools_platform_local.internals.tasks.template idmtools_platform_local.internals.tasks.rst
 	rm idmtools_platform_local.internals.workers.brokers.rst
 	cp idmtools_platform_local.internals.workers.brokers.template idmtools_platform_local.internals.workers.brokers.rst
-	rm idmtools_platform_local.internals.workers.run_borker.rst
-	cp idmtools_platform_local.internals.workers.run_borker.template idmtools_platform_local.internals.workers.run_borker.rst
+	rm idmtools_platform_local.internals.workers.run_broker.rst
+	cp idmtools_platform_local.internals.workers.run_broker.template idmtools_platform_local.internals.workers.run_broker.rst
 
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(INTERNALOPTS) $(BUILDDIR)/html
 	$(INDEXBUILD) -i $(BUILDDIR)/html -o $(BUILDDIR)/html/_static/tipuesearch/tipuesearch_content.js -u $(URLPREFIX)
