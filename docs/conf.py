@@ -60,7 +60,8 @@ autodoc_mock_imports = ['shapefile',
                         'create_experiment',
                         'create_simulation',
                         'dramatiq',
-                        'docker_run'
+                        'docker_run',
+                        'dramatiq.GenericActor'
                         ]
 
 
