@@ -107,8 +107,8 @@ if "%1" == "html" (
 	DEL /Q /F /S "*.tmp" >nul 2>&1
 	sphinx-apidoc -f -e -o . ../idmtools_platform_local/idmtools_platform_local
 	REN modules.rst idmtools_platform_local_index.rst
-	DEL /Q /F /S "*.idmtools_platform_local.internals.task.*.rst" >nul 2>&1
-	copy idmtools_platform_local.internals.task.template idmtools_platform_local.internals.task.rst
+	DEL /Q /F /S "*.idmtools_platform_local.internals.tasks.*.rst" >nul 2>&1
+	copy idmtools_platform_local.internals.tasks.template idmtools_platform_local.internals.tasks.rst
 
 
 	%SPHINXBUILD% -b html %ALLSPHINXOPTS% %INTERNALOPTS% %BUILDDIR%/html
