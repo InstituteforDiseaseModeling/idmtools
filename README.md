@@ -48,6 +48,10 @@ pip install idmtools[idm] --index-url=https://packages.idmod.org/api/pypi/pypi-p
 ```
 This will install the core tools, the cli, the comps, support for EMOD models, and python models
 
+If you are Python 3.6, you will also need to run
+```bash
+pip install dataclasses
+```
 ## Advanced Install
 You can also install just the individual packages to create minimal environments
 
