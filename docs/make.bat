@@ -103,9 +103,13 @@ if "%1" == "html" (
 	sphinx-apidoc -f -e -o . ../idmtools_platform_comps/idmtools_platform_comps
 	REN modules.rst idmtools_platform_comps_index.rst
 
-	del idmtools_platform_local_index.rst >nul 2>&1 
+	del idmtools_platform_local_index.rst >nul 2>&1
+	DEL /Q /F /S "*.tmp" >nul 2>&1
 	sphinx-apidoc -f -e -o . ../idmtools_platform_local/idmtools_platform_local
 	REN modules.rst idmtools_platform_local_index.rst
+	DEL /Q /F /S "*.idmtools_platform_local.internals.task.*.rst" >nul 2>&1
+	copy idmtools_platform_local.internals.task.template idmtools_platform_local.internals.task.rst
+
 
 	%SPHINXBUILD% -b html %ALLSPHINXOPTS% %INTERNALOPTS% %BUILDDIR%/html
 	if errorlevel 1 exit /b 1
