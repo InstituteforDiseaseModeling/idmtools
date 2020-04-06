@@ -107,12 +107,12 @@ if "%1" == "html" (
 	DEL /Q /F /S "*.tmp" >nul 2>&1
 	sphinx-apidoc -f -e -o . ../idmtools_platform_local/idmtools_platform_local
 	REN modules.rst idmtools_platform_local_index.rst
-	DEL /Q /F /S "*.idmtools_platform_local.internals.tasks.*.rst" >nul 2>&1
-	copy idmtools_platform_local.internals.tasks.template idmtools_platform_local.internals.tasks.rst
+	DEL /Q /F /S "idmtools_platform_local.internals.tasks.*.rst" >nul 2>&1
+	COPY idmtools_platform_local.internals.tasks.template idmtools_platform_local.internals.tasks.rst
 	DEL /Q /F /S "*idmtools_platform_local.internals.workers.brokers.rst" >nul 2>&1
-    copy idmtools_platform_local.internals.workers.brokers.template idmtools_platform_local.internals.workers.brokers.rst
+    COPY idmtools_platform_local.internals.workers.brokers.template idmtools_platform_local.internals.workers.brokers.rst
     DEL /Q /F /S "*idmtools_platform_local.internals.workers.run_broker.rst" >nul 2>&1
-    copy idmtools_platform_local.internals.workers.run_broker.template idmtools_platform_local.internals.workers.run_broker.rst
+    COPY idmtools_platform_local.internals.workers.run_broker.template idmtools_platform_local.internals.workers.run_broker.rst
 
 	%SPHINXBUILD% -b html %ALLSPHINXOPTS% %INTERNALOPTS% %BUILDDIR%/html
 	if errorlevel 1 exit /b 1
