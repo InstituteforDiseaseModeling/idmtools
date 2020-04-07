@@ -1,6 +1,7 @@
 import os
 import json
 from urllib import request
+import requests
 from pkg_resources import parse_version
 from packaging.version import parse
 from html.parser import HTMLParser
@@ -54,8 +55,20 @@ def get_latest_package_version_from_artifactory(pkg_name, display_all=False):
         display_all: determine if output all package releases
     Returns: the latest version of ven package
     """
-
     pkg_path = 'https://packages.idmod.org/artifactory/list/idm-pypi-production/'
+    pkg_url = os.path.join(pkg_path, pkg_name)
+    return get_latest_version_from_site(pkg_url, display_all)
+
+
+def get_latest_ssmt_image_version_from_artifactory(pkg_name='comps_ssmt_worker', display_all=False):
+    """
+    Utility to get the latest version for a given package name
+    Args:
+        pkg_name: package name given
+        display_all: determine if output all package releases
+    Returns: the latest version of ven package
+    """
+    pkg_path = 'https://packages.idmod.org/artifactory/list/idm-docker-public/idmtools/'
     pkg_url = os.path.join(pkg_path, pkg_name)
     return get_latest_version_from_site(pkg_url, display_all)
 
@@ -68,8 +81,6 @@ def get_latest_version_from_site(pkg_url, display_all=False):
         display_all: determine if output all package releases
     Returns: the latest version of ven package
     """
-    import requests
-
     resp = requests.get(pkg_url)
     if resp.status_code == 404:
         return None
@@ -87,6 +98,11 @@ def get_latest_version_from_site(pkg_url, display_all=False):
         print(all_releases)
 
     release_versions = [ver for ver in all_releases if not parse(ver).is_prerelease]
+
+    # comps_ssmt_worker will store only x.x.x.x
+    if 'comps_ssmt_worker' in pkg_url.lower():
+        release_versions = [ver for ver in release_versions if len(ver.split('.')) == 4]
+
     latest_version = release_versions[0] if release_versions else None
 
     return latest_version
