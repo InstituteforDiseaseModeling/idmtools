@@ -25,8 +25,8 @@ setup-dev:  ## Setup packages in dev mode
 	$(PDR) -w idmtools_platform_local -ex 'pymake docker-local'
 
 lint: ## check style with flake8
-	$(MAKEALL) --parallel lint
-	flake8 --ignore=E501,W291 examples
+	flake8 --ignore=E501,W291 --exclude="examples/**,workflow/**,docs/**,*/tests/**,idmtools_model_emod/**,idmtools_test/**"
+
 
 test: ## Run our tests
 	$(MAKEALL) --parallel test
@@ -78,7 +78,7 @@ linux-dev-env: ## Runs docker dev env
 	$(PDR) -w 'dev_scripts/linux-test-env' -ex 'docker-compose run --rm linuxtst'
 
 
-draft-change-log:
+change-log: ## Generate partial changelog
 	git log $(shell git tag -l --sort=-v:refname | grep -w '[0-9]\.[0-9]\.[0-9]' | head -n 1) HEAD --pretty=format:'%s' --reverse --simplify-merges | uniq
 
 bump-release: #bump the release version.
