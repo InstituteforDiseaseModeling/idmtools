@@ -98,7 +98,6 @@ try:
         def perform(self, command: str, experiment_uuid: str, simulation_uuid: str, container_config: dict) -> Status:
             return self.docker_perform(command, experiment_uuid, simulation_uuid, container_config)
 
-
     # it would be great we could just derive from RunTask and change the meta but that doesn't seem to work with
     # GenericActors for some reason. Using BaseTask and these few lines of redundant code are our compromise
     class GPURunTask(GenericActor, DockerBaseTask):

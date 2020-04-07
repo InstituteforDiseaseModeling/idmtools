@@ -30,6 +30,8 @@
   - [Running specific tests from the command line](#running-specific-tests-from-the-command-line)
   - [WSL2 on Windows Setup(Experimental)](#wsl2-on-windows-setupexperimental)
   - [Troubleshooting the Development Environment](#troubleshooting-the-development-environment)
+- [Reporting an Issue](#reporting-an-issue)
+- [Requesting a feature](#requesting-a-feature)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -48,6 +50,10 @@ pip install idmtools[idm] --index-url=https://packages.idmod.org/api/pypi/pypi-p
 ```
 This will install the core tools, the cli, the comps, support for EMOD models, and python models
 
+If you are Python 3.6, you will also need to run
+```bash
+pip install dataclasses
+```
 ## Advanced Install
 You can also install just the individual packages to create minimal environments
 
@@ -167,3 +173,11 @@ In addition, you can rerun just the failed test using either the top-level `pyma
 2. Docker image not found
    Rerun the `pymake setup-dev`
 3. Check build logs Detailed Build Logs are located within in package and tests directoery withing the package with the name make.buildlog. You can also increase the console log level to DEBUG by setting the environment variable BUILD_DEBUG to 1
+
+# Reporting an Issue
+
+You can report an issue directly on GitHub or by emailing [idmtools-issue@idmod.org](mailto:idmtools-issue@idmod.org). Please include steps to reproduce the issue
+
+# Requesting a feature 
+
+You can request a feature but opening a ticket on the repo or by emailing [idmtools-feature@idmod.org](mailto:idmtools-feature@idmod.org)

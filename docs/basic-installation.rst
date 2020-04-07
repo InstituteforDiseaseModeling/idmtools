@@ -24,6 +24,10 @@ source code changes.
 
         pip install idmtools[idm] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
 
+    If you are on Python 3.6, also run::
+
+        pip install dataclasses
+
 #.  Verify installation by pulling up |IT_s| help::
 
         idmtools --help

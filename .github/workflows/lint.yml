@@ -15,12 +15,11 @@ jobs:
           python-version: 3.7
 
       - name: Install Python dependencies
-        run: pip install black flake8
+        run: |
+          sudo apt-get update
+          sudo apt-get install make
+          pip install black flake8
 
-      - name: Run linters
-        uses: samuelmeuli/lint-action@v1
-        with:
-          github_token: ${{ secrets.github_token }}
-          # Enable linters
-          flake8: true
-          flake8_args: --ignore=E501,W291 --exclude="examples/**,workflow/**,docs/**,*/tests/**,idmtools_model_emod/**,idmtools_test/**"
+      - name: Run Lint
+        run: |
+          make lint
