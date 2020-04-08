@@ -52,6 +52,7 @@ help:
 .PHONY: clean
 clean:
 	rm -rf $(BUILDDIR)/*
+	rm -rf idmtools*.rst
 
 .PHONY: external
 external:
@@ -78,6 +79,12 @@ html:
 	-rm idmtools_platform_local_index.rst
 	SPHINX_APIDOC_OPTIONS=members,undoc-members,show-inheritance,ignore-module-all sphinx-apidoc -f -e -o . ../idmtools_platform_local/idmtools_platform_local
 	mv modules.rst idmtools_platform_local_index.rst
+	rm -rf idmtools_platform_local.internals.tasks.*.rst
+	cp idmtools_platform_local.internals.tasks.template idmtools_platform_local.internals.tasks.rst
+	rm idmtools_platform_local.internals.workers.brokers.rst
+	cp idmtools_platform_local.internals.workers.brokers.template idmtools_platform_local.internals.workers.brokers.rst
+	rm idmtools_platform_local.internals.workers.run_broker.rst
+	cp idmtools_platform_local.internals.workers.run_broker.template idmtools_platform_local.internals.workers.run_broker.rst
 
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(INTERNALOPTS) $(BUILDDIR)/html
 	$(INDEXBUILD) -i $(BUILDDIR)/html -o $(BUILDDIR)/html/_static/tipuesearch/tipuesearch_content.js -u $(URLPREFIX)
