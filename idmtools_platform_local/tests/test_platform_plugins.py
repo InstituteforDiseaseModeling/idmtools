@@ -11,4 +11,4 @@ class TestPlatformPlugins(TestCase):
         """
         pm = PlatformPlugins()
         self.assertGreater(len(pm.get_plugins()), 1)
-        self.assertIn('COMPS', pm.get_plugin_map().keys())
+        self.assertIn('Local', pm.get_plugin_map().keys())

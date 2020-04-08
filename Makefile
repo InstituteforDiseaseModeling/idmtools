@@ -52,6 +52,9 @@ test-emod: ## Run our emod tests
 test-python: ## Run our python tests
 	$(MAKEALL) test-python
 
+test-smoke: ## Run our smoke tests
+    $(MAKEALL) test-smoke
+
 coverage: ## Generate a code-coverage report
 	$(MAKEALL) coverage-all
 	coverage combine idmtools_cli/.coverage idmtools_core/.coverage idmtools_model_emod/.coverage idmtools_models/.coverage idmtools_platform_comps/.coverage idmtools_platform_local/.coverage
