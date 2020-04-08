@@ -1,9 +1,12 @@
 import os
 import json
 from urllib import request
+import logging
 from pkg_resources import parse_version
 from packaging.version import parse
 from html.parser import HTMLParser
+
+logger = logging.getLogger(__name__)
 
 
 class LinkHTMLParser(HTMLParser):
@@ -32,7 +35,7 @@ def get_latest_package_version_from_pypi(pkg_name, display_all=False):
     url = f'https://pypi.python.org/pypi/{pkg_name}/json'
     try:
         releases = json.loads(request.urlopen(url).read())['releases']
-    except Exception as ex:
+    except Exception:
         return None
 
     all_releases = sorted(releases, key=parse_version, reverse=True)
@@ -57,6 +60,7 @@ def get_latest_package_version_from_artifactory(pkg_name, display_all=False):
 
     pkg_path = 'https://packages.idmod.org/artifactory/list/idm-pypi-production/'
     pkg_url = os.path.join(pkg_path, pkg_name)
+    logger.debug(f'Fetching Packages from {pkg_url}')
     return get_latest_version_from_site(pkg_url, display_all)
 
 
