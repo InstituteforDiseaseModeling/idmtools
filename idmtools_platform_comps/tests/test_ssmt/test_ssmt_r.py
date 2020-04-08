@@ -14,6 +14,7 @@ from idmtools.utils.dropbox_location import get_dropbox_location
 from idmtools_test.utils.utils import del_folder
 
 
+@pytest.mark.skip
 @pytest.mark.tasks
 @pytest.mark.r
 class TestRExperiment(ITestWithPersistence):

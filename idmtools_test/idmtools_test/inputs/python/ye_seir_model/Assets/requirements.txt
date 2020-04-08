@@ -1,1 +1,4 @@
-pandas==0.24.2
+pandas==0.24.1
+dtk_generic_intrahost==0.1.5
+dtk_nodedemog==0.1.5
+dtk_vaccine_intervention==0.0.5
