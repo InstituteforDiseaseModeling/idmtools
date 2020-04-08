@@ -30,7 +30,7 @@ jobs:
             make test-smoke
       - name: Upload test results
         uses: actions/upload-artifact@v1
-        if: failure()
+        if: always()
         with:
           name: test_results
-          path: "*/tests/test_results.xml"
+          path: "**/tests/test_results.xml"
