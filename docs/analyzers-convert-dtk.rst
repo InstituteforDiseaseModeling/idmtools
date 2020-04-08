@@ -29,7 +29,7 @@ The following |DT| example performs analysis on simulation output data in .csv f
         def finalize(self, all_data: dict) -> dict:
 
             results = pd.concat(list(all_data.values()), axis=0,
-                                keys=[str(k.id) for k in all_data.keys()],
+                                keys=[k.id for k in all_data.keys()],
                                 names=['SimId'])
             results.index = results.index.droplevel(1)
 
