@@ -23,8 +23,8 @@ jobs:
         run: |
           make setup-dev
       - name: login to comps2
-          run: |
+        run: |
             python dev_scripts/create_auth_token_args.py --username shchen
       - name: run smoke tests
-          run: |
+        run: |
             make test-smoke
