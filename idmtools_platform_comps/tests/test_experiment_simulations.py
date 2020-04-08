@@ -26,7 +26,7 @@ def param_a_update(simulation, value):
 class TestExperimentSimulations(ITestWithPersistence):
 
     def get_sir_experiment(self, case_name):
-        exp = EMODExperiment.from_default(case_name, default=EMODSir(), eradication_path=DEFAULT_ERADICATION_PATH)
+        exp = EMODExperiment.from_default(case_name, default=EMODSir(), eradication_path=DEFAULT_ERADICATION_PATH)  # noqa: F821
         exp.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         exp.base_simulation.demographics.add_demographics_from_file(DEFAULT_DEMOGRAPHICS_JSON)
         exp.base_simulation.set_parameter("Enable_Immunity", 0)
@@ -49,7 +49,7 @@ class TestExperimentSimulations(ITestWithPersistence):
     @pytest.mark.comps
     def test_input_simulations(self):
         # Create an experiment
-        exp = EMODExperiment.from_default(self.case_name, default=EMODSir(), eradication_path=DEFAULT_ERADICATION_PATH)
+        exp = EMODExperiment.from_default(self.case_name, default=EMODSir(), eradication_path=DEFAULT_ERADICATION_PATH)  # noqa: F821
         exp.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
         exp.demographics.add_demographics_from_file(DEFAULT_DEMOGRAPHICS_JSON)
         exp.base_simulation.set_parameter("Enable_Immunity", 0)
@@ -65,13 +65,13 @@ class TestExperimentSimulations(ITestWithPersistence):
         exp.simulations.append(sim)
 
         # Manually add simulation
-        sim2 = EMODSimulation()
+        sim2 = EMODSimulation()  # noqa: F821
         sim2.load_files(config_path=DEFAULT_CONFIG_PATH, campaign_path=DEFAULT_CAMPAIGN_JSON)
         sim2.experiment = exp
         exp.simulations.append(sim2)
 
         platform = Platform('COMPS2')
-        em = ExperimentManager(platform=platform, experiment=exp)
+        em = ExperimentManager(platform=platform, experiment=exp)  # noqa: F821
         em.create_experiment()
         em.create_simulations()
 
@@ -134,7 +134,7 @@ class TestExperimentSimulations(ITestWithPersistence):
         exps = platform.get_children_by_object(comps_suite)
         self.assertEqual(len(exps), 1)
         exp = exps[0]
-        self.assertTrue(isinstance(exp, EMODExperiment))
+        self.assertTrue(isinstance(exp, EMODExperiment))  # noqa: F821
         self.assertIsNotNone(exp.parent)
         # Test get parent from experiment
         comps_exp = platform.get_item(item_id=exp.uid, item_type=ItemType.EXPERIMENT)
@@ -146,7 +146,7 @@ class TestExperimentSimulations(ITestWithPersistence):
         sims = platform.get_children_by_object(comps_exp)
         self.assertEqual(len(sims), 3)
         sim = sims[0]
-        self.assertTrue(isinstance(sim, EMODSimulation))
+        self.assertTrue(isinstance(sim, EMODSimulation))  # noqa: F821
         self.assertIsNotNone(sim.parent)
 
     @pytest.mark.comps
@@ -163,7 +163,7 @@ class TestExperimentSimulations(ITestWithPersistence):
         platform = Platform('COMPS2')
 
         # Create COMPS experiment and run
-        em = ExperimentManager(platform=platform, experiment=exp)
+        em = ExperimentManager(platform=platform, experiment=exp)  # noqa: F821
 
         # Create a idm suite
         suite = Suite(name='Idm Suite 1')
@@ -195,7 +195,7 @@ class TestExperimentSimulations(ITestWithPersistence):
         platform = Platform('COMPS2')
 
         # Create COMPS experiment and run
-        em = ExperimentManager(platform=platform, experiment=exp, suite=suite)
+        em = ExperimentManager(platform=platform, experiment=exp, suite=suite)  # noqa: F821
         self.run_experiment_and_test_suite(em, platform, suite)
 
 

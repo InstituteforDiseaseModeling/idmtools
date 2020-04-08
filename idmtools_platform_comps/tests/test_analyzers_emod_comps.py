@@ -59,7 +59,6 @@ class TestAnalyzeManagerEmodComps(ITestWithPersistence):
             return Asset(filename='config.json', content=json.dumps(task.config))
         task.gather_transient_asset_hooks.append(save_config)
 
-
         def update_param(simulation, param, value):
             simulation.task.config[param] = value
             return{param: value}

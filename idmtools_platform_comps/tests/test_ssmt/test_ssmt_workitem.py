@@ -1,6 +1,5 @@
 import json
 import os
-import sys
 
 import pytest
 from idmtools.analysis.download_analyzer import DownloadAnalyzer

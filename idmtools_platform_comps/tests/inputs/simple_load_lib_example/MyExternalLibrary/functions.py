@@ -6,7 +6,7 @@ LIBRARY_PATH = os.path.join(CURRENT_DIRECTORY, '..', 'site_packages')  # Need to
 
 sys.path.insert(0, LIBRARY_PATH)
 
-import numpy as np
+import numpy as np  # noqa
 
 
 def add(x, y):

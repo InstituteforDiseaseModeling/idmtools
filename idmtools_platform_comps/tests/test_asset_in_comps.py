@@ -98,8 +98,7 @@ class TestAssetsInComps(unittest.TestCase):
         ac = AssetCollection()
         assets_dir = os.path.join(COMMON_INPUT_PATH, "assets", "collections")
         ac.add_directory(assets_dir)
-        ac.update_tags({"idmtools": "idmtools-automation", "string_tag": "testACtag", "number_tag": 123,
-                          "KeyOnly": None})
+        ac.update_tags({"idmtools": "idmtools-automation", "string_tag": "testACtag", "number_tag": 123, "KeyOnly": None})
 
         ids = self.platform.create_items(ac)
         new_ac = self.platform.get_item(ids[0].id, item_type=ItemType.ASSETCOLLECTION)

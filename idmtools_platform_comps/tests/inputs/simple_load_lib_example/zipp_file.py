@@ -6,9 +6,10 @@ CURRENT_DIRECTORY = os.path.dirname(__file__)
 LIBRARY_PATH = os.path.join(CURRENT_DIRECTORY, 'site_packages')  # Need to site_packages level!!!
 
 sys.path.insert(0, LIBRARY_PATH)  # Very Important!
-import zipp
+import zipp  # noqa
 
 consume = tuple
+
 
 def add_dirs(zf):
     """
@@ -18,6 +19,7 @@ def add_dirs(zf):
     for name in zipp.CompleteDirs._implied_dirs(zf.namelist()):
         zf.writestr(name, b"")
     return zf
+
 
 def build_alpharep_fixture():
     """
@@ -49,6 +51,7 @@ def build_alpharep_fixture():
     zf.writestr("g/h/i.txt", b"content of i")
     zf.filename = "alpharep.zip"
     return zf
+
 
 if __name__ == "__main__":
     zf = build_alpharep_fixture()

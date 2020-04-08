@@ -41,7 +41,6 @@ class TestCOMPSSlurmExperiment(ITestWithPersistence):
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
         self.platform = Platform('SLURM', node_group=None)
-        #self.platform = Platform('COMPS2')
 
     @pytest.mark.long
     def test_sweeps_with_partial_comps_in_slurm(self):
@@ -214,10 +213,7 @@ class TestCOMPSSlurmExperiment(ITestWithPersistence):
             Base_Infectivity_Gaussian_Mean = "Base_Infectivity_Gaussian_Mean"
             Base_Infectivity_Gaussian_Std_Dev = "Base_Infectivity_Gaussian_Std_Dev"
 
-
-        # ------------------------------------------------------
         # First run the experiment
-        # ------------------------------------------------------
         tags = {"idmtools": "idmtools-automation", "simulation_name_tag": "SEIR_Model_SLURM"}
 
         parameters = json.load(
@@ -240,9 +236,6 @@ class TestCOMPSSlurmExperiment(ITestWithPersistence):
         # utility function to update parameters
         def param_update(simulation: Simulation, param: str, value: Any) -> Dict[str, Any]:
             return simulation.task.set_parameter(param, value)
-
-        set_base_infectivity_gaussian_mean = partial(param_update,
-                                                     param=ConfigParameters.Base_Infectivity_Gaussian_Mean)
 
         class setParam:
             def __init__(self, param):

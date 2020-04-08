@@ -9,7 +9,6 @@ from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 
-
 class TestPythonSimulation(ITestWithPersistence):
 
     def setUp(self) -> None:

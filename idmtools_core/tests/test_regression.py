@@ -2,7 +2,6 @@ import os
 import unittest
 
 from idmtools.assets import AssetCollection
-from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations

@@ -4,13 +4,13 @@
 import os
 from sys import platform
 import matplotlib
-if platform == "linux" or platform == "linux2":
-    print('Linux OS. Using non-interactive Agg backend')
-    matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 from idmtools.entities.ianalyzer import IAnalyzer as BaseAnalyzer
+if platform == "linux" or platform == "linux2":
+    print('Linux OS. Using non-interactive Agg backend')
+    matplotlib.use('Agg')
 
 
 # Create a class for a base CSV analyzer
@@ -50,7 +50,7 @@ class NodeCSVAnalyzer(CSVAnalyzer):
         # Make a directory labeled the exp id to write the csv results to
         os.makedirs(exp_id, exist_ok=True)
         # NOTE: If running twice with different filename, the output files will collide
-        results.to_csv(os.path.join(exp_id, self.__class__.__name__+'.csv'))
+        results.to_csv(os.path.join(exp_id, self.__class__.__name__ + '.csv'))
 
         channels = results.drop(['TimeStep'], axis=1).columns.tolist()
         sims = results.index.unique().to_list()
@@ -66,7 +66,7 @@ class NodeCSVAnalyzer(CSVAnalyzer):
             ax.set_title(channel)
             ax.set_xlabel("TimeStep")
             for sim in sims:
-                ax.plot(results[results.index==sim]['TimeStep'], results[results.index==sim][channel])
+                ax.plot(results[results.index == sim]['TimeStep'], results[results.index == sim][channel])
 
         # Create the legend
         sims_label = [str(sim).split('-')[0] for sim in sims]
@@ -74,7 +74,7 @@ class NodeCSVAnalyzer(CSVAnalyzer):
                    fontsize='xx-small', labels=sims_label)
 
         # Save the figure
-        plt.savefig(os.path.join(exp_id, self.__class__.__name__+'.png'))
+        plt.savefig(os.path.join(exp_id, self.__class__.__name__ + '.png'))
 
 
 # Create a class for individual level analyzer
@@ -90,7 +90,7 @@ class InfectiousnessCSVAnalyzer(CSVAnalyzer):
         my_data = [data[filename] for filename in self.filenames]
         # If there are 1 to many csv files, concatenate csv data columns into one dataframe
         # Collect the infectiousness data when is_infected is True only
-        concatenated_df = pd.concat([channel_data[channel_data[self.filter_by]==1][self.channel] for
+        concatenated_df = pd.concat([channel_data[channel_data[self.filter_by] == 1][self.channel] for
                                      channel_data in my_data],
                                     axis=0, ignore_index=True, sort=True)
         return concatenated_df
@@ -108,13 +108,13 @@ class InfectiousnessCSVAnalyzer(CSVAnalyzer):
             keys.append(str(k.tags))
         results = pd.concat(list(all_data.values()), axis=0,  # Combine a list of all the sims csv data column values
                             keys=keys,  # Add a hierarchical index with the keys option
-                            names=['SimTags']) # Using Simulation tags as the keys
+                            names=['SimTags'])  # Using Simulation tags as the keys
         results.index = results.index.droplevel(1)  # Remove default index
 
         # Make a directory labeled the exp id to write the csv results to
         os.makedirs(exp_id, exist_ok=True)
         # NOTE: If running twice with different filename, the output files will collide
-        results.to_csv(os.path.join(exp_id, self.__class__.__name__+'.csv'))
+        results.to_csv(os.path.join(exp_id, self.__class__.__name__ + '.csv'))
 
         sims = results.index.unique().to_list()
         fig, ax = plt.subplots()
@@ -122,7 +122,7 @@ class InfectiousnessCSVAnalyzer(CSVAnalyzer):
         # Plot
         for sim in sims:
             # Filter data by sim tags and then generate the kernel density estimation plot
-            results[results.index == sim].plot.kde(bw_method='scott', ax=ax, label=str(sim)) #
+            results[results.index == sim].plot.kde(bw_method='scott', ax=ax, label=str(sim))
             # sns.distplot() would generate a prettier kde plot but seaborn is not a required library in idmtools.
             # import seaborn as sns
             # sns.distplot(results[results.index==sim], kde=True, hist=False, ax=ax, label=str(sim))
@@ -130,5 +130,4 @@ class InfectiousnessCSVAnalyzer(CSVAnalyzer):
         ax.set_title(self.channel + "(kde)")
         ax.set_ylim(bottom=0)
         # Save the figure
-        plt.savefig(os.path.join(exp_id, self.__class__.__name__+'.png'))
-
+        plt.savefig(os.path.join(exp_id, self.__class__.__name__ + '.png'))

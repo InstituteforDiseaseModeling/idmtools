@@ -51,8 +51,7 @@ class TestRExperiment(ITestWithPersistence):
         ac_lib_path = os.path.join(COMMON_INPUT_PATH, "r", "ncov_analysis")
 
         # Create AssetCollection from dir to provide to the Experiment task
-        r_model_assets = AssetCollection.from_directory(assets_directory=ac_lib_path, flatten=False,
-                                                              relative_path="ncov_analysis")
+        r_model_assets = AssetCollection.from_directory(assets_directory=ac_lib_path, flatten=False, relative_path="ncov_analysis")
 
         experiment = Experiment.from_task(task, name="test_r_task.py--test_r_model_with_ac",
                                           assets=r_model_assets)

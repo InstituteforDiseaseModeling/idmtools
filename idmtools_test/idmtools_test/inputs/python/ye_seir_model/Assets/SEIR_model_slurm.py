@@ -1,27 +1,17 @@
 import sys
 import os
 import random
-from pathlib import Path
-# import utils
-
 assets_dir = os.path.abspath(os.path.dirname(__file__))
 current_directory = os.getcwd()
 p_version = sys.version_info
-# if p_version.major == 3:
-#     if p_version.minor == 7:
-#         sys.path.append( str(Path(os.path.join(assets_dir, './MyExternalLibrary/Python37')).resolve().absolute()) )
-#     elif p_version.minor == 6:
-#         sys.path.append(str(Path(os.path.join(assets_dir, './MyExternalLibrary/Python36')).resolve().absolute()))
-# else:
-#     print("Sorry, this model only support Python 3.6 and 3.7")
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 LIBRARY_PATH = os.path.join(CURRENT_DIRECTORY, 'site_packages')  # Need to site_packages level!!!
 
 sys.path.insert(0, LIBRARY_PATH)  # Very Important!
-import pandas as pd
-import dtk_nodedemog as nd
-import dtk_generic_intrahost as gi
-from config_sim import configure_simulation
+import pandas as pd  # noqa
+import dtk_nodedemog as nd  # noqa
+import dtk_generic_intrahost as gi  # noqa
+from config_sim import configure_simulation  # noqa
 
 
 class Constant():
@@ -35,6 +25,7 @@ class Constant():
     infections = "infections"
     infectiousness = "infectiousness"
     immunity = "immunity"
+
 
 class Persion():
     def __init__(self, mcw, age, gender, id):
@@ -59,7 +50,7 @@ class SEIR():
         :param outbreak_ignore_immunity: iIndividuals will be force-infected regardless of actual immunity level when set to true
         :param other_config_params: other parameter/value pairs in config.json
         """
-        self.human_pop = {} # dictionary of individual objects at run time
+        self.human_pop = {}  # dictionary of individual objects at run time
         self.well_mixed_contagion_pool = []
         self.statistical_population = []
         self.num_infected = []
@@ -75,13 +66,13 @@ class SEIR():
         self.outbreak_ignore_immunity = outbreak_ignore_immunity
         self.other_config_params = other_config_params
 
-    def create_person_callback( self, mcw, age, gender ):
-            new_id = gi.create( (gender, age, mcw) )
-            person = Persion(mcw, age, gender, new_id)
-            if new_id in self.human_pop:
-                raise Exception(" individual {0} is already created.".format(new_id))
-            else:
-                self.human_pop[new_id] = person
+    def create_person_callback(self, mcw, age, gender):
+        new_id = gi.create((gender, age, mcw))
+        person = Persion(mcw, age, gender, new_id)
+        if new_id in self.human_pop:
+            raise Exception(" individual {0} is already created.".format(new_id))
+        else:
+            self.human_pop[new_id] = person
 
     def expose_callback(self, action, prob, individual_id):
         random_draw = random.random()
@@ -122,7 +113,7 @@ class SEIR():
         """
         This is the method to run the SEIR model and generate output files.
         """
-        print( "\tWe cleared out human_pop. Should get populated via populate_from_files and callback..." )
+        print("\tWe cleared out human_pop. Should get populated via populate_from_files and callback...")
         gi.reset()
         nd.reset()
         self.human_pop = {}
@@ -248,4 +239,3 @@ if __name__ == "__main__":
     model.run()
     # The local platform needs to know the resulting status of a work item. We provide it through a return code
     sys.exit(0)
-

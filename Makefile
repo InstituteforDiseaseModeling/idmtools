@@ -53,7 +53,7 @@ test-python: ## Run our python tests
 	$(MAKEALL) test-python
 
 test-smoke: ## Run our smoke tests
-    $(MAKEALL) test-smoke
+	$(MAKEALL) test-smoke
 
 coverage: ## Generate a code-coverage report
 	$(MAKEALL) coverage-all

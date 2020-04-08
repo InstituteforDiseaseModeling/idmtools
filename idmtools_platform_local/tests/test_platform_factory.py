@@ -1,4 +1,3 @@
-import unittest.mock
 import pytest
 from dataclasses import fields
 from idmtools.config import IdmConfigParser
@@ -39,4 +38,3 @@ class TestPlatformFactory(ITestWithPersistence):
         self.assertEqual(platform, platform2)
         del platform
         del platform2
-

@@ -29,4 +29,3 @@ if __name__ == '__main__':
                              ids=[(experiment_id, ItemType.EXPERIMENT)],
                              analyzers=analyzers)
     manager.analyze()
-

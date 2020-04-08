@@ -76,7 +76,7 @@ class TestPythonExperiment(ITestWithPersistence):
         # exp_id = "a727e802-d88b-e911-a2bb-f0921c167866"
 
         # validation each simulation output to compare output/config.json is equal to config.json
-        validate_output(self,exp_id, 4)
+        validate_output(self, exp_id, 4)
 
         expected_tags = [{'a': '0', 'b': '1'}, {'a': '0', 'b': '9'}, {'a': '1', 'b': '1'}, {'a': '1', 'b': '9'}]
         validate_sim_tags(self, exp_id, expected_tags)
@@ -424,10 +424,7 @@ class TestPythonExperiment(ITestWithPersistence):
             Base_Infectivity_Gaussian_Mean = "Base_Infectivity_Gaussian_Mean"
             Base_Infectivity_Gaussian_Std_Dev = "Base_Infectivity_Gaussian_Std_Dev"
 
-
-        # ------------------------------------------------------
         # First run the experiment
-        # ------------------------------------------------------
         script_path = os.path.join(COMMON_INPUT_PATH, "python", "ye_seir_model", "Assets", "SEIR_model.py")
         assets_path = os.path.join(COMMON_INPUT_PATH, "python", "ye_seir_model", "Assets")
         tags = {"idmtools": "idmtools-automation", "simulation_name_tag": "SEIR_Model"}
@@ -451,8 +448,8 @@ class TestPythonExperiment(ITestWithPersistence):
         def param_update(simulation: Simulation, param: str, value: Any) -> Dict[str, Any]:
             return simulation.task.set_parameter(param, value)
 
-        set_base_infectivity_gaussian_mean = partial(param_update,
-                                                     param=ConfigParameters.Base_Infectivity_Gaussian_Mean)
+        # set_base_infectivity_gaussian_mean = partial(param_update,
+        #                                              param=ConfigParameters.Base_Infectivity_Gaussian_Mean)
 
         class setParam:
             def __init__(self, param):
@@ -504,6 +501,7 @@ class TestPythonExperiment(ITestWithPersistence):
         expected_list_sorted = sorted(expected_list, key=itemgetter('filename', 'relative_path'))
         actual_list_sorted = sorted(actual_list, key=itemgetter('filename', 'relative_path'))
         self.assertEqual(expected_list_sorted, actual_list_sorted)
+
 
 if __name__ == '__main__':
     unittest.main()

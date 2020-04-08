@@ -21,8 +21,8 @@ current_directory = os.path.dirname(os.path.realpath(__file__))
 # import analyzers from current dir's inputs dir
 analyzer_path = os.path.join(os.path.dirname(__file__), "inputs")
 sys.path.insert(0, analyzer_path)
-from sim_filter_analyzer import SimFilterAnalyzer
-from sim_filter_analyzer_by_id import SimFilterAnalyzerById
+from sim_filter_analyzer import SimFilterAnalyzer  # noqa
+from sim_filter_analyzer_by_id import SimFilterAnalyzerById  # noqa
 
 
 @pytest.mark.analysis

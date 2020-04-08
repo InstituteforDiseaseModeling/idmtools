@@ -5,7 +5,7 @@ CURRENT_DIRECTORY = os.path.dirname(__file__)
 
 sys.path.insert(0, CURRENT_DIRECTORY)
 
-from MyExternalLibrary.functions import add
+from MyExternalLibrary.functions import add  # noqa E402
 
 if __name__ == "__main__":
     import json
