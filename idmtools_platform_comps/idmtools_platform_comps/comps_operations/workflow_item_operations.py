@@ -3,10 +3,8 @@ import typing
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Tuple, Type
 from uuid import UUID
-
 from COMPS.Data import QueryCriteria, WorkItem as COMPSWorkItem, WorkItemFile
 from COMPS.Data.WorkItem import RelationType, WorkerOrPluginKey
-
 from idmtools.assets import AssetCollection
 from idmtools.core import ItemType
 from idmtools.entities.generic_workitem import GenericWorkItem
@@ -53,20 +51,20 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
 
         # Create a WorkItem
         wi = COMPSWorkItem(name=work_item.item_name,
-                           worker=WorkerOrPluginKey(work_item.work_item_type or self.platform.work_item_type,
-                                                    work_item.plugin_key or self.platform.plugin_key),
+                           worker=WorkerOrPluginKey(work_item.work_item_type, work_item.plugin_key),
                            environment_name=self.platform.environment,
                            asset_collection_id=work_item.asset_collection_id)
 
-        # set tags
+        # Set tags
         wi.set_tags({})
         if work_item.tags:
             wi.set_tags(work_item.tags)
 
-        wi.tags.update({'WorkItem_Type': work_item.work_item_type or self.platform.work_item_type})
+        # Update tags
+        wi.tags.update({'WorkItem_Type': work_item.work_item_type})
 
         # Add work order file
-        wo = work_item.get_base_work_order(self.platform)
+        wo = work_item.get_base_work_order()
         wo.update(work_item.work_order)
         wi.add_work_order(data=json.dumps(wo).encode('utf-8'))
 
