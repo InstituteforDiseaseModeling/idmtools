@@ -8,6 +8,10 @@ Although the use of analyzers in |DT| and |IT_s| is very similar, being aware of
 
     @startuml
 
+    note top of BaseAnalyzer
+    DTK-Tools
+    end note
+
     class BaseAnalyzer {
     initialize()
     per_experiment()
@@ -16,6 +20,10 @@ Although the use of analyzers in |DT| and |IT_s| is very similar, being aware of
     finalize()
     destroy()
     }
+
+    note top of IAnalyzer
+    IDM-Tools
+    end note
 
     class IAnalyzer {
     initialize()
