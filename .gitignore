@@ -374,6 +374,7 @@ examples/generic_sim/download-e2eB/
 examples/**/task.diskcache/
 examples/ssmt/**/output/
 examples/vistools/**/workitem_output/
+examples/**/requirements_updated.txt
 
 idmtools_core/tests/data
 idmtools_core/tests/reports/
