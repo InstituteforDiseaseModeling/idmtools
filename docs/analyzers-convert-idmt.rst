@@ -30,7 +30,7 @@ The following converted from |DT| to |IT_s| example performs analysis on simulat
         def reduce(self, all_data):
 
             results = pd.concat(list(all_data.values()), axis=0,
-                                keys=[str(k.uid) for k in all_data.keys()],
+                                keys=[k.uid for k in all_data.keys()],
                                 names=['SimId'])
             results.index = results.index.droplevel(1)
 
