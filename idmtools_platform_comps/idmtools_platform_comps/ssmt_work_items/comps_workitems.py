@@ -50,7 +50,7 @@ class SSMTWorkItem(ICOMPSWorkflowItem):
         from idmtools_platform_comps.utils.package_version import get_latest_ssmt_image_version_from_artifactory
 
         # Determine the default ssmt docker image
-        if self.platform.endpoint.lower() == "comps.idmod.org":
+        if "comps.idmod.org" in self.platform.endpoint.lower():
             ssmt_image = SSMT_PRODUCTION_IMAGE
         else:
             ssmt_image = SSMT_STAGING_IMAGE
