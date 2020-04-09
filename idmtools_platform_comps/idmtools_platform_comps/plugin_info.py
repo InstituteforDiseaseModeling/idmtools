@@ -17,9 +17,9 @@ simulation_root = $COMPS_PATH(USER)\\output
 node_group = emod_abcd
 num_retries = 0
 num_cores = 1
-exclusive = False
 max_workers = 16
 batch_size = 10
+exclusive = False
 """
 
 logger = getLogger(__name__)
