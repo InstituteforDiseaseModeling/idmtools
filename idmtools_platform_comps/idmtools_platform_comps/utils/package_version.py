@@ -82,7 +82,7 @@ def get_latest_version_from_site(pkg_url, display_all=False):
     Returns: the latest version of ven package
     """
     resp = requests.get(pkg_url)
-    if resp.status_code == 404:
+    if resp.status_code != 200:
         return None
 
     htmlStr = resp.text
