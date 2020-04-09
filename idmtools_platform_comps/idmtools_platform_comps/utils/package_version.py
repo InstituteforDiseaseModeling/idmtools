@@ -68,7 +68,7 @@ def get_latest_ssmt_image_version_from_artifactory(pkg_name='comps_ssmt_worker',
         display_all: determine if output all package releases
     Returns: the latest version of ven package
     """
-    pkg_path = 'https://packages.idmod.org/artifactory/list/idm-docker-public/idmtools/'
+    pkg_path = 'https://packages.idmod.org/artifactory/list/docker-production/idmtools/'
     pkg_url = os.path.join(pkg_path, pkg_name)
     return get_latest_version_from_site(pkg_url, display_all)
 
