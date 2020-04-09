@@ -62,7 +62,6 @@ You can also install just the individual packages to create minimal environments
 - `pip install idmtools-platform-comps --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Support for COMPS
 - `pip install idmtools-platform-local --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Support for Local Platform
 - `pip install idmtools-models --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Python and generic models
-- `pip install idmtools-model-emod --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - EMOD Model support
 
 ## Pre-requisites
 - Python 3.6/3.7 x64
@@ -119,7 +118,6 @@ The directories that should be added as source roots are
 - `idmtools/idmtools_cli`
 - `idmtools/idmtools_platform_local`
 - `idmtools/idmtools_platform_comps`
-- `idmtools/idmtools_model_emod`
 - `idmtools/idmtools_models`
 - `idmtools/idmtools_test`
 
@@ -127,9 +125,9 @@ The directories that should be added as source roots are
 
 To run a select set of tests, you can use the `run_all.py` python script
 
-For example to run all tests that tagged emod but not tagged comps run 
+For example to run all tests that tagged python but not tagged comps run 
 ```bash
-python dev_scripts/run_all.py -sd 'tests' --exec "py.test -m 'not comps and emod'"
+python dev_scripts/run_all.py -sd 'tests' --exec "py.test -m 'not comps and python'"
 ```
 
 You can also filter by test case name or method name. The below will run any test with batch in the name. 
