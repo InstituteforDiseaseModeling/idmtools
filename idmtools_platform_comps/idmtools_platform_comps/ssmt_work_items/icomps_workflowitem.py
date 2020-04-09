@@ -1,8 +1,6 @@
 import json
 from abc import ABC
-
 from dataclasses import field, dataclass
-
 from idmtools.entities.iworkflow_item import IWorkflowItem
 
 
@@ -24,9 +22,8 @@ class ICOMPSWorkflowItem(IWorkflowItem, ABC):
     def __repr__(self):
         return f"<WorkItem {self.uid}>"
 
-    def get_base_work_order(self, platform):
-        wi_type = self.work_item_type or platform.work_item_type
-        base_wo = {"WorkItem_Type": wi_type}
+    def get_base_work_order(self):
+        base_wo = {"WorkItem_Type": self.work_item_type}
         return base_wo
 
     def load_work_order(self, wo_file):
