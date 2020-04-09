@@ -28,9 +28,23 @@ jobs:
       - name: run smoke tests
         run: |
             make test-smoke
-      - name: Upload test results
+      - name: Upload cli smoke test results
         uses: actions/upload-artifact@v1
-        if: always()
         with:
-          name: test_results
-          path: "**/tests/test_results.xml"
+          name: idmtools_cli_test_results
+          path: idmtools_cli/tests/test_results.xml
+      - name: Upload core smoke test results
+        uses: actions/upload-artifact@v1
+        with:
+          name: idmtools_core_test_results
+          path: idmtools_core/tests/test_results.xml
+      - name: Upload model smoke test results
+        uses: actions/upload-artifact@v1
+        with:
+          name: idmtools_models_test_results
+          path: idmtools_models/tests/test_results.xml
+      - name: Upload local platform smoke test results
+        uses: actions/upload-artifact@v1
+        with:
+          name: idmtools_platform_local_test_results
+          path: idmtools_platform_local/tests/test_results.xml
