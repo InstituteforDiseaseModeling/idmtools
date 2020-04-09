@@ -46,7 +46,6 @@ class SSMTWorkItem(ICOMPSWorkflowItem):
         SSMT_PRODUCTION_IMAGE = 'docker-production.packages.idmod.org/idmtools/comps_ssmt_worker'
         SSMT_STAGING_IMAGE = 'docker-staging.packages.idmod.org/idmtools/comps_ssmt_worker'
 
-        from idmtools_platform_comps import __version__
         from idmtools_platform_comps.utils.package_version import get_latest_ssmt_image_version_from_artifactory
 
         # Determine the default ssmt docker image

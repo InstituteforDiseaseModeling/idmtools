@@ -33,7 +33,7 @@ def get_latest_package_version_from_pypi(pkg_name, display_all=False):
     url = f'https://pypi.python.org/pypi/{pkg_name}/json'
     try:
         releases = json.loads(request.urlopen(url).read())['releases']
-    except Exception as ex:
+    except Exception:
         return None
 
     all_releases = sorted(releases, key=parse_version, reverse=True)
