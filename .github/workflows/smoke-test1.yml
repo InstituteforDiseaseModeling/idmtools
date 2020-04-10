@@ -1,0 +1,37 @@
+name: Run smoke tests
+on: [pull_request]
+jobs:
+  run-linters:
+    name: Run smoke tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+
+      - name: Install Python dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install make
+          pip install black flake8
+      - name: Run setup-dev
+        run: |
+          make setup-dev
+      - name: login to comps2
+        run: |
+            python dev_scripts/create_auth_token_args.py --username shchen
+      - name: run smoke tests
+        run: |
+            cd idmtools_models/tests
+            pytest --durations=3 -v --junitxml=test_results.xml -m "smoke"
+      - name: Upload model smoke test results
+        uses: actions/upload-artifact@v1
+        if: failure()
+        with:
+          name: idmtools_models_test_results
+          path: idmtools_models/tests/test_results.xml
