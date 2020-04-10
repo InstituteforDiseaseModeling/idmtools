@@ -19,6 +19,8 @@ You can use the **idmtools.ini** file to configure platform specific settings, a
     node_group = emod_abcd
     num_retires = 0
     num_cores = 1
+    max_workers = 16
+    batch_size = 10
     exclusive = False
 
 Within your code you use the :py:class:`~idmtools.core.platform_factory.Platform` class to specify which platform |IT_s| will use. For example, the following excerpt sets **platform** to use |COMPS_s|::
