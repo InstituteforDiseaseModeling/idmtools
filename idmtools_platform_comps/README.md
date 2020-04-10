@@ -9,6 +9,7 @@
   - [Installing](#installing)
 - [Development Tips](#development-tips)
 - [Building SSMT Docker Image](#building-ssmt-docker-image)
+- [Choose SSMT Docker Image to use in test/script](#choose-ssmt-docker-image-to-use-in-testscript)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
