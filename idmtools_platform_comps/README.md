@@ -47,18 +47,18 @@ To build the SSMT Docker image, follow these steps
 There are three ways to choose which ssmt docker image to use in your script:
 
 1. specify docker_image in SSMTWorkItem creation, for example,
-
+```bash
    wi = SSMTWorkItem(item_name=wi_name, command=command, docker_image='my_test_ssmt_docker_image')
-   
+```   
 2. define docker_image in your idmtools.ini, for example:
-
+```bash
     [COMPS2]
     type = COMPS
     endpoint = https://comps2.idmod.org
     environment = Bayesian
     ......
     docker_image = my_test_ssmt_docker_image
-
+```
 
 3. if not above two cases, idomtools system will determine the default ssmt docker image from platform for you:
 
