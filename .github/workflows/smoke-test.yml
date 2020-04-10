@@ -1,5 +1,5 @@
 name: Run smoke tests
-on: [pull_request]
+on: [push, pull_request]
 jobs:
   run-linters:
     name: Run smoke tests
