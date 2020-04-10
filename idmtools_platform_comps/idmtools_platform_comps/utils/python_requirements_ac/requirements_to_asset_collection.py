@@ -201,6 +201,9 @@ class RequirementsToAssetCollection:
         if not latest_version:
             latest_version = get_latest_package_version_from_pypi(pkg_name, display_all)
 
+        if not latest_version:
+            raise Exception(f"Failed to retrieve the latest version of '{pkg_name}'.")
+
         return latest_version
 
     def consolidate_requirements(self):
