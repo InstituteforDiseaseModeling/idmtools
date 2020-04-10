@@ -53,8 +53,7 @@ test-python: ## Run our python tests
 	$(FULL_TEST_CMD) -m "python"'
 
 test-smoke: ## Run smoke tests
-	@+$(IPY) "print('No Tests')"
-	# $(FULL_TEST_CMD) -m "smoke"'
+	$(FULL_TEST_CMD) -m "smoke"'
 
 test-ssmt: ## Run our ssmt tests
 	$(FULL_TEST_CMD) -m "ssmt"'
