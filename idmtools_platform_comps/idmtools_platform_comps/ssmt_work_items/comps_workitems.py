@@ -1,5 +1,8 @@
+from logging import getLogger, DEBUG
 from dataclasses import dataclass, field
 from idmtools_platform_comps.ssmt_work_items.icomps_workflowitem import ICOMPSWorkflowItem
+
+logger = getLogger(__name__)
 
 
 @dataclass
@@ -46,17 +49,21 @@ class SSMTWorkItem(ICOMPSWorkflowItem):
         SSMT_PRODUCTION_IMAGE = 'docker-production.packages.idmod.org/idmtools/comps_ssmt_worker'
         SSMT_STAGING_IMAGE = 'docker-staging.packages.idmod.org/idmtools/comps_ssmt_worker'
 
-        from idmtools_platform_comps import __version__
         from idmtools_platform_comps.utils.package_version import get_latest_ssmt_image_version_from_artifactory
 
         # Determine the default ssmt docker image
-        if self.platform.endpoint.lower() == "comps.idmod.org":
+        if "comps.idmod.org" in self.platform.endpoint.lower():
             ssmt_image = SSMT_PRODUCTION_IMAGE
         else:
             ssmt_image = SSMT_STAGING_IMAGE
 
         release = get_latest_ssmt_image_version_from_artifactory()
-        return f'{ssmt_image}:{release}'
+
+        docker_image = f'{ssmt_image}:{release}'
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f'docker_image in use: {docker_image}')
+
+        return docker_image
 
 
 @dataclass
