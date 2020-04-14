@@ -5,7 +5,6 @@ from idmtools.core.interfaces.inamed_entity import INamedEntity
 from idmtools.core import ItemType, EntityContainer, NoPlatformException, EntityStatus
 
 
-
 @dataclass(repr=False)
 class Suite(INamedEntity, ABC):
     """
