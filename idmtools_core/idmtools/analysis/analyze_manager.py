@@ -75,7 +75,7 @@ class AnalyzeManager(CacheEnabled):
         super().__init__()
         self.configuration = configuration or {}
         self.platform = platform
-        self.__check_for_platform_from_context(self.platform)
+        self.__check_for_platform_from_context(platform)
         self.max_processes = self.configuration.get('max_threads', os.cpu_count())
         logger.debug(f'AnalyzeManager set to {self.max_processes}')
 
@@ -98,13 +98,13 @@ class AnalyzeManager(CacheEnabled):
         items: List[IEntity] = []
         for oid, otype in ids:
             logger.debug(f'Getting metadata for {oid} and {otype}')
-            result = platform.get_item(oid, otype, force=True)
+            result = self.platform.get_item(oid, otype, force=True)
             items.append(result)
         self.potential_items: List[IEntity] = []
 
         for i in items:
             logger.debug(f'Flattening items for {i.uid}')
-            self.potential_items.extend(platform.flatten_item(item=i))
+            self.potential_items.extend(self.platform.flatten_item(item=i))
 
         # These are leaf items to be ignored in analysis. Make sure they are UUID and then prune them from analysis.
         self.exclude_ids = exclude_ids or []
