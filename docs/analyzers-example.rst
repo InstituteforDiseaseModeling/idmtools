@@ -27,7 +27,7 @@ Each of the included example analyzers inherit from the built-in analyzers and t
     BuiltinAnalyzers <|-- ExampleAnalyzers  
     @enduml
 
-For more information about the built-in analyzers, see :doc:`analyzers-create`.
+For more information about the built-in analyzers, see :doc:`analyzers-create`. There are also additional examples, such as forcing analyzers to use a specific working directory and how to perform partial analysis on only succeeded or failed simulations:
 
 .. toctree::
 
