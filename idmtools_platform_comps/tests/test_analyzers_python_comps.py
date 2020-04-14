@@ -149,6 +149,8 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         self.assertTrue(df['b'].values[1:7].size == 6)
         self.assertTrue(df['c'].values[1:7].size == 6)
 
+    # test analyzer with parameter: analyze_failed_items=True
+    # note: when this flag to True, it does not mean analyzer only on failed simulations, it also on succeeded sims
     def test_analyzer_with_failed_sims(self):
         experiment_id = 'c3e4ef50-ee63-ea11-a2bf-f0921c167862'  # staging experiment includes 5 sims with 3 failed sims
 
@@ -157,7 +159,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         del_folder(output_dir)
         filenames = ["stdErr.txt"]
         analyzers = [DownloadAnalyzer(filenames=filenames)]
-        manager = AnalyzeManager(platform=self.p, partial_analyze_ok=True,
+        manager = AnalyzeManager(platform=self.p, partial_analyze_ok=False,
                                  ids=[(experiment_id, ItemType.EXPERIMENT)],
                                  analyzers=analyzers, analyze_failed_items=True)
         manager.analyze()
@@ -181,3 +183,38 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
             # for successful simulations, make sure stdErr.txt is empty
             else:
                 self.assertEqual("", contents)
+
+    # test analyzer with only succeeded simulations
+    # note: experiment can have failed sims, but analyzer only analyzes succeeded sims
+    def test_analyzer_with_succeeded_sims(self):
+        experiment_id = 'c3e4ef50-ee63-ea11-a2bf-f0921c167862'  # staging experiment includes 5 sims with 3 failed sims
+
+        # delete output from previous run
+        output_dir = "output"
+        del_folder(output_dir)
+        filenames = ["stdOut.txt"]
+        analyzers = [DownloadAnalyzer(filenames=filenames)]
+        manager = AnalyzeManager(platform=self.p, partial_analyze_ok=True,
+                                 ids=[(experiment_id, ItemType.EXPERIMENT)],
+                                 analyzers=analyzers)
+        manager.analyze()
+
+        # validation
+        for simulation in self.p.get_children(experiment_id, ItemType.EXPERIMENT):
+            if simulation.id == "c7e4ef50-ee63-ea11-a2bf-f0921c167862" \
+                    or simulation.id == "c5e4ef50-ee63-ea11-a2bf-f0921c167862":
+                file = os.path.join("output", str(simulation.id), "stdOut.txt")
+                # make sure DownloadAnalyzer only download succeeded simulation's stdOut.txt files
+                self.assertTrue(os.path.exists(file))
+                # make sure download analyzer results are correct
+                # read 'output/stdOut.txt' file content
+                contents = ""
+                with open(file) as f:
+                    for line in f.readlines():
+                        contents += line
+                # for succeeded simulations, check stdOut.txt file content
+                self.assertIn("Done", contents)
+            # for failed simulations, make sure there is no strOut.txt downloaded in local dir
+            else:
+                file = os.path.join("output", str(simulation.id), "stdOut.txt")
+                self.assertFalse(os.path.exists(file))
