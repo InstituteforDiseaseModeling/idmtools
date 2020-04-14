@@ -25,6 +25,8 @@ class Simulation(IAssetsEnabled, INamedEntity):
     pre_creation_hooks: List[Callable[[], NoReturn]] = field(default_factory=lambda: [Simulation.gather_assets])
     # control whether we should replace the task with a proxy after creation
     __replace_task_with_proxy: bool = field(default=True, init=False, compare=False)
+    # Ensure we don't gather assets twice
+    __assets_gathered: bool = field(default=False)
 
     @property
     def experiment(self) -> 'Experiment':  # noqa: F821
@@ -95,8 +97,10 @@ class Simulation(IAssetsEnabled, INamedEntity):
         """
         Gather all the assets for the simulation.
         """
-        self.task.gather_transient_assets()
-        self.assets.add_assets(self.task.transient_assets, fail_on_duplicate=False)
+        if not self.__assets_gathered:
+            self.task.gather_transient_assets()
+            self.assets.add_assets(self.task.transient_assets, fail_on_duplicate=False)
+        self.__assets_gathered = True
 
     @classmethod
     def from_task(cls, task: 'ITask', tags: Dict[str, Any] = None,  # noqa E821
