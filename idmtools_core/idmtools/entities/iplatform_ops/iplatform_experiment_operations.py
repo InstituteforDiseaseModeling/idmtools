@@ -16,7 +16,7 @@ logger = getLogger(__name__)
 
 @dataclass
 class IPlatformExperimentOperations(ABC):
-    platform: 'IPlatform'
+    platform: 'IPlatform'  # noqa: F821
     platform_type: Type
 
     @abstractmethod
@@ -98,8 +98,8 @@ class IPlatformExperimentOperations(ABC):
         """
         pass
 
-    def batch_create(self, experiments: List[Experiment], display_progress: bool = True, **kwargs) -> List[
-        Tuple[Experiment]]:
+    def batch_create(self, experiments: List[Experiment], display_progress: bool = True, **kwargs) \
+            -> List[Tuple[Experiment]]:
         """
         Provides a method to batch create experiments
 

@@ -453,6 +453,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         self._is_item_list_supported(items)
 
         for item in items:
+            item.platform = self
             interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
             getattr(self, interface).run_item(item, **kwargs)
 
@@ -604,8 +605,6 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
                 done_st = [EntityStatus.FAILED, EntityStatus.SUCCEEDED]
             if prog is None:
                 return e.status in done_st if isinstance(e, IWorkflowItem) else e.done
-
-            results = dict()
 
             done = 0
             for sim in e.simulations:

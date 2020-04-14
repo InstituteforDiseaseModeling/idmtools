@@ -4,6 +4,7 @@ PY=python
 PDS=$(PY) dev_scripts/
 MAKEALL=$(PDS)run_pymake_on_all.py
 PDR=$(PDS)run.py
+CLDIR=$(PDS)clean_dir.py
 
 help:
 	$(PDS)get_help_from_makefile.py
@@ -11,18 +12,21 @@ help:
 clean: ## Clean all our jobs
 	$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
 	$(MAKEALL) --parallel clean
+	$(CLDIR) --file-patterns "**/*.log"
+
 
 clean-all: ## Clean all our jobs
 	$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
 	$(MAKEALL) --parallel clean-all
+	$(CLDIR) --file-patterns "**/*.buildlog"
 
 setup-dev:  ## Setup packages in dev mode
 	python dev_scripts/bootstrap.py
 	$(PDR) -w idmtools_platform_local -ex 'pymake docker-local'
 
 lint: ## check style with flake8
-	$(MAKEALL) --parallel lint
-	flake8 --ignore=E501,W291 examples
+	flake8 --ignore=E501,W291 --exclude="examples/**,workflow/**,docs/**,*/tests/**,idmtools_model_emod/**,idmtools_test/**"
+
 
 test: ## Run our tests
 	$(MAKEALL) --parallel test
@@ -74,7 +78,7 @@ linux-dev-env: ## Runs docker dev env
 	$(PDR) -w 'dev_scripts/linux-test-env' -ex 'docker-compose run --rm linuxtst'
 
 
-draft-change-log:
+change-log: ## Generate partial changelog
 	git log $(shell git tag -l --sort=-v:refname | grep -w '[0-9]\.[0-9]\.[0-9]' | head -n 1) HEAD --pretty=format:'%s' --reverse --simplify-merges | uniq
 
 bump-release: #bump the release version.
@@ -101,3 +105,11 @@ bump-minor-dry-run: ## bump the minor version(dry run)
 
 bump-major-dry-run: ## bump the minor version(dry run)
 	$(MAKEALL) bump-major-dry-run
+
+build-docs: ## build docs(only works on linux at moment due to make.bat not running by default)
+	$(PDR) -wd 'docs' -ex 'make html'
+
+build-docs-server: ## builds docs and launch a webserver
+	@make build-docs
+	@+$(IPY) "print('Serving documentation @ server at http://localhost:8000 . Ctrl + C Will Stop Server')"
+	$(PDR) -wd 'docs/_build/html' -ex 'python -m http.server'

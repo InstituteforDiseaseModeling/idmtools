@@ -1,0 +1,6 @@
+sphinx-rtd-theme~=0.4.3
+sphinxcontrib-napoleon~=0.7
+beautifulsoup4~=4.8.2
+sphinx~=2.4.4
+plantweb~=1.2.1
+sphinxcontrib-programoutput~=0.16

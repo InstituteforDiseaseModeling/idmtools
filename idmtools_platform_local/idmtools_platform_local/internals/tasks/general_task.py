@@ -136,15 +136,18 @@ class BaseTask:
         return self.run_task(command, current_job, experiment_uuid, simulation_path, simulation_uuid)
 
 
-class RunTask(GenericActor, BaseTask):
-    """
-    Run the given `command` in the simulation folder.
-    """
+try:
+    class RunTask(GenericActor, BaseTask):
+        """
+        Run the given `command` in the simulation folder.
+        """
 
-    class Meta:
-        store_results = False
-        max_retries = 0
-        queue_name = "cpu"
+        class Meta:
+            store_results = False
+            max_retries = 0
+            queue_name = "cpu"
 
-    def perform(self, command: str, experiment_uuid: str, simulation_uuid: str) -> Status:
-        return self.execute_simulation(command, experiment_uuid, simulation_uuid)
+        def perform(self, command: str, experiment_uuid: str, simulation_uuid: str) -> Status:
+            return self.execute_simulation(command, experiment_uuid, simulation_uuid)
+except TypeError:  # we hit this in docs
+    pass

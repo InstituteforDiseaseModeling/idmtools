@@ -76,24 +76,33 @@ def execute(cmd, cwd):
 
 escapes = ''.join([chr(char) for char in range(1, 32)])
 translator = str.maketrans('', '', escapes)
+
+
+def process_output(line):
+    # catch errors where possible
+    if "FAILED [" in line:
+        logger.critical(line.strip())
+    elif any([s in line for s in ["Successfully", "SUCCESS"]]):
+        logger.log(35, line.strip())
+    elif any([s in line for s in ["WARNING", "SKIPPED"]]):
+        logger.warning(line.strip())
+    else:
+        line = line.strip().translate(translator)
+        logger.debug("".join(ch for ch in line if unicodedata.category(ch)[0] != "C"))
+
+
 # loop through and install our packages
 for package, extras in packages.items():
     extras_str = f"[{','.join(extras)}]" if extras else ''
     logger.info(f'Installing {package} with extras: {extras_str if extras_str else "None"} from {base_directory}')
     try:
         for line in execute(["pip", "install", "-e", f".{extras_str}", idmrepo], cwd=join(base_directory, package)):
-            # catch errors where possible
-            if "FAILED [" in line:
-                logger.critical(line.strip())
-            elif any([s in line for s in ["Successfully", "SUCCESS"]]):
-                logger.log(35, line.strip())
-            elif any([s in line for s in ["WARNING", "SKIPPED"]]):
-                logger.warning(line.strip())
-            else:
-                line = line.strip().translate(translator)
-                logger.debug("".join(ch for ch in line if unicodedata.category(ch)[0] != "C"))
+            process_output(line)
         result = 0
     except subprocess.CalledProcessError as e:
         logger.critical(f'{package} installed failed using {e.cmd} did not succeed')
         result = e.returncode
         logger.debug(f'Return Code: {result}')
+
+for line in execute(["pip", "install", "-r", "requirements.txt"], cwd=join(base_directory, 'docs')):
+    process_output(line)

@@ -34,7 +34,7 @@ class CommandTask(ITask):
             self.transient_assets = ac
         return ac
 
-    def reload_from_simulation(self, simulation: 'Simulation'):
+    def reload_from_simulation(self, simulation: 'Simulation'):  # noqa: F821
         pass
 
 

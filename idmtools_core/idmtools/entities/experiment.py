@@ -287,7 +287,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
         result._task_log = getLogger(__name__)
         return result
 
-    def run(self, wait_until_done: bool = False, platform: 'idmtools.entities.iplatform.IPlatform' = None,
+    def run(self, wait_until_done: bool = False, platform: 'idmtools.entities.iplatform.IPlatform' = None,  # noqa: F821
             **run_opts) -> NoReturn:
         """
         Runs an experiment on a platform
@@ -305,7 +305,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
         if wait_until_done:
             self.wait()
 
-    def __check_for_platform_from_context(self, platform) -> 'idmtools.entities.iplatform.IPlatform':
+    def __check_for_platform_from_context(self, platform) -> 'idmtools.entities.iplatform.IPlatform':  # noqa: F821
         """
         Try to determine platform of current object from self or current platform
 
@@ -328,7 +328,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
         return self.platform
 
     def wait(self, timeout: int = None, refresh_interval=None,
-             platform: 'idmtools.entities.iplatform.IPlatform' = None):
+             platform: 'idmtools.entities.iplatform.IPlatform' = None):  # noqa: F821
         """
         Wait on an experiment to finish running
 

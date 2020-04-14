@@ -33,7 +33,11 @@ class TaskFactory:
         aliases = dict()
         # register types as full paths as well
         for model, spec in self._builders.items():
-            aliases[f'{spec.get_type().__module__}.{spec.get_type().__name__}'] = spec
+            try:
+                aliases[f'{spec.get_type().__module__}.{spec.get_type().__name__}'] = spec
+            except Exception as e:
+                logger.warn(f"Could not load spec for {spec}")
+                logger.exception(e)
         self._builders.update(aliases)
 
     def register(self, spec: TaskSpecification) -> NoReturn:
