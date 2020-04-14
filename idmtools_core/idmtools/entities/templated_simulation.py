@@ -14,7 +14,7 @@ from idmtools.utils.hashing import ignore_fields_in_dataclass_on_pickle
 
 
 def simulation_generator(builders, new_sim_func, additional_sims=None, batch_size=10):
-    if additional_sims:
+    if additional_sims is None:
         additional_sims = []
     # Then the builders
     for groups in grouper(chain(*builders), batch_size):
