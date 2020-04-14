@@ -46,6 +46,10 @@ class Simulation(IAssetsEnabled, INamedEntity):
             user_logger.error(msg)
             raise NoTaskFound(msg)
 
+        if logger.isEnabledFor(DEBUG):
+            logger.debug('Calling task pre creation')
+        self.task.pre_creation(self)
+
         # Call all of our hooks
         for x in self.pre_creation_hooks:
             if logger.isEnabledFor(DEBUG):
@@ -66,10 +70,6 @@ class Simulation(IAssetsEnabled, INamedEntity):
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f'Setting Simulation Tag "task_type" to "{tn}"')
             self.tags["task_type"] = tn
-
-        if logger.isEnabledFor(DEBUG):
-            logger.debug('Calling task post creation')
-        self.task.pre_creation(self)
 
     def post_creation(self) -> None:
         if logger.isEnabledFor(DEBUG):
