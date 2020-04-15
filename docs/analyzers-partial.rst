@@ -18,11 +18,10 @@ For partial analysis only on the succeeded simulations, where one or more simula
 Analysis on both succeeded and failed simulations
 -------------------------------------------------
 
-For analysis on both succeeded and failed simulations, you set to **False** the **partial_analyze_ok** parameter and you set to **True** the **analyze_failed_items** parameter from the :py:class:`~idmtools.analysis.analyze_manager.AnalyzeManager` class, as seen in the following python code excerpt::
+For analysis on both succeeded and failed simulations, you set to **True** the **analyze_failed_items** parameter from the :py:class:`~idmtools.analysis.analyze_manager.AnalyzeManager` class, as seen in the following python code excerpt::
 
         analyzers = [CSVAnalyzer(filenames=filenames)]
-        manager = AnalyzeManager(platform=self.platform, partial_analyze_ok=False, 
-                                 analyze_failed_items=True,
+        manager = AnalyzeManager(platform=self.platform, analyze_failed_items=True,                                 
                                  ids=[(experiment_id, ItemType.EXPERIMENT)],
                                  analyzers=analyzers)
         manager.analyze()
