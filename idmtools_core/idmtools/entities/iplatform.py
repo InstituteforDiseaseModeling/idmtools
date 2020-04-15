@@ -509,6 +509,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         if item.item_type not in self.platform_type_map.values():
             raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
+        if item.platform is None:
+            item.platform = self
         getattr(self, interface).refresh_status(item)
 
     def get_files(self, item: IEntity, files: Union[Set[str], List[str]], output: str = None) -> \
@@ -582,7 +584,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             time.sleep(refresh_interval)
         raise TimeoutError(f"Timeout of {timeout} seconds exceeded")
 
-    def wait_till_done(self, item: Union[Experiment, IWorkflowItem], timeout: int = 60 * 60 * 24,
+    def wait_till_done(self, item: Union[Experiment, IWorkflowItem, Suite], timeout: int = 60 * 60 * 24,
                        refresh_interval: int = 5, progress=True):
         """
         Wait for the experiment to be done.
@@ -597,28 +599,39 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         else:
             self.__wait_till_callback(item, lambda e: e.done, timeout, refresh_interval)
 
-    def wait_till_done_progress(self, item: Union[Experiment, IWorkflowItem], timeout: int = 60 * 60 * 24,
+    def wait_till_done_progress(self, item: Union[Experiment, IWorkflowItem, Suite], timeout: int = 60 * 60 * 24,
                                 refresh_interval: int = 5):
-        def get_prog_bar(e: Union[Experiment, IWorkflowItem], prog: tqdm,
+        def get_prog_bar(item: Union[Experiment, IWorkflowItem], prog: tqdm, child_attribute: str = 'simulations',
                          done_st=None):
             if done_st is None:
                 done_st = [EntityStatus.FAILED, EntityStatus.SUCCEEDED]
             if prog is None:
-                return e.status in done_st if isinstance(e, IWorkflowItem) else e.done
+                return item.status in done_st if isinstance(item, IWorkflowItem) else item.done
 
             done = 0
-            for sim in e.simulations:
-                if sim.status in done_st:
+            for child in getattr(item, child_attribute):
+                if isinstance(item, Experiment) and child.status in done_st:
+                    done += 1
+                elif isinstance(item, Suite) and child.done:
                     done += 1
             if done > prog.last_print_n:
                 prog.update(done - prog.last_print_n)
-            return e.done
+            return item.done
 
+        child_attribute = 'simulations'
         if isinstance(item, Experiment):
             prog = tqdm([], total=len(item.simulations), desc="Waiting on Experiment to Finish running")
+        elif isinstance(item, Suite):
+            prog = tqdm([], total=len(item.experiments), desc="Waiting on Suite to Finish running")
+            child_attribute = 'experiments'
         else:
             prog = None
-        self.__wait_till_callback(item, partial(get_prog_bar, prog=prog), timeout, refresh_interval)
+        self.__wait_till_callback(
+            item,
+            partial(get_prog_bar, prog=prog, child_attribute=child_attribute),
+            timeout,
+            refresh_interval
+        )
 
     def get_related_items(self, item: IWorkflowItem, relation_type: RelationType) -> Dict[str, Dict[str, str]]:
         """

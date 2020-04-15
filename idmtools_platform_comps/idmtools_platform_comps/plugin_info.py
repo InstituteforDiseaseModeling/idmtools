@@ -20,6 +20,9 @@ num_cores = 1
 max_workers = 16
 batch_size = 10
 exclusive = False
+# Optional config option. It is recommended you only use this in advanced scenarios. Otherwise
+# leave it unset
+docker_image = docker-staging.packages.idmod.org/idmtools/comps_ssmt_worker:1.0.0
 """
 
 logger = getLogger(__name__)

@@ -6,6 +6,7 @@ from multiprocessing.pool import Pool
 from typing import NoReturn, List, Dict, Tuple, Optional, Union
 from uuid import UUID
 from idmtools.analysis.map_worker_entry import map_item
+from idmtools.core import NoPlatformException
 from idmtools.core.cache_enabled import CacheEnabled
 from idmtools.core.enums import EntityStatus, ItemType
 from idmtools.core.interfaces.ientity import IEntity
@@ -49,7 +50,7 @@ class AnalyzeManager(CacheEnabled):
     class ItemsNotReady(Exception):
         pass
 
-    def __init__(self, platform: IPlatform, configuration: dict = None,
+    def __init__(self, platform: IPlatform = None, configuration: dict = None,
                  ids: List[Tuple[Union[str, UUID], ItemType]] = None,
                  analyzers: List[IAnalyzer] = None, working_dir: str = os.getcwd(),
                  partial_analyze_ok: bool = False, max_items: Optional[int] = None, verbose: bool = True,
@@ -74,6 +75,7 @@ class AnalyzeManager(CacheEnabled):
         super().__init__()
         self.configuration = configuration or {}
         self.platform = platform
+        self.__check_for_platform_from_context(platform)
         self.max_processes = self.configuration.get('max_threads', os.cpu_count())
         logger.debug(f'AnalyzeManager set to {self.max_processes}')
 
@@ -96,13 +98,13 @@ class AnalyzeManager(CacheEnabled):
         items: List[IEntity] = []
         for oid, otype in ids:
             logger.debug(f'Getting metadata for {oid} and {otype}')
-            result = platform.get_item(oid, otype, force=True)
+            result = self.platform.get_item(oid, otype, force=True)
             items.append(result)
         self.potential_items: List[IEntity] = []
 
         for i in items:
             logger.debug(f'Flattening items for {i.uid}')
-            self.potential_items.extend(platform.flatten_item(item=i))
+            self.potential_items.extend(self.platform.flatten_item(item=i))
 
         # These are leaf items to be ignored in analysis. Make sure they are UUID and then prune them from analysis.
         self.exclude_ids = exclude_ids or []
@@ -116,6 +118,28 @@ class AnalyzeManager(CacheEnabled):
 
         self.analyzers = analyzers or list()
         self.verbose = verbose
+
+    def __check_for_platform_from_context(self, platform) -> 'idmtools.entities.iplatform.IPlatform':  # noqa: F821
+        """
+        Try to determine platform of current object from self or current platform
+
+        Args:
+            platform: Passed in platform object
+
+        Raises:
+            NoPlatformException: when no platform is on current context
+        Returns:
+            Platform object
+        """
+        if self.platform is None:
+            # check context for current platform
+            if platform is None:
+                from idmtools.core.platform_factory import current_platform
+                if current_platform is None:
+                    raise NoPlatformException("No Platform defined on object, in current context, or passed to run")
+                platform = current_platform
+            self.platform = platform
+        return self.platform
 
     def add_item(self, item: IEntity) -> NoReturn:
         """

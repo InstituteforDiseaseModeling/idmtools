@@ -12,7 +12,7 @@ CWD=$($(IPY) "import os; print(os.getcwd())")
 TEST_COMMAND=py.test --durations=10 -v --junitxml=test_results.xml
 TEST_RUN_OPTS=-e DOCKER_REPO=idm-docker-staging NO_SPINNER=1
 FULL_TEST_CMD=$(PDR) -w 'tests' $(TEST_RUN_OPTS) -ex '$(TEST_COMMAND)
-COVERAGE_CMD=$(PDR) -w 'tests' $(TEST_RUN_OPTS) -p . ../ -ex 'coverage run --omit="*/test*,*/setup.py" --source ../,../../idmtools_core,../../idmtools_models,../../idmtools_model_emod -m pytest
+COVERAGE_CMD=$(PDR) -w 'tests' $(TEST_RUN_OPTS) -p . ../ -ex 'coverage run --omit="*/test*,*/setup.py" --source ../,../../idmtools_core,../../idmtools_models -m pytest
 DOCKER_VERSION=$($(IPY) "print(")
 help:
 	$(PDS)get_help_from_makefile.py
@@ -53,9 +53,6 @@ test-comps: ## Run our comps tests
 
 test-docker: ## Run our docker tests
 	$(FULL_TEST_CMD) -m "docker"'
-
-test-emod: ## Run our emod tests
-	$(FULL_TEST_CMD) -m "emod"'
 
 test-python: ## Run our python tests
 	$(FULL_TEST_CMD) -m "python"'

@@ -393,9 +393,8 @@ idmtools_platform_local/idmtools_webui/build
 idmtools_platform_local/idmtools_platform_local/internals/ui/static/
 idmtools_test/idmtools_test/data/
 idmtools_platform_local/idmtools_webui/yarn.lock
-idmtools_model_emod/tests/reload_sim_download/
-idmtools_model_emod/tests/serialized_file_download/
 idmtools_platform_comps/tests/requirements_updated.txt
+
 
 **.buildlog
 docs/_build
