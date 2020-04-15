@@ -599,20 +599,22 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     def wait_till_done_progress(self, item: Union[Experiment, IWorkflowItem, Suite], timeout: int = 60 * 60 * 24,
                                 refresh_interval: int = 5):
-        def get_prog_bar(e: Union[Experiment, IWorkflowItem], prog: tqdm, child_attribute: str = 'simulations',
+        def get_prog_bar(item: Union[Experiment, IWorkflowItem], prog: tqdm, child_attribute: str = 'simulations',
                          done_st=None):
             if done_st is None:
                 done_st = [EntityStatus.FAILED, EntityStatus.SUCCEEDED]
             if prog is None:
-                return e.status in done_st if isinstance(e, IWorkflowItem) else e.done
+                return item.status in done_st if isinstance(item, IWorkflowItem) else item.done
 
             done = 0
-            for child in getattr(e, child_attribute):
-                if child.status in done_st:
+            for child in getattr(item, child_attribute):
+                if isinstance(item, Experiment) and child.status in done_st:
+                    done += 1
+                elif isinstance(item, Suite) and child.done:
                     done += 1
             if done > prog.last_print_n:
                 prog.update(done - prog.last_print_n)
-            return e.done
+            return item.done
 
         child_attribute = 'simulations'
         if isinstance(item, Experiment):
