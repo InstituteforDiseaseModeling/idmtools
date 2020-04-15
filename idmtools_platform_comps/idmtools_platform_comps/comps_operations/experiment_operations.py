@@ -52,7 +52,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             sim_gen1, sim_gen2 = tee(experiment.simulations)
             experiment.simulations = sim_gen2
             sim = next(sim_gen1)
-            sim.pre_creation(sim)
+            sim.task.pre_creation(sim)
             exp_command = sim.task.command
         elif isinstance(experiment.simulations, ParentIterator) and isinstance(experiment.simulations.items,
                                                                                TemplatedSimulations):
