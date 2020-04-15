@@ -509,6 +509,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         if item.item_type not in self.platform_type_map.values():
             raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
+        if item.platform is None:
+            item.platform = self
         getattr(self, interface).refresh_status(item)
 
     def get_files(self, item: IEntity, files: Union[Set[str], List[str]], output: str = None) -> \

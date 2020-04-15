@@ -68,6 +68,7 @@ class IPlatformSuiteOperations(ABC):
             NoReturn
         """
         suite.status = EntityStatus.CREATED
+        suite.platform = self.platform
         suite.post_creation()
         for experiment in suite.experiments:
             experiment.parent_id = suite.id
