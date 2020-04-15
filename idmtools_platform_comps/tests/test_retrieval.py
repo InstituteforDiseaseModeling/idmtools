@@ -18,6 +18,7 @@ setA = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
 
 
 @pytest.mark.comps
+@pytest.mark.long
 class TestRetrieval(ITestWithPersistence):
     @classmethod
     def setUpClass(cls) -> None:

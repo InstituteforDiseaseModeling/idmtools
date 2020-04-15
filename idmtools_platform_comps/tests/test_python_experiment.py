@@ -337,6 +337,7 @@ class TestPythonExperiment(ITestWithPersistence):
                 context.exception.args[0]))
 
     @pytest.mark.comps
+    @pytest.mark.long
     def test_use_existing_ac_with_experiment(self):
         model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
         tags = {"a": "1", "b": 10}
