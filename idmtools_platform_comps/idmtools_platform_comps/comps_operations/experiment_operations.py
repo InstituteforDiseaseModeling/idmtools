@@ -51,12 +51,17 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         if isinstance(experiment.simulations, Generator):
             sim_gen1, sim_gen2 = tee(experiment.simulations)
             experiment.simulations = sim_gen2
-            exp_command = next(sim_gen1).task.command
+            sim = next(sim_gen1)
+            sim.task.pre_creation(sim)
+            exp_command = sim.task.command
         elif isinstance(experiment.simulations, ParentIterator) and isinstance(experiment.simulations.items,
                                                                                TemplatedSimulations):
+            from idmtools.entities.simulation import Simulation
+            experiment.simulations.items.base_task.pre_creation(Simulation())
             exp_command = experiment.simulations.items.base_task.command
             # TODO generators
         else:
+            experiment.simulations[0].task.pre_creation(experiment.simulations[0])
             exp_command = experiment.simulations[0].task.command
 
         if command_arg is None:

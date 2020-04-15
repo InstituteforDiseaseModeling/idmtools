@@ -46,7 +46,8 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
         return children
 
     def refresh_status(self, suite: Suite, **kwargs):
-        pass
+        for experiment in suite.experiments:
+            self.platform.refresh_status(experiment)
 
     def to_entity(self, suite: COMPSSuite, **kwargs) -> Suite:
         # Creat a suite
