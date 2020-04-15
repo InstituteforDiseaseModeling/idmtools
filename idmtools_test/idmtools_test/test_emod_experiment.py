@@ -15,6 +15,7 @@ from idmtools.assets import AssetCollection
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 
+@pytest.mark.skip("need emodpy")
 @pytest.mark.comps
 class TestExperiments(ITestWithPersistence):
 
