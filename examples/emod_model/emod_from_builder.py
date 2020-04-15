@@ -8,6 +8,7 @@ from functools import partial
 from idmtools.assets import Asset
 from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform
+from idmtools.entities import Suite
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 from idmtools_test import COMMON_INPUT_PATH
@@ -55,7 +56,10 @@ def generate_experiment():
     builder.add_sweep_definition(set_run_number, range(0, 2))
     # create experiment from task
     experiment = Experiment.from_builder(builder, task, name="example--emod_from_builder.py")
-
+    suite = Suite(name='Idm Suite')
+    suite.update_tags({'name': 'test', 'fetch': 123})
+    platform.create_items([suite])
+    experiment.suite = suite
     platform.run_items(experiment)
     platform.wait_till_done(experiment)
     return experiment
