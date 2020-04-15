@@ -8,7 +8,7 @@ from COMPS.Data import Experiment
 
 from idmtools.core.platform_factory import Platform
 from idmtools.managers import ExperimentManager
-from idmtools_model_emod import EMODExperiment
+from emodpy import EMODExperiment
 
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools.assets import AssetCollection

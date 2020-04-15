@@ -39,7 +39,6 @@ class PopulationAnalyzer(BaseAnalyzer):
         ax.legend([str(s.uid) for s in all_data.keys()])
         fig.savefig(os.path.join(output_dir, "population.png"))
 
-
 # uncomment following lines with idmtools analyzer
 # if __name__ == "__main__":
 #     platform = Platform('COMPS2')
