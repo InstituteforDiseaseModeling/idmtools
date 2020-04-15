@@ -106,6 +106,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
                          "python run_multiple_analyzers.py " + experiment_id)
 
     # test using SSMTWormItem to run multiple experiments in comps's SSMT DockerWorker
+    @pytest.mark.skip("need emodpy")
     def test_ssmt_workitem_multiple_experiments(self):
         exp_id1 = "8bb8ae8f-793c-ea11-a2be-f0921c167861"
         exp_id2 = "4ea96af7-1549-ea11-a2be-f0921c167861"
