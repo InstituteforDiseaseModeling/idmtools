@@ -2,7 +2,7 @@
 Create an analyzer
 ==================
 
-You can use built-in analyzers included with |IT_s| to help with creating a new analyzer. The following list some of these analyzers:
+You can use built-in analyzers included with |IT_s| to help with creating a new analyzer. The following list some of these analyzers, all inheriting from the the :py:class:`~idmtools.entities.ianalyzer.IAnalyzer` abstract class:
 
 .. uml::
 
