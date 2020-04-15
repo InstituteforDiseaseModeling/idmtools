@@ -159,8 +159,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         del_folder(output_dir)
         filenames = ["stdErr.txt"]
         analyzers = [DownloadAnalyzer(filenames=filenames)]
-        manager = AnalyzeManager(platform=self.p, partial_analyze_ok=False,
-                                 ids=[(experiment_id, ItemType.EXPERIMENT)],
+        manager = AnalyzeManager(platform=self.p, ids=[(experiment_id, ItemType.EXPERIMENT)],
                                  analyzers=analyzers, analyze_failed_items=True)
         manager.analyze()
 
