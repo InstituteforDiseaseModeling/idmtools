@@ -54,11 +54,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     max_workers: int = field(default=16)
     batch_size: int = field(default=10)
     exclusive: bool = field(default=False)
-
-    # TODO What are these for?
-    work_item_type: str = field(default=None)
     docker_image: str = field(default=None)
-    plugin_key: str = field(default=None)
 
     _platform_supports: List[PlatformRequirements] = field(default_factory=lambda: copy.deepcopy(supported_types),
                                                            repr=False, init=False)
