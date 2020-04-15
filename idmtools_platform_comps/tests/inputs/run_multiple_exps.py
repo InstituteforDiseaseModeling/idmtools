@@ -4,9 +4,7 @@ from sys import argv
 from idmtools.analysis.analyze_manager import AnalyzeManager
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
-
-sys.path.append(os.path.dirname(__file__))
-from population_analyzer import PopulationAnalyzer  # noqa
+from emodpy.analyzers.population_analyzer import PopulationAnalyzer
 
 sys.path.append(os.path.dirname(__file__))
 
