@@ -1,4 +1,4 @@
 flask~=1.0.3
-Flask-AutoIndex~=0.6.4
+Flask-AutoIndex~=0.6.6
 flask_restful~=0.3.7
 Flask-SQLAlchemy~=2.4.0
