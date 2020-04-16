@@ -39,6 +39,8 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
 
     def platform_create(self, experiment: Experiment, num_cores: int = None, executable_path: str = None,
                         command_arg: str = None, priority: str = None) -> COMPSExperiment:
+        from idmtools_platform_comps.utils.python_version import platform_task_hooks
+
         # TODO check experiment task supported
 
         # Cleanup the name
@@ -52,17 +54,22 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             sim_gen1, sim_gen2 = tee(experiment.simulations)
             experiment.simulations = sim_gen2
             sim = next(sim_gen1)
-            sim.task.pre_creation(sim)
-            exp_command = sim.task.command
+            task = platform_task_hooks(sim.task, self.platform)
+            task.pre_creation(sim)
+            exp_command = task.command
         elif isinstance(experiment.simulations, ParentIterator) and isinstance(experiment.simulations.items,
                                                                                TemplatedSimulations):
             from idmtools.entities.simulation import Simulation
-            experiment.simulations.items.base_task.pre_creation(Simulation())
-            exp_command = experiment.simulations.items.base_task.command
+            task = experiment.simulations.items.base_task
+            task = platform_task_hooks(task, self.platform)
+            task.pre_creation(Simulation())
+            exp_command = task.command
             # TODO generators
         else:
-            experiment.simulations[0].task.pre_creation(experiment.simulations[0])
-            exp_command = experiment.simulations[0].task.command
+            task = experiment.simulations[0].task
+            task = platform_task_hooks(task, self.platform)
+            task.pre_creation(experiment.simulations[0])
+            exp_command = task.command
 
         if command_arg is None:
             command_arg = exp_command.arguments + " " + exp_command.options

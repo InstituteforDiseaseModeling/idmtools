@@ -31,9 +31,30 @@ class PythonTask(ITask):
             # don't error if we can't find script. Maybe it is in the asset collection? but warn user
             logger.warning(f'Cannot find script at {self.script_path}. If script does not exist in Assets '
                            f'as {os.path.basename(self.script_path)}, execution could fail')
+        self.command = CommandLine()
+
+    @property
+    def command(self):
+        """
+        Update executable with new python_path
+        Returns: re-build command
+        """
         cmd_str = f'{self.python_path} ./Assets/{os.path.basename(self.script_path)}'
-        self._task_log.info('Setting command line to %s', cmd_str)
-        self.command = CommandLine(cmd_str)
+        if self._command:
+            self._command._executable = cmd_str
+            self._task_log.info('Setting command line to %s', cmd_str)
+
+        return self._command
+
+    @command.setter
+    def command(self, command):
+        """
+        Store the new command
+        Args:
+            command: new command to assign
+        Returns: None
+        """
+        self._command = None if isinstance(command, property) else command
 
     def retrieve_python_dependencies(self):
         """
