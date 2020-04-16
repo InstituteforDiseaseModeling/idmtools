@@ -68,8 +68,10 @@ class Experiment(IAssetsEnabled, INamedEntity):
 
     @suite.setter
     def suite(self, suite):
-        suite.experiments.append(self)
-        self.parent = suite
+        ids = [exp.uid for exp in suite.experiments]
+        if self.uid not in ids:
+            suite.experiments.append(self)
+            self.parent = suite
 
     def display(self):
         from idmtools.utils.display import display, experiment_table_display
