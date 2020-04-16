@@ -106,8 +106,8 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
 
     def post_run_item(self, experiment: Experiment, **kwargs):
         super().post_run_item(experiment, **kwargs)
-        print(f'The running experiment can be viewed at {self.platform.endpoint}/#explore/'
-              f'Simulations?filters=ExperimentId={experiment.uid}')
+        print(f"\nThe running experiment can be viewed at {self.platform.endpoint}/#explore/"
+              f"Simulations?filters=ExperimentId={experiment.uid}\n")
 
     def get_children(self, experiment: COMPSExperiment, **kwargs) -> List[Any]:
         cols = kwargs.get("cols")
