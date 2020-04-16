@@ -37,7 +37,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         super().pre_create(experiment, **kwargs)
 
     def platform_create(self, experiment: Experiment, num_cores: int = None, executable_path: str = None,
-                        command_arg: str = None, priority: str = None) -> COMPSExperiment:
+                        command_arg: str = None, priority: str = None, check_command: bool = True) -> COMPSExperiment:
         from idmtools_platform_comps.utils.python_version import platform_task_hooks
         # TODO check experiment task supported
 
@@ -52,20 +52,23 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             sim_gen1, sim_gen2 = tee(experiment.simulations)
             experiment.simulations = sim_gen2
             sim = next(sim_gen1)
-            task = platform_task_hooks(sim.task, self.platform)
+            if check_command:
+                task = platform_task_hooks(sim.task, self.platform)
             task.pre_creation(sim)
             exp_command = task.command
         elif isinstance(experiment.simulations, ParentIterator) and isinstance(experiment.simulations.items,
                                                                                TemplatedSimulations):
             from idmtools.entities.simulation import Simulation
             task = experiment.simulations.items.base_task
-            task = platform_task_hooks(task, self.platform)
+            if check_command:
+                task = platform_task_hooks(task, self.platform)
             task.pre_creation(Simulation())
             exp_command = task.command
             # TODO generators
         else:
             task = experiment.simulations[0].task
-            task = platform_task_hooks(task, self.platform)
+            if check_command:
+                task = platform_task_hooks(task, self.platform)
             task.pre_creation(experiment.simulations[0])
             exp_command = task.command
 
