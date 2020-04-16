@@ -4,7 +4,6 @@ from itertools import tee
 from logging import getLogger, DEBUG
 from typing import Any, List, Type, Generator, NoReturn
 from uuid import UUID
-
 from COMPS.Data import Experiment as COMPSExperiment, QueryCriteria, Configuration, Suite as COMPSSuite
 from idmtools.core import ItemType
 from idmtools.core.experiment_factory import experiment_factory
@@ -40,7 +39,6 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
     def platform_create(self, experiment: Experiment, num_cores: int = None, executable_path: str = None,
                         command_arg: str = None, priority: str = None) -> COMPSExperiment:
         from idmtools_platform_comps.utils.python_version import platform_task_hooks
-
         # TODO check experiment task supported
 
         # Cleanup the name

@@ -3,7 +3,6 @@ from functools import partial
 from logging import getLogger, DEBUG
 from typing import Any, List, Dict, Type
 from uuid import UUID
-
 from COMPS.Data import Simulation as COMPSSimulation, QueryCriteria, Experiment as COMPSExperiment, SimulationFile, \
     Configuration
 from idmtools.core import ItemType

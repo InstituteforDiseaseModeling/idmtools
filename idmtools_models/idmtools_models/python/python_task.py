@@ -48,13 +48,7 @@ class PythonTask(ITask):
 
     @command.setter
     def command(self, command):
-        """
-        Store the new command
-        Args:
-            command: new command to assign
-        Returns: None
-        """
-        self._command = None if isinstance(command, property) else command
+        self._command = command
 
     def retrieve_python_dependencies(self):
         """
