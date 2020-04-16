@@ -68,6 +68,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
 
     @suite.setter
     def suite(self, suite):
+        suite.experiments.append(self)
         self.parent = suite
 
     def display(self):
