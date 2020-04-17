@@ -10,7 +10,7 @@ AC_FILE = 'ac_info.txt'
 LIBRARY_ROOT_PREFIX = 'L'
 
 
-def build_asset_file_list_new(comps_sim, prefix=LIBRARY_ROOT_PREFIX):
+def build_asset_file_list(comps_sim, prefix=LIBRARY_ROOT_PREFIX):
     """
     Utility function to build all library files
     Args:
