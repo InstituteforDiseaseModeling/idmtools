@@ -25,6 +25,10 @@ class Suite(INamedEntity, ABC):
         Args:
             experiment: the experiment to be linked to suite
         """
+        ids = [exp.uid for exp in self.experiments]
+        if experiment.uid in ids:
+            return
+
         # Link the suite to the experiment
         experiment.suite = self
 

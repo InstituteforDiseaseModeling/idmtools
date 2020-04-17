@@ -48,7 +48,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     environment: str = field(default="Bayesian")
     priority: str = field(default=COMPSPriority.Lowest)
     simulation_root: str = field(default="$COMPS_PATH(USER)\\output")
-    node_group: str = field(default="emod_abcd")
+    node_group: str = field(default=None)
     num_retries: int = field(default=0)
     num_cores: int = field(default=1)
     max_workers: int = field(default=16)
