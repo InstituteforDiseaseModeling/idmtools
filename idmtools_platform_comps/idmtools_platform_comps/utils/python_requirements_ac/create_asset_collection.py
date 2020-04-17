@@ -62,27 +62,24 @@ def get_data(url):
 
 
 def main():
-    # print(sys.argv)
-    #
-    # if len(sys.argv) < 3:
-    #     raise Exception(
-    #         "The script needs to be called with `python <model.py> <experiment_id> <md5_str> <endpoint>'.\n{}".format(
-    #             " ".join(sys.argv)))
-    #
-    # # Get the experiments
-    # exp_id = sys.argv[1]
-    # print('exp_id: ', exp_id)
-    #
-    # # Get mds
-    # md5_str = sys.argv[2]
-    # print('md5_str: ', md5_str)
-    #
-    # # Get endpoint
-    # endpoint = sys.argv[3]
-    # print('endpoint: ', endpoint)
+    print(sys.argv)
 
-    exp_id = '30a54b1f-3780-ea11-a2bf-f0921c167862'
-    endpoint = 'https://comps2.idmod.org'
+    if len(sys.argv) < 3:
+        raise Exception(
+            "The script needs to be called with `python <model.py> <experiment_id> <md5_str> <endpoint>'.\n{}".format(
+                " ".join(sys.argv)))
+
+    # Get the experiments
+    exp_id = sys.argv[1]
+    print('exp_id: ', exp_id)
+
+    # Get mds
+    md5_str = sys.argv[2]
+    print('md5_str: ', md5_str)
+
+    # Get endpoint
+    endpoint = sys.argv[3]
+    print('endpoint: ', endpoint)
 
     client = Client()
     client.login(endpoint)
