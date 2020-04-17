@@ -17,7 +17,7 @@ class TestPythonTask(TestCase):
         task = PythonTask(script_path=fpath)
         task.gather_all_assets()
 
-        self.assertEqual(str(task.command), f'python ./Assets/model.py')
+        self.assertEqual(str(task.command), f'python ./Assets/model1.py')
         self.validate_common_assets(fpath, task)
 
     def validate_common_assets(self, fpath, task):
