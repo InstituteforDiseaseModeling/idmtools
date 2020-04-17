@@ -30,7 +30,7 @@ if 'bamboo_PasswordArtifactory' in os.environ:
 else:
     password = getpass(prompt='Password:')
 auth = HTTPBasicAuth(username=username, password=password)
-response = requests.get(f'https://{BASE_REPO}/api/docker/{REPO_KEY}/v2/{IMAGE_NAME}/tags/list', auth=auth)
+response = requests.get(f'https://{BASE_REPO}/artifactory/api/docker/{REPO_KEY}/v2/{IMAGE_NAME}/tags/list', auth=auth)
 if response.status_code == 200:
     images = sorted(response.json()['tags'], reverse=True)
     images = [i for i in images if len(i) > 6]
