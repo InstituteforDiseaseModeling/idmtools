@@ -34,4 +34,5 @@ class AddAnalyzer(IAnalyzer):
     def reduce(self, data):
         # data is currently a dict with item_id: value  entries
         value = sum(data.values())
+        print(value)
         return value
