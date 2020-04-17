@@ -375,6 +375,7 @@ examples/**/task.diskcache/
 examples/ssmt/**/output/
 examples/vistools/**/workitem_output/
 examples/**/requirements_updated.txt
+examples/analyzers/output_csv/
 
 idmtools_core/tests/data
 idmtools_core/tests/reports/

@@ -40,7 +40,7 @@ class TestCOMPSSlurmExperiment(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
-        self.platform = Platform('SLURM', node_group=None)
+        self.platform = Platform('SLURM')
 
     @pytest.mark.long
     def test_sweeps_with_partial_comps_in_slurm(self):
@@ -83,7 +83,7 @@ class TestCOMPSSlurmExperiment(ITestWithPersistence):
         self.assertDictEqual(expected_exp_tags, actual_exp_tags)
         self.assertDictEqual(expected_exp_tags, actual_exp_tags)
 
-    @pytest.mark.skip(reason="issue 757 handle slurm python path")
+    @pytest.mark.skip(reason='test still fail with error we can not control')
     @pytest.mark.long
     @pytest.mark.comps
     def test_seir_model_experiment_slurm(self):
@@ -93,7 +93,7 @@ class TestCOMPSSlurmExperiment(ITestWithPersistence):
         pl = RequirementsToAssetCollection(self.platform,
                                            requirements_path=os.path.join(assets_path, 'requirements.txt'))
 
-        ac_id = pl.run()
+        ac_id = pl.run(rerun=False)
         pandas_assets = AssetCollection.from_id(ac_id, platform=self.platform)
 
         # Define some constant string used in this example
@@ -118,111 +118,6 @@ class TestCOMPSSlurmExperiment(ITestWithPersistence):
         # Pass python_path as python3 for SLURM cluster (python2 is currently the default)
         python_path_script = os.path.join(assets_path, "SEIR_model_slurm.py")
         task = JSONConfiguredPythonTask(script_path=python_path_script, parameters=parameters,
-                                        config_file_name='config.json', common_assets=pandas_assets)
-        task.command.add_option("--duration", 40)
-
-        # now create a TemplatedSimulation builder
-        ts = TemplatedSimulations(base_task=task)
-        ts.base_simulation.tags['simulation_name_tag'] = "SEIR_Model"
-
-        # now define our sweeps
-        builder = SimulationBuilder()
-
-        # utility function to update parameters
-        def param_update(simulation: Simulation, param: str, value: Any) -> Dict[str, Any]:
-            return simulation.task.set_parameter(param, value)
-
-        class setParam:
-            def __init__(self, param):
-                self.param = param
-
-            def __call__(self, simulation, value):
-                return simulation.task.set_parameter(self.param, value)
-
-        builder.add_sweep_definition(setParam(ConfigParameters.Base_Infectivity_Gaussian_Std_Dev), [0.3, 1])
-
-        ts.add_builder(builder)
-        ts.tags = tags
-
-        # now we can create our experiment using our template builder
-        experiment = Experiment(name=self.case_name, simulations=ts)
-        experiment.tags = tags
-
-        experiment.assets.add_directory(assets_directory=assets_path)
-
-        # set platform and run simulations
-        self.platform.run_items(experiment)
-        self.platform.wait_till_done(experiment)
-
-        # check experiment status
-        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)
-
-        # validate sim outputs
-        exp_id = experiment.id
-        self.validate_custom_output(exp_id, 2)
-
-    @pytest.mark.skip(reason="issue 757 handle slurm python path")
-    @pytest.mark.long
-    @pytest.mark.comps
-    def test_seir_model_experiment_slurm1(self):
-        # ye_seir_model assets path
-        assets_path = os.path.join(COMMON_INPUT_PATH, "python", "ye_seir_model", "Assets")
-
-        pl = RequirementsToAssetCollection(self.platform,
-                                           pkg_list=['pandas==0.24.2'],
-                                           local_wheels=[os.path.join(assets_path,
-                                                                      'dtk_generic_intrahost-0.1.5-cp36-cp36m-linux_x86_64.whl'),
-                                                         os.path.join(assets_path,
-                                                                      'dtk_nodedemog-0.1.5-cp36-cp36m-linux_x86_64.whl'),
-                                                         os.path.join(assets_path,
-                                                                      'dtk_vaccine_intervention-0.0.5-cp36-cp36m-linux_x86_64.whl')])
-
-        ac_id = pl.run()
-        pandas_assets = AssetCollection.from_id(ac_id, platform=self.platform)
-
-        # # TODO: COMPS Bug 4270 Cannot insert duplicate key row error
-        # # uncomment import "idmtools.assets import AssetCollection, Asset" to test this
-        # ac = AssetCollection()
-        # ac.add_directory(assets_directory=assets_path)
-        # ids = self.platform.create_items(ac)
-        # new_ac = self.platform.get_item(ids[0].id, item_type=ItemType.ASSETCOLLECTION)
-        # ac_id = new_ac.id
-        # print(str(ac_id))
-        # pandas_assets = AssetCollection.from_id(ac_id, platform=self.platform)
-
-        # # for good measure, test with COMPS AC, no idmtools layer
-        # from COMPS.Data import AssetCollection, AssetCollectionFile
-        # ac = AssetCollection()
-        # for (dirpath, dirnames, filenames) in os.walk(assets_path):
-        #     for fn in filenames:
-        #         rp = os.path.relpath(dirpath, assets_path) if dirpath != assets_path else ''
-        #         print('Adding {0}'.format(os.path.join(rp, fn)))
-        #         acf = AssetCollectionFile(fn, rp)
-        #         ac.add_asset(acf, os.path.join(dirpath, fn))
-        # ac.save()
-        # ac_id = ac.id
-        # from idmtools.assets import AssetCollection
-        # pandas_assets = AssetCollection.from_id(ac_id, platform=self.platform)
-
-        # Define some constant string used in this example
-        class ConfigParameters:
-            Infectious_Period_Constant = "Infectious_Period_Constant"
-            Base_Infectivity_Constant = "Base_Infectivity_Constant"
-            Base_Infectivity_Distribution = "Base_Infectivity_Distribution"
-            GAUSSIAN_DISTRIBUTION = "GAUSSIAN_DISTRIBUTION"
-            Base_Infectivity_Gaussian_Mean = "Base_Infectivity_Gaussian_Mean"
-            Base_Infectivity_Gaussian_Std_Dev = "Base_Infectivity_Gaussian_Std_Dev"
-
-        # First run the experiment
-        tags = {"idmtools": "idmtools-automation", "simulation_name_tag": "SEIR_Model_SLURM"}
-
-        parameters = json.load(
-            open(os.path.join(assets_path, "templates", 'config.json'),
-                 'r'))
-        parameters[ConfigParameters.Base_Infectivity_Distribution] = ConfigParameters.GAUSSIAN_DISTRIBUTION
-        # Pass python_path as python3 for SLURM cluster (python2 is currently the default)
-        python_path_script = os.path.join(assets_path, "SEIR_model_slurm.py")
-        task = JSONConfiguredPythonTask(python_path="/bin/bash", script_path=python_path_script, parameters=parameters,
                                         config_file_name='config.json', common_assets=pandas_assets)
         task.command.add_option("--duration", 40)
 

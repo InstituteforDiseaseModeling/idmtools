@@ -135,14 +135,13 @@ class TestLoadLibWheel(ITestWithPersistence):
         self.platform.get_files_by_id(sims[0].id, ItemType.SIMULATION, out_filenames, local_output_path)
         self.assertTrue(os.path.exists(os.path.join(local_output_path, sims[0].id, "tips.png")))
 
-    @pytest.mark.skip(reason="bug #716 -- need to fix python_task.py in idmtools_model/python")
     @pytest.mark.long
     @pytest.mark.comps
     def test_exp_with_load_pytest_lib_slurm(self):
         # ------------------------------------------------------
-        # First load 'zipp' package (note: comps does not have 'zipp' package)
+        # First load 'pytest' package (note: comps does not have 'pytest' package)
         # ------------------------------------------------------
-        platform = Platform('SLURM', node_group=None)
+        platform = Platform('SLURM')
         requirements_path = os.path.join(model_path, 'requirements1.txt')
         pl = RequirementsToAssetCollection(platform, requirements_path=requirements_path)
         ac_id = pl.run()
@@ -162,17 +161,16 @@ class TestLoadLibWheel(ITestWithPersistence):
         # Make sure this experiment succeeded
         self.assertTrue(experiment.succeeded)
 
-    @pytest.mark.skip(reason="bug #716 -- need to fix python_task.py in idmtools_model/python")
     @pytest.mark.long
     @pytest.mark.comps
     def test_exp_with_load_zipp_lib_slurm(self):
         # ------------------------------------------------------
         # First load 'zipp' package (note: comps does not have 'zipp' package)
         # ------------------------------------------------------
-        platform = Platform('SLURM', node_group=None)
+        platform = Platform('SLURM')
         requirements_path = os.path.join(model_path, 'requirements.txt')
         pl = RequirementsToAssetCollection(platform, requirements_path=requirements_path)
-        ac_id = pl.run()
+        ac_id = pl.run(rerun=False)
         common_assets = AssetCollection.from_id(ac_id, platform=platform)
 
         # create python task with script 'zipp_file_slurm.py', task is doing this in comps: "python ./Assets/zipp_file_slurm.py"
@@ -192,11 +190,11 @@ class TestLoadLibWheel(ITestWithPersistence):
         sims = self.platform.get_children_by_object(experiment)
         local_output_path = "output"
         del_folder(local_output_path)
-        out_filenames = ["StdErr.txt"]
+        out_filenames = ["StdOut.txt"]
         self.platform.get_files_by_id(sims[0].id, ItemType.SIMULATION, out_filenames, local_output_path)
-        self.assertTrue(os.path.exists(os.path.join(local_output_path, sims[0].id, "StdErr.txt")))
-        contents = Path(os.path.join(local_output_path, sims[0].id, "StdErr.txt")).read_text()
-        self.assertIn("ModuleNotFoundError: No module named 'zipp'", contents)
+        self.assertTrue(os.path.exists(os.path.join(local_output_path, sims[0].id, "StdOut.txt")))
+        contents = Path(os.path.join(local_output_path, sims[0].id, "StdOut.txt")).read_text()
+        self.assertEqual(contents, "b/\nb/d/\ng/h/\ng/\n")
 
     @pytest.mark.long
     @pytest.mark.comps
@@ -234,7 +232,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         # ------------------------------------------------------
         requirements_path = os.path.join(model_path, 'requirements3.txt')
         pl = RequirementsToAssetCollection(self.platform, requirements_path=requirements_path)
-        ac_id = pl.run(rerun=True)
+        ac_id = pl.run(rerun=False)
         common_assets = AssetCollection.from_id(ac_id, platform=self.platform)
 
         # create python task with script 'seaborn_file.py', task is doing this in comps: "python ./Assets/seaborn_file.py"
