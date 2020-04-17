@@ -24,7 +24,7 @@ jobs:
           make setup-dev
       - name: login to comps2
         run: |
-            python dev_scripts/create_auth_token_args.py --username shchen
+            python dev_scripts/create_auth_token_args.py --username idmtools_bamboo
       - name: run idmtools_cli smoke tests
         run: |
             cd idmtools_cli/tests
