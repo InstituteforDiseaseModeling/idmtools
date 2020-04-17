@@ -49,6 +49,9 @@ test-docker: ## Run our docker tests
 test-python: ## Run our python tests
 	$(FULL_TEST_CMD) -m "python"'
 
+test-smoke: ## Run our smoke tests
+	$(FULL_TEST_CMD) -m "smoke"'
+
 coverage: ## Generate a code-coverage report
 	@make clean
 	# We have to run in our tests folder to use the proper config
