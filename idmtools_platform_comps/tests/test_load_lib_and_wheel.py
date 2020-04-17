@@ -36,7 +36,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         # ------------------------------------------------------
         requirements_path = os.path.join(model_path, 'requirements.txt')
         pl = RequirementsToAssetCollection(self.platform, requirements_path=requirements_path)
-        ac_id = pl.run()
+        ac_id = pl.run(rerun=True)
         common_assets = AssetCollection.from_id(ac_id, platform=self.platform)
 
         # create python task with script 'model_file.py', task is doing this in comps: "python ./Assets/zipp_file.py"
@@ -170,7 +170,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         platform = Platform('SLURM')
         requirements_path = os.path.join(model_path, 'requirements.txt')
         pl = RequirementsToAssetCollection(platform, requirements_path=requirements_path)
-        ac_id = pl.run(rerun=False)
+        ac_id = pl.run(rerun=True)
         common_assets = AssetCollection.from_id(ac_id, platform=platform)
 
         # create python task with script 'zipp_file_slurm.py', task is doing this in comps: "python ./Assets/zipp_file_slurm.py"
