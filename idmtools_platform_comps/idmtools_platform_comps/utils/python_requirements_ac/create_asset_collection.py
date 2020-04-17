@@ -7,10 +7,10 @@ from COMPS import Client
 
 MD5_KEY = 'idmtools-requirements-md5'
 AC_FILE = 'ac_info.txt'
-LIBRARY_ROOT_PREFIX = 'L/'
+LIBRARY_ROOT_PREFIX = 'L'
 
 
-def build_asset_file_list(comps_sim, prefix=LIBRARY_ROOT_PREFIX):
+def build_asset_file_list_new(comps_sim, prefix=LIBRARY_ROOT_PREFIX):
     """
     Utility function to build all library files
     Args:
@@ -20,8 +20,13 @@ def build_asset_file_list(comps_sim, prefix=LIBRARY_ROOT_PREFIX):
     Returns: file paths as a list
     """
     metadata = comps_sim.retrieve_output_file_info([])
-    output_folder = [{'friendly_name': m.friendly_name, 'path_from_root': m.path_from_root, 'url': m.url} for m in
-                     metadata if m.path_from_root.startswith(prefix)]
+    output_folder = []
+    for m in metadata:
+        parts = m.path_from_root.split('/')
+        if parts[0] == prefix:
+            d = {'friendly_name': m.friendly_name, 'path_from_root': m.path_from_root, 'url': m.url}
+            output_folder.append(d)
+
     return output_folder
 
 
@@ -57,24 +62,27 @@ def get_data(url):
 
 
 def main():
-    print(sys.argv)
+    # print(sys.argv)
+    #
+    # if len(sys.argv) < 3:
+    #     raise Exception(
+    #         "The script needs to be called with `python <model.py> <experiment_id> <md5_str> <endpoint>'.\n{}".format(
+    #             " ".join(sys.argv)))
+    #
+    # # Get the experiments
+    # exp_id = sys.argv[1]
+    # print('exp_id: ', exp_id)
+    #
+    # # Get mds
+    # md5_str = sys.argv[2]
+    # print('md5_str: ', md5_str)
+    #
+    # # Get endpoint
+    # endpoint = sys.argv[3]
+    # print('endpoint: ', endpoint)
 
-    if len(sys.argv) < 3:
-        raise Exception(
-            "The script needs to be called with `python <model.py> <experiment_id> <md5_str> <endpoint>'.\n{}".format(
-                " ".join(sys.argv)))
-
-    # Get the experiments
-    exp_id = sys.argv[1]
-    print('exp_id: ', exp_id)
-
-    # Get mds
-    md5_str = sys.argv[2]
-    print('md5_str: ', md5_str)
-
-    # Get endpoint
-    endpoint = sys.argv[3]
-    print('endpoint: ', endpoint)
+    exp_id = '30a54b1f-3780-ea11-a2bf-f0921c167862'
+    endpoint = 'https://comps2.idmod.org'
 
     client = Client()
     client.login(endpoint)
@@ -90,6 +98,7 @@ def main():
     # Output files
     max_files = 10
     print('Display the fist 10 files:\n', asset_files[0:max_files])
+    exit()
 
     ac = AssetCollection()
     tags = {MD5_KEY: md5_str}
@@ -100,7 +109,7 @@ def main():
     for af in asset_files:
         dirpath = af['path_from_root']
         rp = os.path.relpath(dirpath, path_to_ac) if dirpath != path_to_ac else ''
-        rp = os.path.join('site_packages', rp)      # add all library under site_packages
+        rp = os.path.join('site_packages', rp)  # add all library under site_packages
         ac.add_asset(AssetCollectionFile(af['friendly_name'], rp), data=get_data(af['url']))
 
     ac.save()
