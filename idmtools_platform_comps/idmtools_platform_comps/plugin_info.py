@@ -15,14 +15,14 @@ environment = Bayesian
 priority = Lowest
 simulation_root = $COMPS_PATH(USER)\\output
 node_group = emod_abcd
-num_retires = 0
+num_retries = 0
 num_cores = 1
-exclusive = False
 max_workers = 16
 batch_size = 10
-work_item_type = DockerWorker
-docker_image = docker-staging.packages.idmod.org/idmtools/comps_ssmt_worker:1.0.0.0
-plugin_key = 1.0.0.0_RELEASE
+exclusive = False
+# Optional config option. It is recommended you only use this in advanced scenarios. Otherwise
+# leave it unset
+docker_image = docker-staging.packages.idmod.org/idmtools/comps_ssmt_worker:1.0.0
 """
 
 logger = getLogger(__name__)

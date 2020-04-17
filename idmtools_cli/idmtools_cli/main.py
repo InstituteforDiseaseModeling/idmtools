@@ -1,9 +1,7 @@
 from typing import NoReturn
-
 from colorama import init as color_init
-
 from idmtools_cli.iplatform_cli import PlatformCLIPlugins
-from idmtools_cli.cli import cli
+from idmtools_cli.cli.entrypoint import cli
 
 
 def main() -> NoReturn:

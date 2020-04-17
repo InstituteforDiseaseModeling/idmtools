@@ -301,7 +301,7 @@ instance/
 # Scrapy stuff:
 .scrapy
 
-# Sphinx documentation
+# Sphinx docs
 docs/_build/
 
 # PyBuilder
@@ -345,7 +345,7 @@ venv.bak/
 # Rope project settings
 .ropeproject
 
-# mkdocs documentation
+# mkdocs docs
 /site
 
 # mypy
@@ -392,7 +392,10 @@ idmtools_platform_local/idmtools_webui/build
 idmtools_platform_local/idmtools_platform_local/internals/ui/static/
 idmtools_test/idmtools_test/data/
 idmtools_platform_local/idmtools_webui/yarn.lock
-idmtools_model_emod/tests/reload_sim_download/
-idmtools_model_emod/tests/serialized_file_download/
 
 **.buildlog
+docs/_build
+docs/idmtools.*
+docs/idmtools*index.rst
+docs/idmtools_models*.rst
+docs/idmtools_platform*.rst

@@ -3,7 +3,6 @@ from functools import partial
 from logging import getLogger, DEBUG
 from typing import Any, List, Dict, Type
 from uuid import UUID
-
 from COMPS.Data import Simulation as COMPSSimulation, QueryCriteria, Experiment as COMPSExperiment, SimulationFile, \
     Configuration
 from idmtools.core import ItemType
@@ -50,8 +49,11 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         return COMPSSimulation.get(id=simulation_id,
                                    query_criteria=QueryCriteria().select(cols).select_children(children))
 
-    def platform_create(self, simulation: Simulation, num_cores: int = None, priority: str = None) -> COMPSSimulation:
-
+    def platform_create(self, simulation: Simulation, num_cores: int = None, priority: str = None,
+                        check_command: bool = True) -> COMPSSimulation:
+        from idmtools_platform_comps.utils.python_version import platform_task_hooks
+        if check_command:
+            simulation.task = platform_task_hooks(simulation.task, self.platform)
         s = self.to_comps_sim(num_cores, priority, simulation)
         COMPSSimulation.save(s, save_semaphore=COMPSSimulation.get_save_semaphore())
         return s

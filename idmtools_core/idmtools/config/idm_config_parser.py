@@ -140,9 +140,13 @@ class IdmConfigParser:
                 cls._config._sections[lowercase_version] = cls._config._sections[section]
 
         # setup logging
-        log_config = cls.get_section('Logging')
-        valid_options = ['level', 'log_filename', 'console']
-        setup_logging(**{k: v for k, v in log_config.items() if k in valid_options})
+        try:
+            log_config = cls.get_section('Logging')
+            valid_options = ['level', 'log_filename', 'console']
+            log_config = {k: v for k, v in log_config.items() if k in valid_options}
+        except ValueError:
+            log_config = dict(level='INFO', log_filename='idmtools.log', console='off')
+        setup_logging(**log_config)
 
     @classmethod
     @initialization(error=True)

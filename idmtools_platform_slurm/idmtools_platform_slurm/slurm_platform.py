@@ -1,5 +1,4 @@
-import typing
-from typing import Optional, List
+from typing import Optional
 from dataclasses import dataclass, field
 from logging import getLogger
 from idmtools.entities.iplatform import IPlatform

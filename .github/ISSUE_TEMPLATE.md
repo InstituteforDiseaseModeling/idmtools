@@ -1,3 +1,13 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+    - [Description](#description)
+    - [What I Did](#what-i-did)
+- [Extras](#extras)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ### Description
 
 Describe what you were trying to get done.

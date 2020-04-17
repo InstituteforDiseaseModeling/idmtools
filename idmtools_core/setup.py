@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 
 """The setup script for the idmtools_core platform, the core tools for modeling and analysis."""
-import sys
-
 from setuptools import setup, find_packages
 
 with open('README.md') as readme_file:
@@ -15,12 +13,6 @@ with open('requirements.txt') as requirements_file:
 build_requirements = ['flake8', 'coverage', 'py-make', 'bump2version', 'twine']
 test_requirements = ['pytest', 'pytest-runner', 'numpy==1.16.4', 'xmlrunner', 'pytest-xdist',
                      'pytest-timeout', 'pytest-cache'] + build_requirements
-
-# check for python 3.6
-if sys.version_info[1] == 6:
-    requirements.append('dataclasses')
-elif sys.version_info[0] == 3 and sys.version_info[1] == 7 and sys.version_info[2] < 3:
-    raise EnvironmentError("Python 3.7 requires 3.7.3 or higher")
 
 extras = {
     'test': test_requirements,
@@ -44,6 +36,7 @@ authors = [
     ("Jen Schripsema", "jschripsema@idmod.org")
 ]
 
+
 setup(
     author=[author[0] for author in authors],
     author_email=[author[1] for author in authors],
@@ -62,11 +55,16 @@ setup(
     entry_points=dict(
         idmtools_experiment=["idmtools_experiment = idmtools.entities.experiment:ExperimentSpecification"],
         idmtools_task=  # noqa: E251
-                      ["idmtools_task_command = idmtools.entities.command_task:CommandTaskSpecification"]
+                      ["idmtools_task_command = idmtools.entities.command_task:CommandTaskSpecification",
+                      "idmtools_task_docker = idmtools.core.docker_task:DockerTaskSpecification"]
         ),
+    setup_requirements=[
+        'dataclasses>=0.6;python_version<"3.7"'
+    ],
+    python_requires='>=3.6.*, !=3.7.0, !=3.7.1, !=3.7.2',
     test_suite='tests',
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='1.0.0',
+    version='1.0.0+nightly',
     zip_safe=False
 )

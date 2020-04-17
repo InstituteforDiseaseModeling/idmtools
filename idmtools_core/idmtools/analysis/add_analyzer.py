@@ -7,6 +7,8 @@ class AddAnalyzer(IAnalyzer):
     """
     A simple base class to add analyzers.
 
+    Examples:
+        .. literalinclude:: ../examples/analyzers/example_analysis_AddAnalyzer.py
     """
     def __init__(self, filenames=None, output_path='output'):
         super().__init__()

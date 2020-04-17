@@ -25,6 +25,9 @@ class DownloadAnalyzer(IAnalyzer):
 
         analyzer = DownloadAnalyzer(filenames=['output/InsetChart.json'])
 
+
+    Examples:
+        .. literalinclude:: ../examples/analyzers/example_analysis_DownloadAnalyzer.py
     """
 
     def reduce(self, all_data: dict):

@@ -1,5 +1,5 @@
 import subprocess
-from os.path import abspath, dirname, join
+from os.path import abspath, dirname
 
 # convenience script to run install for packing environment
 

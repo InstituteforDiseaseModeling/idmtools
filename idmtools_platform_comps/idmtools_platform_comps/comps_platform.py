@@ -48,17 +48,13 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     environment: str = field(default="Bayesian")
     priority: str = field(default=COMPSPriority.Lowest)
     simulation_root: str = field(default="$COMPS_PATH(USER)\\output")
-    node_group: str = field(default="emod_abcd")
-    num_retires: int = field(default=0)
+    node_group: str = field(default=None)
+    num_retries: int = field(default=0)
     num_cores: int = field(default=1)
     max_workers: int = field(default=16)
     batch_size: int = field(default=10)
     exclusive: bool = field(default=False)
-
-    # TODO What are these for?
-    work_item_type: str = field(default=None)
     docker_image: str = field(default=None)
-    plugin_key: str = field(default=None)
 
     _platform_supports: List[PlatformRequirements] = field(default_factory=lambda: copy.deepcopy(supported_types),
                                                            repr=False, init=False)

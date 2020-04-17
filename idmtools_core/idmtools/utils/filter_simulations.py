@@ -11,9 +11,17 @@ class FilterItem:
         """
         Filter simulations from Experiment or Suite, by default it filter status with Succeeded.
         If user wants to filter by other status, it also can be done, for example:
+
+        .. code-block:: python
+
                 filter_item(platform, exp, status=EntityStatus.FAILED
+
         If user wants to filter by tags, it also can be done, for example:
+
+        .. code-block:: python
+
                 filter_item(platform, exp, tags={'Run_Number': '2'})
+
         Args:
             platform:
             item:
