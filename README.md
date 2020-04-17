@@ -27,6 +27,7 @@
   - [First Time Setup](#first-time-setup)
   - [General Use](#general-use)
   - [IDE/Runtime Setup](#ideruntime-setup)
+  - [Running smoke tests or all tests from Github Actions](#running-smoke-tests-or-all-tests-from-github-actions)
   - [Running specific tests from the command line](#running-specific-tests-from-the-command-line)
   - [WSL2 on Windows Setup(Experimental)](#wsl2-on-windows-setupexperimental)
   - [Troubleshooting the Development Environment](#troubleshooting-the-development-environment)
@@ -120,6 +121,16 @@ The directories that should be added as source roots are
 - `idmtools/idmtools_platform_comps`
 - `idmtools/idmtools_models`
 - `idmtools/idmtools_test`
+
+## Running smoke tests or all tests from Github Actions
+
+To run smoke tests from Github Actions when push or pull request, put "Run smoke test!" in your commit message
+
+To run all tests from Github Actions when push or pull request, put "Run all test!" in your commit message
+```bash
+git commit -m 'fix bug xxx, Run smoke test!'
+git push
+```
 
 ## Running specific tests from the command line
 
