@@ -1,1 +1,1 @@
-idmtools~=1.0.0
+idmtools~=1.0.1
