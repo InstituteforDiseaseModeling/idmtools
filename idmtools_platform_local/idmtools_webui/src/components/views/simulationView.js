@@ -203,7 +203,7 @@ class SimulationView extends React.Component {
                 command =  sims[index].extra_details.command; // eslint-disable-line no-unused-vars
                 tags = JSON.stringify( sims[index].tags); // eslint-disable-line no-unused-vars
             } else {
-                this.state.selectedSim = null;
+                this.setState({selectedSim: null});
             }
 
         }
