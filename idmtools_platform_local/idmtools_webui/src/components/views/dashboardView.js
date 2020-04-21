@@ -51,7 +51,7 @@ class Dashboard extends React.Component {
         let expCount = 0;
 
         if (simulations.simulations) {
-            simulations.simulations.map((sim)=> {
+            simulations.simulations.forEach((sim) => {
                 simStatus[sim.status] += 1;
             })
         }

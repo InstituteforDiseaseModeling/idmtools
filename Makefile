@@ -25,7 +25,7 @@ setup-dev:  ## Setup packages in dev mode
 	$(PDR) -w idmtools_platform_local -ex 'pymake docker-local'
 
 lint: ## check style with flake8
-	flake8 --ignore=E501,W291 --exclude="examples/**,workflow/**,docs/**,*/tests/**,idmtools_model_emod/**,idmtools_test/**"
+	flake8 --ignore=E501,W291 --exclude="examples/**,workflow/**,docs/**,*/tests/**,idmtools_test/**"
 
 
 test: ## Run our tests
@@ -46,15 +46,15 @@ test-comps: ## Run our comps tests
 test-docker: ## Run our docker tests
 	$(MAKEALL) test-docker
 
-test-emod: ## Run our emod tests
-	$(MAKEALL) test-emod
-
 test-python: ## Run our python tests
 	$(MAKEALL) test-python
 
+test-smoke: ## Run our smoke tests
+	$(MAKEALL) test-smoke
+
 coverage: ## Generate a code-coverage report
 	$(MAKEALL) coverage-all
-	coverage combine idmtools_cli/.coverage idmtools_core/.coverage idmtools_model_emod/.coverage idmtools_models/.coverage idmtools_platform_comps/.coverage idmtools_platform_local/.coverage
+	coverage combine idmtools_cli/.coverage idmtools_core/.coverage idmtools_models/.coverage idmtools_platform_comps/.coverage idmtools_platform_local/.coverage
 	coverage report -m
 	coverage html -i
 	$(PDS)launch_dir_in_browser.py htmlcov/index.html

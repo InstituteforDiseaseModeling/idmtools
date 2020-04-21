@@ -39,6 +39,9 @@ test-no-comps: ## Run our tests
 test-all: ## Run our  docker tests as well
 	@+$(IPY) "print('No Tests')"
 
+test-smoke: ## Run our smoke tests
+	@+$(IPY) "print('No Tests')"
+
 coverage: ## Generate a code-coverage report
 	@+$(IPY) "print('No Tests')"
 

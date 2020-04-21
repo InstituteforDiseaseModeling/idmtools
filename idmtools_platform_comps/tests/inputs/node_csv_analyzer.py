@@ -2,13 +2,13 @@
 import os
 from sys import platform
 import matplotlib
-if platform == "linux" or platform == "linux2":
-    print('Linux OS. Using non-interactive Agg backend')
-    matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 from idmtools.entities.ianalyzer import IAnalyzer as BaseAnalyzer
+if platform == "linux" or platform == "linux2":
+    print('Linux OS. Using non-interactive Agg backend')
+    matplotlib.use('Agg')
 
 
 # Create a class for node level analyzer
@@ -42,7 +42,7 @@ class NodeCSVAnalyzer(BaseAnalyzer):
         # Make a directory labeled the exp id to write the csv results to
         os.makedirs(exp_id, exist_ok=True)
         # NOTE: If running twice with different filename, the output files will collide
-        results.to_csv(os.path.join(exp_id, self.__class__.__name__+'.csv'))
+        results.to_csv(os.path.join(exp_id, self.__class__.__name__ + '.csv'))
 
         channels = results.drop(['TimeStep'], axis=1).columns.tolist()
         sims = results.index.unique().to_list()
@@ -58,7 +58,7 @@ class NodeCSVAnalyzer(BaseAnalyzer):
             ax.set_title(channel)
             ax.set_xlabel("TimeStep")
             for sim in sims:
-                ax.plot(results[results.index==sim]['TimeStep'], results[results.index==sim][channel])
+                ax.plot(results[results.index == sim]['TimeStep'], results[results.index == sim][channel])
 
         # Create the legend
         sims_label = [str(sim).split('-')[0] for sim in sims]
@@ -66,4 +66,4 @@ class NodeCSVAnalyzer(BaseAnalyzer):
                    fontsize='xx-small', labels=sims_label)
 
         # Save the figure
-        plt.savefig(os.path.join(exp_id, self.__class__.__name__+'.png'))
+        plt.savefig(os.path.join(exp_id, self.__class__.__name__ + '.png'))

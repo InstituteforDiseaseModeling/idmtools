@@ -27,6 +27,7 @@
   - [First Time Setup](#first-time-setup)
   - [General Use](#general-use)
   - [IDE/Runtime Setup](#ideruntime-setup)
+  - [Running smoke tests or all tests from Github Actions](#running-smoke-tests-or-all-tests-from-github-actions)
   - [Running specific tests from the command line](#running-specific-tests-from-the-command-line)
   - [WSL2 on Windows Setup(Experimental)](#wsl2-on-windows-setupexperimental)
   - [Troubleshooting the Development Environment](#troubleshooting-the-development-environment)
@@ -62,7 +63,6 @@ You can also install just the individual packages to create minimal environments
 - `pip install idmtools-platform-comps --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Support for COMPS
 - `pip install idmtools-platform-local --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Support for Local Platform
 - `pip install idmtools-models --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Python and generic models
-- `pip install idmtools-model-emod --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - EMOD Model support
 
 ## Pre-requisites
 - Python 3.6/3.7 x64
@@ -87,7 +87,7 @@ When setting up your environment for the first time, you can use the following i
    On Unix(Mac/Linux) you can use venv or virtualenv
 3) Activate the virtualenv
 4) If you are on windows, run `pip install py-make --upgrade --force-reinstall`
-5) Run `docker login docker-staging.idmod.org`
+5) Run `docker login docker-staging.packages.idmod.org`
 6) Then run `python dev_scripts/bootstrap.py`. This will install all the tools. 
 
 ## General Use
@@ -119,17 +119,26 @@ The directories that should be added as source roots are
 - `idmtools/idmtools_cli`
 - `idmtools/idmtools_platform_local`
 - `idmtools/idmtools_platform_comps`
-- `idmtools/idmtools_model_emod`
 - `idmtools/idmtools_models`
 - `idmtools/idmtools_test`
+
+## Running smoke tests or all tests from Github Actions
+
+To run smoke tests from Github Actions when push or pull request, put "Run smoke test!" in your commit message
+
+To run all tests from Github Actions when push or pull request, put "Run all test!" in your commit message
+```bash
+git commit -m 'fix bug xxx, Run smoke test!'
+git push
+```
 
 ## Running specific tests from the command line
 
 To run a select set of tests, you can use the `run_all.py` python script
 
-For example to run all tests that tagged emod but not tagged comps run 
+For example to run all tests that tagged python but not tagged comps run 
 ```bash
-python dev_scripts/run_all.py -sd 'tests' --exec "py.test -m 'not comps and emod'"
+python dev_scripts/run_all.py -sd 'tests' --exec "py.test -m 'not comps and python'"
 ```
 
 You can also filter by test case name or method name. The below will run any test with batch in the name. 

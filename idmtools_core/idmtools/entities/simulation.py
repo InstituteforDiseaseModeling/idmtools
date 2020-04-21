@@ -25,6 +25,8 @@ class Simulation(IAssetsEnabled, INamedEntity):
     pre_creation_hooks: List[Callable[[], NoReturn]] = field(default_factory=lambda: [Simulation.gather_assets])
     # control whether we should replace the task with a proxy after creation
     __replace_task_with_proxy: bool = field(default=True, init=False, compare=False)
+    # Ensure we don't gather assets twice
+    __assets_gathered: bool = field(default=False)
 
     @property
     def experiment(self) -> 'Experiment':  # noqa: F821
@@ -46,6 +48,10 @@ class Simulation(IAssetsEnabled, INamedEntity):
             user_logger.error(msg)
             raise NoTaskFound(msg)
 
+        if logger.isEnabledFor(DEBUG):
+            logger.debug('Calling task pre creation')
+        self.task.pre_creation(self)
+
         # Call all of our hooks
         for x in self.pre_creation_hooks:
             if logger.isEnabledFor(DEBUG):
@@ -66,10 +72,6 @@ class Simulation(IAssetsEnabled, INamedEntity):
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f'Setting Simulation Tag "task_type" to "{tn}"')
             self.tags["task_type"] = tn
-
-        if logger.isEnabledFor(DEBUG):
-            logger.debug('Calling task post creation')
-        self.task.pre_creation(self)
 
     def post_creation(self) -> None:
         if logger.isEnabledFor(DEBUG):
@@ -95,8 +97,10 @@ class Simulation(IAssetsEnabled, INamedEntity):
         """
         Gather all the assets for the simulation.
         """
-        self.task.gather_transient_assets()
-        self.assets.add_assets(self.task.transient_assets, fail_on_duplicate=False)
+        if not self.__assets_gathered:
+            self.task.gather_transient_assets()
+            self.assets.add_assets(self.task.transient_assets, fail_on_duplicate=False)
+        self.__assets_gathered = True
 
     @classmethod
     def from_task(cls, task: 'ITask', tags: Dict[str, Any] = None,  # noqa E821

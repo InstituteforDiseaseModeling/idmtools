@@ -21,6 +21,10 @@ class CommandLine:
     def executable(self):
         return self._executable
 
+    @executable.setter
+    def executable(self, executable):
+        self._executable = executable
+
     def add_argument(self, arg):
         self._args.append(arg)
 

@@ -157,7 +157,7 @@ class IPlatformExperimentOperations(ABC):
         """
         return experiment
 
-    def pre_run_item(self, experiment: Experiment):
+    def pre_run_item(self, experiment: Experiment, **kwargs):
         """
         Trigger right before commissioning experiment on platform. This ensures that the item is created. It also
             ensures that the children(simulations) have also been created
@@ -171,7 +171,7 @@ class IPlatformExperimentOperations(ABC):
         # ensure the item is created before running
         # TODO what status are valid here? Create only?
         if experiment.status is None:
-            self.create(experiment)
+            self.create(experiment, **kwargs)
 
         # check sims
         logger.debug("Ensuring simulations exist")

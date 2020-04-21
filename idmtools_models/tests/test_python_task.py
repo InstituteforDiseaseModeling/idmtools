@@ -11,6 +11,7 @@ from idmtools_test import COMMON_INPUT_PATH
 @pytest.mark.tasks
 class TestPythonTask(TestCase):
 
+    @pytest.mark.smoke
     def test_simple_model(self):
         fpath = os.path.join(COMMON_INPUT_PATH, "python", "model1.py")
         task = PythonTask(script_path=fpath)

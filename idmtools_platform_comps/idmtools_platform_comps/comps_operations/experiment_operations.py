@@ -4,7 +4,6 @@ from itertools import tee
 from logging import getLogger, DEBUG
 from typing import Any, List, Type, Generator, NoReturn
 from uuid import UUID
-
 from COMPS.Data import Experiment as COMPSExperiment, QueryCriteria, Configuration, Suite as COMPSSuite
 from idmtools.core import ItemType
 from idmtools.core.experiment_factory import experiment_factory
@@ -38,7 +37,8 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         super().pre_create(experiment, **kwargs)
 
     def platform_create(self, experiment: Experiment, num_cores: int = None, executable_path: str = None,
-                        command_arg: str = None, priority: str = None) -> COMPSExperiment:
+                        command_arg: str = None, priority: str = None, check_command: bool = True) -> COMPSExperiment:
+        from idmtools_platform_comps.utils.python_version import platform_task_hooks
         # TODO check experiment task supported
 
         # Cleanup the name
@@ -51,13 +51,26 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         if isinstance(experiment.simulations, Generator):
             sim_gen1, sim_gen2 = tee(experiment.simulations)
             experiment.simulations = sim_gen2
-            exp_command = next(sim_gen1).task.command
+            sim = next(sim_gen1)
+            if check_command:
+                task = platform_task_hooks(sim.task, self.platform)
+            task.pre_creation(sim)
+            exp_command = task.command
         elif isinstance(experiment.simulations, ParentIterator) and isinstance(experiment.simulations.items,
                                                                                TemplatedSimulations):
-            exp_command = experiment.simulations.items.base_task.command
+            from idmtools.entities.simulation import Simulation
+            task = experiment.simulations.items.base_task
+            if check_command:
+                task = platform_task_hooks(task, self.platform)
+            task.pre_creation(Simulation())
+            exp_command = task.command
             # TODO generators
         else:
-            exp_command = experiment.simulations[0].task.command
+            task = experiment.simulations[0].task
+            if check_command:
+                task = platform_task_hooks(task, self.platform)
+            task.pre_creation(experiment.simulations[0])
+            exp_command = task.command
 
         if command_arg is None:
             command_arg = exp_command.arguments + " " + exp_command.options
@@ -101,8 +114,8 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
 
     def post_run_item(self, experiment: Experiment, **kwargs):
         super().post_run_item(experiment, **kwargs)
-        print(f'The running experiment can be viewed at {self.platform.endpoint}/#explore/'
-              f'Simulations?filters=ExperimentId={experiment.uid}')
+        print(f"\nThe running experiment can be viewed at {self.platform.endpoint}/#explore/"
+              f"Simulations?filters=ExperimentId={experiment.uid}\n")
 
     def get_children(self, experiment: COMPSExperiment, **kwargs) -> List[Any]:
         cols = kwargs.get("cols")

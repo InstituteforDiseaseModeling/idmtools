@@ -67,7 +67,11 @@ class IPlatformSuiteOperations(ABC):
         Returns:
             NoReturn
         """
+        suite.status = EntityStatus.CREATED
+        suite.platform = self.platform
         suite.post_creation()
+        for experiment in suite.experiments:
+            experiment.parent_id = suite.id
 
     def create(self, suite: Suite, do_pre: bool = True, do_post: bool = True, **kwargs) -> Tuple[Any, UUID]:
         """
@@ -140,7 +144,7 @@ class IPlatformSuiteOperations(ABC):
         Returns:
 
         """
-        pass
+        suite.status = EntityStatus.RUNNING
 
     def run_item(self, suite: Suite, **kwargs):
         """
