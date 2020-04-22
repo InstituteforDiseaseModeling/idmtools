@@ -13,7 +13,7 @@ with open('requirements.txt') as requirements_file:
     requirements = requirements_file.read().split("\n")
 
 build_requirements = ['flake8', 'coverage', 'py-make', 'bump2version', 'twine']
-test_requirements = ['pytest', 'pytest-runner', 'xmlrunner', 'pytest-xdist',
+test_requirements = ['pytest~=5.4.1', 'pytest-runner~=5.2', 'xmlrunner~=1.7.7', 'pytest-xdist',
                      'pytest-timeout', 'pytest-cache'] + build_requirements
 
 extras = {
