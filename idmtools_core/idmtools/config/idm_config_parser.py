@@ -140,7 +140,11 @@ class IdmConfigParser:
                 cls._config._sections[lowercase_version] = cls._config._sections[section]
 
         # setup logging
-        log_config = cls.get_section('Logging')
+        try:
+            log_config = cls.get_section('Logging')
+        except ValueError:
+            print('No Logging block in ini file, running with defaults')
+            log_config = {}
         valid_options = ['level', 'log_filename', 'console']
         setup_logging(**{k: v for k, v in log_config.items() if k in valid_options})
 
