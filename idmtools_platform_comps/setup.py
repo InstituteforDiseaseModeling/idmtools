@@ -41,9 +41,6 @@ setup(
     keywords='modeling, IDM',
     name='idmtools_platform_comps',
     packages=find_packages(),
-    setup_requirements=[
-        'dataclasses>=0.6;python_version<"3.7"'
-    ],
     test_suite='tests',
     entry_points=dict(idmtools_platform=  # noqa: E251
                       ["idmtools_platform_comps = idmtools_platform_comps.plugin_info:COMPSPlatformSpecification",
