@@ -26,6 +26,7 @@ class CreateSimulationTask(GenericActor):
     Creates a simulation.
     - Create the simulation folder in the experiment_id parent folder
     - Returns the UUID of the newly created simulation folder
+
     """
 
     class Meta:
@@ -86,6 +87,7 @@ class CreateSimulationsTask(GenericActor):
     Creates a simulation.
     - Create the simulation folder in the experiment_id parent folder
     - Returns the UUID of the newly created simulation folder
+
     """
 
     class Meta:

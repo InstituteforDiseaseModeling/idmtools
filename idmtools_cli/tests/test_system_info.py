@@ -1,11 +1,14 @@
 import getpass
 import unittest
 
+import pytest
+
 from idmtools_test.utils.cli import get_subcommands_from_help_result, run_command
 
 
 class TestSystemInfoBasics(unittest.TestCase):
 
+    @pytest.mark.smoke
     def test_help(self):
         """
         This test is to ensure:

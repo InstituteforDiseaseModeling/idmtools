@@ -1,7 +1,6 @@
 import copy
 import json
 import os
-import sys
 import unittest
 from functools import partial
 from operator import itemgetter
@@ -12,7 +11,7 @@ from COMPS.Data import Experiment as COMPSExperiment, AssetCollection as COMPSAs
 from COMPS.Data import QueryCriteria
 from idmtools import __version__
 from idmtools.assets import Asset, AssetCollection
-from idmtools.builders import ArmSimulationBuilder, ArmType, SimulationBuilder, StandAloneSimulationsBuilder, SweepArm
+from idmtools.builders import ArmSimulationBuilder, ArmType, SimulationBuilder, SweepArm
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
@@ -24,6 +23,7 @@ from idmtools_test.utils.common_experiments import get_model1_templated_experime
     wait_on_experiment_and_check_all_sim_status
 from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+from idmtools_test.utils.shared_functions import validate_output, validate_sim_tags
 
 setA = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
 setB = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="b")
@@ -76,10 +76,10 @@ class TestPythonExperiment(ITestWithPersistence):
         # exp_id = "a727e802-d88b-e911-a2bb-f0921c167866"
 
         # validation each simulation output to compare output/config.json is equal to config.json
-        self.validate_output(exp_id, 4)
+        validate_output(self, exp_id, 4)
 
         expected_tags = [{'a': '0', 'b': '1'}, {'a': '0', 'b': '9'}, {'a': '1', 'b': '1'}, {'a': '1', 'b': '9'}]
-        self.validate_sim_tags(exp_id, expected_tags)
+        validate_sim_tags(self, exp_id, expected_tags)
 
         # validate experiment tags
         actual_exp_tags = experiment.get(experiment.id, QueryCriteria().select_children('tags')).tags
@@ -115,11 +115,11 @@ class TestPythonExperiment(ITestWithPersistence):
         experiment = COMPSExperiment.get(e.uid)
         print(experiment.id)
         exp_id = experiment.id
-        self.validate_output(exp_id, 5)
+        validate_output(self, exp_id, 5)
 
         # validate b is not in tag since it is not sweep parameter, it just depend on sweep parameter
         expected_tags = [{'a': '0'}, {'a': '1'}, {'a': '2'}, {'a': '3'}, {'a': '4'}]
-        self.validate_sim_tags(exp_id, expected_tags)
+        validate_sim_tags(self, exp_id, expected_tags)
 
     @pytest.mark.long
     @pytest.mark.comps
@@ -160,7 +160,7 @@ class TestPythonExperiment(ITestWithPersistence):
             self.validate_assets(assets, expected_list)
 
     # Test will test pythonExperiment's assets parameter which adds all files under tests/inputs/python/Assets to
-    # COMPS' Assets folder and also test using StandAloneSimulationsBuilder builder to build simulations
+    # COMPS' Assets folder
     # Comps' Assets
     #   |--MyLib
     #       |--temp.py
@@ -181,9 +181,7 @@ class TestPythonExperiment(ITestWithPersistence):
         sim.task.set_parameter("a", 1)
         sim.task.set_parameter("b", 10)
 
-        builder = StandAloneSimulationsBuilder()
-        builder.add_simulation(sim)
-        e.simulations.add_builder(builder)
+        e.simulations = [sim]
 
         wait_on_experiment_and_check_all_sim_status(self, e, self.platform)
 
@@ -317,10 +315,10 @@ class TestPythonExperiment(ITestWithPersistence):
 
         wait_on_experiment_and_check_all_sim_status(self, e, self.platform)
         exp_id = e.uid
-        self.validate_output(exp_id, 6)
+        validate_output(self, exp_id, 6)
         expected_tags = [{'a': '1', 'b': '2', 'c': '4'}, {'a': '1', 'b': '2', 'c': '5'}, {'a': '1', 'b': '3', 'c': '4'},
                          {'a': '1', 'b': '3', 'c': '5'}, {'a': '6', 'b': '2'}, {'a': '7', 'b': '2'}]
-        self.validate_sim_tags(exp_id, expected_tags)
+        validate_sim_tags(self, exp_id, expected_tags)
 
     @pytest.mark.comps
     def test_duplicate_asset_files_not_allowed(self):
@@ -339,6 +337,7 @@ class TestPythonExperiment(ITestWithPersistence):
                 context.exception.args[0]))
 
     @pytest.mark.comps
+    @pytest.mark.long
     def test_use_existing_ac_with_experiment(self):
         model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
         tags = {"a": "1", "b": 10}
@@ -371,6 +370,7 @@ class TestPythonExperiment(ITestWithPersistence):
         self.assertIsInstance(ac, AssetCollection)
         return ac
 
+    @pytest.mark.smoke
     @pytest.mark.comps
     def test_use_existing_ac_and_add_file_with_experiment(self):
         model_path = os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py")
@@ -415,10 +415,17 @@ class TestPythonExperiment(ITestWithPersistence):
 
     @pytest.mark.long
     @pytest.mark.comps
-    def test_ssmt_seir_model_experiment(self):
-        # ------------------------------------------------------
+    def test_seir_model_experiment(self):
+        # Define some constant string used in this example
+        class ConfigParameters:
+            Infectious_Period_Constant = "Infectious_Period_Constant"
+            Base_Infectivity_Constant = "Base_Infectivity_Constant"
+            Base_Infectivity_Distribution = "Base_Infectivity_Distribution"
+            GAUSSIAN_DISTRIBUTION = "GAUSSIAN_DISTRIBUTION"
+            Base_Infectivity_Gaussian_Mean = "Base_Infectivity_Gaussian_Mean"
+            Base_Infectivity_Gaussian_Std_Dev = "Base_Infectivity_Gaussian_Std_Dev"
+
         # First run the experiment
-        # ------------------------------------------------------
         script_path = os.path.join(COMMON_INPUT_PATH, "python", "ye_seir_model", "Assets", "SEIR_model.py")
         assets_path = os.path.join(COMMON_INPUT_PATH, "python", "ye_seir_model", "Assets")
         tags = {"idmtools": "idmtools-automation", "simulation_name_tag": "SEIR_Model"}
@@ -427,7 +434,8 @@ class TestPythonExperiment(ITestWithPersistence):
             open(os.path.join(assets_path, "templates", 'config.json'),
                  'r'))
         parameters[ConfigParameters.Base_Infectivity_Distribution] = ConfigParameters.GAUSSIAN_DISTRIBUTION
-        task = JSONConfiguredPythonTask(script_path=script_path, parameters=parameters, config_file_name='config.json')
+        task = JSONConfiguredPythonTask(script_path=script_path, parameters=parameters,
+                                        config_file_name='config.json')
         task.command.add_option("--duration", 40)
 
         # now create a TemplatedSimulation builder
@@ -441,8 +449,8 @@ class TestPythonExperiment(ITestWithPersistence):
         def param_update(simulation: Simulation, param: str, value: Any) -> Dict[str, Any]:
             return simulation.task.set_parameter(param, value)
 
-        set_base_infectivity_gaussian_mean = partial(param_update,
-                                                     param=ConfigParameters.Base_Infectivity_Gaussian_Mean)
+        # set_base_infectivity_gaussian_mean = partial(param_update,
+        #                                              param=ConfigParameters.Base_Infectivity_Gaussian_Mean)
 
         class setParam:
             def __init__(self, param):
@@ -463,35 +471,26 @@ class TestPythonExperiment(ITestWithPersistence):
         experiment.assets.add_directory(assets_directory=assets_path)
 
         # set platform and run simulations
-        platform = Platform('COMPS2')
-        platform.run_items(experiment)
-        platform.wait_till_done(experiment)
+        self.platform.run_items(experiment)
+        self.platform.wait_till_done(experiment)
 
-        # check experiment status and only move to analyzer test if experiment succeeded
-        if not experiment.succeeded:
-            print(f"Experiment {experiment.uid} failed.\n")
-            sys.exit(-1)
+        # check experiment status
+        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)
 
-    def validate_output(self, exp_id, expected_sim_count):
+        # validate sim outputs
+        exp_id = experiment.id
+        self.validate_custom_output(exp_id, 2)
+
+    def validate_custom_output(self, exp_id, expected_sim_count):
         sim_count = 0
         for simulation in COMPSExperiment.get(exp_id).get_simulations():
             sim_count = sim_count + 1
-            result_file_string = simulation.retrieve_output_files(paths=['output/result.json'])
-            print(result_file_string)
-            config_string = simulation.retrieve_output_files(paths=['config.json'])
-            print(config_string)
-            self.assertEqual(result_file_string, config_string)
+            expected_csv_output_1 = simulation.retrieve_output_files(paths=['output/individual.csv'])
+            expected_csv_output_2 = simulation.retrieve_output_files(paths=['output/node.csv'])
+            self.assertEqual(len(expected_csv_output_1), 1)
+            self.assertEqual(len(expected_csv_output_2), 1)
 
         self.assertEqual(sim_count, expected_sim_count)
-
-    def validate_sim_tags(self, exp_id, expected_tags):
-        tags = []
-        for simulation in COMPSExperiment.get(exp_id).get_simulations():
-            tags.append(simulation.get(simulation.id, QueryCriteria().select_children('tags')).tags)
-
-        sorted_tags = sorted(tags, key=itemgetter('a'))
-        sorted_expected_tags = sorted(expected_tags, key=itemgetter('a'))
-        self.assertEqual(sorted_tags, sorted_expected_tags)
 
     def validate_assets(self, assets, expected_list):
         actual_list = []
@@ -503,16 +502,6 @@ class TestPythonExperiment(ITestWithPersistence):
         expected_list_sorted = sorted(expected_list, key=itemgetter('filename', 'relative_path'))
         actual_list_sorted = sorted(actual_list, key=itemgetter('filename', 'relative_path'))
         self.assertEqual(expected_list_sorted, actual_list_sorted)
-
-
-# Define some constant string used in this example
-class ConfigParameters:
-    Infectious_Period_Constant = "Infectious_Period_Constant"
-    Base_Infectivity_Constant = "Base_Infectivity_Constant"
-    Base_Infectivity_Distribution = "Base_Infectivity_Distribution"
-    GAUSSIAN_DISTRIBUTION = "GAUSSIAN_DISTRIBUTION"
-    Base_Infectivity_Gaussian_Mean = "Base_Infectivity_Gaussian_Mean"
-    Base_Infectivity_Gaussian_Std_Dev = "Base_Infectivity_Gaussian_Std_Dev"
 
 
 if __name__ == '__main__':

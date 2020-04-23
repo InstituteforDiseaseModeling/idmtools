@@ -6,6 +6,7 @@ from idmtools.core.interfaces.iitem import IItem
 
 from idmtools.entities.ianalyzer import IAnalyzer as BaseAnalyzer
 import matplotlib as mpl
+
 mpl.use('Agg')
 
 

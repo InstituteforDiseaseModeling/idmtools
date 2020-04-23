@@ -16,7 +16,7 @@ logger = getLogger(__name__)
 
 @dataclass
 class IPlatformExperimentOperations(ABC):
-    platform: 'IPlatform'
+    platform: 'IPlatform'  # noqa: F821
     platform_type: Type
 
     @abstractmethod
@@ -98,8 +98,8 @@ class IPlatformExperimentOperations(ABC):
         """
         pass
 
-    def batch_create(self, experiments: List[Experiment], display_progress: bool = True, **kwargs) -> List[
-        Tuple[Experiment]]:
+    def batch_create(self, experiments: List[Experiment], display_progress: bool = True, **kwargs) \
+            -> List[Tuple[Experiment]]:
         """
         Provides a method to batch create experiments
 
@@ -157,7 +157,7 @@ class IPlatformExperimentOperations(ABC):
         """
         return experiment
 
-    def pre_run_item(self, experiment: Experiment):
+    def pre_run_item(self, experiment: Experiment, **kwargs):
         """
         Trigger right before commissioning experiment on platform. This ensures that the item is created. It also
             ensures that the children(simulations) have also been created
@@ -171,7 +171,7 @@ class IPlatformExperimentOperations(ABC):
         # ensure the item is created before running
         # TODO what status are valid here? Create only?
         if experiment.status is None:
-            self.create(experiment)
+            self.create(experiment, **kwargs)
 
         # check sims
         logger.debug("Ensuring simulations exist")

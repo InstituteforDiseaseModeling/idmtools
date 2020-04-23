@@ -1,4 +1,3 @@
-from shlex import shlex
 from typing import TypeVar, Dict, Any, List
 from dataclasses import dataclass, field
 
@@ -8,7 +7,6 @@ class CommandLine:
     _executable: str = None
     _options: Dict[str, Any] = field(default_factory=dict)
     _args: List[Any] = field(default_factory=list)
-
 
     """
     A class to construct command line strings from executable, options, and params
@@ -22,6 +20,10 @@ class CommandLine:
     @property
     def executable(self):
         return self._executable
+
+    @executable.setter
+    def executable(self, executable):
+        self._executable = executable
 
     def add_argument(self, arg):
         self._args.append(arg)

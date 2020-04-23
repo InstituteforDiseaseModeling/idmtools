@@ -20,18 +20,20 @@ class Simulation(IAssetsEnabled, INamedEntity):
     Class that represents a generic simulation.
     This class needs to be implemented for each model type with specifics.
     """
-    task: 'ITask' = field(default=None)
+    task: 'ITask' = field(default=None)  # noqa: F821
     item_type: 'ItemType' = field(default=ItemType.SIMULATION, compare=False)
     pre_creation_hooks: List[Callable[[], NoReturn]] = field(default_factory=lambda: [Simulation.gather_assets])
     # control whether we should replace the task with a proxy after creation
     __replace_task_with_proxy: bool = field(default=True, init=False, compare=False)
+    # Ensure we don't gather assets twice
+    __assets_gathered: bool = field(default=False)
 
     @property
-    def experiment(self) -> 'Experiment':
+    def experiment(self) -> 'Experiment':  # noqa: F821
         return self.parent
 
     @experiment.setter
-    def experiment(self, experiment: 'Experiment'):
+    def experiment(self, experiment: 'Experiment'):  # noqa: F821
         self.parent = experiment
 
     def __repr__(self):
@@ -46,11 +48,15 @@ class Simulation(IAssetsEnabled, INamedEntity):
             user_logger.error(msg)
             raise NoTaskFound(msg)
 
+        if logger.isEnabledFor(DEBUG):
+            logger.debug('Calling task pre creation')
+        self.task.pre_creation(self)
+
         # Call all of our hooks
         for x in self.pre_creation_hooks:
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f'Calling simulation pre-create hook named '
-                                 f'{x.__name__ if hasattr(x, "__name__") else str(x)}')
+                             f'{x.__name__ if hasattr(x, "__name__") else str(x)}')
             x(self)
 
         if self.__class__ is not Simulation:
@@ -66,10 +72,6 @@ class Simulation(IAssetsEnabled, INamedEntity):
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f'Setting Simulation Tag "task_type" to "{tn}"')
             self.tags["task_type"] = tn
-
-        if logger.isEnabledFor(DEBUG):
-            logger.debug('Calling task post creation')
-        self.task.pre_creation(self)
 
     def post_creation(self) -> None:
         if logger.isEnabledFor(DEBUG):
@@ -95,11 +97,14 @@ class Simulation(IAssetsEnabled, INamedEntity):
         """
         Gather all the assets for the simulation.
         """
-        self.task.gather_transient_assets()
-        self.assets.add_assets(self.task.transient_assets, fail_on_duplicate=False)
+        if not self.__assets_gathered:
+            self.task.gather_transient_assets()
+            self.assets.add_assets(self.task.transient_assets, fail_on_duplicate=False)
+        self.__assets_gathered = True
 
     @classmethod
-    def from_task(cls, task: 'ITask', tags: Dict[str, Any] = None, asset_collection: AssetCollection = None):
+    def from_task(cls, task: 'ITask', tags: Dict[str, Any] = None,  # noqa E821
+                  asset_collection: AssetCollection = None):
         return Simulation(task=task, tags=dict() if tags is None else tags,
                           assets=asset_collection if asset_collection else AssetCollection())
 

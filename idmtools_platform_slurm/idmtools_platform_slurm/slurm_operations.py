@@ -11,12 +11,9 @@ from datetime import datetime
 from enum import Enum
 from io import BytesIO, StringIO
 from logging import getLogger
-
 from typing import Union
-
 from idmtools.assets import Asset
 from paramiko import SSHClient, SFTP, AutoAddPolicy
-
 from idmtools.core import EntityStatus
 
 logger = getLogger(__name__)
@@ -92,7 +89,6 @@ def _asdict_inner(obj, dict_factory):
         return copy.deepcopy(obj)
 
 
-
 SLURM_STATES = dict(
     BOOT_FAIL=EntityStatus.FAILED,
     CANCELLED=EntityStatus.FAILED,
@@ -109,7 +105,6 @@ SLURM_STATES = dict(
     SUSPENDED=EntityStatus.FAILED,
     TIMEOUT=EntityStatus.FAILED
 )
-
 
 DEFAULT_SIMULATION_BATCH = """#!/bin/bash
 # Create by idm-tools at {now} in {mode}
@@ -206,9 +201,10 @@ class SlurmOperations(ABC):
 
     @abstractmethod
     def create_simulation_batch_file(self, simulation, sim_dir, mail_type=None, mail_user=None, ntasks=None, qos=None,
-                           time=None, nodes=None, ntasks_per_node=None, constraint=None, gres=None, mem=None,
-                           exclusive=None, access=None, partition=None, mem_per_cpu=None, nodelist=None, exclude=None,
-                           requeue=None, modules=None):
+                                     time=None, nodes=None, ntasks_per_node=None, constraint=None, gres=None, mem=None,
+                                     exclusive=None, access=None, partition=None, mem_per_cpu=None, nodelist=None,
+                                     exclude=None,
+                                     requeue=None, modules=None):
 
         pass
 
@@ -219,7 +215,6 @@ class SlurmOperations(ABC):
 
 @dataclass
 class RemoteSlurmOperations(SlurmOperations):
-
     hostname: str
     username: str
     key_file: str
@@ -332,7 +327,7 @@ class LocalSlurmOperations(SlurmOperations):
                 out.write(asset.content)
 
     def create_simulation_batch_file(self, simulation, sim_dir, **kwargs):
-        contents = self.get_batch_contents(simulation, sim_dir, mode='Local',  **kwargs)
+        contents = self.get_batch_contents(simulation, sim_dir, mode='Local', **kwargs)
         contents += "\n"
         contents += f"\nsrun {simulation.experiment.command.cmd}"
         with open(os.path.join(sim_dir, 'submit-simulation.sh'), 'w') as out:
@@ -340,6 +335,7 @@ class LocalSlurmOperations(SlurmOperations):
 
     def submit_job(self, job_file_path, working_directory):
         result = subprocess.check_output(['sbatch', job_file_path], cwd=working_directory)
+        print(result)
         # TODO verify result
 
     def simulation_status(self, simulation):
