@@ -25,4 +25,3 @@ For example to run just docker related tests, you can user
 `pytest -m "docker"`
 
 The local runner tests make
-
