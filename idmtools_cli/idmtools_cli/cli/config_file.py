@@ -33,10 +33,6 @@ def config(ctx, config_path):
      - Add a configuration block
     """
     ctx.ensure_object(dict)
-    print('-' * 30)
-    print(Style.BRIGHT + "idmtools.ini Utility" + Style.NORMAL)
-    print(f"- INI Location: {config_path}")
-    print('-' * 30)
 
     # Create a config parser and read the file if it exist
     # The comment prefixes and allow_no_value is a truck to keep the comments even while editing
@@ -60,7 +56,7 @@ def validate_block_name(context, value):
     value = slugify(value)
     if value in cp.sections():
         secho(f"The {value} block already exists in the selected ini file.", fg="bright_yellow")
-        click.confirm(click.style("Do you want to continue and overwrite the existing block?",fg="bright_yellow"),
+        click.confirm(click.style("Do you want to continue and overwrite the existing block?", fg="bright_yellow"),
                       default=False, abort=True)
 
         # Remove the block from the config parser
@@ -79,7 +75,13 @@ def validate_block_name(context, value):
 @click.option('--platform', default=None, type=click.Choice(AVAILABLE_PLATFORMS.keys()), prompt="Platform type")
 @click.pass_context
 def block(ctx, block_name, platform):
-    secho(f"[{block_name}] block for platform {platform}", fg="bright_white")
+    config_path = ctx.obj['path']
+    print("\n" + Style.BRIGHT + "-" * 50)
+    print("idmtools.ini Utility")
+    print(f"- INI Location: {config_path}")
+    print(f"- Selected block: {block_name}")
+    print(f"- Selected platform: {platform}")
+    print("-" * 50 + Style.NORMAL + "\n")
 
     # Retrieve the platform and its associated fields
     platform_obj = AVAILABLE_PLATFORMS[platform]
@@ -109,9 +111,9 @@ def block(ctx, block_name, platform):
         user_input = click.prompt(field.name, type=prompt_type, default=field_default)
         if user_input != field_default:
             values[field.name] = user_input
+        print()
 
     # Display a validation prompt
-    print("-" * 30)
     print("The following block will be added to the file:")
     longest_param = max(len(p) for p in values)
     block_parameters = "\n".join(f"{param.ljust(longest_param)} = {value}" for param, value in values.items())
@@ -123,7 +125,7 @@ def block(ctx, block_name, platform):
     if click.confirm("Do you want to write this block to the file?", default=True):
         # First re-write the content of the config parser
         cp = ctx.obj["cp"]
-        with open(ctx.obj["path"], 'w') as fp:
+        with open(config_path, 'w') as fp:
             cp.write(fp)
             fp.writelines("\n" + block)
 
