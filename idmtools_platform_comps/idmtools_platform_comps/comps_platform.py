@@ -3,9 +3,13 @@ import copy
 import json
 import logging
 from dataclasses import dataclass, field
+
 # COMPS sometimes messes up our logger so backup handler in case
+from enum import Enum
+
 handlers = [x for x in logging.getLogger().handlers]
 from COMPS import Client
+
 r = logging.getLogger()
 r.handlers = handlers
 from idmtools.core import CacheEnabled, ItemType
@@ -22,7 +26,7 @@ from typing import List
 logger = logging.getLogger(__name__)
 
 
-class COMPSPriority:
+class COMPSPriority(Enum):
     Lowest = "Lowest"
     BelowNormal = "BelowNormal"
     Normal = "Normal"
@@ -44,16 +48,16 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
     MAX_SUBDIRECTORY_LENGTH = 35  # avoid maxpath issues on COMPS
 
-    endpoint: str = field(default="https://comps2.idmod.org")
-    environment: str = field(default="Bayesian")
-    priority: str = field(default=COMPSPriority.Lowest)
-    simulation_root: str = field(default="$COMPS_PATH(USER)\\output")
-    node_group: str = field(default=None)
-    num_retries: int = field(default=0)
-    num_cores: int = field(default=1)
-    max_workers: int = field(default=16)
-    batch_size: int = field(default=10)
-    exclusive: bool = field(default=False)
+    endpoint: str = field(default="https://comps2.idmod.org", metadata={"help": "URL of the COMPS endpoint to use"})
+    environment: str = field(default="Bayesian", metadata={"help": "Name of the COMPS environment to target"})
+    priority: str = field(default=COMPSPriority.Lowest.value, metadata={"help": "Priority of the job", "choices":[p.value for p in COMPSPriority]})
+    simulation_root: str = field(default="$COMPS_PATH(USER)\\output", metadata={"help": "Location of the outputs"})
+    node_group: str = field(default=None, metadata={"help": "Node group to target"})
+    num_retries: int = field(default=0, metadata={"help": "How retries if the simulation fails"})
+    num_cores: int = field(default=1, metadata={"help": "How many cores per simulation"})
+    max_workers: int = field(default=16, metadata={"help": "How many processes to spawn locally"})
+    batch_size: int = field(default=10, metadata={"help": "How many simulations per batch"})
+    exclusive: bool = field(default=False, metadata={"help": "Enable exclusive mode? (one simulation per node on the cluster)"})
     docker_image: str = field(default=None)
 
     _platform_supports: List[PlatformRequirements] = field(default_factory=lambda: copy.deepcopy(supported_types),
