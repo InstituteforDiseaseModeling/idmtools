@@ -19,4 +19,3 @@ def scan_directory(basedir: str, recursive: bool = True) -> Iterable[DirEntry]:
             yield entry
         elif recursive:
             yield from scan_directory(entry.path)
-
