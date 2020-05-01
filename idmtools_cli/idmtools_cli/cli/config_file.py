@@ -10,7 +10,7 @@ from colorama import Fore, Style
 from idmtools.registry.platform_specification import PlatformPlugins
 from idmtools_cli.cli.entrypoint import cli
 
-IGNORED_PLATFORMS = ["Test"]
+IGNORED_PLATFORMS = ["Test", "Slurm"]
 AVAILABLE_PLATFORMS = PlatformPlugins().get_plugin_map()
 for platform in IGNORED_PLATFORMS:
     del AVAILABLE_PLATFORMS[platform]
@@ -26,7 +26,7 @@ FIELD_BLACKLIST = ['platform_type_map', 'supported_types', 'plugin_key', 'docker
 @click.pass_context
 def config(ctx, config_path):
     """
-    Contains commands related to the creation of idmtools.ini for your project.
+    Contains commands related to the creation of idmtools.ini
 
     With the config command, you can :
      - Generate an idmtools.ini file in the current directory
@@ -75,6 +75,14 @@ def validate_block_name(context, value):
 @click.option('--platform', default=None, type=click.Choice(AVAILABLE_PLATFORMS.keys()), prompt="Platform type")
 @click.pass_context
 def block(ctx, block_name, platform):
+    """
+    Command to create/replace a block in the selected idmtools.ini
+
+    Args:
+        ctx: Context containing the path of idmtools.ini and the associated configparser
+        block_name:  Name of the block to create/replace
+        platform:  Selected platform
+    """
     config_path = ctx.obj['path']
     print("\n" + Style.BRIGHT + "-" * 50)
     print("idmtools.ini Utility")
@@ -87,39 +95,49 @@ def block(ctx, block_name, platform):
     platform_obj = AVAILABLE_PLATFORMS[platform]
     fields = dataclasses.fields(platform_obj.get_type())
 
-    # Dictionary to store user choices
+    # Dictionary to store user choices and field defaults
+    # Store both to allow the fields callback functions to access the previous user choices regardless of defaults
     values = {"type": platform}
+    defaults = {}
 
     # Ask about each field
-    for field in fields:
-        # If the field does not include a help text, skip it
-        if "help" not in field.metadata:
-            continue
+    # The field needs to contain a `help` section in the metadata to be considered
+    for field in filter(lambda f: "help" in f.metadata, fields):
 
         # Display the help message
         print(f"{Fore.CYAN}{field.metadata['help']}{Fore.RESET}")
 
+        # Retrieve the metadata
+        md = dict(field.metadata)
+
+        # If a callback exists -> execute it
+        if "callback" in md:
+            md.update(md["callback"](values, field))
+
         # Create the default
-        field_default = field.default if field.default is not None else "None"
+        field_default = md.get("default", field.default if field.default is not None else '')
+        defaults[field.name] = field.default
 
         # Handle the choices if any
-        if "choices" in field.metadata:
-            prompt_type = click.Choice(field.metadata["choices"])
-        else:
-            prompt_type = field.type
+        prompt_type = click.Choice(md["choices"]) if "choices" in md else field.type
 
-        user_input = click.prompt(field.name, type=prompt_type, default=field_default)
-        if user_input != field_default:
-            values[field.name] = user_input
-        print()
+        # Prompt the user and store the answer
+        user_input = click.prompt(field.name, type=prompt_type, default=field_default, prompt_suffix=f": {Fore.GREEN}")
+        values[field.name] = user_input if user_input != "" else None
+        print(Fore.RESET)
+
+    # Remove the default values from the values
+    for k, d in defaults.items():
+        if values[k] == d:
+            del values[k]
 
     # Display a validation prompt
-    print("The following block will be added to the file:")
+    print("The following block will be added to the file:\n")
     longest_param = max(len(p) for p in values)
     block_parameters = "\n".join(f"{param.ljust(longest_param)} = {value}" for param, value in values.items())
     block_headers = f"[{block_name}]"
     block = block_headers + "\n" + block_parameters
-    secho(f"{block}", fg="bright_yellow")
+    secho(f"{block}\n", fg="bright_blue")
 
     # If we decide to go ahead -> write to file
     if click.confirm("Do you want to write this block to the file?", default=True):
@@ -132,3 +150,7 @@ def block(ctx, block_name, platform):
         secho("Block written successfully!", fg="bright_green")
     else:
         secho("Aborted...", fg="bright_red")
+
+
+if __name__ == '__main__':
+    config(["block", '--block_name', 'dsa'])

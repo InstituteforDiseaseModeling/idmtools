@@ -26,7 +26,7 @@ class LocalPlatform(IPlatform):
     Represents the platform allowing to run simulations locally.
     """
 
-    host_data_directory: str = field(default=get_data_directory())
+    host_data_directory: str = field(default=get_data_directory(), metadata={"help": "Where to store the local platform files"})
     network: str = field(default='idmtools')
     redis_image: str = field(default='redis:5.0.4-alpine')
     redis_port: int = field(default=6379)

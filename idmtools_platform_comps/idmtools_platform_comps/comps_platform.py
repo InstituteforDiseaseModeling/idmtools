@@ -7,6 +7,8 @@ from dataclasses import dataclass, field
 # COMPS sometimes messes up our logger so backup handler in case
 from enum import Enum
 
+from idmtools_platform_comps.cli.cli_functions import environment_list
+
 handlers = [x for x in logging.getLogger().handlers]
 from COMPS import Client
 
@@ -49,8 +51,8 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     MAX_SUBDIRECTORY_LENGTH = 35  # avoid maxpath issues on COMPS
 
     endpoint: str = field(default="https://comps2.idmod.org", metadata={"help": "URL of the COMPS endpoint to use"})
-    environment: str = field(default="Bayesian", metadata={"help": "Name of the COMPS environment to target"})
-    priority: str = field(default=COMPSPriority.Lowest.value, metadata={"help": "Priority of the job", "choices":[p.value for p in COMPSPriority]})
+    environment: str = field(default="Bayesian", metadata={"help": "Name of the COMPS environment to target", "callback":environment_list})
+    priority: str = field(default=COMPSPriority.Lowest.value, metadata={"help": "Priority of the job", "choices": [p.value for p in COMPSPriority]})
     simulation_root: str = field(default="$COMPS_PATH(USER)\\output", metadata={"help": "Location of the outputs"})
     node_group: str = field(default=None, metadata={"help": "Node group to target"})
     num_retries: int = field(default=0, metadata={"help": "How retries if the simulation fails"})
