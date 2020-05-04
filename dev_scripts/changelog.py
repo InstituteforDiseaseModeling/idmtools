@@ -50,23 +50,28 @@ for release, contents in release_notes.items():
             if m:
                 issues_to_references[int(m.group(1))] = None
 
+prs = []
+
 # fetch issue details
 for issue in issues_to_references.keys():
     issue_data = gh_repo.get_issue(issue)
     labels = [label.name for label in issue_data.labels]
-    issues_to_references[issue] = issue_data
-    if 'bug' in labels:
-        issue_types[issue] = 'Bugs'
-    elif 'Feature Request' in labels:
-        issue_types[issue] = 'Feature Request'
-    elif 'User Experience' in labels:
-        issue_types[issue] = 'User Experience'
-    elif 'Documentation' in labels:
-        issue_types[issue] = 'Documentation'
-    elif any([x in labels for x in ['Platform support', 'COMPS', 'Local Platform', 'SLURM']]):
-        issue_types[issue] = 'Platforms'
-    elif any([x in labels for x in ['Core', 'CLI', 'Analyzers', 'Workflows']]):
-        issue_types[issue] = 'Core'
+    if issue_data.pull_request is None or issue_data.pull_request.html_url == issue_data.html_url:
+        issues_to_references[issue] = issue_data
+        if 'bug' in labels:
+            issue_types[issue] = 'Bugs'
+        elif 'Feature Request' in labels:
+            issue_types[issue] = 'Feature Request'
+        elif 'User Experience' in labels:
+            issue_types[issue] = 'User Experience'
+        elif 'Documentation' in labels:
+            issue_types[issue] = 'Documentation'
+        elif any([x in labels for x in ['Platform support', 'COMPS', 'Local Platform', 'SLURM']]):
+            issue_types[issue] = 'Platforms'
+        elif any([x in labels for x in ['Core', 'CLI', 'Analyzers', 'Workflows', 'Models', 'Configuration']]):
+            issue_types[issue] = 'Core'
+        elif 'Build/Development Environment' in labels:
+            issue_types[issue] = 'Developer/Test'
 
 print(issues_to_references)
 for release, contents in release_notes.items():
@@ -75,7 +80,7 @@ for release, contents in release_notes.items():
         for message, commits in contents.items():
             m = regex_fix.match(message)
             authors = set([c.author.name.replace("Clinton.Collins", "Clinton Collins") for c in commits])
-            if m:
+            if m and int(m.group(1)) in issues_to_references:
                 cmsg = f'[#{int(m.group(1)):04d}]' \
                        f'(https://github.com/InstituteforDiseaseModeling/idmtools/issues/{int(m.group(1))})' \
                        f' - {issues_to_references[int(m.group(1))].title} by {",".join(authors)}'

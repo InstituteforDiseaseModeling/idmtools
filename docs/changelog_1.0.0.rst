@@ -7,33 +7,18 @@
 Additional Changes
 ------------------
 * [#0104](https://github.com/InstituteforDiseaseModeling/idmtools/issues/104) - Test the fetching of children objects at runtime.  by Benoit Raybaud
-* [#0113](https://github.com/InstituteforDiseaseModeling/idmtools/issues/113) - Create a draft DTKConfigBuilder equivalent  by Benoit Raybaud
 * [#0117](https://github.com/InstituteforDiseaseModeling/idmtools/issues/117) - Create an environment variable to run the COMPS related tests or not by Benoit Raybaud
 * [#0160](https://github.com/InstituteforDiseaseModeling/idmtools/issues/160) - Update tests and add more validations by Sharon Chen
-* [#0212](https://github.com/InstituteforDiseaseModeling/idmtools/issues/212) - Models should be plugins by Clinton Collins
 * [#0220](https://github.com/InstituteforDiseaseModeling/idmtools/issues/220) - Testcase of test_direct_sweep_one_parameter_local in test_python_simulation.py should have fail status by Clinton Collins
 * [#0223](https://github.com/InstituteforDiseaseModeling/idmtools/issues/223) - UnicodeDecodeError for testcases in test_dtk.py when run with LocalPlatform by Clinton Collins
 * [#0237](https://github.com/InstituteforDiseaseModeling/idmtools/issues/237) - Add basic examples how to generate simulations with parameter update and sweep parameters, also add local runner tests by Sharon Chen
-* [#0247](https://github.com/InstituteforDiseaseModeling/idmtools/issues/247) - Fix update config parameters by using get/set functions instead directly call config parameter by Sharon Chen
 * [#0253](https://github.com/InstituteforDiseaseModeling/idmtools/issues/253) - fix failed testcase in test_python_simulation.py after dev fixed loca… by Sharon Chen
-* [#0258](https://github.com/InstituteforDiseaseModeling/idmtools/issues/258) - fix typo from previous checkin by Sharon Chen
-* [#0259](https://github.com/InstituteforDiseaseModeling/idmtools/issues/259) - update setup test script to include create docker network there in case it is not created by Sharon Chen
-* [#0259](https://github.com/InstituteforDiseaseModeling/idmtools/issues/259) - update setup test script to include create docker network there in case it is not created by zdu
 * [#0352](https://github.com/InstituteforDiseaseModeling/idmtools/issues/352) - Current structure of code leads to circular dependencies or classes as modules by Clinton Collins
 * [#0377](https://github.com/InstituteforDiseaseModeling/idmtools/issues/377) - Fix few dtk->emod missing places in current dev by Sharon Chen
-* [#0383](https://github.com/InstituteforDiseaseModeling/idmtools/issues/383) - Add a developer container to run linux on Windows by Clinton Collins
-* [#0392](https://github.com/InstituteforDiseaseModeling/idmtools/issues/392) - Improve IdmConfigParser: make decorator for ensure_ini() method... by zdu
-* [#0396](https://github.com/InstituteforDiseaseModeling/idmtools/issues/396) - fix population analyzer test which failed in linux in bamboo by Sharon Chen
-* [#0538](https://github.com/InstituteforDiseaseModeling/idmtools/issues/538) - Refactor platform interface into subinterfaces by Clinton Collins
-* [#0572](https://github.com/InstituteforDiseaseModeling/idmtools/issues/572) - python 3.7.3 less version will fail for task type changing by Clinton Collins
 * [#0573](https://github.com/InstituteforDiseaseModeling/idmtools/issues/573) - Reorganizing example's folder names by Sharon Chen
-* [#0576](https://github.com/InstituteforDiseaseModeling/idmtools/issues/576) - Fix failed test case with wrong import from previous PR by Sharon Chen
 * [#0577](https://github.com/InstituteforDiseaseModeling/idmtools/issues/577) - Add few more python model examples by Sharon Chen
 * [#0581](https://github.com/InstituteforDiseaseModeling/idmtools/issues/581) - New general purpose analyzers with examples and tests by mfisher-idmod
 * [#0587](https://github.com/InstituteforDiseaseModeling/idmtools/issues/587) - Support SSMT in Idmtools by ZDu-IDM
-* [#0590](https://github.com/InstituteforDiseaseModeling/idmtools/issues/590) - Refactor model to task by Clinton Collins
-* [#0597](https://github.com/InstituteforDiseaseModeling/idmtools/issues/597) - Platform should not be case sensitive. by Clark Kirkman IV
-* [#0603](https://github.com/InstituteforDiseaseModeling/idmtools/issues/603) - implement install custom requirement libs to asset collection with WorkItem by zdu
 * [#0604](https://github.com/InstituteforDiseaseModeling/idmtools/issues/604) - Develop IDMTools docker image for SSMT by Clinton Collins
 * [#0607](https://github.com/InstituteforDiseaseModeling/idmtools/issues/607) - Script to filter sims by ZDu-IDM
 * [#0612](https://github.com/InstituteforDiseaseModeling/idmtools/issues/612) - Ssmt test fix by Sharon Chen
@@ -52,16 +37,21 @@ Bugs
 * [#0170](https://github.com/InstituteforDiseaseModeling/idmtools/issues/170) - tag "type: idmtools_models.python.PythonExperiment" can be missing for same test by Benoit Raybaud
 * [#0184](https://github.com/InstituteforDiseaseModeling/idmtools/issues/184) - Missing 'data' dir for test_experiment_manager test. (TestPlatform) by zdu
 * [#0228](https://github.com/InstituteforDiseaseModeling/idmtools/issues/228) - Fix-194 is still not working for python 3.6 in Linux by Benoit Raybaud
+* [#0247](https://github.com/InstituteforDiseaseModeling/idmtools/issues/247) - Fix update config parameters by using get/set functions instead directly call config parameter by Sharon Chen
+* [#0258](https://github.com/InstituteforDiseaseModeling/idmtools/issues/258) - fix typo from previous checkin by Sharon Chen
 * [#0294](https://github.com/InstituteforDiseaseModeling/idmtools/issues/294) - Docker containers failed to start if they are created but stopped by Clinton Collins
 * [#0304](https://github.com/InstituteforDiseaseModeling/idmtools/issues/304) - Fix issue if failure during start of local platform the spinner continue to spin by Clinton Collins
 * [#0332](https://github.com/InstituteforDiseaseModeling/idmtools/issues/332) - with large number of simulations, local platform either timeout on dramatiq or stuck on persistamceService save method by Clinton Collins
 * [#0386](https://github.com/InstituteforDiseaseModeling/idmtools/issues/386) - Local platfrom cannot create more than 20 simulations in a given experiment by Benoit Raybaud
+* [#0396](https://github.com/InstituteforDiseaseModeling/idmtools/issues/396) - fix population analyzer test which failed in linux in bamboo by Sharon Chen
 * [#0425](https://github.com/InstituteforDiseaseModeling/idmtools/issues/425) - Idmtools should still support old Eradication.exe by Benoit Raybaud
 * [#0426](https://github.com/InstituteforDiseaseModeling/idmtools/issues/426) - Need support to upload Eradication and everything else in same folder by Benoit Raybaud
 * [#0427](https://github.com/InstituteforDiseaseModeling/idmtools/issues/427) - Access to the experiment object in analyzers by Benoit Raybaud
 * [#0455](https://github.com/InstituteforDiseaseModeling/idmtools/issues/455) - Some tests randomly fail in idmtools_core by Clinton Collins
 * [#0458](https://github.com/InstituteforDiseaseModeling/idmtools/issues/458) - There is no way to add custom tags to simulations by zdu
 * [#0465](https://github.com/InstituteforDiseaseModeling/idmtools/issues/465) - BuilderExperiment for sweep "string" is wrong by zdu
+* [#0572](https://github.com/InstituteforDiseaseModeling/idmtools/issues/572) - python 3.7.3 less version will fail for task type changing by Clinton Collins
+* [#0576](https://github.com/InstituteforDiseaseModeling/idmtools/issues/576) - Fix failed test case with wrong import from previous PR by Sharon Chen
 * [#0588](https://github.com/InstituteforDiseaseModeling/idmtools/issues/588) - Running the dev installation in a virtualenv "installs" it globally by Clinton Collins
 * [#0605](https://github.com/InstituteforDiseaseModeling/idmtools/issues/605) - When running multiple analyzers together, 'data' in one analyzer should not contains data from other analyzer by Clark Kirkman IV
 * [#0608](https://github.com/InstituteforDiseaseModeling/idmtools/issues/608) - Can not add custom tag to AssetCollection in idmtools by zdu
@@ -77,11 +67,13 @@ Core
 * [#0081](https://github.com/InstituteforDiseaseModeling/idmtools/issues/81) - Allows the sweeps to be created in arms by zdu
 * [#0084](https://github.com/InstituteforDiseaseModeling/idmtools/issues/84) - Explore different backend for object storage by Clinton Collins
 * [#0091](https://github.com/InstituteforDiseaseModeling/idmtools/issues/91) - Refactor the Experiment/Simulation objects to not persist the simulations by Benoit Raybaud
+* [#0113](https://github.com/InstituteforDiseaseModeling/idmtools/issues/113) - Create a draft DTKConfigBuilder equivalent  by Benoit Raybaud
 * [#0118](https://github.com/InstituteforDiseaseModeling/idmtools/issues/118) - Add the printing of children in the EntityContainer by Benoit Raybaud
 * [#0132](https://github.com/InstituteforDiseaseModeling/idmtools/issues/132) - The Experiment should be able to take a collection of builders instead of single object by zdu
 * [#0141](https://github.com/InstituteforDiseaseModeling/idmtools/issues/141) - Standard Logging throughout tools by Clinton Collins
 * [#0150](https://github.com/InstituteforDiseaseModeling/idmtools/issues/150) - missing pandas package by Benoit Raybaud
 * [#0191](https://github.com/InstituteforDiseaseModeling/idmtools/issues/191) - Create a PlatformFactory by zdu
+* [#0212](https://github.com/InstituteforDiseaseModeling/idmtools/issues/212) - Models should be plugins by Clinton Collins
 * [#0234](https://github.com/InstituteforDiseaseModeling/idmtools/issues/234) - Please add assets parameter to DTKExperiment by zdu
 * [#0235](https://github.com/InstituteforDiseaseModeling/idmtools/issues/235) - Please add update bulk updates for config/campaign parameters to DTKSimulation  by zdu
 * [#0238](https://github.com/InstituteforDiseaseModeling/idmtools/issues/238) - Simulations of Experiment should be made pickle ignored by zdu
@@ -102,18 +94,34 @@ Core
 * [#0370](https://github.com/InstituteforDiseaseModeling/idmtools/issues/370) - Add unit test for deepcopy on simulations by zdu
 * [#0371](https://github.com/InstituteforDiseaseModeling/idmtools/issues/371) - Wrong type for platform_id in IEntity definition by zdu
 * [#0391](https://github.com/InstituteforDiseaseModeling/idmtools/issues/391) - Improve Asset and AssetCollection classes by using @dataclass (field) for clear comparison by zdu
+* [#0392](https://github.com/InstituteforDiseaseModeling/idmtools/issues/392) - Improve IdmConfigParser: make decorator for ensure_ini() method... by zdu
 * [#0394](https://github.com/InstituteforDiseaseModeling/idmtools/issues/394) - Remove the ExperimentPersistService by Clinton Collins
 * [#0449](https://github.com/InstituteforDiseaseModeling/idmtools/issues/449) - Investigate how we can frozen a class instance by zdu
 * [#0518](https://github.com/InstituteforDiseaseModeling/idmtools/issues/518) - Add a task class. by Clinton Collins
 * [#0521](https://github.com/InstituteforDiseaseModeling/idmtools/issues/521) - Create Generic Dictionary Config Task by Clinton Collins
 * [#0524](https://github.com/InstituteforDiseaseModeling/idmtools/issues/524) - Create RTask by Clinton Collins
+* [#0538](https://github.com/InstituteforDiseaseModeling/idmtools/issues/538) - Refactor platform interface into subinterfaces by Clinton Collins
+* [#0590](https://github.com/InstituteforDiseaseModeling/idmtools/issues/590) - Refactor model to task by Clinton Collins
+* [#0597](https://github.com/InstituteforDiseaseModeling/idmtools/issues/597) - Platform should not be case sensitive. by Clark Kirkman IV
 * [#0614](https://github.com/InstituteforDiseaseModeling/idmtools/issues/614) - Convenience function to exclude items in analyze manager by Clark Kirkman IV
 * [#0619](https://github.com/InstituteforDiseaseModeling/idmtools/issues/619) - Ability to get exp sim object ids in analyzers by Clark Kirkman IV
+
+
+Developer/Test
+--------------
+* [#0259](https://github.com/InstituteforDiseaseModeling/idmtools/issues/259) - update setup test script to include create docker network there in case it is not created by Sharon Chen
+* [#0259](https://github.com/InstituteforDiseaseModeling/idmtools/issues/259) - update setup test script to include create docker network there in case it is not created by zdu
+* [#0383](https://github.com/InstituteforDiseaseModeling/idmtools/issues/383) - Add a developer container to run linux on Windows by Clinton Collins
 
 
 Documentation
 -------------
 * [#0312](https://github.com/InstituteforDiseaseModeling/idmtools/issues/312) - idmtools: there is a typo in README by Clinton Collins
+
+
+Feature Request
+---------------
+* [#0603](https://github.com/InstituteforDiseaseModeling/idmtools/issues/603) - implement install custom requirement libs to asset collection with WorkItem by zdu
 
 
 Platforms
