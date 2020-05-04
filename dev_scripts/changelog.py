@@ -74,7 +74,7 @@ for release, contents in release_notes.items():
     if not os.path.exists(release_file):
         for message, commits in contents.items():
             m = regex_fix.match(message)
-            authors = [c.author.name for c in commits]
+            authors = set([c.author.name.replace("Clinton.Collins", "Clinton Collins") for c in commits])
             if m:
                 cmsg = f'[#{int(m.group(1)):04d}]' \
                        f'(https://github.com/InstituteforDiseaseModeling/idmtools/issues/{int(m.group(1))})' \

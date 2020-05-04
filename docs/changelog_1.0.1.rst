@@ -1,3 +1,4 @@
+
 =====
 1.0.1
 =====
@@ -14,7 +15,6 @@ Bugs
 * [#0625](https://github.com/InstituteforDiseaseModeling/idmtools/issues/625) - too much print out from analyzer in console by Clinton Collins
 * [#0643](https://github.com/InstituteforDiseaseModeling/idmtools/issues/643) - "pymake ssmt-image-local" in idmtools_platform_comps not working by Clinton Collins
 * [#0663](https://github.com/InstituteforDiseaseModeling/idmtools/issues/663) - SSMT PlatformAnalysis can not put 2 analyzers in same file as main entry by zdu
-* [#0663](https://github.com/InstituteforDiseaseModeling/idmtools/issues/663) - SSMT PlatformAnalysis can not put 2 analyzers in same file as main entry by zdu,zdu
 * [#0696](https://github.com/InstituteforDiseaseModeling/idmtools/issues/696) - Rename num_retires to num_retries on COMPS Platform by zdu
 * [#0702](https://github.com/InstituteforDiseaseModeling/idmtools/issues/702) - Can not analyzer workitem by zdu
 * [#0739](https://github.com/InstituteforDiseaseModeling/idmtools/issues/739) - Make it where you can run without a logging block by Clinton Collins
@@ -28,7 +28,7 @@ Bugs
 Core
 ----
 * [#0611](https://github.com/InstituteforDiseaseModeling/idmtools/issues/611) - Consider exluding idmtools.log and COMPS_log.log on SSMT WI submission by zdu
-* [#0737](https://github.com/InstituteforDiseaseModeling/idmtools/issues/737) - Remove standalone builder in favor of regular python by Clinton Collins,Clinton Collins
+* [#0737](https://github.com/InstituteforDiseaseModeling/idmtools/issues/737) - Remove standalone builder in favor of regular python by Clinton Collins
 * [#0778](https://github.com/InstituteforDiseaseModeling/idmtools/issues/778) - Add support for context platforms to analyzer manager by Clinton Collins
 
 

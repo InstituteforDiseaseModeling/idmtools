@@ -1,3 +1,4 @@
+
 =====
 1.0.0
 =====
@@ -24,7 +25,7 @@ Additional Changes
 * [#0392](https://github.com/InstituteforDiseaseModeling/idmtools/issues/392) - Improve IdmConfigParser: make decorator for ensure_ini() method... by zdu
 * [#0396](https://github.com/InstituteforDiseaseModeling/idmtools/issues/396) - fix population analyzer test which failed in linux in bamboo by Sharon Chen
 * [#0538](https://github.com/InstituteforDiseaseModeling/idmtools/issues/538) - Refactor platform interface into subinterfaces by Clinton Collins
-* [#0572](https://github.com/InstituteforDiseaseModeling/idmtools/issues/572) - python 3.7.3 less version will fail for task type changing by Clinton Collins,Clinton Collins
+* [#0572](https://github.com/InstituteforDiseaseModeling/idmtools/issues/572) - python 3.7.3 less version will fail for task type changing by Clinton Collins
 * [#0573](https://github.com/InstituteforDiseaseModeling/idmtools/issues/573) - Reorganizing example's folder names by Sharon Chen
 * [#0576](https://github.com/InstituteforDiseaseModeling/idmtools/issues/576) - Fix failed test case with wrong import from previous PR by Sharon Chen
 * [#0577](https://github.com/InstituteforDiseaseModeling/idmtools/issues/577) - Add few more python model examples by Sharon Chen
@@ -33,7 +34,6 @@ Additional Changes
 * [#0590](https://github.com/InstituteforDiseaseModeling/idmtools/issues/590) - Refactor model to task by Clinton Collins
 * [#0597](https://github.com/InstituteforDiseaseModeling/idmtools/issues/597) - Platform should not be case sensitive. by Clark Kirkman IV
 * [#0603](https://github.com/InstituteforDiseaseModeling/idmtools/issues/603) - implement install custom requirement libs to asset collection with WorkItem by zdu
-* [#0603](https://github.com/InstituteforDiseaseModeling/idmtools/issues/603) - implement install custom requirement libs to asset collection with WorkItem by zdu,zdu
 * [#0604](https://github.com/InstituteforDiseaseModeling/idmtools/issues/604) - Develop IDMTools docker image for SSMT by Clinton Collins
 * [#0607](https://github.com/InstituteforDiseaseModeling/idmtools/issues/607) - Script to filter sims by ZDu-IDM
 * [#0612](https://github.com/InstituteforDiseaseModeling/idmtools/issues/612) - Ssmt test fix by Sharon Chen
@@ -76,14 +76,12 @@ Core
 ----
 * [#0081](https://github.com/InstituteforDiseaseModeling/idmtools/issues/81) - Allows the sweeps to be created in arms by zdu
 * [#0084](https://github.com/InstituteforDiseaseModeling/idmtools/issues/84) - Explore different backend for object storage by Clinton Collins
-* [#0084](https://github.com/InstituteforDiseaseModeling/idmtools/issues/84) - Explore different backend for object storage by Clinton.Collins
-* [#0091](https://github.com/InstituteforDiseaseModeling/idmtools/issues/91) - Refactor the Experiment/Simulation objects to not persist the simulations by Benoit Raybaud,Benoit Raybaud
+* [#0091](https://github.com/InstituteforDiseaseModeling/idmtools/issues/91) - Refactor the Experiment/Simulation objects to not persist the simulations by Benoit Raybaud
 * [#0118](https://github.com/InstituteforDiseaseModeling/idmtools/issues/118) - Add the printing of children in the EntityContainer by Benoit Raybaud
 * [#0132](https://github.com/InstituteforDiseaseModeling/idmtools/issues/132) - The Experiment should be able to take a collection of builders instead of single object by zdu
 * [#0141](https://github.com/InstituteforDiseaseModeling/idmtools/issues/141) - Standard Logging throughout tools by Clinton Collins
 * [#0150](https://github.com/InstituteforDiseaseModeling/idmtools/issues/150) - missing pandas package by Benoit Raybaud
 * [#0191](https://github.com/InstituteforDiseaseModeling/idmtools/issues/191) - Create a PlatformFactory by zdu
-* [#0191](https://github.com/InstituteforDiseaseModeling/idmtools/issues/191) - Create a PlatformFactory by zdu,zdu
 * [#0234](https://github.com/InstituteforDiseaseModeling/idmtools/issues/234) - Please add assets parameter to DTKExperiment by zdu
 * [#0235](https://github.com/InstituteforDiseaseModeling/idmtools/issues/235) - Please add update bulk updates for config/campaign parameters to DTKSimulation  by zdu
 * [#0238](https://github.com/InstituteforDiseaseModeling/idmtools/issues/238) - Simulations of Experiment should be made pickle ignored by zdu
@@ -92,25 +90,21 @@ Core
 * [#0252](https://github.com/InstituteforDiseaseModeling/idmtools/issues/252) - Add --debug to cli main level by Clinton Collins
 * [#0257](https://github.com/InstituteforDiseaseModeling/idmtools/issues/257) - CsvExperimentBuilder does not handle csv field with empty space by zdu
 * [#0268](https://github.com/InstituteforDiseaseModeling/idmtools/issues/268) - demographics filenames should be loaded to asset collection by zdu
-* [#0268](https://github.com/InstituteforDiseaseModeling/idmtools/issues/268) - demographics filenames should be loaded to asset collection by zdu,zdu
 * [#0281](https://github.com/InstituteforDiseaseModeling/idmtools/issues/281) - Improve Platform to display selected Block info when creating a platform by zdu
 * [#0282](https://github.com/InstituteforDiseaseModeling/idmtools/issues/282) - Add unit and basic end-to-end tests for AnalyzeManager class by ckirkman-IDM
 * [#0297](https://github.com/InstituteforDiseaseModeling/idmtools/issues/297) - Fix issues with platform factory by zdu
 * [#0307](https://github.com/InstituteforDiseaseModeling/idmtools/issues/307) - idmtools: Packages names should be consistent by Clinton Collins
 * [#0315](https://github.com/InstituteforDiseaseModeling/idmtools/issues/315) - Basic support of suite in the tools by zdu
-* [#0315](https://github.com/InstituteforDiseaseModeling/idmtools/issues/315) - Basic support of suite in the tools by zdu,zdu
 * [#0358](https://github.com/InstituteforDiseaseModeling/idmtools/issues/358) - Improve Constructor of IExperiment by zdu
 * [#0362](https://github.com/InstituteforDiseaseModeling/idmtools/issues/362) - base_simulation in Experiment should be made "pickle-ignore" by zdu
 * [#0368](https://github.com/InstituteforDiseaseModeling/idmtools/issues/368) - PersistService should support clear() method by zdu
 * [#0369](https://github.com/InstituteforDiseaseModeling/idmtools/issues/369) - The method create_simulations of Experiment should consider pre-defined max_workers and batch_size in idmtools.ini by zdu
-* [#0369](https://github.com/InstituteforDiseaseModeling/idmtools/issues/369) - The method create_simulations of Experiment should consider pre-defined max_workers and batch_size in idmtools.ini by zdu,zdu
 * [#0370](https://github.com/InstituteforDiseaseModeling/idmtools/issues/370) - Add unit test for deepcopy on simulations by zdu
 * [#0371](https://github.com/InstituteforDiseaseModeling/idmtools/issues/371) - Wrong type for platform_id in IEntity definition by zdu
 * [#0391](https://github.com/InstituteforDiseaseModeling/idmtools/issues/391) - Improve Asset and AssetCollection classes by using @dataclass (field) for clear comparison by zdu
 * [#0394](https://github.com/InstituteforDiseaseModeling/idmtools/issues/394) - Remove the ExperimentPersistService by Clinton Collins
 * [#0449](https://github.com/InstituteforDiseaseModeling/idmtools/issues/449) - Investigate how we can frozen a class instance by zdu
 * [#0518](https://github.com/InstituteforDiseaseModeling/idmtools/issues/518) - Add a task class. by Clinton Collins
-* [#0518](https://github.com/InstituteforDiseaseModeling/idmtools/issues/518) - Add a task class. by Clinton Collins,Clinton Collins
 * [#0521](https://github.com/InstituteforDiseaseModeling/idmtools/issues/521) - Create Generic Dictionary Config Task by Clinton Collins
 * [#0524](https://github.com/InstituteforDiseaseModeling/idmtools/issues/524) - Create RTask by Clinton Collins
 * [#0614](https://github.com/InstituteforDiseaseModeling/idmtools/issues/614) - Convenience function to exclude items in analyze manager by Clark Kirkman IV
@@ -125,7 +119,6 @@ Documentation
 Platforms
 ---------
 * [#0072](https://github.com/InstituteforDiseaseModeling/idmtools/issues/72) - [Local Runner] Cancelling capabilities by Clinton Collins
-* [#0072](https://github.com/InstituteforDiseaseModeling/idmtools/issues/72) - [Local Runner] Cancelling capabilities by Clinton Collins,Clinton Collins,Clinton Collins,Clinton Collins,Clinton Collins,Clinton Collins,Clinton Collins,Clinton Collins,Clinton Collins,Clinton Collins,Clinton Collins
 * [#0094](https://github.com/InstituteforDiseaseModeling/idmtools/issues/94) - Batch and parallelize simulation creation in the COMPSPlatform by Benoit Raybaud
 * [#0122](https://github.com/InstituteforDiseaseModeling/idmtools/issues/122) - Ability to create an AssetCollection based on a COMPS asset collection id by Clinton Collins
 * [#0130](https://github.com/InstituteforDiseaseModeling/idmtools/issues/130) - User configuration and data storage location by Clinton Collins
@@ -135,7 +128,7 @@ Platforms
 * [#0310](https://github.com/InstituteforDiseaseModeling/idmtools/issues/310) - idmtools: make use field in LocalPlatform definition by Benoit Raybaud
 * [#0316](https://github.com/InstituteforDiseaseModeling/idmtools/issues/316) - Integrate website with Local Runner Container by Clinton Collins
 * [#0405](https://github.com/InstituteforDiseaseModeling/idmtools/issues/405) - Support analysis of data from Work Items in Analyze Manager by zdu
-* [#0635](https://github.com/InstituteforDiseaseModeling/idmtools/issues/635) - Update SSMT base image by Clinton Collins,Clinton Collins,Clinton Collins,Clinton Collins,Clinton Collins
+* [#0635](https://github.com/InstituteforDiseaseModeling/idmtools/issues/635) - Update SSMT base image by Clinton Collins
 * [#0639](https://github.com/InstituteforDiseaseModeling/idmtools/issues/639) - Add a way for the python_requirements_ac to use additional wheel file by zdu
 
 
