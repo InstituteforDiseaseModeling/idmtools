@@ -9,7 +9,7 @@ import pygit2
 if os.getenv('GIT_TOKEN') is None and len(sys.argv) != 2:
     print('You must specify GIT_TOKEN through argument or environment variable GIT_TOKEN')
     sys.exit(-1)
-gh = Github(os.getenv('GIT_TOKEN', sys.argv[2]))
+gh = Github(os.getenv('GIT_TOKEN', sys.argv[1]))
 gh_repo = gh.get_repo("InstituteforDiseaseModeling/idmtools")
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 repo = pygit2.Repository(BASE_DIR)
@@ -99,7 +99,7 @@ section_template = '''
 final_out = ''
 for release, contents in release_notes_final.items():
     release_file = os.path.join(DOCS_DIR, f'changelog_{release}.rst')
-    if not os.path.exists(release_file):
+    if not os.path.exists(release_file) and release != 'Development':
         final_out = release_templates.format(**dict(release=release, release_under='=' * len(release)))
         scontents = sorted(contents.keys())
         for section in scontents:
@@ -116,8 +116,10 @@ with open(cl_name, 'w') as out:
     out.write("=========\n")
     out.write("Changelog\n")
     out.write("=========\n")
+    out.write("\n.. toctree::\n\n")
     files = sorted(list(glob.glob(os.path.join(DOCS_DIR, 'changelog_*.rst'))))
     for file in files:
         rf = release_expr.match(file)
-        fn = rf.group(1)[0:-1]
-        out.write(f'* :doc:`changelog_{fn}`\n')
+        if rf:
+            fn = rf.group(1)[0:-1]
+            out.write(f'    changelog_{fn}\n')
