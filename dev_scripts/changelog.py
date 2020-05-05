@@ -54,14 +54,6 @@ release_notes_final = defaultdict(lambda: defaultdict(list))
 regex_fix = re.compile(r'.*?#([0-9]+).*?')
 issues_to_references = dict()
 issue_types = dict()
-for release, contents in release_notes.items():
-    if not os.path.exists(os.path.join(DOCS_DIR, f'changelog_{release}.rst')):
-        for message, commits in contents.items():
-            m = regex_fix.match(message)
-            if m:
-                issues_to_references[int(m.group(1))] = None
-
-prs = []
 
 
 def get_issue_type(issue, labels):
