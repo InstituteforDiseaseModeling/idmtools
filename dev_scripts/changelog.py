@@ -80,9 +80,11 @@ def get_issue_type(issue, labels):
         issue_types[issue] = 'Analyzers'
     elif 'Configuration' in labels:
         issue_types[issue] = 'Configuration'
+    elif 'CLI' in labels:
+        issue_types[issue] = 'CLI'
     elif any([x in labels for x in ['Models', 'COVID-19']]):
         issue_types[issue] = 'Models'
-    elif any([x in labels for x in ['Core', 'CLI', 'Workflows', 'Architecture']]):
+    elif any([x in labels for x in ['Core', 'Workflows', 'Architecture']]):
         issue_types[issue] = 'Core'
     elif any([x in labels for x in ['Build/Development Environment', 'Test']]):
         issue_types[issue] = 'Developer/Test'
