@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from logging import getLogger
 import pluggy
-from typing import List, Union
+from typing import List, Union, Dict
 
 PLUGIN_REFERENCE_NAME = 'idmtools_plugins'
 get_description_spec = pluggy.HookspecMarker(PLUGIN_REFERENCE_NAME)
@@ -80,3 +80,12 @@ class PluginSpecification:
             List of urls
         """
         return list()
+
+    def get_help_urls(self) -> Dict[str, str]:
+        """
+        Returns a dictionary of topics and links to help
+
+        Returns:
+
+        """
+        return dict()
