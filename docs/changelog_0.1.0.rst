@@ -1,3 +1,4 @@
+
 =====
 0.1.0
 =====
@@ -17,10 +18,11 @@ Bugs
 * `#0115 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/115>`_ - `PythonSimulation` constructor should abstract the `parameters` dict
 * `#0124 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/124>`_ - Can not run tests\test_python_simulation.py from console
 * `#0125 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/125>`_ - relative_path for AssetCollection does not work
+* `#0126 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/126>`_ - Same test in issue #125 does not working for localPlatform
 * `#0129 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/129>`_ - new python model root node changed from "config" to "parameters"
 * `#0137 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/137>`_ - PythonExperiment fails if pass assets 
 * `#0138 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/138>`_ - test_sir.py does not set parameter
-* `#0142 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/142>`_ - experiment.batch_simulations seems not doing batch
+* `#0142 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/142>`_ - experiment.batch_simulations seems not to be batching
 * `#0143 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/143>`_ - COMPSPlatform's refresh_experiment_status() get called too much from ExperimentManager's wait_till_done() mathod
 * `#0150 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/150>`_ - missing pandas package
 * `#0151 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/151>`_ - log throw error from IPersistanceService.py's save method
@@ -45,6 +47,7 @@ Configuration
 
 Core
 ----
+* `#0006 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/6>`_ - Service catalog
 * `#0014 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/14>`_ - Package organization and pre-requisites
 * `#0081 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/81>`_ - Allows the sweeps to be created in arms
 * `#0087 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/87>`_ - Raise an exception if we have 2 files with the same relative path in the asset collection
@@ -59,12 +62,14 @@ Core
 
 Documentation
 -------------
+* `#0004 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/4>`_ - Notebooks exploration for examples
 * `#0085 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/85>`_ - Setup Sphinx and GitHub pages for the docs
 * `#0090 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/90>`_ - "Development installation steps" missing some steps
 
 
 Models
 ------
+* `#0008 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/8>`_ - Which models support out of the box?
 * `#0136 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/136>`_ - Create an envelope argument for the PythonSimulation 
 
 
