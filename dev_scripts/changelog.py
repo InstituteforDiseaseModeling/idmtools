@@ -121,22 +121,9 @@ for release, contents in release_notes.items():
     release_file = os.path.join(DOCS_DIR, f'changelog_{release}.rst')
     for message, commits in contents.items():
         m = regex_fix.match(message)
-        if isinstance(commits[0], Issue):
-            authors = []
-            retries = 0
-            if commits[0].assignee is None:
-                continue
-            while retries < 3:
-                try:
-                    authors = [commits[0].assignee.name if commits[0].assignee.name else commits[0].assignee.login]
-                    break
-                except:  # noqa: E722
-                    retries += 1
-        else:
-            authors = set([c.author.name.replace("Clinton.Collins", "Clinton Collins") for c in commits])
         if m and int(m.group(1)) in issues_to_references and issues_to_references[int(m.group(1))] is not None:
             cmsg = f'`#{int(m.group(1)):04d} ' \
-                   f'https://github.com/InstituteforDiseaseModeling/idmtools/issues/{int(m.group(1))}`' \
+                   f'<https://github.com/InstituteforDiseaseModeling/idmtools/issues/{int(m.group(1))}>`_' \
                    f' - {issues_to_references[int(m.group(1))].title}'
             if int(m.group(1)) in issue_types:
                 release_notes_final[release][issue_types[int(m.group(1))]].append(cmsg)
