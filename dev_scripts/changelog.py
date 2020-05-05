@@ -91,15 +91,17 @@ def get_issue_type(issue, labels):
 
 
 # fetch issue details
+exclude_labels = ['Research', 'wontfix', 'Discuss', 'duplicate', 'Exclude from Changelog', 'Epic', 'Release/Packaging']
 for issue in issues_to_references.keys():
     issue_data = gh_repo.get_issue(issue)
     labels = [label.name for label in issue_data.labels]
-    if issue_data.pull_request is None or issue_data.pull_request.html_url != issue_data.html_url:
+    if (issue_data.pull_request is None or issue_data.pull_request.html_url != issue_data.html_url) \
+            and not any(x in labels for x in exclude_labels):
         issues_to_references[issue] = issue_data
         get_issue_type(issue, labels)
 
 # fetch rest of issues
-exclude_labels = ['Research', 'wontfix', 'Discuss', 'duplicate', 'Exclude from Changelog', 'Epic', 'Release/Packaging']
+
 for issue in gh_repo.get_issues(state='closed'):
     if issue.number not in issues_to_references:
         for release, vals in release_ranges.items():
@@ -132,7 +134,7 @@ for release, contents in release_notes.items():
                     retries += 1
         else:
             authors = set([c.author.name.replace("Clinton.Collins", "Clinton Collins") for c in commits])
-        if m and int(m.group(1)) in issues_to_references and issues_to_references[int(m.group(1))]:
+        if m and int(m.group(1)) in issues_to_references and issues_to_references[int(m.group(1))] is not None:
             cmsg = f'`#{int(m.group(1)):04d} ' \
                    f'https://github.com/InstituteforDiseaseModeling/idmtools/issues/{int(m.group(1))}`' \
                    f' - {issues_to_references[int(m.group(1))].title}'
