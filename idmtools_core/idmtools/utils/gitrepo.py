@@ -1,23 +1,11 @@
 import os
 import sys
 import json
-import shutil
 import urllib
-
-import re
 import urllib.request
 import signal
 import argparse
 from colorama import Fore, Style, init
-
-import github3
-from getpass import getpass
-
-"""
-https://github.com/dustin/py-github/tree/master/github
-
-https://api.github.com/repos/dustin/py-github/contents/github?ref=master
-"""
 
 
 class GitRepo:
@@ -32,10 +20,6 @@ class GitRepo:
 
     REPO_OWNER = 'InstituteforDiseaseModeling'
     REPO_NAME = 'idmtools'
-    TOKEN_FILE = '.token.txt'
-    AUTH_TOKEN = None  # allows subclasses to bypass interactive login if overridden
-
-    # AUTH_TOKEN = '2698a4397820dfdcb898592f5e50362977211981'
 
     def __init__(self, repo_owner=None, repo_name=None):
         self.repo_owner = repo_owner or self.REPO_OWNER
@@ -92,7 +76,6 @@ class GitRepo:
             # bring the cursor to the beginning, erase the current line, and dont make a new line
             # print_text("✘ Got interrupted", "red", in_place=True)
             sys.exit()
-
 
         # make a directory with the name which is taken from
         # the actual repo
@@ -161,16 +144,8 @@ class GitRepo:
 
 
 def demo1():
-    # url = 'https://github.com/dustin/py-github'     # not working
-    url = 'https://github.com/dustin/py-github/tree/master/github'  # working
-    # url = 'https://github.com/InstituteforDiseaseModeling/idmtools/tree/master/examples/load_lib'   # 404 Not Found
-
-    flatten = False
-    output_dir = 'C:\Temp\Temp'
-
     gr = GitRepo('dustin', 'py-github')
-
-    total_files = gr.download(path_to_repo='github', output_dir=output_dir, flatten=False, )
+    total_files = gr.download(path_to_repo='github', output_dir='C:\Temp\Temp')
 
     # print_text("✔ Download complete", "green", in_place=True)
     print("✔ Download complete")
