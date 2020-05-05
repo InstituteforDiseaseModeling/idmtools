@@ -55,6 +55,5 @@ Platforms
 
 User Experience
 ---------------
-* [#0743](https://github.com/InstituteforDiseaseModeling/idmtools/issues/743) - 625 too much console by Clinton Collins
 * [#0781](https://github.com/InstituteforDiseaseModeling/idmtools/issues/781) - Suites should support run on object by Clinton Collins
 * [#0787](https://github.com/InstituteforDiseaseModeling/idmtools/issues/787) - idmtools should print experiment id by default in console by Clinton Collins

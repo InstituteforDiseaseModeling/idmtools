@@ -56,7 +56,7 @@ prs = []
 for issue in issues_to_references.keys():
     issue_data = gh_repo.get_issue(issue)
     labels = [label.name for label in issue_data.labels]
-    if issue_data.pull_request is None or issue_data.pull_request.html_url == issue_data.html_url:
+    if issue_data.pull_request is None or issue_data.pull_request.html_url != issue_data.html_url:
         issues_to_references[issue] = issue_data
         if 'bug' in labels:
             issue_types[issue] = 'Bugs'
@@ -70,7 +70,7 @@ for issue in issues_to_references.keys():
             issue_types[issue] = 'Platforms'
         elif any([x in labels for x in ['Core', 'CLI', 'Analyzers', 'Workflows', 'Models', 'Configuration']]):
             issue_types[issue] = 'Core'
-        elif 'Build/Development Environment' in labels:
+        elif any([x in labels for x in ['Build/Development Environment', 'Test']]):
             issue_types[issue] = 'Developer/Test'
 
 print(issues_to_references)
@@ -80,7 +80,7 @@ for release, contents in release_notes.items():
         for message, commits in contents.items():
             m = regex_fix.match(message)
             authors = set([c.author.name.replace("Clinton.Collins", "Clinton Collins") for c in commits])
-            if m and int(m.group(1)) in issues_to_references:
+            if m and int(m.group(1)) in issues_to_references and issues_to_references[int(m.group(1))]:
                 cmsg = f'[#{int(m.group(1)):04d}]' \
                        f'(https://github.com/InstituteforDiseaseModeling/idmtools/issues/{int(m.group(1))})' \
                        f' - {issues_to_references[int(m.group(1))].title} by {",".join(authors)}'
