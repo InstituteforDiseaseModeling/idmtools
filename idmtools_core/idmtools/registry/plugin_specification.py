@@ -106,4 +106,4 @@ class PluginSpecification:
         Returns:
             URL for item
         """
-        return f'{repo_base_url}{nightly_branch if "nightly" in version else version[0:5]}/{extra}'
+        return f'{repo_base_url}{nightly_branch if "nightly" in version else version[0:6]}/{extra}'
