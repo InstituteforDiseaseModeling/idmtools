@@ -126,7 +126,7 @@ for release, contents in release_notes.items():
                 try:
                     authors = [commits[0].assignee.name if commits[0].assignee.name else commits[0].assignee.login]
                     break
-                except:
+                except:  # noqa: E722
                     retries += 1
         else:
             authors = set([c.author.name.replace("Clinton.Collins", "Clinton Collins") for c in commits])
