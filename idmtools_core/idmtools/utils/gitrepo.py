@@ -1,7 +1,6 @@
 import os
 import sys
 import json
-import urllib
 import urllib.request
 import signal
 import argparse
@@ -9,12 +8,6 @@ from colorama import Fore, Style, init
 
 
 class GitRepo:
-    class BadCredentials(Exception):
-        pass
-
-    class AuthorizationError(Exception):
-        pass
-
     class UnknownRepository(Exception):
         pass
 
@@ -52,7 +45,7 @@ class GitRepo:
         else:
             return [r['full_name'] for r in repo_list]
 
-    def download(self, path_to_repo='./', branch='master', output_dir="./"):
+    def download(self, path_to_repo='./', output_dir="./", branch='master'):
         """ Downloads the files and directories in repo_url. If flatten is specified, the contents of any and all
          sub-directories will be pulled upwards into the root folder. """
 
@@ -61,7 +54,6 @@ class GitRepo:
 
         # generate the url which returns the JSON data
         api_url = self.api_path
-        download_dirs = self._path_to_repo
 
         # To handle file names.
         dir_out = output_dir
@@ -110,8 +102,6 @@ class GitRepo:
 
             for file in data:
                 file_url = file["download_url"]
-                file_name = file["name"]
-
                 path = file["path"]
 
                 # os.makedirs(os.path.dirname(path), exist_ok=True)   # zdu: bug: not consider dir_out
@@ -138,7 +128,7 @@ class GitRepo:
                         # print_text("✘ Got interrupted", 'red', in_place=False)
                         sys.exit()
                 else:
-                    self.download(path, branch, dir_out)
+                    self.download(path, dir_out, branch)
 
         return total_files
 
