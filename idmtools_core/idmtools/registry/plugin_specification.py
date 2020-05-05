@@ -71,3 +71,12 @@ class PluginSpecification:
 
         """
         return list()
+
+    def get_example_urls(self) -> List[str]:
+        """
+        Returns a list of URLs that a series of Examples for plugin can be downloaded from
+
+        Returns:
+            List of urls
+        """
+        return list()
