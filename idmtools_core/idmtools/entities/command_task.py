@@ -44,3 +44,6 @@ class CommandTaskSpecification(TaskSpecification):
 
     def get_description(self) -> str:
         return "Defines a general command that provides user hooks. Intended for use in advanced scenarios"
+
+    def get_example_urls(self) -> List[str]:
+        return ['https://github.com/InstituteforDiseaseModeling/corvid-idmtools']
