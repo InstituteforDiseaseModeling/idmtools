@@ -131,9 +131,9 @@ for release, contents in release_notes.items():
         else:
             authors = set([c.author.name.replace("Clinton.Collins", "Clinton Collins") for c in commits])
         if m and int(m.group(1)) in issues_to_references and issues_to_references[int(m.group(1))]:
-            cmsg = f'[#{int(m.group(1)):04d}]' \
-                   f'(https://github.com/InstituteforDiseaseModeling/idmtools/issues/{int(m.group(1))})' \
-                   f' - {issues_to_references[int(m.group(1))].title} by {",".join(authors)}'
+            cmsg = f'`#{int(m.group(1)):04d} ' \
+                   f'https://github.com/InstituteforDiseaseModeling/idmtools/issues/{int(m.group(1))}`' \
+                   f' - {issues_to_references[int(m.group(1))].title}'
             if int(m.group(1)) in issue_types:
                 release_notes_final[release][issue_types[int(m.group(1))]].append(cmsg)
             else:
