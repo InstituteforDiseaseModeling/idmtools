@@ -3,7 +3,7 @@ import subprocess
 import tempfile
 from dataclasses import dataclass, field
 from logging import getLogger
-from typing import Set
+from typing import Set, List
 
 from idmtools.assets import Asset, AssetCollection
 from idmtools.entities import CommandLine
@@ -115,3 +115,8 @@ class PythonTaskSpecification(TaskSpecification):
 
     def get_description(self) -> str:
         return "Defines a python script command"
+
+    def get_example_urls(self) -> List[str]:
+        from idmtools_models import __version__
+        examples = [f'examples/{example}' for example in ['load_lib']]
+        return [self.get_version_url(__version__, x) for x in examples]

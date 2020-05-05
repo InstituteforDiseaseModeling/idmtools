@@ -89,3 +89,21 @@ class PluginSpecification:
 
         """
         return dict()
+
+    @staticmethod
+    def get_version_url(version: str, extra: str = None,
+                        repo_base_url: str = 'https://github.com/InstituteforDiseaseModeling/idmtools/tree/',
+                        nightly_branch: str = 'dev'):
+        """
+        Build a url using version
+
+        Here we assume the tag will exist for that specific version
+        Args:
+            version: Version to look up. If it contains nightly, we default to nightly_branch
+            extra: Extra parts of url pass base
+            repo_base_url: Optional url
+            nightly_branch: default to dev
+        Returns:
+            URL for item
+        """
+        return f'{repo_base_url}{nightly_branch if "nightly" in version else version[0:5]}/{extra}'
