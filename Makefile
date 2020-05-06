@@ -22,7 +22,7 @@ clean-all: ## Clean all our jobs
 
 setup-dev:  ## Setup packages in dev mode
 	python dev_scripts/bootstrap.py
-	$(PDR) -w idmtools_platform_local -ex 'pymake docker-local'
+	$(PDR) -w idmtools_platform_local -ex 'pymake docker'
 
 lint: ## check style with flake8
 	flake8 --ignore=E501,W291 --exclude="examples/**,workflow/**,docs/**,*/tests/**,idmtools_test/**"
