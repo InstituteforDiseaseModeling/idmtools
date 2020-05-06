@@ -21,9 +21,22 @@ logger = getLogger(__name__)
 class ExperimentPluginSpecification(PluginSpecification, ABC):
 
     @classmethod
-    def get_name(cls) -> str:
-        return cls.__name__.replace('ExperimentPluginSpecification', '').replace("ExperimentPluginSpec", '') \
-            .replace('PluginSpecification', '').replace('PluginSpec', '').replace('Specification', '')
+    def get_name(cls, strip_all: bool = True) -> str:
+        """
+        Get name of plugin. By default we remove the PlatformSpecification portion.
+        Args:
+            strip_all: When true, ExperimentPluginSpecification and ExperimentPluginSpec is stripped from name.
+             When false only  Specification and Spec is Stripped
+
+        Returns:
+
+        """
+        if strip_all:
+            ret = cls.__name__.replace('ExperimentPluginSpecification', '').replace("ExperimentPluginSpec", '').replace(
+                'Spec', '')
+        else:
+            ret = cls.__name__.replace('Specification', '').replace('Spec', '')
+        return ret
 
     @get_model_spec
     def get(self, configuration: dict) -> 'Experiment':  # noqa: F821
@@ -44,9 +57,15 @@ class ExperimentPluginSpecification(PluginSpecification, ABC):
 
 
 class ExperimentPlugins:
-    def __init__(self) -> None:
+    def __init__(self, strip_all: bool = True) -> None:
+        """
+        Initialize the Experiment Registry. When strip all is false, the full plugin name will be used for names in map
+
+        Args:
+            strip_all: Whether to strip common parts of name from plugins in plugin map
+        """
         self._plugins = typing.cast(typing.Dict[str, ExperimentPluginSpecification],
-                                    load_plugin_map('idmtools_experiment', ExperimentPluginSpecification))
+                                    load_plugin_map('idmtools_experiment', ExperimentPluginSpecification, strip_all))
 
     def get_plugins(self) -> typing.Set[ExperimentPluginSpecification]:
         return set(self._plugins.values())

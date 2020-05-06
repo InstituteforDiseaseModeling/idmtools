@@ -21,8 +21,21 @@ logger = getLogger(__name__)
 class TaskSpecification(PluginSpecification, ABC):
 
     @classmethod
-    def get_name(cls) -> str:
-        return cls.__name__.replace('TaskSpecification', '').replace("TaskSpec", '').replace('Spec', '')
+    def get_name(cls, strip_all: bool = True) -> str:
+        """
+        Get name of plugin. By default we remove the PlatformSpecification portion.
+        Args:
+            strip_all: When true, TaskSpecification and TaskSpec is stripped from name. When false only
+            Specification and Spec is Stripped
+
+        Returns:
+
+        """
+        if strip_all:
+            ret = cls.__name__.replace('TaskSpecification', '').replace("TaskSpec", '').replace('Spec', '')
+        else:
+            ret = cls.__name__.replace('Specification', '').replace('Spec', '')
+        return ret
 
     @get_task_spec
     def get(self, configuration: dict) -> 'ITask':  # noqa: F821
@@ -43,9 +56,15 @@ class TaskSpecification(PluginSpecification, ABC):
 
 
 class TaskPlugins:
-    def __init__(self) -> None:
+    def __init__(self, strip_all: bool = True) -> None:
+        """
+        Initialize the Task Registry. When strip all is false, the full plugin name will be used for names in map
+
+        Args:
+            strip_all: Whether to strip common parts of name from plugins in plugin map
+        """
         self._plugins = typing.cast(typing.Dict[str, TaskSpecification],
-                                    load_plugin_map('idmtools_task', TaskSpecification))
+                                    load_plugin_map('idmtools_task', TaskSpecification, strip_all))
 
     def get_plugins(self) -> typing.Set[TaskSpecification]:
         return set(self._plugins.values())

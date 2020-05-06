@@ -22,8 +22,20 @@ logger = getLogger(__name__)
 class PlatformSpecification(PluginSpecification, ABC):
 
     @classmethod
-    def get_name(cls) -> str:
-        return cls.__name__.replace('PlatformSpecification', '')
+    def get_name(cls, strip_all: bool = True) -> str:
+        """
+        Get name of plugin. By default we remove the PlatformSpecification portion.
+        Args:
+            strip_all: When true, PlatformSpecification is stripped from name. When false only Specification is Stripped
+
+        Returns:
+
+        """
+        if strip_all:
+            ret = cls.__name__.replace("PlatformSpecification", '')
+        else:
+            ret = cls.__name__.replace('Specification', '')
+        return ret
 
     @example_configuration_spec
     def example_configuration(self):
@@ -53,9 +65,15 @@ class PlatformSpecification(PluginSpecification, ABC):
 
 
 class PlatformPlugins:
-    def __init__(self) -> None:
+    def __init__(self, strip_all: bool = True) -> None:
+        """
+        Initialize the Platform Registry. When strip all is false, the full plugin name will be used for names in map
+
+        Args:
+            strip_all: Whether to strip common parts of name from plugins in plugin map
+        """
         self._plugins = typing.cast(typing.Dict[str, PlatformSpecification],
-                                    load_plugin_map('idmtools_platform', PlatformSpecification))
+                                    load_plugin_map('idmtools_platform', PlatformSpecification, strip_all))
 
     def get_plugins(self) -> typing.Set[PlatformSpecification]:
         return set(self._plugins.values())
