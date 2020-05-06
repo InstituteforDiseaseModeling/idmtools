@@ -29,7 +29,7 @@ class GitRepo:
     def api_url(self):
         return f'{API_HOME}/repos/{self.repo_owner}/{self.repo_name}/contents/{self._path_to_repo}?ref={self._branch}'
 
-    def parse_url(self, url):
+    def parse_url(self, url, branch=None):
         """
         From the given url, produce a URL that is compatible with Github's REST API. Can handle blob or tree paths.
         """
@@ -43,15 +43,10 @@ class GitRepo:
             ex_text = f'Please Verify URL Format: https://github.com/<owner>/<repo>/(tree|blob)/<branch>/<path_to_repo>'
             raise Exception(f'Your Example URL: {url}\n{ex_text}')
 
-        repo_owner = result.group(1)
-        repo_name = result.group(2)
-        branch = result.group(4)
-        path_to_repo = result.group(5)
-
-        self.repo_owner = repo_owner
-        self.repo_name = repo_name
-        self._branch = branch
-        self._path_to_repo = path_to_repo
+        self.repo_owner = result.group(1)
+        self.repo_name = result.group(2)
+        self._branch = branch if branch else result.group(4)
+        self._path_to_repo = result.group(5)
 
     def list_public_repos(self, repo_owner=None, raw=False):
         import requests
