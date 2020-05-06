@@ -1,4 +1,4 @@
-.PHONY: clean lint test coverage release-local dist release-staging release-staging-release-commit release-staging-minor
+.PHONY: clean lint test coverage dist release-staging release-staging-release-commit release-staging-minor
 IPY=python -c
 PY=python
 PDS=$(PY) dev_scripts/
@@ -58,9 +58,6 @@ coverage: ## Generate a code-coverage report
 	coverage report -m
 	coverage html -i
 	$(PDS)launch_dir_in_browser.py htmlcov/index.html
-
-release-local: ## package and upload a release to http://localhost:7171
-	$(MAKEALL) --parallel release-local
 
 dist: ## build our package
 	$(MAKEALL) --parallel dist
