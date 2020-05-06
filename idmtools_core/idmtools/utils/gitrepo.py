@@ -29,6 +29,30 @@ class GitRepo:
     def api_url(self):
         return f'{API_HOME}/repos/{self.repo_owner}/{self.repo_name}/contents/{self._path_to_repo}?ref={self._branch}'
 
+    def parse_url(self, url):
+        """
+        From the given url, produce a URL that is compatible with Github's REST API. Can handle blob or tree paths.
+        """
+        import re
+        re_match = re.compile("https://github.com/(.+?)/(.+?)/(tree|blob)/(.+?)/(.*)")
+
+        # extract the branch name from the given url (e.g master)
+        result = re_match.search(url)
+        if result is None:
+            # print(f'Your Example URL: {url}')
+            ex_text = f'Please Verify URL Format: https://github.com/<owner>/<repo>/(tree|blob)/<branch>/<path_to_repo>'
+            raise Exception(f'Your Example URL: {url}\n{ex_text}')
+
+        repo_owner = result.group(1)
+        repo_name = result.group(2)
+        branch = result.group(4)
+        path_to_repo = result.group(5)
+
+        self.repo_owner = repo_owner
+        self.repo_name = repo_name
+        self._branch = branch
+        self._path_to_repo = path_to_repo
+
     def list_public_repos(self, repo_owner=None, raw=False):
         import requests
 
@@ -50,8 +74,11 @@ class GitRepo:
         """ Downloads the files and directories in repo_url. If flatten is specified, the contents of any and all
          sub-directories will be pulled upwards into the root folder. """
 
-        self._path_to_repo = path_to_repo
-        self._branch = branch
+        if path_to_repo.startswith('https://'):
+            self.parse_url(path_to_repo)
+        else:
+            self._path_to_repo = path_to_repo
+            self._branch = branch
 
         if not os.path.exists(output_dir):
             raise Exception(f"output_dir does not exist: {output_dir}")
@@ -123,24 +150,3 @@ class GitRepo:
 
         return total_files
 
-
-def demo1():
-    gr = GitRepo('dustin', 'py-github')
-    total_files = gr.download(path_to_repo='github', output_dir='C:\Temp\Temp')
-
-    # print_text("✔ Download complete", "green", in_place=True)
-    print("✔ Download complete")
-
-
-def demo2():
-    gr = GitRepo('dustin', 'py-github')
-    public_repos = gr.list_public_repos('InstituteforDiseaseModeling')
-    print('\n'.join(public_repos))
-
-
-if __name__ == '__main__':
-    demo1()
-    exit()
-
-    demo2()
-    exit()
