@@ -125,7 +125,7 @@ def block(ctx, block_name, platform):
         if "validate" in md:
             validation = md["validate"]
         else:
-            validation = lambda v: (True, None)
+            validation = lambda v: (True, None)  # noqa: E731
 
         # Prompt the user
         while True:

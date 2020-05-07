@@ -2,7 +2,7 @@ from dataclasses import Field
 from typing import Dict, Tuple
 
 
-def validate_range(value:float, min:float, max:float) -> Tuple[bool, str]:
+def validate_range(value: float, min: float, max: float) -> Tuple[bool, str]:
     """
     Function used to validate an integer value between min and max
     Args:

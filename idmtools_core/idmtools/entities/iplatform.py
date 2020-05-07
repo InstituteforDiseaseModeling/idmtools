@@ -191,6 +191,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             The object found on the platform or None.
         """
         if not item_type or item_type not in self.platform_type_map.values():
+            print(self.platform_type_map.values())
+            print(item_type)
             raise Exception("The provided type is invalid or not supported by this platform...")
 
         cache_key = self.get_cache_key(force, item_id, item_type, kwargs, raw, 'r' if raw else 'o')
