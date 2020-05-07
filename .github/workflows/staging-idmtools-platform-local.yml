@@ -26,7 +26,11 @@ jobs:
           pip install setuptools wheel twine bump2version docker py-make coloredlogs
           git config --global user.name "IDM Tools"
           git config --global user.email "idmtools@idmod.org"
-          docker login idm-docker-staging.packages.idmod.org --username ${{ secrets.PYPI_STAGING_USERNAME }} --password "${{ secrets.PYPI_STAGING_PASSWORD }}"
+      - uses: azure/docker-login@v1
+        with:
+          login-server: idm-docker-staging.packages.idmod.org
+          username: ${{ secrets.PYPI_STAGING_USERNAME }}
+          password: ${{ secrets.PYPI_STAGING_PASSWORD }}
       - uses: actions/checkout@v2
       - name: Use backup yarn
         working-directory: idmtools_platform_local/idmtools_webui
