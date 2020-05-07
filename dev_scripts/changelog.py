@@ -11,7 +11,7 @@ import pygit2
 if os.getenv('GIT_TOKEN') is None and len(sys.argv) != 2:
     print('You must specify GIT_TOKEN through argument or environment variable GIT_TOKEN')
     sys.exit(-1)
-gh = Github(os.getenv('GIT_TOKEN', sys.argv[1]))
+gh = Github(os.getenv('GIT_TOKEN', sys.argv[1]) if len(sys.argv) == 2 else '')
 gh_repo = gh.get_repo("InstituteforDiseaseModeling/idmtools")
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 repo = pygit2.Repository(BASE_DIR)
