@@ -1,4 +1,4 @@
-.PHONY: clean lint test coverage release-local dist release-staging release-staging-release-commit release-staging-minor
+.PHONY: clean lint test coverage dist release-staging release-staging-release-commit release-staging-minor
 IPY=python -c
 BASE_PIP_URL="packages.idmod.org/api/pypi/idm-pypi-"
 STAGING_PIP_URL?="https://$(BASE_PIP_URL)staging/simple"
@@ -81,38 +81,20 @@ docker-cleanup:
 	docker stop  idmtools_workers idmtools_postgres idmtools_redis
 	docker rm  idmtools_workers idmtools_postgres idmtools_redis
 
-docker-local: ## Build our docker image using the local pypi
+docker: ## Build our docker image using the local pypi
 	# This job is most useful when actively developing changes to the local_platform internals(tasks, api, cli) or
 	# upstream changes that effect those areas(models and core). Otherwise, installing from latest in the nightly
 	# should suffice for development
 	# ensure pypi local is up
-	$(PDR) -w '../dev_scripts/local_pypi' -ex 'docker-compose up -d'
-	$(PDR) -w '../idmtools_core' -ex 'pymake release-local'
-	@pymake release-local
-	python build_docker_image.py http://localhost:7171/
+	$(PDR) -w '../idmtools_core' -ex 'pymake dist'
+	@pymake dist
+	python build_docker_image.py
 
-docker-local-no-cache:## Build our docker image using the local pypi
-	# This job is most useful when actively developing changes to the local_platform internals(tasks, api, cli) or
-	# upstream changes that effect those areas(models and core). Otherwise, installing from latest in the nightly
-	# should suffice for development
-	# ensure pypi local is up
-	$(PDR) -w '../dev_scripts/local_pypi' -ex 'docker-compose up -d'
-	$(PDR) -w '../idmtools_core' -ex 'pymake release-local'
-	@pymake release-local
-	python build_docker_image.py http://localhost:7171/ no-cache
-
-docker-staging: ## Build our docker image using staging pypi
-	# rebuild local package at moment since we install local platform package from there
-	python build_docker_image.py $(STAGING_PIP_URL) no-cache
-
-docker-release-staging:
-	@make docker-staging
-	python push_docker_image.py
+docker-only: ## Assumes you have made the local package already
+	$(PDR) -w '../idmtools_core' -ex 'pymake dist'
+	python build_docker_image.py
 
 # Release related rules
-release-local: ## package and upload a release to http://localhost:7171
-	@pymake dist
-	twine upload --verbose --repository-url http://localhost:7171 -u admin -p admin dist/*
 
 dist: ## build our package
 	@make build-ui

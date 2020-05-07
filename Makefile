@@ -1,4 +1,5 @@
-.PHONY: clean lint test coverage release-local dist release-staging release-staging-release-commit release-staging-minor changelog
+.PHONY: clean lint test coverage dist release-staging release-staging-release-commit release-staging-minor changelog
+
 IPY=python -c
 PY=python
 PDS=$(PY) dev_scripts/
@@ -22,7 +23,7 @@ clean-all: ## Clean all our jobs
 
 setup-dev:  ## Setup packages in dev mode
 	python dev_scripts/bootstrap.py
-	$(PDR) -w idmtools_platform_local -ex 'pymake docker-local'
+	$(PDR) -w idmtools_platform_local -ex 'pymake docker'
 
 lint: ## check style with flake8
 	flake8 --ignore=E501,W291 --exclude="examples/**,workflow/**,docs/**,*/tests/**,idmtools_test/**"
@@ -58,9 +59,6 @@ coverage: ## Generate a code-coverage report
 	coverage report -m
 	coverage html -i
 	$(PDS)launch_dir_in_browser.py htmlcov/index.html
-
-release-local: ## package and upload a release to http://localhost:7171
-	$(MAKEALL) --parallel release-local
 
 dist: ## build our package
 	$(MAKEALL) --parallel dist

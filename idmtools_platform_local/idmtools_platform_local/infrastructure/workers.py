@@ -27,7 +27,7 @@ def get_worker_image_default():
     if logger.isEnabledFor(DEBUG):
         logger.debug(f"Default docker repo set to: {docker_repo}")
 
-    default_image = f'{docker_repo}/idmtools/local_workers:{__version__.replace("+", ".")}'
+    default_image = f'{docker_repo}/idmtools/local_workers:{__version__[0:5]}'
     return default_image
 
 
@@ -100,6 +100,9 @@ class WorkersContainer(BaseServiceContainer):
         return container_config
 
     def create(self, spinner=None) -> Container:
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f'Pulling: {self.image}')
+        self.client.images.get(self.image)
         result = super().create(spinner)
         # postgres will restart once so we should watch it again
         time.sleep(0.2)
