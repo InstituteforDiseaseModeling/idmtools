@@ -11,7 +11,7 @@ with open('requirements.txt') as requirements_file:
     requirements = requirements_file.read().split("\n")
 
 build_requirements = ['flake8', 'coverage', 'py-make', 'bump2version', 'twine']
-test_requirements = ['pytest', 'pytest-runner', 'numpy==1.16.4', 'xmlrunner', 'pytest-xdist',
+test_requirements = ['pytest', 'pytest-runner', 'xmlrunner', 'pytest-xdist',
                      'pytest-timeout', 'pytest-cache'] + build_requirements
 
 extras = {
@@ -58,13 +58,10 @@ setup(
                       ["idmtools_task_command = idmtools.entities.command_task:CommandTaskSpecification",
                       "idmtools_task_docker = idmtools.core.docker_task:DockerTaskSpecification"]
         ),
-    setup_requirements=[
-        'dataclasses>=0.6;python_version<"3.7"'
-    ],
     python_requires='>=3.6.*, !=3.7.0, !=3.7.1, !=3.7.2',
     test_suite='tests',
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='1.0.0+nightly',
+    version='1.0.1+nightly',
     zip_safe=False
 )
