@@ -52,22 +52,22 @@ COPY docker_scripts/uwsgi.ini docker_scripts/nginx.conf /app/
 WORKDIR /app
 ENV PYTHONPATH=/app:${PYTHONPATH}
 
+
 #TODO: Move the actual package to artifactory and install from there. It would simpify the environmetn quite a bit
 
 # make it where we can specifiy our dependent packages at build time
-ARG PYPIURL=https://packages.idmod.org/api/pypi/pypi-staging/simple
-ARG PYPIHOST=packages.idmod.org
-RUN echo ${PYPIURL}
+COPY .depends/* /tmp/
+RUN bash -c "pip install /tmp/*.gz --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple"
 # Install requirements first to reduce build cache misses
 ADD requirements.txt ui_requirements.txt workers_requirements.txt /tmp/
-RUN pip install -r /tmp/requirements.txt --extra-index-url=${PYPIURL} --trusted-host ${PYPIHOST} && \
-        pip install -r /tmp/ui_requirements.txt --extra-index-url=${PYPIURL} --trusted-host ${PYPIHOST} && \
-        pip install -r /tmp/workers_requirements.txt --extra-index-url=${PYPIURL} --trusted-host ${PYPIHOST}
+RUN pip install -r /tmp/requirements.txt --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple && \
+        pip install -r /tmp/ui_requirements.txt --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple && \
+        pip install -r /tmp/workers_requirements.txt --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
 # Run the setup instal before copying rest of package. This will increase cache hits during docker builds
 # as we will only rebuild if any of the docker_scripts, setup.py, readme.md, and requirements.txt change
 # which should happen infrequently(or less so than library code)
 COPY dist/idmtools_platform_local*.tar.gz /tmp/
-RUN find /tmp -name idmtools_platform_local*.tar.gz -exec pip install {}[workers,ui,server] --extra-index-url=${PYPIURL} --trusted-host ${PYPIHOST} \; && \
+RUN find /tmp -name idmtools_platform_local*.tar.gz -exec pip install {}[workers,ui,server] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple \; && \
     rm -rf /root/.cache
 ADD idmtools_platform_local/internals/ui/static /app/html
 CMD ["/init"]

@@ -18,14 +18,15 @@ ADD requirements.txt /tmp/
 # set default index to IDM Pip Prod(Caching and internal packages IDMTools may depend on like pyComps
 ADD pip.conf /etc/pip.conf
 
+COPY .depends/* /tmp/
+RUN bash -c "pip install /tmp/*.gz --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple"
+
 # make the PIP index configurable so we can build against staging, production, or a local PyPI server
-ARG PYPIURL=https://packages.idmod.org/api/pypi/pypi-staging/simple
-ARG PYPIHOST=packages.idmod.org
 ARG SSMT_VERSION
 
 # Install the packages
 RUN pip3 install --upgrade pip --index-url=https://pypi.python.org/simple && \
-    pip3 install -r /tmp/requirements.txt --index-url=${PYPIURL} --trusted-host ${PYPIHOST} && \
+    pip3 install -r /tmp/requirements.txt --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple && \
     rm -rf /root/.cache
     # To make this effective, we need to collapse this to one layer....... so don't do it for now
     # remove stuff we needed for pip but don't want in our final image

@@ -1,4 +1,4 @@
-.PHONY: clean lint test coverage release-local dist release-staging release-staging-release-commit release-staging-minor
+.PHONY: clean lint test coverage dist release-staging release-staging-release-commit release-staging-minor
 IPY=python -c
 PACKAGE_NAME=idmtools_cli
 PY?=python
@@ -69,10 +69,6 @@ coverage-all: ## Generate a code-coverage report using all tests
 	coverage report -m
 	coverage html -i
 	$(PDS)/launch_dir_in_browser.py htmlcov/index.html
-
-release-local: ## package and upload a release to http://localhost:7171
-	@make dist
-	twine upload --verbose --repository-url http://localhost:7171 -u admin -p admin dist/*
 
 dist: ## build our package
 	@make clean

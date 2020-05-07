@@ -395,7 +395,8 @@ idmtools_platform_local/idmtools_platform_local/internals/ui/static/
 idmtools_test/idmtools_test/data/
 idmtools_platform_local/idmtools_webui/yarn.lock
 idmtools_platform_comps/tests/requirements_updated.txt
-
+/idmtools_platform_local/.depends/
+/idmtools_platform_comps/ssmt_image/.depends/
 
 **.buildlog
 docs/_build
@@ -403,3 +404,4 @@ docs/idmtools.*
 docs/idmtools*index.rst
 docs/idmtools_models*.rst
 docs/idmtools_platform*.rst
+
