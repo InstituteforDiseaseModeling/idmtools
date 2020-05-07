@@ -16,6 +16,10 @@ class TestPlatformPlugins(TestCase):
         packages = get_packages_from_pip()
 
         if any(['idmtools-platform-comps' in p for p in packages]):
+            from idmtools_platform_comps import COMPSPlatformSpecification
+            COMPSSpec: COMPSPlatformSpecification = pm.get_plugin_map()['COMPS']
+            examples = COMPSSpec.get_example_urls()
+            self.assertGreater(len(examples), 1)
             self.assertIn('COMPS', pm.get_plugin_map().keys())
             self.assertIn('SSMT', pm.get_plugin_map().keys())
         if any(['idmtools-platform-local' in p for p in packages]):
