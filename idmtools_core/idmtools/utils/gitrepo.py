@@ -6,7 +6,8 @@ from dataclasses import dataclass, field
 
 REPO_OWNER = 'InstituteforDiseaseModeling'
 REPO_NAME = 'idmtools'
-API_HOME = 'https://api.github.com'
+GITHUB_HOME = 'https://github.com'
+GITHUB_API_HOME = 'https://api.github.com'
 
 
 @dataclass
@@ -15,7 +16,7 @@ class GitRepo:
     repo_name: str = field(default=None)
     _branch: str = field(default='master', init=False, repr=False)
     _path_to_repo: str = field(default='', init=False, repr=False)
-    _download_info: bool = field(default=True)
+    _download_info: bool = field(default=True, init=False, repr=False)
 
     @property
     def repo_home_url(self):
@@ -23,7 +24,7 @@ class GitRepo:
         Construct repo home url
         Returns: repo home url
         """
-        return f'https://github.com/{self.repo_owner}/{self.repo_name}'
+        return f'{GITHUB_HOME}/{self.repo_owner}/{self.repo_name}'
 
     @property
     def repo_example_url(self):
@@ -39,7 +40,7 @@ class GitRepo:
         Construct api url for the examples for download
         Returns: api url
         """
-        return f'{API_HOME}/repos/{self.repo_owner}/{self.repo_name}/contents/{self._path_to_repo}?ref={self._branch}'
+        return f'{GITHUB_API_HOME}/repos/{self.repo_owner}/{self.repo_name}/contents/{self._path_to_repo}?ref={self._branch}'
 
     def parse_url(self, url, branch=None):
         """
@@ -78,7 +79,7 @@ class GitRepo:
         import requests
 
         # build api url
-        api_url = f'{API_HOME}/users/{repo_owner if repo_owner else self.repo_owner}/repos'
+        api_url = f'{GITHUB_API_HOME}/users/{repo_owner if repo_owner else self.repo_owner}/repos'
 
         resp = requests.get(api_url)
         if resp.status_code != 200:
