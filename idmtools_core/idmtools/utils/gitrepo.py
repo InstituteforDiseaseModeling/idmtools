@@ -2,29 +2,39 @@ import os
 import sys
 import json
 import urllib.request
+from dataclasses import dataclass, field
 
 REPO_OWNER = 'InstituteforDiseaseModeling'
 REPO_NAME = 'idmtools'
 API_HOME = 'https://api.github.com'
 
 
+@dataclass
 class GitRepo:
-    def __init__(self, repo_owner=None, repo_name=None):
-        self.repo_owner = repo_owner or REPO_OWNER
-        self.repo_name = repo_name or REPO_NAME
-        self._path_to_repo = ''
-        self._branch = 'master'
+    repo_owner: str = field(default=None)
+    repo_name: str = field(default=None)
+    _branch: str = field(default='master', init=False, repr=False)
+    _path_to_repo: str = field(default='', init=False, repr=False)
+    _download_info: bool = field(default=True)
 
     @property
-    def repo_url(self):
+    def repo_home_url(self):
         """
-        Construct repo url
-        Returns: repo url
+        Construct repo home url
+        Returns: repo home url
         """
-        return f'https://{self.repo_owner}/{self.repo_name}'
+        return f'https://github.com/{self.repo_owner}/{self.repo_name}'
 
     @property
-    def api_url(self):
+    def repo_example_url(self):
+        """
+        Construct repo example url
+        Returns: repo example url
+        """
+        return f'{self.repo_home_url}/tree/{self._branch}/{self._path_to_repo}'
+
+    @property
+    def api_example_url(self):
         """
         Construct api url for the examples for download
         Returns: api url
@@ -102,11 +112,17 @@ class GitRepo:
         if not os.path.exists(output_dir):
             raise Exception(f"output_dir does not exist: {output_dir}")
 
+        # First time display download url and local destination info
+        if self._download_info:
+            print(f'Download Examples From: {self.repo_example_url}')
+            print(f'Local Destination: {os.path.abspath(output_dir)}')
+            self._download_info = False
+
         try:
             opener = urllib.request.build_opener()
             opener.addheaders = [('User-agent', 'Mozilla/5.0')]
             urllib.request.install_opener(opener)
-            response = urllib.request.urlretrieve(self.api_url)  # Retrieve a URL into a temporary location on disk.
+            response = urllib.request.urlretrieve(self.api_example_url)  # Retrieve a URL into a temporary location on disk.
         except KeyboardInterrupt:
             # when CTRL+C is pressed during the execution of this script,
             # bring the cursor to the beginning, erase the current line, and dont make a new line
