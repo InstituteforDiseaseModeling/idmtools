@@ -6,6 +6,7 @@ CLI reference
    :maxdepth: 2
    :titlesonly:
 
+   cli-config
    cli-templates
    cli-simulations
    cli-experiments

@@ -3,7 +3,7 @@ import json
 import os
 from configparser import ConfigParser
 from logging import getLogger
-from typing import Dict, Any
+from typing import Any, Dict
 
 default_config = 'idmtools.ini'
 
@@ -124,10 +124,10 @@ class IdmConfigParser:
 
         ini_file = cls._find_config(dir_path, file_name)
         if ini_file is None:
-            print("/!\\ WARNING: File '{}' Not Found!".format(file_name))
+            logger.error("/!\\ WARNING: File '{}' Not Found!".format(file_name))
             return
 
-        print("INI File Used: {}".format(ini_file))
+        logger.info("INI File Used: {}".format(ini_file))
 
         cls._config = ConfigParser()
         cls._config.read(ini_file)

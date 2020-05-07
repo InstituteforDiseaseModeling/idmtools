@@ -1,4 +1,4 @@
-.PHONY: clean lint test coverage release-local dist release-staging release-staging-release-commit release-staging-minor
+.PHONY: clean lint test coverage release-local dist release-staging release-staging-release-commit release-staging-minor changelog
 IPY=python -c
 PY=python
 PDS=$(PY) dev_scripts/
@@ -78,8 +78,8 @@ linux-dev-env: ## Runs docker dev env
 	$(PDR) -w 'dev_scripts/linux-test-env' -ex 'docker-compose run --rm linuxtst'
 
 
-change-log: ## Generate partial changelog
-	git log $(shell git tag -l --sort=-v:refname | grep -w '[0-9]\.[0-9]\.[0-9]' | head -n 1) HEAD --pretty=format:'%s' --reverse --simplify-merges | uniq
+changelog: ## Generate partial changelog
+	$(PDS)changelog.py
 
 bump-release: #bump the release version.
 	$(MAKEALL) bump-release
