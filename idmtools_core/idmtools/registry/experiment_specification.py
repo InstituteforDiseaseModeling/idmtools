@@ -32,7 +32,7 @@ class ExperimentPluginSpecification(PluginSpecification, ABC):
 
         """
         if strip_all:
-            ret = cls.__name__.replace('ExperimentPluginSpecification', '').replace('ExperimentSpecification', '')\
+            ret = cls.__name__.replace('ExperimentPluginSpecification', '').replace('Specification', '')\
                 .replace("ExperimentPluginSpec", '').replace('Spec', '')
         else:
             ret = cls.__name__.replace('Specification', '').replace('Spec', '')
