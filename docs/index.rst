@@ -51,6 +51,7 @@ guide modelers through necessary tasks. See :doc:`cookiecutters` for the availab
    reference
    cli_index
    glossary
+   changelog
 
 
 
