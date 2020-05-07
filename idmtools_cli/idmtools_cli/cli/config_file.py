@@ -121,8 +121,27 @@ def block(ctx, block_name, platform):
         # Handle the choices if any
         prompt_type = click.Choice(md["choices"]) if "choices" in md else field.type
 
-        # Prompt the user and store the answer
-        user_input = click.prompt(field.name, type=prompt_type, default=field_default, prompt_suffix=f": {Fore.GREEN}")
+        # Retrieve the validation function if any
+        if "validate" in md:
+            validation = md["validate"]
+        else:
+            validation = lambda v: (True, None)
+
+        # Prompt the user
+        while True:
+            user_input = click.prompt(field.name, type=prompt_type, default=field_default, prompt_suffix=f": {Fore.GREEN}")
+
+            # Call the validation
+            result, msg = validation(user_input)
+
+            # If positive, get out
+            if result:
+                break
+
+            # Else display the error message
+            secho(msg, fg="bright_red")
+
+        # Store the value
         values[field.name] = user_input if user_input != "" else None
         print(Fore.RESET)
 
@@ -153,4 +172,4 @@ def block(ctx, block_name, platform):
 
 
 if __name__ == '__main__':
-    config(["block", '--block_name', 'dsa'])
+    config(["block", '--block_name', 'test'])

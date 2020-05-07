@@ -31,7 +31,13 @@ You use the :py:class:`~idmtools.core.platform_factory.Platform` class whether y
 
 For additional information about configuring idmtools.ini, see...
 
-Note for the creation of platforms: If you are developing a new platform plugin, you will need to add some metadata to the Platform class' fields.
+Creation of a platform plugin
+-----------------------------
+
+Adding fields to the config CLI
+```````````````````````````````
+
+If you are developing a new platform plugin, you will need to add some metadata to the Platform class' fields.
 All fields with a ``help`` key in the metadata will be picked up by the ``idmtools config block`` command line and allow a user to set a value.
 ``help`` should contain the help text that will be displayed.
 A ``choices`` key can optionally be present to restrict the available choices.
@@ -47,6 +53,9 @@ For example, for the given platform:
 
 
 The CLI wizard will pick up ``field1`` and ``field2`` and ask the user to provide values. The type of the field will be enforced and for ``field2``, the user will have to select among the ``choices``.
+
+Modify fields metadata at runtime
+`````````````````````````````````
 
 Now, what happens if we want to change the help text, choices, or default value of a field based on a previously set field.
 For example, let's consider an example platform where the user needs to specify an endpoint. This endpoint needs to be used to retrieve a list of environments and we want the user to choose select one of them.
@@ -103,3 +112,43 @@ We can then use this function on the field, and the user will be prompted with t
     class MyNewPlatform(IPlatform, CacheEnabled):
         endpoint: str = field(default="https://myapi.com", metadata={"help": "Enter the URL of the endpoint"})
         environment: str = field(metadata={"help": "Select an environment ", "callback": environment_list})
+
+Fields validation
+`````````````````
+
+By default the CLI will provide validation on type. For example an ``int`` field, will only accept an integer value.
+To fine tune this validation, we can leverage the ``validation`` key of the metadata.
+
+For example, if you want to create a field that has an integer value between 1 and 10, you can pass a validation function as shown:
+
+.. code-block:: python
+
+    def validate_number(value):
+        if 1 <= value <= 10:
+            return True, ''
+        return False, "The value needs to be bewtween 1 and 10"
+
+    @dataclass(repr=False)
+    class MyNewPlatform(IPlatform, CacheEnabled):
+        custom_validation: int = field(default=1, metadata={"help": "Enter a number between 1 and 10", "validation":validate_number})
+
+The validation function will receive the user input as ``value`` and is expected to return a ``bool`` representing the result of the validation
+(``True`` if the value is correct, ``False`` if not) and a ``string`` to give an error message to the user.
+
+We can leverage the `Python partials <https://docs.python.org/3.7/library/functools.html#functools.partial>`_ and make the validation function more generic to use
+in multiple fields:
+
+.. code-block:: python
+
+    from functools import partial
+
+    def validate_range(value, min, max):
+        if min <= value <= max:
+            return True, ''
+        return False, f"The value needs to be between {min} and {max}"
+
+    @dataclass(repr=False)
+    class MyNewPlatform(IPlatform, CacheEnabled):
+        custom_validation: int = field(default=1, metadata={"help": "Enter a number between 1 and 10", "validation":partial(validate_range, min=1, max=10)})
+        custom_validation2: int = field(default=100, metadata={"help": "Enter a number between 100 and 500", "validation":partial(validate_range, min=100, max=500)})
+
