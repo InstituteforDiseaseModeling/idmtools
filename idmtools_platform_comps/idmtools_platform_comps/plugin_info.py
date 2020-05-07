@@ -1,5 +1,5 @@
 from logging import getLogger
-from typing import Type
+from typing import Type, List
 
 from idmtools.entities.iplatform import IPlatform
 from idmtools.registry.platform_specification import example_configuration_impl, get_platform_impl, \
@@ -49,6 +49,11 @@ class COMPSPlatformSpecification(PlatformSpecification):
     def get_type(self) -> Type[COMPSPlatform]:
         return COMPSPlatform
 
+    def get_example_urls(self) -> List[str]:
+        from idmtools_platform_comps import __version__
+        examples = [f'examples/{example}' for example in ['ssmt', 'workitem', 'vistools']]
+        return [self.get_version_url(f'v{__version__}', x) for x in examples]
+
 
 class SSMTPlatformSpecification(PlatformSpecification):
 
@@ -71,3 +76,8 @@ class SSMTPlatformSpecification(PlatformSpecification):
     @get_platform_type_impl
     def get_type(self) -> Type[SSMTPlatform]:
         return SSMTPlatform
+
+    def get_example_urls(self) -> List[str]:
+        from idmtools_platform_comps import __version__
+        examples = [f'examples/{example}' for example in ['ssmt', 'vistools']]
+        return [self.get_version_url(f'v{__version__}', x) for x in examples]
