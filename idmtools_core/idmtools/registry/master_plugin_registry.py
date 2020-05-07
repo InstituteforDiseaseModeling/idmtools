@@ -10,6 +10,11 @@ class MasterPluginRegistry:
         self._plugin_map = PlatformPlugins(strip_all=False).get_plugin_map()
         self._plugin_map.update(TaskPlugins(strip_all=False).get_plugin_map())
         self._plugin_map.update(ExperimentPlugins(strip_all=False).get_plugin_map())
+        try:
+            from idmtools_cli.iplatform_cli import PlatformCLIPlugins
+            self._plugin_map.update(PlatformCLIPlugins(strip_all=False).get_plugin_map())
+        except ImportError:
+            pass
 
     def get_plugin_map(self) -> Dict[str, PluginSpecification]:
         return self._plugin_map
