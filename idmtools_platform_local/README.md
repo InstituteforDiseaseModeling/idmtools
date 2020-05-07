@@ -104,7 +104,7 @@ lint        -   Lint package and tests
 test        -   Run Unit tests
 test-all    -   Run all tests including integration and docker test
 docker-cleanup - Manually cleanup
-docker-local - Build docker image using local pypi server for packaging
+docker - Build docker image using local pypi server for packaging
 
 coverage    -   Run tests and generate coverage report that is shown in browser
 ```

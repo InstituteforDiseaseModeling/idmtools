@@ -1,13 +1,14 @@
 ####
 # This script is currently a workaround so that we can use bump2version with docker since the nightly versions
 # don't work with docker registry
+import glob
 import os
+import shutil
 import subprocess
 import sys
 from getpass import getpass
 import requests
 from requests.auth import HTTPBasicAuth
-from urllib.parse import urlparse
 
 BASE_REPO = 'packages.idmod.org'
 REPO_KEY = 'idm-docker-staging'
@@ -18,6 +19,16 @@ BASE_IMAGE_NAME = f'{DOCKER_REPO}/{IMAGE_NAME}'
 base_version = open('../VERSION').read().strip()
 
 print("Please be sure you are logged into the docker-production.packages.idmod.org Docker Repo")
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+LOCAL_PACKAGE_DIR = os.path.join(BASE_DIR, 'idmtools_platform_comps/ssmt_image')
+
+os.makedirs(os.path.abspath('.depends'), exist_ok=True)
+for root, dirs, files in os.walk(os.path.join(LOCAL_PACKAGE_DIR, '.depends')):
+    for file in files:
+        os.remove(os.path.join(root, file))
+for package in ['idmtools_core', 'idmtools_models', 'idmtools_platform_comps']:
+    for file in glob.glob(os.path.join(BASE_DIR, package, 'dist', '**.gz')):
+        shutil.copy(file, os.path.join(LOCAL_PACKAGE_DIR, '.depends', os.path.basename(file)))
 
 # determine next version by querying artifactory
 if 'bamboo_UserArtifactory' in os.environ:
@@ -45,15 +56,8 @@ else:
     print(response.content)
     raise Exception('Could not load images')
 
-
-print(f'PIP URL: {sys.argv[1]}')
-uri = urlparse(sys.argv[1])
-
-cmd = ['docker', 'build', '--network=host', '--build-arg', f'PYPIURL={sys.argv[1]}', '--build-arg',
-       f'PYPIHOST={uri.hostname}', '--build-arg', f'SSMT_VERSION={version}', '--tag',
+cmd = ['docker', 'build', '--network=host', '--build-arg', f'SSMT_VERSION={version}', '--tag',
        f'{DOCKER_REPO}/{IMAGE_NAME}:{version}', '.']
-if len(sys.argv) == 3 and sys.argv[2] == "no-cache":
-    cmd.insert(2, "--no-cache")
 print(f'Running: {" ".join(cmd)}')
 p = subprocess.Popen(" ".join(cmd), cwd=os.path.abspath(os.path.dirname(__file__)), shell=True)
 p.wait()
