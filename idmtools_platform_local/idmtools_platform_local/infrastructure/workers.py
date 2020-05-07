@@ -100,6 +100,9 @@ class WorkersContainer(BaseServiceContainer):
         return container_config
 
     def create(self, spinner=None) -> Container:
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f'Pulling: {self.image}')
+        self.client.images.get(self.image)
         result = super().create(spinner)
         # postgres will restart once so we should watch it again
         time.sleep(0.2)
