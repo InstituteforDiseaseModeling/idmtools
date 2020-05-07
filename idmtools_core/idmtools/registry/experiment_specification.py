@@ -26,7 +26,7 @@ class ExperimentPluginSpecification(PluginSpecification, ABC):
         Get name of plugin. By default we remove the PlatformSpecification portion.
         Args:
             strip_all: When true, ExperimentPluginSpecification and ExperimentPluginSpec is stripped from name.
-             When false only  Specification and Spec is Stripped
+            When false only  Specification and Spec is Stripped
 
         Returns:
 
