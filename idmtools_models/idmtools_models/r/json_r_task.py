@@ -45,4 +45,4 @@ class JSONConfiguredRTaskSpecification(TaskSpecification):
     def get_example_urls(self) -> List[str]:
         from idmtools_models import __version__
         examples = [f'examples/{example}' for example in ['r_model']]
-        return [self.get_version_url(__version__, x) for x in examples]
+        return [self.get_version_url(f'v{__version__}', x) for x in examples]

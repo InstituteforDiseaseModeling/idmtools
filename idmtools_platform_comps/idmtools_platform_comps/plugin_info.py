@@ -52,7 +52,7 @@ class COMPSPlatformSpecification(PlatformSpecification):
     def get_example_urls(self) -> List[str]:
         from idmtools_platform_comps import __version__
         examples = [f'examples/{example}' for example in ['ssmt', 'workitem', 'vistools']]
-        return [f'v{self.get_version_url(__version__, x)}' for x in examples]
+        return [self.get_version_url(f'v{__version__}', x) for x in examples]
 
 
 class SSMTPlatformSpecification(PlatformSpecification):
@@ -80,4 +80,4 @@ class SSMTPlatformSpecification(PlatformSpecification):
     def get_example_urls(self) -> List[str]:
         from idmtools_platform_comps import __version__
         examples = [f'examples/{example}' for example in ['ssmt', 'vistools']]
-        return [f'v{self.get_version_url(__version__, x)}' for x in examples]
+        return [self.get_version_url(f'v{__version__}', x) for x in examples]
