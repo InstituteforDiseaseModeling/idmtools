@@ -50,4 +50,9 @@ cmd = ['docker', 'push', f'{REPO_KEY}.{BASE_REPO}/{IMAGE_NAME}:{version}']
 print(f'Running: {" ".join(cmd)}')
 p = subprocess.Popen(" ".join(cmd), cwd=os.path.abspath(os.path.dirname(__file__)), shell=True)
 p.wait()
+cmd = ['docker', 'push', f'{REPO_KEY}.{BASE_REPO}/{IMAGE_NAME}:{version[0:5]}']
+# push to version as well
+print(f'Running: {" ".join(cmd)}')
+p = subprocess.Popen(" ".join(cmd), cwd=os.path.abspath(os.path.dirname(__file__)), shell=True)
+p.wait()
 sys.exit(p.returncode)
