@@ -50,12 +50,25 @@ class IPlatformCLI(ABC):
 
 
 class PlatformCLISpecification(PluginSpecification, ABC):
+
     @classmethod
-    def get_name(cls) -> str:
-        return cls.__name__.replace("CLISpecification", "")
+    def get_name(cls, strip_all: bool = True) -> str:
+        """
+        Get name of plugin. By default we remove the CLISpecification portion.
+        Args:
+            strip_all: When true, CLISpecification is stripped from name. When false only Specification is Stripped
+
+        Returns:
+
+        """
+        if strip_all:
+            ret = cls.__name__.replace("CLISpecification", '')
+        else:
+            ret = cls.__name__.replace('Specification', '')
+        return ret
 
     @get_platform_cli_spec
-    def get(configuration: dict) -> IPlatformCLI:
+    def get(self, configuration: dict) -> IPlatformCLI:
         """
         Factor that should return a new platform using the passed in configuration
         Args:
