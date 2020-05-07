@@ -43,6 +43,7 @@ All fields with a ``help`` key in the metadata will be picked up by the ``idmtoo
 A ``choices`` key can optionally be present to restrict the available choices.
 
 For example, for the given platform:
+
 .. code-block:: python
 
     @dataclass(repr=False)
