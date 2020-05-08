@@ -62,7 +62,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             task = experiment.simulations.items.base_task
             if check_command:
                 task = platform_task_hooks(task, self.platform)
-            task.pre_creation(Simulation())
+            task.pre_creation(Simulation(task=task))
             exp_command = task.command
             # TODO generators
         else:
