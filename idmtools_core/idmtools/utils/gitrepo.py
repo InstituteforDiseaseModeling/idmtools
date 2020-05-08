@@ -23,6 +23,14 @@ class GitRepo:
         self.repo_name = self.repo_name or REPO_NAME
 
     @property
+    def path_to_repo(self):
+        return self._path_to_repo
+
+    @property
+    def branch(self):
+        return self._branch
+
+    @property
     def repo_home_url(self):
         """
         Construct repo home url
