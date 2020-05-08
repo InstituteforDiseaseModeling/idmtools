@@ -4,7 +4,7 @@ import json
 import urllib.request
 from dataclasses import dataclass, field
 
-REPO_OWNER = 'InstituteforDiseaseModeling'
+REPO_OWNER = 'institutefordiseasemodeling'
 REPO_NAME = 'idmtools'
 GITHUB_HOME = 'https://github.com'
 GITHUB_API_HOME = 'https://api.github.com'
@@ -17,6 +17,10 @@ class GitRepo:
     _branch: str = field(default='master', init=False, repr=False)
     _path_to_repo: str = field(default='', init=False, repr=False)
     _download_info: bool = field(default=True, init=False, repr=False)
+
+    def __post_init__(self):
+        self.repo_owner = self.repo_owner or REPO_OWNER
+        self.repo_name = self.repo_name or REPO_NAME
 
     @property
     def repo_home_url(self):
@@ -42,7 +46,7 @@ class GitRepo:
         """
         return f'{GITHUB_API_HOME}/repos/{self.repo_owner}/{self.repo_name}/contents/{self._path_to_repo}?ref={self._branch}'
 
-    def _parse_url(self, url, branch=None):
+    def parse_url(self, url, branch=None):
         """
         Parse url for owner, repo, branch and example path
         Args:
@@ -162,7 +166,7 @@ class GitRepo:
         """
 
         if path_to_repo.startswith('https://'):
-            self._parse_url(path_to_repo)
+            self.parse_url(path_to_repo)
         else:
             self._path_to_repo = path_to_repo
             self._branch = branch
