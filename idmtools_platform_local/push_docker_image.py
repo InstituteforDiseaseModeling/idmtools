@@ -50,8 +50,8 @@ else:
 # push full version
 cmd = ['docker', 'push', f'{REPO_KEY}.{BASE_REPO}/{IMAGE_NAME}:{version}']
 print(f'Running: {" ".join(cmd)}')
-p = subprocess.Popen(" ".join(cmd), cwd=os.path.abspath(os.path.dirname(__file__)), shell=True)
-p.wait()
+p1 = subprocess.Popen(" ".join(cmd), cwd=os.path.abspath(os.path.dirname(__file__)), shell=True)
+p1.wait()
 
 # push patch level latest
 cmd = ['docker', 'push', f'{REPO_KEY}.{BASE_REPO}/{IMAGE_NAME}:{version[0:5]}']
