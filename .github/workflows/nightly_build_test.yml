@@ -34,7 +34,7 @@ jobs:
             cd idmtools_cli/tests
             py.test --durations=3 -v --junitxml=test_results.xml
       - name: Upload idmtools_cli test results
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: idmtools_cli_test_results
@@ -44,7 +44,7 @@ jobs:
             cd idmtools_core/tests
             py.test --durations=3 -v --junitxml=test_results.xml
       - name: Upload idmtools_core test results
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: idmtools_core_test_results
@@ -54,7 +54,7 @@ jobs:
             cd idmtools_models/tests
             py.test --durations=3 -v --junitxml=test_results.xml
       - name: Upload idmtools_models test results
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: idmtools_models_test_results
@@ -64,7 +64,7 @@ jobs:
             cd idmtools_platform_comps/tests
             py.test --durations=3 -v --junitxml=test_results.xml
       - name: Upload idmtools_platform_comps test results
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: idmtools_platform_comps_test_results
@@ -74,7 +74,7 @@ jobs:
             cd idmtools_platform_local/tests
             py.test --durations=3 -v --junitxml=test_results.xml
       - name: Upload idmtools_platform_local test results
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: idmtools_platform_local_test_results
