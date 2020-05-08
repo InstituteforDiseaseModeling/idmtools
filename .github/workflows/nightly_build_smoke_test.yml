@@ -1,12 +1,15 @@
 # This workflows will download idmtools nightly packages from artifactory then run smoke tests
 
 name: "nightly build smoke test"
-on: [push, pull_request]
+on:
+  schedule:
+    # At 3am pst (10 utc time)
+    * 10 * * *
 
 jobs:
   nightly_build_smoke_test:
     runs-on: ubuntu-latest
-    if: "contains(github.event.head_commit.message, 'nightly smoke test')"
+    # if: "contains(github.event.head_commit.message, 'nightly smoke test')"
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
