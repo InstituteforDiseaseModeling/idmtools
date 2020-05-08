@@ -52,20 +52,34 @@ class GitRepo:
         Returns: None
         """
         import re
-        re_match = re.compile("https://github.com/(.+?)/(.+?)/(tree|blob)/(.+?)/(.*)")
+
+        url = url.lower().strip()
+        if 'tree' in url or 'blob' in url:
+            re_match = re.compile("https://github.com/(.+?)/(.+?)/(tree|blob)/(.+?)/(.*)")
+        else:
+            if not url.endswith('/'):
+                url = url + '/'
+            re_match = re.compile("https://github.com/(.+?)/(.+?)/")
 
         # extract the owner, repo, branch and example path
         example_url = url.strip()
         result = re_match.search(example_url)
         if result is None:
-            ex_text = f'Please Verify URL Format: https://github.com/<owner>/<repo>/(tree|blob)/<branch>/<path_to_repo>'
+            ex_text = f'Please Verify URL Format: \nhttps://github.com/<owner>/<repo>/(tree|blob)/<branch>/<path_to_repo>\nor\nhttps://github.com/<owner>/<repo>/'
             raise Exception(f'Your Example URL: {url}\n{ex_text}')
 
         # update repo with new info
-        self.repo_owner = result.group(1)
-        self.repo_name = result.group(2)
-        self._branch = branch if branch else result.group(4)
-        self._path_to_repo = result.group(5)
+        if len(result.groups()) == 5:
+            self.repo_owner = result.group(1)
+            self.repo_name = result.group(2)
+            self._branch = branch if branch else result.group(4)
+            self._path_to_repo = result.group(5)
+        else:
+            # len(result.groups()) == 2
+            self.repo_owner = result.group(1)
+            self.repo_name = result.group(2)
+            self._branch = branch if branch else 'master'
+            self._path_to_repo = ''
 
     def list_public_repos(self, repo_owner=None, raw=False):
         """
@@ -123,13 +137,14 @@ class GitRepo:
             opener = urllib.request.build_opener()
             opener.addheaders = [('User-agent', 'Mozilla/5.0')]
             urllib.request.install_opener(opener)
-            response = urllib.request.urlretrieve(self.api_example_url)  # Retrieve a URL into a temporary location on disk.
+            response = urllib.request.urlretrieve(self.api_example_url)
         except KeyboardInterrupt:
             # when CTRL+C is pressed during the execution of this script,
             # bring the cursor to the beginning, erase the current line, and dont make a new line
             print("✘ Got interrupted")
             sys.exit()
 
+        download_dir = os.path.join(output_dir, self.repo_name)
         with open(response[0], "r") as f:
             data = json.load(f)
 
@@ -140,7 +155,7 @@ class GitRepo:
                     opener = urllib.request.build_opener()
                     opener.addheaders = [('User-agent', 'Mozilla/5.0')]
                     urllib.request.install_opener(opener)
-                    urllib.request.urlretrieve(data["download_url"], os.path.join(output_dir, data["name"]))
+                    urllib.request.urlretrieve(data["download_url"], os.path.join(download_dir, data["name"]))
                     # bring the cursor to the beginning, erase the current line, and dont make a new line
                     # print_text("Downloaded: " + Fore.WHITE + "{}".format(data["name"]), "green", in_place=True)
                     return
@@ -155,7 +170,7 @@ class GitRepo:
                 path = file["path"]
 
                 # create folder when necessary
-                os.makedirs(os.path.dirname(os.path.join(output_dir, path)), exist_ok=True)
+                os.makedirs(os.path.dirname(os.path.join(download_dir, path)), exist_ok=True)
 
                 if file_url is not None:
                     try:
@@ -163,7 +178,7 @@ class GitRepo:
                         opener.addheaders = [('User-agent', 'Mozilla/5.0')]
                         urllib.request.install_opener(opener)
                         # download the file
-                        urllib.request.urlretrieve(file_url, os.path.join(output_dir, path))
+                        urllib.request.urlretrieve(file_url, os.path.join(download_dir, path))
                     except KeyboardInterrupt:
                         # when CTRL+C is pressed during the execution of this script,
                         # bring the cursor to the beginning, erase the current line, and dont make a new line
