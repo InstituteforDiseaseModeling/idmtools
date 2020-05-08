@@ -37,7 +37,7 @@ if response.status_code == 200:
     images = sorted(response.json()['tags'], reverse=True)
     images = [i for i in images if len(i) > 6]
     last_version = images[0]
-    if base_version in last_version and 'nightly' not in last_version:
+    if base_version in last_version and 'nightly' not in last_version :
         version_parts = last_version.split('.')
         version_parts[-1] = str(int(version_parts[-1]) + 1)
         version = '.'.join(version_parts)
@@ -51,6 +51,7 @@ cmd = ['docker', 'tag', f'{REPO_KEY}.{BASE_REPO}/{IMAGE_NAME}:{version}',
        f'{REPO_KEY}.{BASE_REPO}/{IMAGE_NAME}:{version[0:5]}']
 print(f'Running: {" ".join(cmd)}')
 p = subprocess.Popen(" ".join(cmd), cwd=os.path.abspath(os.path.dirname(__file__)), shell=True)
+p.wait()
 
 # push full version
 cmd = ['docker', 'push', f'{REPO_KEY}.{BASE_REPO}/{IMAGE_NAME}:{version}']
