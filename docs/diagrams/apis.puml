@@ -1,0 +1,32 @@
+@startuml
+package "idmtools" {
+    class PluginSpecification {
+        str get_name(strip_all)
+        {abstract} str get_description()
+        List[ProjectTemplate] get_project_templates()
+        List[str] get_example_urls()
+        Dict[str, str] get_help_urls()
+        {static} get_version_url(version, repo_base_url, nightly_branch)
+    }
+
+    class TaskSpecification {
+        {abstract} Type[ITask] get_type()
+        {abstract} ITask get()
+    }
+
+    class PlatformSpecification {
+        {abstract} Type[IPlatform] get_type()
+        {abstract} IPlatform get()
+    }
+}
+package "cli"{
+    class PlatformCLISpecification {
+        {abstract} Type[IPlatformCLI] get_type()
+        {abstract} PlatformCLI get()
+    }
+}
+PluginSpecification <-- TaskSpecification
+PluginSpecification <-- PlatformSpecification
+PluginSpecification <-- PlatformCLISpecification
+
+@enduml
