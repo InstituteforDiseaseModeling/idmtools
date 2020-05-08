@@ -4,7 +4,7 @@ name: "nightly build validation test"
 on:
   schedule:
     # At 4am pst (11 utc time)
-    * 11 * * *
+    - cron:  '* 11 * * *'
 
 jobs:
   nightly_build_all_test:
