@@ -1,17 +1,12 @@
-from typing import Optional, Tuple, List
-import os
-import errno
-import shutil
 import json
 import click
-from idmtools.utils.gitrepo import GitRepo
+from idmtools.utils.gitrepo import GitRepo, REPO_OWNER, GITHUB_HOME
 from idmtools_cli.cli.entrypoint import cli
 
 examples_downloaded = []
 
 
 @cli.group()
-# @click.pass_context
 def example():
     pass
 
@@ -20,11 +15,29 @@ def example():
 def list():
     """
     List idmtools examples available
-    Returns:
 
+    Returns: display examples
     """
     urls = get_plugins_example_urls()
     print(json.dumps(urls, indent=3))
+
+
+@example.command()
+@click.option('--owner', default=REPO_OWNER, help="Repo Owner")
+def repos(owner=None):
+    """
+    List owner all public repos
+    Args:
+        owner: repo owner
+        repo: repo name
+
+    Returns: display public repos
+    """
+    gr = GitRepo(owner)
+    repos = gr.list_public_repos()
+    repos_full = [f'{GITHUB_HOME}/{r}' for r in repos]
+    print('\n - '.join(repos_full))
+
 
 @example.command()
 @click.option('--url', default=None, help="Repo Examples Url")
