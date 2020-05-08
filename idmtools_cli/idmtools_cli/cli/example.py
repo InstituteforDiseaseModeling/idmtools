@@ -1,6 +1,6 @@
 import json
 import click
-from idmtools.utils.gitrepo import GitRepo, REPO_OWNER, GITHUB_HOME
+from idmtools.utils.gitrepo import GitRepo, REPO_OWNER, GITHUB_HOME, REPO_NAME
 from idmtools_cli.cli.entrypoint import cli
 
 examples_downloaded = []
@@ -37,6 +37,44 @@ def repos(owner=None):
     repos = gr.list_public_repos()
     repos_full = [f'{GITHUB_HOME}/{r}' for r in repos]
     print('\n - '.join(repos_full))
+
+
+@example.command()
+@click.option('--owner', default=REPO_OWNER, help="Repo Owner")
+@click.option('--repo', default=REPO_NAME, help="Repo Name")
+def releases(owner=None, repo=None):
+    """
+    List all the releases of the repo
+    Args:
+        owner: repo owner
+        repo: repo name
+
+    Returns: the list of repo releases
+    """
+    gr = GitRepo(owner, repo)
+    releases = gr.list_repo_releases()
+    releases_list = [f' - {r}' for r in releases]
+    print(f'The Repo: {gr.repo_home_url}')
+    print('\n'.join(releases_list))
+
+
+@example.command()
+@click.option('--owner', default=REPO_OWNER, help="Repo Owner")
+@click.option('--repo', default=REPO_NAME, help="Repo Name")
+def tags(owner=None, repo=None):
+    """
+    List all the tags of the repo
+    Args:
+        owner: repo owner
+        repo: repo name
+
+    Returns: the list of repo tags
+    """
+    gr = GitRepo(owner, repo)
+    tags = gr.list_repo_tags()
+    tags_list = [f' - {r}' for r in tags]
+    print(f'The Repo: {gr.repo_home_url}')
+    print('\n'.join(tags_list))
 
 
 @example.command()
