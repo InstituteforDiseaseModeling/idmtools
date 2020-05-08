@@ -37,12 +37,12 @@ class GitRepo:
     @property
     def api_example_url(self):
         """
-        Construct api url for the examples for download
+        Construct api url of the examples for download
         Returns: api url
         """
         return f'{GITHUB_API_HOME}/repos/{self.repo_owner}/{self.repo_name}/contents/{self._path_to_repo}?ref={self._branch}'
 
-    def parse_url(self, url, branch=None):
+    def _parse_url(self, url, branch=None):
         """
         Parse url for owner, repo, branch and example path
         Args:
@@ -51,10 +51,10 @@ class GitRepo:
 
         Returns: None
         """
+        default_branch = 'master'
         ex_text = f'Please Verify URL Format: \nhttps://github.com/<owner>/<repo>/(tree|blob)/<branch>/<path_to_repo>\nor\nhttps://github.com/<owner>/<repo>/'
 
-        example_url = url.lower().strip()
-        example_url = example_url.rstrip('/')
+        example_url = url.lower().strip().rstrip('/')
         url_chunks = example_url.replace(f'{GITHUB_HOME}/', '').split('/')
 
         if len(url_chunks) < 2 or (len(url_chunks) >= 3 and url_chunks[2] not in ['tree', 'blob']):
@@ -64,15 +64,15 @@ class GitRepo:
         self.repo_name = url_chunks[1]
 
         if len(url_chunks) <= 3:
-            self._branch = branch if branch else 'master'
+            self._branch = branch if branch else default_branch
             self._path_to_repo = ''
         else:
-            self._branch = branch if branch else url_chunks[3] if url_chunks[3] else 'master'
+            self._branch = branch if branch else url_chunks[3] if url_chunks[3] else default_branch
             self._path_to_repo = '/'.join(url_chunks[4:])
 
     def list_public_repos(self, repo_owner=None, raw=False):
         """
-        Utility method to retrive all public repos
+        Utility method to retrieve all public repos
         Args:
             repo_owner: the owner of the repo
             raw: bool - return rwo data or simplified list
@@ -86,7 +86,7 @@ class GitRepo:
 
         resp = requests.get(api_url)
         if resp.status_code != 200:
-            raise Exception(f'Failed to retrieve Repos: {api_url}')
+            raise Exception(f'Failed to retrieve: {api_url}')
 
         # get repos as json
         repo_list = resp.json()
@@ -95,6 +95,60 @@ class GitRepo:
             return repo_list
         else:
             return [r['full_name'] for r in repo_list]
+
+    def list_repo_tags(self, repo_owner=None, repo_name=None, raw=False):
+        """
+        Utility method to retrieve all tags of the repo
+        Args:
+            repo_owner: the owner of the repo
+            repo_name: the name of repo
+            raw: bool - return raw data or simplified list
+
+        Returns: the tag list of the repo
+        """
+        import requests
+
+        # build api url
+        api_url = f'{GITHUB_API_HOME}/repos/{repo_owner if repo_owner else self.repo_owner}/{repo_name if repo_name else self.repo_name}/tags'
+
+        resp = requests.get(api_url)
+        if resp.status_code != 200:
+            raise Exception(f'Failed to retrieve: {api_url}')
+
+        # get repos as json
+        repo_list = resp.json()
+
+        if raw:
+            return repo_list
+        else:
+            return [r['name'] for r in repo_list]
+
+    def list_repo_releases(self, repo_owner=None, repo_name=None, raw=False):
+        """
+        Utility method to retrieve all releases of the repo
+        Args:
+            repo_owner: the owner of the repo
+            repo_name: the name of repo
+            raw: bool - return raw data or simplified list
+
+        Returns: the release list of the repo
+        """
+        import requests
+
+        # build api url
+        api_url = f'{GITHUB_API_HOME}/repos/{repo_owner if repo_owner else self.repo_owner}/{repo_name if repo_name else self.repo_name}/releases'
+
+        resp = requests.get(api_url)
+        if resp.status_code != 200:
+            raise Exception(f'Failed to retrieve: {api_url}')
+
+        # get repos as json
+        repo_list = resp.json()
+
+        if raw:
+            return repo_list
+        else:
+            return [f"{r['tag_name']} at {r['published_at']}" for r in repo_list]
 
     def download(self, path_to_repo='', output_dir="./", branch='master'):
         """
@@ -108,7 +162,7 @@ class GitRepo:
         """
 
         if path_to_repo.startswith('https://'):
-            self.parse_url(path_to_repo)
+            self._parse_url(path_to_repo)
         else:
             self._path_to_repo = path_to_repo
             self._branch = branch
@@ -145,8 +199,6 @@ class GitRepo:
                     opener.addheaders = [('User-agent', 'Mozilla/5.0')]
                     urllib.request.install_opener(opener)
                     urllib.request.urlretrieve(data["download_url"], os.path.join(download_dir, data["name"]))
-                    # bring the cursor to the beginning, erase the current line, and dont make a new line
-                    # print_text("Downloaded: " + Fore.WHITE + "{}".format(data["name"]), "green", in_place=True)
                     return
                 except KeyboardInterrupt:
                     # when CTRL+C is pressed during the execution of this script,
@@ -163,10 +215,10 @@ class GitRepo:
 
                 if file_url is not None:
                     try:
+                        # download the file
                         opener = urllib.request.build_opener()
                         opener.addheaders = [('User-agent', 'Mozilla/5.0')]
                         urllib.request.install_opener(opener)
-                        # download the file
                         urllib.request.urlretrieve(file_url, os.path.join(download_dir, path))
                     except KeyboardInterrupt:
                         # when CTRL+C is pressed during the execution of this script,
