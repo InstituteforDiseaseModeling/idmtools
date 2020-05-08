@@ -4,7 +4,7 @@ name: "nightly build smoke test"
 on:
   schedule:
     # At 3am pst (10 utc time)
-    - cron:  '* 10 * * *'
+    - cron: '* 10 * * *'
 
 jobs:
   nightly_build_smoke_test:
