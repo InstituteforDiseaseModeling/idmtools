@@ -1,0 +1,98 @@
+import os
+import unittest
+from unittest import TestCase
+from idmtools.utils.gitrepo import GitRepo
+
+
+class TestGithubUrlParse(TestCase):
+
+    def setUp(self) -> None:
+        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        print(self.case_name)
+
+    def test_default_owner_and_repo(self):
+        gr = GitRepo()
+        self.assertEqual(gr.repo_owner, 'institutefordiseasemodeling')
+        self.assertEqual(gr.repo_name, 'idmtools')
+        self.assertEqual(gr._branch, 'master')
+
+    def test_owner_and_repo(self):
+        gr = GitRepo(repo_owner='test_owner', repo_name='test_repo')
+        self.assertEqual(gr.repo_owner, 'test_owner')
+        self.assertEqual(gr.repo_name, 'test_repo')
+        self.assertEqual(gr._branch, 'master')
+        self.assertEqual(gr._path_to_repo, '')
+
+    def test_owner_and_repo_with_url_parse(self):
+        url = "https://github.com/InstituteforDiseaseModeling/idmtools/tree/dev/examples/ssmt"
+
+        gr = GitRepo(repo_owner='test_owner', repo_name='test_repo')
+        gr.parse_url(url)
+        self.assertEqual(gr.repo_owner, 'institutefordiseasemodeling')
+        self.assertEqual(gr.repo_name, 'idmtools')
+        self.assertEqual(gr._branch, 'dev')
+        self.assertEqual(gr._path_to_repo, 'examples/ssmt')
+
+    def test_full_url(self):
+        url = "https://github.com/InstituteforDiseaseModeling/idmtools/tree/dev/examples/ssmt"
+
+        gr = GitRepo()
+        gr.parse_url(url)
+        self.assertEqual(gr.repo_owner, 'institutefordiseasemodeling')
+        self.assertEqual(gr.repo_name, 'idmtools')
+        self.assertEqual(gr._branch, 'dev')
+        self.assertEqual(gr._path_to_repo, 'examples/ssmt')
+
+    def test_short_url(self):
+        url = "https://github.com/InstituteforDiseaseModeling/corvid-idmtools"
+
+        gr = GitRepo()
+        gr.parse_url(url)
+        self.assertEqual(gr.repo_owner, 'institutefordiseasemodeling')
+        self.assertEqual(gr.repo_name, 'corvid-idmtools')
+        self.assertEqual(gr._branch, 'master')
+        self.assertEqual(gr._path_to_repo, '')
+
+    def test_full_url_with_branch(self):
+        url = "https://github.com/InstituteforDiseaseModeling/idmtools/tree/dev/examples/ssmt"
+
+        gr = GitRepo()
+        gr.parse_url(url, branch='master')
+        self.assertEqual(gr.repo_owner, 'institutefordiseasemodeling')
+        self.assertEqual(gr.repo_name, 'idmtools')
+        self.assertEqual(gr._branch, 'master')
+        self.assertEqual(gr._path_to_repo, 'examples/ssmt')
+
+    def test_short_url_with_branch(self):
+        url = "https://github.com/InstituteforDiseaseModeling/corvid-idmtools"
+
+        gr = GitRepo()
+        gr.parse_url(url, branch='dev')
+        self.assertEqual(gr.repo_owner, 'institutefordiseasemodeling')
+        self.assertEqual(gr.repo_name, 'corvid-idmtools')
+        self.assertEqual(gr._branch, 'dev')
+        self.assertEqual(gr._path_to_repo, '')
+
+    def test_file_url(self):
+        url = "https://github.com/InstituteforDiseaseModeling/idmtools/blob/dev/examples/ssmt/__init__.py"
+
+        gr = GitRepo()
+        gr.parse_url(url)
+        self.assertEqual(gr.repo_owner, 'institutefordiseasemodeling')
+        self.assertEqual(gr.repo_name, 'idmtools')
+        self.assertEqual(gr._branch, 'dev')
+        self.assertEqual(gr._path_to_repo, 'examples/ssmt/__init__.py')
+
+    def test_general_url(self):
+        url = "https://github.com/test_owner/test_repo/tree/master/test_example_path"
+
+        gr = GitRepo()
+        gr.parse_url(url)
+        self.assertEqual(gr.repo_owner, 'test_owner')
+        self.assertEqual(gr.repo_name, 'test_repo')
+        self.assertEqual(gr._branch, 'master')
+        self.assertEqual(gr._path_to_repo, 'test_example_path')
+
+
+if __name__ == '__main__':
+    unittest.main()
