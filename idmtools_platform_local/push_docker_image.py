@@ -46,12 +46,6 @@ if response.status_code == 200:
 else:
     print(response.content)
     raise Exception('Could not load images')
-# tag full version as patch version
-cmd = ['docker', 'tag', f'{REPO_KEY}.{BASE_REPO}/{IMAGE_NAME}:{version}',
-       f'{REPO_KEY}.{BASE_REPO}/{IMAGE_NAME}:{version[0:5]}']
-print(f'Running: {" ".join(cmd)}')
-p = subprocess.Popen(" ".join(cmd), cwd=os.path.abspath(os.path.dirname(__file__)), shell=True)
-p.wait()
 
 # push full version
 cmd = ['docker', 'push', f'{REPO_KEY}.{BASE_REPO}/{IMAGE_NAME}:{version}']

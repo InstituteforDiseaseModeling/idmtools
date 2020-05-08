@@ -62,4 +62,10 @@ cmd = ['docker', 'build', '--network=host', '--tag',
 print(f'Running: {" ".join(cmd)}')
 p = subprocess.Popen(" ".join(cmd), cwd=os.path.abspath(os.path.dirname(__file__)), shell=True)
 p.wait()
+# tag full version as patch version
+cmd = ['docker', 'tag', f'{REPO_KEY}.{BASE_REPO}/{IMAGE_NAME}:{version}',
+       f'{REPO_KEY}.{BASE_REPO}/{IMAGE_NAME}:{version[0:5]}']
+print(f'Running: {" ".join(cmd)}')
+tp = subprocess.Popen(" ".join(cmd), cwd=os.path.abspath(os.path.dirname(__file__)), shell=True)
+tp.wait()
 sys.exit(p.returncode)
