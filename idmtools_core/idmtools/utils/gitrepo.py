@@ -51,35 +51,24 @@ class GitRepo:
 
         Returns: None
         """
-        import re
+        ex_text = f'Please Verify URL Format: \nhttps://github.com/<owner>/<repo>/(tree|blob)/<branch>/<path_to_repo>\nor\nhttps://github.com/<owner>/<repo>/'
 
-        url = url.lower().strip()
-        if 'tree' in url or 'blob' in url:
-            re_match = re.compile("https://github.com/(.+?)/(.+?)/(tree|blob)/(.+?)/(.*)")
-        else:
-            if not url.endswith('/'):
-                url = url + '/'
-            re_match = re.compile("https://github.com/(.+?)/(.+?)/")
+        example_url = url.lower().strip()
+        example_url = example_url.rstrip('/')
+        url_chunks = example_url.replace(f'{GITHUB_HOME}/', '').split('/')
 
-        # extract the owner, repo, branch and example path
-        example_url = url.strip()
-        result = re_match.search(example_url)
-        if result is None:
-            ex_text = f'Please Verify URL Format: \nhttps://github.com/<owner>/<repo>/(tree|blob)/<branch>/<path_to_repo>\nor\nhttps://github.com/<owner>/<repo>/'
+        if len(url_chunks) < 2 or (len(url_chunks) >= 3 and url_chunks[2] not in ['tree', 'blob']):
             raise Exception(f'Your Example URL: {url}\n{ex_text}')
 
-        # update repo with new info
-        if len(result.groups()) == 5:
-            self.repo_owner = result.group(1)
-            self.repo_name = result.group(2)
-            self._branch = branch if branch else result.group(4)
-            self._path_to_repo = result.group(5)
-        else:
-            # len(result.groups()) == 2
-            self.repo_owner = result.group(1)
-            self.repo_name = result.group(2)
+        self.repo_owner = url_chunks[0]
+        self.repo_name = url_chunks[1]
+
+        if len(url_chunks) <= 3:
             self._branch = branch if branch else 'master'
             self._path_to_repo = ''
+        else:
+            self._branch = branch if branch else url_chunks[3] if url_chunks[3] else 'master'
+            self._path_to_repo = '/'.join(url_chunks[4:])
 
     def list_public_repos(self, repo_owner=None, raw=False):
         """
