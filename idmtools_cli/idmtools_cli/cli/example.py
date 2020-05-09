@@ -136,6 +136,11 @@ def download_example(option, url, output):
 
 
 def get_plugins_example_urls():
+    """
+    Collect all idmtools examples
+
+    Returns: examples urls as dict
+    """
     # return {'a': 'test_url_1', 'b': 'test_url_2', 'c': ['test_url_1', 'test_url_2', 'test_url_3', 'test_url_4']}
 
     from idmtools.registry.master_plugin_registry import MasterPluginRegistry
@@ -157,20 +162,11 @@ def get_plugins_example_urls():
 
 
 def choice():
-    def validate(user_input):
-        nums = user_input.lower().strip().split(' ')
-        # print(nums)
-        # remove empty space
-        nums = list(filter(None, nums))
-        # print(nums)
-        nums = [int(a) if a.isdigit() else a for a in nums]
-        extra = set(nums) - set(range(1, len(url_list) + 1)) - {'all'}
-
-        if len(extra) == 0:
-            return True, nums
-        else:
-            return False, extra
-
+    """
+    Prompt user for example selections
+    
+    Returns: True/False and results
+    """
     urls = get_plugins_example_urls()
     # print(json.dumps(urls, indent=3))
 
@@ -190,10 +186,13 @@ def choice():
     print('Example List:')
     print('\n'.join(file_list))
 
+    num_set = set(range(1, len(url_list) + 1))
     while True:
-        user_input = click.prompt("\nSelect example to download (# or all separated by space)", type=str, default='all',
-                                  prompt_suffix=f": {Fore.GREEN}")
-        valid, result = validate(user_input)
+        user_input = click.prompt(
+            f"\nSelect examples (multiple) for download (all or 1-{len(url_list)} separated by space)", type=str,
+            default='all',
+            prompt_suffix=f": {Fore.GREEN}")
+        valid, result = validate(user_input, num_set)
 
         if valid:
             user_input = result
@@ -204,3 +203,28 @@ def choice():
 
     # print(user_input)
     return user_input, example_dict
+
+
+def validate(user_input: object, num_set: set):
+    """
+    Validate user_input against num_set
+    Args:
+        user_input: user input
+        num_set: test against this set
+
+    Returns: True/False and result
+    """
+    nums = user_input.lower().strip().split(' ')
+    # print(nums)
+    # remove empty space
+    nums = list(filter(None, nums))
+    # print(nums)
+    nums = [int(a) if a.isdigit() else a for a in nums]
+    extra = set(nums) - num_set - {'all'}
+
+    if len(extra) == 0 and len(nums) > 0:
+        if 'all' in nums:
+            nums = ['all']
+        return True, nums
+    else:
+        return False, list(extra)
