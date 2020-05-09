@@ -12,14 +12,20 @@ def example():
 
 
 @example.command()
-def list():
+def examples():
     """
     List idmtools examples available
 
     Returns: display examples
     """
     urls = get_plugins_example_urls()
-    print(json.dumps(urls, indent=3))
+    # print(json.dumps(urls, indent=3))
+
+    for plugin, files in urls.items():
+        print('\n', plugin)
+        files = [files] if isinstance(files, str) else files
+        file_list = [f'    - {url}' for url in files]
+        print('\n'.join(file_list))
 
 
 @example.command()
@@ -89,7 +95,6 @@ def download(url, output):
         output: Local folder
 
     Returns: None
-
     """
     examples_downloaded.clear()
 
@@ -106,15 +111,11 @@ def download(url, output):
 
 
 def get_plugins_example_urls():
-    return {'a': 'test_url_1', 'b': 'test_url_2', 'c': ['test_url_1', 'test_url_2', 'test_url_3', 'test_url_4']}
+    # return {'a': 'test_url_1', 'b': 'test_url_2', 'c': ['test_url_1', 'test_url_2', 'test_url_3', 'test_url_4']}
 
     from idmtools.registry.master_plugin_registry import MasterPluginRegistry
     pm = MasterPluginRegistry()
-    plugins = pm.get_plugins()
     plugin_map = pm.get_plugin_map()
-    # print(pm)
-    # print(plugins)
-    print(plugin_map)
 
     example_plugins = {}
     for spec_name, plugin in plugin_map.items():
@@ -127,8 +128,6 @@ def get_plugins_example_urls():
         except Exception as ex:
             print(ex)
 
-    print('Has example plugins:\n\n', json.dumps(example_plugins, indent=3))
-
     return example_plugins
 
 
@@ -140,9 +139,6 @@ def download_plugin_examples(plugin, example_list, output):
         example_list = [example_list]
 
     click.echo(f"\nDownloading Examples for '{plugin}'")
-    # if len(example_list) == 1:
-    #     click.echo(f'Example Url: {example_list[0]}')
-    # click.echo(f'Local Folder: {output}')
 
     gr = GitRepo()
     for url in example_list:
