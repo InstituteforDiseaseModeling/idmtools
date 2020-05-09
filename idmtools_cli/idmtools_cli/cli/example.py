@@ -1,5 +1,7 @@
 import json
 import click
+from click import secho
+from colorama import Fore, Style
 from idmtools.utils.gitrepo import GitRepo, REPO_OWNER, GITHUB_HOME, REPO_NAME
 from idmtools_cli.cli.entrypoint import cli
 
@@ -12,7 +14,7 @@ def example():
 
 
 @example.command()
-def examples():
+def view():
     """
     List idmtools examples available
 
@@ -99,15 +101,38 @@ def download(url, output):
     examples_downloaded.clear()
 
     if url:
-        download_plugin_examples('User Examples', url, output)
+        secho(f"Example you want to doanload: \n  {url}", fg="bright_blue")
+        if click.confirm("Do you want to go ahead to download examples?", default=True):
+            download_example('', url, output)
+            secho("✔ Download successfully!", fg="bright_green")
+        else:
+            secho("Aborted...", fg="bright_red")
         exit()
 
-    plugins_example_urls = get_plugins_example_urls()
+    option, example_dict = choice()
+    secho(f"This is your selection: {option}", fg="bright_blue")
 
-    for plugin, example_list in plugins_example_urls.items():
-        download_plugin_examples(plugin, example_list, output)
+    # If we decide to go ahead -> write to file
+    if click.confirm("Do you want to go ahead to download examples?", default=True):
+        if 'all' in option:
+            # for url in example_dict.values():
+            for i in range(1, len(example_dict) + 1):
+                download_example(i, example_dict[i], output)
+        else:
+            for i in option:
+                download_example(i, example_dict[i], output)
 
-    print(f"✔ Download complete!")
+        secho("✔ Download successfully!", fg="bright_green")
+    else:
+        secho("Aborted...", fg="bright_red")
+
+
+def download_example(option, url, output):
+    click.echo(f"\nDownloading Examples #{option}: '{url}'")
+    click.echo(f'Local Folder: {output}')
+
+    gr = GitRepo()
+    # gr.download(path_to_repo=url, output_dir=output)
 
 
 def get_plugins_example_urls():
@@ -131,22 +156,51 @@ def get_plugins_example_urls():
     return example_plugins
 
 
-def download_plugin_examples(plugin, example_list, output):
-    # print(plugin, example_list)
-    # print(examples_downloaded)
-    # print('--------------------')
-    if not isinstance(example_list, list):
-        example_list = [example_list]
+def choice():
+    def validate(user_input):
+        nums = user_input.lower().strip().split(' ')
+        # print(nums)
+        # remove empty space
+        nums = list(filter(None, nums))
+        # print(nums)
+        nums = [int(a) if a.isdigit() else a for a in nums]
+        extra = set(nums) - set(range(1, len(url_list) + 1)) - {'all'}
 
-    click.echo(f"\nDownloading Examples for '{plugin}'")
-
-    gr = GitRepo()
-    for url in example_list:
-        if url not in examples_downloaded:
-            click.echo(f'Example Url: {url}')
-            click.echo(f'Local Folder: {output}')
-            examples_downloaded.append(url)
-            # gr.download(path_to_repo=url, output_dir=output)
+        if len(extra) == 0:
+            return True, nums
         else:
-            print(f'Ignored duplicate: {url}')
-    print(f"✔ {plugin}: Download complete.\n")
+            return False, extra
+
+    urls = get_plugins_example_urls()
+    # print(json.dumps(urls, indent=3))
+
+    url_list = []
+    for u in urls.values():
+        url_list.extend(u)
+    url_list = list(set(url_list))
+    url_list = sorted(url_list, reverse=False)
+    # print('\n'.join(url_list))
+
+    example_dict = {}
+    for i in range(len(url_list)):
+        example_dict[i + 1] = url_list[i]
+    # print(json.dumps(example_dict, indent=3))
+
+    file_list = [f'    {i}. {url}' for i, url in example_dict.items()]
+    print('Example List:')
+    print('\n'.join(file_list))
+
+    while True:
+        user_input = click.prompt("\nSelect example to download (# or all separated by space)", type=str, default='all',
+                                  prompt_suffix=f": {Fore.GREEN}")
+        valid, result = validate(user_input)
+
+        if valid:
+            user_input = result
+            break
+
+        # Else display the error message
+        secho(f'This is not correct choice: {result}', fg="bright_red")
+
+    # print(user_input)
+    return user_input, example_dict
