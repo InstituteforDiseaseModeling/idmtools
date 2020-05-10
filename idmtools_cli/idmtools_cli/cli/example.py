@@ -1,4 +1,4 @@
-import json
+import os
 import click
 from click import secho
 from colorama import Fore, Style
@@ -16,7 +16,7 @@ def example():
 @example.command()
 def view():
     """
-    List idmtools examples available
+    List idmtools available examples
 
     Returns: display examples
     """
@@ -103,7 +103,7 @@ def download(url, output):
     if url:
         secho(f"Example you want to doanload: \n  {url}", fg="bright_blue")
         if click.confirm("Do you want to go ahead to download examples?", default=True):
-            download_example('', url, output)
+            download_example(None, url, output)
             secho("✔ Download successfully!", fg="bright_green")
         else:
             secho("Aborted...", fg="bright_red")
@@ -128,11 +128,12 @@ def download(url, output):
 
 
 def download_example(option, url, output):
-    click.echo(f"\nDownloading Examples #{option}: '{url}'")
-    click.echo(f'Local Folder: {output}')
+    click.echo(f"\nDownloading Examples {option if option else ''}: '{url}'")
+    click.echo(f'Local Folder: {os.path.abspath(output)}')
+    secho('Processing...')
 
     gr = GitRepo()
-    # gr.download(path_to_repo=url, output_dir=output)
+    gr.download(path_to_repo=url, output_dir=output)
 
 
 def get_plugins_example_urls():
@@ -164,7 +165,7 @@ def get_plugins_example_urls():
 def choice():
     """
     Prompt user for example selections
-    
+
     Returns: True/False and results
     """
     urls = get_plugins_example_urls()

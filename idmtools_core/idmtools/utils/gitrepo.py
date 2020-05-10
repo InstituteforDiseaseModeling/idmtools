@@ -16,7 +16,7 @@ class GitRepo:
     repo_name: str = field(default=None)
     _branch: str = field(default='master', init=False, repr=False)
     _path_to_repo: str = field(default='', init=False, repr=False)
-    _download_info: bool = field(default=True, init=False, repr=False)
+    _download_info: bool = field(default=False, init=False, repr=False)
 
     def __post_init__(self):
         self.repo_owner = self.repo_owner or REPO_OWNER
