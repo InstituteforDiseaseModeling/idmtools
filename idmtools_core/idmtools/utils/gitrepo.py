@@ -54,12 +54,13 @@ class GitRepo:
         """
         return f'{GITHUB_API_HOME}/repos/{self.repo_owner}/{self.repo_name}/contents/{self._path_to_repo}?ref={self._branch}'
 
-    def parse_url(self, url, branch=None):
+    def parse_url(self, url, branch=None, update=True):
         """
         Parse url for owner, repo, branch and example path
         Args:
             url: example url
             branch: user branch to replace the branch in url
+            update: True/False - update repo or not
 
         Returns: None
         """
@@ -72,15 +73,23 @@ class GitRepo:
         if len(url_chunks) < 2 or (len(url_chunks) >= 3 and url_chunks[2] not in ['tree', 'blob']):
             raise Exception(f'Your Example URL: {url}\n{ex_text}')
 
-        self.repo_owner = url_chunks[0]
-        self.repo_name = url_chunks[1]
+        repo_owner = url_chunks[0]
+        repo_name = url_chunks[1]
 
         if len(url_chunks) <= 3:
-            self._branch = branch if branch else default_branch
-            self._path_to_repo = ''
+            _branch = branch if branch else default_branch
+            _path_to_repo = ''
         else:
-            self._branch = branch if branch else url_chunks[3] if url_chunks[3] else default_branch
-            self._path_to_repo = '/'.join(url_chunks[4:])
+            _branch = branch if branch else url_chunks[3] if url_chunks[3] else default_branch
+            _path_to_repo = '/'.join(url_chunks[4:])
+
+        if update:
+            self.repo_owner = repo_owner
+            self.repo_name = repo_name
+            self._branch = _branch
+            self._path_to_repo = _path_to_repo
+        else:
+            return {'repo_owner': repo_owner, 'repo_name': repo_name, 'branch': _branch, 'path_to_repo': _path_to_repo}
 
     def list_public_repos(self, repo_owner=None, raw=False):
         """
@@ -186,6 +195,7 @@ class GitRepo:
         if self._download_info:
             print(f'Download Examples From: {self.repo_example_url}')
             print(f'Local Destination: {os.path.abspath(output_dir)}')
+            print('Processing...')
             self._download_info = False
 
         try:
@@ -203,39 +213,85 @@ class GitRepo:
         with open(response[0], "r") as f:
             data = json.load(f)
 
-            # If the data is a file, download it as one.
-            if isinstance(data, dict) and data["type"] == "file":
+        # If the data is a file, download it as one.
+        if isinstance(data, dict) and data["type"] == "file":
+            try:
+                # download the file
+                opener = urllib.request.build_opener()
+                opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+                urllib.request.install_opener(opener)
+                urllib.request.urlretrieve(data["download_url"], os.path.join(download_dir, data["name"]))
+                return
+            except KeyboardInterrupt:
+                # when CTRL+C is pressed during the execution of this script,
+                # bring the cursor to the beginning, erase the current line, and dont make a new line
+                print("✘ Got interrupted", )
+                sys.exit()
+
+        for file in data:
+            file_url = file["download_url"]
+            path = file["path"]
+
+            # create folder when necessary
+            os.makedirs(os.path.dirname(os.path.join(download_dir, path)), exist_ok=True)
+
+            if file_url is not None:
                 try:
                     # download the file
                     opener = urllib.request.build_opener()
                     opener.addheaders = [('User-agent', 'Mozilla/5.0')]
                     urllib.request.install_opener(opener)
-                    urllib.request.urlretrieve(data["download_url"], os.path.join(download_dir, data["name"]))
-                    return
+                    urllib.request.urlretrieve(file_url, os.path.join(download_dir, path))
                 except KeyboardInterrupt:
                     # when CTRL+C is pressed during the execution of this script,
                     # bring the cursor to the beginning, erase the current line, and dont make a new line
                     print("✘ Got interrupted", )
                     sys.exit()
+            else:
+                self.download(path, output_dir, branch)
 
+    def peep(self, path_to_repo='', branch='master'):
+        """
+        Download files with example url provided
+        Args:
+            path_to_repo: local file path to the repo
+            branch: specify branch for files download from
+
+        Returns: None
+        """
+        # print(f'Peep: {path_to_repo}')
+        if path_to_repo.startswith('https://'):
+            repo_meta = self.parse_url(path_to_repo, branch, False)
+        else:
+            self._path_to_repo = path_to_repo
+            self._branch = branch
+            repo_meta = {'repo_owner': self.repo_owner, 'repo_name': self.repo_name, 'branch': branch or self.branch,
+                         'path_to_repo': path_to_repo or self.path_to_repo}
+
+        try:
+            api_example_url = f"{GITHUB_API_HOME}/repos/{repo_meta['repo_owner']}/{repo_meta['repo_name']}/contents/{repo_meta['path_to_repo']}?ref={repo_meta['branch']}"
+            opener = urllib.request.build_opener()
+            opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+            urllib.request.install_opener(opener)
+            response = urllib.request.urlretrieve(api_example_url)
+        except KeyboardInterrupt:
+            # when CTRL+C is pressed during the execution of this script,
+            # bring the cursor to the beginning, erase the current line, and dont make a new line
+            print("✘ Got interrupted")
+            sys.exit()
+
+        result = []
+        with open(response[0], "r") as f:
+            data = json.load(f)
+
+        # If the data is a file, download it as one.
+        if isinstance(data, dict):
+            repo_meta = self.parse_url(data['html_url'], branch, False)
+            result.append(repo_meta['path_to_repo'])
+        else:
             for file in data:
-                file_url = file["download_url"]
-                path = file["path"]
+                repo_meta = self.parse_url(file['html_url'], branch, False)
+                result.append(repo_meta['path_to_repo'])
 
-                # create folder when necessary
-                os.makedirs(os.path.dirname(os.path.join(download_dir, path)), exist_ok=True)
-
-                if file_url is not None:
-                    try:
-                        # download the file
-                        opener = urllib.request.build_opener()
-                        opener.addheaders = [('User-agent', 'Mozilla/5.0')]
-                        urllib.request.install_opener(opener)
-                        urllib.request.urlretrieve(file_url, os.path.join(download_dir, path))
-                    except KeyboardInterrupt:
-                        # when CTRL+C is pressed during the execution of this script,
-                        # bring the cursor to the beginning, erase the current line, and dont make a new line
-                        print("✘ Got interrupted", )
-                        sys.exit()
-                else:
-                    self.download(path, output_dir, branch)
+        # print('\n'.join(result))
+        return result

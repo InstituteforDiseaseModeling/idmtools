@@ -86,6 +86,24 @@ def tags(owner=None, repo=None):
 
 
 @example.command()
+@click.option('--url', required=True, help="Repo Examples Url")
+def peep(url):
+    """
+    List all the tags of the repo
+    Args:
+        url: GitHub Repo examples url (required)
+
+    Returns: the list of current files/dirs (not recursive)
+    """
+    print(f'Peep: {url}')
+    print('Processing...')
+    gr = GitRepo()
+    result = gr.peep(url)
+    result_list = [f'    - {r}' for r in result]
+    print('\n'.join(result_list))
+
+
+@example.command()
 @click.option('--url', default=None, help="Repo Examples Url")
 @click.option('--output', default='./', help="Examples Download Destination")
 def download(url, output):
