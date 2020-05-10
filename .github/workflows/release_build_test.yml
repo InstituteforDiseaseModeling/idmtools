@@ -1,20 +1,18 @@
-# This workflows will download idmtools nightly packages from artifactory then run smoke tests
+# This workflows will download idmtools released packages from artifactory then run tests
 
-name: "nightly build smoke test"
+name: "release build validation test"
 on:
   schedule:
-    # At 6am PST (13 UTC time on Tuesday, Thursday)
-    - cron: '0 13 * * 2,4'
+    # At 5:30AM PST (12:30 UTC time on every Sunday)
+    - cron: '30 12 * *  7'
 
 jobs:
-  nightly_build_smoke_test:
+  nightly_build_all_test:
     if: github.repository == 'InstituteforDiseaseModeling/idmtools'
     runs-on: ubuntu-latest
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
-        with:
-          ref: dev
       - name: Set up Python
         uses: actions/setup-python@v1
         with:
@@ -24,30 +22,27 @@ jobs:
           python -m pip install --upgrade pip
           pip install setuptools wheel twine
       - name: download idmtools packages from staging jfrog
-        env:
-          bamboo_UserArtifactory: ${{ secrets.PYPI_STAGING_USERNAME }}
-          bamboo_PasswordArtifactory: ${{ secrets.PYPI_STAGING_PASSWORD }}
         run: |
-          pip install idmtools[full] --index-url=https://$bamboo_UserArtifactory:$bamboo_PasswordArtifactory@packages.idmod.org/api/pypi/pypi-staging/simple
-          pip install idmtools-test --index-url=https://$bamboo_UserArtifactory:$bamboo_PasswordArtifactory@packages.idmod.org/api/pypi/pypi-staging/simple
+          pip install idmtools[full] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+          pip install idmtools-test --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
       - name: login to comps2
         run: |
             python dev_scripts/create_auth_token_args.py --username idmtools_bamboo
-      - name: run idmtools_cli smoke tests
+      - name: run idmtools_cli tests
         run: |
             cd idmtools_cli/tests
-            py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
-      - name: Upload idmtools_cli smoke test results
+            py.test --durations=3 -v --junitxml=test_results.xml
+      - name: Upload idmtools_cli test results
         uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: idmtools_cli_test_results
           path: idmtools_cli/tests/test_results.xml
-      - name: run idmtools_core smoke tests
+      - name: run idmtools_core tests
         run: |
             cd idmtools_core/tests
-            py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
-      - name: Upload idmtools_core smoke test results
+            py.test --durations=3 -v --junitxml=test_results.xml
+      - name: Upload idmtools_core test results
         uses: actions/upload-artifact@v2
         if: failure()
         with:
@@ -56,8 +51,8 @@ jobs:
       - name: run idmtools_models tests
         run: |
             cd idmtools_models/tests
-            py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
-      - name: Upload idmtools_models smoke test results
+            py.test --durations=3 -v --junitxml=test_results.xml
+      - name: Upload idmtools_models test results
         uses: actions/upload-artifact@v2
         if: failure()
         with:
@@ -66,18 +61,18 @@ jobs:
       - name: run idmtools_platform_comps tests
         run: |
             cd idmtools_platform_comps/tests
-            py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
+            py.test --durations=3 -v --junitxml=test_results.xml
       - name: Upload idmtools_platform_comps test results
         uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: idmtools_platform_comps_test_results
           path: idmtools_platform_comps/tests/test_results.xml
-      - name: run idmtools_platform_local smoke tests
+      - name: run idmtools_platform_local tests
         run: |
             cd idmtools_platform_local/tests
-            py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
-      - name: Upload idmtools_platform_local smoke test results
+            py.test --durations=3 -v --junitxml=test_results.xml
+      - name: Upload idmtools_platform_local test results
         uses: actions/upload-artifact@v2
         if: failure()
         with:
