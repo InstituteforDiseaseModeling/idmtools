@@ -23,7 +23,7 @@ package "Tasks" as tasks {
 
 Analyzers ..... Platform: Load Data from Platform
 ExperimentBuilders . Experiment: ExperimentBuilders build \nexperiments using \ntemplated simulations
-ExperimentBuilders . Simulation : ExperimentBuilders\n use as\n Templated Simulation
+ExperimentBuilders . Simulation : ExperimentBuilders\n uses Simulations from\n TemplatedSimulations
 Platform --> PlatformAPI
 PlatformAPI .. TasksAPI
 [Suite] -down-> Experiment : Suites have Experiments
