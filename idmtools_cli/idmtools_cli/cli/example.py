@@ -185,6 +185,15 @@ def get_plugins_example_urls():
 
     Returns: examples urls as dict
     """
+
+    test_examples = {
+        'A': 'https://github.com/dustin/py-github/tree/master/github/data',
+        'B': 'https://github.com/dustin/py-github/tree/master/github',
+        'C': 'https://github.com/dustin/py-github/blob/master/github/__init__.py',
+        'D': ['https://github.com/dustin/py-github/tree/master/github', 'https://github.com/dustin/py-github/tree/master/github/data']
+
+    }
+    return test_examples
     # return {'A': 'test_url_1', 'B': 'test_url_2', 'C': ['test_url_1', 'test_url_2', 'test_url_3', 'test_url_4']}
 
     from idmtools.registry.master_plugin_registry import MasterPluginRegistry
@@ -213,6 +222,8 @@ def choice():
     # Collect all examples and remove duplicates
     url_list = []
     for u in urls.values():
+        if isinstance(u, str):
+            u = [u]
         url_list.extend(u)
     url_list = list(set(url_list))
     url_list = sorted(url_list, reverse=False)
