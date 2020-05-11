@@ -9,10 +9,10 @@ package "idmtools-models" as models {
     [JSONConfiguredPythonTask]
     [RTask]
     [JSONConfiguredRTask]
-    PythonTask <-- JSONConfiguredPythonTask: Adds JSON Configuration\n file to PythonTask
-    RTask <-- JSONConfiguredRTask: Adds JSON Configuration\n file to PythonTask
+    PythonTask <-- JSONConfiguredPythonTask: Adds JSON configuration\n file to PythonTask
+    RTask <-- JSONConfiguredRTask: Adds JSON configuration\n file to PythonTask
 }
 
-TasksAPI <-- PythonTask: Implements Python Based Tasks
-TasksAPI <- RTask : Implements R Based Tasks
+TasksAPI <-- PythonTask: Implements Python-based Tasks
+TasksAPI <- RTask : Implements R-based Tasks
 @enduml

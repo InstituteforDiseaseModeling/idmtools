@@ -12,7 +12,7 @@ package "idmtools-platform-local" as local {
     [LocalPlatform]
     [LocalPlatformCLI]
 }
-PlatformAPI <-down-> LocalPlatform : Local Platform Implementation
+PlatformAPI <-down-> LocalPlatform : LocalPlatform Implementation
 cli_api <.> LocalPlatformCLI : idmtools local commands
 LocalPlatformCLI <--> LocalPlatform
 LocalPlatform -[hidden]- LocalPlatformCLI

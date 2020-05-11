@@ -10,8 +10,8 @@ tools for building Simulations in bulk
 end note
 [idmtools-cli]
 note left of [idmtools-cli]
-    Provides the CLI Interface for
-    idmtools. Optional
+    Provides the CLI for
+    idmtools. (Optional)
 end note
 [idmtools-models]
 note right of [idmtools-models]
