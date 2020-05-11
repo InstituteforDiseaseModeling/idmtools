@@ -1,7 +1,7 @@
 @startuml
 
 [Analyzers]
-package "Experiment/Job Orchestration" as ejo {
+package "Experiment/Job Orchestration     " as ejo {
     [Assets]
     [Experiment]
     [ExperimentBuilders]
@@ -12,11 +12,11 @@ package "Experiment/Job Orchestration" as ejo {
 }
 
 
-package "regsitry (Plugin Infrastructure)" as regsitry {
+package "regsitry (Plugin Infrastructure)     " as regsitry {
     () "PlatformAPI" as PlatformAPI
     () "TasksAPI" as TasksAPI
 }
-package "Tasks" as tasks {
+package "Tasks " as tasks {
   [CommandTask]
   [DockerTask]
 }
