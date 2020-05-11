@@ -56,11 +56,15 @@ class TestExample(unittest.TestCase):
         self.assertTrue(r2)
         self.assertEqual(_, ['all'])
 
-        r3, _ = validate("1  3  9", choice_set)
+        r3, _ = validate("1  3  , 9", choice_set)
         self.assertFalse(r3)
-        self.assertEqual(_, [9])
+        self.assertListEqual(_, [9, ','])
 
-        r4, _ = validate("1  3 all 9", choice_set)
+        r4, _ = validate("1  3 9   10", choice_set)
         self.assertFalse(r4)
+        self.assertListEqual(_, [9, 10])
+
+        r5, _ = validate("1  3 all 9", choice_set)
+        self.assertFalse(r5)
         self.assertEqual(_, [9])
 

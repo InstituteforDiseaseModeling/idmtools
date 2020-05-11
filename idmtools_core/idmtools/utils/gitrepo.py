@@ -15,20 +15,24 @@ class GitRepo:
     repo_owner: str = field(default=None)
     repo_name: str = field(default=None)
     _branch: str = field(default='master', init=False, repr=False)
-    _path_to_repo: str = field(default='', init=False, repr=False)
-    _download_info: bool = field(default=False, init=False, repr=False)
+    _path: str = field(default='', init=False, repr=False)
+    _verbose: bool = field(default=False, init=False, repr=False)
 
     def __post_init__(self):
         self.repo_owner = self.repo_owner or REPO_OWNER
         self.repo_name = self.repo_name or REPO_NAME
 
     @property
-    def path_to_repo(self):
-        return self._path_to_repo
+    def path(self):
+        return self._path
 
     @property
     def branch(self):
         return self._branch
+
+    @property
+    def verbose(self):
+        return self._verbose
 
     @property
     def repo_home_url(self):
@@ -44,7 +48,7 @@ class GitRepo:
         Construct repo example url
         Returns: repo example url
         """
-        return f'{self.repo_home_url}/tree/{self._branch}/{self._path_to_repo}'
+        return f'{self.repo_home_url}/tree/{self._branch}/{self._path}'
 
     @property
     def api_example_url(self):
@@ -52,7 +56,7 @@ class GitRepo:
         Construct api url of the examples for download
         Returns: api url
         """
-        return f'{GITHUB_API_HOME}/repos/{self.repo_owner}/{self.repo_name}/contents/{self._path_to_repo}?ref={self._branch}'
+        return f'{GITHUB_API_HOME}/repos/{self.repo_owner}/{self.repo_name}/contents/{self._path}?ref={self._branch}'
 
     def parse_url(self, url: str, branch: str = None, update: bool = True):
         """
@@ -65,7 +69,7 @@ class GitRepo:
         Returns: None
         """
         default_branch = 'master'
-        ex_text = f'Please Verify URL Format: \nhttps://github.com/<owner>/<repo>/(tree|blob)/<branch>/<path_to_repo>\nor\nhttps://github.com/<owner>/<repo>/'
+        ex_text = f'Please Verify URL Format: \nhttps://github.com/<owner>/<repo>/(tree|blob)/<branch>/<path>\nor\nhttps://github.com/<owner>/<repo>/'
 
         example_url = url.lower().strip().rstrip('/')
         url_chunks = example_url.replace(f'{GITHUB_HOME}/', '').split('/')
@@ -78,18 +82,18 @@ class GitRepo:
 
         if len(url_chunks) <= 3:
             _branch = branch if branch else default_branch
-            _path_to_repo = ''
+            _path = ''
         else:
             _branch = branch if branch else url_chunks[3] if url_chunks[3] else default_branch
-            _path_to_repo = '/'.join(url_chunks[4:])
+            _path = '/'.join(url_chunks[4:])
 
         if update:
             self.repo_owner = repo_owner
             self.repo_name = repo_name
             self._branch = _branch
-            self._path_to_repo = _path_to_repo
+            self._path = _path
         else:
-            return {'repo_owner': repo_owner, 'repo_name': repo_name, 'branch': _branch, 'path_to_repo': _path_to_repo}
+            return {'repo_owner': repo_owner, 'repo_name': repo_name, 'branch': _branch, 'path': _path}
 
     def list_public_repos(self, repo_owner: str = None, raw: bool = False):
         """
@@ -172,32 +176,32 @@ class GitRepo:
         else:
             return [f"{r['tag_name']} at {r['published_at']}" for r in repo_list]
 
-    def download(self, path_to_repo: str = '', output_dir: str = "./", branch: str = 'master'):
+    def download(self, path: str = '', output_dir: str = "./", branch: str = 'master'):
         """
         Download files with example url provided
         Args:
-            path_to_repo: local file path to the repo
+            path: local file path to the repo
             output_dir: user local folder to download files to
             branch: specify branch for files download from
 
         Returns: None
         """
 
-        if path_to_repo.startswith('https://'):
-            self.parse_url(path_to_repo)
+        if path.startswith('https://'):
+            self.parse_url(path)
         else:
-            self._path_to_repo = path_to_repo
+            self._path = path
             self._branch = branch
 
         if not os.path.exists(output_dir):
             raise Exception(f"output_dir does not exist: {output_dir}")
 
         # First time display download url and local destination info
-        if self._download_info:
+        if self.verbose:
             print(f'Download Examples From: {self.repo_example_url}')
             print(f'Local Destination: {os.path.abspath(output_dir)}')
             print('Processing...')
-            self._download_info = False
+            self._verbose = False
 
         try:
             opener = urllib.request.build_opener()
@@ -250,26 +254,26 @@ class GitRepo:
             else:
                 self.download(path, output_dir, branch)
 
-    def peep(self, path_to_repo: str = '', branch: str = 'master'):
+    def peep(self, path: str = '', branch: str = 'master'):
         """
         Download files with example url provided
         Args:
-            path_to_repo: local file path to the repo
+            path: local file path to the repo
             branch: specify branch for files download from
 
         Returns: None
         """
 
-        if path_to_repo.startswith('https://'):
-            repo_meta = self.parse_url(path_to_repo, branch, False)
+        if path.startswith('https://'):
+            repo_meta = self.parse_url(path, branch, False)
         else:
-            self._path_to_repo = path_to_repo
+            self._path = path
             self._branch = branch
             repo_meta = {'repo_owner': self.repo_owner, 'repo_name': self.repo_name, 'branch': branch or self.branch,
-                         'path_to_repo': path_to_repo or self.path_to_repo}
+                         'path': path or self.path}
 
         try:
-            api_example_url = f"{GITHUB_API_HOME}/repos/{repo_meta['repo_owner']}/{repo_meta['repo_name']}/contents/{repo_meta['path_to_repo']}?ref={repo_meta['branch']}"
+            api_example_url = f"{GITHUB_API_HOME}/repos/{repo_meta['repo_owner']}/{repo_meta['repo_name']}/contents/{repo_meta['path']}?ref={repo_meta['branch']}"
             opener = urllib.request.build_opener()
             opener.addheaders = [('User-agent', 'Mozilla/5.0')]
             urllib.request.install_opener(opener)

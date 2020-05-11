@@ -170,7 +170,7 @@ def download_example(option: int, url: str, output: str):
 
     # Start to download files
     gr = GitRepo()
-    gr.download(path_to_repo=url, output_dir=output)
+    gr.download(path=url, output_dir=output)
 
 
 def get_plugins_example_urls():
