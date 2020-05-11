@@ -1,13 +1,14 @@
 # This workflows will download idmtools nightly packages from artifactory then run smoke tests
 
-name: "nightly build smoke test"
+name: "Install nightly build and run smoke test"
+
 on:
   schedule:
-    # At 6am PST (13 UTC time on Tuesday, Thursday)
-    - cron: '0 13 * * 2,4'
+    # Run at 6AM PST (13 UTC time) on Monday, Wednesday, and Friday
+    - cron: '0 13 * * 1,3,5'
 
 jobs:
-  nightly_build_smoke_test:
+  install-nightly-build-run-smoke-test:
     if: github.repository == 'InstituteforDiseaseModeling/idmtools'
     runs-on: ubuntu-latest
     steps:

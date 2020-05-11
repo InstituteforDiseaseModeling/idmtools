@@ -1,13 +1,21 @@
-# This workflows will download idmtools released packages from artifactory then run tests
+# This workflows will download idmtools nightly packages from production artifactory then run tests with curl command
+#
+# curl command from your cmd:
+# curl -XPOST -u "username:githubPAT" -H "Accept: application/vnd.github.everest-preview+json" \
+# -H "Content-Type: application/json" \
+# --data "{\"event_type\": \"test_release_build\"}" \
+#  https://api.github.com/repos/InstituteforDiseaseModeling/idmtools/dispatches
+#
+# Note, this test will checkout 'master' branch
 
-name: "release build validation test"
+name: "Install release build and run test"
 on:
-  schedule:
-    # At 5:30AM PST (12:30 UTC time on every Sunday)
-    - cron: '30 12 * *  7'
+  repository_dispatch:
+    # Manually trigger with above curl or Postman POST
+    types: [test_release_build]
 
 jobs:
-  nightly_build_all_test:
+  install-release-build-run-all-test:
     if: github.repository == 'InstituteforDiseaseModeling/idmtools'
     runs-on: ubuntu-latest
     steps:
