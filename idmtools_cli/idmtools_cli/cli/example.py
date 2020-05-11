@@ -1,4 +1,5 @@
 import os
+import json
 import click
 from click import secho
 from colorama import Fore, Style
@@ -21,7 +22,6 @@ def view():
     Returns: display examples
     """
     urls = get_plugins_example_urls()
-    # print(json.dumps(urls, indent=3))
 
     for plugin, files in urls.items():
         print('\n', plugin)
@@ -37,7 +37,6 @@ def repos(owner=None):
     List owner all public repos
     Args:
         owner: repo owner
-        repo: repo name
 
     Returns: display public repos
     """
@@ -87,20 +86,30 @@ def tags(owner=None, repo=None):
 
 @example.command()
 @click.option('--url', required=True, help="Repo Examples Url")
-def peep(url):
+@click.option('--raw', default=False, type=bool, help="Files in detail")
+def peep(url, raw):
     """
     List all the tags of the repo
     Args:
         url: GitHub Repo examples url (required)
+        raw: display details or not
 
     Returns: the list of current files/dirs (not recursive)
     """
     print(f'Peep: {url}')
     print('Processing...')
-    gr = GitRepo()
-    result = gr.peep(url)
-    result_list = [f'    - {r}' for r in result]
-    print('\n'.join(result_list))
+    result = GitRepo().peep(url)
+
+    secho(f"Item Count: {len(result)}", fg="green")
+    if raw:
+        print(json.dumps(result, indent=3))
+        exit(0)
+
+    for file in result:
+        if file['type'] == 'dir':
+            secho(f"    - {file['name']}", fg="yellow")
+        else:
+            secho(f"    - {file['name']}")
 
 
 @example.command()
@@ -133,7 +142,6 @@ def download(url, output):
     # If we decide to go ahead -> write to file
     if click.confirm("Do you want to go ahead to download examples?", default=True):
         if 'all' in option:
-            # for url in example_dict.values():
             for i in range(1, len(example_dict) + 1):
                 download_example(i, example_dict[i], output)
         else:
@@ -145,11 +153,22 @@ def download(url, output):
         secho("Aborted...", fg="bright_red")
 
 
-def download_example(option, url, output):
+def download_example(option: int, url: str, output: str):
+    """
+    Use GitRepo utility to download examples
+    Args:
+        option: example index
+        url: example url
+        output: local folder to save examples
+
+    Returns: None
+    """
+    # Display file information
     click.echo(f"\nDownloading Examples {option if option else ''}: '{url}'")
     click.echo(f'Local Folder: {os.path.abspath(output)}')
     secho('Processing...')
 
+    # Start to download files
     gr = GitRepo()
     gr.download(path_to_repo=url, output_dir=output)
 
@@ -160,17 +179,14 @@ def get_plugins_example_urls():
 
     Returns: examples urls as dict
     """
-    # return {'a': 'test_url_1', 'b': 'test_url_2', 'c': ['test_url_1', 'test_url_2', 'test_url_3', 'test_url_4']}
+    # return {'A': 'test_url_1', 'B': 'test_url_2', 'C': ['test_url_1', 'test_url_2', 'test_url_3', 'test_url_4']}
 
     from idmtools.registry.master_plugin_registry import MasterPluginRegistry
-    pm = MasterPluginRegistry()
-    plugin_map = pm.get_plugin_map()
+    plugin_map = MasterPluginRegistry().get_plugin_map()
 
     example_plugins = {}
     for spec_name, plugin in plugin_map.items():
         try:
-            # print('-----------------------------')
-            # print(spec_name, plugin)
             plugin_url_list = plugin.get_example_urls()
             if len(plugin_url_list) > 0:
                 example_plugins[spec_name] = plugin_url_list
@@ -184,34 +200,36 @@ def choice():
     """
     Prompt user for example selections
 
-    Returns: True/False and results
+    Returns: True/False and results (List)
     """
     urls = get_plugins_example_urls()
-    # print(json.dumps(urls, indent=3))
 
+    # Collect all examples and remove duplicates
     url_list = []
     for u in urls.values():
         url_list.extend(u)
     url_list = list(set(url_list))
     url_list = sorted(url_list, reverse=False)
-    # print('\n'.join(url_list))
 
+    # Provide index to each example
     example_dict = {}
     for i in range(len(url_list)):
         example_dict[i + 1] = url_list[i]
-    # print(json.dumps(example_dict, indent=3))
 
+    # Pre-view examples for user to select
     file_list = [f'    {i}. {url}' for i, url in example_dict.items()]
     print('Example List:')
     print('\n'.join(file_list))
 
-    num_set = set(range(1, len(url_list) + 1))
+    # Make sure user makes correct selection
+    choice_set = set(range(1, len(url_list) + 1))
+    choice_set.add('all')
     while True:
         user_input = click.prompt(
             f"\nSelect examples (multiple) for download (all or 1-{len(url_list)} separated by space)", type=str,
             default='all',
             prompt_suffix=f": {Fore.GREEN}")
-        valid, result = validate(user_input, num_set)
+        valid, result = validate(user_input, choice_set)
 
         if valid:
             user_input = result
@@ -220,30 +238,31 @@ def choice():
         # Else display the error message
         secho(f'This is not correct choice: {result}', fg="bright_red")
 
-    # print(user_input)
+    # Return user selection and indexed examples
     return user_input, example_dict
 
 
-def validate(user_input: object, num_set: set):
+def validate(user_input: object, choice_set: set):
     """
     Validate user_input against num_set
     Args:
         user_input: user input
-        num_set: test against this set
+        choice_set: test against this set
 
-    Returns: True/False and result
+    Returns: True/False and result (List)
     """
-    nums = user_input.lower().strip().split(' ')
-    # print(nums)
-    # remove empty space
-    nums = list(filter(None, nums))
-    # print(nums)
-    nums = [int(a) if a.isdigit() else a for a in nums]
-    extra = set(nums) - num_set - {'all'}
+    # Normalize user selection
+    selection = user_input.lower().strip().split(' ')
+    selection = list(filter(None, selection))
+    selection = [int(a) if a.isdigit() else a for a in selection]
 
-    if len(extra) == 0 and len(nums) > 0:
-        if 'all' in nums:
-            nums = ['all']
-        return True, nums
+    # Find difference
+    extra = set(selection) - choice_set
+
+    # Return True/False along with selection details
+    if len(extra) == 0 and len(selection) > 0:
+        if 'all' in selection:
+            selection = ['all']
+        return True, selection
     else:
         return False, list(extra)

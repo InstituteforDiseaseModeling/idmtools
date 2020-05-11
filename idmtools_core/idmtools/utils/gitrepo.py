@@ -54,7 +54,7 @@ class GitRepo:
         """
         return f'{GITHUB_API_HOME}/repos/{self.repo_owner}/{self.repo_name}/contents/{self._path_to_repo}?ref={self._branch}'
 
-    def parse_url(self, url, branch=None, update=True):
+    def parse_url(self, url: str, branch: str = None, update: bool = True):
         """
         Parse url for owner, repo, branch and example path
         Args:
@@ -91,7 +91,7 @@ class GitRepo:
         else:
             return {'repo_owner': repo_owner, 'repo_name': repo_name, 'branch': _branch, 'path_to_repo': _path_to_repo}
 
-    def list_public_repos(self, repo_owner=None, raw=False):
+    def list_public_repos(self, repo_owner: str = None, raw: bool = False):
         """
         Utility method to retrieve all public repos
         Args:
@@ -117,7 +117,7 @@ class GitRepo:
         else:
             return [r['full_name'] for r in repo_list]
 
-    def list_repo_tags(self, repo_owner=None, repo_name=None, raw=False):
+    def list_repo_tags(self, repo_owner: str = None, repo_name: str = None, raw: bool = False):
         """
         Utility method to retrieve all tags of the repo
         Args:
@@ -144,7 +144,7 @@ class GitRepo:
         else:
             return [r['name'] for r in repo_list]
 
-    def list_repo_releases(self, repo_owner=None, repo_name=None, raw=False):
+    def list_repo_releases(self, repo_owner: str = None, repo_name: str = None, raw: bool = False):
         """
         Utility method to retrieve all releases of the repo
         Args:
@@ -159,6 +159,7 @@ class GitRepo:
         # build api url
         api_url = f'{GITHUB_API_HOME}/repos/{repo_owner if repo_owner else self.repo_owner}/{repo_name if repo_name else self.repo_name}/releases'
 
+        # make api call
         resp = requests.get(api_url)
         if resp.status_code != 200:
             raise Exception(f'Failed to retrieve: {api_url}')
@@ -171,7 +172,7 @@ class GitRepo:
         else:
             return [f"{r['tag_name']} at {r['published_at']}" for r in repo_list]
 
-    def download(self, path_to_repo='', output_dir="./", branch='master'):
+    def download(self, path_to_repo: str = '', output_dir: str = "./", branch: str = 'master'):
         """
         Download files with example url provided
         Args:
@@ -213,7 +214,6 @@ class GitRepo:
         with open(response[0], "r") as f:
             data = json.load(f)
 
-        # If the data is a file, download it as one.
         if isinstance(data, dict) and data["type"] == "file":
             try:
                 # download the file
@@ -250,7 +250,7 @@ class GitRepo:
             else:
                 self.download(path, output_dir, branch)
 
-    def peep(self, path_to_repo='', branch='master'):
+    def peep(self, path_to_repo: str = '', branch: str = 'master'):
         """
         Download files with example url provided
         Args:
@@ -259,7 +259,7 @@ class GitRepo:
 
         Returns: None
         """
-        # print(f'Peep: {path_to_repo}')
+
         if path_to_repo.startswith('https://'):
             repo_meta = self.parse_url(path_to_repo, branch, False)
         else:
@@ -284,14 +284,12 @@ class GitRepo:
         with open(response[0], "r") as f:
             data = json.load(f)
 
-        # If the data is a file, download it as one.
         if isinstance(data, dict):
-            repo_meta = self.parse_url(data['html_url'], branch, False)
-            result.append(repo_meta['path_to_repo'])
+            d = {'type': data['type'], 'name': data['path'], 'path': data['path'], 'html_url': data['html_url']}
+            result.append(d)
         else:
             for file in data:
-                repo_meta = self.parse_url(file['html_url'], branch, False)
-                result.append(repo_meta['path_to_repo'])
+                d = {'type': file['type'], 'name': file['name'], 'path': file['path'], 'html_url': file['html_url']}
+                result.append(d)
 
-        # print('\n'.join(result))
         return result
