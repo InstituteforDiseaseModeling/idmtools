@@ -215,22 +215,31 @@ class GitRepo:
             sys.exit()
 
         download_dir = os.path.join(output_dir, self.repo_name)
+
+        # total files count
+        total_files = 0
         with open(response[0], "r") as f:
             data = json.load(f)
 
         if isinstance(data, dict) and data["type"] == "file":
+            # create folder when necessary
+            path = data["path"]
+            os.makedirs(os.path.dirname(os.path.join(download_dir, path)), exist_ok=True)
+
             try:
                 # download the file
                 opener = urllib.request.build_opener()
                 opener.addheaders = [('User-agent', 'Mozilla/5.0')]
                 urllib.request.install_opener(opener)
-                urllib.request.urlretrieve(data["download_url"], os.path.join(download_dir, data["name"]))
-                return
+                urllib.request.urlretrieve(data["download_url"], os.path.join(download_dir, path))
+                return 1
             except KeyboardInterrupt:
                 # when CTRL+C is pressed during the execution of this script,
                 # bring the cursor to the beginning, erase the current line, and dont make a new line
                 print("✘ Got interrupted", )
                 sys.exit()
+
+        total_files += len([f for f in data if f['type'] == 'file'])
 
         for file in data:
             file_url = file["download_url"]
@@ -252,7 +261,9 @@ class GitRepo:
                     print("✘ Got interrupted", )
                     sys.exit()
             else:
-                self.download(path, output_dir, branch)
+                total_files += self.download(path, output_dir, branch)
+
+        return total_files
 
     def peep(self, path: str = '', branch: str = 'master'):
         """

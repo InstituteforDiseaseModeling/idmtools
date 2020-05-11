@@ -42,8 +42,9 @@ def repos(owner=None):
     """
     gr = GitRepo(owner)
     repos = gr.list_public_repos()
-    repos_full = [f'{GITHUB_HOME}/{r}' for r in repos]
-    print('\n - '.join(repos_full))
+    repos_full = [f'    - {GITHUB_HOME}/{r}' for r in repos]
+    print(f"GitHub Owner: {gr.repo_owner}")
+    print('\n'.join(repos_full))
 
 
 @example.command()
@@ -59,10 +60,10 @@ def releases(owner=None, repo=None):
     Returns: the list of repo releases
     """
     gr = GitRepo(owner, repo)
-    releases = gr.list_repo_releases()
-    releases_list = [f' - {r}' for r in releases]
+    rels = gr.list_repo_releases()
+    rels_list = [f' - {r}' for r in rels]
     print(f'The Repo: {gr.repo_home_url}')
-    print('\n'.join(releases_list))
+    print('\n'.join(rels_list))
 
 
 @example.command()
@@ -100,6 +101,7 @@ def peep(url, raw):
     print('Processing...')
     result = GitRepo().peep(url)
 
+    secho(f"{url}", fg="blue")
     secho(f"Item Count: {len(result)}", fg="green")
     if raw:
         print(json.dumps(result, indent=3))
@@ -127,10 +129,12 @@ def download(url, output):
     """
     examples_downloaded.clear()
 
+    total = 0
     if url:
         secho(f"Example you want to doanload: \n  {url}", fg="bright_blue")
         if click.confirm("Do you want to go ahead to download examples?", default=True):
-            download_example(None, url, output)
+            total = download_example(None, url, output)
+            secho(f"Total Files: {total}", fg="yellow")
             secho("✔ Download successfully!", fg="bright_green")
         else:
             secho("Aborted...", fg="bright_red")
@@ -143,11 +147,12 @@ def download(url, output):
     if click.confirm("Do you want to go ahead to download examples?", default=True):
         if 'all' in option:
             for i in range(1, len(example_dict) + 1):
-                download_example(i, example_dict[i], output)
+                total += download_example(i, example_dict[i], output)
         else:
             for i in option:
-                download_example(i, example_dict[i], output)
+                total += download_example(i, example_dict[i], output)
 
+        secho(f"Total Files: {total}", fg="yellow")
         secho("✔ Download successfully!", fg="bright_green")
     else:
         secho("Aborted...", fg="bright_red")
@@ -161,7 +166,7 @@ def download_example(option: int, url: str, output: str):
         url: example url
         output: local folder to save examples
 
-    Returns: None
+    Returns: file count
     """
     # Display file information
     click.echo(f"\nDownloading Examples {option if option else ''}: '{url}'")
@@ -170,7 +175,8 @@ def download_example(option: int, url: str, output: str):
 
     # Start to download files
     gr = GitRepo()
-    gr.download(path=url, output_dir=output)
+    total = gr.download(path=url, output_dir=output)
+    return total
 
 
 def get_plugins_example_urls():
