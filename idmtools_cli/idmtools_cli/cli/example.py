@@ -46,7 +46,7 @@ def repos(owner=None):
     gr = GitRepo(owner)
     repos = gr.list_public_repos()
     repos_full = [f'    - {GITHUB_HOME}/{r}' for r in repos]
-    print(f"GitHub Owner: {gr.repo_owner}")
+    secho(f"GitHub Owner: {gr.repo_owner}", fg="green")
     print('\n'.join(repos_full))
 
 
@@ -65,27 +65,8 @@ def releases(owner=None, repo=None):
     gr = GitRepo(owner, repo)
     rels = gr.list_repo_releases()
     rels_list = [f' - {r}' for r in rels]
-    print(f'The Repo: {gr.repo_home_url}')
+    secho(f'The Repo: {gr.repo_home_url}', fg="green")
     print('\n'.join(rels_list))
-
-
-@example.command()
-@click.option('--owner', default=REPO_OWNER, help="Repo Owner")
-@click.option('--repo', default=REPO_NAME, help="Repo Name")
-def tags(owner=None, repo=None):
-    """
-    List all the tags of the repo
-    Args:
-        owner: repo owner
-        repo: repo name
-
-    Returns: the list of repo tags
-    """
-    gr = GitRepo(owner, repo)
-    tags = gr.list_repo_tags()
-    tags_list = [f' - {r}' for r in tags]
-    print(f'The Repo: {gr.repo_home_url}')
-    print('\n'.join(tags_list))
 
 
 @example.command()
@@ -102,9 +83,13 @@ def peep(url, raw):
     """
     print(f'Peep: {url}')
     print('Processing...')
-    result = GitRepo().peep(url)
+    try:
+        result = GitRepo().peep(url)
+    except Exception as ex:
+        secho(f'Failed to access: {url}', fg="yellow")
+        print(ex)
+        exit(1)
 
-    secho(f"{url}", fg="blue")
     secho(f"Item Count: {len(result)}", fg="green")
     if raw:
         print(json.dumps(result, indent=3))
@@ -139,13 +124,11 @@ def download(url, output):
     if click.confirm("Do you want to go ahead to download examples?", default=True):
         simplified_option, duplicated = remove_duplicated_examples(option, example_dict)
         secho(f'Removed duplicated examples: {duplicated}', fg="bright_red")
-        # secho(f'Simplified Selection: {simplified_option}', fg="bright_green")
-        # exit()
         for i in simplified_option:
             total += download_example(i, example_dict[i], output)
 
         secho(f"Total Files: {total}", fg="yellow")
-        secho("✔ Download successfully!", fg="bright_green")
+        secho("Download successfully!", fg="bright_green")
     else:
         secho("Aborted...", fg="bright_red")
 
@@ -234,7 +217,6 @@ def choice(urls: list = None):
 
     # Soring urls
     url_list = sorted(url_list, reverse=False)
-    # url_list = sorted(url_list, key=len, reverse=False)
 
     # Provide index to each example
     example_dict = {}

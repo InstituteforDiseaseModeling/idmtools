@@ -1,7 +1,9 @@
 import os
 import sys
 import json
+import requests
 import urllib.request
+from click import secho
 from dataclasses import dataclass, field
 
 REPO_OWNER = 'institutefordiseasemodeling'
@@ -104,8 +106,6 @@ class GitRepo:
 
         Returns: repo list
         """
-        import requests
-
         # build api url
         api_url = f'{GITHUB_API_HOME}/users/{repo_owner if repo_owner else self.repo_owner}/repos'
 
@@ -121,33 +121,6 @@ class GitRepo:
         else:
             return [r['full_name'] for r in repo_list]
 
-    def list_repo_tags(self, repo_owner: str = None, repo_name: str = None, raw: bool = False):
-        """
-        Utility method to retrieve all tags of the repo
-        Args:
-            repo_owner: the owner of the repo
-            repo_name: the name of repo
-            raw: bool - return raw data or simplified list
-
-        Returns: the tag list of the repo
-        """
-        import requests
-
-        # build api url
-        api_url = f'{GITHUB_API_HOME}/repos/{repo_owner if repo_owner else self.repo_owner}/{repo_name if repo_name else self.repo_name}/tags'
-
-        resp = requests.get(api_url)
-        if resp.status_code != 200:
-            raise Exception(f'Failed to retrieve: {api_url}')
-
-        # get repos as json
-        repo_list = resp.json()
-
-        if raw:
-            return repo_list
-        else:
-            return [r['name'] for r in repo_list]
-
     def list_repo_releases(self, repo_owner: str = None, repo_name: str = None, raw: bool = False):
         """
         Utility method to retrieve all releases of the repo
@@ -158,8 +131,6 @@ class GitRepo:
 
         Returns: the release list of the repo
         """
-        import requests
-
         # build api url
         api_url = f'{GITHUB_API_HOME}/repos/{repo_owner if repo_owner else self.repo_owner}/{repo_name if repo_name else self.repo_name}/releases'
 
@@ -213,6 +184,10 @@ class GitRepo:
             # bring the cursor to the beginning, erase the current line, and dont make a new line
             print("✘ Got interrupted")
             sys.exit()
+        except Exception as ex:
+            secho(f'Failed to access: {self.api_example_url}', fg="yellow")
+            print(ex)
+            exit(1)
 
         download_dir = os.path.join(output_dir, self.repo_name)
 
@@ -238,6 +213,10 @@ class GitRepo:
                 # bring the cursor to the beginning, erase the current line, and dont make a new line
                 print("✘ Got interrupted", )
                 sys.exit()
+            except Exception as ex:
+                secho(f'Failed to access: {self.api_example_url}', fg="yellow")
+                print(ex)
+                exit(1)
 
         total_files += len([f for f in data if f['type'] == 'file'])
 
