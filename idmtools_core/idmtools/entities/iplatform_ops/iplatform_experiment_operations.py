@@ -178,7 +178,7 @@ class IPlatformExperimentOperations(ABC):
         if isinstance(experiment.simulations, (GeneratorType, Iterator)):
             experiment.simulations = self.platform._create_items_of_type(experiment.simulations, ItemType.SIMULATION)
         elif len(experiment.simulations) == 0:
-            raise ValueError("You cannot have an experiment with now simulations")
+            raise ValueError("You cannot have an experiment with no simulations")
         else:
             experiment.simulations = self.platform._create_items_of_type(experiment.simulations, ItemType.SIMULATION)
 
