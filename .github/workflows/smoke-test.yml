@@ -1,8 +1,11 @@
-name: Run smoke tests
+# run setup-dev to install packages and run smoke test
+# trigger by push or pull_request with commit message: "Run smoke test!"
+
+name: "Install with setup-dev and run smoke test"
 on: [push, pull_request]
+
 jobs:
-  run-linters:
-    name: Run smoke tests
+  install-setup-dev-run-smoke-test:
     runs-on: ubuntu-latest
     if: "contains(github.event.head_commit.message, 'Run smoke test!')"
     steps:
@@ -20,6 +23,9 @@ jobs:
           sudo apt-get install make
           pip install black flake8
       - name: Run setup-dev
+        env:
+          bamboo_UserArtifactory: ${{ secrets.PYPI_STAGING_USERNAME }}
+          bamboo_PasswordArtifactory: ${{ secrets.PYPI_STAGING_PASSWORD }}
         run: |
           make setup-dev
       - name: login to comps2
@@ -30,7 +36,7 @@ jobs:
             cd idmtools_cli/tests
             py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
       - name: Upload idmtools_cli smoke test results
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: idmtools_cli_test_results
@@ -40,7 +46,7 @@ jobs:
             cd idmtools_core/tests
             py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
       - name: Upload idmtools_core smoke test results
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: idmtools_core_test_results
@@ -50,7 +56,7 @@ jobs:
             cd idmtools_models/tests
             py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
       - name: Upload idmtools_models smoke test results
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: idmtools_models_test_results
@@ -60,7 +66,7 @@ jobs:
             cd idmtools_platform_comps/tests
             py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
       - name: Upload idmtools_platform_comps test results
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: idmtools_platform_comps_test_results
@@ -70,7 +76,7 @@ jobs:
             cd idmtools_platform_local/tests
             py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
       - name: Upload idmtools_platform_local smoke test results
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: idmtools_platform_local_test_results
