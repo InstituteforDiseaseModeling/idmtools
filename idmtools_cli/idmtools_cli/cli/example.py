@@ -2,11 +2,9 @@ import os
 import json
 import click
 from click import secho
-from colorama import Fore, Style
+from colorama import Fore
 from idmtools.utils.gitrepo import GitRepo, REPO_OWNER, GITHUB_HOME, REPO_NAME
 from idmtools_cli.cli.entrypoint import cli
-
-examples_downloaded = []
 
 
 @cli.group()
@@ -120,7 +118,7 @@ def peep(url, raw):
 
 
 @example.command()
-@click.option('--url', default=None, help="Repo Examples Url")
+@click.option('--url', default=None, multiple=True, help="Repo Examples Url")
 @click.option('--output', default='./', help="Examples Download Destination")
 def download(url, output):
     """
@@ -132,28 +130,17 @@ def download(url, output):
 
     Returns: None
     """
-    examples_downloaded.clear()
-
     total = 0
-    if url:
-        secho(f"Example you want to doanload: \n  {url}", fg="bright_blue")
-        if click.confirm("Do you want to go ahead to download examples?", default=True):
-            total = download_example(None, url, output)
-            secho(f"Total Files: {total}", fg="yellow")
-            secho("✔ Download successfully!", fg="bright_green")
-        else:
-            secho("Aborted...", fg="bright_red")
-        exit()
-
-    option, example_dict = choice()
+    urls = list(filter(None, url)) if url else None
+    option, example_dict = choice(urls)
     secho(f"This is your selection: {option}", fg="bright_blue")
 
     # If we decide to go ahead -> write to file
     if click.confirm("Do you want to go ahead to download examples?", default=True):
         simplified_option, duplicated = remove_duplicated_examples(option, example_dict)
         secho(f'Removed duplicated examples: {duplicated}', fg="bright_red")
-        secho(f'Simplified Selection: {simplified_option}', fg="bright_green")
-        exit()
+        # secho(f'Simplified Selection: {simplified_option}', fg="bright_green")
+        # exit()
         for i in simplified_option:
             total += download_example(i, example_dict[i], output)
 
@@ -223,19 +210,24 @@ def get_plugins_examples():
     return example_plugins
 
 
-def choice():
+def choice(urls: list = None):
     """
-    Prompt user for example selections
+    Take urls as user selection or prompt user for example selections
+    Args:
+        urls: user provided examples
 
     Returns: True/False and results (List)
     """
-    urls = get_plugins_examples()
+    if urls is None:
+        examples = get_plugins_examples()
 
-    # Collect all examples and remove duplicates
-    url_list = []
-    for urls in urls.values():
-        urls = [urls] if isinstance(urls, str) else urls
-        url_list.extend(list(map(str.lower, urls)))
+        # Collect all examples and remove duplicates
+        url_list = []
+        for exp_urls in examples.values():
+            exp_urls = [exp_urls] if isinstance(exp_urls, str) else exp_urls
+            url_list.extend(list(map(str.lower, exp_urls)))
+    else:
+        url_list = urls
 
     # Remove duplicates
     url_list = list(set(url_list))
@@ -253,6 +245,10 @@ def choice():
     file_list = [f'    {i}. {url}' for i, url in example_dict.items()]
     print('Example List:')
     print('\n'.join(file_list))
+
+    if urls:
+        # No user prompt for selection
+        return ['all'], example_dict
 
     # Make sure user makes correct selection
     choice_set = set(range(1, len(url_list) + 1))
