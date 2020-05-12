@@ -92,3 +92,49 @@ You can also filter by a either id, experiment id, status, and tags or any combi
 > idmtools simulation --platform Local status --tag a 5 --tag b
 > idmtools simulation --platform Local status --experiment-id --status failed
 ```
+
+
+## Example commands
+
+### View
+
+You can check idmtools available examples. You can use --raw to determine to display in detailed or simplified format
+
+```
+> idmtools example view
+```
+
+### Repos
+
+You can list all public repos for a GitHub owner. You can use --owner to specify an owner
+--owner default to be 'institutefordiseasemodeling'
+
+```
+> idmtools example repos
+```
+
+### Releases
+
+You can list all releases of a repo by providing --owner and --repo. 
+--owner default to be 'institutefordiseasemodeling' and --repo default to 'idmtools'
+
+```
+> idmtools example releasess
+```
+
+### Peep
+
+You can list all current files/dirs of a repo folder by providing --url. 
+
+```
+> idmtools example peep
+```
+
+### Download
+
+You can download files from a public repo to a specified local folder (default to current folder). By default, it will 
+download idmtools examples. You can also download any files from any public repo by using --url (multiple is supported)
+
+```
+> idmtools example download
+```
