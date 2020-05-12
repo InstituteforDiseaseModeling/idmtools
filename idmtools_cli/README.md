@@ -14,6 +14,12 @@
     - [Delete](#delete)
   - [Simulation Commands](#simulation-commands)
   - [Status](#status-1)
+  - [Example commands](#example-commands)
+    - [View](#view)
+    - [Repos](#repos)
+    - [Releases](#releases)
+    - [Peep](#peep)
+    - [Download](#download)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
