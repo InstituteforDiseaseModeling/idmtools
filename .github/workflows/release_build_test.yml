@@ -1,43 +1,38 @@
-# This workflows will install idmtools from setup-dev then run tests with curl command
+# This workflows will download idmtools nightly packages from production artifactory then run tests with curl command
 #
-#curl command from your cmd:
+# curl command from your cmd:
 # curl -XPOST -u "username:githubPAT" -H "Accept: application/vnd.github.everest-preview+json" \
 # -H "Content-Type: application/json" \
-# --data "{\"event_type\": \"run_setup_dev_test\"}" \
+# --data "{\"event_type\": \"test_release_build\"}" \
 #  https://api.github.com/repos/InstituteforDiseaseModeling/idmtools/dispatches
 #
-# Note, this test will checkout 'dev' branch
+# Note, this test will checkout 'master' branch
 
-name: "Install with setup-dev and run all test"
-
+name: "Install release build and run test"
 on:
- repository_dispatch:
-  types: [run_setup_dev_test]
+  repository_dispatch:
+    # Manually trigger with above curl or Postman POST
+    types: [test_release_build]
 
 jobs:
-  install-setup-dev-run-all-test:
+  install-release-build-run-all-test:
+    if: github.repository == 'InstituteforDiseaseModeling/idmtools'
     runs-on: ubuntu-latest
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
-        with:
-          ref: dev
       - name: Set up Python
         uses: actions/setup-python@v1
         with:
-          python-version: 3.7
-
-      - name: Install Python dependencies
+          python-version: '3.7'
+      - name: Install dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install make
-          pip install black flake8
-      - name: Run setup-dev
-        env:
-          bamboo_UserArtifactory: ${{ secrets.PYPI_STAGING_USERNAME }}
-          bamboo_PasswordArtifactory: ${{ secrets.PYPI_STAGING_PASSWORD }}
+          python -m pip install --upgrade pip
+          pip install setuptools wheel twine
+      - name: download idmtools packages from staging jfrog
         run: |
-          make setup-dev
+          pip install idmtools[full] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+          pip install idmtools-test --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
       - name: login to comps2
         run: |
             python dev_scripts/create_auth_token_args.py --username idmtools_bamboo
