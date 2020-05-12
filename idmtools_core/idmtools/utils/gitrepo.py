@@ -111,7 +111,7 @@ class GitRepo:
 
         resp = requests.get(api_url)
         if resp.status_code != 200:
-            raise Exception(f'Failed to retrieve: {api_url}')
+            raise Exception(f'Failed to access: {api_url}')
 
         # get repos as json
         repo_list = resp.json()
@@ -137,7 +137,7 @@ class GitRepo:
         # make api call
         resp = requests.get(api_url)
         if resp.status_code != 200:
-            raise Exception(f'Failed to retrieve: {api_url}')
+            raise Exception(f'Failed to access: {api_url}')
 
         # get repos as json
         repo_list = resp.json()

@@ -44,7 +44,11 @@ def repos(owner=None):
     Returns: display public repos
     """
     gr = GitRepo(owner)
-    repos = gr.list_public_repos()
+    try:
+        repos = gr.list_public_repos()
+    except Exception as ex:
+        secho(str(ex), fg="yellow")
+        exit(1)
     repos_full = [f'    - {GITHUB_HOME}/{r}' for r in repos]
     secho(f"GitHub Owner: {gr.repo_owner}", fg="green")
     print('\n'.join(repos_full))
@@ -63,7 +67,11 @@ def releases(owner=None, repo=None):
     Returns: the list of repo releases
     """
     gr = GitRepo(owner, repo)
-    rels = gr.list_repo_releases()
+    try:
+        rels = gr.list_repo_releases()
+    except Exception as ex:
+        secho(str(ex), fg="yellow")
+        exit(1)
     rels_list = [f' - {r}' for r in rels]
     secho(f'The Repo: {gr.repo_home_url}', fg="green")
     print('\n'.join(rels_list))
