@@ -15,19 +15,24 @@ def example():
 
 
 @example.command()
-def view():
+@click.option('--raw', default=False, type=bool, help="Files in detail")
+def view(raw):
     """
     List idmtools available examples
 
     Returns: display examples
     """
-    urls = get_plugins_example_urls()
+    examples = get_plugins_examples()
 
-    for plugin, files in urls.items():
+    if raw:
+        print(json.dumps(examples, indent=3))
+        exit(0)
+
+    for plugin, urls in examples.items():
         print('\n', plugin)
-        files = [files] if isinstance(files, str) else files
-        file_list = [f'    - {url}' for url in files]
-        print('\n'.join(file_list))
+        urls = [urls] if isinstance(urls, str) else urls
+        url_list = [f'    - {url}' for url in urls]
+        print('\n'.join(url_list))
 
 
 @example.command()
@@ -145,12 +150,12 @@ def download(url, output):
 
     # If we decide to go ahead -> write to file
     if click.confirm("Do you want to go ahead to download examples?", default=True):
-        if 'all' in option:
-            for i in range(1, len(example_dict) + 1):
-                total += download_example(i, example_dict[i], output)
-        else:
-            for i in option:
-                total += download_example(i, example_dict[i], output)
+        simplified_option, duplicated = remove_duplicated_examples(option, example_dict)
+        secho(f'Removed duplicated examples: {duplicated}', fg="bright_red")
+        secho(f'Simplified Selection: {simplified_option}', fg="bright_green")
+        exit()
+        for i in simplified_option:
+            total += download_example(i, example_dict[i], output)
 
         secho(f"Total Files: {total}", fg="yellow")
         secho("✔ Download successfully!", fg="bright_green")
@@ -179,22 +184,29 @@ def download_example(option: int, url: str, output: str):
     return total
 
 
-def get_plugins_example_urls():
+def get_plugins_examples():
     """
     Collect all idmtools examples
 
     Returns: examples urls as dict
     """
 
-    test_examples = {
-        'A': 'https://github.com/dustin/py-github/tree/master/github/data',
-        'B': 'https://github.com/dustin/py-github/tree/master/github',
-        'C': 'https://github.com/dustin/py-github/blob/master/github/__init__.py',
-        'D': ['https://github.com/dustin/py-github/tree/master/github', 'https://github.com/dustin/py-github/tree/master/github/data']
-
-    }
-    return test_examples
-    # return {'A': 'test_url_1', 'B': 'test_url_2', 'C': ['test_url_1', 'test_url_2', 'test_url_3', 'test_url_4']}
+    # test_examples = {
+    #     'A': 'https://github.com/dustin/py-github/tree/master/github/data',
+    #     'B': 'https://github.com/dustin/py-github/tree/master/github',
+    #     'C': 'https://github.com/dustin/py-github/tree/master/github/__init__.py',
+    #     'D': ['https://github.com/dustin/py-github/tree/master/github',
+    #           'https://github.com/dustin/py-github/tree/master/github/data'],
+    #     'E': [
+    #         'https://github.com/dustin/py-github/tree/master/github/data',
+    #         'https://github.com/dustin/py-github/tree/master/repo/data/util.py',
+    #         'https://github.com/dustin/py-github/tree/master/repo/data',
+    #         'https://github.com/dustin/py-github/tree/master/github',
+    #         'https://github.com/dustin/py-github/tree/master/github/test',
+    #         'https://github.com/dustin/py-github/tree/master/github/__init__.py'
+    #     ]
+    # }
+    # return test_examples
 
     from idmtools.registry.master_plugin_registry import MasterPluginRegistry
     plugin_map = MasterPluginRegistry().get_plugin_map()
@@ -217,16 +229,20 @@ def choice():
 
     Returns: True/False and results (List)
     """
-    urls = get_plugins_example_urls()
+    urls = get_plugins_examples()
 
     # Collect all examples and remove duplicates
     url_list = []
-    for u in urls.values():
-        if isinstance(u, str):
-            u = [u]
-        url_list.extend(u)
+    for urls in urls.values():
+        urls = [urls] if isinstance(urls, str) else urls
+        url_list.extend(list(map(str.lower, urls)))
+
+    # Remove duplicates
     url_list = list(set(url_list))
+
+    # Soring urls
     url_list = sorted(url_list, reverse=False)
+    # url_list = sorted(url_list, key=len, reverse=False)
 
     # Provide index to each example
     example_dict = {}
@@ -249,7 +265,7 @@ def choice():
         valid, result = validate(user_input, choice_set)
 
         if valid:
-            user_input = result
+            user_input = sorted(result, reverse=False)
             break
 
         # Else display the error message
@@ -283,3 +299,25 @@ def validate(user_input: object, choice_set: set):
         return True, selection
     else:
         return False, list(extra)
+
+
+def remove_duplicated_examples(user_selected: list, example_dict: dict):
+    """
+    Removed duplicated examples
+    Args:
+        user_selected: user selection
+        example_dict: all examples
+
+    Returns: simplified selection, duplicated selection
+    """
+    if 'all' in user_selected:
+        user_selected = range(1, len(example_dict) + 1)
+
+    duplicated_selection = []
+    for i in range(len(user_selected)):
+        pre = [] if i == 0 else user_selected[0:i]
+        if any([example_dict[user_selected[i]].startswith(example_dict[j]) for j in pre]):
+            duplicated_selection.append(user_selected[i])
+
+    simplified_selection = [i for i in user_selected if i not in duplicated_selection]
+    return simplified_selection, duplicated_selection
