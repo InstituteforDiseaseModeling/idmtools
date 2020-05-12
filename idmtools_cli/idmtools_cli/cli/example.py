@@ -3,6 +3,7 @@ import json
 import click
 from click import secho
 from colorama import Fore
+from typing import Optional
 from idmtools.utils.gitrepo import GitRepo, REPO_OWNER, GITHUB_HOME, REPO_NAME
 from idmtools_cli.cli.entrypoint import cli
 
@@ -14,7 +15,7 @@ def example():
 
 @example.command()
 @click.option('--raw', default=False, type=bool, help="Files in detail")
-def view(raw):
+def view(raw: Optional[bool]):
     """
     List idmtools available examples
 
@@ -35,7 +36,7 @@ def view(raw):
 
 @example.command()
 @click.option('--owner', default=REPO_OWNER, help="Repo Owner")
-def repos(owner=None):
+def repos(owner: Optional[str]):
     """
     List owner all public repos
     Args:
@@ -57,7 +58,7 @@ def repos(owner=None):
 @example.command()
 @click.option('--owner', default=REPO_OWNER, help="Repo Owner")
 @click.option('--repo', default=REPO_NAME, help="Repo Name")
-def releases(owner=None, repo=None):
+def releases(owner: Optional[str], repo: Optional[str]):
     """
     List all the releases of the repo
     Args:
@@ -80,7 +81,7 @@ def releases(owner=None, repo=None):
 @example.command()
 @click.option('--url', required=True, help="Repo Examples Url")
 @click.option('--raw', default=False, type=bool, help="Files in detail")
-def peep(url, raw):
+def peep(url: Optional[str], raw: Optional[bool]):
     """
     List all the tags of the repo
     Args:
@@ -113,7 +114,7 @@ def peep(url, raw):
 @example.command()
 @click.option('--url', default=None, multiple=True, help="Repo Examples Url")
 @click.option('--output', default='./', help="Examples Download Destination")
-def download(url, output):
+def download(url: Optional[str], output: Optional[str]):
     """
     Download examples from GitHub repo to user location
 
