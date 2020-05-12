@@ -177,7 +177,13 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         # Temp workaround
         from idmtools.entities.simulation import Simulation
         from idmtools.core import EntityContainer
-        obj.simulations = EntityContainer([Simulation(_uid=s.id, task=None) for s in comps_sims])
+
+        def convert_and_set_platform(simulation):
+            converted_simulation = Simulation(_uid=simulation.id, task=None)
+            converted_simulation.platform = self.platform
+            return converted_simulation
+
+        obj.simulations = EntityContainer([convert_and_set_platform(simulation=s) for s in comps_sims])
 
         # Set parent
         obj.parent = suite
