@@ -4,8 +4,9 @@ import click
 from click import secho
 from colorama import Fore
 from typing import Optional
-from idmtools.utils.gitrepo import GitRepo, REPO_OWNER, GITHUB_HOME, REPO_NAME
 from idmtools_cli.cli.entrypoint import cli
+from idmtools.utils.gitrepo import GitRepo, REPO_OWNER, GITHUB_HOME, REPO_NAME
+from idmtools.registry.master_plugin_registry import MasterPluginRegistry
 
 
 @cli.group()
@@ -169,25 +170,16 @@ def get_plugins_examples():
 
     Returns: examples urls as dict
     """
-
     # test_examples = {
-    #     'A': 'https://github.com/dustin/py-github/tree/master/github/data',
-    #     'B': 'https://github.com/dustin/py-github/tree/master/github',
-    #     'C': 'https://github.com/dustin/py-github/tree/master/github/__init__.py',
-    #     'D': ['https://github.com/dustin/py-github/tree/master/github',
-    #           'https://github.com/dustin/py-github/tree/master/github/data'],
-    #     'E': [
-    #         'https://github.com/dustin/py-github/tree/master/github/data',
-    #         'https://github.com/dustin/py-github/tree/master/repo/data/util.py',
-    #         'https://github.com/dustin/py-github/tree/master/repo/data',
-    #         'https://github.com/dustin/py-github/tree/master/github',
-    #         'https://github.com/dustin/py-github/tree/master/github/test',
-    #         'https://github.com/dustin/py-github/tree/master/github/__init__.py'
-    #     ]
+    #     'TestA': 'https://github.com/dustin/py-github/tree/master/github/data',
+    #     'TestB': 'https://github.com/dustin/py-github/tree/master/github',
+    #     'TestC': 'https://github.com/dustin/py-github/tree/master/github/__init__.py',
+    #     'TestD': ['https://github.com/dustin/py-github/tree/master/github',
+    #               'https://github.com/dustin/py-github/tree/master/github/data']
     # }
     # return test_examples
 
-    from idmtools.registry.master_plugin_registry import MasterPluginRegistry
+    # Collect all idmtools examples
     plugin_map = MasterPluginRegistry().get_plugin_map()
 
     example_plugins = {}
@@ -223,7 +215,6 @@ def choice(urls: list = None):
 
     # Remove duplicates
     url_list = list(set(url_list))
-
     # Soring urls
     url_list = sorted(url_list, reverse=False)
 
@@ -238,7 +229,7 @@ def choice(urls: list = None):
     print('\n'.join(file_list))
 
     if urls:
-        # No user prompt for selection
+        # Return without user prompt for selection
         return ['all'], example_dict
 
     # Make sure user makes correct selection
