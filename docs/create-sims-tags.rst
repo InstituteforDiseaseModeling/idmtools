@@ -10,7 +10,7 @@ During the creation of simulations you can add tags, key:value pairs, included a
 
 (Preferred) Builder callbacks
 =============================
-You can add tags to simulations by using builder callbacks while building experiments with **SimulationBuilder** or **Simulation** classes. The following example shows how to do this using **SimulationBuilder**::
+You can add tags to simulations by using builder callbacks while building experiments with **SimulationBuilder** or **Simulation** classes. This way supports adding tags to a large set of simulations and gives you full control over the simulation/task object. In addition, built-in tag management support is used when implementing the return values in a dictionary for the tags. The following example shows how to do this using **SimulationBuilder**::
 
     def update_sim(sim, parameter, value):
         sim.task.set_parameter(parameter, value)
