@@ -37,17 +37,19 @@ def view(raw: Optional[bool]):
 
 @example.command()
 @click.option('--owner', default=REPO_OWNER, help="Repo Owner")
-def repos(owner: Optional[str]):
+@click.option('--page', default=1, help="Pagination")
+def repos(owner: Optional[str], page: Optional[int]):
     """
     List owner all public repos
     Args:
         owner: repo owner
+        page: result pagination
 
     Returns: display public repos
     """
     gr = GitRepo(owner)
     try:
-        repos = gr.list_public_repos()
+        repos = gr.list_public_repos(page=page)
     except Exception as ex:
         secho(str(ex), fg="yellow")
         exit(1)

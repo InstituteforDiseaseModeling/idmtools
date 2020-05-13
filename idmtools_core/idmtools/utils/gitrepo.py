@@ -97,17 +97,21 @@ class GitRepo:
         else:
             return {'repo_owner': repo_owner, 'repo_name': repo_name, 'branch': _branch, 'path': _path}
 
-    def list_public_repos(self, repo_owner: str = None, raw: bool = False):
+    def list_public_repos(self, repo_owner: str = None, page: int = 1, raw: bool = False):
         """
         Utility method to retrieve all public repos
         Args:
             repo_owner: the owner of the repo
+            page: pagination of results
             raw: bool - return rwo data or simplified list
 
         Returns: repo list
         """
         # build api url
         api_url = f'{GITHUB_API_HOME}/users/{repo_owner if repo_owner else self.repo_owner}/repos'
+
+        if page:
+            api_url = f'{api_url}?page={page}'
 
         resp = requests.get(api_url)
         if resp.status_code != 200:

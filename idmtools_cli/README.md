@@ -106,8 +106,9 @@ You can check idmtools available examples. You can use --raw to determine to dis
 
 ### Repos
 
-You can list all public repos for a GitHub owner. You can use --owner to specify an owner
---owner default to be 'institutefordiseasemodeling'
+You can list all public repos for a GitHub owner. You can use --owner to specify an owner and --page for pagination
+--owner default to 'institutefordiseasemodeling'
+--page default to 1
 
 ```
 > idmtools example repos
@@ -116,7 +117,7 @@ You can list all public repos for a GitHub owner. You can use --owner to specify
 ### Releases
 
 You can list all releases of a repo by providing --owner and --repo. 
---owner default to be 'institutefordiseasemodeling' and --repo default to 'idmtools'
+--owner default to 'institutefordiseasemodeling' and --repo default to 'idmtools'
 
 ```
 > idmtools example releasess
