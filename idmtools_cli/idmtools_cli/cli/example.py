@@ -18,9 +18,12 @@ def example():
 @click.option('--raw', default=False, type=bool, help="Files in detail")
 def view(raw: Optional[bool]):
     """
-    List idmtools available examples
+    \b
+    Display all idmtools available examples
+    Args:
+        raw: True/False - display results in details or simplied format
 
-    Returns: display examples
+    Returns: None
     """
     examples = get_plugins_examples()
 
@@ -40,12 +43,13 @@ def view(raw: Optional[bool]):
 @click.option('--page', default=1, help="Pagination")
 def repos(owner: Optional[str], page: Optional[int]):
     """
-    List owner all public repos
+    \b
+    Display all public repos of the owner
     Args:
         owner: repo owner
         page: result pagination
 
-    Returns: display public repos
+    Returns: None
     """
     gr = GitRepo(owner)
     try:
@@ -63,12 +67,13 @@ def repos(owner: Optional[str], page: Optional[int]):
 @click.option('--repo', default=REPO_NAME, help="Repo Name")
 def releases(owner: Optional[str], repo: Optional[str]):
     """
-    List all the releases of the repo
+    \b
+    Display all the releases of the repo
     Args:
         owner: repo owner
         repo: repo name
 
-    Returns: the list of repo releases
+    Returns: None
     """
     gr = GitRepo(owner, repo)
     try:
@@ -86,12 +91,13 @@ def releases(owner: Optional[str], repo: Optional[str]):
 @click.option('--raw', default=False, type=bool, help="Files in detail")
 def peep(url: Optional[str], raw: Optional[bool]):
     """
-    List all the tags of the repo
+    \b
+    Display all current files/dirs of the repo folder (not recursive)
     Args:
         url: GitHub Repo examples url (required)
         raw: display details or not
 
-    Returns: the list of current files/dirs (not recursive)
+    Returns: None
     """
     print(f'Peep: {url}')
     print('Processing...')
@@ -119,8 +125,8 @@ def peep(url: Optional[str], raw: Optional[bool]):
 @click.option('--output', default='./', help="Examples Download Destination")
 def download(url: Optional[str], output: Optional[str]):
     """
+    \b
     Download examples from GitHub repo to user location
-
     Args:
         url: GitHub Repo examples url
         output: Local folder

@@ -151,7 +151,7 @@ class GitRepo:
         else:
             return [f"{r['tag_name']} at {r['published_at']}" for r in repo_list]
 
-    def download(self, path: str = '', output_dir: str = "./", branch: str = 'master'):
+    def download(self, path: str = '', output_dir: str = "./", branch: str = 'master') -> int:
         """
         Download files with example url provided
         Args:
@@ -159,7 +159,7 @@ class GitRepo:
             output_dir: user local folder to download files to
             branch: specify branch for files download from
 
-        Returns: None
+        Returns: total file count downloaded
         """
 
         if path.startswith('https://'):
