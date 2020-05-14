@@ -14,7 +14,7 @@
     - [Delete](#delete)
   - [Simulation Commands](#simulation-commands)
   - [Status](#status-1)
-  - [Example commands](#example-commands)
+  - [GitRepo commands](#gitrepo-commands)
     - [View](#view)
     - [Repos](#repos)
     - [Releases](#releases)
