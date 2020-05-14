@@ -46,8 +46,8 @@ def repos(owner: Optional[str], page: Optional[int]):
     \b
     Display all public repos of the owner
     Args:
-        owner: repo owner
-        page: result pagination
+        owner: Repo owner
+        page: Result pagination
 
     Returns: None
     """
