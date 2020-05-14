@@ -66,8 +66,8 @@ def releases(owner: Optional[str], repo: Optional[str]):
     \b
     Display all the releases of the repo
     Args:
-        owner: repo owner
-        repo: repo name
+        owner: Repo owner
+        repo: Repo name
     """
     gr = GitRepo(owner, repo)
     try:
@@ -120,7 +120,7 @@ def download(url: Optional[str], output: Optional[str]) -> int:
     \b
     Download files from GitHub repo to user location
     Args:
-        url: GitHub repo file url
+        url: GitHub repo files url
         output: Local folder
 
     Returns: Files download count
