@@ -1,7 +1,7 @@
 import os
 import unittest
 from click.testing import CliRunner
-from idmtools_cli.cli.example import example, get_plugins_examples, validate
+from idmtools_cli.cli.example import gitrepo, get_plugins_examples, validate
 from idmtools_test.utils.cli import get_subcommands_from_help_result, run_command
 
 
@@ -13,7 +13,7 @@ class TestExample(unittest.TestCase):
 
     def test_help(self):
         runner = CliRunner()
-        result = runner.invoke(example, ['--help'])
+        result = runner.invoke(gitrepo, ['--help'])
         # Check for our help string
         self.assertIn('Download examples from GitHub repo to user location', result.output)
         # Ensure we have our expected global sub-commands
@@ -21,7 +21,7 @@ class TestExample(unittest.TestCase):
         self.assertIn('download', commands)
 
     def test_example_help(self):
-        result = run_command('example', '--help')
+        result = run_command('gitrepo', '--help')
         # Check for our help string
         self.assertIn('Download examples from GitHub repo to user location', result.output)
         # Ensure we have our expected global sub-commands
@@ -30,7 +30,7 @@ class TestExample(unittest.TestCase):
 
     def test_download_help(self):
         runner = CliRunner()
-        result = runner.invoke(example, ['download', '--help'])
+        result = runner.invoke(gitrepo, ['download', '--help'])
         self.assertIn('Download examples from GitHub repo to user location', result.output)
         # Check that there is a --url option
         self.assertIn('--url', result.output)
@@ -44,7 +44,7 @@ class TestExample(unittest.TestCase):
         self.assertTrue('COMPSPlatform' in examples)
 
     def test_public_repos(self):
-        result = run_command('example', 'repos')
+        result = run_command('gitrepo', 'repos')
         # Check for special public repo
         self.assertIn('https://github.com/InstituteforDiseaseModeling/EMOD', result.output)
 

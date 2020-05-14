@@ -10,11 +10,11 @@ from idmtools.registry.master_plugin_registry import MasterPluginRegistry
 
 
 @cli.group()
-def example():
+def gitrepo():
     pass
 
 
-@example.command()
+@gitrepo.command()
 @click.option('--raw', default=False, type=bool, help="Files in detail")
 def view(raw: Optional[bool]):
     """
@@ -38,7 +38,7 @@ def view(raw: Optional[bool]):
         print('\n'.join(url_list))
 
 
-@example.command()
+@gitrepo.command()
 @click.option('--owner', default=REPO_OWNER, help="Repo Owner")
 @click.option('--page', default=1, help="Pagination")
 def repos(owner: Optional[str], page: Optional[int]):
@@ -62,7 +62,7 @@ def repos(owner: Optional[str], page: Optional[int]):
     print('\n'.join(repos_full))
 
 
-@example.command()
+@gitrepo.command()
 @click.option('--owner', default=REPO_OWNER, help="Repo Owner")
 @click.option('--repo', default=REPO_NAME, help="Repo Name")
 def releases(owner: Optional[str], repo: Optional[str]):
@@ -86,7 +86,7 @@ def releases(owner: Optional[str], repo: Optional[str]):
     print('\n'.join(rels_list))
 
 
-@example.command()
+@gitrepo.command()
 @click.option('--url', required=True, help="Repo Examples Url")
 @click.option('--raw', default=False, type=bool, help="Files in detail")
 def peep(url: Optional[str], raw: Optional[bool]):
@@ -120,7 +120,7 @@ def peep(url: Optional[str], raw: Optional[bool]):
             secho(f"    - {file['name']}")
 
 
-@example.command()
+@gitrepo.command()
 @click.option('--url', default=None, multiple=True, help="Repo Examples Url")
 @click.option('--output', default='./', help="Examples Download Destination")
 def download(url: Optional[str], output: Optional[str]):
