@@ -21,7 +21,7 @@ def view(raw: Optional[bool]):
     \b
     Display all idmtools available examples
     Args:
-        raw: True/False - display results in details or simplied format
+        raw: True/False - display results in details or simplified format
 
     Returns: None
     """
@@ -39,7 +39,7 @@ def view(raw: Optional[bool]):
 
 
 @gitrepo.command()
-@click.option('--owner', default=REPO_OWNER, help="Repo Owner")
+@click.option('--owner', default=REPO_OWNER, help="Repo owner")
 @click.option('--page', default=1, help="Pagination")
 def repos(owner: Optional[str], page: Optional[int]):
     """
@@ -63,8 +63,8 @@ def repos(owner: Optional[str], page: Optional[int]):
 
 
 @gitrepo.command()
-@click.option('--owner', default=REPO_OWNER, help="Repo Owner")
-@click.option('--repo', default=REPO_NAME, help="Repo Name")
+@click.option('--owner', default=REPO_OWNER, help="Repo owner")
+@click.option('--repo', default=REPO_NAME, help="Repo name")
 def releases(owner: Optional[str], repo: Optional[str]):
     """
     \b
@@ -87,15 +87,15 @@ def releases(owner: Optional[str], repo: Optional[str]):
 
 
 @gitrepo.command()
-@click.option('--url', required=True, help="Repo File Url")
-@click.option('--raw', default=False, type=bool, help="Files in detail")
+@click.option('--url', required=True, help="Repo file url")
+@click.option('--raw', default=False, type=bool, help="Display files in detail")
 def peep(url: Optional[str], raw: Optional[bool]):
     """
     \b
     Display all current files/dirs of the repo folder (not recursive)
     Args:
-        url: GitHub Repo file url (required)
-        raw: display details or not
+        url: GitHub repo file url (required)
+        raw: Display details or not
 
     Returns: None
     """
@@ -121,14 +121,14 @@ def peep(url: Optional[str], raw: Optional[bool]):
 
 
 @gitrepo.command()
-@click.option('--url', default=None, multiple=True, help="Repo Files Url")
-@click.option('--output', default='./', help="Files Download Destination")
+@click.option('--url', default=None, multiple=True, help="Repo files url")
+@click.option('--output', default='./', help="Files download destination")
 def download(url: Optional[str], output: Optional[str]):
     """
     \b
     Download files from GitHub repo to user location
     Args:
-        url: GitHub Repo file url
+        url: GitHub repo file url
         output: Local folder
 
     Returns: None
