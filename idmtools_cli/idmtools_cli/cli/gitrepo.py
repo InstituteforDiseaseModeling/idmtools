@@ -81,14 +81,14 @@ def releases(owner: Optional[str], repo: Optional[str]):
 
 
 @gitrepo.command()
-@click.option('--url', required=True, help="Repo file url")
+@click.option('--url', required=True, help="Repo files url")
 @click.option('--raw', default=False, type=bool, help="Display files in detail")
 def peep(url: Optional[str], raw: Optional[bool]):
     """
     \b
     Display all current files/dirs of the repo folder (not recursive)
     Args:
-        url: GitHub repo file url (required)
+        url: GitHub repo files url (required)
         raw: Display details or not
     """
     print(f'Peep: {url}')
