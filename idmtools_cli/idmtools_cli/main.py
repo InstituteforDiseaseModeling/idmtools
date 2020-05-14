@@ -38,7 +38,7 @@ def start() -> NoReturn:
     import idmtools_cli.cli.simulation
     import idmtools_cli.cli.config_file
     import idmtools_cli.cli.system_info  # noqa: F401
-    import idmtools_cli.cli.example
+    import idmtools_cli.cli.gitrepo
     platform_plugins = PlatformCLIPlugins()
     from idmtools_cli.cli.init import build_project_commands
     build_project_commands()

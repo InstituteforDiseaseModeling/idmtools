@@ -1,7 +1,7 @@
 import os
 import unittest
 from click.testing import CliRunner
-from idmtools_cli.cli.example import gitrepo, get_plugins_examples, validate
+from idmtools_cli.cli.gitrepo import gitrepo, get_plugins_examples, validate
 from idmtools_test.utils.cli import get_subcommands_from_help_result, run_command
 
 
