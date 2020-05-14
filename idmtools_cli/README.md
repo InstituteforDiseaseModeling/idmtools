@@ -100,14 +100,14 @@ You can also filter by a either id, experiment id, status, and tags or any combi
 ```
 
 
-## Example commands
+## GitRepo commands
 
 ### View
 
 You can check idmtools available examples. You can use --raw to determine to display in detailed or simplified format
 
 ```
-> idmtools example view
+> idmtools gitrepo view
 ```
 
 ### Repos
@@ -117,24 +117,24 @@ You can list all public repos for a GitHub owner. You can use --owner to specify
 --page default to 1
 
 ```
-> idmtools example repos
+> idmtools gitrepo repos
 ```
 
 ### Releases
 
-You can list all releases of a repo by providing --owner and --repo. 
+You can list all releases of a repo by providing --owner and --repo
 --owner default to 'institutefordiseasemodeling' and --repo default to 'idmtools'
 
 ```
-> idmtools example releasess
+> idmtools gitrepo releasess
 ```
 
 ### Peep
 
-You can list all current files/dirs of a repo folder by providing --url. 
+You can list all current files/dirs of a repo folder by providing --url
 
 ```
-> idmtools example peep
+> idmtools gitrepo peep
 ```
 
 ### Download
@@ -143,5 +143,5 @@ You can download files from a public repo to a specified local folder (default t
 download idmtools examples. You can also download any files from any public repo by using --url (multiple is supported)
 
 ```
-> idmtools example download
+> idmtools gitrepo download
 ```
