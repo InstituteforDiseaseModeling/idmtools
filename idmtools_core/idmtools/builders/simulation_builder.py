@@ -19,7 +19,7 @@ class SimulationBuilder:
     Examples:
         .. literalinclude:: ../examples/builders/simulation_builder.py
         
-        Add tags with builder callbacks example::
+        Add tags with builder callbacks::
 
             def update_sim(sim, parameter, value):
                 sim.task.set_parameter(parameter, value)
