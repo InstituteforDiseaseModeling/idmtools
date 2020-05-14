@@ -22,8 +22,6 @@ def view(raw: Optional[bool]):
     Display all idmtools available examples
     Args:
         raw: True/False - display results in details or simplified format
-
-    Returns: None
     """
     examples = get_plugins_examples()
 
@@ -48,8 +46,6 @@ def repos(owner: Optional[str], page: Optional[int]):
     Args:
         owner: Repo owner
         page: Result pagination
-
-    Returns: None
     """
     gr = GitRepo(owner)
     try:
@@ -72,8 +68,6 @@ def releases(owner: Optional[str], repo: Optional[str]):
     Args:
         owner: repo owner
         repo: repo name
-
-    Returns: None
     """
     gr = GitRepo(owner, repo)
     try:
@@ -96,8 +90,6 @@ def peep(url: Optional[str], raw: Optional[bool]):
     Args:
         url: GitHub repo file url (required)
         raw: Display details or not
-
-    Returns: None
     """
     print(f'Peep: {url}')
     print('Processing...')
@@ -123,7 +115,7 @@ def peep(url: Optional[str], raw: Optional[bool]):
 @gitrepo.command()
 @click.option('--url', default=None, multiple=True, help="Repo files url")
 @click.option('--output', default='./', help="Files download destination")
-def download(url: Optional[str], output: Optional[str]):
+def download(url: Optional[str], output: Optional[str]) -> int:
     """
     \b
     Download files from GitHub repo to user location
@@ -131,7 +123,7 @@ def download(url: Optional[str], output: Optional[str]):
         url: GitHub repo file url
         output: Local folder
 
-    Returns: None
+    Returns: Files download count
     """
     total = 0
     urls = list(filter(None, url)) if url else None
