@@ -126,9 +126,9 @@ def peep(url: Optional[str], raw: Optional[bool]):
 def download(url: Optional[str], output: Optional[str]):
     """
     \b
-    Download examples from GitHub repo to user location
+    Download files from GitHub repo to user location
     Args:
-        url: GitHub Repo examples url
+        url: GitHub Repp file url
         output: Local folder
 
     Returns: None
@@ -139,11 +139,11 @@ def download(url: Optional[str], output: Optional[str]):
     secho(f"This is your selection: {option}", fg="bright_blue")
 
     # If we decide to go ahead -> write to file
-    if click.confirm("Do you want to go ahead to download examples?", default=True):
-        simplified_option, duplicated = remove_duplicated_examples(option, example_dict)
-        secho(f'Removed duplicated examples: {duplicated}', fg="bright_red")
+    if click.confirm("Do you want to go ahead to download files?", default=True):
+        simplified_option, duplicated = remove_duplicated_files(option, example_dict)
+        secho(f'Removed duplicated files: {duplicated}', fg="bright_red")
         for i in simplified_option:
-            total += download_example(i, example_dict[i], output)
+            total += download_file(i, example_dict[i], output)
 
         secho(f"Total Files: {total}", fg="yellow")
         secho("Download successfully!", fg="bright_green")
@@ -151,18 +151,18 @@ def download(url: Optional[str], output: Optional[str]):
         secho("Aborted...", fg="bright_red")
 
 
-def download_example(option: int, url: str, output: str):
+def download_file(option: int, url: str, output: str):
     """
-    Use GitRepo utility to download examples
+    Use GitRepo utility to download files
     Args:
-        option: example index
-        url: example url
-        output: local folder to save examples
+        option: file index
+        url: file url
+        output: local folder to save files
 
     Returns: file count
     """
     # Display file information
-    click.echo(f"\nDownloading Examples {option if option else ''}: '{url}'")
+    click.echo(f"\nDownloading Files {option if option else ''}: '{url}'")
     click.echo(f'Local Folder: {os.path.abspath(output)}')
     secho('Processing...')
 
@@ -174,9 +174,9 @@ def download_example(option: int, url: str, output: str):
 
 def get_plugins_examples():
     """
-    Collect all idmtools examples
+    Collect all idmtools files
 
-    Returns: examples urls as dict
+    Returns: files urls as dict
     """
     # test_examples = {
     #     'TestA': 'https://github.com/dustin/py-github/tree/master/github/data',
@@ -204,18 +204,18 @@ def get_plugins_examples():
 
 def choice(urls: list = None):
     """
-    Take urls as user selection or prompt user for example selections
+    Take urls as user selection or prompt user for file selections
     Args:
-        urls: user provided examples
+        urls: user provided files
 
     Returns: True/False and results (List)
     """
     if urls is None:
-        examples = get_plugins_examples()
+        files = get_plugins_examples()
 
-        # Collect all examples and remove duplicates
+        # Collect all files and remove duplicates
         url_list = []
-        for exp_urls in examples.values():
+        for exp_urls in files.values():
             exp_urls = [exp_urls] if isinstance(exp_urls, str) else exp_urls
             url_list.extend(list(map(str.lower, exp_urls)))
     else:
@@ -226,26 +226,26 @@ def choice(urls: list = None):
     # Soring urls
     url_list = sorted(url_list, reverse=False)
 
-    # Provide index to each example
-    example_dict = {}
+    # Provide index to each file
+    file_dict = {}
     for i in range(len(url_list)):
-        example_dict[i + 1] = url_list[i]
+        file_dict[i + 1] = url_list[i]
 
-    # Pre-view examples for user to select
-    file_list = [f'    {i}. {url}' for i, url in example_dict.items()]
-    print('Example List:')
+    # Pre-view files for user to select
+    file_list = [f'    {i}. {url}' for i, url in file_dict.items()]
+    print('File List:')
     print('\n'.join(file_list))
 
     if urls:
         # Return without user prompt for selection
-        return ['all'], example_dict
+        return ['all'], file_dict
 
     # Make sure user makes correct selection
     choice_set = set(range(1, len(url_list) + 1))
     choice_set.add('all')
     while True:
         user_input = click.prompt(
-            f"\nSelect examples (multiple) for download (all or 1-{len(url_list)} separated by space)", type=str,
+            f"\nSelect files (multiple) for download (all or 1-{len(url_list)} separated by space)", type=str,
             default='all',
             prompt_suffix=f": {Fore.GREEN}")
         valid, result = validate(user_input, choice_set)
@@ -257,8 +257,8 @@ def choice(urls: list = None):
         # Else display the error message
         secho(f'This is not correct choice: {result}', fg="bright_red")
 
-    # Return user selection and indexed examples
-    return user_input, example_dict
+    # Return user selection and indexed files
+    return user_input, file_dict
 
 
 def validate(user_input: object, choice_set: set):
@@ -287,22 +287,22 @@ def validate(user_input: object, choice_set: set):
         return False, list(extra)
 
 
-def remove_duplicated_examples(user_selected: list, example_dict: dict):
+def remove_duplicated_files(user_selected: list, file_dict: dict):
     """
-    Removed duplicated examples
+    Removed duplicated files
     Args:
         user_selected: user selection
-        example_dict: all examples
+        file_dict: all files
 
     Returns: simplified selection, duplicated selection
     """
     if 'all' in user_selected:
-        user_selected = range(1, len(example_dict) + 1)
+        user_selected = range(1, len(file_dict) + 1)
 
     duplicated_selection = []
     for i in range(len(user_selected)):
         pre = [] if i == 0 else user_selected[0:i]
-        if any([example_dict[user_selected[i]].startswith(example_dict[j]) for j in pre]):
+        if any([file_dict[user_selected[i]].startswith(file_dict[j]) for j in pre]):
             duplicated_selection.append(user_selected[i])
 
     simplified_selection = [i for i in user_selected if i not in duplicated_selection]
