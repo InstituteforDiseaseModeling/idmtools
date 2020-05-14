@@ -87,14 +87,14 @@ def releases(owner: Optional[str], repo: Optional[str]):
 
 
 @gitrepo.command()
-@click.option('--url', required=True, help="Repo Examples Url")
+@click.option('--url', required=True, help="Repo File Url")
 @click.option('--raw', default=False, type=bool, help="Files in detail")
 def peep(url: Optional[str], raw: Optional[bool]):
     """
     \b
     Display all current files/dirs of the repo folder (not recursive)
     Args:
-        url: GitHub Repo examples url (required)
+        url: GitHub Repo file url (required)
         raw: display details or not
 
     Returns: None
@@ -121,29 +121,29 @@ def peep(url: Optional[str], raw: Optional[bool]):
 
 
 @gitrepo.command()
-@click.option('--url', default=None, multiple=True, help="Repo Examples Url")
-@click.option('--output', default='./', help="Examples Download Destination")
+@click.option('--url', default=None, multiple=True, help="Repo Files Url")
+@click.option('--output', default='./', help="Files Download Destination")
 def download(url: Optional[str], output: Optional[str]):
     """
     \b
     Download files from GitHub repo to user location
     Args:
-        url: GitHub Repp file url
+        url: GitHub Repo file url
         output: Local folder
 
     Returns: None
     """
     total = 0
     urls = list(filter(None, url)) if url else None
-    option, example_dict = choice(urls)
+    option, file_dict = choice(urls)
     secho(f"This is your selection: {option}", fg="bright_blue")
 
     # If we decide to go ahead -> write to file
     if click.confirm("Do you want to go ahead to download files?", default=True):
-        simplified_option, duplicated = remove_duplicated_files(option, example_dict)
+        simplified_option, duplicated = remove_duplicated_files(option, file_dict)
         secho(f'Removed duplicated files: {duplicated}', fg="bright_red")
         for i in simplified_option:
-            total += download_file(i, example_dict[i], output)
+            total += download_file(i, file_dict[i], output)
 
         secho(f"Total Files: {total}", fg="yellow")
         secho("Download successfully!", fg="bright_green")
