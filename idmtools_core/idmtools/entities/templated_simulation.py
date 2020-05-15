@@ -36,6 +36,22 @@ def simulation_generator(builders, new_sim_func, additional_sims=None, batch_siz
 
 @dataclass(repr=False)
 class TemplatedSimulations:
+    """
+    Class for building templated simulations and commonly used with SimulationBuilder class.
+
+    Examples:
+        Add tags to all simulations via base task::
+
+            ts = TemplatedSimulations(base_task=task)
+            ts.tags = {'a': 'test', 'b': 9}
+            ts.add_builder(builder)
+
+        Add tags to a specific simulation::
+
+            experiment =  Experiment.from_builder(builder, task, name=expname)
+            experiment.simulations = list(experiment.simulations)
+            experiment.simulations[2].tags['test']=123
+    """
     builders: Set[SimulationBuilder] = field(default_factory=set, compare=False)
     base_simulation: Simulation = field(default=None, compare=False, metadata={"pickle_ignore": True})
     base_task: ITask = field(default=None)
