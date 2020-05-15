@@ -59,6 +59,16 @@ class Experiment(IAssetsEnabled, INamedEntity):
             self.gather_common_assets_from_task = isinstance(self.simulations.items, EntityContainer)
         self.__simulations.parent = self
 
+        # set initial status. Experiment may be new or reloaded.
+        if any([s.status == EntityStatus.CREATED for s in self.simulations]):
+            self.status = EntityStatus.CREATED
+        elif any([s.status == EntityStatus.RUNNING for s in self.simulations]):
+            self.status = EntityStatus.RUNNING
+        elif all([s.status == EntityStatus.SUCCEEDED for s in self.simulations]):
+            self.status = EntityStatus.SUCCEEDED
+        elif any([s.status == EntityStatus.FAILED for s in self.simulations]):
+            self.status = EntityStatus.FAILED
+
     def __repr__(self):
         return f"<Experiment: {self.uid} - {self.name} / Sim count {len(self.simulations) if self.simulations else 0}>"
 
@@ -352,6 +362,31 @@ class Experiment(IAssetsEnabled, INamedEntity):
             opts['refresh_interval'] = refresh_interval
         p = self.__check_for_platform_from_context(platform)
         p.wait_till_done_progress(self, **opts)
+
+    def add_new_simulations(self, simulations: TemplatedSimulations):
+        """
+        Add simulations to a pre-existing experiment containing simulations that may have already been run.
+
+        Args:
+            simulations: TemplatedSimulations object containing builders/sims to add to pre-existing experiment
+
+        Returns:
+            Nothing
+        """
+        # merge existing self.simulations object builders and single simulations into new simulations object
+        if isinstance(self.simulations, TemplatedSimulations):
+            for builder in self.simulations.builders:
+                simulations.add_builder(builder=builder)
+            existing_additional_simulations = self.simulations.__extra_simulations
+        else:
+            existing_additional_simulations = self.simulations
+
+        for simulation in existing_additional_simulations:
+            simulations.add_simulation(simulation=simulation)
+
+        # set experiment simulations to merged object and update experiment status
+        self.simulations = simulations
+        self.status = EntityStatus.CREATED
 
 
 class ExperimentSpecification(ExperimentPluginSpecification):
