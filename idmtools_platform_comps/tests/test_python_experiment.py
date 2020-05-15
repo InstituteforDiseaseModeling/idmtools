@@ -52,7 +52,6 @@ class TestPythonExperiment(ITestWithPersistence):
     # Also current add_sweep_definition will do product of each call. if first call has 5 parameters, second call also
     # has 5 parameter, total sweep parameters are 5*5=25
 
-    # ck4
     @pytest.mark.long
     def test_sweeps_with_partial_comps(self):
 
@@ -170,7 +169,6 @@ class TestPythonExperiment(ITestWithPersistence):
     #       |--functions.py
     #   |--__init__.py
     #   |--model.py
-    # ck4
     @pytest.mark.long
     @pytest.mark.comps
     def test_add_dirs_to_assets_comps(self):
