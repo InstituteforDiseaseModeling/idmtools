@@ -2,6 +2,7 @@ import getpass
 import unittest
 
 import pytest
+from idmtools.utils.info import get_packages_from_pip
 
 from idmtools_test.utils.cli import get_subcommands_from_help_result, run_command
 
@@ -38,6 +39,7 @@ class TestSystemInfoBasics(unittest.TestCase):
         commands = get_subcommands_from_help_result(result)
         self.assertIn('cli', commands)
         self.assertIn('platform', commands)
+        self.assertIn('task', commands)
 
     def test_plugins_subcommands_help(self):
         """
@@ -82,7 +84,30 @@ class TestSystemInfoBasics(unittest.TestCase):
         self.assertEqual(0, result.exit_code)
         # check for our table header
         self.assertIn('Platform Plugins', result.output)
-        # TODO: Improve test by adding a mock CLI plugin and testing for its presence here
+        packages = get_packages_from_pip()
+        if any(['idmtools-platform-comps' in p for p in packages]):
+            for task in ['COMPS', 'SSMT']:
+                self.assertIn(task, result.output)
+        if any(['idmtools-platform-local' in p for p in packages]):
+            self.assertIn('Local', result.output)
+
+    def test_tasks_plugin(self):
+        """
+        This test is to ensure:
+        a) info plugins platform is a valid command within the cli
+        b) Help provides our expected output and options
+        """
+        result = run_command('info', 'plugins', 'task')
+        # Check we got a success
+        self.assertEqual(0, result.exit_code)
+        packages = get_packages_from_pip()
+
+        # check for our table header
+        self.assertIn('Task Plugins', result.output)
+
+        if any(['idmtools-models' in p for p in packages]):
+            for task in ['Python', 'R', 'JSONConfigured', 'JSONConfiguredPython', 'R', 'Docker']:
+                self.assertIn(task, result.output)
 
     def test_system_help(self):
         """

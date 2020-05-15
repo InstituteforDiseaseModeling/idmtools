@@ -44,7 +44,7 @@ class PluginSpecification:
     """
 
     @classmethod
-    def get_name(cls) -> str:
+    def get_name(cls, strip_all: bool = True) -> str:
         """
         Get the name of the plugin. Although it can be overridden, the best practice is to use the class
         name as the plugin name.
@@ -52,7 +52,10 @@ class PluginSpecification:
         Returns:
             The name of the plugin as a string.
         """
-        return cls.__name__.replace("Specification", "")
+        if strip_all:
+            return cls.__name__.replace("Specification", "")
+        else:
+            return cls.__name__
 
     @get_description_spec
     def get_description(self) -> str:

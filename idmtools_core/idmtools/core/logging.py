@@ -2,9 +2,9 @@ import atexit
 import logging
 import os
 from logging import getLogger
-from logging.handlers import QueueHandler, RotatingFileHandler, QueueListener
+from logging.handlers import QueueHandler, QueueListener, RotatingFileHandler
 from multiprocessing import Queue
-from signal import SIGTERM, SIGINT, signal
+from signal import SIGINT, signal, SIGTERM
 from typing import NoReturn, Union
 
 import coloredlogs as coloredlogs
@@ -131,7 +131,10 @@ def register_stop_logger_signal_handler(listener) -> NoReturn:
     """
 
     def stop_logger(*args, **kwargs):
-        listener.stop()
+        try:
+            listener.stop()
+        except Exception:
+            pass
 
     for s in [SIGINT, SIGTERM]:
         signal(s, stop_logger)

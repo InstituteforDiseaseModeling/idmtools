@@ -38,7 +38,7 @@ To build the SSMT Docker image, follow these steps
    docker login docker-production.packages.idmod.org
    ```
 2. ```bash
-   make ssmt-image-local
+   make ssmt-image
    ```
 3. When prompted, enter your idm username and password
 
