@@ -83,7 +83,10 @@ class Simulation(IAssetsEnabled, INamedEntity):
             if logger.isEnabledFor(DEBUG):
                 logger.debug('Replacing task with proxy')
             self.task = TaskProxy.from_task(self.task)
-        self.status = EntityStatus.CREATED
+
+        # provide a default status if none was provided during creation
+        if self.status is None:
+            self.status = EntityStatus.CREATED
 
     def pre_getstate(self):
         """

@@ -179,7 +179,10 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         from idmtools.core import EntityContainer
 
         def convert_and_set_platform(simulation):
-            converted_simulation = Simulation(_uid=simulation.id, task=None)
+            converted_simulation = Simulation(_uid=simulation.id,
+                                              status=convert_comps_status(simulation.state),
+                                              tags=simulation.tags,
+                                              task=None)
             converted_simulation.platform = self.platform
             return converted_simulation
 
