@@ -40,13 +40,13 @@ class TemplatedSimulations:
     Class for building templated simulations and commonly used with SimulationBuilder class.
 
     Examples:
-        Add tags to the base task::
+        Add tags to all simulations via base task::
 
             ts = TemplatedSimulations(base_task=task)
             ts.tags = {'a': 'test', 'b': 9}
             ts.add_builder(builder)
 
-        Add tags a converted simulation to a list::
+        Add tags to a specific simulation::
 
             experiment =  Experiment.from_builder(builder, task, name=expname)
             experiment.simulations = list(experiment.simulations)
