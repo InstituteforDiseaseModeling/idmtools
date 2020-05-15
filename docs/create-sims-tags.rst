@@ -8,9 +8,9 @@ During the creation of simulations you can add tags, key:value pairs, included a
 * Base task with :py:class:`~idmtools.entities.templated_simulation.TemplatedSimulations`
 * Convert simulation from :py:class:`~idmtools.entities.templated_simulation.TemplatedSimulations` to a list
 
-(Preferred) Builder callbacks
-=============================
-You can add tags to simulations by using builder callbacks while building experiments with **SimulationBuilder** or **Simulation** classes. This way supports adding tags to a large set of simulations and gives you full control over the simulation/task object. In addition, built-in tag management support is used when implementing the return values in a dictionary for the tags. For more information see the example in :py:class:`~idmtools.builders.simulation_builder.SimulationBuilder`
+(Preferred) Builder callbacks via add_sweep_definition
+======================================================
+You can add tags to simulations by using builder callbacks while building experiments with **SimulationBuilder** or **Simulation** classes and the **add_sweep_definition** method. This way supports adding tags to a large set of simulations and gives you full control over the simulation/task object. In addition, built-in tag management support is used when implementing the return values in a dictionary for the tags. For more information see the example in :py:class:`~idmtools.builders.simulation_builder.SimulationBuilder`
 
 Base task with TemplatedSimulations
 ===================================
