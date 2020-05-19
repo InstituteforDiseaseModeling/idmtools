@@ -26,7 +26,7 @@ clean-all:  ## Deleting package info hides plugins so we only want to do that fo
 	$(CLDIR) --dir-patterns "**/*.egg-info/"
 	@+$(IPY) "import os; os.chdir('idmtools_webui'); os.system('python build.py clean')"
 
-edv:
+dev:
 	echo $(CWD)
 
 # Dev and test related rules
@@ -78,28 +78,37 @@ coverage-all: ## Generate a code-coverage report
 	$(PDS)/launch_dir_in_browser.py htmlcov/index.html
 
 docker-cleanup:
-	docker stop  idmtools_workers idmtools_postgres idmtools_redis
-	docker rm  idmtools_workers idmtools_postgres idmtools_redis
+	docker stop idmtools_workers idmtools_postgres idmtools_redis
+	docker rm idmtools_workers idmtools_postgres idmtools_redis
 
-docker: ## Build our docker image using the local pypi
+docker: ## Build our docker image using the local pypi without versioning from artifactory
 	# This job is most useful when actively developing changes to the local_platform internals(tasks, api, cli) or
 	# upstream changes that effect those areas(models and core). Otherwise, installing from latest in the nightly
 	# should suffice for development
 	# ensure pypi local is up
 	$(PDR) -w '../idmtools_core' -ex 'pymake dist'
 	@pymake dist
-	python build_docker_image.py
+	$(PDR) -w '../idmtools_platform_local' -ex 'python build_docker_image.py'
+
+docker-proper: ## This job gets version data from artifactory. Should be used for production releases
+	$(PDR) -w '../idmtools_core' -ex 'pymake dist'
+	@pymake dist
+	$(PY) build_docker_image.py --proper
 
 docker-only: ## Assumes you have made the local package already
 	$(PDR) -w '../idmtools_core' -ex 'pymake dist'
-	python build_docker_image.py
+	$(PDR) -w '../idmtools_platform_local' -ex 'python build_docker_image.py'
+
+docker-only-proper: ## Assumes you have made the local package already without versioning from artifactory
+	$(PDR) -w '../idmtools_core' -ex 'pymake dist'
+	$(PY) build_docker_image.py --proper
+
 
 # Release related rules
-
 dist: ## build our package
 	@make build-ui
 	@make clean
-	python setup.py sdist
+	$(PY) setup.py sdist
 
 start-webui: ## start the webserver
 	$(PDR) -w 'idmtools_webui' -ex yarn

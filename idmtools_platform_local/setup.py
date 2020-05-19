@@ -25,11 +25,10 @@ setup_requirements = []
 server_requirements = ['uwsgi==2.0.18', 'Werkzeug==0.16.1']
 test_requirements = ['pytest', 'pytest-runner', 'pytest-timeout', 'pytest-cache']
 
-# Only install uwsgi on python 3.7
-if os.name == "nt":
-    # TODO remove workaround. This is needed because 226 break windows virtual envs when calling processes
-    # which we need
-    test_requirements.append('pywin32==225')
+if sys.platform in ["win32", "cygwin"]:
+    requirements.append('pypiwin32==223')
+    requirements.append('pywin32==227')
+
 
 extras = dict(test=test_requirements, dev=['Pympler'],
               # Requirements for running workers server
