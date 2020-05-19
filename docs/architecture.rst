@@ -127,8 +127,8 @@ Local platform
     LocalPlatform -[hidden]- LocalPlatformCLI
     @enduml
 
-COMPS platform
---------------
+|COMPS_s| platform
+----------------
 
 .. uml::
 
@@ -146,6 +146,10 @@ COMPS platform
     PlatformAPI <-down-- COMPSPlatform: COMPs\nImplementation
     PlatformAPI <-- SSMTPlatform: SSMT\nImplementation
     @enduml
+
+.. note::
+
+    To access and use |COMPS_s| you must receive approval and credentials from |IDM_s|. Send your request to support@idmod.org.
 
 Models
 ------
