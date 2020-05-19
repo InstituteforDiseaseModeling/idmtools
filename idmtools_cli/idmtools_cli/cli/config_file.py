@@ -2,11 +2,9 @@ import configparser
 import dataclasses
 import os
 import re
-
 import click
 from click import secho
 from colorama import Fore, Style
-
 from idmtools.registry.platform_specification import PlatformPlugins
 from idmtools_cli.cli.entrypoint import cli
 

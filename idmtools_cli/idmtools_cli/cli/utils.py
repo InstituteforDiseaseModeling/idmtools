@@ -3,7 +3,6 @@ from typing import NoReturn, Union
 import requests
 from click import UsageError
 from colorama import Fore
-
 from idmtools.core.platform_factory import Platform
 from idmtools_cli.iplatform_cli import PlatformCLIPlugins
 
