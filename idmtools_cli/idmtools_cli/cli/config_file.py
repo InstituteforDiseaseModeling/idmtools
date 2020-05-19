@@ -13,7 +13,8 @@ from idmtools_cli.cli.entrypoint import cli
 IGNORED_PLATFORMS = ["Test", "Slurm"]
 AVAILABLE_PLATFORMS = PlatformPlugins().get_plugin_map()
 for platform in IGNORED_PLATFORMS:
-    del AVAILABLE_PLATFORMS[platform]
+    if platform in AVAILABLE_PLATFORMS:
+        del AVAILABLE_PLATFORMS[platform]
 HIDDEN_FIELD_REGEX = re.compile('^_.+$')
 FIELD_BLACKLIST = ['platform_type_map', 'supported_types', 'plugin_key', 'docker_image']
 
