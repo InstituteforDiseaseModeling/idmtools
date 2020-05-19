@@ -37,7 +37,7 @@ response = requests.get(f'https://{BASE_REPO}/artifactory/api/docker/{REPO_KEY}/
 
 if response.status_code == 200:
     images = sorted(response.json()['tags'], reverse=True)
-    images = [i for i in images if len(i) > 6]
+    images = [i for i in images if len(i) > 6 if 'nightly' not in i]
     last_version = images[0]
     if base_version in last_version and 'nightly' not in last_version:
         version_parts = last_version.split('.')
@@ -62,4 +62,10 @@ cmd = ['docker', 'build', '--network=host', '--tag',
 print(f'Running: {" ".join(cmd)}')
 p = subprocess.Popen(" ".join(cmd), cwd=os.path.abspath(os.path.dirname(__file__)), shell=True)
 p.wait()
+# tag full version as patch version
+cmd = ['docker', 'tag', f'{REPO_KEY}.{BASE_REPO}/{IMAGE_NAME}:{version}',
+       f'{REPO_KEY}.{BASE_REPO}/{IMAGE_NAME}:{version[0:5]}']
+print(f'Running: {" ".join(cmd)}')
+tp = subprocess.Popen(" ".join(cmd), cwd=os.path.abspath(os.path.dirname(__file__)), shell=True)
+tp.wait()
 sys.exit(p.returncode)
