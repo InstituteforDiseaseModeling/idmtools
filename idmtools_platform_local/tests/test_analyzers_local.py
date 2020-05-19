@@ -25,7 +25,6 @@ class AddAnalyzer(IAnalyzer):
     """
     Add Analyzer
     A simple base class to add analyzers.
-
     """
 
     def __init__(self):
