@@ -5,7 +5,6 @@ import sys
 from collections import defaultdict
 from datetime import timezone
 from github import Github
-from github.Issue import Issue
 import pygit2
 
 if os.getenv('GIT_TOKEN') is None and len(sys.argv) != 2:
