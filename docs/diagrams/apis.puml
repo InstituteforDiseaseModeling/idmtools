@@ -1,4 +1,5 @@
 @startuml
+
 package "idmtools" {
     class PluginSpecification {
         str get_name(strip_all)
@@ -19,14 +20,15 @@ package "idmtools" {
         {abstract} IPlatform get()
     }
 }
+
 package "cli"{
     class PlatformCLISpecification {
         {abstract} Type[IPlatformCLI] get_type()
         {abstract} PlatformCLI get()
     }
 }
+
 PluginSpecification <-- TaskSpecification
 PluginSpecification <-- PlatformSpecification
 PluginSpecification <-- PlatformCLISpecification
-
 @enduml
