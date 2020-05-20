@@ -5,6 +5,8 @@ import requests
 from dataclasses import dataclass
 from logging import getLogger, DEBUG
 from typing import Dict
+
+from docker.errors import ImageNotFound
 from docker.models.containers import Container
 
 from idmtools.core.system_information import get_system_information
@@ -100,9 +102,13 @@ class WorkersContainer(BaseServiceContainer):
         return container_config
 
     def create(self, spinner=None) -> Container:
-        if logger.isEnabledFor(DEBUG):
-            logger.debug(f'Pulling: {self.image}')
-        self.client.images.get(self.image)
+        try:
+            image = self.client.images.get(self.image)
+            logger.info(f'Pulled {self.image} with id {image.id}')
+        except ImageNotFound:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f'Pulling: {self.image}')
+            self.client.images.pull(self.image)
         result = super().create(spinner)
         # postgres will restart once so we should watch it again
         time.sleep(0.2)
