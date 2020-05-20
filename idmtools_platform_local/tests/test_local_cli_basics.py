@@ -53,6 +53,7 @@ class TestLocalCLIBasic(unittest.TestCase):
         """
         Filtering depends on a few postgres filtering method so we have to
         setup a connection to postgres and then test querying
+        
         """
 
         with self.subTest("test_experiments_status"):
