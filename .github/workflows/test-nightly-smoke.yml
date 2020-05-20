@@ -10,8 +10,6 @@ jobs:
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
-        with:
-          ref: dev
       - name: Set up Python
         uses: actions/setup-python@v1
         with:
