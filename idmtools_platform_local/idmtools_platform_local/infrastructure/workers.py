@@ -110,7 +110,8 @@ class WorkersContainer(BaseServiceContainer):
             if len(parts) != 2:
                 raise ValueError("Excepted image in format image:tag")
             logger.info(f'Pulling: {self.image}')
-            self.client.images.pull(parts[0], tag=parts[-1])
+            image = self.client.images.pull(parts[0], tag=parts[-1])
+            logger.info(f'Pulled {self.image} with id {image.id}')
         result = super().create(spinner)
         # postgres will restart once so we should watch it again
         time.sleep(0.2)
