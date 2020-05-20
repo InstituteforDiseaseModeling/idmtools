@@ -118,7 +118,11 @@ class WorkersContainer(BaseServiceContainer):
         start = time.time()
         while (time.time() - start) < 30:
             try:
+                if logger.isEnabledFor(level=DEBUG):
+                    logger.debug("Calling healthcheck")
                 response = HealthcheckClient.get(HealthcheckClient.path_url)
+                if logger.isEnabledFor(level=DEBUG):
+                    logger.debug(f"healthcheck response: {response.status_code}")
                 if response.status_code == 200:
                     response = response.json()
                     if 'db' in response and response['db']:
