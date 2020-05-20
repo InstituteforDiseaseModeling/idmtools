@@ -67,7 +67,7 @@ class Simulation(IAssetsEnabled, INamedEntity):
             self.tags["simulation_type"] = sn
 
         # Add a tag to for task
-        if self.parent is None or "task_type" not in self.parent.tags:
+        if self.task is not None:
             tn = get_qualified_class_name_from_obj(self.task)
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f'Setting Simulation Tag "task_type" to "{tn}"')
