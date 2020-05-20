@@ -16,14 +16,17 @@ build_requirements = ['flake8', 'coverage', 'py-make', 'bump2version', 'twine']
 test_requirements = ['pytest~=5.4.1', 'pytest-runner~=5.2', 'xmlrunner~=1.7.7', 'pytest-xdist',
                      'pytest-timeout', 'pytest-cache'] + build_requirements
 
+version = '1.0.1+nightly'
+
 extras = {
     'test': test_requirements,
     # to support notebooks we need docker
     'notebooks': ['docker==4.0.1'],
     'packaging': build_requirements,
-    'idm': ['idmtools_platform_comps', 'idmtools_cli', 'idmtools_models', 'emodpy'],
+    'idm': ['idmtools_platform_comps', 'idmtools_cli', 'idmtools_models', f'emodpy~={version}'],
     # our full install include all common plugins
-    'full': ['idmtools_platform_comps', 'idmtools_platform_local', 'idmtools_cli', 'idmtools_models', 'emodpy']
+    'full': ['idmtools_platform_comps', 'idmtools_platform_local', 'idmtools_cli', 'idmtools_models',
+             f'emodpy~={version}']
 }
 
 authors = [
@@ -67,6 +70,6 @@ setup(
     test_suite='tests',
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='1.0.1+nightly',
+    version=version,
     zip_safe=False
 )
