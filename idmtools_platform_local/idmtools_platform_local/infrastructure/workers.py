@@ -104,7 +104,7 @@ class WorkersContainer(BaseServiceContainer):
     def create(self, spinner=None) -> Container:
         try:
             image = self.client.images.get(self.image)
-            logger.info(f'Pulled {self.image} with id {image.id}')
+            logger.info(f'Found {self.image} with id {image.id}')
         except ImageNotFound:
             parts = self.image.split(':')
             if len(parts) != 2:
