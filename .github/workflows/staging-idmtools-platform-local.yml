@@ -4,6 +4,9 @@ name: "Staging: idmtools-platform-local"
 
 on:
   push:
+    branches:
+      # only run this on
+      - dev
     paths:
       - 'idmtools_core/**'
       - 'idmtools_platform_local/**'

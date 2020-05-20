@@ -7,6 +7,7 @@ on: [push, pull_request]
 jobs:
   install-nightly-build-run-smoke-test:
     runs-on: ubuntu-latest
+    if: "contains(github.event.head_commit.message, 'Run smoke test!')"
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
