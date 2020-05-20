@@ -5,6 +5,8 @@ import requests
 from dataclasses import dataclass
 from logging import getLogger, DEBUG
 from typing import Dict
+
+from docker.errors import ImageNotFound
 from docker.models.containers import Container
 
 from idmtools.core.system_information import get_system_information
@@ -100,9 +102,16 @@ class WorkersContainer(BaseServiceContainer):
         return container_config
 
     def create(self, spinner=None) -> Container:
-        if logger.isEnabledFor(DEBUG):
-            logger.debug(f'Pulling: {self.image}')
-        self.client.images.get(self.image)
+        try:
+            image = self.client.images.get(self.image)
+            logger.info(f'Found {self.image} with id {image.id}')
+        except ImageNotFound:
+            parts = self.image.split(':')
+            if len(parts) != 2:
+                raise ValueError("Excepted image in format image:tag")
+            logger.info(f'Pulling: {self.image}')
+            image = self.client.images.pull(parts[0], tag=parts[-1])
+            logger.info(f'Pulled {self.image} with id {image.id}')
         result = super().create(spinner)
         # postgres will restart once so we should watch it again
         time.sleep(0.2)
@@ -110,7 +119,11 @@ class WorkersContainer(BaseServiceContainer):
         start = time.time()
         while (time.time() - start) < 30:
             try:
+                if logger.isEnabledFor(level=DEBUG):
+                    logger.debug("Calling healthcheck")
                 response = HealthcheckClient.get(HealthcheckClient.path_url)
+                if logger.isEnabledFor(level=DEBUG):
+                    logger.debug(f"healthcheck response: {response.status_code}")
                 if response.status_code == 200:
                     response = response.json()
                     if 'db' in response and response['db']:
