@@ -18,13 +18,7 @@ on:
     paths:
       - '**.py'
       - 'docs/**'
-  pull_request:
-    branches:
-      # only run this on
-      - master
-    paths:
-      - '**.py'
-      - 'docs/**'
+
 jobs:
   rebuild-documentation:
 
