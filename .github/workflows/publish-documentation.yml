@@ -7,10 +7,9 @@ name: "Rebuild docs"
 #
 # Note, this test will checkout 'dev' branch
 on:
-  on:
-    repository_dispatch:
-      # Manually trigger with curl or Postman POST
-      types: [master_doc_build]
+  repository_dispatch:
+    # Manually trigger with curl or Postman POST
+    types: [master_doc_build]
   push:
     branches:
       # only run this on
