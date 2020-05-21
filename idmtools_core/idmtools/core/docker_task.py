@@ -111,7 +111,7 @@ class DockerTask(ITask):
                         line = line['status'].strip()
                         prog.set_description(line)
 
-                logger.info(f'Build Successful)')
+                logger.info('Build Successful)')
             except BuildError as e:
                 logger.info(f"Build failed for {self.image_name} with message {e.msg}")
                 logger.info(f'Build log: {e.build_log}')

@@ -71,7 +71,7 @@ class GitRepo:
         Returns: None
         """
         default_branch = 'master'
-        ex_text = f'Please Verify URL Format: \nhttps://github.com/<owner>/<repo>/(tree|blob)/<branch>/<path>\nor\nhttps://github.com/<owner>/<repo>/'
+        ex_text = 'Please Verify URL Format: \nhttps://github.com/<owner>/<repo>/(tree|blob)/<branch>/<path>\nor\nhttps://github.com/<owner>/<repo>/'
 
         example_url = url.lower().strip().rstrip('/')
         url_chunks = example_url.replace(f'{GITHUB_HOME}/', '').split('/')

@@ -278,7 +278,7 @@ class RemoteSlurmOperations(SlurmOperations):
         # TODO verify result
 
     def experiment_status(self, experiment):
-        stdin_, stdout_, stderr_ = self._cmd_client.exec_command(f'sacct -S1970-01-01T00:00 -n -p -oJobname,state')
+        stdin_, stdout_, stderr_ = self._cmd_client.exec_command('sacct -S1970-01-01T00:00 -n -p -oJobname,state')
         output_lines = reversed(stdout_.readlines())
         sids = [s.uid for s in experiment.simulations]
         sims = {}
