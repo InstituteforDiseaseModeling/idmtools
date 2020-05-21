@@ -1,6 +1,6 @@
 @startuml
 
-package "idmtools-core" as regsitry {
+package "idmtools-core" as registry {
     () "TasksAPI" as TasksAPI
 }
 
