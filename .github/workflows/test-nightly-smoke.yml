@@ -1,5 +1,5 @@
 # This workflows will download idmtools nightly packages from artifactory then run smoke tests
-
+# 
 name: "Install nightly build and run smoke test"
 
 on: [push, pull_request]
