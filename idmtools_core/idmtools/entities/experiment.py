@@ -373,6 +373,10 @@ class Experiment(IAssetsEnabled, INamedEntity):
         Returns:
             Nothing
         """
+        if not isinstance(simulations, TemplatedSimulations):
+            raise TypeError('Adding new simulations to existing experiments requires a TemplatedSimulations object '
+                            'containing the new simulation(s) and/or simulation builder(s).')
+
         # merge existing self.simulations object builders and single simulations into new simulations object
         if isinstance(self.simulations, TemplatedSimulations):
             for builder in self.simulations.builders:
