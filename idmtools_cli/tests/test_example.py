@@ -15,7 +15,7 @@ class TestExample(unittest.TestCase):
         runner = CliRunner()
         result = runner.invoke(gitrepo, ['--help'])
         # Check for our help string
-        self.assertIn('Download examples from GitHub repo to user location', result.output)
+        self.assertIn('Download files from GitHub repo to user location', result.output)
         # Ensure we have our expected global sub-commands
         commands = get_subcommands_from_help_result(result)
         self.assertIn('download', commands)
@@ -23,7 +23,7 @@ class TestExample(unittest.TestCase):
     def test_example_help(self):
         result = run_command('gitrepo', '--help')
         # Check for our help string
-        self.assertIn('Download examples from GitHub repo to user location', result.output)
+        self.assertIn('Download files from GitHub repo to user location', result.output)
         # Ensure we have our expected global sub-commands
         commands = get_subcommands_from_help_result(result)
         self.assertIn('download', commands)
@@ -31,7 +31,7 @@ class TestExample(unittest.TestCase):
     def test_download_help(self):
         runner = CliRunner()
         result = runner.invoke(gitrepo, ['download', '--help'])
-        self.assertIn('Download examples from GitHub repo to user location', result.output)
+        self.assertIn('Download files from GitHub repo to user location', result.output)
         # Check that there is a --url option
         self.assertIn('--url', result.output)
         # Check that there is a --output option
