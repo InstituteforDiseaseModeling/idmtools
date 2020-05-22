@@ -1,0 +1,23 @@
+idmtools.registry package
+=========================
+
+Submodules
+----------
+
+.. toctree::
+
+   idmtools.registry.experiment_specification
+   idmtools.registry.master_plugin_registry
+   idmtools.registry.platform_specification
+   idmtools.registry.plugin_specification
+   idmtools.registry.task_specification
+   idmtools.registry.utils
+
+Module contents
+---------------
+
+.. automodule:: idmtools.registry
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

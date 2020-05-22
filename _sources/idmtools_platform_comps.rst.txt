@@ -1,0 +1,32 @@
+idmtools\_platform\_comps package
+=================================
+
+Subpackages
+-----------
+
+.. toctree::
+
+   idmtools_platform_comps.cli
+   idmtools_platform_comps.comps_operations
+   idmtools_platform_comps.ssmt_operations
+   idmtools_platform_comps.ssmt_work_items
+   idmtools_platform_comps.utils
+
+Submodules
+----------
+
+.. toctree::
+
+   idmtools_platform_comps.comps_cli
+   idmtools_platform_comps.comps_platform
+   idmtools_platform_comps.plugin_info
+   idmtools_platform_comps.ssmt_platform
+
+Module contents
+---------------
+
+.. automodule:: idmtools_platform_comps
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

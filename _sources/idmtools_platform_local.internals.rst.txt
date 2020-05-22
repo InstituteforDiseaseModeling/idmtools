@@ -1,0 +1,21 @@
+idmtools\_platform\_local.internals package
+===========================================
+
+Subpackages
+-----------
+
+.. toctree::
+
+   idmtools_platform_local.internals.data
+   idmtools_platform_local.internals.tasks
+   idmtools_platform_local.internals.ui
+   idmtools_platform_local.internals.workers
+
+Module contents
+---------------
+
+.. automodule:: idmtools_platform_local.internals
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

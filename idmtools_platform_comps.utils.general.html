@@ -1,0 +1,375 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>idmtools_platform_comps.utils.general module &mdash; IDM-Tools  documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/tipuesearch/tipuesearch.js"></script>
+        <script src="_static/tipuesearch/tipuesearch_content.js"></script>
+        <script src="_static/tipuesearch/tipuesearch_set.js"></script>
+        <script src="_static/runsearch.js"></script>
+        <script src="_static/tablecollapse.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Search within IDM-Tools  documentation"
+          href="_static/opensearch.xml"/>
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="_static/tipuesearch/tipuesearch.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="idmtools_platform_comps.utils.lookups module" href="idmtools_platform_comps.utils.lookups.html" />
+    <link rel="prev" title="idmtools_platform_comps.utils.disk_usage module" href="idmtools_platform_comps.utils.disk_usage.html" />
+
+<link href="https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans" rel="stylesheet">
+
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> IDM-Tools
+          
+
+          
+            
+            <img src="_static/IDM_white.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                Beta
+              </div>
+            
+          
+
+          <div role="search">
+    <form action="search-local.html" class='wy-form' id='rtd-search-form' method="get">
+        <input autocomplete="off" id="tipue_search_input" name="q" placeholder="Search docs"
+               required type="text">
+    </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="packages-overview.html">Packages overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run-sims.html">Run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calibrate.html">Calibrate simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reports.html">Output reports</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookie-cutter example projects</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="reference.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="idmtools_index.html">idmtools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_models_index.html">idmtools_models</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="idmtools_platform_comps_index.html">idmtools_platform_comps</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="idmtools_platform_comps.html">idmtools_platform_comps package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="idmtools_platform_comps.cli.html">idmtools_platform_comps.cli package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools_platform_comps.comps_operations.html">idmtools_platform_comps.comps_operations package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools_platform_comps.ssmt_operations.html">idmtools_platform_comps.ssmt_operations package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools_platform_comps.ssmt_work_items.html">idmtools_platform_comps.ssmt_work_items package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="idmtools_platform_comps.utils.html">idmtools_platform_comps.utils package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools_platform_comps.comps_cli.html">idmtools_platform_comps.comps_cli module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools_platform_comps.comps_platform.html">idmtools_platform_comps.comps_platform module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools_platform_comps.plugin_info.html">idmtools_platform_comps.plugin_info module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools_platform_comps.ssmt_platform.html">idmtools_platform_comps.ssmt_platform module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_platform_local_index.html">idmtools_platform_local</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">IDM-Tools</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+<div aria-label="breadcrumbs navigation" role="navigation">
+    <ul class="wy-breadcrumbs">
+        <li><a href="../index.html">IDM docs</a> &raquo;</li>
+        <li><a href="index.html">IDM-Tools</a> &raquo;</li>
+        
+        <li><a href="reference.html">API reference</a> &raquo;</li>
+        
+        <li><a href="idmtools_platform_comps_index.html">idmtools_platform_comps</a> &raquo;</li>
+        
+        <li><a href="idmtools_platform_comps.html">idmtools_platform_comps package</a> &raquo;</li>
+        
+        <li><a href="idmtools_platform_comps.utils.html">idmtools_platform_comps.utils package</a> &raquo;</li>
+        
+        <li>idmtools_platform_comps.utils.general module</li>
+        <li class="wy-breadcrumbs-aside">
+            
+            
+            
+        </li>
+    </ul>
+    <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+<!-- From _templates/page.html -->
+
+  <div class="section" id="module-idmtools_platform_comps.utils.general">
+<span id="idmtools-platform-comps-utils-general-module"></span><h1>idmtools_platform_comps.utils.general module<a class="headerlink" href="#module-idmtools_platform_comps.utils.general" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="idmtools_platform_comps.utils.general.fatal_code">
+<code class="sig-prename descclassname">idmtools_platform_comps.utils.general.</code><code class="sig-name descname">fatal_code</code><span class="sig-paren">(</span><em class="sig-param">e: Exception</em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#idmtools_platform_comps.utils.general.fatal_code" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses to determine if we should stop retrying based on request status code</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>e</strong> – Exeception to check</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True is exception is a request and status code matches 404</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="idmtools_platform_comps.utils.general.convert_comps_status">
+<code class="sig-prename descclassname">idmtools_platform_comps.utils.general.</code><code class="sig-name descname">convert_comps_status</code><span class="sig-paren">(</span><em class="sig-param">comps_status: COMPS.Data.Simulation.SimulationState</em><span class="sig-paren">)</span> &#x2192; idmtools.core.enums.EntityStatus<a class="headerlink" href="#idmtools_platform_comps.utils.general.convert_comps_status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert status from COMPS to IDMTools</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>comps_status</strong> – Status in Comps</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>EntityStatus</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="idmtools_platform_comps.utils.general.convert_comps_workitem_status">
+<code class="sig-prename descclassname">idmtools_platform_comps.utils.general.</code><code class="sig-name descname">convert_comps_workitem_status</code><span class="sig-paren">(</span><em class="sig-param">comps_status: COMPS.Data.WorkItem.WorkItemState</em><span class="sig-paren">)</span> &#x2192; idmtools.core.enums.EntityStatus<a class="headerlink" href="#idmtools_platform_comps.utils.general.convert_comps_workitem_status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert status from COMPS to IDMTools
+Created = 0                # WorkItem has been saved to the database
+CommissionRequested = 5    # WorkItem is ready to be processed by the next available worker of the correct type
+Commissioned = 10          # WorkItem has been commissioned to a worker of the correct type and is beginning execution
+Validating = 30            # WorkItem is being validated
+Running = 40               # WorkItem is currently running
+Waiting = 50               # WorkItem is waiting for dependent items to complete
+ResumeRequested = 60       # Dependent items have completed and WorkItem is ready to be processed by the next available worker of the correct type
+CancelRequested = 80       # WorkItem cancellation was requested
+Canceled = 90              # WorkItem was successfully canceled
+Resumed = 100              # WorkItem has been claimed by a worker of the correct type and is resuming
+Canceling = 120            # WorkItem is in the process of being canceled by the worker
+Succeeded = 130            # WorkItem completed successfully
+Failed = 140               # WorkItem failed
+:param comps_status: Status in Comps</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>EntityStatus</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="idmtools_platform_comps.utils.general.clean_experiment_name">
+<code class="sig-prename descclassname">idmtools_platform_comps.utils.general.</code><code class="sig-name descname">clean_experiment_name</code><span class="sig-paren">(</span><em class="sig-param">experiment_name: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#idmtools_platform_comps.utils.general.clean_experiment_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enforce any COMPS-specific demands on experiment names.
+:param experiment_name: name of the experiment</p>
+<p>Returns:the experiment name allowed for use</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="idmtools_platform_comps.utils.general.get_file_from_collection">
+<code class="sig-prename descclassname">idmtools_platform_comps.utils.general.</code><code class="sig-name descname">get_file_from_collection</code><span class="sig-paren">(</span><em class="sig-param">platform: idmtools.entities.iplatform.IPlatform</em>, <em class="sig-param">collection_id: uuid.UUID</em>, <em class="sig-param">file_path: str</em><span class="sig-paren">)</span> &#x2192; bytearray<a class="headerlink" href="#idmtools_platform_comps.utils.general.get_file_from_collection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a file from an asset collection</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>platform</strong> – Platform object to use</p></li>
+<li><p><strong>collection_id</strong> – Asset Collection ID</p></li>
+<li><p><strong>file_path</strong> – Path within collection</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Object Byte Array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="idmtools_platform_comps.utils.general.get_asset_for_comps_item">
+<code class="sig-prename descclassname">idmtools_platform_comps.utils.general.</code><code class="sig-name descname">get_asset_for_comps_item</code><span class="sig-paren">(</span><em class="sig-param">platform: idmtools.entities.iplatform.IPlatform, item: idmtools.core.interfaces.ientity.IEntity, files: List[str], cache=None</em><span class="sig-paren">)</span> &#x2192; Dict[str, bytearray]<a class="headerlink" href="#idmtools_platform_comps.utils.general.get_asset_for_comps_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve assets from an Entity(Simulation, Experiment, WorkItem)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>platform</strong> – Platform Object to use</p></li>
+<li><p><strong>item</strong> – Item to fetch assets from</p></li>
+<li><p><strong>files</strong> – List of file names to retrieve</p></li>
+<li><p><strong>cache</strong> – Cache object to use</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dictionary in structure of filename -&gt; bytearray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+<div id="tipue_search_content"></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="idmtools_platform_comps.utils.lookups.html" class="btn btn-neutral float-right" title="idmtools_platform_comps.utils.lookups module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="idmtools_platform_comps.utils.disk_usage.html" class="btn btn-neutral float-left" title="idmtools_platform_comps.utils.disk_usage module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Intellectual Ventures Management, LLC (IVM). All rights reserved
+
+    </p>
+  </div>
+<p>IDM-Tools is licensed under the <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode">Creative Commons
+    Attribution-Noncommercial-ShareAlike 4.0 License</a>.</p>
+<p>Send documentation feedback to <a href="mailto:feedback@idmod.org" target="_top">feedback@idmod.org</a>. If you have
+    questions, email <a href="mailto:support@idmod.org" target="_top">support@idmod.org</a>.</p>
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+  
+<!-- Google analytics for IDM docs -->
+ 
+<script>
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+            (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+            m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+    ga('create', 'UA-87656833-3', 'auto');
+    ga('send', 'pageview');
+
+</script>
+
+
+
+</body>
+</html>

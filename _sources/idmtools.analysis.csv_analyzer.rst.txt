@@ -1,0 +1,8 @@
+idmtools.analysis.csv\_analyzer module
+======================================
+
+.. automodule:: idmtools.analysis.csv_analyzer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

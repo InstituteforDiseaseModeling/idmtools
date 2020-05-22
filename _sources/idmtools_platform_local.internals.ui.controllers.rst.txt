@@ -1,0 +1,21 @@
+idmtools\_platform\_local.internals.ui.controllers package
+==========================================================
+
+Submodules
+----------
+
+.. toctree::
+
+   idmtools_platform_local.internals.ui.controllers.experiments
+   idmtools_platform_local.internals.ui.controllers.healthcheck
+   idmtools_platform_local.internals.ui.controllers.simulations
+   idmtools_platform_local.internals.ui.controllers.utils
+
+Module contents
+---------------
+
+.. automodule:: idmtools_platform_local.internals.ui.controllers
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

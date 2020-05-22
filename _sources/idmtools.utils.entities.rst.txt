@@ -1,0 +1,8 @@
+idmtools.utils.entities module
+==============================
+
+.. automodule:: idmtools.utils.entities
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

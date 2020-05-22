@@ -1,0 +1,389 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>idmtools_platform_local.infrastructure.docker_io module &mdash; IDM-Tools  documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/tipuesearch/tipuesearch.js"></script>
+        <script src="_static/tipuesearch/tipuesearch_content.js"></script>
+        <script src="_static/tipuesearch/tipuesearch_set.js"></script>
+        <script src="_static/runsearch.js"></script>
+        <script src="_static/tablecollapse.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Search within IDM-Tools  documentation"
+          href="_static/opensearch.xml"/>
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="_static/tipuesearch/tipuesearch.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="idmtools_platform_local.infrastructure.postgres module" href="idmtools_platform_local.infrastructure.postgres.html" />
+    <link rel="prev" title="idmtools_platform_local.infrastructure.base_service_container module" href="idmtools_platform_local.infrastructure.base_service_container.html" />
+
+<link href="https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans" rel="stylesheet">
+
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> IDM-Tools
+          
+
+          
+            
+            <img src="_static/IDM_white.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                Beta
+              </div>
+            
+          
+
+          <div role="search">
+    <form action="search-local.html" class='wy-form' id='rtd-search-form' method="get">
+        <input autocomplete="off" id="tipue_search_input" name="q" placeholder="Search docs"
+               required type="text">
+    </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="packages-overview.html">Packages overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run-sims.html">Run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calibrate.html">Calibrate simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reports.html">Output reports</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookie-cutter example projects</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="reference.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="idmtools_index.html">idmtools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_models_index.html">idmtools_models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_platform_comps_index.html">idmtools_platform_comps</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="idmtools_platform_local_index.html">idmtools_platform_local</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="idmtools_platform_local.html">idmtools_platform_local package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="idmtools_platform_local.cli.html">idmtools_platform_local.cli package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools_platform_local.client.html">idmtools_platform_local.client package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="idmtools_platform_local.infrastructure.html">idmtools_platform_local.infrastructure package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools_platform_local.internals.html">idmtools_platform_local.internals package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools_platform_local.platform_operations.html">idmtools_platform_local.platform_operations package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools_platform_local.config.html">idmtools_platform_local.config module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools_platform_local.local_cli.html">idmtools_platform_local.local_cli module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools_platform_local.local_platform.html">idmtools_platform_local.local_platform module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools_platform_local.plugin_info.html">idmtools_platform_local.plugin_info module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools_platform_local.status.html">idmtools_platform_local.status module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">IDM-Tools</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+<div aria-label="breadcrumbs navigation" role="navigation">
+    <ul class="wy-breadcrumbs">
+        <li><a href="../index.html">IDM docs</a> &raquo;</li>
+        <li><a href="index.html">IDM-Tools</a> &raquo;</li>
+        
+        <li><a href="reference.html">API reference</a> &raquo;</li>
+        
+        <li><a href="idmtools_platform_local_index.html">idmtools_platform_local</a> &raquo;</li>
+        
+        <li><a href="idmtools_platform_local.html">idmtools_platform_local package</a> &raquo;</li>
+        
+        <li><a href="idmtools_platform_local.infrastructure.html">idmtools_platform_local.infrastructure package</a> &raquo;</li>
+        
+        <li>idmtools_platform_local.infrastructure.docker_io module</li>
+        <li class="wy-breadcrumbs-aside">
+            
+            
+            
+        </li>
+    </ul>
+    <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+<!-- From _templates/page.html -->
+
+  <div class="section" id="module-idmtools_platform_local.infrastructure.docker_io">
+<span id="idmtools-platform-local-infrastructure-docker-io-module"></span><h1>idmtools_platform_local.infrastructure.docker_io module<a class="headerlink" href="#module-idmtools_platform_local.infrastructure.docker_io" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="idmtools_platform_local.infrastructure.docker_io.DockerIO">
+<em class="property">class </em><code class="sig-prename descclassname">idmtools_platform_local.infrastructure.docker_io.</code><code class="sig-name descname">DockerIO</code><span class="sig-paren">(</span><em class="sig-param">host_data_directory: str = 'C:\Users\clinton\.local_data'</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_platform_local.infrastructure.docker_io.DockerIO" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="idmtools_platform_local.infrastructure.docker_io.DockerIO.host_data_directory">
+<code class="sig-name descname">host_data_directory</code><em class="property">: str</em><em class="property"> = 'C:\\Users\\clinton\\.local_data'</em><a class="headerlink" href="#idmtools_platform_local.infrastructure.docker_io.DockerIO.host_data_directory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="idmtools_platform_local.infrastructure.docker_io.DockerIO.delete_files_below_level">
+<code class="sig-name descname">delete_files_below_level</code><span class="sig-paren">(</span><em class="sig-param">directory</em>, <em class="sig-param">target_level=1</em>, <em class="sig-param">current_level=1</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_platform_local.infrastructure.docker_io.DockerIO.delete_files_below_level" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="idmtools_platform_local.infrastructure.docker_io.DockerIO.cleanup">
+<code class="sig-name descname">cleanup</code><span class="sig-paren">(</span><em class="sig-param">delete_data: bool = True</em>, <em class="sig-param">shallow_delete: bool = False</em><span class="sig-paren">)</span> &#x2192; NoReturn<a class="headerlink" href="#idmtools_platform_local.infrastructure.docker_io.DockerIO.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops the running services, removes local data, and removes network. You can optionally disable the deleting
+of local data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>delete_data</strong> (<em>bool</em>) – When true, deletes local data</p></li>
+<li><p><strong>shallow_delete</strong> (<em>bool</em>) – Deletes the data but not the container folders(redis, workers). Preferred to preserve
+permissions and resolve docker issues</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>(NoReturn)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="idmtools_platform_local.infrastructure.docker_io.DockerIO.copy_to_container">
+<code class="sig-name descname">copy_to_container</code><span class="sig-paren">(</span><em class="sig-param">container: docker.models.containers.Container</em>, <em class="sig-param">destination_path: str</em>, <em class="sig-param">file: Union[str</em>, <em class="sig-param">bytes</em>, <em class="sig-param">None] = None</em>, <em class="sig-param">content: [&lt;class 'str'&gt;</em>, <em class="sig-param">&lt;class 'bytes'&gt;] = None</em>, <em class="sig-param">dest_name: Optional[str] = None</em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#idmtools_platform_local.infrastructure.docker_io.DockerIO.copy_to_container" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copies a physical file or content in memory to a container. You can also choose a different name for the
+destination file by using the dest_name option</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>container</strong> – Container to copy the file to</p></li>
+<li><p><strong>file</strong> – Path to the file to copy</p></li>
+<li><p><strong>content</strong> – Content to copy</p></li>
+<li><p><strong>destination_path</strong> – Path within the container to copy the file to(should be a directory)</p></li>
+<li><p><strong>dest_name</strong> – Optional parameter for destination filename. By default the source filename is used</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>(bool) True if the copy succeeds, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="idmtools_platform_local.infrastructure.docker_io.DockerIO.sync_copy">
+<code class="sig-name descname">sync_copy</code><span class="sig-paren">(</span><em class="sig-param">futures</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_platform_local.infrastructure.docker_io.DockerIO.sync_copy" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Sync the copy operations queue in the io_queue. This allows us to take advantage of multi-threaded copying</dt><dd><p>while also making it convenient to have sync points, such as uploading the assets in parallel but pausing
+just before sync point</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>futures</strong> – </p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="idmtools_platform_local.infrastructure.docker_io.DockerIO.copy_multiple_to_container">
+<code class="sig-name descname">copy_multiple_to_container</code><span class="sig-paren">(</span><em class="sig-param">container: docker.models.containers.Container, files: Dict[str, Dict[str, Any]], join_on_copy: bool = True</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_platform_local.infrastructure.docker_io.DockerIO.copy_multiple_to_container" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="idmtools_platform_local.infrastructure.docker_io.DockerIO.create_archive_from_bytes">
+<em class="property">static </em><code class="sig-name descname">create_archive_from_bytes</code><span class="sig-paren">(</span><em class="sig-param">content: Union[bytes, _io.BytesIO, BinaryIO], name: str</em><span class="sig-paren">)</span> &#x2192; _io.BytesIO<a class="headerlink" href="#idmtools_platform_local.infrastructure.docker_io.DockerIO.create_archive_from_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a tar archive from bytes. Used to copy to docker</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>content</strong> – Content to copy into tar</p></li>
+<li><p><strong>name</strong> – Name for file in archive</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>(BytesIO) Return bytesIO object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="idmtools_platform_local.infrastructure.docker_io.DockerIO.create_directory">
+<code class="sig-name descname">create_directory</code><span class="sig-paren">(</span><em class="sig-param">dir: str</em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#idmtools_platform_local.infrastructure.docker_io.DockerIO.create_directory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a directory in a container</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dir</strong> – Path to directory to create</p></li>
+<li><p><strong>container</strong> – Container to create directory in. Default to worker container</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>(ExecResult) Result of the mkdir operation</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+<div id="tipue_search_content"></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="idmtools_platform_local.infrastructure.postgres.html" class="btn btn-neutral float-right" title="idmtools_platform_local.infrastructure.postgres module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="idmtools_platform_local.infrastructure.base_service_container.html" class="btn btn-neutral float-left" title="idmtools_platform_local.infrastructure.base_service_container module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Intellectual Ventures Management, LLC (IVM). All rights reserved
+
+    </p>
+  </div>
+<p>IDM-Tools is licensed under the <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode">Creative Commons
+    Attribution-Noncommercial-ShareAlike 4.0 License</a>.</p>
+<p>Send documentation feedback to <a href="mailto:feedback@idmod.org" target="_top">feedback@idmod.org</a>. If you have
+    questions, email <a href="mailto:support@idmod.org" target="_top">support@idmod.org</a>.</p>
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+  
+<!-- Google analytics for IDM docs -->
+ 
+<script>
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+            (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+            m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+    ga('create', 'UA-87656833-3', 'auto');
+    ga('send', 'pageview');
+
+</script>
+
+
+
+</body>
+</html>

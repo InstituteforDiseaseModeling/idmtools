@@ -1,0 +1,8 @@
+idmtools.core.platform\_factory module
+======================================
+
+.. automodule:: idmtools.core.platform_factory
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

@@ -1,0 +1,8 @@
+idmtools.entities.iplatform module
+==================================
+
+.. automodule:: idmtools.entities.iplatform
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

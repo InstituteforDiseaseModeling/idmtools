@@ -1,0 +1,8 @@
+idmtools.core.experiment\_factory module
+========================================
+
+.. automodule:: idmtools.core.experiment_factory
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

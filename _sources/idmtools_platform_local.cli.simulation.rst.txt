@@ -1,0 +1,8 @@
+idmtools\_platform\_local.cli.simulation module
+===============================================
+
+.. automodule:: idmtools_platform_local.cli.simulation
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

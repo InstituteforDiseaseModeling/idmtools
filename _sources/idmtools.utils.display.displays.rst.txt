@@ -1,0 +1,8 @@
+idmtools.utils.display.displays module
+======================================
+
+.. automodule:: idmtools.utils.display.displays
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

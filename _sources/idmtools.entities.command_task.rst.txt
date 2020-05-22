@@ -1,0 +1,8 @@
+idmtools.entities.command\_task module
+======================================
+
+.. automodule:: idmtools.entities.command_task
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

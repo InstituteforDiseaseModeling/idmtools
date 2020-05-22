@@ -1,0 +1,406 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>idmtools.core.system_information module &mdash; IDM-Tools  documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/tipuesearch/tipuesearch.js"></script>
+        <script src="_static/tipuesearch/tipuesearch_content.js"></script>
+        <script src="_static/tipuesearch/tipuesearch_set.js"></script>
+        <script src="_static/runsearch.js"></script>
+        <script src="_static/tablecollapse.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Search within IDM-Tools  documentation"
+          href="_static/opensearch.xml"/>
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="_static/tipuesearch/tipuesearch.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="idmtools.core.task_factory module" href="idmtools.core.task_factory.html" />
+    <link rel="prev" title="idmtools.core.platform_factory module" href="idmtools.core.platform_factory.html" />
+
+<link href="https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans" rel="stylesheet">
+
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> IDM-Tools
+          
+
+          
+            
+            <img src="_static/IDM_white.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                Beta
+              </div>
+            
+          
+
+          <div role="search">
+    <form action="search-local.html" class='wy-form' id='rtd-search-form' method="get">
+        <input autocomplete="off" id="tipue_search_input" name="q" placeholder="Search docs"
+               required type="text">
+    </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="packages-overview.html">Packages overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run-sims.html">Run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calibrate.html">Calibrate simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reports.html">Output reports</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookie-cutter example projects</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="reference.html">API reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="idmtools_index.html">idmtools</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="idmtools.html">idmtools package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="idmtools.analysis.html">idmtools.analysis package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.assets.html">idmtools.assets package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.builders.html">idmtools.builders package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.config.html">idmtools.config package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="idmtools.core.html">idmtools.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.entities.html">idmtools.entities package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.registry.html">idmtools.registry package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.services.html">idmtools.services package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.utils.html">idmtools.utils package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_models_index.html">idmtools_models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_platform_comps_index.html">idmtools_platform_comps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_platform_local_index.html">idmtools_platform_local</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">IDM-Tools</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+<div aria-label="breadcrumbs navigation" role="navigation">
+    <ul class="wy-breadcrumbs">
+        <li><a href="../index.html">IDM docs</a> &raquo;</li>
+        <li><a href="index.html">IDM-Tools</a> &raquo;</li>
+        
+        <li><a href="reference.html">API reference</a> &raquo;</li>
+        
+        <li><a href="idmtools_index.html">idmtools</a> &raquo;</li>
+        
+        <li><a href="idmtools.html">idmtools package</a> &raquo;</li>
+        
+        <li><a href="idmtools.core.html">idmtools.core package</a> &raquo;</li>
+        
+        <li>idmtools.core.system_information module</li>
+        <li class="wy-breadcrumbs-aside">
+            
+            
+            
+        </li>
+    </ul>
+    <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+<!-- From _templates/page.html -->
+
+  <div class="section" id="module-idmtools.core.system_information">
+<span id="idmtools-core-system-information-module"></span><h1>idmtools.core.system_information module<a class="headerlink" href="#module-idmtools.core.system_information" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="idmtools.core.system_information.get_data_directory">
+<code class="sig-prename descclassname">idmtools.core.system_information.</code><code class="sig-name descname">get_data_directory</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#idmtools.core.system_information.get_data_directory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="idmtools.core.system_information.get_filtered_environment_vars">
+<code class="sig-prename descclassname">idmtools.core.system_information.</code><code class="sig-name descname">get_filtered_environment_vars</code><span class="sig-paren">(</span><em class="sig-param">exclude=None</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.core.system_information.get_filtered_environment_vars" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="idmtools.core.system_information.SystemInformation">
+<em class="property">class </em><code class="sig-prename descclassname">idmtools.core.system_information.</code><code class="sig-name descname">SystemInformation</code><span class="sig-paren">(</span><em class="sig-param">data_directory: Union[str</em>, <em class="sig-param">NoneType] = 'C:\Users\clinton\.local_data'</em>, <em class="sig-param">user: Union[str</em>, <em class="sig-param">NoneType] = 'clinton'</em>, <em class="sig-param">python_version: str = '3.8.3'</em>, <em class="sig-param">python_build: str = ('tags/v3.8.3:6f8c832'</em>, <em class="sig-param">'May 13 2020 22:37:02')</em>, <em class="sig-param">python_packages: List[str] = &lt;factory&gt;</em>, <em class="sig-param">environment_variables: Dict[str</em>, <em class="sig-param">str] = &lt;factory&gt;</em>, <em class="sig-param">os_name: str = 'Windows'</em>, <em class="sig-param">hostname: str = 'morty'</em>, <em class="sig-param">system_version: str = '10.0.18362'</em>, <em class="sig-param">system_architecture: str = 'AMD64'</em>, <em class="sig-param">system_processor: str = 'Intel64 Family 6 Model 58 Stepping 9</em>, <em class="sig-param">GenuineIntel'</em>, <em class="sig-param">system_architecture_details: str = ('64bit'</em>, <em class="sig-param">'WindowsPE')</em>, <em class="sig-param">default_docket_socket_path: str = '/var/run/docker.sock'</em>, <em class="sig-param">cwd: str = 'D:\Dev\idmtools\docs'</em>, <em class="sig-param">user_group_str: str = '1000:1000'</em>, <em class="sig-param">version: str = '1.0.1+nightly.0'</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.core.system_information.SystemInformation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="idmtools.core.system_information.SystemInformation.data_directory">
+<code class="sig-name descname">data_directory</code><em class="property">: Optional[str]</em><em class="property"> = 'C:\\Users\\clinton\\.local_data'</em><a class="headerlink" href="#idmtools.core.system_information.SystemInformation.data_directory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="idmtools.core.system_information.SystemInformation.user">
+<code class="sig-name descname">user</code><em class="property">: Optional[str]</em><em class="property"> = 'clinton'</em><a class="headerlink" href="#idmtools.core.system_information.SystemInformation.user" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="idmtools.core.system_information.SystemInformation.python_version">
+<code class="sig-name descname">python_version</code><em class="property">: str</em><em class="property"> = '3.8.3'</em><a class="headerlink" href="#idmtools.core.system_information.SystemInformation.python_version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="idmtools.core.system_information.SystemInformation.python_build">
+<code class="sig-name descname">python_build</code><em class="property">: str</em><em class="property"> = ('tags/v3.8.3:6f8c832', 'May 13 2020 22:37:02')</em><a class="headerlink" href="#idmtools.core.system_information.SystemInformation.python_build" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="idmtools.core.system_information.SystemInformation.python_implementation">
+<code class="sig-name descname">python_implementation</code><em class="property"> = 'CPython'</em><a class="headerlink" href="#idmtools.core.system_information.SystemInformation.python_implementation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="idmtools.core.system_information.SystemInformation.python_packages">
+<code class="sig-name descname">python_packages</code><em class="property">: List[str]</em><em class="property"> = None</em><a class="headerlink" href="#idmtools.core.system_information.SystemInformation.python_packages" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="idmtools.core.system_information.SystemInformation.environment_variables">
+<code class="sig-name descname">environment_variables</code><em class="property">: Dict[str, str]</em><em class="property"> = None</em><a class="headerlink" href="#idmtools.core.system_information.SystemInformation.environment_variables" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="idmtools.core.system_information.SystemInformation.os_name">
+<code class="sig-name descname">os_name</code><em class="property">: str</em><em class="property"> = 'Windows'</em><a class="headerlink" href="#idmtools.core.system_information.SystemInformation.os_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="idmtools.core.system_information.SystemInformation.hostname">
+<code class="sig-name descname">hostname</code><em class="property">: str</em><em class="property"> = 'morty'</em><a class="headerlink" href="#idmtools.core.system_information.SystemInformation.hostname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="idmtools.core.system_information.SystemInformation.system_version">
+<code class="sig-name descname">system_version</code><em class="property">: str</em><em class="property"> = '10.0.18362'</em><a class="headerlink" href="#idmtools.core.system_information.SystemInformation.system_version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="idmtools.core.system_information.SystemInformation.system_architecture">
+<code class="sig-name descname">system_architecture</code><em class="property">: str</em><em class="property"> = 'AMD64'</em><a class="headerlink" href="#idmtools.core.system_information.SystemInformation.system_architecture" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="idmtools.core.system_information.SystemInformation.system_processor">
+<code class="sig-name descname">system_processor</code><em class="property">: str</em><em class="property"> = 'Intel64 Family 6 Model 58 Stepping 9, GenuineIntel'</em><a class="headerlink" href="#idmtools.core.system_information.SystemInformation.system_processor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="idmtools.core.system_information.SystemInformation.system_architecture_details">
+<code class="sig-name descname">system_architecture_details</code><em class="property">: str</em><em class="property"> = ('64bit', 'WindowsPE')</em><a class="headerlink" href="#idmtools.core.system_information.SystemInformation.system_architecture_details" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="idmtools.core.system_information.SystemInformation.default_docket_socket_path">
+<code class="sig-name descname">default_docket_socket_path</code><em class="property">: str</em><em class="property"> = '/var/run/docker.sock'</em><a class="headerlink" href="#idmtools.core.system_information.SystemInformation.default_docket_socket_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="idmtools.core.system_information.SystemInformation.cwd">
+<code class="sig-name descname">cwd</code><em class="property">: str</em><em class="property"> = 'D:\\Dev\\idmtools\\docs'</em><a class="headerlink" href="#idmtools.core.system_information.SystemInformation.cwd" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="idmtools.core.system_information.SystemInformation.user_group_str">
+<code class="sig-name descname">user_group_str</code><em class="property">: str</em><em class="property"> = '1000:1000'</em><a class="headerlink" href="#idmtools.core.system_information.SystemInformation.user_group_str" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="idmtools.core.system_information.SystemInformation.version">
+<code class="sig-name descname">version</code><em class="property">: str</em><em class="property"> = '1.0.1+nightly.0'</em><a class="headerlink" href="#idmtools.core.system_information.SystemInformation.version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="idmtools.core.system_information.LinuxSystemInformation">
+<em class="property">class </em><code class="sig-prename descclassname">idmtools.core.system_information.</code><code class="sig-name descname">LinuxSystemInformation</code><span class="sig-paren">(</span><em class="sig-param">data_directory: Union[str</em>, <em class="sig-param">NoneType] = 'C:\Users\clinton\.local_data'</em>, <em class="sig-param">user: Union[str</em>, <em class="sig-param">NoneType] = 'clinton'</em>, <em class="sig-param">python_version: str = '3.8.3'</em>, <em class="sig-param">python_build: str = ('tags/v3.8.3:6f8c832'</em>, <em class="sig-param">'May 13 2020 22:37:02')</em>, <em class="sig-param">python_packages: List[str] = &lt;factory&gt;</em>, <em class="sig-param">environment_variables: Dict[str</em>, <em class="sig-param">str] = &lt;factory&gt;</em>, <em class="sig-param">os_name: str = 'Windows'</em>, <em class="sig-param">hostname: str = 'morty'</em>, <em class="sig-param">system_version: str = '10.0.18362'</em>, <em class="sig-param">system_architecture: str = 'AMD64'</em>, <em class="sig-param">system_processor: str = 'Intel64 Family 6 Model 58 Stepping 9</em>, <em class="sig-param">GenuineIntel'</em>, <em class="sig-param">system_architecture_details: str = ('64bit'</em>, <em class="sig-param">'WindowsPE')</em>, <em class="sig-param">default_docket_socket_path: str = '/var/run/docker.sock'</em>, <em class="sig-param">cwd: str = 'D:\Dev\idmtools\docs'</em>, <em class="sig-param">user_group_str: str = &lt;factory&gt;</em>, <em class="sig-param">version: str = '1.0.1+nightly.0'</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.core.system_information.LinuxSystemInformation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#idmtools.core.system_information.SystemInformation" title="idmtools.core.system_information.SystemInformation"><code class="xref py py-class docutils literal notranslate"><span class="pre">idmtools.core.system_information.SystemInformation</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="idmtools.core.system_information.WindowsSystemInformation">
+<em class="property">class </em><code class="sig-prename descclassname">idmtools.core.system_information.</code><code class="sig-name descname">WindowsSystemInformation</code><span class="sig-paren">(</span><em class="sig-param">data_directory: Optional[str] = 'C:\Users\clinton\.local_data'</em>, <em class="sig-param">user: Optional[str] = 'clinton'</em>, <em class="sig-param">python_version: str = '3.8.3'</em>, <em class="sig-param">python_build: str = ('tags/v3.8.3:6f8c832'</em>, <em class="sig-param">'May 13 2020 22:37:02')</em>, <em class="sig-param">python_packages: List[str] = &lt;factory&gt;</em>, <em class="sig-param">environment_variables: Dict[str</em>, <em class="sig-param">str] = &lt;factory&gt;</em>, <em class="sig-param">os_name: str = 'Windows'</em>, <em class="sig-param">hostname: str = 'morty'</em>, <em class="sig-param">system_version: str = '10.0.18362'</em>, <em class="sig-param">system_architecture: str = 'AMD64'</em>, <em class="sig-param">system_processor: str = 'Intel64 Family 6 Model 58 Stepping 9</em>, <em class="sig-param">GenuineIntel'</em>, <em class="sig-param">system_architecture_details: str = ('64bit'</em>, <em class="sig-param">'WindowsPE')</em>, <em class="sig-param">default_docket_socket_path: str = '/var/run/docker.sock'</em>, <em class="sig-param">cwd: str = 'D:\Dev\idmtools\docs'</em>, <em class="sig-param">user_group_str: str = '1000:1000'</em>, <em class="sig-param">version: str = '1.0.1+nightly.0'</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.core.system_information.WindowsSystemInformation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#idmtools.core.system_information.SystemInformation" title="idmtools.core.system_information.SystemInformation"><code class="xref py py-class docutils literal notranslate"><span class="pre">idmtools.core.system_information.SystemInformation</span></code></a></p>
+<dl class="attribute">
+<dt id="idmtools.core.system_information.WindowsSystemInformation.default_docket_socket_path">
+<code class="sig-name descname">default_docket_socket_path</code><em class="property">: str</em><em class="property"> = '//var/run/docker.sock'</em><a class="headerlink" href="#idmtools.core.system_information.WindowsSystemInformation.default_docket_socket_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="idmtools.core.system_information.get_system_information">
+<code class="sig-prename descclassname">idmtools.core.system_information.</code><code class="sig-name descname">get_system_information</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; idmtools.core.system_information.SystemInformation<a class="headerlink" href="#idmtools.core.system_information.get_system_information" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch the system-appropriate information inspection object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#idmtools.core.system_information.SystemInformation" title="idmtools.core.system_information.SystemInformation"><code class="xref py py-class docutils literal notranslate"><span class="pre">SystemInformation</span></code></a> with platform-specific implementation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+<div id="tipue_search_content"></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="idmtools.core.task_factory.html" class="btn btn-neutral float-right" title="idmtools.core.task_factory module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="idmtools.core.platform_factory.html" class="btn btn-neutral float-left" title="idmtools.core.platform_factory module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Intellectual Ventures Management, LLC (IVM). All rights reserved
+
+    </p>
+  </div>
+<p>IDM-Tools is licensed under the <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode">Creative Commons
+    Attribution-Noncommercial-ShareAlike 4.0 License</a>.</p>
+<p>Send documentation feedback to <a href="mailto:feedback@idmod.org" target="_top">feedback@idmod.org</a>. If you have
+    questions, email <a href="mailto:support@idmod.org" target="_top">support@idmod.org</a>.</p>
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+  
+<!-- Google analytics for IDM docs -->
+ 
+<script>
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+            (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+            m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+    ga('create', 'UA-87656833-3', 'auto');
+    ga('send', 'pageview');
+
+</script>
+
+
+
+</body>
+</html>

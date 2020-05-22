@@ -1,0 +1,8 @@
+idmtools.services.ipersistance\_service module
+==============================================
+
+.. automodule:: idmtools.services.ipersistance_service
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

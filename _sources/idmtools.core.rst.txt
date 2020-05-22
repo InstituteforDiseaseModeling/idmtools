@@ -1,0 +1,33 @@
+idmtools.core package
+=====================
+
+Subpackages
+-----------
+
+.. toctree::
+
+   idmtools.core.interfaces
+
+Submodules
+----------
+
+.. toctree::
+
+   idmtools.core.cache_enabled
+   idmtools.core.docker_task
+   idmtools.core.enums
+   idmtools.core.exceptions
+   idmtools.core.experiment_factory
+   idmtools.core.logging
+   idmtools.core.platform_factory
+   idmtools.core.system_information
+   idmtools.core.task_factory
+
+Module contents
+---------------
+
+.. automodule:: idmtools.core
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

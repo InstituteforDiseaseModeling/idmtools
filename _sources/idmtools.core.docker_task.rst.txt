@@ -1,0 +1,8 @@
+idmtools.core.docker\_task module
+=================================
+
+.. automodule:: idmtools.core.docker_task
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

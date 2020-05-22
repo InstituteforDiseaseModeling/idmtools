@@ -1,0 +1,8 @@
+idmtools\_platform\_local.client.experiments\_client module
+===========================================================
+
+.. automodule:: idmtools_platform_local.client.experiments_client
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

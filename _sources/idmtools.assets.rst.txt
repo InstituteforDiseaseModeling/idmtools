@@ -1,0 +1,22 @@
+idmtools.assets package
+=======================
+
+Submodules
+----------
+
+.. toctree::
+
+   idmtools.assets.asset
+   idmtools.assets.asset_collection
+   idmtools.assets.content_handlers
+   idmtools.assets.errors
+   idmtools.assets.file_list
+
+Module contents
+---------------
+
+.. automodule:: idmtools.assets
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

@@ -1,0 +1,8 @@
+idmtools.utils.local\_os module
+===============================
+
+.. automodule:: idmtools.utils.local_os
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

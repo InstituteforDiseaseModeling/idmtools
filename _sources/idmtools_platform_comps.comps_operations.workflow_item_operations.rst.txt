@@ -1,0 +1,8 @@
+idmtools\_platform\_comps.comps\_operations.workflow\_item\_operations module
+=============================================================================
+
+.. automodule:: idmtools_platform_comps.comps_operations.workflow_item_operations
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

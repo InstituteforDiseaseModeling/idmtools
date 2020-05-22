@@ -1,0 +1,8 @@
+idmtools.services.platforms module
+==================================
+
+.. automodule:: idmtools.services.platforms
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

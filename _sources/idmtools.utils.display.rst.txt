@@ -1,0 +1,19 @@
+idmtools.utils.display package
+==============================
+
+Submodules
+----------
+
+.. toctree::
+
+   idmtools.utils.display.displays
+   idmtools.utils.display.settings
+
+Module contents
+---------------
+
+.. automodule:: idmtools.utils.display
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

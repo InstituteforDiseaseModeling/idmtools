@@ -1,0 +1,322 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>idmtools.utils.hashing module &mdash; IDM-Tools  documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/tipuesearch/tipuesearch.js"></script>
+        <script src="_static/tipuesearch/tipuesearch_content.js"></script>
+        <script src="_static/tipuesearch/tipuesearch_set.js"></script>
+        <script src="_static/runsearch.js"></script>
+        <script src="_static/tablecollapse.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Search within IDM-Tools  documentation"
+          href="_static/opensearch.xml"/>
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="_static/tipuesearch/tipuesearch.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="idmtools.utils.info module" href="idmtools.utils.info.html" />
+    <link rel="prev" title="idmtools.utils.gitrepo module" href="idmtools.utils.gitrepo.html" />
+
+<link href="https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans" rel="stylesheet">
+
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> IDM-Tools
+          
+
+          
+            
+            <img src="_static/IDM_white.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                Beta
+              </div>
+            
+          
+
+          <div role="search">
+    <form action="search-local.html" class='wy-form' id='rtd-search-form' method="get">
+        <input autocomplete="off" id="tipue_search_input" name="q" placeholder="Search docs"
+               required type="text">
+    </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="packages-overview.html">Packages overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run-sims.html">Run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calibrate.html">Calibrate simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reports.html">Output reports</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookie-cutter example projects</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="reference.html">API reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="idmtools_index.html">idmtools</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="idmtools.html">idmtools package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="idmtools.analysis.html">idmtools.analysis package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.assets.html">idmtools.assets package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.builders.html">idmtools.builders package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.config.html">idmtools.config package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.core.html">idmtools.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.entities.html">idmtools.entities package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.registry.html">idmtools.registry package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.services.html">idmtools.services package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="idmtools.utils.html">idmtools.utils package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_models_index.html">idmtools_models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_platform_comps_index.html">idmtools_platform_comps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_platform_local_index.html">idmtools_platform_local</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">IDM-Tools</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+<div aria-label="breadcrumbs navigation" role="navigation">
+    <ul class="wy-breadcrumbs">
+        <li><a href="../index.html">IDM docs</a> &raquo;</li>
+        <li><a href="index.html">IDM-Tools</a> &raquo;</li>
+        
+        <li><a href="reference.html">API reference</a> &raquo;</li>
+        
+        <li><a href="idmtools_index.html">idmtools</a> &raquo;</li>
+        
+        <li><a href="idmtools.html">idmtools package</a> &raquo;</li>
+        
+        <li><a href="idmtools.utils.html">idmtools.utils package</a> &raquo;</li>
+        
+        <li>idmtools.utils.hashing module</li>
+        <li class="wy-breadcrumbs-aside">
+            
+            
+            
+        </li>
+    </ul>
+    <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+<!-- From _templates/page.html -->
+
+  <div class="section" id="module-idmtools.utils.hashing">
+<span id="idmtools-utils-hashing-module"></span><h1>idmtools.utils.hashing module<a class="headerlink" href="#module-idmtools.utils.hashing" title="Permalink to this headline">¶</a></h1>
+<p>Fast hash of Python objects.</p>
+<dl class="class">
+<dt id="idmtools.utils.hashing.Hasher">
+<em class="property">class </em><code class="sig-prename descclassname">idmtools.utils.hashing.</code><code class="sig-name descname">Hasher</code><span class="sig-paren">(</span><em class="sig-param">hash_name='md5'</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.utils.hashing.Hasher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pickle._Pickler</span></code></p>
+<p>A subclass of pickler to do hashing, rather than pickling.</p>
+<dl class="method">
+<dt id="idmtools.utils.hashing.Hasher.hash">
+<code class="sig-name descname">hash</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">return_digest=True</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.utils.hashing.Hasher.hash" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="idmtools.utils.hashing.Hasher.save">
+<code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param">obj</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.utils.hashing.Hasher.save" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="idmtools.utils.hashing.Hasher.memoize">
+<code class="sig-name descname">memoize</code><span class="sig-paren">(</span><em class="sig-param">obj</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.utils.hashing.Hasher.memoize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disable memoization for strings so hashing happens on value and not reference.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="idmtools.utils.hashing.Hasher.save_set">
+<code class="sig-name descname">save_set</code><span class="sig-paren">(</span><em class="sig-param">set_items</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.utils.hashing.Hasher.save_set" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="idmtools.utils.hashing.hash_obj">
+<code class="sig-prename descclassname">idmtools.utils.hashing.</code><code class="sig-name descname">hash_obj</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">hash_name='md5'</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.utils.hashing.hash_obj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Quick calculation of a hash to identify uniquely Python objects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>hash_name</strong> – The hashing algorithm to use. ‘md5’ is faster; ‘sha1’ is considered safer.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="idmtools.utils.hashing.ignore_fields_in_dataclass_on_pickle">
+<code class="sig-prename descclassname">idmtools.utils.hashing.</code><code class="sig-name descname">ignore_fields_in_dataclass_on_pickle</code><span class="sig-paren">(</span><em class="sig-param">item</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.utils.hashing.ignore_fields_in_dataclass_on_pickle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+<div id="tipue_search_content"></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="idmtools.utils.info.html" class="btn btn-neutral float-right" title="idmtools.utils.info module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="idmtools.utils.gitrepo.html" class="btn btn-neutral float-left" title="idmtools.utils.gitrepo module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Intellectual Ventures Management, LLC (IVM). All rights reserved
+
+    </p>
+  </div>
+<p>IDM-Tools is licensed under the <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode">Creative Commons
+    Attribution-Noncommercial-ShareAlike 4.0 License</a>.</p>
+<p>Send documentation feedback to <a href="mailto:feedback@idmod.org" target="_top">feedback@idmod.org</a>. If you have
+    questions, email <a href="mailto:support@idmod.org" target="_top">support@idmod.org</a>.</p>
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+  
+<!-- Google analytics for IDM docs -->
+ 
+<script>
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+            (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+            m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+    ga('create', 'UA-87656833-3', 'auto');
+    ga('send', 'pageview');
+
+</script>
+
+
+
+</body>
+</html>

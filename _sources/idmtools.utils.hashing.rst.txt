@@ -1,0 +1,8 @@
+idmtools.utils.hashing module
+=============================
+
+.. automodule:: idmtools.utils.hashing
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

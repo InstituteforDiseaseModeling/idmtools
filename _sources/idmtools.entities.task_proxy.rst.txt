@@ -1,0 +1,8 @@
+idmtools.entities.task\_proxy module
+====================================
+
+.. automodule:: idmtools.entities.task_proxy
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

@@ -1,0 +1,8 @@
+idmtools\_models.r.r\_task module
+=================================
+
+.. automodule:: idmtools_models.r.r_task
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

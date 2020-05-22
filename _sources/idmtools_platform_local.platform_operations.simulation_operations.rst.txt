@@ -1,0 +1,8 @@
+idmtools\_platform\_local.platform\_operations.simulation\_operations module
+============================================================================
+
+.. automodule:: idmtools_platform_local.platform_operations.simulation_operations
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

@@ -1,0 +1,39 @@
+idmtools.entities package
+=========================
+
+Subpackages
+-----------
+
+.. toctree::
+
+   idmtools.entities.iplatform_ops
+
+Submodules
+----------
+
+.. toctree::
+
+   idmtools.entities.command_line
+   idmtools.entities.command_task
+   idmtools.entities.experiment
+   idmtools.entities.generic_workitem
+   idmtools.entities.ianalyzer
+   idmtools.entities.iplatform
+   idmtools.entities.iplatform_metadata
+   idmtools.entities.itask
+   idmtools.entities.iworkflow_item
+   idmtools.entities.platform_requirements
+   idmtools.entities.relation_type
+   idmtools.entities.simulation
+   idmtools.entities.suite
+   idmtools.entities.task_proxy
+   idmtools.entities.templated_simulation
+
+Module contents
+---------------
+
+.. automodule:: idmtools.entities
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

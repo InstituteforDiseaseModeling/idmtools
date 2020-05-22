@@ -1,0 +1,302 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Create an analyzer &mdash; IDM-Tools  documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/tipuesearch/tipuesearch.js"></script>
+        <script src="_static/tipuesearch/tipuesearch_content.js"></script>
+        <script src="_static/tipuesearch/tipuesearch_set.js"></script>
+        <script src="_static/runsearch.js"></script>
+        <script src="_static/tablecollapse.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Search within IDM-Tools  documentation"
+          href="_static/opensearch.xml"/>
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="_static/tipuesearch/tipuesearch.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Convert analyzers from DTK-Tools to IDM-Tools" href="analyzers-convert.html" />
+    <link rel="prev" title="Partial analysis" href="analyzers-partial.html" />
+
+<link href="https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans" rel="stylesheet">
+
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> IDM-Tools
+          
+
+          
+            
+            <img src="_static/IDM_white.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                Beta
+              </div>
+            
+          
+
+          <div role="search">
+    <form action="search-local.html" class='wy-form' id='rtd-search-form' method="get">
+        <input autocomplete="off" id="tipue_search_input" name="q" placeholder="Search docs"
+               required type="text">
+    </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="packages-overview.html">Packages overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run-sims.html">Run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calibrate.html">Calibrate simulations</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="analyzers-example.html">Example analyzers</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Create an analyzer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="analyzers-convert.html">Convert analyzers from DTK-Tools to IDM-Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="analyzers-ssmt.html">Using analyzers with SSMT</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reports.html">Output reports</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookie-cutter example projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">IDM-Tools</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+<div aria-label="breadcrumbs navigation" role="navigation">
+    <ul class="wy-breadcrumbs">
+        <li><a href="../index.html">IDM docs</a> &raquo;</li>
+        <li><a href="index.html">IDM-Tools</a> &raquo;</li>
+        
+        <li><a href="analyzers.html">Introduction to analyzers</a> &raquo;</li>
+        
+        <li>Create an analyzer</li>
+        <li class="wy-breadcrumbs-aside">
+            
+            
+            
+        </li>
+    </ul>
+    <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+<!-- From _templates/page.html -->
+
+  <div class="section" id="create-an-analyzer">
+<h1>Create an analyzer<a class="headerlink" href="#create-an-analyzer" title="Permalink to this headline">¶</a></h1>
+<p>You can use built-in analyzers included with IDM-Tools to help with creating a new analyzer. The following list some of these analyzers, all inheriting from the the <a class="reference internal" href="idmtools.entities.ianalyzer.html#idmtools.entities.ianalyzer.IAnalyzer" title="idmtools.entities.ianalyzer.IAnalyzer"><code class="xref py py-class docutils literal notranslate"><span class="pre">IAnalyzer</span></code></a> abstract class:</p>
+<img alt="_images/e7e3181aa17f00728ac9ef81d912f654169122128d61925d12aea3161eea1c46.svg" class="align-center" src="_images/e7e3181aa17f00728ac9ef81d912f654169122128d61925d12aea3161eea1c46.svg" /><p>For more information about these built-in analyzers, see:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="idmtools.analysis.add_analyzer.html#idmtools.analysis.add_analyzer.AddAnalyzer" title="idmtools.analysis.add_analyzer.AddAnalyzer"><code class="xref py py-class docutils literal notranslate"><span class="pre">AddAnalyzer</span></code></a></p></li>
+<li><p><a class="reference internal" href="idmtools.analysis.csv_analyzer.html#idmtools.analysis.csv_analyzer.CSVAnalyzer" title="idmtools.analysis.csv_analyzer.CSVAnalyzer"><code class="xref py py-class docutils literal notranslate"><span class="pre">CSVAnalyzer</span></code></a></p></li>
+<li><p><a class="reference internal" href="idmtools.analysis.download_analyzer.html#idmtools.analysis.download_analyzer.DownloadAnalyzer" title="idmtools.analysis.download_analyzer.DownloadAnalyzer"><code class="xref py py-class docutils literal notranslate"><span class="pre">DownloadAnalyzer</span></code></a></p></li>
+<li><p><a class="reference internal" href="idmtools.analysis.tags_analyzer.html#idmtools.analysis.tags_analyzer.TagsAnalyzer" title="idmtools.analysis.tags_analyzer.TagsAnalyzer"><code class="xref py py-class docutils literal notranslate"><span class="pre">TagsAnalyzer</span></code></a></p></li>
+</ul>
+<p>To create an analyzer methods from the <a class="reference internal" href="idmtools.entities.ianalyzer.html#idmtools.entities.ianalyzer.IAnalyzer" title="idmtools.entities.ianalyzer.IAnalyzer"><code class="xref py py-class docutils literal notranslate"><span class="pre">IAnalyzer</span></code></a> abstract class are used:</p>
+<img alt="_images/983f9678b23fa5001b323a21bf0a5fb7d33373c46cd3acea79b6b79246c18619.svg" class="align-center" src="_images/983f9678b23fa5001b323a21bf0a5fb7d33373c46cd3acea79b6b79246c18619.svg" /><p>All analyzers must also call the <a class="reference internal" href="idmtools.analysis.analyze_manager.html#idmtools.analysis.analyze_manager.AnalyzeManager" title="idmtools.analysis.analyze_manager.AnalyzeManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">AnalyzeManager</span></code></a> class for analysis management:</p>
+<img alt="_images/d77eb7fac1f2255db3322aeccc0133249b65180e1eca9ec38cc3c6411f6b5624.svg" class="align-center" src="_images/d77eb7fac1f2255db3322aeccc0133249b65180e1eca9ec38cc3c6411f6b5624.svg" /><p>The following python code and comments, from the <a class="reference internal" href="idmtools.analysis.csv_analyzer.html#idmtools.analysis.csv_analyzer.CSVAnalyzer" title="idmtools.analysis.csv_analyzer.CSVAnalyzer"><code class="xref py py-class docutils literal notranslate"><span class="pre">CSVAnalyzer</span></code></a> class, is an example of how to create an analyzer for analysis of .csv output files from simulations:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">CSVAnalyzer</span><span class="p">(</span><span class="n">IAnalyzer</span><span class="p">):</span>
+<span class="c1"># Arg option for analyzer init are uid, working_dir, parse (True to leverage the :class:`OutputParser`;</span>
+<span class="c1"># False to get the raw data in the :meth:`select_simulation_data`), and filenames</span>
+<span class="c1"># In this case, we want parse=True, and the filename(s) to analyze</span>
+<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filenames</span><span class="p">,</span> <span class="n">parse</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parse</span><span class="o">=</span><span class="n">parse</span><span class="p">,</span> <span class="n">filenames</span><span class="o">=</span><span class="n">filenames</span><span class="p">)</span>
+    <span class="c1"># Raise exception early if files are not csv files</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">([</span><span class="s1">&#39;csv&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">f</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">filenames</span><span class="p">]):</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Please ensure all filenames provided to CSVAnalyzer have a csv extension.&#39;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span> <span class="s2">&quot;output_csv&quot;</span><span class="p">)):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span> <span class="s2">&quot;output_csv&quot;</span><span class="p">))</span>
+
+<span class="c1"># Map is called to get for each simulation a data object (all the metadata of the simulations) and simulation object</span>
+<span class="k">def</span> <span class="nf">map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">simulation</span><span class="p">):</span>
+    <span class="c1"># If there are 1 to many csv files, concatenate csv data columns into one dataframe</span>
+    <span class="n">concatenated_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">concatenated_df</span>
+
+<span class="c1"># In reduce, we are printing the simulation and result data filtered in map</span>
+<span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">all_data</span><span class="p">):</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">all_data</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="c1"># Combine a list of all the sims csv data column values</span>
+                        <span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">uid</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">all_data</span><span class="o">.</span><span class="n">keys</span><span class="p">()],</span>  <span class="c1"># Add a hierarchical index with the keys option</span>
+                        <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;SimId&#39;</span><span class="p">])</span>  <span class="c1"># Label the index keys you create with the names option</span>
+    <span class="n">results</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">droplevel</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># Remove default index</span>
+
+    <span class="c1"># Make a directory labeled the exp id to write the csv results to</span>
+    <span class="c1"># NOTE: If running twice with different filename, the output files will collide</span>
+    <span class="n">results</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;output_csv&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;.csv&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>You can quickly see this analyzer in use by running the included <code class="xref py py-class docutils literal notranslate"><span class="pre">example_analysis_CSVAnalyzer</span></code> example class.</p>
+</div>
+
+
+<div id="tipue_search_content"></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="analyzers-convert.html" class="btn btn-neutral float-right" title="Convert analyzers from DTK-Tools to IDM-Tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="analyzers-partial.html" class="btn btn-neutral float-left" title="Partial analysis" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Intellectual Ventures Management, LLC (IVM). All rights reserved
+
+    </p>
+  </div>
+<p>IDM-Tools is licensed under the <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode">Creative Commons
+    Attribution-Noncommercial-ShareAlike 4.0 License</a>.</p>
+<p>Send documentation feedback to <a href="mailto:feedback@idmod.org" target="_top">feedback@idmod.org</a>. If you have
+    questions, email <a href="mailto:support@idmod.org" target="_top">support@idmod.org</a>.</p>
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+  
+<!-- Google analytics for IDM docs -->
+ 
+<script>
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+            (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+            m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+    ga('create', 'UA-87656833-3', 'auto');
+    ga('send', 'pageview');
+
+</script>
+
+
+
+</body>
+</html>

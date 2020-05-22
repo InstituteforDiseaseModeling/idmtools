@@ -1,0 +1,369 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>1.0.1 &mdash; IDM-Tools  documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/tipuesearch/tipuesearch.js"></script>
+        <script src="_static/tipuesearch/tipuesearch_content.js"></script>
+        <script src="_static/tipuesearch/tipuesearch_set.js"></script>
+        <script src="_static/runsearch.js"></script>
+        <script src="_static/tablecollapse.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Search within IDM-Tools  documentation"
+          href="_static/opensearch.xml"/>
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="_static/tipuesearch/tipuesearch.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="1.0.0" href="changelog_1.0.0.html" />
+
+<link href="https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans" rel="stylesheet">
+
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> IDM-Tools
+          
+
+          
+            
+            <img src="_static/IDM_white.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                Beta
+              </div>
+            
+          
+
+          <div role="search">
+    <form action="search-local.html" class='wy-form' id='rtd-search-form' method="get">
+        <input autocomplete="off" id="tipue_search_input" name="q" placeholder="Search docs"
+               required type="text">
+    </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="packages-overview.html">Packages overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run-sims.html">Run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calibrate.html">Calibrate simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reports.html">Output reports</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookie-cutter example projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="changelog.html">Changelog</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="changelog_0.1.0.html">0.1.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog_1.0.0.html">1.0.0</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">1.0.1</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">IDM-Tools</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+<div aria-label="breadcrumbs navigation" role="navigation">
+    <ul class="wy-breadcrumbs">
+        <li><a href="../index.html">IDM docs</a> &raquo;</li>
+        <li><a href="index.html">IDM-Tools</a> &raquo;</li>
+        
+        <li><a href="changelog.html">Changelog</a> &raquo;</li>
+        
+        <li>1.0.1</li>
+        <li class="wy-breadcrumbs-aside">
+            
+            
+            
+        </li>
+    </ul>
+    <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+<!-- From _templates/page.html -->
+
+  <div class="section" id="id1">
+<h1>1.0.1<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="analyzers">
+<h2>Analyzers<a class="headerlink" href="#analyzers" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/778">#0778</a> - Add support for context platforms to analyzer manager</p></li>
+</ul>
+</div>
+<div class="section" id="bugs">
+<h2>Bugs<a class="headerlink" href="#bugs" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/637">#0637</a> - pytest: ValueError: I/O operation on closed file, Printed at the end of tests.</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/663">#0663</a> - SSMT PlatformAnalysis can not put 2 analyzers in same file as main entry</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/696">#0696</a> - Rename num_retires to num_retries on COMPS Platform</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/702">#0702</a> - Can not analyze workitem</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/739">#0739</a> - Logging should load defaults with default config block is missing</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/741">#0741</a> - MAX_PATH issues with RequirementsToAssetCollection WI create_asset_collection</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/752">#0752</a> - type hint in analyzer_manager is wrong</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/758">#0758</a> - Workitem config should be validated on WorkItem for PythonAsset Collection</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/776">#0776</a> - Fix hook execution order for pre_creation</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/779">#0779</a> - Additional Sims is not being detected on TemplatedSimulations</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/788">#0788</a> - Correct requirements on core</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/791">#0791</a> - Missing asset file with RequirementsToAssetCollection</p></li>
+</ul>
+</div>
+<div class="section" id="core">
+<h2>Core<a class="headerlink" href="#core" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/343">#0343</a> - Genericize experiment_factory to work for other items</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/611">#0611</a> - Consider excluding idmtools.log and COMPS_log.log on SSMT WI submission</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/737">#0737</a> - Remove standalone builder in favor of regular python</p></li>
+</ul>
+</div>
+<div class="section" id="developer-test">
+<h2>Developer/Test<a class="headerlink" href="#developer-test" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/83">#0083</a> - Setup python linting for the Pull requests</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/671">#0671</a> - Python Linting</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/735">#0735</a> - Tag or remove local tests in idmtools-core tests</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/736">#0736</a> - Mark set of smoke tests to run in github actions</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/773">#0773</a> - Move model-emod to new repo</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/794">#0794</a> - build idmtools_platform_local fail with idmtools_webui error</p></li>
+</ul>
+</div>
+<div class="section" id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/15">#0015</a> - Add cookiecutter projects</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/423">#0423</a> - Create a clear document on what features are provided by what packages</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/473">#0473</a> - Create sweep without builder</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/476">#0476</a> - ARM builder</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/477">#0477</a> - CSV builder</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/478">#0478</a> - YAML builder</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/487">#0487</a> - Creation of an analyzer</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/488">#0488</a> - Base analyzer - Constructor</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/489">#0489</a> - Base analyzer - Filter function</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/490">#0490</a> - Base analyzer - Parsing</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/491">#0491</a> - Base analyzer - Working directory</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/492">#0492</a> - Base analyzer - Map function</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/493">#0493</a> - Base analyzer - Reduce function</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/494">#0494</a> - Base analyzer - per group function</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/495">#0495</a> - Base analyzer - Destroy function</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/496">#0496</a> - Features of AnalyzeManager - Overview</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/497">#0497</a> - Features of AnalyzeManager - Partial analysis</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/498">#0498</a> - Features of AnalyzeManager - Max items</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/499">#0499</a> - Features of AnalyzeManager - Working directory forcing</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/500">#0500</a> - Features of AnalyzeManager - Adding items</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/501">#0501</a> - Built-in analyzers - InsetChart analyzer</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/502">#0502</a> - Built-in analyzers - CSV Analyzer</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/503">#0503</a> - Built-in analyzers - Tags analyzer</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/504">#0504</a> - Built-in analyzers - Download analyzer</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/508">#0508</a> - Logging and Debugging</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/509">#0509</a> - Global parameters</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/511">#0511</a> - COMPS platform options</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/629">#0629</a> - Update docker endpoint on ssmt/local platform to use external endpoint for pull/running</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/630">#0630</a> - Investigate packaging idmtools as wheel file</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/714">#0714</a> - Document the Versioning details</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/717">#0717</a> - Sweep Simulation Builder</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/720">#0720</a> - Documentation on Analyzing Failed experiments</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/721">#0721</a> - AddAnalyer should have example in its self documentation</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/722">#0722</a> - CSVAnalyzer should have example in its self documentation</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/723">#0723</a> - DownloadAnalyzer should have example in its self documentation</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/724">#0724</a> - PlatformAnalysis should have explanation of its used documented</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/727">#0727</a> - SimulationBuilder Sweep builder documentation</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/734">#0734</a> - idmtools does not install dataclasses on python3.6</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/751">#0751</a> - Switch to apidoc generated RSTs for modules and remove from source control</p></li>
+</ul>
+</div>
+<div class="section" id="feature-request">
+<h2>Feature Request<a class="headerlink" href="#feature-request" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/59">#0059</a> - Chaining of Analyzers</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/97">#0097</a> - Ability to batch simulations within simulation</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/704">#0704</a> - Tthere is no way to  load custom wheel using the RequirementsToAssets utility</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/784">#0784</a> - Remove default node_group value ‘emod_abcd’ from platform</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/786">#0786</a> - Improve Suite support</p></li>
+</ul>
+</div>
+<div class="section" id="platforms">
+<h2>Platforms<a class="headerlink" href="#platforms" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/277">#0277</a> - Need way to add tags to COMPSPlatform ACs after creation</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/638">#0638</a> - Change print statement to logger in python_requirements_ac utility</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/640">#0640</a> - Better error reporting when the python_requirements_ac fails</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/651">#0651</a> - A user should not need to specify the default SSMT image</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/688">#0688</a> - Load Custom Library Utility should support install packages from Artifactory</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/705">#0705</a> - Should have way to regenerate AssetCollection id from RequirementsToAssetCollection</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/757">#0757</a> - Set PYTHONPATH on Slurm</p></li>
+</ul>
+</div>
+<div class="section" id="user-experience">
+<h2>User Experience<a class="headerlink" href="#user-experience" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/760">#0760</a> - Email for issues and feature requests</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/781">#0781</a> - Suites should support run on object</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/787">#0787</a> - idmtools should print experiment id by default in console</p></li>
+</ul>
+</div>
+</div>
+
+
+<div id="tipue_search_content"></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="changelog_1.0.0.html" class="btn btn-neutral float-left" title="1.0.0" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Intellectual Ventures Management, LLC (IVM). All rights reserved
+
+    </p>
+  </div>
+<p>IDM-Tools is licensed under the <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode">Creative Commons
+    Attribution-Noncommercial-ShareAlike 4.0 License</a>.</p>
+<p>Send documentation feedback to <a href="mailto:feedback@idmod.org" target="_top">feedback@idmod.org</a>. If you have
+    questions, email <a href="mailto:support@idmod.org" target="_top">support@idmod.org</a>.</p>
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+  
+<!-- Google analytics for IDM docs -->
+ 
+<script>
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+            (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+            m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+    ga('create', 'UA-87656833-3', 'auto');
+    ga('send', 'pageview');
+
+</script>
+
+
+
+</body>
+</html>

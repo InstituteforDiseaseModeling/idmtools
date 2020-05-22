@@ -1,0 +1,8 @@
+idmtools.entities.suite module
+==============================
+
+.. automodule:: idmtools.entities.suite
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

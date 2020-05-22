@@ -1,0 +1,8 @@
+idmtools.entities.experiment module
+===================================
+
+.. automodule:: idmtools.entities.experiment
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

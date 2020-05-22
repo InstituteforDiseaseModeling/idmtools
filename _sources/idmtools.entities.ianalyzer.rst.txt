@@ -1,0 +1,8 @@
+idmtools.entities.ianalyzer module
+==================================
+
+.. automodule:: idmtools.entities.ianalyzer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

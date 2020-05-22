@@ -1,0 +1,8 @@
+idmtools.utils.file\_parser module
+==================================
+
+.. automodule:: idmtools.utils.file_parser
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:
