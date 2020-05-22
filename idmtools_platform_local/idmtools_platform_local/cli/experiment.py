@@ -59,6 +59,7 @@ def extra_commands():
     from idmtools_cli.cli.experiment import experiment
     from idmtools_cli.cli.utils import show_error
     import idmtools_platform_local.cli.local  # noqa: 40F1
+
     @experiment.command(help="Delete an experiment, and optionally, its data")
     @click.argument('experiment_id')
     @click.option('--data/--no-data', default=False, help="Should we delete the data as well?")

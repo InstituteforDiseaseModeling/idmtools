@@ -107,7 +107,7 @@ class JSONConfiguredTask(ITask):
         if simulation.platform:
             simulation.platform.get_files(simulation, self.config_file_name)
 
-    def pre_creation(self, parent: Union['Simulation', 'WorkflowItem']):
+    def pre_creation(self, parent: Union['Simulation', 'WorkflowItem']):  # noqa: F821
         # Ensure our command line argument is added if configured
         if self.command_line_argument:
             if self.command_line_argument not in self.command.arguments:

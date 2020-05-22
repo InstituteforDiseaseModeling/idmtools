@@ -114,7 +114,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             return super().__new__(cls)
         else:
             raise ValueError(
-                f"Please use Factory to create Platform! For example: \n    platform = Platform('COMPS', **kwargs)")
+                "Please use Factory to create Platform! For example: \n    platform = Platform('COMPS', **kwargs)")
 
     def __post_init__(self) -> NoReturn:
         """
@@ -268,8 +268,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             Tuple with the Base item type and the string path to the interface
         """
         # check both base types and platform speci
-        for l in [STANDARD_TYPE_TO_INTERFACE, self.platform_type_map]:
-            for interface, item_type in l.items():
+        for i in [STANDARD_TYPE_TO_INTERFACE, self.platform_type_map]:
+            for interface, item_type in i.items():
                 if isinstance(item, interface):
                     return item_type, ITEM_TYPE_TO_OBJECT_INTERFACE[item_type]
         raise ValueError(f"{self.__class__.__name__} has no mapping for {item.__class__.__name__}")
