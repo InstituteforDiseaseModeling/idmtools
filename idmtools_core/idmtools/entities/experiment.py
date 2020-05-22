@@ -378,10 +378,10 @@ class Experiment(IAssetsEnabled, INamedEntity):
                             'containing the new simulation(s) and/or simulation builder(s).')
 
         # merge existing self.simulations object builders and single simulations into new simulations object
-        if isinstance(self.simulations, TemplatedSimulations):
-            for builder in self.simulations.builders:
+        if isinstance(self.simulations.items, TemplatedSimulations):
+            for builder in self.simulations.items.builders:
                 simulations.add_builder(builder=builder)
-            existing_additional_simulations = self.simulations.__extra_simulations
+            existing_additional_simulations = self.simulations.items.__extra_simulations
         else:
             existing_additional_simulations = self.simulations
 

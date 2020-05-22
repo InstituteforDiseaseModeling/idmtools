@@ -113,6 +113,8 @@ ts.add_builder(builder)
 
 # Now we can create our Experiment using our template builder
 experiment = Experiment(name=os.path.split(sys.argv[0])[1], simulations=ts)
+experiment.add_new_simulations(simulations=ts)
+
 # Add our own custom tag to simulation
 experiment.tags["tag1"] = 1
 # And maybe some custom Experiment Level Assets

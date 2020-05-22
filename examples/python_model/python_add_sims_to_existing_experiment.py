@@ -25,7 +25,7 @@ experiment = platform.get_item(item_id=experiment_id, item_type=ItemType.EXPERIM
 
 # create a new sweep for new simulations
 builder = SimulationBuilder()
-value = 11
+value = 100
 builder.add_sweep_definition(SetParam("a"), [i * i for i in range(value, value+10, 3)])
 builder.add_sweep_definition(SetParam("b"), [i * i for i in range(10, 20, 3)])
 
