@@ -13,7 +13,7 @@ To create simulations using |EMOD_s| you must use the **emodpy** package include
 
 For more information about the architecture of job (simulation/experiment) creation and how |EMOD_s| leverages |IT_s| plugin architecture, see :doc:`architecture`.
 
-The following Python excerpt shows an example of using **EMODTask** class and **from_default** method to create a task object using default config, campaign, and demographic values from **EMODSir** class and to |exe_s| from local directory::
+The following Python excerpt shows an example of using **EMODTask** class and **from_default** method to create a task object using default config, campaign, and demographic values from **EMODSir** class and to use the |exe_s| from local directory::
 
     task = EMODTask.from_default(default=EMODSir(), eradication_path=os.path.join(BIN_PATH, "Eradication"))
 
