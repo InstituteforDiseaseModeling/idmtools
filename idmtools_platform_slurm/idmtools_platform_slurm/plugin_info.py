@@ -47,6 +47,6 @@ class SlurmPlatformSpecification(PlatformSpecification):
         return SLURM_EXAMPLE_CONFIG
 
     @get_platform_type_impl
-    def get_type(self) -> Type['SlurmPlatform']:
+    def get_type(self) -> Type['SlurmPlatform']:  # noqa: F821
         from idmtools_platform_slurm.slurm_platform import SlurmPlatform
         return SlurmPlatform

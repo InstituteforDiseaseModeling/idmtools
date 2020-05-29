@@ -213,7 +213,7 @@ class IdmConfigParser:
             cls(dir_path, file_name)
 
         if error and not cls.found_ini():
-            raise ValueError(f"Config file NOT FOUND or IS Empty!")
+            raise ValueError("Config file NOT FOUND or IS Empty!")
 
     @classmethod
     @initialization(error=False)

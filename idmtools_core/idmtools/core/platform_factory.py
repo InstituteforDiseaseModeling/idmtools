@@ -97,7 +97,7 @@ class Platform:
         extra_kwargs = set(kwargs.keys()) - set(field_name)
         if len(extra_kwargs) > 0:
             field_not_used_display = [" - {} = {}".format(fn, kwargs[fn]) for fn in extra_kwargs]
-            print(f"\n/!\\ WARNING: The following User Inputs are not used:")
+            print("\n/!\\ WARNING: The following User Inputs are not used:")
             print("\n".join(field_not_used_display))
 
         # Display block info

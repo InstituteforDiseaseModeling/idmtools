@@ -57,7 +57,7 @@ class WorkersContainer(BaseServiceContainer):
             self.run_as = system_info.user_group_str
 
     def get_configuration(self) -> Dict:
-        logger.debug(f'Creating working container')
+        logger.debug('Creating working container')
         if not self.data_volume_name:
             data_dir = os.path.join(self.host_data_directory, 'workers')
             logger.debug(f'Creating worker data directory at {data_dir}')
@@ -87,7 +87,7 @@ class WorkersContainer(BaseServiceContainer):
             environment.append('API_LOGGING=1')
 
         if self.data_volume_name:
-            environment.append(f'IDMTOOLS_WORKERS_DATA_MOUNT_BY_VOLUMENAME=self.data_volume_name')
+            environment.append('IDMTOOLS_WORKERS_DATA_MOUNT_BY_VOLUMENAME=self.data_volume_name')
 
         port_bindings = self._get_optional_port_bindings(self.ui_port, 5000)
         container_config = self.get_common_config(container_name=self.container_name, image=self.image,

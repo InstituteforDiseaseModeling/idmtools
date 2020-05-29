@@ -79,6 +79,6 @@ class LocalPlatformSpecification(PlatformSpecification):
         return LOCAL_PLATFORM_EXAMPLE_CONFIG
 
     @get_platform_type_impl
-    def get_type(self) -> Type['LocalPlatform']:
+    def get_type(self) -> Type['LocalPlatform']:  # noqa: F821
         from idmtools_platform_local.local_platform import LocalPlatform
         return LocalPlatform
