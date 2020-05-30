@@ -2,7 +2,7 @@ import os
 from dataclasses import field, dataclass
 from logging import getLogger, DEBUG
 from threading import Lock
-from typing import List, Any, Type, Dict
+from typing import List, Any, Type, Dict, Union
 from uuid import UUID, uuid4
 
 from idmtools.core import EntityStatus, UnknownItemException
@@ -20,8 +20,8 @@ class TestPlaformExperimentOperation(IPlatformExperimentOperations):
     platform_type: Type = Experiment
     experiments: Dict[str, Experiment] = field(default_factory=dict, compare=False, metadata={"pickle_ignore": True})
 
-    def get(self, experiment_id: UUID, **kwargs) -> Experiment:
-        e = self.experiments.get(experiment_id)
+    def get(self, experiment_id: Union[str,UUID], **kwargs) -> Experiment:
+        e = self.experiments.get(experiment_id if isinstance(experiment_id, UUID) else UUID(experiment_id))
         if e is None:
             raise UnknownItemException(f"Cannot find the experiment with the ID of: {experiment_id}")
         e.platform = self.platform
