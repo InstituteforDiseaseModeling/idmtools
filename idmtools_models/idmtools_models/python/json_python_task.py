@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Type
 from idmtools.assets import AssetCollection
 from idmtools.registry.task_specification import TaskSpecification
 from idmtools_models.json_configured_task import JSONConfiguredTask
@@ -37,7 +37,31 @@ class JSONConfiguredPythonTask(JSONConfiguredTask, PythonTask):
 class JSONConfiguredPythonTaskSpecification(TaskSpecification):
 
     def get(self, configuration: dict) -> JSONConfiguredPythonTask:
+        """
+        Get  instance of JSONConfiguredPythonTask with configuration
+
+        Args:
+            configuration: Configuration for task
+
+        Returns:
+            JSONConfiguredPythonTask with configuration
+        """
         return JSONConfiguredPythonTask(**configuration)
 
     def get_description(self) -> str:
+        """
+        Get description for plugin
+
+        Returns:
+            Plugin Description
+        """
         return "Defines a python script that has a single JSON config file"
+
+    def get_type(self) -> Type[JSONConfiguredPythonTask]:
+        """
+        Get Type for Plugin
+
+        Returns:
+            JSONConfiguredPythonTask
+        """
+        return JSONConfiguredPythonTask

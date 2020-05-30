@@ -1,5 +1,7 @@
 import os
 from dataclasses import field, dataclass
+from typing import Type
+
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core.docker_task import DockerTask
 from idmtools.entities import CommandLine
@@ -48,7 +50,31 @@ class RTask(DockerTask):
 class RTaskSpecification(TaskSpecification):
 
     def get(self, configuration: dict) -> RTask:
+        """
+        Get instance of RTask
+
+        Args:
+            configuration: configuration for task
+
+        Returns:
+            RTask with configuration
+        """
         return RTask(**configuration)
 
     def get_description(self) -> str:
+        """
+        Returns the Description of the plugin
+
+        Returns:
+            Plugin Description
+        """
         return "Defines a R script command"
+
+    def get_type(self) -> Type[RTask]:
+        """
+        Get Type for Plugin
+
+        Returns:
+            RTask
+        """
+        return RTask

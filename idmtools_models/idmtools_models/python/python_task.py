@@ -3,7 +3,7 @@ import subprocess
 import tempfile
 from dataclasses import dataclass, field
 from logging import getLogger
-from typing import Set, List
+from typing import Set, List, Type
 
 from idmtools.assets import Asset, AssetCollection
 from idmtools.entities import CommandLine
@@ -111,12 +111,42 @@ class PythonTask(ITask):
 class PythonTaskSpecification(TaskSpecification):
 
     def get(self, configuration: dict) -> PythonTask:
+        """
+        Get instance of Python Task with specified configuration
+
+        Args:
+            configuration: Configuration for task
+
+        Returns:
+            Python task
+        """
         return PythonTask(**configuration)
 
     def get_description(self) -> str:
+        """
+        Description of the plugin
+
+        Returns:
+            Description string
+        """
         return "Defines a python script command"
 
     def get_example_urls(self) -> List[str]:
+        """
+        Return List of urls that have examples using PythonTask
+
+        Returns:
+            List of urls(str) that point to examples
+        """
         from idmtools_models import __version__
         examples = [f'examples/{example}' for example in ['load_lib']]
         return [self.get_version_url(f'v{__version__}', x) for x in examples]
+
+    def get_type(self) -> Type[PythonTask]:
+        """
+        Get Type for Plugin
+
+        Returns:
+            PythonTask
+        """
+        return PythonTask

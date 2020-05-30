@@ -143,3 +143,12 @@ class JSONConfiguredTaskSpecification(TaskSpecification):
         from idmtools_models import __version__
         examples = [f'examples/{example}' for example in ['python_model', 'load_lib']]
         return [self.get_version_url(f'v{__version__}', x) for x in examples]
+
+    def get_type(self) -> Type[JSONConfiguredTask]:
+        """
+        Get task type provided by plugin
+
+        Returns:
+            JSONConfiguredTask
+        """
+        return JSONConfiguredTask
