@@ -132,6 +132,8 @@ class TemplatedSimulations:
         """
         self.__extra_simulations.append(simulation)
 
+    append = add_simulation  # alias to make this class behave similar to a list for single-added simulations
+
     def new_simulation(self):
         """
         Return a new simulation object.

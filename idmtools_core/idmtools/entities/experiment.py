@@ -363,33 +363,28 @@ class Experiment(IAssetsEnabled, INamedEntity):
         p = self.__check_for_platform_from_context(platform)
         p.wait_till_done_progress(self, **opts)
 
-    def add_new_simulations(self, simulations: TemplatedSimulations):
+    def add_new_simulations(self, simulations: Union[SUPPORTED_SIM_TYPE]):
         """
-        Add simulations to a pre-existing experiment containing simulations that may have already been run.
+        Add simulations to a pre-existing, previously run experiment.
 
         Args:
-            simulations: TemplatedSimulations object containing builders/sims to add to pre-existing experiment
+            simulations: Any simulation containing object containing builders/sims to add to pre-existing experiment
 
         Returns:
             Nothing
         """
-        if not isinstance(simulations, TemplatedSimulations):
-            raise TypeError('Adding new simulations to existing experiments requires a TemplatedSimulations object '
-                            'containing the new simulation(s) and/or simulation builder(s).')
 
-        # merge existing self.simulations object builders and single simulations into new simulations object
-        if isinstance(self.simulations.items, TemplatedSimulations):
-            for builder in self.simulations.items.builders:
-                simulations.add_builder(builder=builder)
-            existing_additional_simulations = self.simulations.items.__extra_simulations
-        else:
-            existing_additional_simulations = self.simulations
+        if not self.done:
+            raise RuntimeError('Additional simulations can only be added to experiments that are done '
+                               '(all simulations succeeded or failed). Run the existing simulations first.')
 
-        for simulation in existing_additional_simulations:
-            simulations.add_simulation(simulation=simulation)
-
-        # set experiment simulations to merged object and update experiment status
+        # merge existing simulations into the new simulations
+        existing_simulations = self.simulations.items
         self.simulations = simulations
+        for simulation in existing_simulations:
+            self.__simulations.append(simulation)
+
+        # reset the status of the experiment so it can run again
         self.status = EntityStatus.CREATED
 
 
