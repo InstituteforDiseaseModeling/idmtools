@@ -60,14 +60,22 @@ class Experiment(IAssetsEnabled, INamedEntity):
         self.__simulations.parent = self
 
         # set initial status. Experiment may be new or reloaded.
-        if any([s.status == EntityStatus.CREATED for s in self.simulations]):
+        self.update_status()
+
+    def update_status(self):
+        # TODO: strangely, looping over self.simulations takes FOREVER on reloaded objects while looping over
+        # self.simulations.items does not
+        if any([s.status == EntityStatus.CREATED for s in self.simulations.items]):
             self.status = EntityStatus.CREATED
-        elif any([s.status == EntityStatus.RUNNING for s in self.simulations]):
+        elif any([s.status == EntityStatus.RUNNING for s in self.simulations.items]):
             self.status = EntityStatus.RUNNING
-        elif all([s.status == EntityStatus.SUCCEEDED for s in self.simulations]):
+        elif all([s.status == EntityStatus.SUCCEEDED for s in self.simulations.items]):
             self.status = EntityStatus.SUCCEEDED
-        elif any([s.status == EntityStatus.FAILED for s in self.simulations]):
+        elif any([s.status == EntityStatus.FAILED for s in self.simulations.items]):
             self.status = EntityStatus.FAILED
+        else:
+            # no simulations exist
+            self.status = EntityStatus.CREATED
 
     def __repr__(self):
         return f"<Experiment: {self.uid} - {self.name} / Sim count {len(self.simulations) if self.simulations else 0}>"
@@ -385,7 +393,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
             self.__simulations.append(simulation)
 
         # reset the status of the experiment so it can run again
-        self.status = EntityStatus.CREATED
+        self.update_status()
 
 
 class ExperimentSpecification(ExperimentPluginSpecification):
