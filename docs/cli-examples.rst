@@ -10,4 +10,4 @@ To see the list of commands and options for downloading examples, type the follo
 
 .. command-output:: idmtools gitrepo download --help
 
-To see a list of |IDM_s| examples available for downloading, type ``idmtools gitrepo download --url`` at a command prompt.
+To see a list of |IDM_s| examples available for downloading, type ``idmtools gitrepo download`` at a command prompt.
