@@ -1,6 +1,7 @@
 from contextlib import contextmanager
 from dataclasses import fields
 from logging import getLogger
+from typing import Dict, Any
 
 from idmtools.config import IdmConfigParser
 from idmtools.entities.iplatform import IPlatform
@@ -50,12 +51,14 @@ class Platform:
                              f"Supported platforms are {', '.join(cls._platforms.keys())}")
 
     @classmethod
-    def _create_from_block(cls, block: str, **kwargs) -> IPlatform:
+    def _create_from_block(cls, block: str, missing_ok: bool = False, default_missing: Dict[str, Any] = None,
+                           **kwargs) -> IPlatform:
         """
         Retrieve section entries from the INI configuration file by giving block.
 
         Args:
             block: The section name in the configuration file.
+            missing_ok: Is it ok if section is missing(uses all default options)
             overrides: Optional override of parameters from the configuration file.
 
         Returns:
@@ -63,7 +66,13 @@ class Platform:
         """
 
         # Read block details
-        section = IdmConfigParser.get_section(block)
+        try:
+            section = IdmConfigParser.get_section(block)
+        except ValueError as e:
+            if missing_ok:
+                section = dict() if default_missing is None else default_missing
+            else:
+                raise
 
         try:
             # Make sure block has type entry
@@ -101,7 +110,11 @@ class Platform:
             print("\n".join(field_not_used_display))
 
         # Display block info
-        IdmConfigParser.display_config_block_details(block)
+        try:
+            IdmConfigParser.display_config_block_details(block)
+        except ValueError:
+            if missing_ok:
+                pass
 
         # Display not used fields of the block
         field_not_used = set(inputs.keys()) - set(field_type.keys())
