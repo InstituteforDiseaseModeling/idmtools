@@ -65,17 +65,19 @@ class Experiment(IAssetsEnabled, INamedEntity):
     def update_status(self):
         # TODO: strangely, looping over self.simulations takes FOREVER on reloaded objects while looping over
         # self.simulations.items does not
-        if any([s.status == EntityStatus.CREATED for s in self.simulations.items]):
+
+        if len(self.simulations.items) == 0 or all([s.status is None for s in self.simulations.items]):
+            self.status = None  # this will trigger experiment creation on a platform
+        elif any([s.status in [EntityStatus.CREATED, None] for s in self.simulations.items]):
             self.status = EntityStatus.CREATED
         elif any([s.status == EntityStatus.RUNNING for s in self.simulations.items]):
             self.status = EntityStatus.RUNNING
-        elif all([s.status == EntityStatus.SUCCEEDED for s in self.simulations.items]):
-            self.status = EntityStatus.SUCCEEDED
         elif any([s.status == EntityStatus.FAILED for s in self.simulations.items]):
             self.status = EntityStatus.FAILED
+        elif all([s.status == EntityStatus.SUCCEEDED for s in self.simulations.items]):
+            self.status = EntityStatus.SUCCEEDED
         else:
-            # no simulations exist
-            self.status = EntityStatus.CREATED
+            raise Exception('Experiment status logic error, please check Experiment code.')
 
     def __repr__(self):
         return f"<Experiment: {self.uid} - {self.name} / Sim count {len(self.simulations) if self.simulations else 0}>"
@@ -286,6 +288,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
             name = template.base_task.__class__.__name__
         e = Experiment(name=name, tags=tags, assets=AssetCollection() if assets is None else assets)
         e.simulations = template
+        e.update_status()
         return e
 
     def __deepcopy__(self, memo):
