@@ -122,13 +122,13 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         """
         pass
 
-    def to_entity(self, simulation: Any, **kwargs) -> Simulation:
+    def to_entity(self, simulation: Any, load_task: bool = False, **kwargs) -> Simulation:
         """
         Converts the platform representation of simulation to idmtools representation
 
         Args:
             simulation:Platform simulation object
-
+            load_task: Load Task Object as well. Can take much longer and have more data on platform
         Returns:
             IDMTools simulation object
         """
@@ -232,4 +232,8 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         Returns:
             List of filenames
         """
+        pass
+
+    @abstractmethod
+    def all_files(self, simulation: Simulation, **kwargs):
         pass
