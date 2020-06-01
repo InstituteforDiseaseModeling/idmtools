@@ -21,7 +21,7 @@ class AssetCollection(IEntity):
         assets: An optional list of assets to create the collection with.
     """
 
-    assets: 'TAssetList' = field(default=None)
+    assets: List[Asset] = field(default=None)
     item_type: ItemType = field(default=ItemType.ASSETCOLLECTION, compare=False)
 
     def __init__(self, assets: List[Asset] = None, tags: Dict[str, Any] = {}):
