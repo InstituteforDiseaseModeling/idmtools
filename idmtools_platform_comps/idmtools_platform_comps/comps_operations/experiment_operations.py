@@ -4,7 +4,9 @@ from itertools import tee
 from logging import getLogger, DEBUG
 from typing import List, Type, Generator, NoReturn, Optional, TYPE_CHECKING
 from uuid import UUID
-from COMPS.Data import Experiment as COMPSExperiment, QueryCriteria, Configuration, Suite as COMPSSuite
+from COMPS.Data import Experiment as COMPSExperiment, QueryCriteria, Configuration, Suite as COMPSSuite, \
+    Simulation as COMPSSimulation
+from idmtools.assets import AssetCollection
 from idmtools.core import ItemType
 from idmtools.core.experiment_factory import experiment_factory
 from idmtools.entities import CommandLine
