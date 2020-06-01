@@ -3,8 +3,7 @@ import uuid
 from dataclasses import dataclass, field, InitVar
 from logging import getLogger
 from types import GeneratorType
-from typing import NoReturn, Set, Union, Iterator, Type, Dict, Any, List
-
+from typing import NoReturn, Set, Union, Iterator, Type, Dict, Any, List, TYPE_CHECKING
 from idmtools.assets import AssetCollection
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType, NoPlatformException, EntityStatus
@@ -20,8 +19,10 @@ from idmtools.registry.plugin_specification import get_description_impl
 from idmtools.utils.collections import ParentIterator
 from idmtools.utils.entities import get_default_tags
 
-logger = getLogger(__name__)
+if TYPE_CHECKING:
+    from idmtools.entities.iplatform import IPlatform
 
+logger = getLogger(__name__)
 SUPPORTED_SIM_TYPE = Union[EntityContainer, GeneratorType, TemplatedSimulations, Iterator]
 
 
@@ -100,9 +101,9 @@ class Experiment(IAssetsEnabled, INamedEntity):
                 task_class = self.simulations.items.base_task.__class__
                 self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
         elif self.gather_common_assets_from_task and isinstance(self.__simulations, List):
-            task_class = self.simulations[0].task.__class__
+            task_class = self.__simulations[0].task.__class__
             self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
-            for sim in self.simulations:
+            for sim in self.__simulations:
                 assets = sim.task.gather_common_assets()
                 if assets is not None:
                     self.assets.add_assets(assets, fail_on_duplicate=False)
@@ -150,12 +151,12 @@ class Experiment(IAssetsEnabled, INamedEntity):
         elif isinstance(simulations, (list, set)):
             from idmtools.entities.simulation import Simulation
             self.gather_common_assets_from_task = True
-            self.simulations = EntityContainer()
+            self.__simulations = EntityContainer()
             for sim in simulations:
                 if isinstance(sim, ITask):
-                    self.simulations.append(sim.to_simulation())
+                    self.__simulations.append(sim.to_simulation())
                 elif isinstance(sim, Simulation):
-                    self.simulations.append(sim)
+                    self.__simulations.append(sim)
                 else:
                     raise ValueError("Only list of tasks/simulations can be passed to experiment simulations")
         else:
@@ -290,7 +291,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
         result._task_log = getLogger(__name__)
         return result
 
-    def run(self, wait_until_done: bool = False, platform: 'idmtools.entities.iplatform.IPlatform' = None,  # noqa: F821
+    def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None,  # noqa: F821
             **run_opts) -> NoReturn:
         """
         Runs an experiment on a platform
@@ -308,7 +309,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
         if wait_until_done:
             self.wait()
 
-    def __check_for_platform_from_context(self, platform) -> 'idmtools.entities.iplatform.IPlatform':  # noqa: F821
+    def __check_for_platform_from_context(self, platform) -> 'IPlatform':  # noqa: F821
         """
         Try to determine platform of current object from self or current platform
 
@@ -331,7 +332,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
         return self.platform
 
     def wait(self, timeout: int = None, refresh_interval=None,
-             platform: 'idmtools.entities.iplatform.IPlatform' = None):  # noqa: F821
+             platform: 'IPlatform' = None):  # noqa: F821
         """
         Wait on an experiment to finish running
 
