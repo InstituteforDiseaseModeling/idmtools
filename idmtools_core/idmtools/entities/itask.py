@@ -3,7 +3,7 @@ import time
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field, fields
 from logging import getLogger, Logger
-from typing import Set, NoReturn, Union, Callable, List
+from typing import Set, NoReturn, Union, Callable, List, TYPE_CHECKING
 from idmtools.assets import AssetCollection
 from idmtools.entities.command_line import CommandLine
 from idmtools.entities.platform_requirements import PlatformRequirements
@@ -17,8 +17,11 @@ logger = getLogger(__name__)
 # 1. Create Suite(If Suite)
 #    a) Pre-Creation hooks
 
+if TYPE_CHECKING:
+    from idmtools.entities.simulation import Simulation
+    from idmtools.entities.iworkflow_item import IWorkflowItem
 
-TTaskParent = Union['Simulation', 'WorkflowItem']  # noqa: F821
+TTaskParent = Union['Simulation', 'IWorkflowItem']  # noqa: F821
 TTaskHook = Callable[[TTaskParent], NoReturn]
 
 
@@ -85,7 +88,7 @@ class ITask(metaclass=ABCMeta):
             requirement = PlatformRequirements[requirement.lower()]
         self.platform_requirements.add(requirement)
 
-    def pre_creation(self, parent: Union['Simulation', 'WorkflowItem']):  # noqa: F821
+    def pre_creation(self, parent: Union['Simulation', 'IWorkflowItem']):  # noqa: F821
         """
         Optional Hook called at the time of creation of task. Can be used to setup simulation and experiment level hooks
         Args:
@@ -99,7 +102,7 @@ class ITask(metaclass=ABCMeta):
             raise ValueError("Command is required for on task when preparing an experiment")
         [hook(parent) for hook in self.__pre_creation_hooks]
 
-    def post_creation(self, parent: Union['Simulation', 'WorkflowItem']):  # noqa: F821
+    def post_creation(self, parent: Union['Simulation', 'IWorkflowItem']):  # noqa: F821
         """
         Optional Hook called at the  after creation task. Can be used to setup simulation and experiment level hooks
         Args:
