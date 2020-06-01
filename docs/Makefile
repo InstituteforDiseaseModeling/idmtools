@@ -57,7 +57,7 @@ clean:
 .PHONY: external generate-api
 
 generate-api:
-    -rm modules.rst
+	-rm modules.rst
 	-rm idmtools_index.rst
 	sphinx-apidoc -f -e -o . ../idmtools_core/idmtools
 	mv modules.rst idmtools_index.rst
