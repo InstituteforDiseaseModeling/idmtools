@@ -23,13 +23,26 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
     platform: 'COMPSPlaform'  # noqa F821
     platform_type: Type = field(default=COMPSExperiment)
 
-    def get(self, experiment_id: UUID, **kwargs) -> COMPSExperiment:
-        cols = kwargs.get('columns')
-        children = kwargs.get('children')
-        cols = cols or ["id", "name", "suite_id"]
+    def get(self, experiment_id: UUID, columns: Optional[List[str]] = None, children: Optional[List[str]] = None,
+            **kwargs) -> COMPSExperiment:
+        """
+        Fetch experiments from COMPS
+
+        Args:
+            experiment_id: Experiment ID
+            columns: Optional Columns. If not provided, id, name, and suite_id are fetched
+            children: Optional Children. If not provided, tags and configuration are specified
+            **kwargs:
+
+        Returns:
+            COMPSExperiment with items
+        """
+        columns = columns or ["id", "name", "suite_id"]
         children = children if children is not None else ["tags", "configuration"]
-        return COMPSExperiment.get(id=experiment_id,
-                                   query_criteria=QueryCriteria().select(cols).select_children(children))
+        return COMPSExperiment.get(
+            id=experiment_id,
+            query_criteria=QueryCriteria().select(columns).select_children(children)
+        )
 
     def pre_create(self, experiment: Experiment, **kwargs) -> NoReturn:
         if experiment.name is None:
