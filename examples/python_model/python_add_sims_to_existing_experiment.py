@@ -9,15 +9,6 @@ from idmtools.entities.templated_simulation import TemplatedSimulations
 
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 
-
-class SetParam:
-    def __init__(self, param: str):
-        self.param = param
-
-    def __call__(self, simulation: Simulation, value) -> Dict[str, any]:
-        return JSONConfiguredPythonTask.set_parameter_sweep_callback(simulation, self.param, value)
-
-
 # load up an existing experiment with completed simulations
 experiment_id = 'c37c274a-f790-ea11-a2bf-f0921c167862'
 platform = Platform('COMPS2')
@@ -26,8 +17,10 @@ experiment = platform.get_item(item_id=experiment_id, item_type=ItemType.EXPERIM
 # create a new sweep for new simulations
 builder = SimulationBuilder()
 value = 100
-builder.add_sweep_definition(SetParam("a"), [i * i for i in range(value, value+10, 3)])
-builder.add_sweep_definition(SetParam("b"), [i * i for i in range(10, 20, 3)])
+builder.add_sweep_definition(JSONConfiguredPythonTask.set_parameter_partial("a"),
+                             [i * i for i in range(value, value+10, 3)])
+builder.add_sweep_definition(JSONConfiguredPythonTask.set_parameter_partial("b"),
+                             [i * i for i in range(10, 20, 3)])
 
 model_path = os.path.join("inputs", "python_model_with_deps", "Assets", "model.py")
 sims_template = TemplatedSimulations(base_task=JSONConfiguredPythonTask(script_path=model_path))
