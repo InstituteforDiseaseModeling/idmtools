@@ -2,7 +2,7 @@ import json
 from dataclasses import dataclass, field
 from functools import partial
 from logging import getLogger, DEBUG
-from typing import Union, Dict, Any, List
+from typing import Union, Dict, Any, List, Optional, Type
 
 from idmtools.assets import Asset, AssetCollection
 from idmtools.entities.itask import ITask
@@ -41,18 +41,36 @@ class JSONConfiguredTask(ITask):
             self.parameters = self.parameters[self.envelope]
 
     def gather_common_assets(self) -> AssetCollection:
+        """
+        Gather assets common across an Experiment(Set of Simulations)
+
+        Returns:
+            Common AssetCollection
+        """
         if self.is_config_common:
             self.__dump_config(self.common_assets)
         return self.common_assets
 
     def gather_transient_assets(self) -> AssetCollection:
         """
-        Here we dump our config
+        Gather assets that are unique to this simulation/worktiem
+
+        Returns:
+            Simulation/workitem level AssetCollection
         """
         self.__dump_config(self.transient_assets)
         return self.transient_assets
 
-    def __dump_config(self, assets):
+    def __dump_config(self, assets) -> None:
+        """
+        Writes the configuration out to asset
+
+        Args:
+            assets: Asset to add configuration too
+
+        Returns:
+            None
+        """
         if self.config_file_name is not None:
             params = {self.envelope: self.parameters} if self.envelope else self.parameters
             self._task_log.info('Adding JSON Configured File %s', self.config_file_name)
@@ -79,6 +97,7 @@ class JSONConfiguredTask(ITask):
     def get_parameter(self, key: TJSONConfigKeyType) -> TJSONConfigValueType:
         """
         Returns a parameter value
+
         Args:
             key: Key of parameter
 
@@ -92,6 +111,7 @@ class JSONConfiguredTask(ITask):
     def update_parameters(self, values: Dict[TJSONConfigKeyType, TJSONConfigValueType]):
         """
         Perform bulk update from another dictionary
+
         Args:
             values:
 
@@ -134,12 +154,33 @@ class JSONConfiguredTask(ITask):
 class JSONConfiguredTaskSpecification(TaskSpecification):
 
     def get(self, configuration: dict) -> JSONConfiguredTask:
+        """
+        Get instance of JSONConfiguredTask with configuration specified
+
+        Args:
+            configuration: Configuration for configuration
+
+        Returns:
+            JSONConfiguredTask with configuration
+        """
         return JSONConfiguredTask(**configuration)
 
     def get_description(self) -> str:
+        """
+        Get description for plugin
+
+        Returns:
+            Description of plugin
+        """
         return "Defines a general command that has a simple JSON based config"
 
     def get_example_urls(self) -> List[str]:
+        """
+        Get list of urls with examples for JSONConfiguredTask
+
+        Returns:
+            List of urls that point to examples relating to JSONConfiguredTask
+        """
         from idmtools_models import __version__
         examples = [f'examples/{example}' for example in ['python_model', 'load_lib']]
         return [self.get_version_url(f'v{__version__}', x) for x in examples]
