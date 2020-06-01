@@ -160,15 +160,15 @@ class JSONConfiguredTask(ITask):
 
     def pre_creation(self, parent: Union['Simulation', 'WorkflowItem']):  # noqa: F821
         if self.config_file_name != fields(JSONConfiguredTask)['parameters'].default:
-            logger.info(f'Found non-default name for config_file_name. Adding tag task_config_file_name')
+            logger.info('Found non-default name for config_file_name. Adding tag task_config_file_name')
             parent.tags['task_config_file_name'] = self.config_file_name
 
         if self.envelope:
-            logger.info(f'Found envelope name. Adding tag envelope')
+            logger.info('Found envelope name. Adding tag envelope')
             parent.tags['task_envelope'] = self.envelope
         # Ensure our command line argument is added if configured
         if self.command_line_argument:
-            logger.debug(f'Adding command_line_argument to command')
+            logger.debug('Adding command_line_argument to command')
             if self.command_line_argument not in self.command.arguments:
                 # check if we should add filename with arg?
                 if self.command_line_argument_no_filename:

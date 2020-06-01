@@ -15,6 +15,7 @@ from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPla
 from idmtools.entities.iplatform_ops.utils import batch_create_items
 from idmtools.entities.simulation import Simulation
 from idmtools_platform_comps.utils.general import convert_comps_status, get_asset_for_comps_item
+
 if TYPE_CHECKING:
     from idmtools_platform_comps.comps_platform import COMPSPlatform
 
