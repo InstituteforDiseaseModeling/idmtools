@@ -66,7 +66,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
 
     def platform_create(self, experiment: Experiment, num_cores: Optional[int] = None,
                         executable_path: Optional[str] = None,
-                        command_arg:  Optional[str] = None, priority:  Optional[str] = None,
+                        command_arg: Optional[str] = None, priority: Optional[str] = None,
                         check_command: bool = True) -> COMPSExperiment:
         """
         Create Experiment on the COMPS Platform
