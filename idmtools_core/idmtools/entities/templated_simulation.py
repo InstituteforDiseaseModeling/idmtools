@@ -170,6 +170,9 @@ class TemplatedSimulations:
         """
         self.__dict__.update(state)
 
+    def __len__(self):
+        return sum([len(b) for b in self.builders]) + len(self.__extra_simulations)
+
     @classmethod
     def from_task(cls, task: ITask, tags: Dict[str, Any] = None) -> 'TemplatedSimulations':
         return TemplatedSimulations(base_task=task, tags=tags)
