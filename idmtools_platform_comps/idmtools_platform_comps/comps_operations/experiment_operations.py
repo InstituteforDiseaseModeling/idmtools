@@ -2,7 +2,7 @@ import os
 from dataclasses import dataclass, field
 from itertools import tee
 from logging import getLogger, DEBUG
-from typing import Any, List, Type, Generator, NoReturn
+from typing import List, Type, Generator, NoReturn, Optional, TYPE_CHECKING
 from uuid import UUID
 from COMPS.Data import Experiment as COMPSExperiment, QueryCriteria, Configuration, Suite as COMPSSuite
 from idmtools.core import ItemType
@@ -14,13 +14,15 @@ from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools.utils.collections import ParentIterator
 from idmtools.utils.time import timestamp
 from idmtools_platform_comps.utils.general import clean_experiment_name, convert_comps_status
+if TYPE_CHECKING:
+    from idmtools_platform_comps.comps_platform import COMPSPlatform
 
 logger = getLogger(__name__)
 
 
 @dataclass
 class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
-    platform: 'COMPSPlaform'  # noqa F821
+    platform: 'COMPSPlatform'  # noqa F821
     platform_type: Type = field(default=COMPSExperiment)
 
     def get(self, experiment_id: UUID, columns: Optional[List[str]] = None, children: Optional[List[str]] = None,
@@ -59,9 +61,24 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             raise ValueError("Experiment name is required on COMPS")
         super().pre_create(experiment, **kwargs)
 
-    def platform_create(self, experiment: Experiment, num_cores: int = None, executable_path: str = None,
-                        command_arg: str = None, priority: str = None, check_command: bool = True) -> COMPSExperiment:
-        from idmtools_platform_comps.utils.python_version import platform_task_hooks
+    def platform_create(self, experiment: Experiment, num_cores: Optional[int] = None,
+                        executable_path: Optional[str] = None,
+                        command_arg:  Optional[str] = None, priority:  Optional[str] = None,
+                        check_command: bool = True) -> COMPSExperiment:
+        """
+        Create Experiment on the COMPS Platform
+
+        Args:
+            experiment: IDMTools Experiment to create
+            num_cores: Optional num of cores to allocate using MPI
+            executable_path: Executable path
+            command_arg: Command Argument
+            priority: Priority of command
+            check_command: Run task hooks on item
+
+        Returns:
+            COMPSExperiment that was created
+        """
         # TODO check experiment task supported
 
         # Cleanup the name
@@ -69,49 +86,30 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
 
         # Define the subdirectory
         subdirectory = experiment_name[0:self.platform.MAX_SUBDIRECTORY_LENGTH] + '_' + timestamp()
+        # Get the experiment command line
 
-        exp_command: CommandLine = None
-        if isinstance(experiment.simulations, Generator):
-            sim_gen1, sim_gen2 = tee(experiment.simulations)
-            experiment.simulations = sim_gen2
-            sim = next(sim_gen1)
-            if check_command:
-                task = platform_task_hooks(sim.task, self.platform)
-            task.pre_creation(sim)
-            exp_command = task.command
-        elif isinstance(experiment.simulations, ParentIterator) and isinstance(experiment.simulations.items,
-                                                                               TemplatedSimulations):
-            from idmtools.entities.simulation import Simulation
-            task = experiment.simulations.items.base_task
-            if check_command:
-                task = platform_task_hooks(task, self.platform)
-            task.pre_creation(Simulation(task=task))
-            exp_command = task.command
-            # TODO generators
-        else:
-            task = experiment.simulations[0].task
-            if check_command:
-                task = platform_task_hooks(task, self.platform)
-            task.pre_creation(experiment.simulations[0])
-            exp_command = task.command
+        exp_command: CommandLine = self._get_experiment_command_line(check_command, experiment)
 
         if command_arg is None:
             command_arg = exp_command.arguments + " " + exp_command.options
 
         if executable_path is None:
             executable_path = exp_command.executable
-        comps_config = dict(environment_name=self.platform.environment,
-                            simulation_input_args=command_arg,
-                            working_directory_root=os.path.join(self.platform.simulation_root, subdirectory).replace(
-                                '\\', '/'),
-                            executable_path=executable_path,
-                            node_group_name=self.platform.node_group,
-                            maximum_number_of_retries=self.platform.num_retries,
-                            priority=self.platform.priority if priority is None else priority,
-                            min_cores=self.platform.num_cores if num_cores is None else num_cores,
-                            max_cores=self.platform.num_cores if num_cores is None else num_cores,
-                            exclusive=self.platform.exclusive
-                            )
+
+        # create initial configuration object
+        comps_config = dict(
+            environment_name=self.platform.environment,
+            simulation_input_args=command_arg,
+            working_directory_root=os.path.join(self.platform.simulation_root, subdirectory).replace(
+                '\\', '/'),
+            executable_path=executable_path,
+            node_group_name=self.platform.node_group,
+            maximum_number_of_retries=self.platform.num_retries,
+            priority=self.platform.priority if priority is None else priority,
+            min_cores=self.platform.num_cores if num_cores is None else num_cores,
+            max_cores=self.platform.num_cores if num_cores is None else num_cores,
+            exclusive=self.platform.exclusive
+        )
 
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'COMPS Experiment Configs: {str(comps_config)}')
@@ -135,6 +133,51 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         self.send_assets(experiment)
         return e
 
+    def _get_experiment_command_line(self, check_command: bool, experiment: Experiment) -> CommandLine:
+        """
+        Get the command line for COMPS
+
+        Args:
+            check_command: Should we run the platform task hooks on comps?
+            experiment: Experiment to get command line for
+
+        Returns:
+            Command line for Experiment
+        """
+        from idmtools_platform_comps.utils.python_version import platform_task_hooks
+        if isinstance(experiment.simulations, Generator):
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Simulations generator detected. Copying generator and using first task as command")
+            sim_gen1, sim_gen2 = tee(experiment.simulations)
+            experiment.simulations = sim_gen2
+            sim = next(sim_gen1)
+            if check_command:
+                task = platform_task_hooks(sim.task, self.platform)
+            # run pre-creation in case task use it to produce the command line dynamically
+            task.pre_creation(sim)
+            exp_command = task.command
+        elif isinstance(experiment.simulations, ParentIterator) and isinstance(experiment.simulations.items,
+                                                                               TemplatedSimulations):
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("ParentIterator/TemplatedSimulations detected. Using base_task for command")
+            from idmtools.entities.simulation import Simulation
+            task = experiment.simulations.items.base_task
+            if check_command:
+                task = platform_task_hooks(task, self.platform)
+            # run pre-creation in case task use it to produce the command line dynamically
+            task.pre_creation(Simulation(task=task))
+            exp_command = task.command
+        else:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("List of simulations detected. Using base_task for command")
+            task = experiment.simulations[0].task
+            if check_command:
+                task = platform_task_hooks(task, self.platform)
+            # run pre-creation in case task use it to produce the command line dynamically
+            task.pre_creation(experiment.simulations[0])
+            exp_command = task.command
+        return exp_command
+
     def post_run_item(self, experiment: Experiment, **kwargs):
         """
         Ran after experiment. Nothing is done on comps other that alerting the user to the item
@@ -150,13 +193,24 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         print(f"\nThe running experiment can be viewed at {self.platform.endpoint}/#explore/"
               f"Simulations?filters=ExperimentId={experiment.uid}\n")
 
-    def get_children(self, experiment: COMPSExperiment, **kwargs) -> List[Any]:
-        cols = kwargs.get("cols")
-        children = kwargs.get("children")
-        cols = cols or ["id", "name", "experiment_id", "state"]
+    def get_children(self, experiment: COMPSExperiment, columns: Optional[List[str]] = None,
+                     children: Optional[List[str]] = None, **kwargs) -> List[COMPSSimulation]:
+        """
+        Get children for a COMPSExperiment
+
+        Args:
+            experiment: Experiment to get children of Comps Experiment
+            columns: Columns to fetch. If not provided, id, name, experiment_id, and state will be loaded
+            children: Children to load. If not provided, Tags will be loaded
+            **kwargs:
+
+        Returns:
+            Simulations belonging to the Experiment
+        """
+        columns = columns or ["id", "name", "experiment_id", "state"]
         children = children if children is not None else ["tags"]
 
-        children = experiment.get_simulations(query_criteria=QueryCriteria().select(cols).select_children(children))
+        children = experiment.get_simulations(query_criteria=QueryCriteria().select(columns).select_children(children))
         return children
 
     def get_parent(self, experiment: COMPSExperiment, **kwargs) -> COMPSSuite:
@@ -203,6 +257,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         """
         if experiment.assets.count == 0:
             logger.warning('Experiment has not assets')
+            return
 
         ac = self.platform._assets.create(experiment.assets)
         print("Asset collection for experiment: {}".format(ac.id))
@@ -227,31 +282,44 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         for s in simulations:
             experiment.simulations.set_status_for_item(s.id, convert_comps_status(s.state))
 
-    def to_entity(self, experiment: COMPSExperiment, parent: COMPSSuite = None, **kwargs) -> Experiment:
+    def to_entity(self, experiment: COMPSExperiment, parent: Optional[COMPSSuite] = None, load_children: bool = True,
+                  load_parent: bool = True, **kwargs) -> Experiment:
+        """
+        Converts a COMPSExperiment to an idmtools Experiment
+
+        Args:
+            experiment: COMPS Experiment objet to convert
+            parent: Optional suite parent
+            load_children: Should we load children objects?
+            load_parent: Should we load parent?
+            **kwargs:
+
+        Returns:
+            Experiment
+        """
         # Recreate the suite if needed
         if experiment.suite_id is None:
             suite = kwargs.get('suite')
         else:
+            # did we have the parent?
             if parent:
                 suite = parent
-            else:
+            elif load_parent:  # should we the parent
                 suite = kwargs.get('suite') or self.platform.get_item(experiment.suite_id, item_type=ItemType.SUITE)
+            else:
+                suite = None
 
         # Create an experiment
         experiment_type = experiment.tags.get("type") if experiment.tags is not None else ""
         obj = experiment_factory.create(experiment_type, tags=experiment.tags, name=experiment.name,
                                         fallback=Experiment)
+        obj.platform = self.platform
+        obj._platform_object = experiment
 
-        # Convert all simulations
-        comps_sims = experiment.get_simulations()
-        # from idmtools.entities.iplatform import ITEM_TYPE_TO_OBJECT_INTERFACE
-        # interface = ITEM_TYPE_TO_OBJECT_INTERFACE[ItemType.SIMULATION]
-        # obj.simulations = [getattr(self.platform, interface).to_entity(s) for s in comps_sims]    # Cause recursive call...
-
-        # Temp workaround
-        from idmtools.entities.simulation import Simulation
-        from idmtools.core import EntityContainer
-        obj.simulations = EntityContainer([Simulation(_uid=s.id, task=None) for s in comps_sims])
+        if load_children:
+            # Convert all simulations
+            comps_sims = experiment.get_simulations()
+            obj.simulations = [self.platform._simulations.to_entity(s, parent=obj, **kwargs) for s in comps_sims]    # Cause recursive call...
 
         # Set parent
         obj.parent = suite
@@ -259,4 +327,10 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         # Set the correct attributes
         obj.uid = experiment.id
         obj.comps_experiment = experiment
+        obj.assets = self.get_assets_from_comps_experiment(experiment)
         return obj
+
+    def get_assets_from_comps_experiment(self, experiment: COMPSExperiment) -> Optional[AssetCollection]:
+        if experiment.configuration and experiment.configuration.asset_collection_id:
+            return self.platform.get_item(experiment.configuration.asset_collection_id, ItemType.ASSETCOLLECTION)
+        return None

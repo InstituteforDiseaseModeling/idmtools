@@ -11,7 +11,6 @@ from idmtools.entities.generic_workitem import GenericWorkItem
 from idmtools.entities.iplatform_ops.iplatform_workflowitem_operations import IPlatformWorkflowItemOperations
 from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools_platform_comps.utils.general import convert_comps_workitem_status
-
 if typing.TYPE_CHECKING:
     from idmtools_platform_comps.comps_platform import COMPSPlatform
 

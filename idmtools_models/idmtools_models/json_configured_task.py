@@ -1,9 +1,8 @@
 import json
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields
 from functools import partial
 from logging import getLogger, DEBUG
 from typing import Union, Dict, Any, List, Optional, Type
-
 from idmtools.assets import Asset, AssetCollection
 from idmtools.entities.itask import ITask
 from idmtools.entities.simulation import Simulation
@@ -123,13 +122,53 @@ class JSONConfiguredTask(ITask):
         self.parameters.update(values)
         return values
 
-    def reload_from_simulation(self, simulation: 'Simulation'):  # noqa: F821
+    def reload_from_simulation(self, simulation: 'Simulation', config_file_name: Optional[str] = None,
+                               envelope: Optional[str] = None):  # noqa: F821
+        """
+        Reload from Simulation. To do this, the process is
+
+         1. First check for a configfile name from arguments, then tags, or the default name
+         2. Load the json config file
+         3. Check if we got an envelope argument from parameters or the simulation tags, or on the task object
+
+        Args:
+            simulation: Simulation object with metadata to load info from
+            config_file_name: Optional name of config file
+            envelope: Optional name of envelope
+
+        Returns:
+            Populates the config with config from object
+        """
         if simulation.platform:
-            simulation.platform.get_files(simulation, self.config_file_name)
+            if config_file_name:
+                cfn = config_file_name
+            elif 'task_config_file_name' in simulation.tags:
+                cfn = simulation.tags['task_config_file_name']
+            else:
+                cfn = self.config_file_name
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f'Loading Config from {simulation.id}:{cfn}')
+            config = simulation.platform.get_files(simulation, cfn)
+
+            self.parameters = config
+            if envelope and envelope in self.parameters:
+                self.parameters = self.parameters[envelope]
+            elif 'task_envelope' in simulation.tags and simulation.tags['task_envelope'] in self.parameters:
+                self.parameters = self.parameters[simulation.tags['task_envelope']]
+            elif self.envelope and self.envelope in self.parameters:
+                self.parameters = self.parameters[self.envelope]
 
     def pre_creation(self, parent: Union['Simulation', 'WorkflowItem']):  # noqa: F821
+        if self.config_file_name != fields(JSONConfiguredTask)['parameters'].default:
+            logger.info(f'Found non-default name for config_file_name. Adding tag task_config_file_name')
+            parent.tags['task_config_file_name'] = self.config_file_name
+
+        if self.envelope:
+            logger.info(f'Found envelope name. Adding tag envelope')
+            parent.tags['task_envelope'] = self.envelope
         # Ensure our command line argument is added if configured
         if self.command_line_argument:
+            logger.debug(f'Adding command_line_argument to command')
             if self.command_line_argument not in self.command.arguments:
                 # check if we should add filename with arg?
                 if self.command_line_argument_no_filename:
