@@ -45,6 +45,16 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         )
 
     def pre_create(self, experiment: Experiment, **kwargs) -> NoReturn:
+        """
+        Pre-create for Experiment. At moment, validation related to COMPS is all that is done
+
+        Args:
+            experiment: Experiment to run pre-create for
+            **kwargs:
+
+        Returns:
+
+        """
         if experiment.name is None:
             raise ValueError("Experiment name is required on COMPS")
         super().pre_create(experiment, **kwargs)
@@ -126,6 +136,16 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         return e
 
     def post_run_item(self, experiment: Experiment, **kwargs):
+        """
+        Ran after experiment. Nothing is done on comps other that alerting the user to the item
+
+        Args:
+            experiment: Experiment to run post run item
+            **kwargs:
+
+        Returns:
+            None
+        """
         super().post_run_item(experiment, **kwargs)
         print(f"\nThe running experiment can be viewed at {self.platform.endpoint}/#explore/"
               f"Simulations?filters=ExperimentId={experiment.uid}\n")
@@ -139,17 +159,48 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         children = experiment.get_simulations(query_criteria=QueryCriteria().select(cols).select_children(children))
         return children
 
-    def get_parent(self, experiment: COMPSExperiment, **kwargs) -> Any:
+    def get_parent(self, experiment: COMPSExperiment, **kwargs) -> COMPSSuite:
+        """
+        Get Parent of experiment
+
+        Args:
+            experiment: Experiment to get parent of
+            **kwargs:
+
+        Returns:
+            Suite of the experiment
+        """
         if experiment.suite_id is None:
             return None
         return self.platform._suites.get(experiment.suite_id, **kwargs)
 
     def platform_run_item(self, experiment: Experiment, **kwargs):
+        """
+        Run experiment on COMPS. Here we commission the experiment
+
+        Args:
+            experiment: Experiment to run
+            **kwargs:
+
+        Returns:
+            None
+        """
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'Commissioning experiment: {experiment.uid}')
         experiment.get_platform_object().commission()
 
     def send_assets(self, experiment: Experiment, **kwargs):
+        """
+        Send assets related to the experiment
+
+        Args:
+            experiment: Experiment to send assets for
+
+            **kwargs:
+
+        Returns:
+            None
+        """
         if experiment.assets.count == 0:
             logger.warning('Experiment has not assets')
 
@@ -162,7 +213,17 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         e.save()
 
     def refresh_status(self, experiment: Experiment, **kwargs):
-        simulations = self.get_children(experiment.get_platform_object(), force=True, cols=["id", "state"], children=[])
+        """
+        Reload status for experiment(load simulations)
+
+        Args:
+            experiment: Experiment to load status for
+            **kwargs:
+
+        Returns:
+            None
+        """
+        simulations = self.get_children(experiment.get_platform_object(), force=True, columns=["id", "state"], children=[])
         for s in simulations:
             experiment.simulations.set_status_for_item(s.id, convert_comps_status(s.state))
 
