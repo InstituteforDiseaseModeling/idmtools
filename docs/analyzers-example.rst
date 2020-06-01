@@ -31,6 +31,5 @@ For more information about the built-in analyzers, see :doc:`analyzers-create`. 
 
 .. toctree::
 
-   analyzers-additems
    analyzers-forcedir
    analyzers-partial
