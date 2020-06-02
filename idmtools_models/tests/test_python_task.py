@@ -1,4 +1,5 @@
 import os
+import sys
 from unittest import TestCase
 import pytest
 from idmtools.builders import SimulationBuilder
@@ -81,7 +82,7 @@ class TestPythonTask(TestCase):
         with Platform("TestExecute", missing_ok=True, default_missing=dict(type='TestExecute')):
             fpath = os.path.join(COMMON_INPUT_PATH, "python", "model1.py")
             # here we test a script that may have no configu
-            task = JSONConfiguredPythonTask(script_path=fpath, configfile_argument=None)
+            task = JSONConfiguredPythonTask(script_path=fpath, configfile_argument=None, python_path=sys.executable)
             experiment = Experiment.from_task(task)
             experiment.run(True)
 
@@ -94,7 +95,7 @@ class TestPythonTask(TestCase):
         with Platform("TestExecute", missing_ok=True, default_missing=dict(type='TestExecute')):
             fpath = os.path.join(COMMON_INPUT_PATH, "python", "model1.py")
             # here we test a script that may have no config
-            task = JSONConfiguredPythonTask(script_path=fpath, configfile_argument=None)
+            task = JSONConfiguredPythonTask(script_path=fpath, configfile_argument=None, python_path=sys.executable)
             builder = SimulationBuilder()
             builder.add_sweep_definition(task.set_parameter_partial("a"), range(2))
             builder.add_sweep_definition(task.set_parameter_partial("b"), range(2))
