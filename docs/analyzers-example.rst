@@ -19,13 +19,7 @@ Each example analyzer is configured to run with existing simulation data and alr
 
 Each of the included example analyzers inherit from the built-in analyzers and the :py:class:`~idmtools.entities.ianalyzer.IAnalyzer` abstract class:
 
-.. uml::
-
-    @startuml
-    abstract class IAnalyzer        
-    IAnalyzer <|-- BuiltinAnalyzers
-    BuiltinAnalyzers <|-- ExampleAnalyzers  
-    @enduml
+.. uml:: /diagrams/ianalyzer-exampleanalyzers.puml
 
 For more information about the built-in analyzers, see :doc:`analyzers-create`. There are also additional examples, such as forcing analyzers to use a specific working directory and how to perform partial analysis on only succeeded or failed simulations:
 
