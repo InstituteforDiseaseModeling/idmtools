@@ -121,7 +121,7 @@ class IdmConfigParser:
             None
         """
         # init logging here as this is our most likely entry-point into an idm-tools "application"
-        from idmtools.core.logging import setup_logging
+        from idmtools.core.logging import setup_logging, VERBOSE
 
         ini_file = cls._find_config(dir_path, file_name)
         if ini_file is None:
@@ -129,7 +129,7 @@ class IdmConfigParser:
             print("/!\\ WARNING: File '{}' Not Found!".format(file_name))
             return
 
-        user_logger.info("INI File Used: {}".format(ini_file))
+        user_logger.log(VERBOSE, "INI File Used: {}".format(ini_file))
 
         cls._config = ConfigParser()
         cls._config.read(ini_file)

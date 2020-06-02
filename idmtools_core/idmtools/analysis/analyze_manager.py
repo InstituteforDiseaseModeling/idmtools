@@ -10,6 +10,7 @@ from idmtools.core import NoPlatformException
 from idmtools.core.cache_enabled import CacheEnabled
 from idmtools.core.enums import EntityStatus, ItemType
 from idmtools.core.interfaces.ientity import IEntity
+from idmtools.core.logging import VERBOSE
 from idmtools.entities.ianalyzer import IAnalyzer
 from idmtools.entities.iplatform import IPlatform
 from idmtools.utils.command_line import animation
@@ -268,18 +269,17 @@ class AnalyzeManager(CacheEnabled):
             None
         """
         n_ignored_items = len(self.potential_items) - n_items
-        user_logger.info('Analyze Manager')
-        user_logger.info(' | {} item(s) selected for analysis'.format(n_items))
-        user_logger.info(' | partial_analyze_ok is {}, max_items is {}, and {} item(s) are being ignored'
-                         .format(on_off(self.partial_analyze_ok), self.max_items_to_analyze, n_ignored_items))
+        user_logger.log(VERBOSE, 'Analyze Manager')
+        user_logger.log(VERBOSE, f' | {n_items} item(s) selected for analysis')
+        user_logger.log(VERBOSE, f' | partial_analyze_ok is {self.partial_analyze_ok}, max_items is '
+                                 f'{self.max_items_to_analyze}, and {n_ignored_items} item(s) are being ignored')
         user_logger.info(' | Analyzer(s): ')
         for analyzer in self.analyzers:
-            user_logger.info(' |  - {} File parsing: {} / Use cache: {})'
-                             .format(analyzer.uid, on_off(analyzer.parse),
-                                     on_off(hasattr(analyzer, 'cache'))))
+            user_logger.log(VERBOSE, f' |  - {analyzer.uid} File parsing: {on_off(analyzer.parse)} / Use '
+                                     f'cache: {on_off(hasattr(analyzer, "cache"))}')
             if hasattr(analyzer, 'need_dir_map'):
-                user_logger.info(' | (Directory map: {}' % on_off(analyzer.need_dir_map))
-        user_logger.info(' | Pool of {} analyzing process(es)'.format(n_processes))
+                user_logger.log(VERBOSE, ' | (Directory map: {}' % on_off(analyzer.need_dir_map))
+        user_logger.log(VERBOSE, f' | Pool of {n_processes} analyzing process(es)')
 
     def _run_and_wait_for_mapping(self, worker_pool: Pool, start_time: float) -> bool:
         """
@@ -376,18 +376,18 @@ class AnalyzeManager(CacheEnabled):
         # If no analyzers or simulations have been provided, there is nothing to do
 
         if len(self.analyzers) == 0:
-            user_logger.info('No analyzers were provided; cannot run analysis.')
+            user_logger.error('No analyzers were provided; cannot run analysis.')
             return False
         self._initialize_analyzers()
 
         if len(self.potential_items) == 0:
-            user_logger.info('No items were provided; cannot run analysis.')
+            user_logger.error('No items were provided; cannot run analysis.')
             return False
         # trim processing to those items that are ready and match requested limits
         self._items: Dict[UUID, IEntity] = self._get_items_to_analyze()
 
         if len(self._items) == 0:
-            user_logger.info('No items are ready; cannot run analysis.')
+            user_logger.error('No items are ready; cannot run analysis.')
             return False
 
         # initialize mapping results cache/storage

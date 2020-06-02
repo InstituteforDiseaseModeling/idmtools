@@ -153,11 +153,11 @@ def download(type: Optional[List[str]], url: Optional[str], output: Optional[str
     download_github_repo(output, url, example_types=type)
 
 
-@examples.command()
+@examples.command(name='download')
 @click.option('--type', default=None, multiple=True, help="Download examples by type(COMPSPlatform, PythonTask, etc)")
 @click.option('--url', default=None, multiple=True, help="Repo files url")
 @click.option('--output', default='./', help="Files download destination")
-def download(type: Optional[List[str]], url: Optional[List[str]], output: Optional[str]):
+def download_alias(type: Optional[List[str]], url: Optional[List[str]], output: Optional[str]):
     """
     \b
     Download examples from specified location
