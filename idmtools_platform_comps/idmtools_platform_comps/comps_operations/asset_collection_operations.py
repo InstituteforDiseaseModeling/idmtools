@@ -1,5 +1,5 @@
 from dataclasses import field, dataclass
-from typing import Type, Union, List, TYPE_CHECKING
+from typing import Type, Union, List, TYPE_CHECKING, Optional
 from uuid import UUID
 from COMPS.Data import AssetCollection as COMPSAssetCollection, QueryCriteria, AssetCollectionFile, SimulationFile
 from idmtools.assets import AssetCollection, Asset
@@ -13,10 +13,11 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
     platform: 'COMPSPlatform'  # noqa F821
     platform_type: Type = field(default=COMPSAssetCollection)
 
-    def get(self, asset_collection_id: UUID, **kwargs) -> COMPSAssetCollection:
-        children = kwargs.get('children')
+    def get(self, asset_collection_id: UUID, children: Optional[List[str]] = None,
+            query_criteria: Optional[QueryCriteria] = None, **kwargs) -> COMPSAssetCollection:
         children = children if children is not None else ["assets", "tags"]
-        return COMPSAssetCollection.get(id=asset_collection_id, query_criteria=QueryCriteria().select_children(children))
+        query_criteria = query_criteria or QueryCriteria().select_children(children)
+        return COMPSAssetCollection.get(id=asset_collection_id, query_criteria=query_criteria)
 
     def platform_create(self, asset_collection: AssetCollection, **kwargs) -> COMPSAssetCollection:
         ac = COMPSAssetCollection()
@@ -49,7 +50,9 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         assets = asset_collection.assets if isinstance(asset_collection, COMPSAssetCollection) else asset_collection
         # if we have just one, make it a list
         if isinstance(asset_collection, SimulationFile):
-            asset_collection = [asset_collection]
+            asset = Asset(filename=SimulationFile.file_name, checksum=SimulationFile.md5_checksum)
+            asset.is_simulation_file = True
+            ac.add_asset(asset)
         if assets:
             # add items to asset collection
             for asset in assets:

@@ -159,7 +159,9 @@ class JSONConfiguredTask(ITask):
                 self.parameters = self.parameters[self.envelope]
 
     def pre_creation(self, parent: Union['Simulation', 'WorkflowItem']):  # noqa: F821
-        if self.config_file_name != fields(JSONConfiguredTask)['parameters'].default:
+        defaults = [x for x in fields(JSONConfiguredTask) if x.name == "config_file_name"][0].default
+
+        if self.config_file_name != defaults:
             logger.info('Found non-default name for config_file_name. Adding tag task_config_file_name')
             parent.tags['task_config_file_name'] = self.config_file_name
 

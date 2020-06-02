@@ -1,7 +1,8 @@
 import json
 import typing
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Tuple, Type
+from logging import getLogger, DEBUG
+from typing import Any, Dict, List, Tuple, Type, Optional
 from uuid import UUID
 from COMPS.Data import QueryCriteria, WorkItem as COMPSWorkItem, WorkItemFile
 from COMPS.Data.WorkItem import RelationType, WorkerOrPluginKey
@@ -15,20 +16,22 @@ from idmtools_platform_comps.utils.general import convert_comps_workitem_status
 if typing.TYPE_CHECKING:
     from idmtools_platform_comps.comps_platform import COMPSPlatform
 
+logger = getLogger(__name__)
+user_logger = getLogger('user')
+
 
 @dataclass
 class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
     platform: 'COMPSPlatform'  # noqa F821
     platform_type: Type = field(default=COMPSWorkItem)
 
-    def get(self, workflow_item_id: UUID, **kwargs) -> COMPSWorkItem:
-        cols = kwargs.get('columns')
-        children = kwargs.get('children')
-        cols = cols or ["id", "name", "state"]
+    def get(self, workflow_item_id: UUID, columns: Optional[List[str]] = None, children: Optional[List[str]] = None,
+            query_criteria: Optional[QueryCriteria] = None, **kwargs) -> \
+            COMPSWorkItem:
+        columns = columns or ["id", "name", "state"]
         children = children if children is not None else ["tags"]
-
-        return COMPSWorkItem.get(workflow_item_id,
-                                 query_criteria=QueryCriteria().select(cols).select_children(children))
+        query_criteria = query_criteria or QueryCriteria().select(columns).select_children(children)
+        return COMPSWorkItem.get(workflow_item_id, query_criteria=query_criteria)
 
     def platform_create(self, work_item: IWorkflowItem, **kwargs) -> Tuple[Any]:
         """
@@ -45,10 +48,15 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         if not work_item.asset_collection_id:
             # Create a collection with everything that is in asset_files
             if len(work_item.asset_files.files) > 0:
+                if logger.isEnabledFor(DEBUG):
+                    logger.debug("Uploading assets for Workitem")
                 ac = AssetCollection(assets=work_item.asset_files)
                 self.platform.create_items([ac])
                 work_item.asset_collection_id = ac.uid
 
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f"Creating workitem {work_item.item_name} of type {work_item.work_item_type}, "
+                         f"{work_item.plugin_key} in {self.platform.environment}")
         # Create a WorkItem
         wi = COMPSWorkItem(name=work_item.item_name,
                            worker=WorkerOrPluginKey(work_item.work_item_type, work_item.plugin_key),
@@ -77,9 +85,14 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
             else:
                 wi.add_file(wi_file, data=af.bytes)
 
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Sending workitem to COMPS")
         # Save the work-item to the server
         wi.save()
         wi.refresh()
+
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Set the relationships")
 
         # Sets the related experiments
         if work_item.related_experiments:
@@ -120,6 +133,10 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         Returns: None
         """
         work_item.get_platform_object().commission()
+        user_logger.info(
+            f"\nThe running experiment can be viewed at {self.platform.endpoint}/#explore/"
+            f"WorkItems?filters=ID={work_item.uid}\n"
+        )
 
     def get_parent(self, work_item: IWorkflowItem, **kwargs) -> Any:
         """
@@ -182,9 +199,8 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         Returns: list of assets associated with WorkItem
 
         """
-        # item: IWorkflowItem = workflow_item.get_platform_object(True)
-        # return item.files
-        pass
+        wi: COMPSWorkItem = workflow_item.get_platform_object()
+        return wi.files
 
     def get_assets(self, workflow_item: IWorkflowItem, files: List[str], **kwargs) -> Dict[str, bytearray]:
         """

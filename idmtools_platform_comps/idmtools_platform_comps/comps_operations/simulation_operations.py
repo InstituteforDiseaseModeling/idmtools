@@ -82,8 +82,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         columns = columns or ["id", "name", "experiment_id", "state"]
         children = children if children is not None else ["tags", "configuration"]
-        if not query_criteria:
-            query_criteria = QueryCriteria().select(columns).select_children(children)
+        query_criteria = query_criteria or QueryCriteria().select(columns).select_children(children)
         return COMPSSimulation.get(
             id=simulation_id,
             query_criteria=query_criteria
@@ -280,7 +279,8 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         else:
             obj.task = None
 
-        simulation.assets = self.list_assets(simulation)
+        if load_task:
+            obj.assets = self.list_assets(obj)
         return obj
 
     def get_asset_collection_from_comps_simulation(self, simulation: COMPSSimulation) -> Optional[AssetCollection]:

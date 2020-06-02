@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any, List, Tuple, Union, Type, TYPE_CHECKING
+from typing import Any, List, Tuple, Union, Type, TYPE_CHECKING, Optional
 from uuid import UUID
 from COMPS.Data import Suite as COMPSSuite, QueryCriteria, Experiment as COMPSExperiment, WorkItem
 from idmtools.entities import Suite
@@ -14,13 +14,13 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
     platform: 'COMPSPlatform'  # noqa F821
     platform_type: Type = field(default=COMPSSuite)
 
-    def get(self, suite_id: UUID, **kwargs) -> COMPSSuite:
-        cols = kwargs.get('columns')
-        children = kwargs.get('children')
-        cols = cols or ["id", "name"]
+    def get(self, suite_id: UUID, columns: Optional[List[str]] = None, children: Optional[List[str]] = None,
+            query_criteria: Optional[QueryCriteria] = None, **kwargs) -> COMPSSuite:
+        columns = columns or ["id", "name"]
         children = children if children is not None else ["tags", "configuration"]
         # Comps doesn't like getting uuids for some reason
-        s = COMPSSuite.get(id=str(suite_id), query_criteria=QueryCriteria().select(cols).select_children(children))
+        query_criteria = query_criteria or QueryCriteria().select(columns).select_children(children)
+        s = COMPSSuite.get(id=str(suite_id), query_criteria=query_criteria)
         return s
 
     def platform_create(self, suite: Suite, **kwargs) -> Tuple[COMPSSuite, UUID]:
@@ -51,7 +51,7 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
         for experiment in suite.experiments:
             self.platform.refresh_status(experiment)
 
-    def to_entity(self, suite: COMPSSuite, **kwargs) -> Suite:
+    def to_entity(self, suite: COMPSSuite, children: bool = True, **kwargs) -> Suite:
         # Creat a suite
         obj = Suite()
 
@@ -63,8 +63,9 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
         obj.comps_suite = suite
 
         # Convert all experiments
-        comps_exps = suite.get_experiments()
-        obj.experiments = []
-        for exp in comps_exps:
-            obj.experiments.append(self.platform._experiments.to_entity(exp, parent=obj))
+        if children:
+            comps_exps = suite.get_experiments()
+            obj.experiments = []
+            for exp in comps_exps:
+                obj.experiments.append(self.platform._experiments.to_entity(exp, parent=obj, **kwargs))
         return obj

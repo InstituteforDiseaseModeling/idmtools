@@ -9,6 +9,7 @@ from COMPS.Data import Experiment as COMPSExperiment, QueryCriteria, Configurati
 from idmtools.assets import AssetCollection
 from idmtools.core import ItemType
 from idmtools.core.experiment_factory import experiment_factory
+from idmtools.core.logging import SUCCESS
 from idmtools.entities import CommandLine
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
@@ -21,6 +22,7 @@ if TYPE_CHECKING:
     from idmtools_platform_comps.comps_platform import COMPSPlatform
 
 logger = getLogger(__name__)
+user_logger = getLogger('user')
 
 
 @dataclass
@@ -29,7 +31,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
     platform_type: Type = field(default=COMPSExperiment)
 
     def get(self, experiment_id: UUID, columns: Optional[List[str]] = None, children: Optional[List[str]] = None,
-            **kwargs) -> COMPSExperiment:
+            query_criteria: Optional[QueryCriteria] = None, **kwargs) -> COMPSExperiment:
         """
         Fetch experiments from COMPS
 
@@ -37,6 +39,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             experiment_id: Experiment ID
             columns: Optional Columns. If not provided, id, name, and suite_id are fetched
             children: Optional Children. If not provided, tags and configuration are specified
+            query_criteria Optional QueryCriteria
             **kwargs:
 
         Returns:
@@ -44,9 +47,10 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         """
         columns = columns or ["id", "name", "suite_id"]
         children = children if children is not None else ["tags", "configuration"]
+        query_criteria = query_criteria or QueryCriteria().select(columns).select_children(children)
         return COMPSExperiment.get(
             id=experiment_id,
-            query_criteria=QueryCriteria().select(columns).select_children(children)
+            query_criteria=query_criteria
         )
 
     def pre_create(self, experiment: Experiment, **kwargs) -> NoReturn:
@@ -193,8 +197,9 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             None
         """
         super().post_run_item(experiment, **kwargs)
-        print(f"\nThe running experiment can be viewed at {self.platform.endpoint}/#explore/"
-              f"Simulations?filters=ExperimentId={experiment.uid}\n")
+        user_logger.log(SUCCESS, f"\nThe running experiment can be viewed at {self.platform.endpoint}/#explore/"
+                                 f"Simulations?filters=ExperimentId={experiment.uid}\n"
+                        )
 
     def get_children(self, experiment: COMPSExperiment, columns: Optional[List[str]] = None,
                      children: Optional[List[str]] = None, **kwargs) -> List[COMPSSimulation]:
@@ -285,16 +290,15 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         for s in simulations:
             experiment.simulations.set_status_for_item(s.id, convert_comps_status(s.state))
 
-    def to_entity(self, experiment: COMPSExperiment, parent: Optional[COMPSSuite] = None, load_children: bool = True,
-                  load_parent: bool = True, **kwargs) -> Experiment:
+    def to_entity(self, experiment: COMPSExperiment, parent: Optional[COMPSSuite] = None, children: bool = True,
+                  **kwargs) -> Experiment:
         """
         Converts a COMPSExperiment to an idmtools Experiment
 
         Args:
             experiment: COMPS Experiment objet to convert
             parent: Optional suite parent
-            load_children: Should we load children objects?
-            load_parent: Should we load parent?
+            children: Should we load children objects?
             **kwargs:
 
         Returns:
@@ -307,10 +311,8 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             # did we have the parent?
             if parent:
                 suite = parent
-            elif load_parent:  # should we the parent
-                suite = kwargs.get('suite') or self.platform.get_item(experiment.suite_id, item_type=ItemType.SUITE)
             else:
-                suite = None
+                suite = kwargs.get('suite') or self.platform.get_item(experiment.suite_id, item_type=ItemType.SUITE)
 
         # Create an experiment
         experiment_type = experiment.tags.get("type") if experiment.tags is not None else ""
@@ -319,7 +321,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         obj.platform = self.platform
         obj._platform_object = experiment
 
-        if load_children:
+        if children:
             # Convert all simulations
             comps_sims = experiment.get_simulations()
             obj.simulations = [self.platform._simulations.to_entity(s, parent=obj, **kwargs) for s in comps_sims]    # Cause recursive call...
@@ -331,6 +333,8 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         obj.uid = experiment.id
         obj.comps_experiment = experiment
         obj.assets = self.get_assets_from_comps_experiment(experiment)
+        if obj.assets is None:
+            obj.assets = AssetCollection()
         return obj
 
     def get_assets_from_comps_experiment(self, experiment: COMPSExperiment) -> Optional[AssetCollection]:
