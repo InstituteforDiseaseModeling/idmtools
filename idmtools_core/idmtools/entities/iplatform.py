@@ -651,6 +651,14 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
         return getattr(self, interface).get_related_items(item, relation_type)
 
+    def __enter__(self):
+        from idmtools.core.context import set_current_platform
+        set_current_platform(self)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        from idmtools.core.context import remove_current_platform
+        remove_current_platform()
+
 
 TPlatform = TypeVar("TPlatform", bound=IPlatform)
 TPlatformClass = Type[TPlatform]
