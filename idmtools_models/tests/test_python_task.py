@@ -1,8 +1,10 @@
 import os
 from unittest import TestCase
-
 import pytest
-
+from idmtools.builders import SimulationBuilder
+from idmtools.core import EntityStatus
+from idmtools.core.platform_factory import Platform
+from idmtools.entities.experiment import Experiment
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_models.python.python_task import PythonTask
 from idmtools_test import COMMON_INPUT_PATH
@@ -73,3 +75,34 @@ class TestPythonTask(TestCase):
         self.assertEqual(str(task.command), f'python3.8 ./Assets/model1.py')
         self.validate_common_assets(fpath, task)
         self.validate_json_transient_assets(task)
+
+    @pytest.mark.smoke
+    def test_model1(self):
+        with Platform("TestExecute", missing_ok=True, default_missing=dict(type='TestExecute')):
+            fpath = os.path.join(COMMON_INPUT_PATH, "python", "model1.py")
+            # here we test a script that may have no configu
+            task = JSONConfiguredPythonTask(script_path=fpath, configfile_argument=None)
+            experiment = Experiment.from_task(task)
+            experiment.run(True)
+
+            self.assertEqual(True, experiment.succeeded)
+            self.assertEqual(1, experiment.simulation_count)
+            self.assertEqual(EntityStatus.SUCCEEDED, experiment.simulations[0].status)
+
+    @pytest.mark.smoke
+    def test_model_sweep(self):
+        with Platform("TestExecute", missing_ok=True, default_missing=dict(type='TestExecute')):
+            fpath = os.path.join(COMMON_INPUT_PATH, "python", "model1.py")
+            # here we test a script that may have no config
+            task = JSONConfiguredPythonTask(script_path=fpath, configfile_argument=None)
+            builder = SimulationBuilder()
+            builder.add_sweep_definition(task.set_parameter_partial("a"), range(2))
+            builder.add_sweep_definition(task.set_parameter_partial("b"), range(2))
+            experiment = Experiment.from_builder(builder, base_task=task)
+            experiment.run(True)
+
+            self.assertEqual(True, experiment.succeeded)
+            self.assertEqual(4, experiment.simulation_count)
+            self.assertEqual(EntityStatus.SUCCEEDED, experiment.simulations[0].status)
+
+
