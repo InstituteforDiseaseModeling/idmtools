@@ -2,12 +2,13 @@ import os
 from dataclasses import field, dataclass
 from logging import getLogger, DEBUG
 from threading import Lock
-from typing import List, Any, Type, Dict, Union
+from typing import List, Any, Type, Dict, Union, TYPE_CHECKING
 from uuid import UUID, uuid4
-
 from idmtools.core import EntityStatus, UnknownItemException
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
+if TYPE_CHECKING:
+    from idmtools_test.utils.test_platform import TestPlatform
 
 logger = getLogger(__name__)
 current_directory = os.path.dirname(os.path.realpath(__file__))
@@ -16,7 +17,8 @@ EXPERIMENTS_LOCK = Lock()
 
 
 @dataclass
-class TestPlaformExperimentOperation(IPlatformExperimentOperations):
+class TestPlatformExperimentOperation(IPlatformExperimentOperations):
+    platform: 'TestPlatform'
     platform_type: Type = Experiment
     experiments: Dict[str, Experiment] = field(default_factory=dict, compare=False, metadata={"pickle_ignore": True})
 
