@@ -79,7 +79,8 @@ class TestPythonExperiment(ITestWithPersistence):
         validate_output(self, exp_id, 4)
 
         expected_tags = [{'a': '0', 'b': '1'}, {'a': '0', 'b': '9'}, {'a': '1', 'b': '1'}, {'a': '1', 'b': '9'}]
-        validate_sim_tags(self, exp_id, expected_tags)
+        task_type = 'idmtools_models.python.json_python_task.JSONConfiguredPythonTask'
+        validate_sim_tags(self, exp_id, expected_tags, task_type)
 
         # validate experiment tags
         actual_exp_tags = experiment.get(experiment.id, QueryCriteria().select_children('tags')).tags
@@ -119,7 +120,8 @@ class TestPythonExperiment(ITestWithPersistence):
 
         # validate b is not in tag since it is not sweep parameter, it just depend on sweep parameter
         expected_tags = [{'a': '0'}, {'a': '1'}, {'a': '2'}, {'a': '3'}, {'a': '4'}]
-        validate_sim_tags(self, exp_id, expected_tags)
+        task_type = 'idmtools_models.python.json_python_task.JSONConfiguredPythonTask'
+        validate_sim_tags(self, exp_id, expected_tags, task_type)
 
     @pytest.mark.long
     @pytest.mark.comps
@@ -318,7 +320,8 @@ class TestPythonExperiment(ITestWithPersistence):
         validate_output(self, exp_id, 6)
         expected_tags = [{'a': '1', 'b': '2', 'c': '4'}, {'a': '1', 'b': '2', 'c': '5'}, {'a': '1', 'b': '3', 'c': '4'},
                          {'a': '1', 'b': '3', 'c': '5'}, {'a': '6', 'b': '2'}, {'a': '7', 'b': '2'}]
-        validate_sim_tags(self, exp_id, expected_tags)
+        task_type = 'idmtools_models.python.json_python_task.JSONConfiguredPythonTask'
+        validate_sim_tags(self, exp_id, expected_tags, task_type)
 
     @pytest.mark.comps
     def test_duplicate_asset_files_not_allowed(self):
