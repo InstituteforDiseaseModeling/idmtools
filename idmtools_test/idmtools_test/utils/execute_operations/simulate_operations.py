@@ -38,8 +38,9 @@ def run_simulation(simulation_id: Simulation, command: str, parent_uid: UUID, ex
 
             # Run our task
             p = subprocess.Popen(
-                shlex.split(cmd),
+                shlex.split(cmd.replace("\\", "/")),
                 cwd=simulation_path,
+                env=os.environ,
                 shell=False,
                 stdout=out,
                 stderr=err
