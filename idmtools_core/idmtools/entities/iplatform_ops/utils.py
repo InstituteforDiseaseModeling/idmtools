@@ -5,7 +5,6 @@ from logging import getLogger, DEBUG
 from typing import List, Union, Generator, Iterable, Callable, Any
 from more_itertools import chunked
 from tqdm import tqdm
-
 from idmtools.core import EntityContainer
 from idmtools.entities.templated_simulation import TemplatedSimulations
 
@@ -27,7 +26,7 @@ def batch_items(items: Union[Iterable, Generator], batch_size=16):
 
     """
     for item_chunk in chunked(items, batch_size):
-        user_logger.info('created chunk')
+        logger.info('created chunk')
         yield item_chunk
     raise StopIteration
 
