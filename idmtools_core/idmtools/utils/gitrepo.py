@@ -189,11 +189,11 @@ class GitRepo:
         except KeyboardInterrupt:
             # when CTRL+C is pressed during the execution of this script,
             # bring the cursor to the beginning, erase the current line, and dont make a new line
-            user_logger.info("✘ Got interrupted")
+            user_logger.error("✘ Got interrupted")
             sys.exit()
         except Exception as ex:
             secho(f'Failed to access: {self.api_example_url}', fg="yellow")
-            logger.exeception(ex)
+            logger.exception(ex)
             exit(1)
 
         download_dir = os.path.join(output_dir, self.repo_name)
