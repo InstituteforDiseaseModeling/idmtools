@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields
 from logging import getLogger, DEBUG
 from typing import List, Callable, NoReturn, Union, Mapping, Any, Type, TypeVar, Dict
 
@@ -107,6 +107,13 @@ class Simulation(IAssetsEnabled, INamedEntity):
                   asset_collection: AssetCollection = None):
         return Simulation(task=task, tags=dict() if tags is None else tags,
                           assets=asset_collection if asset_collection else AssetCollection())
+
+    def to_dict(self) -> Dict:
+        result = dict()
+        for f in fields(self):
+            if not f.name.startswith("_") and f.name not in ['parent']:
+                result[f.name] = getattr(self, f.name)
+        return result
 
 
 # TODO Rename to T simulation once old simulation is one

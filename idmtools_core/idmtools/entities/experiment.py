@@ -1,6 +1,6 @@
 import copy
 import uuid
-from dataclasses import dataclass, field, InitVar
+from dataclasses import dataclass, field, InitVar, fields
 from logging import getLogger
 from types import GeneratorType
 from typing import NoReturn, Set, Union, Iterator, Type, Dict, Any, List, TYPE_CHECKING
@@ -324,7 +324,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
         if self.platform is None:
             # check context for current platform
             if platform is None:
-                from idmtools.core.platform_factory import current_platform
+                from idmtools.core.context import current_platform
                 if current_platform is None:
                     raise NoPlatformException("No Platform defined on object, in current context, or passed to run")
                 platform = current_platform
@@ -353,6 +353,13 @@ class Experiment(IAssetsEnabled, INamedEntity):
             opts['refresh_interval'] = refresh_interval
         p = self.__check_for_platform_from_context(platform)
         p.wait_till_done_progress(self, **opts)
+
+    def to_dict(self):
+        result = dict()
+        for f in fields(self):
+            if not f.name.startswith("_") and f.name not in ['parent']:
+                result[f.name] = getattr(self, f.name)
+        return result
 
 
 class ExperimentSpecification(ExperimentPluginSpecification):

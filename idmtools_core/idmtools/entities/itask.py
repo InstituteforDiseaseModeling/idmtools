@@ -3,7 +3,7 @@ import time
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field, fields
 from logging import getLogger, Logger
-from typing import Set, NoReturn, Union, Callable, List, TYPE_CHECKING
+from typing import Set, NoReturn, Union, Callable, List, TYPE_CHECKING, Dict
 from idmtools.assets import AssetCollection
 from idmtools.entities.command_line import CommandLine
 from idmtools.entities.platform_requirements import PlatformRequirements
@@ -187,4 +187,11 @@ class ITask(metaclass=ABCMeta):
             if k not in ['_task_log']:
                 setattr(result, k, copy.deepcopy(v, memo))
         result._task_log = getLogger(__name__)
+        return result
+
+    def to_dict(self) -> Dict:
+        result = dict()
+        for f in fields(self):
+            if not f.name.startswith("_") and f.name not in ['parent']:
+                result[f.name] = getattr(self, f.name)
         return result

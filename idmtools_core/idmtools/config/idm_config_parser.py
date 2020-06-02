@@ -9,6 +9,7 @@ default_config = 'idmtools.ini'
 
 # this is the only logger that should not be defined using init_logger
 logger = getLogger(__name__)
+user_logger = getLogger('user')
 
 
 def initialization(error=False, force=False):
@@ -124,10 +125,11 @@ class IdmConfigParser:
 
         ini_file = cls._find_config(dir_path, file_name)
         if ini_file is None:
-            logger.error("/!\\ WARNING: File '{}' Not Found!".format(file_name))
+            # We use print since logger isn't configured
+            print("/!\\ WARNING: File '{}' Not Found!".format(file_name))
             return
 
-        logger.info("INI File Used: {}".format(ini_file))
+        user_logger.info("INI File Used: {}".format(ini_file))
 
         cls._config = ConfigParser()
         cls._config.read(ini_file)
@@ -235,7 +237,7 @@ class IdmConfigParser:
         Returns:
             None
         """
-        print(cls.get_config_path())
+        user_logger.info(cls.get_config_path())
 
     @classmethod
     @initialization(error=True)
@@ -246,19 +248,19 @@ class IdmConfigParser:
         Returns:
             None
         """
-        print("View Config INI: \n{}".format(cls._config_path))
-        print('-' * len(cls._config_path), '\n')
+        user_logger.info("View Config INI: \n{}".format(cls._config_path))
+        user_logger.info('-' * len(cls._config_path), '\n')
         with open(cls._config_path) as f:
             read_data = f.read()
-            print(read_data)
+            user_logger.info(read_data)
 
     @classmethod
     def display_config_block_details(cls, block):
         if cls.found_ini():
             block_details = cls.get_section(block)
             # print('\nConfig_info:')
-            print(f"\n[{block}]")
-            print(json.dumps(block_details, indent=3))
+            user_logger.info(f"\n[{block}]")
+            user_logger.info(json.dumps(block_details, indent=3))
 
     @classmethod
     @initialization(error=False)

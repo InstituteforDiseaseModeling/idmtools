@@ -1,11 +1,14 @@
 from abc import ABCMeta
 from dataclasses import dataclass, field
-from typing import NoReturn, List, Any, Dict, Union
+from typing import NoReturn, List, Any, Dict, Union, TYPE_CHECKING
 from uuid import UUID
 
 from idmtools.core import EntityStatus, ItemType, NoPlatformException
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.services.platforms import PlatformPersistService
+
+if TYPE_CHECKING:
+    from idmtools.entities.iplatform import IPlatform
 
 
 @dataclass
@@ -37,7 +40,7 @@ class IEntity(IItem, metaclass=ABCMeta):
     @classmethod
     def from_id(cls, item_id: Union[str, UUID], platform: 'IPlatform' = None, **kwargs) -> 'IEntity':  # noqa E821
         if platform is None:
-            from idmtools.core.platform_factory import current_platform
+            from idmtools.core.context import current_platform
             if current_platform is None:
                 raise ValueError("You have to specify a platfrom to load the asset collection from")
             platform = current_platform

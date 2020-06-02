@@ -10,6 +10,7 @@ from idmtools.core import EntityContainer
 from idmtools.entities.templated_simulation import TemplatedSimulations
 
 logger = getLogger(__name__)
+user_logger = getLogger('user')
 # Global executor
 EXECUTOR = None
 
@@ -26,7 +27,7 @@ def batch_items(items: Union[Iterable, Generator], batch_size=16):
 
     """
     for item_chunk in chunked(items, batch_size):
-        print('created chunk')
+        user_logger.info('created chunk')
         yield item_chunk
     raise StopIteration
 
