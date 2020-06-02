@@ -95,7 +95,7 @@ class PlatformAnalysis:
             return
 
         if len(self.analyzers) < len(self.analyzers_args):
-            user_logger.info("two list 'analyzers' and 'analyzers_args' must have the same length.")
+            user_logger.error("two list 'analyzers' and 'analyzers_args' must have the same length.")
             exit()
 
     def get_work_item(self):
