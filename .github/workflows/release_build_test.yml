@@ -35,7 +35,10 @@ jobs:
           pip install idmtools-test --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
       - name: login to comps2
         run: |
-            python dev_scripts/create_auth_token_args.py --username idmtools_bamboo
+            python dev_scripts/create_auth_token_args.py --username $COMPS_USER --password $COMPS_PASSWORD
+        env:
+          COMPS_USER: ${{ secrets.COMPS_USER }}
+          COMPS_PASSWORD: ${{ secrets.COMPS_PASSWORD }}
       - name: run idmtools_cli tests
         run: |
             cd idmtools_cli/tests
