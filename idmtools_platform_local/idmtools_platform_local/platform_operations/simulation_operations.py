@@ -2,7 +2,7 @@ import os
 from collections import defaultdict
 from dataclasses import dataclass
 from logging import getLogger, DEBUG
-from typing import Dict, List, Set, Union
+from typing import Dict, List, Set, Union, Iterator
 from uuid import UUID
 
 from docker.models.containers import Container
@@ -13,6 +13,7 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.task_proxy import TaskProxy
+from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools.utils.collections import ParentIterator
 from idmtools_platform_local.client.simulations_client import SimulationsClient
 from idmtools_platform_local.platform_operations.uitils import local_status_to_common, SimulationDict, ExperimentDict
@@ -22,6 +23,7 @@ logger = getLogger(__name__)
 
 @dataclass
 class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
+
     platform: 'LocalPlatform'  # noqa F821
     platform_type: type = SimulationDict
 
@@ -87,23 +89,33 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         else:
             parent_uid = sims[0].parent.uid
 
+        final_sims = []
+        # precreation our simulations
+        if isinstance(sims, ParentIterator) and isinstance(sims.items, (TemplatedSimulations, list)):
+            sims_i = sims.items
+            for simulation in sims_i:
+                simulation.pre_creation()
+                final_sims.append(simulation)
+        elif isinstance(sims, (list, Iterator)):
+            for simulation in sims:
+                simulation.pre_creation()
+                final_sims.append(simulation)
+        else:
+            raise ValueError("Needs to be one a list, ParentIterator of TemplatedSimulations or list")
+
         # first create the sim ids
-        m = CreateSimulationsTask.send(parent_uid, [s.tags for s in sims if s.status is None])
+        m = CreateSimulationsTask.send(parent_uid, [s.tags for s in final_sims if s.status is None])
         ids = m.get_result(block=True, timeout=self.platform.default_timeout * 1000)
 
         items = dict()
-        final_sims = []
         # loop over array instead of parent iterator
-        if isinstance(sims, ParentIterator) and isinstance(sims.items, list):
-            sims = sims.items
-        # update our uids and then build a list of files to copy
-        for i, simulation in tqdm(enumerate(sims), total=len(sims), desc="Finding Simulations Assets"):
-            simulation.uid = ids[i]
-            final_sims.append(simulation)
-            path = "/".join(["/data", parent_uid, simulation.uid])
-            simulation.pre_creation()
-            items.update(self._assets_to_copy_multiple_list(path, simulation.assets))
-            simulation.post_creation()
+        if final_sims:
+            # update our uids and then build a list of files to copy
+            for i, simulation in tqdm(enumerate(final_sims), total=len(final_sims), desc="Finding Simulations Assets"):
+                final_sims[i].uid = ids[i]
+                path = "/".join(["/data", parent_uid, simulation.uid])
+                items.update(self._assets_to_copy_multiple_list(path, simulation.assets))
+                simulation.post_creation()
         # copy files to container
         result = self.platform._do.copy_multiple_to_container(worker, items)
         if not result:
@@ -278,3 +290,6 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
                 opts['content'] = asset.content
             items[remote_path].append(opts)
         return items
+
+    def all_files(self, simulation: Simulation, **kwargs):
+        raise NotImplementedError("Not Implemented")

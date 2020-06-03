@@ -76,3 +76,4 @@ def wait_on_experiment_and_check_all_sim_status(tc, experiment, platform=None,
             tc.assertTrue(experiment.succeeded)
         elif expected_status is EntityStatus.FAILED:
             tc.assertFalse(experiment.succeeded)
+    return experiment
