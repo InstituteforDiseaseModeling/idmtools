@@ -19,18 +19,6 @@ class TestConfig(ITestWithPersistence):
         super().tearDown()
 
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
-    def test_reports_no_file_found(self, mock_stdout):
-        fdir = tempfile.mkdtemp()
-        IdmConfigParser(fdir)
-        self.assertIn("WARNING: File 'idmtools.ini' Not Found!", mock_stdout.getvalue())
-
-    @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
-    def test_load_not_found(self, mock_stdout):
-        fdir = tempfile.mkdtemp()
-        IdmConfigParser._load_config_file(fdir, 'aaaaa')
-        self.assertIn("WARNING: File 'aaaaa' Not Found!", mock_stdout.getvalue())
-
-    @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     def test_section_found_case_independent(self, mock_stdout):
         insensitive = IdmConfigParser().get_section('CoMpS')
         sensitive = IdmConfigParser().get_section('COMPS')

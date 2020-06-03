@@ -75,7 +75,8 @@ class TestPythonSimulation(ITestWithPersistence):
         task = JSONConfiguredPythonTask(script_path=model_path, envelope="parameters", parameters=dict(b=10))
         pe = Experiment.from_template(template=TemplatedSimulations(base_task=task, builders={builder}),
                                       name=self.case_name, assets=ac)
-        pe.tags = {"string_tag": "test", "number_tag": 123}
+        pe.tags = {"string_tag": "test", "number_tag": 123,
+                   "task_type": "idmtools_models.python.json_python_task.JSONConfiguredPythonTask"}
 
         wait_on_experiment_and_check_all_sim_status(self, pe, platform)
 

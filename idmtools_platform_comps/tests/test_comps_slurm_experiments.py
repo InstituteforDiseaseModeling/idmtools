@@ -72,9 +72,6 @@ class TestCOMPSSlurmExperiment(ITestWithPersistence):
         # validation each simulation output to compare output/config.json is equal to config.json
         validate_output(self, exp_id, 4)
 
-        expected_tags = [{'a': '0', 'b': '1'}, {'a': '0', 'b': '9'}, {'a': '1', 'b': '1'}, {'a': '1', 'b': '9'}]
-        validate_sim_tags(self, exp_id, expected_tags)
-
         # validate experiment tags
         actual_exp_tags = experiment.get(experiment.id, QueryCriteria().select_children('tags')).tags
         expected_exp_tags = {'idmtools': __version__, 'number_tag': '123', 'string_tag': 'test',
