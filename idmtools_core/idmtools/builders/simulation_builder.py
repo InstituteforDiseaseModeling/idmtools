@@ -3,7 +3,6 @@ from functools import partial
 from inspect import signature
 from itertools import product
 from typing import Callable, Any, List, Iterable, Union, Dict
-
 from idmtools.entities.simulation import Simulation
 from idmtools.utils.collections import duplicate_list_of_generators
 
@@ -19,6 +18,19 @@ class SimulationBuilder:
 
     Examples:
         .. literalinclude:: ../examples/builders/simulation_builder.py
+
+        Add tags with builder callbacks::
+
+            def update_sim(sim, parameter, value):
+                sim.task.set_parameter(parameter, value)
+                # set sim tasks,
+                return {'custom': 123, parameter:value)
+
+            builder = SimulationBuilder()
+            set_run_number = partial(update_sim, param="Run_Number")
+            builder.add_sweep_definition(set_run_number, range(0, 2))
+            # create experiment from builder
+            exp = Experiment.from_builder(builder, task, name=expname)
     """
     # The keyword searched in the function used for sweeps
     SIMULATION_ATTR = 'simulation'

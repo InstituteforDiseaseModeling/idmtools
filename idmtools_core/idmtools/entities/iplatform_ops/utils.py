@@ -1,4 +1,5 @@
 from concurrent.futures.thread import ThreadPoolExecutor
+from concurrent.futures import as_completed
 from functools import partial
 from logging import getLogger, DEBUG
 from typing import List, Union, Generator, Iterable, Callable, Any
@@ -81,8 +82,14 @@ def batch_create_items(items: Union[Iterable, Generator], batch_worker_thread_fu
     #    futures.append(EXECUTOR.submit(batch_worker_thread_func, chunk))
 
     results = []
-    prog = tqdm(futures, desc=progress_description) if display_progress else futures
-    for future in prog:
-        results.extend(future.result())
+    if display_progress:
+        with tqdm(futures, desc=progress_description, total=total) as prog:
+            for future in as_completed(futures):
+                result = future.result()
+                prog.update(len(result))
+                results.extend(future.result())
+    else:
+        for future in futures:
+            results.extend(future.result())
 
     return results

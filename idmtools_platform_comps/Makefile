@@ -1,4 +1,4 @@
-.PHONY: clean lint test coverage release-local dist release-staging release-staging-release-commit release-staging-minor
+.PHONY: clean lint test coverage dist release-staging release-staging-release-commit release-staging-minor
 IPY=python -c
 PACKAGE_NAME=idmtools_platform_comps
 PY?=python
@@ -73,17 +73,10 @@ coverage-all: ## Generate a code-coverage report using all tests
 	$(PDS)/launch_dir_in_browser.py htmlcov/index.html
 
 # Release related rules
-release-local: ## package and upload a release to http://localhost:7171
-	@make dist
-	twine upload --verbose --repository-url http://localhost:7171 -u admin -p admin dist/*
+ssmt-image: ## Build SSMT Docker image
+	$(PDR) -w './ssmt_image' -ex 'pymake docker'
 
-ssmt-image-local:  ## Build SSMT Docker image using Local PyPi
-	$(PDR) -w './ssmt_image' -ex 'pymake docker-local'
-
-ssmt-image-staging:  ## Build SSMT Docker image using Staging PyPi
-	$(PDR) -w './ssmt_image' -ex 'pymake docker-staging'
-
-ssmt-image-release-staging:  ## Build SSMT Docker image using Staging PyPi and Publish to Staging
+ssmt-image-release: ## Push image to stagin
 	$(PDR) -w './ssmt_image' -ex 'pymake docker-release-staging'
 
 dist: ## build our package

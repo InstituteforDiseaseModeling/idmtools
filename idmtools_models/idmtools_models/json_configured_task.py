@@ -2,7 +2,7 @@ import json
 from dataclasses import dataclass, field
 from functools import partial
 from logging import getLogger, DEBUG
-from typing import Union, Dict, Any
+from typing import Union, Dict, Any, List
 
 from idmtools.assets import Asset, AssetCollection
 from idmtools.entities.itask import ITask
@@ -107,7 +107,7 @@ class JSONConfiguredTask(ITask):
         if simulation.platform:
             simulation.platform.get_files(simulation, self.config_file_name)
 
-    def pre_creation(self, parent: Union['Simulation', 'WorkflowItem']):
+    def pre_creation(self, parent: Union['Simulation', 'WorkflowItem']):  # noqa: F821
         # Ensure our command line argument is added if configured
         if self.command_line_argument:
             if self.command_line_argument not in self.command.arguments:
@@ -138,3 +138,8 @@ class JSONConfiguredTaskSpecification(TaskSpecification):
 
     def get_description(self) -> str:
         return "Defines a general command that has a simple JSON based config"
+
+    def get_example_urls(self) -> List[str]:
+        from idmtools_models import __version__
+        examples = [f'examples/{example}' for example in ['python_model', 'load_lib']]
+        return [self.get_version_url(f'v{__version__}', x) for x in examples]

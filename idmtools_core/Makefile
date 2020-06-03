@@ -1,4 +1,4 @@
-.PHONY: clean lint test coverage release-local dist release-staging release-staging-release-commit release-staging-minor
+.PHONY: clean lint test coverage dist release-staging release-staging-release-commit release-staging-minor
 IPY=python -c
 PACKAGE_NAME=idmtools_core
 PY?=python
@@ -74,10 +74,6 @@ watch: ## Automate running of tests and linting of this project using watchdog. 
 
 # Release related rules
 
-release-local: ## package and upload a release to http://localhost:7171
-	@make dist
-	twine upload --verbose --repository-url http://localhost:7171 -u admin -p admin dist/*
-
 dist: ## build our package
 	@make clean
 	python setup.py sdist
@@ -110,3 +106,6 @@ bump-minor-dry-run: ## bump the minor version(dry run)
 
 bump-major-dry-run: ## bump the major version(dry run)
 	bump2version major --dry-run --allow-dirty --verbose
+
+update-dependent-libraries: ## update any libraries in repo that depend on core
+	$(PDS)update_core_version.py

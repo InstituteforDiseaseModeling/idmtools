@@ -1,0 +1,21 @@
+@startuml
+
+package "idmtools-cli" as cli {
+    [CLI]
+    () "CLI API" as cli_api
+}
+
+package "idmtools-core" as registry {
+    () "PlatformAPI" as PlatformAPI
+}
+
+package "idmtools-platform-local" as local {
+    [LocalPlatform]
+    [LocalPlatformCLI]
+}
+
+PlatformAPI <-down-> LocalPlatform : LocalPlatform Implementation
+cli_api <.> LocalPlatformCLI : idmtools local commands
+LocalPlatformCLI <--> LocalPlatform
+LocalPlatform -[hidden]- LocalPlatformCLI
+@enduml

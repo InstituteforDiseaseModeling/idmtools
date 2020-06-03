@@ -71,7 +71,7 @@ You can also install just the individual packages to create minimal environments
 
 ## Additional Resources
 
-Official Documentation is located at https://institutefordiseasemodeling.github.io/Documentation/idm-tools/
+Documentation is located at https://institutefordiseasemodeling.github.io/idmtools/index.html
 
 # Development Environment Setup
 

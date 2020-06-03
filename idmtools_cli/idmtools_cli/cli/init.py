@@ -5,7 +5,6 @@ import os
 import urllib.request
 from logging import getLogger
 from typing import Dict, List
-
 from idmtools.config import IdmConfigParser
 from idmtools.registry.plugin_specification import ProjectTemplate
 from idmtools_cli.cli.entrypoint import cli

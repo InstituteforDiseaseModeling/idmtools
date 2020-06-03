@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from logging import getLogger
 import pluggy
-from typing import List, Union
+from typing import List, Union, Dict
 
 PLUGIN_REFERENCE_NAME = 'idmtools_plugins'
 get_description_spec = pluggy.HookspecMarker(PLUGIN_REFERENCE_NAME)
@@ -44,7 +44,7 @@ class PluginSpecification:
     """
 
     @classmethod
-    def get_name(cls) -> str:
+    def get_name(cls, strip_all: bool = True) -> str:
         """
         Get the name of the plugin. Although it can be overridden, the best practice is to use the class
         name as the plugin name.
@@ -52,7 +52,10 @@ class PluginSpecification:
         Returns:
             The name of the plugin as a string.
         """
-        return cls.__name__.replace("Specification", "")
+        if strip_all:
+            return cls.__name__.replace("Specification", "")
+        else:
+            return cls.__name__
 
     @get_description_spec
     def get_description(self) -> str:
@@ -71,3 +74,39 @@ class PluginSpecification:
 
         """
         return list()
+
+    def get_example_urls(self) -> List[str]:
+        """
+        Returns a list of URLs that a series of Examples for plugin can be downloaded from
+
+        Returns:
+            List of urls
+        """
+        return list()
+
+    def get_help_urls(self) -> Dict[str, str]:
+        """
+        Returns a dictionary of topics and links to help
+
+        Returns:
+
+        """
+        return dict()
+
+    @staticmethod
+    def get_version_url(version: str, extra: str = None,
+                        repo_base_url: str = 'https://github.com/InstituteforDiseaseModeling/idmtools/tree/',
+                        nightly_branch: str = 'dev'):
+        """
+        Build a url using version
+
+        Here we assume the tag will exist for that specific version
+        Args:
+            version: Version to look up. If it contains nightly, we default to nightly_branch
+            extra: Extra parts of url pass base
+            repo_base_url: Optional url
+            nightly_branch: default to dev
+        Returns:
+            URL for item
+        """
+        return f'{repo_base_url}{nightly_branch if "nightly" in version else version[0:6]}/{extra}'

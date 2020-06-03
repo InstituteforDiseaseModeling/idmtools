@@ -50,7 +50,9 @@ guide modelers through necessary tasks. See :doc:`cookiecutters` for the availab
    cookiecutters
    reference
    cli_index
+   architecture
    glossary
+   changelog
 
 
 

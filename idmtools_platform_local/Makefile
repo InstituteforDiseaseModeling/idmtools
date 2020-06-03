@@ -1,4 +1,4 @@
-.PHONY: clean lint test coverage release-local dist release-staging release-staging-release-commit release-staging-minor
+.PHONY: clean lint test coverage dist release-staging release-staging-release-commit release-staging-minor
 IPY=python -c
 BASE_PIP_URL="packages.idmod.org/api/pypi/idm-pypi-"
 STAGING_PIP_URL?="https://$(BASE_PIP_URL)staging/simple"
@@ -26,7 +26,7 @@ clean-all:  ## Deleting package info hides plugins so we only want to do that fo
 	$(CLDIR) --dir-patterns "**/*.egg-info/"
 	@+$(IPY) "import os; os.chdir('idmtools_webui'); os.system('python build.py clean')"
 
-edv:
+dev:
 	echo $(CWD)
 
 # Dev and test related rules
@@ -78,46 +78,37 @@ coverage-all: ## Generate a code-coverage report
 	$(PDS)/launch_dir_in_browser.py htmlcov/index.html
 
 docker-cleanup:
-	docker stop  idmtools_workers idmtools_postgres idmtools_redis
-	docker rm  idmtools_workers idmtools_postgres idmtools_redis
+	docker stop idmtools_workers idmtools_postgres idmtools_redis
+	docker rm idmtools_workers idmtools_postgres idmtools_redis
 
-docker-local: ## Build our docker image using the local pypi
+docker: ## Build our docker image using the local pypi without versioning from artifactory
 	# This job is most useful when actively developing changes to the local_platform internals(tasks, api, cli) or
 	# upstream changes that effect those areas(models and core). Otherwise, installing from latest in the nightly
 	# should suffice for development
 	# ensure pypi local is up
-	$(PDR) -w '../dev_scripts/local_pypi' -ex 'docker-compose up -d'
-	$(PDR) -w '../idmtools_core' -ex 'pymake release-local'
-	@pymake release-local
-	python build_docker_image.py http://localhost:7171/
+	$(PDR) -w '../idmtools_core' -ex 'pymake dist'
+	@pymake dist
+	$(PDR) -w '../idmtools_platform_local' -ex 'python build_docker_image.py'
 
-docker-local-no-cache:## Build our docker image using the local pypi
-	# This job is most useful when actively developing changes to the local_platform internals(tasks, api, cli) or
-	# upstream changes that effect those areas(models and core). Otherwise, installing from latest in the nightly
-	# should suffice for development
-	# ensure pypi local is up
-	$(PDR) -w '../dev_scripts/local_pypi' -ex 'docker-compose up -d'
-	$(PDR) -w '../idmtools_core' -ex 'pymake release-local'
-	@pymake release-local
-	python build_docker_image.py http://localhost:7171/ no-cache
+docker-proper: ## This job gets version data from artifactory. Should be used for production releases
+	$(PDR) -w '../idmtools_core' -ex 'pymake dist'
+	@pymake dist
+	$(PY) build_docker_image.py --proper
 
-docker-staging: ## Build our docker image using staging pypi
-	# rebuild local package at moment since we install local platform package from there
-	python build_docker_image.py $(STAGING_PIP_URL) no-cache
+docker-only: ## Assumes you have made the local package already
+	$(PDR) -w '../idmtools_core' -ex 'pymake dist'
+	$(PDR) -w '../idmtools_platform_local' -ex 'python build_docker_image.py'
 
-docker-release-staging:
-	@make docker-staging
-	python push_docker_image.py
+docker-only-proper: ## Assumes you have made the local package already without versioning from artifactory
+	$(PDR) -w '../idmtools_core' -ex 'pymake dist'
+	$(PY) build_docker_image.py --proper
+
 
 # Release related rules
-release-local: ## package and upload a release to http://localhost:7171
-	@pymake dist
-	twine upload --verbose --repository-url http://localhost:7171 -u admin -p admin dist/*
-
 dist: ## build our package
 	@make build-ui
 	@make clean
-	python setup.py sdist
+	$(PY) setup.py sdist
 
 start-webui: ## start the webserver
 	$(PDR) -w 'idmtools_webui' -ex yarn

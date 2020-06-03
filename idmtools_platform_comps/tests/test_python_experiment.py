@@ -77,8 +77,9 @@ class TestPythonExperiment(ITestWithPersistence):
 
         # validation each simulation output to compare output/config.json is equal to config.json
         validate_output(self, exp_id, 4)
-
-        expected_tags = [{'a': '0', 'b': '1'}, {'a': '0', 'b': '9'}, {'a': '1', 'b': '1'}, {'a': '1', 'b': '9'}]
+        tag_value = "idmtools_models.python.json_python_task.JSONConfiguredPythonTask"
+        expected_tags = [{'a': '0', 'b': '1', 'task_type': tag_value}, {'a': '0', 'b': '9', 'task_type': tag_value},
+                         {'a': '1', 'b': '1', 'task_type': tag_value}, {'a': '1', 'b': '9', 'task_type': tag_value}]
         validate_sim_tags(self, exp_id, expected_tags)
 
         # validate experiment tags
@@ -118,7 +119,10 @@ class TestPythonExperiment(ITestWithPersistence):
         validate_output(self, exp_id, 5)
 
         # validate b is not in tag since it is not sweep parameter, it just depend on sweep parameter
-        expected_tags = [{'a': '0'}, {'a': '1'}, {'a': '2'}, {'a': '3'}, {'a': '4'}]
+        tag_value = "idmtools_models.python.json_python_task.JSONConfiguredPythonTask"
+        expected_tags = [{'a': '0', 'task_type': tag_value}, {'a': '1', 'task_type': tag_value},
+                         {'a': '2', 'task_type': tag_value}, {'a': '3', 'task_type': tag_value},
+                         {'a': '4', 'task_type': tag_value}]
         validate_sim_tags(self, exp_id, expected_tags)
 
     @pytest.mark.long
@@ -316,8 +320,13 @@ class TestPythonExperiment(ITestWithPersistence):
         wait_on_experiment_and_check_all_sim_status(self, e, self.platform)
         exp_id = e.uid
         validate_output(self, exp_id, 6)
-        expected_tags = [{'a': '1', 'b': '2', 'c': '4'}, {'a': '1', 'b': '2', 'c': '5'}, {'a': '1', 'b': '3', 'c': '4'},
-                         {'a': '1', 'b': '3', 'c': '5'}, {'a': '6', 'b': '2'}, {'a': '7', 'b': '2'}]
+        tag_value = "idmtools_models.python.json_python_task.JSONConfiguredPythonTask"
+        expected_tags = [{'a': '1', 'b': '2', 'c': '4', 'task_type': tag_value},
+                         {'a': '1', 'b': '2', 'c': '5', 'task_type': tag_value},
+                         {'a': '1', 'b': '3', 'c': '4', 'task_type': tag_value},
+                         {'a': '1', 'b': '3', 'c': '5', 'task_type': tag_value},
+                         {'a': '6', 'b': '2', 'task_type': tag_value},
+                         {'a': '7', 'b': '2', 'task_type': tag_value}]
         validate_sim_tags(self, exp_id, expected_tags)
 
     @pytest.mark.comps

@@ -20,7 +20,7 @@ logger = getLogger(__name__)
 #    a) Pre-Creation hooks
 
 
-TTaskParent = Union['Simulation', 'WorkflowItem']
+TTaskParent = Union['Simulation', 'WorkflowItem']  # noqa: F821
 TTaskHook = Callable[[TTaskParent], NoReturn]
 
 
@@ -87,7 +87,7 @@ class ITask(metaclass=ABCMeta):
             requirement = PlatformRequirements[requirement.lower()]
         self.platform_requirements.add(requirement)
 
-    def pre_creation(self, parent: Union['Simulation', 'WorkflowItem']):
+    def pre_creation(self, parent: Union['Simulation', 'WorkflowItem']):  # noqa: F821
         """
         Optional Hook called at the time of creation of task. Can be used to setup simulation and experiment level hooks
         Args:
@@ -101,7 +101,7 @@ class ITask(metaclass=ABCMeta):
             raise ValueError("Command is required for on task when preparing an experiment")
         [hook(parent) for hook in self.__pre_creation_hooks]
 
-    def post_creation(self, parent: Union['Simulation', 'WorkflowItem']):
+    def post_creation(self, parent: Union['Simulation', 'WorkflowItem']):  # noqa: F821
         """
         Optional Hook called at the  after creation task. Can be used to setup simulation and experiment level hooks
         Args:

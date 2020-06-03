@@ -1,7 +1,6 @@
 import ntpath
 from typing import List, Dict
 from uuid import UUID
-
 from COMPS.Data import Simulation
 from COMPS.Data.Simulation import SimulationState
 from COMPS.Data.WorkItem import WorkItemState
@@ -109,7 +108,7 @@ def get_file_from_collection(platform: IPlatform, collection_id: UUID, file_path
 
     # Look for the asset file in the collection
     file_name = ntpath.basename(file_path)
-    path = ntpath.dirname(file_path).lstrip(f"Assets\\")
+    path = ntpath.dirname(file_path).lstrip("Assets\\")
 
     for asset_file in ac.assets:
         if asset_file.file_name == file_name and (asset_file.relative_path or '') == path:

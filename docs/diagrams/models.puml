@@ -1,0 +1,18 @@
+@startuml
+
+package "idmtools-core" as registry {
+    () "TasksAPI" as TasksAPI
+}
+
+package "idmtools-models" as models {
+    [PythonTask]
+    [JSONConfiguredPythonTask]
+    [RTask]
+    [JSONConfiguredRTask]
+    PythonTask <-- JSONConfiguredPythonTask: Adds JSON configuration\n file to PythonTask
+    RTask <-- JSONConfiguredRTask: Adds JSON configuration\n file to PythonTask
+}
+
+TasksAPI <-- PythonTask: Implements Python-based Tasks
+TasksAPI <- RTask : Implements R-based Tasks
+@enduml

@@ -1,0 +1,14 @@
+@startuml
+
+package "idmtools-core" as registry {
+    () "PlatformAPI" as PlatformAPI
+}
+
+package "idmtools-platform-comps" as comps {
+    [COMPSPlatform]
+    [SSMTPlatform]
+}
+
+PlatformAPI <-down-- COMPSPlatform: COMPs\nImplementation
+PlatformAPI <-- SSMTPlatform: SSMT\nImplementation
+@enduml

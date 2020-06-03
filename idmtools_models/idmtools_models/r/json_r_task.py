@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, List
 from idmtools.assets import AssetCollection
 from idmtools.registry.task_specification import TaskSpecification
 from idmtools_models.json_configured_task import JSONConfiguredTask
@@ -41,3 +41,8 @@ class JSONConfiguredRTaskSpecification(TaskSpecification):
 
     def get_description(self) -> str:
         return "Defines a R script that has a single JSON config file"
+
+    def get_example_urls(self) -> List[str]:
+        from idmtools_models import __version__
+        examples = [f'examples/{example}' for example in ['r_model']]
+        return [self.get_version_url(f'v{__version__}', x) for x in examples]
