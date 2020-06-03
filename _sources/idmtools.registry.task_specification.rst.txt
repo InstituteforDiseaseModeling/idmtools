@@ -5,4 +5,3 @@ idmtools.registry.task\_specification module
    :members:
    :undoc-members:
    :show-inheritance:
-   :ignore-module-all:

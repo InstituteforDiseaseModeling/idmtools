@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>idmtools.ini File &mdash; IDM-Tools  documentation</title>
+  <title>idmtools.ini file &mdash; IDM-Tools  documentation</title>
   
 
   
@@ -115,11 +115,12 @@
 <li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookie-cutter example projects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reference.html">API reference</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="cli_index.html">CLI reference</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">idmtools.ini File</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">idmtools.ini file</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cli-templates.html">Templates</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cli-simulations.html">Simulations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cli-experiments.html">Experiments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cli-platforms.html">Platforms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli-examples.html">Examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cli-troubleshoot.html">Troubleshooting</a></li>
 </ul>
 </li>
@@ -162,7 +163,7 @@
         
         <li><a href="cli_index.html">CLI reference</a> &raquo;</li>
         
-        <li>idmtools.ini File</li>
+        <li>idmtools.ini file</li>
         <li class="wy-breadcrumbs-aside">
             
             
@@ -177,12 +178,26 @@
 <!-- From _templates/page.html -->
 
   <div class="section" id="idmtools-ini-file">
-<h1>idmtools.ini File<a class="headerlink" href="#idmtools-ini-file" title="Permalink to this headline">¶</a></h1>
+<h1>idmtools.ini file<a class="headerlink" href="#idmtools-ini-file" title="Permalink to this headline">¶</a></h1>
 <p>You can use the <code class="docutils literal notranslate"><span class="pre">config</span></code> command to create a configuration block in your project’s <code class="docutils literal notranslate"><span class="pre">idmtools.ini</span></code> file.</p>
-<p><code class="docutils literal notranslate"><span class="pre">--config_path</span></code> argument: If you do not specify a config path, the command will use the <code class="docutils literal notranslate"><span class="pre">idmtools.ini</span></code> file in the current directory.
-To edit a different file, you can specify its path like <code class="docutils literal notranslate"><span class="pre">idmtools</span> <span class="pre">config</span> <span class="pre">--config_path</span> <span class="pre">C:\my_project\idmtools.ini</span></code></p>
-<p>Use the <code class="docutils literal notranslate"><span class="pre">block</span></code> command to start the wizard that will guide you through the creation of a configuration block in the selected <code class="docutils literal notranslate"><span class="pre">idmtools.ini</span></code>.
-For example: <code class="docutils literal notranslate"><span class="pre">idmtools</span> <span class="pre">config</span> <span class="pre">block</span></code>.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ idmtools config --help
+Usage: idmtools config [OPTIONS] COMMAND [ARGS]...
+
+  Contains commands related to the creation of idmtools.ini
+
+  With the config command, you can :  - Generate an idmtools.ini file in the
+  current directory  - Add a configuration block
+
+Options:
+  --config_path FILE  Path to the idmtools.ini file
+  --help              Show this message and exit.
+
+Commands:
+  block  Command to create/replace a block in the selected idmtools.ini...
+</pre></div>
+</div>
+<p>If you do not specify a config path, the command will use the <code class="docutils literal notranslate"><span class="pre">idmtools.ini</span></code> file in the current directory. To edit a different file, use the <code class="docutils literal notranslate"><span class="pre">--config_path</span></code> argument to specify its path, such as: <code class="docutils literal notranslate"><span class="pre">idmtools</span> <span class="pre">config</span> <span class="pre">--config_path</span> <span class="pre">C:\my_project\idmtools.ini</span></code>.</p>
+<p>Use the <code class="docutils literal notranslate"><span class="pre">block</span></code> command to start the wizard that will guide you through the creation of a configuration block in the selected <code class="docutils literal notranslate"><span class="pre">idmtools.ini</span></code>, for example: <code class="docutils literal notranslate"><span class="pre">idmtools</span> <span class="pre">config</span> <span class="pre">block</span></code>.</p>
 </div>
 
 

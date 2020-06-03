@@ -5,4 +5,3 @@ idmtools.core.interfaces.entity\_container module
    :members:
    :undoc-members:
    :show-inheritance:
-   :ignore-module-all:

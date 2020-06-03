@@ -5,4 +5,3 @@ idmtools.core.interfaces.iassets\_enabled module
    :members:
    :undoc-members:
    :show-inheritance:
-   :ignore-module-all:

@@ -45,3 +45,10 @@ API class specifications
 ------------------------
 
 .. uml:: /diagrams/apis.puml
+
+|EMOD_s|
+^^^^^^^^
+
+|EMOD_s| support with |IT_s| is provided with the **emodpy** package, which leverages |IT_s| plugin architecture:
+
+.. uml:: /diagrams/apis-emod.puml

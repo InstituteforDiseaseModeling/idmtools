@@ -5,4 +5,3 @@ idmtools.entities.generic\_workitem module
    :members:
    :undoc-members:
    :show-inheritance:
-   :ignore-module-all:

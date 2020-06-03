@@ -46,7 +46,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Architecture" href="architecture.html" />
-    <link rel="prev" title="Platforms" href="cli-platforms.html" />
+    <link rel="prev" title="Examples" href="cli-examples.html" />
 
 <link href="https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans" rel="stylesheet">
 
@@ -115,11 +115,12 @@
 <li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookie-cutter example projects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reference.html">API reference</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="cli_index.html">CLI reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="cli-config.html">idmtools.ini File</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli-config.html">idmtools.ini file</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cli-templates.html">Templates</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cli-simulations.html">Simulations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cli-experiments.html">Experiments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cli-platforms.html">Platforms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli-examples.html">Examples</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Troubleshooting</a></li>
 </ul>
 </li>
@@ -178,7 +179,7 @@
 
   <div class="section" id="troubleshooting">
 <h1>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h1>
-<p>…To see the list of troubleshooting commands type the following at a command prompt</p>
+<p>You can use troubleshooting commands to get information abouts plugins (CLI, Platform, and Task) and to get detailed system information. To see the list of troubleshooting commands, type the following at a command prompt:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ idmtools info --help
 Usage: idmtools info [OPTIONS] COMMAND [ARGS]...
 
@@ -190,6 +191,40 @@ Options:
 Commands:
   plugins  Commands to get information about installed IDM-Tools plugins
   system   Provide an output with details about your current execution...
+</pre></div>
+</div>
+<p>To see the list of troubleshooting commands and options for the <code class="docutils literal notranslate"><span class="pre">plugins</span></code> command, type the following at a command prompt:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ idmtools info plugins --help
+Usage: idmtools info plugins [OPTIONS] COMMAND [ARGS]...
+
+  Commands to get information about installed IDM-Tools plugins
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  cli       List CLI plugins
+  platform  List Platform plugins
+  task      List Task plugins
+</pre></div>
+</div>
+<p>To see the list of troubleshooting options for the <code class="docutils literal notranslate"><span class="pre">system</span></code> command, type the following at a command prompt:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ idmtools info system --help
+Usage: idmtools info system [OPTIONS]
+
+  Provide an output with details about your current execution platform and
+  IDM-Tools install
+
+Options:
+  --copy-to-clipboard / --no-copy-to-clipboard
+                                  Copy output to clipboard
+  --no-format-for-gh / --format-for-gh
+                                  When copying to clipboard, do we want to
+                                  formatted for Github
+
+  --issue / --no-issue            Copy data and format for github alias
+  --output-filename TEXT          Output filename
+  --help                          Show this message and exit.
 </pre></div>
 </div>
 </div>
@@ -207,7 +242,7 @@ Commands:
         <a href="architecture.html" class="btn btn-neutral float-right" title="Architecture" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="cli-platforms.html" class="btn btn-neutral float-left" title="Platforms" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="cli-examples.html" class="btn btn-neutral float-left" title="Examples" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

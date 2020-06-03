@@ -5,4 +5,3 @@ idmtools.core.system\_information module
    :members:
    :undoc-members:
    :show-inheritance:
-   :ignore-module-all:

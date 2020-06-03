@@ -5,4 +5,3 @@ idmtools.entities.iplatform\_ops.utils module
    :members:
    :undoc-members:
    :show-inheritance:
-   :ignore-module-all:

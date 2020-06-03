@@ -5,4 +5,3 @@ idmtools.entities.relation\_type module
    :members:
    :undoc-members:
    :show-inheritance:
-   :ignore-module-all:

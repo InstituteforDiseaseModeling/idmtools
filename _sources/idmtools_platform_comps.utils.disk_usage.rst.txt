@@ -5,4 +5,3 @@ idmtools\_platform\_comps.utils.disk\_usage module
    :members:
    :undoc-members:
    :show-inheritance:
-   :ignore-module-all:

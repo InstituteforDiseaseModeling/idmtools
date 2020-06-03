@@ -5,4 +5,3 @@ idmtools.assets.file\_list module
    :members:
    :undoc-members:
    :show-inheritance:
-   :ignore-module-all:

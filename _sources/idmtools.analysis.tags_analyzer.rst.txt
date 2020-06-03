@@ -5,4 +5,3 @@ idmtools.analysis.tags\_analyzer module
    :members:
    :undoc-members:
    :show-inheritance:
-   :ignore-module-all:

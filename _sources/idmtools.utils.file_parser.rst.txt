@@ -5,4 +5,3 @@ idmtools.utils.file\_parser module
    :members:
    :undoc-members:
    :show-inheritance:
-   :ignore-module-all:

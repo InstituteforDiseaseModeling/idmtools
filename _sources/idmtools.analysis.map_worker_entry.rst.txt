@@ -5,4 +5,3 @@ idmtools.analysis.map\_worker\_entry module
    :members:
    :undoc-members:
    :show-inheritance:
-   :ignore-module-all:

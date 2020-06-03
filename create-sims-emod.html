@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Create EMOD simulation &mdash; IDM-Tools  documentation</title>
+  <title>Create EMOD simulations &mdash; IDM-Tools  documentation</title>
   
 
   
@@ -106,7 +106,7 @@
 <li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="create-sims.html">Create simulations</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="create-sims-tags.html">Create simulation tags</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Create EMOD simulation</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Create EMOD simulations</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="run-sims.html">Run simulations</a></li>
@@ -158,7 +158,7 @@
         
         <li><a href="create-sims.html">Create simulations</a> &raquo;</li>
         
-        <li>Create EMOD simulation</li>
+        <li>Create EMOD simulations</li>
         <li class="wy-breadcrumbs-aside">
             
             
@@ -172,8 +172,26 @@
             
 <!-- From _templates/page.html -->
 
-  <div class="section" id="create-emod-s-simulation">
-<h1>Create EMOD simulation<a class="headerlink" href="#create-emod-s-simulation" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="create-emod-s-simulations">
+<h1>Create EMOD simulations<a class="headerlink" href="#create-emod-s-simulations" title="Permalink to this headline">¶</a></h1>
+<p>To create simulations using EMOD you must use the <strong>emodpy</strong> package included with IDM-Tools. Included with <strong>emodpy</strong> is the <code class="xref py py-class docutils literal notranslate"><span class="pre">emodpy.emod_task.EMODTask</span></code> class, inheriting from the <a class="reference internal" href="idmtools.entities.itask.html#idmtools.entities.itask.ITask" title="idmtools.entities.itask.ITask"><code class="xref py py-class docutils literal notranslate"><span class="pre">ITask</span></code></a> abstract class, and used for the running and configuration of EMOD simulations and experiments.</p>
+<img alt="_images/fa23bb3a41e84efc62a62f39968d754e369b89ce345f6de26cb3b9f9438b403d.svg" class="align-center" src="_images/fa23bb3a41e84efc62a62f39968d754e369b89ce345f6de26cb3b9f9438b403d.svg" /><p>For more information about the architecture of job (simulation/experiment) creation and how EMOD leverages IDM-Tools plugin architecture, see <a class="reference internal" href="architecture.html"><span class="doc">Architecture</span></a>.</p>
+<p>The following Python excerpt shows an example of using <strong>EMODTask</strong> class and <strong>from_default</strong> method to create a task object using default config, campaign, and demographic values from <strong>EMODSir</strong> class and to use the Eradication.exe from local directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">task</span> <span class="o">=</span> <span class="n">EMODTask</span><span class="o">.</span><span class="n">from_default</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">EMODSir</span><span class="p">(),</span> <span class="n">eradication_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BIN_PATH</span><span class="p">,</span> <span class="s2">&quot;Eradication&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Another option, instead of using <strong>from_default</strong>, is to use the <strong>from_files</strong> method:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">task</span> <span class="o">=</span> <span class="n">EMODTask</span><span class="o">.</span><span class="n">from_files</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">INPUT_PATH</span><span class="p">,</span> <span class="s2">&quot;config.json&quot;</span><span class="p">),</span>
+                           <span class="n">campaign_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">INPUT_PATH</span><span class="p">,</span> <span class="s2">&quot;campaign.json&quot;</span><span class="p">),</span>
+                           <span class="n">demographics_paths</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">INPUT_PATH</span><span class="p">,</span> <span class="s2">&quot;demographics.json&quot;</span><span class="p">),</span>
+                           <span class="n">eradication_path</span><span class="o">=</span><span class="n">eradication_path</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For complete examples of the above see the following Python scripts:</p>
+<ul class="simple">
+<li><p>(from_default) emodpy.examples.create_sims_from_default_run_analyzer</p></li>
+<li><p>(from_files) emodpy.examples.create_sims_eradication_from_github_url</p></li>
+</ul>
 </div>
 
 

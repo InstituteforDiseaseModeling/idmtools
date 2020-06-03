@@ -5,4 +5,3 @@ idmtools.entities.ianalyzer module
    :members:
    :undoc-members:
    :show-inheritance:
-   :ignore-module-all:

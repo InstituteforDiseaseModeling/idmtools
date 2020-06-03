@@ -5,4 +5,3 @@ idmtools.core.task\_factory module
    :members:
    :undoc-members:
    :show-inheritance:
-   :ignore-module-all:

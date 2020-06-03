@@ -5,4 +5,3 @@ idmtools.analysis.platform\_anaylsis module
    :members:
    :undoc-members:
    :show-inheritance:
-   :ignore-module-all:

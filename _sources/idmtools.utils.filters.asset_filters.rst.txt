@@ -5,4 +5,3 @@ idmtools.utils.filters.asset\_filters module
    :members:
    :undoc-members:
    :show-inheritance:
-   :ignore-module-all:

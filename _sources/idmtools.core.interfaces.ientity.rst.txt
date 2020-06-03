@@ -5,4 +5,3 @@ idmtools.core.interfaces.ientity module
    :members:
    :undoc-members:
    :show-inheritance:
-   :ignore-module-all:

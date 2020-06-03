@@ -5,4 +5,3 @@ idmtools\_platform\_comps.utils.python\_requirements\_ac.create\_asset\_collecti
    :members:
    :undoc-members:
    :show-inheritance:
-   :ignore-module-all:

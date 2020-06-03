@@ -5,4 +5,3 @@ idmtools.utils.display.displays module
    :members:
    :undoc-members:
    :show-inheritance:
-   :ignore-module-all:

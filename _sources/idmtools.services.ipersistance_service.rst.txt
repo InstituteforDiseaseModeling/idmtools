@@ -5,4 +5,3 @@ idmtools.services.ipersistance\_service module
    :members:
    :undoc-members:
    :show-inheritance:
-   :ignore-module-all:

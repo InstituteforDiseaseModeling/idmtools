@@ -4,39 +4,7 @@ Convert analyzers from |DT| to |IT_s|
 
 Although the use of analyzers in |DT| and |IT_s| is very similar, being aware of some of the differences may be helpful with the conversion process. For example some of the class and method names are different, as seen in the following diagram:
 
-.. uml::
-
-    @startuml
-
-    note top of BaseAnalyzer
-    DTK-Tools
-    end note
-
-    class BaseAnalyzer {
-    initialize()
-    per_experiment()
-    filter()
-    select_simulation_data()
-    finalize()
-    destroy()
-    }
-
-    note top of IAnalyzer
-    IDM-Tools
-    end note
-
-    class IAnalyzer {
-    initialize()
-    per_group()
-    filter()
-    map()
-    reduce()
-    destroy()
-    }
-
-    IAnalyzer -left[hidden]-> BaseAnalyzer
-
-    @enduml
+.. uml:: /diagrams/analyzers-convert.puml
 
 For additional information about the *IAnalyzer* class and methods, see :py:class:`~idmtools.entities.ianalyzer.IAnalyzer`.
 

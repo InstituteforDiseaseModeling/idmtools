@@ -5,4 +5,3 @@ idmtools.utils.local\_os module
    :members:
    :undoc-members:
    :show-inheritance:
-   :ignore-module-all:

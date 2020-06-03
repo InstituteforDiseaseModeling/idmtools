@@ -5,4 +5,3 @@ idmtools\_platform\_comps.utils.general module
    :members:
    :undoc-members:
    :show-inheritance:
-   :ignore-module-all:

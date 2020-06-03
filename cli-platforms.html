@@ -45,7 +45,7 @@
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Troubleshooting" href="cli-troubleshoot.html" />
+    <link rel="next" title="Examples" href="cli-examples.html" />
     <link rel="prev" title="Experiments" href="cli-experiments.html" />
 
 <link href="https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans" rel="stylesheet">
@@ -115,11 +115,12 @@
 <li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookie-cutter example projects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reference.html">API reference</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="cli_index.html">CLI reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="cli-config.html">idmtools.ini File</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli-config.html">idmtools.ini file</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cli-templates.html">Templates</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cli-simulations.html">Simulations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cli-experiments.html">Experiments</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Platforms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli-examples.html">Examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cli-troubleshoot.html">Troubleshooting</a></li>
 </ul>
 </li>
@@ -178,7 +179,28 @@
 
   <div class="section" id="platforms">
 <h1>Platforms<a class="headerlink" href="#platforms" title="Permalink to this headline">¶</a></h1>
-<p>IDM includes commands for managing some of the supported platforms…</p>
+<p>IDM includes commands for managing the local platform. To see the list of commands type the following at a command prompt.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ idmtools local --help
+Usage: idmtools local [OPTIONS] COMMAND [ARGS]...
+
+  Commands related to managing the local platform
+
+Options:
+  --run-as TEXT  Change the default user you run docker containers as. Useful
+                 is situations where you need to access docker with sudo.
+                 Example values are &quot;1000:1000&quot;
+
+  --help         Show this message and exit.
+
+Commands:
+  down     Shutdown the local execution platform(and optionally delete data
+  info
+  restart  Restart the local execution platform
+  start    Start the local execution platform
+  status   Check the status of the local execution platform
+  stop
+</pre></div>
+</div>
 </div>
 
 
@@ -191,7 +213,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="cli-troubleshoot.html" class="btn btn-neutral float-right" title="Troubleshooting" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="cli-examples.html" class="btn btn-neutral float-right" title="Examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="cli-experiments.html" class="btn btn-neutral float-left" title="Experiments" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

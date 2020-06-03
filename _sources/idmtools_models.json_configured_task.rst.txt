@@ -5,4 +5,3 @@ idmtools\_models.json\_configured\_task module
    :members:
    :undoc-members:
    :show-inheritance:
-   :ignore-module-all:

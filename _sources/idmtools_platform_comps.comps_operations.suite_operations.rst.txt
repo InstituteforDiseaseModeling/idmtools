@@ -5,4 +5,3 @@ idmtools\_platform\_comps.comps\_operations.suite\_operations module
    :members:
    :undoc-members:
    :show-inheritance:
-   :ignore-module-all:

@@ -5,4 +5,3 @@ idmtools.utils.command\_line module
    :members:
    :undoc-members:
    :show-inheritance:
-   :ignore-module-all:

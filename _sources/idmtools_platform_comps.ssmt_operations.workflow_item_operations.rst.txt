@@ -5,4 +5,3 @@ idmtools\_platform\_comps.ssmt\_operations.workflow\_item\_operations module
    :members:
    :undoc-members:
    :show-inheritance:
-   :ignore-module-all:

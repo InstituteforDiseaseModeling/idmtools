@@ -5,4 +5,3 @@ idmtools\_models.python.python\_task module
    :members:
    :undoc-members:
    :show-inheritance:
-   :ignore-module-all:

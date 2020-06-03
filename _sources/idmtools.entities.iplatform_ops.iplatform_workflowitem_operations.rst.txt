@@ -5,4 +5,3 @@ idmtools.entities.iplatform\_ops.iplatform\_workflowitem\_operations module
    :members:
    :undoc-members:
    :show-inheritance:
-   :ignore-module-all:

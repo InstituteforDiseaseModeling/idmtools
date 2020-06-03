@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="358px" preserveAspectRatio="none" style="width:367px;height:358px;" version="1.1" viewBox="0 0 367 358" width="367px" zoomAndPan="magnify"><defs><filter height="300%" id="fhnfvxyxh54cm" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[272379cf1f80536b6294ad33393ecec2]
+cluster registry--><polygon fill="#FFFFFF" filter="url(#fhnfvxyxh54cm)" points="119,24,238,24,245,46.2969,253,46.2969,253,133,119,133,119,24" style="stroke: #000000; stroke-width: 1.5;"/><line style="stroke: #000000; stroke-width: 1.5;" x1="119" x2="245" y1="46.2969" y2="46.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="113" x="123" y="38.9951">idmtools-core</text><!--MD5=[7662220779859bf7cd8e5a94694e418f]
+cluster comps--><polygon fill="#FFFFFF" filter="url(#fhnfvxyxh54cm)" points="22,259,237,259,244,281.2969,345,281.2969,345,346,22,346,22,259" style="stroke: #000000; stroke-width: 1.5;"/><line style="stroke: #000000; stroke-width: 1.5;" x1="22" x2="244" y1="281.2969" y2="281.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="209" x="26" y="273.9951">idmtools-platform-comps</text><!--MD5=[5df59aa2065c15f87b95d8b2badd43a6]
+entity PlatformAPI--><ellipse cx="186" cy="88" fill="#FEFECE" filter="url(#fhnfvxyxh54cm)" rx="8" ry="8" style="stroke: #A80036; stroke-width: 2.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="86" x="143" y="117.9951">PlatformAPI</text><!--MD5=[c55e5d1c1dcbf3b042d02ca47e4c5e06]
+entity COMPSPlatform--><rect fill="#FEFECE" filter="url(#fhnfvxyxh54cm)" height="36.2969" style="stroke: #A80036; stroke-width: 1.5;" width="134" x="38" y="294"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="33" y="299"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="33" y="320.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="114" x="48" y="316.9951">COMPSPlatform</text><!--MD5=[6caa1f1307bb5822b7d8bac0c81079fb]
+entity SSMTPlatform--><rect fill="#FEFECE" filter="url(#fhnfvxyxh54cm)" height="36.2969" style="stroke: #A80036; stroke-width: 1.5;" width="122" x="207" y="294"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="202" y="299"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="202" y="320.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="102" x="217" y="316.9951">SSMTPlatform</text><!--MD5=[410b2332a3d5aec0834b371ad05822f9]
+reverse link PlatformAPI to COMPSPlatform--><path d="M175.64,101.297 C162.168,117.986 138.951,149.262 127,180 C111.875,218.905 107.14,268.2816 105.6637,293.8743 " fill="none" id="PlatformAPI&lt;-COMPSPlatform" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="178.842,97.378,170.051,101.8186,175.6793,101.2506,176.2473,106.8789,178.842,97.378" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="44" x="156.5" y="193.0669">COMPs</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="101" x="128" y="208.1997">Implementation</text><!--MD5=[2c3f34f35ca8d0f1612701cb6925240e]
+reverse link PlatformAPI to SSMTPlatform--><path d="M193.894,101.665 C204.318,118.85 222.674,150.77 234,180 C249.281,219.437 259.882,268.1801 264.83,293.6456 " fill="none" id="PlatformAPI&lt;-SSMTPlatform" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="191.177,97.223,192.4598,106.988,193.7855,101.4886,199.2848,102.8143,191.177,97.223" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="34" x="278.5" y="193.0669">SSMT</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="101" x="245" y="208.1997">Implementation</text><!--MD5=[ddcaf2ec7510d39d8fbbb91a632668ba]
+@startuml
+package "idmtools-core" as registry {
+    () "PlatformAPI" as PlatformAPI
+}
+
+package "idmtools-platform-comps" as comps {
+    [COMPSPlatform]
+    [SSMTPlatform]
+}
+
+PlatformAPI <-down- - COMPSPlatform: COMPs\nImplementation
+PlatformAPI <- - SSMTPlatform: SSMT\nImplementation
+@enduml
+
+PlantUML version 1.2020.11beta3(Unknown compile time)
+(GPL source distribution)
+Java Runtime: Java(TM) SE Runtime Environment
+JVM: Java HotSpot(TM) 64-Bit Server VM
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>
