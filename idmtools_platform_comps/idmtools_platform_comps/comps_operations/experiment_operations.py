@@ -186,9 +186,6 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             return converted_simulation
 
         obj.simulations = EntityContainer([convert_simulation(simulation=s) for s in comps_sims])
-        # because status is not a @property of Experiment objects that auto/lazy computes, we must do this manually
-        # since simulations were added post-Experiment creation/conversion
-        obj.update_status()
 
         # Set parent
         obj.parent = suite
