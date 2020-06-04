@@ -1,9 +1,11 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Type, Any, List, Dict, NoReturn
+from typing import Type, Any, List, Dict, NoReturn, Optional
 from uuid import UUID
 
+from idmtools.assets import Asset
 from idmtools.core.cache_enabled import CacheEnabled
+from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.utils import batch_create_items
 from idmtools.entities.simulation import Simulation
 
@@ -122,16 +124,20 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         """
         pass
 
-    def to_entity(self, simulation: Any, load_task: bool = False, **kwargs) -> Simulation:
+    def to_entity(self, simulation: Any, load_task: bool = False, parent: Optional[Experiment] = None,
+                  **kwargs) -> Simulation:
         """
         Converts the platform representation of simulation to idmtools representation
 
         Args:
             simulation:Platform simulation object
             load_task: Load Task Object as well. Can take much longer and have more data on platform
+            parent: Optional parent object
         Returns:
             IDMTools simulation object
         """
+        if parent:
+            simulation.parent = parent
         return simulation
 
     def pre_run_item(self, simulation: Simulation, **kwargs):
@@ -217,23 +223,19 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
             **kwargs:
 
         Returns:
-            Dictionary containting filename and content
+            Dictionary containing filename and content
         """
         pass
 
     @abstractmethod
-    def list_assets(self, simulation: Simulation, **kwargs) -> List[str]:
+    def list_assets(self, simulation: Simulation, **kwargs) -> List[Asset]:
         """
-        List available files for a simulation
+        List available assets for a simulation
 
         Args:
-            simulation: Simulation to list files for
+            simulation: Simulation of assets Assets
 
         Returns:
             List of filenames
         """
-        pass
-
-    @abstractmethod
-    def all_files(self, simulation: Simulation, **kwargs):
         pass

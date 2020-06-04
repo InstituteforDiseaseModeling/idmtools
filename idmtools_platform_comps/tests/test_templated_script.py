@@ -6,9 +6,10 @@ from idmtools.entities.experiment import Experiment
 from idmtools_models.templated_script_task import get_script_wrapper_windows_task
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
+
 @pytest.mark.comps
-@pytest.mark.python
-class TestPythonExperiment(ITestWithPersistence):
+@pytest.mark.wrapper
+class TestWrapperTask(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
@@ -31,3 +32,5 @@ class TestPythonExperiment(ITestWithPersistence):
         experiment.run(platform=self.platform, wait_until_done=True)
 
         self.assertTrue(experiment.succeeded)
+
+

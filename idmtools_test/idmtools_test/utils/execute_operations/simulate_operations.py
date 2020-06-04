@@ -5,15 +5,17 @@ import shutil
 import subprocess
 import sys
 from dataclasses import dataclass, field
+from functools import partial
 from logging import getLogger, DEBUG
 from threading import Lock
-from typing import List, Dict, Any, Type, TYPE_CHECKING, TextIO
+from typing import List, Dict, Any, Type, TYPE_CHECKING, Union
 from uuid import UUID, uuid4
 import numpy as np
-
+from idmtools.assets import Asset
 from idmtools.core import EntityStatus
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
 from idmtools.entities.simulation import Simulation
+from idmtools.utils.file import file_contents_to_generator
 from idmtools.utils.json import IDMJSONEncoder
 
 if TYPE_CHECKING:
@@ -36,9 +38,16 @@ def run_simulation(simulation_id: Simulation, command: str, parent_uid: UUID, ex
             logger.info('Executing %s from working directory %s', cmd, simulation_path)
             err.write(f"{cmd}\n")
 
+            os.chdir(simulation_path)
             # Run our task
+            if sys.platform in ['win32', 'cygwin']:
+                cmd = shlex.split(cmd.replace("\\", "/"))
+                cmd[0] = os.path.abspath(cmd[0])
+                cmd = subprocess.list2cmdline(cmd)
+            else:
+                cmd = shlex.split(cmd.replace("\\", "/"))
             p = subprocess.Popen(
-                shlex.split(cmd.replace("\\", "/")),
+                cmd,
                 cwd=simulation_path,
                 env=os.environ,
                 shell=False,
@@ -126,6 +135,19 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
         return self.platform._experiments.experiments.get(simulation.parent_id)
 
     def platform_run_item(self, simulation: Simulation, **kwargs):
+        """
+        Run the item on the test platform
+
+        This method executes the simulation in a thread pool
+
+        Args:
+            simulation: Simulation to run
+            **kwargs:
+
+        Returns:
+
+        """
+        logger.info(f"Running simulation {simulation.id}")
         self.send_assets(simulation, **kwargs)
         future = self.platform.pool.submit(
             run_simulation,
@@ -134,30 +156,62 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
             simulation.parent.uid,
             self.platform.execute_directory
         )
+        sims = self.simulations[simulation.parent.uid]
+
+        for i, sim in enumerate(sims):
+            if sim.id == simulation.id:
+                sims[i] = simulation
+                self._save_simulations_to_cache(simulation.parent.uid, sims)
+                break
         self.platform.queue.append(future)
 
     def send_assets(self, simulation: Any, **kwargs):
-        exp_path = os.path.join(self.platform.execute_directory, str(simulation.parent.uid))
-        sim_path = os.path.join(exp_path, str(simulation.id))
-        if logger.isEnabledFor(DEBUG):
-            logger.debug(f"Creating {exp_path}")
+        """
+        Send assets to the test platform. This method uses the execute directory and first tries to link files
+        If that fails, files are copied into the directory
+
+        Args:
+            simulation: Simulation assets to send
+            **kwargs:
+
+        Returns:
+
+        """
+        exp_path = self.platform._experiments.get_experiment_path(simulation.parent)
+        sim_path = self.get_simulation_asset_path(simulation, experiment_path=exp_path)
+        logger.info(f"Creating {exp_path}")
         os.makedirs(sim_path, exist_ok=True)
-        for asset in simulation.assets:
-            remote_path = os.path.join(sim_path, asset.relative_path) if asset.relative_path else sim_path
-            remote_path = os.path.join(remote_path, asset.filename)
-            if asset.absolute_path:
-                if logger.isEnabledFor(DEBUG):
-                    logger.debug(f"Copying {asset.absolute_path} to {remote_path}")
-                shutil.copy(asset.absolute_path, remote_path)
-            else:
-                if logger.isEnabledFor(DEBUG):
-                    logger.debug(f"Writing {asset.absolute_path} to {remote_path}")
-                with open(os.path.join(remote_path), 'wb') as out:
-                    out.write(asset.content.encode())
-
-        import win32file
+        self.__copy_simulation_assets_to_simulation_directory(sim_path, simulation)
         exp_path = os.path.join(exp_path, "Assets")
+        self._copy_or_link_parent_assets(exp_path, sim_path, simulation)
 
+    def get_simulation_asset_path(self, simulation: Simulation, experiment_path: str = None) -> str:
+        """
+        Get path to simulation assets
+
+        Args:
+            simulation: Simulation Assets to get path to
+
+        Returns:
+            Str path to assets
+        """
+        if experiment_path is None:
+            experiment_path = self.platform._experiments.get_experiment_path(simulation.parent)
+        return os.path.join(experiment_path, str(simulation.id))
+
+    @staticmethod
+    def _copy_or_link_parent_assets(exp_path: str, sim_path: str, simulation: Simulation):
+        """
+        Link or Copy a simulation parent assets into its directory
+
+        Args:
+            exp_path: Path to experiment assets
+            sim_path: Simulation path
+            simulation: Simulation
+
+        Returns:
+
+        """
         for asset in simulation.parent.assets:
             remote_path = os.path.join(exp_path, asset.relative_path) if asset.relative_path else exp_path
             sim_assets = os.path.join(sim_path, "Assets")
@@ -165,43 +219,78 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
             dest_path = os.path.join(sim_assets, asset.filename)
             os.makedirs(sim_assets, exist_ok=True)
             if sys.platform in ['win32']:
+                import win32file
+                link_worked = True
                 try:
-                    win32file.CreateSymbolicLink(src_path, dest_path, 1)
-                except Exception as e:
+                    logger.info("Trying to link the files")
+                    if link_worked:
+                        win32file.CreateSymbolicLink(src_path, dest_path, 1)
+                    else:
+                        shutil.copy(src_path, dest_path)
+                except Exception:
+                    link_worked = False
+                    logger.info("Linking failed. Copying instread")
                     shutil.copy(src_path, dest_path)
             else:
                 os.symlink(src_path, dest_path)
 
+    @staticmethod
+    def __copy_simulation_assets_to_simulation_directory(sim_path:str, simulation: Simulation):
+        for asset in simulation.assets:
+            remote_path = os.path.join(sim_path, asset.relative_path) if asset.relative_path else sim_path
+            remote_path = os.path.join(remote_path, asset.filename)
+            if asset.absolute_path:
+                logger.info(f"Copying {asset.absolute_path} to {remote_path}")
+                shutil.copy(asset.absolute_path, remote_path)
+            else:
+                logger.info(f"Writing {asset.absolute_path} to {remote_path}")
+                with open(os.path.join(remote_path), 'wb') as out:
+                    out.write(asset.content.encode())
 
     def refresh_status(self, simulation: Simulation, **kwargs):
         pass
 
     def get_assets(self, simulation: Simulation, files: List[str], **kwargs) -> Dict[str, bytearray]:
-        return {}
+        """
+        Get list of files
+        Args:
+            simulation:
+            files:
+            **kwargs:
 
-    def list_assets(self, simulation: Simulation, **kwargs) -> List[str]:
-        pass
+        Returns:
 
-    def set_simulation_status(self, experiment_uid, status):
-        self.set_simulation_prob_status(experiment_uid, {status: 1})
+        """
+        logger.info(f'Listing assets for {simulation.id}')
+        assets = {}
+        for root, dirs, actual_files in os.walk(self.get_simulation_asset_path(simulation)):
+            for file in actual_files:
+                if file in files:
+                    fp = os.path.abspath(os.path.join(root, file))
+                    with open(fp, 'rb') as i:
+                        assets[file] = i.read()
+        return assets
 
-    def set_simulation_prob_status(self, experiment_uid, status):
-        if logger.isEnabledFor(DEBUG):
-            logger.debug(f'Setting status for sim s on exp {experiment_uid} to {status}')
-        simulations = self.simulations.get(experiment_uid)
-        for simulation in simulations:
-            new_status = np.random.choice(
-                a=list(status.keys()),
-                p=list(status.values())
-            )
-            simulation.status = new_status
-        self._save_simulations_to_cache(experiment_uid, simulations, True)
+    def list_assets(self, simulation: Simulation, **kwargs) -> List[Asset]:
+        """
+        List assets for an item
 
-    def set_simulation_num_status(self, experiment_uid, status, number):
-        simulations = self.simulations.get(experiment_uid)
-        for simulation in simulations:
-            simulation.status = status
-            number -= 1
-            if number <= 0:
-                break
-        self._save_simulations_to_cache(experiment_uid, simulations, True)
+        Args:
+            simulation: Simulation to list assets for
+            **kwargs:
+
+        Returns:
+
+        """
+        logger.info(f'Listing assets for {simulation.id}')
+        assets = []
+        for root, dirs, files in os.walk(self.get_simulation_asset_path(simulation)):
+            for file in files:
+                fp = os.path.abspath(os.path.join(root, file))
+                asset = Asset(absolute_path=fp, filename=file)
+                asset.download_generator_hook = partial(file_contents_to_generator, fp)
+                assets.append(asset)
+        return assets
+
+
+

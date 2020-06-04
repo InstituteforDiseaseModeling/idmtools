@@ -1,102 +1,89 @@
+import hashlib
+import json
 import os
-import re
 import unittest
+import uuid
+from collections import defaultdict
+
 import pytest
-import responses
-from _pytest.config import get_config
-from idmtools import IdmConfigParser
+
+from idmtools.assets import Asset
+from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform, platform
 from COMPS.Data import Experiment as COMPSExperiment, QueryCriteria
-from tests.utils import load_fixture
-from functools import partial
 from logging import getLogger
+import diskcache as dc
 
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
+from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
+from idmtools_test.utils.common_experiments import get_model1_templated_experiment
 
 logger = getLogger()
-# Enable Creation of Experiments used for fixtures. Use when recreating fixtures
-ce = os.getenv('CREATE_EXPERIMENTS', 'No')
-CREATE_EXPERIMENTS = ce and ce[0].lower() in ['y', 't', '1']
-# Overwrite existing fixtures
-of = os.getenv('OVERWRITE_FIXTURES', 'No')
-OVERWRITE_FIXTURES = of and of[0].lower() in ['y', 't', '1']
-cfne = os.getenv('CREATE_IF_NOT_EXIST', 'No')
-CREATE_IF_NOT_EXIST = cfne and cfne[0].lower() in ['y', 't', '1']
-mark_expr = get_config().getoption('markexpr')
+# Enable Caching of experiment past one session. Useful for working with problems in validating output of experiment
+cache = dc.Cache(os.getcwd() if os.getenv("CACHE_FIXTURES", "No").lower()[0] in ["y", "1"] else None)
 
 
-def is_label_enabled(label):
-    # is comps label enabled in testing?
-    if mark_expr and (label in mark_expr and f'not {label}' not in mark_expr):
-        return True
-    elif not mark_expr:
-        return True
+@cache.memoize(expire=300)
+def setup_command_no_asset(platform: str = 'COMPS2'):
+    bt = CommandTask('hello_world.bat')
+    experiment = Experiment.from_task(
+        bt,
+        tags=dict(
+            test_type='No Assets'
+        )
+    )
+    experiment.add_asset(Asset(content="echo Hello World", filename='hello_world.bat'))
+
+    experiment.run(wait_until_done=True, platform=Platform(platform))
+    if not experiment.succeeded:
+        raise ValueError("Setup prep failed")
+    return experiment.id
 
 
-is_comps_enabled = is_label_enabled("comps")
+@cache.memoize(expire=300)
+def setup_python_model_1(platform: str = 'COMPS2'):
+    platform = Platform(platform)
+    e = get_model1_templated_experiment("TestExperimentOperations")
+    builder = SimulationBuilder()
+    builder.add_sweep_definition(
+        JSONConfiguredPythonTask.set_parameter_partial("a"),
+        range(0, 2)
+    )
+
+    # second way to sweep parameter 'b' is to use class setParam which basiclly doing same thing as param_update
+    # method
+    builder.add_sweep_definition(
+        JSONConfiguredPythonTask.set_parameter_partial("b"),
+        [i * i for i in range(1, 4, 2)]
+    )
+    # ------------------------------------------------------
+
+    e.simulations.add_builder(builder)
+    e.run(True, platform)
+    if not e.succeeded:
+        raise ValueError("Setup prep failed")
+    return e.id
 
 
-# Only Run when
-# We are using only fixtures or
-# CREATE_IF_NOT_EXIST or OVERWRITE_FIXTURES are true and (mark_expr and
-#                     ('comps' in mark_expr and 'not comps' not in mark_expr)
-@pytest.mark.skipif(not is_comps_enabled and not (CREATE_IF_NOT_EXIST or OVERWRITE_FIXTURES),
-                    reason="Creation of fixtures enabled but COMPS disabled")
+@pytest.mark.comps
 class TestExperimentOperations(unittest.TestCase):
 
-    @classmethod
-    def setUpClass(cls) -> None:
-        if CREATE_EXPERIMENTS:
-            """
-            This code should only run when creation in enabled. Only use in development when changing internal 
-            experiment operations that change change requests to COMPS, when re-building fixtures, or when doing full
-            integration tests
-            """
-            logger.info('Creating Experiment')
-            cls.setup_responses()
+    def setUp(self) -> None:
+        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        self.platform = Platform("COMPS2")
 
-            with platform("COMPS2"):
-                # task with no assets(command line task)
-                bt = CommandTask('dir')
-                experiment = Experiment.from_task(
-                    bt,
-                    tags=dict(
-                        test_name=cls.__name__,
-                        test_type='No Assets'
-                    )
-                )
+    def test_to_entity(self):
+        self.assertTrue(False)
 
-                experiment.run()
-                print(experiment.id)
-
-                bt = CommandTask('dir.exe')
-
-    @classmethod
-    def setup_responses(cls):
-        endpoint = IdmConfigParser.get_option("COMPS2", "endpoint")
-        # enable fixtures for Experiments and tokens
-        for method in [responses.GET, responses.POST]:
-            responses.add_callback(
-                method, re.compile(f'{endpoint}/api/(tokens|Experiments|Simulations)(.*)'),
-                callback=partial(
-                    load_fixture,
-                    create_if_not_exist=CREATE_IF_NOT_EXIST,
-                    overwrite_fixtures=OVERWRITE_FIXTURES
-                )
-            )
-
-    @responses.activate
     def test_no_assets(self):
+        setup_command_no_asset("COMPS2")
 
-        self.setup_responses()
         # Ensure login is called
         with platform("COMPS2"):
-
             # Call Experiments
             qc = QueryCriteria().select_children("tags").where_tag(
                 [
-                    f'test_name={self.__class__.__name__}',
                     'test_type=No Assets'
                 ]
             )
@@ -121,4 +108,50 @@ class TestExperimentOperations(unittest.TestCase):
             self.assertEquals(1, idm_experiment.simulation_count)
             self.assertEquals(0, idm_experiment.simulations[0].assets.count)
 
+    def test_list_assets(self):
+        """
+        Test that the list assets with children
+        Test that the list assets without children
+        Test that download works
+        Test that the list assets on children(sims) works
+        Returns:
+
+        """
+        eid = setup_python_model_1('COMPS2')
+
+        e_p = Experiment.from_id(eid)
+        with self.subTest("test_list_assets_and_download_children"):
+            assets = self.platform._experiments.list_assets(e_p, children=True)
+            self.assertEqual(5, len(assets))
+            totals = defaultdict(int)
+            for asset in assets:
+                name = os.path.join(os.path.dirname(__file__), 'output', asset.filename)
+                asset.download_to_path(name)
+                with open(name, 'rb') as din:
+                    content = din.read()
+                    md5_hash = hashlib.md5()
+                    md5_hash.update(content)
+                    self.assertEqual(asset.checksum, uuid.UUID(md5_hash.hexdigest()))
+                totals[asset.filename] += 1
+                os.remove(name)
+            self.assertEqual(4, totals['config.json'])
+            self.assertEqual(1, totals['model1.py'])
+
+        with self.subTest("test_list_assets_no_children"):
+            assets = self.platform._experiments.list_assets(e_p)
+            self.assertEqual(1, len(assets))
+            self.assertEqual('model1.py', assets[0].filename)
+
+        with self.subTest("test_list_assets_simulations"):
+            for sim in e_p.simulations:
+                assets = self.platform._simulations.list_assets(sim)
+                self.assertEqual(1, len(assets))
+                self.assertEqual('config.json', assets[0].filename)
+                content = assets[0].content
+                self.assertIsNotNone(content)
+                config = json.loads(content.decode('utf-8'))
+                for tag, value in sim.tags.items():
+                    if tag in ['a', 'b']:
+                        self.assertIn(tag, config)
+                        self.assertEqual(value, str(config[tag]))
 

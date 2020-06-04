@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Type, Any, List, Tuple, Dict, NoReturn, TYPE_CHECKING
 from uuid import UUID
+
+from idmtools.assets import Asset
 from idmtools.core import CacheEnabled
 from idmtools.entities.iplatform_ops.utils import batch_create_items
 from idmtools.entities.iworkflow_item import IWorkflowItem
@@ -245,12 +247,12 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
         pass
 
     @abstractmethod
-    def list_assets(self, workflow_item: IWorkflowItem, **kwargs) -> List[str]:
+    def list_assets(self, workflow_item: IWorkflowItem, **kwargs) -> List[Asset]:
         """
-        List files available  for workflow item
+        List available assets for a workflow item
 
         Args:
-            workflow_item: Workflow item
+            workflow_item: workflow item to list files for
 
         Returns:
             List of filenames

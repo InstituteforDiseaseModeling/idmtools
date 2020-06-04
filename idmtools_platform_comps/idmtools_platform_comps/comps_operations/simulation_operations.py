@@ -5,7 +5,7 @@ from typing import Any, List, Dict, Type, Optional, TYPE_CHECKING
 from uuid import UUID
 from COMPS.Data import Simulation as COMPSSimulation, QueryCriteria, Experiment as COMPSExperiment, SimulationFile, \
     Configuration
-from idmtools.assets import AssetCollection
+from idmtools.assets import AssetCollection, Asset
 from idmtools.core import ItemType
 from idmtools.core.task_factory import TaskFactory
 from idmtools.entities import CommandLine
@@ -81,7 +81,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             COMPSSimulation
         """
         columns = columns or ["id", "name", "experiment_id", "state"]
-        children = children if children is not None else ["tags", "configuration"]
+        children = children if children is not None else ["tags", "configuration", "files"]
         query_criteria = query_criteria or QueryCriteria().select(columns).select_children(children)
         return COMPSSimulation.get(
             id=simulation_id,
@@ -279,8 +279,8 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         else:
             obj.task = None
 
-        if load_task:
-            obj.assets = self.list_assets(obj)
+        if simulation.files:
+            obj.assets = self.platform._assets.to_entity(simulation.files)
         return obj
 
     def get_asset_collection_from_comps_simulation(self, simulation: COMPSSimulation) -> Optional[AssetCollection]:
@@ -370,30 +370,32 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         return get_asset_for_comps_item(self.platform, simulation, files, self.cache)
 
-    def list_assets(self, simulation: Simulation, non_assets: bool = False, **kwargs) -> AssetCollection:
+    def list_assets(self, simulation: Simulation, common_assets: bool = False, **kwargs) -> List[Asset]:
         """
         List assets for a simulation
 
         Args:
             simulation: Simulation to load data for
-            non_assets: Should we load non-asset files(ie Output, etc) files
+            common_assets: Should we load asset files
             **kwargs:
 
         Returns:
             AssetCollection
         """
         comps_sim: COMPSSimulation = simulation.get_platform_object(children=["files", "configuration"])
+        assets = []
         # load non comps objects
-        if non_assets:
-            return self.platform._assets.to_entity(comps_sim.files)
+        if comps_sim.files:
+            assets = self.platform._assets.to_entity(comps_sim.files).assets
 
-        # here we are loading the simulation assets
-        sa = self.get_asset_collection_from_comps_simulation(comps_sim)
-        if sa:
-            return sa
-        return AssetCollection()
+        if common_assets:
+            # here we are loading the simulation assets
+            sa = self.get_asset_collection_from_comps_simulation(comps_sim)
+            if sa:
+                assets.extend(sa.assets)
+        return assets
 
-    def all_files(self, simulation: Simulation, **kwargs) -> AssetCollection:
+    def all_files(self, simulation: Simulation, **kwargs) -> List[Asset]:
         """
         Returns all files for a specific simulation including experiments or non-assets
 
@@ -408,4 +410,4 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         ac.add_assets(self.list_assets(simulation, **kwargs))
         ac.add_assets(self.list_assets(simulation, non_assets=True))
         ac.add_assets(simulation.parent.assets)
-        return ac
+        return ac.assets

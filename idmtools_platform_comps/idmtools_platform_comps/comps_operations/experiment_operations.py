@@ -1,3 +1,4 @@
+import copy
 import os
 from dataclasses import dataclass, field
 from itertools import tee
@@ -6,7 +7,7 @@ from typing import List, Type, Generator, NoReturn, Optional, TYPE_CHECKING
 from uuid import UUID
 from COMPS.Data import Experiment as COMPSExperiment, QueryCriteria, Configuration, Suite as COMPSSuite, \
     Simulation as COMPSSimulation
-from idmtools.assets import AssetCollection
+from idmtools.assets import AssetCollection, Asset
 from idmtools.core import ItemType
 from idmtools.core.experiment_factory import experiment_factory
 from idmtools.core.logging import SUCCESS
@@ -216,7 +217,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             Simulations belonging to the Experiment
         """
         columns = columns or ["id", "name", "experiment_id", "state"]
-        children = children if children is not None else ["tags"]
+        children = children if children is not None else ["tags", "configuration", "files"]
 
         children = experiment.get_simulations(query_criteria=QueryCriteria().select(columns).select_children(children))
         return children
@@ -323,8 +324,18 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
 
         if children:
             # Convert all simulations
-            comps_sims = experiment.get_simulations()
-            obj.simulations = [self.platform._simulations.to_entity(s, parent=obj, **kwargs) for s in comps_sims]    # Cause recursive call...
+            comps_sims = experiment.get_simulations(
+                QueryCriteria().select(
+                    ["id", "name", "experiment_id", "state"]
+                ).select_children(
+                    ["tags", "files", "configuration"]
+                )
+            )
+            obj.simulations = []
+            for s in comps_sims:
+                obj.simulations.append(
+                    self.platform._simulations.to_entity(s, parent=obj, **kwargs)
+                )
 
         # Set parent
         obj.parent = suite
@@ -341,3 +352,14 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         if experiment.configuration and experiment.configuration.asset_collection_id:
             return self.platform.get_item(experiment.configuration.asset_collection_id, ItemType.ASSETCOLLECTION)
         return None
+
+    def platform_list_asset(self, experiment: Experiment, **kwargs) -> List[Asset]:
+        assets = []
+        if experiment.assets is None:
+            po: COMPSExperiment = experiment.get_platform_object()
+            ac = self.get_assets_from_comps_experiment(po)
+            if ac:
+                assets = ac.assets
+        else:
+            assets = copy.deepcopy(experiment.assets.assets)
+        return assets

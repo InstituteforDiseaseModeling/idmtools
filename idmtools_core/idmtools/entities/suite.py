@@ -88,32 +88,10 @@ class Suite(INamedEntity, ABC):
         Returns:
             None
         """
-        p = self.__check_for_platform_from_context(platform)
+        p = self._check_for_platform_from_context(platform)
         p.run_items(self, **run_opts)
         if wait_until_done:
             self.wait()
-
-    def __check_for_platform_from_context(self, platform) -> 'IPlatform':  # noqa: F821
-        """
-        Try to determine platform of current object from self or current platform
-
-        Args:
-            platform: Passed in platform object
-
-        Raises:
-            NoPlatformException: when no platform is on current context
-        Returns:
-            Platform object
-        """
-        if self.platform is None:
-            # check context for current platform
-            if platform is None:
-                from idmtools.core.context import current_platform
-                if current_platform is None:
-                    raise NoPlatformException("No Platform defined on object, in current context, or passed to run")
-                platform = current_platform
-            self.platform = platform
-        return self.platform
 
     def wait(self, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None):
         """
@@ -134,7 +112,7 @@ class Suite(INamedEntity, ABC):
             opts['timeout'] = timeout
         if refresh_interval:
             opts['refresh_interval'] = refresh_interval
-        p = self.__check_for_platform_from_context(platform)
+        p = self._check_for_platform_from_context(platform)
         p.wait_till_done_progress(self, **opts)
 
     def to_dict(self) -> Dict:

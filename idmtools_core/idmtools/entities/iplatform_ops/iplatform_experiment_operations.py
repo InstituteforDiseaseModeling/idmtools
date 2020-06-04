@@ -7,6 +7,7 @@ from types import GeneratorType
 from typing import Type, Any, NoReturn, Tuple, List, Dict, Iterator, Union, TYPE_CHECKING
 from uuid import UUID
 
+from idmtools.assets import Asset
 from idmtools.core.enums import EntityStatus, ItemType
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.utils import batch_create_items
@@ -267,23 +268,30 @@ class IPlatformExperimentOperations(ABC):
             ret[sim.uid] = self.platform._simulations.get_assets(sim, files, **kwargs)
         return ret
 
-    def list_assets(self, experiment: Experiment, **kwargs) -> Dict[str, List[str]]:
+    def list_assets(self, experiment: Experiment, children: bool = False,
+                    **kwargs) -> List[Asset]:
         """
-        List assets available for experiment
+        List available assets for a experiment
 
         Args:
-            experiment: Experiment to get assets for
+            experiment: Experiment to list files for
+            children: Should we load assets from children as well?
 
         Returns:
-            Dictionary of simulation and assets on each sim
+            List of Assets
         """
-        ret = {}
-        with ThreadPoolExecutor() as pool:
-            futures = dict()
-            for sim in experiment.simulations:
-                future = pool.submit(self.platform._simulations.list_assets, sim, **kwargs)
-                futures[future] = sim
+        ret = self.platform_list_asset(experiment, **kwargs)
+        if children:
+            with ThreadPoolExecutor() as pool:
+                futures = dict()
+                for sim in experiment.simulations:
+                    future = pool.submit(self.platform._simulations.list_assets, sim, **kwargs)
+                    futures[future] = sim
 
-            for future in as_completed(futures):
-                ret[futures[future]] = future.result()
+                for future in as_completed(futures):
+                    result = future.result()
+                    ret.extend(result)
         return ret
+
+    def platform_list_asset(self, experiment: Experiment, **kwargs) -> List[Asset]:
+        return []

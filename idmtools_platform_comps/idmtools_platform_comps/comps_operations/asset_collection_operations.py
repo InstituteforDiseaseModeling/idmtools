@@ -1,9 +1,12 @@
 from dataclasses import field, dataclass
+from functools import partial
 from typing import Type, Union, List, TYPE_CHECKING, Optional
 from uuid import UUID
 from COMPS.Data import AssetCollection as COMPSAssetCollection, QueryCriteria, AssetCollectionFile, SimulationFile
 from idmtools.assets import AssetCollection, Asset
 from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
+from idmtools_platform_comps.utils.general import get_file_as_generator
+
 if TYPE_CHECKING:
     from idmtools_platform_comps.comps_platform import COMPSPlatform
 
@@ -50,8 +53,11 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         assets = asset_collection.assets if isinstance(asset_collection, COMPSAssetCollection) else asset_collection
         # if we have just one, make it a list
         if isinstance(asset_collection, SimulationFile):
-            asset = Asset(filename=SimulationFile.file_name, checksum=SimulationFile.md5_checksum)
+            asset = Asset(filename=asset_collection.file_name, checksum=asset_collection.md5_checksum)
             asset.is_simulation_file = True
+            asset.length = asset_collection.length
+            if asset.uri:
+                asset.download_generator_hook = partial(get_file_as_generator, asset_collection)
             ac.add_asset(asset)
         if assets:
             # add items to asset collection
@@ -60,6 +66,9 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
                 if isinstance(asset_collection, COMPSAssetCollection):
                     a.relative_path = asset.relative_path
                 a.persisted = True
+                asset.length = asset_collection.length
+                if asset.uri:
+                    a.download_generator_hook = partial(get_file_as_generator, asset)
                 ac.assets.append(a)
 
         return ac

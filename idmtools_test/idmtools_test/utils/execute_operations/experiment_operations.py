@@ -6,6 +6,8 @@ from logging import getLogger, DEBUG
 from threading import Lock
 from typing import Any, List, Type, Dict, Union, TYPE_CHECKING
 from uuid import UUID, uuid4
+
+from idmtools.assets import Asset
 from idmtools.core import UnknownItemException, EntityStatus
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
@@ -60,7 +62,31 @@ class TestExecutePlatformExperimentOperation(IPlatformExperimentOperations):
             out.write(json.dumps(experiment.to_dict(), cls=IDMJSONEncoder))
         for sim in experiment.simulations:
             self.platform._simulations.run_item(sim)
-        self.platform._simulations.set_simulation_status(experiment.uid, EntityStatus.RUNNING)
+
+    def get_experiment_path(self, experiment: Experiment) -> str:
+        """
+        Get path to experiment directory
+        Args:
+            experiment:
+
+        Returns:
+
+        """
+        return os.path.join(self.platform.execute_directory, str(experiment.uid))
+
+    @staticmethod
+    def download_asset(path):
+        logger.info(f"Downloading asst from {path}")
+        if not os.path.exists(path):
+            logger.error(f"Cannot the asset {path}")
+            raise FileNotFoundError(f"Cannot the asset {path}")
+        with open(path, 'rb') as i:
+            while True:
+                res = i.read(128)
+                if res:
+                    yield res
+                else:
+                    break
 
     def send_assets(self, experiment: Experiment, **kwargs):
         path = os.path.join(self.platform.execute_directory, str(experiment.uid), "Assets")
@@ -78,7 +104,10 @@ class TestExecutePlatformExperimentOperation(IPlatformExperimentOperations):
                 if logger.isEnabledFor(DEBUG):
                     logger.debug(f"Writing {asset.absolute_path} to {remote_path}")
                 with open(remote_path, 'wb') as out:
-                    out.write(asset.content)
+                    if isinstance(asset.content, str):
+                        out.write(asset.content.encode('utf-8'))
+                    else:
+                        out.write(asset.content)
 
     def refresh_status(self, experiment: Experiment, **kwargs):
         if logger.isEnabledFor(DEBUG):
@@ -89,3 +118,30 @@ class TestExecutePlatformExperimentOperation(IPlatformExperimentOperations):
                     logger.debug(f'Setting {simulation.uid} Status to {simulation.status}')
                     esim.status = simulation.status
                     break
+
+    def list_assets(self, experiment: Experiment, children: bool = False,
+                    **kwargs) -> List[Asset]:
+        """
+        List assets for the experiment
+
+        Args:
+            experiment:
+            children:
+            **kwargs:
+
+        Returns:
+
+        """
+        logger.info("Listing assets for experiment")
+        assets = []
+        asset_path = os.path.join(self.get_experiment_path(experiment), "Assets")
+        for root, files, dirs in os.walk(asset_path):
+            for file in files:
+                fp = os.path.join(asset_path, file)
+                asset = Asset(absolute_path=fp, filename=file)
+                assets.append(asset)
+
+        if children:
+            for sim in experiment.simulations:
+                assets.extend(self.platform._simulations.list_assets(sim))
+        return assets

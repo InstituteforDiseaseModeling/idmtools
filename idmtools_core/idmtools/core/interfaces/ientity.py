@@ -101,5 +101,27 @@ class IEntity(IItem, metaclass=ABCMeta):
     def __hash__(self):
         return id(self.uid)
 
+    def _check_for_platform_from_context(self, platform) -> 'IPlatform':
+        """
+        Try to determine platform of current object from self or current platform
+
+        Args:
+            platform: Passed in platform object
+
+        Raises:
+            NoPlatformException: when no platform is on current context
+        Returns:
+            Platform object
+        """
+        if self.platform is None:
+            # check context for current platform
+            if platform is None:
+                from idmtools.core.context import current_platform
+                if current_platform is None:
+                    raise NoPlatformException("No Platform defined on object, in current context, or passed to run")
+                platform = current_platform
+            self.platform = platform
+        return self.platform
+
 
 IEntityList = List[IEntity]

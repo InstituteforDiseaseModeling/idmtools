@@ -60,11 +60,17 @@ class TestPythonExperiment(ITestWithPersistence):
         # ------------------------------------------------------
         # Sweeping parameters:
         # first way to sweep parameter 'a' is to use param_update function
-        builder.add_sweep_definition(setA, range(0, 2))
+        builder.add_sweep_definition(
+            JSONConfiguredPythonTask.set_parameter_partial("a"),
+            range(0, 2)
+        )
 
         # second way to sweep parameter 'b' is to use class setParam which basiclly doing same thing as param_update
         # method
-        builder.add_sweep_definition(setParam("b"), [i * i for i in range(1, 4, 2)])
+        builder.add_sweep_definition(
+            JSONConfiguredPythonTask.set_parameter_partial("b"),
+            [i * i for i in range(1, 4, 2)]
+        )
         # ------------------------------------------------------
 
         e.simulations.add_builder(builder)

@@ -3,10 +3,10 @@ import uuid
 from dataclasses import dataclass, field, InitVar, fields
 from logging import getLogger
 from types import GeneratorType
-from typing import NoReturn, Set, Union, Iterator, Type, Dict, Any, List, TYPE_CHECKING
-from idmtools.assets import AssetCollection
+from typing import NoReturn, Set, Union, Iterator, Type, Dict, Any, List, TYPE_CHECKING, Generator
+from idmtools.assets import AssetCollection, Asset
 from idmtools.builders import SimulationBuilder
-from idmtools.core import ItemType, NoPlatformException, EntityStatus
+from idmtools.core import ItemType, EntityStatus
 from idmtools.core.interfaces.entity_container import EntityContainer
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.core.interfaces.inamed_entity import INamedEntity
@@ -21,9 +21,15 @@ from idmtools.utils.entities import get_default_tags
 
 if TYPE_CHECKING:
     from idmtools.entities.iplatform import IPlatform
+    from idmtools.entities.simulation import Simulation
 
 logger = getLogger(__name__)
-SUPPORTED_SIM_TYPE = Union[EntityContainer, GeneratorType, TemplatedSimulations, Iterator]
+SUPPORTED_SIM_TYPE = Union[
+    EntityContainer,
+    Generator['Simulation', None, None],
+    TemplatedSimulations,
+    Iterator['Simulation']
+]
 
 
 @dataclass(repr=False)
@@ -131,7 +137,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
         return all([s.succeeded for s in self.simulations])
 
     @property
-    def simulations(self):
+    def simulations(self) -> Iterator['Simulation']:
         return ParentIterator(self.__simulations, parent=self)
 
     @simulations.setter
@@ -204,6 +210,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
 
         Args:
             task: Task to use
+            assets: Asset collection to use for common tasks. Defaults to gather assets from task
             name: Name of experiment
             tags:
             gather_common_assets_from_task: Whether we should attempt to gather assets from the Task object for the
@@ -291,8 +298,24 @@ class Experiment(IAssetsEnabled, INamedEntity):
         result._task_log = getLogger(__name__)
         return result
 
-    def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None,  # noqa: F821
-            **run_opts) -> NoReturn:
+    def list_static_assets(self, children: bool = False, platform: 'IPlatform' = None, **kwargs) -> List[Asset]:
+        """
+        List assets that have been uploaded to a server already
+
+        Args:
+            children: When set to true, simulation assets will be loaded as well
+            platform: Optional platform to load assets list from
+            **kwargs:
+
+        Returns:
+            List of assets
+        """
+        if self.id is None:
+            raise ValueError("You can only list static assets on an existing experiment")
+        p = super()._check_for_platform_from_context(platform)
+        return p._experiments.list_assets(self, children, **kwargs)
+
+    def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None, **run_opts) -> NoReturn:
         """
         Runs an experiment on a platform
 
@@ -304,35 +327,12 @@ class Experiment(IAssetsEnabled, INamedEntity):
         Returns:
             None
         """
-        p = self.__check_for_platform_from_context(platform)
+        p = super()._check_for_platform_from_context(platform)
         p.run_items(self, **run_opts)
         if wait_until_done:
             self.wait()
 
-    def __check_for_platform_from_context(self, platform) -> 'IPlatform':  # noqa: F821
-        """
-        Try to determine platform of current object from self or current platform
-
-        Args:
-            platform: Passed in platform object
-
-        Raises:
-            NoPlatformException: when no platform is on current context
-        Returns:
-            Platform object
-        """
-        if self.platform is None:
-            # check context for current platform
-            if platform is None:
-                from idmtools.core.context import current_platform
-                if current_platform is None:
-                    raise NoPlatformException("No Platform defined on object, in current context, or passed to run")
-                platform = current_platform
-            self.platform = platform
-        return self.platform
-
-    def wait(self, timeout: int = None, refresh_interval=None,
-             platform: 'IPlatform' = None):  # noqa: F821
+    def wait(self, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None):
         """
         Wait on an experiment to finish running
 
@@ -351,7 +351,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
             opts['timeout'] = timeout
         if refresh_interval:
             opts['refresh_interval'] = refresh_interval
-        p = self.__check_for_platform_from_context(platform)
+        p = super()._check_for_platform_from_context(platform)
         p.wait_till_done_progress(self, **opts)
 
     def to_dict(self):

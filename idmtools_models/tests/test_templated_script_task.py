@@ -1,9 +1,14 @@
 import os
+import sys
 from unittest import TestCase
 import pytest
+
+from idmtools.core.platform_factory import Platform
 from idmtools.entities.command_task import CommandTask
+from idmtools.entities.experiment import Experiment
 from idmtools_models.templated_script_task import TemplatedScriptTask, ScriptWrapperTask, \
     get_script_wrapper_windows_task
+from idmtools_test.utils.decorators import windows_only
 
 
 @pytest.mark.tasks
@@ -66,5 +71,33 @@ class TestTemplatedScriptTask(TestCase):
         asset = wrapper_task.common_assets.assets[0]
         self.assertEqual("wrapper.bat", asset.filename)
 
-        self.assertTrue(str(wrapper_task.command).startswith("Assets/wrapper.bat"))
+        self.assertTrue(str(wrapper_task.command).startswith("Assets\\wrapper.bat"))
         self.assertTrue(str(wrapper_task.command).endswith(cmd))
+
+    @pytest.mark.smoke
+    @windows_only
+    def test_wrapper_script_execute(self):
+        cmd = f"\"{sys.executable}\" -c \"import os; print(os.environ)\""
+        task = CommandTask(cmd)
+        template = """
+                set PYTHONPATH=%cd%\\Assets\\;%PYTHONPATH%
+                echo Hello
+                %*
+                """
+
+        with Platform("TestExecute", missing_ok=True, default_missing=dict(type='TestExecute')):
+            wrapper_task = get_script_wrapper_windows_task(task, template_content=template)
+            experiment = Experiment.from_task(wrapper_task)
+            experiment.run(wait_until_done=True)
+            self.assertTrue(experiment.succeeded)
+
+            for sim in experiment.simulations:
+                assets = sim.list_static_assets()
+                for asset in assets:
+                    if asset.filename in ["StdOut.txt"]:
+                        self.assertIn(f'{os.getcwd()}\\Assets\\;', asset.content.decode('utf-8').replace("\\\\", "\\"))
+
+
+    def test_wrapper_script_reload(self):
+        self.assertTrue(False)
+

@@ -2,12 +2,13 @@ import os
 from collections import defaultdict
 from dataclasses import dataclass
 from logging import getLogger, DEBUG
-from typing import Dict, List, Set, Union, Iterator
+from typing import Dict, List, Set, Union, Iterator, Optional
 from uuid import UUID
 
 from docker.models.containers import Container
 from tqdm import tqdm
 
+from idmtools.assets import Asset
 from idmtools.core import ItemType
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
@@ -199,8 +200,8 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
 
         # Retrieve the transient if any
         if transients:
-            sim_path = f'{simulation.parent_id}/{simulation.uid}'
-            transients_files = self._retrieve_output_files(job_id_path=sim_path, paths=transients)
+            transients_files = self._retrieve_output_files(
+                job_id_path=self.__get_simulation_path(simulation), paths=transients)
             ret = dict(zip(transients, transients_files))
 
         # Take care of the assets
@@ -211,7 +212,11 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
 
         return ret
 
-    def list_assets(self, simulation: Simulation, **kwargs) -> List[str]:
+    @staticmethod
+    def __get_simulation_path(simulation: Simulation) -> str:
+        return f'{simulation.parent_id}/{simulation.uid}'
+
+    def list_assets(self, simulation: Simulation, **kwargs) -> List[Asset]:
         """
         List assets for a sim
 
@@ -221,14 +226,38 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         Returns:
 
         """
-        raise NotImplementedError("List assets is not yet supported on the LocalPlatform")
+        assets = []
+        sim_path = self.__get_simulation_path(simulation)
+        full_path = os.path.join(self.platform.host_data_directory, 'workers', sim_path)
 
-    def to_entity(self, simulation: Dict, parent: Experiment = None, **kwargs) -> Simulation:
+        def download_file(filename, buffer_size: int = 128):
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f"Streaming file {filename}")
+            with open(filename, 'rb') as out:
+                while True:
+                    chunk = out.read(buffer_size)
+                    if chunk:
+                        yield chunk
+                    else:
+                        break
+        for root, dirs, files in os.walk(full_path, topdown=False):
+            for file in files:
+                fp = os.path.join(root, file)
+                asset = Asset(filename=file)
+                stat = os.stat(fp)
+                asset.__length = stat.st_size
+                asset.download_generator_hook = lambda: download_file(fp)
+                assets.append(asset)
+        return assets
+
+    def to_entity(self, simulation: Dict, load_task: bool = False, parent: Optional[Experiment] = None, **kwargs) -> \
+            Simulation:
         """
         Convert a sim dict object to an ISimulation
 
         Args:
             simulation: simulation to convert
+            load_task: Load Task Object as well. Can take much longer and have more data on platform
             parent: optional experiment object
             **kwargs:
 
@@ -290,6 +319,3 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
                 opts['content'] = asset.content
             items[remote_path].append(opts)
         return items
-
-    def all_files(self, simulation: Simulation, **kwargs):
-        raise NotImplementedError("Not Implemented")
