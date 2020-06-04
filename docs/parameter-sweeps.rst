@@ -2,7 +2,6 @@
 Parameter sweeps and model iteration
 ====================================
 
-
 In modeling, parameter sweeps are an important method for fine-tuning parameter values, exploring
 parameter space, and calibrating simulations to data. A parameter sweep is an iterative process
 in which simulations are run repeatedly using different values of the parameter(s) of choice. This
@@ -21,17 +20,13 @@ test the model over any range of parameter values, with any combination of param
 parameter sweeps are a simple method of model calibration, and there are more complex calibration
 algorithms available of |IT_s|.  See :doc:`calibrate` for more information on additional methods.
 
-
-
 .. contents:: Contents
    :local:
 
 Parameter sweeps for model calibration
 ======================================
 
-(more info)
 For more information on model calibration, see :doc:`calibrate`.
-
 
 Parameter sweeps and stochasticity
 ==================================
@@ -47,8 +42,6 @@ achieve  desired outcomes. Multiple iterations of a single set of parameter valu
 determine trends in simulation output: a single simulation output could provide results that are due
 to random chance.
 
-
-
 How to do parameter sweeps
 ==========================
 
@@ -57,7 +50,6 @@ your simulation parameters.
 
 The typical 'output' of |IT_s| is a config.json file for each created simulation, which contains
 the parameter values assigned: both the constant values and those being swept.
-
 
 Using builders
 --------------
@@ -81,7 +73,6 @@ For cross sweeping, let's say again you have parameters a, b, c and d, e, f that
 - c & f
 
 For Python models, we also support them using a JSONConfiguredPythonTask. In the future we will support additional configured tasks for Python and R models.
-
 
 Creating sweeps without builders
 --------------------------------
