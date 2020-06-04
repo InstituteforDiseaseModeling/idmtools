@@ -4,8 +4,9 @@ name: "Staging: idmtools-cli"
 
 on:
   push:
-    # only run this on
-    - dev
+    branches:
+      # only run this on
+      - dev
     paths:
       - 'idmtools_cli/**'
 
