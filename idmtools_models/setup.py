@@ -51,7 +51,7 @@ setup(
     entry_points=dict(idmtools_task=  # noqa E521
                       ["idmtools_task_python = idmtools_models.python.python_task:PythonTaskSpecification",
                        "idmtools_task_python_json = idmtools_models.python.json_python_task:JSONConfiguredPythonTaskSpecification",
-                       "idmtools_task_trmplated_script = idmtools_models.templated_script_task:TemplatedScriptTask",
+                       "idmtools_task_trmplated_script = idmtools_models.templated_script_task:TemplatedScriptTaskSpecification",
                        "idmtools_task_r = idmtools_models.r.r_task:RTaskSpecification",
                        "idmtools_task_r_json = idmtools_models.r.json_r_task:JSONConfiguredRTaskSpecification",
                        "idmtools_task_json = idmtools_models.json_configured_task:JSONConfiguredTaskSpecification"
