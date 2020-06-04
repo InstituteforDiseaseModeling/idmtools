@@ -26,7 +26,6 @@ class AddAnalyzer(IAnalyzer):
     Add Analyzer
     A simple base class to add analyzers.
     """
-
     def __init__(self):
         super().__init__(filenames=["output\\result.json"], parse=True)
 
