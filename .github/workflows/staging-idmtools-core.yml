@@ -4,6 +4,8 @@ name: "Staging: idmtools-core"
 
 on:
   push:
+    # only run this on
+    - dev
     paths:
       - 'idmtools_core/**'
 
