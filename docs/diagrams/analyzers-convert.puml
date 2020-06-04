@@ -1,0 +1,31 @@
+@startuml
+
+note top of BaseAnalyzer
+DTK-Tools
+end note
+
+class BaseAnalyzer {
+    initialize()
+    per_experiment()
+    filter()
+    select_simulation_data()
+    finalize()
+    destroy()
+}
+
+note top of IAnalyzer
+IDM-Tools
+end note
+
+class IAnalyzer {
+    initialize()
+    per_group()
+    filter()
+    map()
+    reduce()
+    destroy()
+}
+
+IAnalyzer -left[hidden]-> BaseAnalyzer
+
+@enduml

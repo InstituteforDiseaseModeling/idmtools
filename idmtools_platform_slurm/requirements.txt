@@ -1,3 +1,3 @@
-idmtools~=1.0.0
+idmtools~=1.1.0
 paramiko~=2.6.0
 dataclasses-json
