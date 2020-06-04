@@ -31,7 +31,7 @@ class Asset:
     relative_path: Optional[str] = field(default=None)
     filename: Optional[str] = field(default=None)
     content: Optional[Any] = field(default=None)
-    length: Optional[int] = field(default=None)
+    _length: Optional[int] = field(default=None)
     persisted: bool = field(default=False)
     handler: Callable = field(default=str)
     download_generator_hook: Callable = field(default=None)
@@ -79,13 +79,13 @@ class Asset:
 
     @property
     def length(self):
-        if self.length is None:
-            self.length = len(self.content)
+        if self._length is None:
+            self._length = len(self.content)
         return self.length
 
     @length.setter
-    def length(self, length):
-        self.length = length
+    def length(self, new_length):
+        self._length = new_length
 
     @property
     def content(self):

@@ -80,10 +80,11 @@ class TestExecutePlatform(IPlatform):
                                 refresh_interval: int = 5):
         for future in tqdm(as_completed(self.queue), total=len(self.queue)):
             result = future.result()
-            for sim in self._simulations.simulations[result[0]]:
-                if sim.id == result[1]:
-                    sim.status = result[2]
-                    break
+            if isinstance(item, Experiment):
+                for sim in item.simulations:
+                    if sim.id == result[1]:
+                        self._simulations.save_metadata(sim, update_data=dict(status=result[2]))
+                        break
         del self.queue
         self.queue = []
 

@@ -150,6 +150,8 @@ class Simulation(IAssetsEnabled, INamedEntity):
         for f in fields(self):
             if not f.name.startswith("_") and f.name not in ['parent']:
                 result[f.name] = getattr(self, f.name)
+        result['_uid'] = self.uid
+        result['task'] = self.task.to_dict() if self.task else None
         return result
 
 

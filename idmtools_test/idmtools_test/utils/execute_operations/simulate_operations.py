@@ -8,11 +8,14 @@ from dataclasses import dataclass, field
 from functools import partial
 from logging import getLogger, DEBUG
 from threading import Lock
-from typing import List, Dict, Any, Type, TYPE_CHECKING, Union
+from typing import List, Dict, Any, Type, TYPE_CHECKING, Optional
 from uuid import UUID, uuid4
-import numpy as np
-from idmtools.assets import Asset
+from idmtools.assets import Asset, AssetCollection
 from idmtools.core import EntityStatus
+from idmtools.core.task_factory import TaskFactory
+from idmtools.entities import CommandLine
+from idmtools.entities.command_task import CommandTask
+from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
 from idmtools.entities.simulation import Simulation
 from idmtools.utils.file import file_contents_to_generator
@@ -26,6 +29,10 @@ data_path = os.path.abspath(os.path.join(current_directory, "..", "..", "data"))
 
 logger = getLogger(__name__)
 SIMULATION_LOCK = Lock()
+
+class SimulationDict(dict):
+    pass
+
 
 
 def run_simulation(simulation_id: Simulation, command: str, parent_uid: UUID, execute_directory):
@@ -72,43 +79,26 @@ def run_simulation(simulation_id: Simulation, command: str, parent_uid: UUID, ex
 @dataclass
 class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
     platform: 'TestExecutePlatform'
+    platform_type: Type = SimulationDict
 
-    def all_files(self, simulation: Simulation, **kwargs):
-        pass
-
-    platform_type: Type = Simulation
-    simulations: dict = field(default_factory=dict, compare=False, metadata={"pickle_ignore": True})
-
-    def get(self, simulation_id: UUID, **kwargs) -> Any:
-        obj = None
-        for eid in self.simulations:
-            sims = self.simulations.get(eid)
-            if sims:
-                for sim in self.simulations.get(eid):
-                    if sim.uid == simulation_id:
-                        obj = sim
-                        break
-            if obj:
-                break
-        obj.platform = self.platform
-        return obj
+    def get(self, simulation_id: UUID, experiment_id: UUID = None, **kwargs) -> Any:
+        if simulation_id and experiment_id:
+            exp_path = os.path.join(self.platform.execute_directory, str(experiment_id))
+            sim_path = os.path.join(exp_path, str(simulation_id))
+            metadata_src = os.path.join(sim_path, "simulation_metadata.json")
+            if not os.path.exists(metadata_src):
+                logger.error("Cannot find the simulation at {metadata}")
+                raise ValueError(f"Cannot find the simulation at {metadata_src}")
+            with open(metadata_src, 'r') as metadata_in:
+                metadata = json.load(metadata_in)
+                return SimulationDict(metadata)
 
     def platform_create(self, simulation: Simulation, **kwargs) -> Simulation:
         simulation.platform = self
         experiment_id = simulation.parent_id
         simulation.uid = uuid4()
-
-        self._save_simulations_to_cache(experiment_id, [simulation])
+        self.save_metadata(simulation)
         return simulation
-
-    def _save_simulations_to_cache(self, experiment_id, simulations: List[Simulation], overwrite: bool = False):
-        if logger.isEnabledFor(DEBUG):
-            logger.debug(f'Saving {len(simulations)} to Experiment {experiment_id}')
-        SIMULATION_LOCK.acquire()
-        existing_simulations = [] if overwrite else self.simulations.pop(experiment_id)
-        self.simulations[experiment_id] = existing_simulations + simulations
-        SIMULATION_LOCK.release()
-        logger.debug(f'Saved sims')
 
     def batch_create(self, sims: List[Simulation], **kwargs) -> List[Simulation]:
 
@@ -119,17 +109,25 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
                 self.pre_create(simulation)
                 experiment_id = simulation.parent_id
                 simulation.uid = uuid4()
-                exp_path = os.path.join(self.platform.execute_directory, str(experiment_id))
-                sim_path = os.path.join(exp_path, str(simulation.id))
-                os.makedirs(sim_path, exist_ok=True)
-                with open(os.path.join(sim_path, "simulation_metadata.json"), 'w') as out:
-                    out.write(json.dumps(simulation.to_dict(), cls=IDMJSONEncoder))
+                self.save_metadata(simulation)
                 self.post_create(simulation)
                 simulations.append(simulation)
-
-        if experiment_id:
-            self._save_simulations_to_cache(experiment_id, simulations)
         return simulations
+
+    def save_metadata(self, simulation: Simulation, update_data: dict = None):
+        exp_path = os.path.join(self.platform.execute_directory, str(simulation.parent_id))
+        sim_path = os.path.join(exp_path, str(simulation.id))
+        metadata_file = os.path.join(sim_path, "simulation_metadata.json")
+        os.makedirs(sim_path, exist_ok=True)
+        if update_data and os.path.exists(metadata_file):
+            with open(metadata_file, 'r') as metadata_src:
+                metadata = json.load(metadata_src)
+                metadata.update(update_data)
+        else:
+            metadata = simulation.to_dict()
+
+        with open(metadata_file, 'w') as out:
+            out.write(json.dumps(metadata, cls=IDMJSONEncoder))
 
     def get_parent(self, simulation: Any, **kwargs) -> Any:
         return self.platform._experiments.experiments.get(simulation.parent_id)
@@ -156,13 +154,6 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
             simulation.parent.uid,
             self.platform.execute_directory
         )
-        sims = self.simulations[simulation.parent.uid]
-
-        for i, sim in enumerate(sims):
-            if sim.id == simulation.id:
-                sims[i] = simulation
-                self._save_simulations_to_cache(simulation.parent.uid, sims)
-                break
         self.platform.queue.append(future)
 
     def send_assets(self, simulation: Any, **kwargs):
@@ -177,7 +168,7 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
         Returns:
 
         """
-        exp_path = self.platform._experiments.get_experiment_path(simulation.parent)
+        exp_path = self.platform._experiments.get_experiment_path(simulation.parent.uid)
         sim_path = self.get_simulation_asset_path(simulation, experiment_path=exp_path)
         logger.info(f"Creating {exp_path}")
         os.makedirs(sim_path, exist_ok=True)
@@ -196,7 +187,7 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
             Str path to assets
         """
         if experiment_path is None:
-            experiment_path = self.platform._experiments.get_experiment_path(simulation.parent)
+            experiment_path = self.platform._experiments.get_experiment_path(simulation.parent.uid)
         return os.path.join(experiment_path, str(simulation.id))
 
     @staticmethod
@@ -291,6 +282,51 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
                 asset.download_generator_hook = partial(file_contents_to_generator, fp)
                 assets.append(asset)
         return assets
+
+    def to_entity(self, dict_sim: Dict, load_task: bool = False, parent: Optional[Experiment] = None,
+                  **kwargs) -> Simulation:
+        sim: Simulation = Simulation(**{k: v for k, v in dict_sim.items() if k not in ['platform_id', 'item_type']})
+        sim.platform = self.platform
+        if parent:
+            sim.parent = parent
+        sim_path = self.get_simulation_asset_path(sim)
+
+        sim.task = None
+        if dict_sim['assets']:
+            ac = AssetCollection()
+            for dict_asset in dict_sim['assets']:
+                asset = Asset(**dict_asset)
+                asset.absolute_path = os.path.join(sim_path, asset.filename)
+                asset.persisted = True
+                asset.download_generator_hook = partial(file_contents_to_generator, asset.absolute_path)
+                ac.add_asset(asset)
+            sim.assets = ac
+        if load_task:
+            if dict_sim['tags'] and 'task_type' in dict_sim['tags']:
+                try:
+                    sim.task = TaskFactory().create(dict_sim['tags']['task_type'])
+                except Exception as e:
+                    logger.exception(e)
+
+            cli = self._detect_command_line_from_simulation(dict_sim)
+            # if we could not find task, set it now, otherwise rebuild the cli
+            if sim.task is None:
+                sim.task = CommandTask(CommandLine(cli))
+            else:
+                sim.task.command = CommandLine(cli)
+            # call task load options(load configs from files, etc)
+            sim.task.reload_from_simulation(sim)
+
+        # load assets
+        return sim
+
+
+
+    def _detect_command_line_from_simulation(self, dict_sim):
+        if 'task' in dict_sim and 'command' in dict_sim['task']:
+            return dict_sim['task']['command']
+        return ''
+
 
 
 

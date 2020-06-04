@@ -1,10 +1,11 @@
 from logging import getLogger
-from typing import NoReturn
+from typing import NoReturn, Type
 
 from idmtools.entities.itask import ITask
 from idmtools.registry.task_specification import TaskSpecification
 
 logger = getLogger(__name__)
+TASK_BUILDERS = None
 
 
 class DynamicTaskSpecification(TaskSpecification):
@@ -12,15 +13,18 @@ class DynamicTaskSpecification(TaskSpecification):
     This class allows users to quickly define a spec for special tasks
     """
 
-    def __init__(self, task_type: ITask, description: str = ''):
+    def __init__(self, task_type: Type[ITask], description: str = ''):
         self.task_type = task_type
         self.description = description
 
     def get(self, configuration: dict) -> ITask:
-        return self.task_type
+        return self.task_type(**configuration)
 
     def get_description(self) -> str:
         return self.description
+
+    def get_type(self) -> Type[ITask]:
+        return self.task_type
 
 
 class TaskFactory:
@@ -28,8 +32,11 @@ class TaskFactory:
     DEFAULT_KEY = 'idmtools.entities.command_task.CommandTask'
 
     def __init__(self):
-        from idmtools.registry.task_specification import TaskPlugins
-        self._builders = TaskPlugins().get_plugin_map()
+        global TASK_BUILDERS
+        if TASK_BUILDERS is None:
+            from idmtools.registry.task_specification import TaskPlugins
+            TASK_BUILDERS = TaskPlugins().get_plugin_map()
+        self._builders = TASK_BUILDERS
         aliases = dict()
         # register types as full paths as well
         for model, spec in self._builders.items():
@@ -56,7 +63,7 @@ class TaskFactory:
         self._builders[type_name] = spec
         self._builders[f'{module_name}.{type_name}'] = spec
 
-    def register_task(self, task: ITask) -> NoReturn:
+    def register_task(self, task: Type[ITask]) -> NoReturn:
         """
         Dynamically register a class using the DynamicTaskSpecification
 

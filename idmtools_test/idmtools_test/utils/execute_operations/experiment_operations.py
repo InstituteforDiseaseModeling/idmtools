@@ -4,11 +4,11 @@ import shutil
 from dataclasses import field, dataclass
 from logging import getLogger, DEBUG
 from threading import Lock
-from typing import Any, List, Type, Dict, Union, TYPE_CHECKING
+from typing import Any, List, Type, Dict, Union, TYPE_CHECKING, Optional
 from uuid import UUID, uuid4
 
 from idmtools.assets import Asset
-from idmtools.core import UnknownItemException, EntityStatus
+from idmtools.core import UnknownItemException, EntityStatus, ItemType
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
 from idmtools.utils.json import IDMJSONEncoder
@@ -22,18 +22,27 @@ data_path = os.path.abspath(os.path.join(current_directory, "..", "..", "data"))
 EXPERIMENTS_LOCK = Lock()
 
 
+class ExperimentDict(dict):
+    pass
+
+
 @dataclass
 class TestExecutePlatformExperimentOperation(IPlatformExperimentOperations):
     platform: 'TestExecutePlatform'
-    platform_type: Type = field(default=Experiment)
+    platform_type: Type = field(default=ExperimentDict)
     experiments: Dict[str, Experiment] = field(default_factory=dict, compare=False, metadata={"pickle_ignore": True})
 
     def get(self, experiment_id: Union[str, UUID], **kwargs) -> Any:
-        e = self.experiments.get(experiment_id if isinstance(experiment_id, UUID) else UUID(experiment_id))
-        if e is None:
-            raise UnknownItemException(f"Cannot find the experiment with the ID of: {experiment_id}")
-        e.platform = self.platform
-        return e
+        exp_path = self.get_experiment_path(experiment_id)
+        path = os.path.join(exp_path, "experiment.json")
+        if not os.path.exists(path):
+            logger.error(f"Cannot find experiment with id {experiment_id}")
+            raise FileNotFoundError(f"Cannot find experiment with id {experiment_id}")
+
+        logger.info(f"Loading experiment metadata from {path}")
+        with open(path, 'r') as metadata_in:
+            metadata = json.load(metadata_in)
+            return ExperimentDict(metadata)
 
     def platform_create(self, experiment: Experiment, **kwargs) -> Any:
         if logger.isEnabledFor(DEBUG):
@@ -43,19 +52,26 @@ class TestExecutePlatformExperimentOperation(IPlatformExperimentOperations):
         EXPERIMENTS_LOCK.acquire()
         self.experiments[uid] = experiment
         EXPERIMENTS_LOCK.release()
-        self.platform._simulations._save_simulations_to_cache(uid, list(), overwrite=True)
         logger.debug(f"Created Experiment {experiment.uid}")
         self.send_assets(experiment, **kwargs)
         return experiment
 
-    def get_children(self, experiment: Any, **kwargs) -> List[Any]:
-        return self.platform._simulations.simulations.get(experiment.uid)
+    def get_children(self, experiment: ExperimentDict, **kwargs) -> List[Any]:
+        children = []
+        for sim in experiment['simulations']:
+            children.append(self.platform.get_item(sim, ItemType.SIMULATION,
+                                                   experiment_id=experiment['_uid'],
+                                                   raw=True,
+                                                   **kwargs
+                                                   )
+                            )
+        return children
 
     def get_parent(self, experiment: Any, **kwargs) -> Experiment:
         pass
 
     def platform_run_item(self, experiment: Experiment, **kwargs):
-        exp_path = os.path.join(self.platform.execute_directory, str(experiment.uid))
+        exp_path = self.get_experiment_path(experiment.uid)
         path = os.path.join(exp_path, "experiment.json")
         os.makedirs(exp_path, exist_ok=True)
         with open(path, 'w') as out:
@@ -63,16 +79,17 @@ class TestExecutePlatformExperimentOperation(IPlatformExperimentOperations):
         for sim in experiment.simulations:
             self.platform._simulations.run_item(sim)
 
-    def get_experiment_path(self, experiment: Experiment) -> str:
+    def get_experiment_path(self, experiment_id: Union[UUID, str]) -> str:
         """
         Get path to experiment directory
+
         Args:
-            experiment:
+            experiment_id:
 
         Returns:
 
         """
-        return os.path.join(self.platform.execute_directory, str(experiment.uid))
+        return os.path.join(self.platform.execute_directory, str(experiment_id))
 
     @staticmethod
     def download_asset(path):
@@ -134,7 +151,7 @@ class TestExecutePlatformExperimentOperation(IPlatformExperimentOperations):
         """
         logger.info("Listing assets for experiment")
         assets = []
-        asset_path = os.path.join(self.get_experiment_path(experiment), "Assets")
+        asset_path = os.path.join(self.get_experiment_path(experiment.uid), "Assets")
         for root, files, dirs in os.walk(asset_path):
             for file in files:
                 fp = os.path.join(asset_path, file)
@@ -145,3 +162,18 @@ class TestExecutePlatformExperimentOperation(IPlatformExperimentOperations):
             for sim in experiment.simulations:
                 assets.extend(self.platform._simulations.list_assets(sim))
         return assets
+
+    def to_entity(self, data: Dict[Any, Any], parent: Optional[Any] = None, children: bool = True, **kwargs) -> \
+            Experiment:
+        excluded = ['platform_id', 'item_type', 'frozen', 'simulations']
+        experiment = Experiment(**{k: v for k, v in data.items() if k not in excluded})
+        experiment.platform_metadata = data
+        if children:
+            experiment.simulations = self.platform.get_children(
+                experiment.uid,
+                ItemType.EXPERIMENT,
+                item=experiment,
+                **kwargs
+            )
+
+        return experiment

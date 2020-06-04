@@ -118,4 +118,5 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, ABC):
         for f in fields(self):
             if not f.name.startswith("_") and f.name not in ['parent']:
                 result[f.name] = getattr(self, f.name)
+        result['_uid'] = self.uid
         return result

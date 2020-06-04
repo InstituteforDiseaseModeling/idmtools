@@ -149,6 +149,9 @@ class JSONConfiguredTask(ITask):
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f'Loading Config from {simulation.id}:{cfn}')
             config = simulation.platform.get_files(simulation, cfn)
+            config = config[cfn]
+            if isinstance(config, bytes):
+                config = json.loads(config.decode('utf-8'))
 
             self.parameters = config
             if envelope and envelope in self.parameters:
@@ -157,6 +160,13 @@ class JSONConfiguredTask(ITask):
                 self.parameters = self.parameters[simulation.tags['task_envelope']]
             elif self.envelope and self.envelope in self.parameters:
                 self.parameters = self.parameters[self.envelope]
+
+            new_assets = []
+            # filter our config from the simulation
+            for i, asset in enumerate(simulation.assets.assets):
+                if asset.filename != cfn:
+                    new_assets.append(asset)
+            simulation.assets.assets = new_assets
 
     def pre_creation(self, parent: Union['Simulation', 'WorkflowItem']):  # noqa: F821
         defaults = [x for x in fields(JSONConfiguredTask) if x.name == "config_file_name"][0].default

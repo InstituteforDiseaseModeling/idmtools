@@ -2,7 +2,7 @@ from typing import NoReturn, Type, TYPE_CHECKING, Dict
 from abc import ABC
 from dataclasses import dataclass, field, fields
 from idmtools.core.interfaces.inamed_entity import INamedEntity
-from idmtools.core import ItemType, EntityContainer, NoPlatformException, EntityStatus
+from idmtools.core import ItemType, EntityContainer, EntityStatus
 
 if TYPE_CHECKING:
     from idmtools.entities.iplatform import IPlatform
@@ -82,7 +82,8 @@ class Suite(INamedEntity, ABC):
 
         Args:
             wait_until_done: Whether we should wait on experiment to finish running as well. Defaults to False
-            platform: Platform object to use. If not specified, we first check object for platform object then the current context
+            platform: Platform object to use. If not specified, we first check object for platform object then the
+            current context
             **run_opts: Options to pass to the platform
 
         Returns:
@@ -120,6 +121,7 @@ class Suite(INamedEntity, ABC):
         for f in fields(self):
             if not f.name.startswith("_") and f.name not in ['parent']:
                 result[f.name] = getattr(self, f.name)
+        result['_uid'] = self.uid
         return result
 
 

@@ -13,14 +13,12 @@ user_logger = getLogger('user')
 
 @contextmanager
 def platform(*args, **kwds):
-    global current_platform, current_platform_stack
     logger.debug(f'Acquiring platform context with options: {str(*args)}')
     try:
         # check if we are already in a platform context and if so add to stack
-        platform = Platform(*args, **kwds)
-        set_current_platform(platform)
-        current_platform = Platform(*args, **kwds)
-        yield current_platform
+        pl = Platform(*args, **kwds)
+        set_current_platform(pl)
+        yield pl
     finally:
         # Code to release resource, e.g.:
         logger.debug('Un-setting current platform context')

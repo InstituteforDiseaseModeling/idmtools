@@ -279,7 +279,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         raise ValueError(f"{self.__class__.__name__} has no mapping for {item.__class__.__name__}")
 
     def get_children(self, item_id: UUID, item_type: ItemType,
-                     force: bool = False, raw: bool = False, **kwargs) -> Any:
+                     force: bool = False, raw: bool = False, item: Any = None, **kwargs) -> Any:
         """
         Retrieve the children of a given object.
 
@@ -288,6 +288,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             force: If True, force the object fetching from the platform.
             raw: Return either an |IT_s| object or a platform object.
             item_type: Pass the type of the object for quicker retrieval.
+            item: optional platform or idm item to use instead of loading
 
         Returns:
             The children of the object or None.
@@ -298,7 +299,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             self.cache.delete(cache_key)
 
         if cache_key not in self.cache:
-            ce = self.get_item(item_id, raw=raw, item_type=item_type)
+            ce = item or self.get_item(item_id, raw=raw, item_type=item_type)
             ce.platform = self
             kwargs['parent'] = ce
             children = self._get_children_for_platform_item(ce.get_platform_object(), raw=raw, **kwargs)
