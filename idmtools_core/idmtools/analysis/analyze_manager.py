@@ -10,12 +10,14 @@ from idmtools.core import NoPlatformException
 from idmtools.core.cache_enabled import CacheEnabled
 from idmtools.core.enums import EntityStatus, ItemType
 from idmtools.core.interfaces.ientity import IEntity
+from idmtools.core.logging import VERBOSE
 from idmtools.entities.ianalyzer import IAnalyzer
 from idmtools.entities.iplatform import IPlatform
 from idmtools.utils.command_line import animation
 from idmtools.utils.language import on_off, verbose_timedelta
 
 logger = getLogger(__name__)
+user_logger = getLogger('user')
 
 
 def pool_worker_initializer(func, analyzers, cache, platform: IPlatform) -> NoReturn:
@@ -134,7 +136,7 @@ class AnalyzeManager(CacheEnabled):
         if self.platform is None:
             # check context for current platform
             if platform is None:
-                from idmtools.core.platform_factory import current_platform
+                from idmtools.core.context import current_platform
                 if current_platform is None:
                     raise NoPlatformException("No Platform defined on object, in current context, or passed to run")
                 platform = current_platform
@@ -248,7 +250,7 @@ class AnalyzeManager(CacheEnabled):
         if exception:
             if logger.isEnabledFor(DEBUG):
                 logger.debug(exception)
-            print('\n' + exception)
+            user_logger.error('\n' + exception)
             sys.stdout.flush()
             ex = True
         else:
@@ -267,18 +269,17 @@ class AnalyzeManager(CacheEnabled):
             None
         """
         n_ignored_items = len(self.potential_items) - n_items
-        print('Analyze Manager')
-        print(' | {} item(s) selected for analysis'.format(n_items))
-        print(' | partial_analyze_ok is {}, max_items is {}, and {} item(s) are being ignored'
-              .format(on_off(self.partial_analyze_ok), self.max_items_to_analyze, n_ignored_items))
-        print(' | Analyzer(s): ')
+        user_logger.log(VERBOSE, 'Analyze Manager')
+        user_logger.log(VERBOSE, f' | {n_items} item(s) selected for analysis')
+        user_logger.log(VERBOSE, f' | partial_analyze_ok is {self.partial_analyze_ok}, max_items is '
+                                 f'{self.max_items_to_analyze}, and {n_ignored_items} item(s) are being ignored')
+        user_logger.info(' | Analyzer(s): ')
         for analyzer in self.analyzers:
-            print(' |  - {} File parsing: {} / Use cache: {})'
-                  .format(analyzer.uid, on_off(analyzer.parse),
-                          on_off(hasattr(analyzer, 'cache'))))
+            user_logger.log(VERBOSE, f' |  - {analyzer.uid} File parsing: {on_off(analyzer.parse)} / Use '
+                                     f'cache: {on_off(hasattr(analyzer, "cache"))}')
             if hasattr(analyzer, 'need_dir_map'):
-                print(' | (Directory map: {}' % on_off(analyzer.need_dir_map))
-        print(' | Pool of {} analyzing process(es)'.format(n_processes))
+                user_logger.log(VERBOSE, ' | (Directory map: {}' % on_off(analyzer.need_dir_map))
+        user_logger.log(VERBOSE, f' | Pool of {n_processes} analyzing process(es)')
 
     def _run_and_wait_for_mapping(self, worker_pool: Pool, start_time: float) -> bool:
         """
@@ -375,18 +376,18 @@ class AnalyzeManager(CacheEnabled):
         # If no analyzers or simulations have been provided, there is nothing to do
 
         if len(self.analyzers) == 0:
-            print('No analyzers were provided; cannot run analysis.')
+            user_logger.error('No analyzers were provided; cannot run analysis.')
             return False
         self._initialize_analyzers()
 
         if len(self.potential_items) == 0:
-            print('No items were provided; cannot run analysis.')
+            user_logger.error('No items were provided; cannot run analysis.')
             return False
         # trim processing to those items that are ready and match requested limits
         self._items: Dict[UUID, IEntity] = self._get_items_to_analyze()
 
         if len(self._items) == 0:
-            print('No items are ready; cannot run analysis.')
+            user_logger.error('No items are ready; cannot run analysis.')
             return False
 
         # initialize mapping results cache/storage
@@ -431,6 +432,7 @@ class AnalyzeManager(CacheEnabled):
         if self.verbose:
             total_time = time.time() - start_time
             time_str = verbose_timedelta(total_time)
-            print('\r | Analysis complete. Took {} (~ {:.3f} per item)'.format(time_str, total_time / n_items))
+            user_logger.info(
+                '\r | Analysis complete. Took {} (~ {:.3f} per item)'.format(time_str, total_time / n_items))
 
         return True

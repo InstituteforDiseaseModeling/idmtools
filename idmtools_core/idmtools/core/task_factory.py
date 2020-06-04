@@ -36,7 +36,7 @@ class TaskFactory:
             try:
                 aliases[f'{spec.get_type().__module__}.{spec.get_type().__name__}'] = spec
             except Exception as e:
-                logger.warn(f"Could not load spec for {spec}")
+                logger.warning(f"Could not load alias for {spec}")
                 logger.exception(e)
         self._builders.update(aliases)
 

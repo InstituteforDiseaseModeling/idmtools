@@ -6,11 +6,14 @@ from logging.handlers import QueueHandler, QueueListener, RotatingFileHandler
 from multiprocessing import Queue
 from signal import SIGINT, signal, SIGTERM
 from typing import NoReturn, Union
-
 import coloredlogs as coloredlogs
 
 listener = None
 logging_queue = None
+
+VERBOSE = 15
+SUCCESS = 35
+CRITICAL = 50
 
 
 class IDMQueueListener(QueueListener):
@@ -90,12 +93,15 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
         # set root the use send log messages to a queue by default
         queue_handler = IDMQueueHandler(logging_queue)
         root.addHandler(queue_handler)
+        logging.addLevelName(15, 'VERBOSE')
+        logging.addLevelName(35, 'SUCCESS')
+        logging.addLevelName(50, 'CRITICAL')
 
         if console:
             coloredlogs.install(level=level)
         else:
             # install colored logs for user logger only
-            coloredlogs.install(logger=getLogger('user'), level=logging.INFO, fmt='%(asctime)s.%(msecs)d: %(message)s')
+            coloredlogs.install(logger=getLogger('user'), level=logging.INFO, fmt='%(message)s')
 
         # see https://docs.python.org/3/library/logging.handlers.html#queuelistener
         # setup file logger handler that rotates after 10 mb of logging and keeps 5 copies

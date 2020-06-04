@@ -16,11 +16,13 @@ def validate_output(self, exp_id, expected_sim_count):
     self.assertEqual(sim_count, expected_sim_count)
 
 
-def validate_sim_tags(self, exp_id, expected_tags):
+def validate_sim_tags(self, exp_id, expected_tags, task_type):
     tags = []
     for simulation in COMPSExperiment.get(exp_id).get_simulations():
         tags.append(simulation.get(simulation.id, QueryCriteria().select_children('tags')).tags)
 
     sorted_tags = sorted(tags, key=itemgetter('a'))
+    for tag_list in expected_tags:
+        tag_list['task_type'] = task_type
     sorted_expected_tags = sorted(expected_tags, key=itemgetter('a'))
     self.assertEqual(sorted_tags, sorted_expected_tags)

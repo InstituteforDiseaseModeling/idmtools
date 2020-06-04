@@ -7,7 +7,6 @@ from itertools import groupby
 from logging import getLogger, DEBUG
 from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set, Iterator
 from uuid import UUID
-
 from idmtools.core import CacheEnabled, UnknownItemException, EntityContainer, UnsupportedPlatformType
 from idmtools.core.enums import ItemType, EntityStatus
 from idmtools.core.interfaces.ientity import IEntity
@@ -29,6 +28,7 @@ from idmtools.utils.entities import validate_user_inputs_against_dataclass
 from tqdm import tqdm
 
 logger = getLogger(__name__)
+user_logger = getLogger('user')
 
 CALLER_LIST = ['_create_from_block',    # create platform through Platform Factory
                'fetch',                 # create platform through un-pickle
@@ -197,10 +197,14 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         # If force -> delete in the cache
         if force:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f"Removing {cache_key} from cache")
             self.cache.delete(cache_key)
 
         # If we cannot find the object in the cache -> retrieve depending on the type
         if cache_key not in self.cache:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f"Retrieve item {item_id} of type {item_type}")
             ce = self._get_platform_item(item_id, item_type, **kwargs)
 
             # Nothing was found on the platform
@@ -537,7 +541,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         if output:
             if item.item_type not in (ItemType.SIMULATION, ItemType.WORKFLOW_ITEM):
-                print("Currently 'output' only supports Simulation and WorkItem!")
+                user_logger.info("Currently 'output' only supports Simulation and WorkItem!")
             else:
                 for ofi, ofc in ret.items():
                     file_path = os.path.join(output, str(item.uid), ofi)
@@ -646,6 +650,14 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
         return getattr(self, interface).get_related_items(item, relation_type)
+
+    def __enter__(self):
+        from idmtools.core.context import set_current_platform
+        set_current_platform(self)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        from idmtools.core.context import remove_current_platform
+        remove_current_platform()
 
 
 TPlatform = TypeVar("TPlatform", bound=IPlatform)

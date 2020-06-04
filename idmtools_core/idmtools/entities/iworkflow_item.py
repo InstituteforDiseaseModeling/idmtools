@@ -1,12 +1,13 @@
 from abc import ABC
-from dataclasses import dataclass, field
-from typing import NoReturn, Dict, Any
+from dataclasses import dataclass, field, fields
+from typing import NoReturn, Dict, Any, TYPE_CHECKING
 from uuid import UUID
-
 from idmtools.assets.file_list import FileList
 from idmtools.core import ItemType
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.core.interfaces.inamed_entity import INamedEntity
+if TYPE_CHECKING:
+    from idmtools.entities.iplatform import IPlatform
 
 
 @dataclass
@@ -69,7 +70,7 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, ABC):
         self.user_files.files = [f for f in self.user_files.files if f.filename.lower() not in files_to_be_removed]
 
     def __check_for_platform(self, platform: 'IPlatform'):  # noqa: F821
-        from idmtools.core.platform_factory import current_platform
+        from idmtools.core.context import current_platform
         if platform is not None:
             self.platform = platform
         if self.platform is None:
@@ -111,3 +112,10 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, ABC):
             self.platform.wait_till_done_progress(self)
         else:
             self.platform.wait_till_done(self)
+
+    def to_dict(self) -> Dict:
+        result = dict()
+        for f in fields(self):
+            if not f.name.startswith("_") and f.name not in ['parent']:
+                result[f.name] = getattr(self, f.name)
+        return result

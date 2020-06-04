@@ -25,10 +25,17 @@ class TestExperimentFactory(ITestWithPersistence):
 
         self.assertEqual(len(experiment.simulations), 2)
         self.assertEqual(experiment.assets.assets[0].filename, "working_model.py")
-        tag_value = "idmtools_models.python.json_python_task.JSONConfiguredPythonTask"
-        self.assertEqual(experiment.simulations[0].tags, {'p': 0, 'task_type': tag_value})
-        self.assertEqual(experiment.simulations[1].tags, {'p': 1, 'task_type': tag_value})
-
+        self.assertEqual(
+            experiment.simulations[0].tags,
+            {
+                'p': 0,
+                'task_type': 'idmtools_models.python.json_python_task.JSONConfiguredPythonTask'
+            }
+        )
+        self.assertEqual(experiment.simulations[1].tags, {
+                'p': 1,
+                'task_type': 'idmtools_models.python.json_python_task.JSONConfiguredPythonTask'
+            })
         test_platform.cleanup()
 
     def test_add_asset_collection_to_experiment(self):

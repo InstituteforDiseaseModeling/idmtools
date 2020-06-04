@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Type, Any, List, Tuple, Dict, NoReturn
+from typing import Type, Any, List, Tuple, Dict, NoReturn, TYPE_CHECKING
 from uuid import UUID
-
 from idmtools.core import CacheEnabled
 from idmtools.entities.iplatform_ops.utils import batch_create_items
 from idmtools.entities.iworkflow_item import IWorkflowItem
+if TYPE_CHECKING:
+    from idmtools.entities.iplatform import IPlatform
 
 
 @dataclass
