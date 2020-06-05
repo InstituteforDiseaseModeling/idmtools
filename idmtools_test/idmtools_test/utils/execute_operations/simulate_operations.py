@@ -1,3 +1,4 @@
+import hashlib
 import json
 import os
 import shlex
@@ -280,6 +281,10 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
                 fp = os.path.abspath(os.path.join(root, file))
                 asset = Asset(absolute_path=fp, filename=file)
                 asset.download_generator_hook = partial(file_contents_to_generator, fp)
+                cksum_hash = hashlib.md5()
+                with open(file, 'rb') as fin:
+                    cksum_hash.update(fin.read())
+                    asset.checksum = cksum_hash.hexdigest()
                 assets.append(asset)
         return assets
 

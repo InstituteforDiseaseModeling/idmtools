@@ -66,7 +66,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
                 if isinstance(asset_collection, COMPSAssetCollection):
                     a.relative_path = asset.relative_path
                 a.persisted = True
-                asset.length = asset_collection.length
+                a.length = asset.length
                 if asset.uri:
                     a.download_generator_hook = partial(get_file_as_generator, asset)
                 ac.assets.append(a)
