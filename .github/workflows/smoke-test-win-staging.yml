@@ -28,8 +28,8 @@ jobs:
           bamboo_UserArtifactory: ${{ secrets.PYPI_STAGING_USERNAME }}
           bamboo_PasswordArtifactory: ${{ secrets.PYPI_STAGING_PASSWORD }}
         run: |
-          pip install idmtools[full] --index-url=https://$bamboo_UserArtifactory:$bamboo_PasswordArtifactory@packages.idmod.org/api/pypi/pypi-staging/simple
-          pip install idmtools-test --index-url=https://$bamboo_UserArtifactory:$bamboo_PasswordArtifactory@packages.idmod.org/api/pypi/pypi-staging/simple
+          pip install idmtools[full] --index-url=https://${bamboo_UserArtifactory}:${bamboo_Password}Artifactory@packages.idmod.org/api/pypi/pypi-staging/simple
+          pip install idmtools-test --index-url=https://${bamboo_UserArtifactory}:${bamboo_PasswordArtifactory}@packages.idmod.org/api/pypi/pypi-staging/simple
       - name: login to comps2
         run: |
             python dev_scripts\create_auth_token_args.py --username $COMPS_USER --password $COMPS_PASSWORD
