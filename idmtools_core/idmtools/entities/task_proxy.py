@@ -14,7 +14,7 @@ class TaskProxy:
 
     @staticmethod
     def from_task(task: 'ITask'):  # noqa: F821
-        from idmtools.core.docker_task import DockerTask
-        is_docker = isinstance(task, DockerTask)
+        from idmtools.core.docker_task import ContainerTask
+        is_docker = isinstance(task, ContainerTask)
         item = TaskProxy(command=task.command, is_docker=is_docker, is_gpu=is_docker and task.use_nvidia_run)
         return item

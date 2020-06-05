@@ -123,7 +123,7 @@ class TestExperimentOperations(unittest.TestCase):
         e_p: Experiment = Experiment.from_id(eid)
         with self.subTest("test_list_assets_and_download_children"):
             assets = self.platform._experiments.list_assets(e_p, children=True)
-            self.assertEqual(5, len(assets))
+            self.assertEqual(9, len(assets))
             totals = defaultdict(int)
             for asset in assets:
                 name = os.path.join(os.path.dirname(__file__), 'output', asset.filename)
@@ -135,6 +135,7 @@ class TestExperimentOperations(unittest.TestCase):
                     self.assertEqual(asset.checksum, uuid.UUID(md5_hash.hexdigest()))
                 totals[asset.filename] += 1
                 os.remove(name)
+            self.assertEqual(4, totals['idmtools_metadata.json'])
             self.assertEqual(4, totals['config.json'])
             self.assertEqual(1, totals['model1.py'])
 
@@ -146,8 +147,9 @@ class TestExperimentOperations(unittest.TestCase):
         with self.subTest("test_list_assets_simulations"):
             for sim in e_p.simulations:
                 assets = self.platform._simulations.list_assets(sim)
-                self.assertEqual(1, len(assets))
+                self.assertEqual(2, len(assets))
                 self.assertEqual('config.json', assets[0].filename)
+                self.assertEqual('idmtools_metadata.json', assets[1].filename)
                 content = assets[0].content
                 self.assertIsNotNone(content)
                 config = json.loads(content.decode('utf-8'))
