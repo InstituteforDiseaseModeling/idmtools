@@ -25,11 +25,11 @@ jobs:
           pip install py-make flake8 coloredlogs
       - name: download idmtools packages from staging jfrog
         env:
-          bamboo_UserArtifactory: ${{ secrets.PYPI_STAGING_USERNAME }}
+          bamboo_UserArtifactory: ${{ secrets.PYPI_STAGING_USERNAME1 }}
           bamboo_PasswordArtifactory: ${{ secrets.PYPI_STAGING_PASSWORD }}
         run: |
-          pip install idmtools[full] idmtools==1.1.0%2Bnightly --index-url=https://${bamboo_UserArtifactory}:${bamboo_PasswordArtifactory}@packages.idmod.org/api/pypi/pypi-staging/simple --no-cache-dir --force-reinstall
-          pip install idmtools-test==1.1.0%2Bnightly --index-url=https://${bamboo_UserArtifactory}:${bamboo_PasswordArtifactory}@packages.idmod.org/api/pypi/pypi-staging/simple --no-cache-dir --force-reinstall
+          pip install 'idmtools[full]' --index-url=https://${bamboo_UserArtifactory}:${bamboo_PasswordArtifactory}@packages.idmod.org/api/pypi/pypi-staging/simple --no-cache-dir --force-reinstall
+          pip install 'idmtools-test' --index-url=https://${bamboo_UserArtifactory}:${bamboo_PasswordArtifactory}@packages.idmod.org/api/pypi/pypi-staging/simple --no-cache-dir --force-reinstall
       - name: login to comps2
         run: |
             python dev_scripts\create_auth_token_args.py --username $COMPS_USER --password $COMPS_PASSWORD
