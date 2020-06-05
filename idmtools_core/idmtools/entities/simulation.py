@@ -24,12 +24,15 @@ class Simulation(IAssetsEnabled, INamedEntity):
     Class that represents a generic simulation.
     This class needs to be implemented for each model type with specifics.
     """
+    #: Task representing the configuration of the command to be executed
     task: 'ITask' = field(default=None)  # noqa: F821
+    #: Item Type. Should not be changed from Simulation
     item_type: ItemType = field(default=ItemType.SIMULATION, compare=False)
+    #: List of hooks that we can modify to add additional behaviour before creation of simulations
     pre_creation_hooks: List[Callable[[], NoReturn]] = field(default_factory=lambda: [Simulation.gather_assets])
-    # control whether we should replace the task with a proxy after creation
+    #: Control whether we should replace the task with a proxy after creation
     __replace_task_with_proxy: bool = field(default=True, init=False, compare=False)
-    # Ensure we don't gather assets twice
+    #: Ensure we don't gather assets twice
     __assets_gathered: bool = field(default=False)
 
     @property

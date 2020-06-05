@@ -42,19 +42,26 @@ class Experiment(IAssetsEnabled, INamedEntity):
         name: The experiment name.
         assets: The asset collection for assets global to this experiment.
     """
+    #: Suite ID
     suite_id: uuid = field(default=None)
-
+    #: Item Item(always an experiment)
     item_type: ItemType = field(default=ItemType.EXPERIMENT, compare=False, init=False)
+    #: Task Type(defaults to command)
     task_type: str = field(default='idmtools.entities.command_task.CommandTask')
+    #: List of Requirements for the task that a platform must meet to be able to run
     platform_requirements: Set[PlatformRequirements] = field(default_factory=set)
+    #: Is the Experiment Frozen
     frozen: bool = field(default=False, init=False)
+    #: Simulation in this experiment
     simulations: InitVar[SUPPORTED_SIM_TYPE] = None
+    #: Internal storage of simulation
     __simulations: Union[SUPPORTED_SIM_TYPE] = field(default_factory=lambda: EntityContainer(), compare=False)
 
-    # whether we should gather assets from the first task. This should be autodected based on simulations
+    #: Determines if we should gather assets from a the first task. Only use when not using TemplatedSimulations
     gather_common_assets_from_task: bool = field(default=None, compare=False)
 
-    # control whether we should replace the task with a proxy after creation to conser
+    #: Enable replacing the task with a proxy to reduce the memory footprint. Useful in provisioning large sets of
+    # simulations
     __replace_task_with_proxy: bool = field(default=True, init=False, compare=False)
 
     def __post_init__(self, simulations):

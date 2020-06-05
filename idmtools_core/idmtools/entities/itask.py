@@ -27,16 +27,20 @@ TTaskHook = Callable[[TTaskParent], NoReturn]
 
 @dataclass
 class ITask(metaclass=ABCMeta):
+    #: The Command to run
     command: Union[str, CommandLine] = field(default=None)
-    # Informs platform to what is needed to run a task
+    #: List of requirements needed by the task to run on an execution platform. This is stuff like Windows, Linux, GPU
+    #  etc
     platform_requirements: Set[PlatformRequirements] = field(default_factory=set)
 
-    # We provide hooks as list to allow more user scripting extensibility
+    #: We provide hooks as list to allow more user scripting extensibility
     __pre_creation_hooks: List[TTaskHook] = field(default_factory=list)
     __post_creation_hooks: List[TTaskHook] = field(default_factory=list)
     # This is optional experiment assets
     # That means that users can explicitly define experiment level assets when using a Experiment builders
+    #: Common(Experiment-level) assets
     common_assets: AssetCollection = field(default_factory=AssetCollection)
+    #: Transient(Simulation-level) assets
     transient_assets: AssetCollection = field(default_factory=AssetCollection)
 
     # log to add to items to track provisioning of task

@@ -13,6 +13,14 @@ from idmtools.entities.simulation import Simulation
 from idmtools.registry.task_specification import TaskSpecification
 
 logger = getLogger(__name__)
+WINDOWS_DEFAULT_WRAPPER = """
+set PYTHONPATH=%cd%\\Assets\\;%PYTHONPATH%
+%*
+"""
+LINUX_DEFAULT_WRAPPER = """
+export PYTHONPATH=$(pwd)/Assets/:$PYTHONPATH
+%*
+"""
 
 
 @dataclass()
@@ -20,21 +28,24 @@ class TemplatedScriptTask(ITask):
     """
     Defines a task to run a script using a template. Best suited to shell scripts
     """
-    # Name of script
+    #: Name of script
     script_path: str = field(default=None)
-    # a template string
+    #: The template contents
     template: str = field(default=None)
-    # a template file
+    #: The template file. You can only use either template or template_file at once
     template_file: str = field(default=None)
-    # Is the template a common asset or a transient asset
+    #: Controls whether a template should be an experiment or a simulation level asset
     template_is_common: bool = field(default=True)
-    # template variables
+    #: Template variables used for rendering the template
     variables: Dict[str, Any] = field(default_factory=dict)
+    #: Platform Path Separator. For Windows execution platforms, use \, otherwise use the default of /
     path_sep: str = field(default='/')
+    #: Extra arguments to add to the command line
     extra_command_arguments: str = field(default='')
 
-    # Hooks to extend functionality
+    #: Hooks to gather common assets
     gather_common_asset_hooks: List[Callable[[ITask], AssetCollection]] = field(default_factory=list)
+    #: Hooks to gather transient assets
     gather_transient_asset_hooks: List[Callable[[ITask], AssetCollection]] = field(default_factory=list)
 
     def __post_init__(self):
@@ -79,7 +90,7 @@ class TemplatedScriptTask(ITask):
             asset_collection:Asset collection
 
         Returns:
-
+            Asset Collection with template added
         """
         # setup our jinja environment
         env = Environment()
@@ -180,14 +191,17 @@ class ScriptWrapperTask(ITask):
 
 
     See Also:
-        .. py:class::`TemplatedScriptTask`
+        :py:class:`idmtools_models.templated_script_task.TemplatedScriptTask`
+
+    Raises:
+        ValueError if the template Script Task is not defined
     """
     template_script_task: TemplatedScriptTask = field(default=None)
     task: ITask = field(default=None)
 
     def __post_init__(self):
         if self.template_script_task is None:
-            raise ValueError("Template Scrip Task is required")
+            raise ValueError("Template Script Task is required")
 
         if self.task is None:
             raise ValueError("Task is required")
@@ -273,8 +287,8 @@ def get_script_wrapper_task(task: ITask, wrapper_script_name: str, template_cont
         ScriptWrapperTask wrapping the task
 
     See Also:
-        func:`get_script_wrapper_windows_task`
-        func:`get_script_wrapper_unix_task`
+        :func:`idmtools_models.templated_script_task.get_script_wrapper_windows_task`
+        :func:`idmtools_models.templated_script_task.get_script_wrapper_unix_task`
     """
     if variables is None:
         variables = dict()
@@ -289,16 +303,26 @@ def get_script_wrapper_task(task: ITask, wrapper_script_name: str, template_cont
     return ScriptWrapperTask(template_script_task=template_task, task=task)
 
 
-def get_script_wrapper_windows_task(task: ITask, wrapper_script_name: str = 'wrapper.bat', template_content: str = None,
+def get_script_wrapper_windows_task(task: ITask, wrapper_script_name: str = 'wrapper.bat',
+                                    template_content: str = WINDOWS_DEFAULT_WRAPPER,
                                     template_file: str = None, template_is_common: bool = True,
                                     variables: Dict[str, Any] = None) -> ScriptWrapperTask:
     """
     Get wrapper script task for windows platforms
 
+    The default content wraps a bash script that adds the assets directory to the python path
+
+    .. code-block:: batch
+
+        set PYTHONPATH=%cd%/Assets/;%PYTHONPATH%
+        %*
+
+    You can adapt this script to modify any pre-scripts you need or call others scripts in succession
+
     Args:
         task: Task to wrap
         wrapper_script_name: Wrapper script name(defaults to wrapper.bat)
-        template_content:  Template Content
+        template_content:  Template Content.
         template_file: Template File
         template_is_common: Is the template experiment level
         variables: Variables for template
@@ -306,9 +330,9 @@ def get_script_wrapper_windows_task(task: ITask, wrapper_script_name: str = 'wra
     Returns:
         ScriptWrapperTask
 
-    See Also:
-        func:`get_script_wrapper_task`
-        func:`get_script_wrapper_unix_task`
+    See Also::
+        :func:`idmtools_models.templated_script_task.get_script_wrapper_task`
+        :func:`idmtools_models.templated_script_task.get_script_wrapper_unix_task`
     """
     return get_script_wrapper_task(task, wrapper_script_name, template_content, template_file, template_is_common,
                                    variables, "\\")
@@ -319,6 +343,15 @@ def get_script_wrapper_unix_task(task: ITask, wrapper_script_name: str = 'wrappe
                                  variables: Dict[str, Any] = None):
     """
         Get wrapper script task for unix platforms
+
+        The default content wraps a bash script that adds the assets directory to the python path
+
+        .. code-block:: bash
+
+            set PYTHONPATH=$(pwd)/Assets/:$PYTHONPATH
+            %*
+
+        You can adapt this script to modify any pre-scripts you need or call others scripts in succession
 
         Args:
             task: Task to wrap
@@ -332,8 +365,8 @@ def get_script_wrapper_unix_task(task: ITask, wrapper_script_name: str = 'wrappe
             ScriptWrapperTask
 
         See Also:
-        func:`get_script_wrapper_task`
-        func:`get_script_wrapper_windows_task`
+        :func:`idmtools_models.templated_script_task.get_script_wrapper_task`
+        :func:`idmtools_models.templated_script_task.get_script_wrapper_windows_task`
         """
     return get_script_wrapper_task(task, wrapper_script_name, template_content, template_file, template_is_common,
                                    variables, "/")

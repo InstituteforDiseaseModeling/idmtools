@@ -47,8 +47,8 @@ class JSONConfiguredPythonTask(JSONConfiguredTask, PythonTask):
             None
 
         See Also
-            :py:meth:`JSONConfiguredTask.reload_from_simulation`
-            :py:meth:`PythonTask.reload_from_simulation`
+            :meth:`idmtools_models.json_configured_task.JSONConfiguredTask.reload_from_simulation`
+            :meth:`idmtools_models.python.python_task.PythonTask.reload_from_simulation`
         """
         JSONConfiguredTask.reload_from_simulation(self, simulation, **kwargs)
         PythonTask.reload_from_simulation(self, simulation, **kwargs)
@@ -63,8 +63,8 @@ class JSONConfiguredPythonTask(JSONConfiguredTask, PythonTask):
         Returns:
             None
         See Also
-            :py:meth:`JSONConfiguredTask.pre_creation`
-            :py:meth:`PythonTask.pre_creation`
+            :meth:`idmtools_models.json_configured_task.JSONConfiguredTask.pre_creation`
+            :meth:`idmtools_models.python.python_task.PythonTask.pre_creation`
         """
         JSONConfiguredTask.pre_creation(self, parent)
         PythonTask.pre_creation(self, parent)
@@ -79,8 +79,8 @@ class JSONConfiguredPythonTask(JSONConfiguredTask, PythonTask):
         Returns:
 
         See Also
-            :py:meth:`JSONConfiguredTask.post_creation`
-            :py:meth:`PythonTask.post_creation`
+            :meth:`idmtools_models.json_configured_task.JSONConfiguredTask.post_creation`
+            :meth:`idmtools_models.python.python_task.PythonTask.post_creation`
         """
         JSONConfiguredTask.post_creation(self, parent)
         PythonTask.post_creation(self, parent)
