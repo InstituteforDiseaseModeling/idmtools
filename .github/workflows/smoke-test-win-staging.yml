@@ -1,7 +1,7 @@
 # run setup-dev to install packages and run smoke test
 # trigger by push or pull_request with commit message: "Run smoke test!"
 
-name: "run wins smoke test"
+name: "Run wins staging smoke test"
 on: [push, pull_request]
 
 jobs:
@@ -11,7 +11,7 @@ jobs:
       matrix:
         os: [windows-latest]
         python-version: [3.6, 3.7, 3.8]
-    if: "contains(github.event.head_commit.message, 'Run win smoke test!')"
+    if: "contains(github.event.head_commit.message, 'Run wj smoke test!')"
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
@@ -22,13 +22,14 @@ jobs:
           architecture: x64
       - name: Install Python dependencies
         run: |
-          pip install py-make flake8
-      - name: Run setup-dev
+          pip install py-make flake8 coloredlogs
+      - name: download idmtools packages from staging jfrog
         env:
           bamboo_UserArtifactory: ${{ secrets.PYPI_STAGING_USERNAME }}
           bamboo_PasswordArtifactory: ${{ secrets.PYPI_STAGING_PASSWORD }}
         run: |
-          make setup-dev
+          pip install idmtools[full] --index-url=https://$bamboo_UserArtifactory:$bamboo_PasswordArtifactory@packages.idmod.org/api/pypi/pypi-staging/simple
+          pip install idmtools-test --index-url=https://$bamboo_UserArtifactory:$bamboo_PasswordArtifactory@packages.idmod.org/api/pypi/pypi-staging/simple
       - name: login to comps2
         run: |
             python dev_scripts\create_auth_token_args.py --username $COMPS_USER --password $COMPS_PASSWORD

@@ -1,11 +1,11 @@
 # run setup-dev to install packages and run smoke test
 # trigger by push or pull_request with commit message: "Run smoke test!"
 
-name: "Install with setup-dev and run smoke test"
+name: "Run ubuntu setup-dev smoke test"
 on: [push, pull_request]
 
 jobs:
-  install-setup-dev-run-smoke-test:
+  run-ubuntu-setup-dev-smoke-test:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
