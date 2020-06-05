@@ -90,6 +90,7 @@ class TestExperimentOperations(unittest.TestCase):
 
             experiments = COMPSExperiment.get(query_criteria=qc)
 
+
             experiment = experiments[0]
 
             # load as idm object(testing both get and to_entity
@@ -119,7 +120,7 @@ class TestExperimentOperations(unittest.TestCase):
         """
         eid = setup_python_model_1('COMPS2')
 
-        e_p = Experiment.from_id(eid)
+        e_p: Experiment = Experiment.from_id(eid)
         with self.subTest("test_list_assets_and_download_children"):
             assets = self.platform._experiments.list_assets(e_p, children=True)
             self.assertEqual(5, len(assets))

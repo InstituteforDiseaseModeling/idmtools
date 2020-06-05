@@ -8,7 +8,9 @@ from idmtools.registry.task_specification import TaskSpecification
 
 @dataclass()
 class CommandTask(ITask):
+    #: Hooks to gather common assets
     gather_common_asset_hooks: List[Callable[[ITask], AssetCollection]] = field(default_factory=list)
+    #: Hooks to gather transient assets
     gather_transient_asset_hooks: List[Callable[[ITask], AssetCollection]] = field(default_factory=list)
     """
     Defines an extensible simple task that implements functionality through optional supplied use hooks

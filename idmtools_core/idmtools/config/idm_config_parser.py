@@ -161,6 +161,9 @@ class IdmConfigParser:
 
         Returns:
             All fields as a dictionary.
+
+        Raises:
+            ValueError: If the block doesn't exist
         """
         if not cls.found_ini():
             return {}
@@ -207,6 +210,9 @@ class IdmConfigParser:
 
         Returns:
             None
+
+        Raises:
+            ValueError: If the config file is found but cannot be parsed
         """
         if force:
             cls.clear_instance()
@@ -256,6 +262,15 @@ class IdmConfigParser:
 
     @classmethod
     def display_config_block_details(cls, block):
+        """
+        Display the values of a config block
+
+        Args:
+            block: Block to print
+
+        Returns:
+            None
+        """
         if cls.found_ini():
             block_details = cls.get_section(block)
             # print('\nConfig_info:')
@@ -264,16 +279,30 @@ class IdmConfigParser:
 
     @classmethod
     @initialization(error=False)
-    def has_section(cls, section):
+    def has_section(cls, section: str) -> bool:
+        """
+        Does the config contain a section
+        Args:
+            section:
+
+        Returns:
+            True if the section exists, False otherwise
+        """
         return cls._config.has_section(section.lower())
 
     @classmethod
     @initialization
-    def has_option(cls, section, option):
+    def has_option(cls, section: str, option: str):
         return cls._config.has_option(section, option, fallback=None)
 
     @classmethod
-    def found_ini(cls):
+    def found_ini(cls) -> bool:
+        """
+        Did we find the config?
+
+        Returns:
+            True if did, False Otherwise
+        """
         return cls._config is not None
 
     @classmethod

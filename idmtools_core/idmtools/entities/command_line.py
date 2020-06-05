@@ -4,13 +4,15 @@ from dataclasses import dataclass, field
 
 @dataclass(init=False)
 class CommandLine:
+    """
+        A class to construct command line strings from executable, options, and params
+        """
+    #: The executable portion of the command
     _executable: str = None
+    #: Options for the command
     _options: Dict[str, Any] = field(default_factory=dict)
+    #: Arguments for the command
     _args: List[Any] = field(default_factory=list)
-
-    """
-    A class to construct command line strings from executable, options, and params
-    """
 
     def __init__(self, executable=None, *args, **kwargs):
         self._executable = executable
@@ -18,7 +20,7 @@ class CommandLine:
         self._args = args or []
 
     @property
-    def executable(self):
+    def executable(self) -> str:
         return self._executable
 
     @executable.setter
