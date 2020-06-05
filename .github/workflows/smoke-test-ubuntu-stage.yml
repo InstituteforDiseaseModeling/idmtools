@@ -23,6 +23,10 @@ jobs:
       - name: Install Python dependencies
         run: |
           pip install py-make flake8
+      - name: Install dataclass
+        if: ${{ matrix.python-version }} == 3.6
+        run: |
+          pip install dataclasses
       - name: download idmtools packages from staging jfrog
         env:
           bamboo_UserArtifactory: ${{ secrets.PYPI_STAGING_USERNAME1 }}
