@@ -124,4 +124,14 @@ class TestPythonTask(TestCase):
             self.assertEqual(4, experiment.simulation_count)
             self.assertEqual(EntityStatus.SUCCEEDED, experiment.simulations[0].status)
 
+            with self.subTest("reload_simulation"):
+                experiment_reload = Experiment.from_id(experiment.uid, load_task=True)
+                self.assertEqual(experiment.id, experiment_reload.id)
+                self.assertEqual(experiment.simulation_count, experiment_reload.simulation_count)
+                self.assertEqual(experiment.succeeded, experiment_reload.succeeded)
+                for sim in experiment_reload.simulations:
+                    self.assertIn('a', sim.task.parameters)
+                    self.assertIn('a', sim.tags)
+                    self.assertEqual(sim.tags['a'], sim.task.parameters['a'])
+
 
