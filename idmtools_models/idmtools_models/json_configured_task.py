@@ -123,7 +123,7 @@ class JSONConfiguredTask(ITask):
         return values
 
     def reload_from_simulation(self, simulation: 'Simulation', config_file_name: Optional[str] = None,
-                               envelope: Optional[str] = None):  # noqa: F821
+                               envelope: Optional[str] = None, **kwargs):  # noqa: F821
         """
         Reload from Simulation. To do this, the process is
 

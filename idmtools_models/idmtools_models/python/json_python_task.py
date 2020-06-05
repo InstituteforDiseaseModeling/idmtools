@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional, Type
 from idmtools.assets import AssetCollection
+from idmtools.entities.simulation import Simulation
 from idmtools.registry.task_specification import TaskSpecification
 from idmtools_models.json_configured_task import JSONConfiguredTask
 from idmtools_models.python.python_task import PythonTask
@@ -32,6 +33,10 @@ class JSONConfiguredPythonTask(JSONConfiguredTask, PythonTask):
             Transient assets
         """
         return JSONConfiguredTask.gather_transient_assets(self)
+
+    def reload_from_simulation(self, simulation: Simulation, **kwargs):
+        JSONConfiguredTask.reload_from_simulation(self, simulation, **kwargs)
+        PythonTask.reload_from_simulation(self, simulation, **kwargs)
 
 
 class JSONConfiguredPythonTaskSpecification(TaskSpecification):

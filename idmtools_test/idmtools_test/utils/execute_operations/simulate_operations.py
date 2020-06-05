@@ -286,11 +286,15 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
     def to_entity(self, dict_sim: Dict, load_task: bool = False, parent: Optional[Experiment] = None,
                   **kwargs) -> Simulation:
         sim: Simulation = Simulation(**{k: v for k, v in dict_sim.items() if k not in ['platform_id', 'item_type']})
+        sim._uid = UUID(sim._uid)
+        try:
+            sim.status = EntityStatus[sim.status.upper()]
+        except:
+            pass
         sim.platform = self.platform
         if parent:
             sim.parent = parent
         sim_path = self.get_simulation_asset_path(sim)
-
         sim.task = None
         if dict_sim['assets']:
             ac = AssetCollection()
@@ -304,7 +308,7 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
         if load_task:
             if dict_sim['tags'] and 'task_type' in dict_sim['tags']:
                 try:
-                    sim.task = TaskFactory().create(dict_sim['tags']['task_type'])
+                    sim.task = TaskFactory().create(dict_sim['tags']['task_type'], **dict_sim['task'])
                 except Exception as e:
                     logger.exception(e)
 

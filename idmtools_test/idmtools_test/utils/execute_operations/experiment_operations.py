@@ -2,15 +2,17 @@ import json
 import os
 import shutil
 from dataclasses import field, dataclass
+from functools import partial
 from logging import getLogger, DEBUG
 from threading import Lock
 from typing import Any, List, Type, Dict, Union, TYPE_CHECKING, Optional
 from uuid import UUID, uuid4
 
-from idmtools.assets import Asset
+from idmtools.assets import Asset, AssetCollection
 from idmtools.core import UnknownItemException, EntityStatus, ItemType
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
+from idmtools.utils.file import file_contents_to_generator
 from idmtools.utils.json import IDMJSONEncoder
 
 if TYPE_CHECKING:
@@ -168,6 +170,16 @@ class TestExecutePlatformExperimentOperation(IPlatformExperimentOperations):
         excluded = ['platform_id', 'item_type', 'frozen', 'simulations']
         experiment = Experiment(**{k: v for k, v in data.items() if k not in excluded})
         experiment.platform_metadata = data
+        if data['assets']:
+            assets = AssetCollection()
+            exp_path = os.path.join(self.get_experiment_path(experiment.uid), "Assets")
+            for root, dirs, files in os.walk(exp_path):
+                for file in files:
+                    fp = os.path.abspath(os.path.join(root, file))
+                    asset = Asset(absolute_path=fp, filename=file)
+                    asset.download_generator_hook = partial(file_contents_to_generator, fp)
+                    assets.add_asset(asset)
+            experiment.assets = assets
         if children:
             experiment.simulations = self.platform.get_children(
                 experiment.uid,

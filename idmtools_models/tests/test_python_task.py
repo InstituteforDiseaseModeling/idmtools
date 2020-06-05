@@ -6,6 +6,7 @@ from idmtools.builders import SimulationBuilder
 from idmtools.core import EntityStatus
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
+from idmtools.entities.simulation import Simulation
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_models.python.python_task import PythonTask
 from idmtools_test import COMMON_INPUT_PATH
@@ -81,14 +82,31 @@ class TestPythonTask(TestCase):
     def test_model1(self):
         with Platform("TestExecute", missing_ok=True, default_missing=dict(type='TestExecute')):
             fpath = os.path.join(COMMON_INPUT_PATH, "python", "model1.py")
-            # here we test a script that may have no configu
-            task = JSONConfiguredPythonTask(script_path=fpath, configfile_argument=None, python_path=sys.executable)
+            # here we test a script
+            params = dict(a=1, b=2, c=3)
+            task = JSONConfiguredPythonTask(
+                script_path=fpath,
+                configfile_argument=None,
+                python_path=sys.executable,
+                parameters=params
+            )
             experiment = Experiment.from_task(task)
             experiment.run(True)
 
-            self.assertEqual(True, experiment.succeeded)
+            self.assertTrue(experiment.succeeded)
             self.assertEqual(1, experiment.simulation_count)
             self.assertEqual(EntityStatus.SUCCEEDED, experiment.simulations[0].status)
+
+            with self.subTest("reload_simulation"):
+                experiment_reload = Experiment.from_id(experiment.uid, load_task=True)
+                self.assertEqual(experiment.id, experiment_reload.id)
+                self.assertEqual(experiment.simulation_count, experiment_reload.simulation_count)
+                self.assertEqual(experiment.succeeded, experiment_reload.succeeded)
+                sim1: Simulation = experiment_reload.simulations[0]
+                self.assertEqual(experiment.simulations[0].uid, sim1.uid)
+                self.assertEqual(0, sim1.assets.count)
+                self.assertEqual(experiment.simulations[0].task.command, sim1.task.command)
+                self.assertEqual(params, sim1.task.parameters)
 
     @pytest.mark.smoke
     def test_model_sweep(self):

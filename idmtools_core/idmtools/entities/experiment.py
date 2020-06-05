@@ -364,6 +364,11 @@ class Experiment(IAssetsEnabled, INamedEntity):
         result['_uid'] = self.uid
         return result
 
+    # Define this here for better completion in IDEs for end users
+    @classmethod
+    def from_id(cls, item_id: Union[str, uuid.UUID], platform: 'IPlatform' = None, **kwargs) -> 'Experiment':
+        return super().from_id(item_id, platform, **kwargs)
+
 
 class ExperimentSpecification(ExperimentPluginSpecification):
 

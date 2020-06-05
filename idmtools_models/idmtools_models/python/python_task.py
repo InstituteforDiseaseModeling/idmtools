@@ -39,8 +39,13 @@ class PythonTask(ITask):
         Update executable with new python_path
         Returns: re-build command
         """
+        if self.script_path is None:
+            return None
+
         cmd_str = f'{self.python_path} ./Assets/{os.path.basename(self.script_path)}'
         if self._command:
+            if isinstance(self._command, str):
+                self._command = CommandLine(cmd_str)
             self._command._executable = cmd_str
             self._task_log.info('Setting command line to %s', cmd_str)
 
@@ -94,7 +99,7 @@ class PythonTask(ITask):
         """
         return self.transient_assets
 
-    def reload_from_simulation(self, simulation: Simulation):
+    def reload_from_simulation(self, simulation: Simulation, **kwargs):
         """
         Reloads a python task from a simulation
 
@@ -104,8 +109,15 @@ class PythonTask(ITask):
         Returns:
 
         """
-        # We have no configs so nothing to reload
-        pass
+        # check experiment level assets for items
+        if simulation.parent.assets:
+            new_assets = AssetCollection()
+            for i, asset in enumerate(simulation.parent.assets.assets):
+                if asset.filename != self.script_path and asset.absolute_path != self.script_path:
+                    new_assets.add_asset(asset)
+            simulation.parent.assets = new_assets
+
+        logger.debug("Reload from simulation")
 
 
 class PythonTaskSpecification(TaskSpecification):

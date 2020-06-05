@@ -83,6 +83,7 @@ class TestExecutePlatform(IPlatform):
             if isinstance(item, Experiment):
                 for sim in item.simulations:
                     if sim.id == result[1]:
+                        sim.status = result[2]
                         self._simulations.save_metadata(sim, update_data=dict(status=result[2]))
                         break
         del self.queue
