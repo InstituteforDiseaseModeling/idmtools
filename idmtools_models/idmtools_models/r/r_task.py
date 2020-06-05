@@ -1,10 +1,11 @@
 import os
 from dataclasses import field, dataclass
 from logging import getLogger
-from typing import Type
+from typing import Type, Union
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core.docker_task import DockerTask
 from idmtools.entities import CommandLine
+from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools.entities.simulation import Simulation
 from idmtools.registry.task_specification import TaskSpecification
 
@@ -17,10 +18,30 @@ class RTask(DockerTask):
     r_path: str = field(default='Rscript')
     extra_libraries: list = field(default_factory=lambda: [], compare=False, metadata={"md": True})
 
+    @property
+    def command(self):
+        """
+        Update executable with new python_path
+        Returns: re-build command
+        """
+        if self.script_path is None:
+            return None
+
+        cmd_str = f'{self.r_path} ./Assets/{os.path.basename(self.script_path)}'
+        if self._command:
+            if isinstance(self._command, str):
+                self._command = CommandLine(cmd_str)
+            self._command._executable = cmd_str
+            self._task_log.info('Setting command line to %s', cmd_str)
+
+        return self._command
+
+    @command.setter
+    def command(self, command):
+        self._command = command
+
     def __post_init__(self):
         super().__post_init__()
-        if self.script_path is None:
-            raise ValueError("Script name is required")
         cmd_str = f'{self.r_path} ./Assets/{os.path.basename(self.script_path)}'
         self._task_log.info('Setting command line to %s', cmd_str)
         self.command = CommandLine(cmd_str)
@@ -54,6 +75,22 @@ class RTask(DockerTask):
 
         """
         return self.transient_assets
+
+    def pre_creation(self, parent: Union[Simulation, IWorkflowItem]):
+        """
+        Called before creation of parent
+
+        Args:
+            parent: Parent
+
+        Returns:
+            None
+
+        Raise:
+            ValueError if script name is not provided
+        """
+        if self.script_path is None:
+            raise ValueError("Script name is required")
 
 
 class RTaskSpecification(TaskSpecification):
