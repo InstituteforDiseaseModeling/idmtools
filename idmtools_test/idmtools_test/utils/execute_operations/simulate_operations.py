@@ -282,7 +282,7 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
                 asset = Asset(absolute_path=fp, filename=file)
                 asset.download_generator_hook = partial(file_contents_to_generator, fp)
                 cksum_hash = hashlib.md5()
-                with open(file, 'rb') as fin:
+                with open(fp, 'rb') as fin:
                     cksum_hash.update(fin.read())
                     asset.checksum = cksum_hash.hexdigest()
                 assets.append(asset)
@@ -290,18 +290,27 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
 
     def to_entity(self, dict_sim: Dict, load_task: bool = False, parent: Optional[Experiment] = None,
                   **kwargs) -> Simulation:
+        # convert the dictionary to simulation
         sim: Simulation = Simulation(**{k: v for k, v in dict_sim.items() if k not in ['platform_id', 'item_type']})
+        # str to uid
         sim._uid = UUID(sim._uid)
         try:
+            # load status from str
             sim.status = EntityStatus[sim.status.upper()]
         except:
             pass
+        # set platform before we load assets
         sim.platform = self.platform
+        # and our parent
         if parent:
             sim.parent = parent
+        # get path to our assets
         sim_path = self.get_simulation_asset_path(sim)
+        # set task to a blank slate
         sim.task = None
+        # load assets first
         if dict_sim['assets']:
+            # load the assets
             ac = AssetCollection()
             for dict_asset in dict_sim['assets']:
                 asset = Asset(**dict_asset)
@@ -310,6 +319,7 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
                 asset.download_generator_hook = partial(file_contents_to_generator, asset.absolute_path)
                 ac.add_asset(asset)
             sim.assets = ac
+        # should we fully load the task?
         if load_task:
             if dict_sim['tags'] and 'task_type' in dict_sim['tags']:
                 try:
@@ -325,6 +335,9 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
                 sim.task.command = CommandLine(cli)
             # call task load options(load configs from files, etc)
             sim.task.reload_from_simulation(sim)
+        else:
+            cli = self._detect_command_line_from_simulation(dict_sim)
+            sim.task = CommandTask(cli)
 
         # load assets
         return sim

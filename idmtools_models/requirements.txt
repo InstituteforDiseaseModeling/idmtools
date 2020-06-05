@@ -1,1 +1,2 @@
 idmtools~=1.1.0
+jinja2

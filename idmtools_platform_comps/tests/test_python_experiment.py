@@ -86,7 +86,7 @@ class TestPythonExperiment(ITestWithPersistence):
         tag_value = "idmtools_models.python.json_python_task.JSONConfiguredPythonTask"
         expected_tags = [{'a': '0', 'b': '1', 'task_type': tag_value}, {'a': '0', 'b': '9', 'task_type': tag_value},
                          {'a': '1', 'b': '1', 'task_type': tag_value}, {'a': '1', 'b': '9', 'task_type': tag_value}]
-        validate_sim_tags(self, exp_id, expected_tags)
+        validate_sim_tags(self, exp_id, expected_tags, tag_value)
 
         # validate experiment tags
         actual_exp_tags = experiment.get(experiment.id, QueryCriteria().select_children('tags')).tags
@@ -129,7 +129,7 @@ class TestPythonExperiment(ITestWithPersistence):
         expected_tags = [{'a': '0', 'task_type': tag_value}, {'a': '1', 'task_type': tag_value},
                          {'a': '2', 'task_type': tag_value}, {'a': '3', 'task_type': tag_value},
                          {'a': '4', 'task_type': tag_value}]
-        validate_sim_tags(self, exp_id, expected_tags)
+        validate_sim_tags(self, exp_id, expected_tags, tag_value)
 
     @pytest.mark.long
     @pytest.mark.comps
@@ -333,7 +333,7 @@ class TestPythonExperiment(ITestWithPersistence):
                          {'a': '1', 'b': '3', 'c': '5', 'task_type': tag_value},
                          {'a': '6', 'b': '2', 'task_type': tag_value},
                          {'a': '7', 'b': '2', 'task_type': tag_value}]
-        validate_sim_tags(self, exp_id, expected_tags)
+        validate_sim_tags(self, exp_id, expected_tags, tag_value)
 
     @pytest.mark.comps
     def test_duplicate_asset_files_not_allowed(self):

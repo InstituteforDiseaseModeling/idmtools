@@ -25,11 +25,17 @@ class TestTemplatedScriptTask(TestCase):
         return simple_template
 
     @pytest.mark.smoke
+    @windows_only
     def test_simple_template_assets(self):
+        """
+        Test simple template bat script using the TemplatedScriptTask
+        Returns:
+
+        """
         simple_template = self.get_simplate_template()
         for is_common in [False, True]:
             task = TemplatedScriptTask(
-                script_name="example.bat",
+                script_path="example.bat",
                 template=simple_template,
                 variables=dict(name="Testing"),
                 template_is_common=is_common
@@ -53,11 +59,17 @@ class TestTemplatedScriptTask(TestCase):
                 self.assertEqual("example.bat", str(task.command))
 
     @pytest.mark.smoke
+    @windows_only
     def test_wrapper_script(self):
+        """
+        Do a basic set of tests on inputs/outputs of the wrapper script
+        Returns:
+
+        """
         cmd = 'python -c "import os; print(os.environ)"'
         task = CommandTask(cmd)
         template = """
-        PYTHONPATH=%CWD%\\Assets\\l
+        set PYTHONPATH=%CWD%\\Assets\\l
         %*
         """
 
@@ -74,9 +86,15 @@ class TestTemplatedScriptTask(TestCase):
         self.assertTrue(str(wrapper_task.command).startswith("Assets\\wrapper.bat"))
         self.assertTrue(str(wrapper_task.command).endswith(cmd))
 
-    @pytest.mark.smoke
     @windows_only
     def test_wrapper_script_execute(self):
+        """
+        This tests The ScriptWrapperScriptTask as well as the TemplatedScriptTask
+
+        In addition, it tests reload
+        Returns:
+
+        """
         cmd = f"\"{sys.executable}\" -c \"import os; print(os.environ)\""
         task = CommandTask(cmd)
         template = """
@@ -95,9 +113,19 @@ class TestTemplatedScriptTask(TestCase):
                 assets = sim.list_static_assets()
                 for asset in assets:
                     if asset.filename in ["StdOut.txt"]:
-                        self.assertIn(f'{os.getcwd()}\\Assets\\;', asset.content.decode('utf-8').replace("\\\\", "\\"))
+                        content = asset.content.decode('utf-8').replace("\\\\", "\\")
+                        # check for echo
+                        self.assertIn('Hello', content)
+                        # check for python path
+                        self.assertIn(f'{os.getcwd()}\\Assets\\;', content)
 
-
-    def test_wrapper_script_reload(self):
-        self.assertTrue(False)
+            with self.subTest("test_wrapper_script_execute_wrapper_reload"):
+                experiment_reload = Experiment.from_id(experiment.uid, load_task=True)
+                self.assertEqual(experiment.id, experiment_reload.uid)
+                self.assertEqual(1, experiment_reload.simulation_count)
+                self.assertEqual(experiment.simulations[0].id, experiment_reload.simulations[0].id)
+                task: CommandTask = experiment_reload.simulations[0].task
+                self.assertIsInstance(task, CommandTask)
+                self.assertEqual(1, experiment.assets.count)
+                self.assertIn("wrapper.bat", str(task.command))
 
