@@ -1,3 +1,4 @@
+import json
 from dataclasses import dataclass, field
 from functools import partial
 from logging import getLogger, DEBUG
@@ -14,12 +15,14 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
 from idmtools.entities.iplatform_ops.utils import batch_create_items
 from idmtools.entities.simulation import Simulation
+from idmtools.utils.json import IDMJSONEncoder
 from idmtools_platform_comps.utils.general import convert_comps_status, get_asset_for_comps_item
 
 if TYPE_CHECKING:
     from idmtools_platform_comps.comps_platform import COMPSPlatform
 
 logger = getLogger(__name__)
+user_logger = getLogger('user')
 
 
 def comps_batch_worker(simulations: List[Simulation], interface: 'CompsPlatformSimulationOperations',
@@ -209,13 +212,15 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
     def platform_run_item(self, simulation: Simulation, **kwargs):
         pass
 
-    def send_assets(self, simulation: Simulation, comps_sim: Optional[COMPSSimulation] = None, **kwargs):
+    def send_assets(self, simulation: Simulation, comps_sim: Optional[COMPSSimulation] = None, add_metadata: bool = True,
+                    **kwargs):
         """
         Send assets to Simulation
 
         Args:
             simulation: Simulation to send asset for
-            comps_sim: Optioanl COMPSSimulation object to prevent reloading it
+            comps_sim: Optional COMPSSimulation object to prevent reloading it
+            add_metadata: Add idmtools metadata object
             **kwargs:
 
         Returns:
@@ -225,6 +230,18 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             comps_sim = simulation.get_platform_object()
         for asset in simulation.assets:
             comps_sim.add_file(simulationfile=SimulationFile(asset.filename, 'input'), data=asset.bytes)
+
+        # add metadata
+        if add_metadata:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Creating idmtools metadata for simulation and task on COMPS")
+            # later we should add some filtering for passwords and such here in case anything weird happens
+            metadata = json.dumps(simulation.to_dict()['task'], cls=IDMJSONEncoder)
+            from idmtools import __version__
+            comps_sim.add_file(
+                SimulationFile("idmtools_metadata.json", 'input', description=f'IDMTools {__version__}'),
+                data=metadata.encode()
+            )
 
     def refresh_status(self, simulation: Simulation, additional_columns: Optional[List[str]] = None, **kwargs):
         """
@@ -245,7 +262,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         simulation.status = convert_comps_status(s.state)
 
     def to_entity(self, simulation: COMPSSimulation, load_task: bool = False, parent: Optional[Experiment] = None,
-                  load_parent: bool = False, **kwargs) -> Simulation:
+                  load_parent: bool = False, load_metadata: bool = False, **kwargs) -> Simulation:
         """
         Convert COMPS simulation object to IDM Tools simulation object
 
@@ -254,6 +271,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             load_task: Should we load tasks. Defaults to No. This can increase the load items on fetchs
             parent: Optional parent object to prevent reloads
             load_parent: Force load of parent(Beware, This could cause loading loops)
+            metadata: Should we load metadata by default. If load task is enabled, this is also enabled
             **kwargs:
 
         Returns:
@@ -274,13 +292,16 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         obj.uid = simulation.id
         obj.tags = simulation.tags
         obj.status = convert_comps_status(simulation.state)
+        if simulation.files:
+            obj.assets = self.platform._assets.to_entity(simulation.files)
+
+        # should we load metadata
+        metadata = self.__load_metadata_from_simulation(simulation) if load_metadata else None
         if load_task:
-            self._load_task_from_simulation(obj, parent, simulation)
+            self._load_task_from_simulation(obj, parent, simulation, metadata)
         else:
             obj.task = None
 
-        if simulation.files:
-            obj.assets = self.platform._assets.to_entity(simulation.files)
         return obj
 
     def get_asset_collection_from_comps_simulation(self, simulation: COMPSSimulation) -> Optional[AssetCollection]:
@@ -297,7 +318,8 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             return self.platform.get_item(simulation.configuration.asset_collection_id, ItemType.ASSETCOLLECTION)
         return None
 
-    def _load_task_from_simulation(self, simulation: Simulation, parent: Experiment, comps_sim: COMPSSimulation):
+    def _load_task_from_simulation(self, simulation: Simulation, parent: Experiment, comps_sim: COMPSSimulation,
+                                   metadata: Dict = None):
         """
         Load task from the simulation object
 
@@ -311,9 +333,16 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         simulation.task = None
         if comps_sim.tags and 'task_type' in comps_sim.tags:
+            # check for metadata
+            if not metadata:
+                metadata = self.__load_metadata_from_simulation(simulation)
             try:
-                simulation.task = TaskFactory().create(comps_sim.tags.task_type)
+                if logger.isEnabledFor(DEBUG):
+                    logger.debug(f"Metadata: {metadata}")
+                simulation.task = TaskFactory().create(comps_sim.tags['task_type'], **metadata)
             except Exception as e:
+                user_logger.warning(f"Could not load task of type {comps_sim.tags['task_type']}. "
+                                    f"Received error {str(e)}")
                 logger.exception(e)
         # ensure we have loaded the configuration
         if comps_sim.configuration is None:
@@ -325,7 +354,29 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         else:
             simulation.task.command = CommandLine(cli)
         # call task load options(load configs from files, etc)
-        simulation.task.reload_from_simulation(comps_sim)
+        simulation.task.reload_from_simulation(simulation)
+
+    @staticmethod
+    def __load_metadata_from_simulation(simulation) -> Dict[str, Any]:
+        """
+        Load IDMTools metadata from a simulation
+
+        Args:
+            simulation:
+
+        Returns:
+            Metadata if found
+
+        Raise:
+            FileNotFoundError error if metadata not found
+        """
+        metadata = None
+        for file in simulation.assets:
+            if file.filename == "idmtools_metadata.json":
+                # load the asset
+                metadata = json.loads(file.download_stream().getvalue().decode('utf-8'))
+                return metadata
+        raise FileNotFoundError(f"Cannot find idmtools_metadata.json on the simulation {simulation.uid}")
 
     @staticmethod
     def _detect_command_line_from_simulation(experiment, simulation):

@@ -140,20 +140,7 @@ class JSONConfiguredTask(ITask):
             Populates the config with config from object
         """
         if simulation.platform:
-            if config_file_name:
-                cfn = config_file_name
-            elif 'task_config_file_name' in simulation.tags:
-                cfn = simulation.tags['task_config_file_name']
-            else:
-                cfn = self.config_file_name
-            if logger.isEnabledFor(DEBUG):
-                logger.debug(f'Loading Config from {simulation.id}:{cfn}')
-            config = simulation.platform.get_files(simulation, cfn)
-            config = config[cfn]
-            if isinstance(config, bytes):
-                config = json.loads(config.decode('utf-8'))
-
-            self.parameters = config
+            self.parameters = self.__find_config(simulation)
             if envelope and envelope in self.parameters:
                 self.parameters = self.parameters[envelope]
             elif 'task_envelope' in simulation.tags and simulation.tags['task_envelope'] in self.parameters:
@@ -161,12 +148,55 @@ class JSONConfiguredTask(ITask):
             elif self.envelope and self.envelope in self.parameters:
                 self.parameters = self.parameters[self.envelope]
 
+    def __find_config(self, simulation: Simulation, config_file_name: str = None) -> Dict[str, Any]:
+        """
+
+        Args:
+            simulation:
+            config_file_name:
+
+        Returns:
+
+        """
+        # find the ocnfig
+        if config_file_name:
+            cfn = config_file_name
+        elif 'task_config_file_name' in simulation.tags:
+            cfn = simulation.tags['task_config_file_name']
+        else:
+            cfn = self.config_file_name
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f'Loading Config from {simulation.id}:{cfn}')
+        config = dict()
+        if simulation.assets and isinstance(simulation.assets, (AssetCollection, list)):
+            for file in simulation.assets:
+                if file.filename == cfn:
+                    config = file.download_stream().getvalue()
+                    if isinstance(config, bytes):
+                        config = json.loads(config.decode('utf-8'))
             new_assets = []
             # filter our config from the simulation
             for i, asset in enumerate(simulation.assets.assets):
                 if asset.filename != cfn:
                     new_assets.append(asset)
             simulation.assets.assets = new_assets
+        else:
+            # try to load the config
+            config = simulation.platform.get_files(simulation, [cfn])
+            config = config[cfn]
+            if isinstance(config, bytes):
+                config = json.loads(config.decode('utf-8'))
+
+        # filter config from transient assets
+        if self.transient_assets:
+            nw = AssetCollection()
+            for asset in self.transient_assets:
+                if isinstance(asset, dict) and asset['filename'] != cfn:
+                    self.transient_assets.add_asset(Asset(**asset))
+                elif isinstance(asset, Asset) and asset.filename != cfn:
+                    self.transient_assets.add_asset(Asset(**asset))
+            self.transient_assets = nw
+        return config
 
     def pre_creation(self, parent: Union['Simulation', 'WorkflowItem']):  # noqa: F821
         defaults = [x for x in fields(JSONConfiguredTask) if x.name == "config_file_name"][0].default

@@ -740,7 +740,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             prog = None
         self.__wait_till_callback(
             item,
-            partial(self.__wait_until_done_progress_callback, prog=prog, child_attribute=child_attribute),
+            partial(self.__wait_until_done_progress_callback, progress_bar=prog, child_attribute=child_attribute),
             timeout,
             refresh_interval
         )
@@ -760,6 +760,11 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         return getattr(self, interface).get_related_items(item, relation_type)
 
     def __enter__(self):
+        """
+        Enable our
+        Returns:
+
+        """
         from idmtools.core.context import set_current_platform
         set_current_platform(self)
 

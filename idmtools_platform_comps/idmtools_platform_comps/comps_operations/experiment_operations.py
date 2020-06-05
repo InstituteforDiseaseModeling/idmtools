@@ -321,7 +321,18 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
                                         fallback=Experiment)
         obj.platform = self.platform
         obj._platform_object = experiment
+        # Set parent
+        obj.parent = suite
 
+        # Set the correct attributes
+        obj.uid = experiment.id
+        obj.comps_experiment = experiment
+        # load assets first so children can access during their load
+        obj.assets = self.get_assets_from_comps_experiment(experiment)
+        if obj.assets is None:
+            obj.assets = AssetCollection()
+
+        # if we are loading the children, convert them
         if children:
             # Convert all simulations
             comps_sims = experiment.get_simulations(
@@ -337,15 +348,6 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
                     self.platform._simulations.to_entity(s, parent=obj, **kwargs)
                 )
 
-        # Set parent
-        obj.parent = suite
-
-        # Set the correct attributes
-        obj.uid = experiment.id
-        obj.comps_experiment = experiment
-        obj.assets = self.get_assets_from_comps_experiment(experiment)
-        if obj.assets is None:
-            obj.assets = AssetCollection()
         return obj
 
     def get_assets_from_comps_experiment(self, experiment: COMPSExperiment) -> Optional[AssetCollection]:
