@@ -6,7 +6,11 @@ on: [push, pull_request]
 
 jobs:
   install-setup-dev-run-smoke-test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: [3.6, 3.7, 3.8]
     if: "contains(github.event.head_commit.message, 'Run smoke test!')"
     steps:
       - name: Check out Git repository
