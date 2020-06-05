@@ -8,7 +8,7 @@
 #
 # Note, this test will checkout 'dev' branch
 
-name: "Install nightly build and run all test"
+name: "Nightly build test"
 
 on:
   repository_dispatch:
@@ -16,7 +16,7 @@ on:
     types: [test_nightly_build]
 
 jobs:
-  install-nightly-build-run-all-test:
+  nightly-build-test:
     if: github.repository == 'InstituteforDiseaseModeling/idmtools'
     runs-on: ubuntu-latest
     steps:
