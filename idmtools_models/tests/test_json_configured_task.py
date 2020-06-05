@@ -2,7 +2,7 @@ import json
 from dataclasses import dataclass, field
 from unittest import TestCase
 import pytest
-from idmtools.core.platform_factory import platform
+from idmtools.core.platform_factory import Platform
 from idmtools.core.task_factory import TaskFactory
 from idmtools.entities import CommandLine
 from idmtools.entities.experiment import Experiment
@@ -73,8 +73,9 @@ class TestJSONConfiguredTask(TestCase):
         self.assertEqual(str(task.command), 'cat config.json')
         self.assertDictEqual(json.loads(task.transient_assets.assets[0].content), dict(test=values))
 
+    @pytest.mark.timeout(60)
     def test_reload_from_simulation_task(self):
-        with platform("TestExecute", missing_ok=True, default_missing=dict(type='TestExecute')) as p:
+        with Platform("TestExecute", missing_ok=True, default_missing=dict(type='TestExecute')) as p:
             task = ExampleExtendedJSONConfiguredTask(parameters=dict(a=1, b=2, c=3))
             experiment = Experiment.from_task(task=task, name="Test Reload Simulation")
             experiment.run(wait_until_done=True)

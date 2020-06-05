@@ -34,7 +34,7 @@ def file_contents_to_generator(filename, chunk_size=128) -> Generator[bytearray,
     with open(filename, 'rb') as i:
         while True:
             res = i.read(chunk_size)
-            if res == '':
+            if res == b'':
                 break
             else:
                 yield res
