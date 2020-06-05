@@ -130,15 +130,14 @@ class RequirementsToAssetCollection:
         # if exists, get ac and return it
         if len(ac_list) > 0:
             ac_list = sorted(ac_list, key=lambda t: t.date_created, reverse=True)
-            ac = ac_list[0]
-            return ac
+            return ac_list[0]
 
     def retrieve_ac_from_wi(self, wi):
         """
         Retrieve ac id from file ac_info.txt saved by WI
         Args:
             wi: SSMTWorkItem (which was used to create ac from library)
-        Returns: asset collection id
+        Returns: COMPS asset collection
         """
         ac_file = "ac_info.txt"
 
