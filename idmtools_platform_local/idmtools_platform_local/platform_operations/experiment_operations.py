@@ -8,7 +8,7 @@ from typing import List, Any, Dict, Container, NoReturn
 from uuid import UUID
 from tqdm import tqdm
 from idmtools.assets import Asset
-from idmtools.core.docker_task import ContainerTask
+from idmtools.core.docker_task import DockerTask
 from idmtools.core.experiment_factory import experiment_factory
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
@@ -199,7 +199,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         e.uid = experiment['experiment_id']
         return e
 
-    def _run_docker_sim(self, experiment_uid: UUID, simulation_uid: UUID, task: ContainerTask):
+    def _run_docker_sim(self, experiment_uid: UUID, simulation_uid: UUID, task: DockerTask):
         """
         Run a docker based simulation
 

@@ -3,7 +3,7 @@ from dataclasses import field, dataclass
 from logging import getLogger
 from typing import Type, Union
 from idmtools.assets import Asset, AssetCollection
-from idmtools.core.docker_task import ContainerTask
+from idmtools.core.docker_task import DockerTask
 from idmtools.entities import CommandLine
 from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools.entities.simulation import Simulation
@@ -13,7 +13,7 @@ logger = getLogger(__name__)
 
 
 @dataclass
-class RTask(ContainerTask):
+class RTask(DockerTask):
     script_path: str = field(default=None)
     r_path: str = field(default='Rscript')
     extra_libraries: list = field(default_factory=lambda: [], compare=False, metadata={"md": True})

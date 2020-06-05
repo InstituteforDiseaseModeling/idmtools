@@ -20,7 +20,7 @@ user_logger = getLogger('user')
 
 
 @dataclass
-class ContainerTask(ITask):
+class DockerTask(ITask):
     image_name: str = None
     # Optional config to build the docker image
     build: bool = False
@@ -136,7 +136,7 @@ class ContainerTask(ITask):
 
 class DockerTaskSpecification(TaskSpecification):
 
-    def get(self, configuration: dict) -> ContainerTask:
+    def get(self, configuration: dict) -> DockerTask:
         """
         Get instance of DockerTask with configuration provided
 
@@ -146,7 +146,7 @@ class DockerTaskSpecification(TaskSpecification):
         Returns:
             DockerTask with configuration
         """
-        return ContainerTask(**configuration)
+        return DockerTask(**configuration)
 
     def get_description(self) -> str:
         """
@@ -157,11 +157,11 @@ class DockerTaskSpecification(TaskSpecification):
         """
         return "Defines a docker command"
 
-    def get_type(self) -> Type[ContainerTask]:
+    def get_type(self) -> Type[DockerTask]:
         """
         Get type of task provided by plugin
 
         Returns:
             DockerTask
         """
-        return ContainerTask
+        return DockerTask
