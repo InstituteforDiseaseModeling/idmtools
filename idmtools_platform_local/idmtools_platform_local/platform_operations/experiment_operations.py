@@ -1,13 +1,15 @@
 import functools
 import logging
+import os
 import time
 from dataclasses import dataclass
 from logging import getLogger
 from math import floor
-from typing import List, Any, Dict, Container, NoReturn
+from typing import List, Any, Dict, Container, NoReturn, TYPE_CHECKING
 from uuid import UUID
 from tqdm import tqdm
-from idmtools.assets import Asset, json
+from idmtools.assets import Asset, json, AssetCollection
+from idmtools.core import ItemType
 from idmtools.core.docker_task import DockerTask
 from idmtools.core.experiment_factory import experiment_factory
 from idmtools.entities.experiment import Experiment
@@ -16,7 +18,11 @@ from idmtools.entities.simulation import Simulation
 from idmtools.utils.json import IDMJSONEncoder
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
 from idmtools_platform_local.client.simulations_client import SimulationsClient
-from idmtools_platform_local.platform_operations.uitils import local_status_to_common, ExperimentDict, SimulationDict
+from idmtools_platform_local.platform_operations.uitils import local_status_to_common, ExperimentDict, SimulationDict, \
+    download_lp_file
+
+if TYPE_CHECKING:
+    from idmtools_platform_local.local_platform import LocalPlatform
 
 logger = getLogger(__name__)
 
@@ -57,7 +63,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
             raise ValueError("One of the requirements not supported by platform")
 
         # send metadata about job
-        extra_details = json.loads(json.dumps(experiment.to_dict(), cls=IDMJSONEncoder))
+        extra_details = dict(metadata=json.loads(json.dumps(experiment.to_dict(), cls=IDMJSONEncoder)))
         m = CreateExperimentTask.send(experiment.tags, extra_details)
 
         # Create experiment is vulnerable to disconnects early on of redis errors. Lets do a retry on conditions
@@ -186,7 +192,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         e = dict(experiment_id=experiment.uid, tags=experiment.tags)
         return e
 
-    def to_entity(self, experiment: Dict, **kwargs) -> Experiment:
+    def to_entity(self, experiment: Dict, children: bool = True, **kwargs) -> Experiment:
         """
         Convert an ExperimentDict to an Experiment
 
@@ -199,7 +205,13 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         """
         e = experiment_factory.create(experiment['tags'].get("type"), tags=experiment['tags'])
         e.platform = self.platform
+        e._platform_object = experiment
         e.uid = experiment['experiment_id']
+        e.assets = AssetCollection(self.list_assets(e))
+
+        # load children
+        if children:
+            e.simulations = self.platform.get_children(e.uid, item_type=ItemType.EXPERIMENT, item=e, parent=e, **kwargs)
         return e
 
     def _run_docker_sim(self, experiment_uid: UUID, simulation_uid: UUID, task: DockerTask):
@@ -276,3 +288,51 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
             src['content'] = asset.content
         src['dest_name'] = asset.filename if asset.filename else file_path
         self.platform._do.copy_to_container(worker, remote_path, **src)
+
+    @staticmethod
+    def __get_experiment_path(platform: 'LocalPlatform', experiment: Experiment) -> str:
+        """
+        Returns path to experiment on disk
+        Args:
+            platform: Platform with config
+            experiment: Experiment
+
+        Returns:
+            Experiment path on disk
+        """
+        return os.path.join(platform.host_data_directory, 'workers', experiment.id)
+
+    def list_assets(self, experiment: Experiment, **kwargs) -> List[Asset]:
+        """
+        List assets for a sim
+
+        Args:
+            experiment: Experiment object
+
+        Returns:
+
+        """
+        assets = []
+        experiment_path = self.__get_experiment_path(self.platform, experiment)
+        full_path = os.path.join(experiment_path, "Assets")
+
+        def download_file(filename, buffer_size: int = 128):
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f"Streaming file {filename}")
+            with open(filename, 'rb') as out:
+                while True:
+                    chunk = out.read(buffer_size)
+                    if chunk:
+                        yield chunk
+                    else:
+                        break
+
+        for root, dirs, files in os.walk(full_path, topdown=False):
+            for file in files:
+                fp = os.path.join(root, file)
+                asset = Asset(filename=file)
+                stat = os.stat(fp)
+                asset.length = stat.st_size
+                asset.download_generator_hook = functools.partial(download_lp_file, fp)
+                assets.append(asset)
+        return assets
