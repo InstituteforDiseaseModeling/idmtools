@@ -73,9 +73,6 @@ class TestExperimentOperations(unittest.TestCase):
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         self.platform = Platform("COMPS2")
 
-    def test_to_entity(self):
-        self.assertTrue(False)
-
     def test_no_assets(self):
         setup_command_no_asset("COMPS2")
 
