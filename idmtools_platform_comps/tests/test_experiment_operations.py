@@ -26,7 +26,7 @@ cache = dc.Cache(os.getcwd() if os.getenv("CACHE_FIXTURES", "No").lower()[0] in 
 
 @cache.memoize(expire=300)
 def setup_command_no_asset(platform: str = 'COMPS2'):
-    bt = CommandTask('hello_world.bat')
+    bt = CommandTask("Assets\\hello_world.bat")
     experiment = Experiment.from_task(
         bt,
         tags=dict(
@@ -89,8 +89,6 @@ class TestExperimentOperations(unittest.TestCase):
             )
 
             experiments = COMPSExperiment.get(query_criteria=qc)
-
-
             experiment = experiments[0]
 
             # load as idm object(testing both get and to_entity
@@ -126,7 +124,9 @@ class TestExperimentOperations(unittest.TestCase):
             self.assertEqual(9, len(assets))
             totals = defaultdict(int)
             for asset in assets:
-                name = os.path.join(os.path.dirname(__file__), 'output', asset.filename)
+                out_dir = os.path.join(os.path.dirname(__file__), 'output')
+                os.makedirs(out_dir, exist_ok=True)
+                name = os.path.join(out_dir, asset.filename)
                 asset.download_to_path(name)
                 with open(name, 'rb') as din:
                     content = din.read()
