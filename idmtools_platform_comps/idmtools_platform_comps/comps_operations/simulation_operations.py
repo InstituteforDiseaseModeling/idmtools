@@ -298,10 +298,13 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         # should we load metadata
         metadata = self.__load_metadata_from_simulation(simulation) if load_metadata else None
         if load_task:
-            self._load_task_from_simulation(obj, parent, simulation, metadata)
+            self._load_task_from_simulation(obj, simulation, metadata)
         else:
             obj.task = None
+            self.__extract_cli(simulation, parent, obj)
 
+        # call task load options(load configs from files, etc)
+        obj.task.reload_from_simulation(obj)
         return obj
 
     def get_asset_collection_from_comps_simulation(self, simulation: COMPSSimulation) -> Optional[AssetCollection]:
@@ -318,7 +321,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             return self.platform.get_item(simulation.configuration.asset_collection_id, ItemType.ASSETCOLLECTION)
         return None
 
-    def _load_task_from_simulation(self, simulation: Simulation, parent: Experiment, comps_sim: COMPSSimulation,
+    def _load_task_from_simulation(self, simulation: Simulation, comps_sim: COMPSSimulation,
                                    metadata: Dict = None):
         """
         Load task from the simulation object
@@ -347,14 +350,14 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         # ensure we have loaded the configuration
         if comps_sim.configuration is None:
             comps_sim.refresh(QueryCriteria().select_children('configuration'))
+
+    def __extract_cli(self, comps_sim, parent, simulation):
         cli = self._detect_command_line_from_simulation(parent, comps_sim)
         # if we could not find task, set it now, otherwise rebuild the cli
         if simulation.task is None:
             simulation.task = CommandTask(CommandLine(cli))
         else:
             simulation.task.command = CommandLine(cli)
-        # call task load options(load configs from files, etc)
-        simulation.task.reload_from_simulation(simulation)
 
     @staticmethod
     def __load_metadata_from_simulation(simulation) -> Dict[str, Any]:
@@ -374,7 +377,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         for file in simulation.assets:
             if file.filename == "idmtools_metadata.json":
                 # load the asset
-                metadata = json.loads(file.download_stream().getvalue().decode('utf-8'))
+                metadata = json.loads(file.content.decode('utf-8'))
                 return metadata
         raise FileNotFoundError(f"Cannot find idmtools_metadata.json on the simulation {simulation.uid}")
 
@@ -398,9 +401,9 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             po.refresh(QueryCriteria().select_children('configuration'))
         # simulation configuration for executable?
         if simulation.configuration and simulation.configuration.executable_path:
-            cli = f'{simulation.configuration.executable_path} {simulation.configuration.simulation_input_args}'
+            cli = f'{simulation.configuration.executable_path} {simulation.configuration.simulation_input_args.strip()}'
         elif po.configuration and po.configuration.executable_path:
-            cli = f'{po.configuration.executable_path} {po.configuration.simulation_input_args}'
+            cli = f'{po.configuration.executable_path} {po.configuration.simulation_input_args.strip()}'
         if cli is None:
             raise ValueError("Could not detect cli")
         elif logger.isEnabledFor(DEBUG):

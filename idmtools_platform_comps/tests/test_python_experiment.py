@@ -14,6 +14,7 @@ from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import ArmSimulationBuilder, ArmType, SimulationBuilder, SweepArm
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
+from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
@@ -97,7 +98,7 @@ class TestPythonExperiment(ITestWithPersistence):
         self.assertDictEqual(expected_exp_tags, actual_exp_tags)
 
         # validate reload
-        with self.subTest("test_sweeps_with_partial_comps_reload"):
+        with self.subTest("test_sweeps_with_partial_comps_reload_with_task"):
             experiment_reload = Experiment.from_id(e.uid, self.platform, load_task=True)
             self.assertEqual(e.id, experiment_reload.id)
             self.assertEqual(e.simulation_count, experiment_reload.simulation_count)
@@ -108,7 +109,16 @@ class TestPythonExperiment(ITestWithPersistence):
             )
             for sim in experiment_reload.simulations:
                 self.assertIsInstance(sim.task, JSONConfiguredPythonTask)
+                self.assertIn("a", sim.task.parameters)
+                self.assertIn("b", sim.task.parameters)
+                self.assertEqual(str(e.simulations[0].task.command), str(sim.task.command))
 
+        with self.subTest("test_sweeps_with_partial_comps_reload"):
+            experiment_reload = Experiment.from_id(e.uid, self.platform)
+            for sim in experiment_reload.simulations:
+                self.assertIsInstance(sim.task, CommandTask)
+                'python ./Assets/model1.py --config config.json'
+                self.assertEqual(str(e.simulations[0].task.command), str(sim.task.command))
 
     # Test parameter "b" set is depending on parameter "a"
     # a=[0,1,2,3,4] <--sweep parameter

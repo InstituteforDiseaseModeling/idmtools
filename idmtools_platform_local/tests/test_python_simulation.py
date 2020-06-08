@@ -57,6 +57,16 @@ class TestPythonSimulation(ITestWithPersistence):
         sorted_expected_tags = sorted(expected_tags, key=itemgetter('a'))
         self.assertEqual(sorted_tags, sorted_expected_tags)
 
+        # test reload
+        with self.subTest("test_direct_sweep_one_parameter_local_reload_task"):
+            experiment_reload = Experiment.from_id(e.uid, platform, load_task=True)
+            self.assertEqual(e.uid, experiment_reload.uid)
+            self.assertEqual(e.simulation_count, experiment_reload.simulation_count)
+            for sim in experiment_reload.simulations:
+                self.assertIsInstance(sim, JSONConfiguredPythonTask)
+                self.assertEqual(str(e.simulations[0].task.command), str(sim.task.command))
+                self.assertIn('a', sim.task.parameters)
+
     @pytest.mark.long
     @pytest.mark.timeout(90)
     @restart_local_platform(silent=True, **get_test_local_env_overrides())

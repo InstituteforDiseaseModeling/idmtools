@@ -1,9 +1,12 @@
 import copy
 import uuid
 from dataclasses import dataclass, field, InitVar, fields
-from logging import getLogger
+from logging import getLogger, DEBUG
 from types import GeneratorType
 from typing import NoReturn, Set, Union, Iterator, Type, Dict, Any, List, TYPE_CHECKING, Generator
+
+from tqdm import tqdm
+
 from idmtools.assets import AssetCollection, Asset
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType, EntityStatus
@@ -108,18 +111,26 @@ class Experiment(IAssetsEnabled, INamedEntity):
 
         # if it is a template, set task type on experiment
         if isinstance(self.simulations, ParentIterator) and isinstance(self.simulations.items, TemplatedSimulations):
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Using Base task from template for experiment level assets")
             self.simulations.items.base_task.gather_common_assets()
             self.assets.add_assets(self.simulations.items.base_task.common_assets, fail_on_duplicate=False)
             if "task_type" not in self.tags:
                 task_class = self.simulations.items.base_task.__class__
                 self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
         elif self.gather_common_assets_from_task and isinstance(self.__simulations, List):
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Using first task for task type")
+                logger.debug("Using all tasks to gather assts")
             task_class = self.__simulations[0].task.__class__
             self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
-            for sim in self.__simulations:
-                assets = sim.task.gather_common_assets()
-                if assets is not None:
-                    self.assets.add_assets(assets, fail_on_duplicate=False)
+            pbar = tqdm(self.__simulations, desc="Discovering experiment assets from tasks")
+            for sim in pbar:
+                # don't gather assets from simulations that have been provisioned
+                if sim.status is None:
+                    assets = sim.task.gather_common_assets()
+                    if assets is not None:
+                        self.assets.add_assets(assets, fail_on_duplicate=False)
 
         self.tags.update(get_default_tags())
 

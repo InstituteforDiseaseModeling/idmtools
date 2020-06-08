@@ -7,12 +7,13 @@ from math import floor
 from typing import List, Any, Dict, Container, NoReturn
 from uuid import UUID
 from tqdm import tqdm
-from idmtools.assets import Asset
+from idmtools.assets import Asset, json
 from idmtools.core.docker_task import DockerTask
 from idmtools.core.experiment_factory import experiment_factory
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
 from idmtools.entities.simulation import Simulation
+from idmtools.utils.json import IDMJSONEncoder
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
 from idmtools_platform_local.client.simulations_client import SimulationsClient
 from idmtools_platform_local.platform_operations.uitils import local_status_to_common, ExperimentDict, SimulationDict
@@ -55,7 +56,9 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         if not self.platform.are_requirements_met(experiment.platform_requirements):
             raise ValueError("One of the requirements not supported by platform")
 
-        m = CreateExperimentTask.send(experiment.tags)
+        # send metadata about job
+        extra_details = json.loads(json.dumps(experiment.to_dict(), cls=IDMJSONEncoder))
+        m = CreateExperimentTask.send(experiment.tags, extra_details)
 
         # Create experiment is vulnerable to disconnects early on of redis errors. Lets do a retry on conditions
         start = time.time()

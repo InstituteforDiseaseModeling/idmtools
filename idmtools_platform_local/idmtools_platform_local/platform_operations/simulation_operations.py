@@ -4,22 +4,23 @@ from dataclasses import dataclass
 from logging import getLogger, DEBUG
 from typing import Dict, List, Set, Union, Iterator, Optional
 from uuid import UUID
-
 from docker.models.containers import Container
 from tqdm import tqdm
-
-from idmtools.assets import Asset
+from idmtools.assets import Asset, json
 from idmtools.core import ItemType
+from idmtools.core.task_factory import TaskFactory
+from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
 from idmtools.entities.simulation import Simulation
-from idmtools.entities.task_proxy import TaskProxy
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools.utils.collections import ParentIterator
+from idmtools.utils.json import IDMJSONEncoder
 from idmtools_platform_local.client.simulations_client import SimulationsClient
 from idmtools_platform_local.platform_operations.uitils import local_status_to_common, SimulationDict, ExperimentDict
 
 logger = getLogger(__name__)
+user_logger = getLogger('user')
 
 
 @dataclass
@@ -52,8 +53,8 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
             Simulation dict and created id
         """
         from idmtools_platform_local.internals.tasks.create_simulation import CreateSimulationTask
-
-        m = CreateSimulationTask.send(simulation.experiment.uid, simulation.tags)
+        extra_details = self.__create_simulation_metadata(simulation)
+        m = CreateSimulationTask.send(simulation.experiment.uid, simulation.tags, extra_details=extra_details)
         if logger.isEnabledFor(DEBUG):
             logger.debug('Creating Simulation ID and directories')
         sim_id = m.get_result(block=True, timeout=self.platform.default_timeout * 1000)
@@ -91,7 +92,8 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
             parent_uid = sims[0].parent.uid
 
         final_sims = []
-        # precreation our simulations
+
+        # pre-creation our simulations
         if isinstance(sims, ParentIterator) and isinstance(sims.items, (TemplatedSimulations, list)):
             sims_i = sims.items
             for simulation in sims_i:
@@ -105,7 +107,8 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
             raise ValueError("Needs to be one a list, ParentIterator of TemplatedSimulations or list")
 
         # first create the sim ids
-        m = CreateSimulationsTask.send(parent_uid, [s.tags for s in final_sims if s.status is None])
+        sims_to_create = [(s.tags, self.__create_simulation_metadata(s)) for s in final_sims if s.status is None]
+        m = CreateSimulationsTask.send(parent_uid, sims_to_create)
         ids = m.get_result(block=True, timeout=self.platform.default_timeout * 1000)
 
         items = dict()
@@ -122,6 +125,19 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         if not result:
             raise IOError("Coping of data for simulations failed.")
         return final_sims
+
+    @staticmethod
+    def __create_simulation_metadata(simulation: Simulation):
+        """
+
+        Args:
+            simulation:
+
+        Returns:
+
+        """
+        extra_details = json.loads(json.dumps(simulation.to_dict(), cls=IDMJSONEncoder))
+        return extra_details
 
     def get_parent(self, simulation: SimulationDict, **kwargs) -> ExperimentDict:
         """
@@ -266,12 +282,36 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         if parent is None:
             parent = self.platform.get_item(simulation["experiment_id"], ItemType.EXPERIMENT)
-        isim = Simulation(task=TaskProxy())
+        isim = Simulation(task=None)
+        isim.platform = self
         isim.experiment = parent
         isim.parent_id = simulation["experiment_id"]
         isim.uid = simulation['simulation_uid']
         isim.tags = simulation['tags']
         isim.status = local_status_to_common(simulation['status'])
+        isim.assets = self.list_assets(isim)
+        if load_task:
+            if ['tags'] in simulation and 'task_type' in simulation['tags']:
+                if 'metadata' in simulation['extra_details']:
+                    metadata = simulation['extra_details']['metadata']
+                else:
+                    metadata = dict()
+
+                try:
+                    if logger.isEnabledFor(DEBUG):
+                        logger.debug(f"Metadata: {metadata}")
+                    simulation.task = TaskFactory().create(simulation['tags']['task_type'], **metadata)
+                except Exception as e:
+                    user_logger.warning(f"Could not load task of type {simulation['tags']['task_type']}. "
+                                        f"Received error {str(e)}")
+                    logger.exception(e)
+
+                if simulation.task:
+                    simulation.task.reload_from_simulation(simulation)
+        else:
+            metadata = simulation['extra_details']['metadata']
+            simulation.task = CommandTask(metadata['command'])
+
         return isim
 
     def _retrieve_output_files(self, job_id_path: str, paths: Union[List[str], Set[str]]) -> List[bytes]:

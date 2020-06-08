@@ -171,7 +171,7 @@ class JSONConfiguredTask(ITask):
         if simulation.assets and isinstance(simulation.assets, (AssetCollection, list)):
             for file in simulation.assets:
                 if file.filename == cfn:
-                    config = file.download_stream().getvalue()
+                    config = file.content
                     if isinstance(config, bytes):
                         config = json.loads(config.decode('utf-8'))
             new_assets = []

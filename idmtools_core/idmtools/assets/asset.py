@@ -98,7 +98,7 @@ class Asset:
                 self._content = fp.read()
         elif self.download_generator_hook:
             if logger.isEnabledFor(DEBUG):
-                logger.debug("Fetching content from platform")
+                logger.debug(f"Fetching {self.filename} content from platform")
             self._content = self.download_stream().getvalue()
 
         return self._content
@@ -145,7 +145,7 @@ class Asset:
             BytesIO of the Asset
         """
         if logger.isEnabledFor(DEBUG):
-            logger.debug("Download to stream")
+            logger.debug(f"Download {self.filename} to stream")
         io = BytesIO()
         self.__write_download_generator_to_stream(io)
         return io
@@ -189,7 +189,7 @@ class Asset:
             path = os.path.join(path, self.filename)
         with open(path, 'wb') as out:
             if logger.isEnabledFor(DEBUG):
-                logger.debug(f"Download to {path}")
+                logger.debug(f"Download {self.filename} to {path}")
             self.__write_download_generator_to_stream(out)
 
 
