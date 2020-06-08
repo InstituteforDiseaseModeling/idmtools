@@ -3,6 +3,7 @@ from logging import getLogger, DEBUG
 import hashlib
 from dataclasses import dataclass, field
 from idmtools.assets import Asset
+from idmtools.core import ItemType
 from idmtools.core.interfaces.iitem import IItem
 from COMPS.Data.AssetCollection import AssetCollection as COMPSAssetCollection
 from COMPS.Data import QueryCriteria
@@ -96,7 +97,7 @@ class RequirementsToAssetCollection:
             logger.debug(f'\nwi: {wi.uid}')
 
         # get ac or return ad_id
-        ac = self.retrieve_ac_by_tag()
+        ac = self.retrieve_ac_from_wi(wi)
 
         if ac:
             return ac.id
@@ -129,8 +130,28 @@ class RequirementsToAssetCollection:
         # if exists, get ac and return it
         if len(ac_list) > 0:
             ac_list = sorted(ac_list, key=lambda t: t.date_created, reverse=True)
-            ac = ac_list[0]
-            return ac
+            return ac_list[0]
+
+    def retrieve_ac_from_wi(self, wi):
+        """
+        Retrieve ac id from file ac_info.txt saved by WI
+        Args:
+            wi: SSMTWorkItem (which was used to create ac from library)
+        Returns: COMPS asset collection
+        """
+        ac_file = "ac_info.txt"
+
+        # retrieve ac file
+        ret = self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, [ac_file])
+
+        # get file content
+        ac_id_bytes = ret[ac_file]
+
+        # convert bytes to string
+        ac_id_str = ac_id_bytes.decode('utf-8')
+
+        # return comps ac
+        return self.platform.get_item(ac_id_str, ItemType.ASSETCOLLECTION, raw=True)
 
     def add_wheels_to_assets(self, experiment):
         for whl in self.local_wheels:
@@ -183,9 +204,17 @@ class RequirementsToAssetCollection:
         self.wait_till_done(wi)
 
         if wi.succeeded:
+            # make ac as related_asset_collection to wi
+            from COMPS.Data.WorkItem import RelationType
+            comps_ac = self.retrieve_ac_from_wi(wi)
+            comps_wi = self.platform.get_item(wi.uid, ItemType.WORKFLOW_ITEM, raw=True)
+            comps_wi.add_related_asset_collection(comps_ac.id, relation_type=RelationType.Created)
+            comps_wi.save()
+
             return wi
 
-    def get_latest_version(self, pkg_name, display_all=False):
+    @staticmethod
+    def get_latest_version(pkg_name, display_all=False):
         """
         Utility to get the latest version for a given package name
         Args:

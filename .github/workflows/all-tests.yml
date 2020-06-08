@@ -8,14 +8,14 @@
 #
 # Note, this test will checkout 'dev' branch
 
-name: "Install with setup-dev and run all test"
+name: "setup-dev test"
 
 on:
  repository_dispatch:
   types: [run_setup_dev_test]
 
 jobs:
-  install-setup-dev-run-all-test:
+  setup-dev-test:
     runs-on: ubuntu-latest
     steps:
       - name: Check out Git repository
