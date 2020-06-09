@@ -328,14 +328,26 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         simulation.task.reload_from_simulation(simulation)
         return simulation
 
-    def __convert_json_assets_to_assets(self, asset, sim_path, asset_collection):
+    @staticmethod
+    def __convert_json_assets_to_assets(asset: Dict, simulation_path: str, asset_collection: AssetCollection):
+        """
+        Convert JSON Assets from Metadata to IDM Metadata
+        Args:
+            asset: Asset dict
+            simulation_path: Path to simulation files
+            asset_collection: Asset collection to add asset to
+
+        Returns:
+            None. It modifies the passed in asset_collection
+
+        """
         args = dict()
         if 'absolute_path' in asset:
             args['absolute_path'] = asset['absolute_path']
         if 'filename' in asset:
             args['filename'] = asset['filename']
         if 'absolute_path' not in args or args['absolute_path'] is None:
-            args['absolute_path'] = os.path.join(sim_path, args['filename'])
+            args['absolute_path'] = os.path.join(simulation_path, args['filename'])
         asset_collection.add_asset(Asset(
             download_generator_hook=partial(download_lp_file, args['absolute_path']),
             **args
