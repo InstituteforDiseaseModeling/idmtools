@@ -105,7 +105,7 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
             coloredlogs.install(level=level)
         else:
             # install colored logs for user logger only
-            coloredlogs.install(logger=getLogger('user'), level=logging.INFO, fmt='%(message)s')
+            coloredlogs.install(logger=getLogger('user'), level=VERBOSE, fmt='%(message)s')
 
         # see https://docs.python.org/3/library/logging.handlers.html#queuelistener
         # setup file logger handler that rotates after 10 mb of logging and keeps 5 copies

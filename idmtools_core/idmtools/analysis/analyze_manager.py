@@ -10,7 +10,7 @@ from idmtools.core import NoPlatformException
 from idmtools.core.cache_enabled import CacheEnabled
 from idmtools.core.enums import EntityStatus, ItemType
 from idmtools.core.interfaces.ientity import IEntity
-from idmtools.core.logging import VERBOSE
+from idmtools.core.logging import VERBOSE, SUCCESS
 from idmtools.entities.ianalyzer import IAnalyzer
 from idmtools.entities.iplatform import IPlatform
 from idmtools.utils.command_line import animation
@@ -432,7 +432,7 @@ class AnalyzeManager(CacheEnabled):
         if self.verbose:
             total_time = time.time() - start_time
             time_str = verbose_timedelta(total_time)
-            user_logger.info(
-                '\r | Analysis complete. Took {} (~ {:.3f} per item)'.format(time_str, total_time / n_items))
+            user_logger.log(SUCCESS, '\r | Analysis complete. Took {} '
+                                     '(~ {:.3f} per item)'.format(time_str, total_time / n_items))
 
         return True
