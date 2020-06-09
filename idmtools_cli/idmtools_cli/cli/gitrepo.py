@@ -49,7 +49,7 @@ def list_examples(raw: bool):
 
 
 # alias under examples
-@cli.group()
+@cli.group(help="Display a list of examples organized by plugin type")
 def examples():
     pass
 
