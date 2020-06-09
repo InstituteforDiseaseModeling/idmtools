@@ -273,7 +273,7 @@ class AnalyzeManager(CacheEnabled):
         user_logger.log(VERBOSE, f' | {n_items} item(s) selected for analysis')
         user_logger.log(VERBOSE, f' | partial_analyze_ok is {self.partial_analyze_ok}, max_items is '
                                  f'{self.max_items_to_analyze}, and {n_ignored_items} item(s) are being ignored')
-        user_logger.info(' | Analyzer(s): ')
+        user_logger.log(VERBOSE, ' | Analyzer(s): ')
         for analyzer in self.analyzers:
             user_logger.log(VERBOSE, f' |  - {analyzer.uid} File parsing: {on_off(analyzer.parse)} / Use '
                                      f'cache: {on_off(hasattr(analyzer, "cache"))}')
