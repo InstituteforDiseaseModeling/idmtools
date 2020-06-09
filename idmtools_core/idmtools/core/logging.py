@@ -55,6 +55,9 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
     Returns:
         Returns the ``QueueListener`` created that writes the log messages. In advanced scenarios with
         multi-processing, you may need to manually stop the logger.
+
+    See Also:
+        For logging levels, see https://coloredlogs.readthedocs.io/en/latest/api.html#id26
     """
     global listener, logging_queue
     if type(level) is str:
