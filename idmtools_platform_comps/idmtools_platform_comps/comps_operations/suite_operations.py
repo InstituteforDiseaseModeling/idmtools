@@ -24,6 +24,16 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
         return s
 
     def platform_create(self, suite: Suite, **kwargs) -> Tuple[COMPSSuite, UUID]:
+        """
+        Create suite on COMPS
+
+        Args:
+            suite: Suite to create
+            **kwargs:
+
+        Returns:
+            COMPS Suite object and a UUID
+        """
         self.platform._login()
 
         # Create suite
@@ -36,9 +46,28 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
         return comps_suite, suite.uid
 
     def get_parent(self, suite: COMPSSuite, **kwargs) -> Any:
+        """
+        Get parent of suite. We always return None on COMPS
+
+        Args:
+            suite:
+            **kwargs:
+
+        Returns:
+            None
+        """
         return None
 
     def get_children(self, suite: COMPSSuite, **kwargs) -> List[Union[COMPSExperiment, WorkItem]]:
+        """
+        Get children for a suite
+        Args:
+            suite: Suite to get children for
+            **kwargs: Any arguments to pass on to loading functions
+
+        Returns:
+            List of COMPS Experiments/Workitems that are part of the suite
+        """
         cols = kwargs.get("cols")
         children = kwargs.get("children")
         cols = cols or ["id", "name", "suite_id"]
@@ -48,10 +77,30 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
         return children
 
     def refresh_status(self, suite: Suite, **kwargs):
+        """
+        Refresh the status of a suite. On comps, this is done by refreshing all experiments
+        Args:
+            suite: Suite to refresh status of
+            **kwargs:
+
+        Returns:
+
+        """
         for experiment in suite.experiments:
             self.platform.refresh_status(experiment)
 
     def to_entity(self, suite: COMPSSuite, children: bool = True, **kwargs) -> Suite:
+        """
+        Convert a COMPS Suite to an IDM Suite
+
+        Args:
+            suite: Suite to Convert
+            children: When true, load simulations, false otherwise
+            **kwargs:
+
+        Returns:
+            IDM Suite
+        """
         # Creat a suite
         obj = Suite()
 

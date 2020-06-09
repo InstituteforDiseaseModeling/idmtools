@@ -18,25 +18,58 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
 
     def get(self, asset_collection_id: UUID, children: Optional[List[str]] = None,
             query_criteria: Optional[QueryCriteria] = None, **kwargs) -> COMPSAssetCollection:
+        """
+        Get an asset collection by id
+
+        Args:
+            asset_collection_id: Id of asset collection
+            children: Optional list of children to load. Defaults to assets and tags
+            query_criteria: Optional query_criteria. Ignores children default
+            **kwargs:
+
+        Returns:
+            COMPSAssetCollection
+        """
         children = children if children is not None else ["assets", "tags"]
         query_criteria = query_criteria or QueryCriteria().select_children(children)
         return COMPSAssetCollection.get(id=asset_collection_id, query_criteria=query_criteria)
 
     def platform_create(self, asset_collection: AssetCollection, **kwargs) -> COMPSAssetCollection:
+        """
+        Create AssetCollection
+
+        Args:
+            asset_collection: AssetCollection to create
+            **kwargs:
+
+        Returns:
+            COMPSAssetCollection
+        """
         ac = COMPSAssetCollection()
         for asset in asset_collection:
             # using checksum is not accurate and not all systems will support de-duplication
             if asset.checksum is None:
-                ac.add_asset(AssetCollectionFile(file_name=asset.filename, relative_path=asset.relative_path),
-                             data=asset.bytes)
+                ac.add_asset(
+                    AssetCollectionFile(
+                        file_name=asset.filename,
+                        relative_path=asset.relative_path
+                    ),
+                    data=asset.bytes
+                )
             else:  # We should already have this asset so we should have a md5sum
-                ac.add_asset(AssetCollectionFile(file_name=asset.filename, relative_path=asset.relative_path,
-                                                 md5_checksum=asset.checksum))
+                ac.add_asset(
+                    AssetCollectionFile(
+                        file_name=asset.filename,
+                        relative_path=asset.relative_path,
+                        md5_checksum=asset.checksum
+                    )
+                )
 
         # Add tags
         if asset_collection.tags:
             ac.set_tags(asset_collection.tags)
 
+        # now send it to comps
         ac.save()
         asset_collection.uid = ac.id
         asset_collection._platform_object = asset_collection
@@ -44,6 +77,16 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
 
     def to_entity(self, asset_collection: Union[COMPSAssetCollection, SimulationFile, List[SimulationFile]], **kwargs) \
             -> AssetCollection:
+        """
+        Convert COMPS Asset Collection or Simulation File to IDM Asset Collection
+
+        Args:
+            asset_collection: Comps asset/asset collection to convert to idm asset collection
+            **kwargs:
+
+        Returns:
+            AssetCollection
+        """
         ac = AssetCollection()
         # we support comps simulations files and experiments as asset collections
         # only true asset collections have ids
