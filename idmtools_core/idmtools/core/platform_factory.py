@@ -37,6 +37,9 @@ class Platform:
 
         Returns:
             The requested platform.
+
+        Raises:
+            ValueError if the block is None
         """
         global current_platform, current_platform_stack
         from idmtools.registry.platform_specification import PlatformPlugins
@@ -62,6 +65,9 @@ class Platform:
 
         Returns:
             None
+
+        Raise:
+            ValueError: when the platform is of an unknown type
         """
         if name not in cls._platforms:
             raise ValueError(f"{name} is an unknown Platform Type. "

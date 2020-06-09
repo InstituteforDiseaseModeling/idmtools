@@ -5,6 +5,8 @@ from configparser import ConfigParser
 from logging import getLogger
 from typing import Any, Dict
 
+from idmtools.core.logging import VERBOSE
+
 default_config = 'idmtools.ini'
 
 # this is the only logger that should not be defined using init_logger
@@ -273,9 +275,8 @@ class IdmConfigParser:
         """
         if cls.found_ini():
             block_details = cls.get_section(block)
-            # print('\nConfig_info:')
-            user_logger.info(f"\n[{block}]")
-            user_logger.info(json.dumps(block_details, indent=3))
+            user_logger.log(VERBOSE, f"\n[{block}]")
+            user_logger.log(VERBOSE, json.dumps(block_details, indent=3))
 
     @classmethod
     @initialization(error=False)

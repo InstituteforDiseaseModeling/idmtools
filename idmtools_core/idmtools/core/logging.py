@@ -12,6 +12,7 @@ listener = None
 logging_queue = None
 
 VERBOSE = 15
+NOTICE = 25
 SUCCESS = 35
 CRITICAL = 50
 
@@ -62,6 +63,7 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
         console = console.lower() in ['1', 'y', 'yes', 'on']
 
     logging.addLevelName(15, 'VERBOSE')
+    logging.addLevelName(25, 'NOTICE')
     logging.addLevelName(35, 'SUCCESS')
     logging.addLevelName(50, 'CRITICAL')
 
