@@ -79,6 +79,8 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     _workflow_items: CompsPlatformWorkflowItemOperations = field(**op_defaults, repr=False, init=False)
     _assets: CompsPlatformAssetCollectionOperations = field(**op_defaults, repr=False, init=False)
 
+    __is_logged_in: bool = field(default=False)
+
     def __post_init__(self):
         print("\nUser Login:")
         print(json.dumps({"endpoint": self.endpoint, "environment": self.environment}, indent=3))
@@ -96,7 +98,9 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         self._assets = CompsPlatformAssetCollectionOperations(platform=self)
 
     def _login(self):
-        Client.login(self.endpoint)
+        if not self.__is_logged_in:
+            Client.login(self.endpoint)
+            self.__is_logged_in = True
 
     def post_setstate(self):
         self.__init_interfaces()

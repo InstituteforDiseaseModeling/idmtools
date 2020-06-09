@@ -61,10 +61,16 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
     if type(console) is str:
         console = console.lower() in ['1', 'y', 'yes', 'on']
 
+    logging.addLevelName(15, 'VERBOSE')
+    logging.addLevelName(35, 'SUCCESS')
+    logging.addLevelName(50, 'CRITICAL')
+
     # get a file handler
     root = logging.getLogger()
+    user = logging.getLogger('user')
     # allow setting the debug of logger via environment variable
     root.setLevel(logging.DEBUG if os.getenv('IDM_TOOLS_DEBUG', False) else level)
+    user.setLevel(logging.DEBUG)
 
     if logging_queue is None:
         # We only one to do this setup once per process. Having the logging_queue setup help prevent that issue
@@ -93,9 +99,7 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
         # set root the use send log messages to a queue by default
         queue_handler = IDMQueueHandler(logging_queue)
         root.addHandler(queue_handler)
-        logging.addLevelName(15, 'VERBOSE')
-        logging.addLevelName(35, 'SUCCESS')
-        logging.addLevelName(50, 'CRITICAL')
+        user.addHandler(queue_handler)
 
         if console:
             coloredlogs.install(level=level)
