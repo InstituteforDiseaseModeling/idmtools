@@ -32,6 +32,7 @@ class CommandTask(ITask):
         ac = AssetCollection()
         for x in self.gather_common_asset_hooks:
             ac += x(self)
+        ac += self.common_assets
         return ac
 
     def gather_transient_assets(self) -> AssetCollection:
@@ -46,6 +47,7 @@ class CommandTask(ITask):
             ac += x(self)
         if len(ac.assets) != 0:
             self.transient_assets = ac
+        ac += self.transient_assets
         return ac
 
     def reload_from_simulation(self, simulation: 'Simulation'):  # noqa: F821
