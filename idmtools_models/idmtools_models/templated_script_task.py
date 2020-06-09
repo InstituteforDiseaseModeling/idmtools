@@ -1,4 +1,3 @@
-import copy
 import os
 from dataclasses import dataclass, field
 from functools import partial
@@ -236,16 +235,17 @@ class ScriptWrapperTask(ITask):
         Returns:
 
         """
-        # build simulations with fake objects
-        sim = copy.deepcopy(simulation)
-        sim.task = simulation.task.template_script_task
-        simulation.task.reload_from_simulation(sim)
-        simulation.task.template_script_task = sim.task.task
+        from idmtools.core.task_factory import TaskFactory
+        # check if the task is a dict
+        if isinstance(simulation.task.task, dict):
+            # process sub task first
+            task_args = {k: v for k, v in simulation.task.task.items() if k not in ['task_type']}
+            simulation.task.task = TaskFactory().create(simulation.task.task['task_type'], **task_args)
+            simulation.task.task.reload_from_simulation(simulation)
 
-        sim = copy.deepcopy(simulation)
-        sim.task = simulation.task.task
-        simulation.task.reload_from_simulation(sim)
-        simulation.task.task = sim.task.task
+            simulation.task.template_script_task = simulation.task.task
+        else:
+            logger.warning("Unable to load subtask")
 
     def pre_creation(self, parent: Union[Simulation, IWorkflowItem]):
         """

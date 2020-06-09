@@ -6,8 +6,8 @@ import pytest
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
-from idmtools_models.templated_script_task import TemplatedScriptTask, ScriptWrapperTask, \
-    get_script_wrapper_windows_task
+from idmtools_models.templated_script_task import TemplatedScriptTask, \
+    get_script_wrapper_windows_task, ScriptWrapperTask
 from idmtools_test.utils.decorators import windows_only
 
 
@@ -125,7 +125,8 @@ class TestTemplatedScriptTask(TestCase):
                 self.assertEqual(1, experiment_reload.simulation_count)
                 self.assertEqual(experiment.simulations[0].id, experiment_reload.simulations[0].id)
                 task: CommandTask = experiment_reload.simulations[0].task
-                self.assertIsInstance(task, CommandTask)
+                self.assertIsInstance(task, ScriptWrapperTask)
+                self.assertIsInstance(task.task, CommandTask)
                 self.assertEqual(1, experiment.assets.count)
                 self.assertIn("wrapper.bat", str(task.command))
 
