@@ -98,6 +98,7 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
             for handler in logging.root.handlers[:]:
                 logging.root.removeHandler(handler)
             root.setLevel(logging.DEBUG if os.getenv('IDM_TOOLS_DEBUG', False) else level)
+            exclude_logging_classes()
         except KeyError as e:  # noqa F841
             pass
         # set root the use send log messages to a queue by default
