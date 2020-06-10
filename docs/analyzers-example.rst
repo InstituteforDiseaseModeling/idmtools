@@ -2,14 +2,18 @@
 Example analyzers
 =================
 
-You can use the following example analyzers as templates to get started using |IT_s|: 
+You can use the following example analyzers as templates to get started using |IT_s|:
 
 | :py:class:`idmtools.analysis.add_analyzer.AddAnalyzer`
 | :py:class:`idmtools.analysis.csv_analyzer.CSVAnalyzer`
 | :py:class:`idmtools.analysis.download_analyzer.DownloadAnalyzer`
 | :py:class:`idmtools.analysis.tags_analyzer.TagsAnalyzer`
 
-Each example analyzer is configured to run with existing simulation data and already configured options, such as using the COMPS platform and existing experiments. This allows you to easily run these example analyzers for demonstrating some of the tasks you may want to accomplish when analyzing simulation output data. You can then use and modify these examples for your specific needs. For a description of each of these analyzers please see the following:
+Each example analyzer is configured to run with existing simulation data and already configured options, such as using the |COMPS_s| platform and existing experiments. This allows you to easily run these example analyzers for demonstrating some of the tasks you may want to accomplish when analyzing simulation output data. You can then use and modify these examples for your specific needs.
+
+.. include:: /reuse/comps_note.txt
+
+For a description of each of these analyzers please see the following:
 
 * :py:class:`AddAnalyzer<idmtools.analysis.add_analyzer.AddAnalyzer>`: Gets metadata from simulations, maps to key:value pairs, and returns a .txt output file.
 * :py:class:`CSVAnalyzer <idmtools.analysis.csv_analyzer.CSVAnalyzer>`: Analyzes .csv output files from simulations and returns a .csv output file.
