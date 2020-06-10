@@ -18,7 +18,7 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
             query_criteria: Optional[QueryCriteria] = None, **kwargs) -> COMPSSuite:
         """
         Get COMPS Suite
-        
+
         Args:
             suite_id: Suite id 
             columns:  Optional list of columns. Defaults to id and name
