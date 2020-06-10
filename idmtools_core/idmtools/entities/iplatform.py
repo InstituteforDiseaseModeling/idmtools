@@ -761,7 +761,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     def __enter__(self):
         """
-        Enable our
+        Enable our platform to work on contexts
+
         Returns:
 
         """
@@ -769,6 +770,17 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         set_current_platform(self)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        """
+        Enable our platform to work on contexts
+
+        Args:
+            exc_type:
+            exc_val:
+            exc_tb:
+
+        Returns:
+
+        """
         from idmtools.core.context import remove_current_platform
         remove_current_platform()
 
