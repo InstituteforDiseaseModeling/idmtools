@@ -133,6 +133,7 @@ class TemplatedScriptTask(ITask):
         ac = AssetCollection()
         for x in self.gather_transient_asset_hooks:
             ac += x(self)
+        ac += self.transient_assets
         if len(ac.assets) != 0:
             self.transient_assets = ac
         return ac
