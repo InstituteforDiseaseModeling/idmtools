@@ -16,21 +16,21 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
     platform: 'COMPSPlatform'  # noqa F821
     platform_type: Type = field(default=COMPSAssetCollection)
 
-    def get(self, asset_collection_id: UUID, children: Optional[List[str]] = None,
+    def get(self, asset_collection_id: UUID, load_children: Optional[List[str]] = None,
             query_criteria: Optional[QueryCriteria] = None, **kwargs) -> COMPSAssetCollection:
         """
         Get an asset collection by id
 
         Args:
             asset_collection_id: Id of asset collection
-            children: Optional list of children to load. Defaults to assets and tags
+            load_children: Optional list of children to load. Defaults to assets and tags
             query_criteria: Optional query_criteria. Ignores children default
             **kwargs:
 
         Returns:
             COMPSAssetCollection
         """
-        children = children if children is not None else ["assets", "tags"]
+        children = load_children if load_children is not None else ["assets", "tags"]
         query_criteria = query_criteria or QueryCriteria().select_children(children)
         return COMPSAssetCollection.get(id=asset_collection_id, query_criteria=query_criteria)
 

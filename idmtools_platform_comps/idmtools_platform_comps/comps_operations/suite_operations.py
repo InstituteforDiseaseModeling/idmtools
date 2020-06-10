@@ -14,10 +14,23 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
     platform: 'COMPSPlatform'  # noqa F821
     platform_type: Type = field(default=COMPSSuite)
 
-    def get(self, suite_id: UUID, columns: Optional[List[str]] = None, children: Optional[List[str]] = None,
+    def get(self, suite_id: UUID, columns: Optional[List[str]] = None, load_children: Optional[List[str]] = None,
             query_criteria: Optional[QueryCriteria] = None, **kwargs) -> COMPSSuite:
+        """
+        Get COMPS Suite
+        
+        Args:
+            suite_id: Suite id 
+            columns:  Optional list of columns. Defaults to id and name
+            load_children: Optional list of children to load. Defaults to "tags", "configuration"
+            query_criteria: Optional query criteria
+            **kwargs: 
+
+        Returns:
+        COMPSSuite
+        """
         columns = columns or ["id", "name"]
-        children = children if children is not None else ["tags", "configuration"]
+        children = load_children if load_children is not None else ["tags", "configuration"]
         # Comps doesn't like getting uuids for some reason
         query_criteria = query_criteria or QueryCriteria().select(columns).select_children(children)
         s = COMPSSuite.get(id=str(suite_id), query_criteria=query_criteria)

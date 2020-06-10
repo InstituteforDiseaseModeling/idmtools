@@ -31,7 +31,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
     platform: 'COMPSPlatform'  # noqa F821
     platform_type: Type = field(default=COMPSExperiment)
 
-    def get(self, experiment_id: UUID, columns: Optional[List[str]] = None, children: Optional[List[str]] = None,
+    def get(self, experiment_id: UUID, columns: Optional[List[str]] = None, load_children: Optional[List[str]] = None,
             query_criteria: Optional[QueryCriteria] = None, **kwargs) -> COMPSExperiment:
         """
         Fetch experiments from COMPS
@@ -39,16 +39,16 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         Args:
             experiment_id: Experiment ID
             columns: Optional Columns. If not provided, id, name, and suite_id are fetched
-            children: Optional Children. If not provided, tags and configuration are specified
-            query_criteria Optional QueryCriteria
+            comps_children: Optional Children. If not provided, tags and configuration are specified
+            query_criteria: Optional QueryCriteria
             **kwargs:
 
         Returns:
             COMPSExperiment with items
         """
         columns = columns or ["id", "name", "suite_id"]
-        children = children if children is not None else ["tags", "configuration"]
-        query_criteria = query_criteria or QueryCriteria().select(columns).select_children(children)
+        comps_children = load_children if load_children is not None else ["tags", "configuration"]
+        query_criteria = query_criteria or QueryCriteria().select(columns).select_children(comps_children)
         return COMPSExperiment.get(
             id=experiment_id,
             query_criteria=query_criteria

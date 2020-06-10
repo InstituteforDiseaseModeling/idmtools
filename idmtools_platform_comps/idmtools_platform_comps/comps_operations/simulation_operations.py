@@ -68,7 +68,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
     platform: 'COMPSPlatform'  # noqa F821
     platform_type: Type = field(default=COMPSSimulation)
 
-    def get(self, simulation_id: UUID, columns: Optional[List[str]] = None, children: Optional[List[str]] = None,
+    def get(self, simulation_id: UUID, columns: Optional[List[str]] = None, load_children: Optional[List[str]] = None,
             query_criteria: Optional[QueryCriteria] = None, **kwargs) -> COMPSSimulation:
         """
         Get Simulation from Comps
@@ -76,7 +76,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         Args:
             simulation_id: ID
             columns: Optional list of columns to load. Defaults to "id", "name", "experiment_id", "state"
-            children: Optional children to load. Defaults to "tags", "configuration"
+            load_children: Optional children to load. Defaults to "tags", "configuration"
             query_criteria: Optional query_criteria object to use your own custom criteria object
             **kwargs:
 
@@ -84,7 +84,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             COMPSSimulation
         """
         columns = columns or ["id", "name", "experiment_id", "state"]
-        children = children if children is not None else ["tags", "configuration", "files"]
+        children = load_children if load_children is not None else ["tags", "configuration", "files"]
         query_criteria = query_criteria or QueryCriteria().select(columns).select_children(children)
         return COMPSSimulation.get(
             id=simulation_id,

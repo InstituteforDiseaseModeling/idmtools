@@ -25,12 +25,25 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
     platform: 'COMPSPlatform'  # noqa F821
     platform_type: Type = field(default=COMPSWorkItem)
 
-    def get(self, workflow_item_id: UUID, columns: Optional[List[str]] = None, children: Optional[List[str]] = None,
+    def get(self, workflow_item_id: UUID, columns: Optional[List[str]] = None, load_children: Optional[List[str]] = None,
             query_criteria: Optional[QueryCriteria] = None, **kwargs) -> \
             COMPSWorkItem:
+        """
+        Get COMPSWorkItem
+
+        Args:
+            workflow_item_id: Item id
+            columns: Optional columns to load. Defaults to "id", "name", "state"
+            load_children: Optional list of COMPS Children objects to load. Defaults to "Tags"
+            query_criteria: Optional QueryCriteria
+            **kwargs:
+
+        Returns:
+            COMPSWorkItem
+        """
         columns = columns or ["id", "name", "state"]
-        children = children if children is not None else ["tags"]
-        query_criteria = query_criteria or QueryCriteria().select(columns).select_children(children)
+        load_children = load_children if load_children is not None else ["tags"]
+        query_criteria = query_criteria or QueryCriteria().select(columns).select_children(load_children)
         return COMPSWorkItem.get(workflow_item_id, query_criteria=query_criteria)
 
     def platform_create(self, work_item: IWorkflowItem, **kwargs) -> Tuple[Any]:
