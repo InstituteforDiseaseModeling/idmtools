@@ -112,7 +112,8 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         COMPSSimulation.save(s, save_semaphore=COMPSSimulation.get_save_semaphore())
         return s
 
-    def to_comps_sim(self, simulation, num_cores: int = None, priority: str = None, config: Configuration = None):
+    def to_comps_sim(self, simulation: Simulation, num_cores: int = None, priority: str = None,
+                     config: Configuration = None):
         """
         Covert IDMTools object to COMPS Object
 
