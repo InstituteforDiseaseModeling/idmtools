@@ -157,9 +157,9 @@ class AssetCollection(IEntity):
         na = AssetCollection()
         na.add_assets(self)
         if isinstance(other, Asset):
-            na.add_asset(other, True)
+            na.add_asset(other, False)
         else:
-            na.add_assets(other)
+            na.add_assets(other, False)
         return na
 
     def add_assets(self, assets: Union[TAssetList, 'AssetCollection'], fail_on_duplicate: bool = True):
