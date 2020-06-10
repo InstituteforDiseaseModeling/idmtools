@@ -1,4 +1,4 @@
-name: "Rebuild docs"
+name: "Publish docs"
 # curl command from your cmd:
 # curl -XPOST -u "username:githubPAT" -H "Accept: application/vnd.github.everest-preview+json" \
 # -H "Content-Type: application/json" \
