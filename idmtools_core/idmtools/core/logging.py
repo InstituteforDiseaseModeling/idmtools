@@ -80,7 +80,6 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
     if logging_queue is None:
         # We only one to do this setup once per process. Having the logging_queue setup help prevent that issue
         # get a file handler
-        root = logging.getLogger()
         if os.getenv('IDM_TOOLS_DEBUG', False) or level == logging.DEBUG:
             # Enable detailed logging format
             format_str = '%(asctime)s.%(msecs)d %(pathname)s:%(lineno)d %(funcName)s ' \
