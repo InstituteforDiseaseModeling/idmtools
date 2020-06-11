@@ -230,6 +230,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         else:
             return_object = self.cache.get(cache_key)
+            return_object.platform = self
 
         return return_object
 
