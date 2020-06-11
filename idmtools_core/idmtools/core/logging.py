@@ -60,15 +60,15 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
         For logging levels, see https://coloredlogs.readthedocs.io/en/latest/api.html#id26
     """
     global listener, logging_queue
-    if type(level) is str:
-        level = logging.getLevelName(level)
-    if type(console) is str:
-        console = console.lower() in ['1', 'y', 'yes', 'on']
-
     logging.addLevelName(15, 'VERBOSE')
     logging.addLevelName(25, 'NOTICE')
     logging.addLevelName(35, 'SUCCESS')
     logging.addLevelName(50, 'CRITICAL')
+
+    if type(level) is str:
+        level = logging.getLevelName(level)
+    if type(console) is str:
+        console = console.lower() in ['1', 'y', 'yes', 'on', 'true', 't']
 
     # get a file handler
     root = logging.getLogger()
@@ -91,23 +91,21 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
         file_handler.setLevel(logging.DEBUG)
         file_handler.setFormatter(formatter)
 
-        exclude_logging_classes()
         logging_queue = Queue()
         try:
             # Remove all handlers associated with the root logger object.
             for handler in logging.root.handlers[:]:
                 logging.root.removeHandler(handler)
-            root.setLevel(logging.DEBUG if os.getenv('IDM_TOOLS_DEBUG', False) else level)
-            exclude_logging_classes()
         except KeyError as e:  # noqa F841
             pass
+        exclude_logging_classes()
         # set root the use send log messages to a queue by default
         queue_handler = IDMQueueHandler(logging_queue)
         root.addHandler(queue_handler)
         user.addHandler(queue_handler)
 
         if console:
-            coloredlogs.install(level=level)
+            coloredlogs.install(level=level, milliseconds=True)
         else:
             # install colored logs for user logger only
             coloredlogs.install(logger=getLogger('user'), level=VERBOSE, fmt='%(message)s')

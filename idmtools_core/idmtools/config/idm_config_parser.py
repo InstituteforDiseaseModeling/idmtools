@@ -131,8 +131,6 @@ class IdmConfigParser:
             print("/!\\ WARNING: File '{}' Not Found!".format(file_name))
             return
 
-        user_logger.log(VERBOSE, "INI File Used: {}".format(ini_file))
-
         cls._config = ConfigParser()
         cls._config.read(ini_file)
 
@@ -151,6 +149,7 @@ class IdmConfigParser:
         except ValueError:
             log_config = dict(level='INFO', log_filename='idmtools.log', console='off')
         setup_logging(**log_config)
+        user_logger.log(VERBOSE, "INI File Used: {}".format(ini_file))
 
     @classmethod
     @initialization(error=True)
