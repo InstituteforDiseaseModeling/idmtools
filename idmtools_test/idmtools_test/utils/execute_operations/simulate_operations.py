@@ -5,9 +5,9 @@ import shlex
 import shutil
 import subprocess
 import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from functools import partial
-from logging import getLogger, DEBUG
+from logging import getLogger
 from threading import Lock
 from typing import List, Dict, Any, Type, TYPE_CHECKING, Optional
 from uuid import UUID, uuid4
@@ -31,12 +31,12 @@ data_path = os.path.abspath(os.path.join(current_directory, "..", "..", "data"))
 logger = getLogger(__name__)
 SIMULATION_LOCK = Lock()
 
+
 class SimulationDict(dict):
     pass
 
 
-
-def run_simulation(simulation_id: Simulation, command: str, parent_uid: UUID, execute_directory):
+def run_simulation(simulation_id: Simulation, command: str, parent_uid: UUID, execute_directory, shell: bool = False):
     simulation_path = os.path.join(execute_directory, str(parent_uid), str(simulation_id))
     os.makedirs(simulation_path, exist_ok=True)
     with open(os.path.join(simulation_path, "StdOut.txt"), "w") as out, \
@@ -54,11 +54,17 @@ def run_simulation(simulation_id: Simulation, command: str, parent_uid: UUID, ex
                 cmd = subprocess.list2cmdline(cmd)
             else:
                 cmd = shlex.split(cmd.replace("\\", "/"))
+                try:
+                    if not os.access(cmd[0], os.X_OK):
+                        os.chmod(cmd[0], 0o777)
+                except:
+                    pass
+            logger.info(cmd)
             p = subprocess.Popen(
                 cmd,
                 cwd=simulation_path,
                 env=os.environ,
-                shell=False,
+                shell=shell,
                 stdout=out,
                 stderr=err
             )

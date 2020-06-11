@@ -7,8 +7,8 @@ from idmtools.core.platform_factory import Platform
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 from idmtools_models.templated_script_task import TemplatedScriptTask, \
-    get_script_wrapper_windows_task, ScriptWrapperTask
-from idmtools_test.utils.decorators import windows_only
+    get_script_wrapper_windows_task, ScriptWrapperTask, get_script_wrapper_unix_task
+from idmtools_test.utils.decorators import windows_only, linux_only
 
 
 @pytest.mark.tasks
@@ -25,7 +25,6 @@ class TestTemplatedScriptTask(TestCase):
         return simple_template
 
     @pytest.mark.smoke
-    @windows_only
     def test_simple_template_assets(self):
         """
         Test simple template bat script using the TemplatedScriptTask
@@ -59,7 +58,6 @@ class TestTemplatedScriptTask(TestCase):
                 self.assertEqual("example.bat", str(task.command))
 
     @pytest.mark.smoke
-    @windows_only
     def test_wrapper_script(self):
         """
         Do a basic set of tests on inputs/outputs of the wrapper script
@@ -98,10 +96,10 @@ class TestTemplatedScriptTask(TestCase):
         cmd = f"\"{sys.executable}\" -c \"import os; print(os.environ)\""
         task = CommandTask(cmd)
         template = """
-                set PYTHONPATH=%cd%\\Assets\\;%PYTHONPATH%
-                echo Hello
-                %*
-                """
+set PYTHONPATH=%cd%\\Assets\\;%PYTHONPATH%
+echo Hello
+%*
+"""
 
         with Platform("TestExecute", missing_ok=True, default_missing=dict(type='TestExecute')):
             wrapper_task = get_script_wrapper_windows_task(task, template_content=template)
@@ -129,4 +127,48 @@ class TestTemplatedScriptTask(TestCase):
                 self.assertIsInstance(task.task, CommandTask)
                 self.assertEqual(1, experiment.assets.count)
                 self.assertIn("wrapper.bat", str(task.command))
+
+    @linux_only
+    def test_wrapper_script_execute_linux(self):
+        """
+        This tests The ScriptWrapperScriptTask as well as the TemplatedScriptTask
+
+        In addition, it tests reload
+        Returns:
+
+        """
+        cmd = f"\"{sys.executable}\" -c \"import os; print(os.environ)\""
+        task = CommandTask(cmd)
+        template = """#!/bin/bash
+export PYTHONPATH=$(pwd)/Assets:$PYTHONPATH
+echo Running $@
+"$@"
+"""
+
+        with Platform("TestExecute", missing_ok=True, default_missing=dict(type='TestExecute')):
+            wrapper_task = get_script_wrapper_unix_task(task, template_content=template)
+            experiment = Experiment.from_task(wrapper_task)
+            experiment.run(wait_until_done=True)
+            self.assertTrue(experiment.succeeded)
+
+            for sim in experiment.simulations:
+                assets = sim.list_static_assets()
+                for asset in assets:
+                    if asset.filename in ["StdOut.txt"]:
+                        content = asset.content.decode('utf-8').replace("\\\\", "\\")
+                        # check for echo
+                        self.assertIn('Running', content)
+                        # check for python path
+                        self.assertIn(f'{os.getcwd()}/Assets:', content)
+
+            with self.subTest("test_wrapper_script_execute_wrapper_reload"):
+                experiment_reload = Experiment.from_id(experiment.uid, load_task=True)
+                self.assertEqual(experiment.id, experiment_reload.uid)
+                self.assertEqual(1, experiment_reload.simulation_count)
+                self.assertEqual(experiment.simulations[0].id, experiment_reload.simulations[0].id)
+                task: CommandTask = experiment_reload.simulations[0].task
+                self.assertIsInstance(task, ScriptWrapperTask)
+                self.assertIsInstance(task.task, CommandTask)
+                self.assertEqual(1, experiment.assets.count)
+                self.assertIn("wrapper.sh", str(task.command))
 
