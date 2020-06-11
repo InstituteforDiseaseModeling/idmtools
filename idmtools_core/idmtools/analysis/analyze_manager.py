@@ -3,7 +3,7 @@ import sys
 import time
 from logging import getLogger, DEBUG
 from multiprocessing.pool import Pool
-from typing import NoReturn, List, Dict, Tuple, Optional, Union
+from typing import NoReturn, List, Dict, Tuple, Optional, Union, TYPE_CHECKING
 from uuid import UUID
 from idmtools.analysis.map_worker_entry import map_item
 from idmtools.core import NoPlatformException
@@ -12,15 +12,16 @@ from idmtools.core.enums import EntityStatus, ItemType
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.core.logging import VERBOSE, SUCCESS
 from idmtools.entities.ianalyzer import IAnalyzer
-from idmtools.entities.iplatform import IPlatform
 from idmtools.utils.command_line import animation
 from idmtools.utils.language import on_off, verbose_timedelta
+if TYPE_CHECKING:
+    from idmtools.entities.iplatform import IPlatform
 
 logger = getLogger(__name__)
 user_logger = getLogger('user')
 
 
-def pool_worker_initializer(func, analyzers, cache, platform: IPlatform) -> NoReturn:
+def pool_worker_initializer(func, analyzers, cache, platform: 'IPlatform') -> NoReturn:
     """
     Initialize the pool worker, which allows the process pool to associate the analyzers, cache, and
     path mapping to the function executed to retrieve data. Using an initializer improves performance.
@@ -34,8 +35,8 @@ def pool_worker_initializer(func, analyzers, cache, platform: IPlatform) -> NoRe
     Returns:
         None
     """
-    from idmtools.core.logging import exclude_logging_classes
-    exclude_logging_classes()
+    from idmtools import IdmConfigParser
+    IdmConfigParser()
     func.analyzers = analyzers
     func.cache = cache
     func.platform = platform
@@ -52,7 +53,7 @@ class AnalyzeManager(CacheEnabled):
     class ItemsNotReady(Exception):
         pass
 
-    def __init__(self, platform: IPlatform = None, configuration: dict = None,
+    def __init__(self, platform: 'IPlatform' = None, configuration: dict = None,
                  ids: List[Tuple[Union[str, UUID], ItemType]] = None,
                  analyzers: List[IAnalyzer] = None, working_dir: str = os.getcwd(),
                  partial_analyze_ok: bool = False, max_items: Optional[int] = None, verbose: bool = True,
@@ -121,7 +122,7 @@ class AnalyzeManager(CacheEnabled):
         self.analyzers = analyzers or list()
         self.verbose = verbose
 
-    def __check_for_platform_from_context(self, platform) -> 'idmtools.entities.iplatform.IPlatform':  # noqa: F821
+    def __check_for_platform_from_context(self, platform) -> 'IPlatform':  # noqa: F821
         """
         Try to determine platform of current object from self or current platform
 

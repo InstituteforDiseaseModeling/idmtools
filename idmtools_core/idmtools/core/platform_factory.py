@@ -1,11 +1,12 @@
 from contextlib import contextmanager
 from dataclasses import fields
 from logging import getLogger
-from typing import Dict, Any
+from typing import Dict, Any, TYPE_CHECKING
 from idmtools.core.context import set_current_platform, remove_current_platform
 from idmtools.config import IdmConfigParser
-from idmtools.entities.iplatform import IPlatform
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
+if TYPE_CHECKING:
+    from idmtools.entities.iplatform import IPlatform
 
 logger = getLogger(__name__)
 user_logger = getLogger('user')
@@ -75,7 +76,7 @@ class Platform:
 
     @classmethod
     def _create_from_block(cls, block: str, missing_ok: bool = False, default_missing: Dict[str, Any] = None,
-                           **kwargs) -> IPlatform:
+                           **kwargs) -> 'IPlatform':
         """
         Retrieve section entries from the INI configuration file by giving block.
 

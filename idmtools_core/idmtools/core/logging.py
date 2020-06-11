@@ -1,6 +1,7 @@
 import atexit
 import logging
 import os
+import sys
 from logging import getLogger
 from logging.handlers import QueueHandler, QueueListener, RotatingFileHandler
 from multiprocessing import Queue
@@ -10,6 +11,7 @@ import coloredlogs as coloredlogs
 
 listener = None
 logging_queue = None
+handlers = None
 
 VERBOSE = 15
 NOTICE = 25
@@ -78,37 +80,7 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
     user.setLevel(logging.DEBUG)
 
     if logging_queue is None:
-        # We only one to do this setup once per process. Having the logging_queue setup help prevent that issue
-        # get a file handler
-        if os.getenv('IDM_TOOLS_DEBUG', False) or level == logging.DEBUG:
-            # Enable detailed logging format
-            format_str = '%(asctime)s.%(msecs)d %(pathname)s:%(lineno)d %(funcName)s ' \
-                         '[%(levelname)s] (%(process)d,(%(thread)d) - %(message)s'
-        else:
-            format_str = '%(asctime)s.%(msecs)d %(funcName)s: [%(levelname)s] - %(message)s'
-        formatter = logging.Formatter(format_str)
-        file_handler = RotatingFileHandler(log_filename, maxBytes=(2 ** 20) * 10, backupCount=5)
-        file_handler.setLevel(logging.DEBUG)
-        file_handler.setFormatter(formatter)
-
-        logging_queue = Queue()
-        try:
-            # Remove all handlers associated with the root logger object.
-            for handler in logging.root.handlers[:]:
-                logging.root.removeHandler(handler)
-        except KeyError as e:  # noqa F841
-            pass
-        exclude_logging_classes()
-        # set root the use send log messages to a queue by default
-        queue_handler = IDMQueueHandler(logging_queue)
-        root.addHandler(queue_handler)
-        user.addHandler(queue_handler)
-
-        if console:
-            coloredlogs.install(level=level, milliseconds=True)
-        else:
-            # install colored logs for user logger only
-            coloredlogs.install(logger=getLogger('user'), level=VERBOSE, fmt='%(message)s')
+        file_handler = setup_handlers(level, log_filename, console)
 
         # see https://docs.python.org/3/library/logging.handlers.html#queuelistener
         # setup file logger handler that rotates after 10 mb of logging and keeps 5 copies
@@ -123,9 +95,46 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
     return listener
 
 
+def setup_handlers(level, log_filename, console: bool = False):
+    global logging_queue, handlers
+    # We only one to do this setup once per process. Having the logging_queue setup help prevent that issue
+    # get a file handler
+    if os.getenv('IDM_TOOLS_DEBUG', False) or level == logging.DEBUG:
+        # Enable detailed logging format
+        format_str = '%(asctime)s.%(msecs)d %(pathname)s:%(lineno)d %(funcName)s ' \
+                     '[%(levelname)s] (%(process)d,(%(thread)d) - %(message)s'
+    else:
+        format_str = '%(asctime)s.%(msecs)d %(funcName)s: [%(levelname)s] - %(message)s'
+    formatter = logging.Formatter(format_str)
+    file_handler = RotatingFileHandler(log_filename, maxBytes=(2 ** 20) * 10, backupCount=5)
+    file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(formatter)
+    exclude_logging_classes()
+    logging_queue = Queue()
+    try:
+        # Remove all handlers associated with the root logger object.
+        for handler in logging.root.handlers[:]:
+            logging.root.removeHandler(handler)
+    except KeyError as e:  # noqa F841
+        pass
+
+    # set root the use send log messages to a queue by default
+    queue_handler = IDMQueueHandler(logging_queue)
+    logging.root.addHandler(queue_handler)
+    logging.getLogger('user').addHandler(queue_handler)
+
+    if console:
+        coloredlogs.install(level=level, milliseconds=True, stream=sys.stdout)
+    else:
+        # install colored logs for user logger only
+        coloredlogs.install(logger=getLogger('user'), level=VERBOSE, fmt='%(message)s')
+    handlers = logging.root.handlers
+    return file_handler
+
+
 def exclude_logging_classes(items_to_exclude=None):
     if items_to_exclude is None:
-        items_to_exclude = ['urllib3', 'COMPS', 'paramiko']
+        items_to_exclude = ['urllib3', 'COMPS', 'paramiko', 'matplotlib']
     # remove comps by default
     for logger in items_to_exclude:
         other_logger = getLogger(logger)

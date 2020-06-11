@@ -26,7 +26,6 @@ from idmtools.entities.suite import Suite
 from idmtools.services.platforms import PlatformPersistService
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
 from tqdm import tqdm
-
 logger = getLogger(__name__)
 user_logger = getLogger('user')
 

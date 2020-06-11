@@ -24,7 +24,7 @@ from idmtools.utils.entities import get_default_tags
 
 if TYPE_CHECKING:
     from idmtools.entities.iplatform import IPlatform
-    from idmtools.entities.simulation import Simulation
+    from idmtools.entities.simulation import Simulation  # noqa: F401
 
 logger = getLogger(__name__)
 SUPPORTED_SIM_TYPE = Union[
@@ -173,7 +173,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
             self.gather_common_assets_from_task = isinstance(simulations, (GeneratorType, EntityContainer))
             self.__simulations = simulations
         elif isinstance(simulations, (list, set)):
-            from idmtools.entities.simulation import Simulation
+            from idmtools.entities.simulation import Simulation  # noqa: F811
             self.gather_common_assets_from_task = True
             self.__simulations = EntityContainer()
             for sim in simulations:

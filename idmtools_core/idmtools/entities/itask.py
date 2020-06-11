@@ -19,7 +19,7 @@ logger = getLogger(__name__)
 
 if TYPE_CHECKING:
     from idmtools.entities.simulation import Simulation
-    from idmtools.entities.iworkflow_item import IWorkflowItem
+    from idmtools.entities.iworkflow_item import IWorkflowItem  # noqa: F401
 
 TTaskParent = Union['Simulation', 'IWorkflowItem']  # noqa: F821
 TTaskHook = Callable[[TTaskParent], NoReturn]
