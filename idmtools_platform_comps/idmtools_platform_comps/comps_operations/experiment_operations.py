@@ -39,7 +39,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         Args:
             experiment_id: Experiment ID
             columns: Optional Columns. If not provided, id, name, and suite_id are fetched
-            comps_children: Optional Children. If not provided, tags and configuration are specified
+            load_children: Optional Children. If not provided, tags and configuration are specified
             query_criteria: Optional QueryCriteria
             **kwargs:
 
