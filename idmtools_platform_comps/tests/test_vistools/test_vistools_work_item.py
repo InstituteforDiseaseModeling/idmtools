@@ -392,7 +392,7 @@ class TestVisToolsWorkItem(unittest.TestCase):
 
         # decoding to dictionary
         vtassetmap_dic = json.loads(vtassetmap[0].decode('utf-8'))
-        self.assertTrue(len(vtassetmap_dic) == 20)
+        self.assertTrue(len(vtassetmap_dic) == 21)
 
         self.assertTrue(
             str(vtassetmap_dic['/' + visset_name + '/output/BinnedReport.json']).endswith('/BinnedReport.json'))
