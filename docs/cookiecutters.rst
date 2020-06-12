@@ -1,5 +1,5 @@
 ==============================
-Cookie-cutter example projects
+Cookiecutter example projects
 ==============================
 
-Landing page to link to cookie cutter projects
+Landing page to link to Cookiecutter projects.
