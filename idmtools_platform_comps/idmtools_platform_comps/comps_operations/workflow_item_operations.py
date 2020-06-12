@@ -187,7 +187,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
                 Returns:
                     None
                 """
-        wi = self.get(workflow_item.uid, columns=["id", "state"], children=[])
+        wi = self.get(workflow_item.uid, columns=["id", "state"], load_children=[])
         workflow_item.status = convert_comps_workitem_status(wi.state)  # convert_COMPS_status(wi.state)
 
     def send_assets(self, workflow_item: IWorkflowItem, **kwargs):

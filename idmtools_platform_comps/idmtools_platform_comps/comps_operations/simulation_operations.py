@@ -437,7 +437,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         Returns:
             AssetCollection
         """
-        comps_sim: COMPSSimulation = simulation.get_platform_object(children=["files", "configuration"])
+        comps_sim: COMPSSimulation = simulation.get_platform_object(load_children=["files", "configuration"])
         assets = []
         # load non comps objects
         if comps_sim.files:
