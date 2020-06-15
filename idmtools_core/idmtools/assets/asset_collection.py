@@ -122,15 +122,19 @@ class AssetCollection(IEntity):
         for asset in assets:
             self.add_asset(asset)
 
-    def add_asset(self, asset: Asset, fail_on_duplicate: bool = True):  # noqa: F821
+    def add_asset(self, asset: Union[Asset, str], fail_on_duplicate: bool = True, **kwargs):  # noqa: F821
         """
         Add an asset to the collection.
 
         Args:
-           asset: An :class:`~idmtools.assets.asset.Asset` object to add.
+           asset: A string or an :class:`~idmtools.assets.asset.Asset` object to add. If a string, the string will be
+            used as the absolute_path and any kwargs will be passed to the Asset constructor
            fail_on_duplicate: Raise a **DuplicateAssetError** if an asset is duplicated.
               If not, simply replace it.
+            Keyword Args: Arguments to pass to Asset constructor when asset is a string
         """
+        if isinstance(asset, str):
+            asset = Asset(absolute_path=asset, **kwargs)
         if asset in self.assets:
             if fail_on_duplicate:
                 raise DuplicatedAssetError(asset)
