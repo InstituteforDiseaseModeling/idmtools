@@ -103,8 +103,9 @@ Run tests
 =========
 
 If you want to run tests on the code, do the following. You can add new tests
-to the GitHub repository and they will be run using the same commands. Note
-that |COMPS_s| access is generally restricted to |IDM_s| employees.
+to the GitHub repository and they will be run using the same commands.
+
+.. include:: /reuse/comps_note.txt
 
 #.  Login to |COMPS_s| by navigating to the |IT_s| root directory and entering the following
     at a command prompt::
