@@ -6,3 +6,4 @@ tabulate~=0.8.3
 pyperclip~=1.7
 tqdm~=4.45
 yaspin~=0.14.3
+click-plugins
