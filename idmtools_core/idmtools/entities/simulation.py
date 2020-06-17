@@ -22,11 +22,11 @@ class Simulation(IAssetsEnabled, INamedEntity):
     """
     task: 'ITask' = field(default=None)  # noqa: F821
     item_type: 'ItemType' = field(default=ItemType.SIMULATION, compare=False)
-    pre_creation_hooks: List[Callable[[], NoReturn]] = field(default_factory=lambda: [Simulation.gather_assets])
+    pre_creation_hooks: List[Callable[[], NoReturn]] = field(default_factory=lambda: [Simulation.gather_additional_files])
     # control whether we should replace the task with a proxy after creation
     __replace_task_with_proxy: bool = field(default=True, init=False, compare=False)
     # Ensure we don't gather assets twice
-    __assets_gathered: bool = field(default=False)
+    __additional_files_gathered: bool = field(default=False)
     additional_files: AssetCollection = field(default=AssetCollection(), compare=False)
 
     @property
@@ -98,13 +98,16 @@ class Simulation(IAssetsEnabled, INamedEntity):
         return {"assets": AssetCollection(), "simulations": EntityContainer()}
 
     def gather_assets(self):
+        pass
+
+    def gather_additional_files(self):
         """
-        Gather all the assets for the simulation.
+        Gather the additional, per-simulation files/transient assets.
         """
-        if not self.__assets_gathered:
+        if not self.__additional_files_gathered:
             self.task.gather_transient_assets()
             self.additional_files = self.task.transient_assets
-        self.__assets_gathered = True
+        self.__additional_files_gathered = True
 
     @classmethod
     def from_task(cls, task: 'ITask', tags: Dict[str, Any] = None,  # noqa E821
