@@ -169,11 +169,18 @@ class IPlatformExperimentOperations(ABC):
 
         """
         # ensure the item is created before running
-        # TODO what status are valid here? Create only?
         if experiment.status is None:
             self.create(experiment, **kwargs)
+        else:
+            assets = experiment.gather_all_assets()
+            if hasattr(experiment.simulations, 'base_simulation'):
+                experiment.simulations.base_simulation.assets = assets
+            else:
+                for sim in experiment.__simulations:
+                    if sim.status is None:
+                        sim.assets = assets
 
-        # check sims
+        # ensure simulations have been created and that their assets/additional files are sent
         logger.debug("Ensuring simulations exist")
         if isinstance(experiment.simulations, (GeneratorType, Iterator)):
             experiment.simulations = self.platform._create_items_of_type(experiment.simulations, ItemType.SIMULATION)

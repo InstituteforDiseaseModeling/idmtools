@@ -27,6 +27,7 @@ class Simulation(IAssetsEnabled, INamedEntity):
     __replace_task_with_proxy: bool = field(default=True, init=False, compare=False)
     # Ensure we don't gather assets twice
     __assets_gathered: bool = field(default=False)
+    additional_files: AssetCollection = field(default=AssetCollection(), compare=False)
 
     @property
     def experiment(self) -> 'Experiment':  # noqa: F821
@@ -102,7 +103,7 @@ class Simulation(IAssetsEnabled, INamedEntity):
         """
         if not self.__assets_gathered:
             self.task.gather_transient_assets()
-            self.assets.add_assets(self.task.transient_assets, fail_on_duplicate=False)
+            self.additional_files = self.task.transient_assets
         self.__assets_gathered = True
 
     @classmethod

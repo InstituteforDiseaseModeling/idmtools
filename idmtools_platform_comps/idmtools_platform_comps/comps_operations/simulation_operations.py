@@ -64,7 +64,11 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         s = COMPSSimulation(name=simulation.experiment.name, experiment_id=simulation.parent_id,
                             configuration=config)
 
-        self.send_assets(simulation, s)
+        if len(simulation.assets.assets) > 0:
+            # only send simulation-level assets if there are any set. Otherwise we'll stick with the experiment assets
+            self.send_assets(simulation=simulation, comps_sim=s)
+        self.send_additional_files(simulation=simulation, comps_sim=s)
+
         s.set_tags(simulation.tags)
         simulation._platform_object = self.platform
         return s
@@ -106,11 +110,29 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
     def platform_run_item(self, simulation: Simulation, **kwargs):
         pass
 
-    def send_assets(self, simulation: Simulation, comps_sim: COMPSSimulation = None, **kwargs):
+    # TODO: need to test this out
+    def send_assets(self, simulation: Simulation, comps_sim: COMPSSimulation = None,  **kwargs):
+        if simulation.assets.count == 0:
+            return
+
         if comps_sim is None:
             comps_sim = simulation.get_platform_object()
-        for asset in simulation.assets:
-            comps_sim.add_file(simulationfile=SimulationFile(asset.filename, 'input'), data=asset.bytes)
+
+        ac = self.platform._assets.create(simulation.assets)
+
+        # associate the assets with the simulation in COMPS
+        if not comps_sim.configuration:
+            comps_sim.configuration = Configuration()
+        comps_sim.configuration._asset_collection_id = ac.id
+        comps_sim.save()
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f'Asset collection for simulation: {comps_sim.id} is: {ac.id}')
+
+    def send_additional_files(self, simulation: Simulation, comps_sim: COMPSSimulation = None, **kwargs):
+        if comps_sim is None:
+            comps_sim = simulation.get_platform_object()
+        for af in simulation.additional_files:
+            comps_sim.add_file(simulationfile=SimulationFile(af.filename, 'input'), data=af.bytes)
 
     def refresh_status(self, simulation: Simulation, **kwargs):
         s = COMPSSimulation.get(id=simulation.uid, query_criteria=QueryCriteria().select(['state']))

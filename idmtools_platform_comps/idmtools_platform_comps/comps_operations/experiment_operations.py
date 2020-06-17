@@ -138,7 +138,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
 
     def send_assets(self, experiment: Experiment, **kwargs):
         if experiment.assets.count == 0:
-            logger.warning('Experiment has not assets')
+            logger.warning('Experiment has no assets to send')
 
         ac = self.platform._assets.create(experiment.assets)
         print("Asset collection for experiment: {}".format(ac.id))

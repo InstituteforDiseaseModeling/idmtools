@@ -66,18 +66,14 @@ class Experiment(IAssetsEnabled, INamedEntity):
     def status(self):
         if len(self.simulations.items) == 0 or all([s.status is None for s in self.simulations.items]):
             status = None  # this will trigger experiment creation on a platform
-        elif any([s.status is None for s in self.simulations.items]):
-            status = EntityStatus.CREATED
         elif any([s.status == EntityStatus.FAILED for s in self.simulations.items]):
             status = EntityStatus.FAILED
         elif all([s.status == EntityStatus.SUCCEEDED for s in self.simulations.items]):
             status = EntityStatus.SUCCEEDED
         elif any([s.status == EntityStatus.RUNNING for s in self.simulations.items]):
             status = EntityStatus.RUNNING
-        elif any([s.status == EntityStatus.CREATED for s in self.simulations.items]):
-            status = EntityStatus.CREATED
         else:
-            raise Exception('Experiment status logic error, please check Experiment code.')
+            status = EntityStatus.CREATED
         return status
 
     @status.setter
@@ -104,6 +100,26 @@ class Experiment(IAssetsEnabled, INamedEntity):
         from idmtools.utils.display import display, experiment_table_display
         display(self, experiment_table_display)
 
+    def gather_all_assets(self):
+        '''
+
+        Returns: An AssetCollection representing Experiment and Experiment-contained Simulation assets.
+
+        '''
+        # Gather the experiment level assets, if any
+        assets = self.gather_assets()  # TODO: this should gather info from asset collection id if available from a reload? Currently does nothing.
+
+        # if it is a template, set task type on experiment
+        if isinstance(self.simulations, ParentIterator) and isinstance(self.simulations.items, TemplatedSimulations):
+            self.simulations.items.base_task.gather_common_assets()
+            assets.add_assets(self.simulations.items.base_task.common_assets, fail_on_duplicate=False)
+        elif self.gather_common_assets_from_task and isinstance(self.__simulations, List):
+            for sim in self.simulations:
+                assets = sim.task.gather_common_assets()
+                if assets is not None:
+                    assets.add_assets(assets, fail_on_duplicate=False)
+        return assets
+
     def pre_creation(self) -> None:
         """
         Experiment pre_creation callback
@@ -112,28 +128,14 @@ class Experiment(IAssetsEnabled, INamedEntity):
 
         """
         # Gather the assets
-        self.gather_assets()
+        self.assets = self.gather_all_assets()
 
         # to keep experiments clean, let's only do this is we have a special experiment class
         if self.__class__ is not Experiment:
             # Add a tag to keep the Experiment class name
             self.tags["experiment_type"] = f'{self.__class__.__module__}.{self.__class__.__name__}'
-
-        # if it is a template, set task type on experiment
-        if isinstance(self.simulations, ParentIterator) and isinstance(self.simulations.items, TemplatedSimulations):
-            self.simulations.items.base_task.gather_common_assets()
-            self.assets.add_assets(self.simulations.items.base_task.common_assets, fail_on_duplicate=False)
-            if "task_type" not in self.tags:
-                task_class = self.simulations.items.base_task.__class__
-                self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
-        elif self.gather_common_assets_from_task and isinstance(self.__simulations, List):
-            task_class = self.simulations[0].task.__class__
-            self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
-            for sim in self.simulations:
-                assets = sim.task.gather_common_assets()
-                if assets is not None:
-                    self.assets.add_assets(assets, fail_on_duplicate=False)
-
+        task_class = self.simulations.items.base_task.__class__
+        self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
         self.tags.update(get_default_tags())
 
     @property
@@ -220,7 +222,9 @@ class Experiment(IAssetsEnabled, INamedEntity):
         return {"assets": AssetCollection(), "simulations": EntityContainer()}
 
     def gather_assets(self) -> NoReturn:
-        pass
+        # raise NotImplementedError('TODO: Need to fill this in for sim-added-to-exp-issue to allow merging of existing/new assets')
+        assets = AssetCollection()
+        return assets
 
     @classmethod
     def from_task(cls, task, name: str = None, tags: Dict[str, Any] = None, assets: AssetCollection = None,
@@ -382,19 +386,14 @@ class Experiment(IAssetsEnabled, INamedEntity):
 
     def add_new_simulations(self, simulations: Union[SUPPORTED_SIM_TYPE]):
         """
-        Add simulations to a pre-existing, previously run experiment.
+        Add simulations to an experiment, including pre-existing experiments.
 
         Args:
-            simulations: Any simulation containing object containing builders/sims to add to pre-existing experiment
+            simulations: Any simulation containing object containing builders/sims to add to the experiment
 
         Returns:
             Nothing
         """
-
-        if not self.done:
-            raise RuntimeError('Additional simulations can only be added to experiments that are done '
-                               '(all simulations succeeded or failed). Run the existing simulations first.')
-
         # merge existing simulations into the new simulations
         existing_simulations = self.simulations.items
         self.simulations = simulations
