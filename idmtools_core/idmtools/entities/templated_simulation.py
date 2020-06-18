@@ -55,6 +55,7 @@ class TemplatedSimulations:
     builders: Set[SimulationBuilder] = field(default_factory=set, compare=False)
     base_simulation: Simulation = field(default=None, compare=False, metadata={"pickle_ignore": True})
     base_task: ITask = field(default=None)
+    parent: 'Experiment' = field(default=None)
     tags: InitVar[Dict] = None
     __extra_simulations: List[Simulation] = field(default_factory=list)
 
@@ -159,6 +160,7 @@ class TemplatedSimulations:
         # TODO: the experiment should be frozen when the first simulation is created
         sim = copy.deepcopy(self.base_simulation)
         sim.assets = copy.deepcopy(self.base_simulation.assets)
+        sim.parent = self.parent
         return sim
 
     @property

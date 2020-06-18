@@ -36,6 +36,8 @@ class setParam:
         self.param = param
 
     def __call__(self, simulation: Simulation, value) -> Dict[str, any]:
+        # set simulation name
+        simulation.name = f'{simulation.parent.name}_{self.param}_{value}'
         return JSONConfiguredPythonTask.set_parameter_sweep_callback(simulation, self.param, value)
 
 
@@ -450,6 +452,8 @@ class TestPythonExperiment(ITestWithPersistence):
                              {'filename': 'functions.py', 'relative_path': 'MyExternalLibrary'},
                              {'filename': 'working_model.py', 'relative_path': ''},
                              {'filename': 'test.json', 'relative_path': ''}]
+            # validate simulation names
+            self.assertIn(f'{e.name}_', simulation.name)
             self.validate_assets(assets, expected_list)
 
     @pytest.mark.long

@@ -129,7 +129,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         if config is None:
             config = self.get_simulation_config_from_simulation(simulation, num_cores, priority)
         s = COMPSSimulation(
-            name=simulation.experiment.name,
+            name=simulation.experiment.name if not simulation.name else simulation.name,
             experiment_id=simulation.parent_id,
             configuration=config
         )
