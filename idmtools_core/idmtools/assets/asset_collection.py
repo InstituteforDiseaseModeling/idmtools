@@ -130,8 +130,8 @@ class AssetCollection(IEntity):
            asset: A string or an :class:`~idmtools.assets.asset.Asset` object to add. If a string, the string will be
             used as the absolute_path and any kwargs will be passed to the Asset constructor
            fail_on_duplicate: Raise a **DuplicateAssetError** if an asset is duplicated.
-              If not, simply replace it.
-            Keyword Args: Arguments to pass to Asset constructor when asset is a string
+             If not, simply replace it.
+           **kwargs: Arguments to pass to Asset constructor when asset is a string
         """
         if isinstance(asset, str):
             asset = Asset(absolute_path=asset, **kwargs)
