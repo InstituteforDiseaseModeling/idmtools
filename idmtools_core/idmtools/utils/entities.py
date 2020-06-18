@@ -40,7 +40,7 @@ def as_dict(src, exclude: typing.List[str] = None, exclude_private_fields: bool 
         exclude = []
 
     result = dict()
-     # get metadata
+    # get metadata
     metadata = dataclasses.fields(src.__class__)
     for field in metadata:
         field_metadata = field.metadata
