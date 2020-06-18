@@ -39,7 +39,6 @@ guide modelers through necessary tasks. See :doc:`cookiecutters` for the availab
    configuration
    platforms
    create-sims
-   run-sims
    parameter-sweeps
    calibrate
    analyzers

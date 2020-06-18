@@ -12,8 +12,8 @@ Install |IT_s|
 
         git clone https://github.com/InstituteforDiseaseModeling/idmtools.git
 
-        To work from the latest approved code, work from the "master" branch. To work from
-        the latest code under active development, work from the "dev" branch.
+    To work from the latest approved code, work from the "master" branch. To work from
+    the latest code under active development, work from the "dev" branch.
 
 #.  Open a command prompt and create a virtual environment in any directory you choose. The
     command below names the environment "idmtools", but you may use any desired name::
@@ -58,7 +58,8 @@ Install |IT_s|
     - idmtools/idmtools_models
     - idmtools/idmtools_test
 
-.. TBD add a link to the CLI reference when complete
+See :doc:`cli_index` for more information on the command-line interface available for interacting with
+|IT_s|.
 
 .. _docker-client:
 
