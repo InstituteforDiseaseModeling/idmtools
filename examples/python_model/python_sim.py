@@ -108,11 +108,10 @@ class setParam:
 
 # Now add our sweep on a list
 builder.add_sweep_definition(setParam("b"), [1, 2, 3])
-# add our builder to the templated simulations
 ts.add_builder(builder)
 
 # Now we can create our Experiment using our template builder
-experiment = Experiment(name=os.path.split(sys.argv[0])[1], simulations=ts)
+experiment = Experiment.from_template(ts, name=os.path.split(sys.argv[0])[1])
 # Add our own custom tag to simulation
 experiment.tags["tag1"] = 1
 # And maybe some custom Experiment Level Assets
