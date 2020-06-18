@@ -1,9 +1,9 @@
-click~=7.0
-colorama~=0.4.1
+click~=7.1.2
+colorama~=0.4.3
 cookiecutter~=1.6.0
 idmtools~=1.1.0
-tabulate~=0.8.3
+tabulate~=0.8.7
 pyperclip~=1.7
-tqdm~=4.45
-yaspin~=0.14.3
+tqdm~=4.46.1
+yaspin~=0.17.0
 click-plugins

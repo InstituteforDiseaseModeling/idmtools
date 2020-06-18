@@ -5,9 +5,8 @@ from dataclasses import fields, field
 from functools import partial
 from itertools import groupby
 from logging import getLogger, DEBUG
-from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set, Iterator
+from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set, Iterator, Callable
 from uuid import UUID
-
 from idmtools.core import CacheEnabled, UnknownItemException, EntityContainer, UnsupportedPlatformType
 from idmtools.core.enums import ItemType, EntityStatus
 from idmtools.core.interfaces.ientity import IEntity
@@ -27,8 +26,8 @@ from idmtools.entities.suite import Suite
 from idmtools.services.platforms import PlatformPersistService
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
 from tqdm import tqdm
-
 logger = getLogger(__name__)
+user_logger = getLogger('user')
 
 CALLER_LIST = ['_create_from_block',    # create platform through Platform Factory
                'fetch',                 # create platform through un-pickle
@@ -167,6 +166,9 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         Returns:
             The specified item found on the platform or None.
+
+        Raises:
+            ValueError: If the item type is not supported
         """
         if item_type not in self.platform_type_map.values():
             raise ValueError(f"Unsupported Item Type. {self.__class__.__name__} only supports "
@@ -189,18 +191,25 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         Returns:
             The object found on the platform or None.
+
+        Raises:
+            ValueError: If the item type is not supported
         """
         if not item_type or item_type not in self.platform_type_map.values():
-            raise Exception("The provided type is invalid or not supported by this platform...")
+            raise ValueError("The provided type is invalid or not supported by this platform...")
 
         cache_key = self.get_cache_key(force, item_id, item_type, kwargs, raw, 'r' if raw else 'o')
 
         # If force -> delete in the cache
         if force:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f"Removing {cache_key} from cache")
             self.cache.delete(cache_key)
 
         # If we cannot find the object in the cache -> retrieve depending on the type
         if cache_key not in self.cache:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f"Retrieve item {item_id} of type {item_type}")
             ce = self._get_platform_item(item_id, item_type, **kwargs)
 
             # Nothing was found on the platform
@@ -221,6 +230,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         else:
             return_object = self.cache.get(cache_key)
+            return_object.platform = self
 
         return return_object
 
@@ -266,8 +276,11 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         Returns:
             Tuple with the Base item type and the string path to the interface
+
+        Raises:
+            ValueError: If the item 's interface cannot be found
         """
-        # check both base types and platform speci
+        # check both base types and platform specs
         for i in [STANDARD_TYPE_TO_INTERFACE, self.platform_type_map]:
             for interface, item_type in i.items():
                 if isinstance(item, interface):
@@ -275,7 +288,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         raise ValueError(f"{self.__class__.__name__} has no mapping for {item.__class__.__name__}")
 
     def get_children(self, item_id: UUID, item_type: ItemType,
-                     force: bool = False, raw: bool = False, **kwargs) -> Any:
+                     force: bool = False, raw: bool = False, item: Any = None, **kwargs) -> Any:
         """
         Retrieve the children of a given object.
 
@@ -284,6 +297,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             force: If True, force the object fetching from the platform.
             raw: Return either an |IT_s| object or a platform object.
             item_type: Pass the type of the object for quicker retrieval.
+            item: optional platform or idm item to use instead of loading
 
         Returns:
             The children of the object or None.
@@ -294,7 +308,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             self.cache.delete(cache_key)
 
         if cache_key not in self.cache:
-            ce = self.get_item(item_id, raw=raw, item_type=item_type)
+            ce = item or self.get_item(item_id, raw=raw, item_type=item_type)
             ce.platform = self
             kwargs['parent'] = ce
             children = self._get_children_for_platform_item(ce.get_platform_object(), raw=raw, **kwargs)
@@ -433,10 +447,13 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         Returns:
             True if items supported, false otherwise
+
+        Raises:
+            ValueError: If the item type is not supported
         """
         for item in items:
             if item.item_type not in self.platform_type_map.values():
-                raise Exception(
+                raise ValueError(
                     f'Unable to create items of type: {item.item_type} for platform: {self.__class__.__name__}')
 
     def run_items(self, items: Union[IEntity, List[IEntity]], **kwargs):
@@ -537,7 +554,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         if output:
             if item.item_type not in (ItemType.SIMULATION, ItemType.WORKFLOW_ITEM):
-                print("Currently 'output' only supports Simulation and WorkItem!")
+                user_logger.info("Currently 'output' only supports Simulation and WorkItem!")
             else:
                 for ofi, ofc in ret.items():
                     file_path = os.path.join(output, str(item.uid), ofi)
@@ -567,12 +584,57 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         return self.get_files(idm_item, files, output)
 
     def are_requirements_met(self, requirements: Set[PlatformRequirements]) -> bool:
+        """
+        Does the platform support the list of requirements
+
+        Args:
+            requirements: Requirements
+
+        Returns:
+            True if all the requirements are supported
+        """
         return all([x in self._platform_supports for x in requirements])
 
     def is_task_supported(self, task: ITask) -> bool:
+        """
+        Is a task supported on this platform. This depends on the task properly setting its requirements. See
+        :py:attr:`idmtools.entities.itask.ITask.platform_requirements` and
+        :py:class:`idmtools.entities.platform_requirements.PlatformRequirements`
+
+        Args:
+            task: Task to check support of
+
+        Returns:
+            True if the task is supported, False otherwise.
+        """
         return self.are_requirements_met(task.platform_requirements)
 
-    def __wait_till_callback(self, item, callback, timeout: int = 60 * 60 * 24, refresh_interval: int = 5):
+    def __wait_till_callback(
+            self, item: Union[Experiment, IWorkflowItem, Suite],
+            callback: Callable[[Union[Experiment, IWorkflowItem, Suite]], bool], timeout: int = 60 * 60 * 24,
+            refresh_interval: int = 5
+    ):
+        """
+        Runs a loop until a timeout is met where the item's status is refreshed, then a callback is called with the
+        items as the arguments and if the returns is true, we stop waiting.
+
+        Args:
+            item: Item to monitor
+            callback: Callback to determine if item is done. It should return true is item is complete
+            timeout: Timeout for waiting. Defaults to 24 hours
+            refresh_interval: Refresh the status how often
+
+        Returns:
+            None
+
+        Raises:
+            TimeoutError: If a timeout occurs
+
+        See Also:
+            :meth:`idmtools.entities.iplatform.IPlatform.wait_till_done_progress`
+            :meth:`idmtools.entities.iplatform.IPlatform.__wait_until_done_progress_callback`
+            :meth:`idmtools.entities.iplatform.IPlatform.wait_till_done`
+        """
         import time
         start_time = time.time()
         while time.time() - start_time < timeout:
@@ -585,7 +647,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         raise TimeoutError(f"Timeout of {timeout} seconds exceeded")
 
     def wait_till_done(self, item: Union[Experiment, IWorkflowItem, Suite], timeout: int = 60 * 60 * 24,
-                       refresh_interval: int = 5, progress=True):
+                       refresh_interval: int = 5, progress: bool = True):
         """
         Wait for the experiment to be done.
 
@@ -593,31 +655,81 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             item: Experiment/Workitem to wait on
             refresh_interval: How long to wait between polling.
             timeout: How long to wait before failing.
+            progress: Should we display progress
+
+        See Also:
+            :meth:`idmtools.entities.iplatform.IPlatform.wait_till_done_progress`
+            :meth:`idmtools.entities.iplatform.IPlatform.__wait_until_done_progress_callback`
+            :meth:`idmtools.entities.iplatform.IPlatform.__wait_till_callback`
         """
         if progress:
             self.wait_till_done_progress(item, timeout, refresh_interval)
         else:
             self.__wait_till_callback(item, lambda e: e.done, timeout, refresh_interval)
 
+    @staticmethod
+    def __wait_until_done_progress_callback(item: Union[Experiment, IWorkflowItem], progress_bar: tqdm,
+                                            child_attribute: str = 'simulations',
+                                            done_states: List[EntityStatus] = None) -> bool:
+        """
+        A callback for progress bar(when an item has children) and checking if an item has completed execution. This is
+        meant for mainly for aggregate types where the status is from the children
+
+        Args:
+            item: Item to monitor
+            progress_bar:
+            child_attribute: What is the name of the child attribute. For examples, if item was an Experiment, the
+                child_attribute would be 'simulations'
+            done_states: What states are considered done
+
+        Returns:
+            True is item has completed execution
+
+        See Also:
+            :meth:`idmtools.entities.iplatform.IPlatform.wait_till_done_progress`
+            :meth:`idmtools.entities.iplatform.IPlatform.wait_till_done`
+            :meth:`idmtools.entities.iplatform.IPlatform.__wait_till_callback`
+        """
+        # ensure we have done states. Default to failed or SUCCEEDED
+        if done_states is None:
+            done_states = [EntityStatus.FAILED, EntityStatus.SUCCEEDED]
+        # if we do not have a progress bar, return items state
+        if progress_bar is None:
+            return item.status in done_states if isinstance(item, IWorkflowItem) else item.done
+
+        # if we do have a progress bar, update it
+        done = 0
+        # iterate over the children
+        for child in getattr(item, child_attribute):
+            # if the item is an experiment, use the status
+            if isinstance(item, Experiment) and child.status in done_states:
+                done += 1
+            # otherwise use the done attribute
+            elif isinstance(item, Suite) and child.done:
+                done += 1
+        # check if we need to update the progress bar
+        if done > progress_bar.last_print_n:
+            progress_bar.update(done - progress_bar.last_print_n)
+        return item.done
+
     def wait_till_done_progress(self, item: Union[Experiment, IWorkflowItem, Suite], timeout: int = 60 * 60 * 24,
                                 refresh_interval: int = 5):
-        def get_prog_bar(item: Union[Experiment, IWorkflowItem], prog: tqdm, child_attribute: str = 'simulations',
-                         done_st=None):
-            if done_st is None:
-                done_st = [EntityStatus.FAILED, EntityStatus.SUCCEEDED]
-            if prog is None:
-                return item.status in done_st if isinstance(item, IWorkflowItem) else item.done
+        """
+        Wait on an item to complete with progress bar
 
-            done = 0
-            for child in getattr(item, child_attribute):
-                if isinstance(item, Experiment) and child.status in done_st:
-                    done += 1
-                elif isinstance(item, Suite) and child.done:
-                    done += 1
-            if done > prog.last_print_n:
-                prog.update(done - prog.last_print_n)
-            return item.done
+        Args:
+            item: Item to monitor
+            timeout: Timeout on waiting
+            refresh_interval: How often to refresh
 
+        Returns:
+            None
+
+        See Also:
+            :meth:`idmtools.entities.iplatform.IPlatform.__wait_until_done_progress_callback`
+            :meth:`idmtools.entities.iplatform.IPlatform.wait_till_done`
+            :meth:`idmtools.entities.iplatform.IPlatform.__wait_till_callback`
+        """
         child_attribute = 'simulations'
         if isinstance(item, Experiment):
             prog = tqdm([], total=len(item.simulations), desc="Waiting on Experiment to Finish running")
@@ -628,7 +740,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             prog = None
         self.__wait_till_callback(
             item,
-            partial(get_prog_bar, prog=prog, child_attribute=child_attribute),
+            partial(self.__wait_until_done_progress_callback, progress_bar=prog, child_attribute=child_attribute),
             timeout,
             refresh_interval
         )
@@ -646,6 +758,32 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
         return getattr(self, interface).get_related_items(item, relation_type)
+
+    def __enter__(self):
+        """
+        Enable our platform to work on contexts
+
+        Returns:
+
+        """
+        from idmtools.core.context import set_current_platform
+        set_current_platform(self)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """
+        Enable our platform to work on contexts
+
+        Args:
+            exc_type:
+            exc_val:
+            exc_tb:
+
+        Returns:
+
+        """
+        from idmtools.core.context import remove_current_platform
+        remove_current_platform()
 
 
 TPlatform = TypeVar("TPlatform", bound=IPlatform)

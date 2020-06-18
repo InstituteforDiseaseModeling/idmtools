@@ -12,3 +12,4 @@ class PlatformRequirements(Enum):
     GPU = "gpu"  # GPU support
     PYTHON = "python"  # Python(on host) commands
     DOCKER = "docker"  # Can you run docker commands
+    SINGULARITY = "singularity"

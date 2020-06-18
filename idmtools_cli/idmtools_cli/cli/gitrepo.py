@@ -1,12 +1,16 @@
 import os
 import json
+from logging import getLogger
+
 import click
 from click import secho
 from colorama import Fore
-from typing import Optional
+from typing import Optional, List
 from idmtools_cli.cli.entrypoint import cli
 from idmtools.utils.gitrepo import GitRepo, REPO_OWNER, GITHUB_HOME, REPO_NAME
 from idmtools.registry.master_plugin_registry import MasterPluginRegistry
+
+user_logger = getLogger('user')
 
 
 @cli.group()
@@ -23,17 +27,37 @@ def view(raw: Optional[bool]):
     Args:
         raw: True/False - display results in details or simplified format
     """
+    list_examples(raw)
+
+
+def list_examples(raw: bool):
+    """
+    \b
+    Display all idmtools available examples
+    Args:
+        raw: True/False - display results in details or simplified format
+    """
     examples = get_plugins_examples()
-
     if raw:
-        print(json.dumps(examples, indent=3))
+        user_logger.info(json.dumps(examples, indent=3))
         exit(0)
-
     for plugin, urls in examples.items():
-        print('\n', plugin)
+        user_logger.info(f'\n{plugin}')
         urls = [urls] if isinstance(urls, str) else urls
         url_list = [f'    - {url}' for url in urls]
-        print('\n'.join(url_list))
+        user_logger.info('\n'.join(url_list))
+
+
+# alias under examples
+@cli.group(help="Display a list of examples organized by plugin type")
+def examples():
+    pass
+
+
+@examples.command(name='list', help="List examples available")
+@click.option('--raw', default=False, type=bool, help="Files in detail")
+def list_m(raw: Optional[bool]):
+    list_examples(raw)
 
 
 @gitrepo.command()
@@ -55,7 +79,7 @@ def repos(owner: Optional[str], page: Optional[int]):
         exit(1)
     repos_full = [f'    - {GITHUB_HOME}/{r}' for r in repos]
     secho(f"GitHub Owner: {gr.repo_owner}", fg="green")
-    print('\n'.join(repos_full))
+    user_logger.info('\n'.join(repos_full))
 
 
 @gitrepo.command()
@@ -77,7 +101,7 @@ def releases(owner: Optional[str], repo: Optional[str]):
         exit(1)
     rels_list = [f' - {r}' for r in rels]
     secho(f'The Repo: {gr.repo_home_url}', fg="green")
-    print('\n'.join(rels_list))
+    user_logger.info('\n'.join(rels_list))
 
 
 @gitrepo.command()
@@ -91,18 +115,18 @@ def peep(url: Optional[str], raw: Optional[bool]):
         url: GitHub repo files url (required)
         raw: Display details or not
     """
-    print(f'Peep: {url}')
-    print('Processing...')
+    user_logger.info(f'Peep: {url}')
+    user_logger.info('Processing...')
     try:
         result = GitRepo().peep(url)
     except Exception as ex:
         secho(f'Failed to access: {url}', fg="yellow")
-        print(ex)
+        user_logger.error(ex)
         exit(1)
 
     secho(f"Item Count: {len(result)}", fg="green")
     if raw:
-        print(json.dumps(result, indent=3))
+        user_logger.info(json.dumps(result, indent=3))
         exit(0)
 
     for file in result:
@@ -113,9 +137,10 @@ def peep(url: Optional[str], raw: Optional[bool]):
 
 
 @gitrepo.command()
+@click.option('--type', default=None, multiple=True, help="Download examples by type(COMPSPlatform, PythonTask, etc)")
 @click.option('--url', default=None, multiple=True, help="Repo files url")
 @click.option('--output', default='./', help="Files download destination")
-def download(url: Optional[str], output: Optional[str]) -> int:
+def download(type: Optional[List[str]], url: Optional[str], output: Optional[str]):
     """
     \b
     Download files from GitHub repo to user location
@@ -125,11 +150,44 @@ def download(url: Optional[str], output: Optional[str]) -> int:
 
     Returns: Files download count
     """
+    download_github_repo(output, url, example_types=type)
+
+
+@examples.command(name='download')
+@click.option('--type', default=None, multiple=True, help="Download examples by type(COMPSPlatform, PythonTask, etc)")
+@click.option('--url', default=None, multiple=True, help="Repo files url")
+@click.option('--output', default='./', help="Files download destination")
+def download_alias(type: Optional[List[str]], url: Optional[List[str]], output: Optional[str]):
+    """
+    \b
+    Download examples from specified location
+    Args:
+        url: GitHub repo files url
+        output: Local folder
+
+    Returns: Files download count
+    """
+    download_github_repo(output, url, example_types=list(type))
+
+
+def download_github_repo(output, urls: List[str], example_types: List[str] = None):
+    """
+
+    Args:
+        output:
+        urls:
+        example_types:
+
+    Returns:
+
+    """
     total = 0
-    urls = list(filter(None, url)) if url else None
+    if example_types:
+        urls = list(urls)
+        urls.extend(get_examples_by_types(list(example_types)))
+    urls = list(filter(None, urls)) if urls else None
     option, file_dict = choice(urls)
     secho(f"This is your selection: {option}", fg="bright_blue")
-
     # If we decide to go ahead -> write to file
     if click.confirm("Do you want to go ahead to download files?", default=True):
         simplified_option, duplicated = remove_duplicated_files(option, file_dict)
@@ -141,6 +199,25 @@ def download(url: Optional[str], output: Optional[str]) -> int:
         secho("Download successfully!", fg="bright_green")
     else:
         secho("Aborted...", fg="bright_red")
+
+
+def get_examples_by_types(example_types: List[str]) -> List[str]:
+    """
+
+    Args:
+        example_types:
+
+    Returns:
+
+    """
+    items = get_plugins_examples()
+    result = []
+    for example in example_types:
+        if example in items:
+            result.extend(items[example])
+        else:
+            user_logger.warning(f"Cannot find example type {example}")
+    return result
 
 
 def download_file(option: int, url: str, output: str):
@@ -189,7 +266,7 @@ def get_plugins_examples():
             if len(plugin_url_list) > 0:
                 example_plugins[spec_name] = plugin_url_list
         except Exception as ex:
-            print(ex)
+            user_logger.error(ex)
 
     return example_plugins
 
@@ -225,8 +302,8 @@ def choice(urls: list = None):
 
     # Pre-view files for user to select
     file_list = [f'    {i}. {url}' for i, url in file_dict.items()]
-    print('File List:')
-    print('\n'.join(file_list))
+    user_logger.info('File List:')
+    user_logger.info('\n'.join(file_list))
 
     if urls:
         # Return without user prompt for selection

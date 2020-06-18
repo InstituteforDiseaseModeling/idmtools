@@ -16,6 +16,7 @@
 # add these directories to sys.path here. If the directory is relative to the
 # docs root, use os.path.abspath to make it absolute, like shown here.
 #
+import configparser
 import os
 import sys
 import sphinx_rtd_theme
@@ -95,7 +96,12 @@ author = u'Institute for Disease Modeling'
 # built documents.
 #
 # The short X.Y version.
-version = u'Beta'
+current_path = os.path.dirname(__file__)
+version_path = os.path.join(current_path, '..', 'idmtools_core', '.bumpversion.cfg')
+config = configparser.ConfigParser()
+config.read(version_path)
+
+version = config['bumpversion']['current_version']
 # The full version, including alpha/beta/rc tags.
 # release = u'1.0'
 

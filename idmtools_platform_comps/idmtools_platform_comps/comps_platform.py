@@ -2,22 +2,17 @@
 import copy
 import json
 import logging
+# fix for comps weird import
+handlers = copy.copy(logging.getLogger().handlers)
+from COMPS import Client
+logging.root.handlers = handlers
 from dataclasses import dataclass, field
 from functools import partial
 from typing import List
 from enum import Enum
-
-# COMPS sometimes messes up our logger so backup handler in case
-handlers = [x for x in logging.getLogger().handlers]
-r = logging.getLogger()
-from COMPS import Client
-
-r.handlers = handlers
-
 from idmtools.core import CacheEnabled, ItemType
 from idmtools.entities.iplatform import IPlatform
 from idmtools.entities.platform_requirements import PlatformRequirements
-
 from idmtools_platform_comps.comps_operations.asset_collection_operations import \
     CompsPlatformAssetCollectionOperations
 from idmtools_platform_comps.comps_operations.experiment_operations import CompsPlatformExperimentOperations
@@ -96,6 +91,9 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         self._assets = CompsPlatformAssetCollectionOperations(platform=self)
 
     def _login(self):
+        # ensure logging is initialized
+        from idmtools.core.logging import exclude_logging_classes
+        exclude_logging_classes()
         Client.login(self.endpoint)
 
     def post_setstate(self):

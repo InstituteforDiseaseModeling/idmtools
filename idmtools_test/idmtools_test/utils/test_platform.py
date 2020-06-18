@@ -11,8 +11,8 @@ from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.registry.platform_specification import example_configuration_impl, get_platform_impl, \
     get_platform_type_impl, PlatformSpecification
 from idmtools.registry.plugin_specification import get_description_impl
-from idmtools_test.utils.operations.experiment_operations import TestPlaformExperimentOperation
-from idmtools_test.utils.operations.simulation_operations import TestPlaformSimulationOperation
+from idmtools_test.utils.operations.experiment_operations import TestPlatformExperimentOperation
+from idmtools_test.utils.operations.simulation_operations import TestPlatformSimulationOperation
 
 logger = getLogger(__name__)
 current_directory = os.path.dirname(os.path.realpath(__file__))
@@ -28,9 +28,9 @@ class TestPlatform(IPlatform):
     Test platform simulating a working platform to use in the test suites.
     """
 
-    _experiments: TestPlaformExperimentOperation = field(default=None, compare=False, metadata={"pickle_ignore": True},
+    _experiments: TestPlatformExperimentOperation = field(default=None, compare=False, metadata={"pickle_ignore": True},
                                                          repr=False, init=False)
-    _simulations: TestPlaformSimulationOperation = field(default=None, compare=False, metadata={"pickle_ignore": True},
+    _simulations: TestPlatformSimulationOperation = field(default=None, compare=False, metadata={"pickle_ignore": True},
                                                          repr=False, init=False)
 
     _platform_supports: List[PlatformRequirements] = field(default_factory=lambda: copy.deepcopy(supported_types),
@@ -44,8 +44,8 @@ class TestPlatform(IPlatform):
         super().__post_init__()
 
     def init_interfaces(self):
-        self._experiments = TestPlaformExperimentOperation(self)
-        self._simulations = TestPlaformSimulationOperation(self)
+        self._experiments = TestPlatformExperimentOperation(self)
+        self._simulations = TestPlatformSimulationOperation(self)
 
     def post_setstate(self):
         self.init_interfaces()
