@@ -2,17 +2,20 @@ import inspect
 import os
 import pickle
 import tempfile
-
+from logging import getLogger
 from idmtools.assets.file_list import FileList
 from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
 from idmtools.config import IdmConfigParser
+
+logger = getLogger(__name__)
+user_logger = getLogger('user')
 
 
 class PlatformAnalysis:
 
     def __init__(self, platform, experiment_ids, analyzers, analyzers_args=None, analysis_name='WorkItem Test',
                  tags=None,
-                 additional_files=None, asset_collection_id=None, asset_files=FileList()):
+                 additional_files=None, asset_collection_id=None, asset_files=FileList(), wait_till_done: bool = True):
         self.platform = platform
         self.experiment_ids = experiment_ids
         self.analyzers = analyzers
@@ -23,6 +26,7 @@ class PlatformAnalysis:
         self.asset_collection_id = asset_collection_id
         self.asset_files = asset_files
         self.wi = None
+        self.wait_till_done = wait_till_done
 
         self.validate_args()
 
@@ -65,13 +69,16 @@ class PlatformAnalysis:
         # Add platform
         command += " {}".format(IdmConfigParser._block)
 
+        logger.debug(f"Command: {command}")
         self.wi = SSMTWorkItem(item_name=self.analysis_name, command=command, tags=self.tags,
                                user_files=self.additional_files, asset_collection_id=self.asset_collection_id,
                                asset_files=self.asset_files, related_experiments=self.experiment_ids)
 
         # Run the workitem
         self.platform.run_items(self.wi)
-        self.platform.wait_till_done(self.wi)
+        if self.wait_till_done:
+            self.platform.wait_till_done(self.wi)
+        logger.debug(f"Status: {self.wi.status}")
 
         # remove temp file
         os.remove(temp_file)
@@ -88,7 +95,7 @@ class PlatformAnalysis:
             return
 
         if len(self.analyzers) < len(self.analyzers_args):
-            print("two list 'analyzers' and 'analyzers_args' must have the same length.")
+            user_logger.error("two list 'analyzers' and 'analyzers_args' must have the same length.")
             exit()
 
     def get_work_item(self):

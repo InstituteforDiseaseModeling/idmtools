@@ -37,7 +37,7 @@ class TestRTask(TestCase):
 
     def test_simple_model(self):
         fpath = os.path.join(COMMON_INPUT_PATH, "Rscript", "model1.R")
-        task = RTask(script_name=fpath, image_name='r-base:3.6.1')
+        task = RTask(script_path=fpath, image_name='r-base:3.6.1')
         task.gather_all_assets()
 
         self.assertEqual(str(task.command), f'Rscript ./Assets/model1.R')
@@ -45,7 +45,7 @@ class TestRTask(TestCase):
 
     def test_json_r_argument(self):
         fpath = os.path.join(COMMON_INPUT_PATH, "Rscript", "model1.R")
-        task = JSONConfiguredRTask(script_name=fpath, image_name='r-base:3.6.1')
+        task = JSONConfiguredRTask(script_path=fpath, image_name='r-base:3.6.1')
         task.gather_all_assets()
 
         self.assertEqual(str(task.command), f'Rscript ./Assets/model1.R --config config.json')
@@ -54,7 +54,7 @@ class TestRTask(TestCase):
 
     def test_json_r_static_filename_no_argument(self):
         fpath = os.path.join(COMMON_INPUT_PATH, "Rscript", "model1.R")
-        task = JSONConfiguredRTask(script_name=fpath, configfile_argument=None, image_name='r-base:3.6.1')
+        task = JSONConfiguredRTask(script_path=fpath, configfile_argument=None, image_name='r-base:3.6.1')
         task.gather_all_assets()
 
         self.assertEqual(str(task.command), f'Rscript ./Assets/model1.R')
@@ -63,7 +63,7 @@ class TestRTask(TestCase):
 
     def test_different_r_path(self):
         fpath = os.path.join(COMMON_INPUT_PATH, "Rscript", "model1.R")
-        task = JSONConfiguredRTask(script_name=fpath, configfile_argument=None, image_name='r-base:3.6.1',
+        task = JSONConfiguredRTask(script_path=fpath, configfile_argument=None, image_name='r-base:3.6.1',
                                    r_path='/usr/custom/Rscript')
         task.gather_all_assets()
 

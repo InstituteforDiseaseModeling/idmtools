@@ -1,6 +1,7 @@
 import os
 import shutil
 import tempfile
+import time
 from dataclasses import dataclass, field
 from multiprocessing import current_process, cpu_count
 from logging import getLogger, DEBUG
@@ -69,19 +70,16 @@ class CacheEnabled:
             del self._cache
 
             if self._cache_directory and os.path.exists(self._cache_directory):
-                try:
-                    shutil.rmtree(self._cache_directory)
-                # In some scripts, like multi-processing, we could still end up with a locked file
-                # in these cases, let's just preserve cache. Often these are temp directories the os
-                # will clean up for us
-                except (IOError, PermissionError) as e:
-                    # We can hit logging issues as we are shutting down. Ignore those
+                retries = 0
+                while retries < 3:
                     try:
-                        logger.warning(f"Could not delete cache directory: {self._cache_directory}")
-                        if logger.isEnabledFor(DEBUG):
-                            logger.exception(e)
-                    except Exception:
-                        pass
+                        shutil.rmtree(self._cache_directory)
+                        time.sleep(0.15)
+                        break
+                    except (IOError, PermissionError):
+                        # we don't use logger here because it could be destroyed
+                        print(f"Could not delete cache {self._cache_directory}")
+                        retries += 1
 
     @property
     def cache(self) -> Union[Cache, FanoutCache]:

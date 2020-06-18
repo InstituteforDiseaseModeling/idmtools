@@ -28,7 +28,7 @@ if sys.platform in ["win32", "cygwin"]:
     requirements.append('pypiwin32==223')
     requirements.append('pywin32==227')
 
-
+test_requirements.extend(ui_requirements)
 extras = dict(test=test_requirements, dev=['Pympler'],
               # Requirements for running workers server
               workers=worker_requirements,

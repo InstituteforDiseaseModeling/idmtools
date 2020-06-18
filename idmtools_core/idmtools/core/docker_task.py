@@ -4,7 +4,7 @@ import sys
 import unicodedata
 from dataclasses import dataclass
 from datetime import datetime, timezone, timedelta
-from typing import Optional
+from typing import Optional, Type
 
 from tqdm import tqdm
 
@@ -39,11 +39,23 @@ class DockerTask(ITask):
             self.build_image()
 
     def gather_common_assets(self) -> AssetCollection:
+        """
+        Gather common(experiment-level) assets from task
+
+        Returns:
+            AssetCollection containing all the common assets
+        """
         if self.image_name is None:
             raise ValueError("Image Name is required")
         return self.common_assets
 
     def gather_transient_assets(self) -> AssetCollection:
+        """
+        Gather transient(simulation-level) assets from task
+
+        Returns:
+            AssetCollection
+        """
         return self.transient_assets
 
     def build_image(self, spinner=None, **extra_build_args):
@@ -103,7 +115,6 @@ class DockerTask(ITask):
                                 build_step = line
                             # update build step with output
                             elif build_step:
-
                                 if len(line) > 40:
                                     line = line[:40]
                                 prog.set_description(f'{build_step}: {line}')
@@ -126,7 +137,31 @@ class DockerTask(ITask):
 class DockerTaskSpecification(TaskSpecification):
 
     def get(self, configuration: dict) -> DockerTask:
+        """
+        Get instance of DockerTask with configuration provided
+
+        Args:
+            configuration: configuration for DockerTask
+
+        Returns:
+            DockerTask with configuration
+        """
         return DockerTask(**configuration)
 
     def get_description(self) -> str:
+        """
+        Get description of plugin
+
+        Returns:
+            Plugin description
+        """
         return "Defines a docker command"
+
+    def get_type(self) -> Type[DockerTask]:
+        """
+        Get type of task provided by plugin
+
+        Returns:
+            DockerTask
+        """
+        return DockerTask

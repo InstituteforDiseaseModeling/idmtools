@@ -108,11 +108,10 @@ class setParam:
 
 # Now add our sweep on a list
 builder.add_sweep_definition(setParam("b"), [1, 2, 3])
-# add our builder to the templated simulations
 ts.add_builder(builder)
 
 # Now we can create our Experiment using our template builder
-experiment = Experiment(name=os.path.split(sys.argv[0])[1], simulations=ts)
+experiment = Experiment.from_template(ts, name=os.path.split(sys.argv[0])[1])
 # Add our own custom tag to simulation
 experiment.tags["tag1"] = 1
 # And maybe some custom Experiment Level Assets
@@ -121,10 +120,9 @@ experiment.assets.add_directory(assets_directory=os.path.join("inputs", "python_
 # In order to run the experiment, we need to create a `Platform`
 # The `Platform` defines where we want to run our simulation.
 # You can easily switch platforms by changing the Platform to for example 'Local'
-platform = Platform('COMPS2')
+with Platform('COMPS2'):
 
-# The last step is to call run() on the ExperimentManager to run the simulations.
-platform.run_items(experiment)
-platform.wait_till_done(experiment)
-# use system status as the exit code
-sys.exit(0 if experiment.succeeded else -1)
+    # The last step is to call run() on the ExperimentManager to run the simulations.
+    experiment.run(True)
+    # use system status as the exit code
+    sys.exit(0 if experiment.succeeded else -1)

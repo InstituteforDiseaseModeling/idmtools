@@ -36,7 +36,7 @@ class TestLocalRunnerCLI(ITestWithPersistence):
         builder.add_sweep_definition(param_a_update, range(0, 5))
         ts.add_builder(builder)
         cls.pe = Experiment.from_template(ts, name="python experiment", tags={"string_tag": "test", "number_tag": 123})
-        wait_on_experiment_and_check_all_sim_status(cls, cls.pe, platform)
+        cls.pe = wait_on_experiment_and_check_all_sim_status(cls, cls.pe, platform)
 
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
@@ -58,31 +58,31 @@ class TestLocalRunnerCLI(ITestWithPersistence):
     def test_status_simulationClient_api(self):
         # Test 1: get_all simulations with simulation id only filter
         for s in self.pe.simulations:
-            simulations = SimulationsClient.get_one(str(s.uid))
-            self.assertEqual(simulations['simulation_uid'], str(s.uid))
-            self.assertEqual(simulations['experiment_id'], str(self.pe.uid))
-            print(simulations['status'])
+            simulation = SimulationsClient.get_one(str(s.uid))
+            self.assertEqual(simulation['simulation_uid'], str(s.uid))
+            self.assertEqual(simulation['experiment_id'], str(self.pe.uid))
+            print(simulation['status'])
             # self.assertEqual(simulations[0]['status'], s.status.value) # wait for bug fix
-            self.assertEqual(simulations['tags'], s.tags)
-            self.assertEqual(simulations['data_path'], '/data/' + str(self.pe.uid) + '/' + str(s.uid))
-            self.assertEqual(simulations['extra_details']['command'], 'python ./Assets/model1.py')
+            self.assertEqual(simulation['tags'], s.tags)
+            self.assertEqual(simulation['data_path'], '/data/' + str(self.pe.uid) + '/' + str(s.uid))
+            self.assertEqual(simulation['extra_details']['command'], 'python ./Assets/model1.py')
 
             # Also test get_one with simulation id filter
             simulation = SimulationsClient.get_one(str(s.uid))
-            self.assertEqual(simulations, simulation)
+            self.assertEqual(simulation, simulation)
 
             # Also test get_one with simulation id and tags  filters
             simulation1 = SimulationsClient.get_one(str(s.uid), tags=s.tags)
-            self.assertEqual(simulations, simulation1)
+            self.assertEqual(simulation, simulation1)
 
         # Test 2: get_all simulations with simulation id and experiment id as filters
         for s in self.pe.simulations:
-            simulations = SimulationsClient.get_one(str(s.uid), experiment_id=str(self.pe.uid))
-            self.assertEqual(simulations['simulation_uid'], str(s.uid))
-            self.assertEqual(simulations['experiment_id'], str(self.pe.uid))
-            self.assertEqual(simulations['tags'], s.tags)
-            self.assertEqual(simulations['data_path'], '/data/' + str(self.pe.uid) + '/' + str(s.uid))
-            self.assertEqual(simulations['extra_details']['command'], 'python ./Assets/model1.py')
+            simulation = SimulationsClient.get_one(str(s.uid), experiment_id=str(self.pe.uid))
+            self.assertEqual(simulation['simulation_uid'], str(s.uid))
+            self.assertEqual(simulation['experiment_id'], str(self.pe.uid))
+            self.assertEqual(simulation['tags'], s.tags)
+            self.assertEqual(simulation['data_path'], '/data/' + str(self.pe.uid) + '/' + str(s.uid))
+            self.assertEqual(simulation['extra_details']['command'], 'python ./Assets/model1.py')
 
         # Test 3: get_all simulations with experiment id as only filter
         simulations = SimulationsClient.get_all(experiment_id=str(self.pe.uid))

@@ -11,6 +11,7 @@ from idmtools.registry.plugin_specification import PLUGIN_REFERENCE_NAME
 
 
 logger = getLogger(__name__)
+user_logger = getLogger('user')
 
 
 def is_a_plugin_of_type(value, plugin_specification: Type[PluginSpecification]) -> bool:
@@ -56,7 +57,7 @@ def load_plugin_map(entrypoint: str, spec_type: Type[PluginSpecification], strip
             _plugin_map[plugin.get_name(strip_all)] = plugin()
         except Exception as e:
             logger.exception(e)
-            print(f'Problem loading plugin: {plugin.get_name()}')
+            user_logger.error(f'Problem loading plugin: {plugin.get_name()}')
     return _plugin_map
 
 

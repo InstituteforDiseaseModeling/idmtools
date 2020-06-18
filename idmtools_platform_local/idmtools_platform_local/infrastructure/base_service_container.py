@@ -82,12 +82,22 @@ class BaseServiceContainer(ABC):
         container = self.client.containers.list(filters=dict(name=self.container_name), all=True)
         container = [x for x in container if x.name == self.container_name]
         if container:
+            container = container[0]
             if logger.isEnabledFor(DEBUG):
-                logger.debug(f"Found {container[0].name}")
-            return container[0]
+                logger.debug(f"Found {container.name}")
+            return container
         return None
 
     def get_or_create(self, spinner=None) -> Container:
+        """
+        Get or Create a container
+
+        Args:
+            spinner: Optional spinner to display
+
+        Returns:
+            Docker container object representing service container
+        """
         container = self.get()
         if container is None:
             if logger.isEnabledFor(DEBUG):
@@ -98,7 +108,15 @@ class BaseServiceContainer(ABC):
         return container
 
     @staticmethod
-    def ensure_container_is_running(container) -> Container:
+    def ensure_container_is_running(container: Container) -> Container:
+        """
+        Ensures is running
+        Args:
+            container:
+
+        Returns:
+
+        """
         if container.status in ['exited', 'created']:
             logger.debug(f"Restarting container: {container.name}")
             container.start()

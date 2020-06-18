@@ -1,11 +1,14 @@
 from abc import ABCMeta
 from dataclasses import dataclass, field
-from typing import NoReturn, List, Any, Dict, Union
+from typing import NoReturn, List, Any, Dict, Union, TYPE_CHECKING
 from uuid import UUID
 
 from idmtools.core import EntityStatus, ItemType, NoPlatformException
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.services.platforms import PlatformPersistService
+
+if TYPE_CHECKING:
+    from idmtools.entities.iplatform import IPlatform
 
 
 @dataclass
@@ -35,16 +38,16 @@ class IEntity(IItem, metaclass=ABCMeta):
         self.status = EntityStatus.CREATED
 
     @classmethod
-    def from_id(cls, item_id: Union[str, UUID], platform: 'IPlatform' = None) -> 'IEntity':  # noqa E821
+    def from_id(cls, item_id: Union[str, UUID], platform: 'IPlatform' = None, **kwargs) -> 'IEntity':  # noqa E821
         if platform is None:
-            from idmtools.core.platform_factory import current_platform
+            from idmtools.core.context import current_platform
             if current_platform is None:
                 raise ValueError("You have to specify a platfrom to load the asset collection from")
             platform = current_platform
         if cls.item_type is None:
             raise EnvironmentError("ItemType is None. This is most likely a badly derived IEntity "
                                    "that doesn't run set the default item type on the class")
-        return platform.get_item(item_id, cls.item_type)
+        return platform.get_item(item_id, cls.item_type, **kwargs)
 
     @property
     def parent(self):
@@ -97,6 +100,28 @@ class IEntity(IItem, metaclass=ABCMeta):
 
     def __hash__(self):
         return id(self.uid)
+
+    def _check_for_platform_from_context(self, platform) -> 'IPlatform':
+        """
+        Try to determine platform of current object from self or current platform
+
+        Args:
+            platform: Passed in platform object
+
+        Raises:
+            NoPlatformException: when no platform is on current context
+        Returns:
+            Platform object
+        """
+        if self.platform is None:
+            # check context for current platform
+            if platform is None:
+                from idmtools.core.context import current_platform
+                if current_platform is None:
+                    raise NoPlatformException("No Platform defined on object, in current context, or passed to run")
+                platform = current_platform
+            self.platform = platform
+        return self.platform
 
 
 IEntityList = List[IEntity]

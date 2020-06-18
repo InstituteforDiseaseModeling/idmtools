@@ -1,11 +1,10 @@
-backoff~=1.8.1
+backoff~=1.10.0
 click~=7.0
 colorama~=0.4.1
-docker~=4.0.1
-dramatiq[redis, watch]~=1.6.0
+docker~=4.2.1
+dramatiq[redis, watch]~=1.9.0
 gevent~=1.4.0
 idmtools~=1.1.0
 requests~=2.23.0
 stringcase~=1.2.0
-tabulate~=0.8.3
-Werkzeug==0.16.1
+tabulate~=0.8.7

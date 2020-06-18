@@ -14,6 +14,7 @@ from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import ArmSimulationBuilder, ArmType, SimulationBuilder, SweepArm
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
+from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
@@ -35,6 +36,8 @@ class setParam:
         self.param = param
 
     def __call__(self, simulation: Simulation, value) -> Dict[str, any]:
+        # set simulation name
+        simulation.name = f'{simulation.parent.name}_{self.param}_{value}'
         return JSONConfiguredPythonTask.set_parameter_sweep_callback(simulation, self.param, value)
 
 
@@ -60,11 +63,17 @@ class TestPythonExperiment(ITestWithPersistence):
         # ------------------------------------------------------
         # Sweeping parameters:
         # first way to sweep parameter 'a' is to use param_update function
-        builder.add_sweep_definition(setA, range(0, 2))
+        builder.add_sweep_definition(
+            JSONConfiguredPythonTask.set_parameter_partial("a"),
+            range(0, 2)
+        )
 
         # second way to sweep parameter 'b' is to use class setParam which basiclly doing same thing as param_update
         # method
-        builder.add_sweep_definition(setParam("b"), [i * i for i in range(1, 4, 2)])
+        builder.add_sweep_definition(
+            JSONConfiguredPythonTask.set_parameter_partial("b"),
+            [i * i for i in range(1, 4, 2)]
+        )
         # ------------------------------------------------------
 
         e.simulations.add_builder(builder)
@@ -80,7 +89,7 @@ class TestPythonExperiment(ITestWithPersistence):
         tag_value = "idmtools_models.python.json_python_task.JSONConfiguredPythonTask"
         expected_tags = [{'a': '0', 'b': '1', 'task_type': tag_value}, {'a': '0', 'b': '9', 'task_type': tag_value},
                          {'a': '1', 'b': '1', 'task_type': tag_value}, {'a': '1', 'b': '9', 'task_type': tag_value}]
-        validate_sim_tags(self, exp_id, expected_tags)
+        validate_sim_tags(self, exp_id, expected_tags, tag_value)
 
         # validate experiment tags
         actual_exp_tags = experiment.get(experiment.id, QueryCriteria().select_children('tags')).tags
@@ -89,6 +98,29 @@ class TestPythonExperiment(ITestWithPersistence):
                              'task_type': 'idmtools_models.python.json_python_task.JSONConfiguredPythonTask'}
         self.assertDictEqual(expected_exp_tags, actual_exp_tags)
         self.assertDictEqual(expected_exp_tags, actual_exp_tags)
+
+        # validate reload
+        with self.subTest("test_sweeps_with_partial_comps_reload_with_task"):
+            experiment_reload = Experiment.from_id(e.uid, self.platform, load_task=True)
+            self.assertEqual(e.id, experiment_reload.id)
+            self.assertEqual(e.simulation_count, experiment_reload.simulation_count)
+            # get all the ids
+            self.assertEqual(
+                sorted([s.uid for s in e.simulations]),
+                sorted([s.uid for s in experiment_reload.simulations])
+            )
+            for sim in experiment_reload.simulations:
+                self.assertIsInstance(sim.task, JSONConfiguredPythonTask)
+                self.assertIn("a", sim.task.parameters)
+                self.assertIn("b", sim.task.parameters)
+                self.assertEqual(str(e.simulations[0].task.command), str(sim.task.command))
+
+        with self.subTest("test_sweeps_with_partial_comps_reload"):
+            experiment_reload = Experiment.from_id(e.uid, self.platform)
+            for sim in experiment_reload.simulations:
+                self.assertIsInstance(sim.task, CommandTask)
+                'python ./Assets/model1.py --config config.json'
+                self.assertEqual(str(e.simulations[0].task.command), str(sim.task.command))
 
     # Test parameter "b" set is depending on parameter "a"
     # a=[0,1,2,3,4] <--sweep parameter
@@ -123,7 +155,7 @@ class TestPythonExperiment(ITestWithPersistence):
         expected_tags = [{'a': '0', 'task_type': tag_value}, {'a': '1', 'task_type': tag_value},
                          {'a': '2', 'task_type': tag_value}, {'a': '3', 'task_type': tag_value},
                          {'a': '4', 'task_type': tag_value}]
-        validate_sim_tags(self, exp_id, expected_tags)
+        validate_sim_tags(self, exp_id, expected_tags, tag_value)
 
     @pytest.mark.long
     @pytest.mark.comps
@@ -327,7 +359,7 @@ class TestPythonExperiment(ITestWithPersistence):
                          {'a': '1', 'b': '3', 'c': '5', 'task_type': tag_value},
                          {'a': '6', 'b': '2', 'task_type': tag_value},
                          {'a': '7', 'b': '2', 'task_type': tag_value}]
-        validate_sim_tags(self, exp_id, expected_tags)
+        validate_sim_tags(self, exp_id, expected_tags, tag_value)
 
     @pytest.mark.comps
     def test_duplicate_asset_files_not_allowed(self):
@@ -420,6 +452,8 @@ class TestPythonExperiment(ITestWithPersistence):
                              {'filename': 'functions.py', 'relative_path': 'MyExternalLibrary'},
                              {'filename': 'working_model.py', 'relative_path': ''},
                              {'filename': 'test.json', 'relative_path': ''}]
+            # validate simulation names
+            self.assertIn(f'{e.name}_', simulation.name)
             self.validate_assets(assets, expected_list)
 
     @pytest.mark.long

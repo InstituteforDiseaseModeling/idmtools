@@ -148,7 +148,7 @@ class DockerIO:
                          f'through {target_file}')
 
             with open(target_file, 'wb') as of:
-                of.write(file.read())
+                of.write(file.getvalue())
             return True
 
     def sync_copy(self, futures):

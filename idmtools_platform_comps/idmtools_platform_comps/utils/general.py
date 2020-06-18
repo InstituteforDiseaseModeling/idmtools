@@ -1,7 +1,9 @@
 import ntpath
-from typing import List, Dict
+from typing import List, Dict, Union, Generator, Optional
 from uuid import UUID
-from COMPS.Data import Simulation
+from COMPS import Client
+from COMPS.Data import Simulation, SimulationFile, AssetCollectionFile, WorkItemFile
+from COMPS.Data.AssetFile import AssetFile
 from COMPS.Data.Simulation import SimulationState
 from COMPS.Data.WorkItem import WorkItemState
 from idmtools.core import EntityStatus, ItemType
@@ -67,11 +69,15 @@ def convert_comps_workitem_status(comps_status: WorkItemState) -> EntityStatus:
     Returns:
         EntityStatus
     """
+    work_item_canceled = (WorkItemState.Canceled, WorkItemState.CancelRequested, WorkItemState.Failed)
+    work_item_created = [
+        WorkItemState.Created, WorkItemState.Resumed, WorkItemState.CommissionRequested, WorkItemState.Commissioned
+    ]
     if comps_status == WorkItemState.Succeeded:
         return EntityStatus.SUCCEEDED
-    elif comps_status in (WorkItemState.Canceled, WorkItemState.CancelRequested, WorkItemState.Failed):
+    elif comps_status in work_item_canceled:
         return EntityStatus.FAILED
-    elif comps_status == [WorkItemState.Created, WorkItemState.Resumed, WorkItemState.CommissionRequested, WorkItemState.Commissioned]:
+    elif comps_status == work_item_created:
         return EntityStatus.CREATED
     else:
         return EntityStatus.RUNNING
@@ -115,6 +121,35 @@ def get_file_from_collection(platform: IPlatform, collection_id: UUID, file_path
             return asset_file.retrieve()
 
 
+def get_file_as_generator(file: Union[SimulationFile, AssetCollectionFile, AssetFile, WorkItemFile],
+                          chunk_size: int = 128, resume_byte_pos: Optional[int] = None) -> \
+        Generator[bytearray, None, None]:
+    """
+    Get file as a generator
+
+    Args:
+        file: File to stream contents through a generator
+        chunk_size: Size of chunks to load
+        resume_byte_pos: Optional start of download
+
+    Returns:
+
+    """
+    url = file.uri
+    i = url.find('/asset/')
+    if i == -1:
+        raise RuntimeError('Unable to parse asset url: ' + url)
+
+    if resume_byte_pos:
+        header = {'Range': 'bytes=%d-' % resume_byte_pos}
+    else:
+        header = {}
+    response = Client.get(url[i:], headers=header, stream=True)
+
+    for chunk in response.iter_content(chunk_size=chunk_size):
+        yield chunk
+
+
 def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str], cache=None) -> Dict[str, bytearray]:
     """
     Retrieve assets from an Entity(Simulation, Experiment, WorkItem)
@@ -131,7 +166,7 @@ def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str
     # Retrieve comps item
     if item.platform is None:
         item.platform = platform
-    comps_item: Simulation = item.get_platform_object(True, children=["files", "configuration"])
+    comps_item: Simulation = item.get_platform_object(True, load_children=["files", "configuration"])
 
     all_paths = set(files)
     assets = set(path for path in all_paths if path.lower().startswith("assets"))
