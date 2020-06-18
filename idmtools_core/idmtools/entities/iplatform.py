@@ -768,6 +768,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         """
         from idmtools.core.context import set_current_platform
         set_current_platform(self)
+        return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         """

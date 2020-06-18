@@ -1,5 +1,5 @@
 import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, InitVar
 from io import BytesIO
 from logging import getLogger, DEBUG
 from typing import TypeVar, Union, List, Callable, Any, Optional, Generator, BinaryIO
@@ -30,14 +30,17 @@ class Asset:
     absolute_path: Optional[str] = field(default=None)
     relative_path: Optional[str] = field(default=None)
     filename: Optional[str] = field(default=None)
-    content: Optional[Any] = field(default=None)
+    # make content an init var
+    content: Optional[Any] = InitVar()
+    _content: bytes = field(default=None, init=False)
     _length: Optional[int] = field(default=None)
     persisted: bool = field(default=False)
-    handler: Callable = field(default=str)
-    download_generator_hook: Callable = field(default=None)
+    handler: Callable = field(default=str, metadata=dict(exclude_from_metadata=True))
+    download_generator_hook: Callable = field(default=None, metadata=dict(exclude_from_metadata=True))
     checksum: Optional[str] = field(default=None)
 
-    def __post_init__(self):
+    def __post_init__(self, content=None):
+        self._content = content
         if not self.absolute_path and (not self.filename and not self.content):
             raise ValueError("Impossible to create the asset without either absolute path or filename and content!")
 

@@ -4,15 +4,14 @@ from dataclasses import dataclass, field, InitVar, fields
 from logging import getLogger, DEBUG
 from types import GeneratorType
 from typing import NoReturn, Set, Union, Iterator, Type, Dict, Any, List, TYPE_CHECKING, Generator
-
 from tqdm import tqdm
-
 from idmtools.assets import AssetCollection, Asset
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType, EntityStatus
 from idmtools.core.interfaces.entity_container import EntityContainer
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.core.interfaces.inamed_entity import INamedEntity
+from idmtools.core.logging import SUCCESS, NOTICE
 from idmtools.entities.itask import ITask
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.templated_simulation import TemplatedSimulations
@@ -24,9 +23,10 @@ from idmtools.utils.entities import get_default_tags
 
 if TYPE_CHECKING:
     from idmtools.entities.iplatform import IPlatform
-    from idmtools.entities.simulation import Simulation  # noqa: F401
+    from idmtools.entities.simulation import Simulation
 
 logger = getLogger(__name__)
+user_logger = getLogger('user')
 SUPPORTED_SIM_TYPE = Union[
     EntityContainer,
     Generator['Simulation', None, None],
@@ -385,7 +385,45 @@ class Experiment(IAssetsEnabled, INamedEntity):
     # Define this here for better completion in IDEs for end users
     @classmethod
     def from_id(cls, item_id: Union[str, uuid.UUID], platform: 'IPlatform' = None, **kwargs) -> 'Experiment':
+        """
+        Helper function to provide better intellisense to end users
+
+        Args:
+            item_id: Item id to load
+            platform: Optional platform. Fallbacks to context
+            **kwargs: Optional arguments to be passed on to the platform
+
+        Returns:
+
+        """
         return super().from_id(item_id, platform, **kwargs)
+
+    def print(self, verbose: bool = False):
+        """
+        Print summary of experiment
+        Args:
+            verbose: Verbose printing
+
+        Returns:
+
+        """
+        user_logger.info(f"Experiment <{self.id}>")
+        user_logger.info(f"Total Simulations: {self.simulation_count}")
+        user_logger.info(f"Tags: {self.tags}")
+        user_logger.info(f"Platform: {self.platform.__class__.__name__}")
+        # determine status
+        if self.status:
+            # if succeeded print that
+            if self.succeeded:
+                user_logger.log(SUCCESS, "Succeeded")
+            elif not self.done:
+                user_logger.log(NOTICE, "RUNNING")
+            else:
+                user_logger.critical("Experiment failed. Please check output")
+
+        if verbose:
+            user_logger.info(f"Simulation Type: {type(self.__simulations)}")
+            user_logger.info(f"Assets: {self.assets}")
 
 
 class ExperimentSpecification(ExperimentPluginSpecification):
