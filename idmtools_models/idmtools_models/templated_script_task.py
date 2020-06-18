@@ -65,7 +65,7 @@ class TemplatedScriptTask(ITask):
             if logger.isEnabledFor(DEBUG):
                 logger.debug("Adding common asset hook")
             # add hook to render it to common asset hooks
-            hook = partial(TemplatedScriptTask.__add_template_to_asset_collection, asset_collection=self.common_assets)
+            hook = partial(TemplatedScriptTask._add_template_to_asset_collection, asset_collection=self.common_assets)
             self.gather_common_asset_hooks.append(hook)
         else:
             # it must be a simulation level asset
@@ -73,14 +73,14 @@ class TemplatedScriptTask(ITask):
                 logger.debug("Adding transient asset hook")
             # create hook to render it to our transient assets
             hook = partial(
-                TemplatedScriptTask.__add_template_to_asset_collection,
+                TemplatedScriptTask._add_template_to_asset_collection,
                 asset_collection=self.transient_assets
             )
             # add the hook
             self.gather_transient_asset_hooks.append(hook)
 
     @staticmethod
-    def __add_template_to_asset_collection(task: 'TemplatedScriptTask', asset_collection: AssetCollection) -> \
+    def _add_template_to_asset_collection(task: 'TemplatedScriptTask', asset_collection: AssetCollection) -> \
             AssetCollection:
         """
         Add our rendered template to the asset collection
