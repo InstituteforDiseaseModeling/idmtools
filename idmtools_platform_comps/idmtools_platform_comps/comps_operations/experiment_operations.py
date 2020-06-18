@@ -287,7 +287,8 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             None
         """
-        simulations = self.get_children(experiment.get_platform_object(), force=True, columns=["id", "state"], children=[])
+        simulations = self.get_children(experiment.get_platform_object(), force=True, columns=["id", "state"],
+                                        load_children=[])
         for s in simulations:
             experiment.simulations.set_status_for_item(s.id, convert_comps_status(s.state))
 

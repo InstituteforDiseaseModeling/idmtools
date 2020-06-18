@@ -166,7 +166,7 @@ def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str
     # Retrieve comps item
     if item.platform is None:
         item.platform = platform
-    comps_item: Simulation = item.get_platform_object(True, children=["files", "configuration"])
+    comps_item: Simulation = item.get_platform_object(True, load_children=["files", "configuration"])
 
     all_paths = set(files)
     assets = set(path for path in all_paths if path.lower().startswith("assets"))
