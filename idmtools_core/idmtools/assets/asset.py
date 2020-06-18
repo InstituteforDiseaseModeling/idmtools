@@ -26,10 +26,11 @@ class Asset:
 
             Note: we add this to allow systems who provide asset caching by MD5 opportunity to avoid re-uploading assets
     """
-    content: InitVar[Any] = None
+
     absolute_path: Optional[str] = field(default=None)
     relative_path: Optional[str] = field(default=None)
     filename: Optional[str] = field(default=None)
+    content: InitVar[Any] = None
     _content: bytes = field(default=None, init=False)
     _length: Optional[int] = field(default=None)
     persisted: bool = field(default=False)
@@ -38,7 +39,7 @@ class Asset:
     checksum: Optional[str] = field(default=None)
 
     def __post_init__(self, content):
-        self._content = content
+        self.content = content
         if not self.absolute_path and (not self.filename and not self.content):
             raise ValueError("Impossible to create the asset without either absolute path or filename and content!")
 
