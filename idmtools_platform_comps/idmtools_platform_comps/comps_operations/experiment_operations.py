@@ -141,7 +141,8 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             logger.warning('Experiment has no assets to send')
 
         ac = self.platform._assets.create(experiment.assets)
-        print("Asset collection for experiment: {}".format(ac.id))
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f'Asset collection for experiment: {experiment.id} is: {ac.id}')
 
         # associate the assets with the experiment in COMPS
         e = COMPSExperiment.get(id=experiment.uid)
