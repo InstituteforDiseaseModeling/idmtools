@@ -110,7 +110,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
     def platform_run_item(self, simulation: Simulation, **kwargs):
         pass
 
-    def send_assets(self, simulation: Simulation, comps_sim: COMPSSimulation = None,  **kwargs):
+    def send_assets(self, simulation: Simulation, comps_sim: COMPSSimulation = None, **kwargs):
         if simulation.assets.count == 0:
             return
 
