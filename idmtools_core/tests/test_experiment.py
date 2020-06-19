@@ -1,6 +1,7 @@
 import itertools
 import unittest
 
+from idmtools.assets import AssetCollection, Asset
 from idmtools.builders import SimulationBuilder
 from idmtools.core.enums import EntityStatus
 from idmtools.entities.experiment import Experiment
@@ -9,13 +10,15 @@ from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test.utils.test_task import TestTask
 
 
-def get_new_simulations(n=None):
+def get_new_simulations(n=None, assets=None):
     ts = TemplatedSimulations(base_task=TestTask())
     # create a new sweep for new simulations
     builder = SimulationBuilder()
     builder.add_sweep_definition(JSONConfiguredPythonTask.set_parameter_partial("a"),
                                  [i * i for i in range(100, 120, 3)])
     ts.add_builder(builder=builder)
+    if assets is not None:
+        ts.base_simulation.assets = assets
 
     new_simulations = ts if n is None else [simulation for simulation in ts.simulations()][0:n]
     return new_simulations
@@ -39,16 +42,19 @@ class TestAddingSimulationsToExistingExperiment(unittest.TestCase):
                                       simulations_to_add=new_simulations)
 
     def test_adding_TemplatedSimulations_should_work(self) -> None:
-        new_simulations = get_new_simulations()
+        # we also test adding simulation-level assets to make sure they don't intrude on existing sims in the experiment
+        new_asset_collection = AssetCollection(assets=[Asset(absolute_path='/a/b/c.csv')])
+        new_simulations = get_new_simulations(assets=new_asset_collection)
 
         # add the new simulations and keep track of the existing and total simulation lists
         existing_simulations = [simulation for simulation in self.experiment.simulations.items]
         simulations_to_add = [simulation for simulation in new_simulations.simulations()]
         self.experiment.add_new_simulations(simulations=new_simulations)
 
-        self.verify_added_simulations(self.experiment, existing_simulations, simulations_to_add)
+        self.verify_added_simulations(self.experiment, existing_simulations, simulations_to_add,
+                                      new_asset_collection=new_asset_collection)
 
-    def verify_added_simulations(self, experiment, existing_simulations, simulations_to_add):
+    def verify_added_simulations(self, experiment, existing_simulations, simulations_to_add, new_asset_collection=None):
         # using experiment.simulations.items in here because each iteration over the experiment.simulations object
         # (a ParentIterator) causes all uids to be set to new values...
         all_simulations = [simulation for simulation in experiment.simulations.items]
@@ -60,13 +66,20 @@ class TestAddingSimulationsToExistingExperiment(unittest.TestCase):
         self.assertEqual(len(simulations_to_add), len(added_simulations))
 
         # verify existing simulations have unchanged status and new simulations are ready to be created by a platform
+        # also check that simulation assets are correct for existing sims, and new sims (if requested)
         for simulation in experiment.simulations.items:
             if simulation.uid in existing_uids:
-                self.assertEqual([s for s in existing_simulations if s.uid == simulation.uid][0].status,
-                                 simulation.status)
+                existing_simulation = [s for s in existing_simulations if s.uid == simulation.uid][0]
+                self.assertEqual(existing_simulation.status, simulation.status)
+                self.assertIsNotNone(existing_simulation.assets)
+                self.assertEqual(existing_simulation.assets, simulation.assets)
             else:
                 self.assertEqual(None, simulation.status)
+                if new_asset_collection is not None:
+                    self.assertIsNotNone(simulation.assets)
+                    self.assertEqual(new_asset_collection, simulation.assets)
 
+        # verify assets? TODO
 
 class TestExperimentStatus(unittest.TestCase):
 
