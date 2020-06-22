@@ -23,7 +23,7 @@ from idmtools.utils.entities import get_default_tags
 
 if TYPE_CHECKING:
     from idmtools.entities.iplatform import IPlatform
-    from idmtools.entities.simulation import Simulation
+    from idmtools.entities.simulation import Simulation  # noqa: F401
 
 logger = getLogger(__name__)
 user_logger = getLogger('user')
