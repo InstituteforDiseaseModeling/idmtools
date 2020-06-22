@@ -1,7 +1,7 @@
-# install staging packages and run smoke test
-# trigger by push or pull_request with commit message: "Run uj smoke test!"
+# nstall staging packages and run all test
+# trigger by push or pull_request with commit message: "Run uj all test!"
 
-name: "Run ubuntu staging smoke test"
+name: "Run ubuntu staging all test"
 on: [push, pull_request]
 
 jobs:
@@ -11,7 +11,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         python-version: [3.6, 3.7, 3.8]
-    if: "contains(github.event.head_commit.message, 'Run uj smoke test!')"
+    if: "contains(github.event.head_commit.message, 'Run uj all test!')"
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
@@ -40,21 +40,21 @@ jobs:
         env:
           COMPS_USER: ${{ secrets.COMPS_USER }}
           COMPS_PASSWORD: ${{ secrets.COMPS_PASSWORD }}
-      - name: run idmtools_cli tests
+      - name: run idmtools_cli smoke tests
         run: |
             cd idmtools_cli/tests
-            py.test --durations=3 -v --junitxml=test_results.xml
-      - name: Upload idmtools_cli test results
+            py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
+      - name: Upload idmtools_cli smoke test results
         uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: idmtools_cli_test_results
           path: idmtools_cli/tests/test_results.xml
-      - name: run idmtools_core tests
+      - name: run idmtools_core smoke tests
         run: |
             cd idmtools_core/tests
-            py.test --durations=3 -v --junitxml=test_results.xml
-      - name: Upload idmtools_core test results
+            py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
+      - name: Upload idmtools_core smoke test results
         uses: actions/upload-artifact@v2
         if: failure()
         with:
@@ -63,8 +63,8 @@ jobs:
       - name: run idmtools_models tests
         run: |
             cd idmtools_models/tests
-            py.test --durations=3 -v --junitxml=test_results.xml
-      - name: Upload idmtools_models test results
+            py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
+      - name: Upload idmtools_models smoke test results
         uses: actions/upload-artifact@v2
         if: failure()
         with:
@@ -73,18 +73,18 @@ jobs:
       - name: run idmtools_platform_comps tests
         run: |
             cd idmtools_platform_comps/tests
-            py.test --durations=3 -v --junitxml=test_results.xml
+            py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
       - name: Upload idmtools_platform_comps test results
         uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: idmtools_platform_comps_test_results
           path: idmtools_platform_comps/tests/test_results.xml
-      - name: run idmtools_platform_local tests
+      - name: run idmtools_platform_local smoke tests
         run: |
             cd idmtools_platform_local/tests
-            py.test --durations=3 -v --junitxml=test_results.xml
-      - name: Upload idmtools_platform_local test results
+            py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
+      - name: Upload idmtools_platform_local smoke test results
         uses: actions/upload-artifact@v2
         if: failure()
         with:
