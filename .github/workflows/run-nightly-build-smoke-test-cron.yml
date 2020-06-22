@@ -1,33 +1,45 @@
-# run setup-dev to install packages and run smoke test
-# trigger by push or pull_request with commit message: "Run smoke test!"
+# This workflows will download idmtools nightly packages from artifactory then run smoke tests
 
-name: "Install with setup-dev and run smoke test"
-on: [push, pull_request]
+name: "run-nightly-build-smoke-test-cron"
+
+on:
+  schedule:
+    # Run at 6AM PST (13 UTC time) on Monday, Wednesday, and Friday
+    - cron: '0 13 * * 1,3,5'
 
 jobs:
-  install-setup-dev-run-smoke-test:
-    runs-on: ubuntu-latest
-    if: "contains(github.event.head_commit.message, 'Run smoke test!')"
+  run-nightly-build-smoke-test-cron:
+    if: github.repository == 'InstituteforDiseaseModeling/idmtools'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [3.6, 3.7]
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
-
-      - name: Set up Python
-        uses: actions/setup-python@v1
         with:
-          python-version: 3.7
-
+          ref: dev
+      - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
       - name: Install Python dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install make
-          pip install black flake8
-      - name: Run setup-dev
+          python -m pip install --upgrade pip
+          pip install py-make flake8
+      - name: Install dataclass
+        if: ${{ matrix.python-version }} == 3.6
+        run: |
+          pip install dataclasses
+      - name: download idmtools packages from staging jfrog
         env:
           bamboo_UserArtifactory: ${{ secrets.PYPI_STAGING_USERNAME }}
           bamboo_PasswordArtifactory: ${{ secrets.PYPI_STAGING_PASSWORD }}
         run: |
-          make setup-dev
+          pip install idmtools[full] --index-url=https://$bamboo_UserArtifactory:$bamboo_PasswordArtifactory@packages.idmod.org/api/pypi/pypi-staging/simple
+          pip install idmtools-test --index-url=https://$bamboo_UserArtifactory:$bamboo_PasswordArtifactory@packages.idmod.org/api/pypi/pypi-staging/simple
       - name: login to comps2
         run: |
             python dev_scripts/create_auth_token_args.py --username $COMPS_USER --password $COMPS_PASSWORD
