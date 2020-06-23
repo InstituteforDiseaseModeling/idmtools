@@ -1,7 +1,8 @@
+backoff~=1.10.0
 coloredlogs~=14.0
 diskcache==4.1.0
 marshmallow~=3.3
-more-itertools~=8.3.0
+more-itertools~=8.4.0
 pandas==0.24.2
 pipreqs==0.4.9
 pluggy~=0.13.1
