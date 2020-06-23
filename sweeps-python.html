@@ -77,7 +77,7 @@
             
             
               <div class="version">
-                Beta
+                1.2.0
               </div>
             
           
@@ -101,11 +101,9 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="packages-overview.html">Packages overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create simulations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run-sims.html">Run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="sweeps-r.html">Running parameter sweeps with R models</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Running parameter sweeps with Python models</a></li>
@@ -117,10 +115,9 @@
 <li class="toctree-l1"><a class="reference internal" href="reports.html">Output reports</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookie-cutter example projects</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reference.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookiecutter example projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Architecture and packages reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
@@ -154,7 +151,7 @@
 
 <div aria-label="breadcrumbs navigation" role="navigation">
     <ul class="wy-breadcrumbs">
-        <li><a href="../index.html">IDM docs</a> &raquo;</li>
+        <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
         <li><a href="index.html">IDM-Tools</a> &raquo;</li>
         
         <li><a href="parameter-sweeps.html">Parameter sweeps and model iteration</a> &raquo;</li>
@@ -392,9 +389,7 @@
 125
 126
 127
-128
-129
-130</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Example Python Experiment with JSON Configuration</span>
+128</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Example Python Experiment with JSON Configuration</span>
 <span class="c1"># In this example, we will demonstrate how to run a python experiment with JSON Configuration</span>
 
 <span class="c1"># First, import some necessary system and idmtools packages.</span>
@@ -504,11 +499,10 @@
 
 <span class="c1"># Now add our sweep on a list</span>
 <span class="n">builder</span><span class="o">.</span><span class="n">add_sweep_definition</span><span class="p">(</span><span class="n">setParam</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">),</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
-<span class="c1"># add our builder to the templated simulations</span>
 <span class="n">ts</span><span class="o">.</span><span class="n">add_builder</span><span class="p">(</span><span class="n">builder</span><span class="p">)</span>
 
 <span class="c1"># Now we can create our Experiment using our template builder</span>
-<span class="n">experiment</span> <span class="o">=</span> <span class="n">Experiment</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">1</span><span class="p">],</span> <span class="n">simulations</span><span class="o">=</span><span class="n">ts</span><span class="p">)</span>
+<span class="n">experiment</span> <span class="o">=</span> <span class="n">Experiment</span><span class="o">.</span><span class="n">from_template</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">1</span><span class="p">])</span>
 <span class="c1"># Add our own custom tag to simulation</span>
 <span class="n">experiment</span><span class="o">.</span><span class="n">tags</span><span class="p">[</span><span class="s2">&quot;tag1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="c1"># And maybe some custom Experiment Level Assets</span>
@@ -517,13 +511,12 @@
 <span class="c1"># In order to run the experiment, we need to create a `Platform`</span>
 <span class="c1"># The `Platform` defines where we want to run our simulation.</span>
 <span class="c1"># You can easily switch platforms by changing the Platform to for example &#39;Local&#39;</span>
-<span class="n">platform</span> <span class="o">=</span> <span class="n">Platform</span><span class="p">(</span><span class="s1">&#39;COMPS2&#39;</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">Platform</span><span class="p">(</span><span class="s1">&#39;COMPS2&#39;</span><span class="p">):</span>
 
-<span class="c1"># The last step is to call run() on the ExperimentManager to run the simulations.</span>
-<span class="n">platform</span><span class="o">.</span><span class="n">run_items</span><span class="p">(</span><span class="n">experiment</span><span class="p">)</span>
-<span class="n">platform</span><span class="o">.</span><span class="n">wait_till_done</span><span class="p">(</span><span class="n">experiment</span><span class="p">)</span>
-<span class="c1"># use system status as the exit code</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span> <span class="k">if</span> <span class="n">experiment</span><span class="o">.</span><span class="n">succeeded</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># The last step is to call run() on the ExperimentManager to run the simulations.</span>
+    <span class="n">experiment</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># use system status as the exit code</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span> <span class="k">if</span> <span class="n">experiment</span><span class="o">.</span><span class="n">succeeded</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </td></tr></table></div>
 </div>
@@ -726,6 +719,10 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">manager</span><span class="o">.</span><span class="n">analyze</span><span class="p">()</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To access and use COMPS you must receive approval and credentials from IDM. Send your request to <a class="reference external" href="mailto:support&#37;&#52;&#48;idmod&#46;org">support<span>&#64;</span>idmod<span>&#46;</span>org</a>.</p>
 </div>
 </div>
 <div class="section" id="python-model-python-model-allee">

@@ -77,7 +77,7 @@
             
             
               <div class="version">
-                Beta
+                1.2.0
               </div>
             
           
@@ -105,21 +105,18 @@
 <li class="toctree-l2"><a class="reference internal" href="dev-installation.html">Developer installation</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="packages-overview.html">Packages overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create simulations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run-sims.html">Run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calibrate.html">Calibrate simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reports.html">Output reports</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookie-cutter example projects</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reference.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookiecutter example projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Architecture and packages reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
@@ -153,7 +150,7 @@
 
 <div aria-label="breadcrumbs navigation" role="navigation">
     <ul class="wy-breadcrumbs">
-        <li><a href="../index.html">IDM docs</a> &raquo;</li>
+        <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
         <li><a href="index.html">IDM-Tools</a> &raquo;</li>
         
         <li><a href="installation.html">Installation</a> &raquo;</li>
@@ -206,6 +203,10 @@ command below names the environment “idmtools”, but you may use any desired 
 <p>If you are on Python 3.6, also run:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">dataclasses</span>
 </pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When reinstalling IDM-Tools you should use the <code class="docutils literal notranslate"><span class="pre">--no-cache-dir</span></code> and <code class="docutils literal notranslate"><span class="pre">--force-reinstall</span></code> options, such as: <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">idmtools[idm]</span> <span class="pre">--index-url=https://packages.idmod.org/api/pypi/pipi-production/simple</span> <span class="pre">--no-cache-dir</span> <span class="pre">--force-reinstall</span></code>. Otherwise, you may see the error, <strong>idmtools not found</strong>, when attempting to open and run one of the example Python scripts.</p>
 </div>
 </li>
 <li><p>Verify installation by pulling up IDM-Tools help:</p>

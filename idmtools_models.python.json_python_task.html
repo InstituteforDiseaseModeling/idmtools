@@ -77,7 +77,7 @@
             
             
               <div class="version">
-                Beta
+                1.2.0
               </div>
             
           
@@ -101,25 +101,24 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="packages-overview.html">Packages overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create simulations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run-sims.html">Run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calibrate.html">Calibrate simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reports.html">Output reports</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookie-cutter example projects</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="reference.html">API reference</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookiecutter example projects</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="reference.html">Architecture and packages reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="idmtools_index.html">idmtools</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="idmtools_models_index.html">idmtools_models</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="idmtools_models.html">idmtools_models package</a><ul class="current">
 <li class="toctree-l4 current"><a class="reference internal" href="idmtools_models.python.html">idmtools_models.python package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="idmtools_models.r.html">idmtools_models.r package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="idmtools_models.json_configured_task.html">idmtools_models.json_configured_task module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools_models.templated_script_task.html">idmtools_models.templated_script_task module</a></li>
 </ul>
 </li>
 </ul>
@@ -129,7 +128,6 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
@@ -163,10 +161,10 @@
 
 <div aria-label="breadcrumbs navigation" role="navigation">
     <ul class="wy-breadcrumbs">
-        <li><a href="../index.html">IDM docs</a> &raquo;</li>
+        <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
         <li><a href="index.html">IDM-Tools</a> &raquo;</li>
         
-        <li><a href="reference.html">API reference</a> &raquo;</li>
+        <li><a href="reference.html">Architecture and packages reference</a> &raquo;</li>
         
         <li><a href="idmtools_models_index.html">idmtools_models</a> &raquo;</li>
         
@@ -192,7 +190,7 @@
 <span id="idmtools-models-python-json-python-task-module"></span><h1>idmtools_models.python.json_python_task module<a class="headerlink" href="#module-idmtools_models.python.json_python_task" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="idmtools_models.python.json_python_task.JSONConfiguredPythonTask">
-<em class="property">class </em><code class="sig-prename descclassname">idmtools_models.python.json_python_task.</code><code class="sig-name descname">JSONConfiguredPythonTask</code><span class="sig-paren">(</span><em class="sig-param">command: Union[str, idmtools.entities.command_line.CommandLine] = None, platform_requirements: Set[idmtools.entities.platform_requirements.PlatformRequirements] = &lt;factory&gt;, _ITask__pre_creation_hooks: List[Callable[[Union[ForwardRef('Simulation'), ForwardRef('WorkflowItem')]], NoReturn]] = &lt;factory&gt;, _ITask__post_creation_hooks: List[Callable[[Union[ForwardRef('Simulation'), ForwardRef('WorkflowItem')]], NoReturn]] = &lt;factory&gt;, common_assets: idmtools.assets.asset_collection.AssetCollection = &lt;factory&gt;, transient_assets: idmtools.assets.asset_collection.AssetCollection = &lt;factory&gt;, _task_log: logging.Logger = &lt;factory&gt;, script_path: str = None, python_path: str = 'python', parameters: dict = &lt;factory&gt;, envelope: str = None, config_file_name: str = 'config.json', is_config_common: bool = False, command_line_argument: str = None, command_line_argument_no_filename: bool = True, configfile_argument: Union[str, NoneType] = '--config'</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_models.python.json_python_task.JSONConfiguredPythonTask" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">idmtools_models.python.json_python_task.</code><code class="sig-name descname">JSONConfiguredPythonTask</code><span class="sig-paren">(</span><em class="sig-param">command: Union[str, idmtools.entities.command_line.CommandLine] = None, platform_requirements: Set[idmtools.entities.platform_requirements.PlatformRequirements] = &lt;factory&gt;, _ITask__pre_creation_hooks: List[Callable[[Union[ForwardRef('Simulation'), ForwardRef('IWorkflowItem')]], NoReturn]] = &lt;factory&gt;, _ITask__post_creation_hooks: List[Callable[[Union[ForwardRef('Simulation'), ForwardRef('IWorkflowItem')]], NoReturn]] = &lt;factory&gt;, common_assets: idmtools.assets.asset_collection.AssetCollection = &lt;factory&gt;, transient_assets: idmtools.assets.asset_collection.AssetCollection = &lt;factory&gt;, _task_log: logging.Logger = &lt;factory&gt;, script_path: str = None, python_path: str = 'python', parameters: dict = &lt;factory&gt;, envelope: str = None, config_file_name: str = 'config.json', is_config_common: bool = False, command_line_argument: str = None, command_line_argument_no_filename: bool = True, configfile_argument: Union[str, NoneType] = '--config'</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_models.python.json_python_task.JSONConfiguredPythonTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="idmtools_models.json_configured_task.html#idmtools_models.json_configured_task.JSONConfiguredTask" title="idmtools_models.json_configured_task.JSONConfiguredTask"><code class="xref py py-class docutils literal notranslate"><span class="pre">idmtools_models.json_configured_task.JSONConfiguredTask</span></code></a>, <a class="reference internal" href="idmtools_models.python.python_task.html#idmtools_models.python.python_task.PythonTask" title="idmtools_models.python.python_task.PythonTask"><code class="xref py py-class docutils literal notranslate"><span class="pre">idmtools_models.python.python_task.PythonTask</span></code></a></p>
 <dl class="attribute">
 <dt id="idmtools_models.python.json_python_task.JSONConfiguredPythonTask.configfile_argument">
@@ -218,6 +216,64 @@ Returns:</p>
 </dl>
 </dd></dl>
 
+<dl class="method">
+<dt id="idmtools_models.python.json_python_task.JSONConfiguredPythonTask.reload_from_simulation">
+<code class="sig-name descname">reload_from_simulation</code><span class="sig-paren">(</span><em class="sig-param">simulation: idmtools.entities.simulation.Simulation</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_models.python.json_python_task.JSONConfiguredPythonTask.reload_from_simulation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reload the task from a simulation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>simulation</strong> – Simulation to reload from</p></li>
+<li><p><strong>**kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>See Also</dt><dd><p><a class="reference internal" href="idmtools_models.json_configured_task.html#idmtools_models.json_configured_task.JSONConfiguredTask.reload_from_simulation" title="idmtools_models.json_configured_task.JSONConfiguredTask.reload_from_simulation"><code class="xref py py-meth docutils literal notranslate"><span class="pre">idmtools_models.json_configured_task.JSONConfiguredTask.reload_from_simulation()</span></code></a>
+<a class="reference internal" href="idmtools_models.python.python_task.html#idmtools_models.python.python_task.PythonTask.reload_from_simulation" title="idmtools_models.python.python_task.PythonTask.reload_from_simulation"><code class="xref py py-meth docutils literal notranslate"><span class="pre">idmtools_models.python.python_task.PythonTask.reload_from_simulation()</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="idmtools_models.python.json_python_task.JSONConfiguredPythonTask.pre_creation">
+<code class="sig-name descname">pre_creation</code><span class="sig-paren">(</span><em class="sig-param">parent: Union[idmtools.entities.simulation.Simulation, idmtools.entities.iworkflow_item.IWorkflowItem]</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_models.python.json_python_task.JSONConfiguredPythonTask.pre_creation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pre-creation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>parent</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>See Also</dt><dd><p><a class="reference internal" href="idmtools_models.json_configured_task.html#idmtools_models.json_configured_task.JSONConfiguredTask.pre_creation" title="idmtools_models.json_configured_task.JSONConfiguredTask.pre_creation"><code class="xref py py-meth docutils literal notranslate"><span class="pre">idmtools_models.json_configured_task.JSONConfiguredTask.pre_creation()</span></code></a>
+<a class="reference internal" href="idmtools_models.python.python_task.html#idmtools_models.python.python_task.PythonTask.pre_creation" title="idmtools_models.python.python_task.PythonTask.pre_creation"><code class="xref py py-meth docutils literal notranslate"><span class="pre">idmtools_models.python.python_task.PythonTask.pre_creation()</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="idmtools_models.python.json_python_task.JSONConfiguredPythonTask.post_creation">
+<code class="sig-name descname">post_creation</code><span class="sig-paren">(</span><em class="sig-param">parent: Union[idmtools.entities.simulation.Simulation, idmtools.entities.iworkflow_item.IWorkflowItem]</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_models.python.json_python_task.JSONConfiguredPythonTask.post_creation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Post-creation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>parent</strong> – Parent</p>
+</dd>
+</dl>
+<p>Returns:</p>
+<dl class="simple">
+<dt>See Also</dt><dd><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">idmtools_models.json_configured_task.JSONConfiguredTask.post_creation()</span></code>
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">idmtools_models.python.python_task.PythonTask.post_creation()</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -227,13 +283,13 @@ Returns:</p>
 <dl class="method">
 <dt id="idmtools_models.python.json_python_task.JSONConfiguredPythonTaskSpecification.get">
 <code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param">configuration: dict</em><span class="sig-paren">)</span> &#x2192; idmtools_models.python.json_python_task.JSONConfiguredPythonTask<a class="headerlink" href="#idmtools_models.python.json_python_task.JSONConfiguredPythonTaskSpecification.get" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a new model using the passed in configuration.</p>
+<dd><p>Get  instance of JSONConfiguredPythonTask with configuration</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>configuration</strong> – The INI configuration file to use.</p>
+<dd class="field-odd"><p><strong>configuration</strong> – Configuration for task</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The new model.</p>
+<dd class="field-even"><p>JSONConfiguredPythonTask with configuration</p>
 </dd>
 </dl>
 </dd></dl>
@@ -241,10 +297,21 @@ Returns:</p>
 <dl class="method">
 <dt id="idmtools_models.python.json_python_task.JSONConfiguredPythonTaskSpecification.get_description">
 <code class="sig-name descname">get_description</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#idmtools_models.python.json_python_task.JSONConfiguredPythonTaskSpecification.get_description" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get a brief description of the plugin and its functionality.</p>
+<dd><p>Get description for plugin</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The plugin description.</p>
+<dd class="field-odd"><p>Plugin Description</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="idmtools_models.python.json_python_task.JSONConfiguredPythonTaskSpecification.get_type">
+<code class="sig-name descname">get_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Type[idmtools_models.python.json_python_task.JSONConfiguredPythonTask]<a class="headerlink" href="#idmtools_models.python.json_python_task.JSONConfiguredPythonTaskSpecification.get_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get Type for Plugin</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>JSONConfiguredPythonTask</p>
 </dd>
 </dl>
 </dd></dl>

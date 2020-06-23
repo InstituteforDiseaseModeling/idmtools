@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>API reference &mdash; IDM-Tools  documentation</title>
+  <title>Architecture and packages reference &mdash; IDM-Tools  documentation</title>
   
 
   
@@ -46,7 +46,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="idmtools" href="idmtools_index.html" />
-    <link rel="prev" title="Cookie-cutter example projects" href="cookiecutters.html" />
+    <link rel="prev" title="Cookiecutter example projects" href="cookiecutters.html" />
 
 <link href="https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans" rel="stylesheet">
 
@@ -77,7 +77,7 @@
             
             
               <div class="version">
-                Beta
+                1.2.0
               </div>
             
           
@@ -101,19 +101,17 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="packages-overview.html">Packages overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create simulations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run-sims.html">Run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calibrate.html">Calibrate simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reports.html">Output reports</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookie-cutter example projects</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">API reference</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookiecutter example projects</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Architecture and packages reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="idmtools_index.html">idmtools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="idmtools_models_index.html">idmtools_models</a></li>
 <li class="toctree-l2"><a class="reference internal" href="idmtools_platform_comps_index.html">idmtools_platform_comps</a></li>
@@ -121,7 +119,6 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
@@ -155,10 +152,10 @@
 
 <div aria-label="breadcrumbs navigation" role="navigation">
     <ul class="wy-breadcrumbs">
-        <li><a href="../index.html">IDM docs</a> &raquo;</li>
+        <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
         <li><a href="index.html">IDM-Tools</a> &raquo;</li>
         
-        <li>API reference</li>
+        <li>Architecture and packages reference</li>
         <li class="wy-breadcrumbs-aside">
             
             
@@ -172,9 +169,38 @@
             
 <!-- From _templates/page.html -->
 
-  <div class="section" id="api-reference">
-<h1>API reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h1>
-<div class="toctree-wrapper compound">
+  <div class="section" id="architecture-and-packages-reference">
+<h1>Architecture and packages reference<a class="headerlink" href="#architecture-and-packages-reference" title="Permalink to this headline">¶</a></h1>
+<p>IDM-Tools is built in Python and includes an architecture designed for ease of use, flexibility, and extensibility. You can quickly get up and running and see the capabilities of IDM-Tools by using one of the many included example Python scripts demonstrating the functionality of the packages.</p>
+<p>IDM-Tools is built in a modular fashion, as seen in the diagrams below. IDM-Tools design includes multiple packages and APIs, providing both the flexibility to only include the necessary packages for your modeling needs and the extensibility by using the APIs for any needed customization.</p>
+<div class="section" id="packages-overview">
+<h2>Packages overview<a class="headerlink" href="#packages-overview" title="Permalink to this headline">¶</a></h2>
+<img alt="_images/3260c369f74102ae5579f7654da254155ac25c599a78a7d7fbe954123d43541e.svg" class="align-center" src="_images/3260c369f74102ae5579f7654da254155ac25c599a78a7d7fbe954123d43541e.svg" /></div>
+<div class="section" id="packages-and-apis">
+<h2>Packages and APIs<a class="headerlink" href="#packages-and-apis" title="Permalink to this headline">¶</a></h2>
+<p>The following diagrams help illustrate the primary packages and associated APIs available for modeling and development with IDM-Tools:</p>
+<div class="section" id="core-and-job-orchestration">
+<h3>Core and job orchestration<a class="headerlink" href="#core-and-job-orchestration" title="Permalink to this headline">¶</a></h3>
+<img alt="_images/9e90c3d94a2de75f5017d885f94378c5bd4e7355d1f8f1f889ed26c93f0269f3.svg" class="align-center" src="_images/9e90c3d94a2de75f5017d885f94378c5bd4e7355d1f8f1f889ed26c93f0269f3.svg" /></div>
+<div class="section" id="local-platform">
+<h3>Local platform<a class="headerlink" href="#local-platform" title="Permalink to this headline">¶</a></h3>
+<img alt="_images/67a487b953c1ad173865c0dbbe55ea30620a16fbc30379a451b08db80ed7da2d.svg" class="align-center" src="_images/67a487b953c1ad173865c0dbbe55ea30620a16fbc30379a451b08db80ed7da2d.svg" /></div>
+<div class="section" id="comps-s-platform">
+<h3>COMPS platform<a class="headerlink" href="#comps-s-platform" title="Permalink to this headline">¶</a></h3>
+<img alt="_images/c0a77ff74ef958faf9db93d61006f70b9439615e28729cb3801599ea83afecfc.svg" class="align-center" src="_images/c0a77ff74ef958faf9db93d61006f70b9439615e28729cb3801599ea83afecfc.svg" /><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To access and use COMPS you must receive approval and credentials from IDM. Send your request to <a class="reference external" href="mailto:support&#37;&#52;&#48;idmod&#46;org">support<span>&#64;</span>idmod<span>&#46;</span>org</a>.</p>
+</div>
+</div>
+<div class="section" id="models">
+<h3>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h3>
+<img alt="_images/1471295e28d358159121b66ecb100412ecacef7e14a85abdb1656c7de41d44d7.svg" class="align-center" src="_images/1471295e28d358159121b66ecb100412ecacef7e14a85abdb1656c7de41d44d7.svg" /></div>
+<div class="section" id="api-class-specifications">
+<h3>API class specifications<a class="headerlink" href="#api-class-specifications" title="Permalink to this headline">¶</a></h3>
+<img alt="_images/3a4c68ce075bf4f5f558c37f4e14d3b70c5df0ac83a74bddf1f4fd168ff3c7bd.svg" class="align-center" src="_images/3a4c68ce075bf4f5f558c37f4e14d3b70c5df0ac83a74bddf1f4fd168ff3c7bd.svg" /><div class="section" id="emod-s">
+<h4>EMOD<a class="headerlink" href="#emod-s" title="Permalink to this headline">¶</a></h4>
+<p>EMOD support with IDM-Tools is provided with the <strong>emodpy</strong> package, which leverages IDM-Tools plugin architecture:</p>
+<img alt="_images/035e540468a441e8cb365997a1310a7cd611681dbf66cedb854c1b012a03e541.svg" class="align-center" src="_images/035e540468a441e8cb365997a1310a7cd611681dbf66cedb854c1b012a03e541.svg" /><div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="idmtools_index.html">idmtools</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="idmtools.html">idmtools package</a></li>
@@ -195,6 +221,9 @@
 </ul>
 </div>
 </div>
+</div>
+</div>
+</div>
 
 
 <div id="tipue_search_content"></div>
@@ -209,7 +238,7 @@
         <a href="idmtools_index.html" class="btn btn-neutral float-right" title="idmtools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="cookiecutters.html" class="btn btn-neutral float-left" title="Cookie-cutter example projects" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="cookiecutters.html" class="btn btn-neutral float-left" title="Cookiecutter example projects" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

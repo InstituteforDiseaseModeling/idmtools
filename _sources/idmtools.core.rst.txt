@@ -14,6 +14,7 @@ Submodules
 .. toctree::
 
    idmtools.core.cache_enabled
+   idmtools.core.context
    idmtools.core.docker_task
    idmtools.core.enums
    idmtools.core.exceptions

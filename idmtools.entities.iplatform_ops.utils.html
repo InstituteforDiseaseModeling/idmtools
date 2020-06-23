@@ -77,7 +77,7 @@
             
             
               <div class="version">
-                Beta
+                1.2.0
               </div>
             
           
@@ -101,19 +101,17 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="packages-overview.html">Packages overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create simulations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run-sims.html">Run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calibrate.html">Calibrate simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reports.html">Output reports</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookie-cutter example projects</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="reference.html">API reference</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookiecutter example projects</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="reference.html">Architecture and packages reference</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="idmtools_index.html">idmtools</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="idmtools.html">idmtools package</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="idmtools.analysis.html">idmtools.analysis package</a></li>
@@ -135,7 +133,6 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
@@ -169,10 +166,10 @@
 
 <div aria-label="breadcrumbs navigation" role="navigation">
     <ul class="wy-breadcrumbs">
-        <li><a href="../index.html">IDM docs</a> &raquo;</li>
+        <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
         <li><a href="index.html">IDM-Tools</a> &raquo;</li>
         
-        <li><a href="reference.html">API reference</a> &raquo;</li>
+        <li><a href="reference.html">Architecture and packages reference</a> &raquo;</li>
         
         <li><a href="idmtools_index.html">idmtools</a> &raquo;</li>
         
@@ -201,17 +198,68 @@
 <dl class="function">
 <dt id="idmtools.entities.iplatform_ops.utils.batch_items">
 <code class="sig-prename descclassname">idmtools.entities.iplatform_ops.utils.</code><code class="sig-name descname">batch_items</code><span class="sig-paren">(</span><em class="sig-param">items: Union[Iterable, Generator], batch_size=16</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.iplatform_ops.utils.batch_items" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Batch items</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>items</strong> – </p></li>
+<li><p><strong>batch_size</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="idmtools.entities.iplatform_ops.utils.item_batch_worker_thread">
-<code class="sig-prename descclassname">idmtools.entities.iplatform_ops.utils.</code><code class="sig-name descname">item_batch_worker_thread</code><span class="sig-paren">(</span><em class="sig-param">create_func: Callable</em>, <em class="sig-param">items: List</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.iplatform_ops.utils.item_batch_worker_thread" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-prename descclassname">idmtools.entities.iplatform_ops.utils.</code><code class="sig-name descname">item_batch_worker_thread</code><span class="sig-paren">(</span><em class="sig-param">create_func: Callable</em>, <em class="sig-param">items: List</em><span class="sig-paren">)</span> &#x2192; List<a class="headerlink" href="#idmtools.entities.iplatform_ops.utils.item_batch_worker_thread" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default batch worker thread function. It just calls create on each item</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>create_func</strong> – Create function for item</p></li>
+<li><p><strong>items</strong> – Items to create</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of items created</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="function">
 <dt id="idmtools.entities.iplatform_ops.utils.batch_create_items">
 <code class="sig-prename descclassname">idmtools.entities.iplatform_ops.utils.</code><code class="sig-name descname">batch_create_items</code><span class="sig-paren">(</span><em class="sig-param">items: Union[Iterable, Generator], batch_worker_thread_func: Callable[[List], List] = None, create_func: Callable[[...], Any] = None, display_progress: bool = True, progress_description: str = 'Commissioning items', **kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.iplatform_ops.utils.batch_create_items" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create all the simulations contained in the experiment on the platform.</p>
+<dd><p>Batch create items. You must specify either batch_worker_thread_func or create_func</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>items</strong> – Items to create</p></li>
+<li><p><strong>batch_worker_thread_func</strong> – Optional Function to execute. Should take a list and return a list</p></li>
+<li><p><strong>create_func</strong> – Optional Create function</p></li>
+<li><p><strong>display_progress</strong> – Enable progress bar</p></li>
+<li><p><strong>progress_description</strong> – Description to show in progress bar</p></li>
+<li><p><strong>**kwargs</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="idmtools.entities.iplatform_ops.utils.show_progress_of_batch">
+<code class="sig-prename descclassname">idmtools.entities.iplatform_ops.utils.</code><code class="sig-name descname">show_progress_of_batch</code><span class="sig-paren">(</span><em class="sig-param">futures: List[concurrent.futures._base.Future], progress_description: str, total: int</em><span class="sig-paren">)</span> &#x2192; List<a class="headerlink" href="#idmtools.entities.iplatform_ops.utils.show_progress_of_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show progress bar for batch</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>futures</strong> – List of futures that are still running/queued</p></li>
+<li><p><strong>progress_description</strong> – Progress description</p></li>
+<li><p><strong>total</strong> – Total items being loaded(since we are loading in batches)</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
 </dd></dl>
 
 </div>

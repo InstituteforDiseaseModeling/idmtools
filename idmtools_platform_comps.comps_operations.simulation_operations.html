@@ -77,7 +77,7 @@
             
             
               <div class="version">
-                Beta
+                1.2.0
               </div>
             
           
@@ -101,19 +101,17 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="packages-overview.html">Packages overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create simulations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run-sims.html">Run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calibrate.html">Calibrate simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reports.html">Output reports</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookie-cutter example projects</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="reference.html">API reference</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookiecutter example projects</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="reference.html">Architecture and packages reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="idmtools_index.html">idmtools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="idmtools_models_index.html">idmtools_models</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="idmtools_platform_comps_index.html">idmtools_platform_comps</a><ul class="current">
@@ -135,7 +133,6 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
@@ -169,10 +166,10 @@
 
 <div aria-label="breadcrumbs navigation" role="navigation">
     <ul class="wy-breadcrumbs">
-        <li><a href="../index.html">IDM docs</a> &raquo;</li>
+        <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
         <li><a href="index.html">IDM-Tools</a> &raquo;</li>
         
-        <li><a href="reference.html">API reference</a> &raquo;</li>
+        <li><a href="reference.html">Architecture and packages reference</a> &raquo;</li>
         
         <li><a href="idmtools_platform_comps_index.html">idmtools_platform_comps</a> &raquo;</li>
         
@@ -198,16 +195,30 @@
 <span id="idmtools-platform-comps-comps-operations-simulation-operations-module"></span><h1>idmtools_platform_comps.comps_operations.simulation_operations module<a class="headerlink" href="#module-idmtools_platform_comps.comps_operations.simulation_operations" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="idmtools_platform_comps.comps_operations.simulation_operations.comps_batch_worker">
-<code class="sig-prename descclassname">idmtools_platform_comps.comps_operations.simulation_operations.</code><code class="sig-name descname">comps_batch_worker</code><span class="sig-paren">(</span><em class="sig-param">sims: List[idmtools.entities.simulation.Simulation], interface: idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations, num_cores, priority</em><span class="sig-paren">)</span> &#x2192; List[COMPS.Data.Simulation.Simulation]<a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.comps_batch_worker" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-prename descclassname">idmtools_platform_comps.comps_operations.simulation_operations.</code><code class="sig-name descname">comps_batch_worker</code><span class="sig-paren">(</span><em class="sig-param">simulations: List[idmtools.entities.simulation.Simulation], interface: idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations, num_cores: Optional[int] = None, priority: Optional[str] = None</em><span class="sig-paren">)</span> &#x2192; List[COMPS.Data.Simulation.Simulation]<a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.comps_batch_worker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run batch worker</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>simulations</strong> – Batch of simulation to process</p></li>
+<li><p><strong>interface</strong> – SimulationOperation Interface</p></li>
+<li><p><strong>num_cores</strong> – Optional Number of core to allocate for MPI</p></li>
+<li><p><strong>priority</strong> – Optional Priority to set to</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of Comps Simulations</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="class">
 <dt id="idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations">
-<em class="property">class </em><code class="sig-prename descclassname">idmtools_platform_comps.comps_operations.simulation_operations.</code><code class="sig-name descname">CompsPlatformSimulationOperations</code><span class="sig-paren">(</span><em class="sig-param">platform: 'COMPSPlaform'</em>, <em class="sig-param">platform_type: Type = &lt;class 'COMPS.Data.Simulation.Simulation'&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">idmtools_platform_comps.comps_operations.simulation_operations.</code><code class="sig-name descname">CompsPlatformSimulationOperations</code><span class="sig-paren">(</span><em class="sig-param">platform: 'COMPSPlatform'</em>, <em class="sig-param">platform_type: Type = &lt;class 'COMPS.Data.Simulation.Simulation'&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="idmtools.entities.iplatform_ops.iplatform_simulation_operations.html#idmtools.entities.iplatform_ops.iplatform_simulation_operations.IPlatformSimulationOperations" title="idmtools.entities.iplatform_ops.iplatform_simulation_operations.IPlatformSimulationOperations"><code class="xref py py-class docutils literal notranslate"><span class="pre">idmtools.entities.iplatform_ops.iplatform_simulation_operations.IPlatformSimulationOperations</span></code></a></p>
 <dl class="attribute">
 <dt id="idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.platform">
-<code class="sig-name descname">platform</code><em class="property">: 'COMPSPlaform'</em><em class="property"> = None</em><a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.platform" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">platform</code><em class="property">: 'COMPSPlatform'</em><em class="property"> = None</em><a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.platform" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -218,62 +229,94 @@
 
 <dl class="method">
 <dt id="idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.get">
-<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param">simulation_id: uuid.UUID</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; COMPS.Data.Simulation.Simulation<a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.get" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the platform representation of an Simulation</p>
+<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param">simulation_id: uuid.UUID</em>, <em class="sig-param">columns: Optional[List[str]] = None</em>, <em class="sig-param">load_children: Optional[List[str]] = None</em>, <em class="sig-param">query_criteria: Optional[COMPS.Data.QueryCriteria.QueryCriteria] = None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; COMPS.Data.Simulation.Simulation<a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get Simulation from Comps</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>simulation_id</strong> – Item id of Simulations</p></li>
+<li><p><strong>simulation_id</strong> – ID</p></li>
+<li><p><strong>columns</strong> – Optional list of columns to load. Defaults to “id”, “name”, “experiment_id”, “state”</p></li>
+<li><p><strong>load_children</strong> – Optional children to load. Defaults to “tags”, “configuration”</p></li>
+<li><p><strong>query_criteria</strong> – Optional query_criteria object to use your own custom criteria object</p></li>
 <li><p><strong>**kwargs</strong> – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Platform Representation of an simulation</p>
+<dd class="field-even"><p>COMPSSimulation</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.platform_create">
-<code class="sig-name descname">platform_create</code><span class="sig-paren">(</span><em class="sig-param">simulation: idmtools.entities.simulation.Simulation</em>, <em class="sig-param">num_cores: int = None</em>, <em class="sig-param">priority: str = None</em>, <em class="sig-param">check_command: bool = True</em><span class="sig-paren">)</span> &#x2192; COMPS.Data.Simulation.Simulation<a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.platform_create" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates an simulation on Platform from an IDMTools Simulation Object</p>
+<code class="sig-name descname">platform_create</code><span class="sig-paren">(</span><em class="sig-param">simulation: idmtools.entities.simulation.Simulation</em>, <em class="sig-param">num_cores: int = None</em>, <em class="sig-param">priority: str = None</em>, <em class="sig-param">enable_platform_task_hooks: bool = True</em><span class="sig-paren">)</span> &#x2192; COMPS.Data.Simulation.Simulation<a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.platform_create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create Simulation on COMPS</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>simulation</strong> – Simulation to create</p></li>
-<li><p><strong>**kwargs</strong> – Optional arguments mainly for extensibility</p></li>
+<li><p><strong>num_cores</strong> – Optional number of MPI Cores to allocate</p></li>
+<li><p><strong>priority</strong> – Priority to load</p></li>
+<li><p><strong>enable_platform_task_hooks</strong> – Should platform task hoooks be ran</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Created platform item and the UUID of said item</p>
+<dd class="field-even"><p>COMPS Simulation</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.to_comps_sim">
-<code class="sig-name descname">to_comps_sim</code><span class="sig-paren">(</span><em class="sig-param">num_cores</em>, <em class="sig-param">priority</em>, <em class="sig-param">simulation</em>, <em class="sig-param">config: COMPS.Data.Configuration.Configuration = None</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.to_comps_sim" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.get_simulation_config_from_simulation">
-<code class="sig-name descname">get_simulation_config_from_simulation</code><span class="sig-paren">(</span><em class="sig-param">num_cores</em>, <em class="sig-param">priority</em>, <em class="sig-param">simulation</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.get_simulation_config_from_simulation" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.batch_create">
-<code class="sig-name descname">batch_create</code><span class="sig-paren">(</span><em class="sig-param">sims: List[idmtools.entities.simulation.Simulation], num_cores: int = None, priority: str = None</em><span class="sig-paren">)</span> &#x2192; List[COMPS.Data.Simulation.Simulation]<a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.batch_create" title="Permalink to this definition">¶</a></dt>
-<dd><p>Provides a method to batch create simulations</p>
+<code class="sig-name descname">to_comps_sim</code><span class="sig-paren">(</span><em class="sig-param">simulation: idmtools.entities.simulation.Simulation</em>, <em class="sig-param">num_cores: int = None</em>, <em class="sig-param">priority: str = None</em>, <em class="sig-param">config: COMPS.Data.Configuration.Configuration = None</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.to_comps_sim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Covert IDMTools object to COMPS Object</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>sims</strong> – List of simulations to create</p></li>
-<li><p><strong>display_progress</strong> – Show progress bar</p></li>
-<li><p><strong>**kwargs</strong> – </p></li>
+<li><p><strong>simulation</strong> – Simulation object to convert</p></li>
+<li><p><strong>num_cores</strong> – Optional Num of MPI Cores to allocate</p></li>
+<li><p><strong>priority</strong> – Optional Priority</p></li>
+<li><p><strong>config</strong> – Optional Configuration objet</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>List of tuples containing the create object and id of item that was created</p>
+<dd class="field-even"><p>COMPS Simulation</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.get_simulation_config_from_simulation">
+<em class="property">static </em><code class="sig-name descname">get_simulation_config_from_simulation</code><span class="sig-paren">(</span><em class="sig-param">simulation: idmtools.entities.simulation.Simulation</em>, <em class="sig-param">num_cores: int = None</em>, <em class="sig-param">priority: str = None</em><span class="sig-paren">)</span> &#x2192; COMPS.Data.Configuration.Configuration<a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.get_simulation_config_from_simulation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the comps configuration for a Simulation Object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>simulation</strong> – Simulation</p></li>
+<li><p><strong>num_cores</strong> – Optional Num of core for MPI</p></li>
+<li><p><strong>priority</strong> – Optional Priority</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Configuration</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.batch_create">
+<code class="sig-name descname">batch_create</code><span class="sig-paren">(</span><em class="sig-param">simulations: List[idmtools.entities.simulation.Simulation], num_cores: int = None, priority: str = None</em><span class="sig-paren">)</span> &#x2192; List[COMPS.Data.Simulation.Simulation]<a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.batch_create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform batch creation of Simulations</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>simulations</strong> – Simulation to create</p></li>
+<li><p><strong>num_cores</strong> – Optional MPI Cores to allocate per simulation</p></li>
+<li><p><strong>priority</strong> – Optional Priority</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of COMPSSimulations that were created</p>
 </dd>
 </dl>
 </dd></dl>
@@ -281,18 +324,16 @@
 <dl class="method">
 <dt id="idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.get_parent">
 <code class="sig-name descname">get_parent</code><span class="sig-paren">(</span><em class="sig-param">simulation: Any</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; COMPS.Data.Experiment.Experiment<a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.get_parent" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the parent of item. If the platform doesn’t support parents, you should throw a TopLevelItem error</p>
+<dd><p>Get the parent of the simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>simulation</strong> – </p></li>
+<li><p><strong>simulation</strong> – Simulation to load parent for</p></li>
 <li><p><strong>**kwargs</strong> – </p></li>
 </ul>
 </dd>
-</dl>
-<p>Returns:</p>
-<dl class="simple">
-<dt>Raise:</dt><dd><p>TopLevelItem</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>COMPSExperiment</p>
 </dd>
 </dl>
 </dd></dl>
@@ -311,16 +352,16 @@
 
 <dl class="method">
 <dt id="idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.send_assets">
-<code class="sig-name descname">send_assets</code><span class="sig-paren">(</span><em class="sig-param">simulation: idmtools.entities.simulation.Simulation</em>, <em class="sig-param">comps_sim: COMPS.Data.Simulation.Simulation = None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.send_assets" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.refresh_status">
-<code class="sig-name descname">refresh_status</code><span class="sig-paren">(</span><em class="sig-param">simulation: idmtools.entities.simulation.Simulation</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.refresh_status" title="Permalink to this definition">¶</a></dt>
-<dd><p>Refresh status for simulation object</p>
+<code class="sig-name descname">send_assets</code><span class="sig-paren">(</span><em class="sig-param">simulation: idmtools.entities.simulation.Simulation</em>, <em class="sig-param">comps_sim: Optional[COMPS.Data.Simulation.Simulation] = None</em>, <em class="sig-param">add_metadata: bool = True</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.send_assets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send assets to Simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>simulation</strong> – Experiment to get status for</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>simulation</strong> – Simulation to send asset for</p></li>
+<li><p><strong>comps_sim</strong> – Optional COMPSSimulation object to prevent reloading it</p></li>
+<li><p><strong>add_metadata</strong> – Add idmtools metadata object</p></li>
+<li><p><strong>**kwargs</strong> – </p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>None</p>
@@ -329,47 +370,103 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.to_entity">
-<code class="sig-name descname">to_entity</code><span class="sig-paren">(</span><em class="sig-param">simulation: Any</em>, <em class="sig-param">parent: idmtools.entities.experiment.Experiment = None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; idmtools.entities.simulation.Simulation<a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.to_entity" title="Permalink to this definition">¶</a></dt>
-<dd><p>Converts the platform representation of simulation to idmtools representation</p>
+<dt id="idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.refresh_status">
+<code class="sig-name descname">refresh_status</code><span class="sig-paren">(</span><em class="sig-param">simulation: idmtools.entities.simulation.Simulation</em>, <em class="sig-param">additional_columns: Optional[List[str]] = None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.refresh_status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Refresh status of a simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>simulation</strong> – Platform simulation object</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>simulation</strong> – Simulation to refresh</p></li>
+<li><p><strong>additional_columns</strong> – Optional additional columns to load from COMPS</p></li>
+<li><p><strong>**kwargs</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.to_entity">
+<code class="sig-name descname">to_entity</code><span class="sig-paren">(</span><em class="sig-param">simulation: COMPS.Data.Simulation.Simulation</em>, <em class="sig-param">load_task: bool = False</em>, <em class="sig-param">parent: Optional[idmtools.entities.experiment.Experiment] = None</em>, <em class="sig-param">load_parent: bool = False</em>, <em class="sig-param">load_metadata: bool = False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; idmtools.entities.simulation.Simulation<a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.to_entity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert COMPS simulation object to IDM Tools simulation object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>simulation</strong> – Simulation object</p></li>
+<li><p><strong>load_task</strong> – Should we load tasks. Defaults to No. This can increase the load items on fetchs</p></li>
+<li><p><strong>parent</strong> – Optional parent object to prevent reloads</p></li>
+<li><p><strong>load_parent</strong> – Force load of parent(Beware, This could cause loading loops)</p></li>
+<li><p><strong>metadata</strong> – Should we load metadata by default. If load task is enabled, this is also enabled</p></li>
+<li><p><strong>**kwargs</strong> – </p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>IDMTools simulation object</p>
+<dd class="field-even"><p>Simulation object</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
+<dt id="idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.get_asset_collection_from_comps_simulation">
+<code class="sig-name descname">get_asset_collection_from_comps_simulation</code><span class="sig-paren">(</span><em class="sig-param">simulation: COMPS.Data.Simulation.Simulation</em><span class="sig-paren">)</span> &#x2192; Optional[idmtools.assets.asset_collection.AssetCollection]<a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.get_asset_collection_from_comps_simulation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get assets from COMPS Simulation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>simulation</strong> – Simulation to get assets from</p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.get_assets">
 <code class="sig-name descname">get_assets</code><span class="sig-paren">(</span><em class="sig-param">simulation: idmtools.entities.simulation.Simulation, files: List[str], **kwargs</em><span class="sig-paren">)</span> &#x2192; Dict[str, bytearray]<a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.get_assets" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get files from simulation</p>
+<dd><p>Fetch the files associated with a simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>simulation</strong> – Simulation to fetch files from</p></li>
-<li><p><strong>files</strong> – Files to get</p></li>
+<li><p><strong>simulation</strong> – Simulation</p></li>
+<li><p><strong>files</strong> – List of files to download</p></li>
 <li><p><strong>**kwargs</strong> – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Dictionary containting filename and content</p>
+<dd class="field-even"><p>Dictionary of filename -&gt; ByteArray</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.list_assets">
-<code class="sig-name descname">list_assets</code><span class="sig-paren">(</span><em class="sig-param">simulation: idmtools.entities.simulation.Simulation</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; List[str]<a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.list_assets" title="Permalink to this definition">¶</a></dt>
-<dd><p>List available files for a simulation</p>
+<code class="sig-name descname">list_assets</code><span class="sig-paren">(</span><em class="sig-param">simulation: idmtools.entities.simulation.Simulation</em>, <em class="sig-param">common_assets: bool = False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; List[idmtools.assets.asset.Asset]<a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.list_assets" title="Permalink to this definition">¶</a></dt>
+<dd><p>List assets for a simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>simulation</strong> – Simulation to list files for</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>simulation</strong> – Simulation to load data for</p></li>
+<li><p><strong>common_assets</strong> – Should we load asset files</p></li>
+<li><p><strong>**kwargs</strong> – </p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>List of filenames</p>
+<dd class="field-even"><p>AssetCollection</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.all_files">
+<code class="sig-name descname">all_files</code><span class="sig-paren">(</span><em class="sig-param">simulation: idmtools.entities.simulation.Simulation</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; List[idmtools.assets.asset.Asset]<a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.all_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all files for a specific simulation including experiments or non-assets</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>simulation</strong> – Simulation all files</p></li>
+<li><p><strong>**kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>AssetCollection</p>
 </dd>
 </dl>
 </dd></dl>

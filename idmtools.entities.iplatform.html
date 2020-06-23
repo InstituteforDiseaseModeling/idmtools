@@ -45,7 +45,7 @@
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="idmtools.entities.iplatform_metadata module" href="idmtools.entities.iplatform_metadata.html" />
+    <link rel="next" title="idmtools.entities.itask module" href="idmtools.entities.itask.html" />
     <link rel="prev" title="idmtools.entities.ianalyzer module" href="idmtools.entities.ianalyzer.html" />
 
 <link href="https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans" rel="stylesheet">
@@ -77,7 +77,7 @@
             
             
               <div class="version">
-                Beta
+                1.2.0
               </div>
             
           
@@ -101,19 +101,17 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="packages-overview.html">Packages overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create simulations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run-sims.html">Run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calibrate.html">Calibrate simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reports.html">Output reports</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookie-cutter example projects</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="reference.html">API reference</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookiecutter example projects</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="reference.html">Architecture and packages reference</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="idmtools_index.html">idmtools</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="idmtools.html">idmtools package</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="idmtools.analysis.html">idmtools.analysis package</a></li>
@@ -135,7 +133,6 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
@@ -169,10 +166,10 @@
 
 <div aria-label="breadcrumbs navigation" role="navigation">
     <ul class="wy-breadcrumbs">
-        <li><a href="../index.html">IDM docs</a> &raquo;</li>
+        <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
         <li><a href="index.html">IDM-Tools</a> &raquo;</li>
         
-        <li><a href="reference.html">API reference</a> &raquo;</li>
+        <li><a href="reference.html">Architecture and packages reference</a> &raquo;</li>
         
         <li><a href="idmtools_index.html">idmtools</a> &raquo;</li>
         
@@ -258,12 +255,15 @@ If no <strong>object_type</strong> is passed, the function will try all the type
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The object found on the platform or None.</p>
 </dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If the item type is not supported</p>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="idmtools.entities.iplatform.IPlatform.get_children">
-<code class="sig-name descname">get_children</code><span class="sig-paren">(</span><em class="sig-param">item_id: uuid.UUID</em>, <em class="sig-param">item_type: idmtools.core.enums.ItemType</em>, <em class="sig-param">force: bool = False</em>, <em class="sig-param">raw: bool = False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; Any<a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.get_children" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_children</code><span class="sig-paren">(</span><em class="sig-param">item_id: uuid.UUID</em>, <em class="sig-param">item_type: idmtools.core.enums.ItemType</em>, <em class="sig-param">force: bool = False</em>, <em class="sig-param">raw: bool = False</em>, <em class="sig-param">item: Any = None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; Any<a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.get_children" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve the children of a given object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -272,6 +272,7 @@ If no <strong>object_type</strong> is passed, the function will try all the type
 <li><p><strong>force</strong> – If True, force the object fetching from the platform.</p></li>
 <li><p><strong>raw</strong> – Return either an IDM-Tools object or a platform object.</p></li>
 <li><p><strong>item_type</strong> – Pass the type of the object for quicker retrieval.</p></li>
+<li><p><strong>item</strong> – optional platform or idm item to use instead of loading</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -416,16 +417,36 @@ simulations described above</p>
 <dl class="method">
 <dt id="idmtools.entities.iplatform.IPlatform.are_requirements_met">
 <code class="sig-name descname">are_requirements_met</code><span class="sig-paren">(</span><em class="sig-param">requirements: Set[idmtools.entities.platform_requirements.PlatformRequirements]</em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.are_requirements_met" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Does the platform support the list of requirements</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>requirements</strong> – Requirements</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if all the requirements are supported</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="idmtools.entities.iplatform.IPlatform.is_task_supported">
 <code class="sig-name descname">is_task_supported</code><span class="sig-paren">(</span><em class="sig-param">task: idmtools.entities.itask.ITask</em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.is_task_supported" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Is a task supported on this platform. This depends on the task properly setting its requirements. See
+<a class="reference internal" href="idmtools.entities.itask.html#idmtools.entities.itask.ITask.platform_requirements" title="idmtools.entities.itask.ITask.platform_requirements"><code class="xref py py-attr docutils literal notranslate"><span class="pre">idmtools.entities.itask.ITask.platform_requirements</span></code></a> and
+<a class="reference internal" href="idmtools.entities.platform_requirements.html#idmtools.entities.platform_requirements.PlatformRequirements" title="idmtools.entities.platform_requirements.PlatformRequirements"><code class="xref py py-class docutils literal notranslate"><span class="pre">idmtools.entities.platform_requirements.PlatformRequirements</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>task</strong> – Task to check support of</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if the task is supported, False otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="idmtools.entities.iplatform.IPlatform.wait_till_done">
-<code class="sig-name descname">wait_till_done</code><span class="sig-paren">(</span><em class="sig-param">item: Union[idmtools.entities.experiment.Experiment, idmtools.entities.iworkflow_item.IWorkflowItem, idmtools.entities.suite.Suite], timeout: int = 86400, refresh_interval: int = 5, progress=True</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.wait_till_done" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">wait_till_done</code><span class="sig-paren">(</span><em class="sig-param">item: Union[idmtools.entities.experiment.Experiment, idmtools.entities.iworkflow_item.IWorkflowItem, idmtools.entities.suite.Suite], timeout: int = 86400, refresh_interval: int = 5, progress: bool = True</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.wait_till_done" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wait for the experiment to be done.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -433,15 +454,41 @@ simulations described above</p>
 <li><p><strong>item</strong> – Experiment/Workitem to wait on</p></li>
 <li><p><strong>refresh_interval</strong> – How long to wait between polling.</p></li>
 <li><p><strong>timeout</strong> – How long to wait before failing.</p></li>
+<li><p><strong>progress</strong> – Should we display progress</p></li>
 </ul>
 </dd>
 </dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#idmtools.entities.iplatform.IPlatform.wait_till_done_progress" title="idmtools.entities.iplatform.IPlatform.wait_till_done_progress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">idmtools.entities.iplatform.IPlatform.wait_till_done_progress()</span></code></a>
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">idmtools.entities.iplatform.IPlatform.__wait_until_done_progress_callback()</span></code>
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">idmtools.entities.iplatform.IPlatform.__wait_till_callback()</span></code></p>
+</div>
 </dd></dl>
 
 <dl class="method">
 <dt id="idmtools.entities.iplatform.IPlatform.wait_till_done_progress">
 <code class="sig-name descname">wait_till_done_progress</code><span class="sig-paren">(</span><em class="sig-param">item: Union[idmtools.entities.experiment.Experiment, idmtools.entities.iworkflow_item.IWorkflowItem, idmtools.entities.suite.Suite], timeout: int = 86400, refresh_interval: int = 5</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.wait_till_done_progress" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Wait on an item to complete with progress bar</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>item</strong> – Item to monitor</p></li>
+<li><p><strong>timeout</strong> – Timeout on waiting</p></li>
+<li><p><strong>refresh_interval</strong> – How often to refresh</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">idmtools.entities.iplatform.IPlatform.__wait_until_done_progress_callback()</span></code>
+<a class="reference internal" href="#idmtools.entities.iplatform.IPlatform.wait_till_done" title="idmtools.entities.iplatform.IPlatform.wait_till_done"><code class="xref py py-meth docutils literal notranslate"><span class="pre">idmtools.entities.iplatform.IPlatform.wait_till_done()</span></code></a>
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">idmtools.entities.iplatform.IPlatform.__wait_till_callback()</span></code></p>
+</div>
+</dd></dl>
 
 <dl class="method">
 <dt id="idmtools.entities.iplatform.IPlatform.get_related_items">
@@ -466,7 +513,7 @@ simulations described above</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="idmtools.entities.iplatform_metadata.html" class="btn btn-neutral float-right" title="idmtools.entities.iplatform_metadata module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="idmtools.entities.itask.html" class="btn btn-neutral float-right" title="idmtools.entities.itask module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="idmtools.entities.ianalyzer.html" class="btn btn-neutral float-left" title="idmtools.entities.ianalyzer module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

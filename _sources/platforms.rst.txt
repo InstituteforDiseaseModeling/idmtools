@@ -4,9 +4,11 @@ Platforms
 
 |IT_s| currently supports running on the following platforms:
 
-| **COMPS**: |COMPS_l| is a high performance computing cluster used by employees and collaborators at |IDM_s|. To support running simulations and analysis on |COMPS_s|, |IT_s| includes the following modules: :doc:`idmtools_platform_comps_index`.
+**COMPS**: |COMPS_l| is a high performance computing cluster used by employees and collaborators at |IDM_s|. To support running simulations and analysis on |COMPS_s|, |IT_s| includes the following modules: :doc:`idmtools_platform_comps_index`.
 
-| **Local**: You can also run simulations and analysis locally on your computer, rather than on a remote high-performance computer (HPC). For more information about these modules, see :doc:`idmtools_platform_local_index`.
+.. include:: /reuse/comps_note.txt
+
+**Local**: You can also run simulations and analysis locally on your computer, rather than on a remote high-performance computer (HPC). For more information about these modules, see :doc:`idmtools_platform_local_index`.
 
 You can use the **idmtools.ini** file to configure platform specific settings, as the following examples shows for |COMPS_s|::
 
@@ -68,7 +70,7 @@ For example, let's consider an example platform where the user needs to specify 
         endpoint: str = field(default="https://myapi.com", metadata={"help": "Enter the URL of the endpoint"})
         environment: str = field(metadata={"help": "Select an environment "})
 
-The list of environments is dependant on the endpoint value. To achieve this, we need to provide a ``callback`` function to the metadata.
+The list of environments is dependent on the endpoint value. To achieve this, we need to provide a ``callback`` function to the metadata.
 This function will receive all the previously set user parameters, and will have the opportunity to modify the current field's ``choices``, ``default``, and ``help`` parameters.
 
 Let's create a function querying the endpoint to get the list of environments and setting them as choices. Selecting the first one as default.

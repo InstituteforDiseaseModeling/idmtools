@@ -77,7 +77,7 @@
             
             
               <div class="version">
-                Beta
+                1.2.0
               </div>
             
           
@@ -101,19 +101,17 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="packages-overview.html">Packages overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create simulations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run-sims.html">Run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calibrate.html">Calibrate simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reports.html">Output reports</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookie-cutter example projects</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reference.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookiecutter example projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Architecture and packages reference</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="cli_index.html">CLI reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="cli-config.html">idmtools.ini file</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cli-templates.html">Templates</a></li>
@@ -124,7 +122,6 @@
 <li class="toctree-l2"><a class="reference internal" href="cli-troubleshoot.html">Troubleshooting</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
@@ -158,7 +155,7 @@
 
 <div aria-label="breadcrumbs navigation" role="navigation">
     <ul class="wy-breadcrumbs">
-        <li><a href="../index.html">IDM docs</a> &raquo;</li>
+        <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
         <li><a href="index.html">IDM-Tools</a> &raquo;</li>
         
         <li><a href="cli_index.html">CLI reference</a> &raquo;</li>
@@ -181,6 +178,7 @@
 <h1>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h1>
 <p>You can use IDM CLI to download the included Python example scripts from GitHub to a local folder using the <code class="docutils literal notranslate"><span class="pre">gitrepo</span></code> command. To see the list of commands and options for <code class="docutils literal notranslate"><span class="pre">gitrepo</span></code>, type the following at a command prompt:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ idmtools gitrepo --help
+INI File Used: /home/runner/work/idmtools/idmtools/idmtools/docs/idmtools.ini
 Usage: idmtools gitrepo [OPTIONS] COMMAND [ARGS]...
 
 Options:
@@ -194,8 +192,36 @@ Commands:
   view       Display all idmtools available examples Args: raw: True/False...
 </pre></div>
 </div>
+<p>or view examples by type through</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ idmtools examples list
+INI File Used: /home/runner/work/idmtools/idmtools/idmtools/docs/idmtools.ini
+
+COMPSPlatform
+    - https://github.com/InstituteforDiseaseModeling/idmtools/tree/v1.2.0/examples/ssmt
+    - https://github.com/InstituteforDiseaseModeling/idmtools/tree/v1.2.0/examples/workitem
+    - https://github.com/InstituteforDiseaseModeling/idmtools/tree/v1.2.0/examples/vistools
+
+SSMTPlatform
+    - https://github.com/InstituteforDiseaseModeling/idmtools/tree/v1.2.0/examples/ssmt
+    - https://github.com/InstituteforDiseaseModeling/idmtools/tree/v1.2.0/examples/vistools
+
+CommandTask
+    - https://github.com/InstituteforDiseaseModeling/corvid-idmtools
+
+JSONConfiguredTask
+    - https://github.com/InstituteforDiseaseModeling/idmtools/tree/v1.2.0/examples/python_model
+    - https://github.com/InstituteforDiseaseModeling/idmtools/tree/v1.2.0/examples/load_lib
+
+JSONConfiguredRTask
+    - https://github.com/InstituteforDiseaseModeling/idmtools/tree/v1.2.0/examples/r_model
+
+PythonTask
+    - https://github.com/InstituteforDiseaseModeling/idmtools/tree/v1.2.0/examples/load_lib
+</pre></div>
+</div>
 <p>To see the list of commands and options for downloading examples, type the following at a command prompt:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ idmtools gitrepo download --help
+INI File Used: /home/runner/work/idmtools/idmtools/idmtools/docs/idmtools.ini
 Usage: idmtools gitrepo download [OPTIONS]
 
   Download files from GitHub repo to user location
@@ -206,6 +232,26 @@ Usage: idmtools gitrepo download [OPTIONS]
   Returns: Files download count
 
 Options:
+  --type TEXT    Download examples by type(COMPSPlatform, PythonTask, etc)
+  --url TEXT     Repo files url
+  --output TEXT  Files download destination
+  --help         Show this message and exit.
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ idmtools examples download --help
+INI File Used: /home/runner/work/idmtools/idmtools/idmtools/docs/idmtools.ini
+Usage: idmtools examples download [OPTIONS]
+
+  Download examples from specified location
+  Args:
+      url: GitHub repo files url
+      output: Local folder
+
+  Returns: Files download count
+
+Options:
+  --type TEXT    Download examples by type(COMPSPlatform, PythonTask, etc)
   --url TEXT     Repo files url
   --output TEXT  Files download destination
   --help         Show this message and exit.

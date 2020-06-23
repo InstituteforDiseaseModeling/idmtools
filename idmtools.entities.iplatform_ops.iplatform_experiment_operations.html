@@ -77,7 +77,7 @@
             
             
               <div class="version">
-                Beta
+                1.2.0
               </div>
             
           
@@ -101,19 +101,17 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="packages-overview.html">Packages overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create simulations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run-sims.html">Run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calibrate.html">Calibrate simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reports.html">Output reports</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookie-cutter example projects</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="reference.html">API reference</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookiecutter example projects</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="reference.html">Architecture and packages reference</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="idmtools_index.html">idmtools</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="idmtools.html">idmtools package</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="idmtools.analysis.html">idmtools.analysis package</a></li>
@@ -135,7 +133,6 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
@@ -169,10 +166,10 @@
 
 <div aria-label="breadcrumbs navigation" role="navigation">
     <ul class="wy-breadcrumbs">
-        <li><a href="../index.html">IDM docs</a> &raquo;</li>
+        <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
         <li><a href="index.html">IDM-Tools</a> &raquo;</li>
         
-        <li><a href="reference.html">API reference</a> &raquo;</li>
+        <li><a href="reference.html">Architecture and packages reference</a> &raquo;</li>
         
         <li><a href="idmtools_index.html">idmtools</a> &raquo;</li>
         
@@ -462,17 +459,25 @@ all simulation states are updated as well</p>
 
 <dl class="method">
 <dt id="idmtools.entities.iplatform_ops.iplatform_experiment_operations.IPlatformExperimentOperations.list_assets">
-<code class="sig-name descname">list_assets</code><span class="sig-paren">(</span><em class="sig-param">experiment: idmtools.entities.experiment.Experiment</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; Dict[str, List[str]]<a class="headerlink" href="#idmtools.entities.iplatform_ops.iplatform_experiment_operations.IPlatformExperimentOperations.list_assets" title="Permalink to this definition">¶</a></dt>
-<dd><p>List assets available for experiment</p>
+<code class="sig-name descname">list_assets</code><span class="sig-paren">(</span><em class="sig-param">experiment: idmtools.entities.experiment.Experiment</em>, <em class="sig-param">children: bool = False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; List[idmtools.assets.asset.Asset]<a class="headerlink" href="#idmtools.entities.iplatform_ops.iplatform_experiment_operations.IPlatformExperimentOperations.list_assets" title="Permalink to this definition">¶</a></dt>
+<dd><p>List available assets for a experiment</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>experiment</strong> – Experiment to get assets for</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>experiment</strong> – Experiment to list files for</p></li>
+<li><p><strong>children</strong> – Should we load assets from children as well?</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Dictionary of simulation and assets on each sim</p>
+<dd class="field-even"><p>List of Assets</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="method">
+<dt id="idmtools.entities.iplatform_ops.iplatform_experiment_operations.IPlatformExperimentOperations.platform_list_asset">
+<code class="sig-name descname">platform_list_asset</code><span class="sig-paren">(</span><em class="sig-param">experiment: idmtools.entities.experiment.Experiment</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; List[idmtools.assets.asset.Asset]<a class="headerlink" href="#idmtools.entities.iplatform_ops.iplatform_experiment_operations.IPlatformExperimentOperations.platform_list_asset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 

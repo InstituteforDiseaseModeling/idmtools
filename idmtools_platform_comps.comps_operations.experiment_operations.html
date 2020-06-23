@@ -77,7 +77,7 @@
             
             
               <div class="version">
-                Beta
+                1.2.0
               </div>
             
           
@@ -101,19 +101,17 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="packages-overview.html">Packages overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create simulations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run-sims.html">Run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calibrate.html">Calibrate simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reports.html">Output reports</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookie-cutter example projects</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="reference.html">API reference</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookiecutter example projects</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="reference.html">Architecture and packages reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="idmtools_index.html">idmtools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="idmtools_models_index.html">idmtools_models</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="idmtools_platform_comps_index.html">idmtools_platform_comps</a><ul class="current">
@@ -135,7 +133,6 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
@@ -169,10 +166,10 @@
 
 <div aria-label="breadcrumbs navigation" role="navigation">
     <ul class="wy-breadcrumbs">
-        <li><a href="../index.html">IDM docs</a> &raquo;</li>
+        <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
         <li><a href="index.html">IDM-Tools</a> &raquo;</li>
         
-        <li><a href="reference.html">API reference</a> &raquo;</li>
+        <li><a href="reference.html">Architecture and packages reference</a> &raquo;</li>
         
         <li><a href="idmtools_platform_comps_index.html">idmtools_platform_comps</a> &raquo;</li>
         
@@ -198,11 +195,11 @@
 <span id="idmtools-platform-comps-comps-operations-experiment-operations-module"></span><h1>idmtools_platform_comps.comps_operations.experiment_operations module<a class="headerlink" href="#module-idmtools_platform_comps.comps_operations.experiment_operations" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations">
-<em class="property">class </em><code class="sig-prename descclassname">idmtools_platform_comps.comps_operations.experiment_operations.</code><code class="sig-name descname">CompsPlatformExperimentOperations</code><span class="sig-paren">(</span><em class="sig-param">platform: 'COMPSPlaform'</em>, <em class="sig-param">platform_type: Type = &lt;class 'COMPS.Data.Experiment.Experiment'&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">idmtools_platform_comps.comps_operations.experiment_operations.</code><code class="sig-name descname">CompsPlatformExperimentOperations</code><span class="sig-paren">(</span><em class="sig-param">platform: 'COMPSPlatform'</em>, <em class="sig-param">platform_type: Type = &lt;class 'COMPS.Data.Experiment.Experiment'&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="idmtools.entities.iplatform_ops.iplatform_experiment_operations.html#idmtools.entities.iplatform_ops.iplatform_experiment_operations.IPlatformExperimentOperations" title="idmtools.entities.iplatform_ops.iplatform_experiment_operations.IPlatformExperimentOperations"><code class="xref py py-class docutils literal notranslate"><span class="pre">idmtools.entities.iplatform_ops.iplatform_experiment_operations.IPlatformExperimentOperations</span></code></a></p>
 <dl class="attribute">
 <dt id="idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.platform">
-<code class="sig-name descname">platform</code><em class="property">: 'COMPSPlaform'</em><em class="property"> = None</em><a class="headerlink" href="#idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.platform" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">platform</code><em class="property">: 'COMPSPlatform'</em><em class="property"> = None</em><a class="headerlink" href="#idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.platform" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -213,17 +210,20 @@
 
 <dl class="method">
 <dt id="idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.get">
-<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param">experiment_id: uuid.UUID</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; COMPS.Data.Experiment.Experiment<a class="headerlink" href="#idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.get" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the platform representation of an Experiment</p>
+<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param">experiment_id: uuid.UUID</em>, <em class="sig-param">columns: Optional[List[str]] = None</em>, <em class="sig-param">load_children: Optional[List[str]] = None</em>, <em class="sig-param">query_criteria: Optional[COMPS.Data.QueryCriteria.QueryCriteria] = None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; COMPS.Data.Experiment.Experiment<a class="headerlink" href="#idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch experiments from COMPS</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>experiment_id</strong> – Item id of Experiments</p></li>
+<li><p><strong>experiment_id</strong> – Experiment ID</p></li>
+<li><p><strong>columns</strong> – Optional Columns. If not provided, id, name, and suite_id are fetched</p></li>
+<li><p><strong>load_children</strong> – Optional Children. If not provided, tags and configuration are specified</p></li>
+<li><p><strong>query_criteria</strong> – Optional QueryCriteria</p></li>
 <li><p><strong>**kwargs</strong> – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Platform Representation of an experiment</p>
+<dd class="field-even"><p>COMPSExperiment with items</p>
 </dd>
 </dl>
 </dd></dl>
@@ -231,33 +231,35 @@
 <dl class="method">
 <dt id="idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.pre_create">
 <code class="sig-name descname">pre_create</code><span class="sig-paren">(</span><em class="sig-param">experiment: idmtools.entities.experiment.Experiment</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; NoReturn<a class="headerlink" href="#idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.pre_create" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run the platform/experiment post creation events</p>
+<dd><p>Pre-create for Experiment. At moment, validation related to COMPS is all that is done</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>experiment</strong> – Experiment to run post-creation events</p></li>
-<li><p><strong>**kwargs</strong> – Optional arguments mainly for extensibility</p></li>
+<li><p><strong>experiment</strong> – Experiment to run pre-create for</p></li>
+<li><p><strong>**kwargs</strong> – </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>NoReturn</p>
-</dd>
 </dl>
+<p>Returns:</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.platform_create">
-<code class="sig-name descname">platform_create</code><span class="sig-paren">(</span><em class="sig-param">experiment: idmtools.entities.experiment.Experiment</em>, <em class="sig-param">num_cores: int = None</em>, <em class="sig-param">executable_path: str = None</em>, <em class="sig-param">command_arg: str = None</em>, <em class="sig-param">priority: str = None</em>, <em class="sig-param">check_command: bool = True</em><span class="sig-paren">)</span> &#x2192; COMPS.Data.Experiment.Experiment<a class="headerlink" href="#idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.platform_create" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates an experiment from an IDMTools experiment object</p>
+<code class="sig-name descname">platform_create</code><span class="sig-paren">(</span><em class="sig-param">experiment: idmtools.entities.experiment.Experiment</em>, <em class="sig-param">num_cores: Optional[int] = None</em>, <em class="sig-param">executable_path: Optional[str] = None</em>, <em class="sig-param">command_arg: Optional[str] = None</em>, <em class="sig-param">priority: Optional[str] = None</em>, <em class="sig-param">check_command: bool = True</em><span class="sig-paren">)</span> &#x2192; COMPS.Data.Experiment.Experiment<a class="headerlink" href="#idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.platform_create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create Experiment on the COMPS Platform</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>experiment</strong> – Experiment to create</p></li>
-<li><p><strong>**kwargs</strong> – Optional arguments mainly for extensibility</p></li>
+<li><p><strong>experiment</strong> – IDMTools Experiment to create</p></li>
+<li><p><strong>num_cores</strong> – Optional num of cores to allocate using MPI</p></li>
+<li><p><strong>executable_path</strong> – Executable path</p></li>
+<li><p><strong>command_arg</strong> – Command Argument</p></li>
+<li><p><strong>priority</strong> – Priority of command</p></li>
+<li><p><strong>check_command</strong> – Run task hooks on item</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Created platform item and the UUID of said item</p>
+<dd class="field-even"><p>COMPSExperiment that was created</p>
 </dd>
 </dl>
 </dd></dl>
@@ -265,47 +267,52 @@
 <dl class="method">
 <dt id="idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.post_run_item">
 <code class="sig-name descname">post_run_item</code><span class="sig-paren">(</span><em class="sig-param">experiment: idmtools.entities.experiment.Experiment</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.post_run_item" title="Permalink to this definition">¶</a></dt>
-<dd><p>Trigger right after commissioning experiment on platform.</p>
+<dd><p>Ran after experiment. Nothing is done on comps other that alerting the user to the item</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>experiment</strong> – Experiment just commissioned</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>experiment</strong> – Experiment to run post run item</p></li>
+<li><p><strong>**kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
-<p>Returns:</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.get_children">
-<code class="sig-name descname">get_children</code><span class="sig-paren">(</span><em class="sig-param">experiment: COMPS.Data.Experiment.Experiment</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; List[Any]<a class="headerlink" href="#idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.get_children" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the children of an experiment object</p>
+<code class="sig-name descname">get_children</code><span class="sig-paren">(</span><em class="sig-param">experiment: COMPS.Data.Experiment.Experiment</em>, <em class="sig-param">columns: Optional[List[str]] = None</em>, <em class="sig-param">children: Optional[List[str]] = None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; List[COMPS.Data.Simulation.Simulation]<a class="headerlink" href="#idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.get_children" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get children for a COMPSExperiment</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>experiment</strong> – Experiment object</p></li>
-<li><p><strong>**kwargs</strong> – Optional arguments mainly for extensibility</p></li>
+<li><p><strong>experiment</strong> – Experiment to get children of Comps Experiment</p></li>
+<li><p><strong>columns</strong> – Columns to fetch. If not provided, id, name, experiment_id, and state will be loaded</p></li>
+<li><p><strong>children</strong> – Children to load. If not provided, Tags will be loaded</p></li>
+<li><p><strong>**kwargs</strong> – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Children of experiment object</p>
+<dd class="field-even"><p>Simulations belonging to the Experiment</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.get_parent">
-<code class="sig-name descname">get_parent</code><span class="sig-paren">(</span><em class="sig-param">experiment: COMPS.Data.Experiment.Experiment</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; Any<a class="headerlink" href="#idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.get_parent" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the parent of item. If the platform doesn’t support parents, you should throw a TopLevelItem error</p>
+<code class="sig-name descname">get_parent</code><span class="sig-paren">(</span><em class="sig-param">experiment: COMPS.Data.Experiment.Experiment</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; COMPS.Data.Suite.Suite<a class="headerlink" href="#idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.get_parent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get Parent of experiment</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>experiment</strong> – </p></li>
+<li><p><strong>experiment</strong> – Experiment to get parent of</p></li>
 <li><p><strong>**kwargs</strong> – </p></li>
 </ul>
 </dd>
-</dl>
-<p>Returns:</p>
-<dl class="simple">
-<dt>Raise:</dt><dd><p>TopLevelItem</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Suite of the experiment</p>
 </dd>
 </dl>
 </dd></dl>
@@ -313,31 +320,47 @@
 <dl class="method">
 <dt id="idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.platform_run_item">
 <code class="sig-name descname">platform_run_item</code><span class="sig-paren">(</span><em class="sig-param">experiment: idmtools.entities.experiment.Experiment</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.platform_run_item" title="Permalink to this definition">¶</a></dt>
-<dd><p>Called during commissioning of an item. This should perform what is needed to commission job on platform</p>
+<dd><p>Run experiment on COMPS. Here we commission the experiment</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>experiment</strong> – </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>experiment</strong> – Experiment to run</p></li>
+<li><p><strong>**kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
-<p>Returns:</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.send_assets">
 <code class="sig-name descname">send_assets</code><span class="sig-paren">(</span><em class="sig-param">experiment: idmtools.entities.experiment.Experiment</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.send_assets" title="Permalink to this definition">¶</a></dt>
-<dd><p>Transfer Experiment assets to the platform.
-:param experiment: Experiment to send assets for</p>
-<p>Returns:</p>
+<dd><p>Send assets related to the experiment</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>experiment</strong> – Experiment to send assets for</p></li>
+<li><p><strong>**kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.refresh_status">
 <code class="sig-name descname">refresh_status</code><span class="sig-paren">(</span><em class="sig-param">experiment: idmtools.entities.experiment.Experiment</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.refresh_status" title="Permalink to this definition">¶</a></dt>
-<dd><p>Refresh status for experiment object. This should update the object directly. For experiments it is best if
-all simulation states are updated as well</p>
+<dd><p>Reload status for experiment(load simulations)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>experiment</strong> – Experiment to get status for</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>experiment</strong> – Experiment to load status for</p></li>
+<li><p><strong>**kwargs</strong> – </p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>None</p>
@@ -347,17 +370,32 @@ all simulation states are updated as well</p>
 
 <dl class="method">
 <dt id="idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.to_entity">
-<code class="sig-name descname">to_entity</code><span class="sig-paren">(</span><em class="sig-param">experiment: COMPS.Data.Experiment.Experiment</em>, <em class="sig-param">parent: COMPS.Data.Suite.Suite = None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; idmtools.entities.experiment.Experiment<a class="headerlink" href="#idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.to_entity" title="Permalink to this definition">¶</a></dt>
-<dd><p>Converts the platform representation of experiment to idmtools representation</p>
+<code class="sig-name descname">to_entity</code><span class="sig-paren">(</span><em class="sig-param">experiment: COMPS.Data.Experiment.Experiment</em>, <em class="sig-param">parent: Optional[COMPS.Data.Suite.Suite] = None</em>, <em class="sig-param">children: bool = True</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; idmtools.entities.experiment.Experiment<a class="headerlink" href="#idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.to_entity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts a COMPSExperiment to an idmtools Experiment</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>experiment</strong> – Platform experiment object</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>experiment</strong> – COMPS Experiment objet to convert</p></li>
+<li><p><strong>parent</strong> – Optional suite parent</p></li>
+<li><p><strong>children</strong> – Should we load children objects?</p></li>
+<li><p><strong>**kwargs</strong> – </p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>IDMTools experiment object</p>
+<dd class="field-even"><p>Experiment</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="method">
+<dt id="idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.get_assets_from_comps_experiment">
+<code class="sig-name descname">get_assets_from_comps_experiment</code><span class="sig-paren">(</span><em class="sig-param">experiment: COMPS.Data.Experiment.Experiment</em><span class="sig-paren">)</span> &#x2192; Optional[idmtools.assets.asset_collection.AssetCollection]<a class="headerlink" href="#idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.get_assets_from_comps_experiment" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.platform_list_asset">
+<code class="sig-name descname">platform_list_asset</code><span class="sig-paren">(</span><em class="sig-param">experiment: idmtools.entities.experiment.Experiment</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; List[idmtools.assets.asset.Asset]<a class="headerlink" href="#idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.platform_list_asset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 

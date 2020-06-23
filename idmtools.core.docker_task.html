@@ -46,7 +46,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="idmtools.core.enums module" href="idmtools.core.enums.html" />
-    <link rel="prev" title="idmtools.core.cache_enabled module" href="idmtools.core.cache_enabled.html" />
+    <link rel="prev" title="idmtools.core.context module" href="idmtools.core.context.html" />
 
 <link href="https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans" rel="stylesheet">
 
@@ -77,7 +77,7 @@
             
             
               <div class="version">
-                Beta
+                1.2.0
               </div>
             
           
@@ -101,19 +101,17 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="packages-overview.html">Packages overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create simulations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run-sims.html">Run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calibrate.html">Calibrate simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reports.html">Output reports</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookie-cutter example projects</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="reference.html">API reference</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookiecutter example projects</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="reference.html">Architecture and packages reference</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="idmtools_index.html">idmtools</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="idmtools.html">idmtools package</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="idmtools.analysis.html">idmtools.analysis package</a></li>
@@ -135,7 +133,6 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
@@ -169,10 +166,10 @@
 
 <div aria-label="breadcrumbs navigation" role="navigation">
     <ul class="wy-breadcrumbs">
-        <li><a href="../index.html">IDM docs</a> &raquo;</li>
+        <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
         <li><a href="index.html">IDM-Tools</a> &raquo;</li>
         
-        <li><a href="reference.html">API reference</a> &raquo;</li>
+        <li><a href="reference.html">Architecture and packages reference</a> &raquo;</li>
         
         <li><a href="idmtools_index.html">idmtools</a> &raquo;</li>
         
@@ -198,7 +195,7 @@
 <span id="idmtools-core-docker-task-module"></span><h1>idmtools.core.docker_task module<a class="headerlink" href="#module-idmtools.core.docker_task" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="idmtools.core.docker_task.DockerTask">
-<em class="property">class </em><code class="sig-prename descclassname">idmtools.core.docker_task.</code><code class="sig-name descname">DockerTask</code><span class="sig-paren">(</span><em class="sig-param">command: Union[str, idmtools.entities.command_line.CommandLine] = None, platform_requirements: Set[idmtools.entities.platform_requirements.PlatformRequirements] = &lt;factory&gt;, _ITask__pre_creation_hooks: List[Callable[[Union[ForwardRef('Simulation'), ForwardRef('WorkflowItem')]], NoReturn]] = &lt;factory&gt;, _ITask__post_creation_hooks: List[Callable[[Union[ForwardRef('Simulation'), ForwardRef('WorkflowItem')]], NoReturn]] = &lt;factory&gt;, common_assets: idmtools.assets.asset_collection.AssetCollection = &lt;factory&gt;, transient_assets: idmtools.assets.asset_collection.AssetCollection = &lt;factory&gt;, _task_log: logging.Logger = &lt;factory&gt;, image_name: str = None, build: bool = False, build_path: Union[str, NoneType] = None, Dockerfile: Union[str, NoneType] = None, pull_before_build: bool = True, use_nvidia_run: bool = False, _DockerTask__image_built: bool = False</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.core.docker_task.DockerTask" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">idmtools.core.docker_task.</code><code class="sig-name descname">DockerTask</code><span class="sig-paren">(</span><em class="sig-param">command: Union[str, idmtools.entities.command_line.CommandLine] = None, platform_requirements: Set[idmtools.entities.platform_requirements.PlatformRequirements] = &lt;factory&gt;, _ITask__pre_creation_hooks: List[Callable[[Union[ForwardRef('Simulation'), ForwardRef('IWorkflowItem')]], NoReturn]] = &lt;factory&gt;, _ITask__post_creation_hooks: List[Callable[[Union[ForwardRef('Simulation'), ForwardRef('IWorkflowItem')]], NoReturn]] = &lt;factory&gt;, common_assets: idmtools.assets.asset_collection.AssetCollection = &lt;factory&gt;, transient_assets: idmtools.assets.asset_collection.AssetCollection = &lt;factory&gt;, _task_log: logging.Logger = &lt;factory&gt;, image_name: str = None, build: bool = False, build_path: Union[str, NoneType] = None, Dockerfile: Union[str, NoneType] = None, pull_before_build: bool = True, use_nvidia_run: bool = False, _DockerTask__image_built: bool = False</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.core.docker_task.DockerTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="idmtools.entities.itask.html#idmtools.entities.itask.ITask" title="idmtools.entities.itask.ITask"><code class="xref py py-class docutils literal notranslate"><span class="pre">idmtools.entities.itask.ITask</span></code></a></p>
 <dl class="attribute">
 <dt id="idmtools.core.docker_task.DockerTask.image_name">
@@ -233,13 +230,23 @@
 <dl class="method">
 <dt id="idmtools.core.docker_task.DockerTask.gather_common_assets">
 <code class="sig-name descname">gather_common_assets</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; idmtools.assets.asset_collection.AssetCollection<a class="headerlink" href="#idmtools.core.docker_task.DockerTask.gather_common_assets" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function called at runtime to gather all assets in the collection.</p>
+<dd><p>Gather common(experiment-level) assets from task</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>AssetCollection containing all the common assets</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="idmtools.core.docker_task.DockerTask.gather_transient_assets">
 <code class="sig-name descname">gather_transient_assets</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; idmtools.assets.asset_collection.AssetCollection<a class="headerlink" href="#idmtools.core.docker_task.DockerTask.gather_transient_assets" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function called at runtime to gather all assets in the collection</p>
+<dd><p>Gather transient(simulation-level) assets from task</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>AssetCollection</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -262,13 +269,13 @@
 <dl class="method">
 <dt id="idmtools.core.docker_task.DockerTaskSpecification.get">
 <code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param">configuration: dict</em><span class="sig-paren">)</span> &#x2192; idmtools.core.docker_task.DockerTask<a class="headerlink" href="#idmtools.core.docker_task.DockerTaskSpecification.get" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a new model using the passed in configuration.</p>
+<dd><p>Get instance of DockerTask with configuration provided</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>configuration</strong> – The INI configuration file to use.</p>
+<dd class="field-odd"><p><strong>configuration</strong> – configuration for DockerTask</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The new model.</p>
+<dd class="field-even"><p>DockerTask with configuration</p>
 </dd>
 </dl>
 </dd></dl>
@@ -276,10 +283,21 @@
 <dl class="method">
 <dt id="idmtools.core.docker_task.DockerTaskSpecification.get_description">
 <code class="sig-name descname">get_description</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#idmtools.core.docker_task.DockerTaskSpecification.get_description" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get a brief description of the plugin and its functionality.</p>
+<dd><p>Get description of plugin</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The plugin description.</p>
+<dd class="field-odd"><p>Plugin description</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="idmtools.core.docker_task.DockerTaskSpecification.get_type">
+<code class="sig-name descname">get_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Type[idmtools.core.docker_task.DockerTask]<a class="headerlink" href="#idmtools.core.docker_task.DockerTaskSpecification.get_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get type of task provided by plugin</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>DockerTask</p>
 </dd>
 </dl>
 </dd></dl>
@@ -301,7 +319,7 @@
         <a href="idmtools.core.enums.html" class="btn btn-neutral float-right" title="idmtools.core.enums module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="idmtools.core.cache_enabled.html" class="btn btn-neutral float-left" title="idmtools.core.cache_enabled module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="idmtools.core.context.html" class="btn btn-neutral float-left" title="idmtools.core.context module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

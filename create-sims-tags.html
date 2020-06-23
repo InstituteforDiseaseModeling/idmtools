@@ -46,7 +46,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Create EMOD simulations" href="create-sims-emod.html" />
-    <link rel="prev" title="Create simulations" href="create-sims.html" />
+    <link rel="prev" title="Create and run simulations" href="create-sims.html" />
 
 <link href="https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans" rel="stylesheet">
 
@@ -77,7 +77,7 @@
             
             
               <div class="version">
-                Beta
+                1.2.0
               </div>
             
           
@@ -101,25 +101,22 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="packages-overview.html">Packages overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="create-sims.html">Create simulations</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="create-sims.html">Create and run simulations</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Create simulation tags</a></li>
 <li class="toctree-l2"><a class="reference internal" href="create-sims-emod.html">Create EMOD simulations</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="run-sims.html">Run simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calibrate.html">Calibrate simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reports.html">Output reports</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookie-cutter example projects</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reference.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookiecutter example projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Architecture and packages reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
@@ -153,10 +150,10 @@
 
 <div aria-label="breadcrumbs navigation" role="navigation">
     <ul class="wy-breadcrumbs">
-        <li><a href="../index.html">IDM docs</a> &raquo;</li>
+        <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
         <li><a href="index.html">IDM-Tools</a> &raquo;</li>
         
-        <li><a href="create-sims.html">Create simulations</a> &raquo;</li>
+        <li><a href="create-sims.html">Create and run simulations</a> &raquo;</li>
         
         <li>Create simulation tags</li>
         <li class="wy-breadcrumbs-aside">
@@ -182,12 +179,12 @@
 </ul>
 <div class="section" id="preferred-builder-callbacks-via-add-sweep-definition">
 <h2>(Preferred) Builder callbacks via add_sweep_definition<a class="headerlink" href="#preferred-builder-callbacks-via-add-sweep-definition" title="Permalink to this headline">¶</a></h2>
-<p>You can add tags to simulations by using builder callbacks while building experiments with <strong>SimulationBuilder</strong> or <strong>Simulation</strong> classes and the <strong>add_sweep_definition</strong> method. This way supports adding tags to a large set of simulations and gives you full control over the simulation/task object. In addition, built-in tag management support is used when implementing the return values in a dictionary for the tags. For more information see the example in <a class="reference internal" href="idmtools.builders.simulation_builder.html#idmtools.builders.simulation_builder.SimulationBuilder" title="idmtools.builders.simulation_builder.SimulationBuilder"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimulationBuilder</span></code></a></p>
+<p>You can add tags to simulations by using builder callbacks while building experiments with <strong>SimulationBuilder</strong> or <strong>Simulation</strong> classes and the <strong>add_sweep_definition</strong> method. This way supports adding tags to a large set of simulations and gives you full control over the simulation/task object. In addition, built-in tag management support is used when implementing the return values in a dictionary for the tags. For more information see the example in <a class="reference internal" href="idmtools.builders.simulation_builder.html#idmtools.builders.simulation_builder.SimulationBuilder" title="idmtools.builders.simulation_builder.SimulationBuilder"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimulationBuilder</span></code></a>.</p>
 </div>
 <div class="section" id="base-task-with-templatedsimulations">
 <h2>Base task with TemplatedSimulations<a class="headerlink" href="#base-task-with-templatedsimulations" title="Permalink to this headline">¶</a></h2>
 <p>You can add tags to all simulations via base task used with the
-<strong>TemplatedSimulations</strong> class while building simulations. For more information see the example in <a class="reference internal" href="idmtools.entities.templated_simulation.html#idmtools.entities.templated_simulation.TemplatedSimulations" title="idmtools.entities.templated_simulation.TemplatedSimulations"><code class="xref py py-class docutils literal notranslate"><span class="pre">TemplatedSimulations</span></code></a></p>
+<strong>TemplatedSimulations</strong> class while building simulations. For more information see the example in <a class="reference internal" href="idmtools.entities.templated_simulation.html#idmtools.entities.templated_simulation.TemplatedSimulations" title="idmtools.entities.templated_simulation.TemplatedSimulations"><code class="xref py py-class docutils literal notranslate"><span class="pre">TemplatedSimulations</span></code></a>.</p>
 </div>
 <div class="section" id="specific-simulation-from-templatedsimulations">
 <h2>Specific simulation from TemplatedSimulations<a class="headerlink" href="#specific-simulation-from-templatedsimulations" title="Permalink to this headline">¶</a></h2>
@@ -208,7 +205,7 @@
         <a href="create-sims-emod.html" class="btn btn-neutral float-right" title="Create EMOD simulations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="create-sims.html" class="btn btn-neutral float-left" title="Create simulations" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="create-sims.html" class="btn btn-neutral float-left" title="Create and run simulations" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

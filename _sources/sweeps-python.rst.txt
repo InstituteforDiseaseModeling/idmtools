@@ -386,7 +386,7 @@ Initialize two analyser classes with the path of the output csv file
 
     analyzers = [InfectiousnessCSVAnalyzer(filenames=filenames), NodeCSVAnalyzer(filenames=filenames_2)]
 
-Specify the id Type, in this case an Experiment on COMPS
+Specify the id Type, in this case an Experiment on |COMPS_s|
 
 .. code-block:: python
 
@@ -400,6 +400,8 @@ Now analyze:
 
     manager.analyze()
     sys.exit(0)
+
+.. include:: /reuse/comps_note.txt
 
 python_model.python_model_allee
 ###############################

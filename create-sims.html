@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Create simulations &mdash; IDM-Tools  documentation</title>
+  <title>Create and run simulations &mdash; IDM-Tools  documentation</title>
   
 
   
@@ -77,7 +77,7 @@
             
             
               <div class="version">
-                Beta
+                1.2.0
               </div>
             
           
@@ -101,25 +101,22 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="packages-overview.html">Packages overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Create simulations</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Create and run simulations</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="create-sims-tags.html">Create simulation tags</a></li>
 <li class="toctree-l2"><a class="reference internal" href="create-sims-emod.html">Create EMOD simulations</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="run-sims.html">Run simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calibrate.html">Calibrate simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reports.html">Output reports</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookie-cutter example projects</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reference.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookiecutter example projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Architecture and packages reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
@@ -153,10 +150,10 @@
 
 <div aria-label="breadcrumbs navigation" role="navigation">
     <ul class="wy-breadcrumbs">
-        <li><a href="../index.html">IDM docs</a> &raquo;</li>
+        <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
         <li><a href="index.html">IDM-Tools</a> &raquo;</li>
         
-        <li>Create simulations</li>
+        <li>Create and run simulations</li>
         <li class="wy-breadcrumbs-aside">
             
             
@@ -170,9 +167,11 @@
             
 <!-- From _templates/page.html -->
 
-  <div class="section" id="create-simulations">
-<h1>Create simulations<a class="headerlink" href="#create-simulations" title="Permalink to this headline">¶</a></h1>
-<p>There are different ways to create simulations with IDM-Tools. For example, if you would like to create many simulations “on-the-fly” (such as parameter sweeps) then you should use the <a class="reference internal" href="idmtools.builders.simulation_builder.html#idmtools.builders.simulation_builder.SimulationBuilder" title="idmtools.builders.simulation_builder.SimulationBuilder"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimulationBuilder</span></code></a> and <a class="reference internal" href="idmtools.entities.templated_simulation.html#idmtools.entities.templated_simulation.TemplatedSimulations" title="idmtools.entities.templated_simulation.TemplatedSimulations"><code class="xref py py-class docutils literal notranslate"><span class="pre">TemplatedSimulations</span></code></a> classes. On the other hand, if you would like to create multiple simulations beforehand then you can use the <a class="reference internal" href="idmtools.entities.simulation.html#idmtools.entities.simulation.Simulation" title="idmtools.entities.simulation.Simulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Simulation</span></code></a> class. See the following examples for each of these scenarios:</p>
+  <div class="section" id="create-and-run-simulations">
+<h1>Create and run simulations<a class="headerlink" href="#create-and-run-simulations" title="Permalink to this headline">¶</a></h1>
+<p>To create simulations with IDM-Tools, create a Python file that imports the relevant packages, uses the classes and functions to meet your specific needs, and then run the script using <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">script_name.py</span></code>.</p>
+<p>For example, if you would like to create many simulations “on-the-fly” (such as parameter sweeps) then you should use the <a class="reference internal" href="idmtools.builders.simulation_builder.html#idmtools.builders.simulation_builder.SimulationBuilder" title="idmtools.builders.simulation_builder.SimulationBuilder"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimulationBuilder</span></code></a> and <a class="reference internal" href="idmtools.entities.templated_simulation.html#idmtools.entities.templated_simulation.TemplatedSimulations" title="idmtools.entities.templated_simulation.TemplatedSimulations"><code class="xref py py-class docutils literal notranslate"><span class="pre">TemplatedSimulations</span></code></a> classes. On the other hand, if you would like to create multiple simulations beforehand then you can use the <a class="reference internal" href="idmtools.entities.simulation.html#idmtools.entities.simulation.Simulation" title="idmtools.entities.simulation.Simulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Simulation</span></code></a> class.</p>
+<p>See the following examples for each of these scenarios:</p>
 <div class="section" id="simulationbuilder-example">
 <h2>SimulationBuilder example<a class="headerlink" href="#simulationbuilder-example" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
@@ -307,6 +306,7 @@
     <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span> <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">succeeded</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>Many additional examples can be found in the <a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/tree/master/examples">/examples</a> folder of the GitHub repository.</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="create-sims-tags.html">Create simulation tags</a><ul>

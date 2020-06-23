@@ -77,7 +77,7 @@
             
             
               <div class="version">
-                Beta
+                1.2.0
               </div>
             
           
@@ -101,19 +101,17 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="packages-overview.html">Packages overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create simulations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run-sims.html">Run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calibrate.html">Calibrate simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reports.html">Output reports</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookie-cutter example projects</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="reference.html">API reference</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookiecutter example projects</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="reference.html">Architecture and packages reference</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="idmtools_index.html">idmtools</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="idmtools.html">idmtools package</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="idmtools.analysis.html">idmtools.analysis package</a></li>
@@ -135,7 +133,6 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
@@ -169,10 +166,10 @@
 
 <div aria-label="breadcrumbs navigation" role="navigation">
     <ul class="wy-breadcrumbs">
-        <li><a href="../index.html">IDM docs</a> &raquo;</li>
+        <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
         <li><a href="index.html">IDM-Tools</a> &raquo;</li>
         
-        <li><a href="reference.html">API reference</a> &raquo;</li>
+        <li><a href="reference.html">Architecture and packages reference</a> &raquo;</li>
         
         <li><a href="idmtools_index.html">idmtools</a> &raquo;</li>
         
@@ -198,7 +195,7 @@
 <span id="idmtools-core-task-factory-module"></span><h1>idmtools.core.task_factory module<a class="headerlink" href="#module-idmtools.core.task_factory" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="idmtools.core.task_factory.DynamicTaskSpecification">
-<em class="property">class </em><code class="sig-prename descclassname">idmtools.core.task_factory.</code><code class="sig-name descname">DynamicTaskSpecification</code><span class="sig-paren">(</span><em class="sig-param">task_type: idmtools.entities.itask.ITask</em>, <em class="sig-param">description: str = ''</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.core.task_factory.DynamicTaskSpecification" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">idmtools.core.task_factory.</code><code class="sig-name descname">DynamicTaskSpecification</code><span class="sig-paren">(</span><em class="sig-param">task_type: Type[idmtools.entities.itask.ITask], description: str = ''</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.core.task_factory.DynamicTaskSpecification" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="idmtools.registry.task_specification.html#idmtools.registry.task_specification.TaskSpecification" title="idmtools.registry.task_specification.TaskSpecification"><code class="xref py py-class docutils literal notranslate"><span class="pre">idmtools.registry.task_specification.TaskSpecification</span></code></a></p>
 <p>This class allows users to quickly define a spec for special tasks</p>
 <dl class="method">
@@ -226,6 +223,11 @@
 </dl>
 </dd></dl>
 
+<dl class="method">
+<dt id="idmtools.core.task_factory.DynamicTaskSpecification.get_type">
+<code class="sig-name descname">get_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Type[idmtools.entities.itask.ITask]<a class="headerlink" href="#idmtools.core.task_factory.DynamicTaskSpecification.get_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -251,7 +253,7 @@
 
 <dl class="method">
 <dt id="idmtools.core.task_factory.TaskFactory.register_task">
-<code class="sig-name descname">register_task</code><span class="sig-paren">(</span><em class="sig-param">task: idmtools.entities.itask.ITask</em><span class="sig-paren">)</span> &#x2192; NoReturn<a class="headerlink" href="#idmtools.core.task_factory.TaskFactory.register_task" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">register_task</code><span class="sig-paren">(</span><em class="sig-param">task: Type[idmtools.entities.itask.ITask]</em><span class="sig-paren">)</span> &#x2192; NoReturn<a class="headerlink" href="#idmtools.core.task_factory.TaskFactory.register_task" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dynamically register a class using the DynamicTaskSpecification</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

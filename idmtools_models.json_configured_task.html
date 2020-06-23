@@ -45,7 +45,7 @@
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="idmtools_platform_comps" href="idmtools_platform_comps_index.html" />
+    <link rel="next" title="idmtools_models.templated_script_task module" href="idmtools_models.templated_script_task.html" />
     <link rel="prev" title="idmtools_models.r.r_task module" href="idmtools_models.r.r_task.html" />
 
 <link href="https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans" rel="stylesheet">
@@ -77,7 +77,7 @@
             
             
               <div class="version">
-                Beta
+                1.2.0
               </div>
             
           
@@ -101,25 +101,24 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="packages-overview.html">Packages overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create simulations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run-sims.html">Run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calibrate.html">Calibrate simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reports.html">Output reports</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookie-cutter example projects</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="reference.html">API reference</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookiecutter example projects</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="reference.html">Architecture and packages reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="idmtools_index.html">idmtools</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="idmtools_models_index.html">idmtools_models</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="idmtools_models.html">idmtools_models package</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="idmtools_models.python.html">idmtools_models.python package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="idmtools_models.r.html">idmtools_models.r package</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">idmtools_models.json_configured_task module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools_models.templated_script_task.html">idmtools_models.templated_script_task module</a></li>
 </ul>
 </li>
 </ul>
@@ -129,7 +128,6 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
@@ -163,10 +161,10 @@
 
 <div aria-label="breadcrumbs navigation" role="navigation">
     <ul class="wy-breadcrumbs">
-        <li><a href="../index.html">IDM docs</a> &raquo;</li>
+        <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
         <li><a href="index.html">IDM-Tools</a> &raquo;</li>
         
-        <li><a href="reference.html">API reference</a> &raquo;</li>
+        <li><a href="reference.html">Architecture and packages reference</a> &raquo;</li>
         
         <li><a href="idmtools_models_index.html">idmtools_models</a> &raquo;</li>
         
@@ -190,7 +188,7 @@
 <span id="idmtools-models-json-configured-task-module"></span><h1>idmtools_models.json_configured_task module<a class="headerlink" href="#module-idmtools_models.json_configured_task" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="idmtools_models.json_configured_task.JSONConfiguredTask">
-<em class="property">class </em><code class="sig-prename descclassname">idmtools_models.json_configured_task.</code><code class="sig-name descname">JSONConfiguredTask</code><span class="sig-paren">(</span><em class="sig-param">command: Union[str, idmtools.entities.command_line.CommandLine] = None, platform_requirements: Set[idmtools.entities.platform_requirements.PlatformRequirements] = &lt;factory&gt;, _ITask__pre_creation_hooks: List[Callable[[Union[Simulation, WorkflowItem]], NoReturn]] = &lt;factory&gt;, _ITask__post_creation_hooks: List[Callable[[Union[Simulation, WorkflowItem]], NoReturn]] = &lt;factory&gt;, common_assets: idmtools.assets.asset_collection.AssetCollection = &lt;factory&gt;, transient_assets: idmtools.assets.asset_collection.AssetCollection = &lt;factory&gt;, _task_log: logging.Logger = &lt;factory&gt;, parameters: dict = &lt;factory&gt;, envelope: str = None, config_file_name: str = 'config.json', is_config_common: bool = False, command_line_argument: str = None, command_line_argument_no_filename: bool = True</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">idmtools_models.json_configured_task.</code><code class="sig-name descname">JSONConfiguredTask</code><span class="sig-paren">(</span><em class="sig-param">command: Union[str, idmtools.entities.command_line.CommandLine] = None, platform_requirements: Set[idmtools.entities.platform_requirements.PlatformRequirements] = &lt;factory&gt;, _ITask__pre_creation_hooks: List[Callable[[Union[Simulation, IWorkflowItem]], NoReturn]] = &lt;factory&gt;, _ITask__post_creation_hooks: List[Callable[[Union[Simulation, IWorkflowItem]], NoReturn]] = &lt;factory&gt;, common_assets: idmtools.assets.asset_collection.AssetCollection = &lt;factory&gt;, transient_assets: idmtools.assets.asset_collection.AssetCollection = &lt;factory&gt;, _task_log: logging.Logger = &lt;factory&gt;, parameters: dict = &lt;factory&gt;, envelope: str = None, config_file_name: str = 'config.json', is_config_common: bool = False, command_line_argument: str = None, command_line_argument_no_filename: bool = True</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="idmtools.entities.itask.html#idmtools.entities.itask.ITask" title="idmtools.entities.itask.ITask"><code class="xref py py-class docutils literal notranslate"><span class="pre">idmtools.entities.itask.ITask</span></code></a></p>
 <p>Defines an extensible simple task that implements functionality through optional supplied use hooks</p>
 <dl class="attribute">
@@ -226,13 +224,23 @@
 <dl class="method">
 <dt id="idmtools_models.json_configured_task.JSONConfiguredTask.gather_common_assets">
 <code class="sig-name descname">gather_common_assets</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; idmtools.assets.asset_collection.AssetCollection<a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask.gather_common_assets" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function called at runtime to gather all assets in the collection.</p>
+<dd><p>Gather assets common across an Experiment(Set of Simulations)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Common AssetCollection</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="idmtools_models.json_configured_task.JSONConfiguredTask.gather_transient_assets">
 <code class="sig-name descname">gather_transient_assets</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; idmtools.assets.asset_collection.AssetCollection<a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask.gather_transient_assets" title="Permalink to this definition">¶</a></dt>
-<dd><p>Here we dump our config</p>
+<dd><p>Gather assets that are unique to this simulation/worktiem</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Simulation/workitem level AssetCollection</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -253,14 +261,16 @@
 <dl class="method">
 <dt id="idmtools_models.json_configured_task.JSONConfiguredTask.get_parameter">
 <code class="sig-name descname">get_parameter</code><span class="sig-paren">(</span><em class="sig-param">key: Union[str, int, float]</em><span class="sig-paren">)</span> &#x2192; Union[str, int, float, Dict[Union[str, int, float], Any]]<a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask.get_parameter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a parameter value
-:param key: Key of parameter</p>
+<dd><p>Returns a parameter value</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Value of parameter</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>key</strong> – Key of parameter</p>
 </dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>KeyError</strong> – </p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Value of parameter</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>KeyError</strong> – </p>
 </dd>
 </dl>
 </dd></dl>
@@ -268,15 +278,38 @@
 <dl class="method">
 <dt id="idmtools_models.json_configured_task.JSONConfiguredTask.update_parameters">
 <code class="sig-name descname">update_parameters</code><span class="sig-paren">(</span><em class="sig-param">values: Dict[Union[str, int, float], Union[str, int, float, Dict[Union[str, int, float], Any]]]</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask.update_parameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Perform bulk update from another dictionary
-:param values:</p>
+<dd><p>Perform bulk update from another dictionary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>values</strong> – </p>
+</dd>
+</dl>
 <p>Returns:</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="idmtools_models.json_configured_task.JSONConfiguredTask.reload_from_simulation">
-<code class="sig-name descname">reload_from_simulation</code><span class="sig-paren">(</span><em class="sig-param">simulation: idmtools.entities.simulation.Simulation</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask.reload_from_simulation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Optional hook that is called when loading simulations from a platform</p>
+<code class="sig-name descname">reload_from_simulation</code><span class="sig-paren">(</span><em class="sig-param">simulation: idmtools.entities.simulation.Simulation</em>, <em class="sig-param">config_file_name: Optional[str] = None</em>, <em class="sig-param">envelope: Optional[str] = None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask.reload_from_simulation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reload from Simulation. To do this, the process is</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>First check for a configfile name from arguments, then tags, or the default name</p></li>
+<li><p>Load the json config file</p></li>
+<li><p>Check if we got an envelope argument from parameters or the simulation tags, or on the task object</p></li>
+</ol>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>simulation</strong> – Simulation object with metadata to load info from</p></li>
+<li><p><strong>config_file_name</strong> – Optional name of config file</p></li>
+<li><p><strong>envelope</strong> – Optional name of envelope</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Populates the config with config from object</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -306,13 +339,13 @@
 <dl class="method">
 <dt id="idmtools_models.json_configured_task.JSONConfiguredTaskSpecification.get">
 <code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param">configuration: dict</em><span class="sig-paren">)</span> &#x2192; idmtools_models.json_configured_task.JSONConfiguredTask<a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTaskSpecification.get" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a new model using the passed in configuration.</p>
+<dd><p>Get instance of JSONConfiguredTask with configuration specified</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>configuration</strong> – The INI configuration file to use.</p>
+<dd class="field-odd"><p><strong>configuration</strong> – Configuration for configuration</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The new model.</p>
+<dd class="field-even"><p>JSONConfiguredTask with configuration</p>
 </dd>
 </dl>
 </dd></dl>
@@ -320,10 +353,10 @@
 <dl class="method">
 <dt id="idmtools_models.json_configured_task.JSONConfiguredTaskSpecification.get_description">
 <code class="sig-name descname">get_description</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTaskSpecification.get_description" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get a brief description of the plugin and its functionality.</p>
+<dd><p>Get description for plugin</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The plugin description.</p>
+<dd class="field-odd"><p>Description of plugin</p>
 </dd>
 </dl>
 </dd></dl>
@@ -331,10 +364,21 @@
 <dl class="method">
 <dt id="idmtools_models.json_configured_task.JSONConfiguredTaskSpecification.get_example_urls">
 <code class="sig-name descname">get_example_urls</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; List[str]<a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTaskSpecification.get_example_urls" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a list of URLs that a series of Examples for plugin can be downloaded from</p>
+<dd><p>Get list of urls with examples for JSONConfiguredTask</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>List of urls</p>
+<dd class="field-odd"><p>List of urls that point to examples relating to JSONConfiguredTask</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="idmtools_models.json_configured_task.JSONConfiguredTaskSpecification.get_type">
+<code class="sig-name descname">get_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Type[idmtools_models.json_configured_task.JSONConfiguredTask]<a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTaskSpecification.get_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get task type provided by plugin</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>JSONConfiguredTask</p>
 </dd>
 </dl>
 </dd></dl>
@@ -353,7 +397,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="idmtools_platform_comps_index.html" class="btn btn-neutral float-right" title="idmtools_platform_comps" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="idmtools_models.templated_script_task.html" class="btn btn-neutral float-right" title="idmtools_models.templated_script_task module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="idmtools_models.r.r_task.html" class="btn btn-neutral float-left" title="idmtools_models.r.r_task module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

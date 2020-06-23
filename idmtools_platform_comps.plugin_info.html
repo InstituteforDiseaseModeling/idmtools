@@ -77,7 +77,7 @@
             
             
               <div class="version">
-                Beta
+                1.2.0
               </div>
             
           
@@ -101,19 +101,17 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="packages-overview.html">Packages overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create simulations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run-sims.html">Run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calibrate.html">Calibrate simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reports.html">Output reports</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookie-cutter example projects</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="reference.html">API reference</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookiecutter example projects</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="reference.html">Architecture and packages reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="idmtools_index.html">idmtools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="idmtools_models_index.html">idmtools_models</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="idmtools_platform_comps_index.html">idmtools_platform_comps</a><ul class="current">
@@ -135,7 +133,6 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
@@ -169,10 +166,10 @@
 
 <div aria-label="breadcrumbs navigation" role="navigation">
     <ul class="wy-breadcrumbs">
-        <li><a href="../index.html">IDM docs</a> &raquo;</li>
+        <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
         <li><a href="index.html">IDM-Tools</a> &raquo;</li>
         
-        <li><a href="reference.html">API reference</a> &raquo;</li>
+        <li><a href="reference.html">Architecture and packages reference</a> &raquo;</li>
         
         <li><a href="idmtools_platform_comps_index.html">idmtools_platform_comps</a> &raquo;</li>
         
@@ -211,7 +208,7 @@
 
 <dl class="method">
 <dt id="idmtools_platform_comps.plugin_info.COMPSPlatformSpecification.get">
-<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param">**configuration</em><span class="sig-paren">)</span> &#x2192; idmtools.entities.iplatform.IPlatform<a class="headerlink" href="#idmtools_platform_comps.plugin_info.COMPSPlatformSpecification.get" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param">**configuration</em><span class="sig-paren">)</span> &#x2192; idmtools_platform_comps.comps_platform.COMPSPlatform<a class="headerlink" href="#idmtools_platform_comps.plugin_info.COMPSPlatformSpecification.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a new platform using the passed in configuration.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -265,7 +262,7 @@
 
 <dl class="method">
 <dt id="idmtools_platform_comps.plugin_info.SSMTPlatformSpecification.get">
-<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param">**configuration</em><span class="sig-paren">)</span> &#x2192; idmtools.entities.iplatform.IPlatform<a class="headerlink" href="#idmtools_platform_comps.plugin_info.SSMTPlatformSpecification.get" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param">**configuration</em><span class="sig-paren">)</span> &#x2192; idmtools_platform_comps.comps_platform.COMPSPlatform<a class="headerlink" href="#idmtools_platform_comps.plugin_info.SSMTPlatformSpecification.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a new platform using the passed in configuration.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

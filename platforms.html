@@ -45,7 +45,7 @@
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Create simulations" href="create-sims.html" />
+    <link rel="next" title="Create and run simulations" href="create-sims.html" />
     <link rel="prev" title="Logging" href="logging.html" />
 
 <link href="https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans" rel="stylesheet">
@@ -77,7 +77,7 @@
             
             
               <div class="version">
-                Beta
+                1.2.0
               </div>
             
           
@@ -101,21 +101,18 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="packages-overview.html">Packages overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Platforms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create simulations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run-sims.html">Run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calibrate.html">Calibrate simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reports.html">Output reports</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookie-cutter example projects</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reference.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookiecutter example projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Architecture and packages reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
@@ -149,7 +146,7 @@
 
 <div aria-label="breadcrumbs navigation" role="navigation">
     <ul class="wy-breadcrumbs">
-        <li><a href="../index.html">IDM docs</a> &raquo;</li>
+        <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
         <li><a href="index.html">IDM-Tools</a> &raquo;</li>
         
         <li>Platforms</li>
@@ -169,12 +166,12 @@
   <div class="section" id="platforms">
 <h1>Platforms<a class="headerlink" href="#platforms" title="Permalink to this headline">¶</a></h1>
 <p>IDM-Tools currently supports running on the following platforms:</p>
-<div class="line-block">
-<div class="line"><strong>COMPS</strong>: COmputational Modeling Platform Service (COMPS) is a high performance computing cluster used by employees and collaborators at IDM. To support running simulations and analysis on COMPS, IDM-Tools includes the following modules: <a class="reference internal" href="idmtools_platform_comps_index.html"><span class="doc">idmtools_platform_comps</span></a>.</div>
+<p><strong>COMPS</strong>: COmputational Modeling Platform Service (COMPS) is a high performance computing cluster used by employees and collaborators at IDM. To support running simulations and analysis on COMPS, IDM-Tools includes the following modules: <a class="reference internal" href="idmtools_platform_comps_index.html"><span class="doc">idmtools_platform_comps</span></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To access and use COMPS you must receive approval and credentials from IDM. Send your request to <a class="reference external" href="mailto:support&#37;&#52;&#48;idmod&#46;org">support<span>&#64;</span>idmod<span>&#46;</span>org</a>.</p>
 </div>
-<div class="line-block">
-<div class="line"><strong>Local</strong>: You can also run simulations and analysis locally on your computer, rather than on a remote high-performance computer (HPC). For more information about these modules, see <a class="reference internal" href="idmtools_platform_local_index.html"><span class="doc">idmtools_platform_local</span></a>.</div>
-</div>
+<p><strong>Local</strong>: You can also run simulations and analysis locally on your computer, rather than on a remote high-performance computer (HPC). For more information about these modules, see <a class="reference internal" href="idmtools_platform_local_index.html"><span class="doc">idmtools_platform_local</span></a>.</p>
 <p>You can use the <strong>idmtools.ini</strong> file to configure platform specific settings, as the following examples shows for COMPS:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>[COMPS2]
 type = COMPS
@@ -224,7 +221,7 @@ For example, let’s consider an example platform where the user needs to specif
     <span class="n">environment</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Select an environment &quot;</span><span class="p">})</span>
 </pre></div>
 </div>
-<p>The list of environments is dependant on the endpoint value. To achieve this, we need to provide a <code class="docutils literal notranslate"><span class="pre">callback</span></code> function to the metadata.
+<p>The list of environments is dependent on the endpoint value. To achieve this, we need to provide a <code class="docutils literal notranslate"><span class="pre">callback</span></code> function to the metadata.
 This function will receive all the previously set user parameters, and will have the opportunity to modify the current field’s <code class="docutils literal notranslate"><span class="pre">choices</span></code>, <code class="docutils literal notranslate"><span class="pre">default</span></code>, and <code class="docutils literal notranslate"><span class="pre">help</span></code> parameters.</p>
 <p>Let’s create a function querying the endpoint to get the list of environments and setting them as choices. Selecting the first one as default.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">environment_list</span><span class="p">(</span><span class="n">previous_settings</span><span class="p">:</span><span class="n">Dict</span><span class="p">,</span> <span class="n">current_field</span><span class="p">:</span><span class="n">Field</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
@@ -311,7 +308,7 @@ in multiple fields:</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="create-sims.html" class="btn btn-neutral float-right" title="Create simulations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="create-sims.html" class="btn btn-neutral float-right" title="Create and run simulations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="logging.html" class="btn btn-neutral float-left" title="Logging" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

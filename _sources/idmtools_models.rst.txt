@@ -15,6 +15,7 @@ Submodules
 .. toctree::
 
    idmtools_models.json_configured_task
+   idmtools_models.templated_script_task
 
 Module contents
 ---------------

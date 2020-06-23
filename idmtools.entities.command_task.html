@@ -77,7 +77,7 @@
             
             
               <div class="version">
-                Beta
+                1.2.0
               </div>
             
           
@@ -101,19 +101,17 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="packages-overview.html">Packages overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create simulations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run-sims.html">Run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calibrate.html">Calibrate simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reports.html">Output reports</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookie-cutter example projects</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="reference.html">API reference</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookiecutter example projects</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="reference.html">Architecture and packages reference</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="idmtools_index.html">idmtools</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="idmtools.html">idmtools package</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="idmtools.analysis.html">idmtools.analysis package</a></li>
@@ -135,7 +133,6 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
@@ -169,10 +166,10 @@
 
 <div aria-label="breadcrumbs navigation" role="navigation">
     <ul class="wy-breadcrumbs">
-        <li><a href="../index.html">IDM docs</a> &raquo;</li>
+        <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
         <li><a href="index.html">IDM-Tools</a> &raquo;</li>
         
-        <li><a href="reference.html">API reference</a> &raquo;</li>
+        <li><a href="reference.html">Architecture and packages reference</a> &raquo;</li>
         
         <li><a href="idmtools_index.html">idmtools</a> &raquo;</li>
         
@@ -198,29 +195,40 @@
 <span id="idmtools-entities-command-task-module"></span><h1>idmtools.entities.command_task module<a class="headerlink" href="#module-idmtools.entities.command_task" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="idmtools.entities.command_task.CommandTask">
-<em class="property">class </em><code class="sig-prename descclassname">idmtools.entities.command_task.</code><code class="sig-name descname">CommandTask</code><span class="sig-paren">(</span><em class="sig-param">command: Union[str, idmtools.entities.command_line.CommandLine] = None, platform_requirements: Set[idmtools.entities.platform_requirements.PlatformRequirements] = &lt;factory&gt;, _ITask__pre_creation_hooks: List[Callable[[Union[ForwardRef('Simulation'), ForwardRef('WorkflowItem')]], NoReturn]] = &lt;factory&gt;, _ITask__post_creation_hooks: List[Callable[[Union[ForwardRef('Simulation'), ForwardRef('WorkflowItem')]], NoReturn]] = &lt;factory&gt;, common_assets: idmtools.assets.asset_collection.AssetCollection = &lt;factory&gt;, transient_assets: idmtools.assets.asset_collection.AssetCollection = &lt;factory&gt;, _task_log: logging.Logger = &lt;factory&gt;, gather_common_asset_hooks: List[Callable[[], idmtools.assets.asset_collection.AssetCollection]] = &lt;factory&gt;, gather_transient_asset_hooks: List[Callable[[], idmtools.assets.asset_collection.AssetCollection]] = &lt;factory&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.command_task.CommandTask" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">idmtools.entities.command_task.</code><code class="sig-name descname">CommandTask</code><span class="sig-paren">(</span><em class="sig-param">command: Union[str, idmtools.entities.command_line.CommandLine] = None, platform_requirements: Set[idmtools.entities.platform_requirements.PlatformRequirements] = &lt;factory&gt;, _ITask__pre_creation_hooks: List[Callable[[Union[ForwardRef('Simulation'), ForwardRef('IWorkflowItem')]], NoReturn]] = &lt;factory&gt;, _ITask__post_creation_hooks: List[Callable[[Union[ForwardRef('Simulation'), ForwardRef('IWorkflowItem')]], NoReturn]] = &lt;factory&gt;, common_assets: idmtools.assets.asset_collection.AssetCollection = &lt;factory&gt;, transient_assets: idmtools.assets.asset_collection.AssetCollection = &lt;factory&gt;, _task_log: logging.Logger = &lt;factory&gt;, gather_common_asset_hooks: List[Callable[[idmtools.entities.itask.ITask], idmtools.assets.asset_collection.AssetCollection]] = &lt;factory&gt;, gather_transient_asset_hooks: List[Callable[[idmtools.entities.itask.ITask], idmtools.assets.asset_collection.AssetCollection]] = &lt;factory&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.command_task.CommandTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="idmtools.entities.itask.html#idmtools.entities.itask.ITask" title="idmtools.entities.itask.ITask"><code class="xref py py-class docutils literal notranslate"><span class="pre">idmtools.entities.itask.ITask</span></code></a></p>
 <dl class="attribute">
 <dt id="idmtools.entities.command_task.CommandTask.gather_common_asset_hooks">
-<code class="sig-name descname">gather_common_asset_hooks</code><em class="property">: List[Callable[[], AssetCollection]]</em><em class="property"> = None</em><a class="headerlink" href="#idmtools.entities.command_task.CommandTask.gather_common_asset_hooks" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-name descname">gather_common_asset_hooks</code><em class="property">: List[Callable[[ITask], AssetCollection]]</em><em class="property"> = None</em><a class="headerlink" href="#idmtools.entities.command_task.CommandTask.gather_common_asset_hooks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hooks to gather common assets</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="idmtools.entities.command_task.CommandTask.gather_transient_asset_hooks">
-<code class="sig-name descname">gather_transient_asset_hooks</code><em class="property">: List[Callable[[], AssetCollection]]</em><em class="property"> = None</em><a class="headerlink" href="#idmtools.entities.command_task.CommandTask.gather_transient_asset_hooks" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">gather_transient_asset_hooks</code><em class="property">: List[Callable[[ITask], AssetCollection]]</em><em class="property"> = None</em><a class="headerlink" href="#idmtools.entities.command_task.CommandTask.gather_transient_asset_hooks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines an extensible simple task that implements functionality through optional supplied use hooks</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="idmtools.entities.command_task.CommandTask.gather_common_assets">
 <code class="sig-name descname">gather_common_assets</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; idmtools.assets.asset_collection.AssetCollection<a class="headerlink" href="#idmtools.entities.command_task.CommandTask.gather_common_assets" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function called at runtime to gather all assets in the collection.</p>
+<dd><p>Gather common(experiment-level) assets for task</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>AssetCollection containing common assets</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="idmtools.entities.command_task.CommandTask.gather_transient_assets">
 <code class="sig-name descname">gather_transient_assets</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; idmtools.assets.asset_collection.AssetCollection<a class="headerlink" href="#idmtools.entities.command_task.CommandTask.gather_transient_assets" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function called at runtime to gather all assets in the collection</p>
+<dd><p>Gather transient(experiment-level) assets for task</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>AssetCollection containing transient assets</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -237,14 +245,14 @@
 <dd><p>Bases: <a class="reference internal" href="idmtools.registry.task_specification.html#idmtools.registry.task_specification.TaskSpecification" title="idmtools.registry.task_specification.TaskSpecification"><code class="xref py py-class docutils literal notranslate"><span class="pre">idmtools.registry.task_specification.TaskSpecification</span></code></a></p>
 <dl class="method">
 <dt id="idmtools.entities.command_task.CommandTaskSpecification.get">
-<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param">configuration: dict</em><span class="sig-paren">)</span> &#x2192; idmtools.entities.itask.ITask<a class="headerlink" href="#idmtools.entities.command_task.CommandTaskSpecification.get" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a new model using the passed in configuration.</p>
+<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param">configuration: dict</em><span class="sig-paren">)</span> &#x2192; idmtools.entities.command_task.CommandTask<a class="headerlink" href="#idmtools.entities.command_task.CommandTaskSpecification.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get instance of CommandTask with configuration</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>configuration</strong> – The INI configuration file to use.</p>
+<dd class="field-odd"><p><strong>configuration</strong> – configuration for CommandTask</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The new model.</p>
+<dd class="field-even"><p>CommandTask with configuration</p>
 </dd>
 </dl>
 </dd></dl>
@@ -252,10 +260,10 @@
 <dl class="method">
 <dt id="idmtools.entities.command_task.CommandTaskSpecification.get_description">
 <code class="sig-name descname">get_description</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#idmtools.entities.command_task.CommandTaskSpecification.get_description" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get a brief description of the plugin and its functionality.</p>
+<dd><p>Get description of plugin</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The plugin description.</p>
+<dd class="field-odd"><p>Plugin description</p>
 </dd>
 </dl>
 </dd></dl>
@@ -263,10 +271,21 @@
 <dl class="method">
 <dt id="idmtools.entities.command_task.CommandTaskSpecification.get_example_urls">
 <code class="sig-name descname">get_example_urls</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; List[str]<a class="headerlink" href="#idmtools.entities.command_task.CommandTaskSpecification.get_example_urls" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a list of URLs that a series of Examples for plugin can be downloaded from</p>
+<dd><p>Get example urls related to CommandTask</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>List of urls</p>
+<dd class="field-odd"><p>List of urls that have examples related to CommandTask</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="idmtools.entities.command_task.CommandTaskSpecification.get_type">
+<code class="sig-name descname">get_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Type[idmtools.entities.command_task.CommandTask]<a class="headerlink" href="#idmtools.entities.command_task.CommandTaskSpecification.get_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get task type provided by plugin</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>CommandTask</p>
 </dd>
 </dl>
 </dd></dl>

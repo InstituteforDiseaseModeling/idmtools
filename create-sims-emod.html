@@ -45,7 +45,7 @@
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Run simulations" href="run-sims.html" />
+    <link rel="next" title="Parameter sweeps and model iteration" href="parameter-sweeps.html" />
     <link rel="prev" title="Create simulation tags" href="create-sims-tags.html" />
 
 <link href="https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans" rel="stylesheet">
@@ -77,7 +77,7 @@
             
             
               <div class="version">
-                Beta
+                1.2.0
               </div>
             
           
@@ -101,25 +101,22 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="packages-overview.html">Packages overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="create-sims.html">Create simulations</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="create-sims.html">Create and run simulations</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="create-sims-tags.html">Create simulation tags</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Create EMOD simulations</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="run-sims.html">Run simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calibrate.html">Calibrate simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reports.html">Output reports</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookie-cutter example projects</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reference.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookiecutter example projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Architecture and packages reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
@@ -153,10 +150,10 @@
 
 <div aria-label="breadcrumbs navigation" role="navigation">
     <ul class="wy-breadcrumbs">
-        <li><a href="../index.html">IDM docs</a> &raquo;</li>
+        <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
         <li><a href="index.html">IDM-Tools</a> &raquo;</li>
         
-        <li><a href="create-sims.html">Create simulations</a> &raquo;</li>
+        <li><a href="create-sims.html">Create and run simulations</a> &raquo;</li>
         
         <li>Create EMOD simulations</li>
         <li class="wy-breadcrumbs-aside">
@@ -175,7 +172,7 @@
   <div class="section" id="create-emod-s-simulations">
 <h1>Create EMOD simulations<a class="headerlink" href="#create-emod-s-simulations" title="Permalink to this headline">¶</a></h1>
 <p>To create simulations using EMOD you must use the <strong>emodpy</strong> package included with IDM-Tools. Included with <strong>emodpy</strong> is the <code class="xref py py-class docutils literal notranslate"><span class="pre">emodpy.emod_task.EMODTask</span></code> class, inheriting from the <a class="reference internal" href="idmtools.entities.itask.html#idmtools.entities.itask.ITask" title="idmtools.entities.itask.ITask"><code class="xref py py-class docutils literal notranslate"><span class="pre">ITask</span></code></a> abstract class, and used for the running and configuration of EMOD simulations and experiments.</p>
-<img alt="_images/fa23bb3a41e84efc62a62f39968d754e369b89ce345f6de26cb3b9f9438b403d.svg" class="align-center" src="_images/fa23bb3a41e84efc62a62f39968d754e369b89ce345f6de26cb3b9f9438b403d.svg" /><p>For more information about the architecture of job (simulation/experiment) creation and how EMOD leverages IDM-Tools plugin architecture, see <a class="reference internal" href="architecture.html"><span class="doc">Architecture</span></a>.</p>
+<img alt="_images/fa23bb3a41e84efc62a62f39968d754e369b89ce345f6de26cb3b9f9438b403d.svg" class="align-center" src="_images/fa23bb3a41e84efc62a62f39968d754e369b89ce345f6de26cb3b9f9438b403d.svg" /><p>For more information about the architecture of job (simulation/experiment) creation and how EMOD leverages IDM-Tools plugin architecture, see <a class="reference internal" href="reference.html"><span class="doc">Architecture and packages reference</span></a>.</p>
 <p>The following Python excerpt shows an example of using <strong>EMODTask</strong> class and <strong>from_default</strong> method to create a task object using default config, campaign, and demographic values from <strong>EMODSir</strong> class and to use the Eradication.exe from local directory:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">task</span> <span class="o">=</span> <span class="n">EMODTask</span><span class="o">.</span><span class="n">from_default</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">EMODSir</span><span class="p">(),</span> <span class="n">eradication_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BIN_PATH</span><span class="p">,</span> <span class="s2">&quot;Eradication&quot;</span><span class="p">))</span>
 </pre></div>
@@ -204,7 +201,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="run-sims.html" class="btn btn-neutral float-right" title="Run simulations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="parameter-sweeps.html" class="btn btn-neutral float-right" title="Parameter sweeps and model iteration" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="create-sims-tags.html" class="btn btn-neutral float-left" title="Create simulation tags" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

@@ -19,7 +19,6 @@ Submodules
    idmtools.entities.generic_workitem
    idmtools.entities.ianalyzer
    idmtools.entities.iplatform
-   idmtools.entities.iplatform_metadata
    idmtools.entities.itask
    idmtools.entities.iworkflow_item
    idmtools.entities.platform_requirements

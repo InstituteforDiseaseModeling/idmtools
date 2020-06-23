@@ -71,7 +71,7 @@
             
             
               <div class="version">
-                Beta
+                1.2.0
               </div>
             
           
@@ -95,21 +95,18 @@
             
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="packages-overview.html">Packages overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create simulations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run-sims.html">Run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="calibrate.html">Calibrate simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reports.html">Output reports</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookie-cutter example projects</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reference.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookiecutter example projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Architecture and packages reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
@@ -143,7 +140,7 @@
 
 <div aria-label="breadcrumbs navigation" role="navigation">
     <ul class="wy-breadcrumbs">
-        <li><a href="../index.html">IDM docs</a> &raquo;</li>
+        <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
         <li><a href="index.html">IDM-Tools</a> &raquo;</li>
         
         <li>Index</li>
@@ -257,13 +254,15 @@
       </ul></li>
       <li><a href="idmtools.assets.asset_collection.html#idmtools.assets.asset_collection.AssetCollection.add_tags">add_tags() (idmtools.assets.asset_collection.AssetCollection method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection.html#idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection.RequirementsToAssetCollection.add_wheels_to_assets">add_wheels_to_assets() (idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection.RequirementsToAssetCollection method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="idmtools.analysis.add_analyzer.html#idmtools.analysis.add_analyzer.AddAnalyzer">AddAnalyzer (class in idmtools.analysis.add_analyzer)</a>
 </li>
       <li><a href="idmtools.builders.arm_simulation_builder.html#idmtools.builders.arm_simulation_builder.SweepArm.adjust_values_length">adjust_values_length() (idmtools.builders.arm_simulation_builder.SweepArm method)</a>
+</li>
+      <li><a href="idmtools_platform_comps.comps_operations.simulation_operations.html#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.all_files">all_files() (idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations method)</a>
 </li>
       <li><a href="idmtools.analysis.analyze_manager.html#idmtools.analysis.analyze_manager.AnalyzeManager.analyze">analyze() (idmtools.analysis.analyze_manager.AnalyzeManager method)</a>
 
@@ -292,6 +291,8 @@
       <li><a href="idmtools.builders.arm_simulation_builder.html#idmtools.builders.arm_simulation_builder.ArmSimulationBuilder">ArmSimulationBuilder (class in idmtools.builders.arm_simulation_builder)</a>
 </li>
       <li><a href="idmtools.builders.arm_simulation_builder.html#idmtools.builders.arm_simulation_builder.ArmType">ArmType (class in idmtools.builders.arm_simulation_builder)</a>
+</li>
+      <li><a href="idmtools.utils.entities.html#idmtools.utils.entities.as_dict">as_dict() (in module idmtools.utils.entities)</a>
 </li>
       <li><a href="idmtools.assets.asset.html#idmtools.assets.asset.Asset">Asset (class in idmtools.assets.asset)</a>
 </li>
@@ -458,7 +459,11 @@
 </li>
       </ul></li>
       <li><a href="idmtools_models.python.python_task.html#idmtools_models.python.python_task.PythonTask.command">command() (idmtools_models.python.python_task.PythonTask property)</a>
+
+      <ul>
+        <li><a href="idmtools_models.r.r_task.html#idmtools_models.r.r_task.RTask.command">(idmtools_models.r.r_task.RTask property)</a>
 </li>
+      </ul></li>
       <li><a href="idmtools_models.json_configured_task.html#idmtools_models.json_configured_task.JSONConfiguredTask.command_line_argument">command_line_argument (idmtools_models.json_configured_task.JSONConfiguredTask attribute)</a>
 </li>
       <li><a href="idmtools_models.json_configured_task.html#idmtools_models.json_configured_task.JSONConfiguredTask.command_line_argument_no_filename">command_line_argument_no_filename (idmtools_models.json_configured_task.JSONConfiguredTask attribute)</a>
@@ -491,10 +496,10 @@
 </li>
       <li><a href="idmtools_platform_comps.comps_operations.workflow_item_operations.html#idmtools_platform_comps.comps_operations.workflow_item_operations.CompsPlatformWorkflowItemOperations">CompsPlatformWorkflowItemOperations (class in idmtools_platform_comps.comps_operations.workflow_item_operations)</a>
 </li>
-      <li><a href="idmtools_platform_comps.comps_platform.html#idmtools_platform_comps.comps_platform.COMPSPriority">COMPSPriority (class in idmtools_platform_comps.comps_platform)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="idmtools_platform_comps.comps_platform.html#idmtools_platform_comps.comps_platform.COMPSPriority">COMPSPriority (class in idmtools_platform_comps.comps_platform)</a>
+</li>
       <li><a href="idmtools_models.json_configured_task.html#idmtools_models.json_configured_task.JSONConfiguredTask.config_file_name">config_file_name (idmtools_models.json_configured_task.JSONConfiguredTask attribute)</a>
 </li>
       <li><a href="idmtools_platform_local.infrastructure.base_service_container.html#idmtools_platform_local.infrastructure.base_service_container.BaseServiceContainer.config_prefix">config_prefix (idmtools_platform_local.infrastructure.base_service_container.BaseServiceContainer attribute)</a>
@@ -622,6 +627,8 @@
       <li><a href="idmtools.utils.json.html#idmtools.utils.json.DefaultEncoder.default">default() (idmtools.utils.json.DefaultEncoder method)</a>
 
       <ul>
+        <li><a href="idmtools.utils.json.html#idmtools.utils.json.IDMJSONEncoder.default">(idmtools.utils.json.IDMJSONEncoder method)</a>
+</li>
         <li><a href="idmtools_platform_comps.utils.disk_usage.html#idmtools_platform_comps.utils.disk_usage.DiskEncoder.default">(idmtools_platform_comps.utils.disk_usage.DiskEncoder method)</a>
 </li>
         <li><a href="idmtools_platform_local.internals.ui.utils.html#idmtools_platform_local.internals.ui.utils.DateTimeEncoder.default">(idmtools_platform_local.internals.ui.utils.DateTimeEncoder method)</a>
@@ -677,12 +684,12 @@
 </li>
       <li><a href="idmtools.registry.utils.html#idmtools.registry.utils.discover_plugins_from">discover_plugins_from (in module idmtools.registry.utils)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="idmtools_platform_comps.utils.disk_usage.html#idmtools_platform_comps.utils.disk_usage.DiskEncoder">DiskEncoder (class in idmtools_platform_comps.utils.disk_usage)</a>
 </li>
       <li><a href="idmtools_platform_comps.utils.disk_usage.html#idmtools_platform_comps.utils.disk_usage.DiskSpaceUsage">DiskSpaceUsage (class in idmtools_platform_comps.utils.disk_usage)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="idmtools.core.interfaces.iitem.html#idmtools.core.interfaces.iitem.IItem.display">display() (idmtools.core.interfaces.iitem.IItem method)</a>
 
       <ul>
@@ -740,6 +747,16 @@
 </li>
       </ul></li>
       <li><a href="idmtools.utils.gitrepo.html#idmtools.utils.gitrepo.GitRepo.download">download() (idmtools.utils.gitrepo.GitRepo method)</a>
+</li>
+      <li><a href="idmtools.assets.asset.html#idmtools.assets.asset.Asset.download_generator">download_generator() (idmtools.assets.asset.Asset method)</a>
+</li>
+      <li><a href="idmtools.assets.asset.html#idmtools.assets.asset.Asset.download_generator_hook">download_generator_hook (idmtools.assets.asset.Asset attribute)</a>
+</li>
+      <li><a href="idmtools_platform_local.platform_operations.uitils.html#idmtools_platform_local.platform_operations.uitils.download_lp_file">download_lp_file() (in module idmtools_platform_local.platform_operations.uitils)</a>
+</li>
+      <li><a href="idmtools.assets.asset.html#idmtools.assets.asset.Asset.download_stream">download_stream() (idmtools.assets.asset.Asset method)</a>
+</li>
+      <li><a href="idmtools.assets.asset.html#idmtools.assets.asset.Asset.download_to_path">download_to_path() (idmtools.assets.asset.Asset method)</a>
 </li>
       <li><a href="idmtools.analysis.download_analyzer.html#idmtools.analysis.download_analyzer.DownloadAnalyzer">DownloadAnalyzer (class in idmtools.analysis.download_analyzer)</a>
 </li>
@@ -839,6 +856,8 @@
 </li>
       <li><a href="idmtools.assets.asset.html#idmtools.assets.asset.Asset.extension">extension() (idmtools.assets.asset.Asset property)</a>
 </li>
+      <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.TemplatedScriptTask.extra_command_arguments">extra_command_arguments (idmtools_models.templated_script_task.TemplatedScriptTask attribute)</a>
+</li>
       <li><a href="idmtools_platform_local.cli.experiment.html#idmtools_platform_local.cli.experiment.extra_commands">extra_commands() (in module idmtools_platform_local.cli.experiment)</a>
 </li>
       <li><a href="idmtools_platform_local.internals.data.job_status.html#idmtools_platform_local.internals.data.job_status.JobStatus.extra_details">extra_details (idmtools_platform_local.internals.data.job_status.JobStatus attribute)</a>
@@ -856,6 +875,8 @@
       <li><a href="idmtools_platform_local.status.html#idmtools_platform_local.status.Status.failed">failed (idmtools_platform_local.status.Status attribute)</a>
 </li>
       <li><a href="idmtools_platform_comps.utils.general.html#idmtools_platform_comps.utils.general.fatal_code">fatal_code() (in module idmtools_platform_comps.utils.general)</a>
+</li>
+      <li><a href="idmtools.utils.file.html#idmtools.utils.file.file_contents_to_generator">file_contents_to_generator() (in module idmtools.utils.file)</a>
 </li>
       <li><a href="idmtools.utils.filters.asset_filters.html#idmtools.utils.filters.asset_filters.file_extension_is">file_extension_is() (in module idmtools.utils.filters.asset_filters)</a>
 </li>
@@ -896,7 +917,11 @@
       <li><a href="idmtools_platform_local.platform_operations.experiment_operations.html#idmtools_platform_local.platform_operations.experiment_operations.LocalPlatformExperimentOperations.from_experiment">from_experiment() (idmtools_platform_local.platform_operations.experiment_operations.LocalPlatformExperimentOperations static method)</a>
 </li>
       <li><a href="idmtools.core.interfaces.ientity.html#idmtools.core.interfaces.ientity.IEntity.from_id">from_id() (idmtools.core.interfaces.ientity.IEntity class method)</a>
+
+      <ul>
+        <li><a href="idmtools.entities.experiment.html#idmtools.entities.experiment.Experiment.from_id">(idmtools.entities.experiment.Experiment class method)</a>
 </li>
+      </ul></li>
       <li><a href="idmtools.entities.experiment.html#idmtools.entities.experiment.Experiment.from_task">from_task() (idmtools.entities.experiment.Experiment class method)</a>
 
       <ul>
@@ -930,7 +955,11 @@
 </li>
       </ul></li>
       <li><a href="idmtools.entities.command_task.html#idmtools.entities.command_task.CommandTask.gather_common_asset_hooks">gather_common_asset_hooks (idmtools.entities.command_task.CommandTask attribute)</a>
+
+      <ul>
+        <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.TemplatedScriptTask.gather_common_asset_hooks">(idmtools_models.templated_script_task.TemplatedScriptTask attribute)</a>
 </li>
+      </ul></li>
       <li><a href="idmtools.core.docker_task.html#idmtools.core.docker_task.DockerTask.gather_common_assets">gather_common_assets() (idmtools.core.docker_task.DockerTask method)</a>
 
       <ul>
@@ -948,13 +977,21 @@
 </li>
         <li><a href="idmtools_models.r.r_task.html#idmtools_models.r.r_task.RTask.gather_common_assets">(idmtools_models.r.r_task.RTask method)</a>
 </li>
+        <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.ScriptWrapperTask.gather_common_assets">(idmtools_models.templated_script_task.ScriptWrapperTask method)</a>
+</li>
+        <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.TemplatedScriptTask.gather_common_assets">(idmtools_models.templated_script_task.TemplatedScriptTask method)</a>
+</li>
       </ul></li>
       <li><a href="idmtools.entities.experiment.html#idmtools.entities.experiment.Experiment.gather_common_assets_from_task">gather_common_assets_from_task (idmtools.entities.experiment.Experiment attribute)</a>
 </li>
       <li><a href="idmtools_platform_comps.utils.disk_usage.html#idmtools_platform_comps.utils.disk_usage.DiskSpaceUsage.gather_experiment_info">gather_experiment_info() (idmtools_platform_comps.utils.disk_usage.DiskSpaceUsage static method)</a>
 </li>
       <li><a href="idmtools.entities.command_task.html#idmtools.entities.command_task.CommandTask.gather_transient_asset_hooks">gather_transient_asset_hooks (idmtools.entities.command_task.CommandTask attribute)</a>
+
+      <ul>
+        <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.TemplatedScriptTask.gather_transient_asset_hooks">(idmtools_models.templated_script_task.TemplatedScriptTask attribute)</a>
 </li>
+      </ul></li>
       <li><a href="idmtools.core.docker_task.html#idmtools.core.docker_task.DockerTask.gather_transient_assets">gather_transient_assets() (idmtools.core.docker_task.DockerTask method)</a>
 
       <ul>
@@ -971,6 +1008,10 @@
         <li><a href="idmtools_models.r.json_r_task.html#idmtools_models.r.json_r_task.JSONConfiguredRTask.gather_transient_assets">(idmtools_models.r.json_r_task.JSONConfiguredRTask method)</a>
 </li>
         <li><a href="idmtools_models.r.r_task.html#idmtools_models.r.r_task.RTask.gather_transient_assets">(idmtools_models.r.r_task.RTask method)</a>
+</li>
+        <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.ScriptWrapperTask.gather_transient_assets">(idmtools_models.templated_script_task.ScriptWrapperTask method)</a>
+</li>
+        <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.TemplatedScriptTask.gather_transient_assets">(idmtools_models.templated_script_task.TemplatedScriptTask method)</a>
 </li>
       </ul></li>
       <li><a href="idmtools.entities.generic_workitem.html#idmtools.entities.generic_workitem.GenericWorkItem">GenericWorkItem (class in idmtools.entities.generic_workitem)</a>
@@ -1009,6 +1050,10 @@
         <li><a href="idmtools_models.r.json_r_task.html#idmtools_models.r.json_r_task.JSONConfiguredRTaskSpecification.get">(idmtools_models.r.json_r_task.JSONConfiguredRTaskSpecification method)</a>
 </li>
         <li><a href="idmtools_models.r.r_task.html#idmtools_models.r.r_task.RTaskSpecification.get">(idmtools_models.r.r_task.RTaskSpecification method)</a>
+</li>
+        <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.ScriptWrapperTaskSpecification.get">(idmtools_models.templated_script_task.ScriptWrapperTaskSpecification method)</a>
+</li>
+        <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.TemplatedScriptTaskSpecification.get">(idmtools_models.templated_script_task.TemplatedScriptTaskSpecification method)</a>
 </li>
         <li><a href="idmtools_platform_comps.comps_cli.html#idmtools_platform_comps.comps_cli.COMPSCLISpecification.get">(idmtools_platform_comps.comps_cli.COMPSCLISpecification method)</a>
 </li>
@@ -1065,6 +1110,8 @@
 </li>
       <li><a href="idmtools_platform_local.config.html#idmtools_platform_local.config.get_api_path">get_api_path() (in module idmtools_platform_local.config)</a>
 </li>
+      <li><a href="idmtools_platform_comps.comps_operations.simulation_operations.html#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.get_asset_collection_from_comps_simulation">get_asset_collection_from_comps_simulation() (idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations method)</a>
+</li>
       <li><a href="idmtools_platform_comps.utils.general.html#idmtools_platform_comps.utils.general.get_asset_for_comps_item">get_asset_for_comps_item() (in module idmtools_platform_comps.utils.general)</a>
 </li>
       <li><a href="idmtools.entities.iplatform_ops.iplatform_experiment_operations.html#idmtools.entities.iplatform_ops.iplatform_experiment_operations.IPlatformExperimentOperations.get_assets">get_assets() (idmtools.entities.iplatform_ops.iplatform_experiment_operations.IPlatformExperimentOperations method)</a>
@@ -1087,6 +1134,8 @@
         <li><a href="idmtools_platform_local.platform_operations.simulation_operations.html#idmtools_platform_local.platform_operations.simulation_operations.LocalPlatformSimulationOperations.get_assets">(idmtools_platform_local.platform_operations.simulation_operations.LocalPlatformSimulationOperations method)</a>
 </li>
       </ul></li>
+      <li><a href="idmtools_platform_comps.comps_operations.experiment_operations.html#idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.get_assets_from_comps_experiment">get_assets_from_comps_experiment() (idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations method)</a>
+</li>
       <li><a href="idmtools_platform_comps.ssmt_work_items.comps_workitems.html#idmtools_platform_comps.ssmt_work_items.comps_workitems.SSMTWorkItem.get_base_work_order">get_base_work_order() (idmtools_platform_comps.ssmt_work_items.comps_workitems.SSMTWorkItem method)</a>
 
       <ul>
@@ -1168,6 +1217,10 @@
 </li>
         <li><a href="idmtools_models.r.r_task.html#idmtools_models.r.r_task.RTaskSpecification.get_description">(idmtools_models.r.r_task.RTaskSpecification method)</a>
 </li>
+        <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.ScriptWrapperTaskSpecification.get_description">(idmtools_models.templated_script_task.ScriptWrapperTaskSpecification method)</a>
+</li>
+        <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.TemplatedScriptTaskSpecification.get_description">(idmtools_models.templated_script_task.TemplatedScriptTaskSpecification method)</a>
+</li>
         <li><a href="idmtools_platform_comps.comps_cli.html#idmtools_platform_comps.comps_cli.COMPSCLISpecification.get_description">(idmtools_platform_comps.comps_cli.COMPSCLISpecification method)</a>
 </li>
         <li><a href="idmtools_platform_comps.plugin_info.html#idmtools_platform_comps.plugin_info.COMPSPlatformSpecification.get_description">(idmtools_platform_comps.plugin_info.COMPSPlatformSpecification method)</a>
@@ -1194,6 +1247,10 @@
 </li>
         <li><a href="idmtools_models.r.json_r_task.html#idmtools_models.r.json_r_task.JSONConfiguredRTaskSpecification.get_example_urls">(idmtools_models.r.json_r_task.JSONConfiguredRTaskSpecification method)</a>
 </li>
+        <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.ScriptWrapperTaskSpecification.get_example_urls">(idmtools_models.templated_script_task.ScriptWrapperTaskSpecification method)</a>
+</li>
+        <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.TemplatedScriptTaskSpecification.get_example_urls">(idmtools_models.templated_script_task.TemplatedScriptTaskSpecification method)</a>
+</li>
         <li><a href="idmtools_platform_comps.plugin_info.html#idmtools_platform_comps.plugin_info.COMPSPlatformSpecification.get_example_urls">(idmtools_platform_comps.plugin_info.COMPSPlatformSpecification method)</a>
 </li>
         <li><a href="idmtools_platform_comps.plugin_info.html#idmtools_platform_comps.plugin_info.SSMTPlatformSpecification.get_example_urls">(idmtools_platform_comps.plugin_info.SSMTPlatformSpecification method)</a>
@@ -1209,6 +1266,8 @@
         <li><a href="idmtools_platform_local.local_cli.html#idmtools_platform_local.local_cli.LocalCLI.get_experiment_status">(idmtools_platform_local.local_cli.LocalCLI method)</a>
 </li>
       </ul></li>
+      <li><a href="idmtools_platform_comps.utils.general.html#idmtools_platform_comps.utils.general.get_file_as_generator">get_file_as_generator() (in module idmtools_platform_comps.utils.general)</a>
+</li>
       <li><a href="idmtools_platform_comps.utils.general.html#idmtools_platform_comps.utils.general.get_file_from_collection">get_file_from_collection() (in module idmtools_platform_comps.utils.general)</a>
 </li>
       <li><a href="idmtools.entities.iplatform.html#idmtools.entities.iplatform.IPlatform.get_files">get_files() (idmtools.entities.iplatform.IPlatform method)</a>
@@ -1231,7 +1290,7 @@
 </li>
       <li><a href="idmtools_platform_comps.utils.package_version.html#idmtools_platform_comps.utils.package_version.get_latest_ssmt_image_version_from_artifactory">get_latest_ssmt_image_version_from_artifactory() (in module idmtools_platform_comps.utils.package_version)</a>
 </li>
-      <li><a href="idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection.html#idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection.RequirementsToAssetCollection.get_latest_version">get_latest_version() (idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection.RequirementsToAssetCollection method)</a>
+      <li><a href="idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection.html#idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection.RequirementsToAssetCollection.get_latest_version">get_latest_version() (idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection.RequirementsToAssetCollection static method)</a>
 </li>
       <li><a href="idmtools_platform_comps.utils.package_version.html#idmtools_platform_comps.utils.package_version.get_latest_version_from_site">get_latest_version_from_site() (in module idmtools_platform_comps.utils.package_version)</a>
 </li>
@@ -1351,6 +1410,12 @@
       </ul></li>
       <li><a href="idmtools.utils.decorators.html#idmtools.utils.decorators.ParallelizeDecorator.get_results">get_results() (idmtools.utils.decorators.ParallelizeDecorator method)</a>
 </li>
+      <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.get_script_wrapper_task">get_script_wrapper_task() (in module idmtools_models.templated_script_task)</a>
+</li>
+      <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.get_script_wrapper_unix_task">get_script_wrapper_unix_task() (in module idmtools_models.templated_script_task)</a>
+</li>
+      <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.get_script_wrapper_windows_task">get_script_wrapper_windows_task() (in module idmtools_models.templated_script_task)</a>
+</li>
       <li><a href="idmtools.config.idm_config_parser.html#idmtools.config.idm_config_parser.IdmConfigParser.get_section">get_section() (idmtools.config.idm_config_parser.IdmConfigParser class method)</a>
 </li>
       <li><a href="idmtools_platform_local.cli.utils.html#idmtools_platform_local.cli.utils.get_service_info">get_service_info() (in module idmtools_platform_local.cli.utils)</a>
@@ -1361,7 +1426,7 @@
 </li>
       <li><a href="idmtools_platform_comps.utils.lookups.html#idmtools_platform_comps.utils.lookups.get_simulation_by_id">get_simulation_by_id() (in module idmtools_platform_comps.utils.lookups)</a>
 </li>
-      <li><a href="idmtools_platform_comps.comps_operations.simulation_operations.html#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.get_simulation_config_from_simulation">get_simulation_config_from_simulation() (idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations method)</a>
+      <li><a href="idmtools_platform_comps.comps_operations.simulation_operations.html#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.get_simulation_config_from_simulation">get_simulation_config_from_simulation() (idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations static method)</a>
 </li>
       <li><a href="idmtools_platform_comps.comps_cli.html#idmtools_platform_comps.comps_cli.CompsCLI.get_simulation_status">get_simulation_status() (idmtools_platform_comps.comps_cli.CompsCLI method)</a>
 
@@ -1373,14 +1438,34 @@
 </li>
       <li><a href="idmtools.core.system_information.html#idmtools.core.system_information.get_system_information">get_system_information() (in module idmtools.core.system_information)</a>
 </li>
-      <li><a href="idmtools.entities.experiment.html#idmtools.entities.experiment.ExperimentSpecification.get_type">get_type() (idmtools.entities.experiment.ExperimentSpecification method)</a>
+      <li><a href="idmtools.core.docker_task.html#idmtools.core.docker_task.DockerTaskSpecification.get_type">get_type() (idmtools.core.docker_task.DockerTaskSpecification method)</a>
 
       <ul>
+        <li><a href="idmtools.core.task_factory.html#idmtools.core.task_factory.DynamicTaskSpecification.get_type">(idmtools.core.task_factory.DynamicTaskSpecification method)</a>
+</li>
+        <li><a href="idmtools.entities.command_task.html#idmtools.entities.command_task.CommandTaskSpecification.get_type">(idmtools.entities.command_task.CommandTaskSpecification method)</a>
+</li>
+        <li><a href="idmtools.entities.experiment.html#idmtools.entities.experiment.ExperimentSpecification.get_type">(idmtools.entities.experiment.ExperimentSpecification method)</a>
+</li>
         <li><a href="idmtools.registry.experiment_specification.html#idmtools.registry.experiment_specification.ExperimentPluginSpecification.get_type">(idmtools.registry.experiment_specification.ExperimentPluginSpecification method)</a>
 </li>
         <li><a href="idmtools.registry.platform_specification.html#idmtools.registry.platform_specification.PlatformSpecification.get_type">(idmtools.registry.platform_specification.PlatformSpecification method)</a>
 </li>
         <li><a href="idmtools.registry.task_specification.html#idmtools.registry.task_specification.TaskSpecification.get_type">(idmtools.registry.task_specification.TaskSpecification method)</a>
+</li>
+        <li><a href="idmtools_models.json_configured_task.html#idmtools_models.json_configured_task.JSONConfiguredTaskSpecification.get_type">(idmtools_models.json_configured_task.JSONConfiguredTaskSpecification method)</a>
+</li>
+        <li><a href="idmtools_models.python.json_python_task.html#idmtools_models.python.json_python_task.JSONConfiguredPythonTaskSpecification.get_type">(idmtools_models.python.json_python_task.JSONConfiguredPythonTaskSpecification method)</a>
+</li>
+        <li><a href="idmtools_models.python.python_task.html#idmtools_models.python.python_task.PythonTaskSpecification.get_type">(idmtools_models.python.python_task.PythonTaskSpecification method)</a>
+</li>
+        <li><a href="idmtools_models.r.json_r_task.html#idmtools_models.r.json_r_task.JSONConfiguredRTaskSpecification.get_type">(idmtools_models.r.json_r_task.JSONConfiguredRTaskSpecification method)</a>
+</li>
+        <li><a href="idmtools_models.r.r_task.html#idmtools_models.r.r_task.RTaskSpecification.get_type">(idmtools_models.r.r_task.RTaskSpecification method)</a>
+</li>
+        <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.ScriptWrapperTaskSpecification.get_type">(idmtools_models.templated_script_task.ScriptWrapperTaskSpecification method)</a>
+</li>
+        <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.TemplatedScriptTaskSpecification.get_type">(idmtools_models.templated_script_task.TemplatedScriptTaskSpecification method)</a>
 </li>
         <li><a href="idmtools_platform_comps.plugin_info.html#idmtools_platform_comps.plugin_info.COMPSPlatformSpecification.get_type">(idmtools_platform_comps.plugin_info.COMPSPlatformSpecification method)</a>
 </li>
@@ -1473,6 +1558,8 @@
 </li>
       <li><a href="idmtools.config.idm_config_parser.html#idmtools.config.idm_config_parser.IdmConfigParser">IdmConfigParser (class in idmtools.config.idm_config_parser)</a>
 </li>
+      <li><a href="idmtools.utils.json.html#idmtools.utils.json.IDMJSONEncoder">IDMJSONEncoder (class in idmtools.utils.json)</a>
+</li>
       <li><a href="idmtools.core.logging.html#idmtools.core.logging.IDMQueueHandler">IDMQueueHandler (class in idmtools.core.logging)</a>
 </li>
       <li><a href="idmtools.core.logging.html#idmtools.core.logging.IDMQueueListener">IDMQueueListener (class in idmtools.core.logging)</a>
@@ -1527,6 +1614,8 @@
 </li>
       <li><a href="idmtools.core.cache_enabled.html#module-idmtools.core.cache_enabled">idmtools.core.cache_enabled (module)</a>
 </li>
+      <li><a href="idmtools.core.context.html#module-idmtools.core.context">idmtools.core.context (module)</a>
+</li>
       <li><a href="idmtools.core.docker_task.html#module-idmtools.core.docker_task">idmtools.core.docker_task (module)</a>
 </li>
       <li><a href="idmtools.core.enums.html#module-idmtools.core.enums">idmtools.core.enums (module)</a>
@@ -1568,8 +1657,6 @@
       <li><a href="idmtools.entities.ianalyzer.html#module-idmtools.entities.ianalyzer">idmtools.entities.ianalyzer (module)</a>
 </li>
       <li><a href="idmtools.entities.iplatform.html#module-idmtools.entities.iplatform">idmtools.entities.iplatform (module)</a>
-</li>
-      <li><a href="idmtools.entities.iplatform_metadata.html#module-idmtools.entities.iplatform_metadata">idmtools.entities.iplatform_metadata (module)</a>
 </li>
       <li><a href="idmtools.entities.iplatform_ops.html#module-idmtools.entities.iplatform_ops">idmtools.entities.iplatform_ops (module)</a>
 </li>
@@ -1679,6 +1766,8 @@
 </li>
       <li><a href="idmtools_models.r.r_task.html#module-idmtools_models.r.r_task">idmtools_models.r.r_task (module)</a>
 </li>
+      <li><a href="idmtools_models.templated_script_task.html#module-idmtools_models.templated_script_task">idmtools_models.templated_script_task (module)</a>
+</li>
       <li><a href="idmtools_platform_comps.html#module-idmtools_platform_comps">idmtools_platform_comps (module)</a>
 </li>
       <li><a href="idmtools_platform_comps.cli.html#module-idmtools_platform_comps.cli">idmtools_platform_comps.cli (module)</a>
@@ -1689,10 +1778,10 @@
 </li>
       <li><a href="idmtools_platform_comps.cli.utils.html#module-idmtools_platform_comps.cli.utils">idmtools_platform_comps.cli.utils (module)</a>
 </li>
-      <li><a href="idmtools_platform_comps.comps_cli.html#module-idmtools_platform_comps.comps_cli">idmtools_platform_comps.comps_cli (module)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="idmtools_platform_comps.comps_cli.html#module-idmtools_platform_comps.comps_cli">idmtools_platform_comps.comps_cli (module)</a>
+</li>
       <li><a href="idmtools_platform_comps.comps_operations.html#module-idmtools_platform_comps.comps_operations">idmtools_platform_comps.comps_operations (module)</a>
 </li>
       <li><a href="idmtools_platform_comps.comps_operations.asset_collection_operations.html#module-idmtools_platform_comps.comps_operations.asset_collection_operations">idmtools_platform_comps.comps_operations.asset_collection_operations (module)</a>
@@ -1967,8 +2056,12 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="idmtools_platform_local.local_platform.html#idmtools_platform_local.local_platform.LocalPlatform.launch_created_experiments_in_browser">launch_created_experiments_in_browser (idmtools_platform_local.local_platform.LocalPlatform attribute)</a>
 </li>
-      <li><a href="idmtools.services.ipersistance_service.html#idmtools.services.ipersistance_service.IPersistenceService.length">length() (idmtools.services.ipersistance_service.IPersistenceService class method)</a>
+      <li><a href="idmtools.assets.asset.html#idmtools.assets.asset.Asset.length">length() (idmtools.assets.asset.Asset property)</a>
+
+      <ul>
+        <li><a href="idmtools.services.ipersistance_service.html#idmtools.services.ipersistance_service.IPersistenceService.length">(idmtools.services.ipersistance_service.IPersistenceService class method)</a>
 </li>
+      </ul></li>
       <li><a href="idmtools_platform_comps.utils.package_version.html#idmtools_platform_comps.utils.package_version.LinkHTMLParser">LinkHTMLParser (class in idmtools_platform_comps.utils.package_version)</a>
 </li>
       <li><a href="idmtools.entities.platform_requirements.html#idmtools.entities.platform_requirements.PlatformRequirements.LINUX">LINUX (idmtools.entities.platform_requirements.PlatformRequirements attribute)</a>
@@ -1988,6 +2081,8 @@
 </li>
         <li><a href="idmtools_platform_comps.comps_operations.workflow_item_operations.html#idmtools_platform_comps.comps_operations.workflow_item_operations.CompsPlatformWorkflowItemOperations.list_assets">(idmtools_platform_comps.comps_operations.workflow_item_operations.CompsPlatformWorkflowItemOperations method)</a>
 </li>
+        <li><a href="idmtools_platform_local.platform_operations.experiment_operations.html#idmtools_platform_local.platform_operations.experiment_operations.LocalPlatformExperimentOperations.list_assets">(idmtools_platform_local.platform_operations.experiment_operations.LocalPlatformExperimentOperations method)</a>
+</li>
         <li><a href="idmtools_platform_local.platform_operations.simulation_operations.html#idmtools_platform_local.platform_operations.simulation_operations.LocalPlatformSimulationOperations.list_assets">(idmtools_platform_local.platform_operations.simulation_operations.LocalPlatformSimulationOperations method)</a>
 </li>
       </ul></li>
@@ -1995,18 +2090,24 @@
 </li>
       <li><a href="idmtools.utils.gitrepo.html#idmtools.utils.gitrepo.GitRepo.list_repo_releases">list_repo_releases() (idmtools.utils.gitrepo.GitRepo method)</a>
 </li>
+      <li><a href="idmtools.entities.experiment.html#idmtools.entities.experiment.Experiment.list_static_assets">list_static_assets() (idmtools.entities.experiment.Experiment method)</a>
+
+      <ul>
+        <li><a href="idmtools.entities.simulation.html#idmtools.entities.simulation.Simulation.list_static_assets">(idmtools.entities.simulation.Simulation method)</a>
+</li>
+      </ul></li>
       <li><a href="idmtools.utils.file_parser.html#idmtools.utils.file_parser.FileParser.load_bin_file">load_bin_file() (idmtools.utils.file_parser.FileParser class method)</a>
 </li>
       <li><a href="idmtools.utils.file_parser.html#idmtools.utils.file_parser.FileParser.load_csv_file">load_csv_file() (idmtools.utils.file_parser.FileParser class method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="idmtools.utils.file_parser.html#idmtools.utils.file_parser.FileParser.load_json_file">load_json_file() (idmtools.utils.file_parser.FileParser class method)</a>
 
       <ul>
         <li><a href="idmtools.utils.json.html#idmtools.utils.json.load_json_file">(in module idmtools.utils.json)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="idmtools.registry.utils.html#idmtools.registry.utils.load_plugin_map">load_plugin_map() (in module idmtools.registry.utils)</a>
 </li>
       <li><a href="idmtools.utils.file_parser.html#idmtools.utils.file_parser.FileParser.load_raw_file">load_raw_file() (idmtools.utils.file_parser.FileParser class method)</a>
@@ -2191,6 +2292,8 @@
 </li>
       <li><a href="idmtools_models.json_configured_task.html#idmtools_models.json_configured_task.JSONConfiguredTask.parameters">parameters (idmtools_models.json_configured_task.JSONConfiguredTask attribute)</a>
 </li>
+      <li><a href="idmtools.entities.templated_simulation.html#idmtools.entities.templated_simulation.TemplatedSimulations.parent">parent (idmtools.entities.templated_simulation.TemplatedSimulations attribute)</a>
+</li>
       <li><a href="idmtools.core.interfaces.ientity.html#idmtools.core.interfaces.ientity.IEntity.parent">parent() (idmtools.core.interfaces.ientity.IEntity property)</a>
 </li>
       <li><a href="idmtools.core.interfaces.ientity.html#idmtools.core.interfaces.ientity.IEntity.parent_id">parent_id (idmtools.core.interfaces.ientity.IEntity attribute)</a>
@@ -2208,6 +2311,8 @@
       <li><a href="idmtools_platform_local.infrastructure.postgres.html#idmtools_platform_local.infrastructure.postgres.PostgresContainer.password">password (idmtools_platform_local.infrastructure.postgres.PostgresContainer attribute)</a>
 </li>
       <li><a href="idmtools.utils.gitrepo.html#idmtools.utils.gitrepo.GitRepo.path">path() (idmtools.utils.gitrepo.GitRepo property)</a>
+</li>
+      <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.TemplatedScriptTask.path_sep">path_sep (idmtools_models.templated_script_task.TemplatedScriptTask attribute)</a>
 </li>
       <li><a href="idmtools_platform_local.client.experiments_client.html#idmtools_platform_local.client.experiments_client.ExperimentsClient.path_url">path_url (idmtools_platform_local.client.experiments_client.ExperimentsClient attribute)</a>
 
@@ -2303,6 +2408,12 @@
       </ul></li>
       <li><a href="idmtools.core.interfaces.ientity.html#idmtools.core.interfaces.ientity.IEntity.platform_id">platform_id (idmtools.core.interfaces.ientity.IEntity attribute)</a>
 </li>
+      <li><a href="idmtools.entities.iplatform_ops.iplatform_experiment_operations.html#idmtools.entities.iplatform_ops.iplatform_experiment_operations.IPlatformExperimentOperations.platform_list_asset">platform_list_asset() (idmtools.entities.iplatform_ops.iplatform_experiment_operations.IPlatformExperimentOperations method)</a>
+
+      <ul>
+        <li><a href="idmtools_platform_comps.comps_operations.experiment_operations.html#idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.platform_list_asset">(idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations method)</a>
+</li>
+      </ul></li>
       <li><a href="idmtools.entities.experiment.html#idmtools.entities.experiment.Experiment.platform_requirements">platform_requirements (idmtools.entities.experiment.Experiment attribute)</a>
 
       <ul>
@@ -2365,14 +2476,14 @@
 </li>
       <li><a href="idmtools.services.platforms.html#idmtools.services.platforms.PlatformPersistService">PlatformPersistService (class in idmtools.services.platforms)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="idmtools.registry.platform_specification.html#idmtools.registry.platform_specification.PlatformPlugins">PlatformPlugins (class in idmtools.registry.platform_specification)</a>
 </li>
       <li><a href="idmtools.entities.platform_requirements.html#idmtools.entities.platform_requirements.PlatformRequirements">PlatformRequirements (class in idmtools.entities.platform_requirements)</a>
 </li>
       <li><a href="idmtools.registry.platform_specification.html#idmtools.registry.platform_specification.PlatformSpecification">PlatformSpecification (class in idmtools.registry.platform_specification)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="idmtools_platform_comps.ssmt_work_items.icomps_workflowitem.html#idmtools_platform_comps.ssmt_work_items.icomps_workflowitem.ICOMPSWorkflowItem.plugin_key">plugin_key (idmtools_platform_comps.ssmt_work_items.icomps_workflowitem.ICOMPSWorkflowItem attribute)</a>
 </li>
       <li><a href="idmtools.registry.utils.html#idmtools.registry.utils.plugins_loader">plugins_loader() (in module idmtools.registry.utils)</a>
@@ -2421,6 +2532,12 @@
         <li><a href="idmtools.entities.simulation.html#idmtools.entities.simulation.Simulation.post_creation">(idmtools.entities.simulation.Simulation method)</a>
 </li>
         <li><a href="idmtools.entities.suite.html#idmtools.entities.suite.Suite.post_creation">(idmtools.entities.suite.Suite method)</a>
+</li>
+        <li><a href="idmtools_models.python.json_python_task.html#idmtools_models.python.json_python_task.JSONConfiguredPythonTask.post_creation">(idmtools_models.python.json_python_task.JSONConfiguredPythonTask method)</a>
+</li>
+        <li><a href="idmtools_models.r.json_r_task.html#idmtools_models.r.json_r_task.JSONConfiguredRTask.post_creation">(idmtools_models.r.json_r_task.JSONConfiguredRTask method)</a>
+</li>
+        <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.ScriptWrapperTask.post_creation">(idmtools_models.templated_script_task.ScriptWrapperTask method)</a>
 </li>
       </ul></li>
       <li><a href="idmtools.entities.iplatform_ops.iplatform_experiment_operations.html#idmtools.entities.iplatform_ops.iplatform_experiment_operations.IPlatformExperimentOperations.post_run_item">post_run_item() (idmtools.entities.iplatform_ops.iplatform_experiment_operations.IPlatformExperimentOperations method)</a>
@@ -2504,6 +2621,18 @@
 </li>
         <li><a href="idmtools_models.json_configured_task.html#idmtools_models.json_configured_task.JSONConfiguredTask.pre_creation">(idmtools_models.json_configured_task.JSONConfiguredTask method)</a>
 </li>
+        <li><a href="idmtools_models.python.json_python_task.html#idmtools_models.python.json_python_task.JSONConfiguredPythonTask.pre_creation">(idmtools_models.python.json_python_task.JSONConfiguredPythonTask method)</a>
+</li>
+        <li><a href="idmtools_models.python.python_task.html#idmtools_models.python.python_task.PythonTask.pre_creation">(idmtools_models.python.python_task.PythonTask method)</a>
+</li>
+        <li><a href="idmtools_models.r.json_r_task.html#idmtools_models.r.json_r_task.JSONConfiguredRTask.pre_creation">(idmtools_models.r.json_r_task.JSONConfiguredRTask method)</a>
+</li>
+        <li><a href="idmtools_models.r.r_task.html#idmtools_models.r.r_task.RTask.pre_creation">(idmtools_models.r.r_task.RTask method)</a>
+</li>
+        <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.ScriptWrapperTask.pre_creation">(idmtools_models.templated_script_task.ScriptWrapperTask method)</a>
+</li>
+        <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.TemplatedScriptTask.pre_creation">(idmtools_models.templated_script_task.TemplatedScriptTask method)</a>
+</li>
       </ul></li>
       <li><a href="idmtools.entities.simulation.html#idmtools.entities.simulation.Simulation.pre_creation_hooks">pre_creation_hooks (idmtools.entities.simulation.Simulation attribute)</a>
 </li>
@@ -2534,6 +2663,8 @@
       <li><a href="idmtools_platform_local.cli.simulation.html#idmtools_platform_local.cli.simulation.prettify_simulation">prettify_simulation() (in module idmtools_platform_local.cli.simulation)</a>
 </li>
       <li><a href="idmtools_platform_comps.utils.package_version.html#idmtools_platform_comps.utils.package_version.LinkHTMLParser.previous_tag">previous_tag (idmtools_platform_comps.utils.package_version.LinkHTMLParser attribute)</a>
+</li>
+      <li><a href="idmtools.entities.experiment.html#idmtools.entities.experiment.Experiment.print">print() (idmtools.entities.experiment.Experiment method)</a>
 </li>
       <li><a href="idmtools_platform_comps.comps_platform.html#idmtools_platform_comps.comps_platform.COMPSPlatform.priority">priority (idmtools_platform_comps.comps_platform.COMPSPlatform attribute)</a>
 </li>
@@ -2672,13 +2803,23 @@
 </li>
         <li><a href="idmtools_models.json_configured_task.html#idmtools_models.json_configured_task.JSONConfiguredTask.reload_from_simulation">(idmtools_models.json_configured_task.JSONConfiguredTask method)</a>
 </li>
+        <li><a href="idmtools_models.python.json_python_task.html#idmtools_models.python.json_python_task.JSONConfiguredPythonTask.reload_from_simulation">(idmtools_models.python.json_python_task.JSONConfiguredPythonTask method)</a>
+</li>
         <li><a href="idmtools_models.python.python_task.html#idmtools_models.python.python_task.PythonTask.reload_from_simulation">(idmtools_models.python.python_task.PythonTask method)</a>
 </li>
+        <li><a href="idmtools_models.r.json_r_task.html#idmtools_models.r.json_r_task.JSONConfiguredRTask.reload_from_simulation">(idmtools_models.r.json_r_task.JSONConfiguredRTask method)</a>
+</li>
         <li><a href="idmtools_models.r.r_task.html#idmtools_models.r.r_task.RTask.reload_from_simulation">(idmtools_models.r.r_task.RTask method)</a>
+</li>
+        <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.ScriptWrapperTask.reload_from_simulation">(idmtools_models.templated_script_task.ScriptWrapperTask method)</a>
+</li>
+        <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.TemplatedScriptTask.reload_from_simulation">(idmtools_models.templated_script_task.TemplatedScriptTask method)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="idmtools.core.context.html#idmtools.core.context.remove_current_platform">remove_current_platform() (in module idmtools.core.context)</a>
+</li>
       <li><a href="idmtools.utils.gitrepo.html#idmtools.utils.gitrepo.GitRepo.repo_example_url">repo_example_url() (idmtools.utils.gitrepo.GitRepo property)</a>
 </li>
       <li><a href="idmtools.utils.gitrepo.html#idmtools.utils.gitrepo.GitRepo.repo_home_url">repo_home_url() (idmtools.utils.gitrepo.GitRepo property)</a>
@@ -2706,6 +2847,8 @@
       <li><a href="idmtools.services.ipersistance_service.html#idmtools.services.ipersistance_service.IPersistenceService.retrieve">retrieve() (idmtools.services.ipersistance_service.IPersistenceService class method)</a>
 </li>
       <li><a href="idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection.html#idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection.RequirementsToAssetCollection.retrieve_ac_by_tag">retrieve_ac_by_tag() (idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection.RequirementsToAssetCollection method)</a>
+</li>
+      <li><a href="idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection.html#idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection.RequirementsToAssetCollection.retrieve_ac_from_wi">retrieve_ac_from_wi() (idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection.RequirementsToAssetCollection method)</a>
 </li>
       <li><a href="idmtools.config.idm_config_parser.html#idmtools.config.idm_config_parser.IdmConfigParser.retrieve_dict_config_block">retrieve_dict_config_block() (idmtools.config.idm_config_parser.IdmConfigParser class method)</a>
 </li>
@@ -2781,9 +2924,17 @@
 </li>
       <li><a href="idmtools.utils.file.html#idmtools.utils.file.scan_directory">scan_directory() (in module idmtools.utils.file)</a>
 </li>
-      <li><a href="idmtools_models.r.r_task.html#idmtools_models.r.r_task.RTask.script_name">script_name (idmtools_models.r.r_task.RTask attribute)</a>
-</li>
       <li><a href="idmtools_models.python.python_task.html#idmtools_models.python.python_task.PythonTask.script_path">script_path (idmtools_models.python.python_task.PythonTask attribute)</a>
+
+      <ul>
+        <li><a href="idmtools_models.r.r_task.html#idmtools_models.r.r_task.RTask.script_path">(idmtools_models.r.r_task.RTask attribute)</a>
+</li>
+        <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.TemplatedScriptTask.script_path">(idmtools_models.templated_script_task.TemplatedScriptTask attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.ScriptWrapperTask">ScriptWrapperTask (class in idmtools_models.templated_script_task)</a>
+</li>
+      <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.ScriptWrapperTaskSpecification">ScriptWrapperTaskSpecification (class in idmtools_models.templated_script_task)</a>
 </li>
       <li><a href="idmtools.entities.iplatform_ops.iplatform_experiment_operations.html#idmtools.entities.iplatform_ops.iplatform_experiment_operations.IPlatformExperimentOperations.send_assets">send_assets() (idmtools.entities.iplatform_ops.iplatform_experiment_operations.IPlatformExperimentOperations method)</a>
 
@@ -2805,6 +2956,8 @@
       </ul></li>
       <li><a href="idmtools.assets.asset_collection.html#idmtools.assets.asset_collection.AssetCollection.set_all_persisted">set_all_persisted() (idmtools.assets.asset_collection.AssetCollection method)</a>
 </li>
+      <li><a href="idmtools.core.context.html#idmtools.core.context.set_current_platform">set_current_platform() (in module idmtools.core.context)</a>
+</li>
       <li><a href="idmtools_models.json_configured_task.html#idmtools_models.json_configured_task.JSONConfiguredTask.set_parameter">set_parameter() (idmtools_models.json_configured_task.JSONConfiguredTask method)</a>
 </li>
       <li><a href="idmtools_models.json_configured_task.html#idmtools_models.json_configured_task.JSONConfiguredTask.set_parameter_partial">set_parameter_partial() (idmtools_models.json_configured_task.JSONConfiguredTask class method)</a>
@@ -2821,9 +2974,13 @@
 </li>
       <li><a href="idmtools_platform_local.infrastructure.service_manager.html#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.setup_broker">setup_broker() (idmtools_platform_local.infrastructure.service_manager.DockerServiceManager static method)</a>
 </li>
+      <li><a href="idmtools.core.logging.html#idmtools.core.logging.setup_handlers">setup_handlers() (in module idmtools.core.logging)</a>
+</li>
       <li><a href="idmtools.core.logging.html#idmtools.core.logging.setup_logging">setup_logging() (in module idmtools.core.logging)</a>
 </li>
       <li><a href="idmtools.entities.platform_requirements.html#idmtools.entities.platform_requirements.PlatformRequirements.SHELL">SHELL (idmtools.entities.platform_requirements.PlatformRequirements attribute)</a>
+</li>
+      <li><a href="idmtools.entities.iplatform_ops.utils.html#idmtools.entities.iplatform_ops.utils.show_progress_of_batch">show_progress_of_batch() (in module idmtools.entities.iplatform_ops.utils)</a>
 </li>
       <li><a href="idmtools_platform_local.internals.ui.controllers.simulations.html#idmtools_platform_local.internals.ui.controllers.simulations.sim_status">sim_status() (in module idmtools_platform_local.internals.ui.controllers.simulations)</a>
 </li>
@@ -2841,12 +2998,12 @@
 </li>
       <li><a href="idmtools.builders.simulation_builder.html#idmtools.builders.simulation_builder.SimulationBuilder">SimulationBuilder (class in idmtools.builders.simulation_builder)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="idmtools_platform_local.platform_operations.uitils.html#idmtools_platform_local.platform_operations.uitils.SimulationDict">SimulationDict (class in idmtools_platform_local.platform_operations.uitils)</a>
 </li>
       <li><a href="idmtools_platform_local.internals.ui.controllers.simulations.html#idmtools_platform_local.internals.ui.controllers.simulations.Simulations">Simulations (class in idmtools_platform_local.internals.ui.controllers.simulations)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="idmtools.entities.experiment.html#idmtools.entities.experiment.Experiment.simulations">simulations() (idmtools.entities.experiment.Experiment property)</a>
 
       <ul>
@@ -2856,6 +3013,8 @@
       <li><a href="idmtools_platform_local.client.simulations_client.html#idmtools_platform_local.client.simulations_client.SimulationsClient">SimulationsClient (class in idmtools_platform_local.client.simulations_client)</a>
 </li>
       <li><a href="idmtools.utils.decorators.html#idmtools.utils.decorators.SingletonDecorator">SingletonDecorator (class in idmtools.utils.decorators)</a>
+</li>
+      <li><a href="idmtools.entities.platform_requirements.html#idmtools.entities.platform_requirements.PlatformRequirements.SINGULARITY">SINGULARITY (idmtools.entities.platform_requirements.PlatformRequirements attribute)</a>
 </li>
       <li><a href="idmtools_platform_local.cli.local.html#idmtools_platform_local.cli.local.LocalCliContext.sm">sm (idmtools_platform_local.cli.local.LocalCliContext attribute)</a>
 </li>
@@ -2960,6 +3119,8 @@
       <ul>
         <li><a href="idmtools.entities.simulation.html#idmtools.entities.simulation.Simulation.task">(idmtools.entities.simulation.Simulation attribute)</a>
 </li>
+        <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.ScriptWrapperTask.task">(idmtools_models.templated_script_task.ScriptWrapperTask attribute)</a>
+</li>
       </ul></li>
       <li><a href="idmtools.entities.experiment.html#idmtools.entities.experiment.Experiment.task_type">task_type (idmtools.entities.experiment.Experiment attribute)</a>
 </li>
@@ -2972,6 +3133,20 @@
       <li><a href="idmtools.registry.task_specification.html#idmtools.registry.task_specification.TaskSpecification">TaskSpecification (class in idmtools.registry.task_specification)</a>
 </li>
       <li><a href="glossary.html#term-template"><strong>template</strong></a>
+
+      <ul>
+        <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.TemplatedScriptTask.template">(idmtools_models.templated_script_task.TemplatedScriptTask attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.TemplatedScriptTask.template_file">template_file (idmtools_models.templated_script_task.TemplatedScriptTask attribute)</a>
+</li>
+      <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.TemplatedScriptTask.template_is_common">template_is_common (idmtools_models.templated_script_task.TemplatedScriptTask attribute)</a>
+</li>
+      <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.ScriptWrapperTask.template_script_task">template_script_task (idmtools_models.templated_script_task.ScriptWrapperTask attribute)</a>
+</li>
+      <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.TemplatedScriptTask">TemplatedScriptTask (class in idmtools_models.templated_script_task)</a>
+</li>
+      <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.TemplatedScriptTaskSpecification">TemplatedScriptTaskSpecification (class in idmtools_models.templated_script_task)</a>
 </li>
       <li><a href="idmtools.entities.templated_simulation.html#idmtools.entities.templated_simulation.TemplatedSimulations">TemplatedSimulations (class in idmtools.entities.templated_simulation)</a>
 </li>
@@ -2979,10 +3154,22 @@
 </li>
       <li><a href="idmtools_platform_comps.comps_operations.simulation_operations.html#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.to_comps_sim">to_comps_sim() (idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations method)</a>
 </li>
-      <li><a href="idmtools_platform_local.internals.data.job_status.html#idmtools_platform_local.internals.data.job_status.JobStatus.to_dict">to_dict() (idmtools_platform_local.internals.data.job_status.JobStatus method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="idmtools.entities.experiment.html#idmtools.entities.experiment.Experiment.to_dict">to_dict() (idmtools.entities.experiment.Experiment method)</a>
+
+      <ul>
+        <li><a href="idmtools.entities.itask.html#idmtools.entities.itask.ITask.to_dict">(idmtools.entities.itask.ITask method)</a>
+</li>
+        <li><a href="idmtools.entities.iworkflow_item.html#idmtools.entities.iworkflow_item.IWorkflowItem.to_dict">(idmtools.entities.iworkflow_item.IWorkflowItem method)</a>
+</li>
+        <li><a href="idmtools.entities.simulation.html#idmtools.entities.simulation.Simulation.to_dict">(idmtools.entities.simulation.Simulation method)</a>
+</li>
+        <li><a href="idmtools.entities.suite.html#idmtools.entities.suite.Suite.to_dict">(idmtools.entities.suite.Suite method)</a>
+</li>
+        <li><a href="idmtools_platform_local.internals.data.job_status.html#idmtools_platform_local.internals.data.job_status.JobStatus.to_dict">(idmtools_platform_local.internals.data.job_status.JobStatus method)</a>
+</li>
+      </ul></li>
       <li><a href="idmtools.entities.iplatform_ops.iplatform_asset_collection_operations.html#idmtools.entities.iplatform_ops.iplatform_asset_collection_operations.IPlatformAssetCollectionOperations.to_entity">to_entity() (idmtools.entities.iplatform_ops.iplatform_asset_collection_operations.IPlatformAssetCollectionOperations method)</a>
 
       <ul>
@@ -3085,6 +3272,8 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.TemplatedScriptTask.variables">variables (idmtools_models.templated_script_task.TemplatedScriptTask attribute)</a>
+</li>
       <li><a href="idmtools.utils.gitrepo.html#idmtools.utils.gitrepo.GitRepo.verbose">verbose() (idmtools.utils.gitrepo.GitRepo property)</a>
 </li>
       <li><a href="idmtools.utils.language.html#idmtools.utils.language.verbose_timedelta">verbose_timedelta() (in module idmtools.utils.language)</a>
