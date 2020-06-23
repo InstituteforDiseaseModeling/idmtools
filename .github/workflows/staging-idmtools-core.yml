@@ -7,7 +7,7 @@ on:
     branches:
       # only run this on
       - dev
-      - release-*
+      - 'release**'
     paths:
       - 'idmtools_core/**'
 
