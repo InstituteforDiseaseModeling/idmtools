@@ -1,0 +1,11 @@
+version: 2
+updates:
+  - package-ecosystem: "pip" # See documentation for possible values
+    directory: "/" # Location of package manifests
+    target_branch: "dev"
+    default_reviewers:
+     - "devclinton"
+     - "shchen-idmod"
+     - "ZDi-idm
+    schedule:
+      interval: "daily"
