@@ -233,6 +233,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         requirements_path = os.path.join(model_path, 'requirements3.txt')
         pl = RequirementsToAssetCollection(self.platform, requirements_path=requirements_path)
         ac_id = pl.run(rerun=False)
+        self.assertIsNotNone(ac_id)
         common_assets = AssetCollection.from_id(ac_id, platform=self.platform)
 
         # create python task with script 'seaborn_file.py', task is doing this in comps: "python ./Assets/seaborn_file.py"

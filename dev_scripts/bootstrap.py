@@ -8,6 +8,8 @@ from logging import getLogger
 from os.path import abspath, join, dirname
 
 # on windows virtual env is not populated through pymake
+from typing import List, Generator
+
 if sys.platform == "win32" and 'VIRTUAL_ENV' in os.environ:
     sys.path.insert(0, os.environ['VIRTUAL_ENV'] + "\\Lib\\site-packages")
 
@@ -63,7 +65,20 @@ packages = dict(
 )
 
 
-def execute(cmd, cwd):
+def execute(cmd: List['str'], cwd: str) -> Generator[str, None, None]:
+    """
+    Runs a command and filters output
+
+    Args:
+        cmd: Command to run
+        cwd: Working directory
+
+    Returns:
+        Generator returning each line
+
+    Raises:
+        CalledProcessError if the return code was not 0
+    """
     popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, cwd=cwd)
     for stdout_line in iter(popen.stdout.readline, ""):
         yield stdout_line
@@ -77,17 +92,26 @@ escapes = ''.join([chr(char) for char in range(1, 32)])
 translator = str.maketrans('', '', escapes)
 
 
-def process_output(line):
+def process_output(output_line: str):
+    """
+    Process output
+
+    Args:
+        output_line: Output line
+
+    Returns:
+        None. Instead prints to log level on screen
+    """
     # catch errors where possible
-    if "FAILED [" in line:
-        logger.critical(line.strip())
-    elif any([s in line for s in ["Successfully", "SUCCESS"]]):
-        logger.log(35, line.strip())
-    elif any([s in line for s in ["WARNING", "SKIPPED"]]):
-        logger.warning(line.strip())
+    if "FAILED [" in output_line:
+        logger.critical(output_line.strip())
+    elif any([s in output_line for s in ["Successfully", "SUCCESS"]]):
+        logger.log(35, output_line.strip())
+    elif any([s in output_line for s in ["WARNING", "SKIPPED"]]):
+        logger.warning(output_line.strip())
     else:
-        line = line.strip().translate(translator)
-        logger.debug("".join(ch for ch in line if unicodedata.category(ch)[0] != "C"))
+        output_line = output_line.strip().translate(translator)
+        logger.debug("".join(ch for ch in output_line if unicodedata.category(ch)[0] != "C"))
 
 
 # loop through and install our packages

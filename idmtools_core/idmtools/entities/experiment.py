@@ -1,16 +1,17 @@
 import copy
 import uuid
-from dataclasses import dataclass, field, InitVar
-from logging import getLogger
+from dataclasses import dataclass, field, InitVar, fields
+from logging import getLogger, DEBUG
 from types import GeneratorType
-from typing import NoReturn, Set, Union, Iterator, Type, Dict, Any, List
-
-from idmtools.assets import AssetCollection
+from typing import NoReturn, Set, Union, Iterator, Type, Dict, Any, List, TYPE_CHECKING, Generator
+from tqdm import tqdm
+from idmtools.assets import AssetCollection, Asset
 from idmtools.builders import SimulationBuilder
-from idmtools.core import ItemType, NoPlatformException, EntityStatus
+from idmtools.core import ItemType, EntityStatus
 from idmtools.core.interfaces.entity_container import EntityContainer
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.core.interfaces.inamed_entity import INamedEntity
+from idmtools.core.logging import SUCCESS, NOTICE
 from idmtools.entities.itask import ITask
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.templated_simulation import TemplatedSimulations
@@ -20,9 +21,18 @@ from idmtools.registry.plugin_specification import get_description_impl
 from idmtools.utils.collections import ParentIterator
 from idmtools.utils.entities import get_default_tags
 
-logger = getLogger(__name__)
+if TYPE_CHECKING:
+    from idmtools.entities.iplatform import IPlatform
+    from idmtools.entities.simulation import Simulation  # noqa: F401
 
-SUPPORTED_SIM_TYPE = Union[EntityContainer, GeneratorType, TemplatedSimulations, Iterator]
+logger = getLogger(__name__)
+user_logger = getLogger('user')
+SUPPORTED_SIM_TYPE = Union[
+    EntityContainer,
+    Generator['Simulation', None, None],
+    TemplatedSimulations,
+    Iterator['Simulation']
+]
 
 
 @dataclass(repr=False)
@@ -35,19 +45,26 @@ class Experiment(IAssetsEnabled, INamedEntity):
         name: The experiment name.
         assets: The asset collection for assets global to this experiment.
     """
+    #: Suite ID
     suite_id: uuid = field(default=None)
-
+    #: Item Item(always an experiment)
     item_type: ItemType = field(default=ItemType.EXPERIMENT, compare=False, init=False)
+    #: Task Type(defaults to command)
     task_type: str = field(default='idmtools.entities.command_task.CommandTask')
+    #: List of Requirements for the task that a platform must meet to be able to run
     platform_requirements: Set[PlatformRequirements] = field(default_factory=set)
+    #: Is the Experiment Frozen
     frozen: bool = field(default=False, init=False)
+    #: Simulation in this experiment
     simulations: InitVar[SUPPORTED_SIM_TYPE] = None
+    #: Internal storage of simulation
     __simulations: Union[SUPPORTED_SIM_TYPE] = field(default_factory=lambda: EntityContainer(), compare=False)
 
-    # whether we should gather assets from the first task. This should be autodected based on simulations
+    #: Determines if we should gather assets from a the first task. Only use when not using TemplatedSimulations
     gather_common_assets_from_task: bool = field(default=None, compare=False)
 
-    # control whether we should replace the task with a proxy after creation to conser
+    #: Enable replacing the task with a proxy to reduce the memory footprint. Useful in provisioning large sets of
+    # simulations
     __replace_task_with_proxy: bool = field(default=True, init=False, compare=False)
 
     def __post_init__(self, simulations):
@@ -94,18 +111,26 @@ class Experiment(IAssetsEnabled, INamedEntity):
 
         # if it is a template, set task type on experiment
         if isinstance(self.simulations, ParentIterator) and isinstance(self.simulations.items, TemplatedSimulations):
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Using Base task from template for experiment level assets")
             self.simulations.items.base_task.gather_common_assets()
             self.assets.add_assets(self.simulations.items.base_task.common_assets, fail_on_duplicate=False)
             if "task_type" not in self.tags:
                 task_class = self.simulations.items.base_task.__class__
                 self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
         elif self.gather_common_assets_from_task and isinstance(self.__simulations, List):
-            task_class = self.simulations[0].task.__class__
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Using first task for task type")
+                logger.debug("Using all tasks to gather assts")
+            task_class = self.__simulations[0].task.__class__
             self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
-            for sim in self.simulations:
-                assets = sim.task.gather_common_assets()
-                if assets is not None:
-                    self.assets.add_assets(assets, fail_on_duplicate=False)
+            pbar = tqdm(self.__simulations, desc="Discovering experiment assets from tasks")
+            for sim in pbar:
+                # don't gather assets from simulations that have been provisioned
+                if sim.status is None:
+                    assets = sim.task.gather_common_assets()
+                    if assets is not None:
+                        self.assets.add_assets(assets, fail_on_duplicate=False)
 
         self.tags.update(get_default_tags())
 
@@ -130,7 +155,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
         return all([s.succeeded for s in self.simulations])
 
     @property
-    def simulations(self):
+    def simulations(self) -> Iterator['Simulation']:
         return ParentIterator(self.__simulations, parent=self)
 
     @simulations.setter
@@ -148,14 +173,14 @@ class Experiment(IAssetsEnabled, INamedEntity):
             self.gather_common_assets_from_task = isinstance(simulations, (GeneratorType, EntityContainer))
             self.__simulations = simulations
         elif isinstance(simulations, (list, set)):
-            from idmtools.entities.simulation import Simulation
+            from idmtools.entities.simulation import Simulation  # noqa: F811
             self.gather_common_assets_from_task = True
-            self.simulations = EntityContainer()
+            self.__simulations = EntityContainer()
             for sim in simulations:
                 if isinstance(sim, ITask):
-                    self.simulations.append(sim.to_simulation())
+                    self.__simulations.append(sim.to_simulation())
                 elif isinstance(sim, Simulation):
-                    self.simulations.append(sim)
+                    self.__simulations.append(sim)
                 else:
                     raise ValueError("Only list of tasks/simulations can be passed to experiment simulations")
         else:
@@ -203,6 +228,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
 
         Args:
             task: Task to use
+            assets: Asset collection to use for common tasks. Defaults to gather assets from task
             name: Name of experiment
             tags:
             gather_common_assets_from_task: Whether we should attempt to gather assets from the Task object for the
@@ -290,8 +316,24 @@ class Experiment(IAssetsEnabled, INamedEntity):
         result._task_log = getLogger(__name__)
         return result
 
-    def run(self, wait_until_done: bool = False, platform: 'idmtools.entities.iplatform.IPlatform' = None,  # noqa: F821
-            **run_opts) -> NoReturn:
+    def list_static_assets(self, children: bool = False, platform: 'IPlatform' = None, **kwargs) -> List[Asset]:
+        """
+        List assets that have been uploaded to a server already
+
+        Args:
+            children: When set to true, simulation assets will be loaded as well
+            platform: Optional platform to load assets list from
+            **kwargs:
+
+        Returns:
+            List of assets
+        """
+        if self.id is None:
+            raise ValueError("You can only list static assets on an existing experiment")
+        p = super()._check_for_platform_from_context(platform)
+        return p._experiments.list_assets(self, children, **kwargs)
+
+    def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None, **run_opts) -> NoReturn:
         """
         Runs an experiment on a platform
 
@@ -303,35 +345,12 @@ class Experiment(IAssetsEnabled, INamedEntity):
         Returns:
             None
         """
-        p = self.__check_for_platform_from_context(platform)
+        p = super()._check_for_platform_from_context(platform)
         p.run_items(self, **run_opts)
         if wait_until_done:
             self.wait()
 
-    def __check_for_platform_from_context(self, platform) -> 'idmtools.entities.iplatform.IPlatform':  # noqa: F821
-        """
-        Try to determine platform of current object from self or current platform
-
-        Args:
-            platform: Passed in platform object
-
-        Raises:
-            NoPlatformException: when no platform is on current context
-        Returns:
-            Platform object
-        """
-        if self.platform is None:
-            # check context for current platform
-            if platform is None:
-                from idmtools.core.platform_factory import current_platform
-                if current_platform is None:
-                    raise NoPlatformException("No Platform defined on object, in current context, or passed to run")
-                platform = current_platform
-            self.platform = platform
-        return self.platform
-
-    def wait(self, timeout: int = None, refresh_interval=None,
-             platform: 'idmtools.entities.iplatform.IPlatform' = None):  # noqa: F821
+    def wait(self, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None):
         """
         Wait on an experiment to finish running
 
@@ -350,8 +369,61 @@ class Experiment(IAssetsEnabled, INamedEntity):
             opts['timeout'] = timeout
         if refresh_interval:
             opts['refresh_interval'] = refresh_interval
-        p = self.__check_for_platform_from_context(platform)
+        p = super()._check_for_platform_from_context(platform)
         p.wait_till_done_progress(self, **opts)
+
+    def to_dict(self):
+        result = dict()
+        for f in fields(self):
+            if not f.name.startswith("_") and f.name not in ['parent']:
+                result[f.name] = getattr(self, f.name)
+
+        result['simulations'] = [s.id for s in self.simulations]
+        result['_uid'] = self.uid
+        return result
+
+    # Define this here for better completion in IDEs for end users
+    @classmethod
+    def from_id(cls, item_id: Union[str, uuid.UUID], platform: 'IPlatform' = None, **kwargs) -> 'Experiment':
+        """
+        Helper function to provide better intellisense to end users
+
+        Args:
+            item_id: Item id to load
+            platform: Optional platform. Fallbacks to context
+            **kwargs: Optional arguments to be passed on to the platform
+
+        Returns:
+
+        """
+        return super().from_id(item_id, platform, **kwargs)
+
+    def print(self, verbose: bool = False):
+        """
+        Print summary of experiment
+        Args:
+            verbose: Verbose printing
+
+        Returns:
+
+        """
+        user_logger.info(f"Experiment <{self.id}>")
+        user_logger.info(f"Total Simulations: {self.simulation_count}")
+        user_logger.info(f"Tags: {self.tags}")
+        user_logger.info(f"Platform: {self.platform.__class__.__name__}")
+        # determine status
+        if self.status:
+            # if succeeded print that
+            if self.succeeded:
+                user_logger.log(SUCCESS, "Succeeded")
+            elif not self.done:
+                user_logger.log(NOTICE, "RUNNING")
+            else:
+                user_logger.critical("Experiment failed. Please check output")
+
+        if verbose:
+            user_logger.info(f"Simulation Type: {type(self.__simulations)}")
+            user_logger.info(f"Assets: {self.assets}")
 
 
 class ExperimentSpecification(ExperimentPluginSpecification):

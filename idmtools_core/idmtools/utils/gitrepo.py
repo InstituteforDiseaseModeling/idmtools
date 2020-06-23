@@ -1,10 +1,13 @@
 import os
 import sys
 import json
+from logging import getLogger
 import requests
 import urllib.request
 from click import secho
 from dataclasses import dataclass, field
+logger = getLogger(__name__)
+user_logger = getLogger('user')
 
 REPO_OWNER = 'institutefordiseasemodeling'
 REPO_NAME = 'idmtools'
@@ -173,9 +176,9 @@ class GitRepo:
 
         # First time display download url and local destination info
         if self.verbose:
-            print(f'Download Examples From: {self.repo_example_url}')
-            print(f'Local Destination: {os.path.abspath(output_dir)}')
-            print('Processing...')
+            user_logger.info(f'Download Examples From: {self.repo_example_url}')
+            user_logger.info(f'Local Destination: {os.path.abspath(output_dir)}')
+            user_logger.info('Processing...')
             self._verbose = False
 
         try:
@@ -186,11 +189,11 @@ class GitRepo:
         except KeyboardInterrupt:
             # when CTRL+C is pressed during the execution of this script,
             # bring the cursor to the beginning, erase the current line, and dont make a new line
-            print("✘ Got interrupted")
+            user_logger.error("✘ Got interrupted")
             sys.exit()
         except Exception as ex:
             secho(f'Failed to access: {self.api_example_url}', fg="yellow")
-            print(ex)
+            logger.exception(ex)
             exit(1)
 
         download_dir = os.path.join(output_dir, self.repo_name)
@@ -215,11 +218,11 @@ class GitRepo:
             except KeyboardInterrupt:
                 # when CTRL+C is pressed during the execution of this script,
                 # bring the cursor to the beginning, erase the current line, and dont make a new line
-                print("✘ Got interrupted", )
+                user_logger.error("✘ Got interrupted", )
                 sys.exit()
             except Exception as ex:
                 secho(f'Failed to access: {self.api_example_url}', fg="yellow")
-                print(ex)
+                user_logger.error(ex)
                 exit(1)
 
         total_files += len([f for f in data if f['type'] == 'file'])
@@ -241,7 +244,7 @@ class GitRepo:
                 except KeyboardInterrupt:
                     # when CTRL+C is pressed during the execution of this script,
                     # bring the cursor to the beginning, erase the current line, and dont make a new line
-                    print("✘ Got interrupted", )
+                    user_logger.error("✘ Got interrupted", )
                     sys.exit()
             else:
                 total_files += self.download(path, output_dir, branch)
@@ -275,7 +278,7 @@ class GitRepo:
         except KeyboardInterrupt:
             # when CTRL+C is pressed during the execution of this script,
             # bring the cursor to the beginning, erase the current line, and dont make a new line
-            print("✘ Got interrupted")
+            user_logger.error("✘ Got interrupted")
             sys.exit()
 
         result = []

@@ -25,6 +25,32 @@ def get_dataclass_common_fields(src, dest, exclude_none: bool = True) -> typing.
     return result
 
 
+def as_dict(src, exclude: typing.List[str] = None, exclude_private_fields: bool = True):
+    """
+    Converts a dataclass to a dict while also obeys rules for exclusion
+    Args:
+        src:
+        exclude: List of fields to exclude
+        exclude_private_fields: Should fields that star
+
+    Returns:
+
+    """
+    if exclude is None:
+        exclude = []
+
+    result = dict()
+    # get metadata
+    metadata = dataclasses.fields(src.__class__)
+    for field in metadata:
+        field_metadata = field.metadata
+        if (not exclude_private_fields or field.name[0] != '_') and \
+                ('exclude_from_metadata' not in field_metadata or not field_metadata['exclude_from_metadata']) and \
+                field.name not in exclude:
+            result[field.name] = getattr(src, field.name)
+    return result
+
+
 def validate_user_inputs_against_dataclass(field_type, field_value):
     fs_kwargs = set(field_type.keys()).intersection(set(field_value.keys()))
     for fn in fs_kwargs:

@@ -36,7 +36,6 @@ class TestExample(unittest.TestCase):
         self.assertIn('--url', result.output)
         # Check that there is a --output option
         self.assertIn('--output', result.output)
-        # print(result.output)
 
     def test_get_plugins_example_urls(self):
         examples = get_plugins_examples()

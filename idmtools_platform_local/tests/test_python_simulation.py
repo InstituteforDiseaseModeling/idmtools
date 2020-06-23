@@ -8,6 +8,7 @@ from idmtools.assets import AssetCollection
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
+from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
@@ -52,10 +53,31 @@ class TestPythonSimulation(ITestWithPersistence):
         for simulation in e.simulations:
             self.assertEqual(simulation.experiment.uid, e.uid)
             tags.append(simulation.tags)
+        task_type = 'idmtools_models.python.json_python_task.JSONConfiguredPythonTask'
         expected_tags = [{'a': 0}, {'a': 1}, {'a': 2}, {'a': 3}, {'a': 4}]
+        [s.update(dict(task_type=task_type)) for s in expected_tags]
         sorted_tags = sorted(tags, key=itemgetter('a'))
         sorted_expected_tags = sorted(expected_tags, key=itemgetter('a'))
         self.assertEqual(sorted_tags, sorted_expected_tags)
+
+        # test reload
+        with self.subTest("test_direct_sweep_one_parameter_local_reload_task"):
+            experiment_reload = Experiment.from_id(e.uid, platform, load_task=True)
+            self.assertEqual(e.uid, experiment_reload.uid)
+            self.assertEqual(e.simulation_count, experiment_reload.simulation_count)
+            for sim in experiment_reload.simulations:
+                self.assertIsInstance(sim.task, JSONConfiguredPythonTask)
+                self.assertEqual(str(e.simulations[0].task.command), str(sim.task.command))
+                self.assertIn('a', sim.task.parameters)
+
+        # without tasks
+        with self.subTest("test_direct_sweep_one_parameter_local_reload"):
+            experiment_reload = Experiment.from_id(e.uid, platform)
+            self.assertEqual(e.uid, experiment_reload.uid)
+            self.assertEqual(e.simulation_count, experiment_reload.simulation_count)
+            for sim in experiment_reload.simulations:
+                self.assertIsInstance(sim.task, CommandTask)
+                self.assertEqual(str(e.simulations[0].task.command), str(sim.task.command))
 
     @pytest.mark.long
     @pytest.mark.timeout(90)

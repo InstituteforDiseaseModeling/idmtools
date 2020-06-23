@@ -2,13 +2,15 @@ import os
 from dataclasses import dataclass, field
 from logging import getLogger, DEBUG
 from threading import Lock
-from typing import List, Dict, Any, Type
+from typing import List, Dict, Any, Type, TYPE_CHECKING
 from uuid import UUID, uuid4
-
 import numpy as np
+
+from idmtools.assets import Asset
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
 from idmtools.entities.simulation import Simulation
-
+if TYPE_CHECKING:
+    from idmtools_test.utils.test_platform import TestPlatform
 current_directory = os.path.dirname(os.path.realpath(__file__))
 data_path = os.path.abspath(os.path.join(current_directory, "..", "..", "data"))
 
@@ -17,7 +19,12 @@ SIMULATION_LOCK = Lock()
 
 
 @dataclass
-class TestPlaformSimulationOperation(IPlatformSimulationOperations):
+class TestPlatformSimulationOperation(IPlatformSimulationOperations):
+    platform: 'TestPlatform'
+
+    def all_files(self, simulation: Simulation, **kwargs):
+        pass
+
     platform_type: Type = Simulation
     simulations: dict = field(default_factory=dict, compare=False, metadata={"pickle_ignore": True})
 
@@ -81,7 +88,7 @@ class TestPlaformSimulationOperation(IPlatformSimulationOperations):
     def get_assets(self, simulation: Simulation, files: List[str], **kwargs) -> Dict[str, bytearray]:
         return {}
 
-    def list_assets(self, simulation: Simulation, **kwargs) -> List[str]:
+    def list_assets(self, simulation: Simulation, **kwargs) -> List[Asset]:
         pass
 
     def set_simulation_status(self, experiment_uid, status):

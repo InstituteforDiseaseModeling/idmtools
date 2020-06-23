@@ -1,29 +1,46 @@
-# This workflows will download idmtools nightly packages from artifactory then run smoke tests
+# This workflows will download idmtools nightly packages from staging artifactory then run tests with curl command
+#
+# curl command from your cmd:
+# curl -XPOST -u "username:githubPAT" -H "Accept: application/vnd.github.everest-preview+json" \
+# -H "Content-Type: application/json" \
+# --data "{\"event_type\": \"test_nightly_build\"}" \
+#  https://api.github.com/repos/InstituteforDiseaseModeling/idmtools/dispatches
+#
+# Note, this test will checkout 'dev' branch
 
-name: "Install nightly build and run smoke test"
+name: "run-all-test-ubuntu-stage-curl"
 
 on:
-  schedule:
-    # Run at 6AM PST (13 UTC time) on Monday, Wednesday, and Friday
-    - cron: '0 13 * * 1,3,5'
+  repository_dispatch:
+    # Manually trigger with curl or Postman POST
+    types: [test_nightly_build]
 
 jobs:
-  install-nightly-build-run-smoke-test:
+  run-all-test-ubuntu-stage-curl:
     if: github.repository == 'InstituteforDiseaseModeling/idmtools'
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [3.6, 3.7]
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
         with:
           ref: dev
-      - name: Set up Python
-        uses: actions/setup-python@v1
+      - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
         with:
-          python-version: '3.7'
-      - name: Install dependencies
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+      - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install setuptools wheel twine
+          pip install py-make flake8
+      - name: Install dataclass
+        if: ${{ matrix.python-version }} == 3.6
+        run: |
+          pip install dataclasses
       - name: download idmtools packages from staging jfrog
         env:
           bamboo_UserArtifactory: ${{ secrets.PYPI_STAGING_USERNAME }}
@@ -37,21 +54,21 @@ jobs:
         env:
           COMPS_USER: ${{ secrets.COMPS_USER }}
           COMPS_PASSWORD: ${{ secrets.COMPS_PASSWORD }}
-      - name: run idmtools_cli smoke tests
+      - name: run idmtools_cli tests
         run: |
             cd idmtools_cli/tests
-            py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
-      - name: Upload idmtools_cli smoke test results
+            py.test --durations=3 -v --junitxml=test_results.xml
+      - name: Upload idmtools_cli test results
         uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: idmtools_cli_test_results
           path: idmtools_cli/tests/test_results.xml
-      - name: run idmtools_core smoke tests
+      - name: run idmtools_core tests
         run: |
             cd idmtools_core/tests
-            py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
-      - name: Upload idmtools_core smoke test results
+            py.test --durations=3 -v --junitxml=test_results.xml
+      - name: Upload idmtools_core test results
         uses: actions/upload-artifact@v2
         if: failure()
         with:
@@ -60,8 +77,8 @@ jobs:
       - name: run idmtools_models tests
         run: |
             cd idmtools_models/tests
-            py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
-      - name: Upload idmtools_models smoke test results
+            py.test --durations=3 -v --junitxml=test_results.xml
+      - name: Upload idmtools_models test results
         uses: actions/upload-artifact@v2
         if: failure()
         with:
@@ -70,18 +87,18 @@ jobs:
       - name: run idmtools_platform_comps tests
         run: |
             cd idmtools_platform_comps/tests
-            py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
+            py.test --durations=3 -v --junitxml=test_results.xml
       - name: Upload idmtools_platform_comps test results
         uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: idmtools_platform_comps_test_results
           path: idmtools_platform_comps/tests/test_results.xml
-      - name: run idmtools_platform_local smoke tests
+      - name: run idmtools_platform_local tests
         run: |
             cd idmtools_platform_local/tests
-            py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
-      - name: Upload idmtools_platform_local smoke test results
+            py.test --durations=3 -v --junitxml=test_results.xml
+      - name: Upload idmtools_platform_local test results
         uses: actions/upload-artifact@v2
         if: failure()
         with:

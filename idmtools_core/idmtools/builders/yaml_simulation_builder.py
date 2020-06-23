@@ -1,6 +1,9 @@
+from logging import getLogger
 import yaml
 from idmtools.builders import ArmSimulationBuilder
 from idmtools.builders.arm_simulation_builder import SweepArm, ArmType
+
+logger = getLogger(__name__)
 
 
 class YamlSimulationBuilder(ArmSimulationBuilder):
@@ -14,13 +17,15 @@ class YamlSimulationBuilder(ArmSimulationBuilder):
     def __init__(self):
         super().__init__()
 
-    def add_sweeps_from_file(self, file_path, func_map={}, sweep_type=ArmType.cross):
+    def add_sweeps_from_file(self, file_path, func_map=None, sweep_type=ArmType.cross):
 
+        if func_map is None:
+            func_map = {}
         with open(file_path, 'r') as stream:
             try:
                 parsed = yaml.safe_load(stream)
             except yaml.YAMLError as exc:
-                print(exc)
+                logger.exception(exc)
                 exit()
 
         d_funcs = parsed.values()

@@ -3,12 +3,10 @@ import time
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field, fields
 from logging import getLogger, Logger
-from typing import Set, NoReturn, Union, Callable, List
-
+from typing import Set, NoReturn, Union, Callable, List, TYPE_CHECKING, Dict
 from idmtools.assets import AssetCollection
 from idmtools.entities.command_line import CommandLine
 from idmtools.entities.platform_requirements import PlatformRequirements
-from idmtools.entities.simulation import Simulation
 from idmtools.utils.hashing import ignore_fields_in_dataclass_on_pickle
 
 logger = getLogger(__name__)
@@ -19,23 +17,30 @@ logger = getLogger(__name__)
 # 1. Create Suite(If Suite)
 #    a) Pre-Creation hooks
 
+if TYPE_CHECKING:
+    from idmtools.entities.simulation import Simulation
+    from idmtools.entities.iworkflow_item import IWorkflowItem  # noqa: F401
 
-TTaskParent = Union['Simulation', 'WorkflowItem']  # noqa: F821
+TTaskParent = Union['Simulation', 'IWorkflowItem']  # noqa: F821
 TTaskHook = Callable[[TTaskParent], NoReturn]
 
 
 @dataclass
 class ITask(metaclass=ABCMeta):
+    #: The Command to run
     command: Union[str, CommandLine] = field(default=None)
-    # Informs platform to what is needed to run a task
+    #: List of requirements needed by the task to run on an execution platform. This is stuff like Windows, Linux, GPU
+    #  etc
     platform_requirements: Set[PlatformRequirements] = field(default_factory=set)
 
-    # We provide hooks as list to allow more user scripting extensibility
+    #: We provide hooks as list to allow more user scripting extensibility
     __pre_creation_hooks: List[TTaskHook] = field(default_factory=list)
     __post_creation_hooks: List[TTaskHook] = field(default_factory=list)
     # This is optional experiment assets
     # That means that users can explicitly define experiment level assets when using a Experiment builders
+    #: Common(Experiment-level) assets
     common_assets: AssetCollection = field(default_factory=AssetCollection)
+    #: Transient(Simulation-level) assets
     transient_assets: AssetCollection = field(default_factory=AssetCollection)
 
     # log to add to items to track provisioning of task
@@ -87,7 +92,7 @@ class ITask(metaclass=ABCMeta):
             requirement = PlatformRequirements[requirement.lower()]
         self.platform_requirements.add(requirement)
 
-    def pre_creation(self, parent: Union['Simulation', 'WorkflowItem']):  # noqa: F821
+    def pre_creation(self, parent: Union['Simulation', 'IWorkflowItem']):  # noqa: F821
         """
         Optional Hook called at the time of creation of task. Can be used to setup simulation and experiment level hooks
         Args:
@@ -101,7 +106,7 @@ class ITask(metaclass=ABCMeta):
             raise ValueError("Command is required for on task when preparing an experiment")
         [hook(parent) for hook in self.__pre_creation_hooks]
 
-    def post_creation(self, parent: Union['Simulation', 'WorkflowItem']):  # noqa: F821
+    def post_creation(self, parent: Union['Simulation', 'IWorkflowItem']):  # noqa: F821
         """
         Optional Hook called at the  after creation task. Can be used to setup simulation and experiment level hooks
         Args:
@@ -129,7 +134,7 @@ class ITask(metaclass=ABCMeta):
     def gather_all_assets(self) -> AssetCollection:
         return self.gather_common_assets() + self.gather_transient_assets()
 
-    def copy_simulation(self, base_simulation: Simulation) -> Simulation:
+    def copy_simulation(self, base_simulation: 'Simulation') -> 'Simulation':
         """
         Called when copying a simulation for batching. Override you your task has specific concerns when copying
          simulations.
@@ -137,13 +142,14 @@ class ITask(metaclass=ABCMeta):
         new_simulation = copy.deepcopy(base_simulation)
         return new_simulation
 
-    def reload_from_simulation(self, simulation: Simulation):
+    def reload_from_simulation(self, simulation: 'Simulation'):
         """
         Optional hook that is called when loading simulations from a platform
         """
         raise NotImplementedError("Reloading task from a simulation is not supported")
 
     def to_simulation(self):
+        from idmtools.entities.simulation import Simulation
         s = Simulation()
         s.task = self
         return s
@@ -185,4 +191,11 @@ class ITask(metaclass=ABCMeta):
             if k not in ['_task_log']:
                 setattr(result, k, copy.deepcopy(v, memo))
         result._task_log = getLogger(__name__)
+        return result
+
+    def to_dict(self) -> Dict:
+        result = dict()
+        for f in fields(self):
+            if not f.name.startswith("_") and f.name not in ['parent']:
+                result[f.name] = getattr(self, f.name)
         return result

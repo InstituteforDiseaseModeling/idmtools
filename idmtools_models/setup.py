@@ -51,6 +51,8 @@ setup(
     entry_points=dict(idmtools_task=  # noqa E521
                       ["idmtools_task_python = idmtools_models.python.python_task:PythonTaskSpecification",
                        "idmtools_task_python_json = idmtools_models.python.json_python_task:JSONConfiguredPythonTaskSpecification",
+                       "idmtools_task_templated_script = idmtools_models.templated_script_task:TemplatedScriptTaskSpecification",
+                       "idmtools_task_wrapper_script = idmtools_models.templated_script_task:ScriptWrapperTaskSpecification",
                        "idmtools_task_r = idmtools_models.r.r_task:RTaskSpecification",
                        "idmtools_task_r_json = idmtools_models.r.json_r_task:JSONConfiguredRTaskSpecification",
                        "idmtools_task_json = idmtools_models.json_configured_task:JSONConfiguredTaskSpecification"
@@ -61,5 +63,5 @@ setup(
     test_suite='tests',
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='1.1.0'
+    version='1.2.0'
 )
