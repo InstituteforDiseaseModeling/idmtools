@@ -1,7 +1,5 @@
-from collections import defaultdict
 from logging import getLogger
 from typing import Union, Callable, Dict, Any
-
 import yaml
 from idmtools.builders import ArmSimulationBuilder
 from idmtools.builders.arm_simulation_builder import SweepArm, ArmType
