@@ -115,9 +115,11 @@ class Experiment(IAssetsEnabled, INamedEntity):
             assets.add_assets(self.simulations.items.base_task.common_assets, fail_on_duplicate=False)
         elif self.gather_common_assets_from_task and isinstance(self.__simulations, List):
             for sim in self.simulations:
-                assets = sim.task.gather_common_assets()
-                if assets is not None:
-                    assets.add_assets(assets, fail_on_duplicate=False)
+                if sim.task:
+                    # skip any simulations that have no task (reloaded). No gatherable task assets for them.
+                    assets = sim.task.gather_common_assets()
+                    if assets is not None:
+                        assets.add_assets(assets, fail_on_duplicate=False)
         return assets
 
     def pre_creation(self) -> None:
@@ -394,10 +396,16 @@ class Experiment(IAssetsEnabled, INamedEntity):
         Returns:
             Nothing
         """
+        prior_assets = self.gather_all_assets()
+
         # merge existing simulations into the new simulations
-        existing_simulations = self.simulations.items
+        existing_simulations = self.simulations  # .items
         self.simulations = simulations
         for simulation in existing_simulations:
+            # simulation.assets = simulation.gather_assets() # TODO: make this the right call; just a stand in for now
+            if simulation.task:
+                # if no task exists (reloaded sim) then there is no need to set assets on the sim
+                simulation.assets = prior_assets
             self.__simulations.append(simulation)
 
 
