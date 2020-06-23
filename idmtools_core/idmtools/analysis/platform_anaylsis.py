@@ -4,7 +4,6 @@ import pickle
 import tempfile
 from logging import getLogger
 from idmtools.assets.file_list import FileList
-from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
 from idmtools.config import IdmConfigParser
 
 logger = getLogger(__name__)
@@ -70,6 +69,7 @@ class PlatformAnalysis:
         command += " {}".format(IdmConfigParser._block)
 
         logger.debug(f"Command: {command}")
+        from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
         self.wi = SSMTWorkItem(item_name=self.analysis_name, command=command, tags=self.tags,
                                user_files=self.additional_files, asset_collection_id=self.asset_collection_id,
                                asset_files=self.asset_files, related_experiments=self.experiment_ids)
