@@ -6,6 +6,6 @@ updates:
     default_reviewers:
      - "devclinton"
      - "shchen-idmod"
-     - "ZDi-idm
+     - "ZDu-idm
     schedule:
       interval: "daily"
