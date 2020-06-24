@@ -1,4 +1,4 @@
-SLURM_ENVIRONMENTS = ['slurmdev', 'slurm2', 'slurmstage']
+SLURM_ENVIRONMENTS = ['slurmdev', 'slurm2', 'slurmstage', 'calculon']
 PYTHON_EXECUTABLE = 'python3'
 
 

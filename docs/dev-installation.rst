@@ -12,8 +12,8 @@ Install |IT_s|
 
         git clone https://github.com/InstituteforDiseaseModeling/idmtools.git
 
-        To work from the latest approved code, work from the "master" branch. To work from
-        the latest code under active development, work from the "dev" branch.
+    To work from the latest approved code, work from the "master" branch. To work from
+    the latest code under active development, work from the "dev" branch.
 
 #.  Open a command prompt and create a virtual environment in any directory you choose. The
     command below names the environment "idmtools", but you may use any desired name::
@@ -58,7 +58,8 @@ Install |IT_s|
     - idmtools/idmtools_models
     - idmtools/idmtools_test
 
-.. TBD add a link to the CLI reference when complete
+See :doc:`cli_index` for more information on the command-line interface available for interacting with
+|IT_s|.
 
 .. _docker-client:
 
@@ -103,8 +104,9 @@ Run tests
 =========
 
 If you want to run tests on the code, do the following. You can add new tests
-to the GitHub repository and they will be run using the same commands. Note
-that |COMPS_s| access is generally restricted to |IDM_s| employees.
+to the GitHub repository and they will be run using the same commands.
+
+.. include:: /reuse/comps_note.txt
 
 #.  Login to |COMPS_s| by navigating to the |IT_s| root directory and entering the following
     at a command prompt::

@@ -1,0 +1,18 @@
+@startuml
+
+package "idmtools" {
+    class TaskSpecification {
+        {abstract} Type[ITask] get_type()
+        {abstract} ITask get()
+    }
+}
+
+package "emodpy"{
+    class EMODTaskSpecification{
+        {abstract} Type[EMODTask]
+        {abstract} TaskSpecification get()
+    }
+}
+
+TaskSpecification <-- EMODTaskSpecification
+@enduml

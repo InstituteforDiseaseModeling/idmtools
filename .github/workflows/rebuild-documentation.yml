@@ -5,7 +5,10 @@ on:
     paths:
       - '**.py'
       - 'docs/**'
-
+  pull_request:
+    paths:
+      - '**.py'
+      - 'docs/**'
 jobs:
   rebuild-documentation:
 

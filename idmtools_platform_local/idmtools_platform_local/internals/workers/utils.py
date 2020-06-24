@@ -39,7 +39,7 @@ def get_host_data_bind():
     if HOST_DATA_BIND is None:
         data_bind = os.getenv('HOST_DATA_BIND', None)
         if data_bind is None:
-            logger.error(f'HOST_DATA_BIND is not defined')
+            logger.error('HOST_DATA_BIND is not defined')
             raise ValueError("HOST_DATA_BIND is not set")
         logger.info(f'HOST_DATA_BIND parsing from {data_bind}')
         data_bind = data_bind.split(":")[0].strip()

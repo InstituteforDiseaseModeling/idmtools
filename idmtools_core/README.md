@@ -6,12 +6,20 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-  - [Installing](#installing)
+- [Overview](#overview)
+- [Installing](#installing)
 - [Development Tips](#development-tips)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-## Installing
+# Overview
+
+idmtools provides the APIS, logic, and other operations to provision, execute, analysis, and manage jobs running on an HPC cluster
+
+To see the full API documentation, see https://institutefordiseasemodeling.github.io/idmtools/idmtools_index.html
+
+
+# Installing
 
 ```bash
 pip install idmtools --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple

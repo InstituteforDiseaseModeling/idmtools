@@ -57,7 +57,7 @@ class TestRetrieval(ITestWithPersistence):
         self.assertEqual({k: str(v or '') for k, v in self.pe.tags.items()}, comps_experiment.tags)
 
         # Test retrieving less columns
-        comps_experiment = self.platform.get_item(self.pe.uid, ItemType.EXPERIMENT, raw=True, children=[],
+        comps_experiment = self.platform.get_item(self.pe.uid, ItemType.EXPERIMENT, raw=True, load_children=[],
                                                   columns=["id"])
         self.assertIsNone(comps_experiment.name)
         self.assertIsNone(comps_experiment.tags)

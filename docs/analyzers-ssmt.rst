@@ -11,3 +11,5 @@ The following example, run_ssmt_analysis.py, shows how to use :py:class:`idmtool
     .. literalinclude:: ../examples/ssmt/simple_analysis/run_ssmt_analysis.py
 
 In this example two analyzers are run on an existing experiment with the output results saved to an output directory. After you run the example you can see the results by using the returned SSMTWorkItem id and searching for it under **Work Items** in |COMPS_s|.
+
+.. include:: /reuse/comps_note.txt

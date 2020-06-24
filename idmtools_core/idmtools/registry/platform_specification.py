@@ -2,14 +2,12 @@
 import typing
 from abc import ABC
 from logging import getLogger
-
 import pluggy
-
-from idmtools.entities.iplatform import IPlatform
 from idmtools.registry import PluginSpecification
 from idmtools.registry.plugin_specification import PLUGIN_REFERENCE_NAME
 from idmtools.registry.utils import load_plugin_map
-
+if typing.TYPE_CHECKING:
+    from idmtools.entities.iplatform import IPlatform
 example_configuration_spec = pluggy.HookspecMarker(PLUGIN_REFERENCE_NAME)
 get_platform_spec = pluggy.HookspecMarker(PLUGIN_REFERENCE_NAME)
 get_platform_type_spec = pluggy.HookspecMarker(PLUGIN_REFERENCE_NAME)
@@ -47,7 +45,7 @@ class PlatformSpecification(PluginSpecification, ABC):
         raise NotImplementedError("Plugin did not implement example_configuration")
 
     @get_platform_spec
-    def get(self, configuration: dict) -> IPlatform:
+    def get(self, configuration: dict) -> 'IPlatform':
         """
         Return a new platform using the passed in configuration.
 
@@ -60,7 +58,7 @@ class PlatformSpecification(PluginSpecification, ABC):
         raise NotImplementedError("Plugin did not implement get")
 
     @get_platform_type_spec
-    def get_type(self) -> typing.Type[IPlatform]:
+    def get_type(self) -> typing.Type['IPlatform']:
         pass
 
 

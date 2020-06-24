@@ -19,6 +19,8 @@ application.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_U
 
 
 db = None
+
+
 @backoff.on_exception(backoff.constant, OperationalError, max_tries=3, interval=0.2)
 def start_db(db=None):
     if db is None:
