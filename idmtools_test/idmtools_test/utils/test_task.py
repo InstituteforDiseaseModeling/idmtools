@@ -39,7 +39,7 @@ class TestTask(ITask):
         self.parameters.update(params)
 
     def gather_common_assets(self) -> AssetCollection:
-        pass
+        return AssetCollection()
 
     def gather_transient_assets(self) -> AssetCollection:
         if not self.transient_assets.has_asset("config.json"):
