@@ -64,6 +64,38 @@ You can also install just the individual packages to create minimal environments
 - `pip install idmtools-platform-local --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Support for Local Platform
 - `pip install idmtools-models --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Python and generic models
 
+## Installing Development/Early Release Versions
+
+Development versions are available through both IDM's pypi registry and through Github.
+
+### PyPI
+
+
+If you have your authentication defined in your pip.conf or pip.ini file, you can use the following commands to install from staging
+- `pip install idmtools --index-url=https://<USERNAME>:<PASSWORD>@packages.idmod.org/api/pypi/pypi-staging/simple` - Core package
+- `pip install idmtools-cli --index-url=https://<USERNAME>:<PASSWORD>@packages.idmod.org/api/pypi/pypi-staging/simple` - Adds the idmtools cli commands
+- `pip install idmtools-platform-comps --index-url=https://<USERNAME>:<PASSWORD>@packages.idmod.org/api/pypi/pypi-staging/simple` - Support for COMPS
+- `pip install idmtools-platform-local --index-url=https://<USERNAME>:<PASSWORD>@packages.idmod.org/api/pypi/pypi-staging/simple` - Support for Local Platform
+- `pip install idmtools-models --index-url=https://<USERNAME>:<PASSWORD>@packages.idmod.org/api/pypi/pypi-staging/simple` - Python and generic models
+
+### Github
+
+You can install directly from Github. You can install directly from PRs, Branches, and Tags. You can use either *git+https://* or *git+ssh://*
+
+#### Installing From Development Branch(or other specific branch)
+
+To install from the development branch, use the following commands
+```bash
+pip install git+https://git@github.com/InstituteforDiseaseModeling/idmtools.git@dev#egg="idmtools&subdirectory=idmtools_core"
+pip install git+https://git@github.com/InstituteforDiseaseModeling/idmtools.git@dev#egg="idmtools_platform_comps&subdirectory=idmtools_platform_comps"
+pip install git+https://git@github.com/InstituteforDiseaseModeling/idmtools.git@dev#egg="idmtools_cli&subdirectory=idmtools_cli"
+pip install git+https://git@github.com/InstituteforDiseaseModeling/idmtools.git@dev#egg="idmtools_models&subdirectory=idmtools_models"
+pip install git+https://git@github.com/InstituteforDiseaseModeling/idmtools.git@dev#egg="idmtools_platform_local&subdirectory=idmtools_platform_local"
+pip install git+https://git@github.com/InstituteforDiseaseModeling/idmtools.git@dev#egg="idmtools_test&subdirectory=idmtools_test"
+```
+
+To install a different github branch, change the *@dev* in each command to *@<branch name>* where *branch_name* is the name of branch you would like to install from. To install from a PR, see [Installing from a Pull Request]
+
 ## Pre-requisites
 - Python 3.6/3.7 x64
 - Docker(Required for the local platform)
@@ -89,6 +121,23 @@ When setting up your environment for the first time, you can use the following i
 4) If you are on windows, run `pip install py-make --upgrade --force-reinstall`
 5) Run `docker login docker-staging.packages.idmod.org`
 6) Then run `python dev_scripts/bootstrap.py`. This will install all the tools. 
+
+## Installing from a Pull Request
+
+Sometimes, like when testing a new feature, it is useful to install a development or early version. We can do this directly from GitHub PRs using the following commands
+
+To install idmtools from a specific PR you can use the following script replacing 123 with the number of your PR
+
+```bash
+pip install git+https://git@github.com/InstituteforDiseaseModeling/idmtools.git@refs/pull/123/head#egg="idmtools&subdirectory=idmtools_core"
+pip install git+https://git@github.com/InstituteforDiseaseModeling/idmtools.git@refs/pull/123/head#egg="idmtools_platform_comps&subdirectory=idmtools_platform_comps"
+pip install git+https://git@github.com/InstituteforDiseaseModeling/idmtools.git@refs/pull/123/head#egg="idmtools_cli&subdirectory=idmtools_cli"
+pip install git+https://git@github.com/InstituteforDiseaseModeling/idmtools.git@refs/pull/123/head#egg="idmtools_models&subdirectory=idmtools_models"
+pip install git+https://git@github.com/InstituteforDiseaseModeling/idmtools.git@refs/pull/123/head#egg="idmtools_platform_local&subdirectory=idmtools_platform_local"
+pip install git+https://git@github.com/InstituteforDiseaseModeling/idmtools.git@refs/pull/123/head#egg="idmtools_test&subdirectory=idmtools_test"
+```
+
+To install from a specific branch, see [Installing From Development Branch(or other specific branch)]
 
 ## General Use
 After the first install almost everything you need as a developer is part of the makefiles. There is a Makefile is every project directory. There is also a makefile at the top-level of the project.
