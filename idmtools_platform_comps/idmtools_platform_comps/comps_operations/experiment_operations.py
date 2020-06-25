@@ -94,8 +94,15 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
 
         # Define the subdirectory
         subdirectory = experiment_name[0:self.platform.MAX_SUBDIRECTORY_LENGTH] + '_' + timestamp()
-        # Get the experiment command line
 
+        if experiment.name != "install custom requirements":
+            simulation_root = self.platform.simulation_root
+        else:
+            index = self.platform.simulation_root.rindex('\\')
+            simulation_root = self.platform.simulation_root[0:index]    # shorten simulation_root
+            subdirectory = 'rac' + '_' + timestamp()    # also shorten subdirectory
+
+        # Get the experiment command line
         exp_command: CommandLine = self._get_experiment_command_line(check_command, experiment)
 
         if command_arg is None:
@@ -108,8 +115,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         comps_config = dict(
             environment_name=self.platform.environment,
             simulation_input_args=command_arg,
-            working_directory_root=os.path.join(self.platform.simulation_root, subdirectory).replace(
-                '\\', '/'),
+            working_directory_root=os.path.join(simulation_root, subdirectory).replace('\\', '/'),
             executable_path=executable_path,
             node_group_name=self.platform.node_group,
             maximum_number_of_retries=self.platform.num_retries,
