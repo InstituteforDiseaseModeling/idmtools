@@ -80,18 +80,18 @@ If you have your authentication defined in your pip.conf or pip.ini file, you ca
 
 ### Github
 
-You can install directly from Github. You can install directly from PRs, Branches, and Tags. You can use either *git+https://* or *git+ssh://*
+You can install directly from Github. You can install directly from PRs, Branches, and Tags. You can use either *git+https://* or *git+ssh://git@*
 
 #### Installing From Development Branch(or other specific branch)
 
 To install from the development branch, use the following commands
 ```bash
-pip install git+https://git@github.com/InstituteforDiseaseModeling/idmtools.git@dev#egg="idmtools&subdirectory=idmtools_core"
-pip install git+https://git@github.com/InstituteforDiseaseModeling/idmtools.git@dev#egg="idmtools_platform_comps&subdirectory=idmtools_platform_comps"
-pip install git+https://git@github.com/InstituteforDiseaseModeling/idmtools.git@dev#egg="idmtools_cli&subdirectory=idmtools_cli"
-pip install git+https://git@github.com/InstituteforDiseaseModeling/idmtools.git@dev#egg="idmtools_models&subdirectory=idmtools_models"
-pip install git+https://git@github.com/InstituteforDiseaseModeling/idmtools.git@dev#egg="idmtools_platform_local&subdirectory=idmtools_platform_local"
-pip install git+https://git@github.com/InstituteforDiseaseModeling/idmtools.git@dev#egg="idmtools_test&subdirectory=idmtools_test"
+pip install git+https://github.com/InstituteforDiseaseModeling/idmtools.git@dev#egg="idmtools&subdirectory=idmtools_core"
+pip install git+https://github.com/InstituteforDiseaseModeling/idmtools.git@dev#egg="idmtools_platform_comps&subdirectory=idmtools_platform_comps"
+pip install git+https://github.com/InstituteforDiseaseModeling/idmtools.git@dev#egg="idmtools_cli&subdirectory=idmtools_cli"
+pip install git+https://github.com/InstituteforDiseaseModeling/idmtools.git@dev#egg="idmtools_models&subdirectory=idmtools_models"
+pip install git+https://github.com/InstituteforDiseaseModeling/idmtools.git@dev#egg="idmtools_platform_local&subdirectory=idmtools_platform_local"
+pip install git+https://github.com/InstituteforDiseaseModeling/idmtools.git@dev#egg="idmtools_test&subdirectory=idmtools_test"
 ```
 
 To install a different github branch, change the *@dev* in each command to *@<branch name>* where *branch_name* is the name of branch you would like to install from. To install from a PR, see [Installing from a Pull Request]
@@ -129,12 +129,12 @@ Sometimes, like when testing a new feature, it is useful to install a developmen
 To install idmtools from a specific PR you can use the following script replacing 123 with the number of your PR
 
 ```bash
-pip install git+https://git@github.com/InstituteforDiseaseModeling/idmtools.git@refs/pull/123/head#egg="idmtools&subdirectory=idmtools_core"
-pip install git+https://git@github.com/InstituteforDiseaseModeling/idmtools.git@refs/pull/123/head#egg="idmtools_platform_comps&subdirectory=idmtools_platform_comps"
-pip install git+https://git@github.com/InstituteforDiseaseModeling/idmtools.git@refs/pull/123/head#egg="idmtools_cli&subdirectory=idmtools_cli"
-pip install git+https://git@github.com/InstituteforDiseaseModeling/idmtools.git@refs/pull/123/head#egg="idmtools_models&subdirectory=idmtools_models"
-pip install git+https://git@github.com/InstituteforDiseaseModeling/idmtools.git@refs/pull/123/head#egg="idmtools_platform_local&subdirectory=idmtools_platform_local"
-pip install git+https://git@github.com/InstituteforDiseaseModeling/idmtools.git@refs/pull/123/head#egg="idmtools_test&subdirectory=idmtools_test"
+pip install git+https://github.com/InstituteforDiseaseModeling/idmtools.git@refs/pull/123/head#egg="idmtools&subdirectory=idmtools_core"
+pip install git+https://github.com/InstituteforDiseaseModeling/idmtools.git@refs/pull/123/head#egg="idmtools_platform_comps&subdirectory=idmtools_platform_comps"
+pip install git+https://github.com/InstituteforDiseaseModeling/idmtools.git@refs/pull/123/head#egg="idmtools_cli&subdirectory=idmtools_cli"
+pip install git+https://github.com/InstituteforDiseaseModeling/idmtools.git@refs/pull/123/head#egg="idmtools_models&subdirectory=idmtools_models"
+pip install git+https://github.com/InstituteforDiseaseModeling/idmtools.git@refs/pull/123/head#egg="idmtools_platform_local&subdirectory=idmtools_platform_local"
+pip install git+https://github.com/InstituteforDiseaseModeling/idmtools.git@refs/pull/123/head#egg="idmtools_test&subdirectory=idmtools_test"
 ```
 
 To install from a specific branch, see [Installing From Development Branch(or other specific branch)]
