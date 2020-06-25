@@ -96,7 +96,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         subdirectory = experiment_name[0:self.platform.MAX_SUBDIRECTORY_LENGTH] + '_' + timestamp()
 
         from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import MD5_KEY
-        if experiment.name != "install custom requirements" or MD5_KEY not in experiment.tags:
+        if experiment.name != "install custom requirements":
             simulation_root = self.platform.simulation_root
         else:
             index = self.platform.simulation_root.rindex('\\')
