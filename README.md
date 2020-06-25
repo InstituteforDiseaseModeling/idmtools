@@ -99,7 +99,7 @@ pip install git+https://github.com/InstituteforDiseaseModeling/idmtools.git@dev#
 pip install git+https://github.com/InstituteforDiseaseModeling/idmtools.git@dev#egg="idmtools_test&subdirectory=idmtools_test"
 ```
 
-To install a different github branch, change the *@dev* in each command to *@<branch name>* where *branch_name* is the name of branch you would like to install from. To install from a PR, see [Installing from a Pull Request]
+To install a different github branch, change the *@dev* in each command to *@<branch name>* where *branch_name* is the name of branch you would like to install from. To install from a PR, see [Installing from a Pull Request](#installing-from-a-pull-request)
 
 ## Pre-requisites
 - Python 3.6/3.7 x64
@@ -142,7 +142,7 @@ pip install git+https://github.com/InstituteforDiseaseModeling/idmtools.git@refs
 pip install git+https://github.com/InstituteforDiseaseModeling/idmtools.git@refs/pull/123/head#egg="idmtools_test&subdirectory=idmtools_test"
 ```
 
-To install from a specific branch, see [Installing From Development Branch(or other specific branch)]
+To install from a specific branch, see [Installing From Development Branch(or other specific branch)](#installing-from-development-branchor-other-specific-branch)
 
 ## General Use
 After the first install almost everything you need as a developer is part of the makefiles. There is a Makefile is every project directory. There is also a makefile at the top-level of the project.
