@@ -9,4 +9,4 @@ pluggy~=0.13.1
 PyYaml~=5.1
 tabulate~=0.8.7
 tqdm~=4.46.1
-packaging~=20.3
+packaging~=20.4
