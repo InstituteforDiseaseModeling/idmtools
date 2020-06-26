@@ -1,4 +1,4 @@
-docker==4.0.1
+docker==4.2.1
 pipreqs==0.4.9
 dramatiq[redis]
 pyCOMPS
