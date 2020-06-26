@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""The setup script for the idmtools_platform_comps platform, for users who use the COMPS platform for IDM-Tools."""
+"""The setup script for the idmtools_platform_comps platform, for users who use the COMPS platform for idmtools."""
 from setuptools import setup, find_packages
 
 with open('README.md', encoding='utf-8') as readme_file:

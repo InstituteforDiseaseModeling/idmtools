@@ -33,7 +33,7 @@ class COMPSPlatformSpecification(PlatformSpecification):
 
     @get_description_impl
     def get_description(self) -> str:
-        return "Provides access to the COMPS Platform to IDM-Tools"
+        return "Provides access to the COMPS Platform to idmtools"
 
     @get_platform_impl
     def get(self, **configuration) -> COMPSPlatform:
@@ -60,7 +60,7 @@ class SSMTPlatformSpecification(PlatformSpecification):
 
     @get_description_impl
     def get_description(self) -> str:
-        return "Provides access to the COMPS Platform to IDM-Tools"
+        return "Provides access to the COMPS Platform to idmtools"
 
     @get_platform_impl
     def get(self, **configuration) -> COMPSPlatform:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""The setup script for the idmtools_test module to run extended tests and provide demo date for IDM-Tools tests."""
+"""The setup script for the idmtools_test module to run extended tests and provide demo date for idmtools tests."""
 
 from setuptools import setup, find_packages
 
