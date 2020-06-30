@@ -22,12 +22,20 @@ builder.add_sweep_definition(JSONConfiguredPythonTask.set_parameter_partial("a")
 builder.add_sweep_definition(JSONConfiguredPythonTask.set_parameter_partial("b"),
                              [i * i for i in range(10, 20, 3)])
 
-model_path = os.path.join("inputs", "python_model_with_deps", "Assets", "model.py")
+model_path = os.path.join("inputs", "python_model_with_deps", "Assets", "newmodel3.py")
 sims_template = TemplatedSimulations(base_task=JSONConfiguredPythonTask(script_path=model_path))
 sims_template.add_builder(builder=builder)
+experiment.add_new_simulations(simulations=sims_template)
+
+# TODO: fix this. Addint a second TemplatedSiulations leads to NOT adding assets for PRIOR TS. (e.g. not uploading newmodel3.py)
+# TODO: TASK info seems untouched, e.g. prior block task is still: python newmodel3.py (but only model.py is available; no sim assets)
+model_path = os.path.join("inputs", "python_model_with_deps", "Assets", "newmodel2.py")
+sims_template = TemplatedSimulations(base_task=JSONConfiguredPythonTask(script_path=model_path))
+sims_template.add_builder(builder=builder)
+experiment.add_new_simulations(simulations=sims_template)
+
 
 # add new simulations to the experiment, run (only the new simulations), and wait
-experiment.add_new_simulations(simulations=sims_template)
 
 platform.run_items(experiment)
 platform.wait_till_done(experiment)

@@ -10,12 +10,13 @@ from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test.utils.test_task import TestTask
 
 
-def get_new_simulations(n=None, assets=None):
-    ts = TemplatedSimulations(base_task=TestTask())
+def get_new_simulations(n=None, assets=None, asset_files=None):
+    asset_files = asset_files or []
+    ts = TemplatedSimulations(base_task=TestTask(common_asset_paths=asset_files))
     # create a new sweep for new simulations
     builder = SimulationBuilder()
     builder.add_sweep_definition(JSONConfiguredPythonTask.set_parameter_partial("a"),
-                                 [i * i for i in range(100, 120, 3)])
+                                 [i * i for i in range(100, 110, 3)])
     ts.add_builder(builder=builder)
     if assets is not None:
         ts.base_simulation.assets = assets
@@ -53,6 +54,24 @@ class TestAddingSimulationsToExistingExperiment(unittest.TestCase):
 
         self.verify_added_simulations(self.experiment, existing_simulations, simulations_to_add,
                                       new_asset_collection=new_asset_collection)
+
+    def test_adding_simulations_repeatedly_before_running_should_work(self) -> None:
+        files = ['/a/b/c.csv', '/a/b/c/d.csv']
+        for file in files:
+            # TODO: wire in use of TestTask.common_asset_paths to get gather_common_assets() to work properly for test
+            new_asset_collection = AssetCollection(assets=[Asset(absolute_path=file)])
+            new_simulations = get_new_simulations(assets=new_asset_collection, asset_files=[file])
+
+            # add the new simulations and keep track of the existing and total simulation lists
+            existing_simulations = [simulation for simulation in self.experiment.simulations.items]
+            n_sims = len(existing_simulations)
+            simulations_to_add = [simulation for simulation in new_simulations.simulations()]
+            self.experiment.add_new_simulations(simulations=new_simulations)
+
+            self.verify_added_simulations(self.experiment, existing_simulations, simulations_to_add,
+                                          new_asset_collection=new_asset_collection)
+
+
 
     def verify_added_simulations(self, experiment, existing_simulations, simulations_to_add, new_asset_collection=None):
         # using experiment.simulations.items in here because each iteration over the experiment.simulations object
