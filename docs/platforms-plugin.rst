@@ -18,9 +18,9 @@ For example, for the given platform:
 
     @dataclass(repr=False)
     class MyNewPlatform(IPlatform, CacheEnabled):
-        field1: int = field(default=1, metadata={"help": "This is the first field"})
+        field1: int = field(default=1, metadata={"help": "This is the first field."})
         internal_field: imt = field(default=2)
-        field2: str = field(default="a", metadata={"help": "this is the second field", "choices": ["a", "b", "c"]})
+        field2: str = field(default="a", metadata={"help": "This is the second field.", "choices": ["a", "b", "c"]})
 
 
 The CLI wizard will pick up ``field1`` and ``field2`` and ask the user to provide values. The type of the field will be enforced and for ``field2``, the user will have to select among the ``choices``.
@@ -28,15 +28,15 @@ The CLI wizard will pick up ``field1`` and ``field2`` and ask the user to provid
 Modify fields metadata at runtime
 `````````````````````````````````
 
-Now, what happens if we want to change the help text, choices, or default value of a field based on a previously set field.
+Now, what happens if we want to change the help text, choices, or default value of a field based on a previously set field?
 For example, let's consider an example platform where the user needs to specify an endpoint. This endpoint needs to be used to retrieve a list of environments and we want the user to choose select one of them.
 
 .. code-block:: python
 
     @dataclass(repr=False)
     class MyNewPlatform(IPlatform, CacheEnabled):
-        endpoint: str = field(default="https://myapi.com", metadata={"help": "Enter the URL of the endpoint"})
-        environment: str = field(metadata={"help": "Select an environment "})
+        endpoint: str = field(default="https://myapi.com", metadata={"help": "Enter the URL of the endpoint."})
+        environment: str = field(metadata={"help": "Select an environment."})
 
 The list of environments is dependent on the endpoint value. To achieve this, we need to provide a ``callback`` function to the metadata.
 This function will receive all the previously set user parameters, and will have the opportunity to modify the current field's ``choices``, ``default``, and ``help`` parameters.
@@ -48,12 +48,13 @@ Let's create a function querying the endpoint to get the list of environments an
     def environment_list(previous_settings:Dict, current_field:Field) -> Dict:
         """
         Allows the CLI to provide a list of available environments.
-        Uses the previous_settings to get the endpoint to query for environments
+        Uses the previous_settings to get the endpoint to query for environments.
         Args:
-            previous_settings: previous settings set by the user in the CLI.
-            current_field: Current field specs
+            previous_settings: Previous settings set by the user in the CLI.
+            current_field: Current field specs.
 
-        Returns: updates to the choices and default
+        Returns: 
+            Updates to the choices and default.
         """
         # Retrieve the endpoint set by the user
         # The key of the previous_settings is the name of the field we want the value of
@@ -97,11 +98,11 @@ For example, if you want to create a field that has an integer value between 1 a
     def validate_number(value):
         if 1 <= value <= 10:
             return True, ''
-        return False, "The value needs to be bewtween 1 and 10"
+        return False, "The value needs to be bewtween 1 and 10."
 
     @dataclass(repr=False)
     class MyNewPlatform(IPlatform, CacheEnabled):
-        custom_validation: int = field(default=1, metadata={"help": "Enter a number between 1 and 10", "validation":validate_number})
+        custom_validation: int = field(default=1, metadata={"help": "Enter a number between 1 and 10.", "validation":validate_number})
 
 The validation function will receive the user input as ``value`` and is expected to return a ``bool`` representing the result of the validation
 (``True`` if the value is correct, ``False`` if not) and a ``string`` to give an error message to the user.
@@ -116,9 +117,9 @@ in multiple fields:
     def validate_range(value, min, max):
         if min <= value <= max:
             return True, ''
-        return False, f"The value needs to be between {min} and {max}"
+        return False, f"The value needs to be between {min} and {max}."
 
     @dataclass(repr=False)
     class MyNewPlatform(IPlatform, CacheEnabled):
-        custom_validation: int = field(default=1, metadata={"help": "Enter a number between 1 and 10", "validation":partial(validate_range, min=1, max=10)})
-        custom_validation2: int = field(default=100, metadata={"help": "Enter a number between 100 and 500", "validation":partial(validate_range, min=100, max=500)})
+        custom_validation: int = field(default=1, metadata={"help": "Enter a number between 1 and 10.", "validation":partial(validate_range, min=1, max=10)})
+        custom_validation2: int = field(default=100, metadata={"help": "Enter a number between 100 and 500.", "validation":partial(validate_range, min=100, max=500)})
