@@ -9,14 +9,28 @@ as information relevant to using |IT_s|.
 .. glossary::
     :sorted:
 
+    analyzer
+        TBD
+
     asset collection
         The set of specific input files (such as input parameters, weather or migration data, or
         other configuration settings) required for running a simulation.
 
     assets
-        See asset collection.
+        See :term:asset collection.
 
     builder
+        TBD
+
+    calibration
+        TBD
+
+    cookiecutters
+        TBD
+
+    entities
+        ? Not clear what this is
+    EMOD
         TBD
 
     experiment
@@ -25,6 +39,18 @@ as information relevant to using |IT_s|.
     high-performance computing (HPC)
         The use of parallel processing for running advanced applications efficiently, reliably,
         and quickly.
+
+    platform
+        TBD
+
+    simulation
+        TBD
+
+    SSMT
+        TBD
+
+    suite
+        TBD
         
     task
         TBD
