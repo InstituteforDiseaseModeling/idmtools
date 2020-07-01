@@ -10,7 +10,7 @@ entity LocalPlatformCLI--><rect fill="#FEFECE" filter="url(#f1otlmqchdgrtn)" hei
 link PlatformAPI to LocalPlatform--><path d="M603.564,80.22 C575.026,99.802 507.532,146.114 465.325,175.0751 " fill="none" id="PlatformAPI-LocalPlatform" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="461.068,177.9958,470.7522,176.2026,465.191,175.1672,466.2264,169.6059,461.068,177.9958" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="607.932,77.222,598.2482,79.0175,603.8097,80.0516,602.7756,85.6131,607.932,77.222" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="193" x="529" y="144.0669">LocalPlatform Implementation</text><!--MD5=[78de9c51578464c19ef48d8ebb8f7e18]
 link cli_api to LocalPlatformCLI--><path d="M152.121,70 C186.124,70 274.759,70 342.667,70 " fill="none" id="cli_api-LocalPlatformCLI" style="stroke: #A80036; stroke-width: 1.0; stroke-dasharray: 7.0,7.0;"/><polygon fill="#A80036" points="347.931,70,338.931,66,342.931,70,338.931,74,347.931,70" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="147.028,70,156.028,74,152.028,70,156.028,66,147.028,70" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="164" x="165.5" y="63.0669">idmtools local commands</text><!--MD5=[658114fe877839abac81fa0ed0d92059]
 link LocalPlatformCLI to LocalPlatform--><path d="M418.355,98.352 C415.551,120.215 415.548,150.718 418.348,172.5954 " fill="none" id="LocalPlatformCLI-LocalPlatform" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="419.076,177.6818,421.7617,168.2062,418.3682,172.7322,413.8422,169.3387,419.076,177.6818" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="419.098,93.176,413.8583,101.5154,418.3867,98.1251,421.777,102.6535,419.098,93.176" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[94581a2f3320fb544f94d1cc60a0e352]
-link LocalPlatform to LocalPlatformCLI--><!--MD5=[57527c376c18851e2e9524c2a7db2d8b]
+link LocalPlatform to LocalPlatformCLI--><!--MD5=[852b4a3ba3c737f001c292b8ed137c86]
 @startuml
 package "idmtools-cli" as cli {
     [CLI]
@@ -32,7 +32,7 @@ LocalPlatformCLI <- -> LocalPlatform
 LocalPlatform -[hidden]- LocalPlatformCLI
 @enduml
 
-PlantUML version 1.2020.13(Sat Jun 13 12:26:38 UTC 2020)
+PlantUML version 1.2020.15beta1(Unknown compile time)
 (GPL source distribution)
 Java Runtime: Java(TM) SE Runtime Environment
 JVM: Java HotSpot(TM) 64-Bit Server VM
