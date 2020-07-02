@@ -14,7 +14,7 @@ You should see the status of ``running`` for each of the following docker contai
 
 * idmtools_redis
 
-* idmtools_postres
+* idmtools_postgres
 
 * idmtools_workers
 
