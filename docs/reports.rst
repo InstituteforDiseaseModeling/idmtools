@@ -16,8 +16,6 @@ If you are running simulations on |COMPS_s|, the configuration of the
 
 If you are running simulations or experiments locally, they are saved to your local computer at C:\Users\yourname.local_data\workers for Windows and ~/.local_data/workers for Linux. Additionally, they can be found in your browser when running Docker in the output directory appended after the simulation ID. For example, the output from a simulation with an ID of 5000 could be found at http://localhost:5000/data/output.
 
-You can also mention that experiment/simulations are saved to local computer in: Just suggestion
-
 The python_csv_output.py example below demonstrates how to produce output in CSV format for a simple parameter sweep.
 
 .. literalinclude:: ../examples/python_model/python_csv_output.py
