@@ -6,7 +6,7 @@ more-itertools~=8.4.0
 pandas==1.0.5
 pipreqs==0.4.10
 pluggy~=0.13.1
-PyYaml~=5.1
+PyYaml~=5.3
 tabulate~=0.8.7
 tqdm~=4.47.0
 packaging~=20.4
