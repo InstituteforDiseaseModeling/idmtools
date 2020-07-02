@@ -1,1 +1,1 @@
-__version__ = "1.2.1+nightly.0"
+__version__ = "1.2.2+nightly.0"

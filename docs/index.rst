@@ -41,8 +41,8 @@ guide modelers through necessary tasks. See :doc:`cookiecutters` for the availab
    create-sims
    parameter-sweeps
    calibrate
-   analyzers
    reports
+   analyzers
    plots
    serialization
    cookiecutters

@@ -63,6 +63,10 @@ if __name__ == "__main__":
         # define a list of functions to map the specific yaml values
         func_map = {'a': setA, 'b': setB, 'c': setC, 'd': setD}
         builder.add_sweeps_from_file(file_path, func_map)
+        # optionally, if you can also pass a function that is used for all parameters
+        # The default behaviour of the builder is to assume the default function will be a partial
+        # and attempts to call it with one var(param) before building sweep
+        # builder.add_sweeps_from_file(file_path, JSONConfiguredPythonTask.set_parameter_partial)
 
         # now define we want to create a series of simulations using the base task and the sweep
         ts = TemplatedSimulations.from_task(base_task)
