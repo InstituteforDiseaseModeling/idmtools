@@ -14,7 +14,7 @@ clean: ## Clean all our jobs
 	$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
 	$(MAKEALL) --parallel clean
 	$(CLDIR) --file-patterns "**/*.log"
-
+	$(PDR) -wd "docs" -ex "make clean"
 
 clean-all: ## Clean all our jobs
 	$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"

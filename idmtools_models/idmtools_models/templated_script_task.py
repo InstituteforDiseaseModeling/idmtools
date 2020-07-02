@@ -268,6 +268,12 @@ class ScriptWrapperTask(ITask):
         self.task.post_creation(parent)
         self.template_script_task.post_creation(parent)
 
+    def __getattr__(self, item):
+        if item not in self.__dict__:
+            return getattr(self.task, item)
+        else:
+            return super(ScriptWrapperTask, self).__getattr__(item)
+
 
 def get_script_wrapper_task(task: ITask, wrapper_script_name: str, template_content: str = None,
                             template_file: str = None, template_is_common: bool = True,
