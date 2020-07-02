@@ -25,9 +25,9 @@ You can use the **idmtools.ini** file to configure platform specific settings, a
     batch_size = 10
     exclusive = False
 
-Within your code you use the :py:class:`~idmtools.core.platform_factory.Platform` class to specify which platform |IT_s| will use. For example, the following excerpt sets **platform** to use |COMPS_s|::
+Within your code you use the :py:class:`~idmtools.core.platform_factory.Platform` class to specify which platform |IT_s| will use. For example, the following excerpt sets **platform** to use |COMPS_s| and overrides **priority** and **node_group** settings.::
 
-    platform = Platform('COMPS')
+    platform = Platform('COMPS',priority='AboveNormal',node_group='emod_a')
 
 You use the :py:class:`~idmtools.core.platform_factory.Platform` class whether you're building or running an experiment, or running analysis on output from simulations.
 
