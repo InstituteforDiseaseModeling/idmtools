@@ -15,7 +15,7 @@ You can use the **idmtools.ini** file to configure platform specific settings, a
     [COMPS]
     type = COMPS
     endpoint = https://comps.idmod.org
-    environment = Bayesian
+    environment = Belegost
     priority = Lowest
     simulation_root = $COMPS_PATH(USER)\output
     node_group = emod_abcd
