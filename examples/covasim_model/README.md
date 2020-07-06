@@ -1,3 +1,8 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+undefined
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 Here is an example of how to run the [Covasim] model developed at IDM.
 
 This approach uses a Docker container to run the simulation on a SLURM cluster with Singularity installed.
