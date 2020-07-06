@@ -55,8 +55,8 @@ jobs:
           path: idmtools_cli/tests/test_results.xml
       - name: run idmtools_core tests
         run: |
-            cd idmtools_core/tests
-            py.test --durations=3 -v --junitxml=test_results.xml
+          cd idmtools_core/tests
+          py.test --durations=3 -v --junitxml=test_results.xml
       - name: Upload idmtools_core test results
         uses: actions/upload-artifact@v2
         if: failure()

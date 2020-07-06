@@ -9,6 +9,7 @@
 # Note, this test will checkout 'master' branch in windows
 
 name: "run-master-prod-win-test-curl"
+on:
   repository_dispatch:
     # Manually trigger with curl or Postman POST
     types: [test_master_prod_win]
@@ -45,11 +46,11 @@ jobs:
           pip install idmtools-test --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
       - name: login to comps2
         run: |
-            python dev_scripts/create_auth_token_args.py --username ${{ secrets.COMPS_USER }} --password ${{ secrets.COMPS_PASSWORD }}
+          python dev_scripts/create_auth_token_args.py --username ${{ secrets.COMPS_USER }} --password ${{ secrets.COMPS_PASSWORD }}
       - name: run idmtools_cli tests
         run: |
-            cd idmtools_cli/tests
-            py.test --durations=3 -v --junitxml=test_results.xml
+          cd idmtools_cli/tests
+          py.test --durations=3 -v --junitxml=test_results.xml
       - name: Upload idmtools_cli test results
         uses: actions/upload-artifact@v2
         if: failure()
@@ -58,8 +59,8 @@ jobs:
           path: idmtools_cli/tests/test_results.xml
       - name: run idmtools_core tests
         run: |
-            cd idmtools_core/tests
-            py.test --durations=3 -v --junitxml=test_results.xml
+          cd idmtools_core/tests
+          py.test --durations=3 -v --junitxml=test_results.xml
       - name: Upload idmtools_core test results
         uses: actions/upload-artifact@v2
         if: failure()
@@ -68,8 +69,8 @@ jobs:
           path: idmtools_core/tests/test_results.xml
       - name: run idmtools_models tests
         run: |
-            cd idmtools_models/tests
-            py.test --durations=3 -v --junitxml=test_results.xml
+          cd idmtools_models/tests
+          py.test --durations=3 -v --junitxml=test_results.xml
       - name: Upload idmtools_models test results
         uses: actions/upload-artifact@v2
         if: failure()
@@ -78,8 +79,8 @@ jobs:
           path: idmtools_models/tests/test_results.xml
       - name: run idmtools_platform_comps tests
         run: |
-            cd idmtools_platform_comps/tests
-            py.test --durations=3 -v --junitxml=test_results.xml
+          cd idmtools_platform_comps/tests
+          py.test --durations=3 -v --junitxml=test_results.xml
       - name: Upload idmtools_platform_comps test results
         uses: actions/upload-artifact@v2
         if: failure()
