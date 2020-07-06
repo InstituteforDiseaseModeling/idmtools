@@ -7,8 +7,8 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: [3.6, 3.7]
-    if: "contains(github.event.head_commit.message, 'Run prod uj all test!')"
+        python-version: [3.6, 3.7, 3.8]
+    if: "contains(github.event.head_commit.message, 'Run prod ubuntu all test!')"
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
@@ -19,7 +19,7 @@ jobs:
           architecture: x64
       - name: Install Python dependencies
         run: |
-          pip install py-make flake8
+          pip install py-make flake8 wheel
       - name: Install dataclass
         if: ${{ matrix.python-version }} == 3.6
         run: |
