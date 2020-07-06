@@ -5,10 +5,14 @@ on:
     paths:
       - '**.py'
       - 'docs/**'
+      - '**/requirements.txt'
+      - 'idmtools_core/.bumpversion.cfg'
   pull_request:
     paths:
       - '**.py'
       - 'docs/**'
+      - '**/requirements.txt'
+      - 'idmtools_core/.bumpversion.cfg'
 jobs:
   rebuild-documentation:
 
