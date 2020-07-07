@@ -1,8 +1,7 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-[TOC levels=3-6]: # "### Contents"
+**Table of Contents**
 
-### Contents
 - [Overview](#overview)
 - [Quick Start](#quick-start)
 - [Folder Contents](#folder-contents)
