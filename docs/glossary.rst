@@ -53,7 +53,7 @@ as information relevant to using |IT_s|.
         of an experiement. 
 
     server-side modeling tools (SSMT)
-        Modeling tools used with |COMP_s| that handle computation on the server, rather than the client, side to speed up analysis. 
+        Modeling tools used with |COMP_s| that handle computation on the server side, rather than the client side, to speed up analysis. 
 
     suite
         Logical grouping of experiments. This allows for managing multiple experiments as a single unit or grouping.
