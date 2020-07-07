@@ -2,14 +2,34 @@
 
 # ------------------------------------------------------------------ #
 # Cluster run script
-# This script pull the public Docker container for Covasim
+# This script pulls the public Docker container for Covasim and
+# then runs the simulation script.
 # ------------------------------------------------------------------ #
 
-# Store the .sif container file name
-image=covasim.sif
+# ---------- #
+# Variables
+# ---------- #
+
+# URI for the image (URI formats: https://sylabs.io/guides/3.5/user-guide/cli/singularity_pull.html)
+uri='docker://idmod/covasim'
+
+# image file name after downloading
+image='covasim.sif'
+
+# Get the appropriate mount path(s) for current environment (e.g., /mnt/idm)
+mounts="$(/bin/ls -dm /mnt/* | sed "s/, /,/g")"
+
+# ---------- #
+# Script
+# ---------- #
+
+# List the variables for the job
+echo -e '# Environment Variables\n'
+( set -o posix ; set )
+echo
 
 # Pull the container from Docker Hub
-singularity pull $image docker://idmod/covasim
+singularity pull $image $uri
 
-# Use the container to run sim.py
-singularity exec -B /mnt/idm $image python3 ./Assets/sim.py
+# Use the image to run sim.py
+singularity exec -B "$mounts" $image python3 ./Assets/sim.py

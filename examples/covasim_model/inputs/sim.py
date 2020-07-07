@@ -1,9 +1,13 @@
 import os
 import covasim as cv
 
+# Script that can configures and runs a Covasim model
+
 if __name__ == '__main__':
     # Get the current directory of the input file so that outputs get written to the same directory
     cwd = os.path.dirname(__file__)
+
+    # Set the output directory path
     outputs = os.path.join(cwd, os.pardir, "outputs")
 
     # Make the outputs directory if doesn't exist
