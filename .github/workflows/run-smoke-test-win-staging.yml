@@ -39,14 +39,14 @@ jobs:
           pip install idmtools-test --index-url=https://${{ env.bamboo_user }}:${{ env.bamboo_password }}@packages.idmod.org/api/pypi/pypi-staging/simple --verbose
       - name: login to comps2
         run: |
-            python dev_scripts/create_auth_token_args.py --username ${{ secrets.COMPS_USER }} --password ${{ secrets.COMPS_PASSWORD }}
+          python dev_scripts/create_auth_token_args.py --username ${{ secrets.COMPS_USER }} --password ${{ secrets.COMPS_PASSWORD }}
       - name: login to docker staging
         run: |
           echo '${{ env.bamboo_password }}' | docker login idm-docker-staging.packages.idmod.org --username ${{ env.bamboo_user }} --password-stdin
       - name: run idmtools_cli smoke tests
         run: |
-            cd idmtools_cli\tests
-            py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
+          cd idmtools_cli\tests
+          py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
       - name: Upload idmtools_cli smoke test results
         uses: actions/upload-artifact@v2
         if: failure()
@@ -55,8 +55,8 @@ jobs:
           path: idmtools_cli\tests\test_results.xml
       - name: run idmtools_core smoke tests
         run: |
-            cd idmtools_core\tests
-            py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
+          cd idmtools_core\tests
+          py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
       - name: Upload idmtools_core smoke test results
         uses: actions/upload-artifact@v2
         if: failure()
@@ -65,8 +65,8 @@ jobs:
           path: idmtools_core\tests\test_results.xml
       - name: run idmtools_models tests
         run: |
-            cd idmtools_models/tests
-            py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
+          cd idmtools_models/tests
+          py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
       - name: Upload idmtools_models smoke test results
         uses: actions/upload-artifact@v2
         if: failure()
@@ -75,8 +75,8 @@ jobs:
           path: idmtools_models\tests\test_results.xml
       - name: run idmtools_platform_comps tests
         run: |
-            cd idmtools_platform_comps\tests
-            py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
+          cd idmtools_platform_comps\tests
+          py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
       - name: Upload idmtools_platform_comps test results
         uses: actions/upload-artifact@v2
         if: failure()
