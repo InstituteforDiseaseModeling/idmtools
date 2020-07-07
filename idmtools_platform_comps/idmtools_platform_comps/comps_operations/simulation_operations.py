@@ -213,8 +213,8 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
     def platform_run_item(self, simulation: Simulation, **kwargs):
         pass
 
-    def send_assets(self, simulation: Simulation, comps_sim: Optional[COMPSSimulation] = None, add_metadata: bool = True,
-                    **kwargs):
+    def send_assets(self, simulation: Simulation, comps_sim: Optional[COMPSSimulation] = None,
+                    add_metadata: bool = False, **kwargs):
         """
         Send assets to Simulation
 
