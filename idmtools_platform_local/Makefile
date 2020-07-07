@@ -129,7 +129,7 @@ ui-yarn-upgrade:
 	@+$(IPY) "import os; os.chdir('idmtools_webui'); os.system('python build.py upgrade')"
 
 build-ui: ## build ui
-	# $(CLDIR) --directories "idmtools_platform_local/internals/ui/static,idmtools_webui/build"
+	$(CLDIR) --directories "idmtools_platform_local/internals/ui/static,idmtools_webui/build"
 	@+$(IPY) "import os; os.chdir('idmtools_webui'); os.system('python build.py')"
 	@$(IPY) "import shutil; shutil.copytree('idmtools_webui/build', 'idmtools_platform_local/internals/ui/static')"
 
