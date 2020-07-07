@@ -10,28 +10,33 @@ as information relevant to using |IT_s|.
     :sorted:
 
     analyzer
-        TBD
+        Functionality that uses the the MapReduce framework to process large data sets in parallel, typically on a :term:`high-performance computing (HPC)` cluster. For example, if you would like to focus on specific data points from all simulations in one or more experiments then you can do this using analyzers with |IT_s| and plot the final output.
 
     asset collection
-        The set of specific input files (such as input parameters, weather or migration data, or
-        other configuration settings) required for running a simulation.
+        The set of specific input files (such as input parameters, weather or
+        migration data, or other configuration settings) required for running
+        a simulation.
+
+        .. Is this specific to COMPS? 
 
     assets
-        See :term:asset collection.
+        See :term:`asset collection`.
 
     builder
-        TBD
+        Functionality that builds experiments using templated simulations.
+
+        .. Can you provide more detail? This doesn't seem that clear to me. 
 
     calibration
-        TBD
-
-    cookiecutters
-        TBD
+        The process of adjusting the parameters of a simulation to better match the data from a particular time and place. 
 
     entities
-        ? Not clear what this is
-    EMOD
-        TBD
+        The items, such as simulations, analyzers, or tasks, that are managed by |IT_s|
+
+        .. Is this correct? Total stab in the dark. 
+
+    |EMOD_s|
+        An agent-based mechanistic disease transmission model built by |IDM_s| that can be used with |IT_s|. See the `EMOD GitHub repo <https://github.com/InstituteforDiseaseModeling/EMOD>`_.
 
     experiment
         A collection of multiple simulations, typically sent to an HPC.
@@ -41,19 +46,23 @@ as information relevant to using |IT_s|.
         and quickly.
 
     platform
-        TBD
+        The computing resource on which the simulation runs. See :doc:`platforms` for
+        more information on those that are currently supported. 
 
     simulation
-        TBD
+        An individual run of a model. Generally, multiple simulations are run as part
+        of an experiement. 
 
     SSMT
         TBD
 
     suite
-        TBD
+        A collection of multiple experiments, each of which contains multiple simulations. 
         
     task
-        TBD
+        All simulations have tasks.
+
+        What does this mean exactly? 
 
     template
         TBD
