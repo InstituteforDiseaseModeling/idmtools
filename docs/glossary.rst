@@ -10,26 +10,22 @@ as information relevant to using |IT_s|.
     :sorted:
 
     analyzer
-        Functionality that uses the the MapReduce framework to process large data sets in parallel, typically on a :term:`high-performance computing (HPC)` cluster. For example, if you would like to focus on specific data points from all simulations in one or more experiments then you can do this using analyzers with |IT_s| and plot the final output.
+        Functionality that uses the MapReduce framework to process large data sets in parallel, typically on a :term:`high-performance computing (HPC)` cluster. For example, if you would like to focus on specific data points from all simulations in one or more experiments then you can do this using analyzers with |IT_s| and plot the final output.
 
     asset collection
-        Collection of user created input files, such as demographics, temperature, weather, and overlay files. These files are stored in |COMPS_s| and can be available for use by other users.
+        A collection of user created input files, such as demographics, temperature, weather, binaries, and overlay files. These files are stored in |COMPS_s| and can be available for use by other users.
 
     assets
         See :term:`asset collection`.
 
     builder
-        Functionality that builds experiments using templated simulations.
-
-        .. Can you provide more detail? This doesn't seem that clear to me. 
+        A function and list of values with which to call that function that is used to sweep through parameter values in a simulation.
 
     calibration
         The process of adjusting the parameters of a simulation to better match the data from a particular time and place. 
 
     entity
-        Each of the items, such as simulations, analyzers, or tasks, that are managed by |IT_s|.
-
-        .. Is this correct? Total stab in the dark. 
+        Each of the interfaces or classes that are well-defined models, types, and validations for |IT_s| items, such as simulations, analyzers, or tasks.
 
     |EMOD_s|
         An agent-based mechanistic disease transmission model built by |IDM_s| that can be used with |IT_s|. See the `EMOD GitHub repo <https://github.com/InstituteforDiseaseModeling/EMOD>`_.
@@ -53,7 +49,7 @@ as information relevant to using |IT_s|.
         of an experiement. 
 
     server-side modeling tools (SSMT)
-        Modeling tools used with |COMP_s| that handle computation on the server side, rather than the client side, to speed up analysis. 
+        Modeling tools used with |COMPS_s| that handle computation on the server side, rather than the client side, to speed up analysis. 
 
     suite
         Logical grouping of experiments. This allows for managing multiple experiments as a single unit or grouping.
