@@ -28,6 +28,9 @@ echo -e '# Environment Variables\n'
 ( set -o posix ; set )
 echo
 
+# create outputs directory
+mkdir outputs
+
 # Pull the container from Docker Hub
 singularity pull $image $uri
 
