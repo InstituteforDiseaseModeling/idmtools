@@ -40,7 +40,6 @@ guide modelers through necessary tasks. See :doc:`cookiecutters` for the availab
    platforms
    create-sims
    parameter-sweeps
-   calibrate
    reports
    analyzers
    plots
