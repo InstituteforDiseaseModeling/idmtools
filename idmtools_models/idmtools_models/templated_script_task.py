@@ -36,6 +36,7 @@ class TemplatedScriptTask(ITask):
     #: Controls whether a template should be an experiment or a simulation level asset
     template_is_common: bool = field(default=True, metadata={"md": True})
     #: Template variables used for rendering the template
+    # Note: large amounts of variables will increase metadata size
     variables: Dict[str, Any] = field(default_factory=dict, metadata={"md": True})
     #: Platform Path Separator. For Windows execution platforms, use \, otherwise use the default of /
     path_sep: str = field(default='/', metadata={"md": True})
