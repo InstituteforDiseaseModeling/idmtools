@@ -39,4 +39,14 @@ And, you must include the following block in the ``idmtools.ini`` file::
 
 View simulations and experiments
 ````````````````````````````````
-You can view the status of your simulations and experiments by opening up the |IT_s| dashboard, which runs on a localhost server on port 5000 (http://localhost:5000). It is recommended that you use Google Chrome to open the dashboard.
+You can the dashboard or the CLI for |IT_s| to view and monitor the status of your simulations and experiments.
+
+The **dashboard** runs on a localhost server on port 5000 (http://localhost:5000). It is recommended that you use Google Chrome to open the dashboard.
+
+The **CLI** command to see the status of simulations is::
+
+    idmtools simulation --platform Local status
+
+And, for experiments::
+
+    idmtools experiment --platform Local status

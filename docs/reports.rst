@@ -14,7 +14,7 @@ If you are running simulations on |COMPS_s|, the configuration of the
 
 .. include:: reuse/comps_note.txt
 
-If you are running simulations or experiments locally, they are saved to your local computer at C:\Users\yourname.local_data\workers for Windows and ~/.local_data/workers for Linux. 
+If you are running simulations or experiments locally, they are saved to your local computer at C:\\Users\\yourname\\.local_data\\workers for Windows and ~/.local_data/workers for Linux. 
 
 Additionally, when running locally using Docker, output can be found in your browser in the output directory appended after the experiment or simulation ID. For example, the output from an experiment with an ID of S07OASET could be found at http://localhost:5000/data/S07OASET. The output from an individual simulation (ID FCPRIV7H) within that experiment could be found at http://localhost:5000/data/S07OASET/FCPRIV7H. 
 
