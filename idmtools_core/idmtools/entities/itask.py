@@ -222,12 +222,19 @@ class ITask(metaclass=ABCMeta):
 
         Returns: dict
         """
+        from idmtools_platform_comps.comps_platform import COMPSPlatform
+        from idmtools.core.context import get_current_platform
+
         result = dict()
         metadata_fields = self.metadata_fields
+        platform = get_current_platform()
         for f in fields(self):
             if not f.name.startswith("_") and f.name not in ['parent']:
-                if f.name in metadata_fields:
-                    result[f.name] = getattr(self, f.name)
+                if isinstance(platform, COMPSPlatform):
+                    if f.name in metadata_fields:
+                        result[f.name] = getattr(self, f.name)
+                    else:
+                        result[f.name] = f.default
                 else:
-                    result[f.name] = f.default
+                    result[f.name] = getattr(self, f.name)
         return result
