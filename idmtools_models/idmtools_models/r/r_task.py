@@ -14,8 +14,8 @@ logger = getLogger(__name__)
 
 @dataclass
 class RTask(DockerTask):
-    script_path: str = field(default=None)
-    r_path: str = field(default='Rscript')
+    script_path: str = field(default=None, metadata={"md": True})
+    r_path: str = field(default='Rscript', metadata={"md": True})
     extra_libraries: list = field(default_factory=lambda: [], compare=False, metadata={"md": True})
 
     @property

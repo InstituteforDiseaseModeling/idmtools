@@ -28,7 +28,7 @@ TTaskHook = Callable[[TTaskParent], NoReturn]
 @dataclass
 class ITask(metaclass=ABCMeta):
     #: The Command to run
-    command: Union[str, CommandLine] = field(default=None)
+    command: Union[str, CommandLine] = field(default=None, metadata={"md": True})
     #: List of requirements needed by the task to run on an execution platform. This is stuff like Windows, Linux, GPU
     #  etc
     platform_requirements: Set[PlatformRequirements] = field(default_factory=set)
@@ -54,6 +54,15 @@ class ITask(metaclass=ABCMeta):
 
         self.__pre_creation_hooks = []
         self.__post_creation_hooks = []
+
+    @property
+    def metadata_fields(self):
+        """
+        Collect all metadata fields
+
+        Returns: set of metadata filed names
+        """
+        return set(f.name for f in fields(self) if "md" in f.metadata and f.metadata["md"])
 
     def add_pre_creation_hook(self, hook: TTaskHook):
         """
@@ -132,6 +141,11 @@ class ITask(metaclass=ABCMeta):
         pass
 
     def gather_all_assets(self) -> AssetCollection:
+        """
+        Collect all common and transient assets
+
+        Returns: new AssetCollection
+        """
         return self.gather_common_assets() + self.gather_transient_assets()
 
     def copy_simulation(self, base_simulation: 'Simulation') -> 'Simulation':
@@ -149,6 +163,11 @@ class ITask(metaclass=ABCMeta):
         raise NotImplementedError("Reloading task from a simulation is not supported")
 
     def to_simulation(self):
+        """
+        Convert task to simulation
+
+        Returns: new simulation
+        """
         from idmtools.entities.simulation import Simulation
         s = Simulation()
         s.task = self
@@ -161,6 +180,8 @@ class ITask(metaclass=ABCMeta):
         """
         Return default values for :meth:`~idmtools.interfaces.ientity.pickle_ignore_fields`.
         Call before pickling.
+
+        Returns: dict
         """
         return {"_task_log": None}
 
@@ -174,6 +195,8 @@ class ITask(metaclass=ABCMeta):
     def __getstate__(self):
         """
         Ignore the fields in pickle_ignore_fields during pickling.
+
+        Returns: fields set after removing ignored fields
         """
         return ignore_fields_in_dataclass_on_pickle(self)
 
@@ -194,8 +217,17 @@ class ITask(metaclass=ABCMeta):
         return result
 
     def to_dict(self) -> Dict:
+        """
+        Select metadata fields and make a new dict
+
+        Returns: dict
+        """
         result = dict()
+        metadata_fields = self.metadata_fields
         for f in fields(self):
             if not f.name.startswith("_") and f.name not in ['parent']:
-                result[f.name] = getattr(self, f.name)
+                if f.name in metadata_fields:
+                    result[f.name] = getattr(self, f.name)
+                else:
+                    result[f.name] = f.default
         return result
