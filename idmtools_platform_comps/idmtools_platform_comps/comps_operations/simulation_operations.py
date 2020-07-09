@@ -214,7 +214,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         pass
 
     def send_assets(self, simulation: Simulation, comps_sim: Optional[COMPSSimulation] = None,
-                    add_metadata: bool = True, **kwargs):
+                    add_metadata: bool = False, **kwargs):
         """
         Send assets to Simulation
 
