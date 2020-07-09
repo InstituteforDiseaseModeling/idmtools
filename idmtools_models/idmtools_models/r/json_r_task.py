@@ -10,7 +10,7 @@ from idmtools_models.r.r_task import RTask
 
 @dataclass
 class JSONConfiguredRTask(JSONConfiguredTask, RTask):
-    configfile_argument: Optional[str] = field(default="--config")
+    configfile_argument: Optional[str] = field(default="--config", metadata={"md": True})
 
     def __post_init__(self):
         super().__post_init__()
