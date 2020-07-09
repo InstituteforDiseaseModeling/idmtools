@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Tuple, Type, Optional
 from uuid import UUID
 from COMPS.Data import QueryCriteria, WorkItem as COMPSWorkItem, WorkItemFile
 from COMPS.Data.WorkItem import RelationType, WorkerOrPluginKey
+
 from idmtools.assets import AssetCollection
 from idmtools.core import ItemType
 from idmtools.entities.generic_workitem import GenericWorkItem
