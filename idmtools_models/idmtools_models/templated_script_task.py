@@ -34,7 +34,7 @@ class TemplatedScriptTask(ITask):
     #: The template file. You can only use either template or template_file at once
     template_file: str = field(default=None, metadata={"md": True})
     #: Controls whether a template should be an experiment or a simulation level asset
-    template_is_common: bool = field(default=True)
+    template_is_common: bool = field(default=True, metadata={"md": True})
     #: Template variables used for rendering the template
     variables: Dict[str, Any] = field(default_factory=dict, metadata={"md": True})
     #: Platform Path Separator. For Windows execution platforms, use \, otherwise use the default of /
