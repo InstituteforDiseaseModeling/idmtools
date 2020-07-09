@@ -25,8 +25,9 @@ a simulation, to creating a :term:`experiment`. This allows the user to create i
 specific needs: they can be transient, or sharable across multiple simulations.
 
 Exact workflows for using |IT_s| is user-dependent, and can include any of the tasks listed below.
-To help new users get started, a series of Cookiecutter projects have been added, designed to
-guide modelers through necessary tasks. See :doc:`cookiecutters` for the available templates.
+
+.. To help new users get started, a series of Cookiecutter projects have been added, designed to
+.. guide modelers through necessary tasks. See :doc:`cookiecutters` for the available templates.
 
 
 
@@ -42,14 +43,11 @@ guide modelers through necessary tasks. See :doc:`cookiecutters` for the availab
    parameter-sweeps
    reports
    analyzers
-   plots
-   serialization
-   cookiecutters
+   plots   
    reference
    cli_index
    glossary
    changelog
-
 
 
 
