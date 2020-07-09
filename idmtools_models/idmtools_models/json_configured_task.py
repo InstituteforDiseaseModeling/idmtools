@@ -21,6 +21,7 @@ class JSONConfiguredTask(ITask):
     Defines an extensible simple task that implements functionality through optional supplied use hooks
     """
 
+    # Note: large amounts of parameters will increase size of metadata
     parameters: dict = field(default_factory=lambda: {}, metadata={"md": True})
     envelope: str = field(default=None, metadata={"md": True})
     # If we don't define this we assume static name the script consuming file will know
