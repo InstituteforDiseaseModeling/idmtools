@@ -21,10 +21,11 @@ class JSONConfiguredTask(ITask):
     Defines an extensible simple task that implements functionality through optional supplied use hooks
     """
 
-    parameters: dict = field(default_factory=lambda: {})
-    envelope: str = field(default=None)
+    # Note: large amounts of parameters will increase size of metadata
+    parameters: dict = field(default_factory=lambda: {}, metadata={"md": True})
+    envelope: str = field(default=None, metadata={"md": True})
     # If we don't define this we assume static name the script consuming file will know
-    config_file_name: str = field(default="config.json")
+    config_file_name: str = field(default="config.json", metadata={"md": True})
     # is the config file a common asset or a transient. We default ot transient
     is_config_common: bool = field(default=False)
     command_line_argument: str = field(default=None)

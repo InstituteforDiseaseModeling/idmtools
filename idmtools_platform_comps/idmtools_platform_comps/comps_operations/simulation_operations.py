@@ -213,8 +213,8 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
     def platform_run_item(self, simulation: Simulation, **kwargs):
         pass
 
-    def send_assets(self, simulation: Simulation, comps_sim: Optional[COMPSSimulation] = None, add_metadata: bool = True,
-                    **kwargs):
+    def send_assets(self, simulation: Simulation, comps_sim: Optional[COMPSSimulation] = None,
+                    add_metadata: bool = False, **kwargs):
         """
         Send assets to Simulation
 
@@ -237,7 +237,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             if logger.isEnabledFor(DEBUG):
                 logger.debug("Creating idmtools metadata for simulation and task on COMPS")
             # later we should add some filtering for passwords and such here in case anything weird happens
-            metadata = json.dumps(simulation.to_dict()['task'], cls=IDMJSONEncoder)
+            metadata = json.dumps(simulation.task.to_dict(), cls=IDMJSONEncoder)
             from idmtools import __version__
             comps_sim.add_file(
                 SimulationFile("idmtools_metadata.json", 'input', description=f'IDMTools {__version__}'),
