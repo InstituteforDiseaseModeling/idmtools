@@ -9,7 +9,7 @@ examples_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 
 analyzers_folder = os.path.join(examples_folder, 'analyzers')
 
 
-@pytest.mark.skip
+@pytest.mark.example
 class TestAnalyzersExample(TestCase):
     def test_analyzers_directory(self):
         test_example_folder(self, analyzers_folder)
