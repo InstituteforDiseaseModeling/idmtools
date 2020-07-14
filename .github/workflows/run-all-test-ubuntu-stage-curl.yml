@@ -100,6 +100,7 @@ jobs:
       - name: run idmtools_platform_local tests
         run: |
           cd idmtools_platform_local/tests
+          export DOCKER_REPO=idm-docker-staging
           py.test --durations=3 -v --junitxml=test_results.xml
       - name: Upload idmtools_platform_local test results
         uses: actions/upload-artifact@v2
