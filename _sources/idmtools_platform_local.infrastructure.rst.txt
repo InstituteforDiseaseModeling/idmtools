@@ -5,6 +5,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    idmtools_platform_local.infrastructure.base_service_container
    idmtools_platform_local.infrastructure.docker_io

@@ -5,6 +5,7 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
    idmtools.utils.display
    idmtools.utils.filters
@@ -13,6 +14,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    idmtools.utils.collections
    idmtools.utils.command_line

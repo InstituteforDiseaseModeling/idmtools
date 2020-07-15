@@ -5,6 +5,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    idmtools_platform_comps.comps_operations.asset_collection_operations
    idmtools_platform_comps.comps_operations.experiment_operations

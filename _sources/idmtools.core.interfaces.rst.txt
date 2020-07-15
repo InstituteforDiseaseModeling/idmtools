@@ -5,6 +5,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    idmtools.core.interfaces.entity_container
    idmtools.core.interfaces.iassets_enabled

@@ -22,10 +22,6 @@ see the links below for instructions.
 
 * |Python_IT| (https://www.python.org/downloads/release)
 
-  .. warning::
-
-    Do not install Python 3.8, which includes breaking changes.
-
 * Python virtual environments
 
     Python virtual environments enable you to isolate your Python environments from one

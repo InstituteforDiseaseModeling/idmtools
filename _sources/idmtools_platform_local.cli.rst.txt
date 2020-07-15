@@ -5,6 +5,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    idmtools_platform_local.cli.experiment
    idmtools_platform_local.cli.local

@@ -1,8 +1,7 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
@@ -12,6 +11,13 @@
   
 
   
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="_static/tipuesearch/tipuesearch.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+
+  
   
     <link rel="shortcut icon" href="_static/favicon.ico"/>
   
@@ -19,7 +25,9 @@
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -36,13 +44,6 @@
     <link rel="search" type="application/opensearchdescription+xml"
           title="Search within idmtools  documentation"
           href="_static/opensearch.xml"/>
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-  <link rel="stylesheet" href="_static/tipuesearch/tipuesearch.css" type="text/css" />
-  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="idmtools.assets.content_handlers module" href="idmtools.assets.content_handlers.html" />
@@ -64,7 +65,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> idmtools
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> idmtools
           
 
           
@@ -77,7 +78,7 @@
             
             
               <div class="version">
-                1.2.2
+                1.3.0
               </div>
             
           
@@ -92,6 +93,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -105,12 +107,9 @@
 <li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="calibrate.html">Calibrate simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reports.html">Output data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reports.html">Output reports</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookiecutter example projects</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="reference.html">Architecture and packages reference</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="idmtools_index.html">idmtools</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="idmtools.html">idmtools package</a><ul class="current">
@@ -140,6 +139,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -167,7 +167,7 @@
 <div aria-label="breadcrumbs navigation" role="navigation">
     <ul class="wy-breadcrumbs">
         <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
-        <li><a href="index.html">IDM-Tools</a> &raquo;</li>
+        <li><a href="index.html">idmtools</a> &raquo;</li>
         
         <li><a href="reference.html">Architecture and packages reference</a> &raquo;</li>
         
@@ -193,9 +193,9 @@
 
   <div class="section" id="module-idmtools.assets.asset_collection">
 <span id="idmtools-assets-asset-collection-module"></span><h1>idmtools.assets.asset_collection module<a class="headerlink" href="#module-idmtools.assets.asset_collection" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="idmtools.assets.asset_collection.AssetCollection">
-<em class="property">class </em><code class="sig-prename descclassname">idmtools.assets.asset_collection.</code><code class="sig-name descname">AssetCollection</code><span class="sig-paren">(</span><em class="sig-param">assets: List[idmtools.assets.asset.Asset] = None</em>, <em class="sig-param">tags: Dict[str</em>, <em class="sig-param">Any] = {}</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">idmtools.assets.asset_collection.</code><code class="sig-name descname">AssetCollection</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">assets</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference internal" href="idmtools.assets.asset.html#idmtools.assets.asset.Asset" title="idmtools.assets.asset.Asset">idmtools.assets.asset.Asset</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tags</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="idmtools.core.interfaces.ientity.html#idmtools.core.interfaces.ientity.IEntity" title="idmtools.core.interfaces.ientity.IEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">idmtools.core.interfaces.ientity.IEntity</span></code></a></p>
 <p>A class that represents a collection of assets.</p>
 <dl class="field-list simple">
@@ -203,17 +203,17 @@
 <dd class="field-odd"><p><strong>assets</strong> – An optional list of assets to create the collection with.</p>
 </dd>
 </dl>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="idmtools.assets.asset_collection.AssetCollection.item_type">
-<code class="sig-name descname">item_type</code><em class="property">: idmtools.core.enums.ItemType</em><em class="property"> = 5</em><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.item_type" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">item_type</code><em class="property">: <a class="reference internal" href="idmtools.core.enums.html#idmtools.core.enums.ItemType" title="idmtools.core.enums.ItemType">idmtools.core.enums.ItemType</a></em><em class="property"> = 5</em><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.item_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="idmtools.assets.asset_collection.AssetCollection.assets">
-<code class="sig-name descname">assets</code><em class="property">: List[idmtools.assets.asset.Asset]</em><em class="property"> = None</em><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.assets" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">assets</code><em class="property">: List<span class="p">[</span><a class="reference internal" href="idmtools.assets.asset.html#idmtools.assets.asset.Asset" title="idmtools.assets.asset.Asset">idmtools.assets.asset.Asset</a><span class="p">]</span></em><em class="property"> = None</em><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.assets" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools.assets.asset_collection.AssetCollection.from_directory">
 <em class="property">classmethod </em><code class="sig-name descname">from_directory</code><span class="sig-paren">(</span><em class="sig-param">assets_directory: str, recursive: bool = True, flatten: bool = False, filters: Optional[List[Union[Callable[[TAsset], bool], Callable]]] = None, filters_mode: idmtools.core.enums.FilterMode = &lt;FilterMode.OR: 1&gt;, relative_path: str = None</em><span class="sig-paren">)</span> &#x2192; TAssetCollection<a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.from_directory" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fill up an <a class="reference internal" href="#idmtools.assets.asset_collection.AssetCollection" title="idmtools.assets.asset_collection.AssetCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">AssetCollection</span></code></a> from the specified directory. See
@@ -225,9 +225,9 @@
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools.assets.asset_collection.AssetCollection.assets_from_directory">
-<em class="property">static </em><code class="sig-name descname">assets_from_directory</code><span class="sig-paren">(</span><em class="sig-param">assets_directory: str, recursive: bool = True, flatten: bool = False, filters: Optional[List[Union[Callable[[TAsset], bool], Callable]]] = None, filters_mode: idmtools.core.enums.FilterMode = &lt;FilterMode.OR: 1&gt;, forced_relative_path: str = None</em><span class="sig-paren">)</span> &#x2192; List[idmtools.assets.asset.Asset]<a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.assets_from_directory" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">assets_from_directory</code><span class="sig-paren">(</span><em class="sig-param">assets_directory: str, recursive: bool = True, flatten: bool = False, filters: Optional[List[Union[Callable[[TAsset], bool], Callable]]] = None, filters_mode: idmtools.core.enums.FilterMode = &lt;FilterMode.OR: 1&gt;, forced_relative_path: str = None</em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span><a class="reference internal" href="idmtools.assets.asset.html#idmtools.assets.asset.Asset" title="idmtools.assets.asset.Asset">idmtools.assets.asset.Asset</a><span class="p">]</span><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.assets_from_directory" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create assets for files in a given directory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -255,16 +255,16 @@ relative_path=”test”. Will return assets with relative path: test/a/1,txt an
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools.assets.asset_collection.AssetCollection.add_directory">
 <code class="sig-name descname">add_directory</code><span class="sig-paren">(</span><em class="sig-param">assets_directory: str, recursive: bool = True, flatten: bool = False, filters: Optional[List[Union[Callable[[TAsset], bool], Callable]]] = None, filters_mode: idmtools.core.enums.FilterMode = &lt;FilterMode.OR: 1&gt;, relative_path: str = None</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.add_directory" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve assets from the specified directory and add them to the collection.
 See <a class="reference internal" href="#idmtools.assets.asset_collection.AssetCollection.assets_from_directory" title="idmtools.assets.asset_collection.AssetCollection.assets_from_directory"><code class="xref py py-meth docutils literal notranslate"><span class="pre">assets_from_directory()</span></code></a> for arguments.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools.assets.asset_collection.AssetCollection.add_asset">
-<code class="sig-name descname">add_asset</code><span class="sig-paren">(</span><em class="sig-param">asset: Union[idmtools.assets.asset.Asset, str], fail_on_duplicate: bool = True, **kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.add_asset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add_asset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">asset</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference internal" href="idmtools.assets.asset.html#idmtools.assets.asset.Asset" title="idmtools.assets.asset.Asset">idmtools.assets.asset.Asset</a><span class="p">, </span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">fail_on_duplicate</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.add_asset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add an asset to the collection.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -279,9 +279,9 @@ If not, simply replace it.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools.assets.asset_collection.AssetCollection.add_assets">
-<code class="sig-name descname">add_assets</code><span class="sig-paren">(</span><em class="sig-param">assets: Union[List[TAsset], AssetCollection], fail_on_duplicate: bool = True</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.add_assets" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add_assets</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">assets</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>List<span class="p">[</span>TAsset<span class="p">]</span><span class="p">, </span>AssetCollection<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">fail_on_duplicate</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.add_assets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add assets to a collection</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -295,9 +295,9 @@ If not, simply replace it.</p></li>
 <p>Returns:</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools.assets.asset_collection.AssetCollection.add_or_replace_asset">
-<code class="sig-name descname">add_or_replace_asset</code><span class="sig-paren">(</span><em class="sig-param">asset: idmtools.assets.asset.Asset</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.add_or_replace_asset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add_or_replace_asset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">asset</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.assets.asset.html#idmtools.assets.asset.Asset" title="idmtools.assets.asset.Asset">idmtools.assets.asset.Asset</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.add_or_replace_asset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add or replaces an asset in a collection</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -309,9 +309,9 @@ If not, simply replace it.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools.assets.asset_collection.AssetCollection.get_one">
-<code class="sig-name descname">get_one</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.get_one" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_one</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.get_one" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get an asset out of the collection based on the filers passed.</p>
 <p>Examples:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">AssetCollection</span><span class="p">()</span>
@@ -328,9 +328,9 @@ If not, simply replace it.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools.assets.asset_collection.AssetCollection.delete">
-<code class="sig-name descname">delete</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; NoReturn<a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.delete" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">delete</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; NoReturn<a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete an asset based on keywords attributes</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -339,9 +339,9 @@ If not, simply replace it.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools.assets.asset_collection.AssetCollection.pop">
-<code class="sig-name descname">pop</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span> &#x2192; idmtools.assets.asset.Asset<a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.pop" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">pop</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="idmtools.assets.asset.html#idmtools.assets.asset.Asset" title="idmtools.assets.asset.Asset">idmtools.assets.asset.Asset</a><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.pop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get and delete an asset based on keywords.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -350,37 +350,37 @@ If not, simply replace it.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools.assets.asset_collection.AssetCollection.extend">
-<code class="sig-name descname">extend</code><span class="sig-paren">(</span><em class="sig-param">assets: List[idmtools.assets.asset.Asset], fail_on_duplicate: bool = True</em><span class="sig-paren">)</span> &#x2192; NoReturn<a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.extend" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">extend</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">assets</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference internal" href="idmtools.assets.asset.html#idmtools.assets.asset.Asset" title="idmtools.assets.asset.Asset">idmtools.assets.asset.Asset</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">fail_on_duplicate</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; NoReturn<a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.extend" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extend the collection with new assets
 :param assets: Which assets to add
 :param fail_on_duplicate: Fail if duplicated asset is included.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools.assets.asset_collection.AssetCollection.clear">
 <code class="sig-name descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.clear" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools.assets.asset_collection.AssetCollection.set_all_persisted">
 <code class="sig-name descname">set_all_persisted</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.set_all_persisted" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools.assets.asset_collection.AssetCollection.count">
 <em class="property">property </em><code class="sig-name descname">count</code><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.count" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools.assets.asset_collection.AssetCollection.uid">
 <em class="property">property </em><code class="sig-name descname">uid</code><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.uid" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools.assets.asset_collection.AssetCollection.has_asset">
-<code class="sig-name descname">has_asset</code><span class="sig-paren">(</span><em class="sig-param">absolute_path: str = None</em>, <em class="sig-param">filename: str = None</em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.has_asset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">has_asset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">absolute_path</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.has_asset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Search for asset by absolute_path or by filename</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -395,9 +395,9 @@ If not, simply replace it.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools.assets.asset_collection.AssetCollection.find_index_of_asset">
-<code class="sig-name descname">find_index_of_asset</code><span class="sig-paren">(</span><em class="sig-param">absolute_path: str = None</em>, <em class="sig-param">filename: str = None</em><span class="sig-paren">)</span> &#x2192; Optional[int]<a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.find_index_of_asset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">find_index_of_asset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">absolute_path</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; Optional<span class="p">[</span>int<span class="p">]</span><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.find_index_of_asset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Finds the index of asset by path or filename</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -413,26 +413,26 @@ None if not found.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools.assets.asset_collection.AssetCollection.pre_creation">
 <code class="sig-name descname">pre_creation</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.pre_creation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called before the actual creation of the entity.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools.assets.asset_collection.AssetCollection.post_creation">
 <code class="sig-name descname">post_creation</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.post_creation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called after the actual creation of the entity.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools.assets.asset_collection.AssetCollection.set_tags">
-<code class="sig-name descname">set_tags</code><span class="sig-paren">(</span><em class="sig-param">tags: Dict[str, Any]</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.set_tags" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">set_tags</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tags</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.set_tags" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools.assets.asset_collection.AssetCollection.add_tags">
-<code class="sig-name descname">add_tags</code><span class="sig-paren">(</span><em class="sig-param">tags: Dict[str, Any]</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.add_tags" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add_tags</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tags</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.add_tags" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -461,6 +461,7 @@ None if not found.</p>
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2020, Bill &amp; Melinda Gates Foundation. All rights reserved.
 
     </p>
@@ -482,7 +483,6 @@ None if not found.</p>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

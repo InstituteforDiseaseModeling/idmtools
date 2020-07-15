@@ -1,8 +1,7 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
@@ -12,6 +11,13 @@
   
 
   
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="_static/tipuesearch/tipuesearch.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+
+  
   
     <link rel="shortcut icon" href="_static/favicon.ico"/>
   
@@ -19,7 +25,9 @@
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -36,13 +44,6 @@
     <link rel="search" type="application/opensearchdescription+xml"
           title="Search within idmtools  documentation"
           href="_static/opensearch.xml"/>
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-  <link rel="stylesheet" href="_static/tipuesearch/tipuesearch.css" type="text/css" />
-  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Changelog" href="changelog.html" />
@@ -64,7 +65,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> idmtools
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> idmtools
           
 
           
@@ -77,7 +78,7 @@
             
             
               <div class="version">
-                1.2.2
+                1.3.0
               </div>
             
           
@@ -92,6 +93,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -105,12 +107,9 @@
 <li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="calibrate.html">Calibrate simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reports.html">Output data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reports.html">Output reports</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookiecutter example projects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reference.html">Architecture and packages reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Glossary</a></li>
@@ -120,6 +119,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -147,7 +147,7 @@
 <div aria-label="breadcrumbs navigation" role="navigation">
     <ul class="wy-breadcrumbs">
         <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
-        <li><a href="index.html">IDM-Tools</a> &raquo;</li>
+        <li><a href="index.html">idmtools</a> &raquo;</li>
         
         <li>Glossary</li>
         <li class="wy-breadcrumbs-aside">
@@ -165,24 +165,41 @@
 
   <div class="section" id="glossary">
 <h1>Glossary<a class="headerlink" href="#glossary" title="Permalink to this headline">¶</a></h1>
-<p>The following terms describe both the features and functionality of the IDM-Tools software, as well
-as information relevant to using IDM-Tools.</p>
+<p>The following terms describe both the features and functionality of the idmtools software, as well
+as information relevant to using idmtools.</p>
 <dl class="glossary simple">
-<dt id="term-asset-collection">asset collection</dt><dd><p>The set of specific input files (such as input parameters, weather or migration data, or
-other configuration settings) required for running a simulation.</p>
+<dt id="term-analyzer">analyzer</dt><dd><p>Functionality that uses the MapReduce framework to process large data sets in parallel, typically on a <a class="reference internal" href="#term-high-performance-computing-HPC"><span class="xref std std-term">high-performance computing (HPC)</span></a> cluster. For example, if you would like to focus on specific data points from all simulations in one or more experiments then you can do this using analyzers with idmtools and plot the final output.</p>
 </dd>
-<dt id="term-assets">assets</dt><dd><p>See asset collection.</p>
+<dt id="term-asset-collection">asset collection</dt><dd><p>A collection of user created input files, such as demographics, temperature, weather, binaries, and overlay files. These files are stored in COMPS and can be available for use by other users.</p>
 </dd>
-<dt id="term-builder">builder</dt><dd><p>TBD</p>
+<dt id="term-assets">assets</dt><dd><p>See <a class="reference internal" href="#term-asset-collection"><span class="xref std std-term">asset collection</span></a>.</p>
 </dd>
-<dt id="term-experiment">experiment</dt><dd><p>A collection of multiple simulations, typically sent to an HPC.</p>
+<dt id="term-builder">builder</dt><dd><p>A function and list of values with which to call that function that is used to sweep through parameter values in a simulation.</p>
 </dd>
-<dt id="term-high-performance-computing-hpc">high-performance computing (HPC)</dt><dd><p>The use of parallel processing for running advanced applications efficiently, reliably,
+<dt id="term-calibration">calibration</dt><dd><p>The process of adjusting the parameters of a simulation to better match the data from a particular time and place.</p>
+</dd>
+<dt id="term-EMOD_s">EMOD</dt><dd><p>An agent-based mechanistic disease transmission model built by IDM that can be used with idmtools. See the <a class="reference external" href="https://github.com/InstituteforDiseaseModeling/EMOD">EMOD GitHub repo</a>.</p>
+</dd>
+<dt id="term-entity">entity</dt><dd><p>Each of the interfaces or classes that are well-defined models, types, and validations for idmtools items, such as simulations, analyzers, or tasks.</p>
+</dd>
+<dt id="term-experiment">experiment</dt><dd><p>Logical grouping of simulations. This allows for managing numerous simulations as a single unit or grouping.</p>
+</dd>
+<dt id="term-high-performance-computing-HPC">high-performance computing (HPC)</dt><dd><p>The use of parallel processing for running advanced applications efficiently, reliably,
 and quickly.</p>
 </dd>
-<dt id="term-task">task</dt><dd><p>TBD</p>
+<dt id="term-parameter-sweep">parameter sweep</dt><dd><p>An iterative process in which simulations are run repeatedly using different values of the parameter(s) of choice. This process enables the modeler to determine what a parameter’s “best” value or range of values.</p>
 </dd>
-<dt id="term-template">template</dt><dd><p>TBD</p>
+<dt id="term-platform">platform</dt><dd><p>The computing resource on which the simulation runs. See <a class="reference internal" href="platforms.html"><span class="doc">Platforms</span></a> for
+more information on those that are currently supported.</p>
+</dd>
+<dt id="term-server-side-modeling-tools-SSMT">server-side modeling tools (SSMT)</dt><dd><p>Modeling tools used with COMPS that handle computation on the server side, rather than the client side, to speed up analysis.</p>
+</dd>
+<dt id="term-simulation">simulation</dt><dd><p>An individual run of a model. Generally, multiple simulations are run as part
+of an experiement.</p>
+</dd>
+<dt id="term-suite">suite</dt><dd><p>Logical grouping of experiments. This allows for managing multiple experiments as a single unit or grouping.</p>
+</dd>
+<dt id="term-task">task</dt><dd><p>The individual actions that are processed for each simulation.</p>
 </dd>
 </dl>
 </div>
@@ -209,6 +226,7 @@ and quickly.</p>
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2020, Bill &amp; Melinda Gates Foundation. All rights reserved.
 
     </p>
@@ -230,7 +248,6 @@ and quickly.</p>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

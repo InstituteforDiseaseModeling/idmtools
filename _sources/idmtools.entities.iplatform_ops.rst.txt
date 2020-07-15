@@ -5,6 +5,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    idmtools.entities.iplatform_ops.iplatform_asset_collection_operations
    idmtools.entities.iplatform_ops.iplatform_experiment_operations

@@ -16,20 +16,20 @@ parameter sweep to narrow down the  range of possible values or to provide a ran
 those possible values.
 
 |IT_s| provides an automated approach to parameter sweeps. With few lines of code, it is possible to
-test the model over any range of parameter values, with any combination of parameters. Note that
-parameter sweeps are a simple method of model calibration, and there are more complex calibration
-algorithms available of |IT_s|.  See :doc:`calibrate` for more information on additional methods.
+test the model over any range of parameter values, with any combination of parameters. 
+
+.. Note that parameter sweeps are a simple method of model calibration, and there are more complex calibration algorithms available of |IT_s|.  See :doc:`calibrate` for more information on additional methods.
 
 .. contents:: Contents
    :local:
 
-Parameter sweeps for model calibration
-======================================
+.. Parameter sweeps for model calibration
+.. ======================================
 
-For more information on model calibration, see :doc:`calibrate`.
+.. For more information on model calibration, see :doc:`calibrate`.
 
-Parameter sweeps and stochasticity
-==================================
+.. Parameter sweeps and stochasticity
+.. ==================================
 
 .. this is the "iteration" bit
 .. this should not be EMOD specific
@@ -54,10 +54,10 @@ the parameter values assigned: both the constant values and those being swept.
 Using builders
 --------------
 In this release, to support parameter sweeps for models, we have the following builders to assist you:
-    #. SimulationBuilder - you set your sweep parameters in your scripts and it generates a config.json file with your sweeps for your experiment/simulations to use
-    #. CSVExperimentBuilder - you can use a CSV file to do your parameter sweeps
-    #. YamlSimulationBuilder - you can use a Yaml file to do your parameter sweeps
-    #. Arm Builder for cross and pair parameters, which allows you to cross parameters, like you cross your arms.
+    #. :py:class:`~idmtools.builders.simulation_builder.SimulationBuilder` - you set your sweep parameters in your scripts and it generates a config.json file with your sweeps for your experiment/simulations to use
+    #. :py:class:`~idmtools.builders.csv_simulation_builder.CSVExperimentBuilder` - you can use a CSV file to do your parameter sweeps
+    #. :py:class:`~idmtools.builders.yaml_simulation_builder.YamlSimulationBuilder` - you can use a Yaml file to do your parameter sweeps
+    #. :py:class:`~idmtools.builders.arm_simulation_builder.ArmSimulationBuilder` for cross and pair parameters, which allows you to cross parameters, like you cross your arms.
 
 There are two types of sweeping, cross and pair. Cross means you have for example, 3 x 3 = 9 set of parameters, and pair means 3 + 3 = 3 pairs of parameters, for example, a, b, c and d, e, f.
 

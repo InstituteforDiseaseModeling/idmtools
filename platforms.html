@@ -1,8 +1,7 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
@@ -12,6 +11,13 @@
   
 
   
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="_static/tipuesearch/tipuesearch.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+
+  
   
     <link rel="shortcut icon" href="_static/favicon.ico"/>
   
@@ -19,7 +25,9 @@
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -36,16 +44,9 @@
     <link rel="search" type="application/opensearchdescription+xml"
           title="Search within idmtools  documentation"
           href="_static/opensearch.xml"/>
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-  <link rel="stylesheet" href="_static/tipuesearch/tipuesearch.css" type="text/css" />
-  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Create and run simulations" href="create-sims.html" />
+    <link rel="next" title="Local platform" href="platforms-local.html" />
     <link rel="prev" title="Logging" href="logging.html" />
 
 <link href="https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans" rel="stylesheet">
@@ -64,7 +65,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> idmtools
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> idmtools
           
 
           
@@ -77,7 +78,7 @@
             
             
               <div class="version">
-                1.2.2
+                1.3.0
               </div>
             
           
@@ -92,6 +93,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -102,15 +104,16 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Platforms</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Platforms</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="platforms-local.html">Local platform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platforms-plugin.html">Create platform plugin</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="calibrate.html">Calibrate simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reports.html">Output data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reports.html">Output reports</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookiecutter example projects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reference.html">Architecture and packages reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
@@ -120,6 +123,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -147,7 +151,7 @@
 <div aria-label="breadcrumbs navigation" role="navigation">
     <ul class="wy-breadcrumbs">
         <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
-        <li><a href="index.html">IDM-Tools</a> &raquo;</li>
+        <li><a href="index.html">idmtools</a> &raquo;</li>
         
         <li>Platforms</li>
         <li class="wy-breadcrumbs-aside">
@@ -165,18 +169,18 @@
 
   <div class="section" id="platforms">
 <h1>Platforms<a class="headerlink" href="#platforms" title="Permalink to this headline">¶</a></h1>
-<p>IDM-Tools currently supports running on the following platforms:</p>
-<p><strong>COMPS</strong>: COmputational Modeling Platform Service (COMPS) is a high performance computing cluster used by employees and collaborators at IDM. To support running simulations and analysis on COMPS, IDM-Tools includes the following modules: <a class="reference internal" href="idmtools_platform_comps_index.html"><span class="doc">idmtools_platform_comps</span></a>.</p>
+<p>idmtools currently supports running on the following platforms:</p>
+<p><strong>COMPS</strong>: COmputational Modeling Platform Service (COMPS) is a high performance computing cluster used by employees and collaborators at IDM. To support running simulations and analysis on COMPS, idmtools includes the following modules: <a class="reference internal" href="idmtools_platform_comps_index.html"><span class="doc">idmtools_platform_comps</span></a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>To access and use COMPS you must receive approval and credentials from IDM. Send your request to <a class="reference external" href="mailto:support&#37;&#52;&#48;idmod&#46;org">support<span>&#64;</span>idmod<span>&#46;</span>org</a>.</p>
 </div>
 <p><strong>Local</strong>: You can also run simulations and analysis locally on your computer, rather than on a remote high-performance computer (HPC). For more information about these modules, see <a class="reference internal" href="idmtools_platform_local_index.html"><span class="doc">idmtools_platform_local</span></a>.</p>
 <p>You can use the <strong>idmtools.ini</strong> file to configure platform specific settings, as the following examples shows for COMPS:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>[COMPS2]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>[COMPS]
 type = COMPS
-endpoint = https://comps2.idmod.org
-environment = Bayesian
+endpoint = https://comps.idmod.org
+environment = Belegost
 priority = Lowest
 simulation_root = $COMPS_PATH(USER)\output
 node_group = emod_abcd
@@ -187,114 +191,27 @@ batch_size = 10
 exclusive = False
 </pre></div>
 </div>
-<p>Within your code you use the <a class="reference internal" href="idmtools.core.platform_factory.html#idmtools.core.platform_factory.Platform" title="idmtools.core.platform_factory.Platform"><code class="xref py py-class docutils literal notranslate"><span class="pre">Platform</span></code></a> class to specify which platform IDM-Tools will use. For example, the following excerpt sets <strong>platform</strong> to use COMPS:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">platform</span> <span class="o">=</span> <span class="n">Platform</span><span class="p">(</span><span class="s1">&#39;COMPS2&#39;</span><span class="p">)</span>
+<p>Within your code you use the <a class="reference internal" href="idmtools.core.platform_factory.html#idmtools.core.platform_factory.Platform" title="idmtools.core.platform_factory.Platform"><code class="xref py py-class docutils literal notranslate"><span class="pre">Platform</span></code></a> class to specify which platform idmtools will use. For example, the following excerpt sets <strong>platform</strong> to use COMPS and overrides <strong>priority</strong> and <strong>node_group</strong> settings.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">platform</span> <span class="o">=</span> <span class="n">Platform</span><span class="p">(</span><span class="s1">&#39;COMPS&#39;</span><span class="p">,</span><span class="n">priority</span><span class="o">=</span><span class="s1">&#39;AboveNormal&#39;</span><span class="p">,</span><span class="n">node_group</span><span class="o">=</span><span class="s1">&#39;emod_a&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>You use the <a class="reference internal" href="idmtools.core.platform_factory.html#idmtools.core.platform_factory.Platform" title="idmtools.core.platform_factory.Platform"><code class="xref py py-class docutils literal notranslate"><span class="pre">Platform</span></code></a> class whether you’re building or running an experiment, or running analysis on output from simulations.</p>
-<p>For additional information about configuring idmtools.ini, see…</p>
-<div class="section" id="creation-of-a-platform-plugin">
-<h2>Creation of a platform plugin<a class="headerlink" href="#creation-of-a-platform-plugin" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="adding-fields-to-the-config-cli">
-<h3>Adding fields to the config CLI<a class="headerlink" href="#adding-fields-to-the-config-cli" title="Permalink to this headline">¶</a></h3>
-<p>If you are developing a new platform plugin, you will need to add some metadata to the Platform class’ fields.
-All fields with a <code class="docutils literal notranslate"><span class="pre">help</span></code> key in the metadata will be picked up by the <code class="docutils literal notranslate"><span class="pre">idmtools</span> <span class="pre">config</span> <span class="pre">block</span></code> command line and allow a user to set a value.
-<code class="docutils literal notranslate"><span class="pre">help</span></code> should contain the help text that will be displayed.
-A <code class="docutils literal notranslate"><span class="pre">choices</span></code> key can optionally be present to restrict the available choices.</p>
-<p>For example, for the given platform:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@dataclass</span><span class="p">(</span><span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">MyNewPlatform</span><span class="p">(</span><span class="n">IPlatform</span><span class="p">,</span> <span class="n">CacheEnabled</span><span class="p">):</span>
-    <span class="n">field1</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;This is the first field&quot;</span><span class="p">})</span>
-    <span class="n">internal_field</span><span class="p">:</span> <span class="n">imt</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-    <span class="n">field2</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;this is the second field&quot;</span><span class="p">,</span> <span class="s2">&quot;choices&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">]})</span>
-</pre></div>
-</div>
-<p>The CLI wizard will pick up <code class="docutils literal notranslate"><span class="pre">field1</span></code> and <code class="docutils literal notranslate"><span class="pre">field2</span></code> and ask the user to provide values. The type of the field will be enforced and for <code class="docutils literal notranslate"><span class="pre">field2</span></code>, the user will have to select among the <code class="docutils literal notranslate"><span class="pre">choices</span></code>.</p>
-</div>
-<div class="section" id="modify-fields-metadata-at-runtime">
-<h3>Modify fields metadata at runtime<a class="headerlink" href="#modify-fields-metadata-at-runtime" title="Permalink to this headline">¶</a></h3>
-<p>Now, what happens if we want to change the help text, choices, or default value of a field based on a previously set field.
-For example, let’s consider an example platform where the user needs to specify an endpoint. This endpoint needs to be used to retrieve a list of environments and we want the user to choose select one of them.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@dataclass</span><span class="p">(</span><span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">MyNewPlatform</span><span class="p">(</span><span class="n">IPlatform</span><span class="p">,</span> <span class="n">CacheEnabled</span><span class="p">):</span>
-    <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;https://myapi.com&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Enter the URL of the endpoint&quot;</span><span class="p">})</span>
-    <span class="n">environment</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Select an environment &quot;</span><span class="p">})</span>
-</pre></div>
-</div>
-<p>The list of environments is dependent on the endpoint value. To achieve this, we need to provide a <code class="docutils literal notranslate"><span class="pre">callback</span></code> function to the metadata.
-This function will receive all the previously set user parameters, and will have the opportunity to modify the current field’s <code class="docutils literal notranslate"><span class="pre">choices</span></code>, <code class="docutils literal notranslate"><span class="pre">default</span></code>, and <code class="docutils literal notranslate"><span class="pre">help</span></code> parameters.</p>
-<p>Let’s create a function querying the endpoint to get the list of environments and setting them as choices. Selecting the first one as default.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">environment_list</span><span class="p">(</span><span class="n">previous_settings</span><span class="p">:</span><span class="n">Dict</span><span class="p">,</span> <span class="n">current_field</span><span class="p">:</span><span class="n">Field</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Allows the CLI to provide a list of available environments.</span>
-<span class="sd">    Uses the previous_settings to get the endpoint to query for environments</span>
-<span class="sd">    Args:</span>
-<span class="sd">        previous_settings: previous settings set by the user in the CLI.</span>
-<span class="sd">        current_field: Current field specs</span>
-
-<span class="sd">    Returns: updates to the choices and default</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Retrieve the endpoint set by the user</span>
-    <span class="c1"># The key of the previous_settings is the name of the field we want the value of</span>
-    <span class="n">endpoint</span> <span class="o">=</span> <span class="n">previous_settings</span><span class="p">[</span><span class="s2">&quot;endpoint&quot;</span><span class="p">]</span>
-
-    <span class="c1"># Query the API for environments</span>
-    <span class="n">client</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">endpoint</span><span class="p">)</span>
-    <span class="n">environments</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_all_environments</span><span class="p">()</span>
-
-    <span class="c1"># If the current field doesnt have a set default already, set one by using the first environment</span>
-    <span class="c1"># If the field in the platform class has a default, consider it first</span>
-    <span class="k">if</span> <span class="n">current_field</span><span class="o">.</span><span class="n">default</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">environments</span><span class="p">:</span>
-        <span class="n">default_env</span> <span class="o">=</span> <span class="n">environment_choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">default_env</span> <span class="o">=</span> <span class="n">current_field</span><span class="o">.</span><span class="n">default</span>
-
-    <span class="c1"># Return a dictionary that will be applied to the current field</span>
-    <span class="c1"># Setting the new choices and default at runtime</span>
-    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;choices&quot;</span><span class="p">:</span> <span class="n">environment_choices</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="n">default_env</span><span class="p">}</span>
-</pre></div>
-</div>
-<p>We can then use this function on the field, and the user will be prompted with the correct list of available environments.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@dataclass</span><span class="p">(</span><span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">MyNewPlatform</span><span class="p">(</span><span class="n">IPlatform</span><span class="p">,</span> <span class="n">CacheEnabled</span><span class="p">):</span>
-    <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;https://myapi.com&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Enter the URL of the endpoint&quot;</span><span class="p">})</span>
-    <span class="n">environment</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Select an environment &quot;</span><span class="p">,</span> <span class="s2">&quot;callback&quot;</span><span class="p">:</span> <span class="n">environment_list</span><span class="p">})</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="fields-validation">
-<h3>Fields validation<a class="headerlink" href="#fields-validation" title="Permalink to this headline">¶</a></h3>
-<p>By default the CLI will provide validation on type. For example an <code class="docutils literal notranslate"><span class="pre">int</span></code> field, will only accept an integer value.
-To fine tune this validation, we can leverage the <code class="docutils literal notranslate"><span class="pre">validation</span></code> key of the metadata.</p>
-<p>For example, if you want to create a field that has an integer value between 1 and 10, you can pass a validation function as shown:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">validate_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-    <span class="k">if</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="mi">10</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;&#39;</span>
-    <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;The value needs to be bewtween 1 and 10&quot;</span>
-
-<span class="nd">@dataclass</span><span class="p">(</span><span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">MyNewPlatform</span><span class="p">(</span><span class="n">IPlatform</span><span class="p">,</span> <span class="n">CacheEnabled</span><span class="p">):</span>
-    <span class="n">custom_validation</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Enter a number between 1 and 10&quot;</span><span class="p">,</span> <span class="s2">&quot;validation&quot;</span><span class="p">:</span><span class="n">validate_number</span><span class="p">})</span>
-</pre></div>
-</div>
-<p>The validation function will receive the user input as <code class="docutils literal notranslate"><span class="pre">value</span></code> and is expected to return a <code class="docutils literal notranslate"><span class="pre">bool</span></code> representing the result of the validation
-(<code class="docutils literal notranslate"><span class="pre">True</span></code> if the value is correct, <code class="docutils literal notranslate"><span class="pre">False</span></code> if not) and a <code class="docutils literal notranslate"><span class="pre">string</span></code> to give an error message to the user.</p>
-<p>We can leverage the <a class="reference external" href="https://docs.python.org/3.7/library/functools.html#functools.partial">Python partials</a> and make the validation function more generic to use
-in multiple fields:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
-
-<span class="k">def</span> <span class="nf">validate_range</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">min</span><span class="p">,</span> <span class="nb">max</span><span class="p">):</span>
-    <span class="k">if</span> <span class="nb">min</span> <span class="o">&lt;=</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="nb">max</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;&#39;</span>
-    <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;The value needs to be between </span><span class="si">{</span><span class="nb">min</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="nb">max</span><span class="si">}</span><span class="s2">&quot;</span>
-
-<span class="nd">@dataclass</span><span class="p">(</span><span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">MyNewPlatform</span><span class="p">(</span><span class="n">IPlatform</span><span class="p">,</span> <span class="n">CacheEnabled</span><span class="p">):</span>
-    <span class="n">custom_validation</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Enter a number between 1 and 10&quot;</span><span class="p">,</span> <span class="s2">&quot;validation&quot;</span><span class="p">:</span><span class="n">partial</span><span class="p">(</span><span class="n">validate_range</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">10</span><span class="p">)})</span>
-    <span class="n">custom_validation2</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Enter a number between 100 and 500&quot;</span><span class="p">,</span> <span class="s2">&quot;validation&quot;</span><span class="p">:</span><span class="n">partial</span><span class="p">(</span><span class="n">validate_range</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">500</span><span class="p">)})</span>
-</pre></div>
-</div>
-</div>
+<p>For additional information about configuring idmtools.ini, see <a class="reference internal" href="configuration.html"><span class="doc">Configuration</span></a>.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="platforms-local.html">Local platform</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="platforms-local.html#verify-local-platform-is-running">Verify local platform is running</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platforms-local.html#run-examples">Run examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platforms-local.html#view-simulations-and-experiments">View simulations and experiments</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="platforms-plugin.html">Create platform plugin</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="platforms-plugin.html#adding-fields-to-the-config-cli">Adding fields to the config CLI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platforms-plugin.html#modify-fields-metadata-at-runtime">Modify fields metadata at runtime</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platforms-plugin.html#fields-validation">Fields validation</a></li>
+</ul>
+</li>
+</ul>
 </div>
 </div>
 
@@ -308,7 +225,7 @@ in multiple fields:</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="create-sims.html" class="btn btn-neutral float-right" title="Create and run simulations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="platforms-local.html" class="btn btn-neutral float-right" title="Local platform" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="logging.html" class="btn btn-neutral float-left" title="Logging" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
@@ -320,6 +237,7 @@ in multiple fields:</p>
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2020, Bill &amp; Melinda Gates Foundation. All rights reserved.
 
     </p>
@@ -341,7 +259,6 @@ in multiple fields:</p>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

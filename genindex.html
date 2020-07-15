@@ -1,9 +1,7 @@
 
 
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
@@ -13,6 +11,12 @@
   
 
   
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="_static/tipuesearch/tipuesearch.css" type="text/css" />
+
+  
   
     <link rel="shortcut icon" href="_static/favicon.ico"/>
   
@@ -20,7 +24,9 @@
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -37,12 +43,6 @@
     <link rel="search" type="application/opensearchdescription+xml"
           title="Search within idmtools  documentation"
           href="_static/opensearch.xml"/>
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-  <link rel="stylesheet" href="_static/tipuesearch/tipuesearch.css" type="text/css" />
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" /> 
 </head>
@@ -58,7 +58,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> idmtools
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> idmtools
           
 
           
@@ -71,7 +71,7 @@
             
             
               <div class="version">
-                1.2.2
+                1.3.0
               </div>
             
           
@@ -86,6 +86,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -99,12 +100,9 @@
 <li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="calibrate.html">Calibrate simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reports.html">Output data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reports.html">Output reports</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookiecutter example projects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reference.html">Architecture and packages reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
@@ -114,6 +112,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -141,7 +140,7 @@
 <div aria-label="breadcrumbs navigation" role="navigation">
     <ul class="wy-breadcrumbs">
         <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
-        <li><a href="index.html">IDM-Tools</a> &raquo;</li>
+        <li><a href="index.html">idmtools</a> &raquo;</li>
         
         <li>Index</li>
         <li class="wy-breadcrumbs-aside">
@@ -278,6 +277,8 @@
 </li>
       <li><a href="idmtools.analysis.analyze_manager.html#idmtools.analysis.analyze_manager.AnalyzeManager.TimeOutException">AnalyzeManager.TimeOutException</a>
 </li>
+      <li><a href="glossary.html#term-analyzer"><strong>analyzer</strong></a>
+</li>
       <li><a href="idmtools.core.enums.html#idmtools.core.enums.FilterMode.AND">AND (idmtools.core.enums.FilterMode attribute)</a>
 </li>
       <li><a href="idmtools.utils.gitrepo.html#idmtools.utils.gitrepo.GitRepo.api_example_url">api_example_url() (idmtools.utils.gitrepo.GitRepo property)</a>
@@ -403,6 +404,8 @@
 </li>
       </ul></li>
       <li><a href="idmtools.core.cache_enabled.html#idmtools.core.cache_enabled.CacheEnabled">CacheEnabled (class in idmtools.core.cache_enabled)</a>
+</li>
+      <li><a href="glossary.html#term-calibration"><strong>calibration</strong></a>
 </li>
       <li><a href="idmtools_platform_local.client.simulations_client.html#idmtools_platform_local.client.simulations_client.SimulationsClient.cancel">cancel() (idmtools_platform_local.client.simulations_client.SimulationsClient class method)</a>
 </li>
@@ -652,6 +655,8 @@
 </li>
       <li><a href="idmtools.utils.json.html#idmtools.utils.json.DefaultEncoder">DefaultEncoder (class in idmtools.utils.json)</a>
 </li>
+      <li><a href="idmtools.builders.yaml_simulation_builder.html#idmtools.builders.yaml_simulation_builder.DefaultParamFuncDict">DefaultParamFuncDict (class in idmtools.builders.yaml_simulation_builder)</a>
+</li>
       <li><a href="idmtools.assets.asset_collection.html#idmtools.assets.asset_collection.AssetCollection.delete">delete() (idmtools.assets.asset_collection.AssetCollection method)</a>
 
       <ul>
@@ -682,7 +687,7 @@
 </li>
       <li><a href="idmtools.utils.display.displays.html#idmtools.utils.display.displays.DictDisplaySetting">DictDisplaySetting (class in idmtools.utils.display.displays)</a>
 </li>
-      <li><a href="idmtools.registry.utils.html#idmtools.registry.utils.discover_plugins_from">discover_plugins_from (in module idmtools.registry.utils)</a>
+      <li><a href="idmtools.registry.utils.html#idmtools.registry.utils.discover_plugins_from">discover_plugins_from() (in module idmtools.registry.utils)</a>
 </li>
       <li><a href="idmtools_platform_comps.utils.disk_usage.html#idmtools_platform_comps.utils.disk_usage.DiskEncoder">DiskEncoder (class in idmtools_platform_comps.utils.disk_usage)</a>
 </li>
@@ -772,6 +777,8 @@
 <h2 id="E">E</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="glossary.html#term-EMOD_s"><strong>EMOD_s</strong></a>
+</li>
       <li><a href="idmtools_platform_comps.comps_platform.html#idmtools_platform_comps.comps_platform.COMPSPlatform.endpoint">endpoint (idmtools_platform_comps.comps_platform.COMPSPlatform attribute)</a>
 
       <ul>
@@ -787,6 +794,8 @@
       <li><a href="idmtools.utils.decorators.html#idmtools.utils.decorators.LoadOnCallSingletonDecorator.ensure_created">ensure_created() (idmtools.utils.decorators.LoadOnCallSingletonDecorator method)</a>
 </li>
       <li><a href="idmtools.config.idm_config_parser.html#idmtools.config.idm_config_parser.IdmConfigParser.ensure_init">ensure_init() (idmtools.config.idm_config_parser.IdmConfigParser class method)</a>
+</li>
+      <li><a href="glossary.html#term-entity"><strong>entity</strong></a>
 </li>
       <li><a href="idmtools.core.interfaces.entity_container.html#idmtools.core.interfaces.entity_container.EntityContainer">EntityContainer (class in idmtools.core.interfaces.entity_container)</a>
 </li>
@@ -816,10 +825,10 @@
 </li>
       <li><a href="idmtools_platform_comps.comps_platform.html#idmtools_platform_comps.comps_platform.COMPSPlatform.exclusive">exclusive (idmtools_platform_comps.comps_platform.COMPSPlatform attribute)</a>
 </li>
-      <li><a href="idmtools.entities.command_line.html#idmtools.entities.command_line.CommandLine.executable">executable() (idmtools.entities.command_line.CommandLine property)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="idmtools.entities.command_line.html#idmtools.entities.command_line.CommandLine.executable">executable() (idmtools.entities.command_line.CommandLine property)</a>
+</li>
       <li><a href="idmtools_platform_comps.utils.disk_usage.html#idmtools_platform_comps.utils.disk_usage.DiskSpaceUsage.exp_str">exp_str() (idmtools_platform_comps.utils.disk_usage.DiskSpaceUsage static method)</a>
 </li>
       <li><a href="glossary.html#term-experiment"><strong>experiment</strong></a>
@@ -1184,6 +1193,8 @@
       </ul></li>
       <li><a href="idmtools_platform_local.infrastructure.service_manager.html#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.get_container_config">get_container_config() (idmtools_platform_local.infrastructure.service_manager.DockerServiceManager method)</a>
 </li>
+      <li><a href="idmtools.core.context.html#idmtools.core.context.get_current_platform">get_current_platform() (in module idmtools.core.context)</a>
+</li>
       <li><a href="idmtools.utils.dropbox_location.html#idmtools.utils.dropbox_location.get_current_user">get_current_user() (in module idmtools.utils.dropbox_location)</a>
 </li>
       <li><a href="idmtools_platform_comps.utils.python_requirements_ac.create_asset_collection.html#idmtools_platform_comps.utils.python_requirements_ac.create_asset_collection.get_data">get_data() (in module idmtools_platform_comps.utils.python_requirements_ac.create_asset_collection)</a>
@@ -1520,7 +1531,7 @@
         <li><a href="idmtools_platform_local.local_platform.html#idmtools_platform_local.local_platform.LocalPlatform.heartbeat_timeout">(idmtools_platform_local.local_platform.LocalPlatform attribute)</a>
 </li>
       </ul></li>
-      <li><a href="glossary.html#term-high-performance-computing-hpc"><strong>high-performance computing (HPC)</strong></a>
+      <li><a href="glossary.html#term-high-performance-computing-HPC"><strong>high-performance computing (HPC)</strong></a>
 </li>
       <li><a href="idmtools_platform_comps.comps_platform.html#idmtools_platform_comps.comps_platform.COMPSPriority.Highest">Highest (idmtools_platform_comps.comps_platform.COMPSPriority attribute)</a>
 </li>
@@ -1564,362 +1575,1247 @@
 </li>
       <li><a href="idmtools.core.logging.html#idmtools.core.logging.IDMQueueListener">IDMQueueListener (class in idmtools.core.logging)</a>
 </li>
-      <li><a href="idmtools.html#module-idmtools">idmtools (module)</a>
-</li>
-      <li><a href="idmtools.analysis.html#module-idmtools.analysis">idmtools.analysis (module)</a>
-</li>
-      <li><a href="idmtools.analysis.add_analyzer.html#module-idmtools.analysis.add_analyzer">idmtools.analysis.add_analyzer (module)</a>
-</li>
-      <li><a href="idmtools.analysis.analyze_manager.html#module-idmtools.analysis.analyze_manager">idmtools.analysis.analyze_manager (module)</a>
-</li>
-      <li><a href="idmtools.analysis.csv_analyzer.html#module-idmtools.analysis.csv_analyzer">idmtools.analysis.csv_analyzer (module)</a>
-</li>
-      <li><a href="idmtools.analysis.download_analyzer.html#module-idmtools.analysis.download_analyzer">idmtools.analysis.download_analyzer (module)</a>
-</li>
-      <li><a href="idmtools.analysis.map_worker_entry.html#module-idmtools.analysis.map_worker_entry">idmtools.analysis.map_worker_entry (module)</a>
-</li>
-      <li><a href="idmtools.analysis.platform_analysis_bootstrap.html#module-idmtools.analysis.platform_analysis_bootstrap">idmtools.analysis.platform_analysis_bootstrap (module)</a>
-</li>
-      <li><a href="idmtools.analysis.platform_anaylsis.html#module-idmtools.analysis.platform_anaylsis">idmtools.analysis.platform_anaylsis (module)</a>
-</li>
-      <li><a href="idmtools.analysis.tags_analyzer.html#module-idmtools.analysis.tags_analyzer">idmtools.analysis.tags_analyzer (module)</a>
-</li>
-      <li><a href="idmtools.assets.html#module-idmtools.assets">idmtools.assets (module)</a>
-</li>
-      <li><a href="idmtools.assets.asset.html#module-idmtools.assets.asset">idmtools.assets.asset (module)</a>
-</li>
-      <li><a href="idmtools.assets.asset_collection.html#module-idmtools.assets.asset_collection">idmtools.assets.asset_collection (module)</a>
-</li>
-      <li><a href="idmtools.assets.content_handlers.html#module-idmtools.assets.content_handlers">idmtools.assets.content_handlers (module)</a>
-</li>
-      <li><a href="idmtools.assets.errors.html#module-idmtools.assets.errors">idmtools.assets.errors (module)</a>
-</li>
-      <li><a href="idmtools.assets.file_list.html#module-idmtools.assets.file_list">idmtools.assets.file_list (module)</a>
-</li>
-      <li><a href="idmtools.builders.html#module-idmtools.builders">idmtools.builders (module)</a>
-</li>
-      <li><a href="idmtools.builders.arm_simulation_builder.html#module-idmtools.builders.arm_simulation_builder">idmtools.builders.arm_simulation_builder (module)</a>
-</li>
-      <li><a href="idmtools.builders.csv_simulation_builder.html#module-idmtools.builders.csv_simulation_builder">idmtools.builders.csv_simulation_builder (module)</a>
-</li>
-      <li><a href="idmtools.builders.simulation_builder.html#module-idmtools.builders.simulation_builder">idmtools.builders.simulation_builder (module)</a>
-</li>
-      <li><a href="idmtools.builders.yaml_simulation_builder.html#module-idmtools.builders.yaml_simulation_builder">idmtools.builders.yaml_simulation_builder (module)</a>
-</li>
-      <li><a href="idmtools.config.html#module-idmtools.config">idmtools.config (module)</a>
-</li>
-      <li><a href="idmtools.config.idm_config_parser.html#module-idmtools.config.idm_config_parser">idmtools.config.idm_config_parser (module)</a>
-</li>
-      <li><a href="idmtools.core.html#module-idmtools.core">idmtools.core (module)</a>
-</li>
-      <li><a href="idmtools.core.cache_enabled.html#module-idmtools.core.cache_enabled">idmtools.core.cache_enabled (module)</a>
-</li>
-      <li><a href="idmtools.core.context.html#module-idmtools.core.context">idmtools.core.context (module)</a>
-</li>
-      <li><a href="idmtools.core.docker_task.html#module-idmtools.core.docker_task">idmtools.core.docker_task (module)</a>
-</li>
-      <li><a href="idmtools.core.enums.html#module-idmtools.core.enums">idmtools.core.enums (module)</a>
-</li>
-      <li><a href="idmtools.core.exceptions.html#module-idmtools.core.exceptions">idmtools.core.exceptions (module)</a>
-</li>
-      <li><a href="idmtools.core.experiment_factory.html#module-idmtools.core.experiment_factory">idmtools.core.experiment_factory (module)</a>
-</li>
-      <li><a href="idmtools.core.interfaces.html#module-idmtools.core.interfaces">idmtools.core.interfaces (module)</a>
-</li>
-      <li><a href="idmtools.core.interfaces.entity_container.html#module-idmtools.core.interfaces.entity_container">idmtools.core.interfaces.entity_container (module)</a>
-</li>
-      <li><a href="idmtools.core.interfaces.iassets_enabled.html#module-idmtools.core.interfaces.iassets_enabled">idmtools.core.interfaces.iassets_enabled (module)</a>
-</li>
-      <li><a href="idmtools.core.interfaces.ientity.html#module-idmtools.core.interfaces.ientity">idmtools.core.interfaces.ientity (module)</a>
-</li>
-      <li><a href="idmtools.core.interfaces.iitem.html#module-idmtools.core.interfaces.iitem">idmtools.core.interfaces.iitem (module)</a>
-</li>
-      <li><a href="idmtools.core.interfaces.inamed_entity.html#module-idmtools.core.interfaces.inamed_entity">idmtools.core.interfaces.inamed_entity (module)</a>
-</li>
-      <li><a href="idmtools.core.logging.html#module-idmtools.core.logging">idmtools.core.logging (module)</a>
-</li>
-      <li><a href="idmtools.core.platform_factory.html#module-idmtools.core.platform_factory">idmtools.core.platform_factory (module)</a>
-</li>
-      <li><a href="idmtools.core.system_information.html#module-idmtools.core.system_information">idmtools.core.system_information (module)</a>
-</li>
-      <li><a href="idmtools.core.task_factory.html#module-idmtools.core.task_factory">idmtools.core.task_factory (module)</a>
-</li>
-      <li><a href="idmtools.entities.html#module-idmtools.entities">idmtools.entities (module)</a>
-</li>
-      <li><a href="idmtools.entities.command_line.html#module-idmtools.entities.command_line">idmtools.entities.command_line (module)</a>
-</li>
-      <li><a href="idmtools.entities.command_task.html#module-idmtools.entities.command_task">idmtools.entities.command_task (module)</a>
-</li>
-      <li><a href="idmtools.entities.experiment.html#module-idmtools.entities.experiment">idmtools.entities.experiment (module)</a>
-</li>
-      <li><a href="idmtools.entities.generic_workitem.html#module-idmtools.entities.generic_workitem">idmtools.entities.generic_workitem (module)</a>
-</li>
-      <li><a href="idmtools.entities.ianalyzer.html#module-idmtools.entities.ianalyzer">idmtools.entities.ianalyzer (module)</a>
-</li>
-      <li><a href="idmtools.entities.iplatform.html#module-idmtools.entities.iplatform">idmtools.entities.iplatform (module)</a>
-</li>
-      <li><a href="idmtools.entities.iplatform_ops.html#module-idmtools.entities.iplatform_ops">idmtools.entities.iplatform_ops (module)</a>
-</li>
-      <li><a href="idmtools.entities.iplatform_ops.iplatform_asset_collection_operations.html#module-idmtools.entities.iplatform_ops.iplatform_asset_collection_operations">idmtools.entities.iplatform_ops.iplatform_asset_collection_operations (module)</a>
-</li>
-      <li><a href="idmtools.entities.iplatform_ops.iplatform_experiment_operations.html#module-idmtools.entities.iplatform_ops.iplatform_experiment_operations">idmtools.entities.iplatform_ops.iplatform_experiment_operations (module)</a>
-</li>
-      <li><a href="idmtools.entities.iplatform_ops.iplatform_simulation_operations.html#module-idmtools.entities.iplatform_ops.iplatform_simulation_operations">idmtools.entities.iplatform_ops.iplatform_simulation_operations (module)</a>
-</li>
-      <li><a href="idmtools.entities.iplatform_ops.iplatform_suite_operations.html#module-idmtools.entities.iplatform_ops.iplatform_suite_operations">idmtools.entities.iplatform_ops.iplatform_suite_operations (module)</a>
-</li>
-      <li><a href="idmtools.entities.iplatform_ops.iplatform_workflowitem_operations.html#module-idmtools.entities.iplatform_ops.iplatform_workflowitem_operations">idmtools.entities.iplatform_ops.iplatform_workflowitem_operations (module)</a>
-</li>
-      <li><a href="idmtools.entities.iplatform_ops.utils.html#module-idmtools.entities.iplatform_ops.utils">idmtools.entities.iplatform_ops.utils (module)</a>
-</li>
-      <li><a href="idmtools.entities.itask.html#module-idmtools.entities.itask">idmtools.entities.itask (module)</a>
-</li>
-      <li><a href="idmtools.entities.iworkflow_item.html#module-idmtools.entities.iworkflow_item">idmtools.entities.iworkflow_item (module)</a>
-</li>
-      <li><a href="idmtools.entities.platform_requirements.html#module-idmtools.entities.platform_requirements">idmtools.entities.platform_requirements (module)</a>
-</li>
-      <li><a href="idmtools.entities.relation_type.html#module-idmtools.entities.relation_type">idmtools.entities.relation_type (module)</a>
-</li>
-      <li><a href="idmtools.entities.simulation.html#module-idmtools.entities.simulation">idmtools.entities.simulation (module)</a>
-</li>
-      <li><a href="idmtools.entities.suite.html#module-idmtools.entities.suite">idmtools.entities.suite (module)</a>
-</li>
-      <li><a href="idmtools.entities.task_proxy.html#module-idmtools.entities.task_proxy">idmtools.entities.task_proxy (module)</a>
-</li>
-      <li><a href="idmtools.entities.templated_simulation.html#module-idmtools.entities.templated_simulation">idmtools.entities.templated_simulation (module)</a>
-</li>
-      <li><a href="idmtools.registry.html#module-idmtools.registry">idmtools.registry (module)</a>
-</li>
-      <li><a href="idmtools.registry.experiment_specification.html#module-idmtools.registry.experiment_specification">idmtools.registry.experiment_specification (module)</a>
-</li>
-      <li><a href="idmtools.registry.master_plugin_registry.html#module-idmtools.registry.master_plugin_registry">idmtools.registry.master_plugin_registry (module)</a>
-</li>
-      <li><a href="idmtools.registry.platform_specification.html#module-idmtools.registry.platform_specification">idmtools.registry.platform_specification (module)</a>
-</li>
-      <li><a href="idmtools.registry.plugin_specification.html#module-idmtools.registry.plugin_specification">idmtools.registry.plugin_specification (module)</a>
-</li>
-      <li><a href="idmtools.registry.task_specification.html#module-idmtools.registry.task_specification">idmtools.registry.task_specification (module)</a>
-</li>
-      <li><a href="idmtools.registry.utils.html#module-idmtools.registry.utils">idmtools.registry.utils (module)</a>
-</li>
-      <li><a href="idmtools.services.html#module-idmtools.services">idmtools.services (module)</a>
-</li>
-      <li><a href="idmtools.services.ipersistance_service.html#module-idmtools.services.ipersistance_service">idmtools.services.ipersistance_service (module)</a>
-</li>
-      <li><a href="idmtools.services.platforms.html#module-idmtools.services.platforms">idmtools.services.platforms (module)</a>
-</li>
-      <li><a href="idmtools.utils.html#module-idmtools.utils">idmtools.utils (module)</a>
-</li>
-      <li><a href="idmtools.utils.collections.html#module-idmtools.utils.collections">idmtools.utils.collections (module)</a>
-</li>
-      <li><a href="idmtools.utils.command_line.html#module-idmtools.utils.command_line">idmtools.utils.command_line (module)</a>
-</li>
-      <li><a href="idmtools.utils.decorators.html#module-idmtools.utils.decorators">idmtools.utils.decorators (module)</a>
-</li>
-      <li><a href="idmtools.utils.display.html#module-idmtools.utils.display">idmtools.utils.display (module)</a>
-</li>
-      <li><a href="idmtools.utils.display.displays.html#module-idmtools.utils.display.displays">idmtools.utils.display.displays (module)</a>
-</li>
-      <li><a href="idmtools.utils.display.settings.html#module-idmtools.utils.display.settings">idmtools.utils.display.settings (module)</a>
-</li>
-      <li><a href="idmtools.utils.dropbox_location.html#module-idmtools.utils.dropbox_location">idmtools.utils.dropbox_location (module)</a>
-</li>
-      <li><a href="idmtools.utils.entities.html#module-idmtools.utils.entities">idmtools.utils.entities (module)</a>
-</li>
-      <li><a href="idmtools.utils.file.html#module-idmtools.utils.file">idmtools.utils.file (module)</a>
-</li>
-      <li><a href="idmtools.utils.file_parser.html#module-idmtools.utils.file_parser">idmtools.utils.file_parser (module)</a>
-</li>
-      <li><a href="idmtools.utils.filter_simulations.html#module-idmtools.utils.filter_simulations">idmtools.utils.filter_simulations (module)</a>
-</li>
-      <li><a href="idmtools.utils.filters.html#module-idmtools.utils.filters">idmtools.utils.filters (module)</a>
-</li>
-      <li><a href="idmtools.utils.filters.asset_filters.html#module-idmtools.utils.filters.asset_filters">idmtools.utils.filters.asset_filters (module)</a>
-</li>
-      <li><a href="idmtools.utils.gitrepo.html#module-idmtools.utils.gitrepo">idmtools.utils.gitrepo (module)</a>
-</li>
-      <li><a href="idmtools.utils.hashing.html#module-idmtools.utils.hashing">idmtools.utils.hashing (module)</a>
-</li>
-      <li><a href="idmtools.utils.info.html#module-idmtools.utils.info">idmtools.utils.info (module)</a>
-</li>
-      <li><a href="idmtools.utils.json.html#module-idmtools.utils.json">idmtools.utils.json (module)</a>
-</li>
-      <li><a href="idmtools.utils.language.html#module-idmtools.utils.language">idmtools.utils.language (module)</a>
-</li>
-      <li><a href="idmtools.utils.local_os.html#module-idmtools.utils.local_os">idmtools.utils.local_os (module)</a>
-</li>
-      <li><a href="idmtools.utils.time.html#module-idmtools.utils.time">idmtools.utils.time (module)</a>
-</li>
-      <li><a href="idmtools_models.html#module-idmtools_models">idmtools_models (module)</a>
-</li>
-      <li><a href="idmtools_models.json_configured_task.html#module-idmtools_models.json_configured_task">idmtools_models.json_configured_task (module)</a>
-</li>
-      <li><a href="idmtools_models.python.html#module-idmtools_models.python">idmtools_models.python (module)</a>
-</li>
-      <li><a href="idmtools_models.python.json_python_task.html#module-idmtools_models.python.json_python_task">idmtools_models.python.json_python_task (module)</a>
-</li>
-      <li><a href="idmtools_models.python.python_task.html#module-idmtools_models.python.python_task">idmtools_models.python.python_task (module)</a>
-</li>
-      <li><a href="idmtools_models.r.html#module-idmtools_models.r">idmtools_models.r (module)</a>
-</li>
-      <li><a href="idmtools_models.r.json_r_task.html#module-idmtools_models.r.json_r_task">idmtools_models.r.json_r_task (module)</a>
-</li>
-      <li><a href="idmtools_models.r.r_task.html#module-idmtools_models.r.r_task">idmtools_models.r.r_task (module)</a>
-</li>
-      <li><a href="idmtools_models.templated_script_task.html#module-idmtools_models.templated_script_task">idmtools_models.templated_script_task (module)</a>
-</li>
-      <li><a href="idmtools_platform_comps.html#module-idmtools_platform_comps">idmtools_platform_comps (module)</a>
-</li>
-      <li><a href="idmtools_platform_comps.cli.html#module-idmtools_platform_comps.cli">idmtools_platform_comps.cli (module)</a>
-</li>
-      <li><a href="idmtools_platform_comps.cli.cli_functions.html#module-idmtools_platform_comps.cli.cli_functions">idmtools_platform_comps.cli.cli_functions (module)</a>
-</li>
-      <li><a href="idmtools_platform_comps.cli.comps.html#module-idmtools_platform_comps.cli.comps">idmtools_platform_comps.cli.comps (module)</a>
-</li>
-      <li><a href="idmtools_platform_comps.cli.utils.html#module-idmtools_platform_comps.cli.utils">idmtools_platform_comps.cli.utils (module)</a>
-</li>
+      <li>
+    idmtools
+
+      <ul>
+        <li><a href="idmtools.html#module-idmtools">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.analysis
+
+      <ul>
+        <li><a href="idmtools.analysis.html#module-idmtools.analysis">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.analysis.add_analyzer
+
+      <ul>
+        <li><a href="idmtools.analysis.add_analyzer.html#module-idmtools.analysis.add_analyzer">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.analysis.analyze_manager
+
+      <ul>
+        <li><a href="idmtools.analysis.analyze_manager.html#module-idmtools.analysis.analyze_manager">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.analysis.csv_analyzer
+
+      <ul>
+        <li><a href="idmtools.analysis.csv_analyzer.html#module-idmtools.analysis.csv_analyzer">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.analysis.download_analyzer
+
+      <ul>
+        <li><a href="idmtools.analysis.download_analyzer.html#module-idmtools.analysis.download_analyzer">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.analysis.map_worker_entry
+
+      <ul>
+        <li><a href="idmtools.analysis.map_worker_entry.html#module-idmtools.analysis.map_worker_entry">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.analysis.platform_analysis_bootstrap
+
+      <ul>
+        <li><a href="idmtools.analysis.platform_analysis_bootstrap.html#module-idmtools.analysis.platform_analysis_bootstrap">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.analysis.platform_anaylsis
+
+      <ul>
+        <li><a href="idmtools.analysis.platform_anaylsis.html#module-idmtools.analysis.platform_anaylsis">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.analysis.tags_analyzer
+
+      <ul>
+        <li><a href="idmtools.analysis.tags_analyzer.html#module-idmtools.analysis.tags_analyzer">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.assets
+
+      <ul>
+        <li><a href="idmtools.assets.html#module-idmtools.assets">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.assets.asset
+
+      <ul>
+        <li><a href="idmtools.assets.asset.html#module-idmtools.assets.asset">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.assets.asset_collection
+
+      <ul>
+        <li><a href="idmtools.assets.asset_collection.html#module-idmtools.assets.asset_collection">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.assets.content_handlers
+
+      <ul>
+        <li><a href="idmtools.assets.content_handlers.html#module-idmtools.assets.content_handlers">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.assets.errors
+
+      <ul>
+        <li><a href="idmtools.assets.errors.html#module-idmtools.assets.errors">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.assets.file_list
+
+      <ul>
+        <li><a href="idmtools.assets.file_list.html#module-idmtools.assets.file_list">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.builders
+
+      <ul>
+        <li><a href="idmtools.builders.html#module-idmtools.builders">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.builders.arm_simulation_builder
+
+      <ul>
+        <li><a href="idmtools.builders.arm_simulation_builder.html#module-idmtools.builders.arm_simulation_builder">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.builders.csv_simulation_builder
+
+      <ul>
+        <li><a href="idmtools.builders.csv_simulation_builder.html#module-idmtools.builders.csv_simulation_builder">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.builders.simulation_builder
+
+      <ul>
+        <li><a href="idmtools.builders.simulation_builder.html#module-idmtools.builders.simulation_builder">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.builders.yaml_simulation_builder
+
+      <ul>
+        <li><a href="idmtools.builders.yaml_simulation_builder.html#module-idmtools.builders.yaml_simulation_builder">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.config
+
+      <ul>
+        <li><a href="idmtools.config.html#module-idmtools.config">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.config.idm_config_parser
+
+      <ul>
+        <li><a href="idmtools.config.idm_config_parser.html#module-idmtools.config.idm_config_parser">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.core
+
+      <ul>
+        <li><a href="idmtools.core.html#module-idmtools.core">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.core.cache_enabled
+
+      <ul>
+        <li><a href="idmtools.core.cache_enabled.html#module-idmtools.core.cache_enabled">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.core.context
+
+      <ul>
+        <li><a href="idmtools.core.context.html#module-idmtools.core.context">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.core.docker_task
+
+      <ul>
+        <li><a href="idmtools.core.docker_task.html#module-idmtools.core.docker_task">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.core.enums
+
+      <ul>
+        <li><a href="idmtools.core.enums.html#module-idmtools.core.enums">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.core.exceptions
+
+      <ul>
+        <li><a href="idmtools.core.exceptions.html#module-idmtools.core.exceptions">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.core.experiment_factory
+
+      <ul>
+        <li><a href="idmtools.core.experiment_factory.html#module-idmtools.core.experiment_factory">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.core.interfaces
+
+      <ul>
+        <li><a href="idmtools.core.interfaces.html#module-idmtools.core.interfaces">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.core.interfaces.entity_container
+
+      <ul>
+        <li><a href="idmtools.core.interfaces.entity_container.html#module-idmtools.core.interfaces.entity_container">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.core.interfaces.iassets_enabled
+
+      <ul>
+        <li><a href="idmtools.core.interfaces.iassets_enabled.html#module-idmtools.core.interfaces.iassets_enabled">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.core.interfaces.ientity
+
+      <ul>
+        <li><a href="idmtools.core.interfaces.ientity.html#module-idmtools.core.interfaces.ientity">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.core.interfaces.iitem
+
+      <ul>
+        <li><a href="idmtools.core.interfaces.iitem.html#module-idmtools.core.interfaces.iitem">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.core.interfaces.inamed_entity
+
+      <ul>
+        <li><a href="idmtools.core.interfaces.inamed_entity.html#module-idmtools.core.interfaces.inamed_entity">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.core.logging
+
+      <ul>
+        <li><a href="idmtools.core.logging.html#module-idmtools.core.logging">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.core.platform_factory
+
+      <ul>
+        <li><a href="idmtools.core.platform_factory.html#module-idmtools.core.platform_factory">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.core.system_information
+
+      <ul>
+        <li><a href="idmtools.core.system_information.html#module-idmtools.core.system_information">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.core.task_factory
+
+      <ul>
+        <li><a href="idmtools.core.task_factory.html#module-idmtools.core.task_factory">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.entities
+
+      <ul>
+        <li><a href="idmtools.entities.html#module-idmtools.entities">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.entities.command_line
+
+      <ul>
+        <li><a href="idmtools.entities.command_line.html#module-idmtools.entities.command_line">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.entities.command_task
+
+      <ul>
+        <li><a href="idmtools.entities.command_task.html#module-idmtools.entities.command_task">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.entities.experiment
+
+      <ul>
+        <li><a href="idmtools.entities.experiment.html#module-idmtools.entities.experiment">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.entities.generic_workitem
+
+      <ul>
+        <li><a href="idmtools.entities.generic_workitem.html#module-idmtools.entities.generic_workitem">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.entities.ianalyzer
+
+      <ul>
+        <li><a href="idmtools.entities.ianalyzer.html#module-idmtools.entities.ianalyzer">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.entities.iplatform
+
+      <ul>
+        <li><a href="idmtools.entities.iplatform.html#module-idmtools.entities.iplatform">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.entities.iplatform_ops
+
+      <ul>
+        <li><a href="idmtools.entities.iplatform_ops.html#module-idmtools.entities.iplatform_ops">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.entities.iplatform_ops.iplatform_asset_collection_operations
+
+      <ul>
+        <li><a href="idmtools.entities.iplatform_ops.iplatform_asset_collection_operations.html#module-idmtools.entities.iplatform_ops.iplatform_asset_collection_operations">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.entities.iplatform_ops.iplatform_experiment_operations
+
+      <ul>
+        <li><a href="idmtools.entities.iplatform_ops.iplatform_experiment_operations.html#module-idmtools.entities.iplatform_ops.iplatform_experiment_operations">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.entities.iplatform_ops.iplatform_simulation_operations
+
+      <ul>
+        <li><a href="idmtools.entities.iplatform_ops.iplatform_simulation_operations.html#module-idmtools.entities.iplatform_ops.iplatform_simulation_operations">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.entities.iplatform_ops.iplatform_suite_operations
+
+      <ul>
+        <li><a href="idmtools.entities.iplatform_ops.iplatform_suite_operations.html#module-idmtools.entities.iplatform_ops.iplatform_suite_operations">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.entities.iplatform_ops.iplatform_workflowitem_operations
+
+      <ul>
+        <li><a href="idmtools.entities.iplatform_ops.iplatform_workflowitem_operations.html#module-idmtools.entities.iplatform_ops.iplatform_workflowitem_operations">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.entities.iplatform_ops.utils
+
+      <ul>
+        <li><a href="idmtools.entities.iplatform_ops.utils.html#module-idmtools.entities.iplatform_ops.utils">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.entities.itask
+
+      <ul>
+        <li><a href="idmtools.entities.itask.html#module-idmtools.entities.itask">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.entities.iworkflow_item
+
+      <ul>
+        <li><a href="idmtools.entities.iworkflow_item.html#module-idmtools.entities.iworkflow_item">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.entities.platform_requirements
+
+      <ul>
+        <li><a href="idmtools.entities.platform_requirements.html#module-idmtools.entities.platform_requirements">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.entities.relation_type
+
+      <ul>
+        <li><a href="idmtools.entities.relation_type.html#module-idmtools.entities.relation_type">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.entities.simulation
+
+      <ul>
+        <li><a href="idmtools.entities.simulation.html#module-idmtools.entities.simulation">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.entities.suite
+
+      <ul>
+        <li><a href="idmtools.entities.suite.html#module-idmtools.entities.suite">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.entities.task_proxy
+
+      <ul>
+        <li><a href="idmtools.entities.task_proxy.html#module-idmtools.entities.task_proxy">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.entities.templated_simulation
+
+      <ul>
+        <li><a href="idmtools.entities.templated_simulation.html#module-idmtools.entities.templated_simulation">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.registry
+
+      <ul>
+        <li><a href="idmtools.registry.html#module-idmtools.registry">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.registry.experiment_specification
+
+      <ul>
+        <li><a href="idmtools.registry.experiment_specification.html#module-idmtools.registry.experiment_specification">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.registry.master_plugin_registry
+
+      <ul>
+        <li><a href="idmtools.registry.master_plugin_registry.html#module-idmtools.registry.master_plugin_registry">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.registry.platform_specification
+
+      <ul>
+        <li><a href="idmtools.registry.platform_specification.html#module-idmtools.registry.platform_specification">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.registry.plugin_specification
+
+      <ul>
+        <li><a href="idmtools.registry.plugin_specification.html#module-idmtools.registry.plugin_specification">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.registry.task_specification
+
+      <ul>
+        <li><a href="idmtools.registry.task_specification.html#module-idmtools.registry.task_specification">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.registry.utils
+
+      <ul>
+        <li><a href="idmtools.registry.utils.html#module-idmtools.registry.utils">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.services
+
+      <ul>
+        <li><a href="idmtools.services.html#module-idmtools.services">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.services.ipersistance_service
+
+      <ul>
+        <li><a href="idmtools.services.ipersistance_service.html#module-idmtools.services.ipersistance_service">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.services.platforms
+
+      <ul>
+        <li><a href="idmtools.services.platforms.html#module-idmtools.services.platforms">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.utils
+
+      <ul>
+        <li><a href="idmtools.utils.html#module-idmtools.utils">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.utils.collections
+
+      <ul>
+        <li><a href="idmtools.utils.collections.html#module-idmtools.utils.collections">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.utils.command_line
+
+      <ul>
+        <li><a href="idmtools.utils.command_line.html#module-idmtools.utils.command_line">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.utils.decorators
+
+      <ul>
+        <li><a href="idmtools.utils.decorators.html#module-idmtools.utils.decorators">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.utils.display
+
+      <ul>
+        <li><a href="idmtools.utils.display.html#module-idmtools.utils.display">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.utils.display.displays
+
+      <ul>
+        <li><a href="idmtools.utils.display.displays.html#module-idmtools.utils.display.displays">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.utils.display.settings
+
+      <ul>
+        <li><a href="idmtools.utils.display.settings.html#module-idmtools.utils.display.settings">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.utils.dropbox_location
+
+      <ul>
+        <li><a href="idmtools.utils.dropbox_location.html#module-idmtools.utils.dropbox_location">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.utils.entities
+
+      <ul>
+        <li><a href="idmtools.utils.entities.html#module-idmtools.utils.entities">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.utils.file
+
+      <ul>
+        <li><a href="idmtools.utils.file.html#module-idmtools.utils.file">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.utils.file_parser
+
+      <ul>
+        <li><a href="idmtools.utils.file_parser.html#module-idmtools.utils.file_parser">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.utils.filter_simulations
+
+      <ul>
+        <li><a href="idmtools.utils.filter_simulations.html#module-idmtools.utils.filter_simulations">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.utils.filters
+
+      <ul>
+        <li><a href="idmtools.utils.filters.html#module-idmtools.utils.filters">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.utils.filters.asset_filters
+
+      <ul>
+        <li><a href="idmtools.utils.filters.asset_filters.html#module-idmtools.utils.filters.asset_filters">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.utils.gitrepo
+
+      <ul>
+        <li><a href="idmtools.utils.gitrepo.html#module-idmtools.utils.gitrepo">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.utils.hashing
+
+      <ul>
+        <li><a href="idmtools.utils.hashing.html#module-idmtools.utils.hashing">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.utils.info
+
+      <ul>
+        <li><a href="idmtools.utils.info.html#module-idmtools.utils.info">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.utils.json
+
+      <ul>
+        <li><a href="idmtools.utils.json.html#module-idmtools.utils.json">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.utils.language
+
+      <ul>
+        <li><a href="idmtools.utils.language.html#module-idmtools.utils.language">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.utils.local_os
+
+      <ul>
+        <li><a href="idmtools.utils.local_os.html#module-idmtools.utils.local_os">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools.utils.time
+
+      <ul>
+        <li><a href="idmtools.utils.time.html#module-idmtools.utils.time">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_models
+
+      <ul>
+        <li><a href="idmtools_models.html#module-idmtools_models">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_models.json_configured_task
+
+      <ul>
+        <li><a href="idmtools_models.json_configured_task.html#module-idmtools_models.json_configured_task">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_models.python
+
+      <ul>
+        <li><a href="idmtools_models.python.html#module-idmtools_models.python">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_models.python.json_python_task
+
+      <ul>
+        <li><a href="idmtools_models.python.json_python_task.html#module-idmtools_models.python.json_python_task">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_models.python.python_task
+
+      <ul>
+        <li><a href="idmtools_models.python.python_task.html#module-idmtools_models.python.python_task">module</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="idmtools_platform_comps.comps_cli.html#module-idmtools_platform_comps.comps_cli">idmtools_platform_comps.comps_cli (module)</a>
-</li>
-      <li><a href="idmtools_platform_comps.comps_operations.html#module-idmtools_platform_comps.comps_operations">idmtools_platform_comps.comps_operations (module)</a>
-</li>
-      <li><a href="idmtools_platform_comps.comps_operations.asset_collection_operations.html#module-idmtools_platform_comps.comps_operations.asset_collection_operations">idmtools_platform_comps.comps_operations.asset_collection_operations (module)</a>
-</li>
-      <li><a href="idmtools_platform_comps.comps_operations.experiment_operations.html#module-idmtools_platform_comps.comps_operations.experiment_operations">idmtools_platform_comps.comps_operations.experiment_operations (module)</a>
-</li>
-      <li><a href="idmtools_platform_comps.comps_operations.simulation_operations.html#module-idmtools_platform_comps.comps_operations.simulation_operations">idmtools_platform_comps.comps_operations.simulation_operations (module)</a>
-</li>
-      <li><a href="idmtools_platform_comps.comps_operations.suite_operations.html#module-idmtools_platform_comps.comps_operations.suite_operations">idmtools_platform_comps.comps_operations.suite_operations (module)</a>
-</li>
-      <li><a href="idmtools_platform_comps.comps_operations.workflow_item_operations.html#module-idmtools_platform_comps.comps_operations.workflow_item_operations">idmtools_platform_comps.comps_operations.workflow_item_operations (module)</a>
-</li>
-      <li><a href="idmtools_platform_comps.comps_platform.html#module-idmtools_platform_comps.comps_platform">idmtools_platform_comps.comps_platform (module)</a>
-</li>
-      <li><a href="idmtools_platform_comps.plugin_info.html#module-idmtools_platform_comps.plugin_info">idmtools_platform_comps.plugin_info (module)</a>
-</li>
-      <li><a href="idmtools_platform_comps.ssmt_operations.html#module-idmtools_platform_comps.ssmt_operations">idmtools_platform_comps.ssmt_operations (module)</a>
-</li>
-      <li><a href="idmtools_platform_comps.ssmt_operations.simulation_operations.html#module-idmtools_platform_comps.ssmt_operations.simulation_operations">idmtools_platform_comps.ssmt_operations.simulation_operations (module)</a>
-</li>
-      <li><a href="idmtools_platform_comps.ssmt_operations.workflow_item_operations.html#module-idmtools_platform_comps.ssmt_operations.workflow_item_operations">idmtools_platform_comps.ssmt_operations.workflow_item_operations (module)</a>
-</li>
-      <li><a href="idmtools_platform_comps.ssmt_platform.html#module-idmtools_platform_comps.ssmt_platform">idmtools_platform_comps.ssmt_platform (module)</a>
-</li>
-      <li><a href="idmtools_platform_comps.ssmt_work_items.html#module-idmtools_platform_comps.ssmt_work_items">idmtools_platform_comps.ssmt_work_items (module)</a>
-</li>
-      <li><a href="idmtools_platform_comps.ssmt_work_items.comps_workitems.html#module-idmtools_platform_comps.ssmt_work_items.comps_workitems">idmtools_platform_comps.ssmt_work_items.comps_workitems (module)</a>
-</li>
-      <li><a href="idmtools_platform_comps.ssmt_work_items.icomps_workflowitem.html#module-idmtools_platform_comps.ssmt_work_items.icomps_workflowitem">idmtools_platform_comps.ssmt_work_items.icomps_workflowitem (module)</a>
-</li>
-      <li><a href="idmtools_platform_comps.utils.html#module-idmtools_platform_comps.utils">idmtools_platform_comps.utils (module)</a>
-</li>
-      <li><a href="idmtools_platform_comps.utils.disk_usage.html#module-idmtools_platform_comps.utils.disk_usage">idmtools_platform_comps.utils.disk_usage (module)</a>
-</li>
-      <li><a href="idmtools_platform_comps.utils.general.html#module-idmtools_platform_comps.utils.general">idmtools_platform_comps.utils.general (module)</a>
-</li>
-      <li><a href="idmtools_platform_comps.utils.lookups.html#module-idmtools_platform_comps.utils.lookups">idmtools_platform_comps.utils.lookups (module)</a>
-</li>
-      <li><a href="idmtools_platform_comps.utils.package_version.html#module-idmtools_platform_comps.utils.package_version">idmtools_platform_comps.utils.package_version (module)</a>
-</li>
-      <li><a href="idmtools_platform_comps.utils.python_requirements_ac.html#module-idmtools_platform_comps.utils.python_requirements_ac">idmtools_platform_comps.utils.python_requirements_ac (module)</a>
-</li>
-      <li><a href="idmtools_platform_comps.utils.python_requirements_ac.create_asset_collection.html#module-idmtools_platform_comps.utils.python_requirements_ac.create_asset_collection">idmtools_platform_comps.utils.python_requirements_ac.create_asset_collection (module)</a>
-</li>
-      <li><a href="idmtools_platform_comps.utils.python_requirements_ac.install_requirements.html#module-idmtools_platform_comps.utils.python_requirements_ac.install_requirements">idmtools_platform_comps.utils.python_requirements_ac.install_requirements (module)</a>
-</li>
-      <li><a href="idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection.html#module-idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection">idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection (module)</a>
-</li>
-      <li><a href="idmtools_platform_comps.utils.python_version.html#module-idmtools_platform_comps.utils.python_version">idmtools_platform_comps.utils.python_version (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.html#module-idmtools_platform_local">idmtools_platform_local (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.cli.html#module-idmtools_platform_local.cli">idmtools_platform_local.cli (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.cli.experiment.html#module-idmtools_platform_local.cli.experiment">idmtools_platform_local.cli.experiment (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.cli.local.html#module-idmtools_platform_local.cli.local">idmtools_platform_local.cli.local (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.cli.simulation.html#module-idmtools_platform_local.cli.simulation">idmtools_platform_local.cli.simulation (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.cli.utils.html#module-idmtools_platform_local.cli.utils">idmtools_platform_local.cli.utils (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.client.html#module-idmtools_platform_local.client">idmtools_platform_local.client (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.client.base.html#module-idmtools_platform_local.client.base">idmtools_platform_local.client.base (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.client.experiments_client.html#module-idmtools_platform_local.client.experiments_client">idmtools_platform_local.client.experiments_client (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.client.healthcheck_client.html#module-idmtools_platform_local.client.healthcheck_client">idmtools_platform_local.client.healthcheck_client (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.client.simulations_client.html#module-idmtools_platform_local.client.simulations_client">idmtools_platform_local.client.simulations_client (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.config.html#module-idmtools_platform_local.config">idmtools_platform_local.config (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.infrastructure.html#module-idmtools_platform_local.infrastructure">idmtools_platform_local.infrastructure (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.infrastructure.base_service_container.html#module-idmtools_platform_local.infrastructure.base_service_container">idmtools_platform_local.infrastructure.base_service_container (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.infrastructure.docker_io.html#module-idmtools_platform_local.infrastructure.docker_io">idmtools_platform_local.infrastructure.docker_io (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.infrastructure.postgres.html#module-idmtools_platform_local.infrastructure.postgres">idmtools_platform_local.infrastructure.postgres (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.infrastructure.redis.html#module-idmtools_platform_local.infrastructure.redis">idmtools_platform_local.infrastructure.redis (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.infrastructure.service_manager.html#module-idmtools_platform_local.infrastructure.service_manager">idmtools_platform_local.infrastructure.service_manager (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.infrastructure.workers.html#module-idmtools_platform_local.infrastructure.workers">idmtools_platform_local.infrastructure.workers (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.internals.html#module-idmtools_platform_local.internals">idmtools_platform_local.internals (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.internals.data.html#module-idmtools_platform_local.internals.data">idmtools_platform_local.internals.data (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.internals.data.job_status.html#module-idmtools_platform_local.internals.data.job_status">idmtools_platform_local.internals.data.job_status (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.internals.ui.html#module-idmtools_platform_local.internals.ui">idmtools_platform_local.internals.ui (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.internals.ui.app.html#module-idmtools_platform_local.internals.ui.app">idmtools_platform_local.internals.ui.app (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.internals.ui.config.html#module-idmtools_platform_local.internals.ui.config">idmtools_platform_local.internals.ui.config (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.internals.ui.controllers.html#module-idmtools_platform_local.internals.ui.controllers">idmtools_platform_local.internals.ui.controllers (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.internals.ui.controllers.experiments.html#module-idmtools_platform_local.internals.ui.controllers.experiments">idmtools_platform_local.internals.ui.controllers.experiments (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.internals.ui.controllers.healthcheck.html#module-idmtools_platform_local.internals.ui.controllers.healthcheck">idmtools_platform_local.internals.ui.controllers.healthcheck (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.internals.ui.controllers.simulations.html#module-idmtools_platform_local.internals.ui.controllers.simulations">idmtools_platform_local.internals.ui.controllers.simulations (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.internals.ui.controllers.utils.html#module-idmtools_platform_local.internals.ui.controllers.utils">idmtools_platform_local.internals.ui.controllers.utils (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.internals.ui.utils.html#module-idmtools_platform_local.internals.ui.utils">idmtools_platform_local.internals.ui.utils (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.internals.workers.html#module-idmtools_platform_local.internals.workers">idmtools_platform_local.internals.workers (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.internals.workers.database.html#module-idmtools_platform_local.internals.workers.database">idmtools_platform_local.internals.workers.database (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.internals.workers.run.html#module-idmtools_platform_local.internals.workers.run">idmtools_platform_local.internals.workers.run (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.internals.workers.run_broker.html#module-idmtools_platform_local.internals.workers.run_broker">idmtools_platform_local.internals.workers.run_broker (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.internals.workers.utils.html#module-idmtools_platform_local.internals.workers.utils">idmtools_platform_local.internals.workers.utils (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.local_cli.html#module-idmtools_platform_local.local_cli">idmtools_platform_local.local_cli (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.local_platform.html#module-idmtools_platform_local.local_platform">idmtools_platform_local.local_platform (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.platform_operations.html#module-idmtools_platform_local.platform_operations">idmtools_platform_local.platform_operations (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.platform_operations.experiment_operations.html#module-idmtools_platform_local.platform_operations.experiment_operations">idmtools_platform_local.platform_operations.experiment_operations (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.platform_operations.simulation_operations.html#module-idmtools_platform_local.platform_operations.simulation_operations">idmtools_platform_local.platform_operations.simulation_operations (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.platform_operations.uitils.html#module-idmtools_platform_local.platform_operations.uitils">idmtools_platform_local.platform_operations.uitils (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.plugin_info.html#module-idmtools_platform_local.plugin_info">idmtools_platform_local.plugin_info (module)</a>
-</li>
-      <li><a href="idmtools_platform_local.status.html#module-idmtools_platform_local.status">idmtools_platform_local.status (module)</a>
-</li>
+      <li>
+    idmtools_models.r
+
+      <ul>
+        <li><a href="idmtools_models.r.html#module-idmtools_models.r">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_models.r.json_r_task
+
+      <ul>
+        <li><a href="idmtools_models.r.json_r_task.html#module-idmtools_models.r.json_r_task">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_models.r.r_task
+
+      <ul>
+        <li><a href="idmtools_models.r.r_task.html#module-idmtools_models.r.r_task">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_models.templated_script_task
+
+      <ul>
+        <li><a href="idmtools_models.templated_script_task.html#module-idmtools_models.templated_script_task">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_comps
+
+      <ul>
+        <li><a href="idmtools_platform_comps.html#module-idmtools_platform_comps">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_comps.cli
+
+      <ul>
+        <li><a href="idmtools_platform_comps.cli.html#module-idmtools_platform_comps.cli">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_comps.cli.cli_functions
+
+      <ul>
+        <li><a href="idmtools_platform_comps.cli.cli_functions.html#module-idmtools_platform_comps.cli.cli_functions">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_comps.cli.comps
+
+      <ul>
+        <li><a href="idmtools_platform_comps.cli.comps.html#module-idmtools_platform_comps.cli.comps">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_comps.cli.utils
+
+      <ul>
+        <li><a href="idmtools_platform_comps.cli.utils.html#module-idmtools_platform_comps.cli.utils">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_comps.comps_cli
+
+      <ul>
+        <li><a href="idmtools_platform_comps.comps_cli.html#module-idmtools_platform_comps.comps_cli">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_comps.comps_operations
+
+      <ul>
+        <li><a href="idmtools_platform_comps.comps_operations.html#module-idmtools_platform_comps.comps_operations">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_comps.comps_operations.asset_collection_operations
+
+      <ul>
+        <li><a href="idmtools_platform_comps.comps_operations.asset_collection_operations.html#module-idmtools_platform_comps.comps_operations.asset_collection_operations">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_comps.comps_operations.experiment_operations
+
+      <ul>
+        <li><a href="idmtools_platform_comps.comps_operations.experiment_operations.html#module-idmtools_platform_comps.comps_operations.experiment_operations">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_comps.comps_operations.simulation_operations
+
+      <ul>
+        <li><a href="idmtools_platform_comps.comps_operations.simulation_operations.html#module-idmtools_platform_comps.comps_operations.simulation_operations">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_comps.comps_operations.suite_operations
+
+      <ul>
+        <li><a href="idmtools_platform_comps.comps_operations.suite_operations.html#module-idmtools_platform_comps.comps_operations.suite_operations">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_comps.comps_operations.workflow_item_operations
+
+      <ul>
+        <li><a href="idmtools_platform_comps.comps_operations.workflow_item_operations.html#module-idmtools_platform_comps.comps_operations.workflow_item_operations">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_comps.comps_platform
+
+      <ul>
+        <li><a href="idmtools_platform_comps.comps_platform.html#module-idmtools_platform_comps.comps_platform">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_comps.plugin_info
+
+      <ul>
+        <li><a href="idmtools_platform_comps.plugin_info.html#module-idmtools_platform_comps.plugin_info">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_comps.ssmt_operations
+
+      <ul>
+        <li><a href="idmtools_platform_comps.ssmt_operations.html#module-idmtools_platform_comps.ssmt_operations">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_comps.ssmt_operations.simulation_operations
+
+      <ul>
+        <li><a href="idmtools_platform_comps.ssmt_operations.simulation_operations.html#module-idmtools_platform_comps.ssmt_operations.simulation_operations">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_comps.ssmt_operations.workflow_item_operations
+
+      <ul>
+        <li><a href="idmtools_platform_comps.ssmt_operations.workflow_item_operations.html#module-idmtools_platform_comps.ssmt_operations.workflow_item_operations">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_comps.ssmt_platform
+
+      <ul>
+        <li><a href="idmtools_platform_comps.ssmt_platform.html#module-idmtools_platform_comps.ssmt_platform">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_comps.ssmt_work_items
+
+      <ul>
+        <li><a href="idmtools_platform_comps.ssmt_work_items.html#module-idmtools_platform_comps.ssmt_work_items">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_comps.ssmt_work_items.comps_workitems
+
+      <ul>
+        <li><a href="idmtools_platform_comps.ssmt_work_items.comps_workitems.html#module-idmtools_platform_comps.ssmt_work_items.comps_workitems">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_comps.ssmt_work_items.icomps_workflowitem
+
+      <ul>
+        <li><a href="idmtools_platform_comps.ssmt_work_items.icomps_workflowitem.html#module-idmtools_platform_comps.ssmt_work_items.icomps_workflowitem">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_comps.utils
+
+      <ul>
+        <li><a href="idmtools_platform_comps.utils.html#module-idmtools_platform_comps.utils">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_comps.utils.disk_usage
+
+      <ul>
+        <li><a href="idmtools_platform_comps.utils.disk_usage.html#module-idmtools_platform_comps.utils.disk_usage">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_comps.utils.general
+
+      <ul>
+        <li><a href="idmtools_platform_comps.utils.general.html#module-idmtools_platform_comps.utils.general">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_comps.utils.lookups
+
+      <ul>
+        <li><a href="idmtools_platform_comps.utils.lookups.html#module-idmtools_platform_comps.utils.lookups">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_comps.utils.package_version
+
+      <ul>
+        <li><a href="idmtools_platform_comps.utils.package_version.html#module-idmtools_platform_comps.utils.package_version">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_comps.utils.python_requirements_ac
+
+      <ul>
+        <li><a href="idmtools_platform_comps.utils.python_requirements_ac.html#module-idmtools_platform_comps.utils.python_requirements_ac">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_comps.utils.python_requirements_ac.create_asset_collection
+
+      <ul>
+        <li><a href="idmtools_platform_comps.utils.python_requirements_ac.create_asset_collection.html#module-idmtools_platform_comps.utils.python_requirements_ac.create_asset_collection">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_comps.utils.python_requirements_ac.install_requirements
+
+      <ul>
+        <li><a href="idmtools_platform_comps.utils.python_requirements_ac.install_requirements.html#module-idmtools_platform_comps.utils.python_requirements_ac.install_requirements">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection
+
+      <ul>
+        <li><a href="idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection.html#module-idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_comps.utils.python_version
+
+      <ul>
+        <li><a href="idmtools_platform_comps.utils.python_version.html#module-idmtools_platform_comps.utils.python_version">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local
+
+      <ul>
+        <li><a href="idmtools_platform_local.html#module-idmtools_platform_local">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.cli
+
+      <ul>
+        <li><a href="idmtools_platform_local.cli.html#module-idmtools_platform_local.cli">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.cli.experiment
+
+      <ul>
+        <li><a href="idmtools_platform_local.cli.experiment.html#module-idmtools_platform_local.cli.experiment">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.cli.local
+
+      <ul>
+        <li><a href="idmtools_platform_local.cli.local.html#module-idmtools_platform_local.cli.local">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.cli.simulation
+
+      <ul>
+        <li><a href="idmtools_platform_local.cli.simulation.html#module-idmtools_platform_local.cli.simulation">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.cli.utils
+
+      <ul>
+        <li><a href="idmtools_platform_local.cli.utils.html#module-idmtools_platform_local.cli.utils">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.client
+
+      <ul>
+        <li><a href="idmtools_platform_local.client.html#module-idmtools_platform_local.client">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.client.base
+
+      <ul>
+        <li><a href="idmtools_platform_local.client.base.html#module-idmtools_platform_local.client.base">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.client.experiments_client
+
+      <ul>
+        <li><a href="idmtools_platform_local.client.experiments_client.html#module-idmtools_platform_local.client.experiments_client">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.client.healthcheck_client
+
+      <ul>
+        <li><a href="idmtools_platform_local.client.healthcheck_client.html#module-idmtools_platform_local.client.healthcheck_client">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.client.simulations_client
+
+      <ul>
+        <li><a href="idmtools_platform_local.client.simulations_client.html#module-idmtools_platform_local.client.simulations_client">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.config
+
+      <ul>
+        <li><a href="idmtools_platform_local.config.html#module-idmtools_platform_local.config">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.infrastructure
+
+      <ul>
+        <li><a href="idmtools_platform_local.infrastructure.html#module-idmtools_platform_local.infrastructure">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.infrastructure.base_service_container
+
+      <ul>
+        <li><a href="idmtools_platform_local.infrastructure.base_service_container.html#module-idmtools_platform_local.infrastructure.base_service_container">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.infrastructure.docker_io
+
+      <ul>
+        <li><a href="idmtools_platform_local.infrastructure.docker_io.html#module-idmtools_platform_local.infrastructure.docker_io">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.infrastructure.postgres
+
+      <ul>
+        <li><a href="idmtools_platform_local.infrastructure.postgres.html#module-idmtools_platform_local.infrastructure.postgres">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.infrastructure.redis
+
+      <ul>
+        <li><a href="idmtools_platform_local.infrastructure.redis.html#module-idmtools_platform_local.infrastructure.redis">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.infrastructure.service_manager
+
+      <ul>
+        <li><a href="idmtools_platform_local.infrastructure.service_manager.html#module-idmtools_platform_local.infrastructure.service_manager">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.infrastructure.workers
+
+      <ul>
+        <li><a href="idmtools_platform_local.infrastructure.workers.html#module-idmtools_platform_local.infrastructure.workers">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.internals
+
+      <ul>
+        <li><a href="idmtools_platform_local.internals.html#module-idmtools_platform_local.internals">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.internals.data
+
+      <ul>
+        <li><a href="idmtools_platform_local.internals.data.html#module-idmtools_platform_local.internals.data">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.internals.data.job_status
+
+      <ul>
+        <li><a href="idmtools_platform_local.internals.data.job_status.html#module-idmtools_platform_local.internals.data.job_status">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.internals.ui
+
+      <ul>
+        <li><a href="idmtools_platform_local.internals.ui.html#module-idmtools_platform_local.internals.ui">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.internals.ui.app
+
+      <ul>
+        <li><a href="idmtools_platform_local.internals.ui.app.html#module-idmtools_platform_local.internals.ui.app">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.internals.ui.config
+
+      <ul>
+        <li><a href="idmtools_platform_local.internals.ui.config.html#module-idmtools_platform_local.internals.ui.config">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.internals.ui.controllers
+
+      <ul>
+        <li><a href="idmtools_platform_local.internals.ui.controllers.html#module-idmtools_platform_local.internals.ui.controllers">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.internals.ui.controllers.experiments
+
+      <ul>
+        <li><a href="idmtools_platform_local.internals.ui.controllers.experiments.html#module-idmtools_platform_local.internals.ui.controllers.experiments">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.internals.ui.controllers.healthcheck
+
+      <ul>
+        <li><a href="idmtools_platform_local.internals.ui.controllers.healthcheck.html#module-idmtools_platform_local.internals.ui.controllers.healthcheck">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.internals.ui.controllers.simulations
+
+      <ul>
+        <li><a href="idmtools_platform_local.internals.ui.controllers.simulations.html#module-idmtools_platform_local.internals.ui.controllers.simulations">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.internals.ui.controllers.utils
+
+      <ul>
+        <li><a href="idmtools_platform_local.internals.ui.controllers.utils.html#module-idmtools_platform_local.internals.ui.controllers.utils">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.internals.ui.utils
+
+      <ul>
+        <li><a href="idmtools_platform_local.internals.ui.utils.html#module-idmtools_platform_local.internals.ui.utils">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.internals.workers
+
+      <ul>
+        <li><a href="idmtools_platform_local.internals.workers.html#module-idmtools_platform_local.internals.workers">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.internals.workers.database
+
+      <ul>
+        <li><a href="idmtools_platform_local.internals.workers.database.html#module-idmtools_platform_local.internals.workers.database">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.internals.workers.run
+
+      <ul>
+        <li><a href="idmtools_platform_local.internals.workers.run.html#module-idmtools_platform_local.internals.workers.run">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.internals.workers.run_broker
+
+      <ul>
+        <li><a href="idmtools_platform_local.internals.workers.run_broker.html#module-idmtools_platform_local.internals.workers.run_broker">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.internals.workers.utils
+
+      <ul>
+        <li><a href="idmtools_platform_local.internals.workers.utils.html#module-idmtools_platform_local.internals.workers.utils">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.local_cli
+
+      <ul>
+        <li><a href="idmtools_platform_local.local_cli.html#module-idmtools_platform_local.local_cli">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.local_platform
+
+      <ul>
+        <li><a href="idmtools_platform_local.local_platform.html#module-idmtools_platform_local.local_platform">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.platform_operations
+
+      <ul>
+        <li><a href="idmtools_platform_local.platform_operations.html#module-idmtools_platform_local.platform_operations">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.platform_operations.experiment_operations
+
+      <ul>
+        <li><a href="idmtools_platform_local.platform_operations.experiment_operations.html#module-idmtools_platform_local.platform_operations.experiment_operations">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.platform_operations.simulation_operations
+
+      <ul>
+        <li><a href="idmtools_platform_local.platform_operations.simulation_operations.html#module-idmtools_platform_local.platform_operations.simulation_operations">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.platform_operations.uitils
+
+      <ul>
+        <li><a href="idmtools_platform_local.platform_operations.uitils.html#module-idmtools_platform_local.platform_operations.uitils">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.plugin_info
+
+      <ul>
+        <li><a href="idmtools_platform_local.plugin_info.html#module-idmtools_platform_local.plugin_info">module</a>
+</li>
+      </ul></li>
+      <li>
+    idmtools_platform_local.status
+
+      <ul>
+        <li><a href="idmtools_platform_local.status.html#module-idmtools_platform_local.status">module</a>
+</li>
+      </ul></li>
       <li><a href="idmtools.core.interfaces.ientity.html#idmtools.core.interfaces.ientity.IEntity">IEntity (class in idmtools.core.interfaces.ientity)</a>
 </li>
       <li><a href="idmtools.utils.hashing.html#idmtools.utils.hashing.ignore_fields_in_dataclass_on_pickle">ignore_fields_in_dataclass_on_pickle() (in module idmtools.utils.hashing)</a>
@@ -2180,8 +3076,6 @@
         <li><a href="idmtools_platform_local.internals.ui.controllers.simulations.html#idmtools_platform_local.internals.ui.controllers.simulations.Simulations.mediatypes">(idmtools_platform_local.internals.ui.controllers.simulations.Simulations method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="idmtools_platform_local.infrastructure.postgres.html#idmtools_platform_local.infrastructure.postgres.PostgresContainer.mem_limit">mem_limit (idmtools_platform_local.infrastructure.postgres.PostgresContainer attribute)</a>
 
       <ul>
@@ -2203,13 +3097,376 @@
       <li><a href="idmtools.core.interfaces.iitem.html#idmtools.core.interfaces.iitem.IItem.metadata">metadata() (idmtools.core.interfaces.iitem.IItem property)</a>
 </li>
       <li><a href="idmtools.core.interfaces.iitem.html#idmtools.core.interfaces.iitem.IItem.metadata_fields">metadata_fields() (idmtools.core.interfaces.iitem.IItem property)</a>
+
+      <ul>
+        <li><a href="idmtools.entities.itask.html#idmtools.entities.itask.ITask.metadata_fields">(idmtools.entities.itask.ITask property)</a>
 </li>
+      </ul></li>
       <li><a href="idmtools_platform_local.internals.ui.controllers.experiments.html#idmtools_platform_local.internals.ui.controllers.experiments.Experiments.methods">methods (idmtools_platform_local.internals.ui.controllers.experiments.Experiments attribute)</a>
 
       <ul>
         <li><a href="idmtools_platform_local.internals.ui.controllers.healthcheck.html#idmtools_platform_local.internals.ui.controllers.healthcheck.HealthCheck.methods">(idmtools_platform_local.internals.ui.controllers.healthcheck.HealthCheck attribute)</a>
 </li>
         <li><a href="idmtools_platform_local.internals.ui.controllers.simulations.html#idmtools_platform_local.internals.ui.controllers.simulations.Simulations.methods">(idmtools_platform_local.internals.ui.controllers.simulations.Simulations attribute)</a>
+</li>
+      </ul></li>
+      <li>
+    module
+
+      <ul>
+        <li><a href="idmtools.html#module-idmtools">idmtools</a>
+</li>
+        <li><a href="idmtools.analysis.html#module-idmtools.analysis">idmtools.analysis</a>
+</li>
+        <li><a href="idmtools.analysis.add_analyzer.html#module-idmtools.analysis.add_analyzer">idmtools.analysis.add_analyzer</a>
+</li>
+        <li><a href="idmtools.analysis.analyze_manager.html#module-idmtools.analysis.analyze_manager">idmtools.analysis.analyze_manager</a>
+</li>
+        <li><a href="idmtools.analysis.csv_analyzer.html#module-idmtools.analysis.csv_analyzer">idmtools.analysis.csv_analyzer</a>
+</li>
+        <li><a href="idmtools.analysis.download_analyzer.html#module-idmtools.analysis.download_analyzer">idmtools.analysis.download_analyzer</a>
+</li>
+        <li><a href="idmtools.analysis.map_worker_entry.html#module-idmtools.analysis.map_worker_entry">idmtools.analysis.map_worker_entry</a>
+</li>
+        <li><a href="idmtools.analysis.platform_analysis_bootstrap.html#module-idmtools.analysis.platform_analysis_bootstrap">idmtools.analysis.platform_analysis_bootstrap</a>
+</li>
+        <li><a href="idmtools.analysis.platform_anaylsis.html#module-idmtools.analysis.platform_anaylsis">idmtools.analysis.platform_anaylsis</a>
+</li>
+        <li><a href="idmtools.analysis.tags_analyzer.html#module-idmtools.analysis.tags_analyzer">idmtools.analysis.tags_analyzer</a>
+</li>
+        <li><a href="idmtools.assets.html#module-idmtools.assets">idmtools.assets</a>
+</li>
+        <li><a href="idmtools.assets.asset.html#module-idmtools.assets.asset">idmtools.assets.asset</a>
+</li>
+        <li><a href="idmtools.assets.asset_collection.html#module-idmtools.assets.asset_collection">idmtools.assets.asset_collection</a>
+</li>
+        <li><a href="idmtools.assets.content_handlers.html#module-idmtools.assets.content_handlers">idmtools.assets.content_handlers</a>
+</li>
+        <li><a href="idmtools.assets.errors.html#module-idmtools.assets.errors">idmtools.assets.errors</a>
+</li>
+        <li><a href="idmtools.assets.file_list.html#module-idmtools.assets.file_list">idmtools.assets.file_list</a>
+</li>
+        <li><a href="idmtools.builders.html#module-idmtools.builders">idmtools.builders</a>
+</li>
+        <li><a href="idmtools.builders.arm_simulation_builder.html#module-idmtools.builders.arm_simulation_builder">idmtools.builders.arm_simulation_builder</a>
+</li>
+        <li><a href="idmtools.builders.csv_simulation_builder.html#module-idmtools.builders.csv_simulation_builder">idmtools.builders.csv_simulation_builder</a>
+</li>
+        <li><a href="idmtools.builders.simulation_builder.html#module-idmtools.builders.simulation_builder">idmtools.builders.simulation_builder</a>
+</li>
+        <li><a href="idmtools.builders.yaml_simulation_builder.html#module-idmtools.builders.yaml_simulation_builder">idmtools.builders.yaml_simulation_builder</a>
+</li>
+        <li><a href="idmtools.config.html#module-idmtools.config">idmtools.config</a>
+</li>
+        <li><a href="idmtools.config.idm_config_parser.html#module-idmtools.config.idm_config_parser">idmtools.config.idm_config_parser</a>
+</li>
+        <li><a href="idmtools.core.html#module-idmtools.core">idmtools.core</a>
+</li>
+        <li><a href="idmtools.core.cache_enabled.html#module-idmtools.core.cache_enabled">idmtools.core.cache_enabled</a>
+</li>
+        <li><a href="idmtools.core.context.html#module-idmtools.core.context">idmtools.core.context</a>
+</li>
+        <li><a href="idmtools.core.docker_task.html#module-idmtools.core.docker_task">idmtools.core.docker_task</a>
+</li>
+        <li><a href="idmtools.core.enums.html#module-idmtools.core.enums">idmtools.core.enums</a>
+</li>
+        <li><a href="idmtools.core.exceptions.html#module-idmtools.core.exceptions">idmtools.core.exceptions</a>
+</li>
+        <li><a href="idmtools.core.experiment_factory.html#module-idmtools.core.experiment_factory">idmtools.core.experiment_factory</a>
+</li>
+        <li><a href="idmtools.core.interfaces.html#module-idmtools.core.interfaces">idmtools.core.interfaces</a>
+</li>
+        <li><a href="idmtools.core.interfaces.entity_container.html#module-idmtools.core.interfaces.entity_container">idmtools.core.interfaces.entity_container</a>
+</li>
+        <li><a href="idmtools.core.interfaces.iassets_enabled.html#module-idmtools.core.interfaces.iassets_enabled">idmtools.core.interfaces.iassets_enabled</a>
+</li>
+        <li><a href="idmtools.core.interfaces.ientity.html#module-idmtools.core.interfaces.ientity">idmtools.core.interfaces.ientity</a>
+</li>
+        <li><a href="idmtools.core.interfaces.iitem.html#module-idmtools.core.interfaces.iitem">idmtools.core.interfaces.iitem</a>
+</li>
+        <li><a href="idmtools.core.interfaces.inamed_entity.html#module-idmtools.core.interfaces.inamed_entity">idmtools.core.interfaces.inamed_entity</a>
+</li>
+        <li><a href="idmtools.core.logging.html#module-idmtools.core.logging">idmtools.core.logging</a>
+</li>
+        <li><a href="idmtools.core.platform_factory.html#module-idmtools.core.platform_factory">idmtools.core.platform_factory</a>
+</li>
+        <li><a href="idmtools.core.system_information.html#module-idmtools.core.system_information">idmtools.core.system_information</a>
+</li>
+        <li><a href="idmtools.core.task_factory.html#module-idmtools.core.task_factory">idmtools.core.task_factory</a>
+</li>
+        <li><a href="idmtools.entities.html#module-idmtools.entities">idmtools.entities</a>
+</li>
+        <li><a href="idmtools.entities.command_line.html#module-idmtools.entities.command_line">idmtools.entities.command_line</a>
+</li>
+        <li><a href="idmtools.entities.command_task.html#module-idmtools.entities.command_task">idmtools.entities.command_task</a>
+</li>
+        <li><a href="idmtools.entities.experiment.html#module-idmtools.entities.experiment">idmtools.entities.experiment</a>
+</li>
+        <li><a href="idmtools.entities.generic_workitem.html#module-idmtools.entities.generic_workitem">idmtools.entities.generic_workitem</a>
+</li>
+        <li><a href="idmtools.entities.ianalyzer.html#module-idmtools.entities.ianalyzer">idmtools.entities.ianalyzer</a>
+</li>
+        <li><a href="idmtools.entities.iplatform.html#module-idmtools.entities.iplatform">idmtools.entities.iplatform</a>
+</li>
+        <li><a href="idmtools.entities.iplatform_ops.html#module-idmtools.entities.iplatform_ops">idmtools.entities.iplatform_ops</a>
+</li>
+        <li><a href="idmtools.entities.iplatform_ops.iplatform_asset_collection_operations.html#module-idmtools.entities.iplatform_ops.iplatform_asset_collection_operations">idmtools.entities.iplatform_ops.iplatform_asset_collection_operations</a>
+</li>
+        <li><a href="idmtools.entities.iplatform_ops.iplatform_experiment_operations.html#module-idmtools.entities.iplatform_ops.iplatform_experiment_operations">idmtools.entities.iplatform_ops.iplatform_experiment_operations</a>
+</li>
+        <li><a href="idmtools.entities.iplatform_ops.iplatform_simulation_operations.html#module-idmtools.entities.iplatform_ops.iplatform_simulation_operations">idmtools.entities.iplatform_ops.iplatform_simulation_operations</a>
+</li>
+        <li><a href="idmtools.entities.iplatform_ops.iplatform_suite_operations.html#module-idmtools.entities.iplatform_ops.iplatform_suite_operations">idmtools.entities.iplatform_ops.iplatform_suite_operations</a>
+</li>
+        <li><a href="idmtools.entities.iplatform_ops.iplatform_workflowitem_operations.html#module-idmtools.entities.iplatform_ops.iplatform_workflowitem_operations">idmtools.entities.iplatform_ops.iplatform_workflowitem_operations</a>
+</li>
+        <li><a href="idmtools.entities.iplatform_ops.utils.html#module-idmtools.entities.iplatform_ops.utils">idmtools.entities.iplatform_ops.utils</a>
+</li>
+        <li><a href="idmtools.entities.itask.html#module-idmtools.entities.itask">idmtools.entities.itask</a>
+</li>
+        <li><a href="idmtools.entities.iworkflow_item.html#module-idmtools.entities.iworkflow_item">idmtools.entities.iworkflow_item</a>
+</li>
+        <li><a href="idmtools.entities.platform_requirements.html#module-idmtools.entities.platform_requirements">idmtools.entities.platform_requirements</a>
+</li>
+        <li><a href="idmtools.entities.relation_type.html#module-idmtools.entities.relation_type">idmtools.entities.relation_type</a>
+</li>
+        <li><a href="idmtools.entities.simulation.html#module-idmtools.entities.simulation">idmtools.entities.simulation</a>
+</li>
+        <li><a href="idmtools.entities.suite.html#module-idmtools.entities.suite">idmtools.entities.suite</a>
+</li>
+        <li><a href="idmtools.entities.task_proxy.html#module-idmtools.entities.task_proxy">idmtools.entities.task_proxy</a>
+</li>
+        <li><a href="idmtools.entities.templated_simulation.html#module-idmtools.entities.templated_simulation">idmtools.entities.templated_simulation</a>
+</li>
+        <li><a href="idmtools.registry.html#module-idmtools.registry">idmtools.registry</a>
+</li>
+        <li><a href="idmtools.registry.experiment_specification.html#module-idmtools.registry.experiment_specification">idmtools.registry.experiment_specification</a>
+</li>
+        <li><a href="idmtools.registry.master_plugin_registry.html#module-idmtools.registry.master_plugin_registry">idmtools.registry.master_plugin_registry</a>
+</li>
+        <li><a href="idmtools.registry.platform_specification.html#module-idmtools.registry.platform_specification">idmtools.registry.platform_specification</a>
+</li>
+        <li><a href="idmtools.registry.plugin_specification.html#module-idmtools.registry.plugin_specification">idmtools.registry.plugin_specification</a>
+</li>
+        <li><a href="idmtools.registry.task_specification.html#module-idmtools.registry.task_specification">idmtools.registry.task_specification</a>
+</li>
+        <li><a href="idmtools.registry.utils.html#module-idmtools.registry.utils">idmtools.registry.utils</a>
+</li>
+        <li><a href="idmtools.services.html#module-idmtools.services">idmtools.services</a>
+</li>
+        <li><a href="idmtools.services.ipersistance_service.html#module-idmtools.services.ipersistance_service">idmtools.services.ipersistance_service</a>
+</li>
+        <li><a href="idmtools.services.platforms.html#module-idmtools.services.platforms">idmtools.services.platforms</a>
+</li>
+        <li><a href="idmtools.utils.html#module-idmtools.utils">idmtools.utils</a>
+</li>
+        <li><a href="idmtools.utils.collections.html#module-idmtools.utils.collections">idmtools.utils.collections</a>
+</li>
+        <li><a href="idmtools.utils.command_line.html#module-idmtools.utils.command_line">idmtools.utils.command_line</a>
+</li>
+        <li><a href="idmtools.utils.decorators.html#module-idmtools.utils.decorators">idmtools.utils.decorators</a>
+</li>
+        <li><a href="idmtools.utils.display.html#module-idmtools.utils.display">idmtools.utils.display</a>
+</li>
+        <li><a href="idmtools.utils.display.displays.html#module-idmtools.utils.display.displays">idmtools.utils.display.displays</a>
+</li>
+        <li><a href="idmtools.utils.display.settings.html#module-idmtools.utils.display.settings">idmtools.utils.display.settings</a>
+</li>
+        <li><a href="idmtools.utils.dropbox_location.html#module-idmtools.utils.dropbox_location">idmtools.utils.dropbox_location</a>
+</li>
+        <li><a href="idmtools.utils.entities.html#module-idmtools.utils.entities">idmtools.utils.entities</a>
+</li>
+        <li><a href="idmtools.utils.file.html#module-idmtools.utils.file">idmtools.utils.file</a>
+</li>
+        <li><a href="idmtools.utils.file_parser.html#module-idmtools.utils.file_parser">idmtools.utils.file_parser</a>
+</li>
+        <li><a href="idmtools.utils.filter_simulations.html#module-idmtools.utils.filter_simulations">idmtools.utils.filter_simulations</a>
+</li>
+        <li><a href="idmtools.utils.filters.html#module-idmtools.utils.filters">idmtools.utils.filters</a>
+</li>
+        <li><a href="idmtools.utils.filters.asset_filters.html#module-idmtools.utils.filters.asset_filters">idmtools.utils.filters.asset_filters</a>
+</li>
+        <li><a href="idmtools.utils.gitrepo.html#module-idmtools.utils.gitrepo">idmtools.utils.gitrepo</a>
+</li>
+        <li><a href="idmtools.utils.hashing.html#module-idmtools.utils.hashing">idmtools.utils.hashing</a>
+</li>
+        <li><a href="idmtools.utils.info.html#module-idmtools.utils.info">idmtools.utils.info</a>
+</li>
+        <li><a href="idmtools.utils.json.html#module-idmtools.utils.json">idmtools.utils.json</a>
+</li>
+        <li><a href="idmtools.utils.language.html#module-idmtools.utils.language">idmtools.utils.language</a>
+</li>
+        <li><a href="idmtools.utils.local_os.html#module-idmtools.utils.local_os">idmtools.utils.local_os</a>
+</li>
+        <li><a href="idmtools.utils.time.html#module-idmtools.utils.time">idmtools.utils.time</a>
+</li>
+        <li><a href="idmtools_models.html#module-idmtools_models">idmtools_models</a>
+</li>
+        <li><a href="idmtools_models.json_configured_task.html#module-idmtools_models.json_configured_task">idmtools_models.json_configured_task</a>
+</li>
+        <li><a href="idmtools_models.python.html#module-idmtools_models.python">idmtools_models.python</a>
+</li>
+        <li><a href="idmtools_models.python.json_python_task.html#module-idmtools_models.python.json_python_task">idmtools_models.python.json_python_task</a>
+</li>
+        <li><a href="idmtools_models.python.python_task.html#module-idmtools_models.python.python_task">idmtools_models.python.python_task</a>
+</li>
+        <li><a href="idmtools_models.r.html#module-idmtools_models.r">idmtools_models.r</a>
+</li>
+        <li><a href="idmtools_models.r.json_r_task.html#module-idmtools_models.r.json_r_task">idmtools_models.r.json_r_task</a>
+</li>
+        <li><a href="idmtools_models.r.r_task.html#module-idmtools_models.r.r_task">idmtools_models.r.r_task</a>
+</li>
+        <li><a href="idmtools_models.templated_script_task.html#module-idmtools_models.templated_script_task">idmtools_models.templated_script_task</a>
+</li>
+        <li><a href="idmtools_platform_comps.html#module-idmtools_platform_comps">idmtools_platform_comps</a>
+</li>
+        <li><a href="idmtools_platform_comps.cli.html#module-idmtools_platform_comps.cli">idmtools_platform_comps.cli</a>
+</li>
+        <li><a href="idmtools_platform_comps.cli.cli_functions.html#module-idmtools_platform_comps.cli.cli_functions">idmtools_platform_comps.cli.cli_functions</a>
+</li>
+        <li><a href="idmtools_platform_comps.cli.comps.html#module-idmtools_platform_comps.cli.comps">idmtools_platform_comps.cli.comps</a>
+</li>
+        <li><a href="idmtools_platform_comps.cli.utils.html#module-idmtools_platform_comps.cli.utils">idmtools_platform_comps.cli.utils</a>
+</li>
+        <li><a href="idmtools_platform_comps.comps_cli.html#module-idmtools_platform_comps.comps_cli">idmtools_platform_comps.comps_cli</a>
+</li>
+        <li><a href="idmtools_platform_comps.comps_operations.html#module-idmtools_platform_comps.comps_operations">idmtools_platform_comps.comps_operations</a>
+</li>
+        <li><a href="idmtools_platform_comps.comps_operations.asset_collection_operations.html#module-idmtools_platform_comps.comps_operations.asset_collection_operations">idmtools_platform_comps.comps_operations.asset_collection_operations</a>
+</li>
+        <li><a href="idmtools_platform_comps.comps_operations.experiment_operations.html#module-idmtools_platform_comps.comps_operations.experiment_operations">idmtools_platform_comps.comps_operations.experiment_operations</a>
+</li>
+        <li><a href="idmtools_platform_comps.comps_operations.simulation_operations.html#module-idmtools_platform_comps.comps_operations.simulation_operations">idmtools_platform_comps.comps_operations.simulation_operations</a>
+</li>
+        <li><a href="idmtools_platform_comps.comps_operations.suite_operations.html#module-idmtools_platform_comps.comps_operations.suite_operations">idmtools_platform_comps.comps_operations.suite_operations</a>
+</li>
+        <li><a href="idmtools_platform_comps.comps_operations.workflow_item_operations.html#module-idmtools_platform_comps.comps_operations.workflow_item_operations">idmtools_platform_comps.comps_operations.workflow_item_operations</a>
+</li>
+        <li><a href="idmtools_platform_comps.comps_platform.html#module-idmtools_platform_comps.comps_platform">idmtools_platform_comps.comps_platform</a>
+</li>
+        <li><a href="idmtools_platform_comps.plugin_info.html#module-idmtools_platform_comps.plugin_info">idmtools_platform_comps.plugin_info</a>
+</li>
+        <li><a href="idmtools_platform_comps.ssmt_operations.html#module-idmtools_platform_comps.ssmt_operations">idmtools_platform_comps.ssmt_operations</a>
+</li>
+        <li><a href="idmtools_platform_comps.ssmt_operations.simulation_operations.html#module-idmtools_platform_comps.ssmt_operations.simulation_operations">idmtools_platform_comps.ssmt_operations.simulation_operations</a>
+</li>
+        <li><a href="idmtools_platform_comps.ssmt_operations.workflow_item_operations.html#module-idmtools_platform_comps.ssmt_operations.workflow_item_operations">idmtools_platform_comps.ssmt_operations.workflow_item_operations</a>
+</li>
+        <li><a href="idmtools_platform_comps.ssmt_platform.html#module-idmtools_platform_comps.ssmt_platform">idmtools_platform_comps.ssmt_platform</a>
+</li>
+        <li><a href="idmtools_platform_comps.ssmt_work_items.html#module-idmtools_platform_comps.ssmt_work_items">idmtools_platform_comps.ssmt_work_items</a>
+</li>
+        <li><a href="idmtools_platform_comps.ssmt_work_items.comps_workitems.html#module-idmtools_platform_comps.ssmt_work_items.comps_workitems">idmtools_platform_comps.ssmt_work_items.comps_workitems</a>
+</li>
+        <li><a href="idmtools_platform_comps.ssmt_work_items.icomps_workflowitem.html#module-idmtools_platform_comps.ssmt_work_items.icomps_workflowitem">idmtools_platform_comps.ssmt_work_items.icomps_workflowitem</a>
+</li>
+        <li><a href="idmtools_platform_comps.utils.html#module-idmtools_platform_comps.utils">idmtools_platform_comps.utils</a>
+</li>
+        <li><a href="idmtools_platform_comps.utils.disk_usage.html#module-idmtools_platform_comps.utils.disk_usage">idmtools_platform_comps.utils.disk_usage</a>
+</li>
+        <li><a href="idmtools_platform_comps.utils.general.html#module-idmtools_platform_comps.utils.general">idmtools_platform_comps.utils.general</a>
+</li>
+        <li><a href="idmtools_platform_comps.utils.lookups.html#module-idmtools_platform_comps.utils.lookups">idmtools_platform_comps.utils.lookups</a>
+</li>
+        <li><a href="idmtools_platform_comps.utils.package_version.html#module-idmtools_platform_comps.utils.package_version">idmtools_platform_comps.utils.package_version</a>
+</li>
+        <li><a href="idmtools_platform_comps.utils.python_requirements_ac.html#module-idmtools_platform_comps.utils.python_requirements_ac">idmtools_platform_comps.utils.python_requirements_ac</a>
+</li>
+        <li><a href="idmtools_platform_comps.utils.python_requirements_ac.create_asset_collection.html#module-idmtools_platform_comps.utils.python_requirements_ac.create_asset_collection">idmtools_platform_comps.utils.python_requirements_ac.create_asset_collection</a>
+</li>
+        <li><a href="idmtools_platform_comps.utils.python_requirements_ac.install_requirements.html#module-idmtools_platform_comps.utils.python_requirements_ac.install_requirements">idmtools_platform_comps.utils.python_requirements_ac.install_requirements</a>
+</li>
+        <li><a href="idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection.html#module-idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection">idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection</a>
+</li>
+        <li><a href="idmtools_platform_comps.utils.python_version.html#module-idmtools_platform_comps.utils.python_version">idmtools_platform_comps.utils.python_version</a>
+</li>
+        <li><a href="idmtools_platform_local.html#module-idmtools_platform_local">idmtools_platform_local</a>
+</li>
+        <li><a href="idmtools_platform_local.cli.html#module-idmtools_platform_local.cli">idmtools_platform_local.cli</a>
+</li>
+        <li><a href="idmtools_platform_local.cli.experiment.html#module-idmtools_platform_local.cli.experiment">idmtools_platform_local.cli.experiment</a>
+</li>
+        <li><a href="idmtools_platform_local.cli.local.html#module-idmtools_platform_local.cli.local">idmtools_platform_local.cli.local</a>
+</li>
+        <li><a href="idmtools_platform_local.cli.simulation.html#module-idmtools_platform_local.cli.simulation">idmtools_platform_local.cli.simulation</a>
+</li>
+        <li><a href="idmtools_platform_local.cli.utils.html#module-idmtools_platform_local.cli.utils">idmtools_platform_local.cli.utils</a>
+</li>
+        <li><a href="idmtools_platform_local.client.html#module-idmtools_platform_local.client">idmtools_platform_local.client</a>
+</li>
+        <li><a href="idmtools_platform_local.client.base.html#module-idmtools_platform_local.client.base">idmtools_platform_local.client.base</a>
+</li>
+        <li><a href="idmtools_platform_local.client.experiments_client.html#module-idmtools_platform_local.client.experiments_client">idmtools_platform_local.client.experiments_client</a>
+</li>
+        <li><a href="idmtools_platform_local.client.healthcheck_client.html#module-idmtools_platform_local.client.healthcheck_client">idmtools_platform_local.client.healthcheck_client</a>
+</li>
+        <li><a href="idmtools_platform_local.client.simulations_client.html#module-idmtools_platform_local.client.simulations_client">idmtools_platform_local.client.simulations_client</a>
+</li>
+        <li><a href="idmtools_platform_local.config.html#module-idmtools_platform_local.config">idmtools_platform_local.config</a>
+</li>
+        <li><a href="idmtools_platform_local.infrastructure.html#module-idmtools_platform_local.infrastructure">idmtools_platform_local.infrastructure</a>
+</li>
+        <li><a href="idmtools_platform_local.infrastructure.base_service_container.html#module-idmtools_platform_local.infrastructure.base_service_container">idmtools_platform_local.infrastructure.base_service_container</a>
+</li>
+        <li><a href="idmtools_platform_local.infrastructure.docker_io.html#module-idmtools_platform_local.infrastructure.docker_io">idmtools_platform_local.infrastructure.docker_io</a>
+</li>
+        <li><a href="idmtools_platform_local.infrastructure.postgres.html#module-idmtools_platform_local.infrastructure.postgres">idmtools_platform_local.infrastructure.postgres</a>
+</li>
+        <li><a href="idmtools_platform_local.infrastructure.redis.html#module-idmtools_platform_local.infrastructure.redis">idmtools_platform_local.infrastructure.redis</a>
+</li>
+        <li><a href="idmtools_platform_local.infrastructure.service_manager.html#module-idmtools_platform_local.infrastructure.service_manager">idmtools_platform_local.infrastructure.service_manager</a>
+</li>
+        <li><a href="idmtools_platform_local.infrastructure.workers.html#module-idmtools_platform_local.infrastructure.workers">idmtools_platform_local.infrastructure.workers</a>
+</li>
+        <li><a href="idmtools_platform_local.internals.html#module-idmtools_platform_local.internals">idmtools_platform_local.internals</a>
+</li>
+        <li><a href="idmtools_platform_local.internals.data.html#module-idmtools_platform_local.internals.data">idmtools_platform_local.internals.data</a>
+</li>
+        <li><a href="idmtools_platform_local.internals.data.job_status.html#module-idmtools_platform_local.internals.data.job_status">idmtools_platform_local.internals.data.job_status</a>
+</li>
+        <li><a href="idmtools_platform_local.internals.ui.html#module-idmtools_platform_local.internals.ui">idmtools_platform_local.internals.ui</a>
+</li>
+        <li><a href="idmtools_platform_local.internals.ui.app.html#module-idmtools_platform_local.internals.ui.app">idmtools_platform_local.internals.ui.app</a>
+</li>
+        <li><a href="idmtools_platform_local.internals.ui.config.html#module-idmtools_platform_local.internals.ui.config">idmtools_platform_local.internals.ui.config</a>
+</li>
+        <li><a href="idmtools_platform_local.internals.ui.controllers.html#module-idmtools_platform_local.internals.ui.controllers">idmtools_platform_local.internals.ui.controllers</a>
+</li>
+        <li><a href="idmtools_platform_local.internals.ui.controllers.experiments.html#module-idmtools_platform_local.internals.ui.controllers.experiments">idmtools_platform_local.internals.ui.controllers.experiments</a>
+</li>
+        <li><a href="idmtools_platform_local.internals.ui.controllers.healthcheck.html#module-idmtools_platform_local.internals.ui.controllers.healthcheck">idmtools_platform_local.internals.ui.controllers.healthcheck</a>
+</li>
+        <li><a href="idmtools_platform_local.internals.ui.controllers.simulations.html#module-idmtools_platform_local.internals.ui.controllers.simulations">idmtools_platform_local.internals.ui.controllers.simulations</a>
+</li>
+        <li><a href="idmtools_platform_local.internals.ui.controllers.utils.html#module-idmtools_platform_local.internals.ui.controllers.utils">idmtools_platform_local.internals.ui.controllers.utils</a>
+</li>
+        <li><a href="idmtools_platform_local.internals.ui.utils.html#module-idmtools_platform_local.internals.ui.utils">idmtools_platform_local.internals.ui.utils</a>
+</li>
+        <li><a href="idmtools_platform_local.internals.workers.html#module-idmtools_platform_local.internals.workers">idmtools_platform_local.internals.workers</a>
+</li>
+        <li><a href="idmtools_platform_local.internals.workers.database.html#module-idmtools_platform_local.internals.workers.database">idmtools_platform_local.internals.workers.database</a>
+</li>
+        <li><a href="idmtools_platform_local.internals.workers.run.html#module-idmtools_platform_local.internals.workers.run">idmtools_platform_local.internals.workers.run</a>
+</li>
+        <li><a href="idmtools_platform_local.internals.workers.run_broker.html#module-idmtools_platform_local.internals.workers.run_broker">idmtools_platform_local.internals.workers.run_broker</a>
+</li>
+        <li><a href="idmtools_platform_local.internals.workers.utils.html#module-idmtools_platform_local.internals.workers.utils">idmtools_platform_local.internals.workers.utils</a>
+</li>
+        <li><a href="idmtools_platform_local.local_cli.html#module-idmtools_platform_local.local_cli">idmtools_platform_local.local_cli</a>
+</li>
+        <li><a href="idmtools_platform_local.local_platform.html#module-idmtools_platform_local.local_platform">idmtools_platform_local.local_platform</a>
+</li>
+        <li><a href="idmtools_platform_local.platform_operations.html#module-idmtools_platform_local.platform_operations">idmtools_platform_local.platform_operations</a>
+</li>
+        <li><a href="idmtools_platform_local.platform_operations.experiment_operations.html#module-idmtools_platform_local.platform_operations.experiment_operations">idmtools_platform_local.platform_operations.experiment_operations</a>
+</li>
+        <li><a href="idmtools_platform_local.platform_operations.simulation_operations.html#module-idmtools_platform_local.platform_operations.simulation_operations">idmtools_platform_local.platform_operations.simulation_operations</a>
+</li>
+        <li><a href="idmtools_platform_local.platform_operations.uitils.html#module-idmtools_platform_local.platform_operations.uitils">idmtools_platform_local.platform_operations.uitils</a>
+</li>
+        <li><a href="idmtools_platform_local.plugin_info.html#module-idmtools_platform_local.plugin_info">idmtools_platform_local.plugin_info</a>
+</li>
+        <li><a href="idmtools_platform_local.status.html#module-idmtools_platform_local.status">idmtools_platform_local.status</a>
 </li>
       </ul></li>
   </ul></td>
@@ -2290,6 +3547,8 @@
 </li>
       <li><a href="idmtools.utils.decorators.html#idmtools.utils.decorators.ParallelizeDecorator">ParallelizeDecorator (class in idmtools.utils.decorators)</a>
 </li>
+      <li><a href="glossary.html#term-parameter-sweep"><strong>parameter sweep</strong></a>
+</li>
       <li><a href="idmtools_models.json_configured_task.html#idmtools_models.json_configured_task.JSONConfiguredTask.parameters">parameters (idmtools_models.json_configured_task.JSONConfiguredTask attribute)</a>
 </li>
       <li><a href="idmtools.entities.templated_simulation.html#idmtools.entities.templated_simulation.TemplatedSimulations.parent">parent (idmtools.entities.templated_simulation.TemplatedSimulations attribute)</a>
@@ -2339,6 +3598,8 @@
       <li><a href="idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection.html#idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection.RequirementsToAssetCollection.pkg_list">pkg_list (idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection.RequirementsToAssetCollection attribute)</a>
 </li>
       <li><a href="idmtools_platform_comps.utils.package_version.html#idmtools_platform_comps.utils.package_version.LinkHTMLParser.pkg_version">pkg_version (idmtools_platform_comps.utils.package_version.LinkHTMLParser attribute)</a>
+</li>
+      <li><a href="glossary.html#term-platform"><strong>platform</strong></a>
 </li>
       <li><a href="idmtools.core.platform_factory.html#idmtools.core.platform_factory.Platform">Platform (class in idmtools.core.platform_factory)</a>
 </li>
@@ -2480,10 +3741,10 @@
 </li>
       <li><a href="idmtools.entities.platform_requirements.html#idmtools.entities.platform_requirements.PlatformRequirements">PlatformRequirements (class in idmtools.entities.platform_requirements)</a>
 </li>
-      <li><a href="idmtools.registry.platform_specification.html#idmtools.registry.platform_specification.PlatformSpecification">PlatformSpecification (class in idmtools.registry.platform_specification)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="idmtools.registry.platform_specification.html#idmtools.registry.platform_specification.PlatformSpecification">PlatformSpecification (class in idmtools.registry.platform_specification)</a>
+</li>
       <li><a href="idmtools_platform_comps.ssmt_work_items.icomps_workflowitem.html#idmtools_platform_comps.ssmt_work_items.icomps_workflowitem.ICOMPSWorkflowItem.plugin_key">plugin_key (idmtools_platform_comps.ssmt_work_items.icomps_workflowitem.ICOMPSWorkflowItem attribute)</a>
 </li>
       <li><a href="idmtools.registry.utils.html#idmtools.registry.utils.plugins_loader">plugins_loader() (in module idmtools.registry.utils)</a>
@@ -2954,6 +4215,8 @@
         <li><a href="idmtools_platform_local.platform_operations.simulation_operations.html#idmtools_platform_local.platform_operations.simulation_operations.LocalPlatformSimulationOperations.send_assets">(idmtools_platform_local.platform_operations.simulation_operations.LocalPlatformSimulationOperations method)</a>
 </li>
       </ul></li>
+      <li><a href="glossary.html#term-server-side-modeling-tools-SSMT"><strong>server-side modeling tools (SSMT)</strong></a>
+</li>
       <li><a href="idmtools.assets.asset_collection.html#idmtools.assets.asset_collection.AssetCollection.set_all_persisted">set_all_persisted() (idmtools.assets.asset_collection.AssetCollection method)</a>
 </li>
       <li><a href="idmtools.core.context.html#idmtools.core.context.set_current_platform">set_current_platform() (in module idmtools.core.context)</a>
@@ -2984,6 +4247,8 @@
 </li>
       <li><a href="idmtools_platform_local.internals.ui.controllers.simulations.html#idmtools_platform_local.internals.ui.controllers.simulations.sim_status">sim_status() (in module idmtools_platform_local.internals.ui.controllers.simulations)</a>
 </li>
+      <li><a href="glossary.html#term-simulation"><strong>simulation</strong></a>
+</li>
       <li><a href="idmtools.entities.simulation.html#idmtools.entities.simulation.Simulation">Simulation (class in idmtools.entities.simulation)</a>
 </li>
       <li><a href="idmtools.core.enums.html#idmtools.core.enums.ItemType.SIMULATION">SIMULATION (idmtools.core.enums.ItemType attribute)</a>
@@ -2996,10 +4261,10 @@
 </li>
       <li><a href="idmtools_platform_comps.comps_platform.html#idmtools_platform_comps.comps_platform.COMPSPlatform.simulation_root">simulation_root (idmtools_platform_comps.comps_platform.COMPSPlatform attribute)</a>
 </li>
-      <li><a href="idmtools.builders.simulation_builder.html#idmtools.builders.simulation_builder.SimulationBuilder">SimulationBuilder (class in idmtools.builders.simulation_builder)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="idmtools.builders.simulation_builder.html#idmtools.builders.simulation_builder.SimulationBuilder">SimulationBuilder (class in idmtools.builders.simulation_builder)</a>
+</li>
       <li><a href="idmtools_platform_local.platform_operations.uitils.html#idmtools_platform_local.platform_operations.uitils.SimulationDict">SimulationDict (class in idmtools_platform_local.platform_operations.uitils)</a>
 </li>
       <li><a href="idmtools_platform_local.internals.ui.controllers.simulations.html#idmtools_platform_local.internals.ui.controllers.simulations.Simulations">Simulations (class in idmtools_platform_local.internals.ui.controllers.simulations)</a>
@@ -3066,6 +4331,8 @@
         <li><a href="idmtools.entities.suite.html#idmtools.entities.suite.Suite.succeeded">(idmtools.entities.suite.Suite property)</a>
 </li>
       </ul></li>
+      <li><a href="glossary.html#term-suite"><strong>suite</strong></a>
+</li>
       <li><a href="idmtools.entities.suite.html#idmtools.entities.suite.Suite">Suite (class in idmtools.entities.suite)</a>
 </li>
       <li><a href="idmtools.core.enums.html#idmtools.core.enums.ItemType.SUITE">SUITE (idmtools.core.enums.ItemType attribute)</a>
@@ -3132,12 +4399,8 @@
 </li>
       <li><a href="idmtools.registry.task_specification.html#idmtools.registry.task_specification.TaskSpecification">TaskSpecification (class in idmtools.registry.task_specification)</a>
 </li>
-      <li><a href="glossary.html#term-template"><strong>template</strong></a>
-
-      <ul>
-        <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.TemplatedScriptTask.template">(idmtools_models.templated_script_task.TemplatedScriptTask attribute)</a>
+      <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.TemplatedScriptTask.template">template (idmtools_models.templated_script_task.TemplatedScriptTask attribute)</a>
 </li>
-      </ul></li>
       <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.TemplatedScriptTask.template_file">template_file (idmtools_models.templated_script_task.TemplatedScriptTask attribute)</a>
 </li>
       <li><a href="idmtools_models.templated_script_task.html#idmtools_models.templated_script_task.TemplatedScriptTask.template_is_common">template_is_common (idmtools_models.templated_script_task.TemplatedScriptTask attribute)</a>
@@ -3383,6 +4646,7 @@
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2020, Bill &amp; Melinda Gates Foundation. All rights reserved.
 
     </p>
@@ -3404,7 +4668,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

@@ -5,6 +5,7 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
    idmtools_platform_comps.cli
    idmtools_platform_comps.comps_operations
@@ -16,6 +17,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    idmtools_platform_comps.comps_cli
    idmtools_platform_comps.comps_platform

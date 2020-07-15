@@ -5,6 +5,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    idmtools_platform_local.platform_operations.experiment_operations
    idmtools_platform_local.platform_operations.simulation_operations

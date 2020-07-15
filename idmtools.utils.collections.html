@@ -1,8 +1,7 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
@@ -12,6 +11,13 @@
   
 
   
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="_static/tipuesearch/tipuesearch.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+
+  
   
     <link rel="shortcut icon" href="_static/favicon.ico"/>
   
@@ -19,7 +25,9 @@
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -36,13 +44,6 @@
     <link rel="search" type="application/opensearchdescription+xml"
           title="Search within idmtools  documentation"
           href="_static/opensearch.xml"/>
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-  <link rel="stylesheet" href="_static/tipuesearch/tipuesearch.css" type="text/css" />
-  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="idmtools.utils.command_line module" href="idmtools.utils.command_line.html" />
@@ -64,7 +65,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> idmtools
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> idmtools
           
 
           
@@ -77,7 +78,7 @@
             
             
               <div class="version">
-                1.2.2
+                1.3.0
               </div>
             
           
@@ -92,6 +93,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -105,12 +107,9 @@
 <li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="calibrate.html">Calibrate simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reports.html">Output data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reports.html">Output reports</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookiecutter example projects</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="reference.html">Architecture and packages reference</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="idmtools_index.html">idmtools</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="idmtools.html">idmtools package</a><ul class="current">
@@ -140,6 +139,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -167,7 +167,7 @@
 <div aria-label="breadcrumbs navigation" role="navigation">
     <ul class="wy-breadcrumbs">
         <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
-        <li><a href="index.html">IDM-Tools</a> &raquo;</li>
+        <li><a href="index.html">idmtools</a> &raquo;</li>
         
         <li><a href="reference.html">Architecture and packages reference</a> &raquo;</li>
         
@@ -193,9 +193,9 @@
 
   <div class="section" id="module-idmtools.utils.collections">
 <span id="idmtools-utils-collections-module"></span><h1>idmtools.utils.collections module<a class="headerlink" href="#module-idmtools.utils.collections" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
+<dl class="py function">
 <dt id="idmtools.utils.collections.cut_iterable_to">
-<code class="sig-prename descclassname">idmtools.utils.collections.</code><code class="sig-name descname">cut_iterable_to</code><span class="sig-paren">(</span><em class="sig-param">obj: Iterable</em>, <em class="sig-param">to: int</em><span class="sig-paren">)</span> &#x2192; Tuple[Union[List, Mapping], int]<a class="headerlink" href="#idmtools.utils.collections.cut_iterable_to" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">idmtools.utils.collections.</code><code class="sig-name descname">cut_iterable_to</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span><span class="p">:</span> <span class="n">Iterable</span></em>, <em class="sig-param"><span class="n">to</span><span class="p">:</span> <span class="n">int</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>Union<span class="p">[</span>List<span class="p">, </span>Mapping<span class="p">]</span><span class="p">, </span>int<span class="p">]</span><a class="headerlink" href="#idmtools.utils.collections.cut_iterable_to" title="Permalink to this definition">¶</a></dt>
 <dd><blockquote>
 <div><p>Cut an iterable to a certain length.</p>
 </div></blockquote>
@@ -213,32 +213,32 @@ the remaining elements in the original list or dictionary.</p>
 </dl>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="idmtools.utils.collections.ParentIterator">
-<em class="property">class </em><code class="sig-prename descclassname">idmtools.utils.collections.</code><code class="sig-name descname">ParentIterator</code><span class="sig-paren">(</span><em class="sig-param">lst</em>, <em class="sig-param">parent: IEntity</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.utils.collections.ParentIterator" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">idmtools.utils.collections.</code><code class="sig-name descname">ParentIterator</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwds</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.utils.collections.ParentIterator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">collections.abc.Iterator</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">typing.Generic</span></code></p>
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools.utils.collections.ParentIterator.append">
-<code class="sig-name descname">append</code><span class="sig-paren">(</span><em class="sig-param">item</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.utils.collections.ParentIterator.append" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">append</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">item</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.utils.collections.ParentIterator.append" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="idmtools.utils.collections.ResetGenerator">
-<em class="property">class </em><code class="sig-prename descclassname">idmtools.utils.collections.</code><code class="sig-name descname">ResetGenerator</code><span class="sig-paren">(</span><em class="sig-param">generator_init</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.utils.collections.ResetGenerator" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">idmtools.utils.collections.</code><code class="sig-name descname">ResetGenerator</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwds</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.utils.collections.ResetGenerator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">collections.abc.Iterator</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">typing.Generic</span></code></p>
 <p>Iterator that counts upward forever.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools.utils.collections.ResetGenerator.next_gen">
 <code class="sig-name descname">next_gen</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.utils.collections.ResetGenerator.next_gen" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="idmtools.utils.collections.duplicate_list_of_generators">
-<code class="sig-prename descclassname">idmtools.utils.collections.</code><code class="sig-name descname">duplicate_list_of_generators</code><span class="sig-paren">(</span><em class="sig-param">lst: List[Generator]</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.utils.collections.duplicate_list_of_generators" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">idmtools.utils.collections.</code><code class="sig-name descname">duplicate_list_of_generators</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lst</span><span class="p">:</span> <span class="n">List<span class="p">[</span>Generator<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.utils.collections.duplicate_list_of_generators" title="Permalink to this definition">¶</a></dt>
 <dd><p>Copy a list of iterators using tee
 :param lst: List of generators</p>
 <dl class="field-list simple">
@@ -272,6 +272,7 @@ the remaining elements in the original list or dictionary.</p>
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2020, Bill &amp; Melinda Gates Foundation. All rights reserved.
 
     </p>
@@ -293,7 +294,6 @@ the remaining elements in the original list or dictionary.</p>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

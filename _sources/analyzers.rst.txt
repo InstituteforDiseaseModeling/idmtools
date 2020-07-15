@@ -14,11 +14,24 @@ The analyzers included with |IT_s| help facilitate this process. For example, if
 .. image:: images/alldata-plot.png
 				:scale: 75%
 
+The analysis framework expects simulation output in CSV, JSON, XLSX, or TXT to be automatically loaded to a Python object. All other formats are loaded as a raw binary stream. The format indicated by the filename of the simulation output determines the data format loaded to the analyzers.
+
+.. csv-table:: 
+    :header: Output format, Object loaded to analyzer 
+    :widths: 10, 30
+
+	JSON, A dictionary
+    CSV, A pandas DataFrame
+    XLSX, A pandas DataFrame
+    TXT, An rstring
+    All other files, A bytes object
+
 Example analyzers are inlucded with |IT_s| to help you get started. For more information, see :doc:`analyzers-example`.
 
 You can also create custom analyzers to meet your individual analysis needs. For more information, see :doc:`analyzers-create`.
 
 Integration with |SSMT_l| increases the performance of running analyzers. You may find this useful when running multiple analyzers across multiple experiments.
+
 
 .. toctree::
 

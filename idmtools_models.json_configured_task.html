@@ -1,8 +1,7 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
@@ -12,6 +11,13 @@
   
 
   
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="_static/tipuesearch/tipuesearch.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+
+  
   
     <link rel="shortcut icon" href="_static/favicon.ico"/>
   
@@ -19,7 +25,9 @@
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -36,13 +44,6 @@
     <link rel="search" type="application/opensearchdescription+xml"
           title="Search within idmtools  documentation"
           href="_static/opensearch.xml"/>
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-  <link rel="stylesheet" href="_static/tipuesearch/tipuesearch.css" type="text/css" />
-  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="idmtools_models.templated_script_task module" href="idmtools_models.templated_script_task.html" />
@@ -64,7 +65,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> idmtools
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> idmtools
           
 
           
@@ -77,7 +78,7 @@
             
             
               <div class="version">
-                1.2.2
+                1.3.0
               </div>
             
           
@@ -92,6 +93,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -105,12 +107,9 @@
 <li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="calibrate.html">Calibrate simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reports.html">Output data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reports.html">Output reports</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cookiecutters.html">Cookiecutter example projects</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="reference.html">Architecture and packages reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="idmtools_index.html">idmtools</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="idmtools_models_index.html">idmtools_models</a><ul class="current">
@@ -135,6 +134,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -162,7 +162,7 @@
 <div aria-label="breadcrumbs navigation" role="navigation">
     <ul class="wy-breadcrumbs">
         <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
-        <li><a href="index.html">IDM-Tools</a> &raquo;</li>
+        <li><a href="index.html">idmtools</a> &raquo;</li>
         
         <li><a href="reference.html">Architecture and packages reference</a> &raquo;</li>
         
@@ -186,44 +186,44 @@
 
   <div class="section" id="module-idmtools_models.json_configured_task">
 <span id="idmtools-models-json-configured-task-module"></span><h1>idmtools_models.json_configured_task module<a class="headerlink" href="#module-idmtools_models.json_configured_task" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="idmtools_models.json_configured_task.JSONConfiguredTask">
 <em class="property">class </em><code class="sig-prename descclassname">idmtools_models.json_configured_task.</code><code class="sig-name descname">JSONConfiguredTask</code><span class="sig-paren">(</span><em class="sig-param">command: Union[str, idmtools.entities.command_line.CommandLine] = None, platform_requirements: Set[idmtools.entities.platform_requirements.PlatformRequirements] = &lt;factory&gt;, _ITask__pre_creation_hooks: List[Callable[[Union[Simulation, IWorkflowItem]], NoReturn]] = &lt;factory&gt;, _ITask__post_creation_hooks: List[Callable[[Union[Simulation, IWorkflowItem]], NoReturn]] = &lt;factory&gt;, common_assets: idmtools.assets.asset_collection.AssetCollection = &lt;factory&gt;, transient_assets: idmtools.assets.asset_collection.AssetCollection = &lt;factory&gt;, _task_log: logging.Logger = &lt;factory&gt;, parameters: dict = &lt;factory&gt;, envelope: str = None, config_file_name: str = 'config.json', is_config_common: bool = False, command_line_argument: str = None, command_line_argument_no_filename: bool = True</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="idmtools.entities.itask.html#idmtools.entities.itask.ITask" title="idmtools.entities.itask.ITask"><code class="xref py py-class docutils literal notranslate"><span class="pre">idmtools.entities.itask.ITask</span></code></a></p>
 <p>Defines an extensible simple task that implements functionality through optional supplied use hooks</p>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="idmtools_models.json_configured_task.JSONConfiguredTask.parameters">
-<code class="sig-name descname">parameters</code><em class="property">: dict</em><em class="property"> = None</em><a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask.parameters" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">parameters</code><em class="property">: dict</em><a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask.parameters" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="idmtools_models.json_configured_task.JSONConfiguredTask.envelope">
 <code class="sig-name descname">envelope</code><em class="property">: str</em><em class="property"> = None</em><a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask.envelope" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="idmtools_models.json_configured_task.JSONConfiguredTask.config_file_name">
 <code class="sig-name descname">config_file_name</code><em class="property">: str</em><em class="property"> = 'config.json'</em><a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask.config_file_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="idmtools_models.json_configured_task.JSONConfiguredTask.is_config_common">
 <code class="sig-name descname">is_config_common</code><em class="property">: bool</em><em class="property"> = False</em><a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask.is_config_common" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="idmtools_models.json_configured_task.JSONConfiguredTask.command_line_argument">
 <code class="sig-name descname">command_line_argument</code><em class="property">: str</em><em class="property"> = None</em><a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask.command_line_argument" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="idmtools_models.json_configured_task.JSONConfiguredTask.command_line_argument_no_filename">
 <code class="sig-name descname">command_line_argument_no_filename</code><em class="property">: bool</em><em class="property"> = True</em><a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask.command_line_argument_no_filename" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools_models.json_configured_task.JSONConfiguredTask.gather_common_assets">
-<code class="sig-name descname">gather_common_assets</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; idmtools.assets.asset_collection.AssetCollection<a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask.gather_common_assets" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">gather_common_assets</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="idmtools.assets.asset_collection.html#idmtools.assets.asset_collection.AssetCollection" title="idmtools.assets.asset_collection.AssetCollection">idmtools.assets.asset_collection.AssetCollection</a><a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask.gather_common_assets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gather assets common across an Experiment(Set of Simulations)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -232,9 +232,9 @@
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools_models.json_configured_task.JSONConfiguredTask.gather_transient_assets">
-<code class="sig-name descname">gather_transient_assets</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; idmtools.assets.asset_collection.AssetCollection<a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask.gather_transient_assets" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">gather_transient_assets</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="idmtools.assets.asset_collection.html#idmtools.assets.asset_collection.AssetCollection" title="idmtools.assets.asset_collection.AssetCollection">idmtools.assets.asset_collection.AssetCollection</a><a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask.gather_transient_assets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gather assets that are unique to this simulation/worktiem</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -243,9 +243,9 @@
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools_models.json_configured_task.JSONConfiguredTask.set_parameter">
-<code class="sig-name descname">set_parameter</code><span class="sig-paren">(</span><em class="sig-param">key: Union[str, int, float], value: Union[str, int, float, Dict[Union[str, int, float], Any]]</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask.set_parameter" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">set_parameter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>int<span class="p">, </span>float<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">value</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>int<span class="p">, </span>float<span class="p">, </span>Dict<span class="p">[</span>Union<span class="p">[</span>str<span class="p">, </span>int<span class="p">, </span>float<span class="p">]</span><span class="p">, </span>Any<span class="p">]</span><span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask.set_parameter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update a parameter. The type hinting encourages JSON supported types</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -258,9 +258,9 @@
 <p>Returns:</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools_models.json_configured_task.JSONConfiguredTask.get_parameter">
-<code class="sig-name descname">get_parameter</code><span class="sig-paren">(</span><em class="sig-param">key: Union[str, int, float]</em><span class="sig-paren">)</span> &#x2192; Union[str, int, float, Dict[Union[str, int, float], Any]]<a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask.get_parameter" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_parameter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>int<span class="p">, </span>float<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; Union<span class="p">[</span>str<span class="p">, </span>int<span class="p">, </span>float<span class="p">, </span>Dict<span class="p">[</span>Union<span class="p">[</span>str<span class="p">, </span>int<span class="p">, </span>float<span class="p">]</span><span class="p">, </span>Any<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask.get_parameter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a parameter value</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -275,9 +275,9 @@
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools_models.json_configured_task.JSONConfiguredTask.update_parameters">
-<code class="sig-name descname">update_parameters</code><span class="sig-paren">(</span><em class="sig-param">values: Dict[Union[str, int, float], Union[str, int, float, Dict[Union[str, int, float], Any]]]</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask.update_parameters" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">update_parameters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>Union<span class="p">[</span>str<span class="p">, </span>int<span class="p">, </span>float<span class="p">]</span><span class="p">, </span>Union<span class="p">[</span>str<span class="p">, </span>int<span class="p">, </span>float<span class="p">, </span>Dict<span class="p">[</span>Union<span class="p">[</span>str<span class="p">, </span>int<span class="p">, </span>float<span class="p">]</span><span class="p">, </span>Any<span class="p">]</span><span class="p">]</span><span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask.update_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform bulk update from another dictionary</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -287,9 +287,9 @@
 <p>Returns:</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools_models.json_configured_task.JSONConfiguredTask.reload_from_simulation">
-<code class="sig-name descname">reload_from_simulation</code><span class="sig-paren">(</span><em class="sig-param">simulation: idmtools.entities.simulation.Simulation</em>, <em class="sig-param">config_file_name: Optional[str] = None</em>, <em class="sig-param">envelope: Optional[str] = None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask.reload_from_simulation" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">reload_from_simulation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">simulation</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.entities.simulation.html#idmtools.entities.simulation.Simulation" title="idmtools.entities.simulation.Simulation">idmtools.entities.simulation.Simulation</a></span></em>, <em class="sig-param"><span class="n">config_file_name</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">envelope</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask.reload_from_simulation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reload from Simulation. To do this, the process is</p>
 <blockquote>
 <div><ol class="arabic simple">
@@ -312,33 +312,33 @@
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools_models.json_configured_task.JSONConfiguredTask.pre_creation">
-<code class="sig-name descname">pre_creation</code><span class="sig-paren">(</span><em class="sig-param">parent: Union[Simulation, WorkflowItem]</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask.pre_creation" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">pre_creation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parent</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>Simulation<span class="p">, </span>WorkflowItem<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask.pre_creation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Optional Hook called at the time of creation of task. Can be used to setup simulation and experiment level hooks
 :param parent:</p>
 <p>Returns:</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools_models.json_configured_task.JSONConfiguredTask.set_parameter_sweep_callback">
-<em class="property">static </em><code class="sig-name descname">set_parameter_sweep_callback</code><span class="sig-paren">(</span><em class="sig-param">simulation: idmtools.entities.simulation.Simulation</em>, <em class="sig-param">param: str</em>, <em class="sig-param">value: Any</em><span class="sig-paren">)</span> &#x2192; Dict[str, Any]<a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask.set_parameter_sweep_callback" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">set_parameter_sweep_callback</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">simulation</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.entities.simulation.html#idmtools.entities.simulation.Simulation" title="idmtools.entities.simulation.Simulation">idmtools.entities.simulation.Simulation</a></span></em>, <em class="sig-param"><span class="n">param</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">value</span><span class="p">:</span> <span class="n">Any</span></em><span class="sig-paren">)</span> &#x2192; Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span><a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask.set_parameter_sweep_callback" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools_models.json_configured_task.JSONConfiguredTask.set_parameter_partial">
-<em class="property">classmethod </em><code class="sig-name descname">set_parameter_partial</code><span class="sig-paren">(</span><em class="sig-param">parameter: str</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask.set_parameter_partial" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">set_parameter_partial</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameter</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTask.set_parameter_partial" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="idmtools_models.json_configured_task.JSONConfiguredTaskSpecification">
 <em class="property">class </em><code class="sig-prename descclassname">idmtools_models.json_configured_task.</code><code class="sig-name descname">JSONConfiguredTaskSpecification</code><a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTaskSpecification" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="idmtools.registry.task_specification.html#idmtools.registry.task_specification.TaskSpecification" title="idmtools.registry.task_specification.TaskSpecification"><code class="xref py py-class docutils literal notranslate"><span class="pre">idmtools.registry.task_specification.TaskSpecification</span></code></a></p>
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools_models.json_configured_task.JSONConfiguredTaskSpecification.get">
-<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param">configuration: dict</em><span class="sig-paren">)</span> &#x2192; idmtools_models.json_configured_task.JSONConfiguredTask<a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTaskSpecification.get" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">configuration</span><span class="p">:</span> <span class="n">dict</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#idmtools_models.json_configured_task.JSONConfiguredTask" title="idmtools_models.json_configured_task.JSONConfiguredTask">idmtools_models.json_configured_task.JSONConfiguredTask</a><a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTaskSpecification.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get instance of JSONConfiguredTask with configuration specified</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -350,7 +350,7 @@
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools_models.json_configured_task.JSONConfiguredTaskSpecification.get_description">
 <code class="sig-name descname">get_description</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTaskSpecification.get_description" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get description for plugin</p>
@@ -361,9 +361,9 @@
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools_models.json_configured_task.JSONConfiguredTaskSpecification.get_example_urls">
-<code class="sig-name descname">get_example_urls</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; List[str]<a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTaskSpecification.get_example_urls" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_example_urls</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>str<span class="p">]</span><a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTaskSpecification.get_example_urls" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get list of urls with examples for JSONConfiguredTask</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -372,9 +372,9 @@
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="idmtools_models.json_configured_task.JSONConfiguredTaskSpecification.get_type">
-<code class="sig-name descname">get_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Type[idmtools_models.json_configured_task.JSONConfiguredTask]<a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTaskSpecification.get_type" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Type<span class="p">[</span><a class="reference internal" href="#idmtools_models.json_configured_task.JSONConfiguredTask" title="idmtools_models.json_configured_task.JSONConfiguredTask">idmtools_models.json_configured_task.JSONConfiguredTask</a><span class="p">]</span><a class="headerlink" href="#idmtools_models.json_configured_task.JSONConfiguredTaskSpecification.get_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get task type provided by plugin</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -409,6 +409,7 @@
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2020, Bill &amp; Melinda Gates Foundation. All rights reserved.
 
     </p>
@@ -430,7 +431,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

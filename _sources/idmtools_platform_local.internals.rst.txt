@@ -5,6 +5,7 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
    idmtools_platform_local.internals.data
    idmtools_platform_local.internals.tasks

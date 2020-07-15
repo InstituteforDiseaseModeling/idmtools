@@ -5,6 +5,7 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
    idmtools_platform_local.cli
    idmtools_platform_local.client
@@ -16,6 +17,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    idmtools_platform_local.config
    idmtools_platform_local.local_cli

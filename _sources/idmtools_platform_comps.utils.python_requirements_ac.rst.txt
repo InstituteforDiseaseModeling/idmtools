@@ -5,6 +5,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    idmtools_platform_comps.utils.python_requirements_ac.create_asset_collection
    idmtools_platform_comps.utils.python_requirements_ac.install_requirements

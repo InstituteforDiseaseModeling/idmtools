@@ -5,6 +5,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    idmtools_platform_local.internals.workers.brokers
    idmtools_platform_local.internals.workers.database
