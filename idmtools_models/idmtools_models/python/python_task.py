@@ -18,8 +18,8 @@ logger = getLogger(__name__)
 
 @dataclass()
 class PythonTask(ITask):
-    script_path: str = None
-    python_path: str = 'python'
+    script_path: str = field(default=None, metadata={"md": True})
+    python_path: str = field(default='python', metadata={"md": True})
     platform_requirements: Set[PlatformRequirements] = field(default_factory=lambda: [PlatformRequirements.PYTHON])
 
     def __post_init__(self):

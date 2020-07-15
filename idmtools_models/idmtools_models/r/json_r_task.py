@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional, List, Type, Union
 from idmtools.assets import AssetCollection
 from idmtools.entities.iworkflow_item import IWorkflowItem
@@ -10,7 +10,7 @@ from idmtools_models.r.r_task import RTask
 
 @dataclass
 class JSONConfiguredRTask(JSONConfiguredTask, RTask):
-    configfile_argument: Optional[str] = "--config"
+    configfile_argument: Optional[str] = field(default="--config", metadata={"md": True})
 
     def __post_init__(self):
         super().__post_init__()

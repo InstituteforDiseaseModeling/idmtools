@@ -14,7 +14,7 @@ clean: ## Clean all our jobs
 	$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
 	$(MAKEALL) --parallel clean
 	$(CLDIR) --file-patterns "**/*.log"
-
+	$(PDR) -wd "docs" -ex "make clean"
 
 clean-all: ## Clean all our jobs
 	$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
@@ -26,7 +26,7 @@ setup-dev:  ## Setup packages in dev mode
 	$(PDR) -w idmtools_platform_local -ex 'pymake docker'
 
 lint: ## check style with flake8
-	flake8 --ignore=E501,W291 --exclude="venv**/**,examples/**,workflow/**,docs/**,*/tests/**,idmtools_test/**"
+	flake8 --ignore=E501,W291 --exclude="venv**/**,examples/**,workflow/**,docs/**,*/tests/**,idmtools_test/**, idmtools_platform_comps/prototypes/**"
 
 
 test: ## Run our tests

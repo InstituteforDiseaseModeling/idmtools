@@ -1,5 +1,5 @@
 # install staging packages and run all test
-# trigger by push or pull_request with commit message: "Run uj all test!"
+# trigger by push or pull_request with commit message: "Run ubuntu all test!".
 
 name: "run-all-test-ubuntu-stage"
 on: [push, pull_request]
@@ -10,8 +10,11 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: [3.6, 3.7]
-    if: "contains(github.event.head_commit.message, 'Run uj all test!')"
+        python-version: [3.6, 3.7, 3.8]
+    env:
+      bamboo_user: ${{ secrets.PYPI_STAGING_USERNAME }}
+      bamboo_password: ${{ secrets.PYPI_STAGING_PASSWORD }}
+    if: "contains(github.event.head_commit.message, 'Run ubuntu all test!')"
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
@@ -22,24 +25,24 @@ jobs:
           architecture: x64
       - name: Install Python dependencies
         run: |
-          pip install py-make flake8
+          pip install py-make flake8 wheel
       - name: Install dataclass
         if: ${{ matrix.python-version }} == 3.6
         run: |
           pip install dataclasses
       - name: download idmtools packages from staging jfrog
-        env:
-          bamboo_UserArtifactory: ${{ secrets.PYPI_STAGING_USERNAME }}
-          bamboo_PasswordArtifactory: ${{ secrets.PYPI_STAGING_PASSWORD }}
         run: |
-          pip install idmtools[full] --index-url=https://$bamboo_UserArtifactory:$bamboo_PasswordArtifactory@packages.idmod.org/api/pypi/pypi-staging/simple
-          pip install idmtools-test --index-url=https://$bamboo_UserArtifactory:$bamboo_PasswordArtifactory@packages.idmod.org/api/pypi/pypi-staging/simple
+          pip install idmtools[full] --index-url=https://${{ env.bamboo_user }}:${{ env.bamboo_password }}@packages.idmod.org/api/pypi/pypi-staging/simple
+          pip install idmtools-test --index-url=https://${{ env.bamboo_user }}:${{ env.bamboo_password }}@packages.idmod.org/api/pypi/pypi-staging/simple
       - name: login to comps2
         run: |
             python dev_scripts/create_auth_token_args.py --username $COMPS_USER --password $COMPS_PASSWORD
         env:
           COMPS_USER: ${{ secrets.COMPS_USER }}
           COMPS_PASSWORD: ${{ secrets.COMPS_PASSWORD }}
+      - name: login to docker staging
+        run: |
+          echo '${{ env.bamboo_password }}' | docker login idm-docker-staging.packages.idmod.org --username ${{ env.bamboo_user }} --password-stdin
       - name: run idmtools_cli tests
         run: |
             cd idmtools_cli/tests
@@ -52,8 +55,8 @@ jobs:
           path: idmtools_cli/tests/test_results.xml
       - name: run idmtools_core tests
         run: |
-            cd idmtools_core/tests
-            py.test --durations=3 -v --junitxml=test_results.xml
+          cd idmtools_core/tests
+          py.test --durations=3 -v --junitxml=test_results.xml
       - name: Upload idmtools_core test results
         uses: actions/upload-artifact@v2
         if: failure()
@@ -83,6 +86,7 @@ jobs:
       - name: run idmtools_platform_local tests
         run: |
             cd idmtools_platform_local/tests
+            export DOCKER_REPO=idm-docker-staging
             py.test --durations=3 -v --junitxml=test_results.xml
       - name: Upload idmtools_platform_local test results
         uses: actions/upload-artifact@v2

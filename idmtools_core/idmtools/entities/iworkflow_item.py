@@ -70,13 +70,13 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, ABC):
         self.user_files.files = [f for f in self.user_files.files if f.filename.lower() not in files_to_be_removed]
 
     def __check_for_platform(self, platform: 'IPlatform'):  # noqa: F821
-        from idmtools.core.context import current_platform
+        from idmtools.core.context import CURRENT_PLATFORM
         if platform is not None:
             self.platform = platform
         if self.platform is None:
-            if current_platform is None:
+            if CURRENT_PLATFORM is None:
                 raise ValueError("Platform is required to run item")
-            self.platform = current_platform
+            self.platform = CURRENT_PLATFORM
 
     def run(self, wait_on_done: bool = False, wait_on_done_progress: bool = True,
             platform: 'IPlatform' = None):  # noqa: F821

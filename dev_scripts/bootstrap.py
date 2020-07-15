@@ -6,10 +6,9 @@ import sys
 import unicodedata
 from logging import getLogger
 from os.path import abspath, join, dirname
-
-# on windows virtual env is not populated through pymake
 from typing import List, Generator
 
+# on windows virtual env is not populated through pymake
 if sys.platform == "win32" and 'VIRTUAL_ENV' in os.environ:
     sys.path.insert(0, os.environ['VIRTUAL_ENV'] + "\\Lib\\site-packages")
 
@@ -113,6 +112,10 @@ def process_output(output_line: str):
         output_line = output_line.strip().translate(translator)
         logger.debug("".join(ch for ch in output_line if unicodedata.category(ch)[0] != "C"))
 
+
+# install wheel first to benefit from binaries
+for line in execute(["pip", "install", "wheel"], cwd=join(base_directory, 'docs')):
+    process_output(line)
 
 # loop through and install our packages
 for package, extras in packages.items():
