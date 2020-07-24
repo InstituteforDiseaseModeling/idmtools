@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Examples &mdash; idmtools  documentation</title>
+  <title>1.3.0 &mdash; idmtools  documentation</title>
   
 
   
@@ -46,8 +46,7 @@
           href="_static/opensearch.xml"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Troubleshooting" href="cli-troubleshoot.html" />
-    <link rel="prev" title="Platforms" href="cli-platforms.html" />
+    <link rel="prev" title="1.2.0" href="changelog_1.2.0.html" />
 
 <link href="https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans" rel="stylesheet">
 
@@ -111,18 +110,17 @@
 <li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reference.html">Architecture and packages reference</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="cli_index.html">CLI reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="cli-config.html">idmtools.ini file</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cli-templates.html">Templates</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cli-simulations.html">Simulations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cli-experiments.html">Experiments</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cli-platforms.html">Platforms</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Examples</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cli-troubleshoot.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="changelog.html">Changelog</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="changelog_0.1.0.html">0.1.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog_1.0.0.html">1.0.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog_1.0.1.html">1.0.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog_1.1.0.html">1.1.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog_1.2.0.html">1.2.0</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">1.3.0</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
-<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
 
             
@@ -158,9 +156,9 @@
         <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
         <li><a href="index.html">idmtools</a> &raquo;</li>
         
-        <li><a href="cli_index.html">CLI reference</a> &raquo;</li>
+        <li><a href="changelog.html">Changelog</a> &raquo;</li>
         
-        <li>Examples</li>
+        <li>1.3.0</li>
         <li class="wy-breadcrumbs-aside">
             
             
@@ -174,90 +172,54 @@
             
 <!-- From _templates/page.html -->
 
-  <div class="section" id="examples">
-<h1>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h1>
-<p>You can use IDM CLI to download the included Python example scripts from GitHub to a local folder using the <code class="docutils literal notranslate"><span class="pre">gitrepo</span></code> command. To see the list of commands and options for <code class="docutils literal notranslate"><span class="pre">gitrepo</span></code>, type the following at a command prompt:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ idmtools gitrepo --help
-INI File Used: /home/runner/work/idmtools/idmtools/idmtools/docs/idmtools.ini
-Usage: idmtools gitrepo [OPTIONS] COMMAND [ARGS]...
-
-Options:
-  --help  Show this message and exit.
-
-Commands:
-  download   Download files from GitHub repo to user location Args: url:...
-  peep       Display all current files/dirs of the repo folder (not...
-  releases   Display all the releases of the repo Args: owner: Repo owner...
-  repos      Display all public repos of the owner Args: owner: Repo owner...
-  view       Display all idmtools available examples Args: raw: True/False...
-</pre></div>
+  <div class="section" id="id1">
+<h1>1.3.0<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="bugs">
+<h2>Bugs<a class="headerlink" href="#bugs" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/921">#0921</a> - PlatformAnalysis requires login before execution</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/937">#0937</a> - RequirementsToAssetCollection fail with Max length</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/946">#0946</a> - Upgrade pycomps to 2.3.7</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/972">#0972</a> - Template script wrapper task should proxy calls where possible</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/984">#0984</a> - Make idmtools_metadata.json default to off</p></li>
+</ul>
 </div>
-<p>or view examples by type through</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ idmtools examples list
-INI File Used: /home/runner/work/idmtools/idmtools/idmtools/docs/idmtools.ini
-
-SSMTPlatform
-    - https://github.com/InstituteforDiseaseModeling/idmtools/tree/v1.3.0/examples/ssmt
-    - https://github.com/InstituteforDiseaseModeling/idmtools/tree/v1.3.0/examples/vistools
-
-COMPSPlatform
-    - https://github.com/InstituteforDiseaseModeling/idmtools/tree/v1.3.0/examples/ssmt
-    - https://github.com/InstituteforDiseaseModeling/idmtools/tree/v1.3.0/examples/workitem
-    - https://github.com/InstituteforDiseaseModeling/idmtools/tree/v1.3.0/examples/vistools
-
-PythonTask
-    - https://github.com/InstituteforDiseaseModeling/idmtools/tree/v1.3.0/examples/load_lib
-
-CommandTask
-    - https://github.com/InstituteforDiseaseModeling/corvid-idmtools
-
-JSONConfiguredRTask
-    - https://github.com/InstituteforDiseaseModeling/idmtools/tree/v1.3.0/examples/r_model
-
-JSONConfiguredTask
-    - https://github.com/InstituteforDiseaseModeling/idmtools/tree/v1.3.0/examples/python_model
-    - https://github.com/InstituteforDiseaseModeling/idmtools/tree/v1.3.0/examples/load_lib
-</pre></div>
+<div class="section" id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/481">#0481</a> - Overview of the local platform</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/483">#0483</a> - Monitoring local experiments</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/910">#0910</a> - Add documentation on plotting analysis output using matplotlib as an example</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/925">#0925</a> - Platform Local - add documentation (getting started, run example, etc)</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/965">#0965</a> - Add Analysis Output Format Support Table</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/969">#0969</a> - Create base documentation for creating a new platform plugin</p></li>
+</ul>
 </div>
-<p>To see the list of commands and options for downloading examples, type the following at a command prompt:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ idmtools gitrepo download --help
-INI File Used: /home/runner/work/idmtools/idmtools/idmtools/docs/idmtools.ini
-Usage: idmtools gitrepo download [OPTIONS]
-
-  Download files from GitHub repo to user location
-  Args:
-      url: GitHub repo files url
-      output: Local folder
-
-  Returns: Files download count
-
-Options:
-  --type TEXT    Download examples by type(COMPSPlatform, PythonTask, etc)
-  --url TEXT     Repo files url
-  --output TEXT  Files download destination
-  --help         Show this message and exit.
-</pre></div>
+<div class="section" id="feature-request">
+<h2>Feature Request<a class="headerlink" href="#feature-request" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/830">#0830</a> - Support for python 3.8</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/924">#0924</a> - YamlSimulationBuilder should accept a single function to be mapped to all values</p></li>
+</ul>
 </div>
-<p>or</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ idmtools examples download --help
-INI File Used: /home/runner/work/idmtools/idmtools/idmtools/docs/idmtools.ini
-Usage: idmtools examples download [OPTIONS]
-
-  Download examples from specified location
-  Args:
-      url: GitHub repo files url
-      output: Local folder
-
-  Returns: Files download count
-
-Options:
-  --type TEXT    Download examples by type(COMPSPlatform, PythonTask, etc)
-  --url TEXT     Repo files url
-  --output TEXT  Files download destination
-  --help         Show this message and exit.
-</pre></div>
+<div class="section" id="models">
+<h2>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/834">#0834</a> - Add a COVASIM example with idmtools</p></li>
+</ul>
 </div>
-<p>To see a list of IDM examples available for downloading, type <code class="docutils literal notranslate"><span class="pre">idmtools</span> <span class="pre">gitrepo</span> <span class="pre">download</span></code> at a command prompt.</p>
+<div class="section" id="platforms">
+<h2>Platforms<a class="headerlink" href="#platforms" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/852">#0852</a> - Add emodpy to SSMT image</p></li>
+</ul>
+</div>
+<div class="section" id="user-experience">
+<h2>User Experience<a class="headerlink" href="#user-experience" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/682">#0682</a> - Support full query criteria on COMPS items</p></li>
+</ul>
+</div>
 </div>
 
 
@@ -270,10 +232,8 @@ Options:
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="cli-troubleshoot.html" class="btn btn-neutral float-right" title="Troubleshooting" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
-      
-        <a href="cli-platforms.html" class="btn btn-neutral float-left" title="Platforms" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="changelog_1.2.0.html" class="btn btn-neutral float-left" title="1.2.0" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
