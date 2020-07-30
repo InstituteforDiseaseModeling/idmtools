@@ -136,7 +136,8 @@ def main():
     # If COMPS responds that we're missing some files, then try creating it again,
     # uploading only the files that COMPS doesn't already have.
     if missing_files:
-        print(f"Uploading files not in comps: [{','.join([str(u) for u in missing_files])}]")
+
+        print("Uploading files not in comps: " + "\n".join([str(u) for u in missing_files]))
 
         ac2 = AssetCollection()
         ac2.set_tags(tags)

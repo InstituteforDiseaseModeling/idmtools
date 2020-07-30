@@ -1,6 +1,6 @@
-import sys
 import os
 import subprocess
+import sys
 import traceback
 
 CURRENT_DIRECTORY = os.getcwd()
@@ -26,6 +26,8 @@ def install_packages_from_requirements(python_paths=None):
 
         env = dict(os.environ)
         env['PYTHONPATH'] = os.pathsep.join(python_paths)
+        # should use date of py file + checksum to produce hash of pyc to determine if need to recompile and prevent need to resuse
+        env['PYTHONHASHSEED'] = '2429763551'
 
     print("Running pip install -r {} to tmp directory".format(REQUIREMENT_FILE))
     subprocess.check_call(
