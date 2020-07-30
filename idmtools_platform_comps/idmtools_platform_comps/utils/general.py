@@ -104,6 +104,10 @@ def get_file_from_collection(platform: IPlatform, collection_id: UUID, file_path
         collection_id: Asset Collection ID
         file_path: Path within collection
 
+    Examples::
+    >>> import uuid
+    >>> get_file_from_collection(platform, uuid.UUID("fc461146-3b2a-441f-bc51-0bff3a9c1ba0"), "StdOut.txt")
+
     Returns:
         Object Byte Array
     """

@@ -1,13 +1,26 @@
 import os
 import sys
-from COMPS.Data.AssetCollection import AssetCollection
+from hashlib import md5
+
+from COMPS import Client
 from COMPS.Data import AssetCollectionFile
 from COMPS.Data import Experiment
-from COMPS import Client
+from COMPS.Data.AssetCollection import AssetCollection
 
 MD5_KEY = 'idmtools-requirements-md5'
 AC_FILE = 'ac_info.txt'
 LIBRARY_ROOT_PREFIX = 'L'
+
+
+def calculate_md5(file_path) -> str:
+    """
+    Calculate and md5
+    """
+    with open(file_path, 'rb') as f:
+        md5calc = md5()
+        md5calc.update(f.read())
+        md5_checksum_str = md5calc.hexdigest()
+    return md5_checksum_str
 
 
 def build_asset_file_list(comps_sim, prefix=LIBRARY_ROOT_PREFIX):
@@ -106,10 +119,31 @@ def main():
         dirpath = af['path_from_root']
         rp = os.path.relpath(dirpath, path_to_ac) if dirpath != path_to_ac else ''
         rp = os.path.join('site_packages', rp)  # add all library under site_packages
-        ac.add_asset(AssetCollectionFile(af['friendly_name'], rp), data=get_data(af['url']))
 
+        ac.add_asset(AssetCollectionFile(af['friendly_name'], rp, md5_checksum=calculate_md5(af['url'])), data=get_data(af['url'], ))
+
+    missing_files = ac.save(return_missing_files=True)
     ac.save()
 
+    # If COMPS responds that we're missing some files, then try creating it again,
+    # uploading only the files that COMPS doesn't already have.
+    if missing_files:
+        print(f"Uploading files not in comps: [{','.join([str(u) for u in missing_files])}]")
+
+        ac2 = AssetCollection()
+        ac2.set_tags(tags)
+
+        for acf in ac.assets:
+            if acf.md5_checksum in missing_files:
+                rp = acf.relative_path
+                fn = acf.file_name
+                acf2 = AssetCollectionFile(fn, rp, tags=acf.tags)
+                ac2.add_asset(acf2, os.path.join(path_to_ac, rp, fn))
+            else:
+                ac2.add_asset(acf)
+
+        ac2.save()
+        ac = ac2
     # Output ac
     print('ac_id: ', ac.id)
 
