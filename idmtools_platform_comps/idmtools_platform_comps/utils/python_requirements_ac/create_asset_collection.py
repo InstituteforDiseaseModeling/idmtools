@@ -1,15 +1,21 @@
 import os
+import re
 import sys
 from hashlib import md5
 
 from COMPS import Client
-from COMPS.Data import AssetCollectionFile
+from COMPS.Data import AssetCollectionFile, QueryCriteria
 from COMPS.Data import Experiment
 from COMPS.Data.AssetCollection import AssetCollection
 
 MD5_KEY = 'idmtools-requirements-md5'
 AC_FILE = 'ac_info.txt'
 LIBRARY_ROOT_PREFIX = 'L'
+
+
+def unc_path_to_docker_path(p):
+    mapping = os.environ['COMPS_DATA_MAPPING'].split(';')
+    return re.sub(mapping[1].replace('\\', '\\\\'), mapping[0], p, flags=re.IGNORECASE).replace('\\', '/')
 
 
 def calculate_md5(file_path) -> str:
@@ -52,7 +58,7 @@ def get_first_simulation_of_experiment(exp_id):
     Returns: list of files paths
     """
     comps_exp = Experiment.get(exp_id)
-    comps_sims = comps_exp.get_simulations()
+    comps_sims = comps_exp.get_simulations(QueryCriteria().select_children('hpc_jobs'))
     comps_sim = comps_sims[0]
 
     return comps_sim
@@ -112,18 +118,20 @@ def main():
     ac = AssetCollection()
     tags = {MD5_KEY: md5_str}
     ac.set_tags(tags)
+    experiment_path = unc_path_to_docker_path(comps_sim.hpc_jobs[-1].working_directory)
 
     # Create asset collection
     path_to_ac = 'L'
+    file_mapping = dict()
     for af in asset_files:
         dirpath = af['path_from_root']
-        rp = os.path.relpath(dirpath, path_to_ac) if dirpath != path_to_ac else ''
-        rp = os.path.join('site_packages', rp)  # add all library under site_packages
-
-        ac.add_asset(AssetCollectionFile(af['friendly_name'], rp, md5_checksum=calculate_md5(af['url'])), data=get_data(af['url'], ))
+        frp = os.path.relpath(dirpath, path_to_ac) if dirpath != path_to_ac else ''
+        true_path = os.path.join(experiment_path, LIBRARY_ROOT_PREFIX, frp, af['friendly_name'])
+        rp = os.path.join('site_packages', frp)  # add all library under site_packages
+        file_mapping[os.path.join(rp, af['friendly_name'])] = true_path
+        ac.add_asset(AssetCollectionFile(af['friendly_name'], rp, md5_checksum=calculate_md5(true_path)))
 
     missing_files = ac.save(return_missing_files=True)
-    ac.save()
 
     # If COMPS responds that we're missing some files, then try creating it again,
     # uploading only the files that COMPS doesn't already have.
@@ -138,7 +146,7 @@ def main():
                 rp = acf.relative_path
                 fn = acf.file_name
                 acf2 = AssetCollectionFile(fn, rp, tags=acf.tags)
-                ac2.add_asset(acf2, os.path.join(path_to_ac, rp, fn))
+                ac2.add_asset(acf2, file_mapping[os.path.join(rp, fn)])
             else:
                 ac2.add_asset(acf)
 
