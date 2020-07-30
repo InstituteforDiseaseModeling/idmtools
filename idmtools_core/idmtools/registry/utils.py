@@ -11,6 +11,7 @@ from idmtools.registry.plugin_specification import PLUGIN_REFERENCE_NAME
 
 
 logger = getLogger(__name__)
+user_logger = getLogger('user')
 
 
 def is_a_plugin_of_type(value, plugin_specification: Type[PluginSpecification]) -> bool:
@@ -29,7 +30,8 @@ def is_a_plugin_of_type(value, plugin_specification: Type[PluginSpecification]) 
         and not inspect.isabstract(value) and value is not plugin_specification
 
 
-def load_plugin_map(entrypoint: str, spec_type: Type[PluginSpecification]) -> Dict[str, Type[PluginSpecification]]:
+def load_plugin_map(entrypoint: str, spec_type: Type[PluginSpecification], strip_all: bool = True) -> \
+        Dict[str, Type[PluginSpecification]]:
     """
     Load plugins from entry point with the indicated type of specification into a map.
 
@@ -40,6 +42,7 @@ def load_plugin_map(entrypoint: str, spec_type: Type[PluginSpecification]) -> Di
     Args:
         entrypoint: The name of the entry point.
         spec_type: The type of plugin specification.
+        strip_all: Pass through for get_name from Plugins. Changes names in plugin registries
 
     Returns:
         (Dict[str, Type[PluginSpecification]]): Returns a dictionary of name and :class:`~idmtools.registry.plugin_specification.PluginSpecification`.
@@ -51,10 +54,10 @@ def load_plugin_map(entrypoint: str, spec_type: Type[PluginSpecification]) -> Di
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f"Loading {str(plugin)} as {plugin.get_name()}")
         try:
-            _plugin_map[plugin.get_name()] = plugin()
+            _plugin_map[plugin.get_name(strip_all)] = plugin()
         except Exception as e:
             logger.exception(e)
-            print(f'Problem loading plugin: {plugin.get_name()}')
+            user_logger.error(f'Problem loading plugin: {plugin.get_name()}')
     return _plugin_map
 
 

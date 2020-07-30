@@ -1,7 +1,5 @@
 from logging import getLogger
-from typing import Type
-
-from idmtools.entities.iplatform import IPlatform
+from typing import Type, List
 from idmtools.registry.platform_specification import example_configuration_impl, get_platform_impl, \
     get_platform_type_impl, PlatformSpecification
 from idmtools.registry.plugin_specification import get_description_impl
@@ -17,12 +15,12 @@ simulation_root = $COMPS_PATH(USER)\\output
 node_group = emod_abcd
 num_retries = 0
 num_cores = 1
-exclusive = False
 max_workers = 16
 batch_size = 10
-work_item_type = DockerWorker
-docker_image = docker-staging.packages.idmod.org/idmtools/comps_ssmt_worker:1.0.0.0
-plugin_key = 1.0.0.0_RELEASE
+exclusive = False
+# Optional config option. It is recommended you only use this in advanced scenarios. Otherwise
+# leave it unset
+docker_image = docker-staging.packages.idmod.org/idmtools/comps_ssmt_worker:1.0.0
 """
 
 logger = getLogger(__name__)
@@ -35,10 +33,10 @@ class COMPSPlatformSpecification(PlatformSpecification):
 
     @get_description_impl
     def get_description(self) -> str:
-        return "Provides access to the COMPS Platform to IDM-Tools"
+        return "Provides access to the COMPS Platform to idmtools"
 
     @get_platform_impl
-    def get(self, **configuration) -> IPlatform:
+    def get(self, **configuration) -> COMPSPlatform:
         return COMPSPlatform(**configuration)
 
     @example_configuration_impl
@@ -49,6 +47,11 @@ class COMPSPlatformSpecification(PlatformSpecification):
     def get_type(self) -> Type[COMPSPlatform]:
         return COMPSPlatform
 
+    def get_example_urls(self) -> List[str]:
+        from idmtools_platform_comps import __version__
+        examples = [f'examples/{example}' for example in ['ssmt', 'workitem', 'vistools']]
+        return [self.get_version_url(f'v{__version__}', x) for x in examples]
+
 
 class SSMTPlatformSpecification(PlatformSpecification):
 
@@ -57,10 +60,10 @@ class SSMTPlatformSpecification(PlatformSpecification):
 
     @get_description_impl
     def get_description(self) -> str:
-        return "Provides access to the COMPS Platform to IDM-Tools"
+        return "Provides access to the COMPS Platform to idmtools"
 
     @get_platform_impl
-    def get(self, **configuration) -> IPlatform:
+    def get(self, **configuration) -> COMPSPlatform:
         return SSMTPlatform(**configuration)
 
     @example_configuration_impl
@@ -71,3 +74,8 @@ class SSMTPlatformSpecification(PlatformSpecification):
     @get_platform_type_impl
     def get_type(self) -> Type[SSMTPlatform]:
         return SSMTPlatform
+
+    def get_example_urls(self) -> List[str]:
+        from idmtools_platform_comps import __version__
+        examples = [f'examples/{example}' for example in ['ssmt', 'vistools']]
+        return [self.get_version_url(f'v{__version__}', x) for x in examples]

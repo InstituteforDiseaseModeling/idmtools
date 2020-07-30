@@ -10,7 +10,7 @@ SLURM_EXAMPLE_CONFIG = """
 [Slurm]
 # mode of operation. Options are ssh or local
 # SSH would mean you remotely connect to the head node to submit jobs to slurm(and use that to transfer files as well)
-# Local is when you install idm-tools on the head node and run from there
+# Local is when you install idmtools on the head node and run from there
 mode = ssh
 job_directory = /data
 # values on ALL or END. 
@@ -47,6 +47,6 @@ class SlurmPlatformSpecification(PlatformSpecification):
         return SLURM_EXAMPLE_CONFIG
 
     @get_platform_type_impl
-    def get_type(self) -> Type['SlurmPlatform']:
+    def get_type(self) -> Type['SlurmPlatform']:  # noqa: F821
         from idmtools_platform_slurm.slurm_platform import SlurmPlatform
         return SlurmPlatform

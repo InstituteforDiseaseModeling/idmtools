@@ -1,7 +1,8 @@
 import os
+from functools import partial
 
 from idmtools.assets import Asset, AssetCollection
-from idmtools.builders import StandAloneSimulationsBuilder
+from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.command_task import CommandTask
 
@@ -52,11 +53,10 @@ def run_example_task_from_template(ac_id):
     task = JSONConfiguredPythonTask(script_path=os.path.join("inputs", "task_model", "model_file.py"),
                                     common_assets=common_assets, parameters=dict(c=0))
     ts = TemplatedSimulations(base_task=task)
-    sim = ts.new_simulation()
-    builder = StandAloneSimulationsBuilder()
-    builder.add_simulation(sim)
+    setA = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
+    builder = SimulationBuilder()
+    builder.add_sweep_definition(setA, range(0, 2))
     ts.add_builder(builder)
-
     # create experiment from task
     experiment = Experiment.from_template(ts, name="run_example_task_from_template")
 

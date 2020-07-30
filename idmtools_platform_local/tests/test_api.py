@@ -67,6 +67,7 @@ class TestAPI(unittest.TestCase):
         # this experiment has no children
         create_test_data()
 
+    @pytest.mark.smoke
     def test_fetch_experiments(self):
         # ensure we have some phony data
 

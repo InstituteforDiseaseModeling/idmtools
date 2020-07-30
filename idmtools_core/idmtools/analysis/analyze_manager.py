@@ -3,21 +3,25 @@ import sys
 import time
 from logging import getLogger, DEBUG
 from multiprocessing.pool import Pool
-from typing import NoReturn, List, Dict
+from typing import NoReturn, List, Dict, Tuple, Optional, Union, TYPE_CHECKING
 from uuid import UUID
 from idmtools.analysis.map_worker_entry import map_item
+from idmtools.core import NoPlatformException
 from idmtools.core.cache_enabled import CacheEnabled
-from idmtools.core.enums import EntityStatus
+from idmtools.core.enums import EntityStatus, ItemType
 from idmtools.core.interfaces.ientity import IEntity
-from idmtools.entities.ianalyzer import TAnalyzer
-from idmtools.entities.iplatform import IPlatform
+from idmtools.core.logging import VERBOSE, SUCCESS
+from idmtools.entities.ianalyzer import IAnalyzer
 from idmtools.utils.command_line import animation
 from idmtools.utils.language import on_off, verbose_timedelta
+if TYPE_CHECKING:
+    from idmtools.entities.iplatform import IPlatform
 
 logger = getLogger(__name__)
+user_logger = getLogger('user')
 
 
-def pool_worker_initializer(func, analyzers, cache, platform) -> NoReturn:
+def pool_worker_initializer(func, analyzers, cache, platform: 'IPlatform') -> NoReturn:
     """
     Initialize the pool worker, which allows the process pool to associate the analyzers, cache, and
     path mapping to the function executed to retrieve data. Using an initializer improves performance.
@@ -31,6 +35,8 @@ def pool_worker_initializer(func, analyzers, cache, platform) -> NoReturn:
     Returns:
         None
     """
+    from idmtools import IdmConfigParser
+    IdmConfigParser()
     func.analyzers = analyzers
     func.cache = cache
     func.platform = platform
@@ -47,12 +53,32 @@ class AnalyzeManager(CacheEnabled):
     class ItemsNotReady(Exception):
         pass
 
-    def __init__(self, platform: IPlatform, configuration=None, ids=None, analyzers=None, working_dir=os.getcwd(),
-                 partial_analyze_ok=False, max_items=None, verbose=True, force_manager_working_directory=False,
-                 exclude_ids=None, analyze_failed_items=False):
+    def __init__(self, platform: 'IPlatform' = None, configuration: dict = None,
+                 ids: List[Tuple[Union[str, UUID], ItemType]] = None,
+                 analyzers: List[IAnalyzer] = None, working_dir: str = os.getcwd(),
+                 partial_analyze_ok: bool = False, max_items: Optional[int] = None, verbose: bool = True,
+                 force_manager_working_directory: bool = False,
+                 exclude_ids: List[Union[str, UUID]] = None, analyze_failed_items: bool = False):
+        """
+        Initialize the AnalyzeManager
+
+        Args:
+            platform (IPlatform): Platform
+            configuration (dict, optional): Initial Configuration. Defaults to None.
+            ids (Tuple[UUID, ItemType], optional): List of ids as pair of Tuple and ItemType. Defaults to None.
+            analyzers (List[IAnalyzer], optional): List of Analyzers. Defaults to None.
+            working_dir (str, optional): The working directory. Defaults to os.getcwd().
+            partial_analyze_ok (bool, optional): Whether partial analysis is ok. When this is True, Experiments in progress or Failed can be analyzed. Defaults to False.
+            max_items (int, optional): Max Items to analyze. Useful when developing and testing an Analyzer. Defaults to None.
+            verbose (bool, optional): Print extra information about analysis. Defaults to True.
+            force_manager_working_directory (bool, optional): [description]. Defaults to False.
+            exclude_ids (List[UUID], optional): [description]. Defaults to None.
+            analyze_failed_items (bool, optional): Allows analyzing of failed items. Useful when you are trying to aggregate items that have failed. Defaults to False.
+        """
         super().__init__()
         self.configuration = configuration or {}
         self.platform = platform
+        self.__check_for_platform_from_context(platform)
         self.max_processes = self.configuration.get('max_threads', os.cpu_count())
         logger.debug(f'AnalyzeManager set to {self.max_processes}')
 
@@ -75,13 +101,13 @@ class AnalyzeManager(CacheEnabled):
         items: List[IEntity] = []
         for oid, otype in ids:
             logger.debug(f'Getting metadata for {oid} and {otype}')
-            result = platform.get_item(oid, otype, force=True)
+            result = self.platform.get_item(oid, otype, force=True)
             items.append(result)
         self.potential_items: List[IEntity] = []
 
         for i in items:
             logger.debug(f'Flattening items for {i.uid}')
-            self.potential_items.extend(platform.flatten_item(item=i))
+            self.potential_items.extend(self.platform.flatten_item(item=i))
 
         # These are leaf items to be ignored in analysis. Make sure they are UUID and then prune them from analysis.
         self.exclude_ids = exclude_ids or []
@@ -95,6 +121,28 @@ class AnalyzeManager(CacheEnabled):
 
         self.analyzers = analyzers or list()
         self.verbose = verbose
+
+    def __check_for_platform_from_context(self, platform) -> 'IPlatform':  # noqa: F821
+        """
+        Try to determine platform of current object from self or current platform
+
+        Args:
+            platform: Passed in platform object
+
+        Raises:
+            NoPlatformException: when no platform is on current context
+        Returns:
+            Platform object
+        """
+        if self.platform is None:
+            # check context for current platform
+            if platform is None:
+                from idmtools.core.context import CURRENT_PLATFORM
+                if CURRENT_PLATFORM is None:
+                    raise NoPlatformException("No Platform defined on object, in current context, or passed to run")
+                platform = CURRENT_PLATFORM
+            self.platform = platform
+        return self.platform
 
     def add_item(self, item: IEntity) -> NoReturn:
         """
@@ -144,7 +192,7 @@ class AnalyzeManager(CacheEnabled):
 
         return can_analyze
 
-    def add_analyzer(self, analyzer: TAnalyzer) -> NoReturn:
+    def add_analyzer(self, analyzer: IAnalyzer) -> NoReturn:
         """
         Add another analyzer to use on the items to be analyzed.
 
@@ -203,7 +251,7 @@ class AnalyzeManager(CacheEnabled):
         if exception:
             if logger.isEnabledFor(DEBUG):
                 logger.debug(exception)
-            print('\n' + exception)
+            user_logger.error('\n' + exception)
             sys.stdout.flush()
             ex = True
         else:
@@ -222,18 +270,17 @@ class AnalyzeManager(CacheEnabled):
             None
         """
         n_ignored_items = len(self.potential_items) - n_items
-        print('Analyze Manager')
-        print(' | {} item(s) selected for analysis'.format(n_items))
-        print(' | partial_analyze_ok is {}, max_items is {}, and {} item(s) are being ignored'
-              .format(on_off(self.partial_analyze_ok), self.max_items_to_analyze, n_ignored_items))
-        print(' | Analyzer(s): ')
+        user_logger.log(VERBOSE, 'Analyze Manager')
+        user_logger.log(VERBOSE, f' | {n_items} item(s) selected for analysis')
+        user_logger.log(VERBOSE, f' | partial_analyze_ok is {self.partial_analyze_ok}, max_items is '
+                                 f'{self.max_items_to_analyze}, and {n_ignored_items} item(s) are being ignored')
+        user_logger.log(VERBOSE, ' | Analyzer(s): ')
         for analyzer in self.analyzers:
-            print(' |  - {} File parsing: {} / Use cache: {})'
-                  .format(analyzer.uid, on_off(analyzer.parse),
-                          on_off(hasattr(analyzer, 'cache'))))
+            user_logger.log(VERBOSE, f' |  - {analyzer.uid} File parsing: {on_off(analyzer.parse)} / Use '
+                                     f'cache: {on_off(hasattr(analyzer, "cache"))}')
             if hasattr(analyzer, 'need_dir_map'):
-                print(' | (Directory map: {}' % on_off(analyzer.need_dir_map))
-        print(' | Pool of {} analyzing process(es)'.format(n_processes))
+                user_logger.log(VERBOSE, ' | (Directory map: {}' % on_off(analyzer.need_dir_map))
+        user_logger.log(VERBOSE, f' | Pool of {n_processes} analyzing process(es)')
 
     def _run_and_wait_for_mapping(self, worker_pool: Pool, start_time: float) -> bool:
         """
@@ -330,18 +377,18 @@ class AnalyzeManager(CacheEnabled):
         # If no analyzers or simulations have been provided, there is nothing to do
 
         if len(self.analyzers) == 0:
-            print('No analyzers were provided; cannot run analysis.')
+            user_logger.error('No analyzers were provided; cannot run analysis.')
             return False
         self._initialize_analyzers()
 
         if len(self.potential_items) == 0:
-            print('No items were provided; cannot run analysis.')
+            user_logger.error('No items were provided; cannot run analysis.')
             return False
         # trim processing to those items that are ready and match requested limits
         self._items: Dict[UUID, IEntity] = self._get_items_to_analyze()
 
         if len(self._items) == 0:
-            print('No items are ready; cannot run analysis.')
+            user_logger.error('No items are ready; cannot run analysis.')
             return False
 
         # initialize mapping results cache/storage
@@ -386,6 +433,7 @@ class AnalyzeManager(CacheEnabled):
         if self.verbose:
             total_time = time.time() - start_time
             time_str = verbose_timedelta(total_time)
-            print('\r | Analysis complete. Took {} (~ {:.3f} per item)'.format(time_str, total_time / n_items))
+            user_logger.log(SUCCESS, '\r | Analysis complete. Took {} '
+                                     '(~ {:.3f} per item)'.format(time_str, total_time / n_items))
 
         return True

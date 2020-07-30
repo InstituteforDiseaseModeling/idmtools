@@ -4,9 +4,7 @@ import ast
 from logging import getLogger
 
 from idmtools.core.platform_factory import Platform
-from idmtools.utils.filter_simulations import FilterItem
 from idmtools.entities.ianalyzer import IAnalyzer
-from idmtools.core import ItemType
 
 logger = getLogger(__name__)
 
@@ -60,4 +58,3 @@ class SimFilterAnalyzer(IAnalyzer):
 
         b_results_df = pd.DataFrame.from_records(b_result_list, columns=['key', 'value'])
         b_results_df.to_csv(os.path.join("output", 'b_match.csv'), index_label='index')  # Write the matched sim results to a csv
-

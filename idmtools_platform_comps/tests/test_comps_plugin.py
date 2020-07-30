@@ -32,5 +32,6 @@ class TestCompsPlugin(unittest.TestCase):
         example_config = spec.example_configuration()
         for field in fields:
             # skip private fields and not picklable as they are most lik
-            if field.name[0] != '_' and field not in exclude_fields and not field.metadata.get('pickle_ignore', False):
+            if field.name[0] != '_' and field not in exclude_fields and not field.metadata.get('pickle_ignore', False) \
+                    and field.name != 'docker_image':
                 self.assertIn(field.name, example_config)

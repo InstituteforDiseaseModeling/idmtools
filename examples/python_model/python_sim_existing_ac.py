@@ -9,14 +9,6 @@ from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
 
 
-class setParam:
-    def __init__(self, param):
-        self.param = param
-
-    def __call__(self, simulation, value):
-        return simulation.set_parameter(self.param, value)
-
-
 with platform('COMPS2'):
     base_task = JSONConfiguredPythonTask(
         script_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"),

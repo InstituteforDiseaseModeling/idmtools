@@ -1,26 +1,32 @@
 import json
 
+
 class DemographicsParameters():
     Nodes = "Nodes"
     NodeAttributes = "NodeAttributes"
     InitialPopulation = "InitialPopulation"
+
 
 def get_json_template(json_filename="demographics_template.json"):
     with open(json_filename) as infile:
         j_file_obj = json.load(infile)
     return j_file_obj
 
+
 def set_demographics_file(demographics, demo_filename="demographics.json"):
     with open(demo_filename, 'w') as outfile:
         json.dump(demographics, outfile, indent=4, sort_keys=True)
+
 
 def set_config_file(config, config_filename="nd.json"):
     with open(config_filename, 'w') as outfile:
         json.dump(config, outfile, indent=4, sort_keys=True)
 
+
 def set_gi_file(config, gi_filename="gi.json"):
     with open(gi_filename, 'w') as outfile:
         json.dump(config, outfile, indent=4, sort_keys=True)
+
 
 def configure_simulation(initial_population,
                          nd_template_filename,

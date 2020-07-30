@@ -2,9 +2,9 @@ import os
 import re
 import sys
 import unicodedata
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timezone, timedelta
-from typing import Optional
+from typing import Optional, Type
 
 from tqdm import tqdm
 
@@ -21,16 +21,16 @@ user_logger = getLogger('user')
 
 @dataclass
 class DockerTask(ITask):
-    image_name: str = None
+    image_name: str = field(default=None, metadata={"md": True})
     # Optional config to build the docker image
-    build: bool = False
-    build_path: Optional[str] = None
+    build: bool = field(default=False, metadata={"md": True})
+    build_path: Optional[str] = field(default=None, metadata={"md": True})
     # This should in the build_path directory
-    Dockerfile: Optional[str] = None
-    pull_before_build: bool = True
-    use_nvidia_run: bool = False
+    Dockerfile: Optional[str] = field(default=None, metadata={"md": True})
+    pull_before_build: bool = field(default=True, metadata={"md": True})
+    use_nvidia_run: bool = field(default=False, metadata={"md": True})
 
-    __image_built: bool = False
+    __image_built: bool = field(default=False)
 
     def __post_init__(self):
         super().__post_init__()
@@ -39,11 +39,23 @@ class DockerTask(ITask):
             self.build_image()
 
     def gather_common_assets(self) -> AssetCollection:
+        """
+        Gather common(experiment-level) assets from task
+
+        Returns:
+            AssetCollection containing all the common assets
+        """
         if self.image_name is None:
             raise ValueError("Image Name is required")
         return self.common_assets
 
     def gather_transient_assets(self) -> AssetCollection:
+        """
+        Gather transient(simulation-level) assets from task
+
+        Returns:
+            AssetCollection
+        """
         return self.transient_assets
 
     def build_image(self, spinner=None, **extra_build_args):
@@ -97,13 +109,12 @@ class DockerTask(ITask):
                                     prog.n = step
                                     prog.total = total_steps
                                     line = grps.group(3)
-                                except:
+                                except:  # noqa E722
                                     pass
                                 prog.set_description(line)
                                 build_step = line
                             # update build step with output
                             elif build_step:
-
                                 if len(line) > 40:
                                     line = line[:40]
                                 prog.set_description(f'{build_step}: {line}')
@@ -111,7 +122,7 @@ class DockerTask(ITask):
                         line = line['status'].strip()
                         prog.set_description(line)
 
-                logger.info(f'Build Successful)')
+                logger.info('Build Successful)')
             except BuildError as e:
                 logger.info(f"Build failed for {self.image_name} with message {e.msg}")
                 logger.info(f'Build log: {e.build_log}')
@@ -119,14 +130,38 @@ class DockerTask(ITask):
             finally:
                 prog.close()
 
-    def reload_from_simulation(self, simulation: 'Simulation'):
+    def reload_from_simulation(self, simulation: 'Simulation'):  # noqa E821
         pass
 
 
 class DockerTaskSpecification(TaskSpecification):
 
     def get(self, configuration: dict) -> DockerTask:
+        """
+        Get instance of DockerTask with configuration provided
+
+        Args:
+            configuration: configuration for DockerTask
+
+        Returns:
+            DockerTask with configuration
+        """
         return DockerTask(**configuration)
 
     def get_description(self) -> str:
+        """
+        Get description of plugin
+
+        Returns:
+            Plugin description
+        """
         return "Defines a docker command"
+
+    def get_type(self) -> Type[DockerTask]:
+        """
+        Get type of task provided by plugin
+
+        Returns:
+            DockerTask
+        """
+        return DockerTask

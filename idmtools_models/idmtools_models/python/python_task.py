@@ -3,11 +3,12 @@ import subprocess
 import tempfile
 from dataclasses import dataclass, field
 from logging import getLogger
-from typing import Set
+from typing import Set, List, Type, Union
 
 from idmtools.assets import Asset, AssetCollection
 from idmtools.entities import CommandLine
 from idmtools.entities.itask import ITask
+from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.simulation import Simulation
 from idmtools.registry.task_specification import TaskSpecification
@@ -17,23 +18,42 @@ logger = getLogger(__name__)
 
 @dataclass()
 class PythonTask(ITask):
-    script_path: str = None
-    python_path: str = 'python'
+    script_path: str = field(default=None, metadata={"md": True})
+    python_path: str = field(default='python', metadata={"md": True})
     platform_requirements: Set[PlatformRequirements] = field(default_factory=lambda: [PlatformRequirements.PYTHON])
 
     def __post_init__(self):
         super().__post_init__()
-        if self.script_path is None:
-            raise ValueError("Script name is required")
         if os.path.exists(self.script_path):
-            self.script_path = os.path.abspath(self.script_path)
+            if self.script_path:
+                self.script_path = os.path.abspath(self.script_path)
         else:
             # don't error if we can't find script. Maybe it is in the asset collection? but warn user
             logger.warning(f'Cannot find script at {self.script_path}. If script does not exist in Assets '
                            f'as {os.path.basename(self.script_path)}, execution could fail')
+        self.command = CommandLine()
+
+    @property
+    def command(self):
+        """
+        Update executable with new python_path
+        Returns: re-build command
+        """
+        if self.script_path is None:
+            return None
+
         cmd_str = f'{self.python_path} ./Assets/{os.path.basename(self.script_path)}'
-        self._task_log.info('Setting command line to %s', cmd_str)
-        self.command = CommandLine(cmd_str)
+        if self._command:
+            if isinstance(self._command, str):
+                self._command = CommandLine(cmd_str)
+            self._command._executable = cmd_str
+            self._task_log.info('Setting command line to %s', cmd_str)
+
+        return self._command
+
+    @command.setter
+    def command(self, command):
+        self._command = command
 
     def retrieve_python_dependencies(self):
         """
@@ -79,7 +99,7 @@ class PythonTask(ITask):
         """
         return self.transient_assets
 
-    def reload_from_simulation(self, simulation: Simulation):
+    def reload_from_simulation(self, simulation: Simulation, **kwargs):
         """
         Reloads a python task from a simulation
 
@@ -89,14 +109,72 @@ class PythonTask(ITask):
         Returns:
 
         """
-        # We have no configs so nothing to reload
-        pass
+        # check experiment level assets for items
+        if simulation.parent.assets:
+            new_assets = AssetCollection()
+            for i, asset in enumerate(simulation.parent.assets.assets):
+                if asset.filename != self.script_path and asset.absolute_path != self.script_path:
+                    new_assets.add_asset(asset)
+            simulation.parent.assets = new_assets
+
+        logger.debug("Reload from simulation")
+
+    def pre_creation(self, parent: Union[Simulation, IWorkflowItem]):
+        """
+        Called before creation of parent
+
+        Args:
+            parent: Parent
+
+        Returns:
+            None
+
+        Raise:
+            ValueError if script name is not provided
+        """
+        if self.script_path is None:
+            raise ValueError("Script name is required")
 
 
 class PythonTaskSpecification(TaskSpecification):
 
     def get(self, configuration: dict) -> PythonTask:
+        """
+        Get instance of Python Task with specified configuration
+
+        Args:
+            configuration: Configuration for task
+
+        Returns:
+            Python task
+        """
         return PythonTask(**configuration)
 
     def get_description(self) -> str:
+        """
+        Description of the plugin
+
+        Returns:
+            Description string
+        """
         return "Defines a python script command"
+
+    def get_example_urls(self) -> List[str]:
+        """
+        Return List of urls that have examples using PythonTask
+
+        Returns:
+            List of urls(str) that point to examples
+        """
+        from idmtools_models import __version__
+        examples = [f'examples/{example}' for example in ['load_lib']]
+        return [self.get_version_url(f'v{__version__}', x) for x in examples]
+
+    def get_type(self) -> Type[PythonTask]:
+        """
+        Get Type for Plugin
+
+        Returns:
+            PythonTask
+        """
+        return PythonTask

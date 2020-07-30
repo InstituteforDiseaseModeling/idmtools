@@ -1,3 +1,34 @@
+![Staging: idmtools-cli](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Staging:%20idmtools-cli/badge.svg?branch=dev)
+
+# idmtools-cli
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+  - [Installing](#installing)
+- [Development Tips](#development-tips)
+- [Using the CLI](#using-the-cli)
+  - [Experiment commands](#experiment-commands)
+    - [Status](#status)
+    - [Delete](#delete)
+  - [Simulation Commands](#simulation-commands)
+  - [Status](#status-1)
+  - [GitRepo commands](#gitrepo-commands)
+    - [View](#view)
+    - [Repos](#repos)
+    - [Releases](#releases)
+    - [Peep](#peep)
+    - [Download](#download)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## Installing
+
+```bash
+pip install idmtools-cli --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+```
+
 # Development Tips
 
 There is a Makefile file available for most common development tasks. Here is a list of commands
@@ -66,4 +97,51 @@ You can also filter by a either id, experiment id, status, and tags or any combi
 > idmtools simulation --platform Local status --id XDT0VMVV
 > idmtools simulation --platform Local status --tag a 5 --tag b
 > idmtools simulation --platform Local status --experiment-id --status failed
+```
+
+
+## GitRepo commands
+
+### View
+
+You can check idmtools available examples. You can use --raw to determine to display in detailed or simplified format
+
+```
+> idmtools gitrepo view
+```
+
+### Repos
+
+You can list all public repos for a GitHub owner. You can use --owner to specify an owner and --page for pagination
+--owner default to 'institutefordiseasemodeling'
+--page default to 1
+
+```
+> idmtools gitrepo repos
+```
+
+### Releases
+
+You can list all releases of a repo by providing --owner and --repo
+--owner default to 'institutefordiseasemodeling' and --repo default to 'idmtools'
+
+```
+> idmtools gitrepo releasess
+```
+
+### Peep
+
+You can list all current files/dirs of a repo folder by providing --url
+
+```
+> idmtools gitrepo peep
+```
+
+### Download
+
+You can download files from a public repo to a specified local folder (default to current folder). By default, it will 
+download idmtools examples. You can also download any files from any public repo by using --url (multiple is supported)
+
+```
+> idmtools gitrepo download
 ```

@@ -7,10 +7,10 @@ from COMPS import Client
 
 MD5_KEY = 'idmtools-requirements-md5'
 AC_FILE = 'ac_info.txt'
-LIBRARY_ROOT = 'Libraries/'
+LIBRARY_ROOT_PREFIX = 'L'
 
 
-def build_asset_file_list(comps_sim, prefix=LIBRARY_ROOT):
+def build_asset_file_list(comps_sim, prefix=LIBRARY_ROOT_PREFIX):
     """
     Utility function to build all library files
     Args:
@@ -20,8 +20,13 @@ def build_asset_file_list(comps_sim, prefix=LIBRARY_ROOT):
     Returns: file paths as a list
     """
     metadata = comps_sim.retrieve_output_file_info([])
-    output_folder = [{'friendly_name': m.friendly_name, 'path_from_root': m.path_from_root, 'url': m.url} for m in
-                     metadata if m.path_from_root.startswith(prefix)]
+    output_folder = []
+    for m in metadata:
+        parts = m.path_from_root.split('/')
+        if parts[0] == prefix:
+            d = {'friendly_name': m.friendly_name, 'path_from_root': m.path_from_root, 'url': m.url}
+            output_folder.append(d)
+
     return output_folder
 
 
@@ -84,7 +89,7 @@ def main():
     print('sim_id: ', comps_sim.id)
 
     # Build files metadata
-    asset_files = build_asset_file_list(comps_sim, prefix='Libraries/')
+    asset_files = build_asset_file_list(comps_sim, prefix=LIBRARY_ROOT_PREFIX)
     print('asset files count: ', len(asset_files))
 
     # Output files
@@ -96,10 +101,11 @@ def main():
     ac.set_tags(tags)
 
     # Create asset collection
-    path_to_ac = 'Libraries'
+    path_to_ac = 'L'
     for af in asset_files:
         dirpath = af['path_from_root']
         rp = os.path.relpath(dirpath, path_to_ac) if dirpath != path_to_ac else ''
+        rp = os.path.join('site_packages', rp)  # add all library under site_packages
         ac.add_asset(AssetCollectionFile(af['friendly_name'], rp), data=get_data(af['url']))
 
     ac.save()

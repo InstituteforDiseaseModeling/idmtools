@@ -3,11 +3,11 @@ from logging import getLogger
 import stat
 import click
 import pyperclip
+from idmtools.registry.task_specification import TaskPlugins
 from tabulate import tabulate
-
 from idmtools.core.system_information import get_system_information
 from idmtools.registry.platform_specification import PlatformPlugins
-from idmtools_cli.cli import cli
+from idmtools_cli.cli.entrypoint import cli
 from idmtools_cli.cli.experiment import supported_platforms
 
 logger = getLogger(__name__)
@@ -79,3 +79,9 @@ def cli():
 def platform():
     platforms = PlatformPlugins().get_plugin_map().keys()
     print(tabulate([[x] for x in platforms], headers=['Platform Plugins'], tablefmt='psql'))
+
+
+@plugins.command(help="List Task plugins")
+def task():
+    tasks = TaskPlugins().get_plugin_map().keys()
+    print(tabulate([[x] for x in tasks], headers=['Task Plugins'], tablefmt='psql'))

@@ -1,6 +1,13 @@
 import os
-from dataclasses import dataclass, field
-from typing import TypeVar, Union, List, Callable, Any, Optional
+from dataclasses import dataclass, field, InitVar
+from io import BytesIO
+from logging import getLogger, DEBUG
+from typing import TypeVar, Union, List, Callable, Any, Optional, Generator, BinaryIO
+import backoff
+import requests
+from tqdm import tqdm
+
+logger = getLogger(__name__)
 
 
 @dataclass(repr=False)
@@ -23,12 +30,16 @@ class Asset:
     absolute_path: Optional[str] = field(default=None)
     relative_path: Optional[str] = field(default=None)
     filename: Optional[str] = field(default=None)
-    content: Optional[Any] = field(default=None)
+    content: InitVar[Any] = None
+    _content: bytes = field(default=None, init=False)
+    _length: Optional[int] = field(default=None)
     persisted: bool = field(default=False)
-    handler: Callable = field(default=str)
+    handler: Callable = field(default=str, metadata=dict(exclude_from_metadata=True))
+    download_generator_hook: Callable = field(default=None, metadata=dict(exclude_from_metadata=True))
     checksum: Optional[str] = field(default=None)
 
-    def __post_init__(self):
+    def __post_init__(self, content):
+        self.content = content
         if not self.absolute_path and (not self.filename and not self.content):
             raise ValueError("Impossible to create the asset without either absolute path or filename and content!")
 
@@ -43,14 +54,6 @@ class Asset:
         Returns:
             None.
         """
-        #if self._checksum is None:
-            # TODO determine best way to do this. At moment, the complication is we want the content as bytes
-            # or a string so we can calculate. Maybe we could use bytes property?
-            # for now, just return None
-            #if self.content:
-            #   self._checksum = hashlib.md5(json.dumps(self.content, sort_keys=False).encode('utf-8')).hexdigest()
-        #    return None
-
         return self._checksum
 
     @checksum.setter
@@ -77,6 +80,16 @@ class Asset:
         return str.encode(self.handler(self.content))
 
     @property
+    def length(self):
+        if self._length is None:
+            self._length = len(self.content)
+        return self.length
+
+    @length.setter
+    def length(self, new_length):
+        self._length = new_length
+
+    @property
     def content(self):
         """
         Returns:
@@ -85,6 +98,10 @@ class Asset:
         if not self._content and self.absolute_path:
             with open(self.absolute_path, "rb") as fp:
                 self._content = fp.read()
+        elif self.download_generator_hook:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f"Fetching {self.filename} content from platform")
+            self._content = self.download_stream().getvalue()
 
         return self._content
 
@@ -108,6 +125,74 @@ class Asset:
     def __hash__(self):
         return hash(self.__key())
     # endregion
+
+    def download_generator(self) -> Generator[bytearray, None, None]:
+        """
+        A Download Generator that returns chunks of bytes from the file
+
+
+        Returns:
+            Generator of bytearray
+        """
+        if self.download_generator_hook:
+            return self.download_generator_hook()
+        else:
+            raise ValueError("To be able to download, the Asset needs to be fetched from a platform object")
+
+    def download_stream(self) -> BytesIO:
+        """
+        Get a bytes IO stream of the asset
+
+        Returns:
+            BytesIO of the Asset
+        """
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f"Download {self.filename} to stream")
+        io = BytesIO()
+        self.__write_download_generator_to_stream(io)
+        return io
+
+    @backoff.on_exception(backoff.expo, (requests.exceptions.Timeout, requests.exceptions.ConnectionError), max_tries=8)
+    def __write_download_generator_to_stream(self, stream: BinaryIO, progress: bool = False):
+        """
+        Write the download generator to another stream
+
+        Args:
+            stream:
+            progress:
+
+        Returns:
+
+        """
+        gen = self.download_generator()
+        if progress:
+            gen = tqdm(gen, total=self.length)
+
+        try:
+            for chunk in gen:
+                if progress:
+                    gen.update(len(chunk))
+                stream.write(chunk)
+        finally:  # close progress if we have it open
+            if progress:
+                gen.close()
+
+    def download_to_path(self, path: str):
+        """
+        Download an asset to path. This requires loadings the object through the platofrm
+
+        Args:
+            path: Path to write to. If it is a directory, the asset filename will be added to it
+
+        Returns:
+            None
+        """
+        if os.path.isdir(path):
+            path = os.path.join(path, self.filename)
+        with open(path, 'wb') as out:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f"Download {self.filename} to {path}")
+            self.__write_download_generator_to_stream(out)
 
 
 TAsset = TypeVar("TAsset", bound=Asset)

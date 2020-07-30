@@ -9,12 +9,10 @@ from typing import List, Optional
 
 base_directory = abspath(join(dirname(__file__), '..'))
 modules = ['idmtools_core', 'idmtools_cli', 'idmtools_platform_comps', 'idmtools_platform_local',
-           #'idmtools_model_emod',
            'idmtools_models', 'idmtools_test']
 
 
 def run_command_on_all(idm_modules: List[str], command: str, parallel: bool = False, subdir: Optional[str] = None):
-
     processes = []
 
     def signal_handler(sig, frame):
@@ -48,7 +46,7 @@ def run_command_on_all(idm_modules: List[str], command: str, parallel: bool = Fa
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument(f'--parallel', default=False, action='store_true', help='Parallel Run')
+    parser.add_argument('--parallel', default=False, action='store_true', help='Parallel Run')
     for module in modules:
         parser.add_argument(f'--no-{module.replace("_", "-")}', default=False, action='store_false',
                             help=f'Disable running {module}')

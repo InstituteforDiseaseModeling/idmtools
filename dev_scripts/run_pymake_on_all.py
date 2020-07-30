@@ -7,8 +7,8 @@ base_directory = abspath(join(dirname(__file__), '..'))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument(f'--parallel', default=False, action='store_true', help='Parallel Run')
-    parser.add_argument(f'command', help='Pymake Command to run')
+    parser.add_argument('--parallel', default=False, action='store_true', help='Parallel Run')
+    parser.add_argument('command', help='Pymake Command to run')
 
     args = parser.parse_args()
 

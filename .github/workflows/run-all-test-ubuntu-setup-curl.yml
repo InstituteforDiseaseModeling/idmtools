@@ -1,0 +1,98 @@
+# This workflows will install idmtools from setup-dev then run tests with curl command
+#
+#curl command from your cmd:
+# curl -XPOST -u "username:githubPAT" -H "Accept: application/vnd.github.everest-preview+json" \
+# -H "Content-Type: application/json" \
+# --data "{\"event_type\": \"run_setup_dev_test\"}" \
+#  https://api.github.com/repos/InstituteforDiseaseModeling/idmtools/dispatches
+#
+# Note, this test will checkout 'dev' branch
+
+name: "run-all-test-ubuntu-setup-curl"
+
+on:
+  repository_dispatch:
+    types: [run_setup_dev_test]
+
+jobs:
+  run-all-test-ubuntu-setup-curl:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [3.6, 3.7, 3.8]
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+        with:
+          ref: dev
+      - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+      - name: Install Python dependencies
+        run: |
+          pip install py-make flake8 black
+      - name: Run setup-dev
+        env:
+          bamboo_UserArtifactory: ${{ secrets.PYPI_STAGING_USERNAME }}
+          bamboo_PasswordArtifactory: ${{ secrets.PYPI_STAGING_PASSWORD }}
+        run: |
+          make setup-dev
+      - name: login to comps2
+        run: |
+          python dev_scripts/create_auth_token_args.py --username $COMPS_USER --password $COMPS_PASSWORD
+        env:
+          COMPS_USER: ${{ secrets.COMPS_USER }}
+          COMPS_PASSWORD: ${{ secrets.COMPS_PASSWORD }}
+      - name: run idmtools_cli tests
+        run: |
+          cd idmtools_cli/tests
+          py.test --durations=3 -v --junitxml=test_results.xml
+      - name: Upload idmtools_cli test results
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: idmtools_cli_test_results
+          path: idmtools_cli/tests/test_results.xml
+      - name: run idmtools_core tests
+        run: |
+          cd idmtools_core/tests
+          py.test --durations=3 -v --junitxml=test_results.xml
+      - name: Upload idmtools_core test results
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: idmtools_core_test_results
+          path: idmtools_core/tests/test_results.xml
+      - name: run idmtools_models tests
+        run: |
+          cd idmtools_models/tests
+          py.test --durations=3 -v --junitxml=test_results.xml
+      - name: Upload idmtools_models test results
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: idmtools_models_test_results
+          path: idmtools_models/tests/test_results.xml
+      - name: run idmtools_platform_comps tests
+        run: |
+          cd idmtools_platform_comps/tests
+          py.test --durations=3 -v --junitxml=test_results.xml
+      - name: Upload idmtools_platform_comps test results
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: idmtools_platform_comps_test_results
+          path: idmtools_platform_comps/tests/test_results.xml
+      - name: run idmtools_platform_local tests
+        run: |
+          cd idmtools_platform_local/tests
+          py.test --durations=3 -v --junitxml=test_results.xml
+      - name: Upload idmtools_platform_local test results
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: idmtools_platform_local_test_results
+          path: idmtools_platform_local/tests/test_results.xml

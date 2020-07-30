@@ -1,27 +1,35 @@
 import os
 from collections import defaultdict
 from dataclasses import dataclass
+from functools import partial
 from logging import getLogger, DEBUG
-from typing import Dict, List, Set, Union
+from typing import Dict, List, Set, Union, Iterator, Optional, TYPE_CHECKING
 from uuid import UUID
-
 from docker.models.containers import Container
 from tqdm import tqdm
-
+from idmtools.assets import Asset, json, AssetCollection
 from idmtools.core import ItemType
+from idmtools.core.task_factory import TaskFactory
+from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
 from idmtools.entities.simulation import Simulation
-from idmtools.entities.task_proxy import TaskProxy
+from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools.utils.collections import ParentIterator
+from idmtools.utils.json import IDMJSONEncoder
 from idmtools_platform_local.client.simulations_client import SimulationsClient
-from idmtools_platform_local.platform_operations.uitils import local_status_to_common, SimulationDict, ExperimentDict
+from idmtools_platform_local.platform_operations.uitils import local_status_to_common, SimulationDict, ExperimentDict, \
+    download_lp_file
+if TYPE_CHECKING:
+    from idmtools_platform_local.local_platform import LocalPlatform
 
 logger = getLogger(__name__)
+user_logger = getLogger('user')
 
 
 @dataclass
 class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
+
     platform: 'LocalPlatform'  # noqa F821
     platform_type: type = SimulationDict
 
@@ -49,8 +57,8 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
             Simulation dict and created id
         """
         from idmtools_platform_local.internals.tasks.create_simulation import CreateSimulationTask
-
-        m = CreateSimulationTask.send(simulation.experiment.uid, simulation.tags)
+        extra_details = self.__create_simulation_metadata(simulation)
+        m = CreateSimulationTask.send(simulation.experiment.uid, simulation.tags, extra_details=extra_details)
         if logger.isEnabledFor(DEBUG):
             logger.debug('Creating Simulation ID and directories')
         sim_id = m.get_result(block=True, timeout=self.platform.default_timeout * 1000)
@@ -87,28 +95,53 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         else:
             parent_uid = sims[0].parent.uid
 
+        final_sims = []
+
+        # pre-creation our simulations
+        if isinstance(sims, ParentIterator) and isinstance(sims.items, (TemplatedSimulations, list)):
+            sims_i = sims.items
+            for simulation in sims_i:
+                simulation.pre_creation()
+                final_sims.append(simulation)
+        elif isinstance(sims, (list, Iterator)):
+            for simulation in sims:
+                simulation.pre_creation()
+                final_sims.append(simulation)
+        else:
+            raise ValueError("Needs to be one a list, ParentIterator of TemplatedSimulations or list")
+
         # first create the sim ids
-        m = CreateSimulationsTask.send(parent_uid, [s.tags for s in sims if s.status is None])
+        sims_to_create = [(s.tags, self.__create_simulation_metadata(s)) for s in final_sims if s.status is None]
+        m = CreateSimulationsTask.send(parent_uid, sims_to_create)
         ids = m.get_result(block=True, timeout=self.platform.default_timeout * 1000)
 
         items = dict()
-        final_sims = []
         # loop over array instead of parent iterator
-        if isinstance(sims, ParentIterator) and isinstance(sims.items, list):
-            sims = sims.items
-        # update our uids and then build a list of files to copy
-        for i, simulation in tqdm(enumerate(sims), total=len(sims), desc="Finding Simulations Assets"):
-            simulation.uid = ids[i]
-            final_sims.append(simulation)
-            path = "/".join(["/data", parent_uid, simulation.uid])
-            simulation.pre_creation()
-            items.update(self._assets_to_copy_multiple_list(path, simulation.assets))
-            simulation.post_creation()
+        if final_sims:
+            # update our uids and then build a list of files to copy
+            for i, simulation in tqdm(enumerate(final_sims), total=len(final_sims), desc="Finding Simulations Assets"):
+                final_sims[i].uid = ids[i]
+                path = "/".join(["/data", parent_uid, simulation.uid])
+                items.update(self._assets_to_copy_multiple_list(path, simulation.assets))
+                simulation.post_creation()
         # copy files to container
         result = self.platform._do.copy_multiple_to_container(worker, items)
         if not result:
             raise IOError("Coping of data for simulations failed.")
         return final_sims
+
+    @staticmethod
+    def __create_simulation_metadata(simulation: Simulation):
+        """
+
+        Args:
+            simulation:
+
+        Returns:
+
+        """
+        extra_details = dict(metadata=json.loads(json.dumps(simulation.to_dict(), cls=IDMJSONEncoder)))
+        return extra_details
 
     def get_parent(self, simulation: SimulationDict, **kwargs) -> ExperimentDict:
         """
@@ -187,8 +220,8 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
 
         # Retrieve the transient if any
         if transients:
-            sim_path = f'{simulation.parent_id}/{simulation.uid}'
-            transients_files = self._retrieve_output_files(job_id_path=sim_path, paths=transients)
+            transients_files = self._retrieve_output_files(
+                job_id_path=self.__get_simulation_path(self.platform, simulation), paths=transients)
             ret = dict(zip(transients, transients_files))
 
         # Take care of the assets
@@ -199,7 +232,22 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
 
         return ret
 
-    def list_assets(self, simulation: Simulation, **kwargs) -> List[str]:
+    @staticmethod
+    def __get_simulation_path(platform: 'LocalPlatform', simulation: Simulation) -> str:
+        """
+        Returns the full simulation path on disk
+
+        Args:
+            platform: Platform object(with config)
+            simulation: Simulation
+
+        Returns:
+            Path to simulation on disk
+        """
+        os.path.join(platform.host_data_directory, 'workers', str(simulation.parent_id), str(simulation.uid))
+        return os.path.join(platform.host_data_directory, 'workers', str(simulation.parent_id), str(simulation.uid))
+
+    def list_assets(self, simulation: Simulation, **kwargs) -> List[Asset]:
         """
         List assets for a sim
 
@@ -209,14 +257,27 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         Returns:
 
         """
-        raise NotImplementedError("List assets is not yet supported on the LocalPlatform")
+        assets = []
+        sim_path = self.__get_simulation_path(self.platform, simulation)
 
-    def to_entity(self, simulation: Dict, parent: Experiment = None, **kwargs) -> Simulation:
+        for root, dirs, files in os.walk(sim_path, topdown=False):
+            for file in files:
+                fp = os.path.join(root, file)
+                asset = Asset(filename=file)
+                stat = os.stat(fp)
+                asset.length = stat.st_size
+                asset.download_generator_hook = partial(download_lp_file, fp)
+                assets.append(asset)
+        return assets
+
+    def to_entity(self, local_sim: Dict, load_task: bool = False, parent: Optional[Experiment] = None, **kwargs) -> \
+            Simulation:
         """
         Convert a sim dict object to an ISimulation
 
         Args:
-            simulation: simulation to convert
+            local_sim: simulation to convert
+            load_task: Load Task Object as well. Can take much longer and have more data on platform
             parent: optional experiment object
             **kwargs:
 
@@ -224,14 +285,73 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
             ISimulation object
         """
         if parent is None:
-            parent = self.platform.get_item(simulation["experiment_id"], ItemType.EXPERIMENT)
-        isim = Simulation(task=TaskProxy())
-        isim.experiment = parent
-        isim.parent_id = simulation["experiment_id"]
-        isim.uid = simulation['simulation_uid']
-        isim.tags = simulation['tags']
-        isim.status = local_status_to_common(simulation['status'])
-        return isim
+            parent = self.platform.get_item(local_sim["experiment_id"], ItemType.EXPERIMENT)
+        simulation = Simulation(task=None)
+        simulation.platform = self.platform
+        simulation.experiment = parent
+        simulation.parent_id = local_sim["experiment_id"]
+        simulation.uid = local_sim['simulation_uid']
+        simulation.tags = local_sim['tags']
+        simulation.status = local_status_to_common(local_sim['status'])
+        simulation.task = None
+
+        # load simulation metadata
+        metadata = local_sim['extra_details']['metadata']
+
+        # load simulation assets from metadata
+        sim_path = self.__get_simulation_path(self.platform, simulation)
+        for asset in metadata['assets']:
+            self.__convert_json_assets_to_assets(asset, sim_path, simulation.assets)
+        # load task if requested
+        if load_task:
+            if 'tags' in local_sim and 'task_type' in local_sim['tags']:
+                try:
+                    if logger.isEnabledFor(DEBUG):
+                        logger.debug(f"Metadata: {metadata}")
+                    simulation.task = TaskFactory().create(local_sim['tags']['task_type'], **metadata['task'])
+                except Exception as e:
+                    user_logger.warning(f"Could not load task of type {local_sim['tags']['task_type']}. "
+                                        f"Received error {str(e)}")
+                    logger.exception(e)
+
+        # fallback for task
+        if simulation.task is None:
+
+            simulation.task = CommandTask(metadata['task']['command'])
+
+        # convert task assets
+        for asset_type in ['common_assets', 'transient_assets']:
+            ac = AssetCollection()
+            for asset in metadata['task'][asset_type]:
+                self.__convert_json_assets_to_assets(asset, sim_path, ac)
+            setattr(simulation.task, asset_type, ac)
+        simulation.task.reload_from_simulation(simulation)
+        return simulation
+
+    @staticmethod
+    def __convert_json_assets_to_assets(asset: Dict, simulation_path: str, asset_collection: AssetCollection):
+        """
+        Convert JSON Assets from Metadata to IDM Metadata
+        Args:
+            asset: Asset dict
+            simulation_path: Path to simulation files
+            asset_collection: Asset collection to add asset to
+
+        Returns:
+            None. It modifies the passed in asset_collection
+
+        """
+        args = dict()
+        if 'absolute_path' in asset:
+            args['absolute_path'] = asset['absolute_path']
+        if 'filename' in asset:
+            args['filename'] = asset['filename']
+        if 'absolute_path' not in args or args['absolute_path'] is None:
+            args['absolute_path'] = os.path.join(simulation_path, args['filename'])
+        asset_collection.add_asset(Asset(
+            download_generator_hook=partial(download_lp_file, args['absolute_path']),
+            **args
+        ))
 
     def _retrieve_output_files(self, job_id_path: str, paths: Union[List[str], Set[str]]) -> List[bytes]:
         """

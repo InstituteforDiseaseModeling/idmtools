@@ -2,12 +2,13 @@ import itertools
 import traceback
 from logging import getLogger, DEBUG
 from idmtools.core.interfaces.ientity import IEntity
-from idmtools.entities.iplatform import IPlatform
 from idmtools.utils.file_parser import FileParser
-from typing import NoReturn
+from typing import NoReturn, TYPE_CHECKING
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.entities.ianalyzer import TAnalyzerList
 from diskcache import Cache
+if TYPE_CHECKING:
+    from idmtools.entities.iplatform import IPlatform
 
 logger = getLogger(__name__)
 
@@ -30,7 +31,7 @@ def map_item(item: IItem) -> NoReturn:
     _get_mapped_data_for_item(item, analyzers, cache, platform)
 
 
-def _get_mapped_data_for_item(item: IEntity, analyzers: TAnalyzerList, cache: Cache, platform: IPlatform) -> bool:
+def _get_mapped_data_for_item(item: IEntity, analyzers: TAnalyzerList, cache: Cache, platform: 'IPlatform') -> bool:
     """
 
     Args:

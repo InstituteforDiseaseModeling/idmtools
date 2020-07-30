@@ -1,5 +1,6 @@
 import json
 from dataclasses import dataclass, field
+from typing import Type
 
 from idmtools.assets import Asset, AssetCollection
 from idmtools.entities import CommandLine
@@ -10,8 +11,8 @@ from idmtools.registry.task_specification import TaskSpecification
 
 @dataclass(repr=False)
 class TestTask(ITask):
-    command: CommandLine = CommandLine('echo this is a test')
-    parameters: dict = field(default_factory=lambda: {})
+    command: CommandLine = field(default=CommandLine('echo this is a test'), metadata={"md": True})
+    parameters: dict = field(default_factory=lambda: {}, metadata={"md": True})
 
     __test__ = False  # Hide from test discovery
 
@@ -56,3 +57,6 @@ class TestTaskSpecification(TaskSpecification):
 
     def get_description(self) -> str:
         return "Defines a task that is just used for testing purposes"
+
+    def get_type(self) -> Type[TestTask]:
+        return TestTask

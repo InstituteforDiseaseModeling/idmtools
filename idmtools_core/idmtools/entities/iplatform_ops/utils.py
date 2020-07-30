@@ -1,26 +1,47 @@
 from concurrent.futures.thread import ThreadPoolExecutor
+from concurrent.futures import as_completed, Future
 from functools import partial
 from logging import getLogger, DEBUG
 from typing import List, Union, Generator, Iterable, Callable, Any
-
 from more_itertools import chunked
 from tqdm import tqdm
-
+from idmtools.core import EntityContainer
 from idmtools.entities.templated_simulation import TemplatedSimulations
 
 logger = getLogger(__name__)
+user_logger = getLogger('user')
 # Global executor
 EXECUTOR = None
 
 
 def batch_items(items: Union[Iterable, Generator], batch_size=16):
+    """
+    Batch items
+
+    Args:
+        items:
+        batch_size:
+
+    Returns:
+
+    """
     for item_chunk in chunked(items, batch_size):
-        print('created chunk')
+        logger.info('created chunk')
         yield item_chunk
     raise StopIteration
 
 
-def item_batch_worker_thread(create_func: Callable, items: Union[List]):
+def item_batch_worker_thread(create_func: Callable, items: Union[List]) -> List:
+    """
+    Default batch worker thread function. It just calls create on each item
+
+    Args:
+        create_func: Create function for item
+        items: Items to create
+
+    Returns:
+        List of items created
+    """
     if logger.isEnabledFor(DEBUG):
         logger.debug(f'Create {len(items)}')
 
@@ -35,7 +56,18 @@ def batch_create_items(items: Union[Iterable, Generator], batch_worker_thread_fu
                        create_func: Callable[..., Any] = None, display_progress: bool = True,
                        progress_description: str = "Commissioning items", **kwargs):
     """
-    Create all the simulations contained in the experiment on the platform.
+    Batch create items. You must specify either batch_worker_thread_func or create_func
+
+    Args:
+        items: Items to create
+        batch_worker_thread_func: Optional Function to execute. Should take a list and return a list
+        create_func: Optional Create function
+        display_progress: Enable progress bar
+        progress_description: Description to show in progress bar
+        **kwargs:
+
+    Returns:
+
     """
     global EXECUTOR
     from idmtools.config import IdmConfigParser
@@ -58,31 +90,51 @@ def batch_create_items(items: Union[Iterable, Generator], batch_worker_thread_fu
     if logger.isEnabledFor(DEBUG):
         logger.debug(f'Batching creation by {_batch_size}')
 
-    chunk = []
     futures = []
 
     total = 0
     parent = None
     if isinstance(items, ParentIterator) and isinstance(items.items, TemplatedSimulations):
         parent = items.parent
-        items = items.items.simulations().generator
-    for chunk in chunked(items, _batch_size):
+        i = items.items.simulations().generator
+    elif isinstance(items, ParentIterator) and isinstance(items.items, EntityContainer):
+        parent = items.parent
+        i = items.items
+    else:
+        i = items
+    for chunk in chunked(i, _batch_size):
         total += len(chunk)
         if parent:
             for c in chunk:
                 c.parent = parent
         futures.append(EXECUTOR.submit(batch_worker_thread_func, chunk))
-    # for item in items:
-    #     chunk.append(item)
-    #     if len(chunk) >= _batch_size:
-    #         futures.append(EXECUTOR.submit(batch_worker_thread_func, chunk))
-    #         chunk = []
-    # if len(chunk):
-    #    futures.append(EXECUTOR.submit(batch_worker_thread_func, chunk))
 
     results = []
-    prog = tqdm(futures, desc=progress_description) if display_progress else futures
-    for future in prog:
-        results.extend(future.result())
+    if display_progress:
+        results = show_progress_of_batch(futures, progress_description, total)
+    else:
+        for future in futures:
+            results.extend(future.result())
 
+    return results
+
+
+def show_progress_of_batch(futures: List[Future], progress_description: str, total: int) -> List:
+    """
+    Show progress bar for batch
+
+    Args:
+        futures: List of futures that are still running/queued
+        progress_description: Progress description
+        total: Total items being loaded(since we are loading in batches)
+
+    Returns:
+
+    """
+    results = []
+    with tqdm(futures, desc=progress_description, total=total) as prog:
+        for future in as_completed(futures):
+            result = future.result()
+            prog.update(len(result))
+            results.extend(future.result())
     return results

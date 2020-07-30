@@ -2,7 +2,7 @@ import logging
 import os
 import random
 import string
-import typing as typing
+from typing import Dict, Any
 
 import backoff
 from dramatiq import GenericActor
@@ -25,12 +25,13 @@ class CreateExperimentTask(GenericActor):
         store_results = True
         max_retries = 0
 
-    def perform(self, tags: typing.Dict[str, typing.Any]) -> str:
+    def perform(self, tags: Dict[str, Any], extra_details: Dict[str, Any] = None) -> str:
         """
         Creates an experiment.
             - Create the folder
             - Also create the Assets folder to hold the experiments assets
             - Return the UUID of the newly created experiment
+
         Args:
             tags (TTags): Tags for the experiment to be created
 
@@ -41,9 +42,11 @@ class CreateExperimentTask(GenericActor):
         retries = 0
         data_path = None
         uuid = None
+        if extra_details is None:
+            extra_details = dict()
         while retries <= 3:
             try:
-                data_path, uuid = self.get_uuid_and_data_path(tags)
+                data_path, uuid = self.get_uuid_and_data_path(tags, extra_details)
                 break
             except IntegrityError:
                 retries += 1
@@ -58,7 +61,7 @@ class CreateExperimentTask(GenericActor):
 
     @staticmethod
     @backoff.on_exception(backoff.constant, IntegrityError, max_tries=3, interval=0.02, jitter=None)
-    def get_uuid_and_data_path(tags):
+    def get_uuid_and_data_path(tags, extra_details):
         # we only want to import this here so that clients don't need postgres/sqlalchemy packages
         from idmtools_platform_local.internals.workers.utils import create_or_update_status
         uuid = ''.join(random.choice(string.digits + string.ascii_uppercase) for _ in range(EXPERIMENT_ID_LENGTH))
@@ -66,5 +69,5 @@ class CreateExperimentTask(GenericActor):
             logger.debug('Creating experiment with id %s', uuid)
         # Update the database with experiment
         data_path = os.path.join(os.getenv("DATA_PATH", "/data"), uuid)
-        create_or_update_status(uuid, data_path, tags, extra_details=dict())
+        create_or_update_status(uuid, data_path, tags, extra_details=extra_details)
         return data_path, uuid

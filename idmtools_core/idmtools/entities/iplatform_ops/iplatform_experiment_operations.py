@@ -4,19 +4,22 @@ from concurrent.futures.thread import ThreadPoolExecutor
 from dataclasses import dataclass
 from logging import getLogger
 from types import GeneratorType
-from typing import Type, Any, NoReturn, Tuple, List, Dict, Iterator, Union
+from typing import Type, Any, NoReturn, Tuple, List, Dict, Iterator, Union, TYPE_CHECKING
 from uuid import UUID
 
+from idmtools.assets import Asset
 from idmtools.core.enums import EntityStatus, ItemType
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.utils import batch_create_items
 
 logger = getLogger(__name__)
+if TYPE_CHECKING:
+    from idmtools.entities.iplatform import IPlatform
 
 
 @dataclass
 class IPlatformExperimentOperations(ABC):
-    platform: 'IPlatform'
+    platform: 'IPlatform'  # noqa: F821
     platform_type: Type
 
     @abstractmethod
@@ -98,8 +101,8 @@ class IPlatformExperimentOperations(ABC):
         """
         pass
 
-    def batch_create(self, experiments: List[Experiment], display_progress: bool = True, **kwargs) -> List[
-        Tuple[Experiment]]:
+    def batch_create(self, experiments: List[Experiment], display_progress: bool = True, **kwargs) \
+            -> List[Tuple[Experiment]]:
         """
         Provides a method to batch create experiments
 
@@ -157,7 +160,7 @@ class IPlatformExperimentOperations(ABC):
         """
         return experiment
 
-    def pre_run_item(self, experiment: Experiment):
+    def pre_run_item(self, experiment: Experiment, **kwargs):
         """
         Trigger right before commissioning experiment on platform. This ensures that the item is created. It also
             ensures that the children(simulations) have also been created
@@ -171,7 +174,7 @@ class IPlatformExperimentOperations(ABC):
         # ensure the item is created before running
         # TODO what status are valid here? Create only?
         if experiment.status is None:
-            self.create(experiment)
+            self.create(experiment, **kwargs)
 
         # check sims
         logger.debug("Ensuring simulations exist")
@@ -265,23 +268,30 @@ class IPlatformExperimentOperations(ABC):
             ret[sim.uid] = self.platform._simulations.get_assets(sim, files, **kwargs)
         return ret
 
-    def list_assets(self, experiment: Experiment, **kwargs) -> Dict[str, List[str]]:
+    def list_assets(self, experiment: Experiment, children: bool = False,
+                    **kwargs) -> List[Asset]:
         """
-        List assets available for experiment
+        List available assets for a experiment
 
         Args:
-            experiment: Experiment to get assets for
+            experiment: Experiment to list files for
+            children: Should we load assets from children as well?
 
         Returns:
-            Dictionary of simulation and assets on each sim
+            List of Assets
         """
-        ret = {}
-        with ThreadPoolExecutor() as pool:
-            futures = dict()
-            for sim in experiment.simulations:
-                future = pool.submit(self.platform._simulations.list_assets, sim, **kwargs)
-                futures[future] = sim
+        ret = self.platform_list_asset(experiment, **kwargs)
+        if children:
+            with ThreadPoolExecutor() as pool:
+                futures = dict()
+                for sim in experiment.simulations:
+                    future = pool.submit(self.platform._simulations.list_assets, sim, **kwargs)
+                    futures[future] = sim
 
-            for future in as_completed(futures):
-                ret[futures[future]] = future.result()
+                for future in as_completed(futures):
+                    result = future.result()
+                    ret.extend(result)
         return ret
+
+    def platform_list_asset(self, experiment: Experiment, **kwargs) -> List[Asset]:
+        return []

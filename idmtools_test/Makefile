@@ -1,4 +1,4 @@
-.PHONY: clean lint test coverage release-local dist release-staging release-staging-release-commit release-staging-minor
+.PHONY: clean lint test coverage dist release-staging release-staging-release-commit release-staging-minor
 IPY=python -c
 PACKAGE_NAME=idmtools_test
 PY?=python
@@ -39,6 +39,9 @@ test-no-comps: ## Run our tests
 test-all: ## Run our  docker tests as well
 	@+$(IPY) "print('No Tests')"
 
+test-smoke: ## Run our smoke tests
+	@+$(IPY) "print('No Tests')"
+
 coverage: ## Generate a code-coverage report
 	@+$(IPY) "print('No Tests')"
 
@@ -46,11 +49,6 @@ coverage-all: ## Generate a code-coverage report
 	@+$(IPY) "print('No Tests')"
 
 # Release related rules
-
-release-local: ## package and upload a release to http://localhost:7171
-	@make dist
-	twine upload --verbose --repository-url http://localhost:7171 -u admin -p admin dist/*
-
 dist: ## build our package
 	@make clean
 	python setup.py sdist

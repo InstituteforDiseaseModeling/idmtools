@@ -7,6 +7,10 @@ __comps_client_version = 10
 
 class StaticCredentialPrompt(CredentialPrompt):
     def __init__(self, comps_url, username, password):
+        if (comps_url is None) or (username is None) or (password is None):
+            print("Usage: python create_auth_token_args.py --comps_url url --username username --password pwd")
+            print("\n")
+            raise RuntimeError('Missing comps_url, or username or password')
         self._times_prompted = 0
         self.comps_url = comps_url
         self.username = username
@@ -25,8 +29,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--comps_url', default='https://comps2.idmod.org', help='comps url')
-    parser.add_argument('--username', default='pycomps_bamboo', help='username')
-    parser.add_argument('--password', default='Password123', help='password')
+    parser.add_argument('--username', help='entry username')
+    parser.add_argument('--password', help='entry password')
 
     args = parser.parse_args()
 

@@ -1,0 +1,9 @@
+@startuml
+
+abstract class IAnalyzer        
+IAnalyzer <|-- AddAnalyzer
+IAnalyzer <|-- CSVAnalyzer
+IAnalyzer <|-- DownloadAnalyzer
+IAnalyzer <|-- TagsAnalyzer
+
+@enduml

@@ -3,12 +3,15 @@ import json
 import os
 from configparser import ConfigParser
 from logging import getLogger
-from typing import Dict, Any
+from typing import Any, Dict
+
+from idmtools.core.logging import VERBOSE
 
 default_config = 'idmtools.ini'
 
 # this is the only logger that should not be defined using init_logger
 logger = getLogger(__name__)
+user_logger = getLogger('user')
 
 
 def initialization(error=False, force=False):
@@ -119,15 +122,14 @@ class IdmConfigParser:
         Returns:
             None
         """
-        # init logging here as this is our most likely entry-point into an idm-tools "application"
-        from idmtools.core.logging import setup_logging
+        # init logging here as this is our most likely entry-point into an idmtools "application"
+        from idmtools.core.logging import setup_logging, VERBOSE
 
         ini_file = cls._find_config(dir_path, file_name)
         if ini_file is None:
+            # We use print since logger isn't configured
             print("/!\\ WARNING: File '{}' Not Found!".format(file_name))
             return
-
-        print("INI File Used: {}".format(ini_file))
 
         cls._config = ConfigParser()
         cls._config.read(ini_file)
@@ -140,9 +142,14 @@ class IdmConfigParser:
                 cls._config._sections[lowercase_version] = cls._config._sections[section]
 
         # setup logging
-        log_config = cls.get_section('Logging')
-        valid_options = ['level', 'log_filename', 'console']
-        setup_logging(**{k: v for k, v in log_config.items() if k in valid_options})
+        try:
+            log_config = cls.get_section('Logging')
+            valid_options = ['level', 'log_filename', 'console']
+            log_config = {k: v for k, v in log_config.items() if k in valid_options}
+        except ValueError:
+            log_config = dict(level='INFO', log_filename='idmtools.log', console='off')
+        setup_logging(**log_config)
+        user_logger.log(VERBOSE, "INI File Used: {}".format(ini_file))
 
     @classmethod
     @initialization(error=True)
@@ -155,6 +162,9 @@ class IdmConfigParser:
 
         Returns:
             All fields as a dictionary.
+
+        Raises:
+            ValueError: If the block doesn't exist
         """
         if not cls.found_ini():
             return {}
@@ -201,6 +211,9 @@ class IdmConfigParser:
 
         Returns:
             None
+
+        Raises:
+            ValueError: If the config file is found but cannot be parsed
         """
         if force:
             cls.clear_instance()
@@ -209,7 +222,7 @@ class IdmConfigParser:
             cls(dir_path, file_name)
 
         if error and not cls.found_ini():
-            raise ValueError(f"Config file NOT FOUND or IS Empty!")
+            raise ValueError("Config file NOT FOUND or IS Empty!")
 
     @classmethod
     @initialization(error=False)
@@ -231,7 +244,7 @@ class IdmConfigParser:
         Returns:
             None
         """
-        print(cls.get_config_path())
+        user_logger.info(cls.get_config_path())
 
     @classmethod
     @initialization(error=True)
@@ -242,32 +255,54 @@ class IdmConfigParser:
         Returns:
             None
         """
-        print("View Config INI: \n{}".format(cls._config_path))
-        print('-' * len(cls._config_path), '\n')
+        user_logger.info("View Config INI: \n{}".format(cls._config_path))
+        user_logger.info('-' * len(cls._config_path), '\n')
         with open(cls._config_path) as f:
             read_data = f.read()
-            print(read_data)
+            user_logger.info(read_data)
 
     @classmethod
     def display_config_block_details(cls, block):
+        """
+        Display the values of a config block
+
+        Args:
+            block: Block to print
+
+        Returns:
+            None
+        """
         if cls.found_ini():
             block_details = cls.get_section(block)
-            # print('\nConfig_info:')
-            print(f"\n[{block}]")
-            print(json.dumps(block_details, indent=3))
+            user_logger.log(VERBOSE, f"\n[{block}]")
+            user_logger.log(VERBOSE, json.dumps(block_details, indent=3))
 
     @classmethod
     @initialization(error=False)
-    def has_section(cls, section):
+    def has_section(cls, section: str) -> bool:
+        """
+        Does the config contain a section
+        Args:
+            section:
+
+        Returns:
+            True if the section exists, False otherwise
+        """
         return cls._config.has_section(section.lower())
 
     @classmethod
     @initialization
-    def has_option(cls, section, option):
+    def has_option(cls, section: str, option: str):
         return cls._config.has_option(section, option, fallback=None)
 
     @classmethod
-    def found_ini(cls):
+    def found_ini(cls) -> bool:
+        """
+        Did we find the config?
+
+        Returns:
+            True if did, False Otherwise
+        """
         return cls._config is not None
 
     @classmethod

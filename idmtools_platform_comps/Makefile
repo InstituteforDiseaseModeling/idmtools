@@ -1,4 +1,4 @@
-.PHONY: clean lint test coverage release-local dist release-staging release-staging-release-commit release-staging-minor
+.PHONY: clean lint test coverage dist release-staging release-staging-release-commit release-staging-minor
 IPY=python -c
 PACKAGE_NAME=idmtools_platform_comps
 PY?=python
@@ -9,7 +9,7 @@ CWD=$($(IPY) "import os; print(os.getcwd())")
 TEST_COMMAND=py.test --durations=10 -v --junitxml=test_results.xml
 TEST_RUN_OPTS=-e DOCKER_REPO=idm-docker-staging NO_SPINNER=1
 FULL_TEST_CMD=$(PDR) -w 'tests' $(TEST_RUN_OPTS) -ex '$(TEST_COMMAND)
-COVERAGE_CMD=$(PDR) -w 'tests' $(TEST_RUN_OPTS) -p . ../ -ex 'coverage run --omit="*/test*,*/setup.py" --source ../,../../idmtools_core,../../idmtools_platform_local,../../idmtools_platform_comps,../../idmtools_models,../../idmtools_model_emod -m pytest
+COVERAGE_CMD=$(PDR) -w 'tests' $(TEST_RUN_OPTS) -p . ../ -ex 'coverage run --omit="*/test*,*/setup.py" --source ../,../../idmtools_core,../../idmtools_platform_local,../../idmtools_platform_comps,../../idmtools_models -m pytest
 
 help:
 	$(PDS)get_help_from_makefile.py
@@ -46,13 +46,13 @@ test-comps: ## Run our comps tests
 test-docker: ## Run our docker tests
 	$(FULL_TEST_CMD) -m "docker"'
 
-test-emod: ## Run our emod tests
-	$(FULL_TEST_CMD) -m "emod"'
-
 test-python: ## Run our python tests
 	$(FULL_TEST_CMD) -m "python"'
 
-test-ssmt: ## Run our python tests
+test-smoke: ## Run smoke tests
+	$(FULL_TEST_CMD) -m "smoke"'
+
+test-ssmt: ## Run our ssmt tests
 	$(FULL_TEST_CMD) -m "ssmt"'
 
 coverage: ## Generate a code-coverage report
@@ -73,17 +73,10 @@ coverage-all: ## Generate a code-coverage report using all tests
 	$(PDS)/launch_dir_in_browser.py htmlcov/index.html
 
 # Release related rules
-release-local: ## package and upload a release to http://localhost:7171
-	@make dist
-	twine upload --verbose --repository-url http://localhost:7171 -u admin -p admin dist/*
+ssmt-image: ## Build SSMT Docker image
+	$(PDR) -w './ssmt_image' -ex 'pymake docker'
 
-ssmt-image-local:  ## Build SSMT Docker image using Local PyPi
-	$(PDR) -w './ssmt_image' -ex 'pymake docker-local'
-
-ssmt-image-staging:  ## Build SSMT Docker image using Staging PyPi
-	$(PDR) -w './ssmt_image' -ex 'pymake docker-staging'
-
-ssmt-image-release-staging:  ## Build SSMT Docker image using Staging PyPi and Publish to Staging
+ssmt-image-release: ## Push image to stagin
 	$(PDR) -w './ssmt_image' -ex 'pymake docker-release-staging'
 
 dist: ## build our package

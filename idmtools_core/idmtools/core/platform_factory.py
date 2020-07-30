@@ -1,12 +1,29 @@
 from contextlib import contextmanager
 from dataclasses import fields
 from logging import getLogger
-
+from typing import Dict, Any, TYPE_CHECKING
+from idmtools.core.context import set_current_platform, remove_current_platform
 from idmtools.config import IdmConfigParser
-from idmtools.entities.iplatform import IPlatform
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
+if TYPE_CHECKING:
+    from idmtools.entities.iplatform import IPlatform
 
 logger = getLogger(__name__)
+user_logger = getLogger('user')
+
+
+@contextmanager
+def platform(*args, **kwds):
+    logger.debug(f'Acquiring platform context with options: {str(*args)}')
+    try:
+        # check if we are already in a platform context and if so add to stack
+        pl = Platform(*args, **kwds)
+        set_current_platform(pl)
+        yield pl
+    finally:
+        # Code to release resource, e.g.:
+        logger.debug('Un-setting current platform context')
+        remove_current_platform()
 
 
 class Platform:
@@ -21,7 +38,11 @@ class Platform:
 
         Returns:
             The requested platform.
+
+        Raises:
+            ValueError if the block is None
         """
+        global current_platform, current_platform_stack
         from idmtools.registry.platform_specification import PlatformPlugins
 
         if block is None:
@@ -32,6 +53,7 @@ class Platform:
 
         # Create Platform based on the given block
         platform = cls._create_from_block(block, **kwargs)
+        set_current_platform(platform)
         return platform
 
     @classmethod
@@ -44,18 +66,23 @@ class Platform:
 
         Returns:
             None
+
+        Raise:
+            ValueError: when the platform is of an unknown type
         """
         if name not in cls._platforms:
             raise ValueError(f"{name} is an unknown Platform Type. "
                              f"Supported platforms are {', '.join(cls._platforms.keys())}")
 
     @classmethod
-    def _create_from_block(cls, block: str, **kwargs) -> IPlatform:
+    def _create_from_block(cls, block: str, missing_ok: bool = False, default_missing: Dict[str, Any] = None,
+                           **kwargs) -> 'IPlatform':
         """
         Retrieve section entries from the INI configuration file by giving block.
 
         Args:
             block: The section name in the configuration file.
+            missing_ok: Is it ok if section is missing(uses all default options)
             overrides: Optional override of parameters from the configuration file.
 
         Returns:
@@ -63,7 +90,13 @@ class Platform:
         """
 
         # Read block details
-        section = IdmConfigParser.get_section(block)
+        try:
+            section = IdmConfigParser.get_section(block)
+        except ValueError as e:
+            if missing_ok:
+                section = dict() if default_missing is None else default_missing
+            else:
+                raise e
 
         try:
             # Make sure block has type entry
@@ -88,7 +121,7 @@ class Platform:
         inputs = IdmConfigParser.retrieve_dict_config_block(field_type, section)
 
         # Make sure the user values have the requested type
-        fs_kwargs = validate_user_inputs_against_dataclass(field_type, kwargs)
+        fs_kwargs = validate_user_inputs_against_dataclass(field_type, kwargs)  # noqa: F841
 
         # Update attr based on priority: #1 Code, #2 INI, #3 Default
         for fn in set(kwargs.keys()).intersection(set(field_name)):
@@ -97,18 +130,23 @@ class Platform:
         extra_kwargs = set(kwargs.keys()) - set(field_name)
         if len(extra_kwargs) > 0:
             field_not_used_display = [" - {} = {}".format(fn, kwargs[fn]) for fn in extra_kwargs]
-            print(f"\n/!\\ WARNING: The following User Inputs are not used:")
-            print("\n".join(field_not_used_display))
+            user_logger.warning("\n/!\\ WARNING: The following User Inputs are not used:")
+            user_logger.warning("\n".join(field_not_used_display))
 
         # Display block info
-        IdmConfigParser.display_config_block_details(block)
+        try:
+            IdmConfigParser.display_config_block_details(block)
+        except ValueError:
+            if missing_ok:
+                pass
 
         # Display not used fields of the block
         field_not_used = set(inputs.keys()) - set(field_type.keys())
         if len(field_not_used) > 0:
             field_not_used_display = [" - {} = {}".format(fn, inputs[fn]) for fn in field_not_used]
-            print(f"\n[{block}]: /!\\ WARNING: the following Config Settings are not used when creating Platform:")
-            print("\n".join(field_not_used_display))
+            user_logger.warning(f"\n[{block}]: /!\\ WARNING: the following Config Settings are not used when creating "
+                                f"Platform:")
+            user_logger.warning("\n".join(field_not_used_display))
 
         # Remove extra fields
         for f in field_not_used:
@@ -116,27 +154,3 @@ class Platform:
 
         # Now create Platform using the data with the correct data types
         return platform_cls(**inputs)
-
-
-# The current platform
-current_platform_stack = []
-current_platform: IPlatform = None
-
-
-@contextmanager
-def platform(*args, **kwds):
-    global current_platform
-    logger.debug(f'Acquiring platform context with options: {str(*args)}')
-    current_platform = Platform(*args, **kwds)
-    try:
-        # check if we are already in a platform context and if so add to stack
-        if current_platform is not None:
-            current_platform_stack.append(current_platform)
-        yield current_platform
-    finally:
-        # Code to release resource, e.g.:
-        logger.debug('Un-setting current platform context')
-        del current_platform
-        # check if there is other platforms on the stack and set if so
-        if len(current_platform_stack):
-            current_platform = current_platform_stack.pop()

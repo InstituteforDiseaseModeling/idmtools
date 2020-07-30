@@ -1,23 +1,59 @@
+from logging import getLogger
+from typing import Union, Callable, Dict, Any
 import yaml
 from idmtools.builders import ArmSimulationBuilder
 from idmtools.builders.arm_simulation_builder import SweepArm, ArmType
+
+logger = getLogger(__name__)
+
+
+class DefaultParamFuncDict(dict):
+    def __init__(self, default):
+        super().__init__()
+        self.default = default
+
+    def __getitem__(self, item):
+        if item in self:
+            return super().__getitem__(item)
+        else:
+            return self.default(item)
 
 
 class YamlSimulationBuilder(ArmSimulationBuilder):
     """
     Class that represents an experiment builder.
+
+    Examples:
+        .. literalinclude:: ../examples/builders/yaml_builder_python.py
     """
 
     def __init__(self):
         super().__init__()
 
-    def add_sweeps_from_file(self, file_path, func_map={}, sweep_type=ArmType.cross):
+    def add_sweeps_from_file(self, file_path, func_map: Union[Dict[str, Callable], Callable[[Any], Dict]] = None,
+                             sweep_type=ArmType.cross):
+        """
+        Add sweeps from a file
 
+        Args:
+            file_path: Path to file
+            func_map: Optional function map
+            sweep_type: Type of sweep
+
+        Returns:
+
+        """
+
+        if func_map is None:
+            func_map = {}
+        # if the user passing a single function, map it to all values
+        elif callable(func_map):
+            func_map = DefaultParamFuncDict(func_map)
         with open(file_path, 'r') as stream:
             try:
                 parsed = yaml.safe_load(stream)
             except yaml.YAMLError as exc:
-                print(exc)
+                logger.exception(exc)
                 exit()
 
         d_funcs = parsed.values()

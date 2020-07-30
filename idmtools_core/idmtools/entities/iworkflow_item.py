@@ -1,12 +1,13 @@
 from abc import ABC
-from dataclasses import dataclass, field
-from typing import NoReturn, Dict, Any
+from dataclasses import dataclass, field, fields
+from typing import NoReturn, Dict, Any, TYPE_CHECKING
 from uuid import UUID
-
 from idmtools.assets.file_list import FileList
 from idmtools.core import ItemType
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.core.interfaces.inamed_entity import INamedEntity
+if TYPE_CHECKING:
+    from idmtools.entities.iplatform import IPlatform
 
 
 @dataclass
@@ -61,17 +62,24 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, ABC):
         """
         self.user_files = FileList()
 
-    def __check_for_platform(self, platform: 'IPlatform'):
-        from idmtools.core.platform_factory import current_platform
+    def pre_creation(self) -> None:
+        """
+        Called before the actual creation of the entity.
+        """
+        files_to_be_removed = ('comps_log.log', 'idmtools.log')
+        self.user_files.files = [f for f in self.user_files.files if f.filename.lower() not in files_to_be_removed]
+
+    def __check_for_platform(self, platform: 'IPlatform'):  # noqa: F821
+        from idmtools.core.context import CURRENT_PLATFORM
         if platform is not None:
             self.platform = platform
         if self.platform is None:
-            if current_platform is None:
+            if CURRENT_PLATFORM is None:
                 raise ValueError("Platform is required to run item")
-            self.platform = current_platform
+            self.platform = CURRENT_PLATFORM
 
-
-    def run(self, wait_on_done: bool = False, wait_on_done_progress: bool = True, platform: 'IPlatform' = None):
+    def run(self, wait_on_done: bool = False, wait_on_done_progress: bool = True,
+            platform: 'IPlatform' = None):  # noqa: F821
         """
         Run the item on specified platform
 
@@ -88,7 +96,7 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, ABC):
         if wait_on_done:
             self.wait(wait_on_done_progress)
 
-    def wait(self, wait_on_done_progress: bool = True, platform: 'IPlatform' = None):
+    def wait(self, wait_on_done_progress: bool = True, platform: 'IPlatform' = None):  # noqa: F821
         """
         Wait on item to finish
 
@@ -104,3 +112,11 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, ABC):
             self.platform.wait_till_done_progress(self)
         else:
             self.platform.wait_till_done(self)
+
+    def to_dict(self) -> Dict:
+        result = dict()
+        for f in fields(self):
+            if not f.name.startswith("_") and f.name not in ['parent']:
+                result[f.name] = getattr(self, f.name)
+        result['_uid'] = self.uid
+        return result

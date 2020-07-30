@@ -1,4 +1,4 @@
-.PHONY: clean lint test coverage release-local dist release-staging release-staging-release-commit release-staging-minor
+.PHONY: clean lint test coverage dist release-staging release-staging-release-commit release-staging-minor
 IPY=python -c
 BASE_PIP_URL="packages.idmod.org/api/pypi/idm-pypi-"
 STAGING_PIP_URL?="https://$(BASE_PIP_URL)staging/simple"
@@ -9,10 +9,12 @@ PDS=$(PY) ../dev_scripts/
 PDR=$(PDS)run.py
 CLDIR=$(PDS)clean_dir.py
 CWD=$($(IPY) "import os; print(os.getcwd())")
-TEST_COMMAND=py.test --durations=10 -v --junitxml=test_results.xml
 TEST_RUN_OPTS=-e DOCKER_REPO=idm-docker-staging NO_SPINNER=1
-FULL_TEST_CMD=$(PDR) -w 'tests' $(TEST_RUN_OPTS) -ex '$(TEST_COMMAND)
-COVERAGE_CMD=$(PDR) -w 'tests' $(TEST_RUN_OPTS) -p . ../ -ex 'coverage run --omit="*/test*,*/setup.py" --source ../,../../idmtools_core,../../idmtools_models,../../idmtools_model_emod -m pytest
+TEST_COMMAND=py.test --durations=10 -v --junitxml=test_results.xml
+TEST_CMD_OPTS?=
+FULL_TEST_CMD=$(PDR) -w 'tests' $(TEST_RUN_OPTS) -ex '$(TEST_COMMAND) $(TEST_CMD_OPTS)'
+COVERAGE_CMD=$(PDR) -w 'tests' $(TEST_RUN_OPTS) -p . ../ -ex 'coverage run --omit="*/test*,*/setup.py" --source ../,../../idmtools_core,../../idmtools_models -m pytest $(COVERAGE_CMD_OPTS)'
+COVERAGE_CMD_OPTS?=
 DOCKER_VERSION=$($(IPY) "print(")
 help:
 	$(PDS)get_help_from_makefile.py
@@ -26,7 +28,7 @@ clean-all:  ## Deleting package info hides plugins so we only want to do that fo
 	$(CLDIR) --dir-patterns "**/*.egg-info/"
 	@+$(IPY) "import os; os.chdir('idmtools_webui'); os.system('python build.py clean')"
 
-edv:
+dev:
 	echo $(CWD)
 
 # Dev and test related rules
@@ -34,36 +36,45 @@ lint: ## check style with flake8
 	$(PDR) -w '..' -ex 'flake8 --ignore=E501,W291 $(PACKAGE_NAME)'
 
 test: ## Run our tests
-	$(FULL_TEST_CMD) -m "not comps and not docker"'
+	$(eval TEST_CMD_OPTS=-m "not comps and not docker")
+	$(FULL_TEST_CMD)
 
 test-all: ## Run all our tests
-	$(FULL_TEST_CMD)'
+	$(FULL_TEST_CMD)
 
 test-failed: ## Run only previously failed tests
-	$(FULL_TEST_CMD) --lf'
+	$(eval TEST_CMD_OPTS=--lf)
+	$(FULL_TEST_CMD)
 
 test-long: ## Run any tests that takes more than 30s
-	$(FULL_TEST_CMD) -m "long"'
+	$(eval TEST_CMD_OPTS=-m "long")
+	$(FULL_TEST_CMD)
 
 test-no-long: ## Run any tests that takes less than 30s
-	$(FULL_TEST_CMD) -m "not long"'
+	$(eval TEST_CMD_OPTS=-m "not long")
+	$(FULL_TEST_CMD)
 
 test-comps: ## Run our comps tests
-	$(FULL_TEST_CMD) -m "comps"'
+	$(eval TEST_CMD_OPTS=-m "comps")
+	$(FULL_TEST_CMD)
 
 test-docker: ## Run our docker tests
-	$(FULL_TEST_CMD) -m "docker"'
-
-test-emod: ## Run our emod tests
-	$(FULL_TEST_CMD) -m "emod"'
+	$(eval TEST_CMD_OPTS=-m "docker")
+	$(FULL_TEST_CMD)
 
 test-python: ## Run our python tests
-	$(FULL_TEST_CMD) -m "python"'
+	$(eval TEST_CMD_OPTS=-m "python")
+	$(FULL_TEST_CMD)
+
+test-smoke: ## Run our smoke tests
+	$(eval TEST_CMD_OPTS=-m "smoke")
+	$(FULL_TEST_CMD)
 
 coverage: ## Generate a code-coverage report
 	@make clean
 	# We have to run in our tests folder to use the proper config
-	$(COVERAGE_CMD) -m "not comps and not docker"'
+	$(eval COVERAGE_CMD_OPTS=-m "not comps and not docker")
+	$(COVERAGE_CMD)
 	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
 	coverage report -m
 	coverage html -i
@@ -78,46 +89,37 @@ coverage-all: ## Generate a code-coverage report
 	$(PDS)/launch_dir_in_browser.py htmlcov/index.html
 
 docker-cleanup:
-	docker stop  idmtools_workers idmtools_postgres idmtools_redis
-	docker rm  idmtools_workers idmtools_postgres idmtools_redis
+	docker stop idmtools_workers idmtools_postgres idmtools_redis
+	docker rm idmtools_workers idmtools_postgres idmtools_redis
 
-docker-local: ## Build our docker image using the local pypi
+docker: ## Build our docker image using the local pypi without versioning from artifactory
 	# This job is most useful when actively developing changes to the local_platform internals(tasks, api, cli) or
 	# upstream changes that effect those areas(models and core). Otherwise, installing from latest in the nightly
 	# should suffice for development
 	# ensure pypi local is up
-	$(PDR) -w '../dev_scripts/local_pypi' -ex 'docker-compose up -d'
-	$(PDR) -w '../idmtools_core' -ex 'pymake release-local'
-	@pymake release-local
-	python build_docker_image.py http://localhost:7171/
+	$(PDR) -w '../idmtools_core' -ex 'pymake dist'
+	@pymake dist
+	$(PDR) -w '../idmtools_platform_local' -ex 'python build_docker_image.py'
 
-docker-local-no-cache:## Build our docker image using the local pypi
-	# This job is most useful when actively developing changes to the local_platform internals(tasks, api, cli) or
-	# upstream changes that effect those areas(models and core). Otherwise, installing from latest in the nightly
-	# should suffice for development
-	# ensure pypi local is up
-	$(PDR) -w '../dev_scripts/local_pypi' -ex 'docker-compose up -d'
-	$(PDR) -w '../idmtools_core' -ex 'pymake release-local'
-	@pymake release-local
-	python build_docker_image.py http://localhost:7171/ no-cache
+docker-proper: ## This job gets version data from artifactory. Should be used for production releases
+	$(PDR) -w '../idmtools_core' -ex 'pymake dist'
+	@pymake dist
+	$(PY) build_docker_image.py --proper
 
-docker-staging: ## Build our docker image using staging pypi
-	# rebuild local package at moment since we install local platform package from there
-	python build_docker_image.py $(STAGING_PIP_URL) no-cache
+docker-only: ## Assumes you have made the local package already
+	$(PDR) -w '../idmtools_core' -ex 'pymake dist'
+	$(PDR) -w '../idmtools_platform_local' -ex 'python build_docker_image.py'
 
-docker-release-staging:
-	@make docker-staging
-	python push_docker_image.py
+docker-only-proper: ## Assumes you have made the local package already without versioning from artifactory
+	$(PDR) -w '../idmtools_core' -ex 'pymake dist'
+	$(PY) build_docker_image.py --proper
+
 
 # Release related rules
-release-local: ## package and upload a release to http://localhost:7171
-	@pymake dist
-	twine upload --verbose --repository-url http://localhost:7171 -u admin -p admin dist/*
-
 dist: ## build our package
 	@make build-ui
 	@make clean
-	python setup.py sdist
+	$(PY) setup.py sdist
 
 start-webui: ## start the webserver
 	$(PDR) -w 'idmtools_webui' -ex yarn

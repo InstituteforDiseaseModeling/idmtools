@@ -1,31 +1,44 @@
 # This workflows will upload a Python Package using Twine when a release is created
 
-name: Upload idmtools-platform-comps to Staging
+name: "Staging: idmtools-platform-comps"
 
 on:
   push:
     branches:
       # only run this on
       - dev
-      - 561-nightly-builds
+      - 'release**'
     paths:
+      - 'idmtools_core/**'
       - 'idmtools_platform_comps/**'
+      - 'idmtools_models/**'
 
 jobs:
-  deploy:
-
+  deploy-comps-staging:
     runs-on: ubuntu-latest
-
+    if: "!contains(github.event.head_commit.message, 'Bump version: ')"
     steps:
-      - uses: actions/checkout@v2
       - name: Set up Python
         uses: actions/setup-python@v1
         with:
-          python-version: '3.x'
+          python-version: '3.7'
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install setuptools wheel twine
+          pip install setuptools wheel twine bump2version coloredlogs py-make
+          git config --global user.name "IDM Tools"
+          git config --global user.name "idmtools@idmod.org"
+      - uses: azure/docker-login@v1
+        with:
+          login-server: idm-docker-staging.packages.idmod.org
+          username: ${{ secrets.PYPI_STAGING_USERNAME }}
+          password: ${{ secrets.PYPI_STAGING_PASSWORD }}
+      - uses: azure/docker-login@v1
+        with:
+          login-server: docker-production.packages.idmod.org
+          username: ${{ secrets.PYPI_STAGING_USERNAME }}
+          password: ${{ secrets.PYPI_STAGING_PASSWORD }}
+      - uses: actions/checkout@v2
       - name: Build and publish
         working-directory: idmtools_platform_comps
         env:
@@ -35,3 +48,11 @@ jobs:
         run: |
           python setup.py sdist bdist_wheel
           twine upload dist/*
+      - name: Build and push docker image
+        working-directory: idmtools_platform_comps
+        env:
+          bamboo_UserArtifactory: ${{ secrets.PYPI_STAGING_USERNAME }}
+          bamboo_PasswordArtifactory: ${{ secrets.PYPI_STAGING_PASSWORD }}
+        run: |
+          make ssmt-image
+          make ssmt-image-release

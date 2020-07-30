@@ -3,6 +3,7 @@ import logging
 import time
 from concurrent.futures import as_completed
 from concurrent.futures.thread import ThreadPoolExecutor
+from json import JSONDecodeError
 from logging import getLogger
 from typing import NoReturn, Dict, Optional, List, Union
 from docker import DockerClient
@@ -147,7 +148,20 @@ class DockerServiceManager:
                 # wait on services to be ready for workers
                 if sn in CONTAINER_WAIT:
                     self.wait_on_ports_to_open(CONTAINER_WAIT[sn])
-                self._services[sn].get_or_create(spinner)
+                attempts = 0
+                while attempts < 3:
+                    try:
+                        self._services[sn].get_or_create(spinner)
+                        break
+                    except JSONDecodeError:
+                        if logger.isEnabledFor(logging.DEBUG):
+                            logger.debug(f"Failure to get service {sn}")
+                        if attempts == 3:
+                            logger.debug(f"Ran out of attempts to create {sn}")
+                            raise
+                        if logger.isEnabledFor(logging.DEBUG):
+                            logger.debug(f"Retrying {sn}")
+                        attempts += 1
             self.wait_on_ports_to_open(['workers_ui_port'])
             self.setup_broker(self.heartbeat_timeout)
         except Exception as e:
@@ -201,10 +215,30 @@ class DockerServiceManager:
                 pass
 
     def get(self, container_name: str, create=True) -> Container:
+        """
+        Get the server with specified name
+
+        Args:
+            container_name: Name of container
+            create: Create if it doesn't exists
+
+        Returns:
+
+        """
         service = self._services[container_name.lower()]
         return service.get_or_create() if create else service.get()
 
     def get_container_config(self, service: BaseServiceContainer, opts=None):
+        """
+        Get the container config for the service
+
+        Args:
+            service: Service to get config for
+            opts: Opts to Extract. Should be a fields object
+
+        Returns:
+
+        """
         dest_fields = {f.name: f for f in fields(service)}
         if not opts:
             my_fields = fields(self)
@@ -241,9 +275,21 @@ class DockerServiceManager:
             service.restart()
 
     @staticmethod
-    def is_port_open(host, port):
+    def is_port_open(host: str, port: int) -> bool:
+        """
+        Check if a port is open
+
+        Args:
+            host: Host to check
+            port: Port to check
+
+        Returns:
+            True if port is open, False otherwise
+        """
         import socket
         from contextlib import closing
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f"Checking if port {port} is open on host {host}")
         with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
             if isinstance(port, int) and sock.connect_ex((host, port)) == 0:
                 return True
@@ -251,7 +297,16 @@ class DockerServiceManager:
                 return False
 
     @staticmethod
-    def stop_service_and_wait(service):
+    def stop_service_and_wait(service) -> bool:
+        """
+        Stop server and wait
+
+        Args:
+            service: Service to stop
+
+        Returns:
+
+        """
         service.stop(True)
         container = service.get()
         while container:

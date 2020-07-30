@@ -6,6 +6,7 @@ import sys
 import unicodedata
 from logging import getLogger
 from os.path import abspath, join, dirname
+from typing import List, Generator
 
 # on windows virtual env is not populated through pymake
 if sys.platform == "win32" and 'VIRTUAL_ENV' in os.environ:
@@ -57,14 +58,26 @@ packages = dict(
     idmtools_cli=default_install,
     idmtools_platform_local=data_class_default + ['workers', 'ui'],
     idmtools_platform_comps=data_class_default,
-    # idmtools_model_emod=data_class_default + ['bamboo'],
     idmtools_models=data_class_default,
     idmtools_platform_slurm=data_class_default,
     idmtools_test=[]
 )
 
 
-def execute(cmd, cwd):
+def execute(cmd: List['str'], cwd: str) -> Generator[str, None, None]:
+    """
+    Runs a command and filters output
+
+    Args:
+        cmd: Command to run
+        cwd: Working directory
+
+    Returns:
+        Generator returning each line
+
+    Raises:
+        CalledProcessError if the return code was not 0
+    """
     popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, cwd=cwd)
     for stdout_line in iter(popen.stdout.readline, ""):
         yield stdout_line
@@ -76,24 +89,46 @@ def execute(cmd, cwd):
 
 escapes = ''.join([chr(char) for char in range(1, 32)])
 translator = str.maketrans('', '', escapes)
+
+
+def process_output(output_line: str):
+    """
+    Process output
+
+    Args:
+        output_line: Output line
+
+    Returns:
+        None. Instead prints to log level on screen
+    """
+    # catch errors where possible
+    if "FAILED [" in output_line:
+        logger.critical(output_line.strip())
+    elif any([s in output_line for s in ["Successfully", "SUCCESS"]]):
+        logger.log(35, output_line.strip())
+    elif any([s in output_line for s in ["WARNING", "SKIPPED"]]):
+        logger.warning(output_line.strip())
+    else:
+        output_line = output_line.strip().translate(translator)
+        logger.debug("".join(ch for ch in output_line if unicodedata.category(ch)[0] != "C"))
+
+
+# install wheel first to benefit from binaries
+for line in execute(["pip", "install", "wheel"], cwd=join(base_directory, 'docs')):
+    process_output(line)
+
 # loop through and install our packages
 for package, extras in packages.items():
     extras_str = f"[{','.join(extras)}]" if extras else ''
     logger.info(f'Installing {package} with extras: {extras_str if extras_str else "None"} from {base_directory}')
     try:
         for line in execute(["pip", "install", "-e", f".{extras_str}", idmrepo], cwd=join(base_directory, package)):
-            # catch errors where possible
-            if "FAILED [" in line:
-                logger.critical(line.strip())
-            elif any([s in line for s in ["Successfully", "SUCCESS"]]):
-                logger.log(35, line.strip())
-            elif any([s in line for s in ["WARNING", "SKIPPED"]]):
-                logger.warning(line.strip())
-            else:
-                line = line.strip().translate(translator)
-                logger.debug("".join(ch for ch in line if unicodedata.category(ch)[0] != "C"))
+            process_output(line)
         result = 0
     except subprocess.CalledProcessError as e:
         logger.critical(f'{package} installed failed using {e.cmd} did not succeed')
         result = e.returncode
         logger.debug(f'Return Code: {result}')
+
+for line in execute(["pip", "install", "-r", "requirements.txt"], cwd=join(base_directory, 'docs')):
+    process_output(line)

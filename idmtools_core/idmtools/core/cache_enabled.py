@@ -1,11 +1,12 @@
 import os
 import shutil
 import tempfile
+import time
 from dataclasses import dataclass, field
 from multiprocessing import current_process, cpu_count
 from logging import getLogger, DEBUG
 from diskcache import Cache, DEFAULT_SETTINGS, FanoutCache
-from typing import Union
+from typing import Union, Optional
 
 MAX_CACHE_SIZE = int(2 ** 33)  # 8GB
 DEFAULT_SETTINGS["size_limit"] = MAX_CACHE_SIZE
@@ -26,7 +27,14 @@ class CacheEnabled:
     def __del__(self):
         self.cleanup_cache()
 
-    def initialize_cache(self, shards=None, eviction_policy=None):
+    def initialize_cache(self, shards: Optional[int] = None, eviction_policy=None):
+        """
+        Initialize cache
+
+        Args:
+            shards (Optional[int], optional): How many shards. It is best to set this when multi-procressing Defaults to None.
+            eviction_policy ([type], optional): See Diskcache docs. Defaults to None.
+        """
         logger.debug(f"Initializing the cache with {shards or 0} shards and {eviction_policy or 'none'} policy.")
         if self._cache:
             logger.warning("CacheEnabled class is calling `initialize_cache()` with a cache already initialized: "
@@ -43,7 +51,7 @@ class CacheEnabled:
         # Create different cache depending on the options
         if shards:
             # set default timeout to grow with cpu count. In high thread environments, user hit timeouts
-            default_timeout = max(0.1, cpu_count()*0.0125)
+            default_timeout = max(0.1, cpu_count() * 0.0125)
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f"Setting cache timeout to {default_timeout}")
             self._cache = FanoutCache(self._cache_directory, shards=shards, timeout=default_timeout,
@@ -58,27 +66,20 @@ class CacheEnabled:
             return
 
         if self._cache is not None:
-            try:
-                logger.debug(f"Cleaning up the cache at {self._cache_directory}")
-            except:  # Happens when things are shutting down
-                pass
             self._cache.close()
             del self._cache
 
             if self._cache_directory and os.path.exists(self._cache_directory):
-                try:
-                    shutil.rmtree(self._cache_directory)
-                # In some scripts, like multi-processing, we could still end up with a locked file
-                # in these cases, let's just preserve cache. Often these are temp directories the os
-                # will clean up for us
-                except (IOError, PermissionError) as e:
-                    # We can hit logging issues as we are shutting down. Ignore those
+                retries = 0
+                while retries < 3:
                     try:
-                        logger.warning(f"Could not delete cache directory: {self._cache_directory}")
-                        if logger.isEnabledFor(DEBUG):
-                            logger.exception(e)
-                    except Exception:
-                        pass
+                        shutil.rmtree(self._cache_directory)
+                        time.sleep(0.15)
+                        break
+                    except (IOError, PermissionError):
+                        # we don't use logger here because it could be destroyed
+                        print(f"Could not delete cache {self._cache_directory}")
+                        retries += 1
 
     @property
     def cache(self) -> Union[Cache, FanoutCache]:

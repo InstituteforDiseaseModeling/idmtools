@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""The setup script for the idmtools_test module to run extended tests and provide demo date for IDM-Tools tests."""
+"""The setup script for the idmtools_test module to run extended tests and provide demo date for idmtools tests."""
 
 from setuptools import setup, find_packages
 
@@ -38,12 +38,14 @@ setup(
     packages=find_packages(),
     setup_requires=setup_requirements,
     entry_points=dict(idmtools_platform=  # noqa: E251
-                      ["idmtools_platform_test = idmtools_test.utils.test_platform:TestPlatformSpecification"],
+                      ["idmtools_platform_test = idmtools_test.utils.test_platform:TestPlatformSpecification",
+                       "idmtools_platform_testex = idmtools_test.utils.test_execute_platform:TestExecutePlatformSpecification"
+                      ],
                       idmtools_task=  # noqa: E251
                       ["idmtools_model_test = idmtools_test.utils.test_task:TestTaskSpecification"]
                       ),
     test_suite='tests',
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='1.0.0+nightly',
+    version='1.3.0',
     zip_safe=False
 )

@@ -1,7 +1,6 @@
 import copy
 import json
 import os
-import sys
 import unittest
 from functools import partial
 from operator import itemgetter
@@ -12,9 +11,10 @@ from COMPS.Data import Experiment as COMPSExperiment, AssetCollection as COMPSAs
 from COMPS.Data import QueryCriteria
 from idmtools import __version__
 from idmtools.assets import Asset, AssetCollection
-from idmtools.builders import ArmSimulationBuilder, ArmType, SimulationBuilder, StandAloneSimulationsBuilder, SweepArm
+from idmtools.builders import ArmSimulationBuilder, ArmType, SimulationBuilder, SweepArm
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
+from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
@@ -24,6 +24,7 @@ from idmtools_test.utils.common_experiments import get_model1_templated_experime
     wait_on_experiment_and_check_all_sim_status
 from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+from idmtools_test.utils.shared_functions import validate_output, validate_sim_tags
 
 setA = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
 setB = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="b")
@@ -35,6 +36,8 @@ class setParam:
         self.param = param
 
     def __call__(self, simulation: Simulation, value) -> Dict[str, any]:
+        # set simulation name
+        simulation.name = f'{simulation.parent.name}_{self.param}_{value}'
         return JSONConfiguredPythonTask.set_parameter_sweep_callback(simulation, self.param, value)
 
 
@@ -53,18 +56,24 @@ class TestPythonExperiment(ITestWithPersistence):
     # has 5 parameter, total sweep parameters are 5*5=25
 
     @pytest.mark.long
-    def test_sweeps_with_partial_comps(self):
+    def test_sweeps_with_partial_comps(self):   # zdu: no metadata file any more
 
         e = get_model1_templated_experiment(self.case_name)
         builder = SimulationBuilder()
         # ------------------------------------------------------
         # Sweeping parameters:
         # first way to sweep parameter 'a' is to use param_update function
-        builder.add_sweep_definition(setA, range(0, 2))
+        builder.add_sweep_definition(
+            JSONConfiguredPythonTask.set_parameter_partial("a"),
+            range(0, 2)
+        )
 
         # second way to sweep parameter 'b' is to use class setParam which basiclly doing same thing as param_update
         # method
-        builder.add_sweep_definition(setParam("b"), [i * i for i in range(1, 4, 2)])
+        builder.add_sweep_definition(
+            JSONConfiguredPythonTask.set_parameter_partial("b"),
+            [i * i for i in range(1, 4, 2)]
+        )
         # ------------------------------------------------------
 
         e.simulations.add_builder(builder)
@@ -76,10 +85,11 @@ class TestPythonExperiment(ITestWithPersistence):
         # exp_id = "a727e802-d88b-e911-a2bb-f0921c167866"
 
         # validation each simulation output to compare output/config.json is equal to config.json
-        self.validate_output(exp_id, 4)
-
-        expected_tags = [{'a': '0', 'b': '1'}, {'a': '0', 'b': '9'}, {'a': '1', 'b': '1'}, {'a': '1', 'b': '9'}]
-        self.validate_sim_tags(exp_id, expected_tags)
+        validate_output(self, exp_id, 4)
+        tag_value = "idmtools_models.python.json_python_task.JSONConfiguredPythonTask"
+        expected_tags = [{'a': '0', 'b': '1', 'task_type': tag_value}, {'a': '0', 'b': '9', 'task_type': tag_value},
+                         {'a': '1', 'b': '1', 'task_type': tag_value}, {'a': '1', 'b': '9', 'task_type': tag_value}]
+        validate_sim_tags(self, exp_id, expected_tags, tag_value)
 
         # validate experiment tags
         actual_exp_tags = experiment.get(experiment.id, QueryCriteria().select_children('tags')).tags
@@ -88,6 +98,29 @@ class TestPythonExperiment(ITestWithPersistence):
                              'task_type': 'idmtools_models.python.json_python_task.JSONConfiguredPythonTask'}
         self.assertDictEqual(expected_exp_tags, actual_exp_tags)
         self.assertDictEqual(expected_exp_tags, actual_exp_tags)
+
+        # validate reload
+        # with self.subTest("test_sweeps_with_partial_comps_reload_with_task"):
+        #     experiment_reload = Experiment.from_id(e.uid, self.platform, load_task=True)
+        #     self.assertEqual(e.id, experiment_reload.id)
+        #     self.assertEqual(e.simulation_count, experiment_reload.simulation_count)
+        #     # get all the ids
+        #     self.assertEqual(
+        #         sorted([s.uid for s in e.simulations]),
+        #         sorted([s.uid for s in experiment_reload.simulations])
+        #     )
+        #     for sim in experiment_reload.simulations:
+        #         self.assertIsInstance(sim.task, JSONConfiguredPythonTask)
+        #         self.assertIn("a", sim.task.parameters)
+        #         self.assertIn("b", sim.task.parameters)
+        #         self.assertEqual(str(e.simulations[0].task.command), str(sim.task.command))
+
+        with self.subTest("test_sweeps_with_partial_comps_reload"):
+            experiment_reload = Experiment.from_id(e.uid, self.platform)
+            for sim in experiment_reload.simulations:
+                self.assertIsInstance(sim.task, CommandTask)
+                'python ./Assets/model1.py --config config.json'
+                self.assertEqual(str(e.simulations[0].task.command), str(sim.task.command))
 
     # Test parameter "b" set is depending on parameter "a"
     # a=[0,1,2,3,4] <--sweep parameter
@@ -115,11 +148,14 @@ class TestPythonExperiment(ITestWithPersistence):
         experiment = COMPSExperiment.get(e.uid)
         print(experiment.id)
         exp_id = experiment.id
-        self.validate_output(exp_id, 5)
+        validate_output(self, exp_id, 5)
 
         # validate b is not in tag since it is not sweep parameter, it just depend on sweep parameter
-        expected_tags = [{'a': '0'}, {'a': '1'}, {'a': '2'}, {'a': '3'}, {'a': '4'}]
-        self.validate_sim_tags(exp_id, expected_tags)
+        tag_value = "idmtools_models.python.json_python_task.JSONConfiguredPythonTask"
+        expected_tags = [{'a': '0', 'task_type': tag_value}, {'a': '1', 'task_type': tag_value},
+                         {'a': '2', 'task_type': tag_value}, {'a': '3', 'task_type': tag_value},
+                         {'a': '4', 'task_type': tag_value}]
+        validate_sim_tags(self, exp_id, expected_tags, tag_value)
 
     @pytest.mark.long
     @pytest.mark.comps
@@ -160,7 +196,7 @@ class TestPythonExperiment(ITestWithPersistence):
             self.validate_assets(assets, expected_list)
 
     # Test will test pythonExperiment's assets parameter which adds all files under tests/inputs/python/Assets to
-    # COMPS' Assets folder and also test using StandAloneSimulationsBuilder builder to build simulations
+    # COMPS' Assets folder
     # Comps' Assets
     #   |--MyLib
     #       |--temp.py
@@ -181,9 +217,7 @@ class TestPythonExperiment(ITestWithPersistence):
         sim.task.set_parameter("a", 1)
         sim.task.set_parameter("b", 10)
 
-        builder = StandAloneSimulationsBuilder()
-        builder.add_simulation(sim)
-        e.simulations.add_builder(builder)
+        e.simulations = [sim]
 
         wait_on_experiment_and_check_all_sim_status(self, e, self.platform)
 
@@ -317,10 +351,15 @@ class TestPythonExperiment(ITestWithPersistence):
 
         wait_on_experiment_and_check_all_sim_status(self, e, self.platform)
         exp_id = e.uid
-        self.validate_output(exp_id, 6)
-        expected_tags = [{'a': '1', 'b': '2', 'c': '4'}, {'a': '1', 'b': '2', 'c': '5'}, {'a': '1', 'b': '3', 'c': '4'},
-                         {'a': '1', 'b': '3', 'c': '5'}, {'a': '6', 'b': '2'}, {'a': '7', 'b': '2'}]
-        self.validate_sim_tags(exp_id, expected_tags)
+        validate_output(self, exp_id, 6)
+        tag_value = "idmtools_models.python.json_python_task.JSONConfiguredPythonTask"
+        expected_tags = [{'a': '1', 'b': '2', 'c': '4', 'task_type': tag_value},
+                         {'a': '1', 'b': '2', 'c': '5', 'task_type': tag_value},
+                         {'a': '1', 'b': '3', 'c': '4', 'task_type': tag_value},
+                         {'a': '1', 'b': '3', 'c': '5', 'task_type': tag_value},
+                         {'a': '6', 'b': '2', 'task_type': tag_value},
+                         {'a': '7', 'b': '2', 'task_type': tag_value}]
+        validate_sim_tags(self, exp_id, expected_tags, tag_value)
 
     @pytest.mark.comps
     def test_duplicate_asset_files_not_allowed(self):
@@ -339,6 +378,7 @@ class TestPythonExperiment(ITestWithPersistence):
                 context.exception.args[0]))
 
     @pytest.mark.comps
+    @pytest.mark.long
     def test_use_existing_ac_with_experiment(self):
         model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
         tags = {"a": "1", "b": 10}
@@ -371,6 +411,7 @@ class TestPythonExperiment(ITestWithPersistence):
         self.assertIsInstance(ac, AssetCollection)
         return ac
 
+    @pytest.mark.smoke
     @pytest.mark.comps
     def test_use_existing_ac_and_add_file_with_experiment(self):
         model_path = os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py")
@@ -411,14 +452,23 @@ class TestPythonExperiment(ITestWithPersistence):
                              {'filename': 'functions.py', 'relative_path': 'MyExternalLibrary'},
                              {'filename': 'working_model.py', 'relative_path': ''},
                              {'filename': 'test.json', 'relative_path': ''}]
+            # validate simulation names
+            self.assertIn(f'{e.name}_', simulation.name)
             self.validate_assets(assets, expected_list)
 
     @pytest.mark.long
     @pytest.mark.comps
-    def test_ssmt_seir_model_experiment(self):
-        # ------------------------------------------------------
+    def test_seir_model_experiment(self):
+        # Define some constant string used in this example
+        class ConfigParameters:
+            Infectious_Period_Constant = "Infectious_Period_Constant"
+            Base_Infectivity_Constant = "Base_Infectivity_Constant"
+            Base_Infectivity_Distribution = "Base_Infectivity_Distribution"
+            GAUSSIAN_DISTRIBUTION = "GAUSSIAN_DISTRIBUTION"
+            Base_Infectivity_Gaussian_Mean = "Base_Infectivity_Gaussian_Mean"
+            Base_Infectivity_Gaussian_Std_Dev = "Base_Infectivity_Gaussian_Std_Dev"
+
         # First run the experiment
-        # ------------------------------------------------------
         script_path = os.path.join(COMMON_INPUT_PATH, "python", "ye_seir_model", "Assets", "SEIR_model.py")
         assets_path = os.path.join(COMMON_INPUT_PATH, "python", "ye_seir_model", "Assets")
         tags = {"idmtools": "idmtools-automation", "simulation_name_tag": "SEIR_Model"}
@@ -427,7 +477,8 @@ class TestPythonExperiment(ITestWithPersistence):
             open(os.path.join(assets_path, "templates", 'config.json'),
                  'r'))
         parameters[ConfigParameters.Base_Infectivity_Distribution] = ConfigParameters.GAUSSIAN_DISTRIBUTION
-        task = JSONConfiguredPythonTask(script_path=script_path, parameters=parameters, config_file_name='config.json')
+        task = JSONConfiguredPythonTask(script_path=script_path, parameters=parameters,
+                                        config_file_name='config.json')
         task.command.add_option("--duration", 40)
 
         # now create a TemplatedSimulation builder
@@ -441,8 +492,8 @@ class TestPythonExperiment(ITestWithPersistence):
         def param_update(simulation: Simulation, param: str, value: Any) -> Dict[str, Any]:
             return simulation.task.set_parameter(param, value)
 
-        set_base_infectivity_gaussian_mean = partial(param_update,
-                                                     param=ConfigParameters.Base_Infectivity_Gaussian_Mean)
+        # set_base_infectivity_gaussian_mean = partial(param_update,
+        #                                              param=ConfigParameters.Base_Infectivity_Gaussian_Mean)
 
         class setParam:
             def __init__(self, param):
@@ -463,35 +514,26 @@ class TestPythonExperiment(ITestWithPersistence):
         experiment.assets.add_directory(assets_directory=assets_path)
 
         # set platform and run simulations
-        platform = Platform('COMPS2')
-        platform.run_items(experiment)
-        platform.wait_till_done(experiment)
+        self.platform.run_items(experiment)
+        self.platform.wait_till_done(experiment)
 
-        # check experiment status and only move to analyzer test if experiment succeeded
-        if not experiment.succeeded:
-            print(f"Experiment {experiment.uid} failed.\n")
-            sys.exit(-1)
+        # check experiment status
+        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)
 
-    def validate_output(self, exp_id, expected_sim_count):
+        # validate sim outputs
+        exp_id = experiment.id
+        self.validate_custom_output(exp_id, 2)
+
+    def validate_custom_output(self, exp_id, expected_sim_count):
         sim_count = 0
         for simulation in COMPSExperiment.get(exp_id).get_simulations():
             sim_count = sim_count + 1
-            result_file_string = simulation.retrieve_output_files(paths=['output/result.json'])
-            print(result_file_string)
-            config_string = simulation.retrieve_output_files(paths=['config.json'])
-            print(config_string)
-            self.assertEqual(result_file_string, config_string)
+            expected_csv_output_1 = simulation.retrieve_output_files(paths=['output/individual.csv'])
+            expected_csv_output_2 = simulation.retrieve_output_files(paths=['output/node.csv'])
+            self.assertEqual(len(expected_csv_output_1), 1)
+            self.assertEqual(len(expected_csv_output_2), 1)
 
         self.assertEqual(sim_count, expected_sim_count)
-
-    def validate_sim_tags(self, exp_id, expected_tags):
-        tags = []
-        for simulation in COMPSExperiment.get(exp_id).get_simulations():
-            tags.append(simulation.get(simulation.id, QueryCriteria().select_children('tags')).tags)
-
-        sorted_tags = sorted(tags, key=itemgetter('a'))
-        sorted_expected_tags = sorted(expected_tags, key=itemgetter('a'))
-        self.assertEqual(sorted_tags, sorted_expected_tags)
 
     def validate_assets(self, assets, expected_list):
         actual_list = []
@@ -503,16 +545,6 @@ class TestPythonExperiment(ITestWithPersistence):
         expected_list_sorted = sorted(expected_list, key=itemgetter('filename', 'relative_path'))
         actual_list_sorted = sorted(actual_list, key=itemgetter('filename', 'relative_path'))
         self.assertEqual(expected_list_sorted, actual_list_sorted)
-
-
-# Define some constant string used in this example
-class ConfigParameters:
-    Infectious_Period_Constant = "Infectious_Period_Constant"
-    Base_Infectivity_Constant = "Base_Infectivity_Constant"
-    Base_Infectivity_Distribution = "Base_Infectivity_Distribution"
-    GAUSSIAN_DISTRIBUTION = "GAUSSIAN_DISTRIBUTION"
-    Base_Infectivity_Gaussian_Mean = "Base_Infectivity_Gaussian_Mean"
-    Base_Infectivity_Gaussian_Std_Dev = "Base_Infectivity_Gaussian_Std_Dev"
 
 
 if __name__ == '__main__':

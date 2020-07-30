@@ -19,7 +19,10 @@ class IItem:
 
     @property
     def id(self):
-        return str(self.uid)
+        if self.uid:
+            return str(self.uid)
+        else:
+            return self.uid
 
     @property
     def metadata(self):
@@ -84,4 +87,3 @@ class IItem:
 
 
 IItemList = typing.List[IItem]
-

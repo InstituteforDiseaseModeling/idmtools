@@ -1,4 +1,3 @@
-backoff~=1.8.1
-idmtools~=1.0.0
-pyCOMPS~=2.3.6
-tqdm~=4.39
+idmtools~=1.3.0
+pyCOMPS~=2.3.7
+tqdm~=4.47.0
