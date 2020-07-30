@@ -21,6 +21,8 @@
 
 - [User Installation](#user-installation)
   - [Recommended install](#recommended-install)
+- [IDM Modeling Tools](#idm-modeling-tools)
+- [Installation](#installation)
   - [Advanced Install](#advanced-install)
   - [Installing Development/Early Release Versions](#installing-developmentearly-release-versions)
     - [PyPI](#pypi)
@@ -39,6 +41,7 @@
   - [Troubleshooting the Development Environment](#troubleshooting-the-development-environment)
 - [Reporting an Issue](#reporting-an-issue)
 - [Requesting a feature](#requesting-a-feature)
+- [You can request a feature but opening a ticket on the repo or by emailing idmtools-feature@idmod.org](#you-can-request-a-feature-but-opening-a-ticket-on-the-repo-or-by-emailing-idmtools-featureidmodorg)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
