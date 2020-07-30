@@ -48,7 +48,7 @@ def comps_batch_worker(simulations: List[Simulation], interface: 'CompsPlatformS
             interface.pre_create(simulation)
             simulation.platform = interface.platform
             simulation._platform_object = interface.to_comps_sim(simulation, num_cores, priority)
-            created_simulations.append(simulation._platform_object)
+            created_simulations.append(simulation)#._platform_object)
     if logger.isEnabledFor(DEBUG):
         logger.debug(f'Finished converting to COMPS. Starting saving of {len(simulations)}')
     COMPSSimulation.save_all(None, save_semaphore=COMPSSimulation.get_save_semaphore())
@@ -56,8 +56,8 @@ def comps_batch_worker(simulations: List[Simulation], interface: 'CompsPlatformS
         logger.debug(f'Finished saving of {len(simulations)}. Starting post_create')
     for simulation in created_simulations:
         # TODO Review area
-        simulation.uid = simulation.id
-        simulation.status = convert_comps_status(simulation.state)
+        simulation.uid = simulation._platform_object.id
+        simulation.status = convert_comps_status(simulation._platform_object.state)
         interface.post_create(simulation)
     if logger.isEnabledFor(DEBUG):
         logger.debug(f'Finished post-create of {len(simulations)}')
@@ -434,7 +434,9 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             po.refresh(QueryCriteria().select_children('configuration'))
         # simulation configuration for executable?
         if simulation.configuration and simulation.configuration.executable_path:
-            cli = f'{simulation.configuration.executable_path} {simulation.configuration.simulation_input_args.strip()}'
+            # TODO: needs review. This line is broken. Adding dummy stand-in for testing only
+            # cli = f'{simulation.configuration.executable_path} {simulation.configuration.simulation_input_args.strip()}'
+            cli = f'{simulation.configuration.executable_path}'
         elif po.configuration and po.configuration.executable_path:
             cli = f'{po.configuration.executable_path} {po.configuration.simulation_input_args.strip()}'
         if cli is None:

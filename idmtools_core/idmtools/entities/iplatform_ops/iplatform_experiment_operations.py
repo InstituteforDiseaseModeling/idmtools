@@ -179,7 +179,7 @@ class IPlatformExperimentOperations(ABC):
             if hasattr(experiment.simulations, 'base_simulation'):
                 experiment.simulations.base_simulation.assets = assets
             else:
-                for sim in experiment.__simulations:
+                for sim in experiment.simulations.items: # ck4, 7/27 altered from experiment.__simulations which was breaking
                     if sim.status is None:
                         sim.assets = assets
 

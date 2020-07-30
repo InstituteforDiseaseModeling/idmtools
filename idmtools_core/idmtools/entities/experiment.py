@@ -124,20 +124,21 @@ class Experiment(IAssetsEnabled, INamedEntity):
 
         '''
         # Gather the experiment level assets, if any
-        assets = self.gather_assets()  # TODO: this should gather info from asset collection id if available from a reload? Currently does nothing.
-
+        all_assets = self.gather_assets()  # TODO: this should gather info from asset collection id if available from a reload? Currently does nothing.
+        print('Exp GCA assets: %s' % all_assets.assets)
         # if it is a template, set task type on experiment
         if isinstance(self.simulations, ParentIterator) and isinstance(self.simulations.items, TemplatedSimulations):
-            self.simulations.items.base_task.gather_common_assets()
-            assets.add_assets(self.simulations.items.base_task.common_assets, fail_on_duplicate=False)
+            assets = self.simulations.items.base_task.gather_common_assets()
+            all_assets.add_assets(assets, fail_on_duplicate=False)
         elif self.gather_common_assets_from_task and isinstance(self.__simulations, List):
-            for sim in self.simulations:
+            for sim in self.simulations.items: # 7/24 ck4 possible fix
                 if sim.task:
                     # skip any simulations that have no task (reloaded). No gatherable task assets for them.
-                    assets = sim.task.gather_common_assets()
-                    if assets is not None:
-                        assets.add_assets(assets, fail_on_duplicate=False)
-        return assets
+                    sim_assets = sim.task.gather_common_assets()
+                    if sim_assets is not None:
+                        all_assets.add_assets(sim_assets, fail_on_duplicate=False)
+
+        return all_assets
 
     def pre_creation(self) -> None:
         """
@@ -440,17 +441,48 @@ class Experiment(IAssetsEnabled, INamedEntity):
         Returns:
             Nothing
         """
-        prior_assets = self.gather_all_assets()
 
+        for simulation in self.simulations.items:
+            print('pass 1 uid: %s' % simulation.id)
+
+        # TODO: ck4, 7/27 make sure that this method call will not gather sim-level assets on previously run simulations. Make sure to NOT change existing sim-level assets below.
+        prior_assets = self.gather_all_assets()  # 7/24 ck4 this line is modifying the uid is existing simulations
+        print('Gathered prior assets:')
+        for a in prior_assets.assets:
+            print('--- asset: %s' % a)
+        print('<<<')
         # merge existing simulations into the new simulations
-        existing_simulations = self.simulations  # .items
+
+        for simulation in self.simulations.items:
+            print('pass 2 uid: %s' % simulation.id)
+        existing_simulations = self.simulations.items  # ck4 7/24 edit, added items to force same-uid for same-sims
+        for simulation in self.simulations.items:
+            print('pass 3 uid: %s' % simulation.id)
+        # exit()
+
         self.simulations = simulations
-        for simulation in existing_simulations:
+        # July todo: adding the existing sims to the new ones is altering uid of the object. Should we keep the old one
+        # by setting sim._uid ? Testing indicates the change in uid does not appear to be due to assets, but need to be
+        # 100% sure. It is possible that iterating over the unknown sim container: existing simulations is making the
+        # changes
+        for simulation in existing_simulations: # ck4 7/24 edit, added items to force same-uid for same-sims
+            print('Re-adding existing sim: %s' % simulation.uid)
             # simulation.assets = simulation.gather_assets() # TODO: make this the right call; just a stand in for now
-            if simulation.task:
-                # if no task exists (reloaded sim) then there is no need to set assets on the sim
+
+            # ck4, block removed for testing, 7/27
+            if simulation.status is None and (simulation.assets is None or len(simulation.assets) == 0):
+            # if simulation.task:
+            #     print('--- sim %s has a task, setting assets to prior-computed all-assets' % simulation.uid)
+            #     # if no task exists (reloaded sim) then there is no need to set assets on the sim
                 simulation.assets = prior_assets
+                print('sim: %s -- Re-set assets to all prior assets' % simulation.id)
+
+            print('--- re-added sim. uid is now %s' % simulation.uid)
+            # print('--- sim uid % assets %s' % (simulation.uid, simulation.assets.assets))
             self.__simulations.append(simulation)
+            sims = self.__simulations # debug only, ck4, todo
+        return
+
 
     # Define this here for better completion in IDEs for end users
     @classmethod
