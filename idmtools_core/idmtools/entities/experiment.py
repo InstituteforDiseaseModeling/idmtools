@@ -4,7 +4,9 @@ from dataclasses import dataclass, field, InitVar, fields
 from logging import getLogger, DEBUG
 from types import GeneratorType
 from typing import NoReturn, Set, Union, Iterator, Type, Dict, Any, List, TYPE_CHECKING, Generator
+
 from tqdm import tqdm
+
 from idmtools.assets import AssetCollection, Asset
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType, EntityStatus
@@ -117,29 +119,6 @@ class Experiment(IAssetsEnabled, INamedEntity):
         from idmtools.utils.display import display, experiment_table_display
         display(self, experiment_table_display)
 
-    def gather_all_assets(self):
-        '''
-
-        Returns: An AssetCollection representing Experiment and Experiment-contained Simulation assets.
-
-        '''
-        # Gather the experiment level assets, if any
-        all_assets = self.gather_assets()  # TODO: this should gather info from asset collection id if available from a reload? Currently does nothing.
-        print('Exp GCA assets: %s' % all_assets.assets)
-        # if it is a template, set task type on experiment
-        if isinstance(self.simulations, ParentIterator) and isinstance(self.simulations.items, TemplatedSimulations):
-            assets = self.simulations.items.base_task.gather_common_assets()
-            all_assets.add_assets(assets, fail_on_duplicate=False)
-        elif self.gather_common_assets_from_task and isinstance(self.__simulations, List):
-            for sim in self.simulations.items: # 7/24 ck4 possible fix
-                if sim.task:
-                    # skip any simulations that have no task (reloaded). No gatherable task assets for them.
-                    sim_assets = sim.task.gather_common_assets()
-                    if sim_assets is not None:
-                        all_assets.add_assets(sim_assets, fail_on_duplicate=False)
-
-        return all_assets
-
     def pre_creation(self) -> None:
         """
         Experiment pre_creation callback
@@ -148,14 +127,13 @@ class Experiment(IAssetsEnabled, INamedEntity):
 
         """
         # Gather the assets
-        self.assets = self.gather_all_assets()
+        self.gather_assets()
 
         # to keep experiments clean, let's only do this is we have a special experiment class
         if self.__class__ is not Experiment:
             # Add a tag to keep the Experiment class name
             self.tags["experiment_type"] = f'{self.__class__.__module__}.{self.__class__.__name__}'
 
-        # TODO Review: This code to see if this works in merged
         # if it is a template, set task type on experiment
         if isinstance(self.simulations, ParentIterator) and isinstance(self.simulations.items, TemplatedSimulations):
             if logger.isEnabledFor(DEBUG):
@@ -265,9 +243,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
         return {"assets": AssetCollection(), "simulations": EntityContainer()}
 
     def gather_assets(self) -> NoReturn:
-        # raise NotImplementedError('TODO: Need to fill this in for sim-added-to-exp-issue to allow merging of existing/new assets')
-        assets = AssetCollection()
-        return assets
+        pass
 
     @classmethod
     def from_task(cls, task, name: str = None, tags: Dict[str, Any] = None, assets: AssetCollection = None,
@@ -430,59 +406,6 @@ class Experiment(IAssetsEnabled, INamedEntity):
         result['simulations'] = [s.id for s in self.simulations]
         result['_uid'] = self.uid
         return result
-
-    def add_new_simulations(self, simulations: Union[SUPPORTED_SIM_TYPE]):
-        """
-        Add simulations to an experiment, including pre-existing experiments.
-
-        Args:
-            simulations: Any simulation containing object containing builders/sims to add to the experiment
-
-        Returns:
-            Nothing
-        """
-
-        for simulation in self.simulations.items:
-            print('pass 1 uid: %s' % simulation.id)
-
-        # TODO: ck4, 7/27 make sure that this method call will not gather sim-level assets on previously run simulations. Make sure to NOT change existing sim-level assets below.
-        prior_assets = self.gather_all_assets()  # 7/24 ck4 this line is modifying the uid is existing simulations
-        print('Gathered prior assets:')
-        for a in prior_assets.assets:
-            print('--- asset: %s' % a)
-        print('<<<')
-        # merge existing simulations into the new simulations
-
-        for simulation in self.simulations.items:
-            print('pass 2 uid: %s' % simulation.id)
-        existing_simulations = self.simulations.items  # ck4 7/24 edit, added items to force same-uid for same-sims
-        for simulation in self.simulations.items:
-            print('pass 3 uid: %s' % simulation.id)
-        # exit()
-
-        self.simulations = simulations
-        # July todo: adding the existing sims to the new ones is altering uid of the object. Should we keep the old one
-        # by setting sim._uid ? Testing indicates the change in uid does not appear to be due to assets, but need to be
-        # 100% sure. It is possible that iterating over the unknown sim container: existing simulations is making the
-        # changes
-        for simulation in existing_simulations: # ck4 7/24 edit, added items to force same-uid for same-sims
-            print('Re-adding existing sim: %s' % simulation.uid)
-            # simulation.assets = simulation.gather_assets() # TODO: make this the right call; just a stand in for now
-
-            # ck4, block removed for testing, 7/27
-            if simulation.status is None and (simulation.assets is None or len(simulation.assets) == 0):
-            # if simulation.task:
-            #     print('--- sim %s has a task, setting assets to prior-computed all-assets' % simulation.uid)
-            #     # if no task exists (reloaded sim) then there is no need to set assets on the sim
-                simulation.assets = prior_assets
-                print('sim: %s -- Re-set assets to all prior assets' % simulation.id)
-
-            print('--- re-added sim. uid is now %s' % simulation.uid)
-            # print('--- sim uid % assets %s' % (simulation.uid, simulation.assets.assets))
-            self.__simulations.append(simulation)
-            sims = self.__simulations # debug only, ck4, todo
-        return
-
 
     # Define this here for better completion in IDEs for end users
     @classmethod

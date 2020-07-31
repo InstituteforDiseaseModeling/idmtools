@@ -174,16 +174,8 @@ class IPlatformExperimentOperations(ABC):
         # ensure the item is created before running
         if experiment.status is None:
             self.create(experiment, **kwargs)
-        else:
-            assets = experiment.gather_all_assets()
-            if hasattr(experiment.simulations, 'base_simulation'):
-                experiment.simulations.base_simulation.assets = assets
-            else:
-                for sim in experiment.simulations.items: # ck4, 7/27 altered from experiment.__simulations which was breaking
-                    if sim.status is None:
-                        sim.assets = assets
 
-        # ensure simulations have been created and that their assets/additional files are sent
+        # check sims
         logger.debug("Ensuring simulations exist")
         if isinstance(experiment.simulations, (GeneratorType, Iterator)):
             experiment.simulations = self.platform._create_items_of_type(experiment.simulations, ItemType.SIMULATION)

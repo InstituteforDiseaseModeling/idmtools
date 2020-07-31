@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field, fields
 from logging import getLogger, DEBUG
 from typing import List, Callable, NoReturn, Union, Mapping, Any, Type, TypeVar, Dict, TYPE_CHECKING
+
 from idmtools.assets import AssetCollection, Asset
 from idmtools.core import ItemType, NoTaskFound
 from idmtools.core.enums import EntityStatus
@@ -8,6 +9,7 @@ from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.core.interfaces.inamed_entity import INamedEntity
 from idmtools.entities.task_proxy import TaskProxy
 from idmtools.utils.language import get_qualified_class_name_from_obj
+
 if TYPE_CHECKING:
     from idmtools.entities.itask import ITask
     from idmtools.entities.iplatform import IPlatform
@@ -29,13 +31,11 @@ class Simulation(IAssetsEnabled, INamedEntity):
     #: Item Type. Should not be changed from Simulation
     item_type: ItemType = field(default=ItemType.SIMULATION, compare=False)
     #: List of hooks that we can modify to add additional behaviour before creation of simulations
-    pre_creation_hooks: List[Callable[[], NoReturn]] = field(default_factory=lambda: [Simulation.gather_additional_files])
+    pre_creation_hooks: List[Callable[[], NoReturn]] = field(default_factory=lambda: [Simulation.gather_assets])
     #: Control whether we should replace the task with a proxy after creation
     __replace_task_with_proxy: bool = field(default=True, init=False, compare=False)
     #: Ensure we don't gather assets twice
-    __additional_files_gathered: bool = field(default=False)
-    #: Additional files to be added to the simulation
-    additional_files: AssetCollection = field(default=AssetCollection(), compare=False)
+    __assets_gathered: bool = field(default=False)
 
     @property
     def experiment(self) -> 'Experiment':  # noqa: F821
@@ -92,8 +92,6 @@ class Simulation(IAssetsEnabled, INamedEntity):
             if logger.isEnabledFor(DEBUG):
                 logger.debug('Replacing task with proxy')
             self.task = TaskProxy.from_task(self.task)
-
-        # provide a default status if none was provided during creation
         if self.status is None:
             self.status = EntityStatus.CREATED
 
@@ -106,16 +104,13 @@ class Simulation(IAssetsEnabled, INamedEntity):
         return {"assets": AssetCollection(), "simulations": EntityContainer()}
 
     def gather_assets(self):
-        pass
-
-    def gather_additional_files(self):
         """
-        Gather the additional, per-simulation files/transient assets.
+        Gather all the assets for the simulation.
         """
-        if not self.__additional_files_gathered:
+        if not self.__assets_gathered:
             self.task.gather_transient_assets()
-            self.additional_files = self.task.transient_assets
-        self.__additional_files_gathered = True
+            self.assets.add_assets(self.task.transient_assets, fail_on_duplicate=False)
+        self.__assets_gathered = True
 
     @classmethod
     def from_task(cls, task: 'ITask', tags: Dict[str, Any] = None,  # noqa E821
