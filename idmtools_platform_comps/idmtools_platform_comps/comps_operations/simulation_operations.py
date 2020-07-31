@@ -4,8 +4,10 @@ from functools import partial
 from logging import getLogger, DEBUG
 from typing import Any, List, Dict, Type, Optional, TYPE_CHECKING
 from uuid import UUID
+
 from COMPS.Data import Simulation as COMPSSimulation, QueryCriteria, Experiment as COMPSExperiment, SimulationFile, \
     Configuration
+
 from idmtools.assets import AssetCollection, Asset
 from idmtools.core import ItemType
 from idmtools.core.task_factory import TaskFactory
@@ -54,10 +56,9 @@ def comps_batch_worker(simulations: List[Simulation], interface: 'CompsPlatformS
     COMPSSimulation.save_all(None, save_semaphore=COMPSSimulation.get_save_semaphore())
     if logger.isEnabledFor(DEBUG):
         logger.debug(f'Finished saving of {len(simulations)}. Starting post_create')
-    for simulation in created_simulations:
-        # TODO Review area
-        simulation.uid = simulation._platform_object.id
-        simulation.status = convert_comps_status(simulation._platform_object.state)
+    for simulation in simulations:
+        simulation.uid = simulation.get_platform_object().id
+        simulation.status = convert_comps_status(simulation.get_platform_object().state)
         interface.post_create(simulation)
     if logger.isEnabledFor(DEBUG):
         logger.debug(f'Finished post-create of {len(simulations)}')
@@ -135,11 +136,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             configuration=config
         )
 
-        if len(simulation.assets.assets) > 0:
-            # only send simulation-level assets if there are any set. Otherwise we'll stick with the experiment assets
-            self.send_assets(simulation=simulation, comps_sim=s)
-        self.send_additional_files(simulation=simulation, comps_sim=s)
-
+        self.send_assets(simulation, s)
         s.set_tags(simulation.tags)
         simulation._platform_object = self.platform
         return s
@@ -219,8 +216,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         pass
 
     def send_assets(self, simulation: Simulation, comps_sim: Optional[COMPSSimulation] = None,
-                    add_metadata: bool = True,
-                    **kwargs):
+                    add_metadata: bool = False, **kwargs):
         """
         Send assets to Simulation
 
@@ -233,25 +229,6 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         Returns:
             None
         """
-        if simulation.assets.count == 0:
-            return
-
-        if comps_sim is None:
-            comps_sim = simulation.get_platform_object()
-
-        ac = self.platform._assets.create(simulation.assets)
-
-        # associate the assets with the simulation in COMPS
-        if not comps_sim.configuration:
-            comps_sim.configuration = Configuration()
-        comps_sim.configuration._asset_collection_id = ac.id
-        comps_sim.save()
-        if logger.isEnabledFor(DEBUG):
-            logger.debug(f'Asset collection for simulation: {comps_sim.id} is: {ac.id}')
-
-    # TODO - Check API and deploy for all
-    def send_additional_files(self, simulation: Simulation, comps_sim: COMPSSimulation = None,
-                              add_metadata: bool = True, **kwargs):
         if comps_sim is None:
             comps_sim = simulation.get_platform_object()
         for asset in simulation.assets:
@@ -262,15 +239,12 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             if logger.isEnabledFor(DEBUG):
                 logger.debug("Creating idmtools metadata for simulation and task on COMPS")
             # later we should add some filtering for passwords and such here in case anything weird happens
-            metadata = json.dumps(simulation.to_dict()['task'], cls=IDMJSONEncoder)
+            metadata = json.dumps(simulation.task.to_dict(), cls=IDMJSONEncoder)
             from idmtools import __version__
             comps_sim.add_file(
                 SimulationFile("idmtools_metadata.json", 'input', description=f'IDMTools {__version__}'),
                 data=metadata.encode()
             )
-        for af in simulation.additional_files:
-            comps_sim.add_file(simulationfile=SimulationFile(af.filename, 'input'), data=af.bytes)
-
 
     def refresh_status(self, simulation: Simulation, additional_columns: Optional[List[str]] = None, **kwargs):
         """
@@ -430,9 +404,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             po.refresh(QueryCriteria().select_children('configuration'))
         # simulation configuration for executable?
         if simulation.configuration and simulation.configuration.executable_path:
-            # TODO: needs review. This line is broken. Adding dummy stand-in for testing only
-            # cli = f'{simulation.configuration.executable_path} {simulation.configuration.simulation_input_args.strip()}'
-            cli = f'{simulation.configuration.executable_path}'
+            cli = f'{simulation.configuration.executable_path} {simulation.configuration.simulation_input_args.strip()}'
         elif po.configuration and po.configuration.executable_path:
             cli = f'{po.configuration.executable_path} {po.configuration.simulation_input_args.strip()}'
         if cli is None:
