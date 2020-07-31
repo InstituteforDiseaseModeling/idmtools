@@ -118,7 +118,7 @@ def main():
     ac = AssetCollection()
     tags = {MD5_KEY: md5_str}
     ac.set_tags(tags)
-    experiment_path = unc_path_to_docker_path(comps_sim.hpc_jobs[-1].working_directory)
+    experiment_path = comps_sim.hpc_jobs[-1].working_directory
 
     # Create asset collection
     path_to_ac = 'L'
