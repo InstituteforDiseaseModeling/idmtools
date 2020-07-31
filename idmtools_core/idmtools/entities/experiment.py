@@ -4,7 +4,9 @@ from dataclasses import dataclass, field, InitVar, fields
 from logging import getLogger, DEBUG
 from types import GeneratorType
 from typing import NoReturn, Set, Union, Iterator, Type, Dict, Any, List, TYPE_CHECKING, Generator
+
 from tqdm import tqdm
+
 from idmtools.assets import AssetCollection, Asset
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType, EntityStatus
@@ -75,6 +77,29 @@ class Experiment(IAssetsEnabled, INamedEntity):
         if self.gather_common_assets_from_task is None:
             self.gather_common_assets_from_task = isinstance(self.simulations.items, EntityContainer)
         self.__simulations.parent = self
+
+    def post_creation(self) -> None:
+        pass
+
+    @property
+    def status(self):
+        if len(self.simulations.items) == 0 or all([s.status is None for s in self.simulations.items]):
+            status = None  # this will trigger experiment creation on a platform
+        elif any([s.status == EntityStatus.FAILED for s in self.simulations.items]):
+            status = EntityStatus.FAILED
+        elif all([s.status == EntityStatus.SUCCEEDED for s in self.simulations.items]):
+            status = EntityStatus.SUCCEEDED
+        elif any([s.status == EntityStatus.RUNNING for s in self.simulations.items]):
+            status = EntityStatus.RUNNING
+        else:
+            status = EntityStatus.CREATED
+        return status
+
+    @status.setter
+    def status(self, value):
+        # this method is needed because dataclasses will always try to set each field, even if not allowed to in
+        # the case of Experiment.
+        logger.warning('Experiment status cannot be directly altered. Status unchanged.')
 
     def __repr__(self):
         return f"<Experiment: {self.uid} - {self.name} / Sim count {len(self.simulations) if self.simulations else 0}>"
@@ -217,8 +242,8 @@ class Experiment(IAssetsEnabled, INamedEntity):
         from idmtools.assets import AssetCollection
         return {"assets": AssetCollection(), "simulations": EntityContainer()}
 
-    def gather_assets(self) -> NoReturn:
-        pass
+    def gather_assets(self) -> AssetCollection():
+        return self.assets
 
     @classmethod
     def from_task(cls, task, name: str = None, tags: Dict[str, Any] = None, assets: AssetCollection = None,

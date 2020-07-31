@@ -271,11 +271,12 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             None
         """
         if experiment.assets.count == 0:
-            logger.warning('Experiment has not assets')
+            logger.warning('Experiment has no assets to send')
             return
 
         ac = self.platform._assets.create(experiment.assets)
-        print("Asset collection for experiment: {}".format(ac.id))
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f'Asset collection for experiment: {experiment.id} is: {ac.id}')
 
         # associate the assets with the experiment in COMPS
         e = COMPSExperiment.get(id=experiment.uid)
@@ -316,7 +317,6 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         if experiment.suite_id is None:
             suite = kwargs.get('suite')
         else:
-            # did we have the parent?
             if parent:
                 suite = parent
             else:
@@ -330,7 +330,6 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         obj._platform_object = experiment
         # Set parent
         obj.parent = suite
-
         # Set the correct attributes
         obj.uid = experiment.id
         obj.comps_experiment = experiment
@@ -354,8 +353,8 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
                 obj.simulations.append(
                     self.platform._simulations.to_entity(s, parent=obj, **kwargs)
                 )
-
         return obj
+
 
     def get_assets_from_comps_experiment(self, experiment: COMPSExperiment) -> Optional[AssetCollection]:
         if experiment.configuration and experiment.configuration.asset_collection_id:

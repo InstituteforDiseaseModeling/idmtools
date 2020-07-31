@@ -4,8 +4,10 @@ from functools import partial
 from logging import getLogger, DEBUG
 from typing import Any, List, Dict, Type, Optional, TYPE_CHECKING
 from uuid import UUID
+
 from COMPS.Data import Simulation as COMPSSimulation, QueryCriteria, Experiment as COMPSExperiment, SimulationFile, \
     Configuration
+
 from idmtools.assets import AssetCollection, Asset
 from idmtools.core import ItemType
 from idmtools.core.task_factory import TaskFactory
@@ -48,7 +50,7 @@ def comps_batch_worker(simulations: List[Simulation], interface: 'CompsPlatformS
             interface.pre_create(simulation)
             simulation.platform = interface.platform
             simulation._platform_object = interface.to_comps_sim(simulation, num_cores, priority)
-            created_simulations.append(simulation._platform_object)
+            created_simulations.append(simulation)
     if logger.isEnabledFor(DEBUG):
         logger.debug(f'Finished converting to COMPS. Starting saving of {len(simulations)}')
     COMPSSimulation.save_all(None, save_semaphore=COMPSSimulation.get_save_semaphore())

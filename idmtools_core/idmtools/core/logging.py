@@ -136,8 +136,8 @@ def exclude_logging_classes(items_to_exclude=None):
     if items_to_exclude is None:
         items_to_exclude = ['urllib3', 'COMPS', 'paramiko', 'matplotlib']
     # remove comps by default
-    for logger in items_to_exclude:
-        other_logger = getLogger(logger)
+    for item in items_to_exclude:
+        other_logger = getLogger(item)
         other_logger.setLevel(logging.WARN)
 
 

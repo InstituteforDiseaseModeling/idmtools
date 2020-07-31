@@ -77,7 +77,7 @@ class WorkersContainer(BaseServiceContainer):
         }
         environment = [f'REDIS_URL=redis://idmtools_redis:{self.redis_port}',
                        f'HOST_DATA_PATH={data_dir}',
-                       f'SQLALCHEMY_DATABASE_URI='
+                       'SQLALCHEMY_DATABASE_URI='
                        f'postgresql+psycopg2://idmtools:idmtools@idmtools_postgres:{self.postgres_port}/idmtools']
 
         if platform.system() in ["Linux", "Darwin"]:
@@ -87,7 +87,7 @@ class WorkersContainer(BaseServiceContainer):
             environment.append('API_LOGGING=1')
 
         if self.data_volume_name:
-            environment.append('IDMTOOLS_WORKERS_DATA_MOUNT_BY_VOLUMENAME=self.data_volume_name')
+            environment.append(f'IDMTOOLS_WORKERS_DATA_MOUNT_BY_VOLUMENAME={self.data_volume_name}')
 
         port_bindings = self._get_optional_port_bindings(self.ui_port, 5000)
         container_config = self.get_common_config(container_name=self.container_name, image=self.image,

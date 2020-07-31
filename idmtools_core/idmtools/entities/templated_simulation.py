@@ -3,12 +3,15 @@ from dataclasses import dataclass, field, fields, InitVar
 from functools import partial
 from itertools import chain
 from typing import Set, Generator, Dict, Any, List, TYPE_CHECKING
+
 from more_itertools import grouper
+
 from idmtools.builders.simulation_builder import SimulationBuilder
 from idmtools.entities.itask import ITask
 from idmtools.entities.simulation import Simulation
 from idmtools.utils.collections import ResetGenerator
 from idmtools.utils.hashing import ignore_fields_in_dataclass_on_pickle
+
 if TYPE_CHECKING:
     from idmtools.entities.experiment import Experiment
 
@@ -185,6 +188,9 @@ class TemplatedSimulations:
         Add ignored fields back since they don't exist in the pickle
         """
         self.__dict__.update(state)
+
+    def __len__(self):
+        return sum([len(b) for b in self.builders]) + len(self.__extra_simulations)
 
     @classmethod
     def from_task(cls, task: ITask, tags: Dict[str, Any] = None) -> 'TemplatedSimulations':

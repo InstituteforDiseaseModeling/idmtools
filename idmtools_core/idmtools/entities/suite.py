@@ -36,11 +36,8 @@ class Suite(INamedEntity, ABC):
         if experiment.uid in ids:
             return
 
-        # Link the suite to the experiment
+        # Link the suite to the experiment. Assumes the experiment suite setter adds the experiment to the suite.
         experiment.suite = self
-
-        # Add the experiment to the list
-        self.experiments.append(experiment)
 
     def display(self):
         from idmtools.utils.display import display, suite_table_display

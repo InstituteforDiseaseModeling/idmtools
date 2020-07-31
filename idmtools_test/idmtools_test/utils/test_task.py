@@ -13,6 +13,7 @@ from idmtools.registry.task_specification import TaskSpecification
 class TestTask(ITask):
     command: CommandLine = field(default=CommandLine('echo this is a test'), metadata={"md": True})
     parameters: dict = field(default_factory=lambda: {}, metadata={"md": True})
+    common_asset_paths: list = field(default_factory=lambda: [])
 
     __test__ = False  # Hide from test discovery
 
@@ -39,7 +40,9 @@ class TestTask(ITask):
         self.parameters.update(params)
 
     def gather_common_assets(self) -> AssetCollection:
-        pass
+        # modified for test (uid hashing means changing uids) copied version from python_task.py
+        assets = [Asset(absolute_path=path) for path in self.common_asset_paths]
+        return AssetCollection(assets=assets)
 
     def gather_transient_assets(self) -> AssetCollection:
         if not self.transient_assets.has_asset("config.json"):
