@@ -242,8 +242,8 @@ class Experiment(IAssetsEnabled, INamedEntity):
         from idmtools.assets import AssetCollection
         return {"assets": AssetCollection(), "simulations": EntityContainer()}
 
-    def gather_assets(self) -> NoReturn:
-        pass
+    def gather_assets(self) -> AssetCollection():
+        return self.assets
 
     @classmethod
     def from_task(cls, task, name: str = None, tags: Dict[str, Any] = None, assets: AssetCollection = None,
