@@ -40,24 +40,9 @@ class TestTask(ITask):
         self.parameters.update(params)
 
     def gather_common_assets(self) -> AssetCollection:
-        # ck4 7/27 replacing this with section from python_task.py
-        # assets = [Asset(absolute_path=path) for path in self.common_asset_paths]
-        # return AssetCollection(assets=assets)
-
-        # ensure that assets is in collection
-        # self._task_log.info('Adding Common asset from %s', self.script_path)
-
-        # # copied version from python_task.py
-        # for path in self.common_asset_paths:
-        #     self.common_assets.add_or_replace_asset(Asset(absolute_path=path))
-        # return self.common_assets
-
         # modified for test (uid hashing means changing uids) copied version from python_task.py
         assets = [Asset(absolute_path=path) for path in self.common_asset_paths]
         return AssetCollection(assets=assets)
-
-
-
 
     def gather_transient_assets(self) -> AssetCollection:
         if not self.transient_assets.has_asset("config.json"):

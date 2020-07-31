@@ -48,7 +48,7 @@ def comps_batch_worker(simulations: List[Simulation], interface: 'CompsPlatformS
             interface.pre_create(simulation)
             simulation.platform = interface.platform
             simulation._platform_object = interface.to_comps_sim(simulation, num_cores, priority)
-            created_simulations.append(simulation)#._platform_object)
+            created_simulations.append(simulation)
     if logger.isEnabledFor(DEBUG):
         logger.debug(f'Finished converting to COMPS. Starting saving of {len(simulations)}')
     COMPSSimulation.save_all(None, save_semaphore=COMPSSimulation.get_save_semaphore())
@@ -233,10 +233,6 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         Returns:
             None
         """
-        # TODO: DO we need this still?
-        #if simulation.assets.count == 0:
-        #    return
-        #
         if simulation.assets.count == 0:
             return
 
