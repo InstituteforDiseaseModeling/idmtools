@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""The setup script for the idmtools_platform_comps platform, for users who use the COMPS platform for IDM-Tools."""
+"""The setup script for the idmtools_platform_comps platform, for users who use the COMPS platform for idmtools."""
 from setuptools import setup, find_packages
 
 with open('README.md', encoding='utf-8') as readme_file:
@@ -48,5 +48,5 @@ setup(
                       ),
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='1.2.0+nightly'
+    version='1.3.0+nightly'
 )

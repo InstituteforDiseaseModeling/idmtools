@@ -40,10 +40,10 @@ class IEntity(IItem, metaclass=ABCMeta):
     @classmethod
     def from_id(cls, item_id: Union[str, UUID], platform: 'IPlatform' = None, **kwargs) -> 'IEntity':  # noqa E821
         if platform is None:
-            from idmtools.core.context import current_platform
-            if current_platform is None:
+            from idmtools.core.context import CURRENT_PLATFORM
+            if CURRENT_PLATFORM is None:
                 raise ValueError("You have to specify a platfrom to load the asset collection from")
-            platform = current_platform
+            platform = CURRENT_PLATFORM
         if cls.item_type is None:
             raise EnvironmentError("ItemType is None. This is most likely a badly derived IEntity "
                                    "that doesn't run set the default item type on the class")
@@ -116,10 +116,10 @@ class IEntity(IItem, metaclass=ABCMeta):
         if self.platform is None:
             # check context for current platform
             if platform is None:
-                from idmtools.core.context import current_platform
-                if current_platform is None:
+                from idmtools.core.context import CURRENT_PLATFORM
+                if CURRENT_PLATFORM is None:
                     raise NoPlatformException("No Platform defined on object, in current context, or passed to run")
-                platform = current_platform
+                platform = CURRENT_PLATFORM
             self.platform = platform
         return self.platform
 

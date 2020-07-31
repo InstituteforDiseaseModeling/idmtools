@@ -14,7 +14,7 @@ class BaseAnalyzer {
 }
 
 note top of IAnalyzer
-IDM-Tools
+idmtools
 end note
 
 class IAnalyzer {

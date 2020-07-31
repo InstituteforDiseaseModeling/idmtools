@@ -9,10 +9,12 @@ PDS=$(PY) ../dev_scripts/
 PDR=$(PDS)run.py
 CLDIR=$(PDS)clean_dir.py
 CWD=$($(IPY) "import os; print(os.getcwd())")
-TEST_COMMAND=py.test --durations=10 -v --junitxml=test_results.xml
 TEST_RUN_OPTS=-e DOCKER_REPO=idm-docker-staging NO_SPINNER=1
-FULL_TEST_CMD=$(PDR) -w 'tests' $(TEST_RUN_OPTS) -ex '$(TEST_COMMAND)
-COVERAGE_CMD=$(PDR) -w 'tests' $(TEST_RUN_OPTS) -p . ../ -ex 'coverage run --omit="*/test*,*/setup.py" --source ../,../../idmtools_core,../../idmtools_models -m pytest
+TEST_COMMAND=py.test --durations=10 -v --junitxml=test_results.xml
+TEST_CMD_OPTS?=
+FULL_TEST_CMD=$(PDR) -w 'tests' $(TEST_RUN_OPTS) -ex '$(TEST_COMMAND) $(TEST_CMD_OPTS)'
+COVERAGE_CMD=$(PDR) -w 'tests' $(TEST_RUN_OPTS) -p . ../ -ex 'coverage run --omit="*/test*,*/setup.py" --source ../,../../idmtools_core,../../idmtools_models -m pytest $(COVERAGE_CMD_OPTS)'
+COVERAGE_CMD_OPTS?=
 DOCKER_VERSION=$($(IPY) "print(")
 help:
 	$(PDS)get_help_from_makefile.py
@@ -34,36 +36,45 @@ lint: ## check style with flake8
 	$(PDR) -w '..' -ex 'flake8 --ignore=E501,W291 $(PACKAGE_NAME)'
 
 test: ## Run our tests
-	$(FULL_TEST_CMD) -m "not comps and not docker"'
+	$(eval TEST_CMD_OPTS=-m "not comps and not docker")
+	$(FULL_TEST_CMD)
 
 test-all: ## Run all our tests
-	$(FULL_TEST_CMD)'
+	$(FULL_TEST_CMD)
 
 test-failed: ## Run only previously failed tests
-	$(FULL_TEST_CMD) --lf'
+	$(eval TEST_CMD_OPTS=--lf)
+	$(FULL_TEST_CMD)
 
 test-long: ## Run any tests that takes more than 30s
-	$(FULL_TEST_CMD) -m "long"'
+	$(eval TEST_CMD_OPTS=-m "long")
+	$(FULL_TEST_CMD)
 
 test-no-long: ## Run any tests that takes less than 30s
-	$(FULL_TEST_CMD) -m "not long"'
+	$(eval TEST_CMD_OPTS=-m "not long")
+	$(FULL_TEST_CMD)
 
 test-comps: ## Run our comps tests
-	$(FULL_TEST_CMD) -m "comps"'
+	$(eval TEST_CMD_OPTS=-m "comps")
+	$(FULL_TEST_CMD)
 
 test-docker: ## Run our docker tests
-	$(FULL_TEST_CMD) -m "docker"'
+	$(eval TEST_CMD_OPTS=-m "docker")
+	$(FULL_TEST_CMD)
 
 test-python: ## Run our python tests
-	$(FULL_TEST_CMD) -m "python"'
+	$(eval TEST_CMD_OPTS=-m "python")
+	$(FULL_TEST_CMD)
 
 test-smoke: ## Run our smoke tests
-	$(FULL_TEST_CMD) -m "smoke"'
+	$(eval TEST_CMD_OPTS=-m "smoke")
+	$(FULL_TEST_CMD)
 
 coverage: ## Generate a code-coverage report
 	@make clean
 	# We have to run in our tests folder to use the proper config
-	$(COVERAGE_CMD) -m "not comps and not docker"'
+	$(eval COVERAGE_CMD_OPTS=-m "not comps and not docker")
+	$(COVERAGE_CMD)
 	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
 	coverage report -m
 	coverage html -i

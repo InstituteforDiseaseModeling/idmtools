@@ -2,7 +2,7 @@ import os
 import re
 import sys
 import unicodedata
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timezone, timedelta
 from typing import Optional, Type
 
@@ -21,16 +21,16 @@ user_logger = getLogger('user')
 
 @dataclass
 class DockerTask(ITask):
-    image_name: str = None
+    image_name: str = field(default=None, metadata={"md": True})
     # Optional config to build the docker image
-    build: bool = False
-    build_path: Optional[str] = None
+    build: bool = field(default=False, metadata={"md": True})
+    build_path: Optional[str] = field(default=None, metadata={"md": True})
     # This should in the build_path directory
-    Dockerfile: Optional[str] = None
-    pull_before_build: bool = True
-    use_nvidia_run: bool = False
+    Dockerfile: Optional[str] = field(default=None, metadata={"md": True})
+    pull_before_build: bool = field(default=True, metadata={"md": True})
+    use_nvidia_run: bool = field(default=False, metadata={"md": True})
 
-    __image_built: bool = False
+    __image_built: bool = field(default=False)
 
     def __post_init__(self):
         super().__post_init__()

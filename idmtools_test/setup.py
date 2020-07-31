@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""The setup script for the idmtools_test module to run extended tests and provide demo date for IDM-Tools tests."""
+"""The setup script for the idmtools_test module to run extended tests and provide demo date for idmtools tests."""
 
 from setuptools import setup, find_packages
 
@@ -46,6 +46,6 @@ setup(
                       ),
     test_suite='tests',
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='1.2.0+nightly',
+    version='1.3.0+nightly',
     zip_safe=False
 )

@@ -347,7 +347,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         Args:
             platform_item: Child item
-            raw: Return a platform item if True, an idm-tools entity if false
+            raw: Return a platform item if True, an idmtools entity if false
             **kwargs: Additional platform specific parameters
 
         Returns:

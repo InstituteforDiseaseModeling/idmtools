@@ -28,19 +28,20 @@ class TemplatedScriptTask(ITask):
     Defines a task to run a script using a template. Best suited to shell scripts
     """
     #: Name of script
-    script_path: str = field(default=None)
+    script_path: str = field(default=None, metadata={"md": True})
     #: The template contents
-    template: str = field(default=None)
+    template: str = field(default=None, metadata={"md": True})
     #: The template file. You can only use either template or template_file at once
-    template_file: str = field(default=None)
+    template_file: str = field(default=None, metadata={"md": True})
     #: Controls whether a template should be an experiment or a simulation level asset
-    template_is_common: bool = field(default=True)
+    template_is_common: bool = field(default=True, metadata={"md": True})
     #: Template variables used for rendering the template
-    variables: Dict[str, Any] = field(default_factory=dict)
+    # Note: large amounts of variables will increase metadata size
+    variables: Dict[str, Any] = field(default_factory=dict, metadata={"md": True})
     #: Platform Path Separator. For Windows execution platforms, use \, otherwise use the default of /
-    path_sep: str = field(default='/')
+    path_sep: str = field(default='/', metadata={"md": True})
     #: Extra arguments to add to the command line
-    extra_command_arguments: str = field(default='')
+    extra_command_arguments: str = field(default='', metadata={"md": True})
 
     #: Hooks to gather common assets
     gather_common_asset_hooks: List[Callable[[ITask], AssetCollection]] = field(default_factory=list)
@@ -267,6 +268,12 @@ class ScriptWrapperTask(ITask):
     def post_creation(self, parent: Union[Simulation, IWorkflowItem]):
         self.task.post_creation(parent)
         self.template_script_task.post_creation(parent)
+
+    def __getattr__(self, item):
+        if item not in self.__dict__:
+            return getattr(self.task, item)
+        else:
+            return super(ScriptWrapperTask, self).__getattr__(item)
 
 
 def get_script_wrapper_task(task: ITask, wrapper_script_name: str, template_content: str = None,

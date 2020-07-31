@@ -87,8 +87,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'IDM-Tools'
-copyright = u'2020, Intellectual Ventures Management, LLC (IVM). All rights reserved'
+project = u'idmtools'
+copyright = u'2020, Bill & Melinda Gates Foundation. All rights reserved.'
 author = u'Institute for Disease Modeling'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -296,7 +296,7 @@ html_use_opensearch = 'www.idmod.org/docs/'
 # html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'IDM-Tools'
+htmlhelp_basename = 'idmtools'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -322,7 +322,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'idm-tools-docs.tex', u'IDM-Tools',
+    (master_doc, 'idmtools-docs.tex', u'idmtools',
      u'Institute for Disease Modeling', 'manual'),
 ]
 
@@ -364,7 +364,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'idm-tools-docs', u'IDM-Tools',
+    (master_doc, 'idmtools-docs', u'idmtools',
      [author], 1)
 ]
 
@@ -378,8 +378,8 @@ man_show_urls = True
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'idm-tools-docs', u'IDM-Tools',
-     author, 'Institute for Disease Modeling', 'How to use IDM-Tools for disease simulations.',
+    (master_doc, 'idmtools-docs', u'idmtools',
+     author, 'Institute for Disease Modeling', 'How to use idmtools for disease simulations.',
      'Miscellaneous'),
 ]
 
