@@ -1,3 +1,4 @@
+import compileall
 import glob
 import os
 import subprocess
@@ -37,22 +38,12 @@ def install_packages_from_requirements(python_paths=None):
          f"{INDEX_URL}"], env=env)
 
 
-def clean_pyc():
-    print("Removing pyc files")
-    pool = ThreadPoolExecutor()
-    for filename in glob.glob(f"{LIBRARY_PATH}{os.path.sep}**.pyc"):
-        print(f"Removing {filename}")
-        pool.submit(os.remove, filename)
-    pool.shutdown(True)
-    print(f'Pyc Files Remaining: {len(glob.glob(f"{LIBRARY_PATH}{os.path.sep}**.pyc"))}')
-
-
 def set_python_dates():
     print("Updating file dates")
     pool = ThreadPoolExecutor()
     date = datetime(year=2020, month=1, day=1, hour=0, minute=0, second=0)
     mod_time = time.mktime(date.timetuple())
-    for filename in glob.glob(f"{LIBRARY_PATH}{os.path.sep}**.py"):
+    for filename in glob.glob(f"{LIBRARY_PATH}{os.path.sep}**/*.py", recursive=True):
         print(f"Updating date on {filename}")
         pool.submit(os.utime, filename, (mod_time, mod_time))
     pool.shutdown(True)
@@ -68,9 +59,9 @@ def compile_all(python_paths=None):
 
         env = dict(os.environ)
         env['PYTHONPATH'] = os.pathsep.join(python_paths)
-    print(f'Running {" ".join([sys.executable, "-m", "compileall", LIBRARY_PATH])}')
-    subprocess.check_call([sys.executable, "-m", "compileall", LIBRARY_PATH], env=env)
-    print(f'Pyc Files Generated: {len(glob.glob(f"{LIBRARY_PATH}{os.path.sep}**.pyc"))}')
+    print(f'Compiling {LIBRARY_PATH}')
+    compileall.compile_dir(LIBRARY_PATH, force=True)
+    print(f'Pyc Files Generated: {len(glob.glob(f"{LIBRARY_PATH}{os.path.sep}**/*.pyc", recursive=True))}')
 
 
 if __name__ == "__main__":
@@ -91,7 +82,6 @@ if __name__ == "__main__":
     tb = None
     try:
         install_packages_from_requirements(sys.path)
-        clean_pyc()
         set_python_dates()
         compile_all(sys.path)
     except Exception:

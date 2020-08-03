@@ -38,7 +38,7 @@ def build_asset_file_list(comps_sim, prefix=LIBRARY_ROOT_PREFIX):
     for root, _, filenames in os.walk(prefix):
         for filename in filenames:
             asset = AssetCollectionFile(file_name=os.path.basename(filename),
-                                        relative_path=os.path.join("site-packages", root.replace(prefix, "")),
+                                        relative_path=os.path.join("site-packages", root.replace(prefix, "")).strip("/"),
                                         md5_checksum=calculate_md5(os.path.join(root, filename))
                                         )
             output.append(asset)
@@ -111,7 +111,7 @@ def main():
 
     # Output files
     max_files = 10
-    print('Display the fist 10 files:\n', asset_files[0:max_files])
+    print('Display the fist 10 files:\n', "\n".join([f"{a.relative_path}/{a.file_name}" for a in asset_files[0:max_files]]))
 
     ac = AssetCollection()
     tags = {MD5_KEY: md5_str}
@@ -141,7 +141,8 @@ def main():
             else:
                 ac2.add_asset(acf)
 
-        print("Uploading files not in comps: " + "\n".join([str(a) for a in ac2.assets]))
+        print("\n\n\n=====================\nUploading files not in comps: " +
+              "\n".join([f"{a.relative_path}/{a.file_name}" for a in ac2.assets if a.md5_checksum is None]))
         sys.stdout.flush()
         ac2.save()
         ac = ac2
