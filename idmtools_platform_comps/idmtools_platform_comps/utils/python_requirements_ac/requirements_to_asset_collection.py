@@ -175,7 +175,7 @@ class RequirementsToAssetCollection:
         experiment.add_asset(Asset(REQUIREMENT_FILE))
         experiment.tags = {MD5_KEY: self.checksum}
         self.add_wheels_to_assets(experiment)
-        user_logger.info(f"Run install of python requirements through Experiment")
+        user_logger.info("Run install of python requirements through Experiment")
         experiment.run(wait_until_done=True, platform=self.platform)
 
         if experiment.succeeded:
@@ -200,7 +200,7 @@ class RequirementsToAssetCollection:
         user_files = FileList(root=CURRENT_DIRECTORY, files_in_root=[MODEL_CREATE_AC])
         tags = {MD5_KEY: self.checksum}
 
-        user_logger.info(f"Create workitem to create AssetCollection from output of install")
+        user_logger.info("Create workitem to create AssetCollection from output of install")
         wi = SSMTWorkItem(item_name=wi_name, command=command, user_files=user_files, tags=tags,
                           related_experiments=[exp_id])
 
