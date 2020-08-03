@@ -1,7 +1,11 @@
+import glob
 import os
 import subprocess
 import sys
+import time
 import traceback
+from concurrent.futures.thread import ThreadPoolExecutor
+from datetime import datetime
 
 CURRENT_DIRECTORY = os.getcwd()
 LIBRARY_ROOT = 'L'
@@ -26,13 +30,47 @@ def install_packages_from_requirements(python_paths=None):
 
         env = dict(os.environ)
         env['PYTHONPATH'] = os.pathsep.join(python_paths)
-        # should use date of py file + checksum to produce hash of pyc to determine if need to recompile and prevent need to resuse
-        env['PYTHONHASHSEED'] = '2429763551'
 
     print("Running pip install -r {} to tmp directory".format(REQUIREMENT_FILE))
     subprocess.check_call(
         [sys.executable, "-m", "pip", "install", "-t", LIBRARY_PATH, "-r", f"Assets/{REQUIREMENT_FILE}", "-i",
          f"{INDEX_URL}"], env=env)
+
+
+def clean_pyc():
+    print("Removing pyc files")
+    pool = ThreadPoolExecutor()
+    for filename in glob.glob(f"{LIBRARY_PATH}{os.path.sep}**.pyc"):
+        print(f"Removing {filename}")
+        pool.submit(os.remove, filename)
+    pool.shutdown(True)
+    print(f'Pyc Files Remaining: {len(glob.glob(f"{LIBRARY_PATH}{os.path.sep}**.pyc"))}')
+
+
+def set_python_dates():
+    print("Updating file dates")
+    pool = ThreadPoolExecutor()
+    date = datetime(year=2020, month=1, day=1, hour=0, minute=0, second=0)
+    mod_time = time.mktime(date.timetuple())
+    for filename in glob.glob(f"{LIBRARY_PATH}{os.path.sep}**.py"):
+        print(f"Updating date on {filename}")
+        pool.submit(os.utime, filename, (mod_time, mod_time))
+    pool.shutdown(True)
+
+
+def compile_all(python_paths=None):
+    print("Compiling pyc files")
+    if python_paths is None:
+        env = dict()
+    else:
+        if type(python_paths) is not list:
+            python_paths = [python_paths]
+
+        env = dict(os.environ)
+        env['PYTHONPATH'] = os.pathsep.join(python_paths)
+    print(f'Running {" ".join([sys.executable, "-m", "compileall", LIBRARY_PATH])}')
+    subprocess.check_call([sys.executable, "-m", "compileall", LIBRARY_PATH], env=env)
+    print(f'Pyc Files Generated: {len(glob.glob(f"{LIBRARY_PATH}{os.path.sep}**.pyc"))}')
 
 
 if __name__ == "__main__":
@@ -53,6 +91,9 @@ if __name__ == "__main__":
     tb = None
     try:
         install_packages_from_requirements(sys.path)
+        clean_pyc()
+        set_python_dates()
+        compile_all(sys.path)
     except Exception:
         tb = traceback.format_exc()
         print(tb)

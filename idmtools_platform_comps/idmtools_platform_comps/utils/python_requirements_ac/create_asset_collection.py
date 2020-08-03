@@ -1,5 +1,4 @@
 import os
-import re
 import sys
 from hashlib import md5
 
@@ -13,20 +12,16 @@ AC_FILE = 'ac_info.txt'
 LIBRARY_ROOT_PREFIX = 'L'
 
 
-def unc_path_to_docker_path(p):
-    mapping = os.environ['COMPS_DATA_MAPPING'].split(';')
-    return re.sub(mapping[1].replace('\\', '\\\\'), mapping[0], p, flags=re.IGNORECASE).replace('\\', '/')
-
-
 def calculate_md5(file_path) -> str:
     """
     Calculate and md5
     """
-    with open(file_path, 'rb') as f:
-        md5calc = md5()
-        md5calc.update(f.read())
-        md5_checksum_str = md5calc.hexdigest()
-    return md5_checksum_str
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as f:
+            md5calc = md5()
+            md5calc.update(f.read())
+            md5_checksum_str = md5calc.hexdigest()
+        return md5_checksum_str
 
 
 def build_asset_file_list(comps_sim, prefix=LIBRARY_ROOT_PREFIX):
@@ -38,15 +33,17 @@ def build_asset_file_list(comps_sim, prefix=LIBRARY_ROOT_PREFIX):
 
     Returns: file paths as a list
     """
-    metadata = comps_sim.retrieve_output_file_info([])
-    output_folder = []
-    for m in metadata:
-        parts = m.path_from_root.split('/')
-        if parts[0] == prefix:
-            d = {'friendly_name': m.friendly_name, 'path_from_root': m.path_from_root, 'url': m.url}
-            output_folder.append(d)
 
-    return output_folder
+    output = []
+    for root, _, filenames in os.walk(prefix):
+        for filename in filenames:
+            asset = AssetCollectionFile(file_name=os.path.basename(filename),
+                                        relative_path=os.path.join("site-packages", root.replace(prefix, "")),
+                                        md5_checksum=calculate_md5(os.path.join(root, filename))
+                                        )
+            output.append(asset)
+
+    return output
 
 
 def get_first_simulation_of_experiment(exp_id):
@@ -108,7 +105,8 @@ def main():
     print('sim_id: ', comps_sim.id)
 
     # Build files metadata
-    asset_files = build_asset_file_list(comps_sim, prefix=LIBRARY_ROOT_PREFIX)
+    base_path = os.path.join(comps_sim.hpc_jobs[-1].working_directory, LIBRARY_ROOT_PREFIX)
+    asset_files = build_asset_file_list(comps_sim, prefix=base_path)
     print('asset files count: ', len(asset_files))
 
     # Output files
@@ -118,26 +116,17 @@ def main():
     ac = AssetCollection()
     tags = {MD5_KEY: md5_str}
     ac.set_tags(tags)
-    experiment_path = comps_sim.hpc_jobs[-1].working_directory
 
     # Create asset collection
-    path_to_ac = 'L'
-    file_mapping = dict()
     for af in asset_files:
-        dirpath = af['path_from_root']
-        frp = os.path.relpath(dirpath, path_to_ac) if dirpath != path_to_ac else ''
-        true_path = os.path.join(experiment_path, LIBRARY_ROOT_PREFIX, frp, af['friendly_name'])
-        rp = os.path.join('site_packages', frp)  # add all library under site_packages
-        file_mapping[os.path.join(rp, af['friendly_name'])] = true_path
-        ac.add_asset(AssetCollectionFile(af['friendly_name'], rp, md5_checksum=calculate_md5(true_path)))
+        ac.add_asset(af)
 
+    sys.stdout.flush()
     missing_files = ac.save(return_missing_files=True)
 
     # If COMPS responds that we're missing some files, then try creating it again,
     # uploading only the files that COMPS doesn't already have.
     if missing_files:
-
-        print("Uploading files not in comps: " + "\n".join([str(u) for u in missing_files]))
 
         ac2 = AssetCollection()
         ac2.set_tags(tags)
@@ -147,10 +136,13 @@ def main():
                 rp = acf.relative_path
                 fn = acf.file_name
                 acf2 = AssetCollectionFile(fn, rp, tags=acf.tags)
-                ac2.add_asset(acf2, file_mapping[os.path.join(rp, fn)])
+                rfp = os.path.join(base_path, rp.replace("site-packages", "").strip(os.path.sep), fn)
+                ac2.add_asset(acf2, rfp)
             else:
                 ac2.add_asset(acf)
 
+        print("Uploading files not in comps: " + "\n".join([str(a) for a in ac2.assets]))
+        sys.stdout.flush()
         ac2.save()
         ac = ac2
     # Output ac
@@ -159,6 +151,7 @@ def main():
     # write ac_id to file ac_info.txt
     with open(AC_FILE, 'w') as outfile:
         outfile.write(str(ac.id))
+    sys.stdout.flush()
 
 
 if __name__ == "__main__":
