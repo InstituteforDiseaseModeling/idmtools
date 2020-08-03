@@ -38,7 +38,7 @@ def build_asset_file_list(comps_sim, prefix=LIBRARY_ROOT_PREFIX):
     for root, _, filenames in os.walk(prefix):
         for filename in filenames:
             asset = AssetCollectionFile(file_name=os.path.basename(filename),
-                                        relative_path=os.path.join("site-packages", root.replace(prefix, "")).strip("/"),
+                                        relative_path=os.path.join("site-packages", root.replace(prefix, "").strip("/")).strip("/"),
                                         md5_checksum=calculate_md5(os.path.join(root, filename))
                                         )
             output.append(asset)
