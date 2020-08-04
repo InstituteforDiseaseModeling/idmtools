@@ -61,22 +61,6 @@ def get_first_simulation_of_experiment(exp_id):
     return comps_sim
 
 
-def get_data(url):
-    """
-    Get content of a file
-    Args:
-        url: file location
-    Returns: file content as byte string
-    """
-    i = url.find('/asset/')
-    if i == -1:
-        raise RuntimeError('Unable to parse asset url: ' + url)
-
-    resp = Client.get(url[i:])
-    byte_str = resp.content
-    return byte_str
-
-
 def main():
     print(sys.argv)
 
