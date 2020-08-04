@@ -64,7 +64,7 @@ def compile_all(python_paths=None):
         env = dict(os.environ)
         env['PYTHONPATH'] = os.pathsep.join(python_paths)
     print(f'Compiling {LIBRARY_PATH}')
-    compileall.compile_dir(os.path.relpath(LIBRARY_PATH).strip("/"), force=True)
+    compileall.compile_dir(os.path.relpath(LIBRARY_PATH).strip(os.path.sep), force=True)
     print(f'Pyc Files Generated: {len(glob.glob(f"{LIBRARY_PATH}{os.path.sep}**/*.pyc", recursive=True))}')
 
 
