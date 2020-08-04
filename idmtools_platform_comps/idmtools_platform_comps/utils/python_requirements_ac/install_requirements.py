@@ -41,12 +41,16 @@ def install_packages_from_requirements(python_paths=None):
 def set_python_dates():
     print("Updating file dates")
     pool = ThreadPoolExecutor()
-    date = datetime(year=2020, month=1, day=1, hour=0, minute=0, second=0)
+    date = datetime(year=2020, month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
     mod_time = time.mktime(date.timetuple())
     for filename in glob.glob(f"{LIBRARY_PATH}{os.path.sep}**/*.py", recursive=True):
         print(f"Updating date on {filename}")
         pool.submit(os.utime, filename, (mod_time, mod_time))
     pool.shutdown(True)
+
+    for filename in glob.glob(f"{LIBRARY_PATH}{os.path.sep}**/*.py", recursive=True):
+        print(f"{filename}")
+        print(os.stat(filename))
 
 
 def compile_all(python_paths=None):
@@ -60,7 +64,7 @@ def compile_all(python_paths=None):
         env = dict(os.environ)
         env['PYTHONPATH'] = os.pathsep.join(python_paths)
     print(f'Compiling {LIBRARY_PATH}')
-    compileall.compile_dir(LIBRARY_PATH, force=True)
+    compileall.compile_dir(os.path.relpath(LIBRARY_PATH).strip("/"), force=True)
     print(f'Pyc Files Generated: {len(glob.glob(f"{LIBRARY_PATH}{os.path.sep}**/*.pyc", recursive=True))}')
 
 
