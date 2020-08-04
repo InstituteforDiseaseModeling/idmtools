@@ -126,7 +126,7 @@ def main():
                 ac2.add_asset(acf)
 
         print("\n\n\n=====================\nUploading files not in comps: " + "\n".join(
-            [f"{a.relative_path}/{a.file_name}" for a in ac2.assets[0:max_files] if a.md5_checksum is None]))
+            [f"{a.relative_path}/{a.file_name}" for a in ac2.assets if a.md5_checksum in missing_files or a.md5_checksum is None]))
 
         sys.stdout.flush()
         ac2.save()
