@@ -111,7 +111,7 @@ def main():
     # If COMPS responds that we're missing some files, then try creating it again,
     # uploading only the files that COMPS doesn't already have.
     if missing_files:
-
+        print(f"Total of {len(ac.assets) - len(missing_files)} files currently in comps. Resolving missing files")
         ac2 = AssetCollection()
         ac2.set_tags(tags)
 
@@ -126,7 +126,8 @@ def main():
                 ac2.add_asset(acf)
 
         print("\n\n\n=====================\nUploading files not in comps: " + "\n".join(
-            [f"{a.relative_path}/{a.file_name}" for a in ac2.assets if a.md5_checksum is None]))
+            [f"{a.relative_path}/{a.file_name}" for a in ac2.assets[0:max_files] if a.md5_checksum is None]))
+
         sys.stdout.flush()
         ac2.save()
         ac = ac2
