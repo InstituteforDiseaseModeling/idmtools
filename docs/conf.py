@@ -18,9 +18,11 @@
 #
 import configparser
 import os
-import sys
+import subprocess
+
 import sphinx_rtd_theme
 
+subprocess.check_output(["make", "generate-api"], cwd=os.path.dirname(os.path.abspath(__file__)))
 # -- General configuration ------------------------------------------------
 
 # If your docs needs a minimal Sphinx version, state it here.
