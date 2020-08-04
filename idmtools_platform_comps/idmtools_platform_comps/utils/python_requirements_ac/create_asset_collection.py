@@ -95,7 +95,7 @@ def main():
 
     # Output files
     max_files = 10
-    print('Display the fist 10 files:\n', "\n".join([f"{a.relative_path}/{a.file_name}" for a in asset_files[0:max_files]]))
+    print('Display the first 10 files:\n', "\n".join([f"{a.relative_path}/{a.file_name}" for a in asset_files[0:max_files]]))
 
     ac = AssetCollection()
     tags = {MD5_KEY: md5_str}
