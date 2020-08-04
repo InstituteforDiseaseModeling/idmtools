@@ -1,15 +1,17 @@
 import ntpath
 from typing import List, Dict, Union, Generator, Optional
 from uuid import UUID
+
 from COMPS import Client
-from COMPS.Data import Simulation, SimulationFile, AssetCollectionFile, WorkItemFile
+from COMPS.Data import Simulation, SimulationFile, AssetCollectionFile, WorkItemFile, OutputFileMetadata
 from COMPS.Data.AssetFile import AssetFile
 from COMPS.Data.Simulation import SimulationState
 from COMPS.Data.WorkItem import WorkItemState
+from requests import RequestException
+
 from idmtools.core import EntityStatus, ItemType
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.iplatform import IPlatform
-from requests import RequestException
 
 
 def fatal_code(e: Exception) -> bool:
@@ -125,7 +127,7 @@ def get_file_from_collection(platform: IPlatform, collection_id: UUID, file_path
             return asset_file.retrieve()
 
 
-def get_file_as_generator(file: Union[SimulationFile, AssetCollectionFile, AssetFile, WorkItemFile],
+def get_file_as_generator(file: Union[SimulationFile, AssetCollectionFile, AssetFile, WorkItemFile, OutputFileMetadata],
                           chunk_size: int = 128, resume_byte_pos: Optional[int] = None) -> \
         Generator[bytearray, None, None]:
     """
@@ -139,7 +141,10 @@ def get_file_as_generator(file: Union[SimulationFile, AssetCollectionFile, Asset
     Returns:
 
     """
-    url = file.uri
+    if isinstance(file, OutputFileMetadata):
+        url = file.url
+    else:
+        url = file.uri
     i = url.find('/asset/')
     if i == -1:
         raise RuntimeError('Unable to parse asset url: ' + url)
