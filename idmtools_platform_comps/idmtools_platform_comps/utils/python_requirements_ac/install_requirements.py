@@ -48,10 +48,6 @@ def set_python_dates():
         pool.submit(os.utime, filename, (mod_time, mod_time))
     pool.shutdown(True)
 
-    for filename in glob.glob(f"{LIBRARY_PATH}{os.path.sep}**/*.py", recursive=True):
-        print(f"{filename}")
-        print(os.stat(filename))
-
 
 def compile_all(python_paths=None):
     print("Compiling pyc files")
