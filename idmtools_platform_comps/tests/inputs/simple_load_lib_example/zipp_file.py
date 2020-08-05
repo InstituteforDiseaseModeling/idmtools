@@ -3,7 +3,7 @@ import os
 import sys
 import zipfile
 CURRENT_DIRECTORY = os.path.dirname(__file__)
-LIBRARY_PATH = os.path.join(CURRENT_DIRECTORY, 'site_packages')  # Need to site_packages level!!!
+LIBRARY_PATH = os.path.join(CURRENT_DIRECTORY, 'site-packages')  # Need to site-packages level!!!
 
 sys.path.insert(0, LIBRARY_PATH)  # Very Important!
 import zipp  # noqa

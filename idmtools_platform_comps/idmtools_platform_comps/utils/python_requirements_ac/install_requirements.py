@@ -1,7 +1,12 @@
-import sys
+import compileall
+import glob
 import os
 import subprocess
+import sys
+import time
 import traceback
+from concurrent.futures.thread import ThreadPoolExecutor
+from datetime import datetime
 
 CURRENT_DIRECTORY = os.getcwd()
 LIBRARY_ROOT = 'L'
@@ -33,6 +38,32 @@ def install_packages_from_requirements(python_paths=None):
          f"{INDEX_URL}"], env=env)
 
 
+def set_python_dates():
+    print("Updating file dates")
+    pool = ThreadPoolExecutor()
+    date = datetime(year=2020, month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+    mod_time = time.mktime(date.timetuple())
+    for filename in glob.glob(f"{LIBRARY_PATH}{os.path.sep}**/*.py", recursive=True):
+        print(f"Updating date on {filename}")
+        pool.submit(os.utime, filename, (mod_time, mod_time))
+    pool.shutdown(True)
+
+
+def compile_all(python_paths=None):
+    print("Compiling pyc files")
+    if python_paths is None:
+        env = dict()
+    else:
+        if type(python_paths) is not list:
+            python_paths = [python_paths]
+
+        env = dict(os.environ)
+        env['PYTHONPATH'] = os.pathsep.join(python_paths)
+    print(f'Compiling {LIBRARY_PATH}')
+    compileall.compile_dir(os.path.relpath(LIBRARY_PATH).strip(os.path.sep), force=True)
+    print(f'Pyc Files Generated: {len(glob.glob(f"{LIBRARY_PATH}{os.path.sep}**/*.pyc", recursive=True))}')
+
+
 if __name__ == "__main__":
     print('CURRENT_DIRECTORY: \n', CURRENT_DIRECTORY)
     print('LIBRARY_PATH: \n', LIBRARY_PATH)
@@ -51,6 +82,8 @@ if __name__ == "__main__":
     tb = None
     try:
         install_packages_from_requirements(sys.path)
+        set_python_dates()
+        compile_all(sys.path)
     except Exception:
         tb = traceback.format_exc()
         print(tb)
