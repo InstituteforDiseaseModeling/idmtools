@@ -2,6 +2,7 @@ import copy
 import os
 from dataclasses import dataclass, field
 from typing import List, NoReturn, TypeVar, Union, Any, Dict
+
 from idmtools.assets import Asset, TAssetList
 from idmtools.assets import TAssetFilterList
 from idmtools.assets.errors import DuplicatedAssetError
@@ -24,7 +25,7 @@ class AssetCollection(IEntity):
     assets: List[Asset] = field(default=None)
     item_type: ItemType = field(default=ItemType.ASSETCOLLECTION, compare=False)
 
-    def __init__(self, assets: List[Asset] = None, tags: Dict[str, Any] = {}):
+    def __init__(self, assets: List[Asset] = None, tags=None):
         """
         A constructor.
 
@@ -32,9 +33,11 @@ class AssetCollection(IEntity):
         tags: dict: tags associated with asset collection
         """
         super().__init__()
+        if tags is None:
+            tags = {}
         self.item_type = ItemType.ASSETCOLLECTION
         self.assets = copy.deepcopy(assets) or []
-        self.tags = self.tags or {}
+        self.tags = self.tags or tags
 
     @classmethod
     def from_directory(cls, assets_directory: str, recursive: bool = True, flatten: bool = False,
@@ -122,6 +125,10 @@ class AssetCollection(IEntity):
         for asset in assets:
             self.add_asset(asset)
 
+    def is_editable(self):
+        if self.platform_id:
+            raise ValueError("You cannot modify an already provisioned Asset Collection")
+
     def add_asset(self, asset: Union[Asset, str], fail_on_duplicate: bool = True, **kwargs):  # noqa: F821
         """
         Add an asset to the collection.
@@ -133,6 +140,7 @@ class AssetCollection(IEntity):
              If not, simply replace it.
            **kwargs: Arguments to pass to Asset constructor when asset is a string
         """
+        self.is_editable()
         if isinstance(asset, str):
             asset = Asset(absolute_path=asset, **kwargs)
         if asset in self.assets:
@@ -157,7 +165,7 @@ class AssetCollection(IEntity):
         if not isinstance(other, (list, AssetCollection, Asset)):
             raise ValueError('You can only items of type AssetCollections, List of Assets, or Assets to a '
                              'AssetCollection')
-
+        self.is_editable()
         na = AssetCollection()
         na.add_assets(self)
         if isinstance(other, Asset):
@@ -178,6 +186,7 @@ class AssetCollection(IEntity):
         Returns:
 
         """
+        self.is_editable()
         for asset in assets:
             self.add_asset(asset, fail_on_duplicate)
 
@@ -191,6 +200,7 @@ class AssetCollection(IEntity):
         Returns:
             None.
         """
+        self.is_editable()
         index = self.find_index_of_asset(asset.absolute_path, asset.filename)
         if index is not None:
             self.assets[index] = asset
@@ -243,6 +253,7 @@ class AssetCollection(IEntity):
             **kwargs: Filter for the asset to pop.
 
         """
+        self.is_editable()
         if not kwargs:
             return self.assets.pop()
 
@@ -259,10 +270,12 @@ class AssetCollection(IEntity):
             fail_on_duplicate: Fail if duplicated asset is included.
 
         """
+        self.is_editable()
         for asset in assets:
             self.add_asset(asset, fail_on_duplicate)
 
     def clear(self):
+        self.is_editable()
         self.assets.clear()
 
     def set_all_persisted(self):
