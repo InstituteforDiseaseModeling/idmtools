@@ -11,6 +11,7 @@ from idmtools.core.interfaces.ientity import IEntity
 from idmtools.utils.entities import get_default_tags
 from idmtools.utils.file import scan_directory
 from idmtools.utils.filters.asset_filters import default_asset_file_filter
+from idmtools.utils.info import get_doc_base_url
 
 
 @dataclass(repr=False)
@@ -141,7 +142,7 @@ class AssetCollection(IEntity):
         if self.platform_id:
             if error:
                 raise ValueError(
-                    "You cannot modify an already provisioned Asset Collection. If you want to modify an existing AssetCollection see ")
+                    f"You cannot modify an already provisioned Asset Collection. If you want to modify an existing AssetCollection see the recipe {get_doc_base_url()}cookbook/asset_collections.html#modifying-asset-collection")
             return False
         return True
 
