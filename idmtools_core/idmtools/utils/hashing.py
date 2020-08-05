@@ -148,3 +148,21 @@ def ignore_fields_in_dataclass_on_pickle(item):
                 state[field_name] = field_default[field_name]
 
     return state
+
+
+def calculate_md5(filename: str, chunk_size: int = 8192) -> str:
+    """
+    Calculate MD5
+
+    Args:
+        filename: Filename to caclulate md5 for
+        chunk_size: Chunk size
+
+    Returns:
+
+    """
+    with open(filename, "rb") as f:
+        file_hash = hashlib.md5()
+        while chunk := f.read(chunk_size):
+            file_hash.update(chunk)
+        return file_hash.hexdigest()
