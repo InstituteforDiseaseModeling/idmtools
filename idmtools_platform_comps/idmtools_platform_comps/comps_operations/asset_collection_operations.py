@@ -2,7 +2,9 @@ from dataclasses import field, dataclass
 from functools import partial
 from typing import Type, Union, List, TYPE_CHECKING, Optional
 from uuid import UUID
-from COMPS.Data import AssetCollection as COMPSAssetCollection, QueryCriteria, AssetCollectionFile, SimulationFile
+
+from COMPS.Data import AssetCollection as COMPSAssetCollection, QueryCriteria, AssetCollectionFile, SimulationFile, OutputFileMetadata
+
 from idmtools.assets import AssetCollection, Asset
 from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
 from idmtools_platform_comps.utils.general import get_file_as_generator
@@ -75,7 +77,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         asset_collection._platform_object = asset_collection
         return ac
 
-    def to_entity(self, asset_collection: Union[COMPSAssetCollection, SimulationFile, List[SimulationFile]], **kwargs) \
+    def to_entity(self, asset_collection: Union[COMPSAssetCollection, SimulationFile, List[SimulationFile], OutputFileMetadata], **kwargs) \
             -> AssetCollection:
         """
         Convert COMPS Asset Collection or Simulation File to IDM Asset Collection
@@ -105,12 +107,15 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         if assets:
             # add items to asset collection
             for asset in assets:
-                a = Asset(filename=asset.file_name, checksum=asset.md5_checksum)
+                if isinstance(asset, OutputFileMetadata):
+                    a = Asset(filename=asset.friendly_name, relative_path=asset.path_from_root)
+                else:
+                    a = Asset(filename=asset.file_name, checksum=asset.md5_checksum)
                 if isinstance(asset_collection, COMPSAssetCollection):
                     a.relative_path = asset.relative_path
                 a.persisted = True
                 a.length = asset.length
-                if asset.uri:
+                if isinstance(asset, OutputFileMetadata) or asset.uri:
                     a.download_generator_hook = partial(get_file_as_generator, asset)
                 ac.assets.append(a)
 

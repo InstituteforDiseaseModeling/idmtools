@@ -3,6 +3,7 @@ from dataclasses import dataclass, field, InitVar
 from io import BytesIO
 from logging import getLogger, DEBUG
 from typing import TypeVar, Union, List, Callable, Any, Optional, Generator, BinaryIO
+
 import backoff
 import requests
 from tqdm import tqdm
@@ -83,7 +84,7 @@ class Asset:
     def length(self):
         if self._length is None:
             self._length = len(self.content)
-        return self.length
+        return self._length
 
     @length.setter
     def length(self, new_length):
@@ -177,7 +178,7 @@ class Asset:
             if progress:
                 gen.close()
 
-    def download_to_path(self, path: str):
+    def download_to_path(self, dest: str, force: bool = False):
         """
         Download an asset to path. This requires loadings the object through the platofrm
 
@@ -187,12 +188,22 @@ class Asset:
         Returns:
             None
         """
-        if os.path.isdir(path):
-            path = os.path.join(path, self.filename)
-        with open(path, 'wb') as out:
-            if logger.isEnabledFor(DEBUG):
-                logger.debug(f"Download {self.filename} to {path}")
-            self.__write_download_generator_to_stream(out)
+
+        if os.path.isdir(dest):
+            if self.relative_path:
+                path = os.path.join(dest, self.relative_path, self.filename)
+            else:
+                path = os.path.join(dest, self.filename)
+            path = path.replace("\\", os.path.sep)
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+        else:
+            path = dest
+
+        if not os.path.exists(path) or force:
+            with open(path, 'wb') as out:
+                if logger.isEnabledFor(DEBUG):
+                    logger.debug(f"Download {self.filename} to {path}")
+                self.__write_download_generator_to_stream(out)
 
 
 TAsset = TypeVar("TAsset", bound=Asset)

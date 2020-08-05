@@ -1,12 +1,13 @@
-import os
-from logging import getLogger, DEBUG
 import hashlib
+import os
 from dataclasses import dataclass, field
+from logging import getLogger, DEBUG
+
+from COMPS.Data import QueryCriteria
+from COMPS.Data.AssetCollection import AssetCollection as COMPSAssetCollection
+
 from idmtools.assets import Asset
 from idmtools.core import ItemType
-from idmtools.core.interfaces.iitem import IItem
-from COMPS.Data.AssetCollection import AssetCollection as COMPSAssetCollection
-from COMPS.Data import QueryCriteria
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform import IPlatform
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
@@ -18,6 +19,7 @@ MODEL_CREATE_AC = 'create_asset_collection.py'
 MD5_KEY = 'idmtools-requirements-md5'
 
 logger = getLogger(__name__)
+user_logger = getLogger("user")
 
 
 @dataclass(repr=False)
@@ -108,6 +110,7 @@ class RequirementsToAssetCollection:
         Returns:
 
         """
+        user_logger.info(f"Creating an updated requirements file ensuring all versions are specified at {REQUIREMENT_FILE}")
         req_content = '\n'.join(self.requirements)
         with open(REQUIREMENT_FILE, 'w') as outfile:
             outfile.write(req_content)
@@ -130,6 +133,7 @@ class RequirementsToAssetCollection:
         # if exists, get ac and return it
         if len(ac_list) > 0:
             ac_list = sorted(ac_list, key=lambda t: t.date_created, reverse=True)
+            user_logger.info(f"Found existing requirements assets at {ac_list[0].id}")
             return ac_list[0]
 
     def retrieve_ac_from_wi(self, wi):
@@ -171,9 +175,8 @@ class RequirementsToAssetCollection:
         experiment.add_asset(Asset(REQUIREMENT_FILE))
         experiment.tags = {MD5_KEY: self.checksum}
         self.add_wheels_to_assets(experiment)
-
-        self.platform.run_items(experiment)
-        self.wait_till_done(experiment)
+        user_logger.info("Run install of python requirements through Experiment")
+        experiment.run(wait_until_done=True, platform=self.platform)
 
         if experiment.succeeded:
             return experiment
@@ -197,11 +200,11 @@ class RequirementsToAssetCollection:
         user_files = FileList(root=CURRENT_DIRECTORY, files_in_root=[MODEL_CREATE_AC])
         tags = {MD5_KEY: self.checksum}
 
+        user_logger.info("Create workitem to create AssetCollection from output of install")
         wi = SSMTWorkItem(item_name=wi_name, command=command, user_files=user_files, tags=tags,
                           related_experiments=[exp_id])
 
-        self.platform.run_items(wi)
-        self.wait_till_done(wi)
+        wi.run(wait_on_done=True, platform=self.platform)
 
         if wi.succeeded:
             # make ac as related_asset_collection to wi
@@ -282,27 +285,3 @@ class RequirementsToAssetCollection:
             update_req_list.extend([f"Assets/{os.path.basename(whl)}" for whl in self.local_wheels])
 
         return update_req_list
-
-    def wait_till_done(self, item: IItem, timeout: 'int' = 60 * 60 * 24, refresh_interval: 'int' = 5):
-        """
-        Wait for the experiment to be done.
-        Args:
-            refresh_interval: How long to wait between polling.
-            timeout: How long to wait before failing.
-        """
-        import sys
-        import time
-        from itertools import cycle
-
-        # While they are running, display the status
-        animation = cycle(("|", "/", "-", "\\"))
-
-        start_time = time.time()
-        while time.time() - start_time < timeout:
-            self.platform.refresh_status(item=item)
-            sys.stdout.write("\r  {} Waiting {} to finish.".format(next(animation), item.item_type))
-            sys.stdout.flush()
-            if item.done:
-                return item
-            time.sleep(refresh_interval)
-        raise TimeoutError(f"Timeout of {timeout} seconds exceeded when monitoring item {item.item_type}")
