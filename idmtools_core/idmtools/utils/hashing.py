@@ -163,6 +163,9 @@ def calculate_md5(filename: str, chunk_size: int = 8192) -> str:
     """
     with open(filename, "rb") as f:
         file_hash = hashlib.md5()
-        while chunk := f.read(chunk_size):
+        while True:
+            chunk = f.read(chunk_size)
+            if not chunk:
+                break
             file_hash.update(chunk)
         return file_hash.hexdigest()
