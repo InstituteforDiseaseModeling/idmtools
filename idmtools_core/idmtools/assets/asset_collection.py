@@ -25,7 +25,7 @@ class AssetCollection(IEntity):
     assets: List[Asset] = field(default=None)
     item_type: ItemType = field(default=ItemType.ASSETCOLLECTION, compare=False)
 
-    def __init__(self, assets: List[Asset] = None, tags=None):
+    def __init__(self, assets: Union[TAssetList, 'AssetCollection'] = None, tags=None):
         """
         A constructor.
 
@@ -36,7 +36,10 @@ class AssetCollection(IEntity):
         if tags is None:
             tags = {}
         self.item_type = ItemType.ASSETCOLLECTION
-        self.assets = copy.deepcopy(assets) or []
+        if isinstance(assets, AssetCollection):
+            self.assets = copy.deepcopy(assets.assets)
+        else:
+            self.assets = copy.deepcopy(assets) or []
         self.tags = self.tags or tags
 
     @classmethod
@@ -137,7 +140,8 @@ class AssetCollection(IEntity):
         """
         if self.platform_id:
             if error:
-                raise ValueError("You cannot modify an already provisioned Asset Collection")
+                raise ValueError(
+                    "You cannot modify an already provisioned Asset Collection. If you want to modify an existing AssetCollection see ")
             return False
         return True
 
@@ -152,7 +156,7 @@ class AssetCollection(IEntity):
              If not, simply replace it.
            **kwargs: Arguments to pass to Asset constructor when asset is a string
         """
-        self.is_editable(False)
+        self.is_editable(True)
         if isinstance(asset, str):
             asset = Asset(absolute_path=asset, **kwargs)
         if asset in self.assets:
@@ -177,12 +181,15 @@ class AssetCollection(IEntity):
         if not isinstance(other, (list, AssetCollection, Asset)):
             raise ValueError('You can only items of type AssetCollections, List of Assets, or Assets to a '
                              'AssetCollection')
-        self.is_editable(False)
+        self.is_editable(True)
         na = AssetCollection()
         na.add_assets(self)
         if isinstance(other, Asset):
             na.add_asset(other, False)
         else:
+            if len(self.assets) == 0:
+                na.assets = copy.deepcopy(other.assets)
+                return na
             na.add_assets(other, False)
         return na
 
@@ -198,7 +205,7 @@ class AssetCollection(IEntity):
         Returns:
 
         """
-        self.is_editable(False)
+        self.is_editable(True)
         for asset in assets:
             self.add_asset(asset, fail_on_duplicate)
 
@@ -212,7 +219,7 @@ class AssetCollection(IEntity):
         Returns:
             None.
         """
-        self.is_editable(False)
+        self.is_editable(True)
         index = self.find_index_of_asset(asset.absolute_path, asset.filename)
         if index is not None:
             self.assets[index] = asset
@@ -265,7 +272,7 @@ class AssetCollection(IEntity):
             **kwargs: Filter for the asset to pop.
 
         """
-        self.is_editable(False)
+        self.is_editable(True)
         if not kwargs:
             return self.assets.pop()
 
@@ -282,12 +289,12 @@ class AssetCollection(IEntity):
             fail_on_duplicate: Fail if duplicated asset is included.
 
         """
-        self.is_editable(False)
+        self.is_editable(True)
         for asset in assets:
             self.add_asset(asset, fail_on_duplicate)
 
     def clear(self):
-        self.is_editable(False)
+        self.is_editable(True)
         self.assets.clear()
 
     def set_all_persisted(self):

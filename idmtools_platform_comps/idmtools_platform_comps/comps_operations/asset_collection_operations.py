@@ -1,4 +1,5 @@
 import os
+import uuid
 from dataclasses import field, dataclass
 from functools import partial
 from hashlib import md5
@@ -70,7 +71,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
                             md5_checksum=calculate_md5(asset.absolute_path)
                         )
                     )
-                    ac_map[asset] = cksum
+                    ac_map[asset] = uuid.UUID(cksum)
                 else:
                     md5calc = md5()
                     md5calc.update(asset.bytes)
@@ -80,10 +81,9 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
                             file_name=asset.filename,
                             relative_path=asset.relative_path,
                             md5_checksum=md5_checksum_str
-                        ),
-                        data=asset.bytes,
+                        )
                     )
-                    ac_map[asset] = cksum
+                    ac_map[asset] = uuid.UUID(md5_checksum_str)
             else:  # We should already have this asset so we should have a md5sum
                 ac.add_asset(
                     AssetCollectionFile(
@@ -103,8 +103,8 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         if missing_files:
             ac2 = COMPSAssetCollection()
             total_size = 0
-            for asset in asset_collection:
-                if ac_map[asset] in missing_files:
+            for asset, cksum in ac_map.items():
+                if cksum in missing_files:
                     if asset.absolute_path:
                         total_size += os.path.getsize(asset.absolute_path)
                         ac.add_asset(
@@ -124,8 +124,12 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
                             data=asset.bytes
                         )
                 else:
-                    ac2.add_asset(asset)
-            user_logger.info(f"Uploading {len(missing_files)}/{humanfriendly.format_size(total_size)}")
+                    ac2.add_asset(AssetCollectionFile(
+                        file_name=asset.filename,
+                        relative_path=asset.relative_path,
+                        md5_checksum=cksum
+                    ))
+            user_logger.info(f"Uploading {len(missing_files)} files/{humanfriendly.format_size(total_size)}")
             ac2.save()
             ac = ac2
         asset_collection.uid = ac.id
