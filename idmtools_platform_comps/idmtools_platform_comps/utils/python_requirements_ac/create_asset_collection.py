@@ -7,7 +7,7 @@ from COMPS.Data import AssetCollectionFile, QueryCriteria
 from COMPS.Data import Experiment
 from COMPS.Data.AssetCollection import AssetCollection
 
-MD5_KEY = 'idmtools-requirements-md5'
+MD5_KEY = 'idmtools-requirements-md5-{}'
 AC_FILE = 'ac_info.txt'
 LIBRARY_ROOT_PREFIX = 'L'
 
@@ -24,11 +24,10 @@ def calculate_md5(file_path) -> str:
         return md5_checksum_str
 
 
-def build_asset_file_list(comps_sim, prefix=LIBRARY_ROOT_PREFIX):
+def build_asset_file_list(prefix=LIBRARY_ROOT_PREFIX):
     """
     Utility function to build all library files
     Args:
-        comps_sim: given simulation
         prefix: used to identify library files
 
     Returns: file paths as a list
@@ -81,6 +80,10 @@ def main():
     endpoint = sys.argv[3]
     print('endpoint: ', endpoint)
 
+    # Platform key
+    os_target = sys.argv[4]
+    print('os: ', os_target)
+
     client = Client()
     client.login(endpoint)
 
@@ -90,7 +93,7 @@ def main():
 
     # Build files metadata
     base_path = os.path.join(comps_sim.hpc_jobs[-1].working_directory, LIBRARY_ROOT_PREFIX)
-    asset_files = build_asset_file_list(comps_sim, prefix=base_path)
+    asset_files = build_asset_file_list(prefix=base_path)
     print('asset files count: ', len(asset_files))
 
     # Output files
@@ -98,7 +101,7 @@ def main():
     print('Display the first 10 files:\n', "\n".join([f"{a.relative_path}/{a.file_name}" for a in asset_files[0:max_files]]))
 
     ac = AssetCollection()
-    tags = {MD5_KEY: md5_str}
+    tags = {MD5_KEY.format(os_target): md5_str}
     ac.set_tags(tags)
 
     # Create asset collection

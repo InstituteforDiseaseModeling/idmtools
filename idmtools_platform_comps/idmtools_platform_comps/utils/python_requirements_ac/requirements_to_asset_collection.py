@@ -2,6 +2,7 @@ import hashlib
 import os
 from dataclasses import dataclass, field
 from logging import getLogger, DEBUG
+from typing import List
 
 from COMPS.Data import QueryCriteria
 from COMPS.Data.AssetCollection import AssetCollection as COMPSAssetCollection
@@ -9,27 +10,29 @@ from COMPS.Data.AssetCollection import AssetCollection as COMPSAssetCollection
 from idmtools.assets import Asset
 from idmtools.core import ItemType
 from idmtools.entities.experiment import Experiment
-from idmtools.entities.iplatform import IPlatform
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
+from idmtools_platform_comps.comps_platform import COMPSPlatform
 
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 REQUIREMENT_FILE = 'requirements_updated.txt'
 MODEL_LOAD_LIB = "install_requirements.py"
 MODEL_CREATE_AC = 'create_asset_collection.py'
-MD5_KEY = 'idmtools-requirements-md5'
-
+MD5_KEY = 'idmtools-requirements-md5-{}'
+# We use this to track os. It would be nice to do that in server
+SLURM_ENVS = ['Calculon', 'SLURMStage']
 logger = getLogger(__name__)
 user_logger = getLogger("user")
 
 
 @dataclass(repr=False)
 class RequirementsToAssetCollection:
-    platform: IPlatform = field(default=None)
+    platform: COMPSPlatform = field(default=None)
     requirements_path: str = field(default=None)
     pkg_list: list = field(default=None)
     local_wheels: list = field(default=None)
     _checksum: str = field(default=None, init=False)
-    _requirements: str = field(default=None, init=False)
+    _requirements: List[str] = field(default=None, init=False)
+    _os_target: str = field(default=None, init=False)
 
     def __post_init__(self):
         if not any([self.requirements_path, self.pkg_list, self.local_wheels]):
@@ -39,6 +42,7 @@ class RequirementsToAssetCollection:
         self.requirements_path = os.path.abspath(self.requirements_path) if self.requirements_path else None
         self.pkg_list = self.pkg_list or []
         self.local_wheels = [os.path.abspath(whl) for whl in self.local_wheels] if self.local_wheels else []
+        self._os_target = "win" if "slurm" not in self.platform.environment.lower() or self.platform.environment not in SLURM_ENVS else "linux"
 
     @property
     def checksum(self):
@@ -128,7 +132,7 @@ class RequirementsToAssetCollection:
 
         # check if ac with tag idmtools-requirements-md5 = my_md5 exists
         ac_list = COMPSAssetCollection.get(
-            query_criteria=QueryCriteria().select_children('tags').where_tag([f'{MD5_KEY}={md5_str}']))
+            query_criteria=QueryCriteria().select_children('tags').where_tag([f'{MD5_KEY.format(self._os_target)}={md5_str}']))
 
         # if exists, get ac and return it
         if len(ac_list) > 0:
@@ -173,7 +177,7 @@ class RequirementsToAssetCollection:
         task = JSONConfiguredPythonTask(script_path=os.path.join(CURRENT_DIRECTORY, MODEL_LOAD_LIB))
         experiment = Experiment(name=exp_name, simulations=[task.to_simulation()])
         experiment.add_asset(Asset(REQUIREMENT_FILE))
-        experiment.tags = {MD5_KEY: self.checksum}
+        experiment.tags = {MD5_KEY.format(self._os_target): self.checksum}
         self.add_wheels_to_assets(experiment)
         user_logger.info("Run install of python requirements through Experiment")
         experiment.run(wait_until_done=True, platform=self.platform)
@@ -196,9 +200,9 @@ class RequirementsToAssetCollection:
             logger.debug(f'md5_str: {md5_str}')
 
         wi_name = "wi to create ac"
-        command = f"python {MODEL_CREATE_AC} {exp_id} {md5_str} {self.platform.endpoint}"
+        command = f"python {MODEL_CREATE_AC} {exp_id} {md5_str} {self.platform.endpoint} {self._os_target}"
         user_files = FileList(root=CURRENT_DIRECTORY, files_in_root=[MODEL_CREATE_AC])
-        tags = {MD5_KEY: self.checksum}
+        tags = {MD5_KEY.format(self._os_target): self.checksum}
 
         user_logger.info("Create workitem to create AssetCollection from output of install")
         wi = SSMTWorkItem(item_name=wi_name, command=command, user_files=user_files, tags=tags,
