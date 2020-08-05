@@ -8,5 +8,5 @@ pipreqs==0.4.10
 pluggy~=0.13.1
 PyYaml~=5.3
 tabulate~=0.8.7
-tqdm~=4.48.1
+tqdm~=4.48.2
 packaging~=20.4
