@@ -19,10 +19,14 @@
 import configparser
 import os
 import subprocess
+import sys
 
 import sphinx_rtd_theme
 
-subprocess.check_output(["make", "generate-api"], cwd=os.path.dirname(os.path.abspath(__file__)))
+if sys.platform in ["linux", "darwin"]:
+    subprocess.check_output(["make", "generate-api"], cwd=os.path.dirname(os.path.abspath(__file__)))
+else:
+    subprocess.check_output(["make.bat", "generate-api"], cwd=os.path.dirname(os.path.abspath(__file__)))
 # -- General configuration ------------------------------------------------
 
 # If your docs needs a minimal Sphinx version, state it here.
