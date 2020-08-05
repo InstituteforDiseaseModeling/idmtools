@@ -26,12 +26,19 @@ user_logger = getLogger("user")
 
 @dataclass(repr=False)
 class RequirementsToAssetCollection:
+    #: Platform object
     platform: COMPSPlatform = field(default=None)
+    #: Path to requirements file
     requirements_path: str = field(default=None)
+    #: list of packages
     pkg_list: list = field(default=None)
+    #: list of wheel files locally to upload and install
     local_wheels: list = field(default=None)
+    #: Internal checksum to calculate unique requirements set has be ran before
     _checksum: str = field(default=None, init=False)
+    #: Calculated requirements including versions
     _requirements: List[str] = field(default=None, init=False)
+    #: Since requirements vary by os, target it on the platform as well
     _os_target: str = field(default=None, init=False)
 
     def __post_init__(self):
