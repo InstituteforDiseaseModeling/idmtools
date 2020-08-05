@@ -63,9 +63,9 @@ def get_first_simulation_of_experiment(exp_id):
 def main():
     print(sys.argv)
 
-    if len(sys.argv) < 3:
+    if len(sys.argv) < 4:
         raise Exception(
-            "The script needs to be called with `python <model.py> <experiment_id> <md5_str> <endpoint>'.\n{}".format(
+            "The script needs to be called with `python <model.py> <experiment_id> <md5_str> <endpoint> <os_str>'.\n{}".format(
                 " ".join(sys.argv)))
 
     # Get the experiments
