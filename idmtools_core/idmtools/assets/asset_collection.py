@@ -125,9 +125,21 @@ class AssetCollection(IEntity):
         for asset in assets:
             self.add_asset(asset)
 
-    def is_editable(self):
+    def is_editable(self, error=False) -> bool:
+        """
+        Checks whether Item is editable
+
+        Args:
+            error: Throw error is not
+
+        Returns:
+            True if editable, False otherwise.
+        """
         if self.platform_id:
-            raise ValueError("You cannot modify an already provisioned Asset Collection")
+            if error:
+                raise ValueError("You cannot modify an already provisioned Asset Collection")
+            return False
+        return True
 
     def add_asset(self, asset: Union[Asset, str], fail_on_duplicate: bool = True, **kwargs):  # noqa: F821
         """
@@ -140,7 +152,7 @@ class AssetCollection(IEntity):
              If not, simply replace it.
            **kwargs: Arguments to pass to Asset constructor when asset is a string
         """
-        self.is_editable()
+        self.is_editable(False)
         if isinstance(asset, str):
             asset = Asset(absolute_path=asset, **kwargs)
         if asset in self.assets:
@@ -165,7 +177,7 @@ class AssetCollection(IEntity):
         if not isinstance(other, (list, AssetCollection, Asset)):
             raise ValueError('You can only items of type AssetCollections, List of Assets, or Assets to a '
                              'AssetCollection')
-        self.is_editable()
+        self.is_editable(False)
         na = AssetCollection()
         na.add_assets(self)
         if isinstance(other, Asset):
@@ -186,7 +198,7 @@ class AssetCollection(IEntity):
         Returns:
 
         """
-        self.is_editable()
+        self.is_editable(False)
         for asset in assets:
             self.add_asset(asset, fail_on_duplicate)
 
@@ -200,7 +212,7 @@ class AssetCollection(IEntity):
         Returns:
             None.
         """
-        self.is_editable()
+        self.is_editable(False)
         index = self.find_index_of_asset(asset.absolute_path, asset.filename)
         if index is not None:
             self.assets[index] = asset
@@ -253,7 +265,7 @@ class AssetCollection(IEntity):
             **kwargs: Filter for the asset to pop.
 
         """
-        self.is_editable()
+        self.is_editable(False)
         if not kwargs:
             return self.assets.pop()
 
@@ -270,12 +282,12 @@ class AssetCollection(IEntity):
             fail_on_duplicate: Fail if duplicated asset is included.
 
         """
-        self.is_editable()
+        self.is_editable(False)
         for asset in assets:
             self.add_asset(asset, fail_on_duplicate)
 
     def clear(self):
-        self.is_editable()
+        self.is_editable(False)
         self.assets.clear()
 
     def set_all_persisted(self):
