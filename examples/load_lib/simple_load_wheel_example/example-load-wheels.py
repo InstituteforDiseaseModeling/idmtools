@@ -13,7 +13,7 @@ def run_example(ac_id):
     print(f'run example with ac: {ac_id}')
     platform = Platform('COMPS2')
     # create AssetCollection based on ac_id
-    common_assets = AssetCollection.from_id(ac_id, platform=platform)
+    common_assets = AssetCollection.from_id(ac_id, platform=platform, as_copy=True)
 
     # create python task with script 'model_file.py', task is doing this in comps: "python ./Assets/model_file.py"
     task = JSONConfiguredPythonTask(script_path=os.path.abspath("model_file.py"), common_assets=common_assets)
