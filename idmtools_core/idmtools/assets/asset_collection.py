@@ -79,8 +79,6 @@ class AssetCollection(IEntity):
         assets = cls.assets_from_directory(assets_directory, recursive, flatten, filters, filters_mode, relative_path)
         return cls(assets=assets)
 
-    # endregion
-
     @staticmethod
     def assets_from_directory(assets_directory: str, recursive: bool = True, flatten: bool = False,
                               filters: 'TAssetFilterList' = None,  # noqa: F821
@@ -138,6 +136,15 @@ class AssetCollection(IEntity):
             assets.append(asset)
 
         return assets
+
+    def copy(self) -> 'AssetCollection':
+        """
+        Copy our Asset Collection, removing ID and tags
+
+        Returns:
+            New AssetCollection containing Assets from other AssetCollection
+        """
+        return AssetCollection(self)
 
     def add_directory(self, assets_directory: str, recursive: bool = True, flatten: bool = False,
                       filters: 'TAssetFilterList' = None, filters_mode: FilterMode = FilterMode.OR,  # noqa: F821
