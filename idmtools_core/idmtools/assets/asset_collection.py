@@ -3,6 +3,7 @@ import os
 from dataclasses import dataclass, field
 from logging import getLogger
 from typing import List, NoReturn, TypeVar, Union, Any, Dict
+from uuid import UUID
 
 from idmtools.assets import Asset, TAssetList
 from idmtools.assets import TAssetFilterList
@@ -47,6 +48,24 @@ class AssetCollection(IEntity):
         self.tags = self.tags or tags
 
     @classmethod
+    def from_id(cls, item_id: Union[str, UUID], platform: 'IPlatform' = None, as_copy: bool = False,  # noqa E821
+                **kwargs) -> 'AssetCollection':
+        """
+        Loads a AssetCollection from id
+
+        Args:
+            item_id: Asset Collection ID
+            platform: Platform Ojbect
+            as_copy: Should you load the object as a copy. When True, the contents of AC are copied, but not the id. Useful when editing ACs
+            **kwargs:
+
+        Returns:
+            AssetCollection
+        """
+        item = super(AssetCollection, cls).from_id(item_id, platform, **kwargs)
+        return AssetCollection(item) if as_copy else item
+
+    @classmethod
     def from_directory(cls, assets_directory: str, recursive: bool = True, flatten: bool = False,
                        filters: 'TAssetFilterList' = None, filters_mode: FilterMode = FilterMode.OR,  # noqa: F821
                        relative_path: str = None) -> 'TAssetCollection':
@@ -59,8 +78,6 @@ class AssetCollection(IEntity):
         """
         assets = cls.assets_from_directory(assets_directory, recursive, flatten, filters, filters_mode, relative_path)
         return cls(assets=assets)
-
-    # endregion
 
     @staticmethod
     def assets_from_directory(assets_directory: str, recursive: bool = True, flatten: bool = False,
@@ -119,6 +136,15 @@ class AssetCollection(IEntity):
             assets.append(asset)
 
         return assets
+
+    def copy(self) -> 'AssetCollection':
+        """
+        Copy our Asset Collection, removing ID and tags
+
+        Returns:
+            New AssetCollection containing Assets from other AssetCollection
+        """
+        return AssetCollection(self)
 
     def add_directory(self, assets_directory: str, recursive: bool = True, flatten: bool = False,
                       filters: 'TAssetFilterList' = None, filters_mode: FilterMode = FilterMode.OR,  # noqa: F821

@@ -224,8 +224,14 @@ class RequirementsToAssetCollection:
             comps_wi = self.platform.get_item(wi.uid, ItemType.WORKFLOW_ITEM, raw=True)
             comps_wi.add_related_asset_collection(comps_ac.id, relation_type=RelationType.Created)
             comps_wi.save()
-
             return wi
+        else:
+            user_logger.warning("Work item failed. See logs")
+            try:
+                files = self.platform.get_files_by_id(wi.uid, wi.item_type, ["stderr.txt"])
+                user_logger.error(f'Server Error Log: {files["stderr.txt"].decode("utf-8")}')
+            except:  # noqa: E722
+                pass
 
     @staticmethod
     def get_latest_version(pkg_name, display_all=False):
