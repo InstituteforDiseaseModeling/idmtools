@@ -229,7 +229,7 @@ class RequirementsToAssetCollection:
             user_logger.warning("Work item failed. See logs")
             try:
                 files = self.platform.get_files_by_id(wi.uid, wi.item_type, ["stderr.txt"])
-                user_logger.error(files['stderr.txt'])
+                user_logger.error(files['stderr.txt'].decode("utf-8"))
             except:  # noqa: E722
                 pass
 
