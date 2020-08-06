@@ -405,7 +405,9 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             po.refresh(QueryCriteria().select_children('configuration'))
         # simulation configuration for executable?
         if simulation.configuration and simulation.configuration.executable_path:
-            cli = f'{simulation.configuration.executable_path} {simulation.configuration.simulation_input_args.strip()}'
+            cli = f'{simulation.configuration.executable_path}'
+            if simulation.configuration.simulation_input_args:
+                cli += " " + simulation.configuration.simulation_input_args.strip()
         elif po.configuration and po.configuration.executable_path:
             cli = f'{po.configuration.executable_path} {po.configuration.simulation_input_args.strip()}'
         if cli is None:
