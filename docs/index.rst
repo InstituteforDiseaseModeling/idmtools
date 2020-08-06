@@ -45,6 +45,7 @@ Exact workflows for using |IT_s| is user-dependent, and can include any of the t
    analyzers
    plots   
    reference
+   recipes_index
    cli_index
    glossary
    changelog
