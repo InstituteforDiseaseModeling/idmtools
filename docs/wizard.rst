@@ -1,6 +1,5 @@
-=================
-idmtools.ini file
-=================
+idmtools.ini wizard
+===================
 
 You can use the ``config`` command to create a configuration block in your project's ``idmtools.ini`` file.
 

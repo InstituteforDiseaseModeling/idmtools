@@ -10,7 +10,8 @@ Below is an example configuration file:
 .. toctree::
    :maxdepth: 3
    :titlesonly:
-   :caption: Specific configuration items
+   :caption: Specific configuration items and idmtools.ini wizard
 
    common-parameters
    logging
+   wizard
