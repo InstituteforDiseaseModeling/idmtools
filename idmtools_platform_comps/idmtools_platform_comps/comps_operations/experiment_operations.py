@@ -17,7 +17,7 @@ from idmtools.entities import CommandLine
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
 from idmtools.entities.templated_simulation import TemplatedSimulations
-from idmtools.utils.collections import ParentIterator
+from idmtools.utils.collections import ExperimentParentIterator
 from idmtools.utils.time import timestamp
 from idmtools_platform_comps.utils.general import clean_experiment_name, convert_comps_status
 
@@ -187,8 +187,8 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             # run pre-creation in case task use it to produce the command line dynamically
             task.pre_creation(sim)
             exp_command = task.command
-        elif isinstance(experiment.simulations, ParentIterator) and isinstance(experiment.simulations.items,
-                                                                               TemplatedSimulations):
+        elif isinstance(experiment.simulations, ExperimentParentIterator) and isinstance(experiment.simulations.items,
+                                                                                         TemplatedSimulations):
             if logger.isEnabledFor(DEBUG):
                 logger.debug("ParentIterator/TemplatedSimulations detected. Using base_task for command")
             from idmtools.entities.simulation import Simulation

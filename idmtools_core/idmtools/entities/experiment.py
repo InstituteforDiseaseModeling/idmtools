@@ -20,7 +20,7 @@ from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools.registry.experiment_specification import ExperimentPluginSpecification, get_model_impl, \
     get_model_type_impl
 from idmtools.registry.plugin_specification import get_description_impl
-from idmtools.utils.collections import ParentIterator
+from idmtools.utils.collections import ExperimentParentIterator
 from idmtools.utils.entities import get_default_tags
 
 if TYPE_CHECKING:
@@ -135,7 +135,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
             self.tags["experiment_type"] = f'{self.__class__.__module__}.{self.__class__.__name__}'
 
         # if it is a template, set task type on experiment
-        if isinstance(self.simulations, ParentIterator) and isinstance(self.simulations.items, TemplatedSimulations):
+        if isinstance(self.simulations, ExperimentParentIterator) and isinstance(self.simulations.items, TemplatedSimulations):
             if logger.isEnabledFor(DEBUG):
                 logger.debug("Using Base task from template for experiment level assets")
             self.simulations.items.base_task.gather_common_assets()
@@ -180,8 +180,8 @@ class Experiment(IAssetsEnabled, INamedEntity):
         return all([s.succeeded for s in self.simulations])
 
     @property
-    def simulations(self) -> Iterator['Simulation']:
-        return ParentIterator(self.__simulations, parent=self)
+    def simulations(self) -> ExperimentParentIterator:
+        return ExperimentParentIterator(self.__simulations, parent=self)
 
     @simulations.setter
     def simulations(self, simulations: Union[SUPPORTED_SIM_TYPE]):
