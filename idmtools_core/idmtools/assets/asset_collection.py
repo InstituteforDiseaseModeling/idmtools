@@ -3,6 +3,7 @@ import os
 from dataclasses import dataclass, field
 from logging import getLogger
 from typing import List, NoReturn, TypeVar, Union, Any, Dict
+from uuid import UUID
 
 from idmtools.assets import Asset, TAssetList
 from idmtools.assets import TAssetFilterList
@@ -45,6 +46,24 @@ class AssetCollection(IEntity):
         else:
             self.assets = copy.deepcopy(assets) or []
         self.tags = self.tags or tags
+
+    @classmethod
+    def from_id(cls, item_id: Union[str, UUID], platform: 'IPlatform' = None, as_copy: bool = False,
+                **kwargs) -> 'AssetCollection':  # noqa E821
+        """
+        Loads a AssetCollection from id
+
+        Args:
+            item_id: Asset Collection ID
+            platform: Platform Ojbect
+            as_copy: Should you load the object as a copy. When True, the contents of AC are copied, but not the id. Useful when editing ACs
+            **kwargs:
+
+        Returns:
+            AssetCollection
+        """
+        item = super(AssetCollection, cls).from_id(item_id, platform, **kwargs)
+        return AssetCollection(item) if as_copy else item
 
     @classmethod
     def from_directory(cls, assets_directory: str, recursive: bool = True, flatten: bool = False,
