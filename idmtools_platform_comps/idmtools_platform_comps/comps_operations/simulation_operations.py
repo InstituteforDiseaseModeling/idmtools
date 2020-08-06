@@ -260,7 +260,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         cols = ['state']
         if additional_columns:
-            cols.append(cols)
+            cols.extend(additional_columns)
         s = COMPSSimulation.get(id=simulation.uid, query_criteria=QueryCriteria().select(cols))
         simulation.status = convert_comps_status(s.state)
 

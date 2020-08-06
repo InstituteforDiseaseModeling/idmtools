@@ -24,7 +24,7 @@ class IEntity(IItem, metaclass=ABCMeta):
     tags: Dict[str, Any] = field(default_factory=lambda: {}, metadata={"md": True})
     item_type: ItemType = field(default=None, compare=False)
     # Platform
-    _platform_object: Any = field(default=None, compare=False, metadata={"pickle_ignore": True})
+    _platform_object: Any = field(default=None, compare=False, metadata={"pickle_ignore": True}, repr=False)
 
     def update_tags(self, tags: dict = None) -> NoReturn:
         """
@@ -42,7 +42,7 @@ class IEntity(IItem, metaclass=ABCMeta):
         if platform is None:
             from idmtools.core.context import CURRENT_PLATFORM
             if CURRENT_PLATFORM is None:
-                raise ValueError("You have to specify a platfrom to load the asset collection from")
+                raise ValueError("You have to specify a platfrom to load the item from")
             platform = CURRENT_PLATFORM
         if cls.item_type is None:
             raise EnvironmentError("ItemType is None. This is most likely a badly derived IEntity "
