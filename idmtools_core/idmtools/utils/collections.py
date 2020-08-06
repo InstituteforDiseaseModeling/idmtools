@@ -68,12 +68,11 @@ class ExperimentParentIterator(typing.Iterator['Simulation']):  # noqa F821
         if isinstance(self.items, (list, set)):
             # if it is a template, try to preserve so we can user generators
             if isinstance(item, TemplatedSimulations):
-                existing_items = self.items
-                self.items = item
-                self.items.add_simulations(existing_items)
+                self.items.extend(list(item))
             else:
                 self.items.extend(item)
             return
+
         raise ValueError("Items doesn't support extending")
 
 
