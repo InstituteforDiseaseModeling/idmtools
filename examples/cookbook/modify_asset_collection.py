@@ -10,6 +10,8 @@ with Platform("COMPS2") as platform:
     # create a new asset collection object
     ac = AssetCollection(existing_ac)
     # or
+    # ac = AssetCollection.from_id("98d329b5-95d6-ea11-a2c0-f0921c167862", as_copy=True)
+    # ac = existing_ac.copy()
     # ac = AssetCollection()
     # ac += existing_ac
     # add our items to the new collection

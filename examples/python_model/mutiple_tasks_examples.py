@@ -5,10 +5,8 @@ from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.command_task import CommandTask
-
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.templated_simulation import TemplatedSimulations
-
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 
 
@@ -16,7 +14,7 @@ def run_example_PythonTask(ac_id):
     task = JSONConfiguredPythonTask(script_path=os.path.join("inputs", "task_model", "model_file.py"))
 
     ts = TemplatedSimulations(base_task=task)
-    common_assets = AssetCollection.from_id(ac_id, platform=platform)
+    common_assets = AssetCollection.from_id(ac_id, platform=platform, as_copy=True)
     sim = ts.new_simulation()
     experiment = Experiment(name="run_example_PythonTask", simulations=[sim], assets=common_assets)
     platform.run_items(experiment)
