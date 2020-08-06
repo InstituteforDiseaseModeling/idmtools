@@ -1,16 +1,25 @@
+import os
+import uuid
 from dataclasses import field, dataclass
 from functools import partial
+from hashlib import md5
+from logging import getLogger
 from typing import Type, Union, List, TYPE_CHECKING, Optional
 from uuid import UUID
 
+import humanfriendly
 from COMPS.Data import AssetCollection as COMPSAssetCollection, QueryCriteria, AssetCollectionFile, SimulationFile, OutputFileMetadata
 
 from idmtools.assets import AssetCollection, Asset
 from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
+from idmtools.utils.hashing import calculate_md5
 from idmtools_platform_comps.utils.general import get_file_as_generator
 
 if TYPE_CHECKING:
     from idmtools_platform_comps.comps_platform import COMPSPlatform
+
+logger = getLogger(__name__)
+user_logger = getLogger("user")
 
 
 @dataclass
@@ -48,16 +57,33 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
             COMPSAssetCollection
         """
         ac = COMPSAssetCollection()
+        ac_map = dict()
         for asset in asset_collection:
             # using checksum is not accurate and not all systems will support de-duplication
             if asset.checksum is None:
-                ac.add_asset(
-                    AssetCollectionFile(
-                        file_name=asset.filename,
-                        relative_path=asset.relative_path
-                    ),
-                    data=asset.bytes
-                )
+
+                if asset.absolute_path:
+                    cksum = calculate_md5(asset.absolute_path)
+                    ac.add_asset(
+                        AssetCollectionFile(
+                            file_name=asset.filename,
+                            relative_path=asset.relative_path,
+                            md5_checksum=calculate_md5(asset.absolute_path)
+                        )
+                    )
+                    ac_map[asset] = uuid.UUID(cksum)
+                else:
+                    md5calc = md5()
+                    md5calc.update(asset.bytes)
+                    md5_checksum_str = md5calc.hexdigest()
+                    ac.add_asset(
+                        AssetCollectionFile(
+                            file_name=asset.filename,
+                            relative_path=asset.relative_path,
+                            md5_checksum=md5_checksum_str
+                        )
+                    )
+                    ac_map[asset] = uuid.UUID(md5_checksum_str)
             else:  # We should already have this asset so we should have a md5sum
                 ac.add_asset(
                     AssetCollectionFile(
@@ -66,13 +92,47 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
                         md5_checksum=asset.checksum
                     )
                 )
+                ac_map[asset] = asset.checksum
 
         # Add tags
         if asset_collection.tags:
             ac.set_tags(asset_collection.tags)
 
-        # now send it to comps
-        ac.save()
+        # check for missing files first
+        missing_files = ac.save(return_missing_files=True)
+        if missing_files:
+            ac2 = COMPSAssetCollection()
+            ac2.set_tags(ac.tags)
+            total_size = 0
+            for asset, cksum in ac_map.items():
+                if cksum in missing_files:
+                    if asset.absolute_path:
+                        total_size += os.path.getsize(asset.absolute_path)
+                        ac2.add_asset(
+                            AssetCollectionFile(
+                                file_name=asset.filename,
+                                relative_path=asset.relative_path
+                            ),
+                            file_path=asset.absolute_path
+                        )
+                    else:
+                        total_size += len(asset.bytes)
+                        ac2.add_asset(
+                            AssetCollectionFile(
+                                file_name=asset.filename,
+                                relative_path=asset.relative_path
+                            ),
+                            data=asset.bytes
+                        )
+                else:
+                    ac2.add_asset(AssetCollectionFile(
+                        file_name=asset.filename,
+                        relative_path=asset.relative_path,
+                        md5_checksum=cksum
+                    ))
+            user_logger.info(f"Uploading {len(missing_files)} files/{humanfriendly.format_size(total_size)}")
+            ac2.save()
+            ac = ac2
         asset_collection.uid = ac.id
         asset_collection._platform_object = asset_collection
         return ac

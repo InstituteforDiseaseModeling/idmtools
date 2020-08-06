@@ -19,7 +19,7 @@ MODEL_LOAD_LIB = "install_requirements.py"
 MODEL_CREATE_AC = 'create_asset_collection.py'
 MD5_KEY = 'idmtools-requirements-md5-{}'
 # We use this to track os. It would be nice to do that in server
-SLURM_ENVS = ['Calculon', 'SLURMStage']
+SLURM_ENVS = ['Calculon', 'SLURMStage', "SLURMDev"]
 logger = getLogger(__name__)
 user_logger = getLogger("user")
 
