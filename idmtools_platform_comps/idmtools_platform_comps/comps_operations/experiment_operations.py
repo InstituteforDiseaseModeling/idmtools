@@ -150,6 +150,9 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         return e
 
     def platform_modify_experiment(self, experiment: Experiment) -> Experiment:
+        if experiment.status is not None:
+            if experiment.assets.is_editable():
+                self.send_assets(experiment)
         return experiment
 
     def _get_experiment_command_line(self, check_command: bool, experiment: Experiment) -> CommandLine:

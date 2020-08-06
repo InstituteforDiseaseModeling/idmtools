@@ -142,7 +142,8 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         return s
 
     @staticmethod
-    def get_simulation_config_from_simulation(simulation: Simulation, num_cores: int = None, priority: str = None) -> \
+    def get_simulation_config_from_simulation(simulation: Simulation, num_cores: int = None, priority: str = None,
+                                              asset_collection_id: UUID = None) -> \
             Configuration:
         """
         Get the comps configuration for a Simulation Object
@@ -151,14 +152,14 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             simulation: Simulation
             num_cores: Optional Num of core for MPI
             priority: Optional Priority
-
+            asset_collection_id: Override simulation asset_collection_id
 
         Returns:
             Configuration
         """
         comps_configuration = dict()
-        if simulation.experiment.assets.count != 0:
-            comps_configuration['asset_collection_id'] = simulation.experiment.assets.uid
+        if asset_collection_id:
+            comps_configuration['asset_collection_id'] = asset_collection_id
         comps_exp: COMPSExperiment = simulation.parent.get_platform_object()
         comps_exp_config: Configuration = comps_exp.configuration
         if num_cores is not None and num_cores != comps_exp_config.max_cores:
