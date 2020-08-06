@@ -1,6 +1,7 @@
 import copy
 import os
 from dataclasses import dataclass, field
+from logging import getLogger
 from typing import List, NoReturn, TypeVar, Union, Any, Dict
 
 from idmtools.assets import Asset, TAssetList
@@ -12,6 +13,8 @@ from idmtools.utils.entities import get_default_tags
 from idmtools.utils.file import scan_directory
 from idmtools.utils.filters.asset_filters import default_asset_file_filter
 from idmtools.utils.info import get_doc_base_url
+
+user_logger = getLogger('user')
 
 
 @dataclass(repr=False)
@@ -255,6 +258,20 @@ class AssetCollection(IEntity):
         Args:
             **kwargs: Filter for the asset to delete.
         """
+        user_logger.warning(
+            "delete will be change behaviour to deletion of AssetCollection in version 1.4, use remove instead to remove an asset from an AC",
+            PendingDeprecationWarning
+        )
+        self.remove(**kwargs)
+
+    def remove(self, **kwargs) -> NoReturn:
+        """
+        Remove an asset from the AssetCollection based on keywords attributes
+
+        Args:
+            **kwargs: Filter for the asset to remove.
+        """
+        self.is_editable(True)
         if 'index' in kwargs:
             return self.assets.remove(self.assets[kwargs.get('index')])
 
