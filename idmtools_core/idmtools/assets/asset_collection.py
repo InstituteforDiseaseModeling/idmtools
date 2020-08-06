@@ -259,7 +259,7 @@ class AssetCollection(IEntity):
             **kwargs: Filter for the asset to delete.
         """
         user_logger.warning(
-            "delete will be change behaviour to deletion of AssetCollection in version 1.4, use remove instead to remove an asset from an AC",
+            "delete will be changing behaviour to deletion of AssetCollection in a future release. Use the remove method going forward to remove an asset from an AssetCollection",
             PendingDeprecationWarning
         )
         self.remove(**kwargs)
