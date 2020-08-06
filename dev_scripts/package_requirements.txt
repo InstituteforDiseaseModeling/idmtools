@@ -3,3 +3,4 @@ coverage
 py-make
 bump2version
 twine
+wheel

@@ -117,7 +117,6 @@ if "%1" == "external" (
 )
 
 if "%1" == "html" (
-	call make.bat generate-api
 	%SPHINXBUILD% -b html %ALLSPHINXOPTS% %INTERNALOPTS% %BUILDDIR%/html
 	if errorlevel 1 exit /b 1
 	%INDEXBUILD% -i %BUILDDIR%/html -o %BUILDDIR%/html/_static/tipuesearch/tipuesearch_content.js -u %URLPREFIX%
@@ -127,7 +126,6 @@ if "%1" == "html" (
 )
 
 if "%1" == "tipuesearch" (
-	call make.bat generate-api
 	%INDEXBUILD% -i %BUILDDIR%/html -o %BUILDDIR%/html/_static/tipuesearch/tipuesearch_content.js -u %URLPREFIX%
 	echo.
 	echo. Build finished. Updated tipuesearch content is at %BUILDDIR%/html/_static/tipuesearch/tipuesearch_content.js
@@ -135,7 +133,6 @@ if "%1" == "tipuesearch" (
 )
 
 if "%1" == "dirhtml" (
-	call make.bat generate-api
 	%SPHINXBUILD% -b dirhtml %ALLSPHINXOPTS% %BUILDDIR%/dirhtml
 	if errorlevel 1 exit /b 1
 	echo.
@@ -144,7 +141,6 @@ if "%1" == "dirhtml" (
 )
 
 if "%1" == "singlehtml" (
-	call make.bat generate-api
 	%SPHINXBUILD% -b singlehtml %ALLSPHINXOPTS% %BUILDDIR%/singlehtml
 	if errorlevel 1 exit /b 1
 	echo.
@@ -153,7 +149,6 @@ if "%1" == "singlehtml" (
 )
 
 if "%1" == "pickle" (
-	call make.bat generate-api
 	%SPHINXBUILD% -b pickle %ALLSPHINXOPTS% %BUILDDIR%/pickle
 	if errorlevel 1 exit /b 1
 	echo.
@@ -162,7 +157,6 @@ if "%1" == "pickle" (
 )
 
 if "%1" == "json" (
-	call make.bat generate-api
 	%SPHINXBUILD% -b json %ALLSPHINXOPTS% %BUILDDIR%/json
 	if errorlevel 1 exit /b 1
 	echo.
@@ -171,7 +165,6 @@ if "%1" == "json" (
 )
 
 if "%1" == "htmlhelp" (
-	call make.bat generate-api
 	%SPHINXBUILD% -b htmlhelp %ALLSPHINXOPTS% %BUILDDIR%/htmlhelp
 	if errorlevel 1 exit /b 1
 	echo.
@@ -181,7 +174,6 @@ if "%1" == "htmlhelp" (
 )
 
 if "%1" == "qthelp" (
-	call make.bat generate-api
 	%SPHINXBUILD% -b qthelp %ALLSPHINXOPTS% %BUILDDIR%/qthelp
 	if errorlevel 1 exit /b 1
 	echo.
@@ -194,7 +186,6 @@ if "%1" == "qthelp" (
 )
 
 if "%1" == "devhelp" (
-	call make.bat generate-api
 	%SPHINXBUILD% -b devhelp %ALLSPHINXOPTS% %BUILDDIR%/devhelp
 	if errorlevel 1 exit /b 1
 	echo.
@@ -203,7 +194,6 @@ if "%1" == "devhelp" (
 )
 
 if "%1" == "epub" (
-	call make.bat generate-api
 	%SPHINXBUILD% -b epub %ALLSPHINXOPTS% %BUILDDIR%/epub
 	if errorlevel 1 exit /b 1
 	echo.
@@ -212,8 +202,7 @@ if "%1" == "epub" (
 )
 
 if "%1" == "epub3" (
-    call make.bat generate-api
-	%SPHINXBUILD% -b epub3 %ALLSPHINXOPTS% %BUILDDIR%/epub3
+    %SPHINXBUILD% -b epub3 %ALLSPHINXOPTS% %BUILDDIR%/epub3
 	if errorlevel 1 exit /b 1
 	echo.
 	echo.Build finished. The epub3 file is in %BUILDDIR%/epub3.
@@ -221,8 +210,7 @@ if "%1" == "epub3" (
 )
 
 if "%1" == "latex" (
-    call make.bat generate-api
-	%SPHINXBUILD% -b latex %ALLSPHINXOPTS% %BUILDDIR%/latex
+    %SPHINXBUILD% -b latex %ALLSPHINXOPTS% %BUILDDIR%/latex
 	if errorlevel 1 exit /b 1
 	echo.
 	echo.Build finished; the LaTeX files are in %BUILDDIR%/latex.
@@ -230,7 +218,6 @@ if "%1" == "latex" (
 )
 
 if "%1" == "latexpdf" (
-	call make.bat generate-api
 	%SPHINXBUILD% -b latex %ALLSPHINXOPTS% %BUILDDIR%/latex
 	cd %BUILDDIR%/latex
 	make all-pdf
@@ -241,7 +228,6 @@ if "%1" == "latexpdf" (
 )
 
 if "%1" == "latexpdfja" (
-	call make.bat generate-api
 	%SPHINXBUILD% -b latex %ALLSPHINXOPTS% %BUILDDIR%/latex
 	cd %BUILDDIR%/latex
 	make all-pdf-ja
@@ -252,7 +238,6 @@ if "%1" == "latexpdfja" (
 )
 
 if "%1" == "text" (
-	call make.bat generate-api
 	%SPHINXBUILD% -b text %ALLSPHINXOPTS% %BUILDDIR%/text
 	if errorlevel 1 exit /b 1
 	echo.
@@ -261,7 +246,6 @@ if "%1" == "text" (
 )
 
 if "%1" == "man" (
-	call make.bat generate-api
 	%SPHINXBUILD% -b man %ALLSPHINXOPTS% %BUILDDIR%/man
 	if errorlevel 1 exit /b 1
 	echo.
@@ -270,7 +254,6 @@ if "%1" == "man" (
 )
 
 if "%1" == "texinfo" (
-	call make.bat generate-api
 	%SPHINXBUILD% -b texinfo %ALLSPHINXOPTS% %BUILDDIR%/texinfo
 	if errorlevel 1 exit /b 1
 	echo.
@@ -279,7 +262,6 @@ if "%1" == "texinfo" (
 )
 
 if "%1" == "gettext" (
-	call make.bat generate-api
 	%SPHINXBUILD% -b gettext %I18NSPHINXOPTS% %BUILDDIR%/locale
 	if errorlevel 1 exit /b 1
 	echo.
@@ -288,7 +270,6 @@ if "%1" == "gettext" (
 )
 
 if "%1" == "changes" (
-	call make.bat generate-api
 	%SPHINXBUILD% -b changes %ALLSPHINXOPTS% %BUILDDIR%/changes
 	if errorlevel 1 exit /b 1
 	echo.
@@ -297,7 +278,6 @@ if "%1" == "changes" (
 )
 
 if "%1" == "linkcheck" (
-	call make.bat generate-api
 	%SPHINXBUILD% -b linkcheck %ALLSPHINXOPTS% %BUILDDIR%/linkcheck
 	if errorlevel 1 exit /b 1
 	echo.
@@ -307,7 +287,6 @@ or in %BUILDDIR%/linkcheck/output.txt.
 )
 
 if "%1" == "doctest" (
-	call make.bat generate-api
 	%SPHINXBUILD% -b doctest %ALLSPHINXOPTS% %BUILDDIR%/doctest
 	if errorlevel 1 exit /b 1
 	echo.
@@ -317,7 +296,6 @@ results in %BUILDDIR%/doctest/output.txt.
 )
 
 if "%1" == "coverage" (
-	call make.bat generate-api
 	%SPHINXBUILD% -b coverage %ALLSPHINXOPTS% %BUILDDIR%/coverage
 	if errorlevel 1 exit /b 1
 	echo.
@@ -327,7 +305,6 @@ results in %BUILDDIR%/coverage/python.txt.
 )
 
 if "%1" == "xml" (
-	call make.bat generate-api
 	%SPHINXBUILD% -b xml %ALLSPHINXOPTS% %BUILDDIR%/xml
 	if errorlevel 1 exit /b 1
 	echo.
@@ -336,7 +313,6 @@ if "%1" == "xml" (
 )
 
 if "%1" == "pseudoxml" (
-	call make.bat generate-api
 	%SPHINXBUILD% -b pseudoxml %ALLSPHINXOPTS% %BUILDDIR%/pseudoxml
 	if errorlevel 1 exit /b 1
 	echo.
@@ -345,7 +321,6 @@ if "%1" == "pseudoxml" (
 )
 
 if "%1" == "dummy" (
-	call make.bat generate-api
 	%SPHINXBUILD% -b dummy %ALLSPHINXOPTS% %BUILDDIR%/dummy
 	if errorlevel 1 exit /b 1
 	echo.
