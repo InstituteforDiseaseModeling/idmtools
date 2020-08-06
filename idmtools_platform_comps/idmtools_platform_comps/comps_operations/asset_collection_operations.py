@@ -102,12 +102,13 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         missing_files = ac.save(return_missing_files=True)
         if missing_files:
             ac2 = COMPSAssetCollection()
+            ac2.set_tags(ac.tags)
             total_size = 0
             for asset, cksum in ac_map.items():
                 if cksum in missing_files:
                     if asset.absolute_path:
                         total_size += os.path.getsize(asset.absolute_path)
-                        ac.add_asset(
+                        ac2.add_asset(
                             AssetCollectionFile(
                                 file_name=asset.filename,
                                 relative_path=asset.relative_path
@@ -116,7 +117,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
                         )
                     else:
                         total_size += len(asset.bytes)
-                        ac.add_asset(
+                        ac2.add_asset(
                             AssetCollectionFile(
                                 file_name=asset.filename,
                                 relative_path=asset.relative_path
