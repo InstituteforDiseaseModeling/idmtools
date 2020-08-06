@@ -150,8 +150,17 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         return e
 
     def platform_modify_experiment(self, experiment: Experiment) -> Experiment:
+        """
+        Executed when an Experiment is being ran that is already in Created, Done, In Progress, or Failed State
+        Args:
+            experiment:
+
+        Returns:
+
+        """
         if experiment.status is not None:
             if experiment.assets.is_editable():
+                logger.debug("Updating experiment assets")
                 self.send_assets(experiment)
         return experiment
 
