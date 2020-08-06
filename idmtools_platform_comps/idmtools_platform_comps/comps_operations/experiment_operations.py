@@ -5,8 +5,10 @@ from itertools import tee
 from logging import getLogger, DEBUG
 from typing import List, Type, Generator, NoReturn, Optional, TYPE_CHECKING
 from uuid import UUID
+
 from COMPS.Data import Experiment as COMPSExperiment, QueryCriteria, Configuration, Suite as COMPSSuite, \
     Simulation as COMPSSimulation
+
 from idmtools.assets import AssetCollection, Asset
 from idmtools.core import ItemType
 from idmtools.core.experiment_factory import experiment_factory
@@ -146,6 +148,9 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         # Send the assets for the experiment
         self.send_assets(experiment)
         return e
+
+    def platform_modify_experiment(self, experiment: Experiment) -> Experiment:
+        return experiment
 
     def _get_experiment_command_line(self, check_command: bool, experiment: Experiment) -> CommandLine:
         """
@@ -354,7 +359,6 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
                     self.platform._simulations.to_entity(s, parent=obj, **kwargs)
                 )
         return obj
-
 
     def get_assets_from_comps_experiment(self, experiment: COMPSExperiment) -> Optional[AssetCollection]:
         if experiment.configuration and experiment.configuration.asset_collection_id:

@@ -78,6 +78,7 @@ class IPlatformExperimentOperations(ABC):
             Created platform item and the UUID of said item
         """
         if experiment.status is not None:
+            experiment = self.platform_modify_experiment(experiment)
             return experiment
         if do_pre:
             self.pre_create(experiment, **kwargs)
@@ -294,3 +295,15 @@ class IPlatformExperimentOperations(ABC):
 
     def platform_list_asset(self, experiment: Experiment, **kwargs) -> List[Asset]:
         return []
+
+    def platform_modify_experiment(self, experiment: Experiment) -> Experiment:
+        """
+        API to allow detection of experiments already created
+
+        Args:
+            experiment:
+
+        Returns:
+
+        """
+        return experiment
