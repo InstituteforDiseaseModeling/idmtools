@@ -19,7 +19,7 @@ MODEL_LOAD_LIB = "install_requirements.py"
 MODEL_CREATE_AC = 'create_asset_collection.py'
 MD5_KEY = 'idmtools-requirements-md5-{}'
 # We use this to track os. It would be nice to do that in server
-SLURM_ENVS = ['Calculon', 'SLURMStage']
+SLURM_ENVS = ['Calculon', 'SLURMStage', "SLURMDev"]
 logger = getLogger(__name__)
 user_logger = getLogger("user")
 
@@ -224,8 +224,14 @@ class RequirementsToAssetCollection:
             comps_wi = self.platform.get_item(wi.uid, ItemType.WORKFLOW_ITEM, raw=True)
             comps_wi.add_related_asset_collection(comps_ac.id, relation_type=RelationType.Created)
             comps_wi.save()
-
             return wi
+        else:
+            user_logger.warning("Work item failed. See logs")
+            try:
+                files = self.platform.get_files_by_id(wi.uid, wi.item_type, ["stderr.txt"])
+                user_logger.error(f'Server Error Log: {files["stderr.txt"].decode("utf-8")}')
+            except:  # noqa: E722
+                pass
 
     @staticmethod
     def get_latest_version(pkg_name, display_all=False):

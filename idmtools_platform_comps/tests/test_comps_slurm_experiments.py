@@ -1,25 +1,26 @@
-import os
 import json
+import os
 from functools import partial
+from typing import Any, Dict
 
 import pytest
 from COMPS.Data import Experiment as COMPSExperiment
 from COMPS.Data import QueryCriteria
+
 from idmtools import __version__
+from idmtools.assets import AssetCollection
 from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
-from typing import Any, Dict
-from idmtools.assets import AssetCollection
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
+from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import \
+    RequirementsToAssetCollection
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.common_experiments import wait_on_experiment_and_check_all_sim_status
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.shared_functions import validate_sim_tags, validate_output
-from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import \
-    RequirementsToAssetCollection
 
 setA = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
 setB = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="b")
@@ -95,7 +96,7 @@ class TestCOMPSSlurmExperiment(ITestWithPersistence):
                                            requirements_path=os.path.join(assets_path, 'requirements.txt'))
 
         ac_id = pl.run(rerun=False)
-        pandas_assets = AssetCollection.from_id(ac_id, platform=self.platform)
+        pandas_assets = AssetCollection.from_id(ac_id, platform=self.platform, as_copy=True)
 
         # Define some constant string used in this example
         class ConfigParameters:
