@@ -161,6 +161,8 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         if experiment.status is not None:
             if experiment.assets.is_editable():
                 logger.debug("Updating experiment assets")
+                # trigger precreate just to be usre
+                experiment.pre_creation()
                 self.send_assets(experiment)
         return experiment
 

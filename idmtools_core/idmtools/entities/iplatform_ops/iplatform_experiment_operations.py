@@ -175,6 +175,8 @@ class IPlatformExperimentOperations(ABC):
         # ensure the item is created before running
         if experiment.status is None:
             self.create(experiment, **kwargs)
+        else:
+            experiment = self.platform_modify_experiment(experiment)
 
         # check sims
         logger.debug("Ensuring simulations exist")

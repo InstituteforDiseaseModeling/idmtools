@@ -11,7 +11,7 @@ with Platform('COMPS2'):
     # Create First Experiment
     builder = SimulationBuilder()
     builder.add_sweep_definition(JSONConfiguredPythonTask.set_parameter_partial("a"),
-                                 [i * i for i in range(5)])
+                                 [i for i in range(5)])
     model_path = os.path.join("..", "..", "python_model", "inputs", "python_model_with_deps", "Assets", "model.py")
     sims_template = TemplatedSimulations(base_task=JSONConfiguredPythonTask(script_path=model_path))
     sims_template.add_builder(builder=builder)
@@ -22,7 +22,13 @@ with Platform('COMPS2'):
     # create a new sweep for new simulations
     builder = SimulationBuilder()
     builder.add_sweep_definition(JSONConfiguredPythonTask.set_parameter_partial("a"),
-                                 [i * i for i in range(6, 10)])
+                                 [i for i in range(6, 10)])
+
+    # Changing the Common Assets
+    experiment.assets = experiment.assets.copy()
+    # Add new simulations to the experiment
+    model_path = os.path.join("..", "..", "python_model", "inputs", "python_model_with_deps", "Assets", "newmodel2.py")
+    sims_template = TemplatedSimulations(base_task=JSONConfiguredPythonTask(script_path=model_path))
     sims_template.add_builder(builder=builder)
     experiment.simulations.extend(sims_template)
 
