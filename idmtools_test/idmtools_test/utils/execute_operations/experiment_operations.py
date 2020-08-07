@@ -209,8 +209,8 @@ class TestExecutePlatformExperimentOperation(IPlatformExperimentOperations):
 
         return experiment
 
-    def platform_modify_experiment(self, experiment: Experiment, gather_common_assets: bool = False, **kwargs) -> Experiment:
-        experiment.pre_creation(gather_common_assets)
+    def platform_modify_experiment(self, experiment: Experiment, regather_common_assets: bool = False, **kwargs) -> Experiment:
+        experiment.pre_creation(regather_common_assets)
         EXPERIMENTS_LOCK.acquire()
         self.experiments[experiment.uid] = experiment
         EXPERIMENTS_LOCK.release()

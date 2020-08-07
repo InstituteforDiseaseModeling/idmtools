@@ -34,4 +34,4 @@ with Platform('COMPS2'):
     # experiment.simulations = simulations
 
     # run all simulations in the experiment that have not run before and wait
-    experiment.run(wait_until_done=True, gather_common_assets=True)
+    experiment.run(wait_until_done=True, regather_common_assets=True)

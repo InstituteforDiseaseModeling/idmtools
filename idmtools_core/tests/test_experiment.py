@@ -97,7 +97,7 @@ class TestAddingSimulationsToExistingExperiment(unittest.TestCase):
         # previous experiments
         self.assertTrue(len(exp.simulations) - count, 5)
         with self.assertRaises(ValueError) as r:
-            exp.run(wait_until_done=True, gather_common_assets=True)
+            exp.run(wait_until_done=True, regather_common_assets=True)
 
 
 class TestExperimentStatus(unittest.TestCase):

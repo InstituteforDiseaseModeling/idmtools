@@ -298,13 +298,13 @@ class IPlatformExperimentOperations(ABC):
     def platform_list_asset(self, experiment: Experiment, **kwargs) -> List[Asset]:
         return []
 
-    def platform_modify_experiment(self, experiment: Experiment, gather_common_assets: bool = False, **kwargs) -> Experiment:
+    def platform_modify_experiment(self, experiment: Experiment, regather_common_assets: bool = False, **kwargs) -> Experiment:
         """
         API to allow detection of experiments already created
 
         Args:
             experiment:
-            gather_assets: When modifying, should we gather assets from template/simulations
+            regather_common_assets: When modifying, should we gather assets from template/simulations
 
         Returns:
 

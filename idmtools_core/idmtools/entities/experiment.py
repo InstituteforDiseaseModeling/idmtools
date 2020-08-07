@@ -359,23 +359,24 @@ class Experiment(IAssetsEnabled, INamedEntity):
         p = super()._check_for_platform_from_context(platform)
         return p._experiments.list_assets(self, children, **kwargs)
 
-    def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None, gather_common_assets: bool = False, **run_opts) -> NoReturn:
+    def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None, regather_common_assets: bool = False,
+            **run_opts) -> NoReturn:
         """
         Runs an experiment on a platform
 
         Args:
             wait_until_done: Whether we should wait on experiment to finish running as well. Defaults to False
             platform: Platform object to use. If not specified, we first check object for platform object then the current context
-            gather_common_assets: Triggers gathering of assets for existing experiments. Normally we assume assets are same as existing experiment
+            regather_common_assets: Triggers gathering of assets for existing experiments. Normally we assume assets are same as existing experiment
             **run_opts: Options to pass to the platform
 
         Returns:
             None
         """
         p = super()._check_for_platform_from_context(platform)
-        if gather_common_assets and self.platform_id is None:
+        if regather_common_assets and self.platform_id is None:
             raise ValueError("Only user gather_common_assets on existing experiments")
-        run_opts['gather_common_assets'] = gather_common_assets
+        run_opts['regather_common_assets'] = regather_common_assets
         p.run_items(self, **run_opts)
         if wait_until_done:
             self.wait()

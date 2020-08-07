@@ -150,12 +150,12 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         self.send_assets(experiment)
         return e
 
-    def platform_modify_experiment(self, experiment: Experiment, gather_common_assets: bool = False, **kwargs) -> Experiment:
+    def platform_modify_experiment(self, experiment: Experiment, regather_common_assets: bool = False, **kwargs) -> Experiment:
         """
         Executed when an Experiment is being ran that is already in Created, Done, In Progress, or Failed State
         Args:
             experiment:
-            gather_common_assets:
+            regather_common_assets:
 
         Returns:
 
@@ -164,10 +164,10 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             if experiment.assets.is_editable():
                 logger.debug("Updating experiment assets")
                 # trigger precreate just to be uss
-                if not gather_common_assets:
+                if not regather_common_assets:
                     user_logger.warning(
                         f"No gathering common assets again since experiment exists on platform. If you need to add additional common assets, see {get_doc_base_url()}cookbook/asset_collections.html#modifying-asset-collection")
-                experiment.pre_creation(gather_common_assets)
+                experiment.pre_creation(regather_common_assets)
                 self.send_assets(experiment)
         return experiment
 
