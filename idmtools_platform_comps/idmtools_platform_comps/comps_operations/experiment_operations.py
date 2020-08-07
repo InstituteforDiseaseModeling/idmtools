@@ -18,6 +18,7 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools.utils.collections import ExperimentParentIterator
+from idmtools.utils.info import get_doc_base_url
 from idmtools.utils.time import timestamp
 from idmtools_platform_comps.utils.general import clean_experiment_name, convert_comps_status
 
@@ -74,7 +75,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
     def platform_create(self, experiment: Experiment, num_cores: Optional[int] = None,
                         executable_path: Optional[str] = None,
                         command_arg: Optional[str] = None, priority: Optional[str] = None,
-                        check_command: bool = True) -> COMPSExperiment:
+                        check_command: bool = True, **kwargs) -> COMPSExperiment:
         """
         Create Experiment on the COMPS Platform
 
@@ -149,11 +150,12 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         self.send_assets(experiment)
         return e
 
-    def platform_modify_experiment(self, experiment: Experiment) -> Experiment:
+    def platform_modify_experiment(self, experiment: Experiment, gather_common_assets: bool = False, **kwargs) -> Experiment:
         """
         Executed when an Experiment is being ran that is already in Created, Done, In Progress, or Failed State
         Args:
             experiment:
+            gather_common_assets:
 
         Returns:
 
@@ -161,8 +163,11 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         if experiment.status is not None:
             if experiment.assets.is_editable():
                 logger.debug("Updating experiment assets")
-                # trigger precreate just to be usre
-                experiment.pre_creation()
+                # trigger precreate just to be uss
+                if not gather_common_assets:
+                    user_logger.warning(
+                        f"No gathering common assets again since experiment exists on platform. If you need to add additional common assets, see {get_doc_base_url()}cookbook/asset_collections.html#modifying-asset-collection")
+                experiment.pre_creation(gather_common_assets)
                 self.send_assets(experiment)
         return experiment
 
