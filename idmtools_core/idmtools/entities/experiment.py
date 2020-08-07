@@ -376,6 +376,9 @@ class Experiment(IAssetsEnabled, INamedEntity):
         p = super()._check_for_platform_from_context(platform)
         if regather_common_assets and self.platform_id is None:
             raise ValueError("Only user gather_common_assets on existing experiments")
+        elif regather_common_assets and not self.assets.is_editable():
+            raise ValueError(
+                "To modify an experiment's asset collection, you must make a copy of it first.\nexperiment.assets = experiment.assets.copy()")
         run_opts['regather_common_assets'] = regather_common_assets
         p.run_items(self, **run_opts)
         if wait_until_done:
