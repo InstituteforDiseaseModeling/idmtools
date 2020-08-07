@@ -19,11 +19,7 @@ with Platform('COMPS2'):
     experiment = Experiment.from_template(sims_template)
     experiment.run(wait_until_done=True)
 
-    # create a new sweep for new simulations
-    builder = SimulationBuilder()
-    builder.add_sweep_definition(JSONConfiguredPythonTask.set_parameter_partial("a"),
-                                 [i for i in range(6, 10)])
-
+    # You could start with experiment = Experiment.from_id(....)
     # Changing the Common Assets
     experiment.assets = experiment.assets.copy()
     # Add new simulations to the experiment

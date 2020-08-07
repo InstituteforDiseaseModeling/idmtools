@@ -19,6 +19,7 @@ with Platform('COMPS2'):
     experiment = Experiment.from_template(sims_template)
     experiment.run(wait_until_done=True)
 
+    # You could start with experiment = Experiment.from_id(....)
     # create a new sweep for new simulations
     builder = SimulationBuilder()
     builder.add_sweep_definition(JSONConfiguredPythonTask.set_parameter_partial("a"),
