@@ -1,3 +1,5 @@
+import hashlib
+import io
 import json
 import os
 import shutil
@@ -9,7 +11,7 @@ from typing import Any, List, Type, Dict, Union, TYPE_CHECKING, Optional
 from uuid import UUID, uuid4
 
 from idmtools.assets import Asset, AssetCollection
-from idmtools.core import UnknownItemException, EntityStatus, ItemType
+from idmtools.core import EntityStatus, ItemType
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
 from idmtools.utils.file import file_contents_to_generator
@@ -79,7 +81,8 @@ class TestExecutePlatformExperimentOperation(IPlatformExperimentOperations):
         with open(path, 'w') as out:
             out.write(json.dumps(experiment.to_dict(), cls=IDMJSONEncoder))
         for sim in experiment.simulations:
-            self.platform._simulations.run_item(sim)
+            if sim.status in [None, EntityStatus.CREATED]:
+                self.platform._simulations.run_item(sim)
 
     def get_experiment_path(self, experiment_id: Union[UUID, str]) -> str:
         """
@@ -108,6 +111,8 @@ class TestExecutePlatformExperimentOperation(IPlatformExperimentOperations):
                     break
 
     def send_assets(self, experiment: Experiment, **kwargs):
+        # calculate total md5 of all files
+        md5 = hashlib.md5()
         path = os.path.join(self.platform.execute_directory, str(experiment.uid), "Assets")
         if logger.isEnabledFor(DEBUG):
             logger.debug(f"Creating {path}")
@@ -118,8 +123,12 @@ class TestExecutePlatformExperimentOperation(IPlatformExperimentOperations):
             if asset.absolute_path:
                 if logger.isEnabledFor(DEBUG):
                     logger.debug(f"Copying {asset.absolute_path} to {remote_path}")
+                with open(asset.absolute_path) as ifi:
+                    self.__calculate_partial_md5(ifi, md5)
                 shutil.copy(asset.absolute_path, remote_path)
             else:
+                ifi = io.BytesIO(asset.content.encode('utf-8') if isinstance(asset.content, str) else asset.content)
+                self.__calculate_partial_md5(ifi, md5)
                 if logger.isEnabledFor(DEBUG):
                     logger.debug(f"Writing {asset.absolute_path} to {remote_path}")
                 with open(remote_path, 'wb') as out:
@@ -127,6 +136,16 @@ class TestExecutePlatformExperimentOperation(IPlatformExperimentOperations):
                         out.write(asset.content.encode('utf-8'))
                     else:
                         out.write(asset.content)
+
+        experiment.assets.platform_id = md5.hexdigest()
+
+    def __calculate_partial_md5(self, ifi, md5):
+        while True:
+            chunk = ifi.read(8196)
+            if not chunk:
+                break
+            else:
+                md5.update(chunk.encode('utf-8'))
 
     def refresh_status(self, experiment: Experiment, **kwargs):
         if logger.isEnabledFor(DEBUG):
@@ -188,4 +207,11 @@ class TestExecutePlatformExperimentOperation(IPlatformExperimentOperations):
                 **kwargs
             )
 
+        return experiment
+
+    def platform_modify_experiment(self, experiment: Experiment) -> Experiment:
+        EXPERIMENTS_LOCK.acquire()
+        self.experiments[experiment.uid] = experiment
+        EXPERIMENTS_LOCK.release()
+        self.send_assets(experiment)
         return experiment
