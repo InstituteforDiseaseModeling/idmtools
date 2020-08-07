@@ -16,14 +16,21 @@ class IEntity(IItem, metaclass=ABCMeta):
     """
     Interface for all entities in the system.
     """
+    #: Platform ID
     platform_id: UUID = field(default=None, compare=False, metadata={"md": True})
+    #: Platform item
     _platform: 'IPlatform' = field(default=None, compare=False, metadata={"pickle_ignore": True})  # noqa E821
+    #: Item's Parent ID
     parent_id: UUID = field(default=None, metadata={"md": True})
+    #: Parent Item
     _parent: 'IEntity' = field(default=None, compare=False, metadata={"pickle_ignore": True})
+    #: Item's Status
     status: EntityStatus = field(default=None, compare=False, metadata={"pickle_ignore": True})
+    #: Item's tags
     tags: Dict[str, Any] = field(default_factory=lambda: {}, metadata={"md": True})
+    #: Item Type
     item_type: ItemType = field(default=None, compare=False)
-    # Platform
+    # Item in Platform
     _platform_object: Any = field(default=None, compare=False, metadata={"pickle_ignore": True}, repr=False)
 
     def update_tags(self, tags: dict = None) -> NoReturn:
@@ -42,7 +49,7 @@ class IEntity(IItem, metaclass=ABCMeta):
         if platform is None:
             from idmtools.core.context import CURRENT_PLATFORM
             if CURRENT_PLATFORM is None:
-                raise ValueError("You have to specify a platfrom to load the item from")
+                raise ValueError("You have to specify a platform to load the item from")
             platform = CURRENT_PLATFORM
         if cls.item_type is None:
             raise EnvironmentError("ItemType is None. This is most likely a badly derived IEntity "
