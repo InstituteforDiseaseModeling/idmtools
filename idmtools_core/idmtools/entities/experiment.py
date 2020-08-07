@@ -377,8 +377,9 @@ class Experiment(IAssetsEnabled, INamedEntity):
         if regather_common_assets and self.platform_id is None:
             raise ValueError("Only user gather_common_assets on existing experiments")
         elif regather_common_assets and not self.assets.is_editable():
-            raise ValueError(
-                "To modify an experiment's asset collection, you must make a copy of it first.\nexperiment.assets = experiment.assets.copy()")
+            message = "To modify an experiment's asset collection, you must make a copy of it first. For example\nexperiment.assets = experiment.assets.copy()"
+            user_logger.error(message)  # Show it bold red to user
+            raise ValueError(message)
         run_opts['regather_common_assets'] = regather_common_assets
         p.run_items(self, **run_opts)
         if wait_until_done:
@@ -418,19 +419,23 @@ class Experiment(IAssetsEnabled, INamedEntity):
 
     # Define this here for better completion in IDEs for end users
     @classmethod
-    def from_id(cls, item_id: Union[str, uuid.UUID], platform: 'IPlatform' = None, **kwargs) -> 'Experiment':
+    def from_id(cls, item_id: Union[str, uuid.UUID], platform: 'IPlatform' = None, copy_assets: bool = False, **kwargs) -> 'Experiment':
         """
         Helper function to provide better intellisense to end users
 
         Args:
             item_id: Item id to load
             platform: Optional platform. Fallbacks to context
+            copy_assets: Allow copying assets on load. Makes modifying experiments easier when new assets are involved.
             **kwargs: Optional arguments to be passed on to the platform
 
         Returns:
 
         """
-        return super().from_id(item_id, platform, **kwargs)
+        result = super().from_id(item_id, platform, **kwargs)
+        if copy_assets:
+            result.assets = result.assets.copy()
+        return result
 
     def print(self, verbose: bool = False):
         """

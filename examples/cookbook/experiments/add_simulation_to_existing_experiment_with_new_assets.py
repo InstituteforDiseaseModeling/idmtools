@@ -19,7 +19,7 @@ with Platform('COMPS2'):
     experiment = Experiment.from_template(sims_template)
     experiment.run(wait_until_done=True)
 
-    # You could start with experiment = Experiment.from_id(....)
+    # You could start with experiment = Experiment.from_id(...., copy_assets=True)
     # Changing the Common Assets
     experiment.assets = experiment.assets.copy()
     # Add new simulations to the experiment
