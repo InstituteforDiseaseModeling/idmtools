@@ -11,6 +11,7 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.itask import ITask
 from idmtools.entities.simulation import Simulation
 from idmtools.utils.entities import as_dict
+from datetime import datetime
 
 user_logger = getLogger('user')
 
@@ -48,6 +49,8 @@ class IDMJSONEncoder(JSONEncoder):
             return o.assets
         elif isinstance(o, (dict, int, list, str)):
             return o
+        elif isinstance(o, datetime):
+            return str(o)
 
 
 def load_json_file(path: str) -> Union[Dict[Any, Any], List]:
