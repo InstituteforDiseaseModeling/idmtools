@@ -106,6 +106,8 @@ class Platform:
         except KeyError:
             # try to use the block name as the type
             if missing_ok:
+                user_logger.warning(
+                    "You are specifying a platform without a configuration file or configuration block. Be sure you have supplied all required parameters for the Platform as this can result in unexpected behaviour. Running this way is only recommended for development mode. Instead, it is recommended you create an idmtools.ini to capture the config once you have tested and confirmed your configuration.")
                 platform_type = block
             else:
                 raise ValueError(
