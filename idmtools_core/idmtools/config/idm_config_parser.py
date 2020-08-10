@@ -15,9 +15,16 @@ user_logger = getLogger('user')
 
 
 def initialization(error=False, force=False):
+    # store default value
+    oerror = error
+
     def wrap(func):
         def wrapped_f(*args, **kwargs):
-            IdmConfigParser.ensure_init(error=error, force=force)
+            if 'error' in kwargs:
+                ferror = kwargs.pop('error')
+            else:
+                ferror = oerror
+            IdmConfigParser.ensure_init(error=ferror, force=force)
             value = func(*args, **kwargs)
             return value
 
@@ -208,6 +215,8 @@ class IdmConfigParser:
         Args:
             dir_path: The directory to search for the INI configuration file.
             file_name: The configuration file name to search for.
+            force: Force reload of everything
+            error: Throws error if idmtools.ini cannot be found
 
         Returns:
             None
