@@ -18,9 +18,15 @@
 #
 import configparser
 import os
+import subprocess
 import sys
+
 import sphinx_rtd_theme
 
+if sys.platform in ["linux", "darwin"]:
+    subprocess.check_output(["make", "generate-api"], cwd=os.path.dirname(os.path.abspath(__file__)))
+else:
+    subprocess.check_output(["make.bat", "generate-api"], cwd=os.path.dirname(os.path.abspath(__file__)))
 # -- General configuration ------------------------------------------------
 
 # If your docs needs a minimal Sphinx version, state it here.
@@ -48,22 +54,8 @@ autodoc_default_options = {
     'exclude-members': '__all__'
 }
 
-autodoc_mock_imports = ['shapefile',
-                        'polyline',
-                        'psycopg2',
-                        'npyscreen',
-                        'wx',
-                        '_curses',
-                        'ConfigParser',
-                        'MenuForm',
-                        'osm2nx',
-                        'pika',
-                        'create_experiment',
-                        'create_simulation',
-                        'dramatiq',
-                        'docker_run',
-                        'dramatiq.GenericActor',
-                        'GenericActor'
+autodoc_mock_imports = ['pika',
+                        'dramatiq'
                         ]
 
 
@@ -207,15 +199,6 @@ html_static_path = ['_static']
 html_context = {
     'css_files': [
         '_static/theme_overrides.css',
-        '_static/tipuesearch/tipuesearch.css'
-    ],
-    'script_files': [
-        '_static/jquery.js',
-        '_static/tipuesearch/tipuesearch.js',
-        '_static/tipuesearch/tipuesearch_content.js',
-        '_static/tipuesearch/tipuesearch_set.js',
-        '_static/runsearch.js',
-        '_static/tablecollapse.js'
     ]
 }
 # Add any extra paths that contain custom files (such as robots.txt or

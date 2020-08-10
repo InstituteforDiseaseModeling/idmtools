@@ -1,11 +1,12 @@
-import sys
 import os
 import random
+import sys
+
 assets_dir = os.path.abspath(os.path.dirname(__file__))
 current_directory = os.getcwd()
 p_version = sys.version_info
 CURRENT_DIRECTORY = os.path.dirname(__file__)
-LIBRARY_PATH = os.path.join(CURRENT_DIRECTORY, 'site_packages')  # Need to site_packages level!!!
+LIBRARY_PATH = os.path.join(CURRENT_DIRECTORY, 'site-packages')  # Need to site-packages level!!!
 
 sys.path.insert(0, LIBRARY_PATH)  # Very Important!
 import pandas as pd  # noqa

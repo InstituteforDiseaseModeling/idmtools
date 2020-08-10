@@ -4,8 +4,10 @@ from functools import partial
 from logging import getLogger, DEBUG
 from typing import Any, List, Dict, Type, Optional, TYPE_CHECKING
 from uuid import UUID
+
 from COMPS.Data import Simulation as COMPSSimulation, QueryCriteria, Experiment as COMPSExperiment, SimulationFile, \
     Configuration
+
 from idmtools.assets import AssetCollection, Asset
 from idmtools.core import ItemType
 from idmtools.core.task_factory import TaskFactory
@@ -258,7 +260,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         cols = ['state']
         if additional_columns:
-            cols.append(cols)
+            cols.extend(additional_columns)
         s = COMPSSimulation.get(id=simulation.uid, query_criteria=QueryCriteria().select(cols))
         simulation.status = convert_comps_status(s.state)
 
@@ -450,12 +452,19 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
                 assets.extend(sa.assets)
         return assets
 
-    def all_files(self, simulation: Simulation, **kwargs) -> List[Asset]:
+    def retrieve_output_files(self, simulation: Simulation):
+        metadata = simulation.get_platform_object().retrieve_output_file_info([])
+        assets = self.platform._assets.to_entity(metadata).assets
+        return assets
+
+    def all_files(self, simulation: Simulation, common_assets: bool = False, outfiles: bool = True, **kwargs) -> List[Asset]:
         """
         Returns all files for a specific simulation including experiments or non-assets
 
         Args:
             simulation: Simulation all files
+            common_assets: Include experiment assets
+            outfiles: Include output files
             **kwargs:
 
         Returns:
@@ -463,6 +472,9 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         ac = AssetCollection()
         ac.add_assets(self.list_assets(simulation, **kwargs))
-        ac.add_assets(self.list_assets(simulation, non_assets=True))
-        ac.add_assets(simulation.parent.assets)
+        if common_assets:
+            ac.add_assets(simulation.parent.assets)
+        if outfiles:
+            ac.add_assets(self.retrieve_output_files(simulation))
+
         return ac.assets

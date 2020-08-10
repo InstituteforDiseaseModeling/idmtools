@@ -1,12 +1,13 @@
 backoff~=1.10.0
 coloredlogs~=14.0
 diskcache==4.1.0
+humanfriendly~=8.2
 marshmallow~=3.7
 more-itertools~=8.4.0
-pandas==1.0.5
+pandas==1.1.0
 pipreqs==0.4.10
 pluggy~=0.13.1
 PyYaml~=5.3
 tabulate~=0.8.7
-tqdm~=4.47.0
+tqdm~=4.48.2
 packaging~=20.4

@@ -5,6 +5,10 @@ from typing import List
 logger = getLogger(__name__)
 
 
+def get_doc_base_url():
+    return "https://institutefordiseasemodeling.github.io/idmtools/"
+
+
 def get_pip_packages_10_to_6():
     """
     Load packages for versions 1.0 to 6 of pip.

@@ -21,7 +21,7 @@ with platform('COMPS2'):
     # define our base task with addition of the Comps Asset collection
     base_task = JSONConfiguredPythonTask(
         script_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"),
-        common_assets=AssetCollection.from_id(collection_id)
+        common_assets=AssetCollection.from_id(collection_id, as_copy=True)
     )
 
     # create a templated simulation builder using our base task

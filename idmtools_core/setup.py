@@ -16,7 +16,7 @@ build_requirements = ['flake8', 'coverage', 'py-make', 'bump2version', 'twine']
 test_requirements = ['pytest~=5.4.1', 'pytest-runner~=5.2', 'xmlrunner~=1.7.7', 'pytest-xdist',
                      'pytest-timeout', 'pytest-cache'] + build_requirements
 
-version = '1.3.0'
+version = '1.4.0'
 
 extras = {
     'test': test_requirements,
