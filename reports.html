@@ -14,7 +14,6 @@
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-  <link rel="stylesheet" href="_static/tipuesearch/tipuesearch.css" type="text/css" />
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
 
   
@@ -32,11 +31,9 @@
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
-        <script src="_static/tipuesearch/tipuesearch.js"></script>
-        <script src="_static/tipuesearch/tipuesearch_content.js"></script>
-        <script src="_static/tipuesearch/tipuesearch_set.js"></script>
-        <script src="_static/runsearch.js"></script>
-        <script src="_static/tablecollapse.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -78,16 +75,18 @@
             
             
               <div class="version">
-                1.3.0
+                1.4.0
               </div>
             
           
 
-          <div role="search">
-    <form action="search-local.html" class='wy-form' id='rtd-search-form' method="get">
-        <input autocomplete="off" id="tipue_search_input" name="q" placeholder="Search docs"
-               required type="text">
-    </form>
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
 </div>
 
           
@@ -111,6 +110,7 @@
 <li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reference.html">Architecture and packages reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="recipes_index.html">User Recipes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
@@ -161,8 +161,6 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-<!-- From _templates/page.html -->
-
   <div class="section" id="output-data">
 <h1>Output data<a class="headerlink" href="#output-data" title="Permalink to this headline">¶</a></h1>
 <p>The output produced by running simulations using idmtools depends on the
@@ -172,12 +170,13 @@ simulation output in CSV, JSON, XLSX, or TXT to be automatically loaded to a
 Python object. All other formats are loaded as a raw binary stream. For more
 information, see <a class="reference internal" href="analyzers.html"><span class="doc">Introduction to analyzers</span></a>.</p>
 <p>If you are running simulations on COMPS, the configuration of the
-<a class="reference internal" href="cli-config.html"><span class="doc">idmtools.ini file</span></a> file will determine where output files can be found.</p>
+<code class="docutils literal notranslate"><span class="pre">idmtools.ini</span></code> file will determine where output files can be found.
+For more information, see <a class="reference internal" href="wizard.html"><span class="doc">idmtools.ini wizard</span></a></p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>To access and use COMPS you must receive approval and credentials from IDM. Send your request to <a class="reference external" href="mailto:support&#37;&#52;&#48;idmod&#46;org">support<span>&#64;</span>idmod<span>&#46;</span>org</a>.</p>
 </div>
-<p>If you are running simulations or experiments locally, they are saved to your local computer at C:\Users\yourname.local_data\workers for Windows and ~/.local_data/workers for Linux.</p>
+<p>If you are running simulations or experiments locally, they are saved to your local computer at C:\Users\yourname\.local_data\workers for Windows and ~/.local_data/workers for Linux.</p>
 <p>Additionally, when running locally using Docker, output can be found in your browser in the output directory appended after the experiment or simulation ID. For example, the output from an experiment with an ID of S07OASET could be found at <a class="reference external" href="http://localhost:5000/data/S07OASET">http://localhost:5000/data/S07OASET</a>. The output from an individual simulation (ID FCPRIV7H) within that experiment could be found at <a class="reference external" href="http://localhost:5000/data/S07OASET/FCPRIV7H">http://localhost:5000/data/S07OASET/FCPRIV7H</a>.</p>
 <p>The python_csv_output.py example below demonstrates how to produce output in CSV format for a simple parameter sweep.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example Python Experiment</span>
@@ -240,8 +239,6 @@ information, see <a class="reference internal" href="analyzers.html"><span class
 </div>
 
 
-<div id="tipue_search_content"></div>
-
            </div>
            
           </div>
@@ -293,28 +290,7 @@ information, see <a class="reference internal" href="analyzers.html"><span class
   
   
     
-  
-<!-- Google analytics for IDM docs -->
- 
-<script>
-    (function (i, s, o, g, r, a, m) {
-        i['GoogleAnalyticsObject'] = r;
-        i[r] = i[r] || function () {
-            (i[r].q = i[r].q || []).push(arguments)
-        }, i[r].l = 1 * new Date();
-        a = s.createElement(o),
-            m = s.getElementsByTagName(o)[0];
-        a.async = 1;
-        a.src = g;
-        m.parentNode.insertBefore(a, m)
-    })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
-
-    ga('create', 'UA-87656833-3', 'auto');
-    ga('send', 'pageview');
-
-</script>
-
-
+   
 
 </body>
 </html>
