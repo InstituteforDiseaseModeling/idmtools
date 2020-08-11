@@ -78,6 +78,7 @@ class IPlatformExperimentOperations(ABC):
             Created platform item and the UUID of said item
         """
         if experiment.status is not None:
+            experiment = self.platform_modify_experiment(experiment, **kwargs)
             return experiment
         if do_pre:
             self.pre_create(experiment, **kwargs)
@@ -174,6 +175,8 @@ class IPlatformExperimentOperations(ABC):
         # ensure the item is created before running
         if experiment.status is None:
             self.create(experiment, **kwargs)
+        else:
+            experiment = self.platform_modify_experiment(experiment, **kwargs)
 
         # check sims
         logger.debug("Ensuring simulations exist")
@@ -294,3 +297,16 @@ class IPlatformExperimentOperations(ABC):
 
     def platform_list_asset(self, experiment: Experiment, **kwargs) -> List[Asset]:
         return []
+
+    def platform_modify_experiment(self, experiment: Experiment, regather_common_assets: bool = False, **kwargs) -> Experiment:
+        """
+        API to allow detection of experiments already created
+
+        Args:
+            experiment:
+            regather_common_assets: When modifying, should we gather assets from template/simulations
+
+        Returns:
+
+        """
+        return experiment

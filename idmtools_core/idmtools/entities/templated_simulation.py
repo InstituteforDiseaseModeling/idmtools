@@ -152,6 +152,18 @@ class TemplatedSimulations:
         """
         self.__extra_simulations.append(simulation)
 
+    def add_simulations(self, simulations: List[Simulation]):
+        """
+        Add multiple simulations without templating. See add_simulation
+
+        Args:
+            simulations: Simulation to add
+
+        Returns:
+
+        """
+        self.__extra_simulations.extend(simulations)
+
     def new_simulation(self):
         """
         Return a new simulation object.

@@ -11,6 +11,7 @@ from logging import getLogger
 from threading import Lock
 from typing import List, Dict, Any, Type, TYPE_CHECKING, Optional
 from uuid import UUID, uuid4
+
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core import EntityStatus
 from idmtools.core.task_factory import TaskFactory
@@ -118,6 +119,8 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
                 simulation.uid = uuid4()
                 self.save_metadata(simulation)
                 self.post_create(simulation)
+                simulations.append(simulation)
+            else:
                 simulations.append(simulation)
         return simulations
 

@@ -9,6 +9,7 @@ from typing import Any, Dict
 import pytest
 from COMPS.Data import Experiment as COMPSExperiment, AssetCollection as COMPSAssetCollection
 from COMPS.Data import QueryCriteria
+
 from idmtools import __version__
 from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import ArmSimulationBuilder, ArmType, SimulationBuilder, SweepArm
@@ -429,7 +430,7 @@ class TestPythonExperiment(ITestWithPersistence):
         ac = self.get_existing_python_asset_collection()
 
         # Create new ac starting from an existing asset collection and add a file you need to run your experiment
-        new_ac = AssetCollection(ac.assets)
+        new_ac = AssetCollection(ac)
         new_ac.add_asset(Asset(relative_path=None, filename="test.json", content=json.dumps({"min_x": -2, "max_x": 2})))
         self.platform.create_items([new_ac])
         new_ac = self.platform.get_item(new_ac.uid, item_type=ItemType.ASSETCOLLECTION)

@@ -142,7 +142,8 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         return s
 
     @staticmethod
-    def get_simulation_config_from_simulation(simulation: Simulation, num_cores: int = None, priority: str = None) -> \
+    def get_simulation_config_from_simulation(simulation: Simulation, num_cores: int = None, priority: str = None,
+                                              asset_collection_id: UUID = None) -> \
             Configuration:
         """
         Get the comps configuration for a Simulation Object
@@ -151,14 +152,14 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             simulation: Simulation
             num_cores: Optional Num of core for MPI
             priority: Optional Priority
-
+            asset_collection_id: Override simulation asset_collection_id
 
         Returns:
             Configuration
         """
         comps_configuration = dict()
-        if simulation.experiment.assets.count != 0:
-            comps_configuration['asset_collection_id'] = simulation.experiment.assets.uid
+        if asset_collection_id:
+            comps_configuration['asset_collection_id'] = asset_collection_id
         comps_exp: COMPSExperiment = simulation.parent.get_platform_object()
         comps_exp_config: Configuration = comps_exp.configuration
         if num_cores is not None and num_cores != comps_exp_config.max_cores:
@@ -404,7 +405,9 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             po.refresh(QueryCriteria().select_children('configuration'))
         # simulation configuration for executable?
         if simulation.configuration and simulation.configuration.executable_path:
-            cli = f'{simulation.configuration.executable_path} {simulation.configuration.simulation_input_args.strip()}'
+            cli = f'{simulation.configuration.executable_path}'
+            if simulation.configuration.simulation_input_args:
+                cli += " " + simulation.configuration.simulation_input_args.strip()
         elif po.configuration and po.configuration.executable_path:
             cli = f'{po.configuration.executable_path} {po.configuration.simulation_input_args.strip()}'
         if cli is None:
@@ -452,12 +455,19 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
                 assets.extend(sa.assets)
         return assets
 
-    def all_files(self, simulation: Simulation, **kwargs) -> List[Asset]:
+    def retrieve_output_files(self, simulation: Simulation):
+        metadata = simulation.get_platform_object().retrieve_output_file_info([])
+        assets = self.platform._assets.to_entity(metadata).assets
+        return assets
+
+    def all_files(self, simulation: Simulation, common_assets: bool = False, outfiles: bool = True, **kwargs) -> List[Asset]:
         """
         Returns all files for a specific simulation including experiments or non-assets
 
         Args:
             simulation: Simulation all files
+            common_assets: Include experiment assets
+            outfiles: Include output files
             **kwargs:
 
         Returns:
@@ -465,6 +475,9 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         ac = AssetCollection()
         ac.add_assets(self.list_assets(simulation, **kwargs))
-        ac.add_assets(self.list_assets(simulation, non_assets=True))
-        ac.add_assets(simulation.parent.assets)
+        if common_assets:
+            ac.add_assets(simulation.parent.assets)
+        if outfiles:
+            ac.add_assets(self.retrieve_output_files(simulation))
+
         return ac.assets

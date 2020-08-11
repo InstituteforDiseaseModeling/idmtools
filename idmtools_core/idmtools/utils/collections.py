@@ -27,7 +27,7 @@ def cut_iterable_to(obj: Iterable, to: int) -> Tuple[Union[List, Mapping], int]:
     return slice, remaining
 
 
-class ParentIterator(typing.Iterator):
+class ExperimentParentIterator(typing.Iterator['Simulation']):  # noqa F821
     def __init__(self, lst, parent: 'IEntity'):  # noqa F821
         self.items = lst
         self.__iter = iter(self.items) if not isinstance(self.items, (typing.Iterator, Generator)) else self.items
@@ -62,6 +62,18 @@ class ParentIterator(typing.Iterator):
             self.items.append(item)
             return
         raise ValueError("Items doesn't support appending")
+
+    def extend(self, item: Union[List['Simulation'], 'TemplatedSimulations']):  # noqa F821
+        from idmtools.entities.templated_simulation import TemplatedSimulations
+        if isinstance(self.items, (list, set)):
+            # if it is a template, try to preserve so we can user generators
+            if isinstance(item, TemplatedSimulations):
+                self.items.extend(list(item))
+            else:
+                self.items.extend(item)
+            return
+
+        raise ValueError("Items doesn't support extending")
 
 
 class ResetGenerator(typing.Iterator):

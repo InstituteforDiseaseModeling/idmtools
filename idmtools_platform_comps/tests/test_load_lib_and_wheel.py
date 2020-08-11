@@ -9,10 +9,9 @@ from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
-from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import \
     RequirementsToAssetCollection
-
+from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import del_folder
 
 model_path = os.path.join(os.path.dirname(__file__), "inputs", "simple_load_lib_example")
@@ -37,7 +36,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         requirements_path = os.path.join(model_path, 'requirements.txt')
         pl = RequirementsToAssetCollection(self.platform, requirements_path=requirements_path)
         ac_id = pl.run(rerun=True)
-        common_assets = AssetCollection.from_id(ac_id, platform=self.platform)
+        common_assets = AssetCollection.from_id(ac_id, platform=self.platform, as_copy=True)
 
         # create python task with script 'model_file.py', task is doing this in comps: "python ./Assets/zipp_file.py"
         script_path = os.path.join(model_path, 'zipp_file.py')
@@ -72,7 +71,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         # ------------------------------------------------------
         pl = RequirementsToAssetCollection(self.platform, requirements_path="", pkg_list=["xmlrunner==1.7.7"])
         ac_id = pl.run()
-        common_assets = AssetCollection.from_id(ac_id, platform=self.platform)
+        common_assets = AssetCollection.from_id(ac_id, platform=self.platform, as_copy=True)
 
         # create python task with script 'model_file.py', task is doing this in comps: "python ./Assets/model_file.py"
         script_path = os.path.join(model_path, 'zipp_file.py')
@@ -108,7 +107,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         local_wheels_path = [os.path.join(model_path, 'seaborn-0.7.1-py2.py3-none-any.whl')]
         pl = RequirementsToAssetCollection(self.platform, requirements_path=requirements_path, local_wheels=local_wheels_path)
         ac_id = pl.run()
-        common_assets = AssetCollection.from_id(ac_id, platform=self.platform)
+        common_assets = AssetCollection.from_id(ac_id, platform=self.platform, as_copy=True)
 
         # create python task with script 'seaborn_file.py', task is doing this in comps: "python ./Assets/seaborn_file.py"
         script_path = os.path.join(model_path, 'seaborn_file.py')
@@ -145,7 +144,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         requirements_path = os.path.join(model_path, 'requirements1.txt')
         pl = RequirementsToAssetCollection(platform, requirements_path=requirements_path)
         ac_id = pl.run()
-        common_assets = AssetCollection.from_id(ac_id, platform=platform)
+        common_assets = AssetCollection.from_id(ac_id, platform=platform, as_copy=True)
 
         # create python task with script 'zipp_file_slurm.py', task is doing this in comps: "python ./Assets/zipp_file_slurm.py"
         script_path = os.path.join(model_path, 'model_file.py')
@@ -171,7 +170,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         requirements_path = os.path.join(model_path, 'requirements.txt')
         pl = RequirementsToAssetCollection(platform, requirements_path=requirements_path)
         ac_id = pl.run(rerun=True)
-        common_assets = AssetCollection.from_id(ac_id, platform=platform)
+        common_assets = AssetCollection.from_id(ac_id, platform=platform, as_copy=True)
 
         # create python task with script 'zipp_file_slurm.py', task is doing this in comps: "python ./Assets/zipp_file_slurm.py"
         script_path = os.path.join(model_path, 'zipp_file_slurm.py')
@@ -205,7 +204,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         requirements_path = os.path.join(model_path, 'requirements3.txt')
         pl = RequirementsToAssetCollection(self.platform, requirements_path=requirements_path)
         ac_id = pl.run()
-        common_assets = AssetCollection.from_id(ac_id, platform=self.platform)
+        common_assets = AssetCollection.from_id(ac_id, platform=self.platform, as_copy=True)
 
         # create python task with script 'seaborn_file.py', task is doing this in comps: "python ./Assets/seaborn_file.py"
         script_path = os.path.join(model_path, 'seaborn_file.py')
@@ -234,7 +233,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         pl = RequirementsToAssetCollection(self.platform, requirements_path=requirements_path)
         ac_id = pl.run(rerun=False)
         self.assertIsNotNone(ac_id)
-        common_assets = AssetCollection.from_id(ac_id, platform=self.platform)
+        common_assets = AssetCollection.from_id(ac_id, platform=self.platform, as_copy=True)
 
         # create python task with script 'seaborn_file.py', task is doing this in comps: "python ./Assets/seaborn_file.py"
         script_path = os.path.join(model_path, 'seaborn_file.py')

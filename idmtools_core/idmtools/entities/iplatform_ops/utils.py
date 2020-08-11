@@ -1,10 +1,12 @@
-from concurrent.futures.thread import ThreadPoolExecutor
 from concurrent.futures import as_completed, Future
+from concurrent.futures.thread import ThreadPoolExecutor
 from functools import partial
 from logging import getLogger, DEBUG
 from typing import List, Union, Generator, Iterable, Callable, Any
+
 from more_itertools import chunked
 from tqdm import tqdm
+
 from idmtools.core import EntityContainer
 from idmtools.entities.templated_simulation import TemplatedSimulations
 
@@ -71,7 +73,7 @@ def batch_create_items(items: Union[Iterable, Generator], batch_worker_thread_fu
     """
     global EXECUTOR
     from idmtools.config import IdmConfigParser
-    from idmtools.utils.collections import ParentIterator
+    from idmtools.utils.collections import ExperimentParentIterator
 
     # Consider values from the block that Platform uses
     _batch_size = int(IdmConfigParser.get_option(None, "batch_size", fallback=16))
@@ -94,10 +96,10 @@ def batch_create_items(items: Union[Iterable, Generator], batch_worker_thread_fu
 
     total = 0
     parent = None
-    if isinstance(items, ParentIterator) and isinstance(items.items, TemplatedSimulations):
+    if isinstance(items, ExperimentParentIterator) and isinstance(items.items, TemplatedSimulations):
         parent = items.parent
         i = items.items.simulations().generator
-    elif isinstance(items, ParentIterator) and isinstance(items.items, EntityContainer):
+    elif isinstance(items, ExperimentParentIterator) and isinstance(items.items, EntityContainer):
         parent = items.parent
         i = items.items
     else:

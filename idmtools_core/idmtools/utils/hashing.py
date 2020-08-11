@@ -63,11 +63,11 @@ class Hasher(Pickler):
             return self._hash.hexdigest()
 
     def save(self, obj):
-        from idmtools.utils.collections import ParentIterator
+        from idmtools.utils.collections import ExperimentParentIterator
         import abc
         if isinstance(obj, abc.ABCMeta):
             pass
-        elif isinstance(obj, ParentIterator):
+        elif isinstance(obj, ExperimentParentIterator):
             pass
         elif isinstance(obj, Logger):
             pass
@@ -148,3 +148,24 @@ def ignore_fields_in_dataclass_on_pickle(item):
                 state[field_name] = field_default[field_name]
 
     return state
+
+
+def calculate_md5(filename: str, chunk_size: int = 8192) -> str:
+    """
+    Calculate MD5
+
+    Args:
+        filename: Filename to caclulate md5 for
+        chunk_size: Chunk size
+
+    Returns:
+
+    """
+    with open(filename, "rb") as f:
+        file_hash = hashlib.md5()
+        while True:
+            chunk = f.read(chunk_size)
+            if not chunk:
+                break
+            file_hash.update(chunk)
+        return file_hash.hexdigest()
