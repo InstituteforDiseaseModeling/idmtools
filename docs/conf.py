@@ -54,22 +54,8 @@ autodoc_default_options = {
     'exclude-members': '__all__'
 }
 
-autodoc_mock_imports = ['shapefile',
-                        'polyline',
-                        'psycopg2',
-                        'npyscreen',
-                        'wx',
-                        '_curses',
-                        'ConfigParser',
-                        'MenuForm',
-                        'osm2nx',
-                        'pika',
-                        'create_experiment',
-                        'create_simulation',
-                        'dramatiq',
-                        'docker_run',
-                        'dramatiq.GenericActor',
-                        'GenericActor'
+autodoc_mock_imports = ['pika',
+                        'dramatiq'
                         ]
 
 
@@ -213,15 +199,6 @@ html_static_path = ['_static']
 html_context = {
     'css_files': [
         '_static/theme_overrides.css',
-        '_static/tipuesearch/tipuesearch.css'
-    ],
-    'script_files': [
-        '_static/jquery.js',
-        '_static/tipuesearch/tipuesearch.js',
-        '_static/tipuesearch/tipuesearch_content.js',
-        '_static/tipuesearch/tipuesearch_set.js',
-        '_static/runsearch.js',
-        '_static/tablecollapse.js'
     ]
 }
 # Add any extra paths that contain custom files (such as robots.txt or

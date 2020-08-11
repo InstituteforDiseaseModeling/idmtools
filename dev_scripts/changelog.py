@@ -4,8 +4,9 @@ import re
 import sys
 from collections import defaultdict
 from datetime import timezone
-from github import Github
+
 import pygit2
+from github import Github
 
 if os.getenv('GIT_TOKEN') is None and len(sys.argv) != 2:
     print('You must specify GIT_TOKEN through argument or environment variable GIT_TOKEN')
@@ -79,6 +80,8 @@ def get_issue_type(issue, labels):
         issue_types[issue] = 'Core'
     elif any([x in labels for x in ['Build/Development Environment', 'Test']]):
         issue_types[issue] = 'Developer/Test'
+    elif any([x in labels for x in ['dependencies']]):
+        issue_types[issue] = 'Dependencies'
 
 
 # fetch issue details
@@ -88,6 +91,9 @@ for issue in issues_to_references.keys():
     labels = [label.name for label in issue_data.labels]
     if (issue_data.pull_request is None or issue_data.pull_request.html_url != issue_data.html_url) \
             and not any(x in labels for x in exclude_labels):
+        issues_to_references[issue] = issue_data
+        get_issue_type(issue, labels)
+    elif "dependencies" in labels:
         issues_to_references[issue] = issue_data
         get_issue_type(issue, labels)
 
@@ -104,6 +110,11 @@ for issue in gh_repo.get_issues(state='closed'):
                     and not any(x in labels for x in exclude_labels):
                 release_file = os.path.join(DOCS_DIR, f'changelog_{release}.rst')
                 if issue.pull_request is None or issue.pull_request.html_url != issue.html_url:
+                    if not os.path.exists(release_file):
+                        issues_to_references[issue.number] = issue
+                        release_notes[release][f'#{issue.number} - {issue.title}'] = [issue]
+                        get_issue_type(issue.number, labels)
+                elif "dependencies" in labels:
                     if not os.path.exists(release_file):
                         issues_to_references[issue.number] = issue
                         release_notes[release][f'#{issue.number} - {issue.title}'] = [issue]
