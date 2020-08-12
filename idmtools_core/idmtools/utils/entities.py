@@ -65,7 +65,7 @@ def validate_user_inputs_against_dataclass(field_type, field_value):
                 field_value[fn] = ast.literal_eval(field_value[fn]) if isinstance(field_value[fn], str) else \
                     field_value[fn]
         except ValueError as e:
-            user_logger.error(f"The field {fn} requires a value of type {ft.__name__}. You provided {field_value[fn]}")
+            user_logger.error(f"The field {fn} requires a value of type {ft.__name__}. You provided <{field_value[fn]}>")
             raise e
     return fs_kwargs
 
