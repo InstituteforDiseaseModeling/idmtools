@@ -86,6 +86,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             command_arg: Command Argument
             priority: Priority of command
             check_command: Run task hooks on item
+            **kwargs: Keyword arguments used to expand functionality. At moment these are usually not used
 
         Returns:
             COMPSExperiment that was created
