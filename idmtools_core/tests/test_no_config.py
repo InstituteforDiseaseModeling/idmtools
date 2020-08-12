@@ -17,11 +17,11 @@ class TestNoConfig(ITestWithPersistence):
         IdmConfigParser.clear_instance()
         self.current_directory = os.getcwd()
         self.temp_directory = tempfile.TemporaryDirectory()
-        os.chdir(self.temp_directory.name)
+        #os.chdir(self.temp_directory.name)
 
     def tearDown(self) -> None:
         self.temp_directory.cleanup()
-        os.chdir(self.current_directory)
+        #os.chdir(self.current_directory)
 
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     @pytest.mark.comps
@@ -60,5 +60,5 @@ class TestNoConfig(ITestWithPersistence):
                                 num_retries='0',
                                 exclusive='False', missing_ok=True)
             experiment = Experiment.from_id('a7ea2ac2-a068-ea11-a2c5-c4346bcb1550')
-            self.assertIn("File 'idmtools.ini' Not Found!", output.getvalue())
-            self.assertIn("The field num_cores requires a value of type int. You provided <abc>", output.getvalue())
+        self.assertIn("File 'idmtools.ini' Not Found!", output.getvalue())
+        self.assertIn("The field num_cores requires a value of type int. You provided <abc>", output.getvalue())
