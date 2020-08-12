@@ -281,7 +281,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         """
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'Commissioning experiment: {experiment.uid}')
-        #experiment.get_platform_object().commission()
+        experiment.get_platform_object().commission()
 
     def send_assets(self, experiment: Experiment, **kwargs):
         """
