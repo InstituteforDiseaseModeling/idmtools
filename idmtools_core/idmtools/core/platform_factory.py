@@ -94,6 +94,11 @@ class Platform:
         # Read block details
         try:
             section = IdmConfigParser.get_section(block, error=not missing_ok)
+            if not section and missing_ok:
+                # its possible our logger is not setup
+                from idmtools.core.logging import setup_logging, VERBOSE, listener
+                if not listener:
+                    setup_logging()
         except ValueError as e:
             if missing_ok:
                 section = dict() if default_missing is None else default_missing

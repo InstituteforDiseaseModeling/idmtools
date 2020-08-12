@@ -1,6 +1,9 @@
 import ast
 import dataclasses
 import typing
+from logging import getLogger
+
+user_logger = getLogger('user')
 
 
 def get_dataclass_common_fields(src, dest, exclude_none: bool = True) -> typing.Dict:
@@ -55,11 +58,15 @@ def validate_user_inputs_against_dataclass(field_type, field_value):
     fs_kwargs = set(field_type.keys()).intersection(set(field_value.keys()))
     for fn in fs_kwargs:
         ft = field_type[fn]
-        if ft in (int, float, str):
-            field_value[fn] = ft(field_value[fn]) if field_value[fn] is not None else field_value[fn]
-        elif ft is bool:
-            field_value[fn] = ast.literal_eval(field_value[fn]) if isinstance(field_value[fn], str) else \
-                field_value[fn]
+        try:
+            if ft in (int, float, str):
+                field_value[fn] = ft(field_value[fn]) if field_value[fn] is not None else field_value[fn]
+            elif ft is bool:
+                field_value[fn] = ast.literal_eval(field_value[fn]) if isinstance(field_value[fn], str) else \
+                    field_value[fn]
+        except ValueError as e:
+            user_logger.error(f"The field {fn} requires a value of type {ft}. You provided {field_value[fn]}")
+            raise e
     return fs_kwargs
 
 
