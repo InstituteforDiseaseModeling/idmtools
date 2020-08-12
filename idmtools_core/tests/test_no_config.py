@@ -17,11 +17,11 @@ class TestNoConfig(ITestWithPersistence):
         IdmConfigParser.clear_instance()
         self.current_directory = os.getcwd()
         self.temp_directory = tempfile.TemporaryDirectory()
-        #os.chdir(self.temp_directory.name)
+        os.chdir(self.temp_directory.name)
 
     def tearDown(self) -> None:
         self.temp_directory.cleanup()
-        #os.chdir(self.current_directory)
+        os.chdir(self.current_directory)
 
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     @pytest.mark.comps
