@@ -1,5 +1,7 @@
+import io
 import os
 import tempfile
+import unittest.mock
 import pytest
 from idmtools.config import IdmConfigParser
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
@@ -21,8 +23,9 @@ class TestNoConfig(ITestWithPersistence):
         self.temp_directory.cleanup()
         os.chdir(self.current_directory)
 
+    @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     @pytest.mark.comps
-    def test_success(self):
+    def test_success(self, output):
 
         sim_root_dir = os.path.join('$COMPS_PATH(USER)', 'output')
         plat_obj = Platform('COMPS',
@@ -40,9 +43,11 @@ class TestNoConfig(ITestWithPersistence):
             experiment = Experiment.from_id('a7ea2ac2-a068-ea11-a2c5-c4346bcb1550')
         except:  # noqa: E722
             pass
+        self.assertIn("File 'idmtools.ini' Not Found!", output.getvalue())
 
     @pytest.mark.comps
-    def test_failure(self):
+    @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
+    def test_failure(self, output):
         sim_root_dir = os.path.join('$COMPS_PATH(USER)', 'output')
         with self.assertRaises(ValueError) as a:
             plat_obj = Platform('COMPS',
@@ -55,3 +60,5 @@ class TestNoConfig(ITestWithPersistence):
                                 num_retries='0',
                                 exclusive='False', missing_ok=True)
             experiment = Experiment.from_id('a7ea2ac2-a068-ea11-a2c5-c4346bcb1550')
+            self.assertIn("File 'idmtools.ini' Not Found!", output.getvalue())
+            self.assertIn("The field num_cores requires a value of type int. You provided <abc>", output.getvalue())
