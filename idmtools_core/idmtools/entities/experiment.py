@@ -144,7 +144,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
                 if "task_type" not in self.tags:
                     task_class = self.simulations.items.base_task.__class__
                     self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
-            elif self.gather_common_assets_from_task and isinstance(self.__simulations, List):
+            elif self.gather_common_assets_from_task and isinstance(self.simulations.items, List):
                 if logger.isEnabledFor(DEBUG):
                     logger.debug("Using first task for task type")
                     logger.debug("Using all tasks to gather assts")
