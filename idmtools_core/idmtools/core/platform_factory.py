@@ -1,3 +1,4 @@
+import os
 from contextlib import contextmanager
 from dataclasses import fields
 from logging import getLogger
@@ -30,7 +31,7 @@ def platform(*args, **kwds):
 
 class Platform:
 
-    def __new__(cls, block, missing_ok: bool = False, **kwargs):
+    def __new__(cls, block, missing_ok: bool = None, **kwargs):
         """
         Create a platform based on the block and all other inputs.
 
@@ -49,6 +50,15 @@ class Platform:
 
         if block is None:
             raise ValueError("Must have a valid Block name to create a Platform!")
+
+        if missing_ok is None:
+            env_value = os.getenv("IDMTOOLS_ERROR_NO_CONFIG", None)
+            if env_value:
+                user_logger.warning("Using IDMTOOLS_ERROR_NO_CONFIG environment variable to control behaviour of missing ini file")
+                # here missing ok is the opposite of the config. We want to error by default, so missing ok it if the user said NOT to error, so therefore not in truthy values
+                missing_ok = os.getenv("IDMTOOLS_ERROR_NO_CONFIG", "1").lower() not in ["1", "y", "t", "true", "yes"]
+            else:
+                missing_ok = False
 
         # Load all Platform plugins
         cls._platforms = PlatformPlugins().get_plugin_map()
