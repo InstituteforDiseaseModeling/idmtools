@@ -22,6 +22,9 @@ def initialization(error=False, force=False):
         def wrapped_f(*args, **kwargs):
             if 'error' in kwargs:
                 ferror = kwargs.pop('error')
+            elif os.getenv("IDMTOOLS_ERROR_NO_CONFIG", None):
+                user_logger.warning("Using IDMTOOLS_ERROR_NO_CONFIG environment variable to control behaviour of missing ini file")
+                ferror = os.getenv("IDMTOOLS_ERROR_NO_CONFIG").lower() in ["t", "1", "true", "yes"]
             else:
                 ferror = oerror
             IdmConfigParser.ensure_init(error=ferror, force=force)
