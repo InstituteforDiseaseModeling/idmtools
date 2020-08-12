@@ -21,6 +21,7 @@ with Platform('COMPS2'):
 
     # You could start with experiment = Experiment.from_id(....)
     # create a new sweep for new simulations
+    sims_template = TemplatedSimulations(base_task=JSONConfiguredPythonTask(script_path=model_path))
     builder = SimulationBuilder()
     builder.add_sweep_definition(JSONConfiguredPythonTask.set_parameter_partial("a"),
                                  [i * i for i in range(6, 10)])
