@@ -136,7 +136,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
 
         # if it is a template, set task type on experiment
         if gather_assets:
-            if isinstance(self.simulations, ExperimentParentIterator) and isinstance(self.simulations.items, TemplatedSimulations):
+            if isinstance(self.simulations.items, TemplatedSimulations):
                 if logger.isEnabledFor(DEBUG):
                     logger.debug("Using Base task from template for experiment level assets")
                 self.simulations.items.base_task.gather_common_assets()
