@@ -154,8 +154,8 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         """
         Executed when an Experiment is being ran that is already in Created, Done, In Progress, or Failed State
         Args:
-            experiment:
-            regather_common_assets:
+            experiment: Experiment to modify
+            regather_common_assets: Triggers a new AC to be associated with experiment. It is important to note that when using this feature, ensure the previous simulations have finished provisioning. Failure to do so can lead to unexpected behaviour
 
         Returns:
 
@@ -280,7 +280,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         """
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'Commissioning experiment: {experiment.uid}')
-        experiment.get_platform_object().commission()
+        #experiment.get_platform_object().commission()
 
     def send_assets(self, experiment: Experiment, **kwargs):
         """
