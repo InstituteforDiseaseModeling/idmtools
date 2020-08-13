@@ -49,7 +49,7 @@ class IEntity(IItem, metaclass=ABCMeta):
         if platform is None:
             from idmtools.core.context import CURRENT_PLATFORM
             if CURRENT_PLATFORM is None:
-                raise ValueError("You have to specify a platfrom to load the asset collection from")
+                raise ValueError("You have to specify a platform to load the item from")
             platform = CURRENT_PLATFORM
         if cls.item_type is None:
             raise EnvironmentError("ItemType is None. This is most likely a badly derived IEntity "
