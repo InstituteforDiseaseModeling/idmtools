@@ -3,7 +3,7 @@ import uuid
 from dataclasses import field, dataclass
 from functools import partial
 from hashlib import md5
-from logging import getLogger
+from logging import getLogger, DEBUG
 from typing import Type, Union, List, TYPE_CHECKING, Optional
 from uuid import UUID
 
@@ -96,6 +96,9 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
                 ac_map[asset] = asset.checksum
 
         # remove any duplicates
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f"Building ac. Filtered out {len(asset_collection) - len(ac_files)} duplicate files")
+        print(ac_files)
         for file in ac_files:
             ac.add_asset(AssetCollectionFile(file_name=file[0], relative_path=file[1], md5_checksum=file[2]))
         del ac_files
@@ -106,6 +109,8 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         # check for missing files first
         missing_files = ac.save(return_missing_files=True)
         if missing_files:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f"{len(missing_files)} missing files detected")
             ac2 = COMPSAssetCollection()
             if asset_collection.tags:
                 ac2.set_tags(ac.tags)
