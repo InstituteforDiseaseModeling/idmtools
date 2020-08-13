@@ -86,6 +86,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             command_arg: Command Argument
             priority: Priority of command
             check_command: Run task hooks on item
+            **kwargs: Keyword arguments used to expand functionality. At moment these are usually not used
 
         Returns:
             COMPSExperiment that was created
@@ -154,19 +155,19 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         """
         Executed when an Experiment is being ran that is already in Created, Done, In Progress, or Failed State
         Args:
-            experiment:
-            regather_common_assets:
+            experiment: Experiment to modify
+            regather_common_assets: Triggers a new AC to be associated with experiment. It is important to note that when using this feature, ensure the previous simulations have finished provisioning. Failure to do so can lead to unexpected behaviour
 
         Returns:
 
         """
         if experiment.status is not None:
             if experiment.assets.is_editable():
-                logger.debug("Updating experiment assets")
-                # trigger precreate just to be uss
+
+                # trigger precreate just to be sure
                 if not regather_common_assets:
                     user_logger.warning(
-                        f"No gathering common assets again since experiment exists on platform. If you need to add additional common assets, see {get_doc_base_url()}cookbook/asset_collections.html#modifying-asset-collection")
+                        f"Not gathering common assets again since experiment exists on platform. If you need to add additional common assets, see {get_doc_base_url()}cookbook/asset_collections.html#modifying-asset-collection")
                 experiment.pre_creation(regather_common_assets)
                 self.send_assets(experiment)
         return experiment

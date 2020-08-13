@@ -136,7 +136,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
 
         # if it is a template, set task type on experiment
         if gather_assets:
-            if isinstance(self.simulations, ExperimentParentIterator) and isinstance(self.simulations.items, TemplatedSimulations):
+            if isinstance(self.simulations.items, TemplatedSimulations):
                 if logger.isEnabledFor(DEBUG):
                     logger.debug("Using Base task from template for experiment level assets")
                 self.simulations.items.base_task.gather_common_assets()
@@ -144,7 +144,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
                 if "task_type" not in self.tags:
                     task_class = self.simulations.items.base_task.__class__
                     self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
-            elif self.gather_common_assets_from_task and isinstance(self.__simulations, List):
+            elif self.gather_common_assets_from_task and isinstance(self.simulations.items, List):
                 if logger.isEnabledFor(DEBUG):
                     logger.debug("Using first task for task type")
                     logger.debug("Using all tasks to gather assts")
@@ -368,6 +368,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
             wait_until_done: Whether we should wait on experiment to finish running as well. Defaults to False
             platform: Platform object to use. If not specified, we first check object for platform object then the current context
             regather_common_assets: Triggers gathering of assets for existing experiments. Normally we assume assets are same as existing experiment
+              It is important to note that when using this feature, ensure the previous simulations have finished provisioning. Failure to do so can lead to unexpected behaviour
             **run_opts: Options to pass to the platform
 
         Returns:

@@ -19,6 +19,11 @@ with Platform('COMPS2'):
     experiment = Experiment.from_template(sims_template)
     experiment.run(wait_until_done=True)
 
+    # IMPORTANT NOTE:
+    # Currently it is important you wait on existing Simulations to finish provision when changing assets later
+    # idmtools cannot detect this state at the moment and it can leave to unexpected behaviour
+
+
     # You could start with experiment = Experiment.from_id(...., copy_assets=True)
     # Changing the Common Assets
     experiment.assets = experiment.assets.copy()
