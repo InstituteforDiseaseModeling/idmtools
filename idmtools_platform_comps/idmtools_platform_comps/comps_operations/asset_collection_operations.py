@@ -136,6 +136,8 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
             ac = ac2
         asset_collection.uid = ac.id
         asset_collection._platform_object = asset_collection
+        asset_collection.platform = self.platform
+        asset_collection.platform_id = self.platform.uid
         return ac
 
     def to_entity(self, asset_collection: Union[COMPSAssetCollection, SimulationFile, List[SimulationFile], OutputFileMetadata], **kwargs) \

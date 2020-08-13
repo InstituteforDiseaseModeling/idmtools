@@ -16,14 +16,21 @@ class IEntity(IItem, metaclass=ABCMeta):
     """
     Interface for all entities in the system.
     """
+    #: ID of the platform
     platform_id: UUID = field(default=None, compare=False, metadata={"md": True})
+    #: Platform
     _platform: 'IPlatform' = field(default=None, compare=False, metadata={"pickle_ignore": True})  # noqa E821
+    #: Parent id
     parent_id: UUID = field(default=None, metadata={"md": True})
+    #: Parent object
     _parent: 'IEntity' = field(default=None, compare=False, metadata={"pickle_ignore": True})
+    #: Status of item
     status: EntityStatus = field(default=None, compare=False, metadata={"pickle_ignore": True})
+    #: Tags for item
     tags: Dict[str, Any] = field(default_factory=lambda: {}, metadata={"md": True})
+    #: Item Type(Experiment, Suite, Asset, etc)
     item_type: ItemType = field(default=None, compare=False)
-    # Platform
+    #: Platform Representation of Entity
     _platform_object: Any = field(default=None, compare=False, metadata={"pickle_ignore": True})
 
     def update_tags(self, tags: dict = None) -> NoReturn:
