@@ -307,6 +307,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         e = COMPSExperiment.get(id=experiment.uid)
         e.configuration = Configuration(asset_collection_id=ac.id)
         e.save()
+        experiment.assets.platform_id = ac.id
 
     def refresh_status(self, experiment: Experiment, **kwargs):
         """

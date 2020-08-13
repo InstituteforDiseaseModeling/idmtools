@@ -148,7 +148,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
 
         self.send_assets(simulation, s)
         s.set_tags(simulation.tags)
-        simulation._platform_object = self.platform
+        simulation._platform_object = s
         return s
 
     @staticmethod
