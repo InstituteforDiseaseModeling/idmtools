@@ -308,6 +308,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         e.configuration = Configuration(asset_collection_id=ac.id)
         e.save()
 
+
     def refresh_status(self, experiment: Experiment, **kwargs):
         """
         Reload status for experiment(load simulations)

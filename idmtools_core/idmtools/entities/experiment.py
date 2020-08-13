@@ -374,10 +374,10 @@ class Experiment(IAssetsEnabled, INamedEntity):
         Returns:
             None
         """
-        p = super()._check_for_platform_from_context(platform)
         if regather_common_assets and self.platform_id is None:
             raise ValueError("Only user gather_common_assets on existing experiments")
-        elif regather_common_assets and not self.assets.is_editable():
+        p = super()._check_for_platform_from_context(platform)
+        if regather_common_assets and not self.assets.is_editable():
             message = "To modify an experiment's asset collection, you must make a copy of it first. For example\nexperiment.assets = experiment.assets.copy()"
             user_logger.error(message)  # Show it bold red to user
             raise ValueError(message)
