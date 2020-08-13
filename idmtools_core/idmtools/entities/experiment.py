@@ -141,6 +141,8 @@ class Experiment(IAssetsEnabled, INamedEntity):
                     logger.debug("Using Base task from template for experiment level assets")
                 self.simulations.items.base_task.gather_common_assets()
                 self.assets.add_assets(self.simulations.items.base_task.common_assets, fail_on_duplicate=False)
+                for sim in self.simulations.items.extra_simulations():
+                    self.assets.add_assets(sim.task.gather_common_assets())
                 if "task_type" not in self.tags:
                     task_class = self.simulations.items.base_task.__class__
                     self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
