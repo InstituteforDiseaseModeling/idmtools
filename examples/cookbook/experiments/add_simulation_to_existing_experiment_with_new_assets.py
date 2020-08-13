@@ -32,7 +32,7 @@ with Platform('COMPS2'):
     sims_template = TemplatedSimulations(base_task=JSONConfiguredPythonTask(script_path=model_path))
     builder = SimulationBuilder()
     builder.add_sweep_definition(JSONConfiguredPythonTask.set_parameter_partial("a"),
-                                 [i for i in range(6,10)])
+                                 [i for i in range(6, 10)])
     sims_template.add_builder(builder=builder)
     experiment.simulations.extend(sims_template)
 
