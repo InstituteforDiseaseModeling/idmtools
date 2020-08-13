@@ -163,12 +163,13 @@ class TestExperimentStatus(unittest.TestCase):
         self.set_simulation_statuses_and_check_experiment_status(statuses=statuses, expected_status=expected)
 
         # some CREATED, SUCCEEDED
-        expected = EntityStatus.CREATED
+        # Since this a transition state we don't identify, the closer status is running. Platforms need to sometimes check status if they have to do extra here
+        expected = EntityStatus.RUNNING
         statuses = {EntityStatus.CREATED: 1, EntityStatus.SUCCEEDED: 4}
         self.set_simulation_statuses_and_check_experiment_status(statuses=statuses, expected_status=expected)
 
         # some CREATED, FAILED
-        expected = EntityStatus.FAILED
+        expected = EntityStatus.RUNNING
         statuses = {EntityStatus.CREATED: 1, EntityStatus.FAILED: 4}
         self.set_simulation_statuses_and_check_experiment_status(statuses=statuses, expected_status=expected)
 
@@ -185,7 +186,7 @@ class TestExperimentStatus(unittest.TestCase):
         self.set_simulation_statuses_and_check_experiment_status(statuses=statuses, expected_status=expected)
 
         # some RUNNING, FAILED
-        expected = EntityStatus.FAILED
+        expected = EntityStatus.RUNNING
         statuses = {EntityStatus.RUNNING: 1, EntityStatus.FAILED: 4}
         self.set_simulation_statuses_and_check_experiment_status(statuses=statuses, expected_status=expected)
 
@@ -209,7 +210,7 @@ class TestExperimentStatus(unittest.TestCase):
         # ---
 
         # some FAILED, None
-        expected = EntityStatus.FAILED
+        expected = EntityStatus.CREATED
         statuses = {EntityStatus.FAILED: 1, None: 4}
         self.set_simulation_statuses_and_check_experiment_status(statuses=statuses, expected_status=expected)
 
@@ -223,7 +224,7 @@ class TestExperimentStatus(unittest.TestCase):
         self.set_simulation_statuses_and_check_experiment_status(statuses=statuses, expected_status=expected)
 
         # some CREATED, RUNNING, FAILED
-        expected = EntityStatus.FAILED
+        expected = EntityStatus.RUNNING
         statuses = {EntityStatus.CREATED: 1, EntityStatus.RUNNING: 2, EntityStatus.FAILED: 2}
         self.set_simulation_statuses_and_check_experiment_status(statuses=statuses, expected_status=expected)
 
@@ -235,26 +236,26 @@ class TestExperimentStatus(unittest.TestCase):
         # ---
 
         # some CREATED, SUCCEEDED, FAILED
-        expected = EntityStatus.FAILED
+        expected = EntityStatus.RUNNING
         statuses = {EntityStatus.CREATED: 1, EntityStatus.SUCCEEDED: 2, EntityStatus.FAILED: 2}
         self.set_simulation_statuses_and_check_experiment_status(statuses=statuses, expected_status=expected)
 
         # some CREATED, SUCCEEDED, None
-        expected = EntityStatus.CREATED  # should only exist during commissioning process
+        expected = EntityStatus.RUNNING  # should only exist during commissioning process
         statuses = {EntityStatus.CREATED: 1, EntityStatus.SUCCEEDED: 2, None: 2}
         self.set_simulation_statuses_and_check_experiment_status(statuses=statuses, expected_status=expected)
 
         # ---
 
         # some CREATED, FAILED, None
-        expected = EntityStatus.FAILED  # should only exist during commissioning process
+        expected = EntityStatus.RUNNING  # should only exist during commissioning process
         statuses = {EntityStatus.CREATED: 1, EntityStatus.FAILED: 2, None: 2}
         self.set_simulation_statuses_and_check_experiment_status(statuses=statuses, expected_status=expected)
 
         # ---
 
         # some RUNNING, SUCCEEDED, FAILED
-        expected = EntityStatus.FAILED
+        expected = EntityStatus.RUNNING
         statuses = {EntityStatus.RUNNING: 1, EntityStatus.SUCCEEDED: 2, EntityStatus.FAILED: 2}
         self.set_simulation_statuses_and_check_experiment_status(statuses=statuses, expected_status=expected)
 
@@ -266,14 +267,14 @@ class TestExperimentStatus(unittest.TestCase):
         # ---
 
         # some RUNNING, FAILED, None
-        expected = EntityStatus.FAILED  # should only exist during commissioning process
+        expected = EntityStatus.RUNNING  # should only exist during commissioning process
         statuses = {EntityStatus.RUNNING: 1, EntityStatus.FAILED: 2, None: 2}
         self.set_simulation_statuses_and_check_experiment_status(statuses=statuses, expected_status=expected)
 
         # ---
 
         # some SUCCEEDED, FAILED, None
-        expected = EntityStatus.FAILED
+        expected = EntityStatus.CREATED
         statuses = {EntityStatus.SUCCEEDED: 1, EntityStatus.FAILED: 2, None: 2}
         self.set_simulation_statuses_and_check_experiment_status(statuses=statuses, expected_status=expected)
 
@@ -282,7 +283,7 @@ class TestExperimentStatus(unittest.TestCase):
         #
 
         # some CREATED, RUNNING, SUCCEEDED, FAILED
-        expected = EntityStatus.FAILED
+        expected = EntityStatus.RUNNING
         statuses = {EntityStatus.CREATED: 1, EntityStatus.RUNNING: 1, EntityStatus.SUCCEEDED: 1, EntityStatus.FAILED: 2}
         self.set_simulation_statuses_and_check_experiment_status(statuses=statuses, expected_status=expected)
 
@@ -292,17 +293,17 @@ class TestExperimentStatus(unittest.TestCase):
         self.set_simulation_statuses_and_check_experiment_status(statuses=statuses, expected_status=expected)
 
         # some CREATED, RUNNING, FAILED, None
-        expected = EntityStatus.FAILED  # should only exist during commissioning process
+        expected = EntityStatus.RUNNING  # should only exist during commissioning process
         statuses = {EntityStatus.CREATED: 1, EntityStatus.RUNNING: 1, EntityStatus.FAILED: 1, None: 2}
         self.set_simulation_statuses_and_check_experiment_status(statuses=statuses, expected_status=expected)
 
         # some CREATED, SUCCEEDED, FAILED, None
-        expected = EntityStatus.FAILED  # should only exist during commissioning process
+        expected = EntityStatus.RUNNING  # should only exist during commissioning process
         statuses = {EntityStatus.CREATED: 1, EntityStatus.SUCCEEDED: 1, EntityStatus.FAILED: 1, None: 2}
         self.set_simulation_statuses_and_check_experiment_status(statuses=statuses, expected_status=expected)
 
         # some RUNNING, SUCCEEDED, FAILED, None
-        expected = EntityStatus.FAILED  # should only exist during commissioning process
+        expected = EntityStatus.RUNNING  # should only exist during commissioning process
         statuses = {EntityStatus.RUNNING: 1, EntityStatus.SUCCEEDED: 1, EntityStatus.FAILED: 1, None: 2}
         self.set_simulation_statuses_and_check_experiment_status(statuses=statuses, expected_status=expected)
 
@@ -311,7 +312,7 @@ class TestExperimentStatus(unittest.TestCase):
         #
 
         # some CREATED, RUNNING, SUCCEEDED, FAILED, None
-        expected = EntityStatus.FAILED  # should only exist during commissioning process
+        expected = EntityStatus.RUNNING  # should only exist during commissioning process
         statuses = {EntityStatus.CREATED: 1, EntityStatus.RUNNING: 1, EntityStatus.SUCCEEDED: 1, EntityStatus.FAILED: 1,
                     None: 1}
         self.set_simulation_statuses_and_check_experiment_status(statuses=statuses, expected_status=expected)

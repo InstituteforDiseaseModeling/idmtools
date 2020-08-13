@@ -83,14 +83,20 @@ class Experiment(IAssetsEnabled, INamedEntity):
 
     @property
     def status(self):
-        if len(self.simulations.items) == 0 or all([s.status is None for s in self.simulations.items]):
+        # narrow down to states we have
+        sim_statuses = set([s.status for s in self.simulations.items])
+        if len(self.simulations.items) == 0 or all([s is None for s in sim_statuses]):
             status = None  # this will trigger experiment creation on a platform
-        elif any([s.status == EntityStatus.FAILED for s in self.simulations.items]):
-            status = EntityStatus.FAILED
-        elif all([s.status == EntityStatus.SUCCEEDED for s in self.simulations.items]):
-            status = EntityStatus.SUCCEEDED
-        elif any([s.status == EntityStatus.RUNNING for s in self.simulations.items]):
+        elif any([s == EntityStatus.RUNNING for s in sim_statuses]):
             status = EntityStatus.RUNNING
+        elif any([s == EntityStatus.CREATED for s in sim_statuses]) and any([s in [EntityStatus.FAILED, EntityStatus.SUCCEEDED] for s in sim_statuses]):
+            status = EntityStatus.RUNNING
+        elif any([s is None for s in sim_statuses]) and any([s in [EntityStatus.FAILED, EntityStatus.SUCCEEDED] for s in sim_statuses]):
+            status = EntityStatus.CREATED
+        elif any([s == EntityStatus.FAILED for s in sim_statuses]):
+            status = EntityStatus.FAILED
+        elif all([s == EntityStatus.SUCCEEDED for s in sim_statuses]):
+            status = EntityStatus.SUCCEEDED
         else:
             status = EntityStatus.CREATED
         return status
@@ -141,6 +147,8 @@ class Experiment(IAssetsEnabled, INamedEntity):
                     logger.debug("Using Base task from template for experiment level assets")
                 self.simulations.items.base_task.gather_common_assets()
                 self.assets.add_assets(self.simulations.items.base_task.common_assets, fail_on_duplicate=False)
+                for sim in self.simulations.items.extra_simulations():
+                    self.assets.add_assets(sim.task.gather_common_assets())
                 if "task_type" not in self.tags:
                     task_class = self.simulations.items.base_task.__class__
                     self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
