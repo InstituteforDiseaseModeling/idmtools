@@ -210,7 +210,7 @@ class IPlatformExperimentOperations(ABC):
 
         """
         self.pre_run_item(experiment, **kwargs)
-        if experiment.status not in [EntityStatus.RUNNING]:
+        if experiment.status not in [EntityStatus.FAILED, EntityStatus.SUCCEEDED]:
             self.platform_run_item(experiment, **kwargs)
             self.post_run_item(experiment, **kwargs)
 

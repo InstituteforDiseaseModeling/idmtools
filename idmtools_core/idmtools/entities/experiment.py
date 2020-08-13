@@ -85,12 +85,14 @@ class Experiment(IAssetsEnabled, INamedEntity):
     def status(self):
         if len(self.simulations.items) == 0 or all([s.status is None for s in self.simulations.items]):
             status = None  # this will trigger experiment creation on a platform
+        elif any([s.status == EntityStatus.RUNNING for s in self.simulations.items]):
+            status = EntityStatus.RUNNING
+        elif any([s.status == EntityStatus.CREATED for s in self.simulations.items]) and any([s.status in [EntityStatus.FAILED, EntityStatus.SUCCEEDED] for s in self.simulations.items]):
+            status = EntityStatus.RUNNING
         elif any([s.status == EntityStatus.FAILED for s in self.simulations.items]):
             status = EntityStatus.FAILED
         elif all([s.status == EntityStatus.SUCCEEDED for s in self.simulations.items]):
             status = EntityStatus.SUCCEEDED
-        elif any([s.status == EntityStatus.RUNNING for s in self.simulations.items]):
-            status = EntityStatus.RUNNING
         else:
             status = EntityStatus.CREATED
         return status
