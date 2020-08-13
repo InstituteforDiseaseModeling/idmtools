@@ -83,15 +83,19 @@ class Experiment(IAssetsEnabled, INamedEntity):
 
     @property
     def status(self):
-        if len(self.simulations.items) == 0 or all([s.status is None for s in self.simulations.items]):
+        # narrow down to states we have
+        sim_statuses = set([s.status for s in self.simulations.items])
+        if len(self.simulations.items) == 0 or all([s is None for s in sim_statuses]):
             status = None  # this will trigger experiment creation on a platform
-        elif any([s.status == EntityStatus.RUNNING for s in self.simulations.items]):
+        elif any([s == EntityStatus.RUNNING for s in sim_statuses]):
             status = EntityStatus.RUNNING
-        elif any([s.status == EntityStatus.CREATED for s in self.simulations.items]) and any([s.status in [EntityStatus.FAILED, EntityStatus.SUCCEEDED] for s in self.simulations.items]):
+        elif any([s == EntityStatus.CREATED for s in sim_statuses]) and any([s in [EntityStatus.FAILED, EntityStatus.SUCCEEDED] for s in sim_statuses]):
             status = EntityStatus.RUNNING
-        elif any([s.status == EntityStatus.FAILED for s in self.simulations.items]):
+        elif any([s is None for s in sim_statuses]) and any([s in [EntityStatus.FAILED, EntityStatus.SUCCEEDED] for s in sim_statuses]):
+            status = EntityStatus.CREATED
+        elif any([s == EntityStatus.FAILED for s in sim_statuses]):
             status = EntityStatus.FAILED
-        elif all([s.status == EntityStatus.SUCCEEDED for s in self.simulations.items]):
+        elif all([s == EntityStatus.SUCCEEDED for s in sim_statuses]):
             status = EntityStatus.SUCCEEDED
         else:
             status = EntityStatus.CREATED
