@@ -16,6 +16,7 @@ from idmtools.entities.iplatform import IPlatform
 
 logger = getLogger(__name__)
 
+
 def fatal_code(e: Exception) -> bool:
     """
     Uses to determine if we should stop retrying based on request status code
@@ -189,7 +190,6 @@ def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str
         item.platform = platform
     if comps_item is None:
         comps_item = item.get_platform_object(True, load_children=load_children)
-    
 
     all_paths = set(files)
     assets = set(path for path in all_paths if path.lower().startswith("assets"))

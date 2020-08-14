@@ -133,7 +133,7 @@ class IEntity(IItem, metaclass=ABCMeta):
         else:
             self._platform = self.platform_id = None
 
-    def get_platform_object(self, force: bool=False, **kwargs):
+    def get_platform_object(self, force: bool = False, **kwargs):
         """
         Get the platform representation of an object
 
