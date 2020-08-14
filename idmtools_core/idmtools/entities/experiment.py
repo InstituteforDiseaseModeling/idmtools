@@ -192,6 +192,16 @@ class Experiment(IAssetsEnabled, INamedEntity):
         return all([s.succeeded for s in self.simulations])
 
     @property
+    def any_failed(self) -> bool:
+        """
+        Return if an experiment has any simulation in failed state.
+
+        Returns:
+            True if all simulations have succeeded, False otherwise
+        """
+        return any([s for s in self.simulations])
+
+    @property
     def simulations(self) -> ExperimentParentIterator:
         return ExperimentParentIterator(self.__simulations, parent=self)
 

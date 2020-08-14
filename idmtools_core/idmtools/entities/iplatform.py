@@ -713,6 +713,9 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         # check if we need to update the progress bar
         if done > progress_bar.last_print_n:
             progress_bar.update(done - progress_bar.last_print_n)
+        # Alert user to failing simulations so they can stop execution if wanted
+        if isinstance(item, Experiment) and item.any_failed:
+            user_logger.warning(f"The Experiment {item.uid} has failed simulations. Check Experiment in platform")
         return item.done
 
     def wait_till_done_progress(self, item: Union[Experiment, IWorkflowItem, Suite], timeout: int = 60 * 60 * 24,
