@@ -146,7 +146,10 @@ class TestExecutePlatformExperimentOperation(IPlatformExperimentOperations):
             if not chunk:
                 break
             else:
-                md5.update(chunk.encode('utf-8'))
+                if isinstance(chunk, bytes):
+                    md5.update(chunk)
+                else:
+                    md5.update(chunk.encode('utf-8'))
 
     def refresh_status(self, experiment: Experiment, **kwargs):
         if logger.isEnabledFor(DEBUG):

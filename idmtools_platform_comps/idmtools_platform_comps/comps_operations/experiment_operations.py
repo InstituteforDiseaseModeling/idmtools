@@ -8,9 +8,10 @@ from uuid import UUID
 
 from COMPS.Data import Experiment as COMPSExperiment, QueryCriteria, Configuration, Suite as COMPSSuite, \
     Simulation as COMPSSimulation
+from COMPS.Data.Simulation import SimulationState
 
 from idmtools.assets import AssetCollection, Asset
-from idmtools.core import ItemType
+from idmtools.core import ItemType, EntityStatus
 from idmtools.core.experiment_factory import experiment_factory
 from idmtools.core.logging import SUCCESS
 from idmtools.entities import CommandLine
@@ -281,10 +282,17 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         """
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'Commissioning experiment: {experiment.uid}')
-        po = experiment.get_platform_object()
-        if not hasattr(po, 'commissioned') or not po.commissioned:
-            po.commission()
-            po.commissioned = True
+        # commission only if rules we have items in created or none.
+        # TODO add new status to entity status to track commissioned as well instead of raw comps
+        if any([s.status in [None, EntityStatus.CREATED] for s in experiment.simulations]):
+            # now check comps status
+            if any([s.get_platform_object().state in [SimulationState.Created] for s in experiment.simulations]):
+                po = experiment.get_platform_object()
+                po.commission()
+                # for now, we update here in the comps objects to refelect the new state
+                for sim in experiment.simulations:
+                    spo = sim.get_platform_object()
+                    spo._state = SimulationState.CommissionRequested
 
     def send_assets(self, experiment: Experiment, **kwargs):
         """
