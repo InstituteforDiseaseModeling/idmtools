@@ -199,7 +199,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
         Returns:
             True if all simulations have succeeded, False otherwise
         """
-        return any([s for s in self.simulations])
+        return any([s.failed for s in self.simulations])
 
     @property
     def simulations(self) -> ExperimentParentIterator:

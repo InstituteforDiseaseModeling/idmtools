@@ -673,7 +673,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     @staticmethod
     def __wait_until_done_progress_callback(item: Union[Experiment, IWorkflowItem], progress_bar: tqdm,
                                             child_attribute: str = 'simulations',
-                                            done_states: List[EntityStatus] = None) -> bool:
+                                            done_states: List[EntityStatus] = None, failed_warning: Dict[str, bool] = False) -> bool:
         """
         A callback for progress bar(when an item has children) and checking if an item has completed execution. This is
         meant for mainly for aggregate types where the status is from the children
@@ -684,6 +684,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             child_attribute: What is the name of the child attribute. For examples, if item was an Experiment, the
                 child_attribute would be 'simulations'
             done_states: What states are considered done
+            failed_warning: Used to track if we have warned user of failure. We use dict to pass by refernce since we cannot do that with a bool
 
         Returns:
             True is item has completed execution
@@ -714,8 +715,9 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         if done > progress_bar.last_print_n:
             progress_bar.update(done - progress_bar.last_print_n)
         # Alert user to failing simulations so they can stop execution if wanted
-        if isinstance(item, Experiment) and item.any_failed:
+        if isinstance(item, Experiment) and item.any_failed and not failed_warning['failed_warning']:
             user_logger.warning(f"The Experiment {item.uid} has failed simulations. Check Experiment in platform")
+            failed_warning['failed_warning'] = True
         return item.done
 
     def wait_till_done_progress(self, item: Union[Experiment, IWorkflowItem, Suite], timeout: int = 60 * 60 * 24,
@@ -744,9 +746,11 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             child_attribute = 'experiments'
         else:
             prog = None
+
+        failed_warning = dict(failed_warning=False)
         self.__wait_till_callback(
             item,
-            partial(self.__wait_until_done_progress_callback, progress_bar=prog, child_attribute=child_attribute),
+            partial(self.__wait_until_done_progress_callback, progress_bar=prog, child_attribute=child_attribute, failed_warning=failed_warning),
             timeout,
             refresh_interval
         )
