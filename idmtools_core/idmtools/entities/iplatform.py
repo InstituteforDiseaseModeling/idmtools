@@ -532,7 +532,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             item.platform = self
         getattr(self, interface).refresh_status(item)
 
-    def get_files(self, item: IEntity, files: Union[Set[str], List[str]], output: str = None) -> \
+    def get_files(self, item: IEntity, files: Union[Set[str], List[str]], output: str = None, **kwargs) -> \
             Union[Dict[str, Dict[str, bytearray]], Dict[str, bytearray]]:
         """
         Get files for a platform entity
@@ -541,6 +541,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             item: Item to fetch files for
             files: List of file names to get
             output: save files to
+            **kwargs: Platform arguments
 
         Returns:
             For simulations, this returns a dictionary with filename as key and values being binary data from file or a
@@ -552,7 +553,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         if item.item_type not in self.platform_type_map.values():
             raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
-        ret = getattr(self, interface).get_assets(item, files)
+        ret = getattr(self, interface).get_assets(item, files, **kwargs)
 
         if output:
             if item.item_type not in (ItemType.SIMULATION, ItemType.WORKFLOW_ITEM):
