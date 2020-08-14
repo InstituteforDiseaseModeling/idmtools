@@ -192,7 +192,6 @@ class TestAddSimulationsToExperiment(ITestWithPersistence):
         return sims_template
 
     def verify_assets(self, experiment, files_needed):
-        comps_experiment = Experiment.from_id(experiment.id, self.platform)
-        files_retrieved = self.platform.get_files(item=comps_experiment.simulations[0], files=files_needed)
+        files_retrieved = self.platform.get_files(item=experiment.simulations[0], files=files_needed)
         # We have the correct files?
         self.assertEqual(len(files_needed), len(files_retrieved))
