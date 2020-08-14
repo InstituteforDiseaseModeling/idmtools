@@ -74,6 +74,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     _suites: IPlatformSuiteOperations = field(default=None, repr=False, init=False, compare=False)
     _workflow_items: IPlatformWorkflowItemOperations = field(default=None, repr=False, init=False, compare=False)
     _assets: IPlatformAssetCollectionOperations = field(default=None, repr=False, init=False, compare=False)
+    #: Controls what platform should do we re-running experiments by default
+    _regather_assets_on_modify: bool = field(default=False, repr=False, init=False, compare=False)
 
     @staticmethod
     def get_caller():
@@ -784,6 +786,15 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         """
         from idmtools.core.context import remove_current_platform
         remove_current_platform()
+
+    def is_regather_assets_on_modify(self) -> bool:
+        """
+        Return default behaviour for platform when rerunning experiment and gathering assets
+
+        Returns:
+            True or false
+        """
+        return self._regather_assets_on_modify
 
 
 TPlatform = TypeVar("TPlatform", bound=IPlatform)
