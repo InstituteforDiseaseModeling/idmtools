@@ -1,17 +1,20 @@
 import ntpath
+from logging import getLogger, DEBUG
 from typing import List, Dict, Union, Generator, Optional
 from uuid import UUID
 
 from COMPS import Client
-from COMPS.Data import Simulation, SimulationFile, AssetCollectionFile, WorkItemFile, OutputFileMetadata
+from COMPS.Data import Simulation, SimulationFile, AssetCollectionFile, WorkItemFile, OutputFileMetadata, Experiment
 from COMPS.Data.AssetFile import AssetFile
 from COMPS.Data.Simulation import SimulationState
-from COMPS.Data.WorkItem import WorkItemState
+from COMPS.Data.WorkItem import WorkItemState, WorkItem
 from requests import RequestException
 
 from idmtools.core import EntityStatus, ItemType
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.iplatform import IPlatform
+
+logger = getLogger(__name__)
 
 
 def fatal_code(e: Exception) -> bool:
@@ -159,7 +162,11 @@ def get_file_as_generator(file: Union[SimulationFile, AssetCollectionFile, Asset
         yield chunk
 
 
-def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str], cache=None) -> Dict[str, bytearray]:
+class Workitem(object):
+    pass
+
+
+def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str], cache=None, load_children: List[str] = None, comps_item: Union[Experiment, Workitem, Simulation] = None) -> Dict[str, bytearray]:
     """
     Retrieve assets from an Entity(Simulation, Experiment, WorkItem)
 
@@ -168,14 +175,21 @@ def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str
         item: Item to fetch assets from
         files: List of file names to retrieve
         cache: Cache object to use
+        load_children: Optional Load children fields
+        comps_item: Optional comps item
 
     Returns:
         Dictionary in structure of filename -> bytearray
     """
     # Retrieve comps item
+    if load_children is None:
+        load_children = ["files", "configuration"]
+    if logger.isEnabledFor(DEBUG):
+        logger.debug(f"Loading the files {files} from {item}")
     if item.platform is None:
         item.platform = platform
-    comps_item: Simulation = item.get_platform_object(True, load_children=["files", "configuration"])
+    if comps_item is None:
+        comps_item = item.get_platform_object(True, load_children=load_children)
 
     all_paths = set(files)
     assets = set(path for path in all_paths if path.lower().startswith("assets"))
@@ -185,9 +199,12 @@ def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str
     ret = {}
 
     # Retrieve the transient if any
-    if transients:
-        transient_files = comps_item.retrieve_output_files(paths=transients)
-        ret = dict(zip(transients, transient_files))
+    if isinstance(comps_item, (Simulation, WorkItem)):
+        if transients:
+            transient_files = comps_item.retrieve_output_files(paths=transients)
+            ret = dict(zip(transients, transient_files))
+    else:
+        ret = dict()
 
     # Take care of the assets
     if assets and comps_item.configuration:

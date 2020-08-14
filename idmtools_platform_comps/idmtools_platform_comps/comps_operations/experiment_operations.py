@@ -281,7 +281,10 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         """
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'Commissioning experiment: {experiment.uid}')
-        experiment.get_platform_object().commission()
+        po = experiment.get_platform_object()
+        if not hasattr(po, 'commissioned') or not po.commissioned:
+            po.commission()
+            po.commissioned = True
 
     def send_assets(self, experiment: Experiment, **kwargs):
         """
@@ -307,7 +310,6 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         e = COMPSExperiment.get(id=experiment.uid)
         e.configuration = Configuration(asset_collection_id=ac.id)
         e.save()
-
 
     def refresh_status(self, experiment: Experiment, **kwargs):
         """

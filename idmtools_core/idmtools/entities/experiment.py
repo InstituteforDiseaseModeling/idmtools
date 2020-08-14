@@ -192,6 +192,16 @@ class Experiment(IAssetsEnabled, INamedEntity):
         return all([s.succeeded for s in self.simulations])
 
     @property
+    def any_failed(self) -> bool:
+        """
+        Return if an experiment has any simulation in failed state.
+
+        Returns:
+            True if all simulations have succeeded, False otherwise
+        """
+        return any([s.failed for s in self.simulations])
+
+    @property
     def simulations(self) -> ExperimentParentIterator:
         return ExperimentParentIterator(self.__simulations, parent=self)
 
@@ -392,6 +402,8 @@ class Experiment(IAssetsEnabled, INamedEntity):
             message = "To modify an experiment's asset collection, you must make a copy of it first. For example\nexperiment.assets = experiment.assets.copy()"
             user_logger.error(message)  # Show it bold red to user
             raise ValueError(message)
+        if not self.assets.is_editable() and isinstance(self.simulations.items, TemplatedSimulations) and not regather_common_assets:
+            user_logger.warning("You are modifying and existing experiment by using a template without gathering common assets. Ensure your Template configuration is the same as existing experiments or enable gathering of new common assets through regather_common_assets.")
         run_opts['regather_common_assets'] = regather_common_assets
         p.run_items(self, **run_opts)
         if wait_until_done:

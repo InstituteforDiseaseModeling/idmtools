@@ -429,19 +429,32 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             logger.debug(f"Detected task CLI {cli}")
         return cli
 
-    def get_assets(self, simulation: Simulation, files: List[str], **kwargs) -> Dict[str, bytearray]:
+    def get_assets(self, simulation: Simulation, files: List[str], include_experiment_assets: bool = True, **kwargs) -> Dict[str, bytearray]:
         """
         Fetch the files associated with a simulation
 
         Args:
             simulation: Simulation
             files: List of files to download
+            include_experiment_assets: Should we also load experiment assets?
             **kwargs:
 
         Returns:
             Dictionary of filename -> ByteArray
         """
-        return get_asset_for_comps_item(self.platform, simulation, files, self.cache)
+        # since assets could be in the common assets, we should check that firs
+        # load comps config first
+        comps_sim: COMPSSimulation = simulation.get_platform_object(load_children=["files", "configuration"])
+        if include_experiment_assets and (comps_sim.configuration is None or comps_sim.configuration.asset_collection_id is None):
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Gathering assets from experiment first")
+            exp_assets = get_asset_for_comps_item(self.platform, simulation.experiment, files, self.cache, load_children=["configuration"])
+            if exp_assets is None:
+                exp_assets = dict()
+        else:
+            exp_assets = dict()
+        exp_assets.update(get_asset_for_comps_item(self.platform, simulation, files, self.cache, comps_item=comps_sim))
+        return exp_assets
 
     def list_assets(self, simulation: Simulation, common_assets: bool = False, **kwargs) -> List[Asset]:
         """
