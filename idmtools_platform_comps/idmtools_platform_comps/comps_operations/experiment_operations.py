@@ -282,9 +282,9 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'Commissioning experiment: {experiment.uid}')
         po = experiment.get_platform_object()
-        if not hasattr(po, 'commissioned') and not po.commissioned:
-            po.commission()
-            po.commissioned = True
+        if not hasattr(po, 'commissioned') or not po.commissioned:
+                po.commission()
+                po.commissioned = True
 
     def send_assets(self, experiment: Experiment, **kwargs):
         """
