@@ -210,12 +210,13 @@ def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str
     if assets and comps_item.configuration:
         # Get the collection_id for the simulation
         collection_id = comps_item.configuration.asset_collection_id
-        # Retrieve the files
-        for file_path in assets:
-            # Normalize the separators
-            normalized_path = ntpath.normpath(file_path)
-            if cache is not None:
-                ret[file_path] = cache.memoize()(get_file_from_collection)(platform, collection_id, normalized_path)
-            else:
-                ret[file_path] = get_file_from_collection(platform, collection_id, normalized_path)
+        if collection_id:
+            # Retrieve the files
+            for file_path in assets:
+                # Normalize the separators
+                normalized_path = ntpath.normpath(file_path)
+                if cache is not None:
+                    ret[file_path] = cache.memoize()(get_file_from_collection)(platform, collection_id, normalized_path)
+                else:
+                    ret[file_path] = get_file_from_collection(platform, collection_id, normalized_path)
     return ret
