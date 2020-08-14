@@ -282,7 +282,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         Raises:
             ValueError: If the item 's interface cannot be found
         """
-        # check both base types and platform speci
+        # check both base types and platform specs
         for interface_type_mapping in [STANDARD_TYPE_TO_INTERFACE, self.platform_type_map]:
             for interface, item_type in interface_type_mapping.items():
                 if isinstance(item, interface):
