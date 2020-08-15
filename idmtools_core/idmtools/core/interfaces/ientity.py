@@ -16,22 +16,22 @@ class IEntity(IItem, metaclass=ABCMeta):
     """
     Interface for all entities in the system.
     """
-    #: Platform ID
+    #: ID of the platform
     platform_id: UUID = field(default=None, compare=False, metadata={"md": True})
-    #: Platform item
+    #: Platform
     _platform: 'IPlatform' = field(default=None, compare=False, metadata={"pickle_ignore": True})  # noqa E821
-    #: Item's Parent ID
+    #: Parent id
     parent_id: UUID = field(default=None, metadata={"md": True})
-    #: Parent Item
+    #: Parent object
     _parent: 'IEntity' = field(default=None, compare=False, metadata={"pickle_ignore": True})
-    #: Item's Status
+    #: Status of item
     status: EntityStatus = field(default=None, compare=False, metadata={"pickle_ignore": True})
-    #: Item's tags
+    #: Tags for item
     tags: Dict[str, Any] = field(default_factory=lambda: {}, metadata={"md": True})
-    #: Item Type
+    #: Item Type(Experiment, Suite, Asset, etc)
     item_type: ItemType = field(default=None, compare=False)
-    # Item in Platform
-    _platform_object: Any = field(default=None, compare=False, metadata={"pickle_ignore": True}, repr=False)
+    #: Platform Representation of Entity
+    _platform_object: Any = field(default=None, compare=False, metadata={"pickle_ignore": True})
 
     def update_tags(self, tags: dict = None) -> NoReturn:
         """
@@ -42,10 +42,26 @@ class IEntity(IItem, metaclass=ABCMeta):
         self.tags.update(tags)
 
     def post_creation(self) -> None:
+        """
+        Post creation hook for object
+        Returns:
+
+        """
         self.status = EntityStatus.CREATED
 
     @classmethod
     def from_id(cls, item_id: Union[str, UUID], platform: 'IPlatform' = None, **kwargs) -> 'IEntity':  # noqa E821
+        """
+        Load an item from an id
+
+        Args:
+            item_id: Id of item
+            platform: Platform. If not supplied, we check the current context
+            **kwargs: Optional platform args
+
+        Returns:
+            IEntity of object
+        """
         if platform is None:
             from idmtools.core.context import CURRENT_PLATFORM
             if CURRENT_PLATFORM is None:
@@ -58,6 +74,11 @@ class IEntity(IItem, metaclass=ABCMeta):
 
     @property
     def parent(self):
+        """
+        Return parent object for item
+        Returns:
+
+        """
         if not self._parent:
             if not self.parent_id:
                 return None
@@ -68,7 +89,15 @@ class IEntity(IItem, metaclass=ABCMeta):
         return self._parent
 
     @parent.setter
-    def parent(self, parent):
+    def parent(self, parent: 'IEntity'): # noqa E821
+        """
+        Sets the parent object for item
+        Args:
+            parent: Parent oject
+
+        Returns:
+
+        """
         if parent:
             self._parent = parent
             self.parent_id = parent.uid
@@ -77,19 +106,44 @@ class IEntity(IItem, metaclass=ABCMeta):
 
     @property
     def platform(self) -> 'IPlatform':  # noqa E821
+        """
+        Get objects platform
+
+        Returns:
+            Platform
+        """
         if not self._platform and self.platform_id:
             self._platform = PlatformPersistService.retrieve(self.platform_id)
         return self._platform
 
     @platform.setter
-    def platform(self, platform):
+    def platform(self, platform: 'IPlatform'):  # noqa E821
+        """
+        Sets object platform
+
+        Args:
+            platform: Platform to set
+
+        Returns:
+
+        """
         if platform:
             self.platform_id = platform.uid
             self._platform = platform
         else:
             self._platform = self.platform_id = None
 
-    def get_platform_object(self, force=False, **kwargs):
+    def get_platform_object(self, force: bool = False, **kwargs):
+        """
+        Get the platform representation of an object
+
+        Args:
+            force: Force reload of platform object
+            **kwargs: Optional args used for specific platform behaviour
+
+        Returns:
+            Platform Object
+        """
         if not self.platform:
             raise NoPlatformException("The object has no platform set...")
 
@@ -99,11 +153,33 @@ class IEntity(IItem, metaclass=ABCMeta):
 
     @property
     def done(self):
+        """
+        Returns if a item is done. For an item to be done, it should be in either failed or succeeded state
+
+        Returns:
+            True if status is succeeded or failed
+        """
         return self.status in (EntityStatus.SUCCEEDED, EntityStatus.FAILED)
 
     @property
     def succeeded(self):
+        """
+        Returns if an item has succeeded
+
+        Returns:
+            True if status is SUCCEEDED
+        """
         return self.status == EntityStatus.SUCCEEDED
+
+    @property
+    def failed(self):
+        """
+        Returns is a item has failed
+
+        Returns:
+            True if status is failed
+        """
+        return self.status == EntityStatus.FAILED
 
     def __hash__(self):
         return id(self.uid)

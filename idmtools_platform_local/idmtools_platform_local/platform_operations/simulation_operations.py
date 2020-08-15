@@ -5,8 +5,10 @@ from functools import partial
 from logging import getLogger, DEBUG
 from typing import Dict, List, Set, Union, Iterator, Optional, TYPE_CHECKING
 from uuid import UUID
+
 from docker.models.containers import Container
 from tqdm import tqdm
+
 from idmtools.assets import Asset, json, AssetCollection
 from idmtools.core import ItemType
 from idmtools.core.task_factory import TaskFactory
@@ -15,11 +17,12 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
-from idmtools.utils.collections import ParentIterator
+from idmtools.utils.collections import ExperimentParentIterator
 from idmtools.utils.json import IDMJSONEncoder
 from idmtools_platform_local.client.simulations_client import SimulationsClient
 from idmtools_platform_local.platform_operations.uitils import local_status_to_common, SimulationDict, ExperimentDict, \
     download_lp_file
+
 if TYPE_CHECKING:
     from idmtools_platform_local.local_platform import LocalPlatform
 
@@ -90,7 +93,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         from idmtools_platform_local.internals.tasks.create_simulation import CreateSimulationsTask
         worker = self.platform._sm.get('workers')
 
-        if isinstance(sims, ParentIterator):
+        if isinstance(sims, ExperimentParentIterator):
             parent_uid = sims.parent.uid
         else:
             parent_uid = sims[0].parent.uid
@@ -98,7 +101,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         final_sims = []
 
         # pre-creation our simulations
-        if isinstance(sims, ParentIterator) and isinstance(sims.items, (TemplatedSimulations, list)):
+        if isinstance(sims, ExperimentParentIterator) and isinstance(sims.items, (TemplatedSimulations, list)):
             sims_i = sims.items
             for simulation in sims_i:
                 simulation.pre_creation()

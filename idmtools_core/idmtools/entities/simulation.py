@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field, fields
 from logging import getLogger, DEBUG
 from typing import List, Callable, NoReturn, Union, Mapping, Any, Type, TypeVar, Dict, TYPE_CHECKING
+
 from idmtools.assets import AssetCollection, Asset
 from idmtools.core import ItemType, NoTaskFound
 from idmtools.core.enums import EntityStatus
@@ -8,6 +9,7 @@ from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.core.interfaces.inamed_entity import INamedEntity
 from idmtools.entities.task_proxy import TaskProxy
 from idmtools.utils.language import get_qualified_class_name_from_obj
+
 if TYPE_CHECKING:
     from idmtools.entities.itask import ITask
     from idmtools.entities.iplatform import IPlatform
@@ -90,7 +92,8 @@ class Simulation(IAssetsEnabled, INamedEntity):
             if logger.isEnabledFor(DEBUG):
                 logger.debug('Replacing task with proxy')
             self.task = TaskProxy.from_task(self.task)
-        self.status = EntityStatus.CREATED
+        if self.status is None:
+            self.status = EntityStatus.CREATED
 
     def pre_getstate(self):
         """

@@ -5,17 +5,21 @@ from itertools import tee
 from logging import getLogger, DEBUG
 from typing import List, Type, Generator, NoReturn, Optional, TYPE_CHECKING
 from uuid import UUID
+
 from COMPS.Data import Experiment as COMPSExperiment, QueryCriteria, Configuration, Suite as COMPSSuite, \
     Simulation as COMPSSimulation
+from COMPS.Data.Simulation import SimulationState
+
 from idmtools.assets import AssetCollection, Asset
-from idmtools.core import ItemType
+from idmtools.core import ItemType, EntityStatus
 from idmtools.core.experiment_factory import experiment_factory
 from idmtools.core.logging import SUCCESS
 from idmtools.entities import CommandLine
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
 from idmtools.entities.templated_simulation import TemplatedSimulations
-from idmtools.utils.collections import ParentIterator
+from idmtools.utils.collections import ExperimentParentIterator
+from idmtools.utils.info import get_doc_base_url
 from idmtools.utils.time import timestamp
 from idmtools_platform_comps.utils.general import clean_experiment_name, convert_comps_status
 
@@ -72,7 +76,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
     def platform_create(self, experiment: Experiment, num_cores: Optional[int] = None,
                         executable_path: Optional[str] = None,
                         command_arg: Optional[str] = None, priority: Optional[str] = None,
-                        check_command: bool = True) -> COMPSExperiment:
+                        check_command: bool = True, **kwargs) -> COMPSExperiment:
         """
         Create Experiment on the COMPS Platform
 
@@ -83,6 +87,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             command_arg: Command Argument
             priority: Priority of command
             check_command: Run task hooks on item
+            **kwargs: Keyword arguments used to expand functionality. At moment these are usually not used
 
         Returns:
             COMPSExperiment that was created
@@ -147,6 +152,27 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         self.send_assets(experiment)
         return e
 
+    def platform_modify_experiment(self, experiment: Experiment, regather_common_assets: bool = False, **kwargs) -> Experiment:
+        """
+        Executed when an Experiment is being ran that is already in Created, Done, In Progress, or Failed State
+        Args:
+            experiment: Experiment to modify
+            regather_common_assets: Triggers a new AC to be associated with experiment. It is important to note that when using this feature, ensure the previous simulations have finished provisioning. Failure to do so can lead to unexpected behaviour
+
+        Returns:
+
+        """
+        if experiment.status is not None:
+            if experiment.assets.is_editable():
+
+                # trigger precreate just to be sure
+                if not regather_common_assets:
+                    user_logger.warning(
+                        f"Not gathering common assets again since experiment exists on platform. If you need to add additional common assets, see {get_doc_base_url()}cookbook/asset_collections.html#modifying-asset-collection")
+                experiment.pre_creation(regather_common_assets)
+                self.send_assets(experiment)
+        return experiment
+
     def _get_experiment_command_line(self, check_command: bool, experiment: Experiment) -> CommandLine:
         """
         Get the command line for COMPS
@@ -170,8 +196,8 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             # run pre-creation in case task use it to produce the command line dynamically
             task.pre_creation(sim)
             exp_command = task.command
-        elif isinstance(experiment.simulations, ParentIterator) and isinstance(experiment.simulations.items,
-                                                                               TemplatedSimulations):
+        elif isinstance(experiment.simulations, ExperimentParentIterator) and isinstance(experiment.simulations.items,
+                                                                                         TemplatedSimulations):
             if logger.isEnabledFor(DEBUG):
                 logger.debug("ParentIterator/TemplatedSimulations detected. Using base_task for command")
             from idmtools.entities.simulation import Simulation
@@ -256,7 +282,17 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         """
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'Commissioning experiment: {experiment.uid}')
-        experiment.get_platform_object().commission()
+        # commission only if rules we have items in created or none.
+        # TODO add new status to entity status to track commissioned as well instead of raw comps
+        if any([s.status in [None, EntityStatus.CREATED] for s in experiment.simulations]):
+            # now check comps status
+            if any([s.get_platform_object().state in [SimulationState.Created] for s in experiment.simulations]):
+                po = experiment.get_platform_object()
+                po.commission()
+                # for now, we update here in the comps objects to refelect the new state
+                for sim in experiment.simulations:
+                    spo = sim.get_platform_object()
+                    spo._state = SimulationState.CommissionRequested
 
     def send_assets(self, experiment: Experiment, **kwargs):
         """
@@ -271,11 +307,12 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             None
         """
         if experiment.assets.count == 0:
-            logger.warning('Experiment has not assets')
+            logger.warning('Experiment has no assets to send')
             return
 
         ac = self.platform._assets.create(experiment.assets)
-        print("Asset collection for experiment: {}".format(ac.id))
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f'Asset collection for experiment: {experiment.id} is: {ac.id}')
 
         # associate the assets with the experiment in COMPS
         e = COMPSExperiment.get(id=experiment.uid)
@@ -316,7 +353,6 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         if experiment.suite_id is None:
             suite = kwargs.get('suite')
         else:
-            # did we have the parent?
             if parent:
                 suite = parent
             else:
@@ -330,7 +366,6 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         obj._platform_object = experiment
         # Set parent
         obj.parent = suite
-
         # Set the correct attributes
         obj.uid = experiment.id
         obj.comps_experiment = experiment
@@ -354,7 +389,6 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
                 obj.simulations.append(
                     self.platform._simulations.to_entity(s, parent=obj, **kwargs)
                 )
-
         return obj
 
     def get_assets_from_comps_experiment(self, experiment: COMPSExperiment) -> Optional[AssetCollection]:

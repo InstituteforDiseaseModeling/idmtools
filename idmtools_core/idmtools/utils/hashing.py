@@ -63,11 +63,11 @@ class Hasher(Pickler):
             return self._hash.hexdigest()
 
     def save(self, obj):
-        from idmtools.utils.collections import ParentIterator
+        from idmtools.utils.collections import ExperimentParentIterator
         import abc
         if isinstance(obj, abc.ABCMeta):
             pass
-        elif isinstance(obj, ParentIterator):
+        elif isinstance(obj, ExperimentParentIterator):
             pass
         elif isinstance(obj, Logger):
             pass

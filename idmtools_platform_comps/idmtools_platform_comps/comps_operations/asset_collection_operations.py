@@ -3,7 +3,7 @@ import uuid
 from dataclasses import field, dataclass
 from functools import partial
 from hashlib import md5
-from logging import getLogger
+from logging import getLogger, DEBUG
 from typing import Type, Union, List, TYPE_CHECKING, Optional
 from uuid import UUID
 
@@ -57,6 +57,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
             COMPSAssetCollection
         """
         ac = COMPSAssetCollection()
+        ac_files = set()
         ac_map = dict()
         for asset in asset_collection:
             # using checksum is not accurate and not all systems will support de-duplication
@@ -64,36 +65,43 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
 
                 if asset.absolute_path:
                     cksum = calculate_md5(asset.absolute_path)
-                    ac.add_asset(
-                        AssetCollectionFile(
-                            file_name=asset.filename,
-                            relative_path=asset.relative_path,
-                            md5_checksum=calculate_md5(asset.absolute_path)
+                    ac_files.add(
+                        (
+                            asset.filename,
+                            asset.relative_path,
+                            uuid.UUID(calculate_md5(asset.absolute_path))
                         )
                     )
                     ac_map[asset] = uuid.UUID(cksum)
                 else:
                     md5calc = md5()
                     md5calc.update(asset.bytes)
-                    md5_checksum_str = md5calc.hexdigest()
-                    ac.add_asset(
-                        AssetCollectionFile(
-                            file_name=asset.filename,
-                            relative_path=asset.relative_path,
-                            md5_checksum=md5_checksum_str
+                    md5_checksum_str = uuid.UUID(md5calc.hexdigest())
+                    ac_files.add(
+                        (
+                            asset.filename,
+                            asset.relative_path,
+                            md5_checksum_str
                         )
                     )
-                    ac_map[asset] = uuid.UUID(md5_checksum_str)
+                    ac_map[asset] = md5_checksum_str
             else:  # We should already have this asset so we should have a md5sum
-                ac.add_asset(
-                    AssetCollectionFile(
-                        file_name=asset.filename,
-                        relative_path=asset.relative_path,
-                        md5_checksum=asset.checksum
+                ac_files.add(
+                    (
+                        asset.filename,
+                        asset.relative_path,
+                        asset.checksum if isinstance(asset.checksum, uuid.UUID) else uuid.UUID(asset.checksum)
                     )
                 )
                 ac_map[asset] = asset.checksum
 
+        # remove any duplicates
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f"Building ac. Filtered out {len(asset_collection) - len(ac_files)} duplicate files")
+
+        for file in ac_files:
+            ac.add_asset(AssetCollectionFile(file_name=file[0], relative_path=file[1], md5_checksum=file[2]))
+        del ac_files
         # Add tags
         if asset_collection.tags:
             ac.set_tags(asset_collection.tags)
@@ -101,6 +109,8 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         # check for missing files first
         missing_files = ac.save(return_missing_files=True)
         if missing_files:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f"{len(missing_files)} missing files detected")
             ac2 = COMPSAssetCollection()
             if asset_collection.tags:
                 ac2.set_tags(ac.tags)
@@ -136,6 +146,8 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
             ac = ac2
         asset_collection.uid = ac.id
         asset_collection._platform_object = asset_collection
+        asset_collection.platform = self.platform
+        asset_collection.platform_id = self.platform.uid
         return ac
 
     def to_entity(self, asset_collection: Union[COMPSAssetCollection, SimulationFile, List[SimulationFile], OutputFileMetadata], **kwargs) \

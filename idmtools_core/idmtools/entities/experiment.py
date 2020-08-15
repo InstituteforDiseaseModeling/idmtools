@@ -4,7 +4,9 @@ from dataclasses import dataclass, field, InitVar, fields
 from logging import getLogger, DEBUG
 from types import GeneratorType
 from typing import NoReturn, Set, Union, Iterator, Type, Dict, Any, List, TYPE_CHECKING, Generator
+
 from tqdm import tqdm
+
 from idmtools.assets import AssetCollection, Asset
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType, EntityStatus
@@ -18,7 +20,7 @@ from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools.registry.experiment_specification import ExperimentPluginSpecification, get_model_impl, \
     get_model_type_impl
 from idmtools.registry.plugin_specification import get_description_impl
-from idmtools.utils.collections import ParentIterator
+from idmtools.utils.collections import ExperimentParentIterator
 from idmtools.utils.entities import get_default_tags
 
 if TYPE_CHECKING:
@@ -76,6 +78,35 @@ class Experiment(IAssetsEnabled, INamedEntity):
             self.gather_common_assets_from_task = isinstance(self.simulations.items, EntityContainer)
         self.__simulations.parent = self
 
+    def post_creation(self) -> None:
+        pass
+
+    @property
+    def status(self):
+        # narrow down to states we have
+        sim_statuses = set([s.status for s in self.simulations.items])
+        if len(self.simulations.items) == 0 or all([s is None for s in sim_statuses]):
+            status = None  # this will trigger experiment creation on a platform
+        elif any([s == EntityStatus.RUNNING for s in sim_statuses]):
+            status = EntityStatus.RUNNING
+        elif any([s == EntityStatus.CREATED for s in sim_statuses]) and any([s in [EntityStatus.FAILED, EntityStatus.SUCCEEDED] for s in sim_statuses]):
+            status = EntityStatus.RUNNING
+        elif any([s is None for s in sim_statuses]) and any([s in [EntityStatus.FAILED, EntityStatus.SUCCEEDED] for s in sim_statuses]):
+            status = EntityStatus.CREATED
+        elif any([s == EntityStatus.FAILED for s in sim_statuses]):
+            status = EntityStatus.FAILED
+        elif all([s == EntityStatus.SUCCEEDED for s in sim_statuses]):
+            status = EntityStatus.SUCCEEDED
+        else:
+            status = EntityStatus.CREATED
+        return status
+
+    @status.setter
+    def status(self, value):
+        # this method is needed because dataclasses will always try to set each field, even if not allowed to in
+        # the case of Experiment.
+        logger.warning('Experiment status cannot be directly altered. Status unchanged.')
+
     def __repr__(self):
         return f"<Experiment: {self.uid} - {self.name} / Sim count {len(self.simulations) if self.simulations else 0}>"
 
@@ -94,9 +125,12 @@ class Experiment(IAssetsEnabled, INamedEntity):
         from idmtools.utils.display import display, experiment_table_display
         display(self, experiment_table_display)
 
-    def pre_creation(self) -> None:
+    def pre_creation(self, gather_assets=True) -> None:
         """
         Experiment pre_creation callback
+
+        Args:
+            gather_assets: Determines if an experiment will try to gather the common assets or defer. It most cases, you want this enabled but when modifying existing experiments you may want to disable if there are new assets and the platform has performance hits to determine those assets
 
         Returns:
 
@@ -110,27 +144,30 @@ class Experiment(IAssetsEnabled, INamedEntity):
             self.tags["experiment_type"] = f'{self.__class__.__module__}.{self.__class__.__name__}'
 
         # if it is a template, set task type on experiment
-        if isinstance(self.simulations, ParentIterator) and isinstance(self.simulations.items, TemplatedSimulations):
-            if logger.isEnabledFor(DEBUG):
-                logger.debug("Using Base task from template for experiment level assets")
-            self.simulations.items.base_task.gather_common_assets()
-            self.assets.add_assets(self.simulations.items.base_task.common_assets, fail_on_duplicate=False)
-            if "task_type" not in self.tags:
-                task_class = self.simulations.items.base_task.__class__
+        if gather_assets:
+            if isinstance(self.simulations.items, TemplatedSimulations):
+                if logger.isEnabledFor(DEBUG):
+                    logger.debug("Using Base task from template for experiment level assets")
+                self.simulations.items.base_task.gather_common_assets()
+                self.assets.add_assets(self.simulations.items.base_task.common_assets, fail_on_duplicate=False)
+                for sim in self.simulations.items.extra_simulations():
+                    self.assets.add_assets(sim.task.gather_common_assets(), fail_on_duplicate=False)
+                if "task_type" not in self.tags:
+                    task_class = self.simulations.items.base_task.__class__
+                    self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
+            elif self.gather_common_assets_from_task and isinstance(self.simulations.items, List):
+                if logger.isEnabledFor(DEBUG):
+                    logger.debug("Using first task for task type")
+                    logger.debug("Using all tasks to gather assts")
+                task_class = self.__simulations[0].task.__class__
                 self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
-        elif self.gather_common_assets_from_task and isinstance(self.__simulations, List):
-            if logger.isEnabledFor(DEBUG):
-                logger.debug("Using first task for task type")
-                logger.debug("Using all tasks to gather assts")
-            task_class = self.__simulations[0].task.__class__
-            self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
-            pbar = tqdm(self.__simulations, desc="Discovering experiment assets from tasks")
-            for sim in pbar:
-                # don't gather assets from simulations that have been provisioned
-                if sim.status is None:
-                    assets = sim.task.gather_common_assets()
-                    if assets is not None:
-                        self.assets.add_assets(assets, fail_on_duplicate=False)
+                pbar = tqdm(self.__simulations, desc="Discovering experiment assets from tasks")
+                for sim in pbar:
+                    # don't gather assets from simulations that have been provisioned
+                    if sim.status is None:
+                        assets = sim.task.gather_common_assets()
+                        if assets is not None:
+                            self.assets.add_assets(assets, fail_on_duplicate=False)
 
         self.tags.update(get_default_tags())
 
@@ -155,8 +192,18 @@ class Experiment(IAssetsEnabled, INamedEntity):
         return all([s.succeeded for s in self.simulations])
 
     @property
-    def simulations(self) -> Iterator['Simulation']:
-        return ParentIterator(self.__simulations, parent=self)
+    def any_failed(self) -> bool:
+        """
+        Return if an experiment has any simulation in failed state.
+
+        Returns:
+            True if all simulations have succeeded, False otherwise
+        """
+        return any([s.failed for s in self.simulations])
+
+    @property
+    def simulations(self) -> ExperimentParentIterator:
+        return ExperimentParentIterator(self.__simulations, parent=self)
 
     @simulations.setter
     def simulations(self, simulations: Union[SUPPORTED_SIM_TYPE]):
@@ -217,8 +264,8 @@ class Experiment(IAssetsEnabled, INamedEntity):
         from idmtools.assets import AssetCollection
         return {"assets": AssetCollection(), "simulations": EntityContainer()}
 
-    def gather_assets(self) -> NoReturn:
-        pass
+    def gather_assets(self) -> AssetCollection():
+        return self.assets
 
     @classmethod
     def from_task(cls, task, name: str = None, tags: Dict[str, Any] = None, assets: AssetCollection = None,
@@ -333,19 +380,31 @@ class Experiment(IAssetsEnabled, INamedEntity):
         p = super()._check_for_platform_from_context(platform)
         return p._experiments.list_assets(self, children, **kwargs)
 
-    def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None, **run_opts) -> NoReturn:
+    def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None, regather_common_assets: bool = None,
+            **run_opts) -> NoReturn:
         """
         Runs an experiment on a platform
 
         Args:
             wait_until_done: Whether we should wait on experiment to finish running as well. Defaults to False
             platform: Platform object to use. If not specified, we first check object for platform object then the current context
+            regather_common_assets: Triggers gathering of assets for *existing* experiments. If not provided, we use the platforms default behaviour. See platform details for performance implications of this. For most platforms, it should be ok but for others, it could decrease performance when assets are not changing.
+              It is important to note that when using this feature, ensure the previous simulations have finished provisioning. Failure to do so can lead to unexpected behaviour
             **run_opts: Options to pass to the platform
 
         Returns:
             None
         """
         p = super()._check_for_platform_from_context(platform)
+        if regather_common_assets is None:
+            regather_common_assets = p.is_regather_assets_on_modify()
+        if regather_common_assets and not self.assets.is_editable():
+            message = "To modify an experiment's asset collection, you must make a copy of it first. For example\nexperiment.assets = experiment.assets.copy()"
+            user_logger.error(message)  # Show it bold red to user
+            raise ValueError(message)
+        if not self.assets.is_editable() and isinstance(self.simulations.items, TemplatedSimulations) and not regather_common_assets:
+            user_logger.warning("You are modifying and existing experiment by using a template without gathering common assets. Ensure your Template configuration is the same as existing experiments or enable gathering of new common assets through regather_common_assets.")
+        run_opts['regather_common_assets'] = regather_common_assets
         p.run_items(self, **run_opts)
         if wait_until_done:
             self.wait()
@@ -384,19 +443,23 @@ class Experiment(IAssetsEnabled, INamedEntity):
 
     # Define this here for better completion in IDEs for end users
     @classmethod
-    def from_id(cls, item_id: Union[str, uuid.UUID], platform: 'IPlatform' = None, **kwargs) -> 'Experiment':
+    def from_id(cls, item_id: Union[str, uuid.UUID], platform: 'IPlatform' = None, copy_assets: bool = False, **kwargs) -> 'Experiment':
         """
         Helper function to provide better intellisense to end users
 
         Args:
             item_id: Item id to load
             platform: Optional platform. Fallbacks to context
+            copy_assets: Allow copying assets on load. Makes modifying experiments easier when new assets are involved.
             **kwargs: Optional arguments to be passed on to the platform
 
         Returns:
 
         """
-        return super().from_id(item_id, platform, **kwargs)
+        result = super().from_id(item_id, platform, **kwargs)
+        if copy_assets:
+            result.assets = result.assets.copy()
+        return result
 
     def print(self, verbose: bool = False):
         """

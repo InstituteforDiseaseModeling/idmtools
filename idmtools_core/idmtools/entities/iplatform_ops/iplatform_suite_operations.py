@@ -132,7 +132,6 @@ class IPlatformSuiteOperations(ABC):
             if exp.status is None:
                 exps_to_commission.append(exp)
         if exps_to_commission:
-            self.platform.create_items(exps_to_commission, **kwargs)
             self.platform.run_items(exps_to_commission, **kwargs)
 
     def post_run_item(self, suite: Suite, **kwargs):

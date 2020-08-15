@@ -78,6 +78,7 @@ class IPlatformExperimentOperations(ABC):
             Created platform item and the UUID of said item
         """
         if experiment.status is not None:
+            experiment = self.platform_modify_experiment(experiment, **kwargs)
             return experiment
         if do_pre:
             self.pre_create(experiment, **kwargs)
@@ -172,16 +173,17 @@ class IPlatformExperimentOperations(ABC):
 
         """
         # ensure the item is created before running
-        # TODO what status are valid here? Create only?
         if experiment.status is None:
             self.create(experiment, **kwargs)
+        else:
+            experiment = self.platform_modify_experiment(experiment, **kwargs)
 
         # check sims
         logger.debug("Ensuring simulations exist")
         if isinstance(experiment.simulations, (GeneratorType, Iterator)):
             experiment.simulations = self.platform._create_items_of_type(experiment.simulations, ItemType.SIMULATION)
         elif len(experiment.simulations) == 0:
-            raise ValueError("You cannot have an experiment with now simulations")
+            raise ValueError("You cannot have an experiment with no simulations")
         else:
             experiment.simulations = self.platform._create_items_of_type(experiment.simulations, ItemType.SIMULATION)
 
@@ -208,7 +210,7 @@ class IPlatformExperimentOperations(ABC):
 
         """
         self.pre_run_item(experiment, **kwargs)
-        if experiment.status not in [EntityStatus.RUNNING]:
+        if experiment.status not in [EntityStatus.FAILED, EntityStatus.SUCCEEDED]:
             self.platform_run_item(experiment, **kwargs)
             self.post_run_item(experiment, **kwargs)
 
@@ -295,3 +297,16 @@ class IPlatformExperimentOperations(ABC):
 
     def platform_list_asset(self, experiment: Experiment, **kwargs) -> List[Asset]:
         return []
+
+    def platform_modify_experiment(self, experiment: Experiment, regather_common_assets: bool = False, **kwargs) -> Experiment:
+        """
+        API to allow detection of experiments already created
+
+        Args:
+            experiment:
+            regather_common_assets: When modifying, should we gather assets from template/simulations. It is important to note that when using this feature, ensure the previous simulations have finished provisioning. Failure to do so can lead to unexpected behaviour
+
+        Returns:
+
+        """
+        return experiment

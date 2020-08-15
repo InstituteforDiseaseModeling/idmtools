@@ -3,12 +3,15 @@ from dataclasses import dataclass, field, fields, InitVar
 from functools import partial
 from itertools import chain
 from typing import Set, Generator, Dict, Any, List, TYPE_CHECKING
+
 from more_itertools import grouper
+
 from idmtools.builders.simulation_builder import SimulationBuilder
 from idmtools.entities.itask import ITask
 from idmtools.entities.simulation import Simulation
 from idmtools.utils.collections import ResetGenerator
 from idmtools.utils.hashing import ignore_fields_in_dataclass_on_pickle
+
 if TYPE_CHECKING:
     from idmtools.entities.experiment import Experiment
 
@@ -135,6 +138,15 @@ class TemplatedSimulations:
         p = partial(simulation_generator, self.builders, self.new_simulation, self.__extra_simulations)
         return ResetGenerator(p)
 
+    def extra_simulations(self) -> List[Simulation]:
+        """
+        Returns the extra simulations defined on template
+
+        Returns:
+            Returns the extra simulations defined
+        """
+        return self.__extra_simulations
+
     def add_simulation(self, simulation: Simulation):
         """
         Add a simulation that was built outside template engine to template generator. This is useful we you can build
@@ -148,6 +160,18 @@ class TemplatedSimulations:
 
         """
         self.__extra_simulations.append(simulation)
+
+    def add_simulations(self, simulations: List[Simulation]):
+        """
+        Add multiple simulations without templating. See add_simulation
+
+        Args:
+            simulations: Simulation to add
+
+        Returns:
+
+        """
+        self.__extra_simulations.extend(simulations)
 
     def new_simulation(self):
         """
@@ -185,6 +209,9 @@ class TemplatedSimulations:
         Add ignored fields back since they don't exist in the pickle
         """
         self.__dict__.update(state)
+
+    def __len__(self):
+        return sum([len(b) for b in self.builders]) + len(self.__extra_simulations)
 
     @classmethod
     def from_task(cls, task: ITask, tags: Dict[str, Any] = None) -> 'TemplatedSimulations':

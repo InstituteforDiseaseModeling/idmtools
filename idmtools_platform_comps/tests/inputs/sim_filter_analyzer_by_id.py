@@ -1,8 +1,6 @@
 import os
 import pandas as pd
 from logging import getLogger
-
-from idmtools.core.platform_factory import Platform
 from idmtools.entities.ianalyzer import IAnalyzer
 
 logger = getLogger(__name__)
@@ -16,7 +14,6 @@ class SimFilterAnalyzerById(IAnalyzer):
     def __init__(self, filenames=None, output_path=None, **kwargs):
         super().__init__(filenames=filenames, parse=False, **kwargs)
         self.output_path = output_path or "output"
-        self.p = Platform('COMPS2')
 
     def initialize(self):
         self.output_path = os.path.join(self.working_dir, self.output_path)
