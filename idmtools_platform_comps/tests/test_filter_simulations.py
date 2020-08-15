@@ -42,8 +42,7 @@ class TestSimulations(ITestWithPersistence):
         suite.update_tags({'name': 'test', 'fetch': 123})
         self.platform.create_items([suite])
         suite.add_experiment(experiment)
-        self.platform.run_items(experiment)
-        self.platform.wait_till_done(experiment)
+        experiment.run(wait_until_done=True)
         return suite
 
     @classmethod

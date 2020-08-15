@@ -65,8 +65,7 @@ def wait_on_experiment_and_check_all_sim_status(tc, experiment, platform=None,
     Returns:
 
     """
-    platform.run_items(experiment)
-    platform.wait_till_done(experiment)
+    experiment.run(wait_until_done=True)
     if isinstance(tc, type):
         tc.assertTrue(tc, all([s.status == expected_status for s in experiment.simulations]))
     else:

@@ -33,7 +33,7 @@ class TestAnalyzeManager(unittest.TestCase):
         self.platform = Platform('Test')
         self.platform.cleanup()
         self.sample_experiment = Experiment.from_task(TestTask())
-        self.platform.run_items(self.sample_experiment)
+        self.sample_experiment.run()
         self.platform._simulations.set_simulation_status(self.sample_experiment.uid, status=EntityStatus.SUCCEEDED)
         self.configuration = {'max_processes': 1}
 
@@ -42,7 +42,7 @@ class TestAnalyzeManager(unittest.TestCase):
 
     def test_can_analyze_failed_item(self):
         se = Experiment.from_task(TestTask())
-        self.platform.run_items(se)
+        se.run()
         self.platform._simulations.set_simulation_status(se.uid, status=EntityStatus.FAILED)
         self.configuration = {'max_processes': 1}
 
@@ -97,7 +97,7 @@ class TestAnalyzeManager(unittest.TestCase):
         base_sim = Simulation(task=TestTask())
         for i in range(2):
             test_exp.simulations.append(copy.deepcopy(base_sim))
-        self.platform.run_items(test_exp)
+        test_exp.run()
 
         # all ready
         for test_name, results in results_expected.items():

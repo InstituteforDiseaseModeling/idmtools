@@ -46,8 +46,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         experiment = Experiment(name=self.case_name, simulations=[task.to_simulation()])
         experiment.tags = {'ac_id': str(ac_id)}
 
-        self.platform.run_items(experiment)
-        self.platform.wait_till_done(experiment)
+        experiment.run(wait_until_done=True)
 
         # Make sure this experiment succeeded
         self.assertTrue(experiment.succeeded)
@@ -80,9 +79,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         # create experiment with 1 base simulation with python task
         experiment = Experiment(name=self.case_name, simulations=[task.to_simulation()])
         experiment.tags = {'ac_id': str(ac_id)}
-
-        self.platform.run_items(experiment)
-        self.platform.wait_till_done(experiment)
+        experiment.run(wait_until_done=True)
 
         # Make sure this experiment failed
         self.assertFalse(experiment.succeeded)
@@ -119,9 +116,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         # create experiment with 1 base simulation with python task
         experiment = Experiment(name=self.case_name, simulations=[task.to_simulation()], assets=ac)
         experiment.tags = {'ac_id': str(ac_id)}
-
-        self.platform.run_items(experiment)
-        self.platform.wait_till_done(experiment)
+        experiment.run(wait_until_done=True)
 
         # Make sure this experiment succeeded
         self.assertTrue(experiment.succeeded)
@@ -153,9 +148,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         # create experiment with 1 base simulation with python task
         experiment = Experiment(name=self.case_name, simulations=[task.to_simulation()])
         experiment.tags = {'ac_id': str(ac_id)}
-
-        platform.run_items(experiment)
-        platform.wait_till_done(experiment)
+        experiment.run(wait_until_done=True)
 
         # Make sure this experiment succeeded
         self.assertTrue(experiment.succeeded)
@@ -179,9 +172,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         # create experiment with 1 base simulation with python task
         experiment = Experiment(name=self.case_name, simulations=[task.to_simulation()])
         experiment.tags = {'ac_id': str(ac_id)}
-
-        platform.run_items(experiment)
-        platform.wait_till_done(experiment)
+        experiment.run(wait_until_done=True)
 
         # Make sure this experiment succeeded
         self.assertTrue(experiment.succeeded)
@@ -216,9 +207,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         # create experiment with 1 base simulation with python task
         experiment = Experiment(name=self.case_name, simulations=[task.to_simulation()], assets=ac)
         experiment.tags = {'ac_id': str(ac_id)}
-
-        self.platform.run_items(experiment)
-        self.platform.wait_till_done(experiment)
+        experiment.run(wait_until_done=True)
 
         # Make sure this experiment succeeded
         self.assertTrue(experiment.succeeded)
@@ -245,9 +234,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         # create experiment with 1 base simulation with python task
         experiment = Experiment(name=self.case_name, simulations=[task.to_simulation()], assets=ac)
         experiment.tags = {'ac_id': str(ac_id)}
-
-        self.platform.run_items(experiment)
-        self.platform.wait_till_done(experiment)
+        experiment.run(wait_until_done=True)
 
         # Make sure this experiment succeeded
         self.assertTrue(experiment.succeeded)

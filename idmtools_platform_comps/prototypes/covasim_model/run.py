@@ -34,8 +34,7 @@ if __name__ == "__main__":
                                           'description': 'run with exec'
                                       })
     experiment.assets.add_directory(assets_directory=os.path.join(here, 'inputs'))
-    platform.run_items(experiment)
-    platform.wait_till_done(experiment)
+    experiment.run(wait_until_done=True)
 
     # Exit if the experiment fails
     if not experiment.succeeded:

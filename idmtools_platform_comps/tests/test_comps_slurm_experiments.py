@@ -153,8 +153,7 @@ class TestCOMPSSlurmExperiment(ITestWithPersistence):
         experiment.assets.add_directory(assets_directory=assets_path)
 
         # set platform and run simulations
-        self.platform.run_items(experiment)
-        self.platform.wait_till_done(experiment)
+        experiment.run(wait_until_done=True)
 
         # check experiment status
         wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)
