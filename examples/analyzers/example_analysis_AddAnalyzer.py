@@ -11,18 +11,18 @@ if __name__ == '__main__':
 
     # Set the platform where you want to run your analysis
     # In this case we are running in COMPS, but this can be changed to run 'Local'
-    platform = Platform('COMPS2')
+    with Platform('COMPS2') as platform:
 
-    # Arg option for analyzer init are uid, working_dir, data in the method map (aka select_simulation_data),
-    # and filenames
-    # In this case, we want to provide a filename to analyze
-    filenames = ['StdOut.txt']
-    # Initialize the analyser class with the name of file to save to and start the analysis
-    analyzers = [AddAnalyzer(filenames=filenames)]
+        # Arg option for analyzer init are uid, working_dir, data in the method map (aka select_simulation_data),
+        # and filenames
+        # In this case, we want to provide a filename to analyze
+        filenames = ['StdOut.txt']
+        # Initialize the analyser class with the name of file to save to and start the analysis
+        analyzers = [AddAnalyzer(filenames=filenames)]
 
-    # Set the experiment you want to analyze
-    experiment_id = 'f227704e-0c34-ea11-a2be-f0921c167861'  # comps2 staging exp id
+        # Set the experiment you want to analyze
+        experiment_id = 'f227704e-0c34-ea11-a2be-f0921c167861'  # comps2 staging exp id
 
-    # Specify the id Type, in this case an Experiment
-    manager = AnalyzeManager(platform=platform, ids=[(experiment_id, ItemType.EXPERIMENT)], analyzers=analyzers)
-    manager.analyze()
+        # Specify the id Type, in this case an Experiment
+        manager = AnalyzeManager(ids=[(experiment_id, ItemType.EXPERIMENT)], analyzers=analyzers)
+        manager.analyze()

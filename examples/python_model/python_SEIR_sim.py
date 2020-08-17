@@ -174,7 +174,7 @@ if __name__ == '__main__':
     analyzers = [InfectiousnessCSVAnalyzer(filenames=filenames), NodeCSVAnalyzer(filenames=filenames_2)]
 
     # Specify the id Type, in this case an Experiment on COMPS
-    manager = AnalyzeManager(configuration={}, partial_analyze_ok=True,
+    manager = AnalyzeManager(partial_analyze_ok=True,
                              ids=[(experiment.uid, ItemType.EXPERIMENT)],
                              analyzers=analyzers)
     # Analyze

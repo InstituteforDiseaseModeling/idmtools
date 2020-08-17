@@ -513,7 +513,7 @@ class TestPythonExperiment(ITestWithPersistence):
         experiment.tags = tags
 
         experiment.assets.add_directory(assets_directory=assets_path)
-        experiment.run(wait_until_done=True)
+        experiment.run()
 
         # check experiment status
         wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)

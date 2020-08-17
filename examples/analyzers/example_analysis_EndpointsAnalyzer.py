@@ -94,14 +94,14 @@ if __name__ == "__main__":
 
     # Set the platform where you want to run your analysis
     # In this case we are running in COMPS, but this can be changed to run 'Local'
-    platform = Platform('COMPS2')
+    with Platform('COMPS2') as platform:
 
-    # Set the experiment you want to analyze
-    exp_id = '719de048-64cb-e911-a2bb-f0921c167866'  # comps2 staging exp id
+        # Set the experiment you want to analyze
+        exp_id = '719de048-64cb-e911-a2bb-f0921c167866'  # comps2 staging exp id
 
-    # Initialize the analyser class with the name of file to save to and start the analysis
-    analyzers = [EndpointsAnalyzer(save_file="endpoints_{}.csv".format(exp_id))]
+        # Initialize the analyser class with the name of file to save to and start the analysis
+        analyzers = [EndpointsAnalyzer(save_file="endpoints_{}.csv".format(exp_id))]
 
-    # Specify the id Type, in this case an Experiment
-    manager = AnalyzeManager(platform=platform, ids=[(exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
-    manager.analyze()
+        # Specify the id Type, in this case an Experiment
+        manager = AnalyzeManager(ids=[(exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
+        manager.analyze()

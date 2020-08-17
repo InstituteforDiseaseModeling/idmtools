@@ -28,6 +28,6 @@ if __name__ == '__main__':
         experiment_id = '9311af40-1337-ea11-a2be-f0921c167861'  # staging exp id simple sim and csv example
 
         # Specify the id Type, in this case an Experiment on COMPS
-        manager = AnalyzeManager(configuration={}, partial_analyze_ok=True, ids=[(experiment_id, ItemType.EXPERIMENT)],
+        manager = AnalyzeManager(partial_analyze_ok=True, ids=[(experiment_id, ItemType.EXPERIMENT)],
                                  analyzers=analyzers)
         manager.analyze()
