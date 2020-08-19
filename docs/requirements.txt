@@ -3,5 +3,5 @@ sphinxcontrib-napoleon~=0.7
 sphinx~=3.2.0
 plantweb~=1.2.1
 sphinxcontrib-programoutput~=0.16
-PyGithub~=1.52
+PyGithub~=1.53
 pygit2~=1.2.1
