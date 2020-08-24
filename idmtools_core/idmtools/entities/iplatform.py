@@ -74,6 +74,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     _suites: IPlatformSuiteOperations = field(default=None, repr=False, init=False, compare=False)
     _workflow_items: IPlatformWorkflowItemOperations = field(default=None, repr=False, init=False, compare=False)
     _assets: IPlatformAssetCollectionOperations = field(default=None, repr=False, init=False, compare=False)
+    #: Controls what platform should do we re-running experiments by default
+    _regather_assets_on_modify: bool = field(default=False, repr=False, init=False, compare=False)
 
     @staticmethod
     def get_caller():
@@ -280,7 +282,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         Raises:
             ValueError: If the item 's interface cannot be found
         """
-        # check both base types and platform speci
+        # check both base types and platform specs
         for interface_type_mapping in [STANDARD_TYPE_TO_INTERFACE, self.platform_type_map]:
             for interface, item_type in interface_type_mapping.items():
                 if isinstance(item, interface):
@@ -530,7 +532,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             item.platform = self
         getattr(self, interface).refresh_status(item)
 
-    def get_files(self, item: IEntity, files: Union[Set[str], List[str]], output: str = None) -> \
+    def get_files(self, item: IEntity, files: Union[Set[str], List[str]], output: str = None, **kwargs) -> \
             Union[Dict[str, Dict[str, bytearray]], Dict[str, bytearray]]:
         """
         Get files for a platform entity
@@ -539,6 +541,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             item: Item to fetch files for
             files: List of file names to get
             output: save files to
+            **kwargs: Platform arguments
 
         Returns:
             For simulations, this returns a dictionary with filename as key and values being binary data from file or a
@@ -550,7 +553,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         if item.item_type not in self.platform_type_map.values():
             raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
-        ret = getattr(self, interface).get_assets(item, files)
+        ret = getattr(self, interface).get_assets(item, files, **kwargs)
 
         if output:
             if item.item_type not in (ItemType.SIMULATION, ItemType.WORKFLOW_ITEM):
@@ -670,7 +673,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     @staticmethod
     def __wait_until_done_progress_callback(item: Union[Experiment, IWorkflowItem], progress_bar: tqdm,
                                             child_attribute: str = 'simulations',
-                                            done_states: List[EntityStatus] = None) -> bool:
+                                            done_states: List[EntityStatus] = None, failed_warning: Dict[str, bool] = False) -> bool:
         """
         A callback for progress bar(when an item has children) and checking if an item has completed execution. This is
         meant for mainly for aggregate types where the status is from the children
@@ -681,6 +684,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             child_attribute: What is the name of the child attribute. For examples, if item was an Experiment, the
                 child_attribute would be 'simulations'
             done_states: What states are considered done
+            failed_warning: Used to track if we have warned user of failure. We use dict to pass by refernce since we cannot do that with a bool
 
         Returns:
             True is item has completed execution
@@ -710,6 +714,10 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         # check if we need to update the progress bar
         if done > progress_bar.last_print_n:
             progress_bar.update(done - progress_bar.last_print_n)
+        # Alert user to failing simulations so they can stop execution if wanted
+        if isinstance(item, Experiment) and item.any_failed and not failed_warning['failed_warning']:
+            user_logger.warning(f"The Experiment {item.uid} has failed simulations. Check Experiment in platform")
+            failed_warning['failed_warning'] = True
         return item.done
 
     def wait_till_done_progress(self, item: Union[Experiment, IWorkflowItem, Suite], timeout: int = 60 * 60 * 24,
@@ -738,9 +746,11 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             child_attribute = 'experiments'
         else:
             prog = None
+
+        failed_warning = dict(failed_warning=False)
         self.__wait_till_callback(
             item,
-            partial(self.__wait_until_done_progress_callback, progress_bar=prog, child_attribute=child_attribute),
+            partial(self.__wait_until_done_progress_callback, progress_bar=prog, child_attribute=child_attribute, failed_warning=failed_warning),
             timeout,
             refresh_interval
         )
@@ -784,6 +794,15 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         """
         from idmtools.core.context import remove_current_platform
         remove_current_platform()
+
+    def is_regather_assets_on_modify(self) -> bool:
+        """
+        Return default behaviour for platform when rerunning experiment and gathering assets
+
+        Returns:
+            True or false
+        """
+        return self._regather_assets_on_modify
 
 
 TPlatform = TypeVar("TPlatform", bound=IPlatform)

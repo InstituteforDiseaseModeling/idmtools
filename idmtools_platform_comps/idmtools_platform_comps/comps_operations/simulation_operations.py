@@ -1,8 +1,9 @@
 import json
+import uuid
 from dataclasses import dataclass, field
 from functools import partial
 from logging import getLogger, DEBUG
-from typing import Any, List, Dict, Type, Optional, TYPE_CHECKING
+from typing import Any, List, Dict, Type, Optional, TYPE_CHECKING, Union
 from uuid import UUID
 
 from COMPS.Data import Simulation as COMPSSimulation, QueryCriteria, Experiment as COMPSExperiment, SimulationFile, \
@@ -28,7 +29,8 @@ user_logger = getLogger('user')
 
 
 def comps_batch_worker(simulations: List[Simulation], interface: 'CompsPlatformSimulationOperations',
-                       num_cores: Optional[int] = None, priority: Optional[str] = None) -> List[COMPSSimulation]:
+                       num_cores: Optional[int] = None, priority: Optional[str] = None, asset_collection_id: Union[str, UUID] = None,
+                       **kwargs) -> List[COMPSSimulation]:
     """
     Run batch worker
 
@@ -37,6 +39,8 @@ def comps_batch_worker(simulations: List[Simulation], interface: 'CompsPlatformS
         interface: SimulationOperation Interface
         num_cores: Optional Number of core to allocate for MPI
         priority: Optional Priority to set to
+        asset_collection_id: Override assection id
+        extra info for
 
     Returns:
         List of Comps Simulations
@@ -49,7 +53,7 @@ def comps_batch_worker(simulations: List[Simulation], interface: 'CompsPlatformS
         if simulation.status is None:
             interface.pre_create(simulation)
             simulation.platform = interface.platform
-            simulation._platform_object = interface.to_comps_sim(simulation, num_cores, priority)
+            simulation._platform_object = interface.to_comps_sim(simulation, num_cores=num_cores, priority=priority, asset_collection_id=asset_collection_id, **kwargs)
             created_simulations.append(simulation)
     if logger.isEnabledFor(DEBUG):
         logger.debug(f'Finished converting to COMPS. Starting saving of {len(simulations)}')
@@ -94,7 +98,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         )
 
     def platform_create(self, simulation: Simulation, num_cores: int = None, priority: str = None,
-                        enable_platform_task_hooks: bool = True) -> COMPSSimulation:
+                        enable_platform_task_hooks: bool = True, asset_collection_id: Union[str, UUID] = None, **kwargs) -> COMPSSimulation:
         """
         Create Simulation on COMPS
 
@@ -103,6 +107,8 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             num_cores: Optional number of MPI Cores to allocate
             priority: Priority to load
             enable_platform_task_hooks: Should platform task hoooks be ran
+            asset_collection_id: Override for asset collection id on sim
+            **kwargs: Expansion fields
 
         Returns:
             COMPS Simulation
@@ -110,12 +116,12 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         from idmtools_platform_comps.utils.python_version import platform_task_hooks
         if enable_platform_task_hooks:
             simulation.task = platform_task_hooks(simulation.task, self.platform)
-        s = self.to_comps_sim(simulation, num_cores, priority)
+        s = self.to_comps_sim(simulation, num_cores=num_cores, priority=priority, asset_collection_id=asset_collection_id, **kwargs)
         COMPSSimulation.save(s, save_semaphore=COMPSSimulation.get_save_semaphore())
         return s
 
     def to_comps_sim(self, simulation: Simulation, num_cores: int = None, priority: str = None,
-                     config: Configuration = None):
+                     config: Configuration = None, asset_collection_id: Union[str, UUID] = None, **kwargs):
         """
         Covert IDMTools object to COMPS Object
 
@@ -123,13 +129,17 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             simulation: Simulation object to convert
             num_cores: Optional Num of MPI Cores to allocate
             priority: Optional Priority
-            config: Optional Configuration objet
+            config: Optional Configuration object
+            asset_collection_id:
+            **kwargs additional option for comps
 
         Returns:
             COMPS Simulation
         """
         if config is None:
-            config = self.get_simulation_config_from_simulation(simulation, num_cores, priority)
+            if asset_collection_id and isinstance(asset_collection_id, str):
+                asset_collection_id = uuid.UUID(asset_collection_id)
+            config = self.get_simulation_config_from_simulation(simulation, num_cores, priority, asset_collection_id, **kwargs)
         s = COMPSSimulation(
             name=simulation.experiment.name if not simulation.name else simulation.name,
             experiment_id=simulation.parent_id,
@@ -138,12 +148,12 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
 
         self.send_assets(simulation, s)
         s.set_tags(simulation.tags)
-        simulation._platform_object = self.platform
+        simulation._platform_object = s
         return s
 
     @staticmethod
     def get_simulation_config_from_simulation(simulation: Simulation, num_cores: int = None, priority: str = None,
-                                              asset_collection_id: UUID = None) -> \
+                                              asset_collection_id: UUID = None, **kwargs) -> \
             Configuration:
         """
         Get the comps configuration for a Simulation Object
@@ -153,6 +163,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             num_cores: Optional Num of core for MPI
             priority: Optional Priority
             asset_collection_id: Override simulation asset_collection_id
+            **kwargs additional option for comps
 
         Returns:
             Configuration
@@ -180,7 +191,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             logger.debug(f'Simulation config: {str(comps_configuration)}')
         return Configuration(**comps_configuration)
 
-    def batch_create(self, simulations: List[Simulation], num_cores: int = None, priority: str = None) -> \
+    def batch_create(self, simulations: List[Simulation], num_cores: int = None, priority: str = None, asset_collection_id: Union[str, UUID] = None, **kwargs) -> \
             List[COMPSSimulation]:
         """
         Perform batch creation of Simulations
@@ -189,11 +200,13 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             simulations: Simulation to create
             num_cores: Optional MPI Cores to allocate per simulation
             priority: Optional Priority
+            asset_collection_id: Asset collection id for sim(overide experiment)
+            **kwargs: Future expansion
 
         Returns:
             List of COMPSSimulations that were created
         """
-        thread_func = partial(comps_batch_worker, interface=self, num_cores=num_cores, priority=priority)
+        thread_func = partial(comps_batch_worker, interface=self, num_cores=num_cores, priority=priority, asset_collection_id=asset_collection_id, **kwargs)
         return batch_create_items(
             simulations,
             batch_worker_thread_func=thread_func,
@@ -275,7 +288,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             load_task: Should we load tasks. Defaults to No. This can increase the load items on fetchs
             parent: Optional parent object to prevent reloads
             load_parent: Force load of parent(Beware, This could cause loading loops)
-            metadata: Should we load metadata by default. If load task is enabled, this is also enabled
+            load_metadata: Should we load metadata by default. If load task is enabled, this is also enabled
             **kwargs:
 
         Returns:
@@ -416,19 +429,32 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             logger.debug(f"Detected task CLI {cli}")
         return cli
 
-    def get_assets(self, simulation: Simulation, files: List[str], **kwargs) -> Dict[str, bytearray]:
+    def get_assets(self, simulation: Simulation, files: List[str], include_experiment_assets: bool = True, **kwargs) -> Dict[str, bytearray]:
         """
         Fetch the files associated with a simulation
 
         Args:
             simulation: Simulation
             files: List of files to download
+            include_experiment_assets: Should we also load experiment assets?
             **kwargs:
 
         Returns:
             Dictionary of filename -> ByteArray
         """
-        return get_asset_for_comps_item(self.platform, simulation, files, self.cache)
+        # since assets could be in the common assets, we should check that firs
+        # load comps config first
+        comps_sim: COMPSSimulation = simulation.get_platform_object(load_children=["files", "configuration"])
+        if include_experiment_assets and (comps_sim.configuration is None or comps_sim.configuration.asset_collection_id is None):
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Gathering assets from experiment first")
+            exp_assets = get_asset_for_comps_item(self.platform, simulation.experiment, files, self.cache, load_children=["configuration"])
+            if exp_assets is None:
+                exp_assets = dict()
+        else:
+            exp_assets = dict()
+        exp_assets.update(get_asset_for_comps_item(self.platform, simulation, files, self.cache, comps_item=comps_sim))
+        return exp_assets
 
     def list_assets(self, simulation: Simulation, common_assets: bool = False, **kwargs) -> List[Asset]:
         """

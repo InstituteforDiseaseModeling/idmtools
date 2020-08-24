@@ -210,7 +210,7 @@ class IPlatformExperimentOperations(ABC):
 
         """
         self.pre_run_item(experiment, **kwargs)
-        if experiment.status not in [EntityStatus.RUNNING]:
+        if experiment.status not in [EntityStatus.FAILED, EntityStatus.SUCCEEDED]:
             self.platform_run_item(experiment, **kwargs)
             self.post_run_item(experiment, **kwargs)
 
@@ -304,7 +304,7 @@ class IPlatformExperimentOperations(ABC):
 
         Args:
             experiment:
-            regather_common_assets: When modifying, should we gather assets from template/simulations
+            regather_common_assets: When modifying, should we gather assets from template/simulations. It is important to note that when using this feature, ensure the previous simulations have finished provisioning. Failure to do so can lead to unexpected behaviour
 
         Returns:
 

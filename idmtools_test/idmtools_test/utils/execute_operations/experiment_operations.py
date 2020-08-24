@@ -78,8 +78,9 @@ class TestExecutePlatformExperimentOperation(IPlatformExperimentOperations):
         exp_path = self.get_experiment_path(experiment.uid)
         path = os.path.join(exp_path, "experiment.json")
         os.makedirs(exp_path, exist_ok=True)
-        with open(path, 'w') as out:
-            out.write(json.dumps(experiment.to_dict(), cls=IDMJSONEncoder))
+        if not os.path.exists(path):
+            with open(path, 'w') as out:
+                out.write(json.dumps(experiment.to_dict(), cls=IDMJSONEncoder))
         for sim in experiment.simulations:
             if sim.status in [None, EntityStatus.CREATED]:
                 self.platform._simulations.run_item(sim)
@@ -145,7 +146,10 @@ class TestExecutePlatformExperimentOperation(IPlatformExperimentOperations):
             if not chunk:
                 break
             else:
-                md5.update(chunk.encode('utf-8'))
+                if isinstance(chunk, bytes):
+                    md5.update(chunk)
+                else:
+                    md5.update(chunk.encode('utf-8'))
 
     def refresh_status(self, experiment: Experiment, **kwargs):
         if logger.isEnabledFor(DEBUG):

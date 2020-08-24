@@ -2,7 +2,7 @@ import os
 
 from COMPS import Data
 from COMPS.Data import AssetCollection as CompsAssetCollection
-from COMPS.Data import QueryCriteria, Simulation as COMPSSimulation, Simulation
+from COMPS.Data import QueryCriteria, Simulation as COMPSSimulation, Experiment as COMPSExperiment
 from idmtools.builders import SimulationBuilder
 from idmtools.core.enums import EntityStatus
 from idmtools.entities.experiment import Experiment
@@ -18,7 +18,14 @@ def get_asset_collection_id_for_simulation_id(sim_id):
         ['id', 'experiment_id']).select_children(
         ["files", "configuration"]))
 
-    collection_id = simulation.configuration.asset_collection_id
+    if simulation.configuration is None:
+        # check experiment
+        experiment = COMPSExperiment.get(simulation.experiment_id, query_criteria=QueryCriteria().select(
+            ['id']).select_children("configuration")
+        )
+        collection_id = experiment.configuration.asset_collection_id
+    else:
+        collection_id = simulation.configuration.asset_collection_id
     return collection_id
 
 

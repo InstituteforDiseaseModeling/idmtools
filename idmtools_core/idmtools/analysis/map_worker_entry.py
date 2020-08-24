@@ -28,6 +28,9 @@ def map_item(item: IItem) -> NoReturn:
     cache = map_item.cache
     platform = map_item.platform
 
+    if item.platform is None:
+        item.platform = platform
+
     _get_mapped_data_for_item(item, analyzers, cache, platform)
 
 

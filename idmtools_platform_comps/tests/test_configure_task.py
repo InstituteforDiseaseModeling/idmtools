@@ -6,7 +6,7 @@ from idmtools_models.json_configured_task import JSONConfiguredTask
 
 
 @pytest.mark.comps
-class TestExperimentOperations(unittest.TestCase):
+class TestConfigTask(unittest.TestCase):
     def test_reload_from_simulation_task1(self):
         with Platform("COMPS2") as p:
             command: str = "python -m json.tool my_config.json"

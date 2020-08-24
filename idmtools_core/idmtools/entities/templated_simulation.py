@@ -138,6 +138,15 @@ class TemplatedSimulations:
         p = partial(simulation_generator, self.builders, self.new_simulation, self.__extra_simulations)
         return ResetGenerator(p)
 
+    def extra_simulations(self) -> List[Simulation]:
+        """
+        Returns the extra simulations defined on template
+
+        Returns:
+            Returns the extra simulations defined
+        """
+        return self.__extra_simulations
+
     def add_simulation(self, simulation: Simulation):
         """
         Add a simulation that was built outside template engine to template generator. This is useful we you can build

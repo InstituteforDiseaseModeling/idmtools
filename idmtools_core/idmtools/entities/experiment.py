@@ -83,14 +83,20 @@ class Experiment(IAssetsEnabled, INamedEntity):
 
     @property
     def status(self):
-        if len(self.simulations.items) == 0 or all([s.status is None for s in self.simulations.items]):
+        # narrow down to states we have
+        sim_statuses = set([s.status for s in self.simulations.items])
+        if len(self.simulations.items) == 0 or all([s is None for s in sim_statuses]):
             status = None  # this will trigger experiment creation on a platform
-        elif any([s.status == EntityStatus.FAILED for s in self.simulations.items]):
-            status = EntityStatus.FAILED
-        elif all([s.status == EntityStatus.SUCCEEDED for s in self.simulations.items]):
-            status = EntityStatus.SUCCEEDED
-        elif any([s.status == EntityStatus.RUNNING for s in self.simulations.items]):
+        elif any([s == EntityStatus.RUNNING for s in sim_statuses]):
             status = EntityStatus.RUNNING
+        elif any([s == EntityStatus.CREATED for s in sim_statuses]) and any([s in [EntityStatus.FAILED, EntityStatus.SUCCEEDED] for s in sim_statuses]):
+            status = EntityStatus.RUNNING
+        elif any([s is None for s in sim_statuses]) and any([s in [EntityStatus.FAILED, EntityStatus.SUCCEEDED] for s in sim_statuses]):
+            status = EntityStatus.CREATED
+        elif any([s == EntityStatus.FAILED for s in sim_statuses]):
+            status = EntityStatus.FAILED
+        elif all([s == EntityStatus.SUCCEEDED for s in sim_statuses]):
+            status = EntityStatus.SUCCEEDED
         else:
             status = EntityStatus.CREATED
         return status
@@ -123,6 +129,9 @@ class Experiment(IAssetsEnabled, INamedEntity):
         """
         Experiment pre_creation callback
 
+        Args:
+            gather_assets: Determines if an experiment will try to gather the common assets or defer. It most cases, you want this enabled but when modifying existing experiments you may want to disable if there are new assets and the platform has performance hits to determine those assets
+
         Returns:
 
         """
@@ -136,15 +145,17 @@ class Experiment(IAssetsEnabled, INamedEntity):
 
         # if it is a template, set task type on experiment
         if gather_assets:
-            if isinstance(self.simulations, ExperimentParentIterator) and isinstance(self.simulations.items, TemplatedSimulations):
+            if isinstance(self.simulations.items, TemplatedSimulations):
                 if logger.isEnabledFor(DEBUG):
                     logger.debug("Using Base task from template for experiment level assets")
                 self.simulations.items.base_task.gather_common_assets()
                 self.assets.add_assets(self.simulations.items.base_task.common_assets, fail_on_duplicate=False)
+                for sim in self.simulations.items.extra_simulations():
+                    self.assets.add_assets(sim.task.gather_common_assets(), fail_on_duplicate=False)
                 if "task_type" not in self.tags:
                     task_class = self.simulations.items.base_task.__class__
                     self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
-            elif self.gather_common_assets_from_task and isinstance(self.__simulations, List):
+            elif self.gather_common_assets_from_task and isinstance(self.simulations.items, List):
                 if logger.isEnabledFor(DEBUG):
                     logger.debug("Using first task for task type")
                     logger.debug("Using all tasks to gather assts")
@@ -179,6 +190,16 @@ class Experiment(IAssetsEnabled, INamedEntity):
             True if all simulations have succeeded, False otherwise
         """
         return all([s.succeeded for s in self.simulations])
+
+    @property
+    def any_failed(self) -> bool:
+        """
+        Return if an experiment has any simulation in failed state.
+
+        Returns:
+            True if all simulations have succeeded, False otherwise
+        """
+        return any([s.failed for s in self.simulations])
 
     @property
     def simulations(self) -> ExperimentParentIterator:
@@ -359,7 +380,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
         p = super()._check_for_platform_from_context(platform)
         return p._experiments.list_assets(self, children, **kwargs)
 
-    def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None, regather_common_assets: bool = False,
+    def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None, regather_common_assets: bool = None,
             **run_opts) -> NoReturn:
         """
         Runs an experiment on a platform
@@ -367,19 +388,22 @@ class Experiment(IAssetsEnabled, INamedEntity):
         Args:
             wait_until_done: Whether we should wait on experiment to finish running as well. Defaults to False
             platform: Platform object to use. If not specified, we first check object for platform object then the current context
-            regather_common_assets: Triggers gathering of assets for existing experiments. Normally we assume assets are same as existing experiment
+            regather_common_assets: Triggers gathering of assets for *existing* experiments. If not provided, we use the platforms default behaviour. See platform details for performance implications of this. For most platforms, it should be ok but for others, it could decrease performance when assets are not changing.
+              It is important to note that when using this feature, ensure the previous simulations have finished provisioning. Failure to do so can lead to unexpected behaviour
             **run_opts: Options to pass to the platform
 
         Returns:
             None
         """
         p = super()._check_for_platform_from_context(platform)
-        if regather_common_assets and self.platform_id is None:
-            raise ValueError("Only user gather_common_assets on existing experiments")
-        elif regather_common_assets and not self.assets.is_editable():
+        if regather_common_assets is None:
+            regather_common_assets = p.is_regather_assets_on_modify()
+        if regather_common_assets and not self.assets.is_editable():
             message = "To modify an experiment's asset collection, you must make a copy of it first. For example\nexperiment.assets = experiment.assets.copy()"
             user_logger.error(message)  # Show it bold red to user
             raise ValueError(message)
+        if not self.assets.is_editable() and isinstance(self.simulations.items, TemplatedSimulations) and not regather_common_assets:
+            user_logger.warning("You are modifying and existing experiment by using a template without gathering common assets. Ensure your Template configuration is the same as existing experiments or enable gathering of new common assets through regather_common_assets.")
         run_opts['regather_common_assets'] = regather_common_assets
         p.run_items(self, **run_opts)
         if wait_until_done:
