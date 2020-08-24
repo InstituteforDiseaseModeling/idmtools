@@ -19,7 +19,7 @@ MODEL_LOAD_LIB = "install_requirements.py"
 MODEL_CREATE_AC = 'create_asset_collection.py'
 MD5_KEY = 'idmtools-requirements-md5-{}'
 # We use this to track os. It would be nice to do that in server
-SLURM_ENVS = ['Calculon', 'SLURMStage', "SLURMDev"]
+SLURM_ENVS = ['calculon', 'slurmstage', "slurmdev"]
 logger = getLogger(__name__)
 user_logger = getLogger("user")
 
@@ -49,7 +49,7 @@ class RequirementsToAssetCollection:
         self.requirements_path = os.path.abspath(self.requirements_path) if self.requirements_path else None
         self.pkg_list = self.pkg_list or []
         self.local_wheels = [os.path.abspath(whl) for whl in self.local_wheels] if self.local_wheels else []
-        self._os_target = "win" if "slurm" not in self.platform.environment.lower() and self.platform.environment not in SLURM_ENVS else "linux"
+        self._os_target = "win" if "slurm" not in self.platform.environment.lower() and self.platform.environment.lower() not in SLURM_ENVS else "linux"
 
     @property
     def checksum(self):
