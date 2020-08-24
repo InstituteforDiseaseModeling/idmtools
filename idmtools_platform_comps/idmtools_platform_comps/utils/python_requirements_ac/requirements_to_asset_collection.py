@@ -49,7 +49,7 @@ class RequirementsToAssetCollection:
         self.requirements_path = os.path.abspath(self.requirements_path) if self.requirements_path else None
         self.pkg_list = self.pkg_list or []
         self.local_wheels = [os.path.abspath(whl) for whl in self.local_wheels] if self.local_wheels else []
-        self._os_target = "win" if "slurm" not in self.platform.environment.lower() or self.platform.environment not in SLURM_ENVS else "linux"
+        self._os_target = "win" if "slurm" not in self.platform.environment.lower() and self.platform.environment not in SLURM_ENVS else "linux"
 
     @property
     def checksum(self):
