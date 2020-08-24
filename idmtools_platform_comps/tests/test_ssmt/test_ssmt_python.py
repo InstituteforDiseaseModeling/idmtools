@@ -41,8 +41,7 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
         user_files.add_file(os.path.join(self.input_file_path, "hello.py"))
 
         wi = SSMTWorkItem(item_name=self.case_name, command=command, user_files=user_files, tags=self.tags)
-        self.platform.run_items(wi)
-        self.platform.wait_till_done(wi)
+        wi.run(wait_on_done=True)
 
         # verify workitem output files
         local_output_path = "output"  # local output dir

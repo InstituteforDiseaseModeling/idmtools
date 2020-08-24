@@ -39,8 +39,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         command = "python Assets/run_population_analyzer.py " + experiment_id
         wi = SSMTWorkItem(item_name=self.case_name, command=command, asset_files=asset_files, user_files=user_files,
                           tags=self.tags)
-        self.platform.run_items(wi)
-        self.platform.wait_till_done(wi)
+        wi.run(wait_on_done=True)
 
         # validate output files
         local_output_path = "output"
@@ -78,8 +77,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         command = "python run_multiple_analyzers.py " + experiment_id
         wi = SSMTWorkItem(item_name=self.case_name, command=command, user_files=user_files,
                           tags=self.tags)
-        self.platform.run_items(wi)
-        self.platform.wait_till_done(wi)
+        wi.run(wait_on_done=True)
 
         # validate output files
         local_output_path = "output"
@@ -127,8 +125,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         command = "python Assets/run_multiple_exps.py " + exp_id1 + " " + exp_id2
         wi = SSMTWorkItem(item_name=self.case_name, command=command, asset_files=asset_files, user_files=user_files,
                           tags=self.tags)
-        self.platform.run_items(wi)
-        self.platform.wait_till_done(wi)
+        wi.run(wait_on_done=True)
 
         # validate output files
         local_output_path = "output"
@@ -238,9 +235,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         command = "python Assets/run_csv_analyzer.py " + experiment_id
         wi = SSMTWorkItem(item_name=self.case_name, command=command, asset_files=asset_files, user_files=user_files,
                           tags=self.tags)
-        self.platform.run_items(wi)
-        self.platform.wait_till_done(wi)
-
+        wi.run(wait_on_done=True)
         local_output_path = "output"
         del_folder(local_output_path)
         out_filenames = ["output_csv/CSVAnalyzer.csv"]

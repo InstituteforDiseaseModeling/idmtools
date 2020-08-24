@@ -47,5 +47,5 @@ if __name__ == "__main__":
     platform = Platform('COMPS2')
     analyzers = [ExampleAnalyzer(filenames=["output/result.json"]), ExampleAnalyzer2(filenames=["config.json"])]
     exp_id = "11052582-83da-e911-a2be-f0921c167861"  # COMPS2 exp_id
-    am = AnalyzeManager(platform=platform, ids=[(exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
+    am = AnalyzeManager(platform, ids=[(exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
     am.analyze()

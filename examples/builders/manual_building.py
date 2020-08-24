@@ -46,7 +46,7 @@ if __name__ == "__main__":
         e.simulations.append(sim)
 
     # run the experiment
-    e.run(platform=platform)
+    e.run()
     # wait on it
     # in most real scenarios, you probably do not want to wait as this will wait until all simulations
     # associated with an experiment are done. We do it in our examples to show feature and to enable

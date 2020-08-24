@@ -371,7 +371,7 @@ class TestPythonExperiment(ITestWithPersistence):
         experiment.assets.add_directory(
             assets_directory=os.path.join(COMMON_INPUT_PATH, "python", "folder_dup_file"))
         with self.assertRaises(RuntimeError) as context:
-            self.platform.run_items(experiment)
+            experiment.run()
         self.assertTrue(
             "400 Bad Request - An error was encountered while attempting to save asset collection: Cannot insert "
             "duplicate key row in object 'dbo.AssetCollectionFile' with unique index "
@@ -513,10 +513,7 @@ class TestPythonExperiment(ITestWithPersistence):
         experiment.tags = tags
 
         experiment.assets.add_directory(assets_directory=assets_path)
-
-        # set platform and run simulations
-        self.platform.run_items(experiment)
-        self.platform.wait_till_done(experiment)
+        experiment.run()
 
         # check experiment status
         wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)

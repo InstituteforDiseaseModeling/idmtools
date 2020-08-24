@@ -28,7 +28,7 @@ pl = RequirementsToAssetCollection(platform,
                                    requirements_path=os.path.join("inputs", "allee_python_model", "requirements.txt"))
 
 ac_id = pl.run()
-pandas_assets = AssetCollection.from_id(ac_id, platform=platform)
+pandas_assets = AssetCollection.from_id(ac_id, as_copy=True)
 
 base_task = JSONConfiguredPythonTask(
     # specify the path to the script. This is most likely a scientific model
@@ -64,7 +64,7 @@ e = Experiment.from_template(
     assets=AssetCollection.from_directory(os.path.join("inputs", "allee_python_model"))
 )
 
-platform.run_items(e)
+e.run(wait_until_done=True)
 
 # use system status as the exit code
 sys.exit(0 if e.succeeded else -1)

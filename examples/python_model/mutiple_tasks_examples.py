@@ -14,11 +14,10 @@ def run_example_PythonTask(ac_id):
     task = JSONConfiguredPythonTask(script_path=os.path.join("inputs", "task_model", "model_file.py"))
 
     ts = TemplatedSimulations(base_task=task)
-    common_assets = AssetCollection.from_id(ac_id, platform=platform, as_copy=True)
+    common_assets = AssetCollection.from_id(ac_id,  as_copy=True)
     sim = ts.new_simulation()
     experiment = Experiment(name="run_example_PythonTask", simulations=[sim], assets=common_assets)
-    platform.run_items(experiment)
-    platform.wait_till_done(experiment)
+    experiment.run(wait_until_done=True)
 
 
 def run_example_CommandTask(ac_id):
@@ -26,13 +25,11 @@ def run_example_CommandTask(ac_id):
     task = CommandTask(command=command)
 
     model_asset = Asset(absolute_path=os.path.join("inputs", "task_model", "model_file.py"))
-    common_assets = AssetCollection.from_id(ac_id, platform=platform, as_copy=True)
+    common_assets = AssetCollection.from_id(ac_id, as_copy=True)
     common_assets.add_asset(model_asset)
     # create experiment from task
     experiment = Experiment.from_task(task, name="run_example_CommandTask", assets=common_assets)
-
-    platform.run_items(experiment)
-    platform.wait_till_done(experiment)
+    experiment.run(wait_until_done=True)
 
 def run_pip_list():
     command = "Assets\\run.bat"
@@ -42,12 +39,10 @@ def run_pip_list():
     ac.add_asset(model_asset)
     # create experiment from task
     experiment = Experiment.from_task(task, name="run_pip_list", assets=ac)
-
-    platform.run_items(experiment)
-    platform.wait_till_done(experiment)
+    experiment.run(wait_until_done=True)
 
 def run_example_task_from_template(ac_id):
-    common_assets = AssetCollection.from_id(ac_id, platform=platform, as_copy=True)
+    common_assets = AssetCollection.from_id(ac_id, as_copy=True)
     task = JSONConfiguredPythonTask(script_path=os.path.join("inputs", "task_model", "model_file.py"),
                                     common_assets=common_assets, parameters=dict(c=0))
     ts = TemplatedSimulations(base_task=task)
@@ -57,9 +52,7 @@ def run_example_task_from_template(ac_id):
     ts.add_builder(builder)
     # create experiment from task
     experiment = Experiment.from_template(ts, name="run_example_task_from_template")
-
-    platform.run_items(experiment)
-    platform.wait_till_done(experiment)
+    experiment.run(wait_until_done=True)
 
 
 if __name__ == '__main__':
