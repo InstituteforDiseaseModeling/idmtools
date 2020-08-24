@@ -121,8 +121,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
         builder = SimulationBuilder()
         builder.add_sweep_definition(JSONConfiguredPythonTask.set_parameter_partial('P'), range(3))
         experiment = Experiment.from_builder(builder, task, name='Mixed Model')
-        self.platform.run_items(experiment)
-        self.platform.wait_till_done(experiment)
+        experiment.run(wait_until_done=True)
         self.assertTrue(experiment.done)
         self.assertFalse(experiment.succeeded)
 
@@ -158,8 +157,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
         builder = SimulationBuilder()
         builder.add_sweep_definition(JSONConfiguredPythonTask.set_parameter_partial('P'), range(3))
         experiment = Experiment.from_builder(builder, task, name='Mixed Model')
-        self.platform.run_items(experiment)
-        self.platform.wait_till_done(experiment)
+        experiment.run(wait_until_done=True)
         self.assertTrue(experiment.done)
         self.assertFalse(experiment.succeeded)
 

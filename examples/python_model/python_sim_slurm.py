@@ -53,6 +53,5 @@ experiment.assets.add_directory(assets_directory=os.path.join("inputs", "python_
 
 platform = Platform('SLURM')
 
-platform.run_items(experiment)
-platform.wait_till_done(experiment)
+experiment.run(wait_until_done=True)
 sys.exit(0 if experiment.succeeded else -1)

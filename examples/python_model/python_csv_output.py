@@ -48,8 +48,6 @@ with platform('COMPS2'):
         tags=dict(tag1=1))
 
     # now we can run the experiment
-    e.run()
-    # and wait
-    e.wait()
+    e.run(wait_until_done=True)
     # use system status as the exit code
     sys.exit(0 if e.succeeded else -1)

@@ -57,8 +57,7 @@ class TestRExperiment(ITestWithPersistence):
                                           assets=r_model_assets)
 
         platform = Platform('HPC_LINUX')
-        platform.run_items(experiment)
-        platform.wait_till_done(experiment)
+        experiment.run(wait_until_done=True)
 
         # Check experiment status, only move to Analyzer step if experiment succeeded.
         if not experiment.succeeded:
@@ -87,8 +86,8 @@ class TestRExperiment(ITestWithPersistence):
                                           assets=ncov_analysis_assets)
 
         platform = Platform('HPC_LINUX')
-        platform.run_items(experiment)
-        platform.wait_till_done(experiment)
+        experiment.run(wait_until_done=True)
+
 
         # Check experiment status, only move to Analyzer step if experiment succeeded.
         if not experiment.succeeded:
@@ -117,9 +116,7 @@ class TestRExperiment(ITestWithPersistence):
         experiment = Experiment.from_task(task, name="test_r_task.py--test_r_model_with_ac",
                                           assets=ncov_analysis_assets)
         # experiment.assets.add_directory(ac_lib_path)
-
-        platform.run_items(experiment)
-        platform.wait_till_done(experiment)
+        experiment.run(wait_until_done=True)
 
         # Check experiment status, only move to Analyzer step if experiment succeeded.
         if not experiment.succeeded:

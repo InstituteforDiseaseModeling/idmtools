@@ -38,7 +38,6 @@ with platform('COMPS2'):
 
     # run the experiment and wait
     em = Experiment.from_template(ts, name=os.path.split(sys.argv[0])[1])
-    em.run()
-    em.wait()
+    em.run(wait_until_done=True)
     # use system status as the exit code
-    sys.exit(em.succeeded)
+    sys.exit(0 if em.succeeded else -1)
