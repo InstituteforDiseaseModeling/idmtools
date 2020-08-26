@@ -57,11 +57,11 @@ class TestNoConfig(unittest.TestCase):
         sim_root_dir = os.path.join('$COMPS_PATH(USER)', 'output')
         with self.assertRaises(ValueError) as a:
             plat_obj = Platform('COMPS',
-                                endpoint='https://comps.idmod.org',
-                                environment='Calculon',
+                                endpoint='https://comps2.idmod.org',
+                                environment='Bayesian',
                                 priority='Normal',
                                 simulation_root=sim_root_dir,
-                                node_group='idm_abcd',
+                                node_group='emod_abcd',
                                 num_cores='abc',
                                 num_retries='0',
                                 exclusive='False', missing_ok=True)
@@ -80,11 +80,11 @@ class TestNoConfig(unittest.TestCase):
         from idmtools.entities.experiment import Experiment
         IdmConfigParser.clear_instance()
         plat_obj = Platform('COMPS',
-                            endpoint='https://comps.idmod.org',
-                            environment='Calculon',
+                            endpoint='https://comps2.idmod.org',
+                            environment='Bayesian',
                             priority='Normal',
                             simulation_root=sim_root_dir,
-                            node_group='idm_abcd',
+                            node_group='emod_abcd',
                             num_cores='1',
                             num_retries='0',
                             exclusive='False')
