@@ -15,12 +15,13 @@ class TestNoConfig(unittest.TestCase):
         os.chdir(self.temp_directory.name)
 
     def tearDown(self) -> None:
-        self.temp_directory.cleanup()
-        os.chdir(self.current_directory)
         try:
-            os.unsetenv('IDMTOOLS_ERROR_NO_CONFIG')
+            del os.environ['IDMTOOLS_ERROR_NO_CONFIG']
+            # try to cleanup but be ok with failures
+            self.temp_directory.cleanup()
         except:
             pass
+        os.chdir(self.current_directory)
 
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     @pytest.mark.comps
@@ -99,4 +100,5 @@ class TestNoConfig(unittest.TestCase):
         # self.assertIn("The field num_cores requires a value of type int. You provided <abc>", output.getvalue())
 
         IdmConfigParser.clear_instance()
-        os.unsetenv('IDMTOOLS_ERROR_NO_CONFIG')
+        if 'IDMTOOLS_ERROR_NO_CONFIG' in os.environ:
+            del os.environ['IDMTOOLS_ERROR_NO_CONFIG']
