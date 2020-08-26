@@ -3,32 +3,34 @@ import os
 import tempfile
 import unittest.mock
 import pytest
+from idmtools.config import IdmConfigParser
+from idmtools.core.platform_factory import Platform
+from idmtools.entities.experiment import Experiment
 
 
 class TestNoConfig(unittest.TestCase):
 
-    def setUp(self) -> None:
-        # store current work directory
-        super().setUp()
-        self.current_directory = os.getcwd()
-        self.temp_directory = tempfile.TemporaryDirectory()
-        os.chdir(self.temp_directory.name)
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.current_directory = os.getcwd()
+        cls.temp_directory = tempfile.TemporaryDirectory()
+        os.chdir(cls.temp_directory.name)
 
-    def tearDown(self) -> None:
+    @classmethod
+    def tearDownClass(cls) -> None:
         try:
             del os.environ['IDMTOOLS_ERROR_NO_CONFIG']
             # try to cleanup but be ok with failures
-            self.temp_directory.cleanup()
+            cls.temp_directory.cleanup()
         except:
             pass
-        os.chdir(self.current_directory)
+        os.chdir(cls.current_directory)
+        IdmConfigParser.clear_instance()
 
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     @pytest.mark.comps
     def test_success(self, output):
-        from idmtools.config import IdmConfigParser
-        from idmtools.core.platform_factory import Platform
-        from idmtools.entities.experiment import Experiment
+
         IdmConfigParser.clear_instance()
         sim_root_dir = os.path.join('$COMPS_PATH(USER)', 'output')
         plat_obj = Platform('COMPS',
@@ -51,9 +53,6 @@ class TestNoConfig(unittest.TestCase):
     @pytest.mark.comps
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     def test_failure(self, output):
-        from idmtools.config import IdmConfigParser
-        from idmtools.core.platform_factory import Platform
-        from idmtools.entities.experiment import Experiment
         IdmConfigParser.clear_instance()
         sim_root_dir = os.path.join('$COMPS_PATH(USER)', 'output')
         with self.assertRaises(ValueError) as a:
@@ -76,9 +75,6 @@ class TestNoConfig(unittest.TestCase):
     def test_env_success(self, output):
         sim_root_dir = os.path.join('$COMPS_PATH(USER)', 'output')
         os.environ['IDMTOOLS_ERROR_NO_CONFIG'] = '0'
-        from idmtools.config import IdmConfigParser
-        from idmtools.core.platform_factory import Platform
-        from idmtools.entities.experiment import Experiment
         IdmConfigParser.clear_instance()
         plat_obj = Platform('COMPS',
                             endpoint='https://comps2.idmod.org',
@@ -98,7 +94,3 @@ class TestNoConfig(unittest.TestCase):
         self.assertIn("File 'idmtools.ini' Not Found!", output.getvalue())
         # Need to identify how to capture output after log changes
         # self.assertIn("The field num_cores requires a value of type int. You provided <abc>", output.getvalue())
-
-        IdmConfigParser.clear_instance()
-        if 'IDMTOOLS_ERROR_NO_CONFIG' in os.environ:
-            del os.environ['IDMTOOLS_ERROR_NO_CONFIG']
