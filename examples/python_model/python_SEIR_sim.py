@@ -159,8 +159,7 @@ if __name__ == '__main__':
     platform = Platform('COMPS2')
 
     # The last step is to call run() on the ExperimentManager to run the simulations.
-    platform.run_items(experiment)
-    platform.wait_till_done(experiment)
+    experiment.run(wait_until_done=True)
 
     # Check experiment status, only move to Analyzer step if experiment succeeded.
     if not experiment.succeeded:
@@ -175,7 +174,7 @@ if __name__ == '__main__':
     analyzers = [InfectiousnessCSVAnalyzer(filenames=filenames), NodeCSVAnalyzer(filenames=filenames_2)]
 
     # Specify the id Type, in this case an Experiment on COMPS
-    manager = AnalyzeManager(configuration={}, partial_analyze_ok=True, platform=platform,
+    manager = AnalyzeManager(partial_analyze_ok=True,
                              ids=[(experiment.uid, ItemType.EXPERIMENT)],
                              analyzers=analyzers)
     # Analyze

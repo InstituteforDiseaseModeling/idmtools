@@ -29,7 +29,7 @@ class TestAssetsInComps(unittest.TestCase):
     def _run_and_test_experiment(self, experiment):
         experiment.simulations.add_builder(self.builder)
 
-        self.platform.run_items(experiment)
+        experiment.run()
 
         # Start experiment
         wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)

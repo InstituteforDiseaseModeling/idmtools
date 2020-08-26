@@ -25,7 +25,6 @@ if __name__ == '__main__':
     experiment_id = '1bddce22-0c37-ea11-a2be-f0921c167861'  # staging exp id with multiple csv file outputs
 
     # Specify the id Type, in this case an Experiment on COMPS
-    manager = AnalyzeManager(configuration={}, partial_analyze_ok=True, platform=platform,
-                             ids=[(experiment_id, ItemType.EXPERIMENT)],
+    manager = AnalyzeManager(partial_analyze_ok=True, ids=[(experiment_id, ItemType.EXPERIMENT)],
                              analyzers=analyzers)
     manager.analyze()

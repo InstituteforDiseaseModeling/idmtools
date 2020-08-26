@@ -33,38 +33,36 @@ class TestRetrieval(ITestWithPersistence):
         builder = SimulationBuilder()
         builder.add_sweep_definition(setA, range(0, 2))
         ts.add_builder(builder)
-        cls.pe = Experiment(name=cls.case_name, simulations=ts,
+        cls.exp = Experiment(name=cls.case_name, simulations=ts,
                             tags=dict(string_tag="test", number_tag=123, KeyOnly=None))
-
-        cls.platform.run_items(cls.pe)
-        cls.platform.wait_till_done(cls.pe)
+        cls.exp.run(wait_until_done=True)
 
     def test_retrieve_experiment(self):
-        exp = self.platform.get_item(self.pe.uid, ItemType.EXPERIMENT)
+        exp = self.platform.get_item(self.exp.uid, ItemType.EXPERIMENT)
 
         # Test attributes
-        self.assertEqual(self.pe.uid, exp.uid)
-        self.assertEqual(self.pe.name, exp.name)
+        self.assertEqual(self.exp.uid, exp.uid)
+        self.assertEqual(self.exp.name, exp.name)
 
         # Comps returns tags as string regardless of type
-        self.assertEqual({k: str(v or '') for k, v in self.pe.tags.items()}, exp.tags)
+        self.assertEqual({k: str(v or '') for k, v in self.exp.tags.items()}, exp.tags)
 
         # Test the raw retrieval
-        comps_experiment = self.platform.get_item(self.pe.uid, ItemType.EXPERIMENT, raw=True)
+        comps_experiment = self.platform.get_item(self.exp.uid, ItemType.EXPERIMENT, raw=True)
         self.assertIsInstance(comps_experiment, COMPSExperiment)
-        self.assertEqual(self.pe.uid, comps_experiment.id)
-        self.assertEqual(self.pe.name, comps_experiment.name)
-        self.assertEqual({k: str(v or '') for k, v in self.pe.tags.items()}, comps_experiment.tags)
+        self.assertEqual(self.exp.uid, comps_experiment.id)
+        self.assertEqual(self.exp.name, comps_experiment.name)
+        self.assertEqual({k: str(v or '') for k, v in self.exp.tags.items()}, comps_experiment.tags)
 
         # Test retrieving less columns
-        comps_experiment = self.platform.get_item(self.pe.uid, ItemType.EXPERIMENT, raw=True, load_children=[],
+        comps_experiment = self.platform.get_item(self.exp.uid, ItemType.EXPERIMENT, raw=True, load_children=[],
                                                   columns=["id"])
         self.assertIsNone(comps_experiment.name)
         self.assertIsNone(comps_experiment.tags)
-        self.assertEqual(self.pe.uid, comps_experiment.id)
+        self.assertEqual(self.exp.uid, comps_experiment.id)
 
     def test_retrieve_simulation(self):
-        base = self.pe.simulations[0]
+        base = self.exp.simulations[0]
         sim = self.platform.get_item(base.uid, ItemType.SIMULATION)
         # Test attributes
         self.assertEqual(sim.uid, base.uid)
@@ -79,17 +77,17 @@ class TestRetrieval(ITestWithPersistence):
         self.assertEqual({k: str(v) for k, v in base.tags.items()}, comps_simulation.tags)
 
     def test_parent(self):
-        parent_exp = self.platform.get_parent(self.pe.simulations[0].uid, ItemType.SIMULATION)
-        self.assertEqual(self.pe.uid, parent_exp.uid)
-        self.assertEqual({k: str(v or '') for k, v in self.pe.tags.items()}, parent_exp.tags)
-        self.assertIsNone(self.platform.get_parent(self.pe.uid, ItemType.EXPERIMENT))
+        parent_exp = self.platform.get_parent(self.exp.simulations[0].uid, ItemType.SIMULATION)
+        self.assertEqual(self.exp.uid, parent_exp.uid)
+        self.assertEqual({k: str(v or '') for k, v in self.exp.tags.items()}, parent_exp.tags)
+        self.assertIsNone(self.platform.get_parent(self.exp.uid, ItemType.EXPERIMENT))
 
     def test_children(self):
-        children = self.platform.get_children(self.pe.uid, ItemType.EXPERIMENT)
-        self.assertEqual(len(self.pe.simulations), len(children))
-        for s in self.pe.simulations:
+        children = self.platform.get_children(self.exp.uid, ItemType.EXPERIMENT)
+        self.assertEqual(len(self.exp.simulations), len(children))
+        for s in self.exp.simulations:
             self.assertIn(s.uid, [s.uid for s in children])
-        self.assertCountEqual(self.platform.get_children(self.pe.simulations[0].uid, ItemType.SIMULATION), [])
+        self.assertCountEqual(self.platform.get_children(self.exp.simulations[0].uid, ItemType.SIMULATION), [])
 
 
 if __name__ == '__main__':

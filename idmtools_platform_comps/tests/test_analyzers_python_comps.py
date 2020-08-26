@@ -21,8 +21,6 @@ current_directory = os.path.dirname(os.path.realpath(__file__))
 # import analyzers from current dir's inputs dir
 analyzer_path = os.path.join(os.path.dirname(__file__), "inputs")
 sys.path.insert(0, analyzer_path)
-from sim_filter_analyzer import SimFilterAnalyzer  # noqa
-from sim_filter_analyzer_by_id import SimFilterAnalyzerById  # noqa
 
 
 @pytest.mark.analysis
@@ -52,7 +50,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         builder.add_sweep_definition(setAB, range(0, 2))
         pe.simulations.add_builder(builder)
 
-        wait_on_experiment_and_check_all_sim_status(self, pe, self.p)
+        wait_on_experiment_and_check_all_sim_status(self, pe)
         experiment = COMPSExperiment.get(pe.uid)
         print(experiment.id)
         self.exp_id = experiment.id  # COMPS Experiment object, so .id
@@ -71,7 +69,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         filenames = ['output/result.json', 'config.json']
         analyzers = [DownloadAnalyzer(filenames=filenames, output_path='output')]
 
-        am = AnalyzeManager(platform=self.p, ids=[(self.exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
+        am = AnalyzeManager(ids=[(self.exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
 
         for simulation in COMPSExperiment.get(self.exp_id).get_simulations():
@@ -91,7 +89,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         exp_list = [('3ca4491a-0edb-e911-a2be-f0921c167861', ItemType.EXPERIMENT),
                     ('4dcd7149-4eda-e911-a2be-f0921c167861', ItemType.EXPERIMENT)]
 
-        am = AnalyzeManager(platform=self.p, ids=exp_list, analyzers=analyzers)
+        am = AnalyzeManager(ids=exp_list, analyzers=analyzers)
         am.analyze()
         for exp_id in exp_list:
             for simulation in COMPSExperiment.get(exp_id[0]).get_simulations():
@@ -109,9 +107,10 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
 
         # then run SimFilterAnalyzer to analyze the sims tags
         filenames = ['output/result.json']
+        from sim_filter_analyzer import SimFilterAnalyzer  # noqa
         analyzers = [SimFilterAnalyzer(filenames=filenames, output_path='output')]
 
-        am = AnalyzeManager(platform=self.p, ids=[(exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
+        am = AnalyzeManager(ids=[(exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
 
         # validate result
@@ -134,9 +133,10 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
 
         # then run SimFilterAnalyzer to analyze the sims tags
         filenames = ['output/result.json']
+        from sim_filter_analyzer_by_id import SimFilterAnalyzerById  # noqa
         analyzers = [SimFilterAnalyzerById(filenames=filenames, output_path='output')]
 
-        am = AnalyzeManager(platform=self.p, ids=[(exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
+        am = AnalyzeManager(ids=[(exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
 
         # validate result
@@ -159,7 +159,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         del_folder(output_dir)
         filenames = ["stdErr.txt"]
         analyzers = [DownloadAnalyzer(filenames=filenames)]
-        manager = AnalyzeManager(platform=self.p, ids=[(experiment_id, ItemType.EXPERIMENT)],
+        manager = AnalyzeManager(ids=[(experiment_id, ItemType.EXPERIMENT)],
                                  analyzers=analyzers, analyze_failed_items=True)
         manager.analyze()
 
@@ -193,7 +193,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         del_folder(output_dir)
         filenames = ["stdOut.txt"]
         analyzers = [DownloadAnalyzer(filenames=filenames)]
-        manager = AnalyzeManager(platform=self.p, partial_analyze_ok=True,
+        manager = AnalyzeManager(partial_analyze_ok=True,
                                  ids=[(experiment_id, ItemType.EXPERIMENT)],
                                  analyzers=analyzers)
         manager.analyze()

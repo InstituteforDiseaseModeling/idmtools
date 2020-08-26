@@ -55,9 +55,7 @@ class TestVisToolsWorkItem(unittest.TestCase):
 
         # create experiment from task
         experiment = Experiment.from_task(task, name="test_vistools_work_item.py--experiment", assets=ac)
-
-        self.platform.run_items(experiment)
-        self.platform.wait_till_done(experiment)
+        experiment.run(wait_until_done=True)
 
         # return first simulation
         simulations = self.platform.get_children(experiment.uid, ItemType.EXPERIMENT, force=True)
@@ -72,8 +70,7 @@ class TestVisToolsWorkItem(unittest.TestCase):
         tags = {'idmtools': "vistool test", 'WorkItem type': 'VisTools', 'SimulationId': cls.sim_id}
         cls.wi = VisToolsWorkItem(item_name="test_vistools_work_item.py", tags=tags, work_order=data,
                                   related_simulations=[cls.sim_id])
-        cls.platform.run_items(cls.wi)
-        cls.platform.wait_till_done(cls.wi)
+        cls.wi.run(wait_on_done=True)
 
     def setUp(self):
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName

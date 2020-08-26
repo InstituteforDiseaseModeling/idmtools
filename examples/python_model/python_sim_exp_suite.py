@@ -11,7 +11,7 @@ from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 
-platform = Platform('COMPS2')
+platform = Platform('SLURM')
 
 parameters = {'b' + str(x): x**2 for x in (2, 4, 6)}
 task = JSONConfiguredPythonTask(script_path=os.path.join("inputs", "python_model_with_deps", "Assets", "model.py"),
@@ -43,8 +43,7 @@ suite.add_experiment(exp)
 # exp.suite = suite
 
 # run suite
-platform.run_items(suite)
-platform.wait_till_done(suite)
+exp.run(wait_until_done=True)
 sys.exit(0 if suite.succeeded else -1)
 
 

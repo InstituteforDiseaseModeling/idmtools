@@ -47,8 +47,7 @@ if __name__ == "__main__":
     platform = Platform('COMPS2')
     analyzers = [ExampleAnalyzer, ExampleAnalyzer2]
     experiment_id = "11052582-83da-e911-a2be-f0921c167861" # comps2 staging exp id
-    analysis = PlatformAnalysis(platform=platform,
-                                experiment_ids=[experiment_id],
+    analysis = PlatformAnalysis(platform, experiment_ids=[experiment_id],
                                 analyzers=analyzers,
                                 analyzers_args=[{'filenames': ['output/result.json']}, {'filenames': ['config.json']}],
                                 analysis_name=os.path.split(sys.argv[0])[1])

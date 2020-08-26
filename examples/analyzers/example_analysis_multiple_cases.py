@@ -75,51 +75,51 @@ class ExampleAnalyzer3(IAnalyzer):
 if __name__ == "__main__":
     # Set the platform where you want to run your analysis
     # In this case we are running in COMPS, but this can be changed to run 'Local'
-    platform = Platform('COMPS2')
+    with Platform('COMPS2') as platform:
 
-    # Initialize the analyser class with the name of file to save to and start the analysis
-    analyzers = [ExampleAnalyzer(), ExampleAnalyzer2()]
+        # Initialize the analyser class with the name of file to save to and start the analysis
+        analyzers = [ExampleAnalyzer(), ExampleAnalyzer2()]
 
-    # Set the experiment and simulation ids you want to analyze
-    experiment_tuple = ("11052582-83da-e911-a2be-f0921c167861", ItemType.EXPERIMENT)  # comps2 staging exp id
-    simulation_tuple = ("a042c9a2-60d6-e911-a2bb-f0921c167866", ItemType.SIMULATION)  # comps2 staging sim id
+        # Set the experiment and simulation ids you want to analyze
+        experiment_tuple = ("11052582-83da-e911-a2be-f0921c167861", ItemType.EXPERIMENT)  # comps2 staging exp id
+        simulation_tuple = ("a042c9a2-60d6-e911-a2bb-f0921c167866", ItemType.SIMULATION)  # comps2 staging sim id
 
-    # case #0: normal case with experiment id list. --OK
-    manager = AnalyzeManager(platform=platform, ids=[experiment_tuple], analyzers=analyzers)
-    manager.analyze()
+        # case #0: normal case with experiment id list. --OK
+        manager = AnalyzeManager(ids=[experiment_tuple], analyzers=analyzers)
+        manager.analyze()
 
-    # case #1: test add_analyzer() --OK
-    manager1 = AnalyzeManager(platform=platform, ids=[experiment_tuple])
-    manager1.add_analyzer(ExampleAnalyzer())
-    manager1.add_analyzer(ExampleAnalyzer2())
-    manager1.analyze()
+        # case #1: test add_analyzer() --OK
+        manager1 = AnalyzeManager(ids=[experiment_tuple])
+        manager1.add_analyzer(ExampleAnalyzer())
+        manager1.add_analyzer(ExampleAnalyzer2())
+        manager1.analyze()
 
-    # case #2: test add_item(experiment) --failed at  manager.add_item(experiment)
-    manager2 = AnalyzeManager(platform=platform, analyzers=analyzers)
-    experiment = platform.get_item(item_id=experiment_tuple[0], item_type=ItemType.EXPERIMENT)
-    manager2.add_item(experiment)
-    manager2.analyze()
+        # case #2: test add_item(experiment) --failed at  manager.add_item(experiment)
+        manager2 = AnalyzeManager(analyzers=analyzers)
+        experiment = platform.get_item(item_id=experiment_tuple[0], item_type=ItemType.EXPERIMENT)
+        manager2.add_item(experiment)
+        manager2.analyze()
 
-    # case #3: test add_item(simulation) --failed at platform.get_item
-    simulation = platform.get_item(item_id=simulation_tuple[0], item_type=ItemType.SIMULATION)
-    manager3 = AnalyzeManager(platform=platform, analyzers=analyzers)
-    manager3.add_item(simulation)
-    manager3.analyze()
+        # case #3: test add_item(simulation) --failed at platform.get_item
+        simulation = platform.get_item(item_id=simulation_tuple[0], item_type=ItemType.SIMULATION)
+        manager3 = AnalyzeManager(analyzers=analyzers)
+        manager3.add_item(simulation)
+        manager3.analyze()
 
-    # case #4: old experiment_id
-    filenames = ['output/result.json']
-    analyzer3 = [ExampleAnalyzer3(filenames=filenames)]
-    manager4 = AnalyzeManager(platform=platform, ids=[experiment_tuple],
-                              analyzers=analyzer3)
-    manager4.analyze()
+        # case #4: old experiment_id
+        filenames = ['output/result.json']
+        analyzer3 = [ExampleAnalyzer3(filenames=filenames)]
+        manager4 = AnalyzeManager(ids=[experiment_tuple],
+                                  analyzers=analyzer3)
+        manager4.analyze()
 
-    #case #5: analyzer with simulation
-    manager5 = AnalyzeManager(platform=platform, ids=[simulation_tuple], analyzers=analyzers)
-    manager5.analyze()
+        #case #5: analyzer with simulation
+        manager5 = AnalyzeManager(ids=[simulation_tuple], analyzers=analyzers)
+        manager5.analyze()
 
-    #case #6: analyzer with exclude id
-    analyzers = [ExampleAnalyzer()]
-    exclude_ids = ["13052582-83da-e911-a2be-f0921c167861", "12052582-83da-e911-a2be-f0921c167861"]
-    manager6 = AnalyzeManager(platform=platform, ids=[experiment_tuple], analyzers=analyzers, exclude_ids=exclude_ids)
-    manager6.analyze()
+        #case #6: analyzer with exclude id
+        analyzers = [ExampleAnalyzer()]
+        exclude_ids = ["13052582-83da-e911-a2be-f0921c167861", "12052582-83da-e911-a2be-f0921c167861"]
+        manager6 = AnalyzeManager(ids=[experiment_tuple], analyzers=analyzers, exclude_ids=exclude_ids)
+        manager6.analyze()
 
