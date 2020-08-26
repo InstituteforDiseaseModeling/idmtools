@@ -31,11 +31,11 @@ class TestNoConfig(unittest.TestCase):
         IdmConfigParser.clear_instance()
         sim_root_dir = os.path.join('$COMPS_PATH(USER)', 'output')
         plat_obj = Platform('COMPS',
-                            endpoint='https://comps.idmod.org',
-                            environment='Calculon',
+                            endpoint='https://comps2.idmod.org',
+                            environment='Bayesian',
                             priority='Normal',
                             simulation_root=sim_root_dir,
-                            node_group='idm_abcd',
+                            node_group='emod_abcd',
                             num_cores='1',
                             num_retries='0',
                             exclusive='False', missing_ok=True)
@@ -88,9 +88,15 @@ class TestNoConfig(unittest.TestCase):
                             num_cores='1',
                             num_retries='0',
                             exclusive='False')
-        experiment = Experiment.from_id('a7ea2ac2-a068-ea11-a2c5-c4346bcb1550')
+        try:
+            experiment = Experiment.from_id('a7ea2ac2-a068-ea11-a2c5-c4346bcb1550')
+        except RuntimeError as ex:
+            # ignore error is it is comps error about not finding id
+            if "404 Not Found" in ex.args[0]:
+                pass
         self.assertIn("File 'idmtools.ini' Not Found!", output.getvalue())
         # Need to identify how to capture output after log changes
         # self.assertIn("The field num_cores requires a value of type int. You provided <abc>", output.getvalue())
 
         IdmConfigParser.clear_instance()
+        os.unsetenv('IDMTOOLS_ERROR_NO_CONFIG')

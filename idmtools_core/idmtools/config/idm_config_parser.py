@@ -163,12 +163,13 @@ class IdmConfigParser:
 
     @classmethod
     @initialization(error=True)
-    def get_section(cls, section: str = None) -> Dict[str, str]:
+    def get_section(cls, section: str = None, error: bool = True) -> Dict[str, str]:
         """
         Retrieve INI section values (call directly from platform creation).
 
         Args:
             section: The INI section name where we retrieve all fields.
+            error: Should we throw error is we cannot find block
 
         Returns:
             All fields as a dictionary.
@@ -181,7 +182,7 @@ class IdmConfigParser:
 
         original_case_section = section
         lower_case_section = section.lower()
-        if not cls.has_section(section=lower_case_section):
+        if not cls.has_section(section=lower_case_section) and error:
             raise ValueError(f"Block '{original_case_section}' doesn't exist!")
 
         section_item = cls._config.items(lower_case_section)

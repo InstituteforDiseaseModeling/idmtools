@@ -1,3 +1,5 @@
+import os
+
 import unittest.mock
 import pytest
 from dataclasses import fields
@@ -10,6 +12,8 @@ class TestPlatformFactory(ITestWithPersistence):
     def setUp(self):
         super().setUp()
         IdmConfigParser.clear_instance()
+        # Because of other tests, we cannot clear this properly. The best we can do is set it here so that tests that modify it don't effect this test
+        os.environ['IDMTOOLS_ERROR_NO_CONFIG'] = "1"
 
     def tearDown(self):
         super().tearDown()
@@ -31,7 +35,7 @@ class TestPlatformFactory(ITestWithPersistence):
     def test_no_type(self):
         with self.assertRaises(ValueError) as context:
             Platform('NOTYPE')
-        self.assertIn('When creating a Platform you must specify the type in the block', context.exception.args[0])
+        self.assertIn('When creating a Platform you must specify the type in the block.', context.exception.args[0])
 
     def test_block_is_none(self):
         with self.assertRaises(ValueError) as context:
