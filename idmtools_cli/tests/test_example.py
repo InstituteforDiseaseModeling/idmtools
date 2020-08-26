@@ -43,9 +43,10 @@ class TestExample(unittest.TestCase):
         self.assertTrue('COMPSPlatform' in examples)
 
     def test_public_repos(self):
-        result = run_command('gitrepo', 'repos')
+        # because of weirdness in testing, the log output even when set to stdout appears as stderr. We workaround by capturing both independently
+        result = run_command('gitrepo', 'repos', mix_stderr=False)
         # Check for special public repo
-        self.assertIn('https://github.com/InstituteforDiseaseModeling/EMOD', result.output)
+        self.assertIn('https://github.com/InstituteforDiseaseModeling/EMOD', result.stderr)
 
     def test_validate(self):
         choice_set = {1, 2, 3, 4, 5, 6, 7, 8, 'all'}
