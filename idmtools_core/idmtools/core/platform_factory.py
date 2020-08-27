@@ -1,10 +1,13 @@
+import os
 from contextlib import contextmanager
 from dataclasses import fields
 from logging import getLogger
 from typing import Dict, Any, TYPE_CHECKING
-from idmtools.core.context import set_current_platform, remove_current_platform
+
 from idmtools.config import IdmConfigParser
+from idmtools.core.context import set_current_platform, remove_current_platform
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
+
 if TYPE_CHECKING:
     from idmtools.entities.iplatform import IPlatform
 
@@ -28,7 +31,7 @@ def platform(*args, **kwds):
 
 class Platform:
 
-    def __new__(cls, block, **kwargs):
+    def __new__(cls, block, missing_ok: bool = None, **kwargs):
         """
         Create a platform based on the block and all other inputs.
 
@@ -48,11 +51,20 @@ class Platform:
         if block is None:
             raise ValueError("Must have a valid Block name to create a Platform!")
 
+        if missing_ok is None:
+            env_value = os.getenv("IDMTOOLS_ERROR_NO_CONFIG", None)
+            if env_value:
+                user_logger.warning("Using IDMTOOLS_ERROR_NO_CONFIG environment variable to control behaviour of missing ini file")
+                # here missing ok is the opposite of the config. We want to error by default, so missing ok it if the user said NOT to error, so therefore not in truthy values
+                missing_ok = os.getenv("IDMTOOLS_ERROR_NO_CONFIG", "1").lower() not in ["1", "y", "t", "true", "yes"]
+            else:
+                missing_ok = False
+
         # Load all Platform plugins
         cls._platforms = PlatformPlugins().get_plugin_map()
 
         # Create Platform based on the given block
-        platform = cls._create_from_block(block, **kwargs)
+        platform = cls._create_from_block(block, missing_ok=missing_ok, **kwargs)
         set_current_platform(platform)
         return platform
 
@@ -91,7 +103,12 @@ class Platform:
 
         # Read block details
         try:
-            section = IdmConfigParser.get_section(block)
+            section = IdmConfigParser.get_section(block, error=not missing_ok)
+            if not section and missing_ok:
+                # its possible our logger is not setup
+                from idmtools.core.logging import setup_logging, listener
+                if not listener:
+                    setup_logging()
         except ValueError as e:
             if missing_ok:
                 section = dict() if default_missing is None else default_missing
@@ -102,8 +119,14 @@ class Platform:
             # Make sure block has type entry
             platform_type = section.pop('type')
         except KeyError:
-            raise ValueError(
-                "When creating a Platform you must specify the type in the block. For example:\n    type = COMPS")
+            # try to use the block name as the type
+            if missing_ok:
+                user_logger.warning(
+                    "You are specifying a platform without a configuration file or configuration block. Be sure you have supplied all required parameters for the Platform as this can result in unexpected behaviour. Running this way is only recommended for development mode. Instead, it is recommended you create an idmtools.ini to capture the config once you have tested and confirmed your configuration.")
+                platform_type = block
+            else:
+                raise ValueError(
+                    "When creating a Platform you must specify the type in the block. For example:\n    type = COMPS")
 
         # Make sure we support platform_type
         cls._validate_platform_type(platform_type)
