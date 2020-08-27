@@ -61,6 +61,8 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                                                    "validate": partial(validate_range, min=1, max=32)})
     batch_size: int = field(default=10, metadata={"help": "How many simulations per batch",
                                                   "validate": partial(validate_range, min=1, max=100)})
+    commission_batch_size: int = field(default=20, metadata={"help": "How many simulations to commission as one a batch",
+                                                             "validate": partial(validate_range, min=10, max=100)})
     exclusive: bool = field(default=False,
                             metadata={"help": "Enable exclusive mode? (one simulation per node on the cluster)"})
     docker_image: str = field(default=None)
