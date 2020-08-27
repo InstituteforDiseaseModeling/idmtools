@@ -252,7 +252,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
                 logger.debug("Calling final batch commission")
             try:
                 results[0].parent.get_platform_object().commission()
-            except RuntimeError:  # occasionaly we hit this because
+            except RuntimeError:  # occasionally we hit this because double commissioning. Its ok to ignore though because that means we have already commissioned this experiment
                 pass
             COMPS_EXPERIMENT_BATCH_COMMISSION_COUNT = 0
         COMPS_EXPERIMENT_BATCH_COMMISSION_LOCK.release()
