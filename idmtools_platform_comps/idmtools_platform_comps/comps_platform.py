@@ -64,9 +64,10 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     commission_batch_size: int = field(default=20, metadata={"help": "How many simulations to commission as one a batch",
                                                              "validate": partial(validate_range, min=10, max=100)})
 
-    min_time_between_commissions: int = field(default=3, metadata={"help": "How many seconds between commission calls on an experiment. "
-                                                                           "Used in conjunction with commission_batch_size to commission simulations in batches",
-                                                                   "validate": partial(validate_range, min=2, max=5)})
+    min_time_between_commissions: int = field(default=15, metadata={
+        "help": "How many seconds between commission calls on an experiment. "
+                "Used in conjunction with commission_batch_size to commission simulations in batches",
+        "validate": partial(validate_range, min=10, max=300)})
     exclusive: bool = field(default=False,
                             metadata={"help": "Enable exclusive mode? (one simulation per node on the cluster)"})
     docker_image: str = field(default=None)

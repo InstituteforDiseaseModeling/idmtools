@@ -259,10 +259,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             batch_worker_thread_func=thread_func,
             progress_description="Creating Simulations on Comps"
         )
-        # check if we need to commission again
-        current_time = time.time()
-        if current_time - COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP < self.platform.min_time_between_commissions:
-            time.sleep(current_time - COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP + 1)
+        # Always commission again
         try:
             results[0].parent.get_platform_object().commission()
         except RuntimeError as ex:  # occasionally we hit this because double commissioning. Its ok to ignore though because that means we have already commissioned this experiment
