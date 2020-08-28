@@ -242,20 +242,16 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             progress_description="Creating Simulations on Comps"
         )
         # check if we need to commission again
-        COMPS_EXPERIMENT_BATCH_COMMISSION_LOCK.acquire()
-        COMPS_EXPERIMENT_BATCH_COMMISSION_COUNT += len(simulations)
         current_time = time.time()
         if current_time - COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP < self.platform.min_time_between_commissions:
             time.sleep(current_time - COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP + 1)
-        if COMPS_EXPERIMENT_BATCH_COMMISSION_COUNT > self.platform.commission_batch_size and any([s.status == EntityStatus.CREATED for s in results]):
+        try:
+            results[0].parent.get_platform_object().commission()
+        except RuntimeError as ex:  # occasionally we hit this because double commissioning. Its ok to ignore though because that means we have already commissioned this experiment
             if logger.isEnabledFor(DEBUG):
-                logger.debug("Calling final batch commission")
-            try:
-                results[0].parent.get_platform_object().commission()
-            except RuntimeError:  # occasionally we hit this because double commissioning. Its ok to ignore though because that means we have already commissioned this experiment
-                pass
-            COMPS_EXPERIMENT_BATCH_COMMISSION_COUNT = 0
-        COMPS_EXPERIMENT_BATCH_COMMISSION_LOCK.release()
+                logger.debug(f"COMMISSION Response: {ex.args}")
+        COMPS_EXPERIMENT_BATCH_COMMISSION_COUNT = 0
+        COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP = 0
         # set commission here in comps objects to prevent commission in Experiment when batching
         for sim in results:
             sim.status = EntityStatus.RUNNING
