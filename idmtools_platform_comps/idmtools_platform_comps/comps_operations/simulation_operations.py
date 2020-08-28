@@ -82,7 +82,6 @@ def comps_batch_worker(simulations: List[Simulation], interface: 'CompsPlatformS
     if logger.isEnabledFor(DEBUG):
         logger.debug(f'Finished post-create of {len(simulations)}')
 
-
     if executor:
         # Let's not slow down creation just to commission. It is ok if we are not perfect on commissioning every X sims
         # which should only miss this lock if creation is super quick for sims, so we should be ok in missing a few calls
@@ -94,6 +93,7 @@ def comps_batch_worker(simulations: List[Simulation], interface: 'CompsPlatformS
             if COMPS_EXPERIMENT_BATCH_COMMISSION_COUNT >= commission_batch_size and (current_time - COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP > min_time_between_commissions):
                 if logger.isEnabledFor(DEBUG):
                     logger.debug(f'commissioning {COMPS_EXPERIMENT_BATCH_COMMISSION_COUNT}')
+
                 # do commission asyncing.. If it fine if we happen to miss
                 def do_commission():
                     try:
