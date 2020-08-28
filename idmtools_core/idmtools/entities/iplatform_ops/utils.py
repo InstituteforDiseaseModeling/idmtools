@@ -109,6 +109,8 @@ def batch_create_items(items: Union[Iterable, Generator], batch_worker_thread_fu
         if parent:
             for c in chunk:
                 c.parent = parent
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f"Submitting chunk: {len(chunk)}")
         futures.append(EXECUTOR.submit(batch_worker_thread_func, chunk))
 
     results = []
