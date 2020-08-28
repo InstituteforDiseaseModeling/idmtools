@@ -124,7 +124,7 @@ def batch_create_items(items: Union[Iterable, Generator], batch_worker_thread_fu
     if display_progress:
         prog.set_description(progress_description)
         prog.reset(total)
-        results = show_progress_of_batch(futures, progress_description, total)
+        results = show_progress_of_batch(prog, futures, progress_description, total)
     else:
         for future in futures:
             results.extend(future.result())
@@ -132,11 +132,12 @@ def batch_create_items(items: Union[Iterable, Generator], batch_worker_thread_fu
     return results
 
 
-def show_progress_of_batch(prog: tqdm, futures: List[Future], progress_description: str, total: int) -> List:
+def show_progress_of_batch(pbar: tqdm, futures: List[Future], progress_description: str, total: int) -> List:
     """
     Show progress bar for batch
 
     Args:
+        pbar: Progress bar
         futures: List of futures that are still running/queued
         progress_description: Progress description
         total: Total items being loaded(since we are loading in batches)
@@ -147,7 +148,7 @@ def show_progress_of_batch(prog: tqdm, futures: List[Future], progress_descripti
     results = []
     for future in as_completed(futures):
         result = future.result()
-        prog.update(len(result))
+        pbar.update(len(result))
         results.extend(future.result())
-    prog.close()
+    pbar.close()
     return results
