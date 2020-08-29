@@ -152,5 +152,4 @@ def show_progress_of_batch(pbar: tqdm, futures: List[Future], progress_descripti
         result = future.result()
         pbar.update(len(result))
         results.extend(future.result())
-    pbar.close()
     return results
