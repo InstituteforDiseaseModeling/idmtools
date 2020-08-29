@@ -37,7 +37,7 @@ COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP = 0
 
 def comps_batch_worker(simulations: List[Simulation], interface: 'CompsPlatformSimulationOperations', executor,
                        num_cores: Optional[int] = None, priority: Optional[str] = None, asset_collection_id: Union[str, UUID] = None,
-                       commission_batch_size: int = 20, min_time_between_commissions: int = 3, **kwargs) -> List[COMPSSimulation]:
+                       min_time_between_commissions: int = 3, **kwargs) -> List[COMPSSimulation]:
     """
     Run batch worker
 
@@ -48,7 +48,6 @@ def comps_batch_worker(simulations: List[Simulation], interface: 'CompsPlatformS
         num_cores: Optional Number of core to allocate for MPI
         priority: Optional Priority to set to
         asset_collection_id: Override asset collection id
-        commission_batch_size: How many items before we commission
         min_time_between_commissions: Minimum amount of time(in seconds) between calls to commission on an experiment
         extra info for
 
@@ -241,7 +240,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         global COMPS_EXPERIMENT_BATCH_COMMISSION_LOCK, COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP
         executor = ThreadPoolExecutor()
         thread_func = partial(comps_batch_worker, interface=self, num_cores=num_cores, priority=priority, asset_collection_id=asset_collection_id,
-                              commission_batch_size=self.platform.commission_batch_size, min_time_between_commissions=self.platform.min_time_between_commissions, executor=executor, **kwargs)
+                              min_time_between_commissions=self.platform.min_time_between_commissions, executor=executor, **kwargs)
         results = batch_create_items(
             simulations,
             batch_worker_thread_func=thread_func,
