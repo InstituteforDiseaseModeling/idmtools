@@ -1,4 +1,5 @@
 import ntpath
+import os
 from logging import getLogger, DEBUG
 from typing import List, Dict, Union, Generator, Optional
 from uuid import UUID
@@ -201,7 +202,22 @@ def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str
     # Retrieve the transient if any
     if isinstance(comps_item, (Simulation, WorkItem)):
         if transients:
-            transient_files = comps_item.retrieve_output_files(paths=transients)
+            if False and comps_item.hpc_jobs and comps_item.hpc_jobs.working_directory:
+                bd = comps_item.hpc_jobs[-1].working_directory
+                transient_files = []
+                for file in transients:
+                    fp = os.path.join(bd, file)
+                    if os.path.exists(fp):
+                        if logger.isEnabledFor(DEBUG):
+                            logger.debug(f"Loading file with direct access from {fp}")
+                        with open(fp, 'rb') as src:
+                            transient_files.append(src.read())
+                    else:
+                        logger.warning(f"Cannot find the file: {fp}")
+                        # Should we error here?
+                        transient_files.append(b'')
+            else:
+                transient_files = comps_item.retrieve_output_files(paths=transients)
             ret = dict(zip(transients, transient_files))
     else:
         ret = dict()
@@ -211,6 +227,10 @@ def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str
         # Get the collection_id for the simulation
         collection_id = comps_item.configuration.asset_collection_id
         if collection_id:
+            if False and comps_item.hpc_jobs and comps_item.hpc_jobs.working_directory:
+                bd = comps_item.hpc_jobs[-1].working_directory
+            else:
+                bd = None
             # Retrieve the files
             for file_path in assets:
                 # Normalize the separators

@@ -1,3 +1,4 @@
+import itertools
 from concurrent.futures import as_completed, Future
 from concurrent.futures.thread import ThreadPoolExecutor
 from functools import partial
@@ -108,7 +109,8 @@ def batch_create_items(items: Union[Iterable, Generator], batch_worker_thread_fu
     else:
         i = items
     if display_progress:
-        prog.total = len(items)
+        if hasattr(items, '__len__'):
+            prog.total = len(items)
     for chunk in chunked(i, _batch_size):
         total += len(chunk)
         if parent:

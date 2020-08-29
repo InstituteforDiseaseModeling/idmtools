@@ -17,7 +17,6 @@ num_retries = 0
 num_cores = 1
 max_workers = 16
 batch_size = 10
-commission_batch_size = 50
 min_time_between_commissions = 20
 exclusive = False
 # Optional config option. It is recommended you only use this in advanced scenarios. Otherwise

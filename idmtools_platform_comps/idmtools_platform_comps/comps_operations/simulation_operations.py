@@ -32,8 +32,6 @@ user_logger = getLogger('user')
 
 # Track commissioning in batches
 COMPS_EXPERIMENT_BATCH_COMMISSION_LOCK = Lock()
-# Track count queued to be commissioned
-COMPS_EXPERIMENT_BATCH_COMMISSION_COUNT = 0
 COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP = 0
 
 
@@ -57,7 +55,7 @@ def comps_batch_worker(simulations: List[Simulation], interface: 'CompsPlatformS
     Returns:
         List of Comps Simulations
     """
-    global COMPS_EXPERIMENT_BATCH_COMMISSION_LOCK, COMPS_EXPERIMENT_BATCH_COMMISSION_COUNT, COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP
+    global COMPS_EXPERIMENT_BATCH_COMMISSION_LOCK, COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP
     if logger.isEnabledFor(DEBUG):
         logger.debug(f'Converting {len(simulations)} to COMPS')
     created_simulations = []
@@ -82,33 +80,23 @@ def comps_batch_worker(simulations: List[Simulation], interface: 'CompsPlatformS
     if logger.isEnabledFor(DEBUG):
         logger.debug(f'Finished post-create of {len(simulations)}')
 
-    if executor:
-        # Let's not slow down creation just to commission. It is ok if we are not perfect on commissioning every X sims
-        # which should only miss this lock if creation is super quick for sims, so we should be ok in missing a few calls
-        locked = COMPS_EXPERIMENT_BATCH_COMMISSION_LOCK.acquire(timeout=0.05)
+    current_time = time.time()
+    # check current commission queue and last commission call
+    if current_time - COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP > min_time_between_commissions:
+        # be aggressive in waiting on lock. Worse case, another thread triggers this near same time
+        locked = COMPS_EXPERIMENT_BATCH_COMMISSION_LOCK.acquire(timeout=0.015)
         if locked:
-            COMPS_EXPERIMENT_BATCH_COMMISSION_COUNT += new_sims
-            current_time = time.time()
-            # check current commission queue and last commission call
-            if COMPS_EXPERIMENT_BATCH_COMMISSION_COUNT >= commission_batch_size and (current_time - COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP > min_time_between_commissions):
-                if logger.isEnabledFor(DEBUG):
-                    logger.debug(f'commissioning {COMPS_EXPERIMENT_BATCH_COMMISSION_COUNT}')
-
-                # do commission asyncing.. If it fine if we happen to miss
-                def do_commission():
-                    try:
-                        simulations[0].experiment.get_platform_object().commission()
-                    except RuntimeError:
-                        pass
-                executor.submit(do_commission)
-
-                COMPS_EXPERIMENT_BATCH_COMMISSION_COUNT = 0
-                COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP = current_time
-                for simulation in simulations:
-                    simulation.status = EntityStatus.RUNNING
+            # do commission asyncing.. If it fine if we happen to miss
+            def do_commission():
+                try:
+                    simulations[0].experiment.get_platform_object().commission()
+                except RuntimeError:
+                    pass
+            executor.submit(do_commission)
+            COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP = current_time
             COMPS_EXPERIMENT_BATCH_COMMISSION_LOCK.release()
-        elif logger.isEnabledFor(DEBUG):
-            logger.debug("Could not obtain commission lock")
+            for simulation in simulations:
+                simulation.status = EntityStatus.RUNNING
 
     return simulations
 
@@ -250,7 +238,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         Returns:
             List of COMPSSimulations that were created
         """
-        global COMPS_EXPERIMENT_BATCH_COMMISSION_COUNT, COMPS_EXPERIMENT_BATCH_COMMISSION_LOCK, COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP
+        global COMPS_EXPERIMENT_BATCH_COMMISSION_LOCK, COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP
         executor = ThreadPoolExecutor()
         thread_func = partial(comps_batch_worker, interface=self, num_cores=num_cores, priority=priority, asset_collection_id=asset_collection_id,
                               commission_batch_size=self.platform.commission_batch_size, min_time_between_commissions=self.platform.min_time_between_commissions, executor=executor, **kwargs)
@@ -265,7 +253,6 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         except RuntimeError as ex:  # occasionally we hit this because double commissioning. Its ok to ignore though because that means we have already commissioned this experiment
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f"COMMISSION Response: {ex.args}")
-        COMPS_EXPERIMENT_BATCH_COMMISSION_COUNT = 0
         COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP = 0
         # set commission here in comps objects to prevent commission in Experiment when batching
         for sim in results:
