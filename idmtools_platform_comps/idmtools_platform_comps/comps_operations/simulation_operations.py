@@ -85,7 +85,7 @@ def comps_batch_worker(simulations: List[Simulation], interface: 'CompsPlatformS
         # be aggressive in waiting on lock. Worse case, another thread triggers this near same time
         locked = COMPS_EXPERIMENT_BATCH_COMMISSION_LOCK.acquire(timeout=0.015)
         if locked:
-            # do commission asyncing.. If it fine if we happen to miss
+            # do commission asynchronously. If it fine if we happen to miss a commission
             def do_commission():
                 try:
                     simulations[0].experiment.get_platform_object().commission()
@@ -237,7 +237,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         Returns:
             List of COMPSSimulations that were created
         """
-        global COMPS_EXPERIMENT_BATCH_COMMISSION_LOCK, COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP
+        global COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP
         executor = ThreadPoolExecutor()
         thread_func = partial(comps_batch_worker, interface=self, num_cores=num_cores, priority=priority, asset_collection_id=asset_collection_id,
                               min_time_between_commissions=self.platform.min_time_between_commissions, executor=executor, **kwargs)
