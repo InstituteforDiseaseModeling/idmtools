@@ -81,7 +81,7 @@ def comps_batch_worker(simulations: List[Simulation], interface: 'CompsPlatformS
 
     current_time = time.time()
     # check current commission queue and last commission call
-    if current_time - COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP > min_time_between_commissions:
+    if new_sims > 0 and current_time - COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP > min_time_between_commissions:
         # be aggressive in waiting on lock. Worse case, another thread triggers this near same time
         locked = COMPS_EXPERIMENT_BATCH_COMMISSION_LOCK.acquire(timeout=0.015)
         if locked:
