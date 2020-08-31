@@ -1,5 +1,4 @@
 import ntpath
-import os
 from logging import getLogger, DEBUG
 from typing import List, Dict, Union, Generator, Optional
 from uuid import UUID
