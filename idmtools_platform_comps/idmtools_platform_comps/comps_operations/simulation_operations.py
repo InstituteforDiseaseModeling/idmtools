@@ -37,7 +37,7 @@ COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP = 0
 
 def comps_batch_worker(simulations: List[Simulation], interface: 'CompsPlatformSimulationOperations', executor,
                        num_cores: Optional[int] = None, priority: Optional[str] = None, asset_collection_id: Union[str, UUID] = None,
-                       min_time_between_commissions: int = 3, **kwargs) -> List[COMPSSimulation]:
+                       min_time_between_commissions: int = 10, **kwargs) -> List[COMPSSimulation]:
     """
     Run batch worker
 
