@@ -1,4 +1,3 @@
-import itertools
 from concurrent.futures import as_completed, Future
 from concurrent.futures.thread import ThreadPoolExecutor
 from functools import partial
