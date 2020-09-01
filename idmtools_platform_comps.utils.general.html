@@ -75,7 +75,7 @@
             
             
               <div class="version">
-                1.4.0
+                1.4.0+nightly.0
               </div>
             
           
@@ -277,7 +277,7 @@ Failed = 140               # WorkItem failed
 
 <dl class="py function">
 <dt id="idmtools_platform_comps.utils.general.get_file_as_generator">
-<code class="sig-prename descclassname">idmtools_platform_comps.utils.general.</code><code class="sig-name descname">get_file_as_generator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>COMPS.Data.SimulationFile.SimulationFile<span class="p">, </span>COMPS.Data.AssetCollectionFile.AssetCollectionFile<span class="p">, </span>COMPS.Data.AssetFile.AssetFile<span class="p">, </span>COMPS.Data.WorkItemFile.WorkItemFile<span class="p">, </span>COMPS.Data.OutputFileMetadata.OutputFileMetadata<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">chunk_size</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">128</span></em>, <em class="sig-param"><span class="n">resume_byte_pos</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>int<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; Generator[bytearray, None, None]<a class="headerlink" href="#idmtools_platform_comps.utils.general.get_file_as_generator" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">idmtools_platform_comps.utils.general.</code><code class="sig-name descname">get_file_as_generator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>COMPS.Data.SimulationFile.SimulationFile<span class="p">, </span>COMPS.Data.AssetCollectionFile.AssetCollectionFile<span class="p">, </span>COMPS.Data.AssetFile.AssetFile<span class="p">, </span>COMPS.Data.WorkItemFile.WorkItemFile<span class="p">, </span>COMPS.Data.OutputFileMetadata.OutputFileMetadata<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">chunk_size</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">128</span></em>, <em class="sig-param"><span class="n">resume_byte_pos</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>int<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; Generator<span class="p">[</span>bytearray<span class="p">, </span>None<span class="p">, </span>None<span class="p">]</span><a class="headerlink" href="#idmtools_platform_comps.utils.general.get_file_as_generator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get file as a generator</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -291,9 +291,15 @@ Failed = 140               # WorkItem failed
 <p>Returns:</p>
 </dd></dl>
 
+<dl class="py class">
+<dt id="idmtools_platform_comps.utils.general.Workitem">
+<em class="property">class </em><code class="sig-prename descclassname">idmtools_platform_comps.utils.general.</code><code class="sig-name descname">Workitem</code><a class="headerlink" href="#idmtools_platform_comps.utils.general.Workitem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
 <dl class="py function">
 <dt id="idmtools_platform_comps.utils.general.get_asset_for_comps_item">
-<code class="sig-prename descclassname">idmtools_platform_comps.utils.general.</code><code class="sig-name descname">get_asset_for_comps_item</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">platform</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.entities.iplatform.html#idmtools.entities.iplatform.IPlatform" title="idmtools.entities.iplatform.IPlatform">idmtools.entities.iplatform.IPlatform</a></span></em>, <em class="sig-param"><span class="n">item</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.core.interfaces.ientity.html#idmtools.core.interfaces.ientity.IEntity" title="idmtools.core.interfaces.ientity.IEntity">idmtools.core.interfaces.ientity.IEntity</a></span></em>, <em class="sig-param"><span class="n">files</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">cache</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; Dict<span class="p">[</span>str<span class="p">, </span>bytearray<span class="p">]</span><a class="headerlink" href="#idmtools_platform_comps.utils.general.get_asset_for_comps_item" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">idmtools_platform_comps.utils.general.</code><code class="sig-name descname">get_asset_for_comps_item</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">platform</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.entities.iplatform.html#idmtools.entities.iplatform.IPlatform" title="idmtools.entities.iplatform.IPlatform">idmtools.entities.iplatform.IPlatform</a></span></em>, <em class="sig-param"><span class="n">item</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.core.interfaces.ientity.html#idmtools.core.interfaces.ientity.IEntity" title="idmtools.core.interfaces.ientity.IEntity">idmtools.core.interfaces.ientity.IEntity</a></span></em>, <em class="sig-param"><span class="n">files</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">cache</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">load_children</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">comps_item</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>COMPS.Data.Experiment.Experiment<span class="p">, </span><a class="reference internal" href="#idmtools_platform_comps.utils.general.Workitem" title="idmtools_platform_comps.utils.general.Workitem">idmtools_platform_comps.utils.general.Workitem</a><span class="p">, </span>COMPS.Data.Simulation.Simulation<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; Dict<span class="p">[</span>str<span class="p">, </span>bytearray<span class="p">]</span><a class="headerlink" href="#idmtools_platform_comps.utils.general.get_asset_for_comps_item" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve assets from an Entity(Simulation, Experiment, WorkItem)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -302,6 +308,8 @@ Failed = 140               # WorkItem failed
 <li><p><strong>item</strong> – Item to fetch assets from</p></li>
 <li><p><strong>files</strong> – List of file names to retrieve</p></li>
 <li><p><strong>cache</strong> – Cache object to use</p></li>
+<li><p><strong>load_children</strong> – Optional Load children fields</p></li>
+<li><p><strong>comps_item</strong> – Optional comps item</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>

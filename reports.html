@@ -75,7 +75,7 @@
             
             
               <div class="version">
-                1.4.0
+                1.4.0+nightly.0
               </div>
             
           
@@ -229,9 +229,7 @@ For more information, see <a class="reference internal" href="wizard.html"><span
         <span class="n">tags</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">tag1</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
 
     <span class="c1"># now we can run the experiment</span>
-    <span class="n">e</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
-    <span class="c1"># and wait</span>
-    <span class="n">e</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+    <span class="n">e</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">wait_until_done</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="c1"># use system status as the exit code</span>
     <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span> <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">succeeded</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>

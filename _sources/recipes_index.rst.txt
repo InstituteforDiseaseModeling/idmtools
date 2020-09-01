@@ -6,4 +6,5 @@ User Recipes
    :maxdepth: 2
    :titlesonly:
 
-   cookbook/asset_collections
+   cookbook/assets
+   cookbook/experiments

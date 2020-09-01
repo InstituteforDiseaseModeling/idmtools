@@ -75,7 +75,7 @@
             
             
               <div class="version">
-                1.4.0
+                1.4.0+nightly.0
               </div>
             
           
@@ -197,7 +197,7 @@
 <dd><p>Bases: <a class="reference internal" href="idmtools.entities.iplatform_ops.iplatform_experiment_operations.html#idmtools.entities.iplatform_ops.iplatform_experiment_operations.IPlatformExperimentOperations" title="idmtools.entities.iplatform_ops.iplatform_experiment_operations.IPlatformExperimentOperations"><code class="xref py py-class docutils literal notranslate"><span class="pre">idmtools.entities.iplatform_ops.iplatform_experiment_operations.IPlatformExperimentOperations</span></code></a></p>
 <dl class="py attribute">
 <dt id="idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.platform">
-<code class="sig-name descname">platform</code><em class="property">: ‘COMPSPlatform’</em><a class="headerlink" href="#idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.platform" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">platform</code><em class="property">: COMPSPlatform</em><a class="headerlink" href="#idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.platform" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -243,7 +243,7 @@
 
 <dl class="py method">
 <dt id="idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.platform_create">
-<code class="sig-name descname">platform_create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">experiment</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.entities.experiment.html#idmtools.entities.experiment.Experiment" title="idmtools.entities.experiment.Experiment">idmtools.entities.experiment.Experiment</a></span></em>, <em class="sig-param"><span class="n">num_cores</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>int<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">executable_path</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">command_arg</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">priority</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">check_command</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; COMPS.Data.Experiment.Experiment<a class="headerlink" href="#idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.platform_create" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">platform_create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">experiment</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.entities.experiment.html#idmtools.entities.experiment.Experiment" title="idmtools.entities.experiment.Experiment">idmtools.entities.experiment.Experiment</a></span></em>, <em class="sig-param"><span class="n">num_cores</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>int<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">executable_path</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">command_arg</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">priority</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">check_command</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; COMPS.Data.Experiment.Experiment<a class="headerlink" href="#idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.platform_create" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create Experiment on the COMPS Platform</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -254,10 +254,37 @@
 <li><p><strong>command_arg</strong> – Command Argument</p></li>
 <li><p><strong>priority</strong> – Priority of command</p></li>
 <li><p><strong>check_command</strong> – Run task hooks on item</p></li>
+<li><p><strong>**kwargs</strong> – Keyword arguments used to expand functionality. At moment these are usually not used</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>COMPSExperiment that was created</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.platform_modify_experiment">
+<code class="sig-name descname">platform_modify_experiment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">experiment</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.entities.experiment.html#idmtools.entities.experiment.Experiment" title="idmtools.entities.experiment.Experiment">idmtools.entities.experiment.Experiment</a></span></em>, <em class="sig-param"><span class="n">regather_common_assets</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="idmtools.entities.experiment.html#idmtools.entities.experiment.Experiment" title="idmtools.entities.experiment.Experiment">idmtools.entities.experiment.Experiment</a><a class="headerlink" href="#idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.platform_modify_experiment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executed when an Experiment is being ran that is already in Created, Done, In Progress, or Failed State
+:param experiment: Experiment to modify
+:param regather_common_assets: Triggers a new AC to be associated with experiment. It is important to note that when using this feature, ensure the previous simulations have finished provisioning. Failure to do so can lead to unexpected behaviour</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.post_create">
+<code class="sig-name descname">post_create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">experiment</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.entities.experiment.html#idmtools.entities.experiment.Experiment" title="idmtools.entities.experiment.Experiment">idmtools.entities.experiment.Experiment</a></span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; NoReturn<a class="headerlink" href="#idmtools_platform_comps.comps_operations.experiment_operations.CompsPlatformExperimentOperations.post_create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the platform/experiment post creation events</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>experiment</strong> – Experiment to run post-creation events</p></li>
+<li><p><strong>**kwargs</strong> – Optional arguments mainly for extensibility</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>NoReturn</p>
 </dd>
 </dl>
 </dd></dl>

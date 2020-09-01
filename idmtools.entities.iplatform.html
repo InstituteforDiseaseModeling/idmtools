@@ -75,7 +75,7 @@
             
             
               <div class="version">
-                1.4.0
+                1.4.0+nightly.0
               </div>
             
           
@@ -210,7 +210,7 @@ A platform needs to implement basic operation such as:</p>
 
 <dl class="py attribute">
 <dt id="idmtools.entities.iplatform.IPlatform.supported_types">
-<code class="sig-name descname">supported_types</code><em class="property">: Set<span class="p">[</span>ItemType<span class="p">]</span></em><a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.supported_types" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">supported_types</code><em class="property">: Set<span class="p">[</span><a class="reference internal" href="idmtools.core.enums.html#idmtools.core.enums.ItemType" title="idmtools.core.enums.ItemType">idmtools.core.enums.ItemType</a><span class="p">]</span></em><a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.supported_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -381,7 +381,7 @@ For a suite, will return all the simulations contained in the suites experiments
 
 <dl class="py method">
 <dt id="idmtools.entities.iplatform.IPlatform.get_files">
-<code class="sig-name descname">get_files</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">item</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.core.interfaces.ientity.html#idmtools.core.interfaces.ientity.IEntity" title="idmtools.core.interfaces.ientity.IEntity">idmtools.core.interfaces.ientity.IEntity</a></span></em>, <em class="sig-param"><span class="n">files</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>Set<span class="p">[</span>str<span class="p">]</span><span class="p">, </span>List<span class="p">[</span>str<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">output</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; Union<span class="p">[</span>Dict<span class="p">[</span>str<span class="p">, </span>Dict<span class="p">[</span>str<span class="p">, </span>bytearray<span class="p">]</span><span class="p">]</span><span class="p">, </span>Dict<span class="p">[</span>str<span class="p">, </span>bytearray<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.get_files" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_files</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">item</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.core.interfaces.ientity.html#idmtools.core.interfaces.ientity.IEntity" title="idmtools.core.interfaces.ientity.IEntity">idmtools.core.interfaces.ientity.IEntity</a></span></em>, <em class="sig-param"><span class="n">files</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>Set<span class="p">[</span>str<span class="p">]</span><span class="p">, </span>List<span class="p">[</span>str<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">output</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; Union<span class="p">[</span>Dict<span class="p">[</span>str<span class="p">, </span>Dict<span class="p">[</span>str<span class="p">, </span>bytearray<span class="p">]</span><span class="p">]</span><span class="p">, </span>Dict<span class="p">[</span>str<span class="p">, </span>bytearray<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.get_files" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get files for a platform entity</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -389,6 +389,7 @@ For a suite, will return all the simulations contained in the suites experiments
 <li><p><strong>item</strong> – Item to fetch files for</p></li>
 <li><p><strong>files</strong> – List of file names to get</p></li>
 <li><p><strong>output</strong> – save files to</p></li>
+<li><p><strong>**kwargs</strong> – Platform arguments</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -495,6 +496,17 @@ simulations described above</p>
 :param item: SSMTWorkItem
 :param relation_type: Depends or Create</p>
 <p>Returns: dict with key the object type</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.iplatform.IPlatform.is_regather_assets_on_modify">
+<code class="sig-name descname">is_regather_assets_on_modify</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.is_regather_assets_on_modify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return default behaviour for platform when rerunning experiment and gathering assets</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True or false</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

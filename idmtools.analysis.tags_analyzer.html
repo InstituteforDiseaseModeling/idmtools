@@ -75,7 +75,7 @@
             
             
               <div class="version">
-                1.4.0
+                1.4.0+nightly.0
               </div>
             
           
@@ -210,21 +210,21 @@
 
     <span class="c1"># Set the platform where you want to run your analysis</span>
     <span class="c1"># In this case we are running in COMPS since the Work Item we are analyzing was run on COMPS</span>
-    <span class="n">platform</span> <span class="o">=</span> <span class="n">Platform</span><span class="p">(</span><span class="s1">&#39;COMPS2&#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">Platform</span><span class="p">(</span><span class="s1">&#39;COMPS2&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">platform</span><span class="p">:</span>
 
-    <span class="c1"># Arg option for analyzer init are uid, working_dir, data in the method map (aka select_simulation_data),</span>
-    <span class="c1"># and filenames</span>
-    <span class="c1"># Initialize the analyser class which just requires an experiment id</span>
-    <span class="n">analyzers</span> <span class="o">=</span> <span class="p">[</span><span class="n">TagsAnalyzer</span><span class="p">()]</span>
+        <span class="c1"># Arg option for analyzer init are uid, working_dir, data in the method map (aka select_simulation_data),</span>
+        <span class="c1"># and filenames</span>
+        <span class="c1"># Initialize the analyser class which just requires an experiment id</span>
+        <span class="n">analyzers</span> <span class="o">=</span> <span class="p">[</span><span class="n">TagsAnalyzer</span><span class="p">()]</span>
 
-    <span class="c1"># Set the experiment id you want to analyze</span>
-    <span class="n">experiment_id</span> <span class="o">=</span> <span class="s1">&#39;36d8bfdc-83f6-e911-a2be-f0921c167861&#39;</span>  <span class="c1"># staging exp id JSuresh&#39;s Magude exp</span>
+        <span class="c1"># Set the experiment id you want to analyze</span>
+        <span class="n">experiment_id</span> <span class="o">=</span> <span class="s1">&#39;36d8bfdc-83f6-e911-a2be-f0921c167861&#39;</span>  <span class="c1"># staging exp id JSuresh&#39;s Magude exp</span>
 
-    <span class="c1"># Specify the id Type, in this case an Experiment on COMPS</span>
-    <span class="n">manager</span> <span class="o">=</span> <span class="n">AnalyzeManager</span><span class="p">(</span><span class="n">configuration</span><span class="o">=</span><span class="p">{},</span> <span class="n">partial_analyze_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">platform</span><span class="o">=</span><span class="n">platform</span><span class="p">,</span>
-                             <span class="n">ids</span><span class="o">=</span><span class="p">[(</span><span class="n">experiment_id</span><span class="p">,</span> <span class="n">ItemType</span><span class="o">.</span><span class="n">EXPERIMENT</span><span class="p">)],</span>
-                             <span class="n">analyzers</span><span class="o">=</span><span class="n">analyzers</span><span class="p">)</span>
-    <span class="n">manager</span><span class="o">.</span><span class="n">analyze</span><span class="p">()</span>
+        <span class="c1"># Specify the id Type, in this case an Experiment on COMPS</span>
+        <span class="n">manager</span> <span class="o">=</span> <span class="n">AnalyzeManager</span><span class="p">(</span><span class="n">partial_analyze_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">platform</span><span class="o">=</span><span class="n">platform</span><span class="p">,</span>
+                                 <span class="n">ids</span><span class="o">=</span><span class="p">[(</span><span class="n">experiment_id</span><span class="p">,</span> <span class="n">ItemType</span><span class="o">.</span><span class="n">EXPERIMENT</span><span class="p">)],</span>
+                                 <span class="n">analyzers</span><span class="o">=</span><span class="n">analyzers</span><span class="p">)</span>
+        <span class="n">manager</span><span class="o">.</span><span class="n">analyze</span><span class="p">()</span>
 </pre></div>
 </div>
 <dl class="py method">

@@ -75,7 +75,7 @@
             
             
               <div class="version">
-                1.4.0
+                1.4.0+nightly.0
               </div>
             
           
@@ -227,7 +227,7 @@
 
 <dl class="py function">
 <dt id="idmtools.entities.iplatform_ops.utils.batch_create_items">
-<code class="sig-prename descclassname">idmtools.entities.iplatform_ops.utils.</code><code class="sig-name descname">batch_create_items</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">items</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>Iterable<span class="p">, </span>Generator<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">batch_worker_thread_func</span><span class="p">:</span> <span class="n">Callable<span class="p">[</span><span class="p">[</span>List<span class="p">]</span><span class="p">, </span>List<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">create_func</span><span class="p">:</span> <span class="n">Callable[[…], Any]</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">display_progress</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">progress_description</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'Commissioning items'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.iplatform_ops.utils.batch_create_items" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">idmtools.entities.iplatform_ops.utils.</code><code class="sig-name descname">batch_create_items</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">items</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>Iterable<span class="p">, </span>Generator<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">batch_worker_thread_func</span><span class="p">:</span> <span class="n">Callable<span class="p">[</span><span class="p">[</span>List<span class="p">]</span><span class="p">, </span>List<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">create_func</span><span class="p">:</span> <span class="n">Callable<span class="p">[</span><span class="p">[</span><span class="p">…</span><span class="p">]</span><span class="p">, </span>Any<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">display_progress</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">progress_description</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'Commissioning items'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.iplatform_ops.utils.batch_create_items" title="Permalink to this definition">¶</a></dt>
 <dd><p>Batch create items. You must specify either batch_worker_thread_func or create_func</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -246,11 +246,12 @@
 
 <dl class="py function">
 <dt id="idmtools.entities.iplatform_ops.utils.show_progress_of_batch">
-<code class="sig-prename descclassname">idmtools.entities.iplatform_ops.utils.</code><code class="sig-name descname">show_progress_of_batch</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">futures</span><span class="p">:</span> <span class="n">List<span class="p">[</span>concurrent.futures._base.Future<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">progress_description</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">total</span><span class="p">:</span> <span class="n">int</span></em><span class="sig-paren">)</span> &#x2192; List<a class="headerlink" href="#idmtools.entities.iplatform_ops.utils.show_progress_of_batch" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">idmtools.entities.iplatform_ops.utils.</code><code class="sig-name descname">show_progress_of_batch</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pbar</span><span class="p">:</span> <span class="n">tqdm.std.tqdm</span></em>, <em class="sig-param"><span class="n">futures</span><span class="p">:</span> <span class="n">List<span class="p">[</span>concurrent.futures._base.Future<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">progress_description</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">total</span><span class="p">:</span> <span class="n">int</span></em><span class="sig-paren">)</span> &#x2192; List<a class="headerlink" href="#idmtools.entities.iplatform_ops.utils.show_progress_of_batch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Show progress bar for batch</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>pbar</strong> – Progress bar</p></li>
 <li><p><strong>futures</strong> – List of futures that are still running/queued</p></li>
 <li><p><strong>progress_description</strong> – Progress description</p></li>
 <li><p><strong>total</strong> – Total items being loaded(since we are loading in batches)</p></li>

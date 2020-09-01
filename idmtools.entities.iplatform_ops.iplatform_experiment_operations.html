@@ -75,7 +75,7 @@
             
             
               <div class="version">
-                1.4.0
+                1.4.0+nightly.0
               </div>
             
           
@@ -199,7 +199,7 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
 <dl class="py attribute">
 <dt id="idmtools.entities.iplatform_ops.iplatform_experiment_operations.IPlatformExperimentOperations.platform">
-<code class="sig-name descname">platform</code><em class="property">: ‘IPlatform’</em><a class="headerlink" href="#idmtools.entities.iplatform_ops.iplatform_experiment_operations.IPlatformExperimentOperations.platform" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">platform</code><em class="property">: IPlatform</em><a class="headerlink" href="#idmtools.entities.iplatform_ops.iplatform_experiment_operations.IPlatformExperimentOperations.platform" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -476,6 +476,21 @@ all simulation states are updated as well</p>
 <dt id="idmtools.entities.iplatform_ops.iplatform_experiment_operations.IPlatformExperimentOperations.platform_list_asset">
 <code class="sig-name descname">platform_list_asset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">experiment</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.entities.experiment.html#idmtools.entities.experiment.Experiment" title="idmtools.entities.experiment.Experiment">idmtools.entities.experiment.Experiment</a></span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span><a class="reference internal" href="idmtools.assets.asset.html#idmtools.assets.asset.Asset" title="idmtools.assets.asset.Asset">idmtools.assets.asset.Asset</a><span class="p">]</span><a class="headerlink" href="#idmtools.entities.iplatform_ops.iplatform_experiment_operations.IPlatformExperimentOperations.platform_list_asset" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.iplatform_ops.iplatform_experiment_operations.IPlatformExperimentOperations.platform_modify_experiment">
+<code class="sig-name descname">platform_modify_experiment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">experiment</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.entities.experiment.html#idmtools.entities.experiment.Experiment" title="idmtools.entities.experiment.Experiment">idmtools.entities.experiment.Experiment</a></span></em>, <em class="sig-param"><span class="n">regather_common_assets</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="idmtools.entities.experiment.html#idmtools.entities.experiment.Experiment" title="idmtools.entities.experiment.Experiment">idmtools.entities.experiment.Experiment</a><a class="headerlink" href="#idmtools.entities.iplatform_ops.iplatform_experiment_operations.IPlatformExperimentOperations.platform_modify_experiment" title="Permalink to this definition">¶</a></dt>
+<dd><p>API to allow detection of experiments already created</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>experiment</strong> – </p></li>
+<li><p><strong>regather_common_assets</strong> – When modifying, should we gather assets from template/simulations. It is important to note that when using this feature, ensure the previous simulations have finished provisioning. Failure to do so can lead to unexpected behaviour</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
 
 </dd></dl>
 

@@ -75,7 +75,7 @@
             
             
               <div class="version">
-                1.4.0
+                1.4.0+nightly.0
               </div>
             
           
@@ -229,7 +229,7 @@
         <span class="n">experiment_id</span> <span class="o">=</span> <span class="s1">&#39;9311af40-1337-ea11-a2be-f0921c167861&#39;</span>  <span class="c1"># staging exp id simple sim and csv example</span>
 
         <span class="c1"># Specify the id Type, in this case an Experiment on COMPS</span>
-        <span class="n">manager</span> <span class="o">=</span> <span class="n">AnalyzeManager</span><span class="p">(</span><span class="n">configuration</span><span class="o">=</span><span class="p">{},</span> <span class="n">partial_analyze_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ids</span><span class="o">=</span><span class="p">[(</span><span class="n">experiment_id</span><span class="p">,</span> <span class="n">ItemType</span><span class="o">.</span><span class="n">EXPERIMENT</span><span class="p">)],</span>
+        <span class="n">manager</span> <span class="o">=</span> <span class="n">AnalyzeManager</span><span class="p">(</span><span class="n">partial_analyze_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ids</span><span class="o">=</span><span class="p">[(</span><span class="n">experiment_id</span><span class="p">,</span> <span class="n">ItemType</span><span class="o">.</span><span class="n">EXPERIMENT</span><span class="p">)],</span>
                                  <span class="n">analyzers</span><span class="o">=</span><span class="n">analyzers</span><span class="p">)</span>
         <span class="n">manager</span><span class="o">.</span><span class="n">analyze</span><span class="p">()</span>
 </pre></div>
@@ -265,8 +265,7 @@
     <span class="n">experiment_id</span> <span class="o">=</span> <span class="s1">&#39;1bddce22-0c37-ea11-a2be-f0921c167861&#39;</span>  <span class="c1"># staging exp id with multiple csv file outputs</span>
 
     <span class="c1"># Specify the id Type, in this case an Experiment on COMPS</span>
-    <span class="n">manager</span> <span class="o">=</span> <span class="n">AnalyzeManager</span><span class="p">(</span><span class="n">configuration</span><span class="o">=</span><span class="p">{},</span> <span class="n">partial_analyze_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">platform</span><span class="o">=</span><span class="n">platform</span><span class="p">,</span>
-                             <span class="n">ids</span><span class="o">=</span><span class="p">[(</span><span class="n">experiment_id</span><span class="p">,</span> <span class="n">ItemType</span><span class="o">.</span><span class="n">EXPERIMENT</span><span class="p">)],</span>
+    <span class="n">manager</span> <span class="o">=</span> <span class="n">AnalyzeManager</span><span class="p">(</span><span class="n">partial_analyze_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ids</span><span class="o">=</span><span class="p">[(</span><span class="n">experiment_id</span><span class="p">,</span> <span class="n">ItemType</span><span class="o">.</span><span class="n">EXPERIMENT</span><span class="p">)],</span>
                              <span class="n">analyzers</span><span class="o">=</span><span class="n">analyzers</span><span class="p">)</span>
     <span class="n">manager</span><span class="o">.</span><span class="n">analyze</span><span class="p">()</span>
 </pre></div>

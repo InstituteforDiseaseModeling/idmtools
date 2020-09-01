@@ -75,7 +75,7 @@
             
             
               <div class="version">
-                1.4.0
+                1.4.0+nightly.0
               </div>
             
           
@@ -216,7 +216,7 @@
 </div>
 <dl class="py attribute">
 <dt id="idmtools.entities.templated_simulation.TemplatedSimulations.builders">
-<code class="sig-name descname">builders</code><em class="property">: Set<span class="p">[</span>SimulationBuilder<span class="p">]</span></em><a class="headerlink" href="#idmtools.entities.templated_simulation.TemplatedSimulations.builders" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">builders</code><em class="property">: Set<span class="p">[</span><a class="reference internal" href="idmtools.builders.simulation_builder.html#idmtools.builders.simulation_builder.SimulationBuilder" title="idmtools.builders.simulation_builder.SimulationBuilder">idmtools.builders.simulation_builder.SimulationBuilder</a><span class="p">]</span></em><a class="headerlink" href="#idmtools.entities.templated_simulation.TemplatedSimulations.builders" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -271,8 +271,19 @@
 
 <dl class="py method">
 <dt id="idmtools.entities.templated_simulation.TemplatedSimulations.simulations">
-<code class="sig-name descname">simulations</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Generator[idmtools.entities.simulation.Simulation, None, None]<a class="headerlink" href="#idmtools.entities.templated_simulation.TemplatedSimulations.simulations" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">simulations</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Generator<span class="p">[</span><a class="reference internal" href="idmtools.entities.simulation.html#idmtools.entities.simulation.Simulation" title="idmtools.entities.simulation.Simulation">idmtools.entities.simulation.Simulation</a><span class="p">, </span>None<span class="p">, </span>None<span class="p">]</span><a class="headerlink" href="#idmtools.entities.templated_simulation.TemplatedSimulations.simulations" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.templated_simulation.TemplatedSimulations.extra_simulations">
+<code class="sig-name descname">extra_simulations</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span><a class="reference internal" href="idmtools.entities.simulation.html#idmtools.entities.simulation.Simulation" title="idmtools.entities.simulation.Simulation">idmtools.entities.simulation.Simulation</a><span class="p">]</span><a class="headerlink" href="#idmtools.entities.templated_simulation.TemplatedSimulations.extra_simulations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the extra simulations defined on template</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Returns the extra simulations defined</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt id="idmtools.entities.templated_simulation.TemplatedSimulations.add_simulation">
@@ -283,6 +294,18 @@ sets</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>simulation</strong> – Simulation to add</p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.templated_simulation.TemplatedSimulations.add_simulations">
+<code class="sig-name descname">add_simulations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">simulations</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference internal" href="idmtools.entities.simulation.html#idmtools.entities.simulation.Simulation" title="idmtools.entities.simulation.Simulation">idmtools.entities.simulation.Simulation</a><span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.templated_simulation.TemplatedSimulations.add_simulations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add multiple simulations without templating. See add_simulation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>simulations</strong> – Simulation to add</p>
 </dd>
 </dl>
 <p>Returns:</p>

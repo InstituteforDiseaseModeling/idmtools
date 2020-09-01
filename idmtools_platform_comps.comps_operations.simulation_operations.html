@@ -75,7 +75,7 @@
             
             
               <div class="version">
-                1.4.0
+                1.4.0+nightly.0
               </div>
             
           
@@ -193,15 +193,19 @@
 <span id="idmtools-platform-comps-comps-operations-simulation-operations-module"></span><h1>idmtools_platform_comps.comps_operations.simulation_operations module<a class="headerlink" href="#module-idmtools_platform_comps.comps_operations.simulation_operations" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="idmtools_platform_comps.comps_operations.simulation_operations.comps_batch_worker">
-<code class="sig-prename descclassname">idmtools_platform_comps.comps_operations.simulation_operations.</code><code class="sig-name descname">comps_batch_worker</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">simulations</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference internal" href="idmtools.entities.simulation.html#idmtools.entities.simulation.Simulation" title="idmtools.entities.simulation.Simulation">idmtools.entities.simulation.Simulation</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">interface</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations" title="idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations">idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations</a></span></em>, <em class="sig-param"><span class="n">num_cores</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>int<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">priority</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>COMPS.Data.Simulation.Simulation<span class="p">]</span><a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.comps_batch_worker" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">idmtools_platform_comps.comps_operations.simulation_operations.</code><code class="sig-name descname">comps_batch_worker</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">simulations</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference internal" href="idmtools.entities.simulation.html#idmtools.entities.simulation.Simulation" title="idmtools.entities.simulation.Simulation">idmtools.entities.simulation.Simulation</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">interface</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations" title="idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations">idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations</a></span></em>, <em class="sig-param"><span class="n">executor</span></em>, <em class="sig-param"><span class="n">num_cores</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>int<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">priority</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">asset_collection_id</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>uuid.UUID<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">min_time_between_commissions</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">10</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>COMPS.Data.Simulation.Simulation<span class="p">]</span><a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.comps_batch_worker" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run batch worker</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>simulations</strong> – Batch of simulation to process</p></li>
 <li><p><strong>interface</strong> – SimulationOperation Interface</p></li>
+<li><p><strong>executor</strong> – Thread/process executor</p></li>
 <li><p><strong>num_cores</strong> – Optional Number of core to allocate for MPI</p></li>
 <li><p><strong>priority</strong> – Optional Priority to set to</p></li>
+<li><p><strong>asset_collection_id</strong> – Override asset collection id</p></li>
+<li><p><strong>min_time_between_commissions</strong> – Minimum amount of time(in seconds) between calls to commission on an experiment</p></li>
+<li><p><strong>info for</strong> (<em>extra</em>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -216,7 +220,7 @@
 <dd><p>Bases: <a class="reference internal" href="idmtools.entities.iplatform_ops.iplatform_simulation_operations.html#idmtools.entities.iplatform_ops.iplatform_simulation_operations.IPlatformSimulationOperations" title="idmtools.entities.iplatform_ops.iplatform_simulation_operations.IPlatformSimulationOperations"><code class="xref py py-class docutils literal notranslate"><span class="pre">idmtools.entities.iplatform_ops.iplatform_simulation_operations.IPlatformSimulationOperations</span></code></a></p>
 <dl class="py attribute">
 <dt id="idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.platform">
-<code class="sig-name descname">platform</code><em class="property">: ‘COMPSPlatform’</em><a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.platform" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">platform</code><em class="property">: COMPSPlatform</em><a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.platform" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -247,7 +251,7 @@
 
 <dl class="py method">
 <dt id="idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.platform_create">
-<code class="sig-name descname">platform_create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">simulation</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.entities.simulation.html#idmtools.entities.simulation.Simulation" title="idmtools.entities.simulation.Simulation">idmtools.entities.simulation.Simulation</a></span></em>, <em class="sig-param"><span class="n">num_cores</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">priority</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">enable_platform_task_hooks</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; COMPS.Data.Simulation.Simulation<a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.platform_create" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">platform_create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">simulation</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.entities.simulation.html#idmtools.entities.simulation.Simulation" title="idmtools.entities.simulation.Simulation">idmtools.entities.simulation.Simulation</a></span></em>, <em class="sig-param"><span class="n">num_cores</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">priority</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">enable_platform_task_hooks</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">asset_collection_id</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>uuid.UUID<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; COMPS.Data.Simulation.Simulation<a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.platform_create" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create Simulation on COMPS</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -256,6 +260,8 @@
 <li><p><strong>num_cores</strong> – Optional number of MPI Cores to allocate</p></li>
 <li><p><strong>priority</strong> – Priority to load</p></li>
 <li><p><strong>enable_platform_task_hooks</strong> – Should platform task hoooks be ran</p></li>
+<li><p><strong>asset_collection_id</strong> – Override for asset collection id on sim</p></li>
+<li><p><strong>**kwargs</strong> – Expansion fields</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -266,7 +272,7 @@
 
 <dl class="py method">
 <dt id="idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.to_comps_sim">
-<code class="sig-name descname">to_comps_sim</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">simulation</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.entities.simulation.html#idmtools.entities.simulation.Simulation" title="idmtools.entities.simulation.Simulation">idmtools.entities.simulation.Simulation</a></span></em>, <em class="sig-param"><span class="n">num_cores</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">priority</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">config</span><span class="p">:</span> <span class="n">COMPS.Data.Configuration.Configuration</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.to_comps_sim" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">to_comps_sim</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">simulation</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.entities.simulation.html#idmtools.entities.simulation.Simulation" title="idmtools.entities.simulation.Simulation">idmtools.entities.simulation.Simulation</a></span></em>, <em class="sig-param"><span class="n">num_cores</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">priority</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">config</span><span class="p">:</span> <span class="n">COMPS.Data.Configuration.Configuration</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">asset_collection_id</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>uuid.UUID<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.to_comps_sim" title="Permalink to this definition">¶</a></dt>
 <dd><p>Covert IDMTools object to COMPS Object</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -274,7 +280,9 @@
 <li><p><strong>simulation</strong> – Simulation object to convert</p></li>
 <li><p><strong>num_cores</strong> – Optional Num of MPI Cores to allocate</p></li>
 <li><p><strong>priority</strong> – Optional Priority</p></li>
-<li><p><strong>config</strong> – Optional Configuration objet</p></li>
+<li><p><strong>config</strong> – Optional Configuration object</p></li>
+<li><p><strong>asset_collection_id</strong> – </p></li>
+<li><p><strong>additional option for comps</strong> (<em>**kwargs</em>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -285,7 +293,7 @@
 
 <dl class="py method">
 <dt id="idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.get_simulation_config_from_simulation">
-<em class="property">static </em><code class="sig-name descname">get_simulation_config_from_simulation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">simulation</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.entities.simulation.html#idmtools.entities.simulation.Simulation" title="idmtools.entities.simulation.Simulation">idmtools.entities.simulation.Simulation</a></span></em>, <em class="sig-param"><span class="n">num_cores</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">priority</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; COMPS.Data.Configuration.Configuration<a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.get_simulation_config_from_simulation" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">get_simulation_config_from_simulation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">simulation</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.entities.simulation.html#idmtools.entities.simulation.Simulation" title="idmtools.entities.simulation.Simulation">idmtools.entities.simulation.Simulation</a></span></em>, <em class="sig-param"><span class="n">num_cores</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">priority</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">asset_collection_id</span><span class="p">:</span> <span class="n">uuid.UUID</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; COMPS.Data.Configuration.Configuration<a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.get_simulation_config_from_simulation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the comps configuration for a Simulation Object</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -293,6 +301,8 @@
 <li><p><strong>simulation</strong> – Simulation</p></li>
 <li><p><strong>num_cores</strong> – Optional Num of core for MPI</p></li>
 <li><p><strong>priority</strong> – Optional Priority</p></li>
+<li><p><strong>asset_collection_id</strong> – Override simulation asset_collection_id</p></li>
+<li><p><strong>additional option for comps</strong> (<em>**kwargs</em>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -303,7 +313,7 @@
 
 <dl class="py method">
 <dt id="idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.batch_create">
-<code class="sig-name descname">batch_create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">simulations</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference internal" href="idmtools.entities.simulation.html#idmtools.entities.simulation.Simulation" title="idmtools.entities.simulation.Simulation">idmtools.entities.simulation.Simulation</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">num_cores</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">priority</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>COMPS.Data.Simulation.Simulation<span class="p">]</span><a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.batch_create" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">batch_create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">simulations</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference internal" href="idmtools.entities.simulation.html#idmtools.entities.simulation.Simulation" title="idmtools.entities.simulation.Simulation">idmtools.entities.simulation.Simulation</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">num_cores</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">priority</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">asset_collection_id</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>uuid.UUID<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>COMPS.Data.Simulation.Simulation<span class="p">]</span><a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.batch_create" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform batch creation of Simulations</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -311,6 +321,8 @@
 <li><p><strong>simulations</strong> – Simulation to create</p></li>
 <li><p><strong>num_cores</strong> – Optional MPI Cores to allocate per simulation</p></li>
 <li><p><strong>priority</strong> – Optional Priority</p></li>
+<li><p><strong>asset_collection_id</strong> – Asset collection id for sim(overide experiment)</p></li>
+<li><p><strong>**kwargs</strong> – Future expansion</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -394,7 +406,7 @@
 <li><p><strong>load_task</strong> – Should we load tasks. Defaults to No. This can increase the load items on fetchs</p></li>
 <li><p><strong>parent</strong> – Optional parent object to prevent reloads</p></li>
 <li><p><strong>load_parent</strong> – Force load of parent(Beware, This could cause loading loops)</p></li>
-<li><p><strong>metadata</strong> – Should we load metadata by default. If load task is enabled, this is also enabled</p></li>
+<li><p><strong>load_metadata</strong> – Should we load metadata by default. If load task is enabled, this is also enabled</p></li>
 <li><p><strong>**kwargs</strong> – </p></li>
 </ul>
 </dd>
@@ -418,13 +430,14 @@
 
 <dl class="py method">
 <dt id="idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.get_assets">
-<code class="sig-name descname">get_assets</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">simulation</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.entities.simulation.html#idmtools.entities.simulation.Simulation" title="idmtools.entities.simulation.Simulation">idmtools.entities.simulation.Simulation</a></span></em>, <em class="sig-param"><span class="n">files</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; Dict<span class="p">[</span>str<span class="p">, </span>bytearray<span class="p">]</span><a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.get_assets" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_assets</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">simulation</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.entities.simulation.html#idmtools.entities.simulation.Simulation" title="idmtools.entities.simulation.Simulation">idmtools.entities.simulation.Simulation</a></span></em>, <em class="sig-param"><span class="n">files</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">include_experiment_assets</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; Dict<span class="p">[</span>str<span class="p">, </span>bytearray<span class="p">]</span><a class="headerlink" href="#idmtools_platform_comps.comps_operations.simulation_operations.CompsPlatformSimulationOperations.get_assets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetch the files associated with a simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>simulation</strong> – Simulation</p></li>
 <li><p><strong>files</strong> – List of files to download</p></li>
+<li><p><strong>include_experiment_assets</strong> – Should we also load experiment assets?</p></li>
 <li><p><strong>**kwargs</strong> – </p></li>
 </ul>
 </dd>
