@@ -83,7 +83,12 @@ class Experiment(IAssetsEnabled, INamedEntity):
 
     @property
     def status(self):
-        # narrow down to states we have
+        # still creating sims since we have a template. When adding new simulations, we will pre-create sim objects unless
+        # the item is new
+        if isinstance(self.simulations.items, TemplatedSimulations):
+            status = EntityStatus.CREATED if self._platform_object else None
+            return status
+
         sim_statuses = set([s.status for s in self.simulations.items])
         if len(self.simulations.items) == 0 or all([s is None for s in sim_statuses]):
             status = None  # this will trigger experiment creation on a platform

@@ -78,6 +78,9 @@ def batch_create_items(items: Union[Iterable, Generator], batch_worker_thread_fu
     # Consider values from the block that Platform uses
     _batch_size = int(IdmConfigParser.get_option(None, "batch_size", fallback=16))
 
+    if display_progress:
+        prog = tqdm(desc="Initializing objects for creation")
+
     if EXECUTOR is None:
         _max_workers = int(IdmConfigParser.get_option(None, "max_workers", fallback=16))
         logger.info(f'Creating {_max_workers} Platform Workers')
@@ -104,16 +107,25 @@ def batch_create_items(items: Union[Iterable, Generator], batch_worker_thread_fu
         i = items.items
     else:
         i = items
+    if display_progress:
+        if hasattr(items, '__len__'):
+            prog.total = len(items)
     for chunk in chunked(i, _batch_size):
         total += len(chunk)
         if parent:
             for c in chunk:
                 c.parent = parent
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f"Submitting chunk: {len(chunk)}")
+        if display_progress:
+            prog.update(len(chunk))
         futures.append(EXECUTOR.submit(batch_worker_thread_func, chunk))
 
     results = []
     if display_progress:
-        results = show_progress_of_batch(futures, progress_description, total)
+        prog.set_description(progress_description)
+        prog.reset(total)
+        results = show_progress_of_batch(prog, futures, progress_description, total)
     else:
         for future in futures:
             results.extend(future.result())
@@ -121,11 +133,12 @@ def batch_create_items(items: Union[Iterable, Generator], batch_worker_thread_fu
     return results
 
 
-def show_progress_of_batch(futures: List[Future], progress_description: str, total: int) -> List:
+def show_progress_of_batch(pbar: tqdm, futures: List[Future], progress_description: str, total: int) -> List:
     """
     Show progress bar for batch
 
     Args:
+        pbar: Progress bar
         futures: List of futures that are still running/queued
         progress_description: Progress description
         total: Total items being loaded(since we are loading in batches)
@@ -134,9 +147,8 @@ def show_progress_of_batch(futures: List[Future], progress_description: str, tot
 
     """
     results = []
-    with tqdm(futures, desc=progress_description, total=total) as prog:
-        for future in as_completed(futures):
-            result = future.result()
-            prog.update(len(result))
-            results.extend(future.result())
+    for future in as_completed(futures):
+        result = future.result()
+        pbar.update(len(result))
+        results.extend(future.result())
     return results

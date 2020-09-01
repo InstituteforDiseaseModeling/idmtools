@@ -218,6 +218,11 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             exp_command = task.command
         return exp_command
 
+    def post_create(self, experiment: Experiment, **kwargs) -> NoReturn:
+        user_logger.log(SUCCESS, f"\nThe created experiment can be viewed at {self.platform.endpoint}/#explore/"
+                                 f"Simulations?filters=ExperimentId={experiment.uid}\nSimulations are still being created\n"
+                        )
+
     def post_run_item(self, experiment: Experiment, **kwargs):
         """
         Ran after experiment. Nothing is done on comps other that alerting the user to the item
@@ -230,9 +235,6 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             None
         """
         super().post_run_item(experiment, **kwargs)
-        user_logger.log(SUCCESS, f"\nThe running experiment can be viewed at {self.platform.endpoint}/#explore/"
-                                 f"Simulations?filters=ExperimentId={experiment.uid}\n"
-                        )
 
     def get_children(self, experiment: COMPSExperiment, columns: Optional[List[str]] = None,
                      children: Optional[List[str]] = None, **kwargs) -> List[COMPSSimulation]:

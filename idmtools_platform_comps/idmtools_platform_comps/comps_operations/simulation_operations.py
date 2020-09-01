@@ -1,16 +1,19 @@
+from concurrent.futures.thread import ThreadPoolExecutor
+
+from threading import Lock
+import time
 import json
 import uuid
 from dataclasses import dataclass, field
+from COMPS.Data.Simulation import SimulationState
 from functools import partial
 from logging import getLogger, DEBUG
 from typing import Any, List, Dict, Type, Optional, TYPE_CHECKING, Union
 from uuid import UUID
-
 from COMPS.Data import Simulation as COMPSSimulation, QueryCriteria, Experiment as COMPSExperiment, SimulationFile, \
     Configuration
-
 from idmtools.assets import AssetCollection, Asset
-from idmtools.core import ItemType
+from idmtools.core import ItemType, EntityStatus
 from idmtools.core.task_factory import TaskFactory
 from idmtools.entities import CommandLine
 from idmtools.entities.command_task import CommandTask
@@ -27,31 +30,40 @@ if TYPE_CHECKING:
 logger = getLogger(__name__)
 user_logger = getLogger('user')
 
+# Track commissioning in batches
+COMPS_EXPERIMENT_BATCH_COMMISSION_LOCK = Lock()
+COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP = 0
 
-def comps_batch_worker(simulations: List[Simulation], interface: 'CompsPlatformSimulationOperations',
+
+def comps_batch_worker(simulations: List[Simulation], interface: 'CompsPlatformSimulationOperations', executor,
                        num_cores: Optional[int] = None, priority: Optional[str] = None, asset_collection_id: Union[str, UUID] = None,
-                       **kwargs) -> List[COMPSSimulation]:
+                       min_time_between_commissions: int = 10, **kwargs) -> List[COMPSSimulation]:
     """
     Run batch worker
 
     Args:
         simulations: Batch of simulation to process
         interface: SimulationOperation Interface
+        executor: Thread/process executor
         num_cores: Optional Number of core to allocate for MPI
         priority: Optional Priority to set to
-        asset_collection_id: Override assection id
+        asset_collection_id: Override asset collection id
+        min_time_between_commissions: Minimum amount of time(in seconds) between calls to commission on an experiment
         extra info for
 
     Returns:
         List of Comps Simulations
     """
+    global COMPS_EXPERIMENT_BATCH_COMMISSION_LOCK, COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP
     if logger.isEnabledFor(DEBUG):
         logger.debug(f'Converting {len(simulations)} to COMPS')
     created_simulations = []
 
+    new_sims = 0
     for simulation in simulations:
         if simulation.status is None:
             interface.pre_create(simulation)
+            new_sims += 1
             simulation.platform = interface.platform
             simulation._platform_object = interface.to_comps_sim(simulation, num_cores=num_cores, priority=priority, asset_collection_id=asset_collection_id, **kwargs)
             created_simulations.append(simulation)
@@ -66,6 +78,25 @@ def comps_batch_worker(simulations: List[Simulation], interface: 'CompsPlatformS
         interface.post_create(simulation)
     if logger.isEnabledFor(DEBUG):
         logger.debug(f'Finished post-create of {len(simulations)}')
+
+    current_time = time.time()
+    # check current commission queue and last commission call
+    if new_sims > 0 and current_time - COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP > min_time_between_commissions:
+        # be aggressive in waiting on lock. Worse case, another thread triggers this near same time
+        locked = COMPS_EXPERIMENT_BATCH_COMMISSION_LOCK.acquire(timeout=0.015)
+        if locked:
+            # do commission asynchronously. If it fine if we happen to miss a commission
+            def do_commission():
+                try:
+                    simulations[0].experiment.get_platform_object().commission()
+                except RuntimeError:
+                    pass
+            executor.submit(do_commission)
+            COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP = current_time
+            COMPS_EXPERIMENT_BATCH_COMMISSION_LOCK.release()
+            for simulation in simulations:
+                simulation.status = EntityStatus.RUNNING
+
     return simulations
 
 
@@ -206,12 +237,27 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         Returns:
             List of COMPSSimulations that were created
         """
-        thread_func = partial(comps_batch_worker, interface=self, num_cores=num_cores, priority=priority, asset_collection_id=asset_collection_id, **kwargs)
-        return batch_create_items(
+        global COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP
+        executor = ThreadPoolExecutor()
+        thread_func = partial(comps_batch_worker, interface=self, num_cores=num_cores, priority=priority, asset_collection_id=asset_collection_id,
+                              min_time_between_commissions=self.platform.min_time_between_commissions, executor=executor, **kwargs)
+        results = batch_create_items(
             simulations,
             batch_worker_thread_func=thread_func,
             progress_description="Creating Simulations on Comps"
         )
+        # Always commission again
+        try:
+            results[0].parent.get_platform_object().commission()
+        except RuntimeError as ex:  # occasionally we hit this because double commissioning. Its ok to ignore though because that means we have already commissioned this experiment
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f"COMMISSION Response: {ex.args}")
+        COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP = 0
+        # set commission here in comps objects to prevent commission in Experiment when batching
+        for sim in results:
+            sim.status = EntityStatus.RUNNING
+            sim.get_platform_object()._state = SimulationState.CommissionRequested
+        return results
 
     def get_parent(self, simulation: Any, **kwargs) -> COMPSExperiment:
         """
