@@ -10,7 +10,6 @@ from idmtools.analysis.analyze_manager import AnalyzeManager
 from idmtools.analysis.csv_analyzer import CSVAnalyzer
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
-from idmtools_test.utils.utils import del_folder
 
 if __name__ == '__main__':
 
