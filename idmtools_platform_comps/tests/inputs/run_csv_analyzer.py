@@ -24,11 +24,6 @@ if __name__ == '__main__':
     analyzers = [CSVAnalyzer(filenames=filenames)]
 
     # Set the experiment id you want to analyze
-    if len(sys.argv) > 1:
-        expid = [(sys.argv[1], ItemType.EXPERIMENT)]
-    else:
-        expid = [('9311af40-1337-ea11-a2be-f0921c167861', ItemType.EXPERIMENT)]
-
-    # Specify the id Type, in this case an Experiment on COMPS
-    manager = AnalyzeManager(partial_analyze_ok=True, ids=expid, analyzers=analyzers)
-    manager.analyze()
+    exp_id = sys.argv[1] if len(sys.argv) > 1 else '9311af40-1337-ea11-a2be-f0921c167861'   # COMPS2 exp_id
+    am = AnalyzeManager(ids=[(exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
+    am.analyze()

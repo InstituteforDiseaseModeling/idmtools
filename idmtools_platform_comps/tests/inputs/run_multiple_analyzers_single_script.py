@@ -20,9 +20,6 @@ if __name__ == "__main__":
     filenames_2 = ['output/node.csv']
     analyzers = [InfectiousnessCSVAnalyzer(filenames=filenames), NodeCSVAnalyzer(filenames=filenames_2)]
 
-    if len(sys.argv) > 1:
-        expid = [(sys.argv[1], ItemType.EXPERIMENT)]
-    else:
-        expid = [('a980f265-995e-ea11-a2bf-f0921c167862', ItemType.EXPERIMENT)]
-    am = AnalyzeManager(ids=expid, analyzers=analyzers)
+    exp_id = sys.argv[1] if len(sys.argv) > 1 else 'a980f265-995e-ea11-a2bf-f0921c167862'  # COMPS2 exp_id
+    am = AnalyzeManager(ids=[(exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
     am.analyze()

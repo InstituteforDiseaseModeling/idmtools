@@ -11,10 +11,10 @@ mpl.use('Agg')
 
 class PopulationAnalyzer(BaseAnalyzer):
 
-    def __init__(self, working_dir=".", name='idm', output_path=None):
+    def __init__(self, working_dir=".", name='idm', output_path="output"):
         super().__init__(filenames=["output\\InsetChart.json"], working_dir=working_dir)
         print(name)
-        self.output_path = output_path or "output"
+        self.output_path = output_path
 
     def initialize(self):
         self.output_path = os.path.join(self.working_dir, self.output_path)
@@ -28,7 +28,7 @@ class PopulationAnalyzer(BaseAnalyzer):
         return data[self.filenames[0]]["Channels"]["Statistical Population"]["Data"]
 
     def reduce(self, all_data: dict) -> Any:
-        first_sim = next(iter(all_data.keys()))  # Iterate over the dataframe keys
+        first_sim = list(all_data.keys())[0]  # get first Simulation
         exp_id = first_sim.experiment.id  # Set the exp id from the first sim data
         output_folder = os.path.join(self.output_path, exp_id)
         os.makedirs(output_folder, exist_ok=True)
