@@ -10,7 +10,7 @@ class Asset(IFrozen):
     """
 
     def __init__(self, absolute_path: 'str' = None, relative_path: 'str' = None, filename: 'str' = None,
-                 content: 'Any' = None, handler: 'Callable' = str):
+                 content: 'Any' = None, handler: 'Callable' = str, checksum: str = None):
         """
         A constructor.
 
@@ -31,6 +31,7 @@ class Asset(IFrozen):
         self._content = content
         self.persisted = False
         self.handler = handler
+        self.checksum = checksum
 
     def __repr__(self):
         return f"<Asset: {os.path.join(self.relative_path, self.filename)} from {self.absolute_path}>"
