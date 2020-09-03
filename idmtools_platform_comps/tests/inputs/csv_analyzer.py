@@ -32,11 +32,11 @@ class CSVAnalyzer(BaseAnalyzer):
 
     # In reduce, we are printing the simulation and result data filtered in map
     def reduce(self, all_data: dict) -> Any:
-        output_dir = os.path.join(self.working_dir, "output")
+        output_folder = os.path.join(self.working_dir, "output")
         results = pd.concat(list(all_data.values()), axis=0,  # Combine a list of all the sims csv data column values
                             keys=[str(k.uid) for k in all_data.keys()],  # Add a hierarchical index with the keys option
                             names=['SimId'])  # Label the index keys you create with the names option
         results.index = results.index.droplevel(1)  # Remove default index
 
         # NOTE: If running twice with different filename, the output files will collide
-        results.to_csv(os.path.join(output_dir, 'aggregated_c.csv'))
+        results.to_csv(os.path.join(output_folder, 'aggregated_c.csv'))

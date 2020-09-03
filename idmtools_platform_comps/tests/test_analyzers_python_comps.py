@@ -53,68 +53,55 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         wait_on_experiment_and_check_all_sim_status(self, pe)
         experiment = COMPSExperiment.get(pe.uid)
         print(experiment.id)
-        self.exp_id = experiment.id  # COMPS Experiment object, so .id
+        exp_id = experiment.id  # COMPS Experiment object, so .id
 
         # Uncomment out if you do not want to regenerate exp and sims
-        # self.exp_id = '9eacbb9a-5ecf-e911-a2bb-f0921c167866' #comps2 staging
+        # exp_id = '9eacbb9a-5ecf-e911-a2bb-f0921c167866' #comps2 staging
+        return exp_id
 
     @pytest.mark.long
     def test_download_analyzer(self):
-        # delete output from previous run
-        del_folder("output")
-
-        # create a new empty 'output' dir
-        os.mkdir("output")
-        self.create_experiment()
+        # step1: test with 1 experiment
+        output_folder = "output_test_download_analyzer"
+        del_folder(output_folder)
+        exp_id1 = self.create_experiment()
         filenames = ['output/result.json', 'config.json']
-        analyzers = [DownloadAnalyzer(filenames=filenames, output_path='output')]
+        analyzers = [DownloadAnalyzer(filenames=filenames, output_path=output_folder)]
 
-        am = AnalyzeManager(ids=[(self.exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
+        am = AnalyzeManager(ids=[(exp_id1, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
+        for simulation in COMPSExperiment.get(exp_id1).get_simulations():
+            self.assertTrue(os.path.exists(os.path.join(output_folder, str(simulation.id), "config.json")))
+            self.assertTrue(os.path.exists(os.path.join(output_folder, str(simulation.id), "result.json")))
 
-        for simulation in COMPSExperiment.get(self.exp_id).get_simulations():
-            self.assertTrue(os.path.exists(os.path.join('output', str(simulation.id), "config.json")))
-            self.assertTrue(os.path.exists(os.path.join('output', str(simulation.id), "result.json")))
-
-    def test_analyzer_multiple_experiments(self):
-        # delete output from previous run
-        del_folder("output")
-
-        # create a new empty 'output' dir
-        os.mkdir("output")
-
-        filenames = ['output/result.json', 'config.json']
-        analyzers = [DownloadAnalyzer(filenames=filenames, output_path='output')]
-
-        exp_list = [('3ca4491a-0edb-e911-a2be-f0921c167861', ItemType.EXPERIMENT),
-                    ('4dcd7149-4eda-e911-a2be-f0921c167861', ItemType.EXPERIMENT)]
-
+        # step2: test with 2 experiments
+        exp_id2 = self.create_experiment()
+        exp_list = [(exp_id1, ItemType.EXPERIMENT),
+                    (exp_id2, ItemType.EXPERIMENT)]
+        output_folder = "output_test_download_analyzer1"
+        del_folder(output_folder)
+        analyzers = [DownloadAnalyzer(filenames=filenames, output_path=output_folder)]
         am = AnalyzeManager(ids=exp_list, analyzers=analyzers)
         am.analyze()
         for exp_id in exp_list:
             for simulation in COMPSExperiment.get(exp_id[0]).get_simulations():
-                self.assertTrue(os.path.exists(os.path.join('output', str(simulation.id), "config.json")))
-                self.assertTrue(os.path.exists(os.path.join('output', str(simulation.id), "result.json")))
+                self.assertTrue(os.path.exists(os.path.join(output_folder, str(simulation.id), "config.json")))
+                self.assertTrue(os.path.exists(os.path.join(output_folder, str(simulation.id), "result.json")))
 
     def test_analyzer_filter_sims(self):
-        # delete output from previous run
-        del_folder("output")
-
-        # create a new empty 'output' dir
-        os.mkdir("output")
-
-        exp_id = '69cab2fe-a252-ea11-a2bf-f0921c167862'
-
+        exp_id = '69cab2fe-a252-ea11-a2bf-f0921c167862'  # comps2
         # then run SimFilterAnalyzer to analyze the sims tags
         filenames = ['output/result.json']
         from sim_filter_analyzer import SimFilterAnalyzer  # noqa
-        analyzers = [SimFilterAnalyzer(filenames=filenames, output_path='output')]
+        output_folder = "output_test_analyzer_filter_sims"
+        del_folder(output_folder)
+        analyzers = [SimFilterAnalyzer(filenames=filenames, output_path=output_folder)]
 
         am = AnalyzeManager(ids=[(exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
 
         # validate result
-        file_path = os.path.join("output", "b_match.csv")
+        file_path = os.path.join(output_folder, exp_id, "b_match.csv")
         self.assertTrue(os.path.exists(file_path))
         df = pd.read_csv(file_path, names=['index', 'key', 'value'], header=None)
         self.assertTrue(df['key'].values[1:5].size == 4)
@@ -123,24 +110,19 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         self.assertTrue(df['value'].values[1:5].all() == '2')
 
     def test_analyzer_filter_sims_by_id(self):
-        # delete output from previous run
-        del_folder("output")
-
-        # create a new empty 'output' dir
-        os.mkdir("output")
-
-        exp_id = '69cab2fe-a252-ea11-a2bf-f0921c167862'
-
+        exp_id = '69cab2fe-a252-ea11-a2bf-f0921c167862'  # comps2
+        output_folder = "output_test_analyzer_filter_sims_by_id"
+        del_folder(output_folder)
         # then run SimFilterAnalyzer to analyze the sims tags
         filenames = ['output/result.json']
         from sim_filter_analyzer_by_id import SimFilterAnalyzerById  # noqa
-        analyzers = [SimFilterAnalyzerById(filenames=filenames, output_path='output')]
+        analyzers = [SimFilterAnalyzerById(filenames=filenames, output_path=output_folder)]
 
         am = AnalyzeManager(ids=[(exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
 
         # validate result
-        file_path = os.path.join("output", "result.csv")
+        file_path = os.path.join(output_folder, exp_id, "result.csv")
         self.assertTrue(os.path.exists(file_path))
         # validate content of output.csv
         df = pd.read_csv(file_path, names=['SimId', 'a', 'b', 'c'], header=None)
@@ -153,19 +135,17 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
     # note: when this flag to True, it does not mean analyzer only on failed simulations, it also on succeeded sims
     def test_analyzer_with_failed_sims(self):
         experiment_id = 'c3e4ef50-ee63-ea11-a2bf-f0921c167862'  # staging experiment includes 5 sims with 3 failed sims
-
-        # delete output from previous run
-        output_dir = "output"
-        del_folder(output_dir)
         filenames = ["stdErr.txt"]
-        analyzers = [DownloadAnalyzer(filenames=filenames)]
+        output_folder = "output_test_analyzer_with_failed_sims"
+        del_folder(output_folder)
+        analyzers = [DownloadAnalyzer(filenames=filenames, output_path=output_folder)]
         manager = AnalyzeManager(ids=[(experiment_id, ItemType.EXPERIMENT)],
                                  analyzers=analyzers, analyze_failed_items=True)
         manager.analyze()
 
         # validation
         for simulation in self.p.get_children(experiment_id, ItemType.EXPERIMENT):
-            file = os.path.join("output", str(simulation.id), "stdErr.txt")
+            file = os.path.join(output_folder, str(simulation.id), "stdErr.txt")
             # make sure we have download all stdErr.txt files from all sims including failed ones
             self.assertTrue(os.path.exists(file))
             # make sure download analyzer results are correct
@@ -187,12 +167,11 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
     # note: experiment can have failed sims, but analyzer only analyzes succeeded sims
     def test_analyzer_with_succeeded_sims(self):
         experiment_id = 'c3e4ef50-ee63-ea11-a2bf-f0921c167862'  # staging experiment includes 5 sims with 3 failed sims
+        output_folder = "output_test_analyzer_with_succeeded_sims"
+        del_folder(output_folder)
 
-        # delete output from previous run
-        output_dir = "output"
-        del_folder(output_dir)
         filenames = ["stdOut.txt"]
-        analyzers = [DownloadAnalyzer(filenames=filenames)]
+        analyzers = [DownloadAnalyzer(filenames=filenames, output_path=output_folder)]
         manager = AnalyzeManager(partial_analyze_ok=True,
                                  ids=[(experiment_id, ItemType.EXPERIMENT)],
                                  analyzers=analyzers)
@@ -202,7 +181,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         for simulation in self.p.get_children(experiment_id, ItemType.EXPERIMENT):
             if simulation.id == "c7e4ef50-ee63-ea11-a2bf-f0921c167862" \
                     or simulation.id == "c5e4ef50-ee63-ea11-a2bf-f0921c167862":
-                file = os.path.join("output", str(simulation.id), "stdOut.txt")
+                file = os.path.join(output_folder, str(simulation.id), "stdOut.txt")
                 # make sure DownloadAnalyzer only download succeeded simulation's stdOut.txt files
                 self.assertTrue(os.path.exists(file))
                 # make sure download analyzer results are correct
@@ -215,5 +194,5 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
                 self.assertIn("Done", contents)
             # for failed simulations, make sure there is no strOut.txt downloaded in local dir
             else:
-                file = os.path.join("output", str(simulation.id), "stdOut.txt")
+                file = os.path.join(output_folder, str(simulation.id), "stdOut.txt")
                 self.assertFalse(os.path.exists(file))

@@ -19,7 +19,7 @@ if __name__ == '__main__':
     # In this case, we have multiple csv files to analyze
     filenames = ['output/a.csv', 'output/b.csv']
     # Initialize the analyser class with the path of the output csv file
-    analyzers = [CSVAnalyzer(filenames=filenames)]
+    analyzers = [CSVAnalyzer(filenames=filenames, output_path="output_csv")]
 
     # Set the experiment id you want to analyze
     experiment_id = '1bddce22-0c37-ea11-a2be-f0921c167861'  # staging exp id with multiple csv file outputs

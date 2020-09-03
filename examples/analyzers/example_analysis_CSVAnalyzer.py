@@ -9,7 +9,6 @@ from idmtools.analysis.csv_analyzer import CSVAnalyzer
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 
-
 if __name__ == '__main__':
 
     # Set the platform where you want to run your analysis
@@ -22,7 +21,7 @@ if __name__ == '__main__':
         # In this case, we want to provide a filename to analyze
         filenames = ['output/c.csv']
         # Initialize the analyser class with the path of the output csv file
-        analyzers = [CSVAnalyzer(filenames=filenames)]
+        analyzers = [CSVAnalyzer(filenames=filenames, output_path="output_csv")]
 
         # Set the experiment id you want to analyze
         experiment_id = '9311af40-1337-ea11-a2be-f0921c167861'  # staging exp id simple sim and csv example

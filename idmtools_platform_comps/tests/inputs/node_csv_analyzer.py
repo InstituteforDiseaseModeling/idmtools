@@ -30,7 +30,7 @@ class NodeCSVAnalyzer(BaseAnalyzer):
     # In reduce, we are printing and plotting the simulation and result data filtered in map
     def reduce(self, all_data):
         # Let's hope the first simulation is representative
-        first_sim = next(iter(all_data.keys()))  # Iterate over the dataframe keys
+        first_sim = list(all_data.keys())[0]  # get first Simulation
         exp_id = first_sim.experiment.id  # Set the exp id from the first sim data
 
         results = pd.concat(list(all_data.values()), axis=0,  # Combine a list of all the sims csv data column values
