@@ -416,7 +416,6 @@ class AssetCollection(IEntity):
             checksum = str(checksum)
         for idx, asset in enumerate(self.assets):
             if filename and asset.filename == filename and relative_path and asset.relative_path:
-
                 if (absolute_path and absolute_path == asset.absolute_path) or (checksum and asset.calculate_checksum() == checksum) or absolute_path is None:
                     return idx
         return None
