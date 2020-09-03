@@ -8,6 +8,8 @@ import backoff
 import requests
 from tqdm import tqdm
 
+from idmtools.utils.hashing import calculate_md5
+
 logger = getLogger(__name__)
 
 
@@ -204,6 +206,16 @@ class Asset:
                 if logger.isEnabledFor(DEBUG):
                     logger.debug(f"Download {self.filename} to {path}")
                 self.__write_download_generator_to_stream(out)
+
+    def calculate_checksum(self) -> str:
+        """
+        Calculate checksum on asset
+        Returns:
+
+        """
+        if not self.checksum and self.absolute_path:
+            self._checksum = calculate_md5(self.absolute_path)
+        return self._checksum
 
 
 TAsset = TypeVar("TAsset", bound=Asset)

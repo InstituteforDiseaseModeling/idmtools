@@ -1,4 +1,6 @@
 import copy
+import uuid
+
 import os
 from dataclasses import dataclass, field
 from logging import getLogger
@@ -13,6 +15,7 @@ from idmtools.core.interfaces.ientity import IEntity
 from idmtools.utils.entities import get_default_tags
 from idmtools.utils.file import scan_directory
 from idmtools.utils.filters.asset_filters import default_asset_file_filter
+from idmtools.utils.hashing import calculate_md5
 from idmtools.utils.info import get_doc_base_url
 
 user_logger = getLogger('user')
@@ -43,8 +46,13 @@ class AssetCollection(IEntity):
         self.item_type = ItemType.ASSETCOLLECTION
         if isinstance(assets, AssetCollection):
             self.assets = copy.deepcopy(assets.assets)
+        elif assets:
+            self.assets = []
+            for asset in assets:
+                self.add_or_replace_asset(asset)
         else:
-            self.assets = copy.deepcopy(assets) or []
+            self.assets = []
+
         self.tags = self.tags or tags
 
     @classmethod
@@ -189,6 +197,7 @@ class AssetCollection(IEntity):
         self.is_editable(True)
         if isinstance(asset, str):
             asset = Asset(absolute_path=asset, **kwargs)
+        # do a simple check first
         if asset in self.assets:
             if fail_on_duplicate:
                 raise DuplicatedAssetError(asset)
@@ -196,6 +205,13 @@ class AssetCollection(IEntity):
                 # The equality not considering the content of the asset, even if it is already present
                 # nothing guarantees that the content is the same. So remove and add the fresh one.
                 self.assets.remove(asset)
+        elif asset.checksum:
+            for oasset in self.assets:
+                if asset.filename == oasset.filename and asset.relative_path == oasset.relative_path and asset.checksum == oasset.calculate_checksum():
+                    if fail_on_duplicate:
+                        raise DuplicatedAssetError(asset)
+                    else:
+                        return
         self.assets.append(asset)
 
     def __add__(self, other: Union[TAssetList, 'AssetCollection', Asset]) -> 'AssetCollection':
@@ -250,7 +266,7 @@ class AssetCollection(IEntity):
             None.
         """
         self.is_editable(True)
-        index = self.find_index_of_asset(asset.absolute_path, asset.filename)
+        index = self.find_index_of_asset(asset.absolute_path, asset.filename, asset.checksum)
         if index is not None:
             self.assets[index] = asset
         else:
@@ -364,34 +380,43 @@ class AssetCollection(IEntity):
     def __iter__(self):
         yield from self.assets
 
-    def has_asset(self, absolute_path: str = None, filename: str = None) -> bool:
+    def has_asset(self, absolute_path: str = None, filename: str = None, checksum: str = None) -> bool:
         """
         Search for asset by absolute_path or by filename
 
         Args:
             absolute_path: Absolute path of source file
             filename: Destination filename
+            checksum: Checksum of asset(optional)
 
         Returns:
             True if asset exists, False otherwise
         """
-        return self.find_index_of_asset(absolute_path, filename) is not None
+        if checksum is None:
+            checksum = calculate_md5(absolute_path)
+        return self.find_index_of_asset(absolute_path, filename, checksum) is not None
 
-    def find_index_of_asset(self, absolute_path: str = None, filename: str = None) -> Union[int, None]:
+    def find_index_of_asset(self, absolute_path: str = None, filename: str = None, checksum: str = None) -> Union[int, None]:
         """
         Finds the index of asset by path or filename
 
         Args:
             absolute_path: Path to search
             filename: Filename to search
+            checksum: checksum
 
         Returns:
             Index number if found.
             None if not found.
         """
+        if checksum and isinstance(checksum, uuid.UUID):
+            checksum = str(checksum)
         for idx, asset in enumerate(self.assets):
             if filename and asset.filename == filename:
-                if absolute_path and absolute_path == asset.absolute_path:
+                # check the checksum first
+                if checksum and asset.calculate_checksum() == checksum:
+                    return idx
+                elif absolute_path and absolute_path == asset.absolute_path:
                     return idx
                 elif absolute_path is None:
                     return idx
