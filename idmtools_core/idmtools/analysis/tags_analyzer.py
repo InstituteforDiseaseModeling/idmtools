@@ -18,10 +18,10 @@ class TagsAnalyzer(IAnalyzer):
     # Arg option for analyzer init are uid, working_dir, parse (True to leverage the :class:`OutputParser`;
     # False to get the raw data in the :meth:`select_simulation_data`), and filenames
     # In this case, we want uid, working_dir, and parse=True
-    def __init__(self, uid=None, working_dir=None, parse=True, output_path=None):
+    def __init__(self, uid=None, working_dir=None, parse=True, output_path="output_tag"):
         super().__init__(uid, working_dir, parse)
         self.exp_id = None
-        self.output_path = output_path or "output_tag"
+        self.output_path = output_path
 
     def initialize(self):
         self.output_path = os.path.join(self.working_dir, self.output_path)
@@ -42,7 +42,7 @@ class TagsAnalyzer(IAnalyzer):
         results = pd.concat(list(all_data.values()), axis=0)  # Combine a list of all the sims tag values
 
         # Make a directory labeled the exp id to write the csv results to
-        first_sim = next(iter(all_data.keys()))  # Iterate over the dataframe keys
+        first_sim = list(all_data.keys())[0]  # get first Simulation
         exp_id = first_sim.experiment.id  # Set the exp id from the first sim data
         output_folder = os.path.join(self.output_path, exp_id)
         os.makedirs(output_folder, exist_ok=True)

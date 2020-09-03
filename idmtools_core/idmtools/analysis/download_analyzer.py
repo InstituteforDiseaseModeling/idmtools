@@ -33,9 +33,9 @@ class DownloadAnalyzer(IAnalyzer):
     def reduce(self, all_data: dict):
         pass
 
-    def __init__(self, filenames=None, output_path=None, **kwargs):
+    def __init__(self, filenames=None, output_path="output", **kwargs):
         super().__init__(filenames=filenames, parse=False, **kwargs)
-        self.output_path = output_path or "output"
+        self.output_path = output_path
 
     def initialize(self):
         self.output_path = os.path.join(self.working_dir, self.output_path)
