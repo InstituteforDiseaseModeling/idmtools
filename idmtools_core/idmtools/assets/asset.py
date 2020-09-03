@@ -1,3 +1,5 @@
+import io
+
 import os
 from dataclasses import dataclass, field, InitVar
 from io import BytesIO
@@ -8,7 +10,7 @@ import backoff
 import requests
 from tqdm import tqdm
 
-from idmtools.utils.hashing import calculate_md5
+from idmtools.utils.hashing import calculate_md5, calculate_md5_stream
 
 logger = getLogger(__name__)
 
@@ -39,14 +41,16 @@ class Asset:
     persisted: bool = field(default=False)
     handler: Callable = field(default=str, metadata=dict(exclude_from_metadata=True))
     download_generator_hook: Callable = field(default=None, metadata=dict(exclude_from_metadata=True))
-    checksum: Optional[str] = field(default=None)
+    checksum: InitVar[Any] = None
+    _checksum: Optional[str] = field(default=None)
 
-    def __post_init__(self, content):
+    def __post_init__(self, content, checksum):
         self.content = content
         if not self.absolute_path and (not self.filename and not self.content):
             raise ValueError("Impossible to create the asset without either absolute path or filename and content!")
 
         self.filename = self.filename or (os.path.basename(self.absolute_path) if self.absolute_path else None)
+        self._checksum = checksum if not isinstance(checksum, property) else None
 
     def __repr__(self):
         return f"<Asset: {os.path.join(self.relative_path, self.filename)} from {self.absolute_path}>"
@@ -61,7 +65,7 @@ class Asset:
 
     @checksum.setter
     def checksum(self, checksum):
-        self._checksum = None if isinstance(checksum, property) else checksum
+        self._checksum = checksum
 
     @property
     def extension(self):
@@ -213,8 +217,11 @@ class Asset:
         Returns:
 
         """
-        if not self.checksum and self.absolute_path:
-            self._checksum = calculate_md5(self.absolute_path)
+        if not self._checksum:
+            if self.absolute_path:
+                self._checksum = calculate_md5(self.absolute_path)
+            elif self.content:
+                self._checksum = calculate_md5_stream(io.BytesIO(self.content))
         return self._checksum
 
 

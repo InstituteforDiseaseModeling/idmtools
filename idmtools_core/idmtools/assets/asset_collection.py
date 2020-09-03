@@ -266,7 +266,7 @@ class AssetCollection(IEntity):
             None.
         """
         self.is_editable(True)
-        index = self.find_index_of_asset(asset.absolute_path, asset.filename, asset.checksum)
+        index = self.find_index_of_asset(asset.absolute_path, asset.filename, asset.relative_path, asset.checksum)
         if index is not None:
             self.assets[index] = asset
         else:
@@ -380,29 +380,32 @@ class AssetCollection(IEntity):
     def __iter__(self):
         yield from self.assets
 
-    def has_asset(self, absolute_path: str = None, filename: str = None, checksum: str = None) -> bool:
+    def has_asset(self, absolute_path: str = None, filename: str = None, relative_path: str = None, checksum: str = None) -> bool:
         """
         Search for asset by absolute_path or by filename
 
         Args:
             absolute_path: Absolute path of source file
             filename: Destination filename
+            relative_path: Relative path of asset
             checksum: Checksum of asset(optional)
 
         Returns:
             True if asset exists, False otherwise
         """
         if checksum is None:
-            checksum = calculate_md5(absolute_path)
-        return self.find_index_of_asset(absolute_path, filename, checksum) is not None
+            if os.path.exists(absolute_path):
+                checksum = calculate_md5(absolute_path)
+        return self.find_index_of_asset(absolute_path, filename, relative_path, checksum) is not None
 
-    def find_index_of_asset(self, absolute_path: str = None, filename: str = None, checksum: str = None) -> Union[int, None]:
+    def find_index_of_asset(self, absolute_path: str = None, filename: str = None, relative_path: str = None, checksum: str = None) -> Union[int, None]:
         """
         Finds the index of asset by path or filename
 
         Args:
             absolute_path: Path to search
             filename: Filename to search
+            relative_path: Relative path of asset
             checksum: checksum
 
         Returns:
@@ -412,7 +415,7 @@ class AssetCollection(IEntity):
         if checksum and isinstance(checksum, uuid.UUID):
             checksum = str(checksum)
         for idx, asset in enumerate(self.assets):
-            if filename and asset.filename == filename:
+            if filename and asset.filename == filename and relative_path and asset.relative_path:
                 # check the checksum first
                 if checksum and asset.calculate_checksum() == checksum:
                     return idx
@@ -420,9 +423,6 @@ class AssetCollection(IEntity):
                     return idx
                 elif absolute_path is None:
                     return idx
-
-            if absolute_path == asset.absolute_path:
-                return idx
         return None
 
     def pre_creation(self) -> None:

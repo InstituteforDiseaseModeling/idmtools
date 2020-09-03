@@ -187,6 +187,45 @@ class TestAssets(unittest.TestCase):
         self.assertNotEqual(ac1, ac2)
         self.assertNotEqual(ac1.assets, ac2.assets)
 
+    def test_duplicates_filtered_from_list(self):
+        a = Asset(relative_path="1", absolute_path=os.path.join(self.base_path, "1", "a.txt"))
+        b = Asset(relative_path="1", absolute_path=os.path.join(self.base_path, "1", "a.txt"))
+
+        ac1 = AssetCollection([a, b])
+        self.assertEqual(1, len(ac1.assets))
+
+    def test_duplicates_filtered_from_list_with_checksum(self):
+        a = Asset(relative_path="1", absolute_path=os.path.join(self.base_path, "1", "a.txt"))
+        b = Asset(relative_path="1", filename="a.txt", checksum='d41d8cd98f00b204e9800998ecf8427e')
+
+        ac1 = AssetCollection([a, b])
+        self.assertEqual(1, len(ac1.assets))
+
+    def test_fail_checksum_add_with_local_file(self):
+        a = Asset(relative_path="1", absolute_path=os.path.join(self.base_path, "1", "a.txt"))
+        b = Asset(relative_path="1", filename="a.txt", checksum='d41d8cd98f00b204e9800998ecf8427e')
+
+        ac1 = AssetCollection([a])
+        with self.assertRaises(DuplicatedAssetError):
+            ac1.add_asset(b)
+
+    def test_fail_checksum_add_with_checksums_only(self):
+        a = Asset(relative_path="1", filename="a.txt", checksum='d41d8cd98f00b204e9800998ecf8427e')
+        b = Asset(relative_path="1", filename="a.txt", checksum='d41d8cd98f00b204e9800998ecf8427e')
+
+        ac1 = AssetCollection([a])
+        with self.assertRaises(DuplicatedAssetError):
+            ac1.add_asset(b)
+
+    def test_checksum_add_ok_with_different_filenames(self):
+        a = Asset(relative_path="1", filename="a.txt", checksum='d41d8cd98f00b204e9800998ecf8427e')
+        b = Asset(relative_path="1", filename="b.txt", checksum='d41d8cd98f00b204e9800998ecf8427e')
+
+        ac1 = AssetCollection([a])
+        ac1.add_asset(b)
+        self.assertEqual(2, len(ac1.assets))
+
+
 
 if __name__ == '__main__':
     unittest.main()
