@@ -2,6 +2,8 @@
 # In this example, we will demonstrate how to use a CSVAnalyzer to analyze csv files for experiments
 
 # First, import some necessary system and idmtools packages.
+import sys
+
 from idmtools.analysis.analyze_manager import AnalyzeManager
 from idmtools.analysis.csv_analyzer import CSVAnalyzer
 from idmtools.core import ItemType
@@ -22,10 +24,11 @@ if __name__ == '__main__':
     analyzers = [CSVAnalyzer(filenames=filenames)]
 
     # Set the experiment id you want to analyze
-    experiment_id = '9311af40-1337-ea11-a2be-f0921c167861'  # staging exp id simple sim and csv example
+    if len(sys.argv) > 1:
+        expid = [(sys.argv[1], ItemType.EXPERIMENT)]
+    else:
+        expid = [('9311af40-1337-ea11-a2be-f0921c167861', ItemType.EXPERIMENT)]
 
     # Specify the id Type, in this case an Experiment on COMPS
-    manager = AnalyzeManager(configuration={}, partial_analyze_ok=True, platform=platform,
-                             ids=[(experiment_id, ItemType.EXPERIMENT)],
-                             analyzers=analyzers)
+    manager = AnalyzeManager(partial_analyze_ok=True, ids=expid, analyzers=analyzers)
     manager.analyze()

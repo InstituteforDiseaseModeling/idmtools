@@ -2,13 +2,15 @@
 # In this example, we will demonstrate how to use a CSVAnalyzer to analyze csv files for experiments
 
 # First, import some necessary system and idmtools packages.
+import os
+import shutil
 from logging import getLogger
 
 from idmtools.analysis.analyze_manager import AnalyzeManager
 from idmtools.analysis.csv_analyzer import CSVAnalyzer
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
-
+from idmtools_test.utils.utils import del_folder
 
 if __name__ == '__main__':
 
@@ -22,7 +24,7 @@ if __name__ == '__main__':
         # In this case, we want to provide a filename to analyze
         filenames = ['output/c.csv']
         # Initialize the analyser class with the path of the output csv file
-        analyzers = [CSVAnalyzer(filenames=filenames)]
+        analyzers = [CSVAnalyzer(filenames=filenames, output_path="output_csv")]
 
         # Set the experiment id you want to analyze
         experiment_id = '9311af40-1337-ea11-a2be-f0921c167861'  # staging exp id simple sim and csv example

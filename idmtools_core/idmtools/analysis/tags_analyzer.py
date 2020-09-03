@@ -18,13 +18,17 @@ class TagsAnalyzer(IAnalyzer):
     # Arg option for analyzer init are uid, working_dir, parse (True to leverage the :class:`OutputParser`;
     # False to get the raw data in the :meth:`select_simulation_data`), and filenames
     # In this case, we want uid, working_dir, and parse=True
-    def __init__(self, uid=None, working_dir=None, parse=True):
+    def __init__(self, uid=None, working_dir=None, parse=True, output_path=None):
         super().__init__(uid, working_dir, parse)
         self.exp_id = None
+        self.output_path = output_path or "output_tag"
 
     def initialize(self):
-        if not os.path.exists(os.path.join(self.working_dir, "output_tag")):
-            os.mkdir(os.path.join(self.working_dir, "output_tag"))
+        self.output_path = os.path.join(self.working_dir, self.output_path)
+
+        # Create the output path
+        if not os.path.exists(self.output_path):
+            os.makedirs(self.output_path)
 
     # Map is called to get for each simulation a data object (all the metadata of the simulations) and simulation object
     def map(self, data, simulation):
@@ -36,4 +40,10 @@ class TagsAnalyzer(IAnalyzer):
     # In reduce, we are printing the simulation and result data filtered in map
     def reduce(self, all_data):
         results = pd.concat(list(all_data.values()), axis=0)  # Combine a list of all the sims tag values
-        results.to_csv(os.path.join("output_tag", 'tags.csv'))  # Write the sim tags to a csv
+
+        # Make a directory labeled the exp id to write the csv results to
+        first_sim = next(iter(all_data.keys()))  # Iterate over the dataframe keys
+        exp_id = first_sim.experiment.id  # Set the exp id from the first sim data
+        output_folder = os.path.join(self.output_path, exp_id)
+        os.makedirs(output_folder, exist_ok=True)
+        results.to_csv(os.path.join(output_folder, self.__class__.__name__ + '.csv'))

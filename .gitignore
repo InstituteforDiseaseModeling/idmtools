@@ -380,6 +380,7 @@ examples/ssmt/**/output/
 examples/vistools/**/workitem_output/
 examples/**/requirements_updated.txt
 examples/analyzers/output_csv/
+examples/analyzers/output_tag/
 
 idmtools_core/tests/data
 idmtools_core/tests/reports/
