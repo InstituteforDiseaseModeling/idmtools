@@ -2,8 +2,6 @@
 # In this example, we will demonstrate how to use a CSVAnalyzer to analyze csv files for experiments
 
 # First, import some necessary system and idmtools packages.
-import os
-import shutil
 from logging import getLogger
 
 from idmtools.analysis.analyze_manager import AnalyzeManager
