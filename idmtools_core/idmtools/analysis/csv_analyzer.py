@@ -66,4 +66,3 @@ class CSVAnalyzer(IAnalyzer):
         output_folder = os.path.join(self.output_path, exp_id)
         os.makedirs(output_folder, exist_ok=True)
         results.to_csv(os.path.join(output_folder, self.__class__.__name__ + '.csv'))
-
