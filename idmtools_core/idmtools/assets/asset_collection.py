@@ -207,7 +207,9 @@ class AssetCollection(IEntity):
                 self.assets.remove(asset)
         elif asset.checksum:
             for oasset in self.assets:
-                if asset.filename == oasset.filename and asset.relative_path == oasset.relative_path and asset.checksum == oasset.calculate_checksum():
+                # don't check cksum since we only care about duplicate paths. We have to do this because a local file might not have checksum calculated
+                # but have same path which will result in different hash then remote asset
+                if asset.filename == oasset.filename and asset.relative_path == oasset.relative_path:
                     if fail_on_duplicate:
                         raise DuplicatedAssetError(asset)
                     else:
