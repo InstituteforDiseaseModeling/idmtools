@@ -62,29 +62,8 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         for asset in asset_collection:
             # using checksum is not accurate and not all systems will support de-duplication
             if asset.checksum is None:
-
-                if asset.absolute_path:
-                    cksum = calculate_md5(asset.absolute_path)
-                    ac_files.add(
-                        (
-                            asset.filename,
-                            asset.relative_path,
-                            uuid.UUID(calculate_md5(asset.absolute_path))
-                        )
-                    )
-                    ac_map[asset] = uuid.UUID(cksum)
-                else:
-                    md5calc = md5()
-                    md5calc.update(asset.bytes)
-                    md5_checksum_str = uuid.UUID(md5calc.hexdigest())
-                    ac_files.add(
-                        (
-                            asset.filename,
-                            asset.relative_path,
-                            md5_checksum_str
-                        )
-                    )
-                    ac_map[asset] = md5_checksum_str
+                md5_checksum_str = asset.calculate_checksum()
+                ac_map[asset] = md5_checksum_str
             else:  # We should already have this asset so we should have a md5sum
                 ac_files.add(
                     (
