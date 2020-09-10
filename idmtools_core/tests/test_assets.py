@@ -239,6 +239,15 @@ class TestAssets(unittest.TestCase):
         result = a.calculate_checksum()
         self.assertEqual(result, '644e28386b702cbd6d2938d1af5eaa3c')
 
+    def test_change_contents(self):
+        a = Asset(filename="blah", content="A test tring")
+        checksum_a = a.calculate_checksum()
+        a.content = "Lala"
+        checksum_b = a.calculate_checksum()
+        self.assertNotEqual(checksum_a, checksum_b)
+
+
+
 
 if __name__ == '__main__':
     unittest.main()

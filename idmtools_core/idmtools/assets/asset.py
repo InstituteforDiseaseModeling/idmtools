@@ -45,8 +45,8 @@ class Asset:
     _checksum: Optional[str] = field(default=None)
 
     def __post_init__(self, content, checksum):
-        self._checksum = checksum if not isinstance(checksum, property) else None
         self.content = content
+        self._checksum = checksum if not isinstance(checksum, property) else None
         self.filename = self.filename or (os.path.basename(self.absolute_path) if self.absolute_path else None)
         # populate absolute path for conditions where user does not supply info
         if not self._checksum and not self.content and not self.absolute_path and self.filename:
