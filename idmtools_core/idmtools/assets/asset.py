@@ -47,11 +47,15 @@ class Asset:
     def __post_init__(self, content, checksum):
         self._checksum = checksum if not isinstance(checksum, property) else None
         self.content = content
-        if not self.absolute_path or (not self.filename and not self.content) or (not self.filename and not self._checksum):
-            raise ValueError("Impossible to create the asset without either absolute path, filename and content, or filename and checksum!")
-
         self.filename = self.filename or (os.path.basename(self.absolute_path) if self.absolute_path else None)
+        # populate absolute path for conditions where user does not supply info
+        if not self._checksum and not self.content and not self.absolute_path and self.filename:
+            self.absolute_path = os.path.abspath(self.filename)
 
+        if self.absolute_path and not os.path.exists(self.absolute_path):
+            raise FileNotFoundError(f"Cannot find specified asset: {self.absolute_path}")
+        elif not self.absolute_path and (not self.filename or (self.filename and not self._checksum and not self.content)):
+            raise ValueError("Impossible to create the asset without either absolute path, filename and content, or filename and checksum!")
 
     def __repr__(self):
         return f"<Asset: {os.path.join(self.relative_path, self.filename)} from {self.absolute_path}>"
