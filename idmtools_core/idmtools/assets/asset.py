@@ -140,17 +140,27 @@ class Asset:
             self._checksum = None
 
     # region Equality and Hashing
-    def __eq__(self, other):
+    def __eq__(self, other: 'Asset'):
         return self.__key() == other.__key()
 
+    def deep_equals(self, other: 'Asset') -> bool:
+        """
+        Performs a deep comparison of assets, including contents
+
+        Args:
+            other: Other asset to compare
+
+        Returns:
+            True if filename, relative path, and contents are equal, otherwise false
+        """
+        if self.filename == other.filename and self.relative_path == other.relative_path:
+            return self.calculate_checksum() == other.calculate_checksum()
+        return False
+
     def __key(self):
-        if self.absolute_path:
-            return self.absolute_path
-
-        if self.filename and self.relative_path:
-            return self.filename, self.relative_path
-
-        return self._content, self.filename
+        # We only care to check if filename and relative path is same. Goal here is not identical check but rather that
+        # two files don't exist in same remote path
+        return self.filename, self.relative_path
 
     def __hash__(self):
         return hash(self.__key())

@@ -251,6 +251,46 @@ class TestAssets(unittest.TestCase):
         checksum_a = a.calculate_checksum()
         self.assertEqual(checksum_a, '11cc97cf2d9c08aa403d131333b3d298')
 
+    def test_compare_assets(self):
+        # compare different paths, same checksums
+        a = Asset(relative_path="1", filename="a.txt", checksum='d41d8cd98f00b204e9800998ecf8427e')
+        b = Asset(relative_path="1", filename="b.txt", checksum='d41d8cd98f00b204e9800998ecf8427e')
+
+        self.assertNotEqual(a, b)
+
+        # compare same paths, different checksums
+        a = Asset(relative_path="1", filename="a.txt", checksum='d41d8cd98f00b204e9800998ecf8427e')
+        b = Asset(relative_path="1", filename="a.txt", checksum='e41d8cd98f00b204e9800998ecf8427e')
+        self.assertEqual(a, b)
+
+        # compare different paths, same checksums
+        a = Asset(filename="a.txt", checksum='d41d8cd98f00b204e9800998ecf8427e')
+        b = Asset(filename="b.txt", checksum='d41d8cd98f00b204e9800998ecf8427e')
+        self.assertNotEqual(a, b)
+
+        # compare same paths, different checksums
+        a = Asset(filename="a.txt", checksum='d41d8cd98f00b204e9800998ecf8427e')
+        b = Asset(filename="a.txt", checksum='e41d8cd98f00b204e9800998ecf8427e')
+        self.assertEqual(a, b)
+        # Deep compare should be false
+        self.assertFalse(a.deep_equals(b))
+
+        # same content with different path
+        a = Asset(relative_path="1", filename="a.txt", content='hello')
+        b = Asset(relative_path="1", filename="b.txt", content='hello')
+        self.assertNotEqual(a, b)
+
+        # different content with same path
+        a = Asset(relative_path="1", filename="a.txt", content='hello')
+        b = Asset(relative_path="1", filename="a.txt", content='world')
+        self.assertEqual(a, b)
+        self.assertFalse(a.deep_equals(b))
+
+        # content vs file
+        a = Asset(relative_path="1", filename="a.txt", content='hello')
+        b = Asset(relative_path="1", filename="a.txt", absolute_path=os.path.join(COMMON_INPUT_PATH, 'files', 'hello.txt'))
+        self.assertEqual(a, b)
+        self.assertTrue(a.deep_equals(b))
 
 
 
