@@ -50,7 +50,11 @@ class Asset:
         self.filename = self.filename or (os.path.basename(self.absolute_path) if self.absolute_path else None)
         # populate absolute path for conditions where user does not supply info
         if not self._checksum and not self.content and not self.absolute_path and self.filename:
-            self.absolute_path = os.path.abspath(self.filename)
+            # try relative path
+            if self.relative_path and os.path.exists(os.path.join(self.relative_path, self.filename)):
+                self.absolute_path = os.path.join(self.relative_path, self.filename)
+            else:
+                self.absolute_path = os.path.abspath(self.filename)
 
         if self.absolute_path and not os.path.exists(self.absolute_path) and not self.content:
             raise FileNotFoundError(f"Cannot find specified asset: {self.absolute_path}")
