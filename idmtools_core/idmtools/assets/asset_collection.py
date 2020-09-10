@@ -1,12 +1,9 @@
 import copy
-import uuid
-
 import os
 from dataclasses import dataclass, field
 from logging import getLogger
 from typing import List, NoReturn, TypeVar, Union, Any, Dict
 from uuid import UUID
-
 from idmtools.assets import Asset, TAssetList
 from idmtools.assets import TAssetFilterList
 from idmtools.assets.errors import DuplicatedAssetError
@@ -15,7 +12,6 @@ from idmtools.core.interfaces.ientity import IEntity
 from idmtools.utils.entities import get_default_tags
 from idmtools.utils.file import scan_directory
 from idmtools.utils.filters.asset_filters import default_asset_file_filter
-from idmtools.utils.hashing import calculate_md5
 from idmtools.utils.info import get_doc_base_url
 
 user_logger = getLogger('user')
