@@ -53,15 +53,13 @@ class TestAssets(unittest.TestCase):
         self.assertEqual(a.relative_path, "")
 
     def test_creat_asset_only_content(self):
-        a = Asset(content="blah")
-        self.assertEqual(a.content, "blah")
-        self.assertIsNone(a.filename)
-        self.assertEqual(a.relative_path, "")
+        with self.assertRaises(ValueError) as ex:
+            a = Asset(content="blah")
 
     def test_creat_asset_no_parameters(self):
         with self.assertRaises(ValueError) as context:
             a = Asset()  # noqa F841
-        self.assertTrue('Impossible to create the asset without either absolute path or filename and content!' in str(
+        self.assertTrue('Impossible to create the asset without either absolute path, filename and content, or filename and checksum!' in str(
             context.exception.args[0]))
 
     def test_assets_is_iterable(self):
@@ -150,7 +148,7 @@ class TestAssets(unittest.TestCase):
 
         with self.assertRaises(ValueError) as context:
             ac.add_asset(Asset())
-        self.assertTrue('Impossible to create the asset without either absolute path or filename and content!' in str(
+        self.assertTrue('Impossible to create the asset without either absolute path, filename and content, or filename and checksum!' in str(
             context.exception.args[0]))
 
     def test_assets_collection_from_dir_flatten(self):
@@ -225,6 +223,9 @@ class TestAssets(unittest.TestCase):
         ac1.add_asset(b)
         self.assertEqual(2, len(ac1.assets))
 
+    def test_file_not_exists(self):
+        with self.assertRaises(FileNotFoundError) as ex:
+            a = Asset(filename="abc")
 
 
 if __name__ == '__main__':
