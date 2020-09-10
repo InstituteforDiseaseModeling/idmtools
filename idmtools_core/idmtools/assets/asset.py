@@ -63,7 +63,6 @@ class Asset:
                 self.absolute_path = os.path.join(self.relative_path, self.filename)
             else:
                 self.absolute_path = os.path.abspath(self.filename)
-
         if self.absolute_path and not os.path.exists(self.absolute_path) and self.content is None:
             raise FileNotFoundError(f"Cannot find specified asset: {self.absolute_path}")
         elif not self.absolute_path and (not self.filename or (self.filename and not self._checksum and self.content is None and not self.persisted)):

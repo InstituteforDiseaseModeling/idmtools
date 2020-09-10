@@ -179,7 +179,7 @@ class AssetCollection(IEntity):
             return False
         return True
 
-    def add_asset(self, asset: Union[Asset, str], fail_on_duplicate: bool = True, **kwargs):  # noqa: F821
+    def add_asset(self, asset: Union[Asset, str], fail_on_duplicate: bool = True, fail_on_deep_comparison: bool = False, **kwargs):  # noqa: F821
         """
         Add an asset to the collection.
 
@@ -188,6 +188,7 @@ class AssetCollection(IEntity):
             used as the absolute_path and any kwargs will be passed to the Asset constructor
            fail_on_duplicate: Raise a **DuplicateAssetError** if an asset is duplicated.
              If not, simply replace it.
+           fail_on_deep_comparison: Fails only if deep comparison differs
            **kwargs: Arguments to pass to Asset constructor when asset is a string
         """
         self.is_editable(True)
@@ -196,20 +197,12 @@ class AssetCollection(IEntity):
         # do a simple check first
         if asset in self.assets:
             if fail_on_duplicate:
-                raise DuplicatedAssetError(asset)
+                if not fail_on_deep_comparison or self.find_index_of_asset(asset, deep_compare=True) is None:
+                    raise DuplicatedAssetError(("File with same paths but different content provided", asset) if fail_on_deep_comparison else asset)
             else:
                 # The equality not considering the content of the asset, even if it is already present
                 # nothing guarantees that the content is the same. So remove and add the fresh one.
                 self.assets.remove(asset)
-        elif asset.checksum:
-            for oasset in self.assets:
-                # don't check cksum since we only care about duplicate paths. We have to do this because a local file might not have checksum calculated
-                # but have same path which will result in different hash then remote asset
-                if asset.filename == oasset.filename and asset.relative_path == oasset.relative_path:
-                    if fail_on_duplicate:
-                        raise DuplicatedAssetError(asset)
-                    else:
-                        return
         self.assets.append(asset)
 
     def __add__(self, other: Union[TAssetList, 'AssetCollection', Asset]) -> 'AssetCollection':
@@ -237,7 +230,7 @@ class AssetCollection(IEntity):
             na.add_assets(other, False)
         return na
 
-    def add_assets(self, assets: Union[TAssetList, 'AssetCollection'], fail_on_duplicate: bool = True):
+    def add_assets(self, assets: Union[TAssetList, 'AssetCollection'], fail_on_duplicate: bool = True, fail_on_deep_comparison: bool = False):
         """
         Add assets to a collection
 
@@ -245,20 +238,22 @@ class AssetCollection(IEntity):
             assets: An list of assets as either list or a collection
             fail_on_duplicate: Raise a **DuplicateAssetError** if an asset is duplicated.
               If not, simply replace it.
+            fail_on_deep_comparison: Fail if relative path/file is same but contents differ
 
         Returns:
 
         """
         self.is_editable(True)
         for asset in assets:
-            self.add_asset(asset, fail_on_duplicate)
+            self.add_asset(asset, fail_on_duplicate, fail_on_deep_comparison)
 
-    def add_or_replace_asset(self, asset: Asset):
+    def add_or_replace_asset(self, asset: Asset, fail_on_deep_comparison: bool = False):
         """
         Add or replaces an asset in a collection
 
         Args:
             asset: Asset to add or replace
+            fail_on_deep_comparison: Fail replace if contents differ
 
         Returns:
             None.
@@ -266,6 +261,9 @@ class AssetCollection(IEntity):
         self.is_editable(True)
         index = self.find_index_of_asset(asset)
         if index is not None:
+            if fail_on_deep_comparison and not asset.deep_equals(self.assets[index]):
+                fn = f"{asset.relative_path}/{asset.filename}" if asset.relative_path else asset.filename
+                raise ValueError(f"Contents of file {fn} being replaced differs. To prevent unexpected behaviour, please review script or disable deep checks")
             self.assets[index] = asset
         else:
             self.assets.append(asset)
@@ -396,19 +394,22 @@ class AssetCollection(IEntity):
         tmp_asset = Asset(absolute_path=absolute_path, filename=filename, relative_path=relative_path, checksum=checksum, content=content)
         return self.find_index_of_asset(tmp_asset) is not None
 
-    def find_index_of_asset(self, other: 'Asset') -> Union[int, None]:
+    def find_index_of_asset(self, other: 'Asset', deep_compare: bool = False) -> Union[int, None]:
         """
         Finds the index of asset by path or filename
 
         Args:
             other: Other asset
+            deep_compare: Should content as well as path be compared
 
         Returns:
             Index number if found.
             None if not found.
         """
         for idx, asset in enumerate(self.assets):
-            if asset == other:
+            if deep_compare and asset.deep_equals(other):
+                return idx
+            elif not deep_compare and asset == other:
                 return idx
         return None
 
