@@ -396,7 +396,7 @@ class AssetCollection(IEntity):
             True if asset exists, False otherwise
         """
         # make a dummy asset
-        content = "" if absolute_path is None or checksum is None else None
+        content = None if absolute_path or checksum else ""
         tmp_asset = Asset(absolute_path=absolute_path, filename=filename, relative_path=relative_path, checksum=checksum, content=content)
         return self.find_index_of_asset(tmp_asset) is not None
 

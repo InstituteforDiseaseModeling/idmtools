@@ -57,16 +57,16 @@ class Asset:
         self._checksum = checksum if not isinstance(checksum, property) else None
         self.filename = self.filename or (os.path.basename(self.absolute_path) if self.absolute_path else None)
         # populate absolute path for conditions where user does not supply info
-        if not self._checksum and not self.content and not self.absolute_path and self.filename and not self.persisted:
+        if not self._checksum and self.content is None and not self.absolute_path and self.filename and not self.persisted:
             # try relative path
             if self.relative_path and os.path.exists(os.path.join(self.relative_path, self.filename)):
                 self.absolute_path = os.path.join(self.relative_path, self.filename)
             else:
                 self.absolute_path = os.path.abspath(self.filename)
 
-        if self.absolute_path and not os.path.exists(self.absolute_path) and not self.content:
+        if self.absolute_path and not os.path.exists(self.absolute_path) and self.content is None:
             raise FileNotFoundError(f"Cannot find specified asset: {self.absolute_path}")
-        elif not self.absolute_path and (not self.filename or (self.filename and not self._checksum and not self.content and not self.persisted)):
+        elif not self.absolute_path and (not self.filename or (self.filename and not self._checksum and self.content is None and not self.persisted)):
             raise ValueError("Impossible to create the asset without either absolute path, filename and content, or filename and checksum!")
 
     def __repr__(self):
@@ -121,7 +121,7 @@ class Asset:
         Returns:
             The content of the file, either from the content attribute or by opening the absolute path.
         """
-        if not self._content and self.absolute_path:
+        if self._content is None and self.absolute_path:
             with open(self.absolute_path, "rb") as fp:
                 self._content = fp.read()
 
