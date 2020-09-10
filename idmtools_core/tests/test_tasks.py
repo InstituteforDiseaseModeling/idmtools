@@ -28,7 +28,7 @@ class TestTasks(TestCase):
     @staticmethod
     def get_cat_command():
         task = CommandTask(command='cat pytest.ini')
-        task.common_assets.add_asset(Asset('./pytest.ini'))
+        task.common_assets.add_asset(Asset(absolute_path=os.path.join(os.path.dirname(__file__), './pytest.ini')))
         return task
 
     # TODO fix as part of rewrite of tasks
