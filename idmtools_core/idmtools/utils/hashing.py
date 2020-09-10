@@ -1,6 +1,7 @@
 """
 Fast hash of Python objects.
 """
+from typing import Union, BinaryIO
 
 import decimal
 import hashlib
@@ -166,7 +167,7 @@ def calculate_md5(filename: str, chunk_size: int = 8192) -> str:
         return calculate_md5_stream(f, chunk_size)
 
 
-def calculate_md5_stream(stream, chunk_size: int = 8192, ):
+def calculate_md5_stream(stream: Union[io.BytesIO, BinaryIO], chunk_size: int = 8192, ):
     """
     Calculate md5 on stream
     Args:

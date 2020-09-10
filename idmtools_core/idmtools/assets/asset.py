@@ -226,7 +226,7 @@ class Asset:
             if self.absolute_path:
                 self._checksum = calculate_md5(self.absolute_path)
             elif self.content:
-                self._checksum = calculate_md5_stream(io.BytesIO(self.content))
+                self._checksum = calculate_md5_stream(io.BytesIO(self.content.encode('utf-8')) if isinstance(self.content, str) else io.BytesIO(self.content) )
         return self._checksum
 
 

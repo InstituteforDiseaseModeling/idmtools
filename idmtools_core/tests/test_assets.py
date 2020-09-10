@@ -227,6 +227,11 @@ class TestAssets(unittest.TestCase):
         with self.assertRaises(FileNotFoundError) as ex:
             a = Asset(filename="abc")
 
+    def test_checksum_str(self):
+        a = Asset(filename="blah", content="A test tring")
+        result = a.calculate_checksum()
+        self.assertEqual(result, '644e28386b702cbd6d2938d1af5eaa3c')
+
 
 if __name__ == '__main__':
     unittest.main()
