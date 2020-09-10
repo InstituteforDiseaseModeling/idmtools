@@ -81,7 +81,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
 
         # remove any duplicates
         if logger.isEnabledFor(DEBUG):
-            logger.debug(f"Building ac. Filtered out {len(asset_collection) - len(ac_files)} duplicate files")
+            logger.debug(f"Building ac. Filtered out {len(asset_collection) - len(ac_files)} assets that exist on COMPS already")
 
         for file in ac_files:
             ac.add_asset(AssetCollectionFile(file_name=file[0], relative_path=file[1], md5_checksum=file[2]))
