@@ -268,7 +268,7 @@ class AssetCollection(IEntity):
             None.
         """
         self.is_editable(True)
-        index = self.find_index_of_asset(asset.absolute_path, asset.filename, asset.relative_path, asset.checksum)
+        index = self.find_index_of_asset(asset)
         if index is not None:
             self.assets[index] = asset
         else:
@@ -395,31 +395,25 @@ class AssetCollection(IEntity):
         Returns:
             True if asset exists, False otherwise
         """
-        if checksum is None:
-            if os.path.exists(absolute_path):
-                checksum = calculate_md5(absolute_path)
-        return self.find_index_of_asset(absolute_path, filename, relative_path, checksum) is not None
+        # make a dummy asset
+        content = "" if absolute_path is None or checksum is None else None
+        tmp_asset = Asset(absolute_path=absolute_path, filename=filename, relative_path=relative_path, checksum=checksum, content=content)
+        return self.find_index_of_asset(tmp_asset) is not None
 
-    def find_index_of_asset(self, absolute_path: str = None, filename: str = None, relative_path: str = None, checksum: str = None) -> Union[int, None]:
+    def find_index_of_asset(self, other: 'Asset') -> Union[int, None]:
         """
         Finds the index of asset by path or filename
 
         Args:
-            absolute_path: Path to search
-            filename: Filename to search
-            relative_path: Relative path of asset
-            checksum: checksum
+            other: Other asset
 
         Returns:
             Index number if found.
             None if not found.
         """
-        if checksum and isinstance(checksum, uuid.UUID):
-            checksum = str(checksum)
         for idx, asset in enumerate(self.assets):
-            if filename and asset.filename == filename and relative_path == asset.relative_path:
-                if (absolute_path and absolute_path == asset.absolute_path) or (checksum and asset.calculate_checksum() == checksum) or absolute_path is None:
-                    return idx
+            if asset == other:
+                return idx
         return None
 
     def pre_creation(self) -> None:
