@@ -246,6 +246,11 @@ class TestAssets(unittest.TestCase):
         checksum_b = a.calculate_checksum()
         self.assertNotEqual(checksum_a, checksum_b)
 
+    def test_checksum_dict(self):
+        a = Asset(filename="blah", content={'a': 'b'})
+        checksum_a = a.calculate_checksum()
+        self.assertEqual(checksum_a, '11cc97cf2d9c08aa403d131333b3d298')
+
 
 
 
