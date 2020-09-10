@@ -212,7 +212,8 @@ class Asset:
         Download an asset to path. This requires loadings the object through the platofrm
 
         Args:
-            path: Path to write to. If it is a directory, the asset filename will be added to it
+            dest: Path to write to. If it is a directory, the asset filename will be added to it
+            force: Force download even if file exists
 
         Returns:
             None
