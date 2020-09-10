@@ -2,17 +2,14 @@ import os
 import uuid
 from dataclasses import field, dataclass
 from functools import partial
-from hashlib import md5
 from logging import getLogger, DEBUG
 from typing import Type, Union, List, TYPE_CHECKING, Optional
 from uuid import UUID
-
 import humanfriendly
 from COMPS.Data import AssetCollection as COMPSAssetCollection, QueryCriteria, AssetCollectionFile, SimulationFile, OutputFileMetadata
 
 from idmtools.assets import AssetCollection, Asset
 from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
-from idmtools.utils.hashing import calculate_md5
 from idmtools_platform_comps.utils.general import get_file_as_generator
 
 if TYPE_CHECKING:
