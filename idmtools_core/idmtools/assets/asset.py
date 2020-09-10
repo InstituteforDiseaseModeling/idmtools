@@ -75,8 +75,11 @@ class Asset:
     @property
     def checksum(self):
         """
+
+        Returns checksum of object. This will return None unless the user has provided checksum or called calculate checksum to avoid
+        computation. If you need to guarantee a checksum value, call calculate_checksum beforehand
         Returns:
-            None.
+            Checksum
         """
         return self._checksum
 
@@ -233,9 +236,10 @@ class Asset:
 
     def calculate_checksum(self) -> str:
         """
-        Calculate checksum on asset
-        Returns:
+        Calculate checksum on asset. If previous checksum was calculated, that value will be returned
 
+        Returns:
+            Checksum string
         """
         if not self._checksum:
             if self.absolute_path:
