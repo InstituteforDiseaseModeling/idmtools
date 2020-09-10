@@ -32,15 +32,23 @@ class Asset:
             Note: we add this to allow systems who provide asset caching by MD5 opportunity to avoid re-uploading assets
     """
 
+    #: The absolute path of the asset. Optional if **filename** and **content** are given.
     absolute_path: Optional[str] = field(default=None)
+    #: The relative path (compared to the simulation root folder).
     relative_path: Optional[str] = field(default=None)
+    #: Name of the file. Optional if **absolute_path** is given.
     filename: Optional[str] = field(default=None)
+    #: The content of the file. Optional if **absolute_path** is given.
     content: InitVar[Any] = None
     _content: bytes = field(default=None, init=False)
     _length: Optional[int] = field(default=None)
+    #: Persisted tracks if item has been saved
     persisted: bool = field(default=False)
+    #: Handler to api
     handler: Callable = field(default=str, metadata=dict(exclude_from_metadata=True))
+    #: Hook to allow downloading from platform
     download_generator_hook: Callable = field(default=None, metadata=dict(exclude_from_metadata=True))
+    #: Checksum of asset. Only required for existing assets
     checksum: InitVar[Any] = None
     _checksum: Optional[str] = field(default=None)
 
