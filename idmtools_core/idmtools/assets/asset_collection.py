@@ -26,11 +26,11 @@ class AssetCollection(IEntity):
     """
     A class that represents a collection of assets.
 
-    Args:
-        assets: An optional list of assets to create the collection with.
     """
 
+    #: Assets for collection
     assets: List[Asset] = field(default=None)
+    #: ItemType so platform knows how to handle item properly
     item_type: ItemType = field(default=ItemType.ASSETCOLLECTION, compare=False)
 
     def __init__(self, assets: Union[TAssetList, 'AssetCollection'] = None, tags=None):
