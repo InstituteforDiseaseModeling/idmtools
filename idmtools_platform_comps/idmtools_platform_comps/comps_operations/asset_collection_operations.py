@@ -5,6 +5,7 @@ from functools import partial
 from logging import getLogger, DEBUG
 from typing import Type, Union, List, TYPE_CHECKING, Optional
 from uuid import UUID
+
 import humanfriendly
 from COMPS.Data import AssetCollection as COMPSAssetCollection, QueryCriteria, AssetCollectionFile, SimulationFile, OutputFileMetadata
 
@@ -60,6 +61,13 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
             # using checksum is not accurate and not all systems will support de-duplication
             if asset.checksum is None:
                 md5_checksum_str = asset.calculate_checksum()
+                ac_files.add(
+                    (
+                        asset.filename,
+                        asset.relative_path,
+                        md5_checksum_str
+                    )
+                )
                 ac_map[asset] = md5_checksum_str
             else:  # We should already have this asset so we should have a md5sum
                 ac_files.add(
