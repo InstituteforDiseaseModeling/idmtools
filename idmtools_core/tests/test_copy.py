@@ -44,8 +44,8 @@ class TestCopy(ITestWithPersistence):
         super().tearDown()
 
     def test_deepcopy_assets(self):
-        e = Experiment.from_task(JSONConfiguredPythonTask(script_path='blah.py'))
-        e.simulations[0].assets.add_asset(Asset(filename="config.json"))
+        e = Experiment.from_task(JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, 'python_experiments', "model.py")))
+        e.simulations[0].assets.add_asset(Asset(absolute_path=os.path.join(COMMON_INPUT_PATH, 'files', "config.json")))
 
         # test deepcopy of experiment
         e.pre_creation()
@@ -64,7 +64,7 @@ class TestCopy(ITestWithPersistence):
         self.assertEqual(sim.assets, sim.assets)
 
     def test_deepcopy_experiment(self):
-        ts = TemplatedSimulations(base_task=JSONConfiguredPythonTask(script_path='blath.py'))
+        ts = TemplatedSimulations(base_task=JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, 'python_experiments', "model.py")))
         e = Experiment.from_template(ts)
         from idmtools.builders import SimulationBuilder
         builder = SimulationBuilder()
@@ -93,7 +93,7 @@ class TestCopy(ITestWithPersistence):
         self.assertIn('Set self.maxDiff to None to see it', context.exception.args[0])
 
     def test_deepcopy_simulation(self):
-        sim = Simulation.from_task(JSONConfiguredPythonTask(script_path='blath.py'))
+        sim = Simulation.from_task(JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, 'python_experiments', "model.py")))
 
         sim.pre_creation()
         self.assertEqual(len(sim.assets.assets), 1)
