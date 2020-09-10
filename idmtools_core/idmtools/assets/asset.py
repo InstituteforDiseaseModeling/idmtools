@@ -52,7 +52,7 @@ class Asset:
         if not self._checksum and not self.content and not self.absolute_path and self.filename:
             self.absolute_path = os.path.abspath(self.filename)
 
-        if self.absolute_path and not os.path.exists(self.absolute_path):
+        if self.absolute_path and not os.path.exists(self.absolute_path) and not self.content:
             raise FileNotFoundError(f"Cannot find specified asset: {self.absolute_path}")
         elif not self.absolute_path and (not self.filename or (self.filename and not self._checksum and not self.content)):
             raise ValueError("Impossible to create the asset without either absolute path, filename and content, or filename and checksum!")
