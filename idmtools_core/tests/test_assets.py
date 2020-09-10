@@ -192,6 +192,13 @@ class TestAssets(unittest.TestCase):
         ac1 = AssetCollection([a, b])
         self.assertEqual(1, len(ac1.assets))
 
+    def test_duplicates_filtered_from_list_with_relative_paths(self):
+        a = Asset(relative_path="1", absolute_path=os.path.join(self.base_path, "1", "a.txt"))
+        b = Asset(relative_path="2", absolute_path=os.path.join(self.base_path, "1", "a.txt"))
+
+        ac1 = AssetCollection([a, b])
+        self.assertEqual(2, len(ac1.assets))
+
     def test_duplicates_filtered_from_list_with_checksum(self):
         a = Asset(relative_path="1", absolute_path=os.path.join(self.base_path, "1", "a.txt"))
         b = Asset(relative_path="1", filename="a.txt", checksum='d41d8cd98f00b204e9800998ecf8427e')
