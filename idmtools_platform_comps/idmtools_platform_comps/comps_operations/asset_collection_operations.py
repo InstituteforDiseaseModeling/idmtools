@@ -65,7 +65,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
                     (
                         asset.filename,
                         asset.relative_path,
-                        md5_checksum_str
+                        uuid.UUID(md5_checksum_str)
                     )
                 )
                 ac_map[asset] = md5_checksum_str
