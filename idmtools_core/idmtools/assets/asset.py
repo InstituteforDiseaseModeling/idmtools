@@ -110,10 +110,16 @@ class Asset:
         if not self._content and self.absolute_path:
             with open(self.absolute_path, "rb") as fp:
                 self._content = fp.read()
+            # Reset checksum to None until requested
+            if self._checksum:
+                self._checksum = None
         elif self.download_generator_hook:
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f"Fetching {self.filename} content from platform")
             self._content = self.download_stream().getvalue()
+            # Reset checksum to None until requested
+            if self._checksum:
+                self._checksum = None
 
         return self._content
 
