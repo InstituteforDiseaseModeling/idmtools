@@ -68,7 +68,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
                         uuid.UUID(md5_checksum_str)
                     )
                 )
-                ac_map[asset] = md5_checksum_str
+                ac_map[asset] = uuid.UUID(md5_checksum_str)
             else:  # We should already have this asset so we should have a md5sum
                 ac_files.add(
                     (
@@ -77,7 +77,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
                         asset.checksum if isinstance(asset.checksum, uuid.UUID) else uuid.UUID(asset.checksum)
                     )
                 )
-                ac_map[asset] = asset.checksum
+                ac_map[asset] = asset.checksum if isinstance(asset.checksum, uuid.UUID) else uuid.UUID(asset.checksum)
 
         # remove any duplicates
         if logger.isEnabledFor(DEBUG):
