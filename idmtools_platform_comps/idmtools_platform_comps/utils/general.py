@@ -95,7 +95,7 @@ def clean_experiment_name(experiment_name: str) -> str:
         experiment_name: name of the experiment
     Returns:the experiment name allowed for use
     """
-    for c in ['/', '\\', ':']:
+    for c in ['/', '\\', ':', "'", '"', '?', '<', '>', '*', '|']:
         experiment_name = experiment_name.replace(c, '_')
     return experiment_name
 
