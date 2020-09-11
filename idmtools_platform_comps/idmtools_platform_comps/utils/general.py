@@ -95,9 +95,9 @@ def clean_experiment_name(experiment_name: str) -> str:
         experiment_name: name of the experiment
     Returns:the experiment name allowed for use
     """
-    for c in ['/', '\\', ':', "'", '"', '?', '<', '>', '*', '|']:
+    for c in ['/', '\\', ':', "'", '"', '?', '<', '>', '*', '|', "\0"]:
         experiment_name = experiment_name.replace(c, '_')
-    return experiment_name
+    return experiment_name.strip()
 
 
 def get_file_from_collection(platform: IPlatform, collection_id: UUID, file_path: str) -> bytearray:
