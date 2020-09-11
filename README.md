@@ -108,7 +108,7 @@ To install a different github branch, change the *@dev* in each command to *@<br
 
 ## Additional Resources
 
-Documentation is located at https://institutefordiseasemodeling.github.io/idmtools/index.html
+Private documentation is located at https://docs.idmod.org/projects/idmtools/en/latest/, using the password "IDM2020idmtools". 
 
 # Development Environment Setup
 
