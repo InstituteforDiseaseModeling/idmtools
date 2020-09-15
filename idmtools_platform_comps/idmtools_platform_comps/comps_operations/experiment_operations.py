@@ -134,7 +134,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             logger.debug(f'COMPS Experiment Configs: {str(comps_config)}')
         config = Configuration(**comps_config)
 
-        e = COMPSExperiment(name=experiment_name,
+        e = COMPSExperiment(name=experiment.name,
                             configuration=config,
                             suite_id=experiment.parent_id)
 
