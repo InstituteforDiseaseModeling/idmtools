@@ -95,10 +95,10 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         # TODO check experiment task supported
 
         # Cleanup the name
-        experiment_name = clean_experiment_name(experiment.name)
+        experiment.name = clean_experiment_name(experiment.name)
 
         # Define the subdirectory
-        subdirectory = experiment_name[0:self.platform.MAX_SUBDIRECTORY_LENGTH] + '_' + timestamp()
+        subdirectory = experiment.name[0:self.platform.MAX_SUBDIRECTORY_LENGTH] + '_' + timestamp()
 
         if experiment.name != "install custom requirements":
             simulation_root = self.platform.simulation_root

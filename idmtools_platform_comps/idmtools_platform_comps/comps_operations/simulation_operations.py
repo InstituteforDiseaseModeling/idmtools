@@ -171,6 +171,8 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             if asset_collection_id and isinstance(asset_collection_id, str):
                 asset_collection_id = uuid.UUID(asset_collection_id)
             config = self.get_simulation_config_from_simulation(simulation, num_cores, priority, asset_collection_id, **kwargs)
+        if simulation.name:
+            simulation.name = clean_experiment_name(simulation.name)
         s = COMPSSimulation(
             name=clean_experiment_name(simulation.experiment.name if not simulation.name else simulation.name),
             experiment_id=simulation.parent_id,
