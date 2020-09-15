@@ -3,6 +3,8 @@ from logging import getLogger
 import stat
 import click
 import pyperclip
+
+from idmtools.registry.master_plugin_registry import MasterPluginRegistry
 from idmtools.registry.task_specification import TaskPlugins
 from tabulate import tabulate
 from idmtools.core.system_information import get_system_information
@@ -11,6 +13,18 @@ from idmtools_cli.cli.entrypoint import cli
 from idmtools_cli.cli.experiment import supported_platforms
 
 logger = getLogger(__name__)
+
+
+@cli.command(help="List version info about idmtools and plugins")
+def version():
+    from idmtools import __version__
+    from idmtools_cli import __version__ as cli_version
+    click.echo(f"idmtools: {__version__}")
+    click.echo(f"idmtools cli: {cli_version}")
+    plugin_map = MasterPluginRegistry().get_plugin_map()
+    for name in sorted(plugin_map.keys()):
+        if plugin_map[name].get_version():
+            click.echo(f'{name}: {plugin_map[name].get_version()}')
 
 
 @cli.group(help="Troubleshooting and debugging information")

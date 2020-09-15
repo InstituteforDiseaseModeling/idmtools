@@ -93,3 +93,7 @@ class CommandTaskSpecification(TaskSpecification):
             CommandTask
         """
         return CommandTask
+
+    def get_version(self) -> str:
+        from idmtools import __version__
+        return __version__

@@ -53,6 +53,16 @@ class COMPSPlatformSpecification(PlatformSpecification):
         examples = [f'examples/{example}' for example in ['ssmt', 'workitem', 'vistools']]
         return [self.get_version_url(f'v{__version__}', x) for x in examples]
 
+    def get_version(self) -> str:
+        """
+        Returns the version of the plugin
+
+        Returns:
+            Plugin Version
+        """
+        from idmtools_platform_comps import __version__
+        return __version__
+
 
 class SSMTPlatformSpecification(PlatformSpecification):
 
@@ -80,3 +90,13 @@ class SSMTPlatformSpecification(PlatformSpecification):
         from idmtools_platform_comps import __version__
         examples = [f'examples/{example}' for example in ['ssmt', 'vistools']]
         return [self.get_version_url(f'v{__version__}', x) for x in examples]
+
+    def get_version(self) -> str:
+        """
+        Returns the version of the plugin
+
+        Returns:
+            Plugin Version
+        """
+        from idmtools_platform_comps import __version__
+        return __version__
