@@ -4,7 +4,6 @@ from dataclasses import dataclass, field
 from logging import getLogger
 from typing import List, NoReturn, TypeVar, Union, Any, Dict
 from uuid import UUID
-
 from idmtools.assets import Asset, TAssetList
 from idmtools.assets import TAssetFilterList
 from idmtools.assets.errors import DuplicatedAssetError
@@ -23,11 +22,11 @@ class AssetCollection(IEntity):
     """
     A class that represents a collection of assets.
 
-    Args:
-        assets: An optional list of assets to create the collection with.
     """
 
+    #: Assets for collection
     assets: List[Asset] = field(default=None)
+    #: ItemType so platform knows how to handle item properly
     item_type: ItemType = field(default=ItemType.ASSETCOLLECTION, compare=False)
 
     def __init__(self, assets: Union[TAssetList, 'AssetCollection'] = None, tags=None):
@@ -43,8 +42,13 @@ class AssetCollection(IEntity):
         self.item_type = ItemType.ASSETCOLLECTION
         if isinstance(assets, AssetCollection):
             self.assets = copy.deepcopy(assets.assets)
+        elif assets:
+            self.assets = []
+            for asset in assets:
+                self.add_or_replace_asset(asset)
         else:
-            self.assets = copy.deepcopy(assets) or []
+            self.assets = []
+
         self.tags = self.tags or tags
 
     @classmethod
@@ -175,7 +179,7 @@ class AssetCollection(IEntity):
             return False
         return True
 
-    def add_asset(self, asset: Union[Asset, str], fail_on_duplicate: bool = True, **kwargs):  # noqa: F821
+    def add_asset(self, asset: Union[Asset, str], fail_on_duplicate: bool = True, fail_on_deep_comparison: bool = False, **kwargs):  # noqa: F821
         """
         Add an asset to the collection.
 
@@ -184,14 +188,17 @@ class AssetCollection(IEntity):
             used as the absolute_path and any kwargs will be passed to the Asset constructor
            fail_on_duplicate: Raise a **DuplicateAssetError** if an asset is duplicated.
              If not, simply replace it.
+           fail_on_deep_comparison: Fails only if deep comparison differs
            **kwargs: Arguments to pass to Asset constructor when asset is a string
         """
         self.is_editable(True)
         if isinstance(asset, str):
             asset = Asset(absolute_path=asset, **kwargs)
+        # do a simple check first
         if asset in self.assets:
             if fail_on_duplicate:
-                raise DuplicatedAssetError(asset)
+                if not fail_on_deep_comparison or self.find_index_of_asset(asset, deep_compare=True) is None:
+                    raise DuplicatedAssetError(("File with same paths but different content provided", asset) if fail_on_deep_comparison else asset)
             else:
                 # The equality not considering the content of the asset, even if it is already present
                 # nothing guarantees that the content is the same. So remove and add the fresh one.
@@ -223,7 +230,7 @@ class AssetCollection(IEntity):
             na.add_assets(other, False)
         return na
 
-    def add_assets(self, assets: Union[TAssetList, 'AssetCollection'], fail_on_duplicate: bool = True):
+    def add_assets(self, assets: Union[TAssetList, 'AssetCollection'], fail_on_duplicate: bool = True, fail_on_deep_comparison: bool = False):
         """
         Add assets to a collection
 
@@ -231,27 +238,32 @@ class AssetCollection(IEntity):
             assets: An list of assets as either list or a collection
             fail_on_duplicate: Raise a **DuplicateAssetError** if an asset is duplicated.
               If not, simply replace it.
+            fail_on_deep_comparison: Fail if relative path/file is same but contents differ
 
         Returns:
 
         """
         self.is_editable(True)
         for asset in assets:
-            self.add_asset(asset, fail_on_duplicate)
+            self.add_asset(asset, fail_on_duplicate, fail_on_deep_comparison)
 
-    def add_or_replace_asset(self, asset: Asset):
+    def add_or_replace_asset(self, asset: Asset, fail_on_deep_comparison: bool = False):
         """
         Add or replaces an asset in a collection
 
         Args:
             asset: Asset to add or replace
+            fail_on_deep_comparison: Fail replace if contents differ
 
         Returns:
             None.
         """
         self.is_editable(True)
-        index = self.find_index_of_asset(asset.absolute_path, asset.filename)
+        index = self.find_index_of_asset(asset)
         if index is not None:
+            if fail_on_deep_comparison and not asset.deep_equals(self.assets[index]):
+                fn = f"{asset.relative_path}/{asset.filename}" if asset.relative_path else asset.filename
+                raise ValueError(f"Contents of file {fn} being replaced differs. To prevent unexpected behaviour, please review script or disable deep checks")
             self.assets[index] = asset
         else:
             self.assets.append(asset)
@@ -364,39 +376,40 @@ class AssetCollection(IEntity):
     def __iter__(self):
         yield from self.assets
 
-    def has_asset(self, absolute_path: str = None, filename: str = None) -> bool:
+    def has_asset(self, absolute_path: str = None, filename: str = None, relative_path: str = None, checksum: str = None) -> bool:
         """
         Search for asset by absolute_path or by filename
 
         Args:
             absolute_path: Absolute path of source file
             filename: Destination filename
+            relative_path: Relative path of asset
+            checksum: Checksum of asset(optional)
 
         Returns:
             True if asset exists, False otherwise
         """
-        return self.find_index_of_asset(absolute_path, filename) is not None
+        # make a dummy asset
+        content = None if absolute_path or checksum else ""
+        tmp_asset = Asset(absolute_path=absolute_path, filename=filename, relative_path=relative_path, checksum=checksum, content=content)
+        return self.find_index_of_asset(tmp_asset) is not None
 
-    def find_index_of_asset(self, absolute_path: str = None, filename: str = None) -> Union[int, None]:
+    def find_index_of_asset(self, other: 'Asset', deep_compare: bool = False) -> Union[int, None]:
         """
         Finds the index of asset by path or filename
 
         Args:
-            absolute_path: Path to search
-            filename: Filename to search
+            other: Other asset
+            deep_compare: Should content as well as path be compared
 
         Returns:
             Index number if found.
             None if not found.
         """
         for idx, asset in enumerate(self.assets):
-            if filename and asset.filename == filename:
-                if absolute_path and absolute_path == asset.absolute_path:
-                    return idx
-                elif absolute_path is None:
-                    return idx
-
-            if absolute_path == asset.absolute_path:
+            if deep_compare and asset.deep_equals(other):
+                return idx
+            elif not deep_compare and asset == other:
                 return idx
         return None
 

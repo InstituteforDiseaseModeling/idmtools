@@ -266,7 +266,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         for root, dirs, files in os.walk(sim_path, topdown=False):
             for file in files:
                 fp = os.path.join(root, file)
-                asset = Asset(filename=file)
+                asset = Asset(filename=file, persisted=True)
                 stat = os.stat(fp)
                 asset.length = stat.st_size
                 asset.download_generator_hook = partial(download_lp_file, fp)
