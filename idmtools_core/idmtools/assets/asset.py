@@ -254,7 +254,7 @@ class Asset:
         if not self._checksum:
             if self.absolute_path:
                 self._checksum = calculate_md5(self.absolute_path)
-            elif self.content:
+            elif self.content is not None:
                 self._checksum = calculate_md5_stream(io.BytesIO(self.bytes))
         return self._checksum
 

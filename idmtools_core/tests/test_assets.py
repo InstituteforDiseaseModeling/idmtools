@@ -251,6 +251,11 @@ class TestAssets(unittest.TestCase):
         checksum_a = a.calculate_checksum()
         self.assertEqual(checksum_a, '11cc97cf2d9c08aa403d131333b3d298')
 
+    def test_checksum_empty_dict(self):
+        a = Asset(filename="blah", content={})
+        checksum_a = a.calculate_checksum()
+        self.assertEqual(checksum_a, '99914b932bd37a50b983c5e7c90ae93b')
+
     def test_compare_assets(self):
         # compare different paths, same checksums
         a = Asset(relative_path="1", filename="a.txt", checksum='d41d8cd98f00b204e9800998ecf8427e')
