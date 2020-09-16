@@ -23,8 +23,6 @@ logger = getLogger(__name__)
 def version(no_plugins: bool):
     from idmtools import __version__
     from idmtools_cli import __version__ as cli_version
-    click.echo(click.style(columns(('idmtools', 36), (f'Version: {__version__}', 40)), fg='green'))
-    click.echo(click.style(columns(('idmtools-cli', 36), (f'Version: {cli_version}', 40)), fg='green'))
     plugin_map = MasterPluginRegistry().get_plugin_map()
     module_map = defaultdict(dict)
     for name in sorted(plugin_map.keys()):
@@ -38,14 +36,22 @@ def version(no_plugins: bool):
         if plugin_map[name].get_version():
             module_map[module_name][name] = plugin_map[name].get_version()
 
+    if not module_map['idmtools']:
+        module_map['idmtools'] = __version__
+
+    if not module_map['idmtools-cli']:
+        module_map['idmtools-cli'] = cli_version
+
     for module in sorted(module_map.keys()):
-        if module_map[module]:
+        if isinstance(module_map[module], dict):
             mod_version = list(module_map[module].values())[0]
             click.echo(click.style(columns((module.replace("_", "-"), 36), (f'Version: {mod_version}', 40)), fg='green'))
             if not no_plugins:
                 click.echo(click.style('  Plugins:', fg='yellow'))
                 for plugin_name in sorted(module_map[module].keys()):
                     click.echo(click.style(columns(('', 3), (f'{plugin_name}', 25)), fg='blue'))
+        else:
+            click.echo(click.style(columns((module.replace("_", "-"), 36), (f'Version: {module_map[module]}', 40)), fg='green'))
 
 
 @cli.group(help="Troubleshooting and debugging information")
