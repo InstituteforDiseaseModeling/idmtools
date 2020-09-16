@@ -43,9 +43,9 @@ def version(no_plugins: bool):
             mod_version = list(module_map[module].values())[0]
             click.echo(click.style(columns((module, 36), (f'Version: {mod_version}', 40)), fg='green'))
             if not no_plugins:
-                click.echo(click.style('\tPlugins:', fg='yellow'))
+                click.echo(click.style('  Plugins:', fg='yellow'))
                 for plugin_name in sorted(module_map[module].keys()):
-                    click.echo(click.style(columns(('', 10), (f'{plugin_name}', 25)), fg='blue'))
+                    click.echo(click.style(columns(('', 3), (f'{plugin_name}', 25)), fg='blue'))
 
 
 @cli.group(help="Troubleshooting and debugging information")
