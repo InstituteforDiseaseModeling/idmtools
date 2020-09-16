@@ -30,7 +30,7 @@
 pip install idmtools-cli --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
 ```
 
-# Development Tips
+# Development tips
 
 There is a Makefile file available for most common development tasks. Here is a list of commands
 ```bash
@@ -46,7 +46,7 @@ On Windows, you can use `pymake` instead of `make`
 The CLI requires the workers service to already be running.
 `idmtools`
 
-## Version Command
+## Version command
 
 To determine version of idmtools and related plugins, use the version cli command.
 
@@ -121,7 +121,7 @@ the associated data directories as well by using the *--data* option.
 >idmtools experiment delete <experiment_id>
 ```
 
-## Simulation Commands
+## Simulation commands
 
 ## Status 
 
