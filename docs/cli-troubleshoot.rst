@@ -13,3 +13,7 @@ To see the list of troubleshooting commands and options for the ``plugins`` comm
 To see the list of troubleshooting options for the ``system`` command, type the following at a command prompt:
 
 .. command-output:: idmtools info system --help
+
+To see the versions of idmtools and related modules and the plugins they provide
+
+.. command-output:: idmtools version
