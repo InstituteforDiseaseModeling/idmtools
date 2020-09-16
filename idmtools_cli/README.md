@@ -9,6 +9,7 @@
   - [Installing](#installing)
 - [Development Tips](#development-tips)
 - [Using the CLI](#using-the-cli)
+  - [Version Command](#version-command)
   - [Experiment commands](#experiment-commands)
     - [Status](#status)
     - [Delete](#delete)
