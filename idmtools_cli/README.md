@@ -46,6 +46,7 @@ The CLI requires the workers service to already be running.
 `idmtools`
 
 ## Version Command
+
 To determine version of idmtools and related plugins, use the version cli command.
 
 
