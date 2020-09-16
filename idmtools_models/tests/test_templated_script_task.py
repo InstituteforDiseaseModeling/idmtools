@@ -198,9 +198,10 @@ echo Running $@
         for sim in experiment.simulations:
             assets = pl_slurm._simulations.all_files(sim)
             for asset in assets:
-                if asset.filename in ["StdOut.txt"]:
-                    content = asset.content.decode('utf-8').replace("\\\\", "\\")
+                content = asset.content.decode('utf-8').replace("\\\\", "\\")
+                if asset.filename in ["stdout.txt"]:
                     # check for echo
                     self.assertIn('Running', content)
-                    # check for python path
-                    self.assertIn(f'{os.getcwd()}/Assets:', content)
+                elif asset.filename in ["stderr.txt"]:
+                    self.assertIn("Python 2.7.5", content)
+
