@@ -172,3 +172,35 @@ echo Running $@
                 self.assertEqual(1, experiment.assets.count)
                 self.assertIn("wrapper.sh", str(task.command))
 
+    @pytest.mark.comps
+    def test_wrapper_script_execute_comps(self):
+        """
+        This tests The ScriptWrapperScriptTask as well as the TemplatedScriptTask
+
+        In addition, it tests reload
+        Returns:
+
+        """
+        cmd = f"\"python\" --version"
+        task = CommandTask(cmd)
+        template = """#!/bin/bash
+export PYTHONPATH=$(pwd)/Assets:$PYTHONPATH
+echo Running $@
+"$@"
+"""
+        pl_slurm = Platform("SLURM")
+        wrapper_task: TemplatedScriptTask = get_script_wrapper_unix_task(task, template_content=template)
+        wrapper_task.script_binary = "/bin/bash"
+        experiment = Experiment.from_task(wrapper_task)
+        experiment.run(wait_until_done=True)
+        self.assertTrue(experiment.succeeded)
+
+        for sim in experiment.simulations:
+            assets = pl_slurm._simulations.all_files(sim)
+            for asset in assets:
+                if asset.filename in ["StdOut.txt"]:
+                    content = asset.content.decode('utf-8').replace("\\\\", "\\")
+                    # check for echo
+                    self.assertIn('Running', content)
+                    # check for python path
+                    self.assertIn(f'{os.getcwd()}/Assets:', content)
