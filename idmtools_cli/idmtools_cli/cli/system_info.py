@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 import os
 from logging import getLogger
 import stat
@@ -11,20 +13,39 @@ from idmtools.core.system_information import get_system_information
 from idmtools.registry.platform_specification import PlatformPlugins
 from idmtools_cli.cli.entrypoint import cli
 from idmtools_cli.cli.experiment import supported_platforms
+from idmtools_cli.utils.cols import columns
 
 logger = getLogger(__name__)
 
 
 @cli.command(help="List version info about idmtools and plugins")
-def version():
+@click.option('--no-plugins/--plugins', default=False, help="Control whether we display plugins with modules")
+def version(no_plugins: bool):
     from idmtools import __version__
     from idmtools_cli import __version__ as cli_version
-    click.echo(f"idmtools: {__version__}")
-    click.echo(f"idmtools cli: {cli_version}")
+    click.echo(click.style(columns(('idmtools', 36), (f'Version: {__version__}', 40)), fg='green'))
+    click.echo(click.style(columns(('idmtools cli', 36), (f'Version: {cli_version}', 40)), fg='green'))
     plugin_map = MasterPluginRegistry().get_plugin_map()
+    module_map = defaultdict(dict)
     for name in sorted(plugin_map.keys()):
+        try:
+            spec = plugin_map[name]
+            module_name = str(spec.get_type().__module__)
+            if module_name:
+                module_name = module_name.split(".")[0]
+        except Exception:
+            module_name = 'Unknown Module'
         if plugin_map[name].get_version():
-            click.echo(f'{name}: {plugin_map[name].get_version()}')
+            module_map[module_name][name] = plugin_map[name].get_version()
+
+    for module in sorted(module_map.keys()):
+        if module_map[module]:
+            mod_version = list(module_map[module].values())[0]
+            click.echo(click.style(columns((module, 36), (f'Version: {mod_version}', 40)), fg='green'))
+            if not no_plugins:
+                click.echo(click.style('\tPlugins:', fg='yellow'))
+                for plugin_name in sorted(module_map[module].keys()):
+                    click.echo(click.style(columns(('', 10), (f'{plugin_name}', 25)), fg='blue'))
 
 
 @cli.group(help="Troubleshooting and debugging information")
@@ -40,7 +61,7 @@ def info():
 @click.option('--output-filename', default=None, help="Output filename")
 def system(copy_to_clipboard, no_format_for_gh, issue, output_filename):
     system_info = get_system_information()
-    lines = [f'System Information\n{ "=" * 20}']
+    lines = [f'System Information\n{"=" * 20}']
     ordered_fields = sorted(system_info.__dict__.keys())
     [lines.append(f'{k}: {system_info.__dict__[k]}') for k in ordered_fields]
     if os.name != 'nt':
@@ -54,7 +75,7 @@ def system(copy_to_clipboard, no_format_for_gh, issue, output_filename):
                              f'and is owned by {owned_by}')
     try:
         import docker
-        lines.append(f'\nDocker Information\n{ "=" * 20}')
+        lines.append(f'\nDocker Information\n{"=" * 20}')
         client = docker.from_env()
         lines.append(f'Version: {client.version()}')
         docker_info = client.info()
