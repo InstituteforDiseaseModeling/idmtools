@@ -157,6 +157,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         if isinstance(asset_collection, SimulationFile):
             asset = Asset(filename=asset_collection.file_name, checksum=asset_collection.md5_checksum)
             asset.is_simulation_file = True
+            asset.persisted = True
             asset.length = asset_collection.length
             if asset.uri:
                 asset.download_generator_hook = partial(get_file_as_generator, asset_collection)
@@ -165,7 +166,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
             # add items to asset collection
             for asset in assets:
                 if isinstance(asset, OutputFileMetadata):
-                    a = Asset(filename=asset.friendly_name, relative_path=asset.path_from_root)
+                    a = Asset(filename=asset.friendly_name, relative_path=asset.path_from_root, persisted=True)
                 else:
                     a = Asset(filename=asset.file_name, checksum=asset.md5_checksum)
                 if isinstance(asset_collection, COMPSAssetCollection):
