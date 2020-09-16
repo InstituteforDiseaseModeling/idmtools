@@ -30,7 +30,7 @@ class TemplatedScriptTask(ITask):
     #: Name of script
     script_path: str = field(default=None, metadata={"md": True})
     #: If platform requires path to script executing binary(ie /bin/bash)
-    script_binary: str = field(default=None)
+    script_binary: str = field(default=None, metadata={"md": True})
     #: The template contents
     template: str = field(default=None, metadata={"md": True})
     #: The template file. You can only use either template or template_file at once
