@@ -82,3 +82,13 @@ class LocalPlatformSpecification(PlatformSpecification):
     def get_type(self) -> Type['LocalPlatform']:  # noqa: F821
         from idmtools_platform_local.local_platform import LocalPlatform
         return LocalPlatform
+
+    def get_version(self) -> str:
+        """
+        Returns the version of the plugin
+
+        Returns:
+            Plugin Version
+        """
+        from idmtools_platform_local import __version__
+        return __version__

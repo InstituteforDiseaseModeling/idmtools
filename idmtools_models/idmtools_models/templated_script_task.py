@@ -426,6 +426,16 @@ class TemplatedScriptTaskSpecification(TaskSpecification):
         """
         return TemplatedScriptTask
 
+    def get_version(self) -> str:
+        """
+        Returns the version of the plugin
+
+        Returns:
+            Plugin Version
+        """
+        from idmtools_models import __version__
+        return __version__
+
 
 class ScriptWrapperTaskSpecification(TaskSpecification):
     def get(self, configuration: dict) -> ScriptWrapperTask:
@@ -466,3 +476,13 @@ class ScriptWrapperTaskSpecification(TaskSpecification):
             TemplatedScriptTask
         """
         return ScriptWrapperTask
+
+    def get_version(self) -> str:
+        """
+        Returns the version of the plugin
+
+        Returns:
+            Plugin Version
+        """
+        from idmtools_models import __version__
+        return __version__
