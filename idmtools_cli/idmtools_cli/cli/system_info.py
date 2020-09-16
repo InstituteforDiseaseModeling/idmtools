@@ -24,7 +24,7 @@ def version(no_plugins: bool):
     from idmtools import __version__
     from idmtools_cli import __version__ as cli_version
     click.echo(click.style(columns(('idmtools', 36), (f'Version: {__version__}', 40)), fg='green'))
-    click.echo(click.style(columns(('idmtools cli', 36), (f'Version: {cli_version}', 40)), fg='green'))
+    click.echo(click.style(columns(('idmtools-cli', 36), (f'Version: {cli_version}', 40)), fg='green'))
     plugin_map = MasterPluginRegistry().get_plugin_map()
     module_map = defaultdict(dict)
     for name in sorted(plugin_map.keys()):
@@ -41,7 +41,7 @@ def version(no_plugins: bool):
     for module in sorted(module_map.keys()):
         if module_map[module]:
             mod_version = list(module_map[module].values())[0]
-            click.echo(click.style(columns((module, 36), (f'Version: {mod_version}', 40)), fg='green'))
+            click.echo(click.style(columns((module.replace("_", "-"), 36), (f'Version: {mod_version}', 40)), fg='green'))
             if not no_plugins:
                 click.echo(click.style('  Plugins:', fg='yellow'))
                 for plugin_name in sorted(module_map[module].keys()):
