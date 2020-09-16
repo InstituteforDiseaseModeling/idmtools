@@ -2,6 +2,7 @@ from enum import Enum, auto
 
 
 class EntityStatus(Enum):
+    COMMISSIONING = 'commissioning'
     CREATED = 'created'
     RUNNING = 'running'
     SUCCEEDED = 'succeeded'

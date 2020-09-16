@@ -62,8 +62,12 @@ class CacheEnabled:
     def cleanup_cache(self):
         # Only delete and close the cache if the owner thread ends
         # Avoid deleting and closing when a child thread ends
-        if current_process().name != 'MainProcess':
-            return
+        try:
+            if current_process().name != 'MainProcess':
+                return
+        # On Linux, there is no MainProcess name like windows
+        except AttributeError:
+            pass
 
         if self._cache is not None:
             self._cache.close()

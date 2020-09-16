@@ -2,7 +2,6 @@ import os
 import uuid
 from dataclasses import field, dataclass
 from functools import partial
-from hashlib import md5
 from logging import getLogger, DEBUG
 from typing import Type, Union, List, TYPE_CHECKING, Optional
 from uuid import UUID
@@ -12,7 +11,6 @@ from COMPS.Data import AssetCollection as COMPSAssetCollection, QueryCriteria, A
 
 from idmtools.assets import AssetCollection, Asset
 from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
-from idmtools.utils.hashing import calculate_md5
 from idmtools_platform_comps.utils.general import get_file_as_generator
 
 if TYPE_CHECKING:
@@ -62,29 +60,15 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         for asset in asset_collection:
             # using checksum is not accurate and not all systems will support de-duplication
             if asset.checksum is None:
-
-                if asset.absolute_path:
-                    cksum = calculate_md5(asset.absolute_path)
-                    ac_files.add(
-                        (
-                            asset.filename,
-                            asset.relative_path,
-                            uuid.UUID(calculate_md5(asset.absolute_path))
-                        )
+                md5_checksum_str = asset.calculate_checksum()
+                ac_files.add(
+                    (
+                        asset.filename,
+                        asset.relative_path,
+                        uuid.UUID(md5_checksum_str)
                     )
-                    ac_map[asset] = uuid.UUID(cksum)
-                else:
-                    md5calc = md5()
-                    md5calc.update(asset.bytes)
-                    md5_checksum_str = uuid.UUID(md5calc.hexdigest())
-                    ac_files.add(
-                        (
-                            asset.filename,
-                            asset.relative_path,
-                            md5_checksum_str
-                        )
-                    )
-                    ac_map[asset] = md5_checksum_str
+                )
+                ac_map[asset] = uuid.UUID(md5_checksum_str)
             else:  # We should already have this asset so we should have a md5sum
                 ac_files.add(
                     (
@@ -93,11 +77,11 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
                         asset.checksum if isinstance(asset.checksum, uuid.UUID) else uuid.UUID(asset.checksum)
                     )
                 )
-                ac_map[asset] = asset.checksum
+                ac_map[asset] = asset.checksum if isinstance(asset.checksum, uuid.UUID) else uuid.UUID(asset.checksum)
 
         # remove any duplicates
         if logger.isEnabledFor(DEBUG):
-            logger.debug(f"Building ac. Filtered out {len(asset_collection) - len(ac_files)} duplicate files")
+            logger.debug(f"Building ac. Filtered out {len(asset_collection) - len(ac_files)} assets that exist on COMPS already")
 
         for file in ac_files:
             ac.add_asset(AssetCollectionFile(file_name=file[0], relative_path=file[1], md5_checksum=file[2]))
@@ -173,6 +157,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         if isinstance(asset_collection, SimulationFile):
             asset = Asset(filename=asset_collection.file_name, checksum=asset_collection.md5_checksum)
             asset.is_simulation_file = True
+            asset.persisted = True
             asset.length = asset_collection.length
             if asset.uri:
                 asset.download_generator_hook = partial(get_file_as_generator, asset_collection)
@@ -181,7 +166,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
             # add items to asset collection
             for asset in assets:
                 if isinstance(asset, OutputFileMetadata):
-                    a = Asset(filename=asset.friendly_name, relative_path=asset.path_from_root)
+                    a = Asset(filename=asset.friendly_name, relative_path=asset.path_from_root, persisted=True)
                 else:
                     a = Asset(filename=asset.file_name, checksum=asset.md5_checksum)
                 if isinstance(asset_collection, COMPSAssetCollection):

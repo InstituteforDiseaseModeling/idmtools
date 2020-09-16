@@ -53,15 +53,13 @@ class TestAssets(unittest.TestCase):
         self.assertEqual(a.relative_path, "")
 
     def test_creat_asset_only_content(self):
-        a = Asset(content="blah")
-        self.assertEqual(a.content, "blah")
-        self.assertIsNone(a.filename)
-        self.assertEqual(a.relative_path, "")
+        with self.assertRaises(ValueError) as ex:
+            a = Asset(content="blah")
 
     def test_creat_asset_no_parameters(self):
         with self.assertRaises(ValueError) as context:
             a = Asset()  # noqa F841
-        self.assertTrue('Impossible to create the asset without either absolute path or filename and content!' in str(
+        self.assertTrue('Impossible to create the asset without either absolute path, filename and content, or filename and checksum!' in str(
             context.exception.args[0]))
 
     def test_assets_is_iterable(self):
@@ -150,7 +148,7 @@ class TestAssets(unittest.TestCase):
 
         with self.assertRaises(ValueError) as context:
             ac.add_asset(Asset())
-        self.assertTrue('Impossible to create the asset without either absolute path or filename and content!' in str(
+        self.assertTrue('Impossible to create the asset without either absolute path, filename and content, or filename and checksum!' in str(
             context.exception.args[0]))
 
     def test_assets_collection_from_dir_flatten(self):
@@ -186,6 +184,126 @@ class TestAssets(unittest.TestCase):
 
         self.assertNotEqual(ac1, ac2)
         self.assertNotEqual(ac1.assets, ac2.assets)
+
+    def test_duplicates_filtered_from_list(self):
+        a = Asset(relative_path="1", absolute_path=os.path.join(self.base_path, "1", "a.txt"))
+        b = Asset(relative_path="1", absolute_path=os.path.join(self.base_path, "1", "a.txt"))
+
+        ac1 = AssetCollection([a, b])
+        self.assertEqual(1, len(ac1.assets))
+
+    def test_duplicates_filtered_from_list_with_relative_paths(self):
+        a = Asset(relative_path="1", absolute_path=os.path.join(self.base_path, "1", "a.txt"))
+        b = Asset(relative_path="2", absolute_path=os.path.join(self.base_path, "1", "a.txt"))
+
+        ac1 = AssetCollection([a, b])
+        self.assertEqual(2, len(ac1.assets))
+
+    def test_duplicates_filtered_from_list_with_checksum(self):
+        a = Asset(relative_path="1", absolute_path=os.path.join(self.base_path, "1", "a.txt"))
+        b = Asset(relative_path="1", filename="a.txt", checksum='d41d8cd98f00b204e9800998ecf8427e')
+
+        ac1 = AssetCollection([a, b])
+        self.assertEqual(1, len(ac1.assets))
+
+    def test_fail_checksum_add_with_local_file(self):
+        a = Asset(relative_path="1", absolute_path=os.path.join(self.base_path, "1", "a.txt"))
+        b = Asset(relative_path="1", filename="a.txt", checksum='d41d8cd98f00b204e9800998ecf8427e')
+
+        ac1 = AssetCollection([a])
+        with self.assertRaises(DuplicatedAssetError):
+            ac1.add_asset(b)
+
+    def test_fail_checksum_add_with_checksums_only(self):
+        a = Asset(relative_path="1", filename="a.txt", checksum='d41d8cd98f00b204e9800998ecf8427e')
+        b = Asset(relative_path="1", filename="a.txt", checksum='d41d8cd98f00b204e9800998ecf8427e')
+
+        ac1 = AssetCollection([a])
+        with self.assertRaises(DuplicatedAssetError):
+            ac1.add_asset(b)
+
+    def test_checksum_add_ok_with_different_filenames(self):
+        a = Asset(relative_path="1", filename="a.txt", checksum='d41d8cd98f00b204e9800998ecf8427e')
+        b = Asset(relative_path="1", filename="b.txt", checksum='d41d8cd98f00b204e9800998ecf8427e')
+
+        ac1 = AssetCollection([a])
+        ac1.add_asset(b)
+        self.assertEqual(2, len(ac1.assets))
+
+    def test_file_not_exists(self):
+        with self.assertRaises(FileNotFoundError) as ex:
+            a = Asset(filename="abc")
+
+    def test_checksum_str(self):
+        a = Asset(filename="blah", content="A test tring")
+        result = a.calculate_checksum()
+        self.assertEqual(result, '644e28386b702cbd6d2938d1af5eaa3c')
+
+    def test_change_contents(self):
+        a = Asset(filename="blah", content="A test tring")
+        checksum_a = a.calculate_checksum()
+        a.content = "Lala"
+        checksum_b = a.calculate_checksum()
+        self.assertNotEqual(checksum_a, checksum_b)
+
+    def test_checksum_dict(self):
+        a = Asset(filename="blah", content={'a': 'b'})
+        checksum_a = a.calculate_checksum()
+        self.assertEqual(checksum_a, '11cc97cf2d9c08aa403d131333b3d298')
+
+    def test_checksum_empty_dict(self):
+        a = Asset(filename="blah", content={})
+        checksum_a = a.calculate_checksum()
+        self.assertEqual(checksum_a, '99914b932bd37a50b983c5e7c90ae93b')
+
+    def test_dict_and_byte_contents(self):
+        a = Asset(filename="blah", content={"a": "v1", "b": 123})
+        checksom_a = a.calculate_checksum()
+        b = Asset(filename="blah", content=b"{'a': 'v1', 'b': 123}")
+        checksom_b = b.calculate_checksum()
+        self.assertEqual(checksom_a, checksom_b)
+
+    def test_compare_assets(self):
+        # compare different paths, same checksums
+        a = Asset(relative_path="1", filename="a.txt", checksum='d41d8cd98f00b204e9800998ecf8427e')
+        b = Asset(relative_path="1", filename="b.txt", checksum='d41d8cd98f00b204e9800998ecf8427e')
+
+        self.assertNotEqual(a, b)
+
+        # compare same paths, different checksums
+        a = Asset(relative_path="1", filename="a.txt", checksum='d41d8cd98f00b204e9800998ecf8427e')
+        b = Asset(relative_path="1", filename="a.txt", checksum='e41d8cd98f00b204e9800998ecf8427e')
+        self.assertEqual(a, b)
+
+        # compare different paths, same checksums
+        a = Asset(filename="a.txt", checksum='d41d8cd98f00b204e9800998ecf8427e')
+        b = Asset(filename="b.txt", checksum='d41d8cd98f00b204e9800998ecf8427e')
+        self.assertNotEqual(a, b)
+
+        # compare same paths, different checksums
+        a = Asset(filename="a.txt", checksum='d41d8cd98f00b204e9800998ecf8427e')
+        b = Asset(filename="a.txt", checksum='e41d8cd98f00b204e9800998ecf8427e')
+        self.assertEqual(a, b)
+        # Deep compare should be false
+        self.assertFalse(a.deep_equals(b))
+
+        # same content with different path
+        a = Asset(relative_path="1", filename="a.txt", content='hello')
+        b = Asset(relative_path="1", filename="b.txt", content='hello')
+        self.assertNotEqual(a, b)
+
+        # different content with same path
+        a = Asset(relative_path="1", filename="a.txt", content='hello')
+        b = Asset(relative_path="1", filename="a.txt", content='world')
+        self.assertEqual(a, b)
+        self.assertFalse(a.deep_equals(b))
+
+        # content vs file
+        a = Asset(relative_path="1", filename="a.txt", content='hello')
+        b = Asset(relative_path="1", filename="a.txt", absolute_path=os.path.join(COMMON_INPUT_PATH, 'files', 'hello.txt'))
+        self.assertEqual(a, b)
+        self.assertTrue(a.deep_equals(b))
+
 
 
 if __name__ == '__main__':
