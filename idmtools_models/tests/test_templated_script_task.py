@@ -181,7 +181,7 @@ echo Running $@
         Returns:
 
         """
-        cmd = f"\"python\" --version"
+        cmd = "\"python3.6\" --version"
         task = CommandTask(cmd)
         template = """#!/bin/bash
 export PYTHONPATH=$(pwd)/Assets:$PYTHONPATH
@@ -202,6 +202,6 @@ echo Running $@
                 if asset.filename in ["stdout.txt"]:
                     # check for echo
                     self.assertIn('Running', content)
-                elif asset.filename in ["stderr.txt"]:
-                    self.assertIn("Python 2.7.5", content)
+                    # don't check full version in case comps updates system
+                    self.assertIn('Python 3.6', content)
 
