@@ -17,36 +17,40 @@ class TestSystemInfoBasics(unittest.TestCase):
         result = run_command('version')
         self.assertEqual(0, result.exit_code)
         # Check for our help string
-        self.assertIn(f'idmtools: {idm_version}', result.output)
-        self.assertIn(f'idmtools cli: {idm_cli_version}', result.output)
-        self.assertIn(f'CommandTask: {idm_version}', result.output)
+        self.assertIn(f'idmtools                             Version: {idm_version}', result.output)
+        self.assertIn(f'idmtools-cli                         Version: {idm_cli_version}', result.output)
+        self.assertIn(f'CommandTask', result.output)
         # test in case we don't have plugins installed
         try:
             from idmtools_models import __version__ as models_version
-            self.assertIn(f'JSONConfiguredPythonTask: {models_version}', result.output)
-            self.assertIn(f'PythonTask: {models_version}', result.output)
-            self.assertIn(f'JSONConfiguredRTask: {models_version}', result.output)
-            self.assertIn(f'ScriptWrapperTask: {models_version}', result.output)
-            self.assertIn(f'RTask: {models_version}', result.output)
-            self.assertIn(f'TemplatedScriptTask: {models_version}', result.output)
+            self.assertIn(f'idmtools-models                      Version: {models_version}', result.output)
+            self.assertIn(f'JSONConfiguredPythonTask', result.output)
+            self.assertIn(f'PythonTask', result.output)
+            self.assertIn(f'JSONConfiguredRTask', result.output)
+            self.assertIn(f'ScriptWrapperTask', result.output)
+            self.assertIn(f'RTask', result.output)
+            self.assertIn(f'TemplatedScriptTask', result.output)
         except ImportError:
             pass
 
         try:
             from idmtools_platform_comps import __version__ as comps_version
-            self.assertIn(f'COMPSPlatform: {comps_version}', result.output)
-            self.assertIn(f'SSMTPlatform: {comps_version}', result.output)
+            self.assertIn(f'idmtools-platform-comps              Version: {comps_version}', result.output)
+            self.assertIn(f'COMPSPlatform', result.output)
+            self.assertIn(f'SSMTPlatform', result.output)
         except ImportError:
             pass
 
         try:
             from idmtools_platform_local import __version__ as local_version
-            self.assertIn(f'LocalPlatform: {local_version}', result.output)
+            self.assertIn(f'idmtools-platform-local              Version: {local_version}', result.output)
+            self.assertIn(f'LocalPlatform', result.output)
         except ImportError:
             pass
 
         try:
             from idmtools_platform_slurm import __version__ as slurm_version
-            self.assertIn(f'SlurmPlatform: {slurm_version}', result.output)
+            self.assertIn(f'idmtools-platform-slurm              Version: {slurm_version}', result.output)
+            self.assertIn(f'SlurmPlatform', result.output)
         except ImportError:
             pass
