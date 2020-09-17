@@ -26,6 +26,7 @@ class setParam:
         return JSONConfiguredTask.set_parameter_sweep_callback(simulation, self.param, value)
 
 
+@pytest.mark.smoke
 class TestPythonSimulation(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName

@@ -155,6 +155,7 @@ class TestLoadLibWheel(ITestWithPersistence):
 
     @pytest.mark.long
     @pytest.mark.comps
+    @pytest.mark.smoke
     def test_exp_with_load_zipp_lib_slurm(self):
         # ------------------------------------------------------
         # First load 'zipp' package (note: comps does not have 'zipp' package)

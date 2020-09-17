@@ -33,6 +33,7 @@ class setParam:
 setA = partial(param_update, param="a")
 
 
+@pytest.mark.smoke
 class TestCopy(ITestWithPersistence):
 
     def setUp(self):

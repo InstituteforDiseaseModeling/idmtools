@@ -12,6 +12,7 @@ from idmtools_test import COMMON_INPUT_PATH
 
 
 @pytest.mark.assets
+@pytest.mark.smoke
 class TestAssets(unittest.TestCase):
 
     def setUp(self) -> None:

@@ -1,4 +1,6 @@
 import os
+
+import pytest
 from idmtools.assets import AssetCollection
 from idmtools.builders import SimulationBuilder
 from idmtools.core.experiment_factory import experiment_factory
@@ -10,6 +12,7 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.test_platform import TestPlatform
 
 
+@pytest.mark.smoke
 class TestExperimentFactory(ITestWithPersistence):
 
     def test_build_python_experiment_from_factory(self):

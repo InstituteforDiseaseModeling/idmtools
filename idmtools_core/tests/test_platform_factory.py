@@ -8,6 +8,7 @@ from idmtools.core.platform_factory import Platform
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 
+@pytest.mark.smoke
 class TestPlatformFactory(ITestWithPersistence):
     def setUp(self):
         super().setUp()

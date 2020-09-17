@@ -65,6 +65,7 @@ class TestAssetsInComps(unittest.TestCase):
         self.assertEqual({'test.json'}, new_filenames - filenames)
 
     @pytest.mark.long
+    @pytest.mark.smoke
     def test_md5_hashing_for_same_file_contents(self):
         a = Asset(relative_path=None, filename="test.json", content=json.dumps({"a": 1, "b": 2}))
         b = Asset(relative_path=None, filename="test1.json", content=json.dumps({"a": 1, "b": 2}))
