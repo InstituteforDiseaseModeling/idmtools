@@ -7,13 +7,13 @@
 **Table of Contents**
 
   - [Installing](#installing)
-- [Development Tips](#development-tips)
+- [Development tips](#development-tips)
 - [Using the CLI](#using-the-cli)
-  - [Version Command](#version-command)
+  - [Version command](#version-command)
   - [Experiment commands](#experiment-commands)
     - [Status](#status)
     - [Delete](#delete)
-  - [Simulation Commands](#simulation-commands)
+  - [Simulation commands](#simulation-commands)
   - [Status](#status-1)
   - [GitRepo commands](#gitrepo-commands)
     - [View](#view)
