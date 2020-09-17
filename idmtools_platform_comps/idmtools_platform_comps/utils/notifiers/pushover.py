@@ -1,26 +1,11 @@
 import os
 from collections import defaultdict
 from logging import getLogger
-from typing import List, Dict
 
 from idmtools.assets.file_list import FileList
-from idmtools.entities import Suite
-from idmtools.entities.experiment import Experiment
-from idmtools.entities.simulation import Simulation
+from idmtools_platform_comps.utils.notifiers.utils import parse_relation
 
 user_logger = getLogger('user')
-
-
-def parse_relation(extra_args: Dict[str, List], item):
-    from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
-    if isinstance(item, Experiment):
-        extra_args['related_experiments'].append(item.id)
-    elif isinstance(item, Suite):
-        extra_args['related_suites'].append(item.id)
-    elif isinstance(item, Simulation):
-        extra_args['related_simulations'].append(item.id)
-    elif isinstance(item, SSMTWorkItem):
-        extra_args['related_work_items'].append(item.id)
 
 
 def notify_pushover_when_done(items, message, title=None, token=None, user=None) -> 'SSMTWorkItem':  # noqa: F821
@@ -42,7 +27,7 @@ def notify_pushover_when_done(items, message, title=None, token=None, user=None)
 
     files = FileList()
     current_dir = os.path.dirname(__file__)
-    files.add_file(os.path.join(current_dir, "pushover_script.py"))
+    files.add_file(os.path.join(current_dir, "deploy_scripts", "pushover.py"))
     # add pushover client
     try:
         import pushover
