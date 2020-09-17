@@ -51,6 +51,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
                          "python hello.py")
 
     # test using SSMTWormItem to run PopulationAnalyzer in comps's SSMT DockerWorker
+    @pytest.mark.smoke
     def test_ssmt_workitem_PopulationAnalyzer(self):
         # load local ("inputs") PopulationAnalyzer.py and run_dtktools_PopulationAnalyzer.py
         # to COMPS's assets

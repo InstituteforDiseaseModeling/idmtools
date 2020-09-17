@@ -12,6 +12,7 @@ from idmtools_test.utils.decorators import windows_only, linux_only
 
 
 @pytest.mark.tasks
+@pytest.mark.smoke
 class TestTemplatedScriptTask(TestCase):
     def get_simplate_template(self):
         """"""
@@ -24,7 +25,6 @@ class TestTemplatedScriptTask(TestCase):
             """
         return simple_template
 
-    @pytest.mark.smoke
     def test_simple_template_assets(self):
         """
         Test simple template bat script using the TemplatedScriptTask
@@ -57,7 +57,6 @@ class TestTemplatedScriptTask(TestCase):
             else:
                 self.assertEqual("example.bat", str(task.command))
 
-    @pytest.mark.smoke
     def test_wrapper_script(self):
         """
         Do a basic set of tests on inputs/outputs of the wrapper script

@@ -3,6 +3,7 @@ import pickle
 import unittest
 from dataclasses import dataclass, field, fields
 
+import pytest
 from idmtools.builders import SimulationBuilder
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.experiment import Experiment
@@ -26,6 +27,7 @@ def _custom_post_setstate(o):
     o.ignore = 5
 
 
+@pytest.mark.smoke
 class TestEntity(ITestWithPersistence):
 
     def test_hashing(self):

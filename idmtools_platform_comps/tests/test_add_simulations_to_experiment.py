@@ -19,6 +19,7 @@ class TestAddSimulationsToExperiment(ITestWithPersistence):
         self.platform = Platform('COMPS2')
 
     # test add TemlatedSimulations to existing experiment with extend
+    @pytest.mark.smoke
     def test_add_simulations_to_existing_experiment(self):
         # First create experiment with single simulation via JSONConfiguredPythonTask
         config = {"a": 1, "b": 2}

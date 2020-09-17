@@ -7,6 +7,7 @@ from idmtools_test import COMMON_INPUT_PATH
 
 
 @pytest.mark.tasks
+@pytest.mark.smoke
 class TestRTask(TestCase):
 
     def validate_common_assets(self, fpath, task):

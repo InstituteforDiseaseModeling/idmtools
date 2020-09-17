@@ -1,10 +1,13 @@
 import os
 import unittest
+
+import pytest
 from click.testing import CliRunner
 from idmtools_cli.cli.gitrepo import gitrepo, get_plugins_examples, validate
 from idmtools_test.utils.cli import get_subcommands_from_help_result, run_command
 
 
+@pytest.mark.smoke
 class TestExample(unittest.TestCase):
 
     def setUp(self) -> None:

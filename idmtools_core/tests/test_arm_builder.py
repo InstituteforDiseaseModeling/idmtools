@@ -1,6 +1,7 @@
 import itertools
 from functools import partial
 
+import pytest
 from idmtools.builders.arm_simulation_builder import ArmSimulationBuilder, SweepArm, ArmType
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.json_configured_task import JSONConfiguredTask
@@ -12,6 +13,7 @@ setA = partial(JSONConfiguredTask.set_parameter_sweep_callback, param="a")
 setB = partial(JSONConfiguredTask.set_parameter_sweep_callback, param="b")
 
 
+@pytest.mark.smoke
 class TestArmBuilder(ITestWithPersistence):
 
     def setUp(self):

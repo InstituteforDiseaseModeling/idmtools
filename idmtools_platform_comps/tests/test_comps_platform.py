@@ -29,6 +29,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
     @pytest.mark.assets
     @pytest.mark.python
     @pytest.mark.long
+    @pytest.mark.smoke
     def test_output_files_retrieval(self):
         config = {"a": 1, "b": 2}
         experiment = self.get_working_model_experiment(config)

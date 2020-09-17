@@ -1,6 +1,7 @@
 import os
 from functools import partial
 
+import pytest
 from idmtools.builders.arm_simulation_builder import ArmType
 from idmtools.builders.yaml_simulation_builder import YamlSimulationBuilder
 from idmtools.entities.templated_simulation import TemplatedSimulations
@@ -19,6 +20,7 @@ setC = partial(param_update, param="c")
 setD = partial(param_update, param="d")
 
 
+@pytest.mark.smoke
 class TestYamlBuilder(ITestWithPersistence):
 
     def setUp(self):

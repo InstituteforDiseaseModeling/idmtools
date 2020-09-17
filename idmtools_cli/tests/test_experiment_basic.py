@@ -1,8 +1,10 @@
 import unittest
 
+import pytest
 from idmtools_test.utils.cli import get_subcommands_from_help_result, run_command
 
 
+@pytest.mark.smoke
 class TestExperimentBasics(unittest.TestCase):
 
     def test_help(self):

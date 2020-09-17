@@ -1,11 +1,14 @@
 import subprocess
 import unittest.mock
 from unittest import TestCase
+
+import pytest
 from idmtools.core.system_information import get_system_information, SystemInformation
 from idmtools.utils.info import get_packages_list
 from idmtools_test.utils.decorators import linux_only, windows_only
 
 
+@pytest.mark.smoke
 class TestSystemInformation(TestCase):
     def test_minimal_info(self):
         """
