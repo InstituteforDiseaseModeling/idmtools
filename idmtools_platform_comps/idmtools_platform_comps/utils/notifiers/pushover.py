@@ -1,4 +1,3 @@
-import glob
 import os
 from collections import defaultdict
 from typing import List, Dict
@@ -48,5 +47,3 @@ def notify_pushover_when_done(items, message, title=None, token=None, user=None)
         user_files=files,
         **extra_args)
     return wi.run()
-
-
