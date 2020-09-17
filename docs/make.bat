@@ -110,13 +110,6 @@ if "%1" == "html" (
 	goto end
 )
 
-if "%1" == "tipuesearch" (
-	%INDEXBUILD% -i %BUILDDIR%/html -o %BUILDDIR%/html/_static/tipuesearch/tipuesearch_content.js -u %URLPREFIX%
-	echo.
-	echo. Build finished. Updated tipuesearch content is at %BUILDDIR%/html/_static/tipuesearch/tipuesearch_content.js
-	goto end
-)
-
 if "%1" == "dirhtml" (
 	%SPHINXBUILD% -b dirhtml %ALLSPHINXOPTS% %BUILDDIR%/dirhtml
 	if errorlevel 1 exit /b 1
