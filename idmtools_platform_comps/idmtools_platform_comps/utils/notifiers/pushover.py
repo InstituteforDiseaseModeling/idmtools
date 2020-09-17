@@ -1,11 +1,14 @@
 import os
 from collections import defaultdict
+from logging import getLogger
 from typing import List, Dict
 
 from idmtools.assets.file_list import FileList
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
+
+user_logger = getLogger('user')
 
 
 def parse_relation(extra_args: Dict[str, List], item):
@@ -20,7 +23,7 @@ def parse_relation(extra_args: Dict[str, List], item):
         extra_args['related_work_items'].append(item.id)
 
 
-def notify_pushover_when_done(items, message, title=None, token=None, user=None):
+def notify_pushover_when_done(items, message, title=None, token=None, user=None) -> 'SSMTWorkItem':  # noqa: F821
     from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
     user_token = token
     user = user
@@ -41,7 +44,16 @@ def notify_pushover_when_done(items, message, title=None, token=None, user=None)
     current_dir = os.path.dirname(__file__)
     files.add_file(os.path.join(current_dir, "pushover_script.py"))
     # add pushover client
-    import pushover
+    try:
+        import pushover
+    except ImportError:
+        user_logger.error("You are missing the pushover plugin. Please install manually using\n"
+                          "pip install python-pushover\n"
+                          "or reinstall idmtools-platform-comps using\n"
+                          "pip install idmtools-platform-comps[pushover]")
+        # TODO: Should we fail or gracefully ignore?
+        return None
+
     files.add_file(pushover.__file__)
 
     wi = SSMTWorkItem(
@@ -49,4 +61,6 @@ def notify_pushover_when_done(items, message, title=None, token=None, user=None)
         command=command,
         user_files=files,
         **extra_args)
-    return wi.run()
+    wi.run()
+
+    return wi
