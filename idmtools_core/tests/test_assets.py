@@ -121,7 +121,7 @@ class TestAssets(unittest.TestCase):
             Asset(relative_path="2", absolute_path=os.path.join(self.base_path, "2", "c.txt"))
         ]
         filter_name = partial(file_name_is, filenames=["a.txt", "c.txt"])
-        filter_dir = partial(asset_in_directory, directories=["2"])
+        filter_dir = partial(asset_in_directory, directories=["2"], base_path=self.base_path)
         ac.add_directory(assets_directory=self.base_path, filters=[filter_name, filter_dir])
         self.assertSetEqual(set(ac.assets), set(assets_to_find))
 
