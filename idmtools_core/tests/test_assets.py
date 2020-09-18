@@ -93,7 +93,6 @@ class TestAssets(unittest.TestCase):
         with self.assertRaises(DuplicatedAssetError):
             ac.add_asset(a)
 
-    @pytest.mark.skip
     def test_assets_collection_filtering_basic(self):
         # Test basic file name filtering
         ac = AssetCollection()
@@ -121,7 +120,6 @@ class TestAssets(unittest.TestCase):
             print("caculate_md5:" + my_asset.calculate_checksum())
         self.assertSetEqual(set(ac.assets), set(assets_to_find))
 
-    @pytest.mark.skip
     def test_assets_collection_filtering_mode(self):
         # Test OR
         ac = AssetCollection()
