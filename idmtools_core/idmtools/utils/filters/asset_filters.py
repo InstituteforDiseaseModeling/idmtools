@@ -12,6 +12,7 @@ For example::
     fname = partial(file_name_is, filenames=["a.txt", "b.txt"])
     AssetCollection.from_directory(... filters=[fname], ...)
 """
+import os
 import typing
 
 if typing.TYPE_CHECKING:
@@ -54,7 +55,7 @@ def file_extension_is(asset: 'TAsset', extensions: 'List[str]') -> 'bool':
     return asset.extension in extensions
 
 
-def asset_in_directory(asset: 'TAsset', directories: 'List[str]') -> 'bool':
+def asset_in_directory(asset: 'TAsset', directories: 'List[str]', base_path: str = os.getcwd()) -> 'bool':
     """
     Restrict filtering to assets within a given directory.
     This filter is not strict and simply checks if the directory portion is present in the assets absolute path.
@@ -62,5 +63,14 @@ def asset_in_directory(asset: 'TAsset', directories: 'List[str]') -> 'bool':
     Args:
         asset: The asset to filter.
         directories: List of directory portions to include.
+        base_path: base_path
     """
-    return any([d in asset.absolute_path for d in directories])
+
+    norm_base_path = os.path.abspath(base_path)
+    norm_dirs = [f"{os.sep}{d}{os.sep}" for d in directories]
+    norm_asset_absolute_path = os.path.abspath(asset.absolute_path)
+    norm_root = norm_asset_absolute_path.replace(norm_base_path, "")
+
+    if not norm_asset_absolute_path.startswith(norm_base_path):
+        return False
+    return any([d in norm_root for d in norm_dirs])
