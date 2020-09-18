@@ -14,6 +14,7 @@ from idmtools_test.utils.test_task import TestTask
 
 
 @pytest.mark.analysis
+@pytest.mark.smoke
 class TestAnalyzeManager(unittest.TestCase):
     class TestAnalyzer(IAnalyzer):
         def __init__(self, working_dir=None):
@@ -72,7 +73,6 @@ class TestAnalyzeManager(unittest.TestCase):
             self.analyze_manager.potential_items.clear()
 
     # check the conditionals; do they work properly when partial_analyze_ok and/or max_items_to_analyze are used?
-    @pytest.mark.smoke
     def test_get_items_to_analyze(self):
         # first make sure that partial analyze is set to True if max_items has been specified
         am = AnalyzeManager(self.platform, partial_analyze_ok=False)

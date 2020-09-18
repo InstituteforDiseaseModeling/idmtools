@@ -165,6 +165,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
 
     # test analyzer with only succeeded simulations
     # note: experiment can have failed sims, but analyzer only analyzes succeeded sims
+    @pytest.mark.smoke
     def test_analyzer_with_succeeded_sims(self):
         experiment_id = 'c3e4ef50-ee63-ea11-a2bf-f0921c167862'  # staging experiment includes 5 sims with 3 failed sims
         output_folder = "output_test_analyzer_with_succeeded_sims"

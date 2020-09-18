@@ -13,7 +13,7 @@ with open('requirements.txt') as requirements_file:
 build_requirements = ['flake8', 'coverage', 'py-make', 'bump2version', 'twine']
 test_requirements = ['pytest', 'pytest-runner', 'matplotlib', 'pytest-timeout', 'pytest-cache'] + build_requirements
 
-extras = dict(test=test_requirements, dev=['Pympler'], pushover="python-pushover", packaging=build_requirements)
+extras = dict(test=test_requirements, dev=['Pympler'], packaging=build_requirements)
 
 authors = [
     ("Ross Carter", "rcarter@idmod.org"),
@@ -48,5 +48,5 @@ setup(
                       ),
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='1.4.0+nightly'
+    version='1.5.0+nightly'
 )

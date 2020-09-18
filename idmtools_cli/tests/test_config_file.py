@@ -1,10 +1,12 @@
 import unittest
 
+import pytest
 from click.testing import CliRunner
 
 from idmtools_cli.cli.config_file import config
 
 
+@pytest.mark.smoke
 class TestConfigFile(unittest.TestCase):
 
     def test_slugify(self):

@@ -1,6 +1,7 @@
 import pickle
 import unittest
 
+import pytest
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
@@ -9,6 +10,7 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.test_task import TestTask
 
 
+@pytest.mark.smoke
 class TestPersistenceServices(ITestWithPersistence):
 
     def test_persist_retrieve_platform(self):

@@ -9,6 +9,7 @@ from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 
+@pytest.mark.smoke
 class TestConfig(ITestWithPersistence):
 
     def setUp(self):

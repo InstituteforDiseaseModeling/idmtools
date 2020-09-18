@@ -2,6 +2,7 @@ import os
 import unittest
 from functools import partial
 
+import pytest
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType, EntityStatus
 from idmtools.core.platform_factory import Platform

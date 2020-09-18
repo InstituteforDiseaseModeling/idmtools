@@ -1,6 +1,7 @@
 import os
 import unittest
 
+import pytest
 from idmtools.assets import AssetCollection
 
 from idmtools.entities.experiment import Experiment
@@ -12,6 +13,7 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.test_task import TestTask
 
 
+@pytest.mark.smoke
 class TestPersistenceServices(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName

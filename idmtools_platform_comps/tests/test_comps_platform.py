@@ -29,6 +29,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
     @pytest.mark.assets
     @pytest.mark.python
     @pytest.mark.long
+    @pytest.mark.smoke
     def test_output_files_retrieval(self):
         config = {"a": 1, "b": 2}
         experiment = self.get_working_model_experiment(config)
@@ -164,6 +165,28 @@ class TestCOMPSPlatform(ITestWithPersistence):
         # only get back the succeeded sims
         sims = FilterItem.filter_item(self.platform, experiment, status=EntityStatus.SUCCEEDED)
         self.assertEqual(len(sims), 2)
+
+    def test_experiment_name(self):  # zdu: no metadata file any more
+        model_path = os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py")
+        task = JSONConfiguredPythonTask(script_path=model_path, envelope="parameters")
+        e = Experiment.from_task(task, name="test/\\:'?<>*|name1")
+        e.run(wait_until_done=True)
+        name_expected = "test_________name1"
+        self.assertEqual(e.name, name_expected)
+        self.assertIsNone(e.simulations[0].name)
+
+    def test_experiment_simulation_name_cleanup(self):
+        model_path = os.path.join(COMMON_INPUT_PATH, "python", "hello_world.py")
+        task = JSONConfiguredPythonTask(script_path=model_path, parameters={})
+        name = ""
+        s = ['/', '\\', ':', "'", '"', '?', '<', '>', '*', '|', "\0"]
+        exp_name = name.join(s)
+        experiment = Experiment.from_task(task, name="name" + exp_name + "test")
+        experiment.simulations[0].name = "test/\\:'?<>*|sim1"
+        experiment.run(wait_until_done=True)
+        name_expected = "name___________test"
+        self.assertEqual(experiment.name, name_expected)
+        self.assertEqual(experiment.simulations[0].name, "test_________sim1")
 
 
 if __name__ == '__main__':

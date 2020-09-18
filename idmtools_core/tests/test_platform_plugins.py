@@ -1,8 +1,11 @@
 from unittest import TestCase
+
+import pytest
 from idmtools.registry.platform_specification import PlatformPlugins
 from idmtools.utils.info import get_packages_from_pip
 
 
+@pytest.mark.smoke
 class TestPlatformPlugins(TestCase):
     def test_get_plugins(self):
         """

@@ -12,6 +12,7 @@ from COMPS.Data import QueryCriteria
 
 from idmtools import __version__
 from idmtools.assets import Asset, AssetCollection
+from idmtools.assets.errors import DuplicatedAssetError
 from idmtools.builders import ArmSimulationBuilder, ArmType, SimulationBuilder, SweepArm
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
@@ -368,15 +369,11 @@ class TestPythonExperiment(ITestWithPersistence):
         experiment = Experiment(name=self.case_name,
                                 simulations=[JSONConfiguredPythonTask(script_path=script_path)],
                                 tags={"string_tag": "test", "number_tag": 123}, gather_common_assets_from_task=True)
-        experiment.assets.add_directory(
-            assets_directory=os.path.join(COMMON_INPUT_PATH, "python", "folder_dup_file"))
-        with self.assertRaises(RuntimeError) as context:
+        # add another file with different content at same path
+        experiment.assets.add_asset(Asset(filename="model1.py", content="yay"))
+        with self.assertRaises(DuplicatedAssetError) as context:
             experiment.run()
-        self.assertTrue(
-            "400 Bad Request - An error was encountered while attempting to save asset collection: Cannot insert "
-            "duplicate key row in object 'dbo.AssetCollectionFile' with unique index "
-            "'IX_AssetCollectionFile_AssetCollectionId_NewFileName_RelativePath_Unique'." in str(
-                context.exception.args[0]))
+        self.assertIn("File with same paths but different content provided", str(context.exception.args[0]))
 
     @pytest.mark.comps
     @pytest.mark.long

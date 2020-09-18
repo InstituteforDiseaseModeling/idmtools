@@ -29,6 +29,8 @@ class TemplatedScriptTask(ITask):
     """
     #: Name of script
     script_path: str = field(default=None, metadata={"md": True})
+    #: If platform requires path to script executing binary(ie /bin/bash)
+    script_binary: str = field(default=None, metadata={"md": True})
     #: The template contents
     template: str = field(default=None, metadata={"md": True})
     #: The template file. You can only use either template or template_file at once
@@ -172,10 +174,14 @@ class TemplatedScriptTask(ITask):
 
         """
         # are we experiment or simulation level asset?
-        if self.template_is_common:
-            sn = f'Assets{self.path_sep}{self.script_path}'
+        if self.script_binary:
+            sn = self.script_binary + ' '
         else:
-            sn = self.script_path
+            sn = ''
+        if self.template_is_common:
+            sn += f'Assets{self.path_sep}{self.script_path}'
+        else:
+            sn += self.script_path
         # set the command line to the rendered script
         self.command = CommandLine(sn)
         # set any extra arguments
