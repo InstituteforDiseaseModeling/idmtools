@@ -75,7 +75,7 @@
             
             
               <div class="version">
-                1.4.0+nightly.0
+                1.5.0
               </div>
             
           
@@ -196,20 +196,17 @@
 <em class="property">class </em><code class="sig-prename descclassname">idmtools.assets.asset_collection.</code><code class="sig-name descname">AssetCollection</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">assets</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>List<span class="p">[</span>TAsset<span class="p">]</span><span class="p">, </span><a class="reference internal" href="#idmtools.assets.asset_collection.AssetCollection" title="idmtools.assets.asset_collection.AssetCollection">AssetCollection</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tags</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="idmtools.core.interfaces.ientity.html#idmtools.core.interfaces.ientity.IEntity" title="idmtools.core.interfaces.ientity.IEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">idmtools.core.interfaces.ientity.IEntity</span></code></a></p>
 <p>A class that represents a collection of assets.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>assets</strong> – An optional list of assets to create the collection with.</p>
-</dd>
-</dl>
 <dl class="py attribute">
 <dt id="idmtools.assets.asset_collection.AssetCollection.item_type">
 <code class="sig-name descname">item_type</code><em class="property">: <a class="reference internal" href="idmtools.core.enums.html#idmtools.core.enums.ItemType" title="idmtools.core.enums.ItemType">idmtools.core.enums.ItemType</a></em><em class="property"> = 5</em><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.item_type" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>ItemType so platform knows how to handle item properly</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt id="idmtools.assets.asset_collection.AssetCollection.assets">
 <code class="sig-name descname">assets</code><em class="property">: List<span class="p">[</span><a class="reference internal" href="idmtools.assets.asset.html#idmtools.assets.asset.Asset" title="idmtools.assets.asset.Asset">idmtools.assets.asset.Asset</a><span class="p">]</span></em><em class="property"> = None</em><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.assets" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Assets for collection</p>
+</dd></dl>
 
 <dl class="py method">
 <dt id="idmtools.assets.asset_collection.AssetCollection.from_id">
@@ -306,7 +303,7 @@ See <a class="reference internal" href="#idmtools.assets.asset_collection.AssetC
 
 <dl class="py method">
 <dt id="idmtools.assets.asset_collection.AssetCollection.add_asset">
-<code class="sig-name descname">add_asset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">asset</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference internal" href="idmtools.assets.asset.html#idmtools.assets.asset.Asset" title="idmtools.assets.asset.Asset">idmtools.assets.asset.Asset</a><span class="p">, </span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">fail_on_duplicate</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.add_asset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add_asset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">asset</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference internal" href="idmtools.assets.asset.html#idmtools.assets.asset.Asset" title="idmtools.assets.asset.Asset">idmtools.assets.asset.Asset</a><span class="p">, </span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">fail_on_duplicate</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">fail_on_deep_comparison</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.add_asset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add an asset to the collection.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -315,6 +312,7 @@ See <a class="reference internal" href="#idmtools.assets.asset_collection.AssetC
 used as the absolute_path and any kwargs will be passed to the Asset constructor</p></li>
 <li><p><strong>fail_on_duplicate</strong> – Raise a <strong>DuplicateAssetError</strong> if an asset is duplicated.
 If not, simply replace it.</p></li>
+<li><p><strong>fail_on_deep_comparison</strong> – Fails only if deep comparison differs</p></li>
 <li><p><strong>**kwargs</strong> – Arguments to pass to Asset constructor when asset is a string</p></li>
 </ul>
 </dd>
@@ -323,7 +321,7 @@ If not, simply replace it.</p></li>
 
 <dl class="py method">
 <dt id="idmtools.assets.asset_collection.AssetCollection.add_assets">
-<code class="sig-name descname">add_assets</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">assets</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>List<span class="p">[</span>TAsset<span class="p">]</span><span class="p">, </span><a class="reference internal" href="#idmtools.assets.asset_collection.AssetCollection" title="idmtools.assets.asset_collection.AssetCollection">AssetCollection</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">fail_on_duplicate</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.add_assets" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add_assets</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">assets</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>List<span class="p">[</span>TAsset<span class="p">]</span><span class="p">, </span><a class="reference internal" href="#idmtools.assets.asset_collection.AssetCollection" title="idmtools.assets.asset_collection.AssetCollection">AssetCollection</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">fail_on_duplicate</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">fail_on_deep_comparison</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.add_assets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add assets to a collection</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -331,6 +329,7 @@ If not, simply replace it.</p></li>
 <li><p><strong>assets</strong> – An list of assets as either list or a collection</p></li>
 <li><p><strong>fail_on_duplicate</strong> – Raise a <strong>DuplicateAssetError</strong> if an asset is duplicated.
 If not, simply replace it.</p></li>
+<li><p><strong>fail_on_deep_comparison</strong> – Fail if relative path/file is same but contents differ</p></li>
 </ul>
 </dd>
 </dl>
@@ -339,11 +338,14 @@ If not, simply replace it.</p></li>
 
 <dl class="py method">
 <dt id="idmtools.assets.asset_collection.AssetCollection.add_or_replace_asset">
-<code class="sig-name descname">add_or_replace_asset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">asset</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.assets.asset.html#idmtools.assets.asset.Asset" title="idmtools.assets.asset.Asset">idmtools.assets.asset.Asset</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.add_or_replace_asset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add_or_replace_asset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">asset</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.assets.asset.html#idmtools.assets.asset.Asset" title="idmtools.assets.asset.Asset">idmtools.assets.asset.Asset</a></span></em>, <em class="sig-param"><span class="n">fail_on_deep_comparison</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.add_or_replace_asset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add or replaces an asset in a collection</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>asset</strong> – Asset to add or replace</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>asset</strong> – Asset to add or replace</p></li>
+<li><p><strong>fail_on_deep_comparison</strong> – Fail replace if contents differ</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>None.</p>
@@ -433,13 +435,15 @@ If not, simply replace it.</p></li>
 
 <dl class="py method">
 <dt id="idmtools.assets.asset_collection.AssetCollection.has_asset">
-<code class="sig-name descname">has_asset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">absolute_path</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.has_asset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">has_asset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">absolute_path</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">relative_path</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">checksum</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.has_asset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Search for asset by absolute_path or by filename</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>absolute_path</strong> – Absolute path of source file</p></li>
 <li><p><strong>filename</strong> – Destination filename</p></li>
+<li><p><strong>relative_path</strong> – Relative path of asset</p></li>
+<li><p><strong>checksum</strong> – Checksum of asset(optional)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -450,13 +454,13 @@ If not, simply replace it.</p></li>
 
 <dl class="py method">
 <dt id="idmtools.assets.asset_collection.AssetCollection.find_index_of_asset">
-<code class="sig-name descname">find_index_of_asset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">absolute_path</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; Optional<span class="p">[</span>int<span class="p">]</span><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.find_index_of_asset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">find_index_of_asset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">other</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.assets.asset.html#idmtools.assets.asset.Asset" title="idmtools.assets.asset.Asset">idmtools.assets.asset.Asset</a></span></em>, <em class="sig-param"><span class="n">deep_compare</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span> &#x2192; Optional<span class="p">[</span>int<span class="p">]</span><a class="headerlink" href="#idmtools.assets.asset_collection.AssetCollection.find_index_of_asset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Finds the index of asset by path or filename</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>absolute_path</strong> – Path to search</p></li>
-<li><p><strong>filename</strong> – Filename to search</p></li>
+<li><p><strong>other</strong> – Other asset</p></li>
+<li><p><strong>deep_compare</strong> – Should content as well as path be compared</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>

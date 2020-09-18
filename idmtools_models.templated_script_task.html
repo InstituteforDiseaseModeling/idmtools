@@ -75,7 +75,7 @@
             
             
               <div class="version">
-                1.4.0+nightly.0
+                1.5.0
               </div>
             
           
@@ -186,13 +186,19 @@
 <span id="idmtools-models-templated-script-task-module"></span><h1>idmtools_models.templated_script_task module<a class="headerlink" href="#module-idmtools_models.templated_script_task" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="idmtools_models.templated_script_task.TemplatedScriptTask">
-<em class="property">class </em><code class="sig-prename descclassname">idmtools_models.templated_script_task.</code><code class="sig-name descname">TemplatedScriptTask</code><span class="sig-paren">(</span><em class="sig-param">command: Union[str, idmtools.entities.command_line.CommandLine] = None, platform_requirements: Set[idmtools.entities.platform_requirements.PlatformRequirements] = &lt;factory&gt;, _ITask__pre_creation_hooks: List[Callable[[Union[Simulation, IWorkflowItem]], NoReturn]] = &lt;factory&gt;, _ITask__post_creation_hooks: List[Callable[[Union[Simulation, IWorkflowItem]], NoReturn]] = &lt;factory&gt;, common_assets: idmtools.assets.asset_collection.AssetCollection = &lt;factory&gt;, transient_assets: idmtools.assets.asset_collection.AssetCollection = &lt;factory&gt;, _task_log: logging.Logger = &lt;factory&gt;, script_path: str = None, template: str = None, template_file: str = None, template_is_common: bool = True, variables: Dict[str, Any] = &lt;factory&gt;, path_sep: str = '/', extra_command_arguments: str = '', gather_common_asset_hooks: List[Callable[[idmtools.entities.itask.ITask], idmtools.assets.asset_collection.AssetCollection]] = &lt;factory&gt;, gather_transient_asset_hooks: List[Callable[[idmtools.entities.itask.ITask], idmtools.assets.asset_collection.AssetCollection]] = &lt;factory&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_models.templated_script_task.TemplatedScriptTask" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">idmtools_models.templated_script_task.</code><code class="sig-name descname">TemplatedScriptTask</code><span class="sig-paren">(</span><em class="sig-param">command: Union[str, idmtools.entities.command_line.CommandLine] = None, platform_requirements: Set[idmtools.entities.platform_requirements.PlatformRequirements] = &lt;factory&gt;, _ITask__pre_creation_hooks: List[Callable[[Union[Simulation, IWorkflowItem]], NoReturn]] = &lt;factory&gt;, _ITask__post_creation_hooks: List[Callable[[Union[Simulation, IWorkflowItem]], NoReturn]] = &lt;factory&gt;, common_assets: idmtools.assets.asset_collection.AssetCollection = &lt;factory&gt;, transient_assets: idmtools.assets.asset_collection.AssetCollection = &lt;factory&gt;, _task_log: logging.Logger = &lt;factory&gt;, script_path: str = None, script_binary: str = None, template: str = None, template_file: str = None, template_is_common: bool = True, variables: Dict[str, Any] = &lt;factory&gt;, path_sep: str = '/', extra_command_arguments: str = '', gather_common_asset_hooks: List[Callable[[idmtools.entities.itask.ITask], idmtools.assets.asset_collection.AssetCollection]] = &lt;factory&gt;, gather_transient_asset_hooks: List[Callable[[idmtools.entities.itask.ITask], idmtools.assets.asset_collection.AssetCollection]] = &lt;factory&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_models.templated_script_task.TemplatedScriptTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="idmtools.entities.itask.html#idmtools.entities.itask.ITask" title="idmtools.entities.itask.ITask"><code class="xref py py-class docutils literal notranslate"><span class="pre">idmtools.entities.itask.ITask</span></code></a></p>
 <p>Defines a task to run a script using a template. Best suited to shell scripts</p>
 <dl class="py attribute">
 <dt id="idmtools_models.templated_script_task.TemplatedScriptTask.script_path">
 <code class="sig-name descname">script_path</code><em class="property">: str</em><em class="property"> = None</em><a class="headerlink" href="#idmtools_models.templated_script_task.TemplatedScriptTask.script_path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Name of script</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools_models.templated_script_task.TemplatedScriptTask.script_binary">
+<code class="sig-name descname">script_binary</code><em class="property">: str</em><em class="property"> = None</em><a class="headerlink" href="#idmtools_models.templated_script_task.TemplatedScriptTask.script_binary" title="Permalink to this definition">¶</a></dt>
+<dd><p>If platform requires path to script executing binary(ie /bin/bash)</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -502,6 +508,17 @@ Returns:</p>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt id="idmtools_models.templated_script_task.TemplatedScriptTaskSpecification.get_version">
+<code class="sig-name descname">get_version</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#idmtools_models.templated_script_task.TemplatedScriptTaskSpecification.get_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the version of the plugin</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Plugin Version</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -551,6 +568,17 @@ Returns:</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>TemplatedScriptTask</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools_models.templated_script_task.ScriptWrapperTaskSpecification.get_version">
+<code class="sig-name descname">get_version</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#idmtools_models.templated_script_task.ScriptWrapperTaskSpecification.get_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the version of the plugin</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Plugin Version</p>
 </dd>
 </dl>
 </dd></dl>

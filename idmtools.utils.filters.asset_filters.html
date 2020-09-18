@@ -75,7 +75,7 @@
             
             
               <div class="version">
-                1.4.0+nightly.0
+                1.5.0
               </div>
             
           
@@ -242,7 +242,7 @@ This filter is used in the creation of
 
 <dl class="py function">
 <dt id="idmtools.utils.filters.asset_filters.asset_in_directory">
-<code class="sig-prename descclassname">idmtools.utils.filters.asset_filters.</code><code class="sig-name descname">asset_in_directory</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">asset</span><span class="p">:</span> <span class="n">TAsset</span></em>, <em class="sig-param"><span class="n">directories</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#idmtools.utils.filters.asset_filters.asset_in_directory" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">idmtools.utils.filters.asset_filters.</code><code class="sig-name descname">asset_in_directory</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">asset</span><span class="p">:</span> <span class="n">TAsset</span></em>, <em class="sig-param"><span class="n">directories</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">base_path</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'/home/runner/work/idmtools/idmtools/idmtools/docs'</span></em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#idmtools.utils.filters.asset_filters.asset_in_directory" title="Permalink to this definition">¶</a></dt>
 <dd><p>Restrict filtering to assets within a given directory.
 This filter is not strict and simply checks if the directory portion is present in the assets absolute path.</p>
 <dl class="field-list simple">
@@ -250,6 +250,7 @@ This filter is not strict and simply checks if the directory portion is present 
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>asset</strong> – The asset to filter.</p></li>
 <li><p><strong>directories</strong> – List of directory portions to include.</p></li>
+<li><p><strong>base_path</strong> – base_path</p></li>
 </ul>
 </dd>
 </dl>

@@ -75,7 +75,7 @@
             
             
               <div class="version">
-                1.4.0+nightly.0
+                1.5.0
               </div>
             
           
@@ -193,7 +193,7 @@
 <span id="idmtools-analysis-csv-analyzer-module"></span><h1>idmtools.analysis.csv_analyzer module<a class="headerlink" href="#module-idmtools.analysis.csv_analyzer" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="idmtools.analysis.csv_analyzer.CSVAnalyzer">
-<em class="property">class </em><code class="sig-prename descclassname">idmtools.analysis.csv_analyzer.</code><code class="sig-name descname">CSVAnalyzer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filenames</span></em>, <em class="sig-param"><span class="n">parse</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.analysis.csv_analyzer.CSVAnalyzer" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">idmtools.analysis.csv_analyzer.</code><code class="sig-name descname">CSVAnalyzer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filenames</span></em>, <em class="sig-param"><span class="n">parse</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">output_path</span><span class="o">=</span><span class="default_value">'output_csv'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.analysis.csv_analyzer.CSVAnalyzer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="idmtools.entities.ianalyzer.html#idmtools.entities.ianalyzer.IAnalyzer" title="idmtools.entities.ianalyzer.IAnalyzer"><code class="xref py py-class docutils literal notranslate"><span class="pre">idmtools.entities.ianalyzer.IAnalyzer</span></code></a></p>
 <p>Provides an analyzer for CSV output</p>
 <p class="rubric">Examples</p>
@@ -210,7 +210,6 @@
 <span class="kn">from</span> <span class="nn">idmtools.core</span> <span class="kn">import</span> <span class="n">ItemType</span>
 <span class="kn">from</span> <span class="nn">idmtools.core.platform_factory</span> <span class="kn">import</span> <span class="n">Platform</span>
 
-
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
 
     <span class="c1"># Set the platform where you want to run your analysis</span>
@@ -223,7 +222,7 @@
         <span class="c1"># In this case, we want to provide a filename to analyze</span>
         <span class="n">filenames</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;output/c.csv&#39;</span><span class="p">]</span>
         <span class="c1"># Initialize the analyser class with the path of the output csv file</span>
-        <span class="n">analyzers</span> <span class="o">=</span> <span class="p">[</span><span class="n">CSVAnalyzer</span><span class="p">(</span><span class="n">filenames</span><span class="o">=</span><span class="n">filenames</span><span class="p">)]</span>
+        <span class="n">analyzers</span> <span class="o">=</span> <span class="p">[</span><span class="n">CSVAnalyzer</span><span class="p">(</span><span class="n">filenames</span><span class="o">=</span><span class="n">filenames</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="s2">&quot;output_csv&quot;</span><span class="p">)]</span>
 
         <span class="c1"># Set the experiment id you want to analyze</span>
         <span class="n">experiment_id</span> <span class="o">=</span> <span class="s1">&#39;9311af40-1337-ea11-a2be-f0921c167861&#39;</span>  <span class="c1"># staging exp id simple sim and csv example</span>
@@ -259,7 +258,7 @@
     <span class="c1"># In this case, we have multiple csv files to analyze</span>
     <span class="n">filenames</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;output/a.csv&#39;</span><span class="p">,</span> <span class="s1">&#39;output/b.csv&#39;</span><span class="p">]</span>
     <span class="c1"># Initialize the analyser class with the path of the output csv file</span>
-    <span class="n">analyzers</span> <span class="o">=</span> <span class="p">[</span><span class="n">CSVAnalyzer</span><span class="p">(</span><span class="n">filenames</span><span class="o">=</span><span class="n">filenames</span><span class="p">)]</span>
+    <span class="n">analyzers</span> <span class="o">=</span> <span class="p">[</span><span class="n">CSVAnalyzer</span><span class="p">(</span><span class="n">filenames</span><span class="o">=</span><span class="n">filenames</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="s2">&quot;output_csv&quot;</span><span class="p">)]</span>
 
     <span class="c1"># Set the experiment id you want to analyze</span>
     <span class="n">experiment_id</span> <span class="o">=</span> <span class="s1">&#39;1bddce22-0c37-ea11-a2be-f0921c167861&#39;</span>  <span class="c1"># staging exp id with multiple csv file outputs</span>

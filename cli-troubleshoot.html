@@ -75,7 +75,7 @@
             
             
               <div class="version">
-                1.4.0+nightly.0
+                1.5.0
               </div>
             
           
@@ -173,7 +173,7 @@
             
   <div class="section" id="troubleshooting">
 <h1>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h1>
-<p>You can use troubleshooting commands to get information abouts plugins (CLI, Platform, and Task) and to get detailed system information. To see the list of troubleshooting commands, type the following at a command prompt:</p>
+<p>You can use troubleshooting commands to get information about plugins (CLI, Platform, and Task) and to get detailed system information. To see the list of troubleshooting commands, type the following at a command prompt:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ idmtools info --help
 INI File Used: /home/runner/work/idmtools/idmtools/idmtools/docs/idmtools.ini
 Usage: idmtools info [OPTIONS] COMMAND [ARGS]...
@@ -222,6 +222,34 @@ Options:
   --issue / --no-issue            Copy data and format for github alias
   --output-filename TEXT          Output filename
   --help                          Show this message and exit.
+</pre></div>
+</div>
+<p>To see the versions of idmtools and related modules, along with the plugins they provide, you can use the <code class="docutils literal notranslate"><span class="pre">version</span></code> command. Here is an example of the output:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ idmtools version
+INI File Used: /home/runner/work/idmtools/idmtools/idmtools/docs/idmtools.ini
+idmtools                             Version: 1.5.0.0                         
+  Plugins:
+    CommandTask               
+idmtools-cli                         Version: 1.5.0.0                         
+idmtools-models                      Version: 1.5.0.0                         
+  Plugins:
+    JSONConfiguredPythonTask  
+    JSONConfiguredRTask       
+    JSONConfiguredTask        
+    PythonTask                
+    RTask                     
+    ScriptWrapperTask         
+    TemplatedScriptTask       
+idmtools-platform-comps              Version: 1.5.0.0                         
+  Plugins:
+    COMPSPlatform             
+    SSMTPlatform              
+idmtools-platform-local              Version: 1.5.0                           
+  Plugins:
+    LocalPlatform             
+idmtools-platform-slurm              Version: 1.0.0+nightly                   
+  Plugins:
+    SlurmPlatform
 </pre></div>
 </div>
 </div>

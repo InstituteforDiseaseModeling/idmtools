@@ -75,7 +75,7 @@
             
             
               <div class="version">
-                1.4.0+nightly.0
+                1.5.0
               </div>
             
           
@@ -193,38 +193,27 @@
 <span id="idmtools-assets-asset-module"></span><h1>idmtools.assets.asset module<a class="headerlink" href="#module-idmtools.assets.asset" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="idmtools.assets.asset.Asset">
-<em class="property">class </em><code class="sig-prename descclassname">idmtools.assets.asset.</code><code class="sig-name descname">Asset</code><span class="sig-paren">(</span><em class="sig-param">absolute_path: Optional[str] = None</em>, <em class="sig-param">relative_path: Optional[str] = &lt;property object&gt;</em>, <em class="sig-param">filename: Optional[str] = None</em>, <em class="sig-param">content: dataclasses.InitVar = &lt;property object&gt;</em>, <em class="sig-param">_length: Optional[int] = None</em>, <em class="sig-param">persisted: bool = False</em>, <em class="sig-param">handler: Callable = &lt;class 'str'&gt;</em>, <em class="sig-param">download_generator_hook: Callable = None</em>, <em class="sig-param">checksum: Optional[str] = &lt;property object&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.assets.asset.Asset" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">idmtools.assets.asset.</code><code class="sig-name descname">Asset</code><span class="sig-paren">(</span><em class="sig-param">absolute_path: Optional[str] = None</em>, <em class="sig-param">relative_path: Optional[str] = &lt;property object&gt;</em>, <em class="sig-param">filename: Optional[str] = None</em>, <em class="sig-param">content: dataclasses.InitVar = &lt;property object&gt;</em>, <em class="sig-param">_length: Optional[int] = None</em>, <em class="sig-param">persisted: bool = False</em>, <em class="sig-param">handler: Callable = &lt;class 'str'&gt;</em>, <em class="sig-param">download_generator_hook: Callable = None</em>, <em class="sig-param">checksum: dataclasses.InitVar = &lt;property object&gt;</em>, <em class="sig-param">_checksum: Optional[str] = None</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.assets.asset.Asset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class representing an asset. An asset can either be related to a physical
 asset present on the computer or directly specified by a filename and content.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>absolute_path</strong> – The absolute path of the asset. Optional if <strong>filename</strong> and <strong>content</strong> are given.</p></li>
-<li><p><strong>relative_path</strong> – The relative path (compared to the simulation root folder).</p></li>
-<li><p><strong>filename</strong> – Name of the file. Optional if <strong>absolute_path</strong> is given.</p></li>
-<li><p><strong>content</strong> – The content of the file. Optional if <strong>absolute_path</strong> is given.</p></li>
-<li><p><strong>checksum</strong> – <p>Optional. Useful in systems that allow single upload based on checksums and retrieving from those
-systems</p>
-<p>Note: we add this to allow systems who provide asset caching by MD5 opportunity to avoid re-uploading assets</p>
-</p></li>
-</ul>
-</dd>
-</dl>
 <dl class="py attribute">
 <dt id="idmtools.assets.asset.Asset.absolute_path">
 <code class="sig-name descname">absolute_path</code><em class="property">: Optional<span class="p">[</span>str<span class="p">]</span></em><em class="property"> = None</em><a class="headerlink" href="#idmtools.assets.asset.Asset.absolute_path" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>The absolute path of the asset. Optional if <strong>filename</strong> and <strong>content</strong> are given.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt id="idmtools.assets.asset.Asset.filename">
 <code class="sig-name descname">filename</code><em class="property">: Optional<span class="p">[</span>str<span class="p">]</span></em><em class="property"> = None</em><a class="headerlink" href="#idmtools.assets.asset.Asset.filename" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Name of the file. Optional if <strong>absolute_path</strong> is given.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt id="idmtools.assets.asset.Asset.persisted">
 <code class="sig-name descname">persisted</code><em class="property">: bool</em><em class="property"> = False</em><a class="headerlink" href="#idmtools.assets.asset.Asset.persisted" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Persisted tracks if item has been saved</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt id="idmtools.assets.asset.Asset.handler">
@@ -235,16 +224,13 @@ systems</p>
 <dl class="py attribute">
 <dt id="idmtools.assets.asset.Asset.download_generator_hook">
 <code class="sig-name descname">download_generator_hook</code><em class="property">: Callable</em><em class="property"> = None</em><a class="headerlink" href="#idmtools.assets.asset.Asset.download_generator_hook" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Hook to allow downloading from platform</p>
+</dd></dl>
 
 <dl class="py method">
 <dt id="idmtools.assets.asset.Asset.checksum">
 <em class="property">property </em><code class="sig-name descname">checksum</code><a class="headerlink" href="#idmtools.assets.asset.Asset.checksum" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>None.</p>
-</dd>
-</dl>
+<dd><p>Checksum of asset. Only required for existing assets</p>
 </dd></dl>
 
 <dl class="py method">
@@ -255,7 +241,8 @@ systems</p>
 <dl class="py method">
 <dt id="idmtools.assets.asset.Asset.relative_path">
 <em class="property">property </em><code class="sig-name descname">relative_path</code><a class="headerlink" href="#idmtools.assets.asset.Asset.relative_path" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>The relative path (compared to the simulation root folder).</p>
+</dd></dl>
 
 <dl class="py method">
 <dt id="idmtools.assets.asset.Asset.bytes">
@@ -270,9 +257,19 @@ systems</p>
 <dl class="py method">
 <dt id="idmtools.assets.asset.Asset.content">
 <em class="property">property </em><code class="sig-name descname">content</code><a class="headerlink" href="#idmtools.assets.asset.Asset.content" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The content of the file, either from the content attribute or by opening the absolute path.</p>
+<dd><p>The content of the file. Optional if <strong>absolute_path</strong> is given.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.assets.asset.Asset.deep_equals">
+<code class="sig-name descname">deep_equals</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">other</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#idmtools.assets.asset.Asset" title="idmtools.assets.asset.Asset">idmtools.assets.asset.Asset</a></span></em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#idmtools.assets.asset.Asset.deep_equals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a deep comparison of assets, including contents</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>other</strong> – Other asset to compare</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if filename, relative path, and contents are equal, otherwise false</p>
 </dd>
 </dl>
 </dd></dl>
@@ -305,10 +302,24 @@ systems</p>
 <dd><p>Download an asset to path. This requires loadings the object through the platofrm</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>path</strong> – Path to write to. If it is a directory, the asset filename will be added to it</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dest</strong> – Path to write to. If it is a directory, the asset filename will be added to it</p></li>
+<li><p><strong>force</strong> – Force download even if file exists</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.assets.asset.Asset.calculate_checksum">
+<code class="sig-name descname">calculate_checksum</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#idmtools.assets.asset.Asset.calculate_checksum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate checksum on asset. If previous checksum was calculated, that value will be returned</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Checksum string</p>
 </dd>
 </dl>
 </dd></dl>
