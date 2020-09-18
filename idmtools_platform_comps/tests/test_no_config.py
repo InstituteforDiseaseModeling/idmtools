@@ -8,6 +8,7 @@ from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 
 
+@pytest.mark.smoke
 class TestNoConfig(unittest.TestCase):
 
     @classmethod

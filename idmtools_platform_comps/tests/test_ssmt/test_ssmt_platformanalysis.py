@@ -4,14 +4,10 @@ import sys
 
 import pytest
 from idmtools.analysis.platform_anaylsis import PlatformAnalysis
-from idmtools.assets.file_list import FileList
 from idmtools.core.platform_factory import Platform
-from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-from idmtools_test.utils.utils import del_folder
 from idmtools.core import ItemType
 
-# import analyzers from current dir's inputs dir
 analyzer_path = os.path.join(os.path.dirname(__file__), "..", "inputs")
 sys.path.insert(0, analyzer_path)
 from simple_analyzer import SimpleAnalyzer  # noqa
@@ -22,7 +18,7 @@ from node_csv_analyzer import NodeCSVAnalyzer  # noqa
 
 @pytest.mark.comps
 @pytest.mark.ssmt
-class TestSSMTWorkItemPythonExp(ITestWithPersistence):
+class TestPlatformAnalysis(ITestWithPersistence):
 
     def setUp(self):
         print(self._testMethodName)
@@ -32,40 +28,11 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
         self.tags = {'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}
         self.input_file_path = analyzer_path
 
-    # test SSMTWorkItem with simple python script "hello.py"
-    # "hello.py" will run in comps's workitem worker like running it in local:
-    # python hello.py
-    def test_ssmt_workitem_python(self):
-        command = "python hello.py"
-        user_files = FileList()
-        user_files.add_file(os.path.join(self.input_file_path, "hello.py"))
-
-        wi = SSMTWorkItem(item_name=self.case_name, command=command, user_files=user_files, tags=self.tags)
-        wi.run(wait_on_done=True)
-
-        # verify workitem output files
-        local_output_path = "output"  # local output dir
-        del_folder(local_output_path)  # delete existing folder before run validation
-        out_filenames = ["hello.py", "WorkOrder.json"]  # files to retrieve from workitem dir
-        self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
-
-        file_path = os.path.join(local_output_path, str(wi.uid))
-        # verify that we do retrieved the correct files from comps' workitem to local
-        self.assertTrue(os.path.exists(os.path.join(file_path, "hello.py")))
-        self.assertTrue(os.path.exists(os.path.join(file_path, "WorkOrder.json")))
-
-        # verify that WorkOrder.json content is correct
-        worker_order = json.load(open(os.path.join(file_path, "WorkOrder.json"), 'r'))
-        print(worker_order)
-        self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
-        execution = worker_order['Execution']
-        self.assertEqual(execution['Command'],
-                         "python hello.py")
-
     # Test SimpleAnalyzer with SSMTAnalysis which analyzes python experiment's results
+    @pytest.mark.smoke
     def test_ssmt_workitem_python_simple_analyzer(self):
-
-        experiment_id = "9311af40-1337-ea11-a2be-f0921c167861"
+        experiment_id = '9311af40-1337-ea11-a2be-f0921c167861'  # comps2 exp id
+        # experiment_id = 'de07f612-69ed-ea11-941f-0050569e0ef3'  # idmtvapp17
         analysis = PlatformAnalysis(platform=self.platform,
                                     experiment_ids=[experiment_id],
                                     analyzers=[SimpleAnalyzer],
@@ -78,15 +45,13 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
 
         # verify workitem result
         local_output_path = "output"
-        del_folder(local_output_path)
         out_filenames = ["output/aggregated_config.json", "WorkOrder.json"]
         self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
 
-        file_path = os.path.join(local_output_path, str(wi.uid))
+        file_path = os.path.join(local_output_path, wi.id)
         self.assertTrue(os.path.exists(os.path.join(file_path, "output", "aggregated_config.json")))
         self.assertTrue(os.path.exists(os.path.join(file_path, "WorkOrder.json")))
         worker_order = json.load(open(os.path.join(file_path, "WorkOrder.json"), 'r'))
-        print(worker_order)
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
         self.assertEqual(execution['Command'],
@@ -94,7 +59,8 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
 
     # Test CSVAnalyzer with SSMTAnalysis which analyzes python experiment's results
     def test_ssmt_workitem_python_csv_analyzer(self):
-        experiment_id = "9311af40-1337-ea11-a2be-f0921c167861"
+        experiment_id = '9311af40-1337-ea11-a2be-f0921c167861'  # comps2 exp id
+        # experiment_id = 'de07f612-69ed-ea11-941f-0050569e0ef3'  # idmtvapp17
         analysis = PlatformAnalysis(platform=self.platform,
                                     experiment_ids=[experiment_id],
                                     analyzers=[CSVAnalyzer],
@@ -107,11 +73,10 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
 
         # verify workitem result
         local_output_path = "output"
-        del_folder(local_output_path)
         out_filenames = ["output/aggregated_c.csv", "WorkOrder.json"]
         self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
 
-        file_path = os.path.join(local_output_path, str(wi.uid))
+        file_path = os.path.join(local_output_path, wi.id)
         self.assertTrue(os.path.exists(os.path.join(file_path, "output", "aggregated_c.csv")))
         self.assertTrue(os.path.exists(os.path.join(file_path, "WorkOrder.json")))
         worker_order = json.load(open(os.path.join(file_path, "WorkOrder.json"), 'r'))
@@ -123,7 +88,8 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
 
     @pytest.mark.comps
     def test_ssmt_seir_model_analysis(self):
-        exp_id = 'a980f265-995e-ea11-a2bf-f0921c167862'  # comps2 staging exp id
+        exp_id = "a980f265-995e-ea11-a2bf-f0921c167862"  # comps2 exp id
+        # exp_id = "b2a31828-78ed-ea11-941f-0050569e0ef3"  # idmtvapp17
         filenames = {'filenames': ['output/individual.csv']}
         filenames_2 = {'filenames': ['output/node.csv']}
         analysis = PlatformAnalysis(platform=self.platform,
@@ -138,7 +104,6 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
 
         # Verify workitem results
         local_output_path = "output"
-        del_folder(local_output_path)
         out_filenames = [exp_id + "/InfectiousnessCSVAnalyzer.csv", exp_id + "/NodeCSVAnalyzer.csv", "WorkOrder.json"]
         self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
 
@@ -154,7 +119,8 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
 
     @pytest.mark.comps
     def test_ssmt_seir_model_analysis_single_script(self):
-        exp_id = 'a980f265-995e-ea11-a2bf-f0921c167862'  # comps2 staging exp id
+        exp_id = "a980f265-995e-ea11-a2bf-f0921c167862"  # comps2 exp id
+        # exp_id = "b2a31828-78ed-ea11-941f-0050569e0ef3"  # idmtvapp17
         filenames = {'filenames': ['output/individual.csv']}
         filenames_2 = {'filenames': ['output/node.csv']}
 
@@ -173,7 +139,6 @@ class TestSSMTWorkItemPythonExp(ITestWithPersistence):
 
         # Verify workitem results
         local_output_path = "output"
-        del_folder(local_output_path)
         out_filenames = [exp_id + "/InfectiousnessCSVAnalyzer.csv", exp_id + "/NodeCSVAnalyzer.csv", "WorkOrder.json"]
         self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
 

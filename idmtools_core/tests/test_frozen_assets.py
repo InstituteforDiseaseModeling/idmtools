@@ -1,5 +1,7 @@
 import os
 import unittest
+
+import pytest
 from idmtools.frozen.frozen_utils import frozen_transform
 from idmtools_test import COMMON_INPUT_PATH
 
@@ -9,6 +11,7 @@ DEFAULT_CAMPAIGN_JSON = os.path.join(COMMON_INPUT_PATH, "files", "campaign.json"
 DEFAULT_DEMOGRAPHICS_JSON = os.path.join(COMMON_INPUT_PATH, "files", "demographics.json")
 
 
+@pytest.mark.smoke
 class TestFrozenAssets(unittest.TestCase):
 
     def setUp(self) -> None:

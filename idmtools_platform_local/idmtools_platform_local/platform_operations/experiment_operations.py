@@ -330,7 +330,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         for root, dirs, files in os.walk(full_path, topdown=False):
             for file in files:
                 fp = os.path.join(root, file)
-                asset = Asset(filename=file)
+                asset = Asset(filename=file, persisted=True)
                 stat = os.stat(fp)
                 asset.length = stat.st_size
                 asset.download_generator_hook = functools.partial(download_lp_file, fp)

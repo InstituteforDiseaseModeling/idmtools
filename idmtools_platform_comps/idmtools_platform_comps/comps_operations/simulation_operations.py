@@ -22,7 +22,7 @@ from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPla
 from idmtools.entities.iplatform_ops.utils import batch_create_items
 from idmtools.entities.simulation import Simulation
 from idmtools.utils.json import IDMJSONEncoder
-from idmtools_platform_comps.utils.general import convert_comps_status, get_asset_for_comps_item
+from idmtools_platform_comps.utils.general import convert_comps_status, get_asset_for_comps_item, clean_experiment_name
 
 if TYPE_CHECKING:
     from idmtools_platform_comps.comps_platform import COMPSPlatform
@@ -171,8 +171,10 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             if asset_collection_id and isinstance(asset_collection_id, str):
                 asset_collection_id = uuid.UUID(asset_collection_id)
             config = self.get_simulation_config_from_simulation(simulation, num_cores, priority, asset_collection_id, **kwargs)
+        if simulation.name:
+            simulation.name = clean_experiment_name(simulation.name)
         s = COMPSSimulation(
-            name=simulation.experiment.name if not simulation.name else simulation.name,
+            name=clean_experiment_name(simulation.experiment.name if not simulation.name else simulation.name),
             experiment_id=simulation.parent_id,
             configuration=config
         )

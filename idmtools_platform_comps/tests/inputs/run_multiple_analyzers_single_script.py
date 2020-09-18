@@ -9,17 +9,17 @@ import sys
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.analysis.analyze_manager import AnalyzeManager
-from custom_csv_analyzer import NodeCSVAnalyzer  # noqa
-from custom_csv_analyzer import InfectiousnessCSVAnalyzer  # noqa
 
 sys.path.append(os.path.dirname(__file__))
-
+from custom_csv_analyzer import NodeCSVAnalyzer  # noqa
+from custom_csv_analyzer import InfectiousnessCSVAnalyzer  # noqa
 
 if __name__ == "__main__":
     platform = Platform('COMPS2')
     filenames = ['output/individual.csv']
     filenames_2 = ['output/node.csv']
     analyzers = [InfectiousnessCSVAnalyzer(filenames=filenames), NodeCSVAnalyzer(filenames=filenames_2)]
-    exp_id = "a980f265-995e-ea11-a2bf-f0921c167862"  # COMPS2 exp_id
-    am = AnalyzeManager(platform=platform, ids=[(exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
+
+    exp_id = sys.argv[1] if len(sys.argv) > 1 else 'a980f265-995e-ea11-a2bf-f0921c167862'  # COMPS2 exp_id
+    am = AnalyzeManager(ids=[(exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
     am.analyze()

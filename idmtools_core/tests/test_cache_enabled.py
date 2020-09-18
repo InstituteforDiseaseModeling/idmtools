@@ -5,9 +5,11 @@ from unittest import TestCase
 
 import gc
 
+import pytest
 from idmtools.core import CacheEnabled
 
 
+@pytest.mark.smoke
 class TestCacheEnabled(TestCase):
     def test_cache_works(self):
         c = CacheEnabled()

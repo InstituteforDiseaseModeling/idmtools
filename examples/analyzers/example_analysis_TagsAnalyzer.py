@@ -16,13 +16,13 @@ if __name__ == '__main__':
         # Arg option for analyzer init are uid, working_dir, data in the method map (aka select_simulation_data),
         # and filenames
         # Initialize the analyser class which just requires an experiment id
-        analyzers = [TagsAnalyzer()]
+        analyzers = [TagsAnalyzer(output_path="output_tag")]
 
         # Set the experiment id you want to analyze
         experiment_id = '36d8bfdc-83f6-e911-a2be-f0921c167861'  # staging exp id JSuresh's Magude exp
 
         # Specify the id Type, in this case an Experiment on COMPS
-        manager = AnalyzeManager(partial_analyze_ok=True, platform=platform,
+        manager = AnalyzeManager(partial_analyze_ok=True,
                                  ids=[(experiment_id, ItemType.EXPERIMENT)],
                                  analyzers=analyzers)
         manager.analyze()

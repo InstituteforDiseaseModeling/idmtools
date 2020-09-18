@@ -172,7 +172,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
                     if sim.status is None:
                         assets = sim.task.gather_common_assets()
                         if assets is not None:
-                            self.assets.add_assets(assets, fail_on_duplicate=False)
+                            self.assets.add_assets(assets, fail_on_duplicate=True, fail_on_deep_comparison=True)
 
         self.tags.update(get_default_tags())
 

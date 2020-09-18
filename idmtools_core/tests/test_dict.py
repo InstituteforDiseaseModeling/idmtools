@@ -1,11 +1,13 @@
 import unittest
 
+import pytest
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.test_task import TestTask
 
 
+@pytest.mark.smoke
 class TestDictionary(ITestWithPersistence):
 
     def test_dict(self):

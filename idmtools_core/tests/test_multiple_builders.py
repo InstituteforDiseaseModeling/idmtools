@@ -2,6 +2,7 @@ import os
 from functools import partial
 
 import numpy as np
+import pytest
 
 from idmtools.builders import ArmSimulationBuilder, SweepArm, ArmType, SimulationBuilder
 from idmtools.builders import CsvExperimentBuilder
@@ -22,6 +23,7 @@ setC = partial(param_update, param="c")
 setD = partial(param_update, param="d")
 
 
+@pytest.mark.smoke
 class TestMultipleBuilders(ITestWithPersistence):
 
     def setUp(self):

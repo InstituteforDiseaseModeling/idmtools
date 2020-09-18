@@ -1,9 +1,11 @@
 import unittest
 
+import pytest
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.suite import Suite
 
 
+@pytest.mark.smoke
 class TestSuite(unittest.TestCase):
 
     def setUp(self):

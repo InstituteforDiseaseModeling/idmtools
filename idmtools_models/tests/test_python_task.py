@@ -13,6 +13,7 @@ from idmtools_test import COMMON_INPUT_PATH
 
 
 @pytest.mark.tasks
+@pytest.mark.smoke
 class TestPythonTask(TestCase):
 
     @pytest.mark.smoke

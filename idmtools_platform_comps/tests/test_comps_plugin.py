@@ -1,5 +1,7 @@
 import unittest
 import dataclasses
+
+import pytest
 from idmtools.core import CacheEnabled
 from idmtools.entities.iplatform import IPlatform
 from idmtools.registry.platform_specification import PlatformPlugins
@@ -8,6 +10,7 @@ from idmtools_platform_comps.plugin_info import COMPSPlatformSpecification
 
 
 class TestCompsPlugin(unittest.TestCase):
+    @pytest.mark.smoke
     def test_comps_in_entrypoints(self):
         """
         This test requires the package is installed first. In then confirms that COMPS is detected by the

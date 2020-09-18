@@ -1,6 +1,8 @@
 import os
 import numpy as np
 from functools import partial
+
+import pytest
 from idmtools.builders import CsvExperimentBuilder
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_test import COMMON_INPUT_PATH
@@ -18,6 +20,7 @@ setC = partial(param_update, param="c")
 setD = partial(param_update, param="d")
 
 
+@pytest.mark.smoke
 class TestCsvBuilder(ITestWithPersistence):
 
     def setUp(self):

@@ -26,6 +26,7 @@ class setParam:
         return JSONConfiguredTask.set_parameter_sweep_callback(simulation, self.param, value)
 
 
+@pytest.mark.smoke
 class TestPythonSimulation(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
@@ -82,12 +83,13 @@ class TestPythonSimulation(ITestWithPersistence):
         pe = Experiment.from_task(name=self.case_name, task=JSONConfiguredPythonTask(script_path=sp), assets=ac)
         pe.pre_creation()
         assets_to_find = [
-            Asset(relative_path='MyExternalLibrary', filename="functions.py"),
-            Asset(relative_path='', filename="model.py")
+            Asset(relative_path='MyExternalLibrary', filename="functions.py",
+                  absolute_path=os.path.join(COMMON_INPUT_PATH, "python", "Assets", "MyExternalLibrary", "functions.py")),
+            Asset(relative_path='', filename="model.py", absolute_path=os.path.join(COMMON_INPUT_PATH, "python", "model.py"))
         ]
         assets_in_pythonexperiment = []
         for asset in pe.assets:
-            assets_in_pythonexperiment.append(Asset(relative_path=asset.relative_path, filename=asset.filename))
+            assets_in_pythonexperiment.append(Asset(relative_path=asset.relative_path, filename=asset.filename, absolute_path=asset.absolute_path))
 
         self.assertSetEqual(set(assets_in_pythonexperiment), set(assets_to_find))
 
@@ -107,12 +109,13 @@ class TestPythonSimulation(ITestWithPersistence):
         pe.add_assets(ac)
         pe.pre_creation()
         assets_to_find = [
-            Asset(relative_path='MyExternalLibrary', filename="functions.py"),
-            Asset(relative_path='', filename="model.py")
+            Asset(relative_path='MyExternalLibrary', filename="functions.py",
+                  absolute_path=os.path.join(COMMON_INPUT_PATH, "python", "Assets", "MyExternalLibrary", "functions.py")),
+            Asset(relative_path='', filename="model.py", absolute_path=os.path.join(COMMON_INPUT_PATH, "python", "model.py"))
         ]
         assets_in_pythonexperiment = []
         for asset in pe.assets:
-            assets_in_pythonexperiment.append(Asset(relative_path=asset.relative_path, filename=asset.filename))
+            assets_in_pythonexperiment.append(Asset(relative_path=asset.relative_path, filename=asset.filename, absolute_path=asset.absolute_path))
 
         self.assertSetEqual(set(assets_in_pythonexperiment), set(assets_to_find))
 

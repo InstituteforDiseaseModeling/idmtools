@@ -7,12 +7,13 @@
 **Table of Contents**
 
   - [Installing](#installing)
-- [Development Tips](#development-tips)
+- [Development tips](#development-tips)
 - [Using the CLI](#using-the-cli)
+  - [Version command](#version-command)
   - [Experiment commands](#experiment-commands)
     - [Status](#status)
     - [Delete](#delete)
-  - [Simulation Commands](#simulation-commands)
+  - [Simulation commands](#simulation-commands)
   - [Status](#status-1)
   - [GitRepo commands](#gitrepo-commands)
     - [View](#view)
@@ -29,7 +30,7 @@
 pip install idmtools-cli --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
 ```
 
-# Development Tips
+# Development tips
 
 There is a Makefile file available for most common development tasks. Here is a list of commands
 ```bash
@@ -44,6 +45,46 @@ On Windows, you can use `pymake` instead of `make`
 
 The CLI requires the workers service to already be running.
 `idmtools`
+
+## Version command
+
+To determine version of idmtools and related plugins, use the version cli command.
+
+
+```
+> idmtools version
+```
+
+Example output
+```bash
+emodpy                               Version: 1.3.0                           
+  Plugins:
+    EMODTask                  
+idmtools                             Version: 1.4.0+nightly.0                 
+  Plugins:
+    CommandTask               
+idmtools-cli                         Version: 1.4.0+nightly.0                 
+idmtools-models                      Version: 1.4.0+nightly.0                 
+  Plugins:
+    JSONConfiguredPythonTask  
+    JSONConfiguredRTask       
+    JSONConfiguredTask        
+    PythonTask                
+    RTask                     
+    ScriptWrapperTask         
+    TemplatedScriptTask       
+idmtools-platform-comps              Version: 1.4.0+nightly.0                 
+  Plugins:
+    COMPSPlatform             
+    SSMTPlatform              
+idmtools-platform-local              Version: 1.4.0+nightly                   
+  Plugins:
+    LocalPlatform             
+idmtools-platform-slurm              Version: 1.0.0+nightly                   
+  Plugins:
+    SlurmPlatform             
+```
+
 
 ## Experiment commands
 
@@ -80,7 +121,7 @@ the associated data directories as well by using the *--data* option.
 >idmtools experiment delete <experiment_id>
 ```
 
-## Simulation Commands
+## Simulation commands
 
 ## Status 
 

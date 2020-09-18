@@ -1,9 +1,12 @@
 import os
 import unittest
 from unittest import TestCase
+
+import pytest
 from idmtools.utils.gitrepo import GitRepo
 
 
+@pytest.mark.smoke
 class TestGithubUrlParse(TestCase):
 
     def setUp(self) -> None:

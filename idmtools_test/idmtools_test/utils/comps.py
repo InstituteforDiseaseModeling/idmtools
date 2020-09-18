@@ -81,7 +81,7 @@ def assure_running_then_wait_til_done(tst, experiment):
 
 def setup_test_with_platform_and_simple_sweep(tst):
     from idmtools.core.platform_factory import Platform
-    tst.platform = Platform('COMPS2')
+    tst.platform = Platform('SLURM')
     tst.case_name = os.path.basename(__file__) + "--" + tst._testMethodName
     print(tst.case_name)
 

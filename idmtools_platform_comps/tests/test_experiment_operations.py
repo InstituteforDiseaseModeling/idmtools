@@ -67,6 +67,7 @@ def setup_python_model_1(platform: str = 'COMPS2'):
 
 
 @pytest.mark.comps
+@pytest.mark.smoke
 class TestExperimentOperations(unittest.TestCase):
 
     def setUp(self) -> None:

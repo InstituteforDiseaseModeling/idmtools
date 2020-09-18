@@ -117,3 +117,13 @@ class JSONConfiguredPythonTaskSpecification(TaskSpecification):
             JSONConfiguredPythonTask
         """
         return JSONConfiguredPythonTask
+
+    def get_version(self) -> str:
+        """
+        Returns the version of the plugin
+
+        Returns:
+            Plugin Version
+        """
+        from idmtools_models import __version__
+        return __version__

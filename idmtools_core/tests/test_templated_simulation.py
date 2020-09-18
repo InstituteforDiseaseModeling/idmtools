@@ -15,6 +15,7 @@ def print_sweep(simulation: Simulation, value) -> Dict:
 
 
 @pytest.mark.tasks
+@pytest.mark.smoke
 class TestTemplatedSimulation(TestCase):
 
     def test_generator(self):

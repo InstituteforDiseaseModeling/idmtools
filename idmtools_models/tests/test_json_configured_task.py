@@ -16,6 +16,7 @@ class ExampleExtendedJSONConfiguredTask(JSONConfiguredTask):
 
 
 @pytest.mark.tasks
+@pytest.mark.smoke
 class TestJSONConfiguredTask(TestCase):
 
     def setUp(self) -> None:

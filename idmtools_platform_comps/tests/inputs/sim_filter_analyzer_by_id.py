@@ -11,13 +11,16 @@ logger = getLogger(__name__)
 class SimFilterAnalyzerById(IAnalyzer):
     data_group_names = ['sim_id', 'key', 'value']
 
-    def __init__(self, filenames=None, output_path=None, **kwargs):
+    def __init__(self, filenames=None, output_path="output", **kwargs):
         super().__init__(filenames=filenames, parse=False, **kwargs)
-        self.output_path = output_path or "output"
+        self.output_path = output_path
 
     def initialize(self):
         self.output_path = os.path.join(self.working_dir, self.output_path)
-        os.makedirs(self.output_path, exist_ok=True)
+
+        # Create the output path
+        if not os.path.exists(self.output_path):
+            os.makedirs(self.output_path)
 
     def get_sim_folder(self, item):
         """
@@ -44,5 +47,9 @@ class SimFilterAnalyzerById(IAnalyzer):
         return df
 
     def reduce(self, all_data):
+        first_sim = list(all_data.keys())[0]  # get first Simulation
+        exp_id = first_sim.experiment.id  # Set the exp id from the first sim data
+        output_folder = os.path.join(self.output_path, exp_id)
+        os.makedirs(output_folder, exist_ok=True)
         results = pd.concat(list(all_data.values()), axis=0, sort=False)  # Combine a list of all the sims tag values
-        results.to_csv(os.path.join("output", 'result.csv'))  # Write the sim tags to a csv
+        results.to_csv(os.path.join(output_folder, 'result.csv'))  # Write the sim tags to a csv

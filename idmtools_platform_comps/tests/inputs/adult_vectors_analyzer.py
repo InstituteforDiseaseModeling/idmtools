@@ -12,20 +12,27 @@ mpl.use('Agg')
 
 class AdultVectorsAnalyzer(BaseAnalyzer):
 
-    def __init__(self, name='hi'):
+    def __init__(self, name='hi', output_path="output"):
         super().__init__(filenames=["output\\InsetChart.json"])
         print(name)
+        self.output_path = output_path
 
     def initialize(self):
-        if not os.path.exists(os.path.join(self.working_dir, "output")):
-            os.mkdir(os.path.join(self.working_dir, "output"))
+        self.output_path = os.path.join(self.working_dir, self.output_path)
+
+        # Create the output path
+        if not os.path.exists(self.output_path):
+            os.makedirs(self.output_path)
 
     def map(self, data: Any, item: IItem) -> Any:
         return data[self.filenames[0]]["Channels"]["Adult Vectors"]["Data"]
 
     def reduce(self, all_data: dict) -> Any:
-        output_dir = os.path.join(self.working_dir, "output")
-        with open(os.path.join(output_dir, "adult_vectors.json"), "w") as fp:
+        first_sim = list(all_data.keys())[0]  # get first Simulation
+        exp_id = first_sim.experiment.id  # Set the exp id from the first sim data
+        output_folder = os.path.join(self.output_path, exp_id)
+        os.makedirs(output_folder, exist_ok=True)
+        with open(os.path.join(output_folder, "adult_vectors.json"), "w") as fp:
             json.dump({str(s.uid): v for s, v in all_data.items()}, fp)
 
         import matplotlib.pyplot as plt
@@ -36,4 +43,4 @@ class AdultVectorsAnalyzer(BaseAnalyzer):
         for pop in list(all_data.values()):
             ax.plot(pop)
         ax.legend([str(s.uid) for s in all_data.keys()])
-        fig.savefig(os.path.join(output_dir, "adult_vectors.png"))
+        fig.savefig(os.path.join(output_folder, "adult_vectors.png"))
