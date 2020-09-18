@@ -13,3 +13,4 @@ analyzers_folder = os.path.join(examples_folder, 'analyzers')
 class TestAnalyzersExample(TestCase):
     def test_analyzers_directory(self):
         test_example_folder(self, analyzers_folder)
+
