@@ -111,6 +111,13 @@ class TestAssets(unittest.TestCase):
         ]
         filter_dir = partial(asset_in_directory, directories=["2"])
         ac.add_directory(assets_directory=self.base_path, filters=[filter_dir])
+        print(len(ac.assets))
+        for my_asset in ac.assets:
+            print("absolute_path: " + my_asset.absolute_path)
+            print("filename:" + my_asset.filename)
+            print("relative_path:" + my_asset.relative_path)
+            print(my_asset.checksum)
+            print("caculate_md5:" + my_asset.calculate_checksum())
         self.assertSetEqual(set(ac.assets), set(assets_to_find))
 
     def test_assets_collection_filtering_mode(self):
