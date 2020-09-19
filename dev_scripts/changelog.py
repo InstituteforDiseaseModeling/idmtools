@@ -58,7 +58,9 @@ issue_types = dict()
 
 def get_issue_type(issue, labels):
     global issue_types
-    if 'bug' in labels:
+    if any([x in labels for x in ['Support']]):
+        issue_types[issue] = 'Support'
+    elif 'bug' in labels:
         issue_types[issue] = 'Bugs'
     elif 'Feature Request' in labels:
         issue_types[issue] = 'Feature Request'
@@ -85,7 +87,7 @@ def get_issue_type(issue, labels):
 
 
 # fetch issue details
-exclude_labels = ['Research', 'wontfix', 'Discuss', 'duplicate', 'Exclude from Changelog', 'Epic', 'Release/Packaging']
+exclude_labels = ['Research', 'wontfix', 'Discuss', 'duplicate', 'Exclude from Changelog', 'Epic', 'Release/Packaging', 'Support']
 for issue in issues_to_references.keys():
     issue_data = gh_repo.get_issue(issue)
     labels = [label.name for label in issue_data.labels]
