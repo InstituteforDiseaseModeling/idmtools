@@ -42,34 +42,34 @@ Install |IT_s|
 
 #.  In the base directory of the cloned GitHub repository, run the setup script.
 
-        .. container:: os-code-block
+    .. container:: os-code-block
 
-            .. container:: choices
+        .. container:: choices
 
-                * Windows
-                * Linux
+            * Windows
+            * Linux
 
-            .. container:: windows
+        .. container:: windows
 
-                  Enter the following::
+              Enter the following::
 
-                    pip install py-make
-                    pymake setup-dev
+                pip install py-make
+                pymake setup-dev
 
-                  You can also use the following if you are not going to develop or test using the Local Platform::
+              You can also use the following if you are not going to develop or test using the Local Platform::
 
-                    pip install py-make
-                    pymake setup-dev-no-docker
+                pip install py-make
+                pymake setup-dev-no-docker
 
-            .. container:: linux
+        .. container:: linux
 
-                  Enter the following::
+              Enter the following::
 
-                    make setup-dev
+                make setup-dev
 
-                  You can also use the following if you are not going to develop or test using the Local Platform::
+              You can also use the following if you are not going to develop or test using the Local Platform::
 
-                    make setup-dev-no-docker
+                make setup-dev-no-docker
 
 #.  To verify that |IT_s| is installed, enter the following command::
 
