@@ -56,7 +56,7 @@ Install |IT_s|
                 pip install py-make
                 pymake setup-dev
 
-              You can also use the following if you are not going to develop or test using the Local Platform::
+              You can also use the following if you are **not** going to develop or test using the Local Platform::
 
                 pip install py-make
                 pymake setup-dev-no-docker
@@ -67,7 +67,7 @@ Install |IT_s|
 
                 make setup-dev
 
-              You can also use the following if you are not going to develop or test using the Local Platform::
+              You can also use the following if you are **not** going to develop or test using the Local Platform::
 
                 make setup-dev-no-docker
 
