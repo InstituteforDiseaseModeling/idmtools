@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import glob
 import os
 import re
@@ -87,7 +88,7 @@ def get_issue_type(issue, labels):
 
 
 # fetch issue details
-exclude_labels = ['Research', 'wontfix', 'Discuss', 'duplicate', 'Exclude from Changelog', 'Epic', 'Release/Packaging', 'Support']
+exclude_labels = ['Research', 'wontfix', 'Discuss', 'duplicate', 'Exclude from Changelog', 'Epic', 'Release/Packaging', 'Support', 'Transition']
 for issue in issues_to_references.keys():
     issue_data = gh_repo.get_issue(issue)
     labels = [label.name for label in issue_data.labels]
@@ -117,7 +118,7 @@ for issue in gh_repo.get_issues(state='closed'):
                         release_notes[release][f'#{issue.number} - {issue.title}'] = [issue]
                         get_issue_type(issue.number, labels)
                 elif "dependencies" in labels:
-                    if not os.path.exists(release_file):
+                    if issue.as_pull_request().merged_at is not None and not os.path.exists(release_file):
                         issues_to_references[issue.number] = issue
                         release_notes[release][f'#{issue.number} - {issue.title}'] = [issue]
                         get_issue_type(issue.number, labels)
