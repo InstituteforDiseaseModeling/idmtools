@@ -106,6 +106,7 @@ div.os-code-block div.choices li {
 div.os-code-block div.choices li.active {
     font-weight: bold;
     background-color: #60add5;
+    text-decoration: underline;
 }
 
 
