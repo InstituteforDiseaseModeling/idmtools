@@ -110,7 +110,15 @@ bump-major-dry-run: ## bump the minor version(dry run)
 build-docs: ## build docs(only works on linux at moment due to make.bat not running by default)
 	$(PDR) -wd 'docs' -ex 'make html'
 
-build-docs-server: ## builds docs and launch a webserver
-	@make build-docs
-	@+$(IPY) "print('Serving documentation @ server at http://localhost:8000 . Ctrl + C Will Stop Server')"
-	$(PDR) -wd 'docs/_build/html' -ex 'python -m http.server'
+build-docs-server: build-docs ## builds docs and launch a webserver
+	$(PDS)serve_docs.py
+
+dev-watch: ## Run lint on any python code changes
+	$(PDS)run_commands_and_wait.py --command 'watchmedo shell-command --drop --wait --interval 10 --patterns="*.py" --ignore-pattern="*/tests/.test_platform/*" --recursive --command="pymake lint"' \
+        --command 'watchmedo shell-command --patterns="*.py" --ignore-pattern="*/tests/.test_platform/*" --drop --interval 10 --recursive --command="pymake test-smoke";;;idmtools_core' \
+        --command 'watchmedo shell-command --patterns="*.py" --ignore-pattern="*/tests/.test_platform/*" --drop --interval 10 --recursive --command="pymake test-smoke";;;idmtools_models' \
+        --command 'watchmedo shell-command --patterns="*.py" --ignore-pattern="*/tests/.test_platform/*" --drop --interval 10 --recursive --command="pymake test-smoke";;;idmtools_platform_comps' \
+        --command 'watchmedo shell-command --patterns="*.py" --ignore-pattern="*/tests/.test_platform/*" --drop --interval 10 --recursive --command="pymake test-smoke";;;idmtools_platform_local' \
+        --command 'watchmedo shell-command --patterns="*.py" --ignore-pattern="*/tests/.test_platform/*" --drop --interval 10 --recursive --command="pymake test-smoke";;;idmtools_cli'
+
+

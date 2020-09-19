@@ -164,6 +164,12 @@ coverage    -   Run tests and generate coverage report that is shown in browser
 
 Some packages have unique build related commands, specifically the local platform. Use `make help` to identify specific commands
 
+## Tips
+
+* Use `dev-watch` make rule to autorun linter and tests in response to local changes
+* When a specific test fails, you `test-failed` rule to run only previously failed tested
+* Use 
+
 ## IDE/Runtime Setup
 
 For source completion and indexing, set the package paths in your IDE. In PyCharm, select the following directories then right-click and select `Mark Directory as -> Source Root`.
