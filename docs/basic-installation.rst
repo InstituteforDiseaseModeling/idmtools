@@ -12,24 +12,24 @@ source code changes.
 
 #.  Activate the virtual environment:
 
-        .. container:: os-code-block
+    .. container:: os-code-block
 
-            .. container:: choices
+        .. container:: choices
 
-                * Windows
-                * Linux
+            * Windows
+            * Linux
 
-            .. container:: windows
+        .. container:: windows
 
-                Enter the following::
+            Enter the following::
 
-                    idmtools\Scripts\activate
+                idmtools\Scripts\activate
 
-            .. container:: linux
+        .. container:: linux
 
-                Enter the following::
+            Enter the following::
 
-                    source idmtools/bin/activate
+                source idmtools/bin/activate
 
 #.  Install |IT_s| packages::
 
