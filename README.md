@@ -153,6 +153,7 @@ Here are a list of common commands
 
 ```bash
 setup-dev   -   Setup dev environment(assumes you already have a virtualenv)
+setup-dev-no-docker -   Setup dev environment(assumes you already have a virtualenv) exlcuding docker builds for the local platform
 clean       -   Clean up temporary files
 clean-all   -   Deep clean project
 lint        -   Lint package and tests

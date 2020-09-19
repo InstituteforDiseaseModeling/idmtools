@@ -25,6 +25,9 @@ setup-dev:  ## Setup packages in dev mode
 	python dev_scripts/bootstrap.py
 	$(PDR) -w idmtools_platform_local -ex 'pymake docker'
 
+setup-dev-no-docker:  ## Setup packages in dev mode minus docker
+	python dev_scripts/bootstrap.py
+
 lint: ## check style with flake8
 	flake8 --ignore=E501,W291 --exclude="venv**/**,examples/**,workflow/**,docs/**,*/tests/**,idmtools_test/**, idmtools_platform_comps/prototypes/**"
 
