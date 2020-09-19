@@ -7,7 +7,7 @@ class TagsAnalyzer--><rect fill="#FEFECE" filter="url(#f5a38baz6wgca)" height="4
 reverse link IAnalyzer to AddAnalyzer--><path codeLine="2" d="M222.218,61.367 C186.621,78.2877 142.522,99.2495 109.449,114.9705 " fill="none" id="IAnalyzer-backto-AddAnalyzer" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="219.406,54.954,240.474,52.69,225.416,67.5978,219.406,54.954" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[b16f7644da16eab7ea4d30a036e2608d]
 reverse link IAnalyzer to CSVAnalyzer--><path codeLine="3" d="M254.431,71.1784 C243.397,85.7995 231.223,101.9295 221.601,114.6784 " fill="none" id="IAnalyzer-backto-CSVAnalyzer" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="249.006,66.7474,266.641,55,260.18,75.1811,249.006,66.7474" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[3142f6a4adeee1d1d4255da7dc64e400]
 reverse link IAnalyzer to DownloadAnalyzer--><path codeLine="4" d="M313.938,71.1784 C325.111,85.7995 337.437,101.9295 347.179,114.6784 " fill="none" id="IAnalyzer-backto-DownloadAnalyzer" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="308.157,75.1421,301.576,55,319.281,66.6416,308.157,75.1421" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[3540d9988800bd28bbdf3d354b845199]
-reverse link IAnalyzer to TagsAnalyzer--><path codeLine="5" d="M346.116,58.875 C386.091,76.17 437.507,98.4153 475.636,114.912 " fill="none" id="IAnalyzer-backto-TagsAnalyzer" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="343.095,65.1947,327.519,50.829,348.654,52.346,343.095,65.1947" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[a1c8848a0b5b08d4e3ff980bf7548b95]
+reverse link IAnalyzer to TagsAnalyzer--><path codeLine="5" d="M346.116,58.875 C386.091,76.17 437.507,98.4153 475.636,114.912 " fill="none" id="IAnalyzer-backto-TagsAnalyzer" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="343.095,65.1947,327.519,50.829,348.654,52.346,343.095,65.1947" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[3252723b8231bbae0c5beefbb2215b08]
 @startuml
 abstract class IAnalyzer        
 IAnalyzer <|- - AddAnalyzer
@@ -16,7 +16,7 @@ IAnalyzer <|- - DownloadAnalyzer
 IAnalyzer <|- - TagsAnalyzer
 @enduml
 
-PlantUML version 1.2020.17beta5(Unknown compile time)
+PlantUML version 1.2020.17(Sat Sep 19 12:30:11 UTC 2020)
 (GPL source distribution)
 Java Runtime: Java(TM) SE Runtime Environment
 JVM: Java HotSpot(TM) 64-Bit Server VM

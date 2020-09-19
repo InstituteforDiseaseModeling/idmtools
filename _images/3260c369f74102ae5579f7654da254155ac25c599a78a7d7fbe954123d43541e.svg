@@ -7,7 +7,7 @@ entity idmtools-platform-local--><rect fill="#FEFECE" filter="url(#f10xip8qwks1h
 link idmtools-cli to idmtools--><path d="M431.911,53.169 C447.068,74.285 469.897,106.093 486.001,128.529 " fill="none" id="idmtools-cli-to-idmtools" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="488.926,132.605,486.9267,122.9612,486.0101,128.5433,480.428,127.6267,488.926,132.605" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[8aa5f3bcec73aaf41ac40fe3f9c475da]
 link idmtools-models to idmtools--><path d="M578.089,53.169 C562.932,74.285 540.103,106.093 523.999,128.529 " fill="none" id="idmtools-models-to-idmtools" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="521.074,132.605,529.572,127.6267,523.9899,128.5433,523.0733,122.9612,521.074,132.605" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[12601bca6d00bb52d45f7b5f74140434]
 link idmtools-platform-comps to idmtools--><path d="M418.672,156 C428.531,156 438.39,156 448.25,156 " fill="none" id="idmtools-platform-comps-to-idmtools" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="453.405,156,444.405,152,448.405,156,444.405,160,453.405,156" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[237ff08c58a06a7ec220f3d1c714d5ad]
-reverse link idmtools to idmtools-platform-local--><path d="M505,184.353 C505,206.6539 505,237.7642 505,258.6051 " fill="none" id="idmtools-backto-idmtools-platform-local" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="505,179.169,501,188.169,505,184.169,509,188.169,505,179.169" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[90046d30b52bbdb59dd3464d9c21ea8e]
+reverse link idmtools to idmtools-platform-local--><path d="M505,184.353 C505,206.6539 505,237.7642 505,258.6051 " fill="none" id="idmtools-backto-idmtools-platform-local" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="505,179.169,501,188.169,505,184.169,509,188.169,505,179.169" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[88768555ef9708ac0ea962fa0bfb65aa]
 @startuml
 [idmtools]
 note right of idmtools
@@ -44,7 +44,7 @@ end note
 [idmtools-platform-local] -up-> idmtools
 @enduml
 
-PlantUML version 1.2020.17beta5(Unknown compile time)
+PlantUML version 1.2020.17(Sat Sep 19 12:30:11 UTC 2020)
 (GPL source distribution)
 Java Runtime: Java(TM) SE Runtime Environment
 JVM: Java HotSpot(TM) 64-Bit Server VM
