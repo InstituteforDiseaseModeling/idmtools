@@ -31,6 +31,7 @@
   - [First Time Setup](#first-time-setup)
   - [Installing from a Pull Request](#installing-from-a-pull-request)
   - [General Use](#general-use)
+  - [Tips](#tips)
   - [IDE/Runtime Setup](#ideruntime-setup)
   - [Running smoke tests or all tests from Github Actions](#running-smoke-tests-or-all-tests-from-github-actions)
   - [Running specific tests from the command line](#running-specific-tests-from-the-command-line)
