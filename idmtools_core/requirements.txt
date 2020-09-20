@@ -2,7 +2,6 @@ backoff~=1.10.0
 coloredlogs~=14.0
 diskcache==5.0.3
 humanfriendly~=8.2
-marshmallow~=3.7
 more-itertools~=8.5.0
 pandas==1.1.2
 pipreqs==0.4.10
