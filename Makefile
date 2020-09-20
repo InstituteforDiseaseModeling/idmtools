@@ -53,6 +53,24 @@ test-python: ## Run our python tests
 test-smoke: ## Run our smoke tests
 	$(MAKEALL) test-smoke
 
+aggregate-html-reports: ## Aggregate html test reports into one directory
+	$(PDS)aggregate_reports.py
+	@+$(IPY) "print('Serving documentation @ server at http://localhost:8001 . Ctrl + C Will Stop Server')"
+	$(PDR) -wd '.html_reports' -ex 'python -m http.server 8001'
+
+start-allure: ## start the allue docker report server
+	$(IPY) "import os; os.makedirs('.allure_results', exist_ok=True)"
+	$(IPY) "import os; os.makedirs('.allure_reports', exist_ok=True)"
+	$(PDR) -wd dev_scripts -ex "docker-compose -f allure.yml up -d allure"
+	$(IPY) "print('Once tests have finished, your test report will be available at http://localhost:5050/allure-docker-service/latest-report')"
+	$(IPY) "import os; os.makedirs('.allure_reports', exist_ok=True)"
+
+test-smoke-allure: start-allure ## Run smoke tests with reports to Allure server
+	$(PDS)run_pymake_on_all.py --env "TEST_EXTRA_OPTS=--alluredir=../../.allure_results" test-smoke
+
+test-all-allure: start-allure ## Run smoke tests with reports to Allure server
+	$(PDS)run_pymake_on_all.py --env "TEST_EXTRA_OPTS=--alluredir=../../.allure_results" test-all
+
 coverage: ## Generate a code-coverage report
 	$(MAKEALL) coverage-all
 	coverage combine idmtools_cli/.coverage idmtools_core/.coverage idmtools_models/.coverage idmtools_platform_comps/.coverage idmtools_platform_local/.coverage

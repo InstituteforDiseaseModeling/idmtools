@@ -16,8 +16,12 @@ logging.addLevelName(50, 'CRITICAL')
 logger = getLogger(__name__)
 
 
-def execute(cmd):
-    popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
+def execute(cmd, env=None):
+    if env is None:
+        env = dict()
+    final_env = dict(os.environ)
+    final_env.update(env)
+    popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, shell=True, env=final_env)
     for stdout_line in iter(popen.stdout.readline, ""):
         yield stdout_line
     popen.stdout.close()
@@ -47,10 +51,11 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     setup_logging(args.working_dir)
+    env = dict()
     if args.environment:
-        env = dict()
         for e in args.environment:
             parts = e.split("=")
+            env[parts[0]] = parts[1]
             env[parts[0]] = parts[1]
         logger.info(f"Environment opts: {env}")
 
@@ -67,7 +72,7 @@ if __name__ == '__main__':
         os.chdir(os.path.abspath(args.working_dir))
     logger.info(f'Running {args.ex}')
     try:
-        for line in execute(args.ex):
+        for line in execute(args.ex, env=env):
             # catch errors where possible
             if any([s in line for s in
                     ["rollbackFailedOptional:", "extract:yarn:", "Using cache", "copying ", "creating idm",
