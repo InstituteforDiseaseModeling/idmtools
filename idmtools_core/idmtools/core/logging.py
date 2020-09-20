@@ -101,10 +101,9 @@ def setup_handlers(level, log_filename, console: bool = False):
     # get a file handler
     if os.getenv('IDM_TOOLS_DEBUG', False) or level == logging.DEBUG:
         # Enable detailed logging format
-        format_str = '%(asctime)s.%(msecs)d %(pathname)s:%(lineno)d %(funcName)s ' \
-                     '[%(levelname)s] (%(process)d,(%(thread)d) - %(message)s'
+        format_str = '%(asctime)s.%(msecs)d %(pathname)s:%(lineno)d %(funcName)s [%(levelname)s] (%(process)d,(%(thread)d) - %(message)s'
     else:
-        format_str = '%(asctime)s.%(msecs)d %(funcName)s: [%(levelname)s] - %(message)s'
+        format_str = '%(asctime)s.%(msecs)d %(pathname)s:%(lineno)d %(funcName)s [%(levelname)s] - %(message)s'
     formatter = logging.Formatter(format_str)
     file_handler = RotatingFileHandler(log_filename, maxBytes=(2 ** 20) * 10, backupCount=5)
     file_handler.setLevel(logging.DEBUG)
