@@ -8,15 +8,24 @@ def clean_package_dir(glob_file_patterns, glob_delete_patterns, delete_directori
     for gp in glob_file_patterns:
         for i in glob.glob(gp, recursive=True):
             print(f"Removing {i}")
-            os.remove(i)
+            try:
+                os.remove(i)
+            except FileNotFoundError:
+                pass
     for gp in glob_delete_patterns:
         for i in glob.glob(gp, recursive=True):
             print(f"Removing directory: {i}")
-            shutil.rmtree(i)
+            try:
+                shutil.rmtree(i)
+            except FileNotFoundError:
+                pass
     for d in delete_directories:
         if os.path.exists(d):
             print(f"Removing directory: {d}")
-            shutil.rmtree(d)
+            try:
+                shutil.rmtree(d)
+            except FileNotFoundError:
+                pass
 
 
 if __name__ == '__main__':

@@ -13,7 +13,7 @@ help:
 clean: ## Clean most common outputs(Logs, Test Results, etc)
 	$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
 	$(MAKEALL) --parallel clean
-	$(CLDIR) --file-patterns "**/*.log"
+	$(CLDIR) --file-patterns "**/*.log" --dir-patterns "./.allure_results,./.*_reports"
 	$(PDR) -wd "docs" -ex "make clean"
 
 clean-all: ## Clean most common outputs(Logs, Test Results, etc) as well as local install information. Running this requires a new call to setup-dev or setup-dev-no-docker
