@@ -10,13 +10,13 @@ CLDIR=$(PDS)clean_dir.py
 help:
 	$(PDS)get_help_from_makefile.py
 
-clean: ## Clean all our jobs
+clean: ## Clean most common outputs(Logs, Test Results, etc)
 	$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
 	$(MAKEALL) --parallel clean
 	$(CLDIR) --file-patterns "**/*.log"
 	$(PDR) -wd "docs" -ex "make clean"
 
-clean-all: ## Clean all our jobs
+clean-all: ## Clean most common outputs(Logs, Test Results, etc) as well as local install information. Running this requires a new call to setup-dev or setup-dev-no-docker
 	$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
 	$(MAKEALL) --parallel clean-all
 	$(CLDIR) --file-patterns "**/*.buildlog"
