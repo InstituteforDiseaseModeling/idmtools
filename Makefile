@@ -121,6 +121,6 @@ dev-watch: ## Run lint on any python code changes
         --command 'watchmedo shell-command --patterns="*.py" --ignore-pattern="*/tests/.test_platform/*" --drop --interval 10 --recursive --command="pymake test-smoke";;;idmtools_platform_local' \
         --command 'watchmedo shell-command --patterns="*.py" --ignore-pattern="*/tests/.test_platform/*" --drop --interval 10 --recursive --command="pymake test-smoke";;;idmtools_cli'
 
-generate-stubs: ## Generate pything interfaces. Useful to identify what the next version should be by comparing to previous runs
+generate-stubs: ## Generate python interfaces. Useful to identify what the next version should be by comparing to previous runs
 	$(PDS)make_stub_files.py  -c dev_scripts/stub.cfg
 	$(PDS)process_interfaces.py
