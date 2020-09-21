@@ -151,6 +151,8 @@ class Experiment(IAssetsEnabled, INamedEntity):
         # if it is a template, set task type on experiment
         if gather_assets:
             if isinstance(self.simulations.items, TemplatedSimulations):
+                if len(self.simulations.items) == 0:
+                    raise ValueError("You cannot run an empty experiment")
                 if logger.isEnabledFor(DEBUG):
                     logger.debug("Using Base task from template for experiment level assets")
                 self.simulations.items.base_task.gather_common_assets()
@@ -161,6 +163,8 @@ class Experiment(IAssetsEnabled, INamedEntity):
                     task_class = self.simulations.items.base_task.__class__
                     self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
             elif self.gather_common_assets_from_task and isinstance(self.simulations.items, List):
+                if len(self.simulations.items) == 0:
+                    raise ValueError("You cannot run an empty experiment")
                 if logger.isEnabledFor(DEBUG):
                     logger.debug("Using first task for task type")
                     logger.debug("Using all tasks to gather assts")
