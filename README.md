@@ -169,7 +169,7 @@ Some packages have unique build related commands, specifically the local platfor
 
 * Use `dev-watch` make rule to autorun linter and tests in response to local changes
 * When a specific test fails, you `test-failed` rule to run only previously failed tested
-* Use 
+* Use `build-docs-server` to build documents and serve locally with live-reload of documentation as you edit files
 
 ## IDE/Runtime Setup
 
