@@ -14,6 +14,11 @@ from idmtools_test.utils.decorators import windows_only, linux_only
 @pytest.mark.tasks
 @pytest.mark.smoke
 class TestTemplatedScriptTask(TestCase):
+
+    def setUp(self) -> None:
+        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        print(self.case_name)
+
     def get_simplate_template(self):
         """"""
         simple_template = """
@@ -102,7 +107,7 @@ echo Hello
 
         with Platform("TestExecute", missing_ok=True, default_missing=dict(type='TestExecute')):
             wrapper_task = get_script_wrapper_windows_task(task, template_content=template)
-            experiment = Experiment.from_task(wrapper_task)
+            experiment = Experiment.from_task(wrapper_task, name=self.case_name)
             experiment.run(wait_until_done=True)
             self.assertTrue(experiment.succeeded)
 
@@ -146,7 +151,7 @@ echo Running $@
 
         with Platform("TestExecute", missing_ok=True, default_missing=dict(type='TestExecute')):
             wrapper_task = get_script_wrapper_unix_task(task, template_content=template)
-            experiment = Experiment.from_task(wrapper_task)
+            experiment = Experiment.from_task(wrapper_task, name=self.case_name)
             experiment.run(wait_until_done=True)
             self.assertTrue(experiment.succeeded)
 
@@ -190,7 +195,7 @@ echo Running $@
         pl_slurm = Platform("SLURM")
         wrapper_task: TemplatedScriptTask = get_script_wrapper_unix_task(task, template_content=template)
         wrapper_task.script_binary = "/bin/bash"
-        experiment = Experiment.from_task(wrapper_task)
+        experiment = Experiment.from_task(wrapper_task, name=self.case_name)
         experiment.run(wait_until_done=True)
         self.assertTrue(experiment.succeeded)
 

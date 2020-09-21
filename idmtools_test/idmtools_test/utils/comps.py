@@ -60,7 +60,7 @@ def get_simulation_path(simulation):
 
 
 def get_simulation_by_id(sim_id, query_criteria=None):
-    return Simulation.get(id=sim_id, query_criteria=query_criteria)
+    return COMPSSimulation.get(id=sim_id, query_criteria=query_criteria)
 
 
 def assure_running_then_wait_til_done(tst, experiment):
@@ -82,7 +82,6 @@ def assure_running_then_wait_til_done(tst, experiment):
 def setup_test_with_platform_and_simple_sweep(tst):
     from idmtools.core.platform_factory import Platform
     tst.platform = Platform('SLURM')
-    tst.case_name = os.path.basename(__file__) + "--" + tst._testMethodName
     print(tst.case_name)
 
     def setP(simulation, p):
