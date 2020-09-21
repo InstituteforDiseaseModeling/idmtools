@@ -24,6 +24,7 @@ class TestAssetsInComps(unittest.TestCase):
     def setUp(self) -> None:
         self.base_path = os.path.abspath(os.path.join(COMMON_INPUT_PATH, "assets", "collections"))
         self.platform: COMPSPlatform = None
+        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         setup_test_with_platform_and_simple_sweep(self)
 
     def _run_and_test_experiment(self, experiment):
