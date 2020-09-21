@@ -1,4 +1,7 @@
 import copy
+import platform
+from pathlib import Path
+
 import json
 import os
 from configparser import ConfigParser
@@ -135,7 +138,20 @@ class IdmConfigParser:
         # init logging here as this is our most likely entry-point into an idmtools "application"
         from idmtools.core.logging import setup_logging, VERBOSE
 
-        ini_file = cls._find_config(dir_path, file_name)
+        if "IDMTOOLS_CONFIG_FILE" in os.environ:
+            if not os.path.exists(os.environ["IDMTOOLS_CONFIG_FILE"]):
+                raise FileNotFoundError(f'Cannot for idmtools config at {os.environ["IDMTOOLS_CONFIG_FILE"]}')
+            ini_file = os.environ["IDMTOOLS_CONFIG_FILE"]
+        else:
+            ini_file = cls._find_config(dir_path, file_name)
+            # Fallback to user home directories
+            if ini_file is None:
+                # check for Linux global configuration at /home/username/.idmtools.ini
+                if platform.platform() in ["Linux", "Darwin"] and os.path.exists(os.path.join(str(Path.home()), ".idmtools.ini")):
+                    ini_file = os.path.join(str(Path.home()), ".idmtools.ini")
+                # On Windows, c:\users\user\AppData\Local\idmtools\idmtools.ini
+                elif platform.platform() in ["Windows"] and os.path.exists(os.path.join(os.path.expandvars(r'%LOCALAPPDATA%'), "idmtools", "idmtools.ini")):
+                    ini_file = os.path.join(os.path.expandvars(r'%LOCALAPPDATA%'), "idmtools", "idmtools.ini")
         if ini_file is None:
             # We use print since logger isn't configured
             print("/!\\ WARNING: File '{}' Not Found!".format(file_name))
