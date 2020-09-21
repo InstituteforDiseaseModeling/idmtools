@@ -37,7 +37,7 @@ class SimulationBuilder:
 
     def __init__(self):
         self.sweeps = []
-        self.count = 1
+        self.count = 0
 
     def add_sweep_definition(self, function: TSweepFunction,
                              values: Union[List[Any], Iterable]):
