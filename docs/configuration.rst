@@ -1,7 +1,7 @@
 Configuration
 =============
 
-The configuration of |IT_s| is set in the idmtools.ini file. This file is normally located in the project directory but |IT_s| will search up through the directory hierachy. An idmtools.ini file must be included when using |IT_s|.
+The configuration of |IT_s| is set in the idmtools.ini file. This file is normally located in the project directory but |IT_s| will search up through the directory hierarchy, and lastly the files *~/.idmtools.ini* on Linux and *%LOCALAPPDATA%\idmtools\idmtools.ini*. You can also specify the path to the idmtools file by setting the environment variable *IDMTOOLS_CONFIG_FILE*. An idmtools.ini file must be included when using |IT_s|.
 
 Below is an example configuration file:
 
