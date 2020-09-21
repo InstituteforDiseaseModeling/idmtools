@@ -52,13 +52,13 @@ class TestAddingSimulationsToExistingExperiment(unittest.TestCase):
         exp = Experiment.from_builder(builder, base_task=base_task)
         with self.assertRaises(ValueError) as er:
             exp.run(wait_until_done=True)
-        self.assertTrue(er.exception.args[0], 'The experiment cannot be waited for if it is not in Running/Created state')
+        self.assertTrue(er.exception.args[0], 'You cannot run an empty experiment')
 
     def test_empty_experiment_list(self):
         exp = Experiment()
         with self.assertRaises(ValueError) as er:
             exp.run(wait_until_done=True)
-        self.assertTrue(er.exception.args[0], 'The experiment cannot be waited for if it is not in Running/Created state')
+        self.assertTrue(er.exception.args[0], 'You cannot run an empty experiment')
 
     def test_adding_manual_simulation(self):
         base_task = JSONConfiguredPythonTask(script_path=model_path, python_path=sys.executable)

@@ -177,6 +177,8 @@ class Experiment(IAssetsEnabled, INamedEntity):
                         assets = sim.task.gather_common_assets()
                         if assets is not None:
                             self.assets.add_assets(assets, fail_on_duplicate=True, fail_on_deep_comparison=True)
+            elif isinstance(self.simulations.items, List) and len(self.simulations.items) == 0:
+                raise ValueError("You cannot run an empty experiment")
 
         self.tags.update(get_default_tags())
 
