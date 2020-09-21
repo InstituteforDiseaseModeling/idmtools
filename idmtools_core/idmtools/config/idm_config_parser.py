@@ -164,7 +164,7 @@ class IdmConfigParser:
         # Do import locally to prevent load error
         from idmtools import __version__
         if "+nightly" in __version__:
-            user_logger.warning(f"You are using a the development version of idmtools, version {__version__}!")
+            user_logger.warning(f"You are using a development version of idmtools, version {__version__}!")
 
     @classmethod
     @initialization(error=True)
