@@ -104,7 +104,7 @@ bump-patch-dry-run: ## bump the patch version(dry run)
 bump-minor-dry-run: ## bump the minor version(dry run)
 	$(MAKEALL) bump-minor-dry-run
 
-bump-major-dry-run: ## bump the minor version(dry run)
+bump-major-dry-run: ## bump the major version(dry run)
 	$(MAKEALL) bump-major-dry-run
 
 build-docs: ## build docs(only works on linux at moment due to make.bat not running by default)
