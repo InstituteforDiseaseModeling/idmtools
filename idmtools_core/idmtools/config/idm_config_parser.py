@@ -1,4 +1,6 @@
 import copy
+import platform
+
 import json
 import os
 from configparser import ConfigParser
@@ -160,6 +162,10 @@ class IdmConfigParser:
             log_config = dict(level='INFO', log_filename='idmtools.log', console='off')
         setup_logging(**log_config)
         user_logger.log(VERBOSE, "INI File Used: {}".format(ini_file))
+
+        if platform.system() == "Darwin":
+            # see https://bugs.python.org/issue27126
+            os.environ['NO_PROXY'] = "*"
 
     @classmethod
     @initialization(error=True)
