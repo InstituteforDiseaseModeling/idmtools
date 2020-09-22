@@ -415,3 +415,4 @@ stub_out
 .*_reports/
 .*_results/
 /**/tests/assets/
+*.test_results.html

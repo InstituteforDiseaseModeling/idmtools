@@ -1,4 +1,4 @@
-.PHONY: clean lint test coverage dist release-staging release-staging-release-commit release-staging-minor changelog
+.PHONY: clean lint test coverage dist release-staging release-staging-release-commit release-staging-minor changelog start-allure
 
 IPY=python -c
 PY=python
@@ -68,10 +68,12 @@ start-allure: ## start the allue docker report server
 	$(IPY) "print('Once tests have finished, your test report will be available at http://localhost:5050/allure-docker-service/latest-report')"
 	$(IPY) "import os; os.makedirs('.allure_reports', exist_ok=True)"
 
-test-smoke-allure: start-allure ## Run smoke tests with reports to Allure server
+## Run smoke tests with reports to Allure server(Comment moved until https://github.com/tqdm/py-make/issues/11 is resolves)
+test-smoke-allure: start-allure 
 	$(PDS)run_pymake_on_all.py --env "TEST_EXTRA_OPTS=--alluredir=../../.allure_results" test-smoke
 
-test-all-allure: start-allure ## Run smoke tests with reports to Allure server
+ ## Run smoke tests with reports to Allure server(Comment moved until https://github.com/tqdm/py-make/issues/11 is resolves)
+test-all-allure: start-allure
 	$(PDS)run_pymake_on_all.py --env "TEST_EXTRA_OPTS=--alluredir=../../.allure_results" test-all
 
 coverage: ## Generate a code-coverage report

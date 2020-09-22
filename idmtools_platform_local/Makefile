@@ -11,7 +11,7 @@ CLDIR=$(PDS)clean_dir.py
 CWD=$($(IPY) "import os; print(os.getcwd())")
 TEST_RUN_OPTS=-e DOCKER_REPO=idm-docker-staging NO_SPINNER=1
 TEST_EXTRA_OPTS?=
-TEST_COMMAND := py.test --durations=3 -v --junitxml=test_results.xml --html=cli.test_results.html $(TEST_EXTRA_OPTS)
+TEST_COMMAND := py.test --durations=3 -v --junitxml=test_results.xml --html=local.test_results.html $(TEST_EXTRA_OPTS)
 TEST_RUN_OPTS = -e DOCKER_REPO=docker-staging NO_SPINNER=1
 FULL_TEST_CMD := $(PDR) -w 'tests' $(TEST_RUN_OPTS) -ex '$(TEST_COMMAND)
 COVERAGE_CMD := $(PDR) -w 'tests' $(TEST_RUN_OPTS) -p . ../ -ex 'coverage run --omit="*/test*,*/setup.py" --source ../,../../idmtools_core,../../idmtools_models -m pytest $(COVERAGE_CMD_OPTS)'
@@ -66,7 +66,8 @@ coverage-report:  ## Generate HTML report from coverage. Requires running covera
 	coverage report -m
 	coverage html -i
 
-coverage-report-view: coverage-report ## View coverage report
+## View coverage report (Comment out https://github.com/tqdm/py-make/issues/11)
+coverage-report-view: coverage-report
    $(PDS)/launch_dir_in_browser.py htmlcov/index.html
 
 coverage: ## Generate a code-coverage report
