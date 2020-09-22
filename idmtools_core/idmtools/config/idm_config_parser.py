@@ -147,10 +147,10 @@ class IdmConfigParser:
             # Fallback to user home directories
             if ini_file is None:
                 # check for Linux global configuration at /home/username/.idmtools.ini
-                if platform.platform() in ["Linux", "Darwin"] and os.path.exists(os.path.join(str(Path.home()), ".idmtools.ini")):
+                if platform.system() in ["Linux", "Darwin"] and os.path.exists(os.path.join(str(Path.home()), ".idmtools.ini")):
                     ini_file = os.path.join(str(Path.home()), ".idmtools.ini")
                 # On Windows, c:\users\user\AppData\Local\idmtools\idmtools.ini
-                elif platform.platform() in ["Windows"] and os.path.exists(os.path.join(os.path.expandvars(r'%LOCALAPPDATA%'), "idmtools", "idmtools.ini")):
+                elif platform.system() in ["Windows"] and os.path.exists(os.path.join(os.path.expandvars(r'%LOCALAPPDATA%'), "idmtools", "idmtools.ini")):
                     ini_file = os.path.join(os.path.expandvars(r'%LOCALAPPDATA%'), "idmtools", "idmtools.ini")
         if ini_file is None:
             # We use print since logger isn't configured
