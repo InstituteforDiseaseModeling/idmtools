@@ -289,19 +289,6 @@ class AssetCollection(IEntity):
         except StopIteration:
             return None
 
-    def delete(self, **kwargs) -> NoReturn:
-        """
-        Delete an asset based on keywords attributes
-
-        Args:
-            **kwargs: Filter for the asset to delete.
-        """
-        user_logger.warning(
-            "delete will be changing behaviour to deletion of AssetCollection in a future release. Use the remove method going forward to remove an asset from an AssetCollection",
-            PendingDeprecationWarning
-        )
-        self.remove(**kwargs)
-
     def remove(self, **kwargs) -> NoReturn:
         """
         Remove an asset from the AssetCollection based on keywords attributes
