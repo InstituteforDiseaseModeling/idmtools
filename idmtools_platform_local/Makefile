@@ -11,9 +11,10 @@ CLDIR=$(PDS)clean_dir.py
 CWD=$($(IPY) "import os; print(os.getcwd())")
 TEST_RUN_OPTS=-e DOCKER_REPO=idm-docker-staging NO_SPINNER=1
 TEST_EXTRA_OPTS?=
-TEST_COMMAND=py.test --durations=10 -v --junitxml=test_results.xml --html=local.test_results.html ${TEST_EXTRA_OPTS}
-FULL_TEST_CMD=$(PDR) -w 'tests' $(TEST_RUN_OPTS) -ex '$(TEST_COMMAND)
-COVERAGE_CMD=$(PDR) -w 'tests' $(TEST_RUN_OPTS) -p . ../ -ex 'coverage run --omit="*/test*,*/setup.py" --source ../,../../idmtools_core,../../idmtools_models -m pytest $(COVERAGE_CMD_OPTS)'
+TEST_COMMAND := py.test --durations=3 -v --junitxml=test_results.xml --html=cli.test_results.html $(TEST_EXTRA_OPTS)
+TEST_RUN_OPTS = -e DOCKER_REPO=docker-staging NO_SPINNER=1
+FULL_TEST_CMD := $(PDR) -w 'tests' $(TEST_RUN_OPTS) -ex '$(TEST_COMMAND)
+COVERAGE_CMD := $(PDR) -w 'tests' $(TEST_RUN_OPTS) -p . ../ -ex 'coverage run --omit="*/test*,*/setup.py" --source ../,../../idmtools_core,../../idmtools_models -m pytest $(COVERAGE_CMD_OPTS)'
 COVERAGE_CMD_OPTS?=
 help:
 	$(PDS)get_help_from_makefile.py
@@ -61,23 +62,29 @@ test-python: ## Run our python tests
 test-smoke: ## Run our smoke tests
 	$(FULL_TEST_CMD) -m "smoke"'
 
+coverage-report:  ## Generate HTML report from coverage. Requires running coverage run first(coverage, coverage-smoke, coverage-all)
+	coverage report -m
+	coverage html -i
+
+coverage-report-view: coverage-report ## View coverage report
+   $(PDS)/launch_dir_in_browser.py htmlcov/index.html
+
 coverage: ## Generate a code-coverage report
 	@make clean
 	# We have to run in our tests folder to use the proper config
-	$(eval COVERAGE_CMD_OPTS=-m "not comps and not docker")
-	$(COVERAGE_CMD)
+	$(COVERAGE_CMD) -m "not comps and not docker"'
 	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
-	coverage report -m
-	coverage html -i
-	$(PDS)/launch_dir_in_browser.py htmlcov/index.html
 
-coverage-all: ## Generate a code-coverage report
+coverage-smoke: ## Generate a code-coverage report
+	@make clean
 	# We have to run in our tests folder to use the proper config
-	$(COVERAGE_CMD)
+	$(COVERAGE_CMD) -m "smoke"'
 	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
-	coverage report -m
-	coverage html -i
-	$(PDS)/launch_dir_in_browser.py htmlcov/index.html
+
+coverage-all: ## Generate a code-coverage report using all tests
+	# We have to run in our tests folder to use the proper config
+	$(COVERAGE_CMD)'
+	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
 
 docker-cleanup:
 	docker stop idmtools_workers idmtools_postgres idmtools_redis
