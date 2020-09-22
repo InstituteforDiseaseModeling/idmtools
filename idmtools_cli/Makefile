@@ -59,7 +59,7 @@ coverage-report:  ## Generate HTML report from coverage. Requires running covera
 	coverage html -i
 
 coverage-report-view: coverage-report ## View coverage report
-   $(PDS)/launch_dir_in_browser.py htmlcov/index.html
+	$(PDS)/launch_dir_in_browser.py htmlcov/index.html
 
 coverage: ## Generate a code-coverage report
 	@make clean

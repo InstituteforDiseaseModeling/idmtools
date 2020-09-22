@@ -62,7 +62,7 @@ coverage-report:  ## Generate HTML report from coverage. Requires running covera
 
 ## View coverage report (Comment out https://github.com/tqdm/py-make/issues/11)
 coverage-report-view: coverage-report
-   $(PDS)/launch_dir_in_browser.py htmlcov/index.html
+	$(PDS)/launch_dir_in_browser.py htmlcov/index.html
 
 coverage: ## Generate a code-coverage report
 	@make clean
