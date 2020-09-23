@@ -107,7 +107,7 @@ class TestConfig(ITestWithPersistence):
     @pytest.mark.skipif(os.environ.get("TEST_GLOBAL_CONFIG", 'n').lower() not in ['1', 'y', 'yes', 't', 'true'], reason="Either the environment variable TEST_GLOBAL_CONFIG is not set to true")
     def test_global_configuration(self):
         # ensure user does not have a global config
-        self.assertNotIn('IDMTOOLS_CONFIG_FILE', list(os.environ.keys()))
+        self.assertNotIn('IDMTOOLS_CONFIG_FILE', list(os.environ.keys()), msg="Cannot run this test when you have IDMTOOLS_CONFIG_FILE since it would be loaded before the global config")
         self.assertFalse(os.path.exists(IdmConfigParser.get_global_configuration_name()), msg=f"You already have an existing global configuration file at {IdmConfigParser.get_global_configuration_name()}. This test would overwrite your existing configuration.")
 
         # wrap in try finally so we copy file away even if we hit exception
