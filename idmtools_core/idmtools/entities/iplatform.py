@@ -5,7 +5,7 @@ from dataclasses import fields, field
 from functools import partial
 from itertools import groupby
 from logging import getLogger, DEBUG
-from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set, Iterator, Callable
+from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set, Iterator, Callable, Iterable
 from uuid import UUID
 from idmtools.core import CacheEnabled, UnknownItemException, EntityContainer, UnsupportedPlatformType
 from idmtools.core.enums import ItemType, EntityStatus
@@ -586,16 +586,18 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         idm_item = self.get_item(item_id, item_type, raw=False)
         return self.get_files(idm_item, files, output)
 
-    def are_requirements_met(self, requirements: Set[PlatformRequirements]) -> bool:
+    def are_requirements_met(self, requirements: Union[PlatformRequirements, Set[PlatformRequirements]]) -> bool:
         """
         Does the platform support the list of requirements
 
         Args:
-            requirements: Requirements
+            requirements: Requirements should be a list of PlatformRequirements or a single PlatformRequirements
 
         Returns:
             True if all the requirements are supported
         """
+        if isinstance(requirements, PlatformRequirements):
+            requirements = [requirements]
         return all([x in self._platform_supports for x in requirements])
 
     def is_task_supported(self, task: ITask) -> bool:

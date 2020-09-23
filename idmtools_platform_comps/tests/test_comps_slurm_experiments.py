@@ -12,6 +12,7 @@ from idmtools.assets import AssetCollection
 from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
+from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
@@ -42,6 +43,13 @@ class TestCOMPSSlurmExperiment(ITestWithPersistence):
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
         self.platform = Platform('SLURM')
+
+    @pytest.mark.smoke
+    def test_slurm_requirements(self):
+        self.assertTrue(self.platform.are_requirements_met(PlatformRequirements.LINUX))
+        self.assertTrue(self.platform.are_requirements_met(PlatformRequirements.NativeBinary))
+        self.assertTrue(self.platform.are_requirements_met(PlatformRequirements.PYTHON))
+        self.assertFalse(self.platform.are_requirements_met(PlatformRequirements.WINDOWS))
 
     @pytest.mark.long
     def test_sweeps_with_partial_comps_in_slurm(self):
