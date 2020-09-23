@@ -172,7 +172,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
         e = Experiment.from_task(task, name="test/\\:'?<>*\|name1()δ`")
         e.run(wait_until_done=True)
         self.assertTrue(e.succeeded)
-        name_expected = 'test_________name1___'
+        name_expected = 'test__________name1___'
         self.assertEqual(e.name, name_expected)
         self.assertIsNone(e.simulations[0].name)
 
