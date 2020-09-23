@@ -411,3 +411,4 @@ docs/idmtools_models*.rst
 docs/idmtools_platform*.rst
 
 /**/tests/.test_platform/
+stub_out

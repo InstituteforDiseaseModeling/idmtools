@@ -29,7 +29,7 @@ class TestWrapperTask(ITestWithPersistence):
 
         # wrap the script
         wrapper_task = get_script_wrapper_windows_task(task, template_content=template)
-        experiment = Experiment.from_task(wrapper_task)
+        experiment = Experiment.from_task(wrapper_task, self.case_name)
         experiment.run(platform=self.platform, wait_until_done=True)
 
         self.assertTrue(experiment.succeeded)
