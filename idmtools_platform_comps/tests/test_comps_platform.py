@@ -24,6 +24,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
     def setUp(self) -> None:
         super().setUp()
         self.platform: COMPSPlatform = None
+        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         setup_test_with_platform_and_simple_sweep(self)
 
     @pytest.mark.assets
@@ -121,7 +122,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
         task = JSONConfiguredPythonTask(script_path=model_path)
         builder = SimulationBuilder()
         builder.add_sweep_definition(JSONConfiguredPythonTask.set_parameter_partial('P'), range(3))
-        experiment = Experiment.from_builder(builder, task, name='Mixed Model')
+        experiment = Experiment.from_builder(builder, task, name=self.case_name)
         experiment.run(wait_until_done=True)
         self.assertTrue(experiment.done)
         self.assertFalse(experiment.succeeded)
@@ -157,7 +158,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
         task = JSONConfiguredPythonTask(script_path=model_path)
         builder = SimulationBuilder()
         builder.add_sweep_definition(JSONConfiguredPythonTask.set_parameter_partial('P'), range(3))
-        experiment = Experiment.from_builder(builder, task, name='Mixed Model')
+        experiment = Experiment.from_builder(builder, task, name=self.case_name)
         experiment.run(wait_until_done=True)
         self.assertTrue(experiment.done)
         self.assertFalse(experiment.succeeded)
@@ -169,9 +170,9 @@ class TestCOMPSPlatform(ITestWithPersistence):
     def test_experiment_name(self):  # zdu: no metadata file any more
         model_path = os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py")
         task = JSONConfiguredPythonTask(script_path=model_path, envelope="parameters")
-        e = Experiment.from_task(task, name="test/\\:'?<>*|name1")
+        e = Experiment.from_task(task, name=self.case_name + "_test/\\:'?<>*|name1")
         e.run(wait_until_done=True)
-        name_expected = "test_________name1"
+        name_expected = self.case_name + "_test_________name1"
         self.assertEqual(e.name, name_expected)
         self.assertIsNone(e.simulations[0].name)
 
@@ -181,10 +182,10 @@ class TestCOMPSPlatform(ITestWithPersistence):
         name = ""
         s = ['/', '\\', ':', "'", '"', '?', '<', '>', '*', '|', "\0"]
         exp_name = name.join(s)
-        experiment = Experiment.from_task(task, name="name" + exp_name + "test")
+        experiment = Experiment.from_task(task, name=self.case_name + "_name" + exp_name + "test")
         experiment.simulations[0].name = "test/\\:'?<>*|sim1"
         experiment.run(wait_until_done=True)
-        name_expected = "name___________test"
+        name_expected = self.case_name + "_name___________test"
         self.assertEqual(experiment.name, name_expected)
         self.assertEqual(experiment.simulations[0].name, "test_________sim1")
 

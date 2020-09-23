@@ -22,24 +22,54 @@ Install |IT_s|
 
 #.  Activate the virtual environment:
 
-        * On Windows, enter the following::
+    .. container:: os-code-block
 
-            idmtools\Scripts\activate
+        .. container:: choices
 
-        * On Linux, enter the following::
+            * Windows
+            * Linux
 
-            source idmtools/bin/activate
+        .. container:: windows
+
+            Enter the following::
+
+                idmtools\Scripts\activate
+        .. container:: linux
+
+            Enter the following::
+
+                source idmtools/bin/activate
 
 #.  In the base directory of the cloned GitHub repository, run the setup script.
 
-        * On Windows, enter the following::
+    .. container:: os-code-block
 
-            pip install py-make
-            pymake setup-dev
+        .. container:: choices
 
-        * On Linux, enter the following::
+            * Windows
+            * Linux
 
-            make setup-dev
+        .. container:: windows
+
+              Enter the following::
+
+                pip install py-make
+                pymake setup-dev
+
+              You can also use the following if you are **not** going to develop or test using the Local Platform::
+
+                pip install py-make
+                pymake setup-dev-no-docker
+
+        .. container:: linux
+
+              Enter the following::
+
+                make setup-dev
+
+              You can also use the following if you are **not** going to develop or test using the Local Platform::
+
+                make setup-dev-no-docker
 
 #.  To verify that |IT_s| is installed, enter the following command::
 

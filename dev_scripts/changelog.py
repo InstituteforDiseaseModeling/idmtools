@@ -59,7 +59,9 @@ issue_types = dict()
 
 def get_issue_type(issue, labels):
     global issue_types
-    if 'bug' in labels:
+    if any([x in labels for x in ['Support']]):
+        issue_types[issue] = 'Support'
+    elif 'bug' in labels:
         issue_types[issue] = 'Bugs'
     elif 'Feature Request' in labels:
         issue_types[issue] = 'Feature Request'
