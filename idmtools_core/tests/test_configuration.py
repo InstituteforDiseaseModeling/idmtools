@@ -104,7 +104,7 @@ class TestConfig(ITestWithPersistence):
             self.assertIn("WARNING: File 'idmtools_NotExist.ini' Not Found!", out.getvalue())
 
     # enable config only through special file
-    @pytest.mark.skipif(all([os.environ.get("TEST_GLOBAL_CONFIG", 'n').lower() in ['1', 'y', 'yes', 't', 'true'], os.environ.get('IDMTOOLS_CONFIG_FILE', None) is None, not os.path.exists(IdmConfigParser.get_global_configuration_name())]), reason="Either the environment variable TEST_GLOBAL_CONFIG is not set to true, you already have a global configuration, or IDMTOOLS_CONFIG_FILE is set")
+    @pytest.mark.skipif(not all([os.environ.get("TEST_GLOBAL_CONFIG", 'n').lower() in ['1', 'y', 'yes', 't', 'true'], os.environ.get('IDMTOOLS_CONFIG_FILE', None) is None, not os.path.exists(IdmConfigParser.get_global_configuration_name())]), reason="Either the environment variable TEST_GLOBAL_CONFIG is not set to true, you already have a global configuration, or IDMTOOLS_CONFIG_FILE is set")
     def test_global_configuration(self):
         # wrap in try finally so we copy file away even if we hit exception
         try:
