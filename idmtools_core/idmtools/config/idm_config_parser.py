@@ -1,6 +1,6 @@
 import copy
 import platform
-
+from pathlib import Path
 import json
 import os
 from configparser import ConfigParser
@@ -17,6 +17,7 @@ user_logger = getLogger('user')
 
 
 def initialization(error=False, force=False):
+    # store default value
     # store default value
     oerror = error
 
@@ -122,6 +123,27 @@ class IdmConfigParser:
                 cls._config_path = cls._find_config(dir_parent, file_name)
                 return cls._config_path
 
+    @staticmethod
+    def get_global_configuration_name() -> str:
+        """
+        Get Global Configuration Name
+
+        Returns:
+            On Windows, this returns %LOCALDATA%\\idmtools\\idmtools.ini
+            On Mac and Linux, it returns "/home/username/.idmtools.ini'
+
+        Raises:
+            Value Error on OSs not supported
+        """
+        if platform.system() in ["Linux", "Darwin"]:
+            ini_file = os.path.join(str(Path.home()), ".idmtools.ini")
+        # On Windows, c:\users\user\AppData\Local\idmtools\idmtools.ini
+        elif platform.system() in ["Windows"]:
+            ini_file = os.path.join(os.path.expandvars(r'%LOCALAPPDATA%'), "idmtools", "idmtools.ini")
+        else:
+            raise ValueError("OS global configuration cannot be detected")
+        return ini_file
+
     @classmethod
     def _load_config_file(cls, dir_path: str = os.getcwd(), file_name: str = default_config):
         """
@@ -137,12 +159,23 @@ class IdmConfigParser:
         # init logging here as this is our most likely entry-point into an idmtools "application"
         from idmtools.core.logging import setup_logging, VERBOSE
 
-        ini_file = cls._find_config(dir_path, file_name)
+        if "IDMTOOLS_CONFIG_FILE" in os.environ:
+            if not os.path.exists(os.environ["IDMTOOLS_CONFIG_FILE"]):
+                raise FileNotFoundError(f'Cannot for idmtools config at {os.environ["IDMTOOLS_CONFIG_FILE"]}')
+            ini_file = os.environ["IDMTOOLS_CONFIG_FILE"]
+        else:
+            ini_file = cls._find_config(dir_path, file_name)
+            # Fallback to user home directories
+            if ini_file is None:
+                global_config = cls.get_global_configuration_name()
+                if os.path.exists(global_config):
+                    ini_file = global_config
         if ini_file is None:
             # We use print since logger isn't configured
             print("/!\\ WARNING: File '{}' Not Found!".format(file_name))
             return
 
+        cls._config_path = ini_file
         cls._config = ConfigParser()
         cls._config.read(ini_file)
 
@@ -223,7 +256,7 @@ class IdmConfigParser:
 
     @classmethod
     def ensure_init(cls, dir_path: str = '.', file_name: str = default_config, error: bool = False,
-                    force=False) -> None:
+                    force: bool = False) -> None:
         """
         Verify that the INI file loaded and a configparser instance is available.
 
