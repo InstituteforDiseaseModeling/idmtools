@@ -3,7 +3,9 @@ import dataclasses
 
 import pytest
 from idmtools.core import CacheEnabled
+from idmtools.core.platform_factory import Platform
 from idmtools.entities.iplatform import IPlatform
+from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.registry.platform_specification import PlatformPlugins
 from idmtools_platform_comps.comps_platform import COMPSPlatform
 from idmtools_platform_comps.plugin_info import COMPSPlatformSpecification
@@ -38,3 +40,21 @@ class TestCompsPlugin(unittest.TestCase):
             if field.name[0] != '_' and field not in exclude_fields and not field.metadata.get('pickle_ignore', False) \
                     and field.name != 'docker_image':
                 self.assertIn(field.name, example_config)
+
+    @pytest.mark.comps
+    @pytest.mark.smoke
+    def test_comps_requirements(self):
+        with Platform("SLURM") as platform:
+            self.assertTrue(platform.are_requirements_met(PlatformRequirements.LINUX))
+            self.assertTrue(platform.are_requirements_met(PlatformRequirements.NativeBinary))
+            self.assertTrue(platform.are_requirements_met(PlatformRequirements.PYTHON))
+            self.assertFalse(platform.are_requirements_met(PlatformRequirements.WINDOWS))
+
+    @pytest.mark.comps
+    @pytest.mark.smoke
+    def test_slurm_requirements(self):
+        with Platform("COMPS2") as platform:
+            self.assertFalse(platform.are_requirements_met(PlatformRequirements.LINUX))
+            self.assertTrue(platform.are_requirements_met(PlatformRequirements.NativeBinary))
+            self.assertTrue(platform.are_requirements_met(PlatformRequirements.PYTHON))
+            self.assertTrue(platform.are_requirements_met(PlatformRequirements.WINDOWS))

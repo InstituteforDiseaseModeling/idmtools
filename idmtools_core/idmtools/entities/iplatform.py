@@ -5,7 +5,7 @@ from dataclasses import fields, field
 from functools import partial
 from itertools import groupby
 from logging import getLogger, DEBUG
-from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set, Iterator, Callable, Iterable
+from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set, Iterator, Callable
 from uuid import UUID
 from idmtools.core import CacheEnabled, UnknownItemException, EntityContainer, UnsupportedPlatformType
 from idmtools.core.enums import ItemType, EntityStatus

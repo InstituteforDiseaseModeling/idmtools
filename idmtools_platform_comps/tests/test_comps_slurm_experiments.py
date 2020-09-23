@@ -44,13 +44,6 @@ class TestCOMPSSlurmExperiment(ITestWithPersistence):
         print(self.case_name)
         self.platform = Platform('SLURM')
 
-    @pytest.mark.smoke
-    def test_slurm_requirements(self):
-        self.assertTrue(self.platform.are_requirements_met(PlatformRequirements.LINUX))
-        self.assertTrue(self.platform.are_requirements_met(PlatformRequirements.NativeBinary))
-        self.assertTrue(self.platform.are_requirements_met(PlatformRequirements.PYTHON))
-        self.assertFalse(self.platform.are_requirements_met(PlatformRequirements.WINDOWS))
-
     @pytest.mark.long
     def test_sweeps_with_partial_comps_in_slurm(self):
         model_path = os.path.join(COMMON_INPUT_PATH, "python", "model1.py")
