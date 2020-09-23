@@ -130,7 +130,7 @@ class IdmConfigParser:
         Get Global Configuration Name
 
         Returns:
-            On Windows, this returns %LOCALDATA%\idmtools\idmtools.ini
+            On Windows, this returns %LOCALDATA%\\idmtools\\idmtools.ini
             On Mac and Linux, it returns "/home/username/.idmtools.ini'
 
         Raises:

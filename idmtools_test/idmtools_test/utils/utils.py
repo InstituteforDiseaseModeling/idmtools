@@ -1,17 +1,38 @@
+import sys
+from io import StringIO
+from contextlib import contextmanager
 import os
 import shutil
 import subprocess
-
 import pandas as pd
 from idmtools.entities.simulation import Simulation
 
 
-def del_folder(path):
+def del_folder(path: str):
+    """
+    Delete Folder
+
+    Args:
+        path: Path to delete
+
+    Returns:
+
+    """
     if os.path.exists(path):
         shutil.rmtree(path)
 
 
-def del_file(filename, dir=None):
+def del_file(filename: str, dir: str = None):
+    """
+    Delete a file
+
+    Args:
+        filename: Filename
+        dir: Optional Directory
+
+    Returns:
+
+    """
     if dir:
         filepath = os.path.join(dir, filename)
     else:
@@ -22,7 +43,17 @@ def del_file(filename, dir=None):
         os.remove(filepath)
 
 
-def load_csv_file(filename, dir=None):
+def load_csv_file(filename: str, dir: str = None) -> pd.DataFrame():
+    """
+    Load CSV File
+
+    Args:
+        filename: Filename
+        dir: Optional Directory
+
+    Returns:
+
+    """
     df = None
     if dir:
         filepath = os.path.join(dir, filename)
@@ -74,3 +105,14 @@ def test_example_folder(tc, analyzers_folder):
                 tc.assertEqual(result, 0)
             except subprocess.CalledProcessError as e:
                 tc.assertEqual(result, e.returncode, f'Result for example {file} failed. See {e.output}')
+
+
+@contextmanager
+def captured_output():
+    new_out, new_err = StringIO(), StringIO()
+    old_out, old_err = sys.stdout, sys.stderr
+    try:
+        sys.stdout, sys.stderr = new_out, new_err
+        yield sys.stdout, sys.stderr
+    finally:
+        sys.stdout, sys.stderr = old_out, old_err
