@@ -107,7 +107,10 @@ class SimulationBuilder:
         # Everything is OK, create a partial to have everything set in the signature except `simulation` and add
         self.sweeps.append((partial(function, **{remaining_parameters[0]: v})) for v in values)
 
-        self.count += len(values)
+        if self.count > 0:
+            self.count *= len(values)
+        else:
+            self.count = len(values)
 
     def __iter__(self):
         old_sw, new_sw = duplicate_list_of_generators(self.sweeps)
