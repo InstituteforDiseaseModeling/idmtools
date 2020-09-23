@@ -1,8 +1,0 @@
-idmtools\_platform\_local.infrastructure.redis module
-=====================================================
-
-.. automodule:: idmtools_platform_local.infrastructure.redis
-   :members:
-   :undoc-members:
-   :show-inheritance:
-   :ignore-module-all:

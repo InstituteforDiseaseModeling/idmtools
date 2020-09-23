@@ -1,7 +1,0 @@
-idmtools.entities.iworkflow\_item module
-========================================
-
-.. automodule:: idmtools.entities.iworkflow_item
-   :members:
-   :undoc-members:
-   :show-inheritance:

@@ -1,7 +1,0 @@
-idmtools.assets.content\_handlers module
-========================================
-
-.. automodule:: idmtools.assets.content_handlers
-   :members:
-   :undoc-members:
-   :show-inheritance:

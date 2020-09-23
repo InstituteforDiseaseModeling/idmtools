@@ -1,7 +1,0 @@
-idmtools.analysis.platform\_anaylsis module
-===========================================
-
-.. automodule:: idmtools.analysis.platform_anaylsis
-   :members:
-   :undoc-members:
-   :show-inheritance:

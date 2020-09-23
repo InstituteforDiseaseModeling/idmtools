@@ -1,7 +1,0 @@
-idmtools\_models.templated\_script\_task module
-===============================================
-
-.. automodule:: idmtools_models.templated_script_task
-   :members:
-   :undoc-members:
-   :show-inheritance:

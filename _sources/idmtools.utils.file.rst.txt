@@ -1,7 +1,0 @@
-idmtools.utils.file module
-==========================
-
-.. automodule:: idmtools.utils.file
-   :members:
-   :undoc-members:
-   :show-inheritance:

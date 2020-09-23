@@ -1,8 +1,0 @@
-idmtools\_platform\_local.platform\_operations.experiment\_operations module
-============================================================================
-
-.. automodule:: idmtools_platform_local.platform_operations.experiment_operations
-   :members:
-   :undoc-members:
-   :show-inheritance:
-   :ignore-module-all:

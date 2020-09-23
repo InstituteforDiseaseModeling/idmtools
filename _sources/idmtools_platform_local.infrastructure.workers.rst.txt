@@ -1,8 +1,0 @@
-idmtools\_platform\_local.infrastructure.workers module
-=======================================================
-
-.. automodule:: idmtools_platform_local.infrastructure.workers
-   :members:
-   :undoc-members:
-   :show-inheritance:
-   :ignore-module-all:

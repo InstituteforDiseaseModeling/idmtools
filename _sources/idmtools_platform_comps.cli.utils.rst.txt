@@ -1,7 +1,0 @@
-idmtools\_platform\_comps.cli.utils module
-==========================================
-
-.. automodule:: idmtools_platform_comps.cli.utils
-   :members:
-   :undoc-members:
-   :show-inheritance:

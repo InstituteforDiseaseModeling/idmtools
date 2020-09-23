@@ -1,7 +1,0 @@
-idmtools.core.interfaces.iitem module
-=====================================
-
-.. automodule:: idmtools.core.interfaces.iitem
-   :members:
-   :undoc-members:
-   :show-inheritance:

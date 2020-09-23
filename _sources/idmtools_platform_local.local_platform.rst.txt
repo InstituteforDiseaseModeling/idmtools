@@ -1,8 +1,0 @@
-idmtools\_platform\_local.local\_platform module
-================================================
-
-.. automodule:: idmtools_platform_local.local_platform
-   :members:
-   :undoc-members:
-   :show-inheritance:
-   :ignore-module-all:

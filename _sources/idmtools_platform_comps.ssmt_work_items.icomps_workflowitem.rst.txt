@@ -1,7 +1,0 @@
-idmtools\_platform\_comps.ssmt\_work\_items.icomps\_workflowitem module
-=======================================================================
-
-.. automodule:: idmtools_platform_comps.ssmt_work_items.icomps_workflowitem
-   :members:
-   :undoc-members:
-   :show-inheritance:

@@ -1,7 +1,0 @@
-idmtools.core.interfaces.inamed\_entity module
-==============================================
-
-.. automodule:: idmtools.core.interfaces.inamed_entity
-   :members:
-   :undoc-members:
-   :show-inheritance:

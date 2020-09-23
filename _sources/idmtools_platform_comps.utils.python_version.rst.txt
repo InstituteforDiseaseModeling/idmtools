@@ -1,7 +1,0 @@
-idmtools\_platform\_comps.utils.python\_version module
-======================================================
-
-.. automodule:: idmtools_platform_comps.utils.python_version
-   :members:
-   :undoc-members:
-   :show-inheritance:

@@ -1,7 +1,0 @@
-idmtools.utils.gitrepo module
-=============================
-
-.. automodule:: idmtools.utils.gitrepo
-   :members:
-   :undoc-members:
-   :show-inheritance:

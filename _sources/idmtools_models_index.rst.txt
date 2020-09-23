@@ -1,7 +1,0 @@
-idmtools_models
-===============
-
-.. toctree::
-   :maxdepth: 4
-
-   idmtools_models

@@ -1,7 +1,0 @@
-idmtools.entities.command\_line module
-======================================
-
-.. automodule:: idmtools.entities.command_line
-   :members:
-   :undoc-members:
-   :show-inheritance:

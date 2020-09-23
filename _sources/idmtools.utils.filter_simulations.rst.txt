@@ -1,7 +1,0 @@
-idmtools.utils.filter\_simulations module
-=========================================
-
-.. automodule:: idmtools.utils.filter_simulations
-   :members:
-   :undoc-members:
-   :show-inheritance:

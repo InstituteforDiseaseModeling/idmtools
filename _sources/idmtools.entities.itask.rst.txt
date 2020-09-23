@@ -1,7 +1,0 @@
-idmtools.entities.itask module
-==============================
-
-.. automodule:: idmtools.entities.itask
-   :members:
-   :undoc-members:
-   :show-inheritance:

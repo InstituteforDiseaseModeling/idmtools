@@ -1,7 +1,0 @@
-idmtools.registry.experiment\_specification module
-==================================================
-
-.. automodule:: idmtools.registry.experiment_specification
-   :members:
-   :undoc-members:
-   :show-inheritance:

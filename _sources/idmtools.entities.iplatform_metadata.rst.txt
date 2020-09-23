@@ -1,7 +1,0 @@
-idmtools.entities.iplatform\_metadata module
-============================================
-
-.. automodule:: idmtools.entities.iplatform_metadata
-   :members:
-   :undoc-members:
-   :show-inheritance:

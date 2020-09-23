@@ -1,7 +1,0 @@
-idmtools.entities.simulation module
-===================================
-
-.. automodule:: idmtools.entities.simulation
-   :members:
-   :undoc-members:
-   :show-inheritance:

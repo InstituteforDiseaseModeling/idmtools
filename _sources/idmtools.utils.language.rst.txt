@@ -1,7 +1,0 @@
-idmtools.utils.language module
-==============================
-
-.. automodule:: idmtools.utils.language
-   :members:
-   :undoc-members:
-   :show-inheritance:

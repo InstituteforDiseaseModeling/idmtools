@@ -1,7 +1,0 @@
-idmtools.analysis.tags\_analyzer module
-=======================================
-
-.. automodule:: idmtools.analysis.tags_analyzer
-   :members:
-   :undoc-members:
-   :show-inheritance:

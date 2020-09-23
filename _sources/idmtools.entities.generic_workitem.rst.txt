@@ -1,7 +1,0 @@
-idmtools.entities.generic\_workitem module
-==========================================
-
-.. automodule:: idmtools.entities.generic_workitem
-   :members:
-   :undoc-members:
-   :show-inheritance:

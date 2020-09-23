@@ -1,7 +1,0 @@
-idmtools.analysis.download\_analyzer module
-===========================================
-
-.. automodule:: idmtools.analysis.download_analyzer
-   :members:
-   :undoc-members:
-   :show-inheritance:

@@ -1,7 +1,0 @@
-idmtools.registry.platform\_specification module
-================================================
-
-.. automodule:: idmtools.registry.platform_specification
-   :members:
-   :undoc-members:
-   :show-inheritance:
