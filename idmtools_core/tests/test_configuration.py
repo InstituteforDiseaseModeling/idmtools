@@ -1,3 +1,4 @@
+import tempfile
 from shutil import copyfile
 
 import io
@@ -106,15 +107,12 @@ class TestConfig(ITestWithPersistence):
     # enable config only through special file
     @pytest.mark.skipif(not all([os.environ.get("TEST_GLOBAL_CONFIG", 'n').lower() in ['1', 'y', 'yes', 't', 'true'], os.environ.get('IDMTOOLS_CONFIG_FILE', None) is None, not os.path.exists(IdmConfigParser.get_global_configuration_name())]), reason="Either the environment variable TEST_GLOBAL_CONFIG is not set to true, you already have a global configuration, or IDMTOOLS_CONFIG_FILE is set")
     def test_global_configuration(self):
-        # wrap in try finally so we copy file away even if we hit exception
-        try:
-            copyfile(os.path.join(os.path.dirname(__file__), "idmtools.ini"), IdmConfigParser.get_global_configuration_name())
-            config_file = IdmConfigParser.get_config_path()
-            self.assertEqual(os.path.basename(config_file), IdmConfigParser.get_global_configuration_name())
-        # remove file after test
-        finally:
-            if os.path.exists(IdmConfigParser.get_global_configuration_name()):
-                os.remove(IdmConfigParser.get_global_configuration_name())
+        copyfile(os.path.join(os.path.dirname(__file__), "idmtools.ini"), IdmConfigParser.get_global_configuration_name())
+        IdmConfigParser.ensure_init(dir_path=tempfile.gettempdir(), force=True)
+        config_file = IdmConfigParser.get_config_path()
+        self.assertEqual(config_file, IdmConfigParser.get_global_configuration_name())
+        if os.path.exists(IdmConfigParser.get_global_configuration_name()):
+            os.remove(IdmConfigParser.get_global_configuration_name())
 
     def test_has_idmtools_common(self):
         IdmConfigParser(file_name="idmtools_NotExist.ini")
