@@ -55,7 +55,7 @@ class IPlatformSuiteOperations(ABC):
         Returns:
             NoReturn
         """
-        suite.pre_creation()
+        suite.pre_creation(self.platform)
 
     def post_create(self, suite: Suite, **kwargs) -> NoReturn:
         """
@@ -70,7 +70,7 @@ class IPlatformSuiteOperations(ABC):
         """
         suite.status = EntityStatus.CREATED
         suite.platform = self.platform
-        suite.post_creation()
+        suite.post_creation(self.platform)
         for experiment in suite.experiments:
             experiment.parent_id = suite.id
 

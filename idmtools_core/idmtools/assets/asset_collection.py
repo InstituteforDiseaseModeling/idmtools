@@ -2,7 +2,7 @@ import copy
 import os
 from dataclasses import dataclass, field
 from logging import getLogger
-from typing import List, NoReturn, TypeVar, Union, Any, Dict
+from typing import List, NoReturn, TypeVar, Union, Any, Dict, TYPE_CHECKING
 from uuid import UUID
 from idmtools.assets import Asset, TAssetList
 from idmtools.assets import TAssetFilterList
@@ -13,6 +13,9 @@ from idmtools.utils.entities import get_default_tags
 from idmtools.utils.file import scan_directory
 from idmtools.utils.filters.asset_filters import default_asset_file_filter
 from idmtools.utils.info import get_doc_base_url
+
+if TYPE_CHECKING:
+    from idmtools.entities.iplatform import IPlatform
 
 user_logger = getLogger('user')
 
@@ -400,13 +403,13 @@ class AssetCollection(IEntity):
                 return idx
         return None
 
-    def pre_creation(self) -> None:
+    def pre_creation(self, platform: 'IPlatform') -> None:
         if self.tags:
             self.tags.update(get_default_tags())
         else:
             self.tags = get_default_tags()
 
-    def post_creation(self) -> None:
+    def post_creation(self, platform: 'IPlatform') -> None:
         pass
 
     def set_tags(self, tags: Dict[str, Any]):

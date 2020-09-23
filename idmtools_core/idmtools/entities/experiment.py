@@ -78,7 +78,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
             self.gather_common_assets_from_task = isinstance(self.simulations.items, EntityContainer)
         self.__simulations.parent = self
 
-    def post_creation(self) -> None:
+    def post_creation(self, platform: 'IPlatform') -> None:
         pass
 
     @property
@@ -130,11 +130,12 @@ class Experiment(IAssetsEnabled, INamedEntity):
         from idmtools.utils.display import display, experiment_table_display
         display(self, experiment_table_display)
 
-    def pre_creation(self, gather_assets=True) -> None:
+    def pre_creation(self, platform: 'IPlatform', gather_assets=True) -> None:
         """
         Experiment pre_creation callback
 
         Args:
+            platform: Platform experiment is being created on
             gather_assets: Determines if an experiment will try to gather the common assets or defer. It most cases, you want this enabled but when modifying existing experiments you may want to disable if there are new assets and the platform has performance hits to determine those assets
 
         Returns:
