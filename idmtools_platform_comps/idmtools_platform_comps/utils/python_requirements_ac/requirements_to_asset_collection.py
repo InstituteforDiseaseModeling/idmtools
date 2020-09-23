@@ -211,7 +211,7 @@ class RequirementsToAssetCollection:
         user_files = FileList(root=CURRENT_DIRECTORY, files_in_root=[MODEL_CREATE_AC])
         tags = {MD5_KEY.format(self._os_target): self.checksum}
 
-        user_logger.info("Converting Python Packages to an Asset Collection. This may take awhile for large dependency lists")
+        user_logger.info("Converting Python Packages to an Asset Collection. This may take some time for large dependency lists")
         wi = SSMTWorkItem(item_name=wi_name, command=command, user_files=user_files, tags=tags,
                           related_experiments=[exp_id])
 
