@@ -46,6 +46,20 @@ class TestAddingSimulationsToExistingExperiment(unittest.TestCase):
         self.assertTrue(exp.succeeded)
         self.assertEqual(10, len(exp.simulations))
 
+    def test_empty_experiment_template(self):
+        base_task = JSONConfiguredPythonTask(script_path=model_path, python_path=sys.executable)
+        builder = SimulationBuilder()
+        exp = Experiment.from_builder(builder, base_task=base_task)
+        with self.assertRaises(ValueError) as er:
+            exp.run(wait_until_done=True)
+        self.assertTrue(er.exception.args[0], 'You cannot run an empty experiment')
+
+    def test_empty_experiment_list(self):
+        exp = Experiment()
+        with self.assertRaises(ValueError) as er:
+            exp.run(wait_until_done=True)
+        self.assertTrue(er.exception.args[0], 'You cannot run an empty experiment')
+
     def test_adding_manual_simulation(self):
         base_task = JSONConfiguredPythonTask(script_path=model_path, python_path=sys.executable)
         builder = SimulationBuilder()
