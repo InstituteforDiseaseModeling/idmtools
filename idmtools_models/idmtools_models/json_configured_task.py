@@ -7,15 +7,14 @@ from idmtools.assets import Asset, AssetCollection
 from idmtools.entities.itask import ITask
 from idmtools.entities.simulation import Simulation
 from idmtools.registry.task_specification import TaskSpecification
+if TYPE_CHECKING:
+    from idmtools.entities.iplatform import IPlatform
 
 TJSONConfigKeyType = Union[str, int, float]
 TJSONConfigValueType = Union[str, int, float, Dict[TJSONConfigKeyType, Any]]
 
 logger = getLogger(__name__)
 user_logger = getLogger('user')
-
-if TYPE_CHECKING:
-    from idmtools.entities.iplatform import IPlatform
 
 
 @dataclass

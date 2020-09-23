@@ -2,7 +2,7 @@ import os
 from dataclasses import dataclass, field
 from functools import partial
 from logging import getLogger, DEBUG
-from typing import List, Callable, Type, Dict, Any, Union
+from typing import List, Callable, Type, Dict, Any, Union, TYPE_CHECKING
 from jinja2 import Environment
 from idmtools.assets import AssetCollection, Asset
 from idmtools.entities import CommandLine
@@ -10,6 +10,8 @@ from idmtools.entities.itask import ITask
 from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools.entities.simulation import Simulation
 from idmtools.registry.task_specification import TaskSpecification
+if TYPE_CHECKING:
+    from idmtools.entities.iplatform import IPlatform
 
 logger = getLogger(__name__)
 WINDOWS_DEFAULT_WRAPPER = """
@@ -353,7 +355,7 @@ def get_script_wrapper_windows_task(task: ITask, wrapper_script_name: str = 'wra
                                    variables, "\\")
 
 
-def get_script_wrapper_unix_task(task: ITask, wrapper_script_name: str = 'wrapper.sh', template_content: str = None,
+def get_script_wrapper_unix_task(task: ITask, wrapper_script_name: str = 'wrapper.sh', template_content: str = LINUX_DEFAULT_WRAPPER,
                                  template_file: str = None, template_is_common: bool = True,
                                  variables: Dict[str, Any] = None):
     """
