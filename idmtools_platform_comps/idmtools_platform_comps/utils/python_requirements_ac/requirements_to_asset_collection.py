@@ -186,8 +186,8 @@ class RequirementsToAssetCollection:
         experiment.add_asset(Asset(REQUIREMENT_FILE))
         experiment.tags = {MD5_KEY.format(self._os_target): self.checksum}
         self.add_wheels_to_assets(experiment)
-        user_logger.info("Run install of python requirements through Experiment")
-        experiment.run(wait_until_done=True, platform=self.platform)
+        user_logger.info("Run install of python requirements on COMPS. To view the details, see the experiment below")
+        experiment.run(wait_until_done=True, platform=self.platform, use_short_path=True)
 
         if experiment.succeeded:
             return experiment
@@ -211,7 +211,7 @@ class RequirementsToAssetCollection:
         user_files = FileList(root=CURRENT_DIRECTORY, files_in_root=[MODEL_CREATE_AC])
         tags = {MD5_KEY.format(self._os_target): self.checksum}
 
-        user_logger.info("Create workitem to create AssetCollection from output of install")
+        user_logger.info("Converting Python Packages to an Asset Collection. This may take awhile for large dependency lists")
         wi = SSMTWorkItem(item_name=wi_name, command=command, user_files=user_files, tags=tags,
                           related_experiments=[exp_id])
 
