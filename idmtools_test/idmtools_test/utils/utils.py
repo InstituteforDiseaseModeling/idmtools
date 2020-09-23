@@ -116,3 +116,8 @@ def captured_output():
         yield sys.stdout, sys.stderr
     finally:
         sys.stdout, sys.stderr = old_out, old_err
+
+
+def is_global_configuration_enabled() -> bool:
+    from idmtools import IdmConfigParser
+    return os.path.exists(IdmConfigParser.get_global_configuration_name()) or os.environ.get("IDMTOOLS_CONFIG_FILE", None) is not None
