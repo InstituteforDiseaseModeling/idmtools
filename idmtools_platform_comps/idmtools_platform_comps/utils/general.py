@@ -101,7 +101,7 @@ def clean_experiment_name(experiment_name: str) -> str:
     """
 
     experiment_name = clean_names_expr.sub("_", experiment_name)
-    return str(experiment_name.encode("ascii", "ignore")).strip()
+    return experiment_name.encode("ascii", "ignore").decode('utf8').strip()
 
 
 def get_file_from_collection(platform: IPlatform, collection_id: UUID, file_path: str) -> bytearray:
