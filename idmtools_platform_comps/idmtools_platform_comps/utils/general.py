@@ -1,4 +1,5 @@
 import ntpath
+import re
 from logging import getLogger, DEBUG
 from typing import List, Dict, Union, Generator, Optional
 from uuid import UUID
@@ -15,6 +16,9 @@ from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.iplatform import IPlatform
 
 logger = getLogger(__name__)
+
+chars_to_replace = ['/', '\\', ':', "'", '"', '?', '<', '>', '*', '|', "\0", "(", ")", '`']
+clean_names_expr = re.compile(f'[{re.escape("".join(chars_to_replace))}]')
 
 
 def fatal_code(e: Exception) -> bool:
@@ -95,9 +99,9 @@ def clean_experiment_name(experiment_name: str) -> str:
         experiment_name: name of the experiment
     Returns:the experiment name allowed for use
     """
-    for c in ['/', '\\', ':', "'", '"', '?', '<', '>', '*', '|', "\0"]:
-        experiment_name = experiment_name.replace(c, '_')
-    return experiment_name.strip()
+
+    experiment_name = clean_names_expr.sub("_", experiment_name)
+    return str(experiment_name.encode("ascii", "ignore")).strip()
 
 
 def get_file_from_collection(platform: IPlatform, collection_id: UUID, file_path: str) -> bytearray:
