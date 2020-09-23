@@ -158,6 +158,7 @@ class TestConfig(ITestWithPersistence):
         local_type = idm.get_option("Custom_Local", 'type')
         self.assertEqual(str(local_type), "Local")
 
+    @pytest.mark.skipif(os.path.exists(IdmConfigParser.get_global_configuration_name()) and os.environ.get("IDMTOOLS_CONFIG_FILE", None) is None, reason=f"Either {IdmConfigParser.get_global_configuration_name()} is set or the environment variable 'IDMTOOLS_CONFIG_FILE' is set")
     def test_no_idmtools(self):
         IdmConfigParser(file_name="idmtools_NotExist.ini")
         self.assertIsNone(IdmConfigParser.get_config_path())
@@ -167,6 +168,7 @@ class TestConfig(ITestWithPersistence):
             IdmConfigParser.view_config_file()
         self.assertIn('Config file NOT FOUND or IS Empty!', context.exception.args[0])
 
+    @pytest.mark.skipif( os.path.exists(IdmConfigParser.get_global_configuration_name()) and os.environ.get("IDMTOOLS_CONFIG_FILE", None) is None, reason=f"Either {IdmConfigParser.get_global_configuration_name()} is set or the environment variable 'IDMTOOLS_CONFIG_FILE' is set")
     def test_no_idmtools_values(self):
         IdmConfigParser(file_name="idmtools_NotExist.ini")
         max_workers = IdmConfigParser.get_option(None, 'max_workers')
