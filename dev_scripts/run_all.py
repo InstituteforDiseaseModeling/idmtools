@@ -21,17 +21,23 @@ def run_command_on_all(idm_modules: List[str], command: str, parallel: bool = Fa
 
     def signal_handler(sig, frame):
         print('Stopping running processes')
+        
         for p in processes:
-            print(f'Trying to kill {p.pid}')
-            p.kill()
-            p.terminate()
-            p.wait()
+            if os.name != "nt":
+                os.killpg(os.getpgid(pro.pid), signal.SIGTERM) 
+            else:
+               os.kill(os.getpid(), signal.CTRL_BREAK_EVENT)
+
         sys.exit(0)
 
     if os.name != 'nt':
         # register signal handler to stop on ctrl c and ctrl k
         signal.signal(signal.SIGINT, signal_handler)
         signal.signal(signal.SIGTSTP, signal_handler)
+        signal.signal(signal.SIGKILL, signal_handler)
+    else:
+        signal.signal(signal.SIGINT, signal_handler)
+        signal.signal(signal.SIGBREAK, signal_handler)
     for module in idm_modules:
         wd = join(base_directory, module)
         if subdir:
@@ -42,10 +48,10 @@ def run_command_on_all(idm_modules: List[str], command: str, parallel: bool = Fa
         current_env = dict(os.environ)
         current_env.update(env_override)
         p = subprocess.Popen(f'{command}', cwd=wd, shell=True, env=current_env)
-        if parallel:
-            processes.append(p)
-        else:
-            p.wait()
+        processes.append(p)
+        if not parallel:
+           p.wait()
+           processes.pop()
     if parallel:
         print('Waiting to finish')
         [p.wait() for p in processes]

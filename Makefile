@@ -86,6 +86,13 @@ coverage: ## Generate a code-coverage report
 	coverage html -i
 	$(PDS)launch_dir_in_browser.py htmlcov/index.html
 
+coverage-smoke: ## Generate a code-coverage report
+	$(MAKEALL) coverage-smoke
+	coverage combine idmtools_cli/.coverage idmtools_core/.coverage idmtools_models/.coverage idmtools_platform_comps/.coverage idmtools_platform_local/.coverage
+	coverage report -m
+	coverage html -i
+	$(PDS)launch_dir_in_browser.py htmlcov/index.html
+
 dist: ## build our package
 	$(MAKEALL) --parallel dist
 
