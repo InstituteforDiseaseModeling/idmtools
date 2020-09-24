@@ -89,6 +89,7 @@ class TestTemplatedScriptTask(TestCase):
         self.assertTrue(str(wrapper_task.command).endswith(cmd))
 
     @windows_only
+    @pytest.mark.timeout(20)
     def test_wrapper_script_execute(self):
         """
         This tests The ScriptWrapperScriptTask as well as the TemplatedScriptTask
@@ -133,6 +134,7 @@ echo Hello
                 self.assertIn("wrapper.bat", str(task.command))
 
     @linux_only
+    @pytest.mark.timeout(20)
     def test_wrapper_script_execute_linux(self):
         """
         This tests The ScriptWrapperScriptTask as well as the TemplatedScriptTask
@@ -177,6 +179,7 @@ echo Running $@
                 self.assertIn("wrapper.sh", str(task.command))
 
     @pytest.mark.comps
+    @pytest.mark.timeout(60)
     def test_wrapper_script_execute_comps(self):
         """
         This tests The ScriptWrapperScriptTask as well as the TemplatedScriptTask

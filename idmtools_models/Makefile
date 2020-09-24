@@ -9,8 +9,8 @@ CWD=$($(IPY) "import os; print(os.getcwd())")
 TEST_EXTRA_OPTS?=
 TEST_COMMAND := py.test --durations=3 -v --junitxml=test_results.xml --html=models.test_results.html $(TEST_EXTRA_OPTS)
 TEST_RUN_OPTS = -e DOCKER_REPO=docker-staging NO_SPINNER=1
-FULL_TEST_CMD := $(PDR) -w 'tests' $(TEST_RUN_OPTS) -ex '$(TEST_COMMAND)
-COVERAGE_CMD := $(PDR) -w 'tests' $(TEST_RUN_OPTS) -p . ../ -ex 'coverage run --omit="*/test*,*/setup.py" --source ../,../../idmtools_core,../../idmtools_platform_local,../../idmtools_platform_comps,../../idmtools_models -m pytest
+FULL_TEST_CMD := $(PDR) -wd 'tests' $(TEST_RUN_OPTS) -ex '$(TEST_COMMAND)
+COVERAGE_CMD := $(PDR) -wd 'tests' $(TEST_RUN_OPTS) -p . ../ -ex 'coverage run --omit="*/test*,*/setup.py" --source ../,../../idmtools_core,../../idmtools_platform_local,../../idmtools_platform_comps,../../idmtools_models -m pytest
 
 help:
 	$(PDS)get_help_from_makefile.py
