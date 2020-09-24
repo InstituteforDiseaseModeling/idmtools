@@ -68,7 +68,7 @@ start-allure: ## start the allue docker report server
 	$(IPY) "import os; os.makedirs('.allure_results', exist_ok=True)"
 	$(IPY) "import os; os.makedirs('./dev_scripts/.allure_reports', exist_ok=True)"
 	$(PDR) -wd dev_scripts -ex "docker-compose -f allure.yml up -d allure"
-	$(IPY) "print('Once tests have finished, your test report will be available at http://localhost:5050/allure-docker-service/latest-report')"
+	$(IPY) "print('Once tests have finished, your test report will be available at http://localhost:5050/allure-docker-service/latest-report. To clean results, use http://localhost:5050/allure-docker-service/clean-results')"
 	$(IPY) "import os; os.makedirs('.allure_reports', exist_ok=True)"
 
 ## Run smoke tests with reports to Allure server(Comment moved until https://github.com/tqdm/py-make/issues/11 is resolves)
