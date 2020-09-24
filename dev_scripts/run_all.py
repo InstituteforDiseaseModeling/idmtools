@@ -24,7 +24,7 @@ def run_command_on_all(idm_modules: List[str], command: str, parallel: bool = Fa
         
         for p in processes:
             if os.name != "nt":
-                os.killpg(os.getpgid(pro.pid), signal.SIGTERM) 
+                os.killpg(os.getpgid(p.pid), signal.SIGTERM)
             else:
                os.kill(os.getpid(), signal.CTRL_BREAK_EVENT)
 
