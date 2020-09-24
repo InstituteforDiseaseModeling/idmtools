@@ -24,6 +24,7 @@ if __name__ == '__main__':
         make_command = "make"
     # check for almost make next
     elif which("almake"):
+        print("almake is currently being tested as a replacement for pymake on Windows. There could be issues. It is recommended you use make or pymake for now.")
         make_command = "almake"
     elif which("pymake"):
         make_command = "pymake"
