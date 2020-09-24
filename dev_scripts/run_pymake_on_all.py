@@ -1,5 +1,5 @@
 import platform
-
+from shutil import which
 import argparse
 import os
 import sys
@@ -19,6 +19,16 @@ if __name__ == '__main__':
     env_str = "--env ".join(args.env)
     if env_str:
         env_str = f"--env {env_str}"
-    make_command = 'pymake' if platform.system() == "Windows" else "make"
+        # check for true make first
+    if which("make"):
+        make_command = "make"
+    # check for almost make next
+    elif which("almake"):
+        make_command = "almake"
+    elif which("pymake"):
+        make_command = "pymake"
+    # fallback to os default
+    else:
+        raise FileNotFoundError("Cannot find make. If you are on Windows, run pip install almake or pip install py-make. On Linux install make")
     print(f'python {os.path.join(base_directory, "dev_scripts", "run_all.py")} {env_str} {p_str}--exec "{make_command} {args.command}"')
     sys.exit(os.system(f'python {os.path.join(base_directory, "dev_scripts", "run_all.py")} {env_str} {p_str}--exec "{make_command} {args.command}"'))
