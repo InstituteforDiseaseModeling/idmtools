@@ -34,7 +34,6 @@ def run_command_on_all(idm_modules: List[str], command: str, parallel: bool = Fa
         # register signal handler to stop on ctrl c and ctrl k
         signal.signal(signal.SIGINT, signal_handler)
         signal.signal(signal.SIGTSTP, signal_handler)
-        signal.signal(signal.SIGKILL, signal_handler)
     else:
         signal.signal(signal.SIGINT, signal_handler)
         signal.signal(signal.SIGBREAK, signal_handler)
