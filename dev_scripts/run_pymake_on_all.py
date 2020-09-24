@@ -1,4 +1,3 @@
-import platform
 from shutil import which
 import argparse
 import os
