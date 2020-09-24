@@ -1,3 +1,5 @@
+import platform
+
 import argparse
 import os
 import sys
@@ -17,5 +19,6 @@ if __name__ == '__main__':
     env_str = "--env ".join(args.env)
     if env_str:
         env_str = f"--env {env_str}"
-    print(f'python {os.path.join(base_directory, "dev_scripts", "run_all.py")} {env_str} {p_str}--exec "pymake {args.command}"')
-    sys.exit(os.system(f'python {os.path.join(base_directory, "dev_scripts", "run_all.py")} {env_str} {p_str}--exec "pymake {args.command}"'))
+    make_command = 'pymake' if platform.system() == "Windows" else "make"
+    print(f'python {os.path.join(base_directory, "dev_scripts", "run_all.py")} {env_str} {p_str}--exec "{make_command} {args.command}"')
+    sys.exit(os.system(f'python {os.path.join(base_directory, "dev_scripts", "run_all.py")} {env_str} {p_str}--exec "{make_command} {args.command}"'))
