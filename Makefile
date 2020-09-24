@@ -66,7 +66,7 @@ stop-allure: ## Stop Allure
 
 start-allure: ## start the allue docker report server
 	$(IPY) "import os; os.makedirs('.allure_results', exist_ok=True)"
-	$(IPY) "import os; os.makedirs('.allure_reports', exist_ok=True)"
+	$(IPY) "import os; os.makedirs('./dev_scripts/.allure_reports', exist_ok=True)"
 	$(PDR) -wd dev_scripts -ex "docker-compose -f allure.yml up -d allure"
 	$(IPY) "print('Once tests have finished, your test report will be available at http://localhost:5050/allure-docker-service/latest-report')"
 	$(IPY) "import os; os.makedirs('.allure_reports', exist_ok=True)"
