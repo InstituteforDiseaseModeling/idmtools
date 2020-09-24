@@ -14,7 +14,7 @@ TEST_EXTRA_OPTS?=
 TEST_COMMAND := py.test --durations=3 -v --junitxml=test_results.xml --html=local.test_results.html $(TEST_EXTRA_OPTS)
 TEST_RUN_OPTS = -e DOCKER_REPO=docker-staging NO_SPINNER=1
 FULL_TEST_CMD := $(PDR) -w 'tests' $(TEST_RUN_OPTS) -ex '$(TEST_COMMAND)
-COVERAGE_CMD := $(PDR) -w 'tests' $(TEST_RUN_OPTS) -p . ../ -ex 'coverage run --omit="*/test*,*/setup.py" --source ../,../../idmtools_core,../../idmtools_models -m pytest $(COVERAGE_CMD_OPTS)'
+COVERAGE_CMD := $(PDR) -w 'tests' $(TEST_RUN_OPTS) -p . ../ -ex 'coverage run --omit="*/test*,*/setup.py" --source ../,../../idmtools_core,../../idmtools_models -m pytest $(COVERAGE_CMD_OPTS)
 COVERAGE_CMD_OPTS?=
 help:
 	$(PDS)get_help_from_makefile.py
