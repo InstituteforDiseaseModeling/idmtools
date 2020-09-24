@@ -61,6 +61,9 @@ aggregate-html-reports: ## Aggregate html test reports into one directory
 	@+$(IPY) "print('Serving documentation @ server at http://localhost:8001 . Ctrl + C Will Stop Server')"
 	$(PDR) -wd '.html_reports' -ex 'python -m http.server 8001'
 
+stop-allure: ## Stop Allure
+	$(PDR) -wd dev_scripts -ex "docker-compose -f allure.yml up -d allure"
+
 start-allure: ## start the allue docker report server
 	$(IPY) "import os; os.makedirs('.allure_results', exist_ok=True)"
 	$(IPY) "import os; os.makedirs('.allure_reports', exist_ok=True)"
