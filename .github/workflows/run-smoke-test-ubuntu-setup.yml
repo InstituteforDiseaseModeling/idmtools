@@ -2,14 +2,14 @@
 # trigger by push or pull_request with commit message: "Run smoke test!"
 
 name: "run-smoke-test-ubuntu-setup"
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   run-smoke-test-ubuntu-setup:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [self-hosted]
         python-version: [3.6, 3.7, 3.8]
     if: "contains(github.event.head_commit.message, 'Run smoke test!')"
     steps:
