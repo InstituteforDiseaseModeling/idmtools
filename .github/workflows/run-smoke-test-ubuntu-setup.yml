@@ -16,19 +16,19 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v2
       - uses: dorny/paths-filter@v2
-          id: filter
-          with:
-            filters: |
-              core:
-                - 'idmtools_core/**'
-              cli:
-                - 'idmtools_cli/**'
-              models:
-                - 'idmtools_models/**'
-              comps:
-                - 'idmtools_comps_platform/**'
-              local:
-                - 'idmtools_local_platform/**'
+        id: filter
+        with:
+          filters: |
+            core:
+              - 'idmtools_core/**'
+            cli:
+              - 'idmtools_cli/**'
+            models:
+              - 'idmtools_models/**'
+            comps:
+              - 'idmtools_comps_platform/**'
+            local:
+              - 'idmtools_local_platform/**'
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
