@@ -46,13 +46,13 @@ jobs:
         run: |
           make setup-dev
       - name: Run setup-dev
-          # only run if core, local, models wasn't changed
-          if: steps.filter.outputs.core == 'false' &&  steps.filter.outputs.local == 'false' &&  steps.filter.outputs.models == 'false'
-          env:
-            bamboo_UserArtifactory: ${{ secrets.PYPI_STAGING_USERNAME }}
-            bamboo_PasswordArtifactory: ${{ secrets.PYPI_STAGING_PASSWORD }}
-          run: |
-            make setup-dev-no-docker
+        # only run if core, local, models wasn't changed
+        if: steps.filter.outputs.core == 'false' &&  steps.filter.outputs.local == 'false' &&  steps.filter.outputs.models == 'false'
+        env:
+          bamboo_UserArtifactory: ${{ secrets.PYPI_STAGING_USERNAME }}
+          bamboo_PasswordArtifactory: ${{ secrets.PYPI_STAGING_PASSWORD }}
+        run: |
+          make setup-dev-no-docker
       - name: login to comps2
         run: |
           python dev_scripts/create_auth_token_args.py --username $COMPS_USER --password $COMPS_PASSWORD
