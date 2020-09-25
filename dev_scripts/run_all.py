@@ -21,12 +21,12 @@ def run_command_on_all(idm_modules: List[str], command: str, parallel: bool = Fa
 
     def signal_handler(sig, frame):
         print('Stopping running processes')
-        
+
         for p in processes:
             if os.name != "nt":
                 os.killpg(os.getpgid(p.pid), signal.SIGTERM)
             else:
-               os.kill(os.getpid(), signal.CTRL_BREAK_EVENT)
+                os.kill(os.getpid(), signal.CTRL_BREAK_EVENT)
 
         sys.exit(0)
 
@@ -49,8 +49,8 @@ def run_command_on_all(idm_modules: List[str], command: str, parallel: bool = Fa
         p = subprocess.Popen(f'{command}', cwd=wd, shell=True, env=current_env)
         processes.append(p)
         if not parallel:
-           p.wait()
-           processes.pop()
+            p.wait()
+            processes.pop()
     if parallel:
         print('Waiting to finish')
         [p.wait() for p in processes]
