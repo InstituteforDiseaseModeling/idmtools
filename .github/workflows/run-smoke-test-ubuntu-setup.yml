@@ -2,7 +2,7 @@
 # trigger by push or pull_request with commit message: "Run smoke test!"
 
 name: "run-smoke-test-ubuntu-setup"
-on: [pull_request]
+on: [push]
 
 jobs:
   run-smoke-test-ubuntu-setup:
