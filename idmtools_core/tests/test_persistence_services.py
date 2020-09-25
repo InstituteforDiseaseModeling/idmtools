@@ -11,6 +11,7 @@ from idmtools_test.utils.test_task import TestTask
 
 
 @pytest.mark.smoke
+@pytest.mark.serial
 class TestPersistenceServices(ITestWithPersistence):
 
     def test_persist_retrieve_platform(self):

@@ -15,6 +15,7 @@ class TestPlatformFactory(ITestWithPersistence):
         super().tearDown()
 
     @pytest.mark.docker
+    @pytest.mark.serial
     def test_platform_factory(self):
         custom_local_platform = Platform('Custom_Local', **get_test_local_env_overrides())
         self.assertEqual(custom_local_platform.__class__.__name__, 'LocalPlatform')
@@ -26,6 +27,7 @@ class TestPlatformFactory(ITestWithPersistence):
 
     @pytest.mark.docker
     @pytest.mark.timeout(60)
+    @pytest.mark.serial
     def test_LocalPlatform(self):
         platform = Platform('Custom_Local', **get_test_local_env_overrides())
         members = platform.__dict__

@@ -19,7 +19,9 @@ if __name__ == '__main__':
     if env_str:
         env_str = f"--env {env_str}"
         # check for true make first
-    if which("make"):
+    if os.environ.get("DEFAULT_MAKE", None) is not None:
+        make_command = which(os.environ.get("DEFAULT_MAKE"))
+    elif which("make"):
         make_command = "make"
     # check for almost make next
     elif which("pymake"):

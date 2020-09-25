@@ -15,6 +15,7 @@ from idmtools_test.utils.test_task import TestTask
 
 @pytest.mark.analysis
 @pytest.mark.smoke
+@pytest.mark.serial
 class TestAnalyzeManager(unittest.TestCase):
     class TestAnalyzer(IAnalyzer):
         def __init__(self, working_dir=None):

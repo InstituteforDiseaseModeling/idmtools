@@ -80,7 +80,7 @@ test-all-allure: start-allure
 	$(PDS)run_pymake_on_all.py --env "TEST_EXTRA_OPTS=--alluredir=../../.allure_results" test-all
 
 coverage: ## Generate a code-coverage report
-	$(MAKEALL) coverage-all
+	$(MAKEALL) "coverage-all -i"
 	coverage combine idmtools_cli/.coverage idmtools_core/.coverage idmtools_models/.coverage idmtools_platform_comps/.coverage idmtools_platform_local/.coverage
 	coverage report -m
 	coverage html -i

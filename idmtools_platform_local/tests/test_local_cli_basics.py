@@ -18,6 +18,7 @@ from idmtools_test.utils.local_platform import create_test_data
 
 @pytest.mark.docker
 @pytest.mark.local_platform_cli
+@pytest.mark.serial
 class TestLocalCLIBasic(unittest.TestCase):
 
     @classmethod

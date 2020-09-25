@@ -21,6 +21,7 @@ current_directory = os.path.dirname(os.path.realpath(__file__))
 param_a = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
 
 
+
 class AddAnalyzer(IAnalyzer):
     """
     Add Analyzer
@@ -47,6 +48,7 @@ class AddAnalyzer(IAnalyzer):
 
 @pytest.mark.analysis
 @pytest.mark.docker
+@pytest.mark.serial
 class TestAnalyzersLocal(ITestWithPersistence):
 
     @classmethod

@@ -15,6 +15,20 @@ jobs:
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
+      - uses: dorny/paths-filter@v2
+          id: filter
+          with:
+            filters: |
+              core:
+                - 'idmtools_core/**'
+              cli:
+                - 'idmtools_cli/**'
+              models:
+                - 'idmtools_models/**'
+              comps:
+                - 'idmtools_comps_platform/**'
+              local:
+                - 'idmtools_local_platform/**'
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
@@ -24,11 +38,21 @@ jobs:
         run: |
           pip install py-make flake8
       - name: Run setup-dev
+        # only run if full install for core, local changes, or models
+        if: steps.filter.outputs.core == 'true' ||  steps.filter.outputs.local == 'true' ||  steps.filter.outputs.models == 'true'
         env:
           bamboo_UserArtifactory: ${{ secrets.PYPI_STAGING_USERNAME }}
           bamboo_PasswordArtifactory: ${{ secrets.PYPI_STAGING_PASSWORD }}
         run: |
           make setup-dev
+      - name: Run setup-dev
+          # only run if core, local, models wasn't changed
+          if: steps.filter.outputs.core == 'false' &&  steps.filter.outputs.local == 'false' &&  steps.filter.outputs.models == 'false'
+          env:
+            bamboo_UserArtifactory: ${{ secrets.PYPI_STAGING_USERNAME }}
+            bamboo_PasswordArtifactory: ${{ secrets.PYPI_STAGING_PASSWORD }}
+          run: |
+            make setup-dev-no-docker
       - name: login to comps2
         run: |
           python dev_scripts/create_auth_token_args.py --username $COMPS_USER --password $COMPS_PASSWORD
@@ -36,52 +60,62 @@ jobs:
           COMPS_USER: ${{ secrets.COMPS_USER }}
           COMPS_PASSWORD: ${{ secrets.COMPS_PASSWORD }}
       - name: run idmtools_cli smoke tests
+        # only run if core or cli changed
+        if: steps.filter.outputs.core == 'true' ||  steps.filter.outputs.cli == 'true'
         run: |
           cd idmtools_cli/tests
           py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
       - name: Upload idmtools_cli smoke test results
         uses: actions/upload-artifact@v2
-        if: failure()
+        if: failure() && (steps.filter.outputs.core == 'true' ||  steps.filter.outputs.cli == 'true')
         with:
           name: idmtools_cli_test_results
           path: idmtools_cli/tests/test_results.xml
       - name: run idmtools_core smoke tests
+        # only run if core changed
+        if: steps.filter.outputs.core == 'true'
         run: |
           cd idmtools_core/tests
           py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
       - name: Upload idmtools_core smoke test results
         uses: actions/upload-artifact@v2
-        if: failure()
+        if: failure() && steps.filter.outputs.core == 'true'
         with:
           name: idmtools_core_test_results
           path: idmtools_core/tests/test_results.xml
       - name: run idmtools_models tests
+        # only run if core changed
+        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.models == 'true'
         run: |
           cd idmtools_models/tests
           py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
       - name: Upload idmtools_models smoke test results
         uses: actions/upload-artifact@v2
-        if: failure()
+        if: failure() && (steps.filter.outputs.core == 'true' || steps.filter.outputs.models == 'true')
         with:
           name: idmtools_models_test_results
           path: idmtools_models/tests/test_results.xml
       - name: run idmtools_platform_comps tests
+        # only run if core, comps, or models changed
+        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
         run: |
           cd idmtools_platform_comps/tests
           py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
       - name: Upload idmtools_platform_comps test results
         uses: actions/upload-artifact@v2
-        if: failure()
+        if: failure() && (steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true')
         with:
           name: idmtools_platform_comps_test_results
           path: idmtools_platform_comps/tests/test_results.xml
       - name: run idmtools_platform_local smoke tests
+        # only run if core and comps changed
+        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.local == 'true' || steps.filter.outputs.models == 'true'
         run: |
           cd idmtools_platform_local/tests
           py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
       - name: Upload idmtools_platform_local smoke test results
         uses: actions/upload-artifact@v2
-        if: failure()
+        if: failure() && (steps.filter.outputs.core == 'true' || steps.filter.outputs.local == 'true' || steps.filter.outputs.models == 'true')
         with:
           name: idmtools_platform_local_test_results
           path: idmtools_platform_local/tests/test_results.xml

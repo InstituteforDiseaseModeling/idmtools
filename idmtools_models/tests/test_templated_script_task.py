@@ -90,6 +90,7 @@ class TestTemplatedScriptTask(TestCase):
 
     @windows_only
     @pytest.mark.timeout(20)
+    @pytest.mark.serial
     def test_wrapper_script_execute(self):
         """
         This tests The ScriptWrapperScriptTask as well as the TemplatedScriptTask
@@ -135,6 +136,7 @@ echo Hello
 
     @linux_only
     @pytest.mark.timeout(20)
+    @pytest.mark.serial
     def test_wrapper_script_execute_linux(self):
         """
         This tests The ScriptWrapperScriptTask as well as the TemplatedScriptTask

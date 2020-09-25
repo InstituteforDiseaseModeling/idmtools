@@ -24,6 +24,7 @@ def check_port_is_open(port):
 
 @pytest.mark.docker
 @pytest.mark.local_platform_internals
+@pytest.mark.serial
 class TestServiceManager(unittest.TestCase):
 
     @classmethod

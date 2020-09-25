@@ -20,6 +20,7 @@ from idmtools_test.utils.local_platform import create_test_data
 
 @pytest.mark.docker
 @pytest.mark.local_platform_internals
+@pytest.mark.serial
 class TestAPI(unittest.TestCase):
 
     @classmethod

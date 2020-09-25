@@ -101,10 +101,10 @@ class TestExperimentOperations(unittest.TestCase):
                 self.assertEqual('No Assets', e.tags['test_type'])
 
             # check empty asset collection
-            self.assertEquals(0, idm_experiment.assets.count)
+            self.assertEqual(0, idm_experiment.assets.count)
             self.assertIsNone(idm_experiment.assets.id)
-            self.assertEquals(1, idm_experiment.simulation_count)
-            self.assertEquals(0, idm_experiment.simulations[0].assets.count)
+            self.assertEqual(1, idm_experiment.simulation_count)
+            self.assertEqual(0, idm_experiment.simulations[0].assets.count)
 
     def test_list_assets(self):
         """

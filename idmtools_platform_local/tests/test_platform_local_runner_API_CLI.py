@@ -24,6 +24,7 @@ param_a_update = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, 
 
 @pytest.mark.docker
 @pytest.mark.local_platform_cli
+@pytest.mark.serial
 class TestLocalRunnerCLI(ITestWithPersistence):
 
     @classmethod

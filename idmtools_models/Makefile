@@ -51,7 +51,8 @@ test-python: ## Run our python tests
 	$(FULL_TEST_CMD) -m "python"'
 
 test-smoke: ## Run smoke tests
-	$(FULL_TEST_CMD) -m "smoke"'
+	$(FULL_TEST_CMD) -n 4 -m "smoke and not serial"'
+	$(FULL_TEST_CMD) -m "smoke and serial"'
 
 coverage-report:  ## Generate HTML report from coverage. Requires running coverage run first(coverage, coverage-smoke, coverage-all)
 	coverage report -m

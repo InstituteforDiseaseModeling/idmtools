@@ -95,6 +95,7 @@ class TestPythonTask(TestCase):
         self.validate_common_assets(fpath, task)
         self.validate_json_transient_assets(task)
 
+    @pytest.mark.serial
     def test_model1(self):
         """
         Test local execution of the model1 python script using JSONConfiguredPythonTask
@@ -144,6 +145,7 @@ class TestPythonTask(TestCase):
                 self.assertEqual(1, sim1.assets.count)
                 self.assertEqual(experiment.simulations[0].task.command, sim1.task.command)
 
+    @pytest.mark.serial
     def test_model_sweep(self):
         """
         Test model Sweep using JSONConfiguredPythonTask

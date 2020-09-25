@@ -23,6 +23,7 @@ param_a = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="
 
 @pytest.mark.docker
 @pytest.mark.python
+@pytest.mark.serial
 class TestPythonSimulation(ITestWithPersistence):
 
     def setUp(self) -> None:

@@ -106,6 +106,7 @@ class TestCopy(ITestWithPersistence):
 
     @pytest.mark.comps
     @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
+    @pytest.mark.serial
     def test_deepcopy_platform(self, login_mock):
         from idmtools.core.platform_factory import Platform
         p = Platform('COMPS')

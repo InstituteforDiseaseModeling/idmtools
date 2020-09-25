@@ -21,6 +21,7 @@ class TestPlatformSimulations(ITestWithPersistence):
 
     @pytest.mark.long
     @restart_local_platform(silent=True, **get_test_local_env_overrides())
+    @pytest.mark.serial
     def test_fetch_simulation_files(self):
         platform = Platform('Local')
 
