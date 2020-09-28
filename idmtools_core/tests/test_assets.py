@@ -308,6 +308,7 @@ class TestAssets(unittest.TestCase):
     def test_asset_directory_fails(self):
         with self.assertRaises(ValueError) as ex:
             a = Asset(os.path.abspath(os.path.dirname(__file__)))
+        self.assertEqual(ex.exception.args[0], "Asset cannot be a directory!")
 
 
 
