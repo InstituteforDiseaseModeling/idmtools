@@ -265,7 +265,6 @@ class Asset:
         return path
 
 
-
 TAsset = TypeVar("TAsset", bound=Asset)
 # Assets types
 TAssetList = List[TAsset]
