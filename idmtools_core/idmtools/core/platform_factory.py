@@ -1,3 +1,5 @@
+import json
+
 import os
 from contextlib import contextmanager
 from dataclasses import fields
@@ -103,6 +105,7 @@ class Platform:
 
         # Read block details
         platform_type = None
+        is_alias = False
         try:
             section = IdmConfigParser.get_section(block, error=not missing_ok)
             if not section and missing_ok:
@@ -118,6 +121,7 @@ class Platform:
                 props = cls._aliases[block.upper()]
                 platform_type = props[0].get_name()
                 section = props[1]
+                is_alias = True
             else:
                 if missing_ok:
                     section = dict() if default_missing is None else default_missing
@@ -167,7 +171,12 @@ class Platform:
 
         # Display block info
         try:
-            IdmConfigParser.display_config_block_details(block)
+            from idmtools.core.logging import VERBOSE
+            if is_alias:
+                user_logger.log(VERBOSE, f"\n[{block}]")
+                user_logger.log(VERBOSE, json.dumps(section, indent=3))
+            else:
+                IdmConfigParser.display_config_block_details(block)
         except ValueError:
             if missing_ok:
                 pass

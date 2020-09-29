@@ -84,6 +84,9 @@ class COMPSPlatformSpecification(PlatformSpecification):
         )
         config_aliases['SLURM'] = config_aliases['CALCULON']
         config_aliases['SLURM2'] = config_aliases['SLURMSTAGE']
+        # Friendly names for dev/staging environments from @clortion
+        config_aliases['BOXY'] = config_aliases['SLURMSTAGE']
+        config_aliases['NIBBLER'] = config_aliases['SLURMDEV']
         return config_aliases
 
 
