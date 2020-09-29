@@ -13,8 +13,13 @@ from idmtools.registry.task_specification import TaskSpecification
 
 logger = getLogger(__name__)
 
-DICT_TO_ENVIRONMENT = """{% for key, value in vars.items() %}
+LINUX_DICT_TO_ENVIRONMENT = """{% for key, value in vars.items() %}
 export {{key}}="{{value}}"
+{% endfor %}
+"""
+
+WINDOWS_DICT_TO_ENVIRONMENT = """{% for key, value in vars.items() %}
+set {{key}}="{{value}}"
 {% endfor %}
 """
 
@@ -23,7 +28,7 @@ WINDOWS_BASE_WRAPPER = """echo Running %*
 %*"""
 WINDOWS_PYTHON_PATH_WRAPPER = """set PYTHONPATH=%cd%\\Assets\\site-packages\\;%cd%\\Assets\\;%PYTHONPATH%
 {}""".format(WINDOWS_BASE_WRAPPER)
-WINDOWS_DICT_TO_ENVIRONMENT = DICT_TO_ENVIRONMENT + WINDOWS_BASE_WRAPPER
+WINDOWS_DICT_TO_ENVIRONMENT = WINDOWS_DICT_TO_ENVIRONMENT + WINDOWS_BASE_WRAPPER
 
 # Define our linux common scripts
 LINUX_BASE_WRAPPER = """echo Running $@
@@ -31,7 +36,7 @@ LINUX_BASE_WRAPPER = """echo Running $@
 """
 LINUX_PYTHON_PATH_WRAPPER = """export PYTHONPATH=$(pwd)/Assets/site-packages:$(pwd)/Assets/:$PYTHONPATH
 {}""".format(LINUX_BASE_WRAPPER)
-LINUX_DICT_TO_ENVIRONMENT = DICT_TO_ENVIRONMENT + LINUX_BASE_WRAPPER
+LINUX_DICT_TO_ENVIRONMENT = LINUX_DICT_TO_ENVIRONMENT + LINUX_BASE_WRAPPER
 
 
 @dataclass()
