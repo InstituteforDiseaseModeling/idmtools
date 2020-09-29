@@ -6,7 +6,7 @@ Adding items to the Python Path
 ----------------------------------
 
 The example below runs a simple model that depends on a user produced package. It uses a wrapper script to add the items
-to the PYTHONPATH environment variables so the package can easily be imported into our model.py
+to the PYTHONPATH environment variables so the package can be imported into model.py
 
 Here is our dummy package. It just has a variable we are going to use in model.py
 
