@@ -11,8 +11,6 @@ task = PythonTask(script_path="model.py")
 # Get a task to wrap the script in a shell script. Which get_script_wrapper function you use depends on the platform's OS
 wrapper_task = get_script_wrapper_unix_task(
     task=task,
-    # We use the platform specific version of template that automatically exports environment variables
-    template_content=LINUX_DICT_TO_ENVIRONMENT,
     # and set some values here
     variables=dict(EXAMPLE='It works!')
 )

@@ -340,13 +340,13 @@ def get_script_wrapper_task(task: ITask, wrapper_script_name: str, template_cont
 
 
 def get_script_wrapper_windows_task(task: ITask, wrapper_script_name: str = 'wrapper.bat',
-                                    template_content: str = WINDOWS_BASE_WRAPPER,
+                                    template_content: str = WINDOWS_DICT_TO_ENVIRONMENT,
                                     template_file: str = None, template_is_common: bool = True,
                                     variables: Dict[str, Any] = None) -> ScriptWrapperTask:
     """
     Get wrapper script task for windows platforms
 
-    The default content wraps a batch script that just passes on to actual task. To modify python path, use WINDOWS_PYTHON_PATH_WRAPPER
+    The default content wraps a another task with a batch script that exports the variables to the run environment defined in variables. To modify python path, use WINDOWS_PYTHON_PATH_WRAPPER
 
     You can adapt this script to modify any pre-scripts you need or call others scripts in succession
 
@@ -370,13 +370,13 @@ def get_script_wrapper_windows_task(task: ITask, wrapper_script_name: str = 'wra
                                    variables, "\\")
 
 
-def get_script_wrapper_unix_task(task: ITask, wrapper_script_name: str = 'wrapper.sh', template_content: str = LINUX_BASE_WRAPPER,
+def get_script_wrapper_unix_task(task: ITask, wrapper_script_name: str = 'wrapper.sh', template_content: str = LINUX_DICT_TO_ENVIRONMENT,
                                  template_file: str = None, template_is_common: bool = True,
                                  variables: Dict[str, Any] = None):
     """
         Get wrapper script task for unix platforms
 
-        The default content wraps a bash script just passes options to a script. To modify python path, you can use LINUX_PYTHON_PATH_WRAPPER
+        The default content wraps a another task with a bash script that exports the variables to the run environment defined in variables. To modify python path, you can use LINUX_PYTHON_PATH_WRAPPER
 
         You can adapt this script to modify any pre-scripts you need or call others scripts in succession
 
