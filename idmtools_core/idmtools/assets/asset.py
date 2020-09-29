@@ -58,7 +58,7 @@ class Asset:
             raise FileNotFoundError(f"Cannot find specified asset: {self.absolute_path}")
         elif self.absolute_path and os.path.isdir(self.absolute_path) and not self.persisted:
             raise ValueError("Asset cannot be a directory!")
-        elif not self.absolute_path and (not self.filename or (self.filename and not self._checksum and self.content is None and not self.persisted)):
+        elif not self.absolute_path and (not self.filename or (self.filename and not self._checksum and self._content is None and not self.persisted)):
             raise ValueError("Impossible to create the asset without either absolute path, filename and content, or filename and checksum!")
 
     def __repr__(self):
