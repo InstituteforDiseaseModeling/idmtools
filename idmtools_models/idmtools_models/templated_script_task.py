@@ -20,7 +20,7 @@ export {{key}}="{{value}}"
 
 # Define our common windows templates
 WINDOWS_BASE_WRAPPER = """echo Running %*
-\"%*\""""
+%*"""
 WINDOWS_PYTHON_PATH_WRAPPER = """set PYTHONPATH=%cd%\\Assets\\site-packages\\;%cd%\\Assets\\;%PYTHONPATH%
 {}""".format(WINDOWS_BASE_WRAPPER)
 WINDOWS_DICT_TO_ENVIRONMENT = DICT_TO_ENVIRONMENT + WINDOWS_BASE_WRAPPER
