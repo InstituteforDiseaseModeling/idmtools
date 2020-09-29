@@ -48,14 +48,16 @@ class Asset:
         self._checksum = checksum if not isinstance(checksum, property) else None
         self.filename = self.filename or (os.path.basename(self.absolute_path) if self.absolute_path else None)
         # populate absolute path for conditions where user does not supply info
-        if not self._checksum and self.content is None and not self.absolute_path and self.filename and not self.persisted:
+        if not self._checksum and self._content is None and not self.absolute_path and self.filename and not self.persisted:
             # try relative path
-            if self.relative_path and os.path.exists(os.path.join(self.relative_path, self.filename)):
-                self.absolute_path = os.path.join(self.relative_path, self.filename)
+            if self.relative_path and os.path.exists(self.short_remote_path()):
+                self.absolute_path = os.path.abspath(self.short_remote_path())
             else:
                 self.absolute_path = os.path.abspath(self.filename)
-        if self.absolute_path and not os.path.exists(self.absolute_path) and self.content is None:
+        if self.absolute_path and not os.path.exists(self.absolute_path) and self._content is None:
             raise FileNotFoundError(f"Cannot find specified asset: {self.absolute_path}")
+        elif self.absolute_path and os.path.isdir(self.absolute_path) and not self.persisted:
+            raise ValueError("Asset cannot be a directory!")
         elif not self.absolute_path and (not self.filename or (self.filename and not self._checksum and self.content is None and not self.persisted)):
             raise ValueError("Impossible to create the asset without either absolute path, filename and content, or filename and checksum!")
 
@@ -221,9 +223,9 @@ class Asset:
 
         if os.path.isdir(dest):
             if self.relative_path:
-                path = os.path.join(dest, self.relative_path, self.filename)
+                path = os.path.join(dest, self.short_remote_path())
             else:
-                path = os.path.join(dest, self.filename)
+                path = os.path.join(dest, self.short_remote_path())
             path = path.replace("\\", os.path.sep)
             os.makedirs(os.path.dirname(path), exist_ok=True)
         else:
@@ -248,6 +250,19 @@ class Asset:
             elif self.content is not None:
                 self._checksum = calculate_md5_stream(io.BytesIO(self.bytes))
         return self._checksum
+
+    def short_remote_path(self) -> str:
+        """
+        Returns the short remote path. This is the join of the relative path and filename
+
+        Returns:
+            Remote Path + Filename
+        """
+        if self.relative_path:
+            path = os.path.join(self.relative_path, self.filename)
+        else:
+            path = os.path.join(self.filename)
+        return path
 
 
 TAsset = TypeVar("TAsset", bound=Asset)
