@@ -1,6 +1,6 @@
-==========================
+===========
 Environment
-==========================
+===========
 
 Modifying environment variables on platforms without native support
 -------------------------------------------------------------------
