@@ -99,7 +99,7 @@ def get_packages_list() -> List[str]:
     return packages
 
 
-def get_help_version_url(help_path, url_template: str = 'https://docs.idmod.org/projects/idmtools/en/v{version}/', version: Optional[str] = None) -> str:
+def get_help_version_url(help_path, url_template: str = 'https://docs.idmod.org/projects/idmtools/en/{version}/', version: Optional[str] = None) -> str:
     """
     Get the help url for a subject based on a version
 
@@ -116,6 +116,6 @@ def get_help_version_url(help_path, url_template: str = 'https://docs.idmod.org/
         if "nightly" in __version__:
             version = "latest"
         else:
-            version = __version__[0:6]
+            version = f'v{__version__[0:6]}'
 
     return urllib.parse.urljoin(url_template.format(version=version), help_path)
