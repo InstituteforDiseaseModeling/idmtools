@@ -1,9 +1,16 @@
+import tempfile
+
+import os
+
 import unittest
 import dataclasses
 
 import pytest
+
+from idmtools import IdmConfigParser
 from idmtools.core import CacheEnabled
 from idmtools.entities.iplatform import IPlatform
+from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.registry.platform_specification import PlatformPlugins
 from idmtools_platform_comps.comps_platform import COMPSPlatform
 from idmtools_platform_comps.plugin_info import COMPSPlatformSpecification
@@ -38,3 +45,22 @@ class TestCompsPlugin(unittest.TestCase):
             if field.name[0] != '_' and field not in exclude_fields and not field.metadata.get('pickle_ignore', False) \
                     and field.name != 'docker_image':
                 self.assertIn(field.name, example_config)
+
+    @pytest.mark.comps
+    def test_platform_aliases(self):
+        from idmtools.core.platform_factory import Platform
+        org_directory = os.getcwd()
+        try:
+            with tempfile.TemporaryDirectory() as tmpdirname:
+                os.chdir(tmpdirname)
+                IdmConfigParser.clear_instance()
+
+                with Platform("BAYESIAN") as comps2:
+                    self.assertEqual(comps2.endpoint, "https://comps2.idmod.org")
+                    self.assertEqual(comps2.environment.upper(), "BAYESIAN")
+
+                with Platform("SlurmStage") as comps2:
+                    self.assertEqual(comps2.endpoint, "https://comps2.idmod.org")
+                    self.assertEqual(comps2.environment.upper(), "SLURMSTAGE")
+        finally:
+            os.chdir(org_directory)

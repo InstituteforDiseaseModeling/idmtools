@@ -1,5 +1,5 @@
 from logging import getLogger
-from typing import Type, List
+from typing import Type, List, Dict
 from idmtools.registry.platform_specification import example_configuration_impl, get_platform_impl, \
     get_platform_type_impl, PlatformSpecification
 from idmtools.registry.plugin_specification import get_description_impl
@@ -62,6 +62,29 @@ class COMPSPlatformSpecification(PlatformSpecification):
         """
         from idmtools_platform_comps import __version__
         return __version__
+
+    def get_configuration_aliases(self) -> Dict[str, Dict]:
+        config_aliases = dict(
+            BELEGOST=dict(
+                endpoint="https://comps.idmod.org",
+                environment="Belegost"
+            ),
+            BAYESIAN=dict(
+                endpoint="https://comps2.idmod.org",
+                environment="Bayesian"
+            ),
+            SLURMSTAGE=dict(
+                endpoint="https://comps2.idmod.org",
+                environment="SlurmStage"
+            ),
+            CALCULON=dict(
+                endpoint="https://comps.idmod.org",
+                environment="Calculon"
+            )
+        )
+        config_aliases['SLURM'] = config_aliases['CALCULON']
+        config_aliases['SLURM2'] = config_aliases['SLURMSTAGE']
+        return config_aliases
 
 
 class SSMTPlatformSpecification(PlatformSpecification):

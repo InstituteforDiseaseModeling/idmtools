@@ -1,7 +1,7 @@
 import os
 from contextlib import contextmanager
 from dataclasses import fields
-from logging import getLogger
+from logging import getLogger, DEBUG
 from typing import Dict, Any, TYPE_CHECKING
 
 from idmtools.config import IdmConfigParser
@@ -62,8 +62,8 @@ class Platform:
 
         # Load all Platform plugins
         cls._platforms = PlatformPlugins().get_plugin_map()
+        cls._aliases = PlatformPlugins().get_aliases()
 
-        # Create Platform based on the given block
         platform = cls._create_from_block(block, missing_ok=missing_ok, **kwargs)
         set_current_platform(platform)
         return platform
@@ -102,6 +102,7 @@ class Platform:
         """
 
         # Read block details
+        platform_type = None
         try:
             section = IdmConfigParser.get_section(block, error=not missing_ok)
             if not section and missing_ok:
@@ -110,23 +111,31 @@ class Platform:
                 if not listener:
                     setup_logging()
         except ValueError as e:
-            if missing_ok:
-                section = dict() if default_missing is None else default_missing
+            # attempt alias load
+            if block.upper() in cls._aliases:
+                if logger.isEnabledFor(DEBUG):
+                    logger.debug(f"Loading plugin from alias {block.upper()}")
+                props = cls._aliases[block.upper()]
+                platform_type = props[0].get_name()
+                section = props[1]
             else:
-                raise e
+                if missing_ok:
+                    section = dict() if default_missing is None else default_missing
+                else:
+                    raise e
 
-        try:
-            # Make sure block has type entry
-            platform_type = section.pop('type')
-        except KeyError:
-            # try to use the block name as the type
-            if missing_ok:
-                user_logger.warning(
-                    "You are specifying a platform without a configuration file or configuration block. Be sure you have supplied all required parameters for the Platform as this can result in unexpected behaviour. Running this way is only recommended for development mode. Instead, it is recommended you create an idmtools.ini to capture the config once you have tested and confirmed your configuration.")
-                platform_type = block
-            else:
-                raise ValueError(
-                    "When creating a Platform you must specify the type in the block. For example:\n    type = COMPS")
+        if platform_type is None:
+            try:
+                # Make sure block has type entry
+                platform_type = section.pop('type')
+            except KeyError:
+                # try to use the block name as the type
+                if missing_ok:
+                    user_logger.warning("You are specifying a platform without a configuration file or configuration block. Be sure you have supplied all required parameters for the Platform as this can result in unexpected behaviour. Running this way is only recommended for development mode. Instead, "
+                                        "it is recommended you create an idmtools.ini to capture the config once you have tested and confirmed your configuration.")
+                    platform_type = block
+                else:
+                    raise ValueError("When creating a Platform you must specify the type in the block. For example:\n    type = COMPS")
 
         # Make sure we support platform_type
         cls._validate_platform_type(platform_type)

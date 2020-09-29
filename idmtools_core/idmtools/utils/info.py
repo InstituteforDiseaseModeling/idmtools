@@ -1,6 +1,8 @@
+import urllib
+
 import sys
 from logging import getLogger
-from typing import List
+from typing import List, Optional
 
 logger = getLogger(__name__)
 
@@ -95,3 +97,24 @@ def get_packages_list() -> List[str]:
             packages.append(f'{name}=={version}')
         packages = list(sorted(packages))
     return packages
+
+
+def get_help_version_url(help_path, url_template: str = 'https://docs.idmod.org/projects/idmtools/en/{version}/', version: Optional[str] = None) -> str:
+    """
+    Get the help url for a subject based on a version
+
+    Args:
+        help_path: Path to config(minus base url). For example, configuration.html
+        url_template: Template for URL containing version replacement formatter
+        version: Optional version. If not provided, the version of idmtools installed will be used. For development versions, the version will always be nightly
+
+    Returns:
+        Path to url
+    """
+    from idmtools import __version__
+    if version is None:
+        version = __version__
+
+    if "nightly" in version:
+        version = "latest"
+    return urllib.parse.urljoin(url_template.format(version=version), help_path)
