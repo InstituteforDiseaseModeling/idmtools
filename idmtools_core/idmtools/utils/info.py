@@ -116,6 +116,6 @@ def get_help_version_url(help_path, url_template: str = 'https://docs.idmod.org/
         if "nightly" in __version__:
             version = "latest"
         else:
-            version = f'v{__version__[0:6]}'
+            version = f'v{__version__[0:5]}'
 
     return urllib.parse.urljoin(url_template.format(version=version), help_path)
