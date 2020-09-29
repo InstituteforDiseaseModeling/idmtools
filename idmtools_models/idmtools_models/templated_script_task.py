@@ -1,4 +1,3 @@
-import shlex
 import os
 from dataclasses import dataclass, field
 from functools import partial
@@ -41,7 +40,11 @@ class TemplatedScriptTask(ITask):
     Defines a task to run a script using a template. Best suited to shell scripts
 
     Examples:
+        In this example, we add modify the Python Path using TemplatedScriptTask and LINUX_PYTHON_PATH_WRAPPER
+
         .. literalinclude:: ../examples/cookbook/python/python-path/python-path.py
+
+        In this example, we modify environment variable using TemplatedScriptTask and LINUX_DICT_TO_ENVIRONMENT
 
         .. literalinclude:: ../examples/cookbook/environment/variables/environment-vars.py
     """
@@ -319,6 +322,7 @@ def get_script_wrapper_task(task: ITask, wrapper_script_name: str, template_cont
         ScriptWrapperTask wrapping the task
 
     See Also:
+        :class:`idmtools_models.templated_script_task.TemplatedScriptTask`
         :func:`idmtools_models.templated_script_task.get_script_wrapper_windows_task`
         :func:`idmtools_models.templated_script_task.get_script_wrapper_unix_task`
     """
@@ -388,6 +392,7 @@ def get_script_wrapper_unix_task(task: ITask, wrapper_script_name: str = 'wrappe
             ScriptWrapperTask
 
         See Also:
+        :class:`idmtools_models.templated_script_task.TemplatedScriptTask`
         :func:`idmtools_models.templated_script_task.get_script_wrapper_task`
         :func:`idmtools_models.templated_script_task.get_script_wrapper_windows_task`
         """
