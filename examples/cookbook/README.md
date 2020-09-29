@@ -1,0 +1,1 @@
+The cookbook contains short "recipes" which are succinct example demonstrating specific features
