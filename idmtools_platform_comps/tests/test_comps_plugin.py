@@ -62,5 +62,7 @@ class TestCompsPlugin(unittest.TestCase):
                 with Platform("SlurmStage") as comps2:
                     self.assertEqual(comps2.endpoint, "https://comps2.idmod.org")
                     self.assertEqual(comps2.environment.upper(), "SLURMSTAGE")
+        except PermissionError as ex:
+            print("Could not remove temp directory")
         finally:
             os.chdir(org_directory)
