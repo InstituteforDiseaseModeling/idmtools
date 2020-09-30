@@ -32,7 +32,7 @@ class Asset:
     #: The content of the file. Optional if **absolute_path** is given.
     content: InitVar[Any] = None
     _content: bytes = field(default=None, init=False)
-    _length: Optional[int] = field(default=None)
+    _length: Optional[int] = field(default=None, init=False)
     #: Persisted tracks if item has been saved
     persisted: bool = field(default=False)
     #: Handler to api
@@ -41,10 +41,10 @@ class Asset:
     download_generator_hook: Callable = field(default=None, metadata=dict(exclude_from_metadata=True))
     #: Checksum of asset. Only required for existing assets
     checksum: InitVar[Any] = None
-    _checksum: Optional[str] = field(default=None)
+    _checksum: Optional[str] = field(default=None, init=False)
 
     def __post_init__(self, content, checksum):
-        self.content = content
+        self._content = None if isinstance(content, property) else content
         self._checksum = checksum if not isinstance(checksum, property) else None
         self.filename = self.filename or (os.path.basename(self.absolute_path) if self.absolute_path else None)
         # populate absolute path for conditions where user does not supply info
@@ -224,10 +224,7 @@ class Asset:
         """
 
         if os.path.isdir(dest):
-            if self.relative_path:
-                path = os.path.join(dest, self.short_remote_path())
-            else:
-                path = os.path.join(dest, self.short_remote_path())
+            path = os.path.join(dest, self.short_remote_path())
             path = path.replace("\\", os.path.sep)
             os.makedirs(os.path.dirname(path), exist_ok=True)
         else:
