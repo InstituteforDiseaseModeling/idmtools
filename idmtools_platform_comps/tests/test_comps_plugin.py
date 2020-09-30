@@ -52,6 +52,7 @@ class TestCompsPlugin(unittest.TestCase):
         org_directory = os.getcwd()
         try:
             with tempfile.TemporaryDirectory() as tmpdirname:
+                print(f'Set working directory to {tmpdirname}')
                 os.chdir(tmpdirname)
                 IdmConfigParser.clear_instance()
 
@@ -64,5 +65,9 @@ class TestCompsPlugin(unittest.TestCase):
                     self.assertEqual(comps2.environment.upper(), "SLURMSTAGE")
         except PermissionError as ex:
             print("Could not remove temp directory")
+        except Exception as e:
+            pass
         finally:
+            print(f'Set working directory to {org_directory}')
             os.chdir(org_directory)
+            IdmConfigParser.clear_instance()
