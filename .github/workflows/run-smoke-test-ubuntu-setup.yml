@@ -28,6 +28,8 @@ jobs:
               - 'idmtools_comps_platform/**'
             local:
               - 'idmtools_local_platform/**'
+      - name: Set Python environment variable
+        run: echo '::set-env name=LD_LIBRARY_PATH::/tmp/runner/work/_tool/Python/${{ matrix.python-version }}/x64/lib'
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
