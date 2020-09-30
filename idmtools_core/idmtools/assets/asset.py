@@ -54,7 +54,9 @@ class Asset:
                 self.absolute_path = os.path.abspath(self.short_remote_path())
             else:
                 self.absolute_path = os.path.abspath(self.filename)
-        if self.absolute_path and not os.path.exists(self.absolute_path) and self._content is None:
+        if self.absolute_path and self._content is not None:
+            raise ValueError("Absolute Path and Content are mutually exclusive. Please provide only one of the options")
+        elif self.absolute_path and not os.path.exists(self.absolute_path):
             raise FileNotFoundError(f"Cannot find specified asset: {self.absolute_path}")
         elif self.absolute_path and os.path.isdir(self.absolute_path) and not self.persisted:
             raise ValueError("Asset cannot be a directory!")

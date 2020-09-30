@@ -41,11 +41,10 @@ class TestAssets(unittest.TestCase):
         self.assertEqual(a.filename, "a.txt")
         self.assertEqual(a.relative_path, "2")
 
-    def test_creat_asset_absolute_path_and_content(self):
-        a = Asset(absolute_path=os.path.join(self.base_path, "d.txt"), content="blah")
-        self.assertEqual(a.content, "blah")
-        self.assertEqual(a.filename, "d.txt")
-        self.assertEqual(a.relative_path, "")
+    def test_create_asset_absolute_path_and_content_fails(self):
+        with self.assertRaises(ValueError) as e:
+            a = Asset(absolute_path=os.path.join(self.base_path, "d.txt"), content="blah")
+        self.assertEqual(e.exception.args[0], "Absolute Path and Content are mutually exclusive. Please provide only one of the options")
 
     def test_creat_asset_content_filename(self):
         a = Asset(filename='test', content="blah")
