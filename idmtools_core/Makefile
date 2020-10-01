@@ -19,8 +19,7 @@ clean: ## Clean most of the temp-data from the project
 	$(CLDIR) --file-patterns "*.py[co],*.done,*.log,**/.coverage" \
 		--dir-patterns "**/__pycache__,**/htmlcov,**/.pytest_cache" --directories "dist,build"
 
-clean-all:  ## Deleting package info hides plugins so we only want to do that for packaging
-	@make clean
+clean-all: clean ## Deleting package info hides plugins so we only want to do that for packaging
 	$(CLDIR) --dir-patterns "**/*.egg-info/"
 
 lint: ## check style with flake8
@@ -62,14 +61,12 @@ coverage-report:  ## Generate HTML report from coverage. Requires running covera
 coverage-report-view: coverage-report
 	$(PDS)/launch_dir_in_browser.py htmlcov/index.html
 
-coverage: ## Generate a code-coverage report
-	@make clean
+coverage: clean ## Generate a code-coverage report
 	# We have to run in our tests folder to use the proper config
 	$(COVERAGE_CMD) -m "not comps and not docker"'
 	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
 
-coverage-smoke: ## Generate a code-coverage report
-	@make clean
+coverage-smoke: clean ## Generate a code-coverage report
 	# We have to run in our tests folder to use the proper config
 	$(COVERAGE_CMD) -m "smoke"'
 	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
@@ -84,12 +81,10 @@ watch: ## Automate running of tests and linting of this project using watchdog. 
 
 # Release related rules
 
-dist: ## build our package
-	@make clean
+dist: clean ## build our package
 	python setup.py sdist
 
-release-staging: ## perform a release to staging
-	@make dist
+release-staging: dist ## perform a release to staging
 	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/idm-pypi-staging/ dist/*
 
 bump-release: ## bump the release version.

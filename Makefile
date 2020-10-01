@@ -96,10 +96,8 @@ coverage-smoke: ## Generate a code-coverage report
 dist: ## build our package
 	$(MAKEALL) --parallel dist
 
-release-staging: ## perform a release to staging
-	@make clean-all
+release-staging: clean-all ## perform a release to staging
 	$(MAKEALL) release-staging
-
 
 packages-changes-since-last-verison: ## Get list of versions since last release that have changes
 	git diff --name-only $(shell git tag -l --sort=-v:refname | grep -w '[0-9]\.[0-9]\.[0-9]' | head -n 1) HEAD | grep idmtools | cut -d "/" -f 1  | sort | uniq | grep -v ini | grep -v examples | grep -v dev_scripts

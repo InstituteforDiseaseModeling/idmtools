@@ -20,8 +20,7 @@ clean: ## Clean most of the temp-data from the project
 	$(CLDIR) --file-patterns "*.py[co],*.done,*.log,**/.coverage" \
 		--dir-patterns "**/__pycache__,**/htmlcov,**/.pytest_cache" --directories "dist,build,idmtools_webui/build"
 
-clean-all:  ## Deleting package info hides plugins so we only want to do that for packaging
-	@make clean
+clean-all: clean ## Deleting package info hides plugins so we only want to do that for packaging
 	$(CLDIR) --dir-patterns "**/*.egg-info/"
 	docker rmi idmtools_comps_ssmt_worker
 
@@ -32,6 +31,5 @@ docker: ## Build our docker image using the local pypi
 	$(PDR) -w '../../idmtools_platform_comps' -ex 'pymake dist'
 	python build_docker_image.py
 
-docker-release-staging:
-	@make docker
+docker-release-staging: docker
 	python push_docker_image.py
