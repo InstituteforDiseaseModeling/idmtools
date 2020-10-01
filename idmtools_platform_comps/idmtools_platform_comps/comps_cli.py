@@ -25,7 +25,6 @@ try:  # since cli is not required but we always try to load file, wrap in try ex
         @get_additional_commands_impl
         def get_additional_commands(self) -> NoReturn:
             import idmtools_platform_comps.cli.comps  # noqa: F401
-            import idmtools_platform_comps.cli.utils  # noqa: F401
 
         @get_description_impl
         def get_description(self) -> str:
