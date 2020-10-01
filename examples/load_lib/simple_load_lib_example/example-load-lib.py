@@ -48,5 +48,5 @@ def main():
 
 
 if __name__ == '__main__':
-    with Platform('COMPS') as platform:
+    with Platform('BAYESIAN') as platform:
         main()

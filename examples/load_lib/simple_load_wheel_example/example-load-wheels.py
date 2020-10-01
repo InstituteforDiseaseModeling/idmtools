@@ -11,7 +11,6 @@ from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_
 
 def run_example(ac_id):
     print(f'run example with ac: {ac_id}')
-    # with Platform('COMPS'):
     # create AssetCollection based on ac_id
     common_assets = AssetCollection.from_id(ac_id, as_copy=True)
 
@@ -33,7 +32,7 @@ def run_example(ac_id):
 def main():
     # RequirementsToAssetCollection will do:
     # 1. check if asset collection exists for given requirements, return ac id (#4) if exists
-    # 2. create an Experiment to install the requirements on COMPS
+    # 2. create an Experiment to install the requirements on BAYESIAN
     # 3. create a WorkItem to create a Asset Collection
     # 4. return ac id based on the requirements.txt
     # note: pkg_list is not required. package in this list will override package in requirements.txt
@@ -51,5 +50,5 @@ def main():
 
 
 if __name__ == '__main__':
-    with Platform('COMPS') as platform:
+    with Platform('BAYESIAN') as platform:
         main()
