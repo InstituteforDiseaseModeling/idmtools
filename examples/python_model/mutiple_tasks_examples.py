@@ -56,7 +56,7 @@ def run_example_task_from_template(ac_id):
 
 
 if __name__ == '__main__':
-    platform = Platform('COMPS2')
+    platform = Platform('COMPS')
     ac_id = "743df90e-2f57-ea11-a2bf-f0921c167862"
     if ac_id:
         run_example_CommandTask(ac_id)

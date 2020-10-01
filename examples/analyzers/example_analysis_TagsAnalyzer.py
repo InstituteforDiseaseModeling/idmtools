@@ -11,7 +11,7 @@ if __name__ == '__main__':
 
     # Set the platform where you want to run your analysis
     # In this case we are running in COMPS since the Work Item we are analyzing was run on COMPS
-    with Platform('COMPS2') as platform:
+    with Platform('COMPS') as platform:
 
         # Arg option for analyzer init are uid, working_dir, data in the method map (aka select_simulation_data),
         # and filenames

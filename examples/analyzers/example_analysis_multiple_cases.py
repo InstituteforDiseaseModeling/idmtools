@@ -75,7 +75,7 @@ class ExampleAnalyzer3(IAnalyzer):
 if __name__ == "__main__":
     # Set the platform where you want to run your analysis
     # In this case we are running in COMPS, but this can be changed to run 'Local'
-    with Platform('COMPS2') as platform:
+    with Platform('COMPS') as platform:
 
         # Initialize the analyser class with the name of file to save to and start the analysis
         analyzers = [ExampleAnalyzer(), ExampleAnalyzer2()]
