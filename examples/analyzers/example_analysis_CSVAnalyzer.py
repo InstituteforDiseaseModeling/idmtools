@@ -12,9 +12,9 @@ from idmtools.core.platform_factory import Platform
 if __name__ == '__main__':
 
     # Set the platform where you want to run your analysis
-    # In this case we are running in BAYESIAN since the Work Item we are analyzing was run on BAYESIAN
+    # In this case we are running in BELEGOST since the Work Item we are analyzing was run on BELEGOST
     logger = getLogger()
-    with Platform('BAYESIAN') as platform:
+    with Platform('BELEGOST') as platform:
 
         # Arg option for analyzer init are uid, working_dir, data in the method map (aka select_simulation_data),
         # and filenames
