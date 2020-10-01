@@ -12,7 +12,7 @@ from idmtools.core.platform_factory import Platform
 if __name__ == '__main__':
 
     # Set the platform where you want to run your analysis
-    # In this case we are running in BELEGOST since the Work Item we are analyzing was run on BELEGOST
+    # In this case we are running in BELEGOST since the Work Item we are analyzing was run on COMPS
     logger = getLogger()
     with Platform('BELEGOST') as platform:
 
