@@ -323,8 +323,12 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
             # load the assets
             ac = AssetCollection()
             for dict_asset in dict_sim['assets']:
+                if dict_asset['absolute_path'] is None:
+                    if dict_asset['relative_path']:
+                        dict_asset['absolute_path'] = os.path.join(sim_path, dict_asset['relative_path'], dict_asset['filename'])
+                    else:
+                        dict_asset['absolute_path'] = os.path.join(sim_path, dict_asset['filename'])
                 asset = Asset(**dict_asset)
-                asset.absolute_path = os.path.join(sim_path, asset.filename)
                 asset.persisted = True
                 asset.download_generator_hook = partial(file_contents_to_generator, asset.absolute_path)
                 ac.add_asset(asset)
@@ -351,8 +355,6 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
 
         # load assets
         return sim
-
-
 
     def _detect_command_line_from_simulation(self, dict_sim):
         if 'task' in dict_sim and 'command' in dict_sim['task']:
