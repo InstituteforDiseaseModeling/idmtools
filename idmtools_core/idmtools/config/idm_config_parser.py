@@ -6,6 +6,7 @@ from logging import getLogger
 from typing import Any, Dict
 
 from idmtools.core.logging import VERBOSE
+from idmtools.utils.info import get_help_version_url
 
 default_config = 'idmtools.ini'
 
@@ -138,7 +139,7 @@ class IdmConfigParser:
         ini_file = cls._find_config(dir_path, file_name)
         if ini_file is None:
             # We use print since logger isn't configured
-            print("/!\\ WARNING: File '{}' Not Found!".format(file_name))
+            print(f"/!\\ WARNING: File '{file_name}' Not Found! For details on how to configure idmtools, see {get_help_version_url('configuration.html')} for details on how to configure idmtools.")
             return
 
         cls._config = ConfigParser()

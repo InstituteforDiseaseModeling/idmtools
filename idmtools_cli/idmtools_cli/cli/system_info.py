@@ -116,6 +116,12 @@ def cli():
     print(tabulate([[x] for x in items], headers=['CLI Plugins'], tablefmt='psql'))
 
 
+@plugins.command(help="List Platform plugins configuration aliases")
+def platform_aliases():
+    aliases = PlatformPlugins().get_aliases()
+    print(tabulate([[name, details[1]] for name, details in aliases.items()], headers=['Platform Plugin Aliases', "Configuration Options"], tablefmt='psql'))
+
+
 @plugins.command(help="List Platform plugins")
 def platform():
     platforms = PlatformPlugins().get_plugin_map().keys()
