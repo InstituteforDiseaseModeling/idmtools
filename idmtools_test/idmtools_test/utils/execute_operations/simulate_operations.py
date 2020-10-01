@@ -61,6 +61,8 @@ def run_simulation(simulation_id: Simulation, command: str, parent_uid: UUID, ex
                 except:
                     pass
             logger.info(cmd)
+            if cmd[0].endswith(".sh"):
+                cmd.insert(0, "/bin/bash")
             p = subprocess.Popen(
                 cmd,
                 cwd=simulation_path,
