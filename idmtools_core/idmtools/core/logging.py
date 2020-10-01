@@ -158,6 +158,10 @@ def register_stop_logger_signal_handler(listener) -> NoReturn:
             pass
 
     for s in [SIGINT, SIGTERM]:
-        signal(s, stop_logger)
+        try:
+            signal(s, stop_logger)
+        except ValueError as ex:
+            if ex.args[0] == "signal only works in main thread":
+                pass
 
     atexit.register(stop_logger)
