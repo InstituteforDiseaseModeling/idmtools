@@ -75,7 +75,8 @@ jobs:
         if: steps.filter.outputs.core == 'true'
         run: |
           cd idmtools_core/tests
-          py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
+          py.test --durations=3 -v --junitxml=test_results.xml -n 6 -m "smoke and not serial"
+          py.test --durations=3 -v --junitxml=test_results.xml -m "smoke and serial"
       - name: Upload idmtools_core smoke test results
         uses: actions/upload-artifact@v2
         if: failure() && steps.filter.outputs.core == 'true'
@@ -87,7 +88,8 @@ jobs:
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.models == 'true'
         run: |
           cd idmtools_models/tests
-          py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
+          py.test --durations=3 -v --junitxml=test_results.xml -n 6 -m "smoke and not serial"
+          py.test --durations=3 -v --junitxml=test_results.xml -m "smoke and serial"
       - name: Upload idmtools_models smoke test results
         uses: actions/upload-artifact@v2
         if: failure() && (steps.filter.outputs.core == 'true' || steps.filter.outputs.models == 'true')
@@ -99,7 +101,8 @@ jobs:
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
         run: |
           cd idmtools_platform_comps/tests
-          py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
+          py.test --durations=3 -v --junitxml=test_results.xml -n 6 -m "smoke and not serial"
+          py.test --durations=3 -v --junitxml=test_results.xml -m "smoke and serial"
       - name: Upload idmtools_platform_comps test results
         uses: actions/upload-artifact@v2
         if: failure() && (steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true')
