@@ -44,7 +44,7 @@ class ExampleAnalyzer2(IAnalyzer):
 
 
 if __name__ == "__main__":
-    platform = Platform('COMPS2')
+    platform = Platform('COMPS')
     analyzers = [ExampleAnalyzer, ExampleAnalyzer2]
     experiment_id = "11052582-83da-e911-a2be-f0921c167861" # comps2 staging exp id
     analysis = PlatformAnalysis(platform, experiment_ids=[experiment_id],

@@ -94,7 +94,7 @@ if __name__ == "__main__":
 
     # Set the platform where you want to run your analysis
     # In this case we are running in COMPS, but this can be changed to run 'Local'
-    with Platform('COMPS2') as platform:
+    with Platform('COMPS') as platform:
 
         # Set the experiment you want to analyze
         exp_id = '719de048-64cb-e911-a2bb-f0921c167866'  # comps2 staging exp id
