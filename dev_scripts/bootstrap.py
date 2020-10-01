@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+import argparse
+
 import logging
 import os
 import subprocess
@@ -50,7 +52,8 @@ base_directory = abspath(join(dirname(__file__), '..'))
 default_install = ['test']
 data_class_default = default_install
 
-idmrepo = '--extra-index-url=https://packages.idmod.org/api/pypi/pypi-production/simple'
+escapes = ''.join([chr(char) for char in range(1, 32)])
+translator = str.maketrans('', '', escapes)
 
 # Our packages and the extras to install
 packages = dict(
@@ -78,17 +81,13 @@ def execute(cmd: List['str'], cwd: str) -> Generator[str, None, None]:
     Raises:
         CalledProcessError if the return code was not 0
     """
-    popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, cwd=cwd)
-    for stdout_line in iter(popen.stdout.readline, ""):
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, cwd=cwd)
+    for stdout_line in iter(process.stdout.readline, ""):
         yield stdout_line
-    popen.stdout.close()
-    return_code = popen.wait()
+    process.stdout.close()
+    return_code = process.wait()
     if return_code:
         raise subprocess.CalledProcessError(return_code, cmd)
-
-
-escapes = ''.join([chr(char) for char in range(1, 32)])
-translator = str.maketrans('', '', escapes)
 
 
 def process_output(output_line: str):
@@ -113,22 +112,36 @@ def process_output(output_line: str):
         logger.debug("".join(ch for ch in output_line if unicodedata.category(ch)[0] != "C"))
 
 
-# install wheel first to benefit from binaries
-for line in execute(["pip", "install", "wheel"], cwd=join(base_directory, 'docs')):
-    process_output(line)
+def install_dev_packages(pip_url):
+    # loop through and install our packages
+    for package, extras in packages.items():
+        extras_str = f"[{','.join(extras)}]" if extras else ''
+        logger.info(f'Installing {package} with extras: {extras_str if extras_str else "None"} from {base_directory}')
+        try:
+            for line in execute(["pip", "install", "-e", f".{extras_str}", f"--extra-index-url={pip_url}"], cwd=join(base_directory, package)):
+                process_output(line)
+        except subprocess.CalledProcessError as e:
+            logger.critical(f'{package} installed failed using {e.cmd} did not succeed')
+            result = e.returncode
+            logger.debug(f'Return Code: {result}')
+    for line in execute(["pip", "install", "-r", "requirements.txt", f"--extra-index-url={pip_url}"], cwd=join(base_directory, 'docs')):
+        process_output(line)
 
-# loop through and install our packages
-for package, extras in packages.items():
-    extras_str = f"[{','.join(extras)}]" if extras else ''
-    logger.info(f'Installing {package} with extras: {extras_str if extras_str else "None"} from {base_directory}')
-    try:
-        for line in execute(["pip", "install", "-e", f".{extras_str}", idmrepo], cwd=join(base_directory, package)):
-            process_output(line)
-        result = 0
-    except subprocess.CalledProcessError as e:
-        logger.critical(f'{package} installed failed using {e.cmd} did not succeed')
-        result = e.returncode
-        logger.debug(f'Return Code: {result}')
 
-for line in execute(["pip", "install", "-r", "requirements.txt"], cwd=join(base_directory, 'docs')):
-    process_output(line)
+def install_base_environment(pip_url):
+    # install wheel first to benefit from binaries
+    for line in execute(["pip", "install", "wheel", f"--extra-index-url={pip_url}"], cwd=join(base_directory, 'docs')):
+        process_output(line)
+
+    for line in execute(["pip", "uninstall", "py-make"]):
+        process_output(line)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Bootstrap the development environment")
+    parser.add_argument("--index-url", default='https://packages.idmod.org/api/pypi/pypi-production/simple', help="Pip url to install dependencies from")
+
+    args = parser.parse_args()
+
+    install_base_environment(args.index_url)
+    sys.exit(install_dev_packages(args.index_url))
