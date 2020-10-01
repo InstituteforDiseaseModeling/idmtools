@@ -7,4 +7,6 @@ User Recipes
    :titlesonly:
 
    cookbook/assets
+   cookbook/environment
    cookbook/experiments
+   cookbook/python
