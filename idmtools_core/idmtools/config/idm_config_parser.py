@@ -296,6 +296,7 @@ class IdmConfigParser:
             None
         """
         if cls.found_ini():
+            from idmtools.core.logging import VERBOSE
             block_details = cls.get_section(block)
             user_logger.log(VERBOSE, f"\n[{block}]")
             user_logger.log(VERBOSE, json.dumps(block_details, indent=3))
