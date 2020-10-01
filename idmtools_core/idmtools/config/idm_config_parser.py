@@ -4,8 +4,6 @@ import os
 from configparser import ConfigParser
 from logging import getLogger
 from typing import Any, Dict
-
-from idmtools.core.logging import VERBOSE, setup_logging
 from idmtools.utils.info import get_help_version_url
 
 default_config = 'idmtools.ini'
@@ -134,8 +132,6 @@ class IdmConfigParser:
             None
         """
         # init logging here as this is our most likely entry-point into an idmtools "application"
-        from idmtools.core.logging import setup_logging, VERBOSE
-
         ini_file = cls._find_config(dir_path, file_name)
         if ini_file is None:
             # We use print since logger isn't configured
@@ -154,10 +150,12 @@ class IdmConfigParser:
                 cls._config._sections[lowercase_version] = cls._config._sections[section]
 
         cls._init_logging()
+        from idmtools.core.logging import VERBOSE
         user_logger.log(VERBOSE, "INI File Used: {}".format(ini_file))
 
     @classmethod
     def _init_logging(cls):
+        from idmtools.core.logging import setup_logging
         # setup logging
         try:
             log_config = cls.get_section('Logging')
