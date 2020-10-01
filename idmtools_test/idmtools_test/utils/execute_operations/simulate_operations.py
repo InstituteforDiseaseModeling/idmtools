@@ -47,7 +47,6 @@ def run_simulation(simulation_id: Simulation, command: str, parent_uid: UUID, ex
             logger.info('Executing %s from working directory %s', cmd, simulation_path)
             err.write(f"{cmd}\n")
 
-            os.chdir(simulation_path)
             # Run our task
             if sys.platform in ['win32', 'cygwin']:
                 cmd = shlex.split(cmd.replace("\\", "/"))
