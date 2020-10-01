@@ -137,6 +137,9 @@ def install_base_environment(pip_url):
     for line in execute(["pip", "uninstall", "-y", "py-make"], ignore_error=True):
         process_output(line)
 
+    for line in execute(["pip", "install", "mozilla-pymake", f"--extra-index-url={pip_url}"]):
+        process_output(line)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Bootstrap the development environment")
