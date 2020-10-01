@@ -13,6 +13,7 @@ from idmtools_test.utils.test_platform import TestPlatform
 
 
 @pytest.mark.smoke
+@pytest.mark.serial
 class TestExperimentFactory(ITestWithPersistence):
 
     def test_build_python_experiment_from_factory(self):
