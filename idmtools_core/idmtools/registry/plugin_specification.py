@@ -110,3 +110,12 @@ class PluginSpecification:
             URL for item
         """
         return f'{repo_base_url}{nightly_branch if "nightly" in version else version[0:6]}/{extra}'
+
+    def get_version(self) -> str:
+        """
+        Returns the version of the plugin
+
+        Returns:
+
+        """
+        return None

@@ -29,6 +29,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
         self.input_file_path = analyzer_path
 
     # Test SimpleAnalyzer with SSMTAnalysis which analyzes python experiment's results
+    @pytest.mark.smoke
     def test_ssmt_workitem_python_simple_analyzer(self):
         experiment_id = '9311af40-1337-ea11-a2be-f0921c167861'  # comps2 exp id
         # experiment_id = 'de07f612-69ed-ea11-941f-0050569e0ef3'  # idmtvapp17

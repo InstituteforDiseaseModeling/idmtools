@@ -3,6 +3,7 @@ import os
 import sys
 import unittest
 
+import pytest
 from idmtools.assets import Asset
 from idmtools.builders import SimulationBuilder
 from idmtools.core import EntityStatus
@@ -15,6 +16,7 @@ from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 model_path = os.path.abspath(os.path.join("..", "..", "examples", "python_model", "inputs", "simple_python", "model.py"))
 
 
+@pytest.mark.smoke
 class TestAddingSimulationsToExistingExperiment(unittest.TestCase):
     def setUp(self):
         self.platform = Platform("TestExecute", missing_ok=True, default_missing=dict(type='TestExecute'))
@@ -43,6 +45,20 @@ class TestAddingSimulationsToExistingExperiment(unittest.TestCase):
 
         self.assertTrue(exp.succeeded)
         self.assertEqual(10, len(exp.simulations))
+
+    def test_empty_experiment_template(self):
+        base_task = JSONConfiguredPythonTask(script_path=model_path, python_path=sys.executable)
+        builder = SimulationBuilder()
+        exp = Experiment.from_builder(builder, base_task=base_task)
+        with self.assertRaises(ValueError) as er:
+            exp.run(wait_until_done=True)
+        self.assertTrue(er.exception.args[0], 'You cannot run an empty experiment')
+
+    def test_empty_experiment_list(self):
+        exp = Experiment()
+        with self.assertRaises(ValueError) as er:
+            exp.run(wait_until_done=True)
+        self.assertTrue(er.exception.args[0], 'You cannot run an empty experiment')
 
     def test_adding_manual_simulation(self):
         base_task = JSONConfiguredPythonTask(script_path=model_path, python_path=sys.executable)
@@ -100,6 +116,7 @@ class TestAddingSimulationsToExistingExperiment(unittest.TestCase):
             exp.run(wait_until_done=True, regather_common_assets=True)
 
 
+@pytest.mark.smoke
 class TestExperimentStatus(unittest.TestCase):
 
     def setUp(self):

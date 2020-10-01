@@ -9,24 +9,23 @@ from setuptools import setup, find_packages
 with open('README.md') as readme_file:
     readme = readme_file.read()
 
-with open('requirements.txt') as requirements_file:
-    requirements = requirements_file.read().split("\n")
+extra_require_files = dict()
+for file_prefix in ['', 'dev_', 'build_']:
+    filename = f'{file_prefix}requirements'
+    with open(f'{filename}.txt') as requirements_file:
+        extra_require_files[file_prefix.strip("_") if file_prefix else filename] = requirements_file.read().split("\n")
 
-build_requirements = ['flake8', 'coverage', 'py-make', 'bump2version', 'twine']
-test_requirements = ['pytest~=5.4.1', 'pytest-runner~=5.2', 'xmlrunner~=1.7.7', 'pytest-xdist',
-                     'pytest-timeout', 'pytest-cache'] + build_requirements
 
-version = '1.4.0+nightly'
+version = '1.5.0+nightly'
 
 extras = {
-    'test': test_requirements,
+    'test': extra_require_files['build'] + extra_require_files['dev'],
     # to support notebooks we need docker
     'notebooks': ['docker==4.0.1'],
-    'packaging': build_requirements,
-    'idm': ['idmtools_platform_comps', 'idmtools_cli', 'idmtools_models', 'emodpy'],
+    'packaging': extra_require_files['build'],
+    'idm': ['idmtools_platform_comps', 'idmtools_cli', 'idmtools_models'],
     # our full install include all common plugins
-    'full': ['idmtools_platform_comps', 'idmtools_platform_local', 'idmtools_cli', 'idmtools_models',
-             'emodpy']
+    'full': ['idmtools_platform_comps', 'idmtools_platform_local', 'idmtools_cli', 'idmtools_models']
 }
 
 authors = [
@@ -42,8 +41,8 @@ authors = [
 ]
 
 # check for python 3.6
-if sys.version_info[1] == 6:
-    requirements.append('dataclasses')
+if sys.version_info <= (3, 6):
+    extra_require_files['requirements'].append('dataclasses')
 
 setup(
     author=[author[0] for author in authors],
@@ -54,7 +53,7 @@ setup(
         'Framework:: IDM-Tools'
     ],
     description="Core tools for modeling",
-    install_requires=requirements,
+    install_requires=extra_require_files['requirements'],
     long_description=readme,
     include_package_data=True,
     keywords='modeling, IDM',

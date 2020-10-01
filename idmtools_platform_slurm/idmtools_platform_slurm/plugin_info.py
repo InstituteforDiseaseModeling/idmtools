@@ -50,3 +50,13 @@ class SlurmPlatformSpecification(PlatformSpecification):
     def get_type(self) -> Type['SlurmPlatform']:  # noqa: F821
         from idmtools_platform_slurm.slurm_platform import SlurmPlatform
         return SlurmPlatform
+
+    def get_version(self) -> str:
+        """
+        Returns the version of the plugin
+
+        Returns:
+            Plugin Version
+        """
+        from idmtools_platform_slurm import __version__
+        return __version__

@@ -45,8 +45,8 @@ class TestTask(ITask):
         return AssetCollection(assets=assets)
 
     def gather_transient_assets(self) -> AssetCollection:
-        if not self.transient_assets.has_asset("config.json"):
-            self.transient_assets.add_asset(Asset("config.json", content=json.dumps(self.parameters)))
+        if not self.transient_assets.has_asset(filename="config.json"):
+            self.transient_assets.add_asset(Asset(filename="config.json", content=json.dumps(self.parameters)))
         return self.transient_assets
 
     def reload_from_simulation(self, simulation: 'Simulation'):

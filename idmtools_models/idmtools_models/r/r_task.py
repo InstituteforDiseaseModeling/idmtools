@@ -124,3 +124,13 @@ class RTaskSpecification(TaskSpecification):
             RTask
         """
         return RTask
+
+    def get_version(self) -> str:
+        """
+        Returns the version of the plugin
+
+        Returns:
+            Plugin Version
+        """
+        from idmtools_models import __version__
+        return __version__

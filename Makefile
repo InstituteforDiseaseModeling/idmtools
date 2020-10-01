@@ -10,20 +10,23 @@ CLDIR=$(PDS)clean_dir.py
 help:
 	$(PDS)get_help_from_makefile.py
 
-clean: ## Clean all our jobs
+clean: ## Clean most common outputs(Logs, Test Results, etc)
 	$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
 	$(MAKEALL) --parallel clean
-	$(CLDIR) --file-patterns "**/*.log"
+	$(CLDIR) --file-patterns "**/*.log,**/*.pyi"
 	$(PDR) -wd "docs" -ex "make clean"
 
-clean-all: ## Clean all our jobs
+clean-all: ## Clean most common outputs(Logs, Test Results, etc) as well as local install information. Running this requires a new call to setup-dev or setup-dev-no-docker
 	$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
 	$(MAKEALL) --parallel clean-all
 	$(CLDIR) --file-patterns "**/*.buildlog"
 
-setup-dev:  ## Setup packages in dev mode
+setup-dev: ## Setup packages in dev mode
 	python dev_scripts/bootstrap.py
 	$(PDR) -w idmtools_platform_local -ex 'pymake docker'
+
+setup-dev-no-docker: ## Setup packages in dev mode minus docker
+	python dev_scripts/bootstrap.py
 
 lint: ## check style with flake8
 	flake8 --ignore=E501,W291 --exclude="venv**/**,examples/**,workflow/**,docs/**,*/tests/**,idmtools_test/**, idmtools_platform_comps/prototypes/**"
@@ -101,13 +104,23 @@ bump-patch-dry-run: ## bump the patch version(dry run)
 bump-minor-dry-run: ## bump the minor version(dry run)
 	$(MAKEALL) bump-minor-dry-run
 
-bump-major-dry-run: ## bump the minor version(dry run)
+bump-major-dry-run: ## bump the major version(dry run)
 	$(MAKEALL) bump-major-dry-run
 
 build-docs: ## build docs(only works on linux at moment due to make.bat not running by default)
 	$(PDR) -wd 'docs' -ex 'make html'
 
-build-docs-server: ## builds docs and launch a webserver
-	@make build-docs
-	@+$(IPY) "print('Serving documentation @ server at http://localhost:8000 . Ctrl + C Will Stop Server')"
-	$(PDR) -wd 'docs/_build/html' -ex 'python -m http.server'
+build-docs-server: build-docs ## builds docs and launch a webserver
+	$(PDS)serve_docs.py
+
+dev-watch: ## Run lint on any python code changes
+	$(PDS)run_commands_and_wait.py --command 'watchmedo shell-command --drop --wait --interval 10 --patterns="*.py" --ignore-pattern="*/tests/.test_platform/*" --recursive --command="pymake --ignore-errors lint"' \
+        --command 'watchmedo shell-command --patterns="*.py" --ignore-pattern="*/tests/.test_platform/*" --drop --interval 10 --recursive --command="pymake test-smoke";;;idmtools_core' \
+        --command 'watchmedo shell-command --patterns="*.py" --ignore-pattern="*/tests/.test_platform/*" --drop --interval 10 --recursive --command="pymake test-smoke";;;idmtools_models' \
+        --command 'watchmedo shell-command --patterns="*.py" --ignore-pattern="*/tests/.test_platform/*" --drop --interval 10 --recursive --command="pymake test-smoke";;;idmtools_platform_comps' \
+        --command 'watchmedo shell-command --patterns="*.py" --ignore-pattern="*/tests/.test_platform/*" --drop --interval 10 --recursive --command="pymake test-smoke";;;idmtools_platform_local' \
+        --command 'watchmedo shell-command --patterns="*.py" --ignore-pattern="*/tests/.test_platform/*" --drop --interval 10 --recursive --command="pymake test-smoke";;;idmtools_cli'
+
+generate-stubs: ## Generate python interfaces. Useful to identify what the next version should be by comparing to previous runs
+	$(PDS)make_stub_files.py  -c dev_scripts/stub.cfg
+	$(PDS)process_interfaces.py

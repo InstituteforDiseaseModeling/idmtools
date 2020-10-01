@@ -16,13 +16,9 @@ Bugs
 Dependencies
 ------------
 * `#1007 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1007>`_ - Update flask-sqlalchemy requirement from ~=2.4.3 to ~=2.4.4
-* `#1008 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1008>`_ - Update tqdm requirement from ~=4.47.0 to ~=4.48.0
 * `#1009 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1009>`_ - Update matplotlib requirement from ~=3.2.2 to ~=3.3.0
-* `#1010 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1010>`_ - Update yaspin requirement from ~=0.17.0 to ~=0.18.0
 * `#1015 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1015>`_ - Bump pandas from 1.0.5 to 1.1.0
-* `#1016 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1016>`_ - Update pytest requirement from ~=5.4.3 to ~=6.0.0
 * `#1024 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1024>`_ - Update pytest requirement from ~=6.0.0 to ~=6.0.1
-* `#1030 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1030>`_ - Update tqdm requirement from ~=4.48.0 to ~=4.48.1
 * `#1031 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1031>`_ - Update yaspin requirement from ~=0.18.0 to ~=1.0.0
 * `#1032 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1032>`_ - Update tqdm requirement from ~=4.48.1 to ~=4.48.2
 * `#1033 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1033>`_ - Update pygithub requirement from ~=1.51 to ~=1.52
@@ -37,5 +33,4 @@ Documentation
 
 Feature Request
 ---------------
-* `#0991 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/991>`_ - Explore singularity images on Windows
 * `#1020 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1020>`_ - Requirements to Asset Collection should first check what assets exist before uploading

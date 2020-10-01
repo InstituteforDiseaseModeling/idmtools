@@ -1,0 +1,7 @@
+livereload~=2.6.3
+pytest-cache~=1.0
+pytest-runner~=5.2
+pytest-timeout~=1.4.2
+pytest-xdist~=2.1
+pytest~=6.1.0
+xmlrunner~=1.7.7

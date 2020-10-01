@@ -24,6 +24,7 @@ class TestAssetsInComps(unittest.TestCase):
     def setUp(self) -> None:
         self.base_path = os.path.abspath(os.path.join(COMMON_INPUT_PATH, "assets", "collections"))
         self.platform: COMPSPlatform = None
+        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         setup_test_with_platform_and_simple_sweep(self)
 
     def _run_and_test_experiment(self, experiment):
@@ -46,7 +47,7 @@ class TestAssetsInComps(unittest.TestCase):
         self.assertEqual(filenames_comps, filenames)
 
     def test_create_asset_collection_from_existing_collection(self):
-        ac = self.platform.get_item('2c62399b-1a31-ea11-a2be-f0921c167861', item_type=ItemType.ASSETCOLLECTION)
+        ac = AssetCollection.from_id('2c62399b-1a31-ea11-a2be-f0921c167861')
         self.assertIsInstance(ac, AssetCollection)
         new_ac = AssetCollection(ac.assets)
         new_ac.add_asset(Asset(relative_path=None, filename="test.json", content=json.dumps({"a": 9, "b": 2})))
@@ -65,6 +66,7 @@ class TestAssetsInComps(unittest.TestCase):
         self.assertEqual({'test.json'}, new_filenames - filenames)
 
     @pytest.mark.long
+    @pytest.mark.smoke
     def test_md5_hashing_for_same_file_contents(self):
         a = Asset(relative_path=None, filename="test.json", content=json.dumps({"a": 1, "b": 2}))
         b = Asset(relative_path=None, filename="test1.json", content=json.dumps({"a": 1, "b": 2}))

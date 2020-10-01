@@ -1,3 +1,5 @@
+import io
+
 import os
 from dataclasses import dataclass, field, InitVar
 from io import BytesIO
@@ -8,6 +10,8 @@ import backoff
 import requests
 from tqdm import tqdm
 
+from idmtools.utils.hashing import calculate_md5, calculate_md5_stream
+
 logger = getLogger(__name__)
 
 
@@ -17,34 +21,47 @@ class Asset:
     A class representing an asset. An asset can either be related to a physical
     asset present on the computer or directly specified by a filename and content.
 
-    Args:
-        absolute_path: The absolute path of the asset. Optional if **filename** and **content** are given.
-        relative_path:  The relative path (compared to the simulation root folder).
-        filename: Name of the file. Optional if **absolute_path** is given.
-        content: The content of the file. Optional if **absolute_path** is given.
-        checksum: Optional. Useful in systems that allow single upload based on checksums and retrieving from those
-            systems
-
-            Note: we add this to allow systems who provide asset caching by MD5 opportunity to avoid re-uploading assets
     """
 
+    #: The absolute path of the asset. Optional if **filename** and **content** are given.
     absolute_path: Optional[str] = field(default=None)
+    #: The relative path (compared to the simulation root folder).
     relative_path: Optional[str] = field(default=None)
+    #: Name of the file. Optional if **absolute_path** is given.
     filename: Optional[str] = field(default=None)
+    #: The content of the file. Optional if **absolute_path** is given.
     content: InitVar[Any] = None
     _content: bytes = field(default=None, init=False)
-    _length: Optional[int] = field(default=None)
+    _length: Optional[int] = field(default=None, init=False)
+    #: Persisted tracks if item has been saved
     persisted: bool = field(default=False)
+    #: Handler to api
     handler: Callable = field(default=str, metadata=dict(exclude_from_metadata=True))
+    #: Hook to allow downloading from platform
     download_generator_hook: Callable = field(default=None, metadata=dict(exclude_from_metadata=True))
-    checksum: Optional[str] = field(default=None)
+    #: Checksum of asset. Only required for existing assets
+    checksum: InitVar[Any] = None
+    _checksum: Optional[str] = field(default=None, init=False)
 
-    def __post_init__(self, content):
-        self.content = content
-        if not self.absolute_path and (not self.filename and not self.content):
-            raise ValueError("Impossible to create the asset without either absolute path or filename and content!")
-
+    def __post_init__(self, content, checksum):
+        self._content = None if isinstance(content, property) else content
+        self._checksum = checksum if not isinstance(checksum, property) else None
         self.filename = self.filename or (os.path.basename(self.absolute_path) if self.absolute_path else None)
+        # populate absolute path for conditions where user does not supply info
+        if not self._checksum and self._content is None and not self.absolute_path and self.filename and not self.persisted:
+            # try relative path
+            if self.relative_path and os.path.exists(self.short_remote_path()):
+                self.absolute_path = os.path.abspath(self.short_remote_path())
+            else:
+                self.absolute_path = os.path.abspath(self.filename)
+        if self.absolute_path and self._content is not None:
+            raise ValueError("Absolute Path and Content are mutually exclusive. Please provide only one of the options")
+        elif self.absolute_path and not os.path.exists(self.absolute_path):
+            raise FileNotFoundError(f"Cannot find specified asset: {self.absolute_path}")
+        elif self.absolute_path and os.path.isdir(self.absolute_path) and not self.persisted:
+            raise ValueError("Asset cannot be a directory!")
+        elif not self.absolute_path and (not self.filename or (self.filename and not self._checksum and self._content is None and not self.persisted)):
+            raise ValueError("Impossible to create the asset without either absolute path, filename and content, or filename and checksum!")
 
     def __repr__(self):
         return f"<Asset: {os.path.join(self.relative_path, self.filename)} from {self.absolute_path}>"
@@ -52,14 +69,17 @@ class Asset:
     @property
     def checksum(self):
         """
+
+        Returns checksum of object. This will return None unless the user has provided checksum or called calculate checksum to avoid
+        computation. If you need to guarantee a checksum value, call calculate_checksum beforehand
         Returns:
-            None.
+            Checksum
         """
         return self._checksum
 
     @checksum.setter
     def checksum(self, checksum):
-        self._checksum = None if isinstance(checksum, property) else checksum
+        self._checksum = checksum
 
     @property
     def extension(self):
@@ -71,8 +91,7 @@ class Asset:
 
     @relative_path.setter
     def relative_path(self, relative_path):
-        self._relative_path = relative_path.strip(" \\/") if not isinstance(relative_path,
-                                                                            property) and relative_path else None
+        self._relative_path = relative_path.strip(" \\/") if not isinstance(relative_path, property) and relative_path else None
 
     @property
     def bytes(self):
@@ -96,9 +115,10 @@ class Asset:
         Returns:
             The content of the file, either from the content attribute or by opening the absolute path.
         """
-        if not self._content and self.absolute_path:
+        if self._content is None and self.absolute_path:
             with open(self.absolute_path, "rb") as fp:
                 self._content = fp.read()
+
         elif self.download_generator_hook:
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f"Fetching {self.filename} content from platform")
@@ -109,19 +129,32 @@ class Asset:
     @content.setter
     def content(self, content):
         self._content = None if isinstance(content, property) else content
+        # Reset checksum to None until requested
+        if self._checksum:
+            self._checksum = None
 
     # region Equality and Hashing
-    def __eq__(self, other):
+    def __eq__(self, other: 'Asset'):
         return self.__key() == other.__key()
 
+    def deep_equals(self, other: 'Asset') -> bool:
+        """
+        Performs a deep comparison of assets, including contents
+
+        Args:
+            other: Other asset to compare
+
+        Returns:
+            True if filename, relative path, and contents are equal, otherwise false
+        """
+        if self.filename == other.filename and self.relative_path == other.relative_path:
+            return self.calculate_checksum() == other.calculate_checksum()
+        return False
+
     def __key(self):
-        if self.absolute_path:
-            return self.absolute_path
-
-        if self.filename and self.relative_path:
-            return self.filename, self.relative_path
-
-        return self._content, self.filename
+        # We only care to check if filename and relative path is same. Goal here is not identical check but rather that
+        # two files don't exist in same remote path
+        return self.filename, self.relative_path
 
     def __hash__(self):
         return hash(self.__key())
@@ -183,17 +216,15 @@ class Asset:
         Download an asset to path. This requires loadings the object through the platofrm
 
         Args:
-            path: Path to write to. If it is a directory, the asset filename will be added to it
+            dest: Path to write to. If it is a directory, the asset filename will be added to it
+            force: Force download even if file exists
 
         Returns:
             None
         """
 
         if os.path.isdir(dest):
-            if self.relative_path:
-                path = os.path.join(dest, self.relative_path, self.filename)
-            else:
-                path = os.path.join(dest, self.filename)
+            path = os.path.join(dest, self.short_remote_path())
             path = path.replace("\\", os.path.sep)
             os.makedirs(os.path.dirname(path), exist_ok=True)
         else:
@@ -204,6 +235,33 @@ class Asset:
                 if logger.isEnabledFor(DEBUG):
                     logger.debug(f"Download {self.filename} to {path}")
                 self.__write_download_generator_to_stream(out)
+
+    def calculate_checksum(self) -> str:
+        """
+        Calculate checksum on asset. If previous checksum was calculated, that value will be returned
+
+        Returns:
+            Checksum string
+        """
+        if not self._checksum:
+            if self.absolute_path:
+                self._checksum = calculate_md5(self.absolute_path)
+            elif self.content is not None:
+                self._checksum = calculate_md5_stream(io.BytesIO(self.bytes))
+        return self._checksum
+
+    def short_remote_path(self) -> str:
+        """
+        Returns the short remote path. This is the join of the relative path and filename
+
+        Returns:
+            Remote Path + Filename
+        """
+        if self.relative_path:
+            path = os.path.join(self.relative_path, self.filename)
+        else:
+            path = os.path.join(self.filename)
+        return path
 
 
 TAsset = TypeVar("TAsset", bound=Asset)

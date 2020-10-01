@@ -25,10 +25,11 @@ cache = dc.Cache(os.getcwd() if os.getenv("CACHE_FIXTURES", "No").lower()[0] in 
 
 
 @cache.memoize(expire=300)
-def setup_command_no_asset(platform: str = 'COMPS2'):
+def setup_command_no_asset(case_name, platform: str = 'COMPS2'):
     bt = CommandTask("Assets\\hello_world.bat")
     experiment = Experiment.from_task(
         bt,
+        name=case_name,
         tags=dict(
             test_type='No Assets'
         )
@@ -42,9 +43,9 @@ def setup_command_no_asset(platform: str = 'COMPS2'):
 
 
 @cache.memoize(expire=300)
-def setup_python_model_1(platform: str = 'COMPS2'):
+def setup_python_model_1(case_name, platform: str = 'COMPS2'):
     platform = Platform(platform)
-    e = get_model1_templated_experiment("TestExperimentOperations")
+    e = get_model1_templated_experiment(case_name)
     builder = SimulationBuilder()
     builder.add_sweep_definition(
         JSONConfiguredPythonTask.set_parameter_partial("a"),
@@ -67,6 +68,7 @@ def setup_python_model_1(platform: str = 'COMPS2'):
 
 
 @pytest.mark.comps
+@pytest.mark.smoke
 class TestExperimentOperations(unittest.TestCase):
 
     def setUp(self) -> None:
@@ -74,7 +76,7 @@ class TestExperimentOperations(unittest.TestCase):
         self.platform = Platform("COMPS2")
 
     def test_no_assets(self):
-        setup_command_no_asset("COMPS2")
+        setup_command_no_asset(self.case_name, "COMPS2")
 
         # Ensure login is called
         with platform("COMPS2"):
@@ -113,7 +115,7 @@ class TestExperimentOperations(unittest.TestCase):
         Returns:
 
         """
-        eid = setup_python_model_1('COMPS2')
+        eid = setup_python_model_1(self.case_name, 'COMPS2')
 
         e_p: Experiment = Experiment.from_id(eid)
         with self.subTest("test_list_assets_and_download_children"):
