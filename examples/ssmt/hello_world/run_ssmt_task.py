@@ -8,7 +8,7 @@ user_files = FileList(root='files')
 tags = {'test': 123}
 
 if __name__ == "__main__":
-    with Platform('COMPS'):
+    with Platform('BAYESIAN'):
 
         # If docker_image is defined within idmtools.ini, it It will use this docker image.
         # If docker_image is not defined in idmtools.ini, it will use the default docker image based on platform:
