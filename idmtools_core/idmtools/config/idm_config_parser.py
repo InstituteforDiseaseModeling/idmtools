@@ -7,7 +7,7 @@ from configparser import ConfigParser
 from logging import getLogger
 from typing import Any, Dict
 
-from idmtools.core.logging import VERBOSE
+from idmtools.core.logging import VERBOSE, setup_logging
 from idmtools.utils.info import get_help_version_url
 
 default_config = 'idmtools.ini'
@@ -174,6 +174,7 @@ class IdmConfigParser:
         if ini_file is None:
             # We use print since logger isn't configured
             print(f"/!\\ WARNING: File '{file_name}' Not Found! For details on how to configure idmtools, see {get_help_version_url('configuration.html')} for details on how to configure idmtools.")
+            cls._init_logging()
             return
 
         cls._config_path = ini_file
@@ -187,6 +188,11 @@ class IdmConfigParser:
             if not cls._config.has_section(section=lowercase_version):
                 cls._config._sections[lowercase_version] = cls._config._sections[section]
 
+        cls._init_logging()
+        user_logger.log(VERBOSE, "INI File Used: {}".format(ini_file))
+
+    @classmethod
+    def _init_logging(cls):
         # setup logging
         try:
             log_config = cls.get_section('Logging')
@@ -195,7 +201,6 @@ class IdmConfigParser:
         except ValueError:
             log_config = dict(level='INFO', log_filename='idmtools.log', console='off')
         setup_logging(**log_config)
-        user_logger.log(VERBOSE, "INI File Used: {}".format(ini_file))
 
         if platform.system() == "Darwin":
             # see https://bugs.python.org/issue27126
