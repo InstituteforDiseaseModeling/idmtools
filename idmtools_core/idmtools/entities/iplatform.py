@@ -586,16 +586,18 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         idm_item = self.get_item(item_id, item_type, raw=False)
         return self.get_files(idm_item, files, output)
 
-    def are_requirements_met(self, requirements: Set[PlatformRequirements]) -> bool:
+    def are_requirements_met(self, requirements: Union[PlatformRequirements, Set[PlatformRequirements]]) -> bool:
         """
         Does the platform support the list of requirements
 
         Args:
-            requirements: Requirements
+            requirements: Requirements should be a list of PlatformRequirements or a single PlatformRequirements
 
         Returns:
             True if all the requirements are supported
         """
+        if isinstance(requirements, PlatformRequirements):
+            requirements = [requirements]
         return all([x in self._platform_supports for x in requirements])
 
     def is_task_supported(self, task: ITask) -> bool:

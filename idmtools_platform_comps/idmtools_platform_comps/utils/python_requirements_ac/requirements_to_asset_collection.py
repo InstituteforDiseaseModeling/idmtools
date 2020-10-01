@@ -11,15 +11,13 @@ from idmtools.assets import Asset
 from idmtools.core import ItemType
 from idmtools.entities.experiment import Experiment
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
-from idmtools_platform_comps.comps_platform import COMPSPlatform
+from idmtools_platform_comps.comps_platform import COMPSPlatform, SLURM_ENVS
 
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 REQUIREMENT_FILE = 'requirements_updated.txt'
 MODEL_LOAD_LIB = "install_requirements.py"
 MODEL_CREATE_AC = 'create_asset_collection.py'
 MD5_KEY = 'idmtools-requirements-md5-{}'
-# We use this to track os. It would be nice to do that in server
-SLURM_ENVS = ['calculon', 'slurmstage', "slurmdev"]
 logger = getLogger(__name__)
 user_logger = getLogger("user")
 
