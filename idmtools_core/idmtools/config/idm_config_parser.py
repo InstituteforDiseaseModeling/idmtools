@@ -255,7 +255,7 @@ class IdmConfigParser:
         if not cls.found_ini():
             return fallback
 
-        if cls.__config is None:
+        if cls._config is None:
             if fallback is None:
                 user_logger.warning("No Configuration file defined. Please define a fallback value")
             return fallback
