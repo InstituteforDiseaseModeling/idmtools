@@ -3,4 +3,7 @@
 undefined
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+Cookbook
+========
 The cookbook contains short "recipes" which are succinct examples demonstrating specific features
+
