@@ -29,7 +29,8 @@ test: ## Run our tests
 	$(FULL_TEST_CMD) -m "not comps and not docker"'
 
 test-all: ## Run all our tests
-	$(FULL_TEST_CMD)'
+	$(FULL_TEST_CMD) -m "serial"'
+	$(FULL_TEST_CMD) -n 8 -m "not serial"'
 
 test-failed: ## Run only previously failed tests
 	$(FULL_TEST_CMD) --lf'
@@ -50,7 +51,7 @@ test-python: ## Run our python tests
 	$(FULL_TEST_CMD) -m "python"'
 
 test-smoke: ## Run smoke tests
-	$(FULL_TEST_CMD) -n 6 -m "smoke and not serial"'
+	$(FULL_TEST_CMD) -n 8 -m "smoke and not serial"'
 
 test-ssmt: ## Run our ssmt tests
 	$(FULL_TEST_CMD) -m "ssmt"'

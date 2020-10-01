@@ -29,7 +29,8 @@ test: ## Run our tests
 	$(FULL_TEST_CMD) -m "not comps and not docker"'
 
 test-all: ## Run all our tests
-	$(FULL_TEST_CMD)'
+	$(FULL_TEST_CMD) -m "serial"'
+	$(FULL_TEST_CMD) -n 8 -m "not serial"'
 
 test-failed: ## Run only previously failed tests
 	$(FULL_TEST_CMD) --lf'

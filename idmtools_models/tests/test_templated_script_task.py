@@ -122,7 +122,7 @@ echo Hello
                         # check for echo
                         self.assertIn('Hello', content)
                         # check for python path
-                        self.assertIn(f'{os.getcwd()}\\Assets\\;', content)
+                        self.assertIn(os.path.join(os.getcwd(), ".test_platform", experiment.id, sim.id, 'Assets'), content)
 
             with self.subTest("test_wrapper_script_execute_wrapper_reload"):
                 experiment_reload = Experiment.from_id(experiment.uid, load_task=True)

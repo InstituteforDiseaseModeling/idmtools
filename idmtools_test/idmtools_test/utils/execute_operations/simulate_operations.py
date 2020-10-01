@@ -44,13 +44,20 @@ def run_simulation(simulation_id: Simulation, command: str, parent_uid: UUID, ex
             open(os.path.join(simulation_path, "StdErr.txt"), "w") as err:
         try:
             cmd = str(command)
+            print(cmd)
+            print(execute_directory)
+            if cmd.startswith(execute_directory):
+                cmd = cmd.replace(execute_directory, "")
             logger.info('Executing %s from working directory %s', cmd, simulation_path)
             err.write(f"{cmd}\n")
 
             # Run our task
             if sys.platform in ['win32', 'cygwin']:
                 cmd = shlex.split(cmd.replace("\\", "/"))
-                cmd[0] = os.path.abspath(cmd[0])
+                if os.path.exists(os.path.join(simulation_path, cmd[0])):
+                    cmd[0] = os.path.join(simulation_path, cmd[0])
+                else:
+                    cmd[0] = os.path.abspath(cmd[0])
                 cmd = subprocess.list2cmdline(cmd)
             else:
                 cmd = shlex.split(cmd.replace("\\", "/"))
