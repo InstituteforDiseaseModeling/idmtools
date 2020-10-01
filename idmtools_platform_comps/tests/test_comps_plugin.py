@@ -1,7 +1,13 @@
+import tempfile
+
+import os
+
 import unittest
 import dataclasses
 
 import pytest
+
+from idmtools import IdmConfigParser
 from idmtools.core import CacheEnabled
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.iplatform import IPlatform
@@ -58,3 +64,29 @@ class TestCompsPlugin(unittest.TestCase):
             self.assertTrue(platform.are_requirements_met(PlatformRequirements.NativeBinary))
             self.assertTrue(platform.are_requirements_met(PlatformRequirements.PYTHON))
             self.assertTrue(platform.are_requirements_met(PlatformRequirements.WINDOWS))
+
+    @pytest.mark.comp
+    def test_platform_aliases(self):
+        from idmtools.core.platform_factory import Platform
+        org_directory = os.getcwd()
+        try:
+            with tempfile.TemporaryDirectory() as tmpdirname:
+                print(f'Set working directory to {tmpdirname}')
+                os.chdir(tmpdirname)
+                IdmConfigParser.clear_instance()
+
+                with Platform("BAYESIAN") as comps2:
+                    self.assertEqual(comps2.endpoint, "https://comps2.idmod.org")
+                    self.assertEqual(comps2.environment.upper(), "BAYESIAN")
+
+                with Platform("SlurmStage") as comps2:
+                    self.assertEqual(comps2.endpoint, "https://comps2.idmod.org")
+                    self.assertEqual(comps2.environment.upper(), "SLURMSTAGE")
+        except PermissionError as ex:
+            print("Could not remove temp directory")
+        except Exception as e:
+            pass
+        finally:
+            print(f'Set working directory to {org_directory}')
+            os.chdir(org_directory)
+            IdmConfigParser.clear_instance()
