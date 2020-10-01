@@ -128,7 +128,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-
     logger.setLevel(logging.DEBUG)
     log_formatter = logging.Formatter("%(asctime)s [%(levelname)-5.5s]  %(message)s")
     file_handler = logging.FileHandler("bootstrap.buildlog")
@@ -149,7 +148,6 @@ if __name__ == "__main__":
         console_handler.setFormatter(log_formatter)
         console_handler.setLevel(console_log_level)
         logger.addHandler(console_handler)
-
 
     install_base_environment(args.index_url)
     sys.exit(install_dev_packages(args.index_url))
