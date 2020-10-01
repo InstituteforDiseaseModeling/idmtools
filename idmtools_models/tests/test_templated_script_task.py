@@ -150,7 +150,7 @@ echo Hello
         task = CommandTask(cmd)
 
         with Platform("TestExecute", missing_ok=True, default_missing=dict(type='TestExecute')):
-            wrapper_task = get_script_wrapper_unix_task(task)
+            wrapper_task = get_script_wrapper_unix_task(task, template_content=LINUX_PYTHON_PATH_WRAPPER)
             experiment = Experiment.from_task(wrapper_task, name=self.case_name)
             experiment.run(wait_until_done=True)
             self.assertTrue(experiment.succeeded)
