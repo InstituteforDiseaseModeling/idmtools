@@ -134,7 +134,7 @@ def install_base_environment(pip_url):
     for line in execute(["pip", "install", "wheel", f"--extra-index-url={pip_url}"]):
         process_output(line)
 
-    for line in execute(["pip", "uninstall", "py-make"]):
+    for line in execute(["pip", "uninstall", "py-make"], ignore_error=True):
         process_output(line)
 
 
