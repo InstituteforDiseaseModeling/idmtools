@@ -1,3 +1,5 @@
+import shutil
+
 import argparse
 import logging
 import os
@@ -21,6 +23,7 @@ def execute(cmd, env=None):
         env = dict()
     final_env = dict(os.environ)
     final_env.update(env)
+    print(shutil.which(cmd.split(" ")))
     popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, shell=True, env=final_env)
     for stdout_line in iter(popen.stdout.readline, ""):
         yield stdout_line
