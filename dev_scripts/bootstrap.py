@@ -67,13 +67,14 @@ packages = dict(
 )
 
 
-def execute(cmd: List['str'], cwd: str = base_directory) -> Generator[str, None, None]:
+def execute(cmd: List['str'], cwd: str = base_directory, ignore_error: bool = False) -> Generator[str, None, None]:
     """
     Runs a command and filters output
 
     Args:
         cmd: Command to run
-        cwd: Working directory
+        cwd: Working directory - Defaults to current directory
+        ignore_error: Should we ignore errors
 
     Returns:
         Generator returning each line
@@ -86,7 +87,7 @@ def execute(cmd: List['str'], cwd: str = base_directory) -> Generator[str, None,
         yield stdout_line
     process.stdout.close()
     return_code = process.wait()
-    if return_code:
+    if return_code and not ignore_error:
         raise subprocess.CalledProcessError(return_code, cmd)
 
 
