@@ -118,8 +118,9 @@ jobs:
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.local == 'true' || steps.filter.outputs.models == 'true'
         run: |
           cd idmtools_platform_local/tests
-           py.test --durations=3 -v --junitxml=test_results.xml -m "smoke and not serial"
            py.test --durations=3 -v --junitxml=test_results.serial.xml -m "smoke and serial"
+        # Comment out for now. Local does not have any non-serial smoke tests
+        # py.test --durations=3 -v --junitxml=test_results.xml -m "smoke and not serial"
       - name: Upload idmtools_platform_local smoke test results
         uses: actions/upload-artifact@v2
         if: failure() && (steps.filter.outputs.core == 'true' || steps.filter.outputs.local == 'true' || steps.filter.outputs.models == 'true')
