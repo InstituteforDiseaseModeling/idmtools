@@ -23,7 +23,7 @@ clean-all: ## Clean most common outputs(Logs, Test Results, etc) as well as loca
 
 setup-dev: ## Setup packages in dev mode
 	python dev_scripts/bootstrap.py
-	$(PDR) -w idmtools_platform_local -ex 'pymake docker'
+	cd idmtools_platform_local && $(MAKE) docker
 
 setup-dev-no-docker: ## Setup packages in dev mode minus docker
 	python dev_scripts/bootstrap.py
