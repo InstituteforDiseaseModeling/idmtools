@@ -1,5 +1,4 @@
 import os
-
 import unittest.mock
 import pytest
 from dataclasses import fields
@@ -9,6 +8,7 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 
 @pytest.mark.smoke
+@pytest.mark.serial
 class TestPlatformFactory(ITestWithPersistence):
     def setUp(self):
         super().setUp()
