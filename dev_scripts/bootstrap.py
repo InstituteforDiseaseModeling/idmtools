@@ -67,7 +67,7 @@ packages = dict(
 )
 
 
-def execute(cmd: List['str'], cwd: str) -> Generator[str, None, None]:
+def execute(cmd: List['str'], cwd: str = base_directory) -> Generator[str, None, None]:
     """
     Runs a command and filters output
 
@@ -130,7 +130,7 @@ def install_dev_packages(pip_url):
 
 def install_base_environment(pip_url):
     # install wheel first to benefit from binaries
-    for line in execute(["pip", "install", "wheel", f"--extra-index-url={pip_url}"], cwd=join(base_directory, 'docs')):
+    for line in execute(["pip", "install", "wheel", f"--extra-index-url={pip_url}"]):
         process_output(line)
 
     for line in execute(["pip", "uninstall", "py-make"]):
