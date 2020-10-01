@@ -93,8 +93,8 @@ class EndpointsAnalyzer(IAnalyzer):
 if __name__ == "__main__":
 
     # Set the platform where you want to run your analysis
-    # In this case we are running in BAYESIAN, but this can be changed to run 'Local'
-    with Platform('BAYESIAN') as platform:
+    # In this case we are running in BELEGOST, but this can be changed to run 'Local'
+    with Platform('BELEGOST') as platform:
 
         # Set the experiment you want to analyze
         exp_id = '719de048-64cb-e911-a2bb-f0921c167866'  # comps2 staging exp id
