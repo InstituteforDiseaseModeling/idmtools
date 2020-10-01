@@ -17,3 +17,7 @@ To see the list of troubleshooting options for the ``system`` command, type the 
 To see the versions of |IT_s| and related modules, along with the plugins they provide, you can use the ``version`` command. Here is an example of the output:
 
 .. command-output:: idmtools version
+
+To see a list of the predefined configurations from Platform Plugins, use the command:
+
+.. command-output:: idmtools info plugins platform-aliases
