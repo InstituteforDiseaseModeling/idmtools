@@ -54,6 +54,9 @@ test-smoke: ## Run our smoke tests
 	$(FULL_TEST_CMD) -n 4 -m "smoke and not serial"'
 	$(FULL_TEST_CMD) -m "smoke and serial"'
 
+test-report: ## Launch test report in browser
+	$(PDS)/launch_dir_in_browser.py tests/core.test_results.html
+
 coverage-report: coverage ## Generate HTML report from coverage. Requires running coverage run first(coverage, coverage-smoke, coverage-all)
 	coverage report -m
 	coverage html -i
