@@ -261,7 +261,3 @@ class TestPlatformAnalysis(ITestWithPersistence):
         self.assertIn("!!!!!!!!!!!!!Preload executed!!!!!!!!!!!!!!!!!!", stdout_contents)
         self.assertIn(f"Idmtools Core Version: {core_version}", stdout_contents)
         self.assertIn(f"Idmtools COMPS Version: {platform_comps_version}", stdout_contents)
-
-
-
-
