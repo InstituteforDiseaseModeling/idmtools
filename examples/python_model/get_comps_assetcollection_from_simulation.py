@@ -11,11 +11,11 @@ from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id
 
-# connect to COMPS staging
-with platform('COMPS2'):
+# connect to COMPS
+with platform('BELEGOST'):
     # get asset collection from an existing sim
     # Use existing simulation id
-    sim_id = "50796602-3433-ea11-a2be-f0921c167861"
+    sim_id = '071c6f5d-1504-eb11-a2c7-c4346bcb1553'  # comps sim id
     collection_id = get_asset_collection_id_for_simulation_id(sim_id)
 
     # define our base task with addition of the Comps Asset collection
