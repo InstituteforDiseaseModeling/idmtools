@@ -21,7 +21,7 @@ if __name__ == '__main__':
         analyzers = [AddAnalyzer(filenames=filenames)]
 
         # Set the experiment you want to analyze
-        experiment_id = 'f227704e-0c34-ea11-a2be-f0921c167861'  # comps2 staging exp id
+        experiment_id = '6f305619-64b3-ea11-a2c6-c4346bcb1557'  # comps exp id
 
         # Specify the id Type, in this case an Experiment
         manager = AnalyzeManager(ids=[(experiment_id, ItemType.EXPERIMENT)], analyzers=analyzers)

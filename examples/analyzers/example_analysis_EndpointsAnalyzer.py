@@ -97,7 +97,7 @@ if __name__ == "__main__":
     with Platform('BELEGOST') as platform:
 
         # Set the experiment you want to analyze
-        exp_id = '719de048-64cb-e911-a2bb-f0921c167866'  # comps2 staging exp id
+        exp_id = 'adad3ad2-4304-eb11-a2c7-c4346bcb1553'  # comps exp id
 
         # Initialize the analyser class with the name of file to save to and start the analysis
         analyzers = [EndpointsAnalyzer(save_file="endpoints_{}.csv".format(exp_id))]

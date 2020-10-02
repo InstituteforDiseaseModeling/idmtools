@@ -24,7 +24,7 @@ if __name__ == '__main__':
         analyzers = [CSVAnalyzer(filenames=filenames, output_path="output_csv")]
 
         # Set the experiment id you want to analyze
-        experiment_id = '9311af40-1337-ea11-a2be-f0921c167861'  # staging exp id simple sim and csv example
+        experiment_id = '1038ebdb-0904-eb11-a2c7-c4346bcb1553'  # comps exp id simple sim and csv example
 
         # Specify the id Type, in this case an Experiment on COMPS
         manager = AnalyzeManager(partial_analyze_ok=True, ids=[(experiment_id, ItemType.EXPERIMENT)],

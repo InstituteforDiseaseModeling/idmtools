@@ -3,7 +3,7 @@ from idmtools.core.platform_factory import Platform
 from idmtools_platform_comps.ssmt_work_items.comps_workitems import InputDataWorkItem
 
 wi_name = "InputDataWorker sample 1"
-sim_id = "8db8ae8f-793c-ea11-a2be-f0921c167861"
+sim_id = "b816f387-cb04-eb11-a2c7-c4346bcb1553"
 tags = {'SimulationId': sim_id}
 
 if __name__ == "__main__":
