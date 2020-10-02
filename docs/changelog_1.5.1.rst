@@ -18,5 +18,5 @@ Feature Request
 ---------------
 * `#1127 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1127>`_ - Remove emodpy from idmtools[full] and idmtools[idm] install options. This allows a more control of packages used in projects
 * `#1179 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1179>`_ - Supply multiple default templates for template script wrapper. See the examples in the cookbook.
-* `#1180 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1180>`_ - Support Configuration Aliases. This provides out of the box configurations for common platforms
+* `#1180 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1180>`_ - Support Configuration Aliases. This provides out of the box configurations for common platform configurations. For example, COMPS environments have predefined aliases such as Calculon, Belegost, etc
 
