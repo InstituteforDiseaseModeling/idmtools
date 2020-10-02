@@ -26,7 +26,7 @@ Known Issues
 * PlatformAnalysis requires an idmtools.ini
 
 
-Upcoming breaking changed in 1.6.0
+Upcoming breaking changes in 1.6.0
 ----------------------------------
 * Assets will no longer support both absolute_path and content. That will be mutually exclusive going forward
 * The task API **pre_creation** method has a new parameter to pass the platform object. All tasks implementing the API will need to update the pre_creation method
