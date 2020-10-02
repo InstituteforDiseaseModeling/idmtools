@@ -21,7 +21,7 @@ if __name__ == '__main__':
         analyzers = [DownloadAnalyzer(filenames=filenames, output_path='download')]
 
         # Set the experiment you want to analyze
-        experiment_id = '11052582-83da-e911-a2be-f0921c167861'  # comps2 staging exp id
+        experiment_id = '40c1b14d-0a04-eb11-a2c7-c4346bcb1553'  # comps exp id
 
         # Specify the id Type, in this case an Experiment
         manager = AnalyzeManager(ids=[(experiment_id, ItemType.EXPERIMENT)],

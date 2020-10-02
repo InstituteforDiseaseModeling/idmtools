@@ -81,8 +81,8 @@ if __name__ == "__main__":
         analyzers = [ExampleAnalyzer(), ExampleAnalyzer2()]
 
         # Set the experiment and simulation ids you want to analyze
-        experiment_tuple = ("11052582-83da-e911-a2be-f0921c167861", ItemType.EXPERIMENT)  # comps2 staging exp id
-        simulation_tuple = ("a042c9a2-60d6-e911-a2bb-f0921c167866", ItemType.SIMULATION)  # comps2 staging sim id
+        experiment_tuple = ('40c1b14d-0a04-eb11-a2c7-c4346bcb1553', ItemType.EXPERIMENT)  # comps exp id
+        simulation_tuple = ("45c1b14d-0a04-eb11-a2c7-c4346bcb1553", ItemType.SIMULATION)  # comps sim id
 
         # case #0: normal case with experiment id list. --OK
         manager = AnalyzeManager(ids=[experiment_tuple], analyzers=analyzers)
@@ -102,7 +102,7 @@ if __name__ == "__main__":
 
         # case #3: test add_item(simulation) --failed at platform.get_item
         simulation = platform.get_item(item_id=simulation_tuple[0], item_type=ItemType.SIMULATION)
-        manager3 = AnalyzeManager(analyzers=analyzers)
+        manager3 = AnalyzeManager(analyzers=analyzers, partial_analyze_ok=True)
         manager3.add_item(simulation)
         manager3.analyze()
 
@@ -119,7 +119,7 @@ if __name__ == "__main__":
 
         #case #6: analyzer with exclude id
         analyzers = [ExampleAnalyzer()]
-        exclude_ids = ["13052582-83da-e911-a2be-f0921c167861", "12052582-83da-e911-a2be-f0921c167861"]
+        exclude_ids = ["43c1b14d-0a04-eb11-a2c7-c4346bcb1553", "42c1b14d-0a04-eb11-a2c7-c4346bcb1553"]  #comps sim ids
         manager6 = AnalyzeManager(ids=[experiment_tuple], analyzers=analyzers, exclude_ids=exclude_ids)
         manager6.analyze()
 
