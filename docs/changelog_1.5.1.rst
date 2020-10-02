@@ -36,7 +36,7 @@ Upcoming breaking changed in 1.6.0
 Upcoming features in the coming releases
 ----------------------------------------
 * Ability to query the platform from task for items such as OS, supported workflows, etc
-* Utilities to Asset-ize outputs within COMPS. This should make it into 1.6.0
+* Utility to Asset-ize outputs within COMPS. This should make it into 1.6.0
 * HPC Container build and run utilities. Slated for next few releases
 * Better integration of errors with references to relevant documentation(ongoing)
 * Improves support for Mac OS
