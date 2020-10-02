@@ -54,7 +54,7 @@ test-smoke: ## Run our smoke tests
 	$(FULL_TEST_CMD) -n 4 -m "smoke and not serial"'
 	$(FULL_TEST_CMD) -m "smoke and serial"'
 
-coverage-report:  ## Generate HTML report from coverage. Requires running coverage run first(coverage, coverage-smoke, coverage-all)
+coverage-report: coverage ## Generate HTML report from coverage. Requires running coverage run first(coverage, coverage-smoke, coverage-all)
 	coverage report -m
 	coverage html -i
 
@@ -76,9 +76,6 @@ coverage-all: ## Generate a code-coverage report using all tests
 	# We have to run in our tests folder to use the proper config
 	$(COVERAGE_CMD)'
 	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
-
-watch: ## Automate running of tests and linting of this project using watchdog. Useful for development
-	watchmedo tricks-from dev.yml
 
 # Release related rules
 
