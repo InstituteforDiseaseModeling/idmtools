@@ -13,3 +13,4 @@ Changelog
     changelog_1.3.0
     changelog_1.4.0
     changelog_1.5.0
+    changelog_1.5.1
