@@ -13,7 +13,7 @@ with platform('BELEGOST'):
     base_task = JSONConfiguredPythonTask(
         script_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"),
         # add common assets from existing collection
-        common_assets=AssetCollection.from_id('bd80dd0c-1b31-ea11-a2be-f0921c167861', as_copy=True)
+        common_assets=AssetCollection.from_id("6af9a874-1304-eb11-a2c7-c4346bcb1553", as_copy=True)
     )
 
     ts = TemplatedSimulations(base_task=base_task)

@@ -19,7 +19,7 @@ if __name__ == '__main__':
         analyzers = [TagsAnalyzer(output_path="output_tag")]
 
         # Set the experiment id you want to analyze
-        experiment_id = '36d8bfdc-83f6-e911-a2be-f0921c167861'  # staging exp id JSuresh's Magude exp
+        experiment_id = '79b3cab3-d604-eb11-a2c7-c4346bcb1553'  # comps exp id with partial succeed sims
 
         # Specify the id Type, in this case an Experiment on COMPS
         manager = AnalyzeManager(partial_analyze_ok=True,
