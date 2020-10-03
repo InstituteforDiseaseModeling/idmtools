@@ -2,6 +2,7 @@
 IPY=python -c
 PACKAGE_NAME=idmtools_models
 PY?=python
+MV?=mv
 PDS=$(PY) ../dev_scripts/
 PDR=$(PDS)run.py
 CLDIR=$(PDS)clean_dir.py
@@ -30,8 +31,8 @@ test: ## Run our tests
 
 test-all: ## Run all our tests
 	$(TEST_COMMAND) -m "serial"
-	mv tests/test_results.xml tests/serial.test_results.xml
-	mv tests/$(HTML_TEST_REPORT) tests/models.serial.test_results.html
+	$(MV) tests/test_results.xml tests/serial.test_results.xml
+	$(MV) tests/$(HTML_TEST_REPORT) tests/models.serial.test_results.html
 	$(TEST_COMMAND) -n 8 -m "not serial"
 	junitparser merge tests/serial.test_results.xml tests/$(TEST_REPORT) tests/$(TEST_REPORT)
 
@@ -55,8 +56,8 @@ test-python: ## Run our python tests
 
 test-smoke: ## Run smoke tests
 	$(TEST_COMMAND) -m "smoke and serial"
-	mv tests/test_results.xml tests/serial.test_results.xml
-	mv tests/$(HTML_TEST_REPORT) tests/models.serial.test_results.html
+	$(MV) tests/test_results.xml tests/serial.test_results.xml
+	$(MV) tests/$(HTML_TEST_REPORT) tests/models.serial.test_results.html
 	$(TEST_COMMAND) -n 8 -m "smoke and not serial"
 	junitparser merge tests/serial.test_results.xml tests/$(TEST_REPORT) tests/$(TEST_REPORT)
 
@@ -70,18 +71,18 @@ coverage-report-view: coverage-report
 coverage: clean ## Generate a code-coverage report
 	# We have to run in our tests folder to use the proper config
 	$(TEST_COMMAND) $(COVERAGE_OPTS)  -m "not comps and not docker"
-	mv tests/.coverage .coverage
+	$(MV) tests/.coverage .coverage
 
 coverage-smoke: clean ## Generate a code-coverage report
 	# We have to run in our tests folder to use the proper config
 	$(TEST_COMMAND) $(COVERAGE_OPTS) -m "smoke"
-	mv tests/.coverage .coverage
+	$(MV) tests/.coverage .coverage
 
 coverage-all: ## Generate a code-coverage report using all tests
 	# We have to run in our tests folder to use the proper config
 	$(TEST_COMMAND) $(COVERAGE_OPTS) -n 8 -m "not serial"
 	$(TEST_COMMAND) $(COVERAGE_OPTS) -m "serial"
-	mv tests/.coverage .coverage
+	$(MV) tests/.coverage .coverage
 
 # Release related rules
 

@@ -2,6 +2,7 @@
 IPY=python -c
 PACKAGE_NAME=idmtools_core
 PY?=python
+MV?=mv
 PDS=$(PY) ../dev_scripts/
 PDR=$(PDS)run.py
 CLDIR=$(PDS)clean_dir.py
@@ -29,8 +30,8 @@ test: ## Run our tests
 
 test-all: ## Run all our tests
 	$(TEST_COMMAND) -m "serial"
-	mv tests/test_results.xml tests/serial.test_results.xml
-	mv tests/$(HTML_TEST_REPORT) tests/core.serial.test_results.html
+	$(MV) tests/test_results.xml tests/serial.test_results.xml
+	$(MV) tests/$(HTML_TEST_REPORT) tests/core.serial.test_results.html
 	$(TEST_COMMAND) -n 8 -m "not serial"
 	junitparser merge tests/serial.test_results.xml tests/$(TEST_REPORT) tests/$(TEST_REPORT)
 
@@ -54,8 +55,8 @@ test-python: ## Run our python tests
 
 test-smoke: ## Run our smoke tests
 	$(TEST_COMMAND) -n 4 -m "smoke and not serial"
-	mv tests/$(TEST_REPORT) tests/serial.test_results.xml
-	mv tests/$(HTML_TEST_REPORT) tests/core.serial.test_results.html
+	$(MV) tests/$(TEST_REPORT) tests/serial.test_results.xml
+	$(MV) tests/$(HTML_TEST_REPORT) tests/core.serial.test_results.html
 	$(TEST_COMMAND) -m "smoke and serial"
 	junitparser merge tests/serial.test_results.xml tests/$(TEST_REPORT) tests/$(TEST_REPORT)
 
@@ -72,17 +73,18 @@ coverage-report-view: coverage-report
 coverage: clean ## Generate a code-coverage report
 	# We have to run in our tests folder to use the proper config
 	$(TEST_COMMAND) $(COVERAGE_OPTS) -m "not comps and not docker"
-	mv tests/.coverage .coverage
+	$(MV) tests/.coverage .coverage
 
 coverage-smoke: clean ## Generate a code-coverage report
 	# We have to run in our tests folder to use the proper config
-	$(TEST_COMMAND) $(COVERAGE_OPTS) -m "smoke"
-	mv tests/.coverage .coverage
+	$(TEST_COMMAND) $(COVERAGE_OPTS) -n 4 -m "smoke and not serial"
+	$(TEST_COMMAND) $(COVERAGE_OPTS) -m "smoke and serial"
+	$(MV) tests/.coverage .coverage
 
 coverage-all: ## Generate a code-coverage report using all tests
 	# We have to run in our tests folder to use the proper config
 	$(TEST_COMMAND) $(COVERAGE_OPTS)
-	mv tests/.coverage .coverage
+	$(MV) tests/.coverage .coverage
 
 # Release related rules
 

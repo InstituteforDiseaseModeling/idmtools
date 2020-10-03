@@ -2,6 +2,7 @@
 IPY=python -c
 PACKAGE_NAME=idmtools_cli
 PY?=python
+MV?=mv
 PDS=$(PY) ../dev_scripts/
 PDR=$(PDS)run.py
 CLDIR=$(PDS)clean_dir.py
@@ -61,17 +62,17 @@ coverage-report-view: coverage-report ## View coverage report
 coverage: clean ## Generate a code-coverage report
 	# We have to run in our tests folder to use the proper config
 	$(TEST_COMMAND) $(COVERAGE_OPTS) -n 8 -m "not comps and not docker"
-	mv tests/.coverage .coverage
+	$(MV) tests/.coverage .coverage
 
 coverage-smoke: clean ## Generate a code-coverage report
 	# We have to run in our tests folder to use the proper config
 	$(TEST_COMMAND) $(COVERAGE_OPTS) -n 8 -m "smoke"
-	mv tests/.coverage .coverage
+	$(MV) tests/.coverage .coverage
 
 coverage-all: ## Generate a code-coverage report using all tests
 	# We have to run in our tests folder to use the proper config
 	$(TEST_COMMAND) $(COVERAGE_OPTS) -n 8
-	mv tests/.coverage .coverage
+	$(MV) tests/.coverage .coverage
 
 dist: clean ## build our package
 	python setup.py sdist bdist

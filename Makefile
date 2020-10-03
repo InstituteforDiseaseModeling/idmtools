@@ -1,5 +1,6 @@
 .PHONY: clean lint test coverage dist release-staging release-staging-release-commit release-staging-minor changelog start-allure
-
+MKDIR ?= mkdir
+MV ?= mv
 IPY=python -c
 PY=python
 PDS=$(PY) dev_scripts/
@@ -65,8 +66,8 @@ stop-allure: ## Stop Allure
 	$(PDR) -wd dev_scripts -ex "docker-compose -f allure.yml down"
 
 start-allure: ## start the allue docker report server
-	-mkdir ./dev_scripts/.allure_results
-	-mkdir ./dev_scripts/.allure_reports
+	-$(MKDIR) ./dev_scripts/.allure_results
+	-$(MKDIR) ./dev_scripts/.allure_reports
 	$(PDR) -wd dev_scripts -ex "docker-compose -f allure.yml up -d allure"
 	$(IPY) "print('Once tests have finished, your test report will be available at http://localhost:5050/allure-docker-service/latest-report. To clean results, use http://localhost:5050/allure-docker-service/clean-results')"
 

@@ -1,5 +1,6 @@
 .PHONY: clean lint test coverage dist release-staging release-staging-release-commit release-staging-minor
 IPY=python -c
+MV ?= mv
 PACKAGE_NAME=idmtools_platform_slurm
 PY?=python
 PDS=$(PY) ../dev_scripts/
@@ -61,17 +62,17 @@ coverage-report-view: coverage-report
 coverage: clean ## Generate a code-coverage report
 	# We have to run in our tests folder to use the proper config
 	$(TEST_COMMAND) $(COVERAGE_OPTS) -m "not comps and not docker"
-	mv tests/.coverage .coverage
+	$(MV) tests/.coverage .coverage
 
 coverage-smoke: clean ## Generate a code-coverage report
 	# We have to run in our tests folder to use the proper config
 	$(TEST_COMMAND) $(COVERAGE_OPTS) -m "smoke"
-	mv tests/.coverage .coverage
+	$(MV) tests/.coverage .coverage
 
 coverage-all: ## Generate a code-coverage report using all tests
 	# We have to run in our tests folder to use the proper config
 	$(TEST_COMMAND) $(COVERAGE_OPTS)
-	mv tests/.coverage .coverage
+	$(MV) tests/.coverage .coverage
 
 # Release related rules
 dist: clean ## build our package

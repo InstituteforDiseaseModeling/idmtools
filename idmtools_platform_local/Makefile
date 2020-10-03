@@ -1,5 +1,6 @@
 .PHONY: clean lint test coverage dist release-staging release-staging-release-commit release-staging-minor
 IPY=python -c
+MV ?= mv
 BASE_PIP_URL="packages.idmod.org/api/pypi/idm-pypi-"
 STAGING_PIP_URL?="https://$(BASE_PIP_URL)staging/simple"
 PRODUCTION_PIP_URL?="https://$(BASE_PIP_URL)production/simple"
@@ -72,17 +73,17 @@ coverage-report-view: coverage-report
 coverage: clean ## Generate a code-coverage report
 	# We have to run in our tests folder to use the proper config
 	$(TEST_COMMAND) $(COVERAGE_OPTS) -m "not comps and not docker"
-	mv tests/.coverage .coverage
+	$(MV) tests/.coverage .coverage
 
 coverage-smoke: clean ## Generate a code-coverage report
 	# We have to run in our tests folder to use the proper config
 	$(TEST_COMMAND) $(COVERAGE_OPTS) -m "smoke"
-	mv tests/.coverage .coverage
+	$(MV) tests/.coverage .coverage
 
 coverage-all: ## Generate a code-coverage report using all tests
 	# We have to run in our tests folder to use the proper config
 	$(TEST_COMMAND) $(COVERAGE_OPTS)
-	mv tests/.coverage .coverage
+	$(MV) tests/.coverage .coverage
 
 docker-cleanup:
 	docker stop idmtools_workers idmtools_postgres idmtools_redis
