@@ -33,7 +33,7 @@ test-all: ## Run all our tests
 	mv tests/test_results.xml tests/serial.test_results.xml
 	mv tests/core.test_results.html tests/core.serial.test_results.html
 	$(TEST_COMMAND) -n 8 -m "not serial"
-	junitparser merge tests/serial.test_results.xml tests/test_results.xml tests/test_results.xml
+	junitparser merge tests/serial.test_results.xml tests/$(TEST_REPORT) tests/$(TEST_REPORT)
 
 test-failed: ## Run only previously failed tests
 	$(TEST_COMMAND) --lf
@@ -55,10 +55,10 @@ test-python: ## Run our python tests
 
 test-smoke: ## Run our smoke tests
 	$(TEST_COMMAND) -n 4 -m "smoke and not serial"
-	mv tests/test_results.xml tests/serial.test_results.xml
-	mv tests/core.test_results.html tests/core.serial.test_results.html
+	mv tests/$(TEST_REPORT)tests/serial.test_results.xml
+	mv tests/$(HTML_TEST_REPORT) tests/core.serial.test_results.html
 	$(TEST_COMMAND) -m "smoke and serial"
-	junitparser merge tests/serial.test_results.xml tests/test_results.xml tests/test_results.xml
+	junitparser merge tests/serial.test_results.xml tests/$(TEST_REPORT) tests/$(TEST_REPORT)
 
 test-report: ## Launch test report in browser
 	$(PDS)/launch_dir_in_browser.py tests/core.test_results.html
@@ -73,17 +73,17 @@ coverage-report-view: coverage-report
 coverage: clean ## Generate a code-coverage report
 	# We have to run in our tests folder to use the proper config
 	$(COVERAGE_CMD) -m "not comps and not docker"
-	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
+	mv tests/.coverage .coverage
 
 coverage-smoke: clean ## Generate a code-coverage report
 	# We have to run in our tests folder to use the proper config
 	$(COVERAGE_CMD) -m "smoke"
-	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
+	mv tests/.coverage .coverage
 
 coverage-all: ## Generate a code-coverage report using all tests
 	# We have to run in our tests folder to use the proper config
 	$(COVERAGE_CMD)
-	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
+	mv tests/.coverage .coverage
 
 # Release related rules
 
