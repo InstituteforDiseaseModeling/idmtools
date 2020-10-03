@@ -104,11 +104,11 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         if isinstance(sims, ExperimentParentIterator) and isinstance(sims.items, (TemplatedSimulations, list)):
             sims_i = sims.items
             for simulation in sims_i:
-                simulation.pre_creation()
+                simulation.pre_creation(self.platform)
                 final_sims.append(simulation)
         elif isinstance(sims, (list, Iterator)):
             for simulation in sims:
-                simulation.pre_creation()
+                simulation.pre_creation(self.platform)
                 final_sims.append(simulation)
         else:
             raise ValueError("Needs to be one a list, ParentIterator of TemplatedSimulations or list")
@@ -126,7 +126,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
                 final_sims[i].uid = ids[i]
                 path = "/".join(["/data", parent_uid, simulation.uid])
                 items.update(self._assets_to_copy_multiple_list(path, simulation.assets))
-                simulation.post_creation()
+                simulation.post_creation(self.platform)
         # copy files to container
         result = self.platform._do.copy_multiple_to_container(worker, items)
         if not result:

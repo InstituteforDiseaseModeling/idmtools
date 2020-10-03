@@ -46,20 +46,26 @@ class TestTasks(TestCase):
 
     def test_command_task_custom_hooks(self):
         global test_global
+        global platform_item
         task = self.get_cat_command()
         test_global = 0
+        platform_item = None
 
         def update_x_callback(task):  # noqa F841
             global test_global
             test_global += 1
+
             return AssetCollection()
         task.gather_common_asset_hooks.append(update_x_callback)
         task.gather_common_assets()
         self.assertEqual(test_global, 1)
 
-        def update_sim(simulation):
+        def update_sim(simulation, platform):
+            global platform_item
+            platform_item = platform
             simulation.tags['a'] = 12
         task.add_pre_creation_hook(update_sim)
         sim = Simulation(task=task)
-        task.pre_creation(sim)
+        task.pre_creation(sim, 'a')
         self.assertEqual(sim.tags['a'], 12)
+        self.assertEqual(platform_item, 'a')

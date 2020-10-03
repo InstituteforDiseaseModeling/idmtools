@@ -27,7 +27,7 @@ class IPlatformAssetCollectionOperations(CacheEnabled, ABC):
         Returns:
             NoReturn
         """
-        asset_collection.pre_creation()
+        asset_collection.pre_creation(self.platform)
 
     def post_create(self, asset_collection: AssetCollection, **kwargs) -> NoReturn:
         """
@@ -40,7 +40,7 @@ class IPlatformAssetCollectionOperations(CacheEnabled, ABC):
         Returns:
             NoReturn
         """
-        asset_collection.post_creation()
+        asset_collection.post_creation(self.platform)
 
     def create(self, asset_collection: AssetCollection, do_pre: bool = True, do_post: bool = True, **kwargs) -> Any:
         """

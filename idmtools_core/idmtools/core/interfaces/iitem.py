@@ -2,6 +2,8 @@ from dataclasses import dataclass, field, fields
 from typing import List, Callable, TYPE_CHECKING
 from uuid import UUID
 from idmtools.utils.hashing import hash_obj, ignore_fields_in_dataclass_on_pickle
+if typing.TYPE_CHECKING:
+    from idmtools.entities.iplatform import IPlatform
 
 if TYPE_CHECKING:
     from idmtools.entities import IPlatform
@@ -46,15 +48,27 @@ class IItem:
         return self.__repr__()
 
     # region Events methods
-    def pre_creation(self) -> None:
+    def pre_creation(self, platform: 'IPlatform') -> None:
         """
         Called before the actual creation of the entity.
+
+        Args:
+            platform: Platform item is being created on
+
+        Returns:
+
         """
         pass
 
-    def post_creation(self) -> None:
+    def post_creation(self, platform: 'IPlatform') -> None:
         """
         Called after the actual creation of the entity.
+
+        Args:
+            platform: Platform item was created on
+
+        Returns:
+
         """
         pass
 

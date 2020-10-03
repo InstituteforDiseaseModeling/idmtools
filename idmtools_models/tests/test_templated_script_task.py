@@ -47,7 +47,7 @@ class TestTemplatedScriptTask(TestCase):
             )
             task.gather_common_assets()
             task.gather_transient_assets()
-            task.pre_creation(None)
+            task.pre_creation(None, None)
 
             self.assertEqual(1 if is_common else 0, task.common_assets.count)
             self.assertEqual(0 if is_common else 1, task.transient_assets.count)
@@ -79,7 +79,7 @@ class TestTemplatedScriptTask(TestCase):
         wrapper_task = get_script_wrapper_windows_task(task, template_content=template)
         wrapper_task.gather_common_assets()
         wrapper_task.gather_transient_assets()
-        wrapper_task.pre_creation(None)
+        wrapper_task.pre_creation(None, None)
 
         self.assertEqual(1, wrapper_task.common_assets.count)
         self.assertEqual(0, wrapper_task.transient_assets.count)

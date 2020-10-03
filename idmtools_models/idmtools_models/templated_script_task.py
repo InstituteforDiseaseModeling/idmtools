@@ -2,7 +2,7 @@ import os
 from dataclasses import dataclass, field
 from functools import partial
 from logging import getLogger, DEBUG
-from typing import List, Callable, Type, Dict, Any, Union
+from typing import List, Callable, Type, Dict, Any, Union, TYPE_CHECKING
 from jinja2 import Environment
 from idmtools.assets import AssetCollection, Asset
 from idmtools.entities import CommandLine
@@ -10,6 +10,8 @@ from idmtools.entities.itask import ITask
 from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools.entities.simulation import Simulation
 from idmtools.registry.task_specification import TaskSpecification
+if TYPE_CHECKING:
+    from idmtools.entities.iplatform import IPlatform
 
 logger = getLogger(__name__)
 
@@ -189,7 +191,7 @@ class TemplatedScriptTask(ITask):
             # set filtered assets back to parent
             simulation.parent.assets = new_assets
 
-    def pre_creation(self, parent: Union[Simulation, IWorkflowItem]):
+    def pre_creation(self, parent: Union[Simulation, IWorkflowItem], platform: 'IPlatform'):
         """
         Before creating simulation, we need to set our command line
 
@@ -214,7 +216,7 @@ class TemplatedScriptTask(ITask):
         if self.extra_command_arguments:
             self.command.add_argument(self.extra_command_arguments)
         # run base precreation
-        super().pre_creation(parent)
+        super().pre_creation(parent, platform)
 
 
 @dataclass()
@@ -281,25 +283,26 @@ class ScriptWrapperTask(ITask):
         else:
             logger.warning("Unable to load subtask")
 
-    def pre_creation(self, parent: Union[Simulation, IWorkflowItem]):
+    def pre_creation(self, parent: Union[Simulation, IWorkflowItem], platform: 'IPlatform'):
         """
         Before creation, create the true command by adding the wrapper name
 
         Args:
-            parent:
+            parent: Parent Task
+            platform: Platform Templated Task is executing on
 
         Returns:
 
         """
-        self.task.pre_creation(parent)
+        self.task.pre_creation(parent, platform)
         # get command from wrapper command and add to wrapper script as item we call as argument to script
         self.template_script_task.extra_command_arguments = str(self.task.command)
-        self.template_script_task.pre_creation(parent)
+        self.template_script_task.pre_creation(parent, platform)
         self.command = self.template_script_task.command
 
-    def post_creation(self, parent: Union[Simulation, IWorkflowItem]):
-        self.task.post_creation(parent)
-        self.template_script_task.post_creation(parent)
+    def post_creation(self, parent: Union[Simulation, IWorkflowItem], platform: 'IPlatform'):
+        self.task.post_creation(parent, platform)
+        self.template_script_task.post_creation(parent, platform)
 
     def __getattr__(self, item):
         if item not in self.__dict__:

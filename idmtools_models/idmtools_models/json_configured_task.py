@@ -2,11 +2,13 @@ import json
 from dataclasses import dataclass, field, fields
 from functools import partial
 from logging import getLogger, DEBUG
-from typing import Union, Dict, Any, List, Optional, Type
+from typing import Union, Dict, Any, List, Optional, Type, TYPE_CHECKING
 from idmtools.assets import Asset, AssetCollection
 from idmtools.entities.itask import ITask
 from idmtools.entities.simulation import Simulation
 from idmtools.registry.task_specification import TaskSpecification
+if TYPE_CHECKING:
+    from idmtools.entities.iplatform import IPlatform
 
 TJSONConfigKeyType = Union[str, int, float]
 TJSONConfigValueType = Union[str, int, float, Dict[TJSONConfigKeyType, Any]]
@@ -199,7 +201,7 @@ class JSONConfiguredTask(ITask):
             self.transient_assets = nw
         return config
 
-    def pre_creation(self, parent: Union['Simulation', 'WorkflowItem']):  # noqa: F821
+    def pre_creation(self, parent: Union['Simulation', 'WorkflowItem'], platform: 'IPlatform'):  # noqa: F821
         defaults = [x for x in fields(JSONConfiguredTask) if x.name == "config_file_name"][0].default
 
         if self.config_file_name != defaults:
