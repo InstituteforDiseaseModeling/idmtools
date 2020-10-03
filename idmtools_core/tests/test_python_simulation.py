@@ -32,11 +32,6 @@ class TestPythonSimulation(ITestWithPersistence):
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
 
-    def test_retrieve_extra_libraries(self):
-        ps = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model.py"))
-        dependencies_str = ' '.join([str(elem) for elem in ps.retrieve_python_dependencies()])
-        self.assertTrue("numpy" in dependencies_str)
-
     def test_add_task_tag(self):
         ps = Simulation(task=JSONConfiguredTask(parameters={"a": 1}, envelope="config", command="ls"))
         # The tag for type is added at runtime during the pre_creation event
