@@ -5,12 +5,11 @@ PY?=python
 PDS=$(PY) ../dev_scripts/
 PDR=$(PDS)run.py
 CLDIR=$(PDS)clean_dir.py
-CWD=$($(IPY) "import os; print(os.getcwd())")
 TEST_EXTRA_OPTS?=
 TEST_REPORT ?= test_results.xml
 HTML_TEST_REPORT ?= core.test_results.html
-TEST_COMMAND = DOCKER_REPO=docker-staging NO_SPINNER=1 cd tests && py.test --durations=3 -v --junitxml=$(TEST_REPORT) --html=$(HTML_TEST_REPORT) --self-contained-html $(TEST_EXTRA_OPTS)
-COVERAGE_CMD := cd tests && coverage run --omit="*/test*,*/setup.py" --source ../,../../idmtools_platform_local,../../idmtools_platform_comps,../../idmtools_models -m pytest
+TEST_COMMAND = DOCKER_REPO=docker-staging NO_SPINNER=1 cd tests && py.test --junitxml=$(TEST_REPORT) --html=$(HTML_TEST_REPORT) --self-contained-html $(TEST_EXTRA_OPTS)
+COVERAGE_OPTS := --cov-config=.coveragerc --cov-branch --cov-append --cov=idmtools --cov=idmtoools_cli --cov=idmtools_models --cov=idmtools_platform_comps
 
 help:
 	$(PDS)get_help_from_makefile.py
@@ -31,7 +30,7 @@ test: ## Run our tests
 test-all: ## Run all our tests
 	$(TEST_COMMAND) -m "serial"
 	mv tests/test_results.xml tests/serial.test_results.xml
-	mv tests/core.test_results.html tests/core.serial.test_results.html
+	mv tests/$(HTML_TEST_REPORT) tests/core.serial.test_results.html
 	$(TEST_COMMAND) -n 8 -m "not serial"
 	junitparser merge tests/serial.test_results.xml tests/$(TEST_REPORT) tests/$(TEST_REPORT)
 
@@ -72,17 +71,17 @@ coverage-report-view: coverage-report
 
 coverage: clean ## Generate a code-coverage report
 	# We have to run in our tests folder to use the proper config
-	$(COVERAGE_CMD) -m "not comps and not docker"
+	$(TEST_COMMAND) $(COVERAGE_OPTS) -m "not comps and not docker"
 	mv tests/.coverage .coverage
 
 coverage-smoke: clean ## Generate a code-coverage report
 	# We have to run in our tests folder to use the proper config
-	$(COVERAGE_CMD) -m "smoke"
+	$(TEST_COMMAND) $(COVERAGE_OPTS) -m "smoke"
 	mv tests/.coverage .coverage
 
 coverage-all: ## Generate a code-coverage report using all tests
 	# We have to run in our tests folder to use the proper config
-	$(COVERAGE_CMD)
+	$(TEST_COMMAND) $(COVERAGE_OPTS)
 	mv tests/.coverage .coverage
 
 # Release related rules

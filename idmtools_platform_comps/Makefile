@@ -7,10 +7,11 @@ PDR=$(PDS)run.py
 CLDIR=$(PDS)clean_dir.py
 CWD=$($(IPY) "import os; print(os.getcwd())")
 TEST_EXTRA_OPTS?=
-TEST_COMMAND := py.test --durations=3 -v --junitxml=test_results.xml --html=comps.test_results.html $(TEST_EXTRA_OPTS)
-TEST_RUN_OPTS = -e DOCKER_REPO=docker-staging NO_SPINNER=1
-FULL_TEST_CMD := $(PDR) -w 'tests' $(TEST_RUN_OPTS) -ex '$(TEST_COMMAND)
-COVERAGE_CMD := $(PDR) -w 'tests' $(TEST_RUN_OPTS) -p . ../ -ex 'coverage run --omit="*/test*,*/setup.py" --source ../,../../idmtools_core,../../idmtools_platform_local,../../idmtools_platform_comps,../../idmtools_models -m pytest
+TEST_REPORT ?= test_results.xml
+HTML_TEST_REPORT ?= comps.test_results.html
+TEST_COMMAND = DOCKER_REPO=docker-staging NO_SPINNER=1 cd tests && py.test --junitxml=$(TEST_REPORT) --html=$(HTML_TEST_REPORT) --self-contained-html $(TEST_EXTRA_OPTS)
+COVERAGE_OPTS := --cov-config=.coveragerc --cov-branch --cov-append --cov=idmtools --cov=idmtoools_cli --cov=idmtools_models --cov=idmtools_platform_comps
+
 
 help:
 	$(PDS)get_help_from_makefile.py
@@ -26,35 +27,35 @@ lint: ## check style with flake8
 	flake8 --ignore=E501,W291 $(PACKAGE_NAME) tests
 
 test: ## Run our tests
-	$(FULL_TEST_CMD) -m "not comps and not docker"'
+	$(TEST_COMMAND) -m "not comps and not docker"
 
 test-all: ## Run all our tests
-	$(FULL_TEST_CMD) -n 8 -m "not serial"'
+	$(TEST_COMMAND) -n 8 -m "not serial"
 	# $(FULL_TEST_CMD) -m "serial"' # No serial tests at moment
 
 test-failed: ## Run only previously failed tests
-	$(FULL_TEST_CMD) --lf'
+	$(TEST_COMMAND) --lf
 
 test-long: ## Run any tests that takes more than 30s
-	$(FULL_TEST_CMD) -m "long"'
+	$(TEST_COMMAND) -m "long"
 
 test-no-long: ## Run any tests that takes less than 30s
-	$(FULL_TEST_CMD) -m "not long"'
+	$(TEST_COMMAND) -m "not long"
 
 test-comps: ## Run our comps tests
-	$(FULL_TEST_CMD) -m "comps"'
+	$(TEST_COMMAND) -m "comps"
 
 test-docker: ## Run our docker tests
-	$(FULL_TEST_CMD) -m "docker"'
+	$(TEST_COMMAND) -m "docker"
 
 test-python: ## Run our python tests
-	$(FULL_TEST_CMD) -m "python"'
+	$(TEST_COMMAND) -m "python"
 
 test-smoke: ## Run smoke tests
-	$(FULL_TEST_CMD) -n 8 -m "smoke and not serial"'
+	$(TEST_COMMAND) -n 8 -m "smoke and not serial"
 
 test-ssmt: ## Run our ssmt tests
-	$(FULL_TEST_CMD) -m "ssmt"'
+	$(TEST_COMMAND) -m "ssmt"
 
 coverage-report:  ## Generate HTML report from coverage. Requires running coverage run first(coverage, coverage-smoke, coverage-all)
 	coverage report -m
@@ -66,18 +67,18 @@ coverage-report-view: coverage-report
 
 coverage: clean ## Generate a code-coverage report
 	# We have to run in our tests folder to use the proper config
-	$(COVERAGE_CMD) -m "not comps and not docker"'
-	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
+	$(TEST_COMMAND) $(COVERAGE_OPTS) -n 12 -m "not comps and not docker"
+	mv tests/.coverage .coverage
 
 coverage-smoke: clean ## Generate a code-coverage report
 	# We have to run in our tests folder to use the proper config
-	$(COVERAGE_CMD) -m "smoke"'
-	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
+	$(TEST_COMMAND) $(COVERAGE_OPTS) -n 12 -m "smoke"
+	mv tests/.coverage .coverage
 
 coverage-all: ## Generate a code-coverage report using all tests
 	# We have to run in our tests folder to use the proper config
-	$(COVERAGE_CMD)'
-	@+$(IPY) "import shutil as s; s.move('tests/.coverage','.coverage')"
+	$(TEST_COMMAND) $(COVERAGE_OPTS)  -n 12
+	mv tests/.coverage .coverage
 
 # Release related rules
 ssmt-image: ## Build SSMT Docker image

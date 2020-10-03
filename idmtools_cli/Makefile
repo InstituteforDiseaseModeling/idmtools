@@ -5,13 +5,11 @@ PY?=python
 PDS=$(PY) ../dev_scripts/
 PDR=$(PDS)run.py
 CLDIR=$(PDS)clean_dir.py
-CWD=$($(IPY) "import os; print(os.getcwd())")
 TEST_EXTRA_OPTS?=
 TEST_REPORT ?= test_results.xml
 HTML_TEST_REPORT ?= cli.test_results.html
-TEST_COMMAND = DOCKER_REPO=docker-staging NO_SPINNER=1 cd tests && py.test --durations=3 -v --junitxml=$(TEST_REPORT) --html=$(HTML_TEST_REPORT) --self-contained-html $(TEST_EXTRA_OPTS)
-COVERAGE_CMD := cd tests && coverage run --omit="*/test*,*/setup.py" --source ../,../../idmtools_platform_local,../../idmtools_platform_comps,../../idmtools_models -m pytest
-
+TEST_COMMAND = DOCKER_REPO=docker-staging NO_SPINNER=1 cd tests && py.test --junitxml=$(TEST_REPORT) --html=$(HTML_TEST_REPORT) --self-contained-html $(TEST_EXTRA_OPTS)
+COVERAGE_OPTS := --cov-config=.coveragerc --cov-branch --cov-append --cov=idmtools --cov=idmtoools_cli --cov=idmtools_models --cov=idmtools_platform_comps
 
 help:
 	$(PDS)get_help_from_makefile.py
@@ -62,17 +60,17 @@ coverage-report-view: coverage-report ## View coverage report
 
 coverage: clean ## Generate a code-coverage report
 	# We have to run in our tests folder to use the proper config
-	$(COVERAGE_CMD) -m "not comps and not docker"
+	$(TEST_COMMAND) $(COVERAGE_OPTS) -n 8 -m "not comps and not docker"
 	mv tests/.coverage .coverage
 
 coverage-smoke: clean ## Generate a code-coverage report
 	# We have to run in our tests folder to use the proper config
-	$(COVERAGE_CMD) -m "smoke"
+	$(TEST_COMMAND) $(COVERAGE_OPTS) -n 8 -m "smoke"
 	mv tests/.coverage .coverage
 
 coverage-all: ## Generate a code-coverage report using all tests
 	# We have to run in our tests folder to use the proper config
-	$(COVERAGE_CMD)
+	$(TEST_COMMAND) $(COVERAGE_OPTS) -n 8
 	mv tests/.coverage .coverage
 
 dist: clean ## build our package
