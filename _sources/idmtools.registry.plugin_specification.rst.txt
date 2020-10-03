@@ -1,0 +1,7 @@
+idmtools.registry.plugin\_specification module
+==============================================
+
+.. automodule:: idmtools.registry.plugin_specification
+   :members:
+   :undoc-members:
+   :show-inheritance:

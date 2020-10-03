@@ -1,0 +1,266 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Environment &mdash; idmtools  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Search within idmtools  documentation"
+          href="../_static/opensearch.xml"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Experiments" href="experiments.html" />
+    <link rel="prev" title="Asset Collections" href="assets.html" />
+
+<link href="https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans" rel="stylesheet">
+
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> idmtools
+          
+
+          
+            
+            <img src="../_static/IDM_white.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.5.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platforms.html">Platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../create-sims.html">Create and run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports.html">Output data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../analyzers.html">Introduction to analyzers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plots.html">Plot data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference.html">Architecture and packages reference</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../recipes_index.html">User Recipes</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="assets.html">Asset Collections</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="experiments.html">Experiments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python.html">Python</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../cli_index.html">CLI reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">idmtools</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+<div aria-label="breadcrumbs navigation" role="navigation">
+    <ul class="wy-breadcrumbs">
+        <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
+        <li><a href="../index.html">idmtools</a> &raquo;</li>
+        
+        <li><a href="../recipes_index.html">User Recipes</a> &raquo;</li>
+        
+        <li>Environment</li>
+        <li class="wy-breadcrumbs-aside">
+            
+            
+            
+        </li>
+    </ul>
+    <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="environment">
+<h1>Environment<a class="headerlink" href="#environment" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="modifying-environment-variables-on-platforms-without-native-support">
+<h2>Modifying environment variables on platforms without native support<a class="headerlink" href="#modifying-environment-variables-on-platforms-without-native-support" title="Permalink to this headline">¶</a></h2>
+<p>Some platforms do not support changing environment variables in a job definition. IDMTools provides a utility through the TemplatedTaskWrapperTask to allow you to still modify environment variables. In the below example, we use that utility to run</p>
+<p>Here is our model.py. It imports our package and then prints the environment variable “EXAMPLE”</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;EXAMPLE&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>This is our idmtools orchestration script to run the defines our python task and wrapper task with additional variables</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">idmtools.core.platform_factory</span> <span class="kn">import</span> <span class="n">Platform</span>
+<span class="kn">from</span> <span class="nn">idmtools.entities.experiment</span> <span class="kn">import</span> <span class="n">Experiment</span>
+<span class="kn">from</span> <span class="nn">idmtools_models.python.python_task</span> <span class="kn">import</span> <span class="n">PythonTask</span>
+<span class="kn">from</span> <span class="nn">idmtools_models.templated_script_task</span> <span class="kn">import</span> <span class="n">get_script_wrapper_unix_task</span><span class="p">,</span> <span class="n">LINUX_DICT_TO_ENVIRONMENT</span>
+
+
+<span class="n">platform</span> <span class="o">=</span> <span class="n">Platform</span><span class="p">(</span><span class="s2">&quot;SLURM&quot;</span><span class="p">)</span>
+<span class="c1"># here we define the task we want to use the environment variables. In this example we have a simple python script that prints the EXAMPLE environment variable</span>
+<span class="n">task</span> <span class="o">=</span> <span class="n">PythonTask</span><span class="p">(</span><span class="n">script_path</span><span class="o">=</span><span class="s2">&quot;model.py&quot;</span><span class="p">)</span>
+<span class="c1"># Get a task to wrap the script in a shell script. Which get_script_wrapper function you use depends on the platform&#39;s OS</span>
+<span class="n">wrapper_task</span> <span class="o">=</span> <span class="n">get_script_wrapper_unix_task</span><span class="p">(</span>
+    <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
+    <span class="c1"># and set some values here</span>
+    <span class="n">variables</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">EXAMPLE</span><span class="o">=</span><span class="s1">&#39;It works!&#39;</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="c1"># some platforms need to you hint where their script binary is. Usually this is only applicable to Unix platforms(Linux, Mac, etc)</span>
+<span class="n">wrapper_task</span><span class="o">.</span><span class="n">script_binary</span> <span class="o">=</span> <span class="s2">&quot;/bin/bash&quot;</span>
+
+<span class="c1"># Now we define our experiment. We could just as easily use this wrapper in a templated simulation builder as well</span>
+<span class="n">experiment</span> <span class="o">=</span> <span class="n">Experiment</span><span class="o">.</span><span class="n">from_task</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="n">task</span><span class="o">=</span><span class="n">wrapper_task</span><span class="p">)</span>
+<span class="n">experiment</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">wait_until_done</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="experiments.html" class="btn btn-neutral float-right" title="Experiments" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="assets.html" class="btn btn-neutral float-left" title="Asset Collections" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bill &amp; Melinda Gates Foundation. All rights reserved.
+
+    </p>
+  </div>
+<p>idmtools is licensed under the <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode">Creative Commons
+    Attribution-Noncommercial-ShareAlike 4.0 License</a>.</p>
+<p>Send documentation feedback to <a href="mailto:feedback@idmod.org" target="_top">feedback@idmod.org</a>. If you have
+    questions, email <a href="mailto:support@idmod.org" target="_top">support@idmod.org</a>.</p>
+<p><a href="https://www.gatesfoundation.org/Privacy-and-Cookies-Notice">Privacy and Cookies Notice</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+<a href="https://www.gatesfoundation.org/Terms-of-Use">Terms of Use</a></p>
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

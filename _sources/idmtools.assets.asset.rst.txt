@@ -1,0 +1,7 @@
+idmtools.assets.asset module
+============================
+
+.. automodule:: idmtools.assets.asset
+   :members:
+   :undoc-members:
+   :show-inheritance:

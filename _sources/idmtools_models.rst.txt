@@ -1,0 +1,28 @@
+idmtools\_models package
+========================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   idmtools_models.python
+   idmtools_models.r
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   idmtools_models.json_configured_task
+   idmtools_models.templated_script_task
+
+Module contents
+---------------
+
+.. automodule:: idmtools_models
+   :members:
+   :undoc-members:
+   :show-inheritance:

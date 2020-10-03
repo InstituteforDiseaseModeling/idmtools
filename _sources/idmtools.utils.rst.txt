@@ -1,0 +1,41 @@
+idmtools.utils package
+======================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   idmtools.utils.display
+   idmtools.utils.filters
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   idmtools.utils.collections
+   idmtools.utils.command_line
+   idmtools.utils.decorators
+   idmtools.utils.dropbox_location
+   idmtools.utils.entities
+   idmtools.utils.file
+   idmtools.utils.file_parser
+   idmtools.utils.filter_simulations
+   idmtools.utils.gitrepo
+   idmtools.utils.hashing
+   idmtools.utils.info
+   idmtools.utils.json
+   idmtools.utils.language
+   idmtools.utils.local_os
+   idmtools.utils.time
+
+Module contents
+---------------
+
+.. automodule:: idmtools.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:

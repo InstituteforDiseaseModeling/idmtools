@@ -1,0 +1,377 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>idmtools.utils.decorators module &mdash; idmtools  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Search within idmtools  documentation"
+          href="_static/opensearch.xml"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="idmtools.utils.dropbox_location module" href="idmtools.utils.dropbox_location.html" />
+    <link rel="prev" title="idmtools.utils.command_line module" href="idmtools.utils.command_line.html" />
+
+<link href="https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans" rel="stylesheet">
+
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> idmtools
+          
+
+          
+            
+            <img src="_static/IDM_white.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.5.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reports.html">Output data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="reference.html">Architecture and packages reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="idmtools_index.html">idmtools</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="idmtools.html">idmtools package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="idmtools.analysis.html">idmtools.analysis package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.assets.html">idmtools.assets package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.builders.html">idmtools.builders package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.config.html">idmtools.config package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.core.html">idmtools.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.entities.html">idmtools.entities package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.registry.html">idmtools.registry package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.services.html">idmtools.services package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="idmtools.utils.html">idmtools.utils package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_models_index.html">idmtools_models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_platform_comps_index.html">idmtools_platform_comps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_platform_local_index.html">idmtools_platform_local</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="recipes_index.html">User Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">idmtools</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+<div aria-label="breadcrumbs navigation" role="navigation">
+    <ul class="wy-breadcrumbs">
+        <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
+        <li><a href="index.html">idmtools</a> &raquo;</li>
+        
+        <li><a href="reference.html">Architecture and packages reference</a> &raquo;</li>
+        
+        <li><a href="idmtools_index.html">idmtools</a> &raquo;</li>
+        
+        <li><a href="idmtools.html">idmtools package</a> &raquo;</li>
+        
+        <li><a href="idmtools.utils.html">idmtools.utils package</a> &raquo;</li>
+        
+        <li>idmtools.utils.decorators module</li>
+        <li class="wy-breadcrumbs-aside">
+            
+            
+            
+        </li>
+    </ul>
+    <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-idmtools.utils.decorators">
+<span id="idmtools-utils-decorators-module"></span><h1>idmtools.utils.decorators module<a class="headerlink" href="#module-idmtools.utils.decorators" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="idmtools.utils.decorators.abstractstatic">
+<em class="property">class </em><code class="sig-prename descclassname">idmtools.utils.decorators.</code><code class="sig-name descname">abstractstatic</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">function</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.utils.decorators.abstractstatic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">staticmethod</span></code></p>
+<p>A decorator for defining a method both as static and abstract.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="idmtools.utils.decorators.optional_decorator">
+<code class="sig-prename descclassname">idmtools.utils.decorators.</code><code class="sig-name descname">optional_decorator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">decorator</span><span class="p">:</span> <span class="n">Callable</span></em>, <em class="sig-param"><span class="n">condition</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>bool<span class="p">, </span>Callable<span class="p">[</span><span class="p">]</span><span class="p">, </span>bool<span class="p">]</span><span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.utils.decorators.optional_decorator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="idmtools.utils.decorators.SingletonDecorator">
+<em class="property">class </em><code class="sig-prename descclassname">idmtools.utils.decorators.</code><code class="sig-name descname">SingletonDecorator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">klass</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.utils.decorators.SingletonDecorator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Wraps a class in a singleton decorator.</p>
+<p class="rubric">Example</p>
+<p>In the below example, we would print out <em>99</em> since <em>z</em> is referring to the same object as <em>x</em>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Thing</span><span class="p">:</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="mi">14</span>
+<span class="n">Thing</span> <span class="o">=</span> <span class="n">SingletonDecorator</span><span class="p">(</span><span class="n">Thing</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">Thing</span><span class="p">()</span>
+<span class="n">x</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="mi">99</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">Thing</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt id="idmtools.utils.decorators.LoadOnCallSingletonDecorator">
+<em class="property">class </em><code class="sig-prename descclassname">idmtools.utils.decorators.</code><code class="sig-name descname">LoadOnCallSingletonDecorator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">klass</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.utils.decorators.LoadOnCallSingletonDecorator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Additional class decorator that creates a singleton instance only when a method or attribute is accessed.
+This is useful for expensive tasks like loading plugin factories that should only be executed when finally
+needed and not on declaration.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<span class="k">class</span> <span class="nc">ExpensiveFactory</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">():</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">items</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">]</span>
+    <span class="k">def</span> <span class="nf">get_items</span><span class="p">():</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span>
+
+<span class="n">ExpensiveFactory</span> <span class="o">=</span> <span class="n">LoadOnCallSingletonDecorator</span><span class="p">(</span><span class="n">ExpensiveFactory</span><span class="p">)</span>
+<span class="n">ExpensiveFactory</span><span class="o">.</span><span class="n">get_items</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="idmtools.utils.decorators.LoadOnCallSingletonDecorator.ensure_created">
+<code class="sig-name descname">ensure_created</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.utils.decorators.LoadOnCallSingletonDecorator.ensure_created" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="idmtools.utils.decorators.cache_for">
+<code class="sig-prename descclassname">idmtools.utils.decorators.</code><code class="sig-name descname">cache_for</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ttl</span><span class="o">=</span><span class="default_value">datetime.timedelta(seconds=60)</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.utils.decorators.cache_for" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="idmtools.utils.decorators.optional_yaspin_load">
+<code class="sig-prename descclassname">idmtools.utils.decorators.</code><code class="sig-name descname">optional_yaspin_load</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">yargs</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">ykwargs</span></em><span class="sig-paren">)</span> &#x2192; Callable<a class="headerlink" href="#idmtools.utils.decorators.optional_yaspin_load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a CLI spinner to a function if:</p>
+<ul class="simple">
+<li><p>yaspin package is present.</p></li>
+<li><p>NO_SPINNER environment variable is not defined.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>*yargs</strong> – Arguments to pass to yaspin constructor.</p></li>
+<li><p><strong>**ykwargs</strong> – Keyword arguments to pass to yaspin constructor.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@optional_yaspin_load</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Loading test&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;yellow&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">test</span><span class="p">():</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A callable wrapper function.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="idmtools.utils.decorators.ParallelizeDecorator">
+<em class="property">class </em><code class="sig-prename descclassname">idmtools.utils.decorators.</code><code class="sig-name descname">ParallelizeDecorator</code><span class="sig-paren">(</span><em class="sig-param">queue=None</em>, <em class="sig-param">pool_type: Optional[Type[concurrent.futures._base.Executor]] = &lt;class 'concurrent.futures.thread.ThreadPoolExecutor'&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.utils.decorators.ParallelizeDecorator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>ParallelizeDecorator allows you to easily parallelize a group of code. A simple of example would be</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">op_queue</span> <span class="o">=</span> <span class="n">ParallelizeDecorator</span><span class="p">()</span>
+
+<span class="k">class</span> <span class="nc">Ops</span><span class="p">:</span>
+    <span class="n">op_queue</span><span class="o">.</span><span class="n">parallelize</span>
+    <span class="k">def</span> <span class="nf">heavy_op</span><span class="p">():</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">do_lots_of_heavy</span><span class="p">():</span>
+        <span class="n">futures</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">heavy_op</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">)]</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">op_queue</span><span class="o">.</span><span class="n">get_results</span><span class="p">(</span><span class="n">futures</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="idmtools.utils.decorators.ParallelizeDecorator.parallelize">
+<code class="sig-name descname">parallelize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">func</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.utils.decorators.ParallelizeDecorator.parallelize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.utils.decorators.ParallelizeDecorator.join">
+<code class="sig-name descname">join</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.utils.decorators.ParallelizeDecorator.join" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.utils.decorators.ParallelizeDecorator.get_results">
+<code class="sig-name descname">get_results</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">futures</span></em>, <em class="sig-param"><span class="n">ordered</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.utils.decorators.ParallelizeDecorator.get_results" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="idmtools.utils.dropbox_location.html" class="btn btn-neutral float-right" title="idmtools.utils.dropbox_location module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="idmtools.utils.command_line.html" class="btn btn-neutral float-left" title="idmtools.utils.command_line module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bill &amp; Melinda Gates Foundation. All rights reserved.
+
+    </p>
+  </div>
+<p>idmtools is licensed under the <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode">Creative Commons
+    Attribution-Noncommercial-ShareAlike 4.0 License</a>.</p>
+<p>Send documentation feedback to <a href="mailto:feedback@idmod.org" target="_top">feedback@idmod.org</a>. If you have
+    questions, email <a href="mailto:support@idmod.org" target="_top">support@idmod.org</a>.</p>
+<p><a href="https://www.gatesfoundation.org/Privacy-and-Cookies-Notice">Privacy and Cookies Notice</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+<a href="https://www.gatesfoundation.org/Terms-of-Use">Terms of Use</a></p>
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

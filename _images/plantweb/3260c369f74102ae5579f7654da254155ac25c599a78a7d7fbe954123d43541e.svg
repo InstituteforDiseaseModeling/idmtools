@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="324px" preserveAspectRatio="none" style="width:896px;height:324px;" version="1.1" viewBox="0 0 896 324" width="896px" zoomAndPan="magnify"><defs><filter height="300%" id="f10xip8qwks1hd" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[18e0cda30f73ac5722c6ca9bf3c84e2e]
+entity idmtools--><rect fill="#FEFECE" filter="url(#f10xip8qwks1hd)" height="46.2969" style="stroke: #A80036; stroke-width: 1.5;" width="103" x="453.5" y="133"/><rect fill="#FEFECE" height="10" style="stroke: #A80036; stroke-width: 1.5;" width="15" x="536.5" y="138"/><rect fill="#FEFECE" height="2" style="stroke: #A80036; stroke-width: 1.5;" width="4" x="534.5" y="140"/><rect fill="#FEFECE" height="2" style="stroke: #A80036; stroke-width: 1.5;" width="4" x="534.5" y="144"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="63" x="468.5" y="165.9951">idmtools</text><path d="M592,113 L592,152 L556.758,156 L592,160 L592,198.6641 A0,0 0 0 0 592,198.6641 L842,198.6641 A0,0 0 0 0 842,198.6641 L842,123 L832,113 L592,113 A0,0 0 0 0 592,113 " fill="#FBFB77" filter="url(#f10xip8qwks1hd)" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M832,113 L832,123 L842,123 L832,113 " fill="#FBFB77" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="216" x="598" y="130.0669">Provides Plugin Infrastructure and</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="203" x="598" y="145.1997">common APIS like Experiments,</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="202" x="598" y="160.3325">Simulations, Suites, Workitems,</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="228" x="598" y="175.4653">Tasks, and Platforms. Also contains</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="229" x="598" y="190.5981">tools for building Simulations in bulk</text><!--MD5=[d81fc142acf7a269b9935adf33a44c7d]
+entity idmtools-cli--><rect fill="#FEFECE" filter="url(#f10xip8qwks1hd)" height="46.2969" style="stroke: #A80036; stroke-width: 1.5;" width="125" x="353.5" y="7"/><rect fill="#FEFECE" height="10" style="stroke: #A80036; stroke-width: 1.5;" width="15" x="458.5" y="12"/><rect fill="#FEFECE" height="2" style="stroke: #A80036; stroke-width: 1.5;" width="4" x="456.5" y="14"/><rect fill="#FEFECE" height="2" style="stroke: #A80036; stroke-width: 1.5;" width="4" x="456.5" y="18"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="85" x="368.5" y="39.9951">idmtools-cli</text><path d="M171.5,10 L171.5,50.2656 A0,0 0 0 0 171.5,50.2656 L318.5,50.2656 A0,0 0 0 0 318.5,50.2656 L318.5,34 L353.358,30 L318.5,26 L318.5,20 L308.5,10 L171.5,10 A0,0 0 0 0 171.5,10 " fill="#FBFB77" filter="url(#f10xip8qwks1hd)" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M308.5,10 L308.5,20 L318.5,20 L308.5,10 " fill="#FBFB77" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="125" x="177.5" y="27.0669">Provides the CLI for</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="126" x="177.5" y="42.1997">idmtools. (Optional)</text><!--MD5=[48de66e59a328d9225ceb0bd55c9bb29]
+entity idmtools-models--><rect fill="#FEFECE" filter="url(#f10xip8qwks1hd)" height="46.2969" style="stroke: #A80036; stroke-width: 1.5;" width="161" x="513.5" y="7"/><rect fill="#FEFECE" height="10" style="stroke: #A80036; stroke-width: 1.5;" width="15" x="654.5" y="12"/><rect fill="#FEFECE" height="2" style="stroke: #A80036; stroke-width: 1.5;" width="4" x="652.5" y="14"/><rect fill="#FEFECE" height="2" style="stroke: #A80036; stroke-width: 1.5;" width="4" x="652.5" y="18"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="121" x="528.5" y="39.9951">idmtools-models</text><path d="M709.5,10 L709.5,26 L674.883,30 L709.5,34 L709.5,50.2656 A0,0 0 0 0 709.5,50.2656 L884.5,50.2656 A0,0 0 0 0 884.5,50.2656 L884.5,20 L874.5,10 L709.5,10 A0,0 0 0 0 709.5,10 " fill="#FBFB77" filter="url(#f10xip8qwks1hd)" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M874.5,10 L874.5,20 L884.5,20 L874.5,10 " fill="#FBFB77" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="154" x="715.5" y="27.0669">Provides common tasks</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="108" x="719.5" y="42.1997">for Python and R</text><!--MD5=[9c745974f04ed06c06fcc37d0b8ce56f]
+entity idmtools-platform-comps--><rect fill="#FEFECE" filter="url(#f10xip8qwks1hd)" height="46.2969" style="stroke: #A80036; stroke-width: 1.5;" width="227" x="191.5" y="133"/><rect fill="#FEFECE" height="10" style="stroke: #A80036; stroke-width: 1.5;" width="15" x="398.5" y="138"/><rect fill="#FEFECE" height="2" style="stroke: #A80036; stroke-width: 1.5;" width="4" x="396.5" y="140"/><rect fill="#FEFECE" height="2" style="stroke: #A80036; stroke-width: 1.5;" width="4" x="396.5" y="144"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="187" x="206.5" y="165.9951">idmtools-platform-comps</text><path d="M6,136 L6,176.2656 A0,0 0 0 0 6,176.2656 L156,176.2656 A0,0 0 0 0 156,176.2656 L156,160 L191.404,156 L156,152 L156,146 L146,136 L6,136 A0,0 0 0 0 6,136 " fill="#FBFB77" filter="url(#f10xip8qwks1hd)" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M146,136 L146,146 L156,146 L146,136 " fill="#FBFB77" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="114" x="12" y="153.0669">Provides ability to</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="129" x="12" y="168.1997">interact with COMPS</text><!--MD5=[5b99558ca566e47ac8017019bc5bd800]
+entity idmtools-platform-local--><rect fill="#FEFECE" filter="url(#f10xip8qwks1hd)" height="46.2969" style="stroke: #A80036; stroke-width: 1.5;" width="212" x="399" y="259"/><rect fill="#FEFECE" height="10" style="stroke: #A80036; stroke-width: 1.5;" width="15" x="591" y="264"/><rect fill="#FEFECE" height="2" style="stroke: #A80036; stroke-width: 1.5;" width="4" x="589" y="266"/><rect fill="#FEFECE" height="2" style="stroke: #A80036; stroke-width: 1.5;" width="4" x="589" y="270"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="172" x="414" y="291.9951">idmtools-platform-local</text><path d="M144.5,262 L144.5,302.2656 A0,0 0 0 0 144.5,302.2656 L363.5,302.2656 A0,0 0 0 0 363.5,302.2656 L363.5,286 L398.834,282 L363.5,278 L363.5,272 L353.5,262 L144.5,262 A0,0 0 0 0 144.5,262 " fill="#FBFB77" filter="url(#f10xip8qwks1hd)" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M353.5,262 L353.5,272 L363.5,272 L353.5,262 " fill="#FBFB77" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="139" x="150.5" y="279.0669">Provides ability to run</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="198" x="150.5" y="294.1997">locally using Docker containers</text><!--MD5=[f3e4c595aabc74860a442666101b744f]
+link idmtools-cli to idmtools--><path d="M431.911,53.169 C447.068,74.285 469.897,106.093 486.001,128.529 " fill="none" id="idmtools-cli-to-idmtools" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="488.926,132.605,486.9267,122.9612,486.0101,128.5433,480.428,127.6267,488.926,132.605" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[8aa5f3bcec73aaf41ac40fe3f9c475da]
+link idmtools-models to idmtools--><path d="M578.089,53.169 C562.932,74.285 540.103,106.093 523.999,128.529 " fill="none" id="idmtools-models-to-idmtools" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="521.074,132.605,529.572,127.6267,523.9899,128.5433,523.0733,122.9612,521.074,132.605" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[12601bca6d00bb52d45f7b5f74140434]
+link idmtools-platform-comps to idmtools--><path d="M418.672,156 C428.531,156 438.39,156 448.25,156 " fill="none" id="idmtools-platform-comps-to-idmtools" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="453.405,156,444.405,152,448.405,156,444.405,160,453.405,156" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[237ff08c58a06a7ec220f3d1c714d5ad]
+reverse link idmtools to idmtools-platform-local--><path d="M505,184.353 C505,206.6539 505,237.7642 505,258.6051 " fill="none" id="idmtools-backto-idmtools-platform-local" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="505,179.169,501,188.169,505,184.169,509,188.169,505,179.169" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[a701f6402b2d638653dca0da8d910445]
+@startuml
+[idmtools]
+note right of idmtools
+Provides Plugin Infrastructure and
+common APIS like Experiments,
+Simulations, Suites, Workitems,
+Tasks, and Platforms. Also contains
+tools for building Simulations in bulk
+end note
+[idmtools-cli]
+note left of [idmtools-cli]
+    Provides the CLI for
+    idmtools. (Optional)
+end note
+[idmtools-models]
+note right of [idmtools-models]
+    Provides common tasks
+     for Python and R
+end note
+[idmtools-platform-comps]
+note left of [idmtools-platform-comps]
+    Provides ability to
+    interact with COMPS
+end note
+[idmtools-platform-local]
+note left of [idmtools-platform-local]
+    Provides ability to run
+    locally using Docker containers
+end note
+
+[idmtools-cli] - -> [idmtools]
+[idmtools-models] - -> [idmtools]
+[idmtools-platform-comps] -> idmtools
+[idmtools-platform-local] -up-> idmtools
+@enduml
+
+PlantUML version 1.2020.18beta4(Unknown compile time)
+(GPL source distribution)
+Java Runtime: Java(TM) SE Runtime Environment
+JVM: Java HotSpot(TM) 64-Bit Server VM
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>

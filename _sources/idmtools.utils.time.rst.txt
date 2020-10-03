@@ -1,0 +1,7 @@
+idmtools.utils.time module
+==========================
+
+.. automodule:: idmtools.utils.time
+   :members:
+   :undoc-members:
+   :show-inheritance:

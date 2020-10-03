@@ -1,0 +1,8 @@
+idmtools\_platform\_local.infrastructure.service\_manager module
+================================================================
+
+.. automodule:: idmtools_platform_local.infrastructure.service_manager
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

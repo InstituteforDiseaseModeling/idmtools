@@ -1,0 +1,35 @@
+idmtools\_platform\_local package
+=================================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   idmtools_platform_local.cli
+   idmtools_platform_local.client
+   idmtools_platform_local.infrastructure
+   idmtools_platform_local.internals
+   idmtools_platform_local.platform_operations
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   idmtools_platform_local.config
+   idmtools_platform_local.local_cli
+   idmtools_platform_local.local_platform
+   idmtools_platform_local.plugin_info
+   idmtools_platform_local.status
+
+Module contents
+---------------
+
+.. automodule:: idmtools_platform_local
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

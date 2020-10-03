@@ -1,0 +1,7 @@
+idmtools\_platform\_comps.ssmt\_platform module
+===============================================
+
+.. automodule:: idmtools_platform_comps.ssmt_platform
+   :members:
+   :undoc-members:
+   :show-inheritance:

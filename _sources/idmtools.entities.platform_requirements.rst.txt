@@ -1,0 +1,7 @@
+idmtools.entities.platform\_requirements module
+===============================================
+
+.. automodule:: idmtools.entities.platform_requirements
+   :members:
+   :undoc-members:
+   :show-inheritance:

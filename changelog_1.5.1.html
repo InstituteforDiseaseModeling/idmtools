@@ -1,0 +1,279 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>1.5.1 &mdash; idmtools  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Search within idmtools  documentation"
+          href="_static/opensearch.xml"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="1.5.0" href="changelog_1.5.0.html" />
+
+<link href="https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans" rel="stylesheet">
+
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> idmtools
+          
+
+          
+            
+            <img src="_static/IDM_white.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.5.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reports.html">Output data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Architecture and packages reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="recipes_index.html">User Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="changelog.html">Changelog</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="changelog_0.1.0.html">0.1.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog_1.0.0.html">1.0.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog_1.0.1.html">1.0.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog_1.1.0.html">1.1.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog_1.2.0.html">1.2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog_1.2.2.html">1.2.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog_1.3.0.html">1.3.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog_1.4.0.html">1.4.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog_1.5.0.html">1.5.0</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">1.5.1</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">idmtools</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+<div aria-label="breadcrumbs navigation" role="navigation">
+    <ul class="wy-breadcrumbs">
+        <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
+        <li><a href="index.html">idmtools</a> &raquo;</li>
+        
+        <li><a href="changelog.html">Changelog</a> &raquo;</li>
+        
+        <li>1.5.1</li>
+        <li class="wy-breadcrumbs-aside">
+            
+            
+            
+        </li>
+    </ul>
+    <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="id1">
+<h1>1.5.1<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="bugs">
+<h2>Bugs<a class="headerlink" href="#bugs" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/1166">#1166</a> - Properly remove/replace unsupported characters on the COMPS platform in experiment names</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/1173">#1173</a> - Ensure assets are not directories on creation of Asset</p></li>
+</ul>
+</div>
+<div class="section" id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/1191">#1191</a> - Remove idmtools.ini from examples to leverage configuration aliases. This change allows executing of examples with minimal local configuration</p></li>
+</ul>
+</div>
+<div class="section" id="feature-request">
+<h2>Feature Request<a class="headerlink" href="#feature-request" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/1127">#1127</a> - Remove emodpy from idmtools[full] and idmtools[idm] install options. This allows a more control of packages used in projects</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/1179">#1179</a> - Supply multiple default templates for template script wrapper. See the examples in the cookbook.</p></li>
+<li><p><a class="reference external" href="https://github.com/InstituteforDiseaseModeling/idmtools/issues/1180">#1180</a> - Support Configuration Aliases. This provides out of the box configurations for common platform configurations. For example, COMPS environments have predefined aliases such as Calculon, Belegost, etc</p></li>
+</ul>
+</div>
+<div class="section" id="known-issues">
+<h2>Known Issues<a class="headerlink" href="#known-issues" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>PlatformAnalysis requires an idmtools.ini</p></li>
+</ul>
+</div>
+<div class="section" id="upcoming-breaking-changes-in-1-6-0">
+<h2>Upcoming breaking changes in 1.6.0<a class="headerlink" href="#upcoming-breaking-changes-in-1-6-0" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Assets will no longer support both absolute_path and content. That will be mutually exclusive going forward</p></li>
+<li><p>The task API <strong>pre_creation</strong> method has a new parameter to pass the platform object. All tasks implementing the API will need to update the pre_creation method</p></li>
+<li><p>Deprecation of the <em>delete</em> function from <em>AssetCollection</em> in favor or <em>remove</em>.</p></li>
+</ul>
+</div>
+<div class="section" id="upcoming-features-in-the-coming-releases">
+<h2>Upcoming features in the coming releases<a class="headerlink" href="#upcoming-features-in-the-coming-releases" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Ability to query the platform from task for items such as OS, supported workflows, etc</p></li>
+<li><p>Utility to Asset-ize outputs within COMPS. This should make it into 1.6.0</p></li>
+<li><p>HPC Container build and run utilities. Slated for next few releases</p></li>
+<li><p>Better integration of errors with references to relevant documentation(ongoing)</p></li>
+<li><p>Improves support for Mac OS</p></li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="changelog_1.5.0.html" class="btn btn-neutral float-left" title="1.5.0" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bill &amp; Melinda Gates Foundation. All rights reserved.
+
+    </p>
+  </div>
+<p>idmtools is licensed under the <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode">Creative Commons
+    Attribution-Noncommercial-ShareAlike 4.0 License</a>.</p>
+<p>Send documentation feedback to <a href="mailto:feedback@idmod.org" target="_top">feedback@idmod.org</a>. If you have
+    questions, email <a href="mailto:support@idmod.org" target="_top">support@idmod.org</a>.</p>
+<p><a href="https://www.gatesfoundation.org/Privacy-and-Cookies-Notice">Privacy and Cookies Notice</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+<a href="https://www.gatesfoundation.org/Terms-of-Use">Terms of Use</a></p>
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

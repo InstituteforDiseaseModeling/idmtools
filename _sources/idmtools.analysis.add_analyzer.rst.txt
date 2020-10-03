@@ -1,0 +1,7 @@
+idmtools.analysis.add\_analyzer module
+======================================
+
+.. automodule:: idmtools.analysis.add_analyzer
+   :members:
+   :undoc-members:
+   :show-inheritance:

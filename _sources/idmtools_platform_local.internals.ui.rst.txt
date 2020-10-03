@@ -1,0 +1,29 @@
+idmtools\_platform\_local.internals.ui package
+==============================================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   idmtools_platform_local.internals.ui.controllers
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   idmtools_platform_local.internals.ui.app
+   idmtools_platform_local.internals.ui.config
+   idmtools_platform_local.internals.ui.utils
+
+Module contents
+---------------
+
+.. automodule:: idmtools_platform_local.internals.ui
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

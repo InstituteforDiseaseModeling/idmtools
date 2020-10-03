@@ -1,9 +1,335 @@
+
+
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta http-equiv="refresh" content="1; url='https://docs.idmod.org/projects/idmtools/en/latest/'" />
-  </head>
-  <body>
-    <p>Please follow <a href="https://docs.idmod.org/projects/idmtools/en/latest/">this link</a>.</p>
-  </body>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Welcome to idmtools &mdash; idmtools  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Search within idmtools  documentation"
+          href="_static/opensearch.xml"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation" href="installation.html" />
+
+<link href="https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans" rel="stylesheet">
+
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="#" class="icon icon-home" alt="Documentation Home"> idmtools
+          
+
+          
+            
+            <img src="_static/IDM_white.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.5.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reports.html">Output data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Architecture and packages reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="recipes_index.html">User Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">idmtools</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+<div aria-label="breadcrumbs navigation" role="navigation">
+    <ul class="wy-breadcrumbs">
+        <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
+        <li><a href="#">idmtools</a> &raquo;</li>
+        
+        <li>Welcome to idmtools</li>
+        <li class="wy-breadcrumbs-aside">
+            
+            
+            
+        </li>
+    </ul>
+    <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="welcome-to-it-s">
+<h1>Welcome to idmtools<a class="headerlink" href="#welcome-to-it-s" title="Permalink to this headline">¶</a></h1>
+<p>IDM Modeling Tools is a collection of Python scripts and utilities created to streamline user interactions with
+disease models. This framework provides the user with tools necessary to complete projects, starting
+from the creation of input files (if required), to calibration of the model to data, to commissioning
+and running simulations, through the analysis of results. Modelers can use idmtools to run models
+locally or send suites of simulations to an HPC or other computing source. This framework is
+free, open-source, and model agnostic: it can be used to interact with a variety of models,
+such as custom models written in R or Python, or IDM’s own EMOD.</p>
+<div class="section" id="it-s-workflow">
+<h2>idmtools workflow<a class="headerlink" href="#it-s-workflow" title="Permalink to this headline">¶</a></h2>
+<p>idmtools includes a variety of options for each step of the modeling process. Because of this, the
+tool suite was developed in a modular fashion, so that users can select the utilities they wish
+to use. In order to simplify the desired workflow, facilitate the modeling process, and make the
+model (and its results) reusable and sharable, idmtools allows the user to create <a class="reference internal" href="glossary.html#term-assets"><span class="xref std std-term">assets</span></a>.
+Assets can be added at any level of the process, from running a specific task, through creating
+a simulation, to creating a <a class="reference internal" href="glossary.html#term-experiment"><span class="xref std std-term">experiment</span></a>. This allows the user to create inputs based on their
+specific needs: they can be transient, or sharable across multiple simulations.</p>
+<p>Exact workflows for using idmtools is user-dependent, and can include any of the tasks listed below.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="basic-installation.html">Basic installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dev-installation.html">Developer installation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="common-parameters.html">Global parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="logging.html">Logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wizard.html">idmtools.ini wizard</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="platforms-local.html">Local platform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platforms-plugin.html">Create platform plugin</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="create-sims-tags.html">Create simulation tags</a></li>
+<li class="toctree-l2"><a class="reference internal" href="create-sims-emod.html">Create EMOD simulations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sweeps-r.html">Running parameter sweeps with R models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sweeps-python.html">Running parameter sweeps with Python models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sweeps-emod.html">Running parameter sweeps with EMOD</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reports.html">Output data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="analyzers-example.html">Example analyzers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="analyzers-forcedir.html">Force working directory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="analyzers-partial.html">Partial analysis</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="analyzers-create.html">Create an analyzer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="analyzers-convert.html">Convert analyzers from DTK-Tools to idmtools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="analyzers-convert-dtk.html">DTK-Tools example analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="analyzers-convert-idmt.html">DTK-Tools converted to idmtools</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="analyzers-ssmt.html">Using analyzers with SSMT</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Architecture and packages reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_index.html">idmtools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="idmtools.html">idmtools package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_models_index.html">idmtools_models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="idmtools_models.html">idmtools_models package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_platform_comps_index.html">idmtools_platform_comps</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="idmtools_platform_comps.html">idmtools_platform_comps package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_platform_local_index.html">idmtools_platform_local</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="idmtools_platform_local.html">idmtools_platform_local package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="recipes_index.html">User Recipes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cookbook/assets.html">Asset Collections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cookbook/environment.html">Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cookbook/experiments.html">Experiments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cookbook/python.html">Python</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cli-templates.html">Templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli-simulations.html">Simulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli-experiments.html">Experiments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli-platforms.html">Platforms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli-examples.html">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli-troubleshoot.html">Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="changelog_0.1.0.html">0.1.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog_1.0.0.html">1.0.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog_1.0.1.html">1.0.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog_1.1.0.html">1.1.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog_1.2.0.html">1.2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog_1.2.2.html">1.2.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog_1.3.0.html">1.3.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog_1.4.0.html">1.4.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog_1.5.0.html">1.5.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog_1.5.1.html">1.5.1</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bill &amp; Melinda Gates Foundation. All rights reserved.
+
+    </p>
+  </div>
+<p>idmtools is licensed under the <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode">Creative Commons
+    Attribution-Noncommercial-ShareAlike 4.0 License</a>.</p>
+<p>Send documentation feedback to <a href="mailto:feedback@idmod.org" target="_top">feedback@idmod.org</a>. If you have
+    questions, email <a href="mailto:support@idmod.org" target="_top">support@idmod.org</a>.</p>
+<p><a href="https://www.gatesfoundation.org/Privacy-and-Cookies-Notice">Privacy and Cookies Notice</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+<a href="https://www.gatesfoundation.org/Terms-of-Use">Terms of Use</a></p>
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

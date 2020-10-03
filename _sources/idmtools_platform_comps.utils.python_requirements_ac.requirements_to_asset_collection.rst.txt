@@ -1,0 +1,7 @@
+idmtools\_platform\_comps.utils.python\_requirements\_ac.requirements\_to\_asset\_collection module
+===================================================================================================
+
+.. automodule:: idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection
+   :members:
+   :undoc-members:
+   :show-inheritance:

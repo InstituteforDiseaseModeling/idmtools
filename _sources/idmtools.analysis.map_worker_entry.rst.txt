@@ -1,0 +1,7 @@
+idmtools.analysis.map\_worker\_entry module
+===========================================
+
+.. automodule:: idmtools.analysis.map_worker_entry
+   :members:
+   :undoc-members:
+   :show-inheritance:

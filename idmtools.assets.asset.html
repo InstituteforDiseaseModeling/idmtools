@@ -1,0 +1,397 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>idmtools.assets.asset module &mdash; idmtools  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Search within idmtools  documentation"
+          href="_static/opensearch.xml"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="idmtools.assets.asset_collection module" href="idmtools.assets.asset_collection.html" />
+    <link rel="prev" title="idmtools.assets package" href="idmtools.assets.html" />
+
+<link href="https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans" rel="stylesheet">
+
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> idmtools
+          
+
+          
+            
+            <img src="_static/IDM_white.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.5.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reports.html">Output data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="reference.html">Architecture and packages reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="idmtools_index.html">idmtools</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="idmtools.html">idmtools package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="idmtools.analysis.html">idmtools.analysis package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="idmtools.assets.html">idmtools.assets package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.builders.html">idmtools.builders package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.config.html">idmtools.config package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.core.html">idmtools.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.entities.html">idmtools.entities package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.registry.html">idmtools.registry package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.services.html">idmtools.services package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.utils.html">idmtools.utils package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_models_index.html">idmtools_models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_platform_comps_index.html">idmtools_platform_comps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_platform_local_index.html">idmtools_platform_local</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="recipes_index.html">User Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">idmtools</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+<div aria-label="breadcrumbs navigation" role="navigation">
+    <ul class="wy-breadcrumbs">
+        <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
+        <li><a href="index.html">idmtools</a> &raquo;</li>
+        
+        <li><a href="reference.html">Architecture and packages reference</a> &raquo;</li>
+        
+        <li><a href="idmtools_index.html">idmtools</a> &raquo;</li>
+        
+        <li><a href="idmtools.html">idmtools package</a> &raquo;</li>
+        
+        <li><a href="idmtools.assets.html">idmtools.assets package</a> &raquo;</li>
+        
+        <li>idmtools.assets.asset module</li>
+        <li class="wy-breadcrumbs-aside">
+            
+            
+            
+        </li>
+    </ul>
+    <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-idmtools.assets.asset">
+<span id="idmtools-assets-asset-module"></span><h1>idmtools.assets.asset module<a class="headerlink" href="#module-idmtools.assets.asset" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="idmtools.assets.asset.Asset">
+<em class="property">class </em><code class="sig-prename descclassname">idmtools.assets.asset.</code><code class="sig-name descname">Asset</code><span class="sig-paren">(</span><em class="sig-param">absolute_path: Optional[str] = None</em>, <em class="sig-param">relative_path: Optional[str] = &lt;property object&gt;</em>, <em class="sig-param">filename: Optional[str] = None</em>, <em class="sig-param">content: dataclasses.InitVar = &lt;property object&gt;</em>, <em class="sig-param">persisted: bool = False</em>, <em class="sig-param">handler: Callable = &lt;class 'str'&gt;</em>, <em class="sig-param">download_generator_hook: Callable = None</em>, <em class="sig-param">checksum: dataclasses.InitVar = &lt;property object&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.assets.asset.Asset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class representing an asset. An asset can either be related to a physical
+asset present on the computer or directly specified by a filename and content.</p>
+<dl class="py attribute">
+<dt id="idmtools.assets.asset.Asset.absolute_path">
+<code class="sig-name descname">absolute_path</code><em class="property">: Optional<span class="p">[</span>str<span class="p">]</span></em><em class="property"> = None</em><a class="headerlink" href="#idmtools.assets.asset.Asset.absolute_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>The absolute path of the asset. Optional if <strong>filename</strong> and <strong>content</strong> are given.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools.assets.asset.Asset.filename">
+<code class="sig-name descname">filename</code><em class="property">: Optional<span class="p">[</span>str<span class="p">]</span></em><em class="property"> = None</em><a class="headerlink" href="#idmtools.assets.asset.Asset.filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the file. Optional if <strong>absolute_path</strong> is given.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools.assets.asset.Asset.persisted">
+<code class="sig-name descname">persisted</code><em class="property">: bool</em><em class="property"> = False</em><a class="headerlink" href="#idmtools.assets.asset.Asset.persisted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Persisted tracks if item has been saved</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools.assets.asset.Asset.handler">
+<code class="sig-name descname">handler</code><a class="headerlink" href="#idmtools.assets.asset.Asset.handler" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">builtins.str</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools.assets.asset.Asset.download_generator_hook">
+<code class="sig-name descname">download_generator_hook</code><em class="property">: Callable</em><em class="property"> = None</em><a class="headerlink" href="#idmtools.assets.asset.Asset.download_generator_hook" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook to allow downloading from platform</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.assets.asset.Asset.checksum">
+<em class="property">property </em><code class="sig-name descname">checksum</code><a class="headerlink" href="#idmtools.assets.asset.Asset.checksum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checksum of asset. Only required for existing assets</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.assets.asset.Asset.extension">
+<em class="property">property </em><code class="sig-name descname">extension</code><a class="headerlink" href="#idmtools.assets.asset.Asset.extension" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.assets.asset.Asset.relative_path">
+<em class="property">property </em><code class="sig-name descname">relative_path</code><a class="headerlink" href="#idmtools.assets.asset.Asset.relative_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>The relative path (compared to the simulation root folder).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.assets.asset.Asset.bytes">
+<em class="property">property </em><code class="sig-name descname">bytes</code><a class="headerlink" href="#idmtools.assets.asset.Asset.bytes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.assets.asset.Asset.length">
+<em class="property">property </em><code class="sig-name descname">length</code><a class="headerlink" href="#idmtools.assets.asset.Asset.length" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.assets.asset.Asset.content">
+<em class="property">property </em><code class="sig-name descname">content</code><a class="headerlink" href="#idmtools.assets.asset.Asset.content" title="Permalink to this definition">¶</a></dt>
+<dd><p>The content of the file. Optional if <strong>absolute_path</strong> is given.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.assets.asset.Asset.deep_equals">
+<code class="sig-name descname">deep_equals</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">other</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#idmtools.assets.asset.Asset" title="idmtools.assets.asset.Asset">idmtools.assets.asset.Asset</a></span></em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#idmtools.assets.asset.Asset.deep_equals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a deep comparison of assets, including contents</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>other</strong> – Other asset to compare</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if filename, relative path, and contents are equal, otherwise false</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.assets.asset.Asset.download_generator">
+<code class="sig-name descname">download_generator</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Generator<span class="p">[</span>bytearray<span class="p">, </span>None<span class="p">, </span>None<span class="p">]</span><a class="headerlink" href="#idmtools.assets.asset.Asset.download_generator" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Download Generator that returns chunks of bytes from the file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Generator of bytearray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.assets.asset.Asset.download_stream">
+<code class="sig-name descname">download_stream</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; _io.BytesIO<a class="headerlink" href="#idmtools.assets.asset.Asset.download_stream" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a bytes IO stream of the asset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>BytesIO of the Asset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.assets.asset.Asset.download_to_path">
+<code class="sig-name descname">download_to_path</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dest</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">force</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.assets.asset.Asset.download_to_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download an asset to path. This requires loadings the object through the platofrm</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dest</strong> – Path to write to. If it is a directory, the asset filename will be added to it</p></li>
+<li><p><strong>force</strong> – Force download even if file exists</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.assets.asset.Asset.calculate_checksum">
+<code class="sig-name descname">calculate_checksum</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#idmtools.assets.asset.Asset.calculate_checksum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate checksum on asset. If previous checksum was calculated, that value will be returned</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Checksum string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.assets.asset.Asset.short_remote_path">
+<code class="sig-name descname">short_remote_path</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#idmtools.assets.asset.Asset.short_remote_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the short remote path. This is the join of the relative path and filename</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Remote Path + Filename</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="idmtools.assets.asset_collection.html" class="btn btn-neutral float-right" title="idmtools.assets.asset_collection module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="idmtools.assets.html" class="btn btn-neutral float-left" title="idmtools.assets package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bill &amp; Melinda Gates Foundation. All rights reserved.
+
+    </p>
+  </div>
+<p>idmtools is licensed under the <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode">Creative Commons
+    Attribution-Noncommercial-ShareAlike 4.0 License</a>.</p>
+<p>Send documentation feedback to <a href="mailto:feedback@idmod.org" target="_top">feedback@idmod.org</a>. If you have
+    questions, email <a href="mailto:support@idmod.org" target="_top">support@idmod.org</a>.</p>
+<p><a href="https://www.gatesfoundation.org/Privacy-and-Cookies-Notice">Privacy and Cookies Notice</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+<a href="https://www.gatesfoundation.org/Terms-of-Use">Terms of Use</a></p>
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

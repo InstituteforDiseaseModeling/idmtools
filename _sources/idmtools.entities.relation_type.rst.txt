@@ -1,0 +1,7 @@
+idmtools.entities.relation\_type module
+=======================================
+
+.. automodule:: idmtools.entities.relation_type
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,578 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>idmtools.entities.experiment module &mdash; idmtools  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Search within idmtools  documentation"
+          href="_static/opensearch.xml"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="idmtools.entities.generic_workitem module" href="idmtools.entities.generic_workitem.html" />
+    <link rel="prev" title="idmtools.entities.command_task module" href="idmtools.entities.command_task.html" />
+
+<link href="https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans" rel="stylesheet">
+
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> idmtools
+          
+
+          
+            
+            <img src="_static/IDM_white.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.5.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reports.html">Output data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="reference.html">Architecture and packages reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="idmtools_index.html">idmtools</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="idmtools.html">idmtools package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="idmtools.analysis.html">idmtools.analysis package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.assets.html">idmtools.assets package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.builders.html">idmtools.builders package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.config.html">idmtools.config package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.core.html">idmtools.core package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="idmtools.entities.html">idmtools.entities package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.registry.html">idmtools.registry package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.services.html">idmtools.services package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.utils.html">idmtools.utils package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_models_index.html">idmtools_models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_platform_comps_index.html">idmtools_platform_comps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_platform_local_index.html">idmtools_platform_local</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="recipes_index.html">User Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">idmtools</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+<div aria-label="breadcrumbs navigation" role="navigation">
+    <ul class="wy-breadcrumbs">
+        <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
+        <li><a href="index.html">idmtools</a> &raquo;</li>
+        
+        <li><a href="reference.html">Architecture and packages reference</a> &raquo;</li>
+        
+        <li><a href="idmtools_index.html">idmtools</a> &raquo;</li>
+        
+        <li><a href="idmtools.html">idmtools package</a> &raquo;</li>
+        
+        <li><a href="idmtools.entities.html">idmtools.entities package</a> &raquo;</li>
+        
+        <li>idmtools.entities.experiment module</li>
+        <li class="wy-breadcrumbs-aside">
+            
+            
+            
+        </li>
+    </ul>
+    <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-idmtools.entities.experiment">
+<span id="idmtools-entities-experiment-module"></span><h1>idmtools.entities.experiment module<a class="headerlink" href="#module-idmtools.entities.experiment" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="idmtools.entities.experiment.Experiment">
+<em class="property">class </em><code class="sig-prename descclassname">idmtools.entities.experiment.</code><code class="sig-name descname">Experiment</code><span class="sig-paren">(</span><em class="sig-param">_uid: uuid.UUID = None, platform_id: uuid.UUID = None, _platform: IPlatform = None, parent_id: uuid.UUID = None, _parent: IEntity = None, status: idmtools.core.enums.EntityStatus = None, tags: Dict[str, Any] = &lt;factory&gt;, _platform_object: Any = None, name: str = None, assets: idmtools.assets.asset_collection.AssetCollection = &lt;factory&gt;, suite_id: &lt;module 'uuid' from '/opt/hostedtoolcache/Python/3.7.9/x64/lib/python3.7/uuid.py'&gt; = None, task_type: str = 'idmtools.entities.command_task.CommandTask', platform_requirements: Set[idmtools.entities.platform_requirements.PlatformRequirements] = &lt;factory&gt;, simulations: dataclasses.InitVar = &lt;property object&gt;, _Experiment__simulations: Union[idmtools.core.interfaces.entity_container.EntityContainer, Generator[Simulation, None, None], idmtools.entities.templated_simulation.TemplatedSimulations, Iterator[Simulation]] = &lt;factory&gt;, gather_common_assets_from_task: bool = None</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.experiment.Experiment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="idmtools.core.interfaces.iassets_enabled.html#idmtools.core.interfaces.iassets_enabled.IAssetsEnabled" title="idmtools.core.interfaces.iassets_enabled.IAssetsEnabled"><code class="xref py py-class docutils literal notranslate"><span class="pre">idmtools.core.interfaces.iassets_enabled.IAssetsEnabled</span></code></a>, <a class="reference internal" href="idmtools.core.interfaces.inamed_entity.html#idmtools.core.interfaces.inamed_entity.INamedEntity" title="idmtools.core.interfaces.inamed_entity.INamedEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">idmtools.core.interfaces.inamed_entity.INamedEntity</span></code></a></p>
+<p>Class that represents a generic experiment.
+This class needs to be implemented for each model type with specifics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – The experiment name.</p></li>
+<li><p><strong>assets</strong> – The asset collection for assets global to this experiment.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="idmtools.entities.experiment.Experiment.suite_id">
+<code class="sig-name descname">suite_id</code><em class="property">: &lt;module ‘uuid’ from ‘/opt/hostedtoolcache/Python/3.7.9/x64/lib/python3.7/uuid.py’&gt;</em><em class="property"> = None</em><a class="headerlink" href="#idmtools.entities.experiment.Experiment.suite_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Suite ID</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools.entities.experiment.Experiment.item_type">
+<code class="sig-name descname">item_type</code><em class="property">: <a class="reference internal" href="idmtools.core.enums.html#idmtools.core.enums.ItemType" title="idmtools.core.enums.ItemType">idmtools.core.enums.ItemType</a></em><em class="property"> = 2</em><a class="headerlink" href="#idmtools.entities.experiment.Experiment.item_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Item Item(always an experiment)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools.entities.experiment.Experiment.task_type">
+<code class="sig-name descname">task_type</code><em class="property">: str</em><em class="property"> = 'idmtools.entities.command_task.CommandTask'</em><a class="headerlink" href="#idmtools.entities.experiment.Experiment.task_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Task Type(defaults to command)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools.entities.experiment.Experiment.platform_requirements">
+<code class="sig-name descname">platform_requirements</code><em class="property">: Set<span class="p">[</span><a class="reference internal" href="idmtools.entities.platform_requirements.html#idmtools.entities.platform_requirements.PlatformRequirements" title="idmtools.entities.platform_requirements.PlatformRequirements">idmtools.entities.platform_requirements.PlatformRequirements</a><span class="p">]</span></em><a class="headerlink" href="#idmtools.entities.experiment.Experiment.platform_requirements" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of Requirements for the task that a platform must meet to be able to run</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools.entities.experiment.Experiment.frozen">
+<code class="sig-name descname">frozen</code><em class="property">: bool</em><em class="property"> = False</em><a class="headerlink" href="#idmtools.entities.experiment.Experiment.frozen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Is the Experiment Frozen</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools.entities.experiment.Experiment.gather_common_assets_from_task">
+<code class="sig-name descname">gather_common_assets_from_task</code><em class="property">: bool</em><em class="property"> = None</em><a class="headerlink" href="#idmtools.entities.experiment.Experiment.gather_common_assets_from_task" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines if we should gather assets from a the first task. Only use when not using TemplatedSimulations</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.experiment.Experiment.post_creation">
+<code class="sig-name descname">post_creation</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#idmtools.entities.experiment.Experiment.post_creation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Post creation hook for object
+Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.experiment.Experiment.status">
+<em class="property">property </em><code class="sig-name descname">status</code><a class="headerlink" href="#idmtools.entities.experiment.Experiment.status" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.experiment.Experiment.suite">
+<em class="property">property </em><code class="sig-name descname">suite</code><a class="headerlink" href="#idmtools.entities.experiment.Experiment.suite" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.experiment.Experiment.display">
+<code class="sig-name descname">display</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.experiment.Experiment.display" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.experiment.Experiment.pre_creation">
+<code class="sig-name descname">pre_creation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gather_assets</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#idmtools.entities.experiment.Experiment.pre_creation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Experiment pre_creation callback</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>gather_assets</strong> – Determines if an experiment will try to gather the common assets or defer. It most cases, you want this enabled but when modifying existing experiments you may want to disable if there are new assets and the platform has performance hits to determine those assets</p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.experiment.Experiment.done">
+<em class="property">property </em><code class="sig-name descname">done</code><a class="headerlink" href="#idmtools.entities.experiment.Experiment.done" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return if an experiment has finished executing</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True if all simulations have ran, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.experiment.Experiment.succeeded">
+<em class="property">property </em><code class="sig-name descname">succeeded</code><a class="headerlink" href="#idmtools.entities.experiment.Experiment.succeeded" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return if an experiment has succeeded. An experiment is succeeded when all simulations have succeeded</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True if all simulations have succeeded, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.experiment.Experiment.any_failed">
+<em class="property">property </em><code class="sig-name descname">any_failed</code><a class="headerlink" href="#idmtools.entities.experiment.Experiment.any_failed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return if an experiment has any simulation in failed state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True if all simulations have succeeded, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.experiment.Experiment.simulations">
+<em class="property">property </em><code class="sig-name descname">simulations</code><a class="headerlink" href="#idmtools.entities.experiment.Experiment.simulations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simulation in this experiment</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.experiment.Experiment.simulation_count">
+<em class="property">property </em><code class="sig-name descname">simulation_count</code><a class="headerlink" href="#idmtools.entities.experiment.Experiment.simulation_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the total simulations
+Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.experiment.Experiment.refresh_simulations">
+<code class="sig-name descname">refresh_simulations</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; NoReturn<a class="headerlink" href="#idmtools.entities.experiment.Experiment.refresh_simulations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Refresh the simulations from the platform</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.experiment.Experiment.refresh_simulations_status">
+<code class="sig-name descname">refresh_simulations_status</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.experiment.Experiment.refresh_simulations_status" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.experiment.Experiment.pre_getstate">
+<code class="sig-name descname">pre_getstate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.experiment.Experiment.pre_getstate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return default values for <code class="xref py py-meth docutils literal notranslate"><span class="pre">pickle_ignore_fields()</span></code>.
+Call before pickling.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.experiment.Experiment.gather_assets">
+<code class="sig-name descname">gather_assets</code><span class="sig-paren">(</span><em class="sig-param">) -&gt; AssetCollection(_uid=None</em>, <em class="sig-param">platform_id=None</em>, <em class="sig-param">_platform=None</em>, <em class="sig-param">parent_id=None</em>, <em class="sig-param">_parent=None</em>, <em class="sig-param">status=None</em>, <em class="sig-param">tags={}</em>, <em class="sig-param">item_type=&lt;ItemType.ASSETCOLLECTION: 5&gt;</em>, <em class="sig-param">_platform_object=None</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.experiment.Experiment.gather_assets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function called at runtime to gather all assets in the collection.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.experiment.Experiment.from_task">
+<em class="property">classmethod </em><code class="sig-name descname">from_task</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">task</span></em>, <em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tags</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">assets</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.assets.asset_collection.html#idmtools.assets.asset_collection.AssetCollection" title="idmtools.assets.asset_collection.AssetCollection">idmtools.assets.asset_collection.AssetCollection</a></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">gather_common_assets_from_task</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#idmtools.entities.experiment.Experiment" title="idmtools.entities.experiment.Experiment">idmtools.entities.experiment.Experiment</a><a class="headerlink" href="#idmtools.entities.experiment.Experiment.from_task" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an Experiment with one Simulation from a task</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>task</strong> – Task to use</p></li>
+<li><p><strong>assets</strong> – Asset collection to use for common tasks. Defaults to gather assets from task</p></li>
+<li><p><strong>name</strong> – Name of experiment</p></li>
+<li><p><strong>tags</strong> – </p></li>
+<li><p><strong>gather_common_assets_from_task</strong> – Whether we should attempt to gather assets from the Task object for the
+experiment. With large amounts of tasks, this can be expensive as we loop through all</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.experiment.Experiment.from_builder">
+<em class="property">classmethod </em><code class="sig-name descname">from_builder</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">builders</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference internal" href="idmtools.builders.simulation_builder.html#idmtools.builders.simulation_builder.SimulationBuilder" title="idmtools.builders.simulation_builder.SimulationBuilder">idmtools.builders.simulation_builder.SimulationBuilder</a><span class="p">, </span>List<span class="p">[</span><a class="reference internal" href="idmtools.builders.simulation_builder.html#idmtools.builders.simulation_builder.SimulationBuilder" title="idmtools.builders.simulation_builder.SimulationBuilder">idmtools.builders.simulation_builder.SimulationBuilder</a><span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">base_task</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.entities.itask.html#idmtools.entities.itask.ITask" title="idmtools.entities.itask.ITask">idmtools.entities.itask.ITask</a></span></em>, <em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">assets</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.assets.asset_collection.html#idmtools.assets.asset_collection.AssetCollection" title="idmtools.assets.asset_collection.AssetCollection">idmtools.assets.asset_collection.AssetCollection</a></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tags</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#idmtools.entities.experiment.Experiment" title="idmtools.entities.experiment.Experiment">idmtools.entities.experiment.Experiment</a><a class="headerlink" href="#idmtools.entities.experiment.Experiment.from_builder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an experiment from a SimulationBuilder object(or list of builders</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>builders</strong> – List of builder to create experiment from</p></li>
+<li><p><strong>base_task</strong> – Base task to use as template</p></li>
+<li><p><strong>name</strong> – Experiment name</p></li>
+<li><p><strong>assets</strong> – Experiment level assets</p></li>
+<li><p><strong>tags</strong> – Experiment tags</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Experiment object from the builders</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.experiment.Experiment.from_template">
+<em class="property">classmethod </em><code class="sig-name descname">from_template</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">template</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.entities.templated_simulation.html#idmtools.entities.templated_simulation.TemplatedSimulations" title="idmtools.entities.templated_simulation.TemplatedSimulations">idmtools.entities.templated_simulation.TemplatedSimulations</a></span></em>, <em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">assets</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.assets.asset_collection.html#idmtools.assets.asset_collection.AssetCollection" title="idmtools.assets.asset_collection.AssetCollection">idmtools.assets.asset_collection.AssetCollection</a></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tags</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#idmtools.entities.experiment.Experiment" title="idmtools.entities.experiment.Experiment">idmtools.entities.experiment.Experiment</a><a class="headerlink" href="#idmtools.entities.experiment.Experiment.from_template" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an Experiment from a TemplatedSimulation object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>template</strong> – TemplatedSimulation object</p></li>
+<li><p><strong>name</strong> – Experiment name</p></li>
+<li><p><strong>assets</strong> – Experiment level assets</p></li>
+<li><p><strong>tags</strong> – Tags</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Experiment object from the TemplatedSimulation object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.experiment.Experiment.list_static_assets">
+<code class="sig-name descname">list_static_assets</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">children</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">platform</span><span class="p">:</span> <span class="n">IPlatform</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span><a class="reference internal" href="idmtools.assets.asset.html#idmtools.assets.asset.Asset" title="idmtools.assets.asset.Asset">idmtools.assets.asset.Asset</a><span class="p">]</span><a class="headerlink" href="#idmtools.entities.experiment.Experiment.list_static_assets" title="Permalink to this definition">¶</a></dt>
+<dd><p>List assets that have been uploaded to a server already</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>children</strong> – When set to true, simulation assets will be loaded as well</p></li>
+<li><p><strong>platform</strong> – Optional platform to load assets list from</p></li>
+<li><p><strong>**kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of assets</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.experiment.Experiment.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">wait_until_done</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">platform</span><span class="p">:</span> <span class="n">IPlatform</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">regather_common_assets</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">run_opts</span></em><span class="sig-paren">)</span> &#x2192; NoReturn<a class="headerlink" href="#idmtools.entities.experiment.Experiment.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs an experiment on a platform</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wait_until_done</strong> – Whether we should wait on experiment to finish running as well. Defaults to False</p></li>
+<li><p><strong>platform</strong> – Platform object to use. If not specified, we first check object for platform object then the current context</p></li>
+<li><p><strong>regather_common_assets</strong> – Triggers gathering of assets for <em>existing</em> experiments. If not provided, we use the platforms default behaviour. See platform details for performance implications of this. For most platforms, it should be ok but for others, it could decrease performance when assets are not changing.
+It is important to note that when using this feature, ensure the previous simulations have finished provisioning. Failure to do so can lead to unexpected behaviour</p></li>
+<li><p><strong>**run_opts</strong> – Options to pass to the platform</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.experiment.Experiment.wait">
+<code class="sig-name descname">wait</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">timeout</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">refresh_interval</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">platform</span><span class="p">:</span> <span class="n">IPlatform</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.experiment.Experiment.wait" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wait on an experiment to finish running</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>timeout</strong> – Timeout to wait</p></li>
+<li><p><strong>refresh_interval</strong> – How often to refresh object</p></li>
+<li><p><strong>platform</strong> – Platform. If not specified, we try to determine this from context</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.experiment.Experiment.to_dict">
+<code class="sig-name descname">to_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.experiment.Experiment.to_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.experiment.Experiment.from_id">
+<em class="property">classmethod </em><code class="sig-name descname">from_id</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">item_id</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>uuid.UUID<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">platform</span><span class="p">:</span> <span class="n">IPlatform</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">copy_assets</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#idmtools.entities.experiment.Experiment" title="idmtools.entities.experiment.Experiment">Experiment</a><a class="headerlink" href="#idmtools.entities.experiment.Experiment.from_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function to provide better intellisense to end users</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>item_id</strong> – Item id to load</p></li>
+<li><p><strong>platform</strong> – Optional platform. Fallbacks to context</p></li>
+<li><p><strong>copy_assets</strong> – Allow copying assets on load. Makes modifying experiments easier when new assets are involved.</p></li>
+<li><p><strong>**kwargs</strong> – Optional arguments to be passed on to the platform</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.experiment.Experiment.print">
+<code class="sig-name descname">print</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">verbose</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.experiment.Experiment.print" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print summary of experiment
+:param verbose: Verbose printing</p>
+<p>Returns:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="idmtools.entities.experiment.ExperimentSpecification">
+<em class="property">class </em><code class="sig-prename descclassname">idmtools.entities.experiment.</code><code class="sig-name descname">ExperimentSpecification</code><a class="headerlink" href="#idmtools.entities.experiment.ExperimentSpecification" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="idmtools.registry.experiment_specification.html#idmtools.registry.experiment_specification.ExperimentPluginSpecification" title="idmtools.registry.experiment_specification.ExperimentPluginSpecification"><code class="xref py py-class docutils literal notranslate"><span class="pre">idmtools.registry.experiment_specification.ExperimentPluginSpecification</span></code></a></p>
+<dl class="py method">
+<dt id="idmtools.entities.experiment.ExperimentSpecification.get_description">
+<code class="sig-name descname">get_description</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#idmtools.entities.experiment.ExperimentSpecification.get_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a brief description of the plugin and its functionality.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The plugin description.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.experiment.ExperimentSpecification.get">
+<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">configuration</span><span class="p">:</span> <span class="n">dict</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#idmtools.entities.experiment.Experiment" title="idmtools.entities.experiment.Experiment">idmtools.entities.experiment.Experiment</a><a class="headerlink" href="#idmtools.entities.experiment.ExperimentSpecification.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Experiment is going</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.experiment.ExperimentSpecification.get_type">
+<code class="sig-name descname">get_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Type<span class="p">[</span><a class="reference internal" href="#idmtools.entities.experiment.Experiment" title="idmtools.entities.experiment.Experiment">idmtools.entities.experiment.Experiment</a><span class="p">]</span><a class="headerlink" href="#idmtools.entities.experiment.ExperimentSpecification.get_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="idmtools.entities.generic_workitem.html" class="btn btn-neutral float-right" title="idmtools.entities.generic_workitem module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="idmtools.entities.command_task.html" class="btn btn-neutral float-left" title="idmtools.entities.command_task module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bill &amp; Melinda Gates Foundation. All rights reserved.
+
+    </p>
+  </div>
+<p>idmtools is licensed under the <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode">Creative Commons
+    Attribution-Noncommercial-ShareAlike 4.0 License</a>.</p>
+<p>Send documentation feedback to <a href="mailto:feedback@idmod.org" target="_top">feedback@idmod.org</a>. If you have
+    questions, email <a href="mailto:support@idmod.org" target="_top">support@idmod.org</a>.</p>
+<p><a href="https://www.gatesfoundation.org/Privacy-and-Cookies-Notice">Privacy and Cookies Notice</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+<a href="https://www.gatesfoundation.org/Terms-of-Use">Terms of Use</a></p>
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,365 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>idmtools_models.r.r_task module &mdash; idmtools  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Search within idmtools  documentation"
+          href="_static/opensearch.xml"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="idmtools_models.json_configured_task module" href="idmtools_models.json_configured_task.html" />
+    <link rel="prev" title="idmtools_models.r.json_r_task module" href="idmtools_models.r.json_r_task.html" />
+
+<link href="https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans" rel="stylesheet">
+
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> idmtools
+          
+
+          
+            
+            <img src="_static/IDM_white.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.5.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reports.html">Output data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="reference.html">Architecture and packages reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="idmtools_index.html">idmtools</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="idmtools_models_index.html">idmtools_models</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="idmtools_models.html">idmtools_models package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="idmtools_models.python.html">idmtools_models.python package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="idmtools_models.r.html">idmtools_models.r package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools_models.json_configured_task.html">idmtools_models.json_configured_task module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools_models.templated_script_task.html">idmtools_models.templated_script_task module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_platform_comps_index.html">idmtools_platform_comps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_platform_local_index.html">idmtools_platform_local</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="recipes_index.html">User Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">idmtools</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+<div aria-label="breadcrumbs navigation" role="navigation">
+    <ul class="wy-breadcrumbs">
+        <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
+        <li><a href="index.html">idmtools</a> &raquo;</li>
+        
+        <li><a href="reference.html">Architecture and packages reference</a> &raquo;</li>
+        
+        <li><a href="idmtools_models_index.html">idmtools_models</a> &raquo;</li>
+        
+        <li><a href="idmtools_models.html">idmtools_models package</a> &raquo;</li>
+        
+        <li><a href="idmtools_models.r.html">idmtools_models.r package</a> &raquo;</li>
+        
+        <li>idmtools_models.r.r_task module</li>
+        <li class="wy-breadcrumbs-aside">
+            
+            
+            
+        </li>
+    </ul>
+    <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-idmtools_models.r.r_task">
+<span id="idmtools-models-r-r-task-module"></span><h1>idmtools_models.r.r_task module<a class="headerlink" href="#module-idmtools_models.r.r_task" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="idmtools_models.r.r_task.RTask">
+<em class="property">class </em><code class="sig-prename descclassname">idmtools_models.r.r_task.</code><code class="sig-name descname">RTask</code><span class="sig-paren">(</span><em class="sig-param">command: Union[str, idmtools.entities.command_line.CommandLine] = None, platform_requirements: Set[idmtools.entities.platform_requirements.PlatformRequirements] = &lt;factory&gt;, _ITask__pre_creation_hooks: List[Callable[[Union[ForwardRef('Simulation'), ForwardRef('IWorkflowItem')]], NoReturn]] = &lt;factory&gt;, _ITask__post_creation_hooks: List[Callable[[Union[ForwardRef('Simulation'), ForwardRef('IWorkflowItem')]], NoReturn]] = &lt;factory&gt;, common_assets: idmtools.assets.asset_collection.AssetCollection = &lt;factory&gt;, transient_assets: idmtools.assets.asset_collection.AssetCollection = &lt;factory&gt;, _task_log: logging.Logger = &lt;factory&gt;, image_name: str = None, build: bool = False, build_path: Union[str, NoneType] = None, Dockerfile: Union[str, NoneType] = None, pull_before_build: bool = True, use_nvidia_run: bool = False, _DockerTask__image_built: bool = False, script_path: str = None, r_path: str = 'Rscript', extra_libraries: list = &lt;factory&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_models.r.r_task.RTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="idmtools.core.docker_task.html#idmtools.core.docker_task.DockerTask" title="idmtools.core.docker_task.DockerTask"><code class="xref py py-class docutils literal notranslate"><span class="pre">idmtools.core.docker_task.DockerTask</span></code></a></p>
+<dl class="py attribute">
+<dt id="idmtools_models.r.r_task.RTask.script_path">
+<code class="sig-name descname">script_path</code><em class="property">: str</em><em class="property"> = None</em><a class="headerlink" href="#idmtools_models.r.r_task.RTask.script_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools_models.r.r_task.RTask.r_path">
+<code class="sig-name descname">r_path</code><em class="property">: str</em><em class="property"> = 'Rscript'</em><a class="headerlink" href="#idmtools_models.r.r_task.RTask.r_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools_models.r.r_task.RTask.extra_libraries">
+<code class="sig-name descname">extra_libraries</code><em class="property">: list</em><a class="headerlink" href="#idmtools_models.r.r_task.RTask.extra_libraries" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="idmtools_models.r.r_task.RTask.command">
+<em class="property">property </em><code class="sig-name descname">command</code><a class="headerlink" href="#idmtools_models.r.r_task.RTask.command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update executable with new python_path
+Returns: re-build command</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools_models.r.r_task.RTask.reload_from_simulation">
+<code class="sig-name descname">reload_from_simulation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">simulation</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.entities.simulation.html#idmtools.entities.simulation.Simulation" title="idmtools.entities.simulation.Simulation">idmtools.entities.simulation.Simulation</a></span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_models.r.r_task.RTask.reload_from_simulation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optional hook that is called when loading simulations from a platform</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools_models.r.r_task.RTask.gather_common_assets">
+<code class="sig-name descname">gather_common_assets</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="idmtools.assets.asset_collection.html#idmtools.assets.asset_collection.AssetCollection" title="idmtools.assets.asset_collection.AssetCollection">idmtools.assets.asset_collection.AssetCollection</a><a class="headerlink" href="#idmtools_models.r.r_task.RTask.gather_common_assets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gather R Assets
+Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools_models.r.r_task.RTask.gather_transient_assets">
+<code class="sig-name descname">gather_transient_assets</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="idmtools.assets.asset_collection.html#idmtools.assets.asset_collection.AssetCollection" title="idmtools.assets.asset_collection.AssetCollection">idmtools.assets.asset_collection.AssetCollection</a><a class="headerlink" href="#idmtools_models.r.r_task.RTask.gather_transient_assets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gather transient assets. Generally this is the simulation level assets</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools_models.r.r_task.RTask.pre_creation">
+<code class="sig-name descname">pre_creation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parent</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference internal" href="idmtools.entities.simulation.html#idmtools.entities.simulation.Simulation" title="idmtools.entities.simulation.Simulation">idmtools.entities.simulation.Simulation</a><span class="p">, </span><a class="reference internal" href="idmtools.entities.iworkflow_item.html#idmtools.entities.iworkflow_item.IWorkflowItem" title="idmtools.entities.iworkflow_item.IWorkflowItem">idmtools.entities.iworkflow_item.IWorkflowItem</a><span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_models.r.r_task.RTask.pre_creation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called before creation of parent</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>parent</strong> – Parent</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Raise:</dt><dd><p>ValueError if script name is not provided</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="idmtools_models.r.r_task.RTaskSpecification">
+<em class="property">class </em><code class="sig-prename descclassname">idmtools_models.r.r_task.</code><code class="sig-name descname">RTaskSpecification</code><a class="headerlink" href="#idmtools_models.r.r_task.RTaskSpecification" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="idmtools.registry.task_specification.html#idmtools.registry.task_specification.TaskSpecification" title="idmtools.registry.task_specification.TaskSpecification"><code class="xref py py-class docutils literal notranslate"><span class="pre">idmtools.registry.task_specification.TaskSpecification</span></code></a></p>
+<dl class="py method">
+<dt id="idmtools_models.r.r_task.RTaskSpecification.get">
+<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">configuration</span><span class="p">:</span> <span class="n">dict</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#idmtools_models.r.r_task.RTask" title="idmtools_models.r.r_task.RTask">idmtools_models.r.r_task.RTask</a><a class="headerlink" href="#idmtools_models.r.r_task.RTaskSpecification.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get instance of RTask</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>configuration</strong> – configuration for task</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>RTask with configuration</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools_models.r.r_task.RTaskSpecification.get_description">
+<code class="sig-name descname">get_description</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#idmtools_models.r.r_task.RTaskSpecification.get_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the Description of the plugin</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Plugin Description</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools_models.r.r_task.RTaskSpecification.get_type">
+<code class="sig-name descname">get_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Type<span class="p">[</span><a class="reference internal" href="#idmtools_models.r.r_task.RTask" title="idmtools_models.r.r_task.RTask">idmtools_models.r.r_task.RTask</a><span class="p">]</span><a class="headerlink" href="#idmtools_models.r.r_task.RTaskSpecification.get_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get Type for Plugin</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>RTask</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools_models.r.r_task.RTaskSpecification.get_version">
+<code class="sig-name descname">get_version</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#idmtools_models.r.r_task.RTaskSpecification.get_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the version of the plugin</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Plugin Version</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="idmtools_models.json_configured_task.html" class="btn btn-neutral float-right" title="idmtools_models.json_configured_task module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="idmtools_models.r.json_r_task.html" class="btn btn-neutral float-left" title="idmtools_models.r.json_r_task module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bill &amp; Melinda Gates Foundation. All rights reserved.
+
+    </p>
+  </div>
+<p>idmtools is licensed under the <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode">Creative Commons
+    Attribution-Noncommercial-ShareAlike 4.0 License</a>.</p>
+<p>Send documentation feedback to <a href="mailto:feedback@idmod.org" target="_top">feedback@idmod.org</a>. If you have
+    questions, email <a href="mailto:support@idmod.org" target="_top">support@idmod.org</a>.</p>
+<p><a href="https://www.gatesfoundation.org/Privacy-and-Cookies-Notice">Privacy and Cookies Notice</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+<a href="https://www.gatesfoundation.org/Terms-of-Use">Terms of Use</a></p>
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

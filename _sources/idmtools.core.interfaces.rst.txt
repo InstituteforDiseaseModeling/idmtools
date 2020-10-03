@@ -1,0 +1,22 @@
+idmtools.core.interfaces package
+================================
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   idmtools.core.interfaces.entity_container
+   idmtools.core.interfaces.iassets_enabled
+   idmtools.core.interfaces.ientity
+   idmtools.core.interfaces.iitem
+   idmtools.core.interfaces.inamed_entity
+
+Module contents
+---------------
+
+.. automodule:: idmtools.core.interfaces
+   :members:
+   :undoc-members:
+   :show-inheritance:

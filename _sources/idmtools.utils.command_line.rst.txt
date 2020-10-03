@@ -1,0 +1,7 @@
+idmtools.utils.command\_line module
+===================================
+
+.. automodule:: idmtools.utils.command_line
+   :members:
+   :undoc-members:
+   :show-inheritance:

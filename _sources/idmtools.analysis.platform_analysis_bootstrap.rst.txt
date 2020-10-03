@@ -1,0 +1,7 @@
+idmtools.analysis.platform\_analysis\_bootstrap module
+======================================================
+
+.. automodule:: idmtools.analysis.platform_analysis_bootstrap
+   :members:
+   :undoc-members:
+   :show-inheritance:

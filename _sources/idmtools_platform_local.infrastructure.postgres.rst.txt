@@ -1,0 +1,8 @@
+idmtools\_platform\_local.infrastructure.postgres module
+========================================================
+
+.. automodule:: idmtools_platform_local.infrastructure.postgres
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

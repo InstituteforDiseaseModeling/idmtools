@@ -1,0 +1,365 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>idmtools.entities.suite module &mdash; idmtools  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Search within idmtools  documentation"
+          href="_static/opensearch.xml"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="idmtools.entities.task_proxy module" href="idmtools.entities.task_proxy.html" />
+    <link rel="prev" title="idmtools.entities.simulation module" href="idmtools.entities.simulation.html" />
+
+<link href="https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans" rel="stylesheet">
+
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> idmtools
+          
+
+          
+            
+            <img src="_static/IDM_white.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.5.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reports.html">Output data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="reference.html">Architecture and packages reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="idmtools_index.html">idmtools</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="idmtools.html">idmtools package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="idmtools.analysis.html">idmtools.analysis package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.assets.html">idmtools.assets package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.builders.html">idmtools.builders package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.config.html">idmtools.config package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.core.html">idmtools.core package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="idmtools.entities.html">idmtools.entities package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.registry.html">idmtools.registry package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.services.html">idmtools.services package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.utils.html">idmtools.utils package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_models_index.html">idmtools_models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_platform_comps_index.html">idmtools_platform_comps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_platform_local_index.html">idmtools_platform_local</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="recipes_index.html">User Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">idmtools</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+<div aria-label="breadcrumbs navigation" role="navigation">
+    <ul class="wy-breadcrumbs">
+        <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
+        <li><a href="index.html">idmtools</a> &raquo;</li>
+        
+        <li><a href="reference.html">Architecture and packages reference</a> &raquo;</li>
+        
+        <li><a href="idmtools_index.html">idmtools</a> &raquo;</li>
+        
+        <li><a href="idmtools.html">idmtools package</a> &raquo;</li>
+        
+        <li><a href="idmtools.entities.html">idmtools.entities package</a> &raquo;</li>
+        
+        <li>idmtools.entities.suite module</li>
+        <li class="wy-breadcrumbs-aside">
+            
+            
+            
+        </li>
+    </ul>
+    <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-idmtools.entities.suite">
+<span id="idmtools-entities-suite-module"></span><h1>idmtools.entities.suite module<a class="headerlink" href="#module-idmtools.entities.suite" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="idmtools.entities.suite.Suite">
+<em class="property">class </em><code class="sig-prename descclassname">idmtools.entities.suite.</code><code class="sig-name descname">Suite</code><span class="sig-paren">(</span><em class="sig-param">_uid: uuid.UUID = None</em>, <em class="sig-param">platform_id: uuid.UUID = None</em>, <em class="sig-param">_platform: IPlatform = None</em>, <em class="sig-param">parent_id: uuid.UUID = None</em>, <em class="sig-param">_parent: IEntity = None</em>, <em class="sig-param">status: idmtools.core.enums.EntityStatus = None</em>, <em class="sig-param">tags: Dict[str</em>, <em class="sig-param">Any] = &lt;factory&gt;</em>, <em class="sig-param">_platform_object: Any = None</em>, <em class="sig-param">name: str = None</em>, <em class="sig-param">experiments: idmtools.core.interfaces.entity_container.EntityContainer = &lt;factory&gt;</em>, <em class="sig-param">description: str = None</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.suite.Suite" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="idmtools.core.interfaces.inamed_entity.html#idmtools.core.interfaces.inamed_entity.INamedEntity" title="idmtools.core.interfaces.inamed_entity.INamedEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">idmtools.core.interfaces.inamed_entity.INamedEntity</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>Class that represents a generic suite (a collection of experiments).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>experiments</strong> – The child items of this suite.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="idmtools.entities.suite.Suite.experiments">
+<code class="sig-name descname">experiments</code><em class="property">: <a class="reference internal" href="idmtools.core.interfaces.entity_container.html#idmtools.core.interfaces.entity_container.EntityContainer" title="idmtools.core.interfaces.entity_container.EntityContainer">idmtools.core.interfaces.entity_container.EntityContainer</a></em><a class="headerlink" href="#idmtools.entities.suite.Suite.experiments" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools.entities.suite.Suite.item_type">
+<code class="sig-name descname">item_type</code><em class="property">: <a class="reference internal" href="idmtools.core.enums.html#idmtools.core.enums.ItemType" title="idmtools.core.enums.ItemType">idmtools.core.enums.ItemType</a></em><em class="property"> = 1</em><a class="headerlink" href="#idmtools.entities.suite.Suite.item_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools.entities.suite.Suite.description">
+<code class="sig-name descname">description</code><em class="property">: str</em><em class="property"> = None</em><a class="headerlink" href="#idmtools.entities.suite.Suite.description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.suite.Suite.add_experiment">
+<code class="sig-name descname">add_experiment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">experiment</span><span class="p">:</span> <span class="n">Experiment</span></em><span class="sig-paren">)</span> &#x2192; NoReturn<a class="headerlink" href="#idmtools.entities.suite.Suite.add_experiment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add an experiment to the suite
+:param experiment: the experiment to be linked to suite</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.suite.Suite.display">
+<code class="sig-name descname">display</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.suite.Suite.display" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.suite.Suite.pre_creation">
+<code class="sig-name descname">pre_creation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.suite.Suite.pre_creation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called before the actual creation of the entity.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.suite.Suite.post_creation">
+<code class="sig-name descname">post_creation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.suite.Suite.post_creation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Post creation hook for object
+Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.suite.Suite.done">
+<em class="property">property </em><code class="sig-name descname">done</code><a class="headerlink" href="#idmtools.entities.suite.Suite.done" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return if an suite has finished executing</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True if all experiments have ran, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.suite.Suite.succeeded">
+<em class="property">property </em><code class="sig-name descname">succeeded</code><a class="headerlink" href="#idmtools.entities.suite.Suite.succeeded" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return if an suite has succeeded. An suite is succeeded when all experiments have succeeded</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True if all experiments have succeeded, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.suite.Suite.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">wait_until_done</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">platform</span><span class="p">:</span> <span class="n">IPlatform</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">run_opts</span></em><span class="sig-paren">)</span> &#x2192; NoReturn<a class="headerlink" href="#idmtools.entities.suite.Suite.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs an experiment on a platform</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wait_until_done</strong> – Whether we should wait on experiment to finish running as well. Defaults to False</p></li>
+<li><p><strong>platform</strong> – Platform object to use. If not specified, we first check object for platform object then the</p></li>
+<li><p><strong>context</strong> (<em>current</em>) – </p></li>
+<li><p><strong>**run_opts</strong> – Options to pass to the platform</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.suite.Suite.wait">
+<code class="sig-name descname">wait</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">timeout</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">refresh_interval</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">platform</span><span class="p">:</span> <span class="n">IPlatform</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.suite.Suite.wait" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wait on an experiment to finish running</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>timeout</strong> – Timeout to wait</p></li>
+<li><p><strong>refresh_interval</strong> – How often to refresh object</p></li>
+<li><p><strong>platform</strong> – Platform. If not specified, we try to determine this from context</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.suite.Suite.to_dict">
+<code class="sig-name descname">to_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Dict<a class="headerlink" href="#idmtools.entities.suite.Suite.to_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="idmtools.entities.task_proxy.html" class="btn btn-neutral float-right" title="idmtools.entities.task_proxy module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="idmtools.entities.simulation.html" class="btn btn-neutral float-left" title="idmtools.entities.simulation module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bill &amp; Melinda Gates Foundation. All rights reserved.
+
+    </p>
+  </div>
+<p>idmtools is licensed under the <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode">Creative Commons
+    Attribution-Noncommercial-ShareAlike 4.0 License</a>.</p>
+<p>Send documentation feedback to <a href="mailto:feedback@idmod.org" target="_top">feedback@idmod.org</a>. If you have
+    questions, email <a href="mailto:support@idmod.org" target="_top">support@idmod.org</a>.</p>
+<p><a href="https://www.gatesfoundation.org/Privacy-and-Cookies-Notice">Privacy and Cookies Notice</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+<a href="https://www.gatesfoundation.org/Terms-of-Use">Terms of Use</a></p>
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

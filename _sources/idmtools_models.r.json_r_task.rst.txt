@@ -1,0 +1,7 @@
+idmtools\_models.r.json\_r\_task module
+=======================================
+
+.. automodule:: idmtools_models.r.json_r_task
+   :members:
+   :undoc-members:
+   :show-inheritance:

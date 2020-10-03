@@ -1,0 +1,22 @@
+idmtools\_platform\_local.cli package
+=====================================
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   idmtools_platform_local.cli.experiment
+   idmtools_platform_local.cli.local
+   idmtools_platform_local.cli.simulation
+   idmtools_platform_local.cli.utils
+
+Module contents
+---------------
+
+.. automodule:: idmtools_platform_local.cli
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

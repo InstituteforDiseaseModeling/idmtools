@@ -1,0 +1,8 @@
+idmtools\_platform\_local.plugin\_info module
+=============================================
+
+.. automodule:: idmtools_platform_local.plugin_info
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

@@ -1,0 +1,7 @@
+idmtools.analysis.analyze\_manager module
+=========================================
+
+.. automodule:: idmtools.analysis.analyze_manager
+   :members:
+   :undoc-members:
+   :show-inheritance:

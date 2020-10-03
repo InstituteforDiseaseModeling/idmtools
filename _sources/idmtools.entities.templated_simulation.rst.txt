@@ -1,0 +1,7 @@
+idmtools.entities.templated\_simulation module
+==============================================
+
+.. automodule:: idmtools.entities.templated_simulation
+   :members:
+   :undoc-members:
+   :show-inheritance:

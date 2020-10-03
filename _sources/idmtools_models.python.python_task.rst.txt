@@ -1,0 +1,7 @@
+idmtools\_models.python.python\_task module
+===========================================
+
+.. automodule:: idmtools_models.python.python_task
+   :members:
+   :undoc-members:
+   :show-inheritance:

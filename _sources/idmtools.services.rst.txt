@@ -1,0 +1,19 @@
+idmtools.services package
+=========================
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   idmtools.services.ipersistance_service
+   idmtools.services.platforms
+
+Module contents
+---------------
+
+.. automodule:: idmtools.services
+   :members:
+   :undoc-members:
+   :show-inheritance:

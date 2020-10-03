@@ -1,0 +1,7 @@
+idmtools.utils.display.settings module
+======================================
+
+.. automodule:: idmtools.utils.display.settings
+   :members:
+   :undoc-members:
+   :show-inheritance:

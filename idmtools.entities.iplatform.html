@@ -1,0 +1,571 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>idmtools.entities.iplatform module &mdash; idmtools  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Search within idmtools  documentation"
+          href="_static/opensearch.xml"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="idmtools.entities.itask module" href="idmtools.entities.itask.html" />
+    <link rel="prev" title="idmtools.entities.ianalyzer module" href="idmtools.entities.ianalyzer.html" />
+
+<link href="https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans" rel="stylesheet">
+
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> idmtools
+          
+
+          
+            
+            <img src="_static/IDM_white.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.5.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reports.html">Output data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="reference.html">Architecture and packages reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="idmtools_index.html">idmtools</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="idmtools.html">idmtools package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="idmtools.analysis.html">idmtools.analysis package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.assets.html">idmtools.assets package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.builders.html">idmtools.builders package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.config.html">idmtools.config package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.core.html">idmtools.core package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="idmtools.entities.html">idmtools.entities package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.registry.html">idmtools.registry package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.services.html">idmtools.services package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.utils.html">idmtools.utils package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_models_index.html">idmtools_models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_platform_comps_index.html">idmtools_platform_comps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_platform_local_index.html">idmtools_platform_local</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="recipes_index.html">User Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">idmtools</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+<div aria-label="breadcrumbs navigation" role="navigation">
+    <ul class="wy-breadcrumbs">
+        <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
+        <li><a href="index.html">idmtools</a> &raquo;</li>
+        
+        <li><a href="reference.html">Architecture and packages reference</a> &raquo;</li>
+        
+        <li><a href="idmtools_index.html">idmtools</a> &raquo;</li>
+        
+        <li><a href="idmtools.html">idmtools package</a> &raquo;</li>
+        
+        <li><a href="idmtools.entities.html">idmtools.entities package</a> &raquo;</li>
+        
+        <li>idmtools.entities.iplatform module</li>
+        <li class="wy-breadcrumbs-aside">
+            
+            
+            
+        </li>
+    </ul>
+    <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-idmtools.entities.iplatform">
+<span id="idmtools-entities-iplatform-module"></span><h1>idmtools.entities.iplatform module<a class="headerlink" href="#module-idmtools.entities.iplatform" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="idmtools.entities.iplatform.IPlatform">
+<em class="property">class </em><code class="sig-prename descclassname">idmtools.entities.iplatform.</code><code class="sig-name descname">IPlatform</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.iplatform.IPlatform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="idmtools.core.interfaces.iitem.html#idmtools.core.interfaces.iitem.IItem" title="idmtools.core.interfaces.iitem.IItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">idmtools.core.interfaces.iitem.IItem</span></code></a>, <a class="reference internal" href="idmtools.core.cache_enabled.html#idmtools.core.cache_enabled.CacheEnabled" title="idmtools.core.cache_enabled.CacheEnabled"><code class="xref py py-class docutils literal notranslate"><span class="pre">idmtools.core.cache_enabled.CacheEnabled</span></code></a></p>
+<p>Interface defining a platform.
+A platform needs to implement basic operation such as:</p>
+<ul class="simple">
+<li><p>Creating experiment</p></li>
+<li><p>Creating simulation</p></li>
+<li><p>Commissioning</p></li>
+<li><p>File handling</p></li>
+</ul>
+<dl class="py attribute">
+<dt id="idmtools.entities.iplatform.IPlatform.platform_type_map">
+<code class="sig-name descname">platform_type_map</code><em class="property">: Dict<span class="p">[</span>Type<span class="p">, </span><a class="reference internal" href="idmtools.core.enums.html#idmtools.core.enums.ItemType" title="idmtools.core.enums.ItemType">idmtools.core.enums.ItemType</a><span class="p">]</span></em><em class="property"> = None</em><a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.platform_type_map" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools.entities.iplatform.IPlatform.supported_types">
+<code class="sig-name descname">supported_types</code><em class="property">: Set<span class="p">[</span><a class="reference internal" href="idmtools.core.enums.html#idmtools.core.enums.ItemType" title="idmtools.core.enums.ItemType">idmtools.core.enums.ItemType</a><span class="p">]</span></em><a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.supported_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.iplatform.IPlatform.get_caller">
+<em class="property">static </em><code class="sig-name descname">get_caller</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.get_caller" title="Permalink to this definition">¶</a></dt>
+<dd><p>Trace the stack and find the caller.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The direct caller.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.iplatform.IPlatform.validate_inputs_types">
+<code class="sig-name descname">validate_inputs_types</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; NoReturn<a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.validate_inputs_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate user inputs and case attributes with the correct data types.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.iplatform.IPlatform.get_item">
+<code class="sig-name descname">get_item</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">item_id</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>uuid.UUID<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">item_type</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.core.enums.html#idmtools.core.enums.ItemType" title="idmtools.core.enums.ItemType">idmtools.core.enums.ItemType</a></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">force</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">raw</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; Any<a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.get_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve an object from the platform.
+This function is cached; force allows you to force the refresh of the cache.
+If no <strong>object_type</strong> is passed, the function will try all the types (experiment, suite, simulation).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>item_id</strong> – The ID of the object to retrieve.</p></li>
+<li><p><strong>item_type</strong> – The type of the object to be retrieved.</p></li>
+<li><p><strong>force</strong> – If True, force the object fetching from the platform.</p></li>
+<li><p><strong>raw</strong> – Return either an idmtools object or a platform object.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The object found on the platform or None.</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If the item type is not supported</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.iplatform.IPlatform.get_children">
+<code class="sig-name descname">get_children</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">item_id</span><span class="p">:</span> <span class="n">uuid.UUID</span></em>, <em class="sig-param"><span class="n">item_type</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.core.enums.html#idmtools.core.enums.ItemType" title="idmtools.core.enums.ItemType">idmtools.core.enums.ItemType</a></span></em>, <em class="sig-param"><span class="n">force</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">raw</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">item</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; Any<a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.get_children" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the children of a given object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>item_id</strong> – The ID of the object for which we want the children.</p></li>
+<li><p><strong>force</strong> – If True, force the object fetching from the platform.</p></li>
+<li><p><strong>raw</strong> – Return either an idmtools object or a platform object.</p></li>
+<li><p><strong>item_type</strong> – Pass the type of the object for quicker retrieval.</p></li>
+<li><p><strong>item</strong> – optional platform or idm item to use instead of loading</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The children of the object or None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.iplatform.IPlatform.get_children_by_object">
+<code class="sig-name descname">get_children_by_object</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parent</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.core.interfaces.ientity.html#idmtools.core.interfaces.ientity.IEntity" title="idmtools.core.interfaces.ientity.IEntity">idmtools.core.interfaces.ientity.IEntity</a></span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span><a class="reference internal" href="idmtools.core.interfaces.ientity.html#idmtools.core.interfaces.ientity.IEntity" title="idmtools.core.interfaces.ientity.IEntity">idmtools.core.interfaces.ientity.IEntity</a><span class="p">]</span><a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.get_children_by_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of children for an entity</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>parent</strong> – Parent object</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of children</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.iplatform.IPlatform.get_parent_by_object">
+<code class="sig-name descname">get_parent_by_object</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">child</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.core.interfaces.ientity.html#idmtools.core.interfaces.ientity.IEntity" title="idmtools.core.interfaces.ientity.IEntity">idmtools.core.interfaces.ientity.IEntity</a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="idmtools.core.interfaces.ientity.html#idmtools.core.interfaces.ientity.IEntity" title="idmtools.core.interfaces.ientity.IEntity">idmtools.core.interfaces.ientity.IEntity</a><a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.get_parent_by_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parent of object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>child</strong> – Child object to find parent for</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Returns parent object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.iplatform.IPlatform.get_parent">
+<code class="sig-name descname">get_parent</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">item_id</span><span class="p">:</span> <span class="n">uuid.UUID</span></em>, <em class="sig-param"><span class="n">item_type</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.core.enums.html#idmtools.core.enums.ItemType" title="idmtools.core.enums.ItemType">idmtools.core.enums.ItemType</a></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">force</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">raw</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.get_parent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the parent of a given object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>item_id</strong> – The ID of the object for which we want the parent.</p></li>
+<li><p><strong>force</strong> – If True, force the object fetching from the platform.</p></li>
+<li><p><strong>raw</strong> – Return either an idmtools object or a platform object.</p></li>
+<li><p><strong>item_type</strong> – Pass the type of the object for quicker retrieval.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The parent of the object or None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.iplatform.IPlatform.get_cache_key">
+<code class="sig-name descname">get_cache_key</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">force</span></em>, <em class="sig-param"><span class="n">item_id</span></em>, <em class="sig-param"><span class="n">item_type</span></em>, <em class="sig-param"><span class="n">kwargs</span></em>, <em class="sig-param"><span class="n">raw</span></em>, <em class="sig-param"><span class="n">prefix</span><span class="o">=</span><span class="default_value">'p'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.get_cache_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.iplatform.IPlatform.create_items">
+<code class="sig-name descname">create_items</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">items</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>List<span class="p">[</span><a class="reference internal" href="idmtools.core.interfaces.ientity.html#idmtools.core.interfaces.ientity.IEntity" title="idmtools.core.interfaces.ientity.IEntity">idmtools.core.interfaces.ientity.IEntity</a><span class="p">]</span><span class="p">, </span><a class="reference internal" href="idmtools.core.interfaces.ientity.html#idmtools.core.interfaces.ientity.IEntity" title="idmtools.core.interfaces.ientity.IEntity">idmtools.core.interfaces.ientity.IEntity</a><span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span><a class="reference internal" href="idmtools.core.interfaces.ientity.html#idmtools.core.interfaces.ientity.IEntity" title="idmtools.core.interfaces.ientity.IEntity">idmtools.core.interfaces.ientity.IEntity</a><span class="p">]</span><a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.create_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create items (simulations, experiments, or suites) on the platform. The function will batch the items based on
+type and call the self._create_batch for creation
+:param items: The list of items to create.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List of item IDs created.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.iplatform.IPlatform.run_items">
+<code class="sig-name descname">run_items</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">items</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference internal" href="idmtools.core.interfaces.ientity.html#idmtools.core.interfaces.ientity.IEntity" title="idmtools.core.interfaces.ientity.IEntity">idmtools.core.interfaces.ientity.IEntity</a><span class="p">, </span>List<span class="p">[</span><a class="reference internal" href="idmtools.core.interfaces.ientity.html#idmtools.core.interfaces.ientity.IEntity" title="idmtools.core.interfaces.ientity.IEntity">idmtools.core.interfaces.ientity.IEntity</a><span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.run_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run items on the platform.
+:param items:</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.iplatform.IPlatform.flatten_item">
+<code class="sig-name descname">flatten_item</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">item</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.core.interfaces.ientity.html#idmtools.core.interfaces.ientity.IEntity" title="idmtools.core.interfaces.ientity.IEntity">idmtools.core.interfaces.ientity.IEntity</a></span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span><a class="reference internal" href="idmtools.core.interfaces.ientity.html#idmtools.core.interfaces.ientity.IEntity" title="idmtools.core.interfaces.ientity.IEntity">idmtools.core.interfaces.ientity.IEntity</a><span class="p">]</span><a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.flatten_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flatten an item: resolve the children until getting to the leaves.
+For example, for an experiment, will return all the simulations.
+For a suite, will return all the simulations contained in the suites experiments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>item</strong> – Which item to flatten</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of leaves</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.iplatform.IPlatform.refresh_status">
+<code class="sig-name descname">refresh_status</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">item</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.core.interfaces.ientity.html#idmtools.core.interfaces.ientity.IEntity" title="idmtools.core.interfaces.ientity.IEntity">idmtools.core.interfaces.ientity.IEntity</a></span></em><span class="sig-paren">)</span> &#x2192; NoReturn<a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.refresh_status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Populate the platform item and specified item with its status.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>item</strong> – The item to check status for.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.iplatform.IPlatform.get_files">
+<code class="sig-name descname">get_files</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">item</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.core.interfaces.ientity.html#idmtools.core.interfaces.ientity.IEntity" title="idmtools.core.interfaces.ientity.IEntity">idmtools.core.interfaces.ientity.IEntity</a></span></em>, <em class="sig-param"><span class="n">files</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>Set<span class="p">[</span>str<span class="p">]</span><span class="p">, </span>List<span class="p">[</span>str<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">output</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; Union<span class="p">[</span>Dict<span class="p">[</span>str<span class="p">, </span>Dict<span class="p">[</span>str<span class="p">, </span>bytearray<span class="p">]</span><span class="p">]</span><span class="p">, </span>Dict<span class="p">[</span>str<span class="p">, </span>bytearray<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.get_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get files for a platform entity</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>item</strong> – Item to fetch files for</p></li>
+<li><p><strong>files</strong> – List of file names to get</p></li>
+<li><p><strong>output</strong> – save files to</p></li>
+<li><p><strong>**kwargs</strong> – Platform arguments</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>For simulations, this returns a dictionary with filename as key and values being binary data from file or a
+dict.</p>
+<p>For experiments, this returns a dictionary with key as sim id and then the values as a dict of the
+simulations described above</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.iplatform.IPlatform.get_files_by_id">
+<code class="sig-name descname">get_files_by_id</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">item_id</span><span class="p">:</span> <span class="n">uuid.UUID</span></em>, <em class="sig-param"><span class="n">item_type</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.core.enums.html#idmtools.core.enums.ItemType" title="idmtools.core.enums.ItemType">idmtools.core.enums.ItemType</a></span></em>, <em class="sig-param"><span class="n">files</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>Set<span class="p">[</span>str<span class="p">]</span><span class="p">, </span>List<span class="p">[</span>str<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">output</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; Union<span class="p">[</span>Dict<span class="p">[</span>str<span class="p">, </span>Dict<span class="p">[</span>str<span class="p">, </span>bytearray<span class="p">]</span><span class="p">]</span><span class="p">, </span>Dict<span class="p">[</span>str<span class="p">, </span>bytearray<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.get_files_by_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get files by item id (UUID)
+:param item_id: COMPS Item, say, Simulation Id or WorkItem Id
+:param item_type: Item Type
+:param files: List of files to retrieve
+:param output: save files to</p>
+<p>Returns: dict with key/value: file_name/file_content</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.iplatform.IPlatform.are_requirements_met">
+<code class="sig-name descname">are_requirements_met</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">requirements</span><span class="p">:</span> <span class="n">Set<span class="p">[</span><a class="reference internal" href="idmtools.entities.platform_requirements.html#idmtools.entities.platform_requirements.PlatformRequirements" title="idmtools.entities.platform_requirements.PlatformRequirements">idmtools.entities.platform_requirements.PlatformRequirements</a><span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.are_requirements_met" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does the platform support the list of requirements</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>requirements</strong> – Requirements</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if all the requirements are supported</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.iplatform.IPlatform.is_task_supported">
+<code class="sig-name descname">is_task_supported</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">task</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.entities.itask.html#idmtools.entities.itask.ITask" title="idmtools.entities.itask.ITask">idmtools.entities.itask.ITask</a></span></em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.is_task_supported" title="Permalink to this definition">¶</a></dt>
+<dd><p>Is a task supported on this platform. This depends on the task properly setting its requirements. See
+<a class="reference internal" href="idmtools.entities.itask.html#idmtools.entities.itask.ITask.platform_requirements" title="idmtools.entities.itask.ITask.platform_requirements"><code class="xref py py-attr docutils literal notranslate"><span class="pre">idmtools.entities.itask.ITask.platform_requirements</span></code></a> and
+<a class="reference internal" href="idmtools.entities.platform_requirements.html#idmtools.entities.platform_requirements.PlatformRequirements" title="idmtools.entities.platform_requirements.PlatformRequirements"><code class="xref py py-class docutils literal notranslate"><span class="pre">idmtools.entities.platform_requirements.PlatformRequirements</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>task</strong> – Task to check support of</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if the task is supported, False otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.iplatform.IPlatform.wait_till_done">
+<code class="sig-name descname">wait_till_done</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">item</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference internal" href="idmtools.entities.experiment.html#idmtools.entities.experiment.Experiment" title="idmtools.entities.experiment.Experiment">idmtools.entities.experiment.Experiment</a><span class="p">, </span><a class="reference internal" href="idmtools.entities.iworkflow_item.html#idmtools.entities.iworkflow_item.IWorkflowItem" title="idmtools.entities.iworkflow_item.IWorkflowItem">idmtools.entities.iworkflow_item.IWorkflowItem</a><span class="p">, </span><a class="reference internal" href="idmtools.entities.suite.html#idmtools.entities.suite.Suite" title="idmtools.entities.suite.Suite">idmtools.entities.suite.Suite</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">timeout</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">86400</span></em>, <em class="sig-param"><span class="n">refresh_interval</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">5</span></em>, <em class="sig-param"><span class="n">progress</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.wait_till_done" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wait for the experiment to be done.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>item</strong> – Experiment/Workitem to wait on</p></li>
+<li><p><strong>refresh_interval</strong> – How long to wait between polling.</p></li>
+<li><p><strong>timeout</strong> – How long to wait before failing.</p></li>
+<li><p><strong>progress</strong> – Should we display progress</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#idmtools.entities.iplatform.IPlatform.wait_till_done_progress" title="idmtools.entities.iplatform.IPlatform.wait_till_done_progress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">idmtools.entities.iplatform.IPlatform.wait_till_done_progress()</span></code></a>
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">idmtools.entities.iplatform.IPlatform.__wait_until_done_progress_callback()</span></code>
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">idmtools.entities.iplatform.IPlatform.__wait_till_callback()</span></code></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.iplatform.IPlatform.wait_till_done_progress">
+<code class="sig-name descname">wait_till_done_progress</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">item</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference internal" href="idmtools.entities.experiment.html#idmtools.entities.experiment.Experiment" title="idmtools.entities.experiment.Experiment">idmtools.entities.experiment.Experiment</a><span class="p">, </span><a class="reference internal" href="idmtools.entities.iworkflow_item.html#idmtools.entities.iworkflow_item.IWorkflowItem" title="idmtools.entities.iworkflow_item.IWorkflowItem">idmtools.entities.iworkflow_item.IWorkflowItem</a><span class="p">, </span><a class="reference internal" href="idmtools.entities.suite.html#idmtools.entities.suite.Suite" title="idmtools.entities.suite.Suite">idmtools.entities.suite.Suite</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">timeout</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">86400</span></em>, <em class="sig-param"><span class="n">refresh_interval</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">5</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.wait_till_done_progress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wait on an item to complete with progress bar</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>item</strong> – Item to monitor</p></li>
+<li><p><strong>timeout</strong> – Timeout on waiting</p></li>
+<li><p><strong>refresh_interval</strong> – How often to refresh</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">idmtools.entities.iplatform.IPlatform.__wait_until_done_progress_callback()</span></code>
+<a class="reference internal" href="#idmtools.entities.iplatform.IPlatform.wait_till_done" title="idmtools.entities.iplatform.IPlatform.wait_till_done"><code class="xref py py-meth docutils literal notranslate"><span class="pre">idmtools.entities.iplatform.IPlatform.wait_till_done()</span></code></a>
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">idmtools.entities.iplatform.IPlatform.__wait_till_callback()</span></code></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.iplatform.IPlatform.get_related_items">
+<code class="sig-name descname">get_related_items</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">item</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.entities.iworkflow_item.html#idmtools.entities.iworkflow_item.IWorkflowItem" title="idmtools.entities.iworkflow_item.IWorkflowItem">idmtools.entities.iworkflow_item.IWorkflowItem</a></span></em>, <em class="sig-param"><span class="n">relation_type</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.entities.relation_type.html#idmtools.entities.relation_type.RelationType" title="idmtools.entities.relation_type.RelationType">idmtools.entities.relation_type.RelationType</a></span></em><span class="sig-paren">)</span> &#x2192; Dict<span class="p">[</span>str<span class="p">, </span>Dict<span class="p">[</span>str<span class="p">, </span>str<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.get_related_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve all related objects
+:param item: SSMTWorkItem
+:param relation_type: Depends or Create</p>
+<p>Returns: dict with key the object type</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.iplatform.IPlatform.is_regather_assets_on_modify">
+<code class="sig-name descname">is_regather_assets_on_modify</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#idmtools.entities.iplatform.IPlatform.is_regather_assets_on_modify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return default behaviour for platform when rerunning experiment and gathering assets</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True or false</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="idmtools.entities.itask.html" class="btn btn-neutral float-right" title="idmtools.entities.itask module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="idmtools.entities.ianalyzer.html" class="btn btn-neutral float-left" title="idmtools.entities.ianalyzer module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bill &amp; Melinda Gates Foundation. All rights reserved.
+
+    </p>
+  </div>
+<p>idmtools is licensed under the <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode">Creative Commons
+    Attribution-Noncommercial-ShareAlike 4.0 License</a>.</p>
+<p>Send documentation feedback to <a href="mailto:feedback@idmod.org" target="_top">feedback@idmod.org</a>. If you have
+    questions, email <a href="mailto:support@idmod.org" target="_top">support@idmod.org</a>.</p>
+<p><a href="https://www.gatesfoundation.org/Privacy-and-Cookies-Notice">Privacy and Cookies Notice</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+<a href="https://www.gatesfoundation.org/Terms-of-Use">Terms of Use</a></p>
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,395 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>idmtools.entities.templated_simulation module &mdash; idmtools  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Search within idmtools  documentation"
+          href="_static/opensearch.xml"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="idmtools.registry package" href="idmtools.registry.html" />
+    <link rel="prev" title="idmtools.entities.task_proxy module" href="idmtools.entities.task_proxy.html" />
+
+<link href="https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans" rel="stylesheet">
+
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> idmtools
+          
+
+          
+            
+            <img src="_static/IDM_white.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.5.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reports.html">Output data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="reference.html">Architecture and packages reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="idmtools_index.html">idmtools</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="idmtools.html">idmtools package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="idmtools.analysis.html">idmtools.analysis package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.assets.html">idmtools.assets package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.builders.html">idmtools.builders package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.config.html">idmtools.config package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.core.html">idmtools.core package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="idmtools.entities.html">idmtools.entities package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.registry.html">idmtools.registry package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.services.html">idmtools.services package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools.utils.html">idmtools.utils package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_models_index.html">idmtools_models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_platform_comps_index.html">idmtools_platform_comps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_platform_local_index.html">idmtools_platform_local</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="recipes_index.html">User Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">idmtools</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+<div aria-label="breadcrumbs navigation" role="navigation">
+    <ul class="wy-breadcrumbs">
+        <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
+        <li><a href="index.html">idmtools</a> &raquo;</li>
+        
+        <li><a href="reference.html">Architecture and packages reference</a> &raquo;</li>
+        
+        <li><a href="idmtools_index.html">idmtools</a> &raquo;</li>
+        
+        <li><a href="idmtools.html">idmtools package</a> &raquo;</li>
+        
+        <li><a href="idmtools.entities.html">idmtools.entities package</a> &raquo;</li>
+        
+        <li>idmtools.entities.templated_simulation module</li>
+        <li class="wy-breadcrumbs-aside">
+            
+            
+            
+        </li>
+    </ul>
+    <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-idmtools.entities.templated_simulation">
+<span id="idmtools-entities-templated-simulation-module"></span><h1>idmtools.entities.templated_simulation module<a class="headerlink" href="#module-idmtools.entities.templated_simulation" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="idmtools.entities.templated_simulation.simulation_generator">
+<code class="sig-prename descclassname">idmtools.entities.templated_simulation.</code><code class="sig-name descname">simulation_generator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">builders</span></em>, <em class="sig-param"><span class="n">new_sim_func</span></em>, <em class="sig-param"><span class="n">additional_sims</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">batch_size</span><span class="o">=</span><span class="default_value">10</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.templated_simulation.simulation_generator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="idmtools.entities.templated_simulation.TemplatedSimulations">
+<em class="property">class </em><code class="sig-prename descclassname">idmtools.entities.templated_simulation.</code><code class="sig-name descname">TemplatedSimulations</code><span class="sig-paren">(</span><em class="sig-param">builders: Set[idmtools.builders.simulation_builder.SimulationBuilder] = &lt;factory&gt;</em>, <em class="sig-param">base_simulation: idmtools.entities.simulation.Simulation = None</em>, <em class="sig-param">base_task: idmtools.entities.itask.ITask = None</em>, <em class="sig-param">parent: Experiment = None</em>, <em class="sig-param">tags: dataclasses.InitVar = &lt;property object&gt;</em>, <em class="sig-param">_TemplatedSimulations__extra_simulations: List[idmtools.entities.simulation.Simulation] = &lt;factory&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.templated_simulation.TemplatedSimulations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for building templated simulations and commonly used with SimulationBuilder class.</p>
+<p class="rubric">Examples</p>
+<p>Add tags to all simulations via base task:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ts</span> <span class="o">=</span> <span class="n">TemplatedSimulations</span><span class="p">(</span><span class="n">base_task</span><span class="o">=</span><span class="n">task</span><span class="p">)</span>
+<span class="n">ts</span><span class="o">.</span><span class="n">tags</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="mi">9</span><span class="p">}</span>
+<span class="n">ts</span><span class="o">.</span><span class="n">add_builder</span><span class="p">(</span><span class="n">builder</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Add tags to a specific simulation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">experiment</span> <span class="o">=</span>  <span class="n">Experiment</span><span class="o">.</span><span class="n">from_builder</span><span class="p">(</span><span class="n">builder</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">expname</span><span class="p">)</span>
+<span class="n">experiment</span><span class="o">.</span><span class="n">simulations</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">experiment</span><span class="o">.</span><span class="n">simulations</span><span class="p">)</span>
+<span class="n">experiment</span><span class="o">.</span><span class="n">simulations</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">tags</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span><span class="o">=</span><span class="mi">123</span>
+</pre></div>
+</div>
+<dl class="py attribute">
+<dt id="idmtools.entities.templated_simulation.TemplatedSimulations.builders">
+<code class="sig-name descname">builders</code><em class="property">: Set<span class="p">[</span><a class="reference internal" href="idmtools.builders.simulation_builder.html#idmtools.builders.simulation_builder.SimulationBuilder" title="idmtools.builders.simulation_builder.SimulationBuilder">idmtools.builders.simulation_builder.SimulationBuilder</a><span class="p">]</span></em><a class="headerlink" href="#idmtools.entities.templated_simulation.TemplatedSimulations.builders" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools.entities.templated_simulation.TemplatedSimulations.base_simulation">
+<code class="sig-name descname">base_simulation</code><em class="property">: <a class="reference internal" href="idmtools.entities.simulation.html#idmtools.entities.simulation.Simulation" title="idmtools.entities.simulation.Simulation">idmtools.entities.simulation.Simulation</a></em><em class="property"> = None</em><a class="headerlink" href="#idmtools.entities.templated_simulation.TemplatedSimulations.base_simulation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools.entities.templated_simulation.TemplatedSimulations.base_task">
+<code class="sig-name descname">base_task</code><em class="property">: <a class="reference internal" href="idmtools.entities.itask.html#idmtools.entities.itask.ITask" title="idmtools.entities.itask.ITask">idmtools.entities.itask.ITask</a></em><em class="property"> = None</em><a class="headerlink" href="#idmtools.entities.templated_simulation.TemplatedSimulations.base_task" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools.entities.templated_simulation.TemplatedSimulations.parent">
+<code class="sig-name descname">parent</code><em class="property">: Experiment</em><em class="property"> = None</em><a class="headerlink" href="#idmtools.entities.templated_simulation.TemplatedSimulations.parent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.templated_simulation.TemplatedSimulations.builder">
+<em class="property">property </em><code class="sig-name descname">builder</code><a class="headerlink" href="#idmtools.entities.templated_simulation.TemplatedSimulations.builder" title="Permalink to this definition">¶</a></dt>
+<dd><p>For backward-compatibility purposes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The last <code class="docutils literal notranslate"><span class="pre">TExperimentBuilder</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.templated_simulation.TemplatedSimulations.add_builder">
+<code class="sig-name descname">add_builder</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">builder</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.builders.simulation_builder.html#idmtools.builders.simulation_builder.SimulationBuilder" title="idmtools.builders.simulation_builder.SimulationBuilder">idmtools.builders.simulation_builder.SimulationBuilder</a></span></em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#idmtools.entities.templated_simulation.TemplatedSimulations.add_builder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add builder to builder collection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>builder</strong> – A builder to be added.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.templated_simulation.TemplatedSimulations.pickle_ignore_fields">
+<em class="property">property </em><code class="sig-name descname">pickle_ignore_fields</code><a class="headerlink" href="#idmtools.entities.templated_simulation.TemplatedSimulations.pickle_ignore_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.templated_simulation.TemplatedSimulations.display">
+<code class="sig-name descname">display</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.templated_simulation.TemplatedSimulations.display" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.templated_simulation.TemplatedSimulations.simulations">
+<code class="sig-name descname">simulations</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Generator<span class="p">[</span><a class="reference internal" href="idmtools.entities.simulation.html#idmtools.entities.simulation.Simulation" title="idmtools.entities.simulation.Simulation">idmtools.entities.simulation.Simulation</a><span class="p">, </span>None<span class="p">, </span>None<span class="p">]</span><a class="headerlink" href="#idmtools.entities.templated_simulation.TemplatedSimulations.simulations" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.templated_simulation.TemplatedSimulations.extra_simulations">
+<code class="sig-name descname">extra_simulations</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span><a class="reference internal" href="idmtools.entities.simulation.html#idmtools.entities.simulation.Simulation" title="idmtools.entities.simulation.Simulation">idmtools.entities.simulation.Simulation</a><span class="p">]</span><a class="headerlink" href="#idmtools.entities.templated_simulation.TemplatedSimulations.extra_simulations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the extra simulations defined on template</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Returns the extra simulations defined</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.templated_simulation.TemplatedSimulations.add_simulation">
+<code class="sig-name descname">add_simulation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">simulation</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.entities.simulation.html#idmtools.entities.simulation.Simulation" title="idmtools.entities.simulation.Simulation">idmtools.entities.simulation.Simulation</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.templated_simulation.TemplatedSimulations.add_simulation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a simulation that was built outside template engine to template generator. This is useful we you can build
+most simulations through a template but need a some that cannot. This is especially true for large simulation
+sets</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>simulation</strong> – Simulation to add</p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.templated_simulation.TemplatedSimulations.add_simulations">
+<code class="sig-name descname">add_simulations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">simulations</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference internal" href="idmtools.entities.simulation.html#idmtools.entities.simulation.Simulation" title="idmtools.entities.simulation.Simulation">idmtools.entities.simulation.Simulation</a><span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.templated_simulation.TemplatedSimulations.add_simulations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add multiple simulations without templating. See add_simulation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>simulations</strong> – Simulation to add</p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.templated_simulation.TemplatedSimulations.new_simulation">
+<code class="sig-name descname">new_simulation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#idmtools.entities.templated_simulation.TemplatedSimulations.new_simulation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a new simulation object.
+The simulation will be copied from the base simulation of the experiment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The created simulation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.templated_simulation.TemplatedSimulations.tags">
+<em class="property">property </em><code class="sig-name descname">tags</code><a class="headerlink" href="#idmtools.entities.templated_simulation.TemplatedSimulations.tags" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="idmtools.entities.templated_simulation.TemplatedSimulations.from_task">
+<em class="property">classmethod </em><code class="sig-name descname">from_task</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">task</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools.entities.itask.html#idmtools.entities.itask.ITask" title="idmtools.entities.itask.ITask">idmtools.entities.itask.ITask</a></span></em>, <em class="sig-param"><span class="n">tags</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#idmtools.entities.templated_simulation.TemplatedSimulations" title="idmtools.entities.templated_simulation.TemplatedSimulations">idmtools.entities.templated_simulation.TemplatedSimulations</a><a class="headerlink" href="#idmtools.entities.templated_simulation.TemplatedSimulations.from_task" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="idmtools.registry.html" class="btn btn-neutral float-right" title="idmtools.registry package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="idmtools.entities.task_proxy.html" class="btn btn-neutral float-left" title="idmtools.entities.task_proxy module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bill &amp; Melinda Gates Foundation. All rights reserved.
+
+    </p>
+  </div>
+<p>idmtools is licensed under the <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode">Creative Commons
+    Attribution-Noncommercial-ShareAlike 4.0 License</a>.</p>
+<p>Send documentation feedback to <a href="mailto:feedback@idmod.org" target="_top">feedback@idmod.org</a>. If you have
+    questions, email <a href="mailto:support@idmod.org" target="_top">support@idmod.org</a>.</p>
+<p><a href="https://www.gatesfoundation.org/Privacy-and-Cookies-Notice">Privacy and Cookies Notice</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+<a href="https://www.gatesfoundation.org/Terms-of-Use">Terms of Use</a></p>
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

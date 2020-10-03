@@ -1,0 +1,8 @@
+idmtools\_platform\_local.internals.ui.controllers.simulations module
+=====================================================================
+
+.. automodule:: idmtools_platform_local.internals.ui.controllers.simulations
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

@@ -1,0 +1,7 @@
+idmtools.core.interfaces.iassets\_enabled module
+================================================
+
+.. automodule:: idmtools.core.interfaces.iassets_enabled
+   :members:
+   :undoc-members:
+   :show-inheritance:

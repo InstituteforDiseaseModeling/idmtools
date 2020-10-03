@@ -1,0 +1,505 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>idmtools_platform_local.infrastructure.service_manager module &mdash; idmtools  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Search within idmtools  documentation"
+          href="_static/opensearch.xml"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="idmtools_platform_local.infrastructure.workers module" href="idmtools_platform_local.infrastructure.workers.html" />
+    <link rel="prev" title="idmtools_platform_local.infrastructure.redis module" href="idmtools_platform_local.infrastructure.redis.html" />
+
+<link href="https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans" rel="stylesheet">
+
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> idmtools
+          
+
+          
+            
+            <img src="_static/IDM_white.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.5.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reports.html">Output data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="reference.html">Architecture and packages reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="idmtools_index.html">idmtools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_models_index.html">idmtools_models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="idmtools_platform_comps_index.html">idmtools_platform_comps</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="idmtools_platform_local_index.html">idmtools_platform_local</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="idmtools_platform_local.html">idmtools_platform_local package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="idmtools_platform_local.cli.html">idmtools_platform_local.cli package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools_platform_local.client.html">idmtools_platform_local.client package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="idmtools_platform_local.infrastructure.html">idmtools_platform_local.infrastructure package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools_platform_local.internals.html">idmtools_platform_local.internals package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools_platform_local.platform_operations.html">idmtools_platform_local.platform_operations package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools_platform_local.config.html">idmtools_platform_local.config module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools_platform_local.local_cli.html">idmtools_platform_local.local_cli module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools_platform_local.local_platform.html">idmtools_platform_local.local_platform module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools_platform_local.plugin_info.html">idmtools_platform_local.plugin_info module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="idmtools_platform_local.status.html">idmtools_platform_local.status module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="recipes_index.html">User Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">idmtools</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+<div aria-label="breadcrumbs navigation" role="navigation">
+    <ul class="wy-breadcrumbs">
+        <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
+        <li><a href="index.html">idmtools</a> &raquo;</li>
+        
+        <li><a href="reference.html">Architecture and packages reference</a> &raquo;</li>
+        
+        <li><a href="idmtools_platform_local_index.html">idmtools_platform_local</a> &raquo;</li>
+        
+        <li><a href="idmtools_platform_local.html">idmtools_platform_local package</a> &raquo;</li>
+        
+        <li><a href="idmtools_platform_local.infrastructure.html">idmtools_platform_local.infrastructure package</a> &raquo;</li>
+        
+        <li>idmtools_platform_local.infrastructure.service_manager module</li>
+        <li class="wy-breadcrumbs-aside">
+            
+            
+            
+        </li>
+    </ul>
+    <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-idmtools_platform_local.infrastructure.service_manager">
+<span id="idmtools-platform-local-infrastructure-service-manager-module"></span><h1>idmtools_platform_local.infrastructure.service_manager module<a class="headerlink" href="#module-idmtools_platform_local.infrastructure.service_manager" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="idmtools_platform_local.infrastructure.service_manager.DockerServiceManager">
+<em class="property">class </em><code class="sig-prename descclassname">idmtools_platform_local.infrastructure.service_manager.</code><code class="sig-name descname">DockerServiceManager</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">client</span><span class="p">:</span> <span class="n">docker.client.DockerClient</span></em>, <em class="sig-param"><span class="n">host_data_directory</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'/home/runner/.local_data'</span></em>, <em class="sig-param"><span class="n">network</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'idmtools'</span></em>, <em class="sig-param"><span class="n">redis_image</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'redis:5.0.4-alpine'</span></em>, <em class="sig-param"><span class="n">heartbeat_timeout</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">15</span></em>, <em class="sig-param"><span class="n">redis_port</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">6379</span></em>, <em class="sig-param"><span class="n">runtime</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>NoneType<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">'runc'</span></em>, <em class="sig-param"><span class="n">redis_mem_limit</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'256m'</span></em>, <em class="sig-param"><span class="n">redis_mem_reservation</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'32m'</span></em>, <em class="sig-param"><span class="n">postgres_image</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'postgres:11.4'</span></em>, <em class="sig-param"><span class="n">postgres_mem_limit</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'128m'</span></em>, <em class="sig-param"><span class="n">postgres_mem_reservation</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'32m'</span></em>, <em class="sig-param"><span class="n">postgres_port</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>NoneType<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">5432</span></em>, <em class="sig-param"><span class="n">workers_image</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">workers_ui_port</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">5000</span></em>, <em class="sig-param"><span class="n">workers_mem_limit</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">workers_mem_reservation</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'64m'</span></em>, <em class="sig-param"><span class="n">run_as</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>NoneType<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">_services</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span><a class="reference internal" href="idmtools_platform_local.infrastructure.base_service_container.html#idmtools_platform_local.infrastructure.base_service_container.BaseServiceContainer" title="idmtools_platform_local.infrastructure.base_service_container.BaseServiceContainer">idmtools_platform_local.infrastructure.base_service_container.BaseServiceContainer</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt id="idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.client">
+<code class="sig-name descname">client</code><em class="property">: docker.client.DockerClient</em><a class="headerlink" href="#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.client" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.host_data_directory">
+<code class="sig-name descname">host_data_directory</code><em class="property">: str</em><em class="property"> = '/home/runner/.local_data'</em><a class="headerlink" href="#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.host_data_directory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.network">
+<code class="sig-name descname">network</code><em class="property">: str</em><em class="property"> = 'idmtools'</em><a class="headerlink" href="#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.network" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.redis_image">
+<code class="sig-name descname">redis_image</code><em class="property">: str</em><em class="property"> = 'redis:5.0.4-alpine'</em><a class="headerlink" href="#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.redis_image" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.heartbeat_timeout">
+<code class="sig-name descname">heartbeat_timeout</code><em class="property">: int</em><em class="property"> = 15</em><a class="headerlink" href="#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.heartbeat_timeout" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.redis_port">
+<code class="sig-name descname">redis_port</code><em class="property">: int</em><em class="property"> = 6379</em><a class="headerlink" href="#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.redis_port" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.runtime">
+<code class="sig-name descname">runtime</code><em class="property">: Optional<span class="p">[</span>str<span class="p">]</span></em><em class="property"> = 'runc'</em><a class="headerlink" href="#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.runtime" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.redis_mem_limit">
+<code class="sig-name descname">redis_mem_limit</code><em class="property">: str</em><em class="property"> = '256m'</em><a class="headerlink" href="#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.redis_mem_limit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.redis_mem_reservation">
+<code class="sig-name descname">redis_mem_reservation</code><em class="property">: str</em><em class="property"> = '32m'</em><a class="headerlink" href="#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.redis_mem_reservation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.postgres_image">
+<code class="sig-name descname">postgres_image</code><em class="property">: str</em><em class="property"> = 'postgres:11.4'</em><a class="headerlink" href="#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.postgres_image" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.postgres_mem_limit">
+<code class="sig-name descname">postgres_mem_limit</code><em class="property">: str</em><em class="property"> = '128m'</em><a class="headerlink" href="#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.postgres_mem_limit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.postgres_mem_reservation">
+<code class="sig-name descname">postgres_mem_reservation</code><em class="property">: str</em><em class="property"> = '32m'</em><a class="headerlink" href="#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.postgres_mem_reservation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.postgres_port">
+<code class="sig-name descname">postgres_port</code><em class="property">: Optional<span class="p">[</span>str<span class="p">]</span></em><em class="property"> = 5432</em><a class="headerlink" href="#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.postgres_port" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.workers_image">
+<code class="sig-name descname">workers_image</code><em class="property">: str</em><em class="property"> = None</em><a class="headerlink" href="#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.workers_image" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.workers_ui_port">
+<code class="sig-name descname">workers_ui_port</code><em class="property">: int</em><em class="property"> = 5000</em><a class="headerlink" href="#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.workers_ui_port" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.workers_mem_limit">
+<code class="sig-name descname">workers_mem_limit</code><em class="property">: str</em><em class="property"> = None</em><a class="headerlink" href="#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.workers_mem_limit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.workers_mem_reservation">
+<code class="sig-name descname">workers_mem_reservation</code><em class="property">: str</em><em class="property"> = '64m'</em><a class="headerlink" href="#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.workers_mem_reservation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.run_as">
+<code class="sig-name descname">run_as</code><em class="property">: Optional<span class="p">[</span>str<span class="p">]</span></em><em class="property"> = None</em><a class="headerlink" href="#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.run_as" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.init_services">
+<code class="sig-name descname">init_services</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.init_services" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.cleanup">
+<code class="sig-name descname">cleanup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">delete_data</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">tear_down_brokers</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span> &#x2192; NoReturn<a class="headerlink" href="#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops the containers and removes the network. Optionally the postgres data container can be deleted as well
+as closing any active Redis connections</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>delete_data</strong> – Delete postgres data</p></li>
+<li><p><strong>tear_down_brokers</strong> – True to close redis brokers, false otherwise</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>NoReturn</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.setup_broker">
+<em class="property">static </em><code class="sig-name descname">setup_broker</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">heartbeat_timeout</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.setup_broker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.restart_brokers">
+<em class="property">static </em><code class="sig-name descname">restart_brokers</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">heartbeat_timeout</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.restart_brokers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.create_services">
+<code class="sig-name descname">create_services</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">spinner</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; NoReturn<a class="headerlink" href="#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.create_services" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create all the components of our</p>
+<p>Our architecture is as depicted in the UML diagram below</p>
+<img alt="_images/58111b881264229fc93245b9a4037968cc5093cd27a1c506dc5351a77a0395ac.svg" class="align-center" src="_images/58111b881264229fc93245b9a4037968cc5093cd27a1c506dc5351a77a0395ac.svg" /><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>(NoReturn)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.wait_on_ports_to_open">
+<code class="sig-name descname">wait_on_ports_to_open</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ports</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">wait_between_tries</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>int<span class="p">, </span>float<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">0.2</span></em>, <em class="sig-param"><span class="n">max_retries</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">5</span></em>, <em class="sig-param"><span class="n">sleep_after</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>int<span class="p">, </span>float<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">0.5</span></em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.wait_on_ports_to_open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Polls list of port attributes(eg postgres_port, redis_port and checks if they are currently open. We use this
+to verify postgres/redis are ready for our workers</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ports</strong> – List of port attributes</p></li>
+<li><p><strong>wait_between_tries</strong> – Time between port checks</p></li>
+<li><p><strong>max_retries</strong> – Max checks</p></li>
+<li><p><strong>sleep_after</strong> – Sleep after all our found open(Postgres starts accepting connections before actually ready)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if ports are ready</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.stop_services">
+<code class="sig-name descname">stop_services</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">spinner</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; NoReturn<a class="headerlink" href="#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.stop_services" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops all running IDM Tools services</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>(NoReturn)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.get">
+<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">container_name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">create</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; docker.models.containers.Container<a class="headerlink" href="#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the server with specified name</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>container_name</strong> – Name of container</p></li>
+<li><p><strong>create</strong> – Create if it doesn’t exists</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.get_container_config">
+<code class="sig-name descname">get_container_config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">service</span><span class="p">:</span> <span class="n"><a class="reference internal" href="idmtools_platform_local.infrastructure.base_service_container.html#idmtools_platform_local.infrastructure.base_service_container.BaseServiceContainer" title="idmtools_platform_local.infrastructure.base_service_container.BaseServiceContainer">idmtools_platform_local.infrastructure.base_service_container.BaseServiceContainer</a></span></em>, <em class="sig-param"><span class="n">opts</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.get_container_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the container config for the service</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>service</strong> – Service to get config for</p></li>
+<li><p><strong>opts</strong> – Opts to Extract. Should be a fields object</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.restart_all">
+<code class="sig-name descname">restart_all</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">spinner</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; NoReturn<a class="headerlink" href="#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.restart_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Restart all the services IDM-Tools services</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>(NoReturn)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.is_port_open">
+<em class="property">static </em><code class="sig-name descname">is_port_open</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">host</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">port</span><span class="p">:</span> <span class="n">int</span></em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.is_port_open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if a port is open</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>host</strong> – Host to check</p></li>
+<li><p><strong>port</strong> – Port to check</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if port is open, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.stop_service_and_wait">
+<em class="property">static </em><code class="sig-name descname">stop_service_and_wait</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">service</span></em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.stop_service_and_wait" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stop server and wait</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>service</strong> – Service to stop</p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.get_network">
+<code class="sig-name descname">get_network</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; docker.models.networks.Network<a class="headerlink" href="#idmtools_platform_local.infrastructure.service_manager.DockerServiceManager.get_network" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches the IDM Tools network</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>(Network) Return Docker network object</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="idmtools_platform_local.infrastructure.workers.html" class="btn btn-neutral float-right" title="idmtools_platform_local.infrastructure.workers module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="idmtools_platform_local.infrastructure.redis.html" class="btn btn-neutral float-left" title="idmtools_platform_local.infrastructure.redis module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bill &amp; Melinda Gates Foundation. All rights reserved.
+
+    </p>
+  </div>
+<p>idmtools is licensed under the <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode">Creative Commons
+    Attribution-Noncommercial-ShareAlike 4.0 License</a>.</p>
+<p>Send documentation feedback to <a href="mailto:feedback@idmod.org" target="_top">feedback@idmod.org</a>. If you have
+    questions, email <a href="mailto:support@idmod.org" target="_top">support@idmod.org</a>.</p>
+<p><a href="https://www.gatesfoundation.org/Privacy-and-Cookies-Notice">Privacy and Cookies Notice</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+<a href="https://www.gatesfoundation.org/Terms-of-Use">Terms of Use</a></p>
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

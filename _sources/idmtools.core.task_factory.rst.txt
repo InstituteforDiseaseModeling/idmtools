@@ -1,0 +1,7 @@
+idmtools.core.task\_factory module
+==================================
+
+.. automodule:: idmtools.core.task_factory
+   :members:
+   :undoc-members:
+   :show-inheritance:

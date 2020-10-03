@@ -1,0 +1,7 @@
+idmtools.registry.task\_specification module
+============================================
+
+.. automodule:: idmtools.registry.task_specification
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,294 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Output data &mdash; idmtools  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Search within idmtools  documentation"
+          href="_static/opensearch.xml"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Introduction to analyzers" href="analyzers.html" />
+    <link rel="prev" title="Running parameter sweeps with EMOD" href="sweeps-emod.html" />
+
+<link href="https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans" rel="stylesheet">
+
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> idmtools
+          
+
+          
+            
+            <img src="_static/IDM_white.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.5.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platforms.html">Platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-sims.html">Create and run simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameter-sweeps.html">Parameter sweeps and model iteration</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Output data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analyzers.html">Introduction to analyzers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plots.html">Plot data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Architecture and packages reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="recipes_index.html">User Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli_index.html">CLI reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">idmtools</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+<div aria-label="breadcrumbs navigation" role="navigation">
+    <ul class="wy-breadcrumbs">
+        <li><a href="https://idmod.org/documentation">IDM docs</a> &raquo;</li>
+        <li><a href="index.html">idmtools</a> &raquo;</li>
+        
+        <li>Output data</li>
+        <li class="wy-breadcrumbs-aside">
+            
+            
+            
+        </li>
+    </ul>
+    <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="output-data">
+<h1>Output data<a class="headerlink" href="#output-data" title="Permalink to this headline">¶</a></h1>
+<p>The output produced by running simulations using idmtools depends on the
+configuration of the model itself. idmtools is itself agnostic to the output
+format when running simulations.  However, the analysis framework expects
+simulation output in CSV, JSON, XLSX, or TXT to be automatically loaded to a
+Python object. All other formats are loaded as a raw binary stream. For more
+information, see <a class="reference internal" href="analyzers.html"><span class="doc">Introduction to analyzers</span></a>.</p>
+<p>If you are running simulations on COMPS, the configuration of the
+<code class="docutils literal notranslate"><span class="pre">idmtools.ini</span></code> file will determine where output files can be found.
+For more information, see <a class="reference internal" href="wizard.html"><span class="doc">idmtools.ini wizard</span></a></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To access and use COMPS you must receive approval and credentials from IDM. Send your request to <a class="reference external" href="mailto:support&#37;&#52;&#48;idmod&#46;org">support<span>&#64;</span>idmod<span>&#46;</span>org</a>.</p>
+</div>
+<p>If you are running simulations or experiments locally, they are saved to your local computer at C:\Users\yourname\.local_data\workers for Windows and ~/.local_data/workers for Linux.</p>
+<p>Additionally, when running locally using Docker, output can be found in your browser in the output directory appended after the experiment or simulation ID. For example, the output from an experiment with an ID of S07OASET could be found at <a class="reference external" href="http://localhost:5000/data/S07OASET">http://localhost:5000/data/S07OASET</a>. The output from an individual simulation (ID FCPRIV7H) within that experiment could be found at <a class="reference external" href="http://localhost:5000/data/S07OASET/FCPRIV7H">http://localhost:5000/data/S07OASET/FCPRIV7H</a>.</p>
+<p>The python_csv_output.py example below demonstrates how to produce output in CSV format for a simple parameter sweep.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example Python Experiment</span>
+<span class="c1"># In this example, we will demonstrate how to run a python experiment.</span>
+
+<span class="c1"># First, import some necessary system and idmtools packages.</span>
+<span class="c1"># - TemplatedSimulations: To create simulation from a template</span>
+<span class="c1"># - ExperimentManager: To manage our experiment</span>
+<span class="c1"># - platform: To specify the platform you want to run your experiment on as a context object</span>
+<span class="c1"># - JSONConfiguredPythonTask: We want to run an experiment executing a Python script that uses a JSON configuration file</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">idmtools.assets</span> <span class="kn">import</span> <span class="n">AssetCollection</span>
+<span class="kn">from</span> <span class="nn">idmtools.builders</span> <span class="kn">import</span> <span class="n">SimulationBuilder</span>
+<span class="kn">from</span> <span class="nn">idmtools.core.platform_factory</span> <span class="kn">import</span> <span class="n">platform</span>
+<span class="kn">from</span> <span class="nn">idmtools.entities.experiment</span> <span class="kn">import</span> <span class="n">Experiment</span>
+<span class="kn">from</span> <span class="nn">idmtools.entities.templated_simulation</span> <span class="kn">import</span> <span class="n">TemplatedSimulations</span>
+<span class="kn">from</span> <span class="nn">idmtools_models.python.json_python_task</span> <span class="kn">import</span> <span class="n">JSONConfiguredPythonTask</span>
+
+<span class="c1"># In order to run the experiment, we need to create a `Platform` and an `ExperimentManager`.</span>
+<span class="c1"># The `Platform` defines where we want to run our simulation.</span>
+<span class="c1"># You can easily switch platforms by changing the Platform to for example &#39;Local&#39;</span>
+<span class="k">with</span> <span class="n">platform</span><span class="p">(</span><span class="s1">&#39;BELEGOST&#39;</span><span class="p">):</span>
+    <span class="c1"># define our base task as a python model with json config</span>
+    <span class="n">base_task</span> <span class="o">=</span> <span class="n">JSONConfiguredPythonTask</span><span class="p">(</span>
+        <span class="n">script_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;inputs&quot;</span><span class="p">,</span> <span class="s2">&quot;csv_inputs&quot;</span><span class="p">,</span> <span class="s2">&quot;Assets&quot;</span><span class="p">,</span> <span class="s2">&quot;model.py&quot;</span><span class="p">),</span>
+        <span class="c1"># set the default parameters to 0</span>
+        <span class="n">parameters</span><span class="o">=</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="mi">0</span><span class="p">)),</span>
+        <span class="c1"># add some experiment level assets</span>
+        <span class="n">common_assets</span><span class="o">=</span><span class="n">AssetCollection</span><span class="o">.</span><span class="n">from_directory</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;inputs&quot;</span><span class="p">,</span> <span class="s2">&quot;csv_inputs&quot;</span><span class="p">,</span> <span class="s2">&quot;Assets&quot;</span><span class="p">))</span>
+    <span class="p">)</span>
+
+    <span class="c1"># create a templating object using the base task</span>
+    <span class="n">ts</span> <span class="o">=</span> <span class="n">TemplatedSimulations</span><span class="p">(</span><span class="n">base_task</span><span class="o">=</span><span class="n">base_task</span><span class="p">)</span>
+    <span class="c1"># Define the parameters we are going to want to sweep</span>
+    <span class="n">builder</span> <span class="o">=</span> <span class="n">SimulationBuilder</span><span class="p">()</span>
+    <span class="c1"># define two partial callbacks so we can use the built in sweep callback function on the model</span>
+    <span class="c1"># Since we want to sweep per parameter, and we want need to define a partial for each parameter</span>
+    <span class="c1"># The JSON model provides utility function for this puprose</span>
+    <span class="n">builder</span><span class="o">.</span><span class="n">add_sweep_definition</span><span class="p">(</span><span class="n">JSONConfiguredPythonTask</span><span class="o">.</span><span class="n">set_parameter_partial</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+    <span class="n">builder</span><span class="o">.</span><span class="n">add_sweep_definition</span><span class="p">(</span><span class="n">JSONConfiguredPythonTask</span><span class="o">.</span><span class="n">set_parameter_partial</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">),</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+    <span class="c1"># add the builder to our template</span>
+    <span class="n">ts</span><span class="o">.</span><span class="n">add_builder</span><span class="p">(</span><span class="n">builder</span><span class="p">)</span>
+
+    <span class="c1"># now build experiment</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">Experiment</span><span class="o">.</span><span class="n">from_template</span><span class="p">(</span>
+        <span class="n">ts</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="n">tags</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">tag1</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+
+    <span class="c1"># now we can run the experiment</span>
+    <span class="n">e</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">wait_until_done</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># use system status as the exit code</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span> <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">succeeded</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="analyzers.html" class="btn btn-neutral float-right" title="Introduction to analyzers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="sweeps-emod.html" class="btn btn-neutral float-left" title="Running parameter sweeps with EMOD" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bill &amp; Melinda Gates Foundation. All rights reserved.
+
+    </p>
+  </div>
+<p>idmtools is licensed under the <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode">Creative Commons
+    Attribution-Noncommercial-ShareAlike 4.0 License</a>.</p>
+<p>Send documentation feedback to <a href="mailto:feedback@idmod.org" target="_top">feedback@idmod.org</a>. If you have
+    questions, email <a href="mailto:support@idmod.org" target="_top">support@idmod.org</a>.</p>
+<p><a href="https://www.gatesfoundation.org/Privacy-and-Cookies-Notice">Privacy and Cookies Notice</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+<a href="https://www.gatesfoundation.org/Terms-of-Use">Terms of Use</a></p>
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

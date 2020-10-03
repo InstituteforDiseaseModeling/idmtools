@@ -1,0 +1,23 @@
+idmtools\_platform\_local.internals.workers package
+===================================================
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   idmtools_platform_local.internals.workers.brokers
+   idmtools_platform_local.internals.workers.database
+   idmtools_platform_local.internals.workers.run
+   idmtools_platform_local.internals.workers.run_broker
+   idmtools_platform_local.internals.workers.utils
+
+Module contents
+---------------
+
+.. automodule:: idmtools_platform_local.internals.workers
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

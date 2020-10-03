@@ -1,0 +1,7 @@
+idmtools.core.system\_information module
+========================================
+
+.. automodule:: idmtools.core.system_information
+   :members:
+   :undoc-members:
+   :show-inheritance:

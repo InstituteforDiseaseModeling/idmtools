@@ -1,0 +1,7 @@
+idmtools.utils.collections module
+=================================
+
+.. automodule:: idmtools.utils.collections
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+idmtools.entities.iplatform\_ops.iplatform\_asset\_collection\_operations module
+================================================================================
+
+.. automodule:: idmtools.entities.iplatform_ops.iplatform_asset_collection_operations
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,23 @@
+idmtools.entities.iplatform\_ops package
+========================================
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   idmtools.entities.iplatform_ops.iplatform_asset_collection_operations
+   idmtools.entities.iplatform_ops.iplatform_experiment_operations
+   idmtools.entities.iplatform_ops.iplatform_simulation_operations
+   idmtools.entities.iplatform_ops.iplatform_suite_operations
+   idmtools.entities.iplatform_ops.iplatform_workflowitem_operations
+   idmtools.entities.iplatform_ops.utils
+
+Module contents
+---------------
+
+.. automodule:: idmtools.entities.iplatform_ops
+   :members:
+   :undoc-members:
+   :show-inheritance:

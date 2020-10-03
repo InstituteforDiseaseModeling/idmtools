@@ -1,0 +1,8 @@
+idmtools\_platform\_local.local\_cli module
+===========================================
+
+.. automodule:: idmtools_platform_local.local_cli
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :ignore-module-all:

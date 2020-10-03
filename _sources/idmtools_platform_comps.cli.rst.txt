@@ -1,0 +1,19 @@
+idmtools\_platform\_comps.cli package
+=====================================
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   idmtools_platform_comps.cli.cli_functions
+   idmtools_platform_comps.cli.comps
+
+Module contents
+---------------
+
+.. automodule:: idmtools_platform_comps.cli
+   :members:
+   :undoc-members:
+   :show-inheritance:

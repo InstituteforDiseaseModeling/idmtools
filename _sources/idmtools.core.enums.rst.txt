@@ -1,0 +1,7 @@
+idmtools.core.enums module
+==========================
+
+.. automodule:: idmtools.core.enums
+   :members:
+   :undoc-members:
+   :show-inheritance:
