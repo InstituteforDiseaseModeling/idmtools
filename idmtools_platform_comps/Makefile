@@ -5,7 +5,6 @@ PY?=python
 PDS=$(PY) ../dev_scripts/
 PDR=$(PDS)run.py
 CLDIR=$(PDS)clean_dir.py
-CWD=$($(IPY) "import os; print(os.getcwd())")
 TEST_EXTRA_OPTS?=
 TEST_REPORT ?= test_results.xml
 HTML_TEST_REPORT ?= comps.test_results.html

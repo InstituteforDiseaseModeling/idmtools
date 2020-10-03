@@ -9,7 +9,7 @@ TEST_EXTRA_OPTS?=
 TEST_REPORT ?= test_results.xml
 HTML_TEST_REPORT ?= core.test_results.html
 TEST_COMMAND = DOCKER_REPO=docker-staging NO_SPINNER=1 cd tests && py.test --junitxml=$(TEST_REPORT) --html=$(HTML_TEST_REPORT) --self-contained-html $(TEST_EXTRA_OPTS)
-COVERAGE_OPTS := --cov-config=.coveragerc --cov-branch --cov-append --cov=idmtools --cov=idmtoools_cli --cov=idmtools_models --cov=idmtools_platform_comps
+COVERAGE_OPTS := --cov-config=.coveragerc --cov-branch --cov-append --cov=idmtools --cov=idmtoools_cli --cov=idmtools_models --cov=idmtools_platform_comps --cov=idmtools_platform_local
 
 help:
 	$(PDS)get_help_from_makefile.py

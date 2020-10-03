@@ -65,29 +65,30 @@ stop-allure: ## Stop Allure
 	$(PDR) -wd dev_scripts -ex "docker-compose -f allure.yml up -d allure"
 
 start-allure: ## start the allue docker report server
-	$(IPY) "import os; os.makedirs('.allure_results', exist_ok=True)"
-	$(IPY) "import os; os.makedirs('./dev_scripts/.allure_reports', exist_ok=True)"
+	-mkdir ./dev_scripts/.allure_results
+	-mkdir ./dev_scripts/.allure_reports
 	$(PDR) -wd dev_scripts -ex "docker-compose -f allure.yml up -d allure"
 	$(IPY) "print('Once tests have finished, your test report will be available at http://localhost:5050/allure-docker-service/latest-report. To clean results, use http://localhost:5050/allure-docker-service/clean-results')"
-	$(IPY) "import os; os.makedirs('.allure_reports', exist_ok=True)"
 
 ## Run smoke tests with reports to Allure server(Comment moved until https://github.com/tqdm/py-make/issues/11 is resolves)
 test-smoke-allure: start-allure 
 	$(PDS)run_pymake_on_all.py --env "TEST_EXTRA_OPTS=--alluredir=../../.allure_results" test-smoke
+	$(PDS)launch_dir_in_browser.py http://localhost:5050/allure-docker-service/latest-report
 
  ## Run smoke tests with reports to Allure server(Comment moved until https://github.com/tqdm/py-make/issues/11 is resolves)
 test-all-allure: start-allure
 	$(PDS)run_pymake_on_all.py --env "TEST_EXTRA_OPTS=--alluredir=../../.allure_results" test-all
+	$(PDS)launch_dir_in_browser.py http://localhost:5050/allure-docker-service/latest-report
 
 coverage: ## Generate a code-coverage report
-	$(MAKEALL) "coverage-all -i"
+	$(MAKEALL) "coverage-all"
 	coverage combine idmtools_cli/.coverage idmtools_core/.coverage idmtools_models/.coverage idmtools_platform_comps/.coverage idmtools_platform_local/.coverage
 	coverage report -m
 	coverage html -i
 	$(PDS)launch_dir_in_browser.py htmlcov/index.html
 
 coverage-smoke: ## Generate a code-coverage report
-	$(MAKEALL) "coverage-smoke -i"
+	$(MAKEALL) "coverage-smoke"
 	coverage combine idmtools_cli/.coverage idmtools_core/.coverage idmtools_models/.coverage idmtools_platform_comps/.coverage idmtools_platform_local/.coverage
 	coverage report -m
 	coverage html -i
