@@ -88,7 +88,7 @@ Install |IT_s|
     - idmtools/idmtools_models
     - idmtools/idmtools_test
 
-See :doc:`cli_index` for more information on the command-line interface available for interacting with
+See :doc:`cli/cli_index` for more information on the command-line interface available for interacting with
 |IT_s|.
 
 .. _docker-client:
