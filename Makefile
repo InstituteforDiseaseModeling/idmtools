@@ -13,7 +13,7 @@ help:
 clean: ## Clean most common outputs(Logs, Test Results, etc)
 	$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
 	$(MAKEALL) --parallel clean
-	$(CLDIR) --file-patterns "**/*.log,./.allure_*/**.json" --dir-patterns "./.allure_results/*,./.*_reports"
+	$(CLDIR) --file-patterns "**/*.log,./dev_scripts/.allure_*/**.json,*.pyi" --dir-patterns "./.allure_results/*,./.*_reports"
 	$(PDR) -wd "docs" -ex "make clean"
 
 clean-all: ## Clean most common outputs(Logs, Test Results, etc) as well as local install information. Running this requires a new call to setup-dev or setup-dev-no-docker
@@ -71,7 +71,7 @@ start-allure: ## start the allue docker report server
 	$(IPY) "print('Once tests have finished, your test report will be available at http://localhost:5050/allure-docker-service/latest-report. To clean results, use http://localhost:5050/allure-docker-service/clean-results')"
 
 ## Run smoke tests with reports to Allure server(Comment moved until https://github.com/tqdm/py-make/issues/11 is resolves)
-test-smoke-allure: start-allure 
+test-smoke-allure: start-allure
 	$(PDS)run_pymake_on_all.py --env "TEST_EXTRA_OPTS=--alluredir=../../.allure_results" test-smoke
 	$(PDS)launch_dir_in_browser.py http://localhost:5050/allure-docker-service/latest-report
 
