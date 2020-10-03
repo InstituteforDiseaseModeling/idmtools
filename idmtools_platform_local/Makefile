@@ -124,7 +124,7 @@ ui-yarn-upgrade:
 
 build-ui: ## build ui
 	$(CLDIR) --directories "idmtools_platform_local/internals/ui/static,idmtools_webui/build"
-	cd webui && python build.py
+	cd idmtools_webui && python build.py
 	@$(IPY) "import shutil; shutil.copytree('idmtools_webui/build', 'idmtools_platform_local/internals/ui/static')"
 
 release-staging: dist ## perform a release to staging
