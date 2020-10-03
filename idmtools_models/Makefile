@@ -56,7 +56,7 @@ test-python: ## Run our python tests
 test-smoke: ## Run smoke tests
 	$(TEST_COMMAND) -m "smoke and serial"
 	mv tests/test_results.xml tests/serial.test_results.xml
-	mv tests/$(HTML_TEST_REPORT) tests/core.serial.test_results.html
+	mv tests/$(HTML_TEST_REPORT) tests/models.serial.test_results.html
 	$(TEST_COMMAND) -n 8 -m "smoke and not serial"
 	junitparser merge tests/serial.test_results.xml tests/$(TEST_REPORT) tests/$(TEST_REPORT)
 
