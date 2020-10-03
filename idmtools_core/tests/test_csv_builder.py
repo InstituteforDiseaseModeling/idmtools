@@ -1,3 +1,4 @@
+import allure
 import os
 import numpy as np
 from functools import partial
@@ -21,6 +22,8 @@ setD = partial(param_update, param="d")
 
 
 @pytest.mark.smoke
+@allure.story("Sweeps")
+@allure.suite("idmtools_core")
 class TestCsvBuilder(ITestWithPersistence):
 
     def setUp(self):

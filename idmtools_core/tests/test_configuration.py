@@ -1,3 +1,4 @@
+import allure
 import tempfile
 from shutil import copyfile
 
@@ -15,6 +16,8 @@ from idmtools_test.utils.utils import captured_output
 
 @pytest.mark.smoke
 @pytest.mark.serial
+@allure.story("Configuration")
+@allure.suite("idmtools_core")
 class TestConfig(ITestWithPersistence):
 
     def setUp(self):

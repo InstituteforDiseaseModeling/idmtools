@@ -1,6 +1,6 @@
+import allure
 import os
 import unittest
-
 import pytest
 from idmtools.frozen.frozen_utils import frozen_transform
 from idmtools_test import COMMON_INPUT_PATH
@@ -12,6 +12,8 @@ DEFAULT_DEMOGRAPHICS_JSON = os.path.join(COMMON_INPUT_PATH, "files", "demographi
 
 
 @pytest.mark.smoke
+@allure.story("Assets")
+@allure.suite("idmtools_core")
 class TestFrozenAssets(unittest.TestCase):
 
     def setUp(self) -> None:

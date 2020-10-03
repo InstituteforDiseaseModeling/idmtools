@@ -1,3 +1,4 @@
+import allure
 import datetime
 import os
 import time
@@ -9,6 +10,9 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 
 @pytest.mark.cleanup
+@allure.story("COMPS")
+@allure.story("Delete Items")
+@allure.suite("idmtools_platform_comps")
 class TestCleanup(ITestWithPersistence):
 
     # Enable this test by setting the environment variable CLEANUP_COMPS_TESTS to 1

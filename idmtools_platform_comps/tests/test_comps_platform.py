@@ -1,9 +1,10 @@
 import copy
+
+import allure
 import json
 import os
 import unittest
 from os import path
-
 import pytest
 from idmtools.builders import SimulationBuilder
 from idmtools.core import EntityStatus
@@ -20,6 +21,8 @@ current_directory = path.dirname(path.realpath(__file__))
 
 
 @pytest.mark.comps
+@allure.story("COMPS")
+@allure.suite("idmtools_platform_comps")
 class TestCOMPSPlatform(ITestWithPersistence):
     def setUp(self) -> None:
         super().setUp()

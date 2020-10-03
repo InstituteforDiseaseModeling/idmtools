@@ -1,3 +1,4 @@
+import allure
 import os
 from unittest import TestCase
 import pytest
@@ -8,6 +9,8 @@ from idmtools_test import COMMON_INPUT_PATH
 
 @pytest.mark.tasks
 @pytest.mark.smoke
+@allure.story("RTask")
+@allure.suite("idmtools_models")
 class TestRTask(TestCase):
 
     def validate_common_assets(self, fpath, task):

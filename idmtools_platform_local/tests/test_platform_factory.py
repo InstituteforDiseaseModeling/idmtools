@@ -1,3 +1,4 @@
+import allure
 import pytest
 from dataclasses import fields
 from idmtools.config import IdmConfigParser
@@ -6,6 +7,9 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.confg_local_runner_test import get_test_local_env_overrides
 
 
+@allure.story("LocalPlatform")
+@allure.story("Plugins")
+@allure.suite("idmtools_platform_local")
 class TestPlatformFactory(ITestWithPersistence):
     def setUp(self):
         super().setUp()

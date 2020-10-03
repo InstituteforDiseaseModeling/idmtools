@@ -9,4 +9,7 @@ try:
 except:  # noqa E722
     from urllib.request import pathname2url
 
-webbrowser.open("file://" + pathname2url(os.path.abspath(sys.argv[1])))
+arg = sys.argv[1]
+if not arg.startswith("http"):
+    arg = "file://" + pathname2url(os.path.abspath(arg))
+webbrowser.open(arg)

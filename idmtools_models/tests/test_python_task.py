@@ -1,3 +1,4 @@
+import allure
 import os
 import sys
 from unittest import TestCase
@@ -14,6 +15,8 @@ from idmtools_test import COMMON_INPUT_PATH
 
 @pytest.mark.tasks
 @pytest.mark.smoke
+@allure.story("Python")
+@allure.suite("idmtools_models")
 class TestPythonTask(TestCase):
 
     @pytest.mark.smoke

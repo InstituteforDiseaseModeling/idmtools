@@ -1,3 +1,4 @@
+import allure
 import io
 import os
 import unittest.mock
@@ -27,6 +28,9 @@ class setParam:
 
 
 @pytest.mark.smoke
+@allure.story("JSONConfiguredTask")
+@allure.story("Python")
+@allure.suite("idmtools_core")
 class TestPythonSimulation(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName

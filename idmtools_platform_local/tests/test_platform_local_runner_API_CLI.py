@@ -1,3 +1,4 @@
+import allure
 import os
 import re
 import subprocess
@@ -25,6 +26,9 @@ param_a_update = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, 
 @pytest.mark.docker
 @pytest.mark.local_platform_cli
 @pytest.mark.serial
+@allure.story("LocalPlatform")
+@allure.story("CLI")
+@allure.suite("idmtools_platform_local")
 class TestLocalRunnerCLI(ITestWithPersistence):
 
     @classmethod

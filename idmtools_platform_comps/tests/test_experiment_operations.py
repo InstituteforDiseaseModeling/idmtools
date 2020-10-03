@@ -1,3 +1,4 @@
+import allure
 import hashlib
 import json
 import os
@@ -69,6 +70,8 @@ def setup_python_model_1(case_name, platform: str = 'COMPS2'):
 
 @pytest.mark.comps
 @pytest.mark.smoke
+@allure.story("COMPS")
+@allure.suite("idmtools_platform_comps")
 class TestExperimentOperations(unittest.TestCase):
 
     def setUp(self) -> None:
@@ -106,6 +109,7 @@ class TestExperimentOperations(unittest.TestCase):
             self.assertEqual(1, idm_experiment.simulation_count)
             self.assertEqual(0, idm_experiment.simulations[0].assets.count)
 
+    @allure.story("Assets")
     def test_list_assets(self):
         """
         Test that the list assets with children

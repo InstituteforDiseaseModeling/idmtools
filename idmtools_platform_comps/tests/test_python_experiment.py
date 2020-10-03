@@ -1,4 +1,6 @@
 import copy
+
+import allure
 import json
 import os
 import unittest
@@ -45,6 +47,9 @@ class setParam:
 
 @pytest.mark.comps
 @pytest.mark.python
+@allure.story("COMPS")
+@allure.story("Python")
+@allure.suite("idmtools_platform_comps")
 class TestPythonExperiment(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName

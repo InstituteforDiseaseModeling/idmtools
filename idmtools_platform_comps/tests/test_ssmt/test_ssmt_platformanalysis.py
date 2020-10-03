@@ -1,3 +1,4 @@
+import allure
 import json
 import os
 import sys
@@ -18,6 +19,10 @@ from node_csv_analyzer import NodeCSVAnalyzer  # noqa
 
 @pytest.mark.comps
 @pytest.mark.ssmt
+@allure.story("COMPS")
+@allure.story("Analyzers")
+@allure.story("PlatformAnalysis")
+@allure.story("SSMT")
 class TestPlatformAnalysis(ITestWithPersistence):
 
     def setUp(self):

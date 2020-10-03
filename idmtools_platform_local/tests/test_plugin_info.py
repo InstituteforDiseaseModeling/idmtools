@@ -1,4 +1,6 @@
 import dataclasses
+
+import allure
 import unittest
 from idmtools.entities.iplatform import IPlatform
 from idmtools.registry.platform_specification import PlatformPlugins
@@ -6,6 +8,9 @@ from idmtools_platform_local.local_platform import LocalPlatform
 from idmtools_platform_local.plugin_info import LocalPlatformSpecification
 
 
+@allure.story("LocalPlatform")
+@allure.story("Plugins")
+@allure.suite("idmtools_platform_local")
 class TestLocalPlatformPlugin(unittest.TestCase):
     def test_local_in_entrypoints(self):
         """

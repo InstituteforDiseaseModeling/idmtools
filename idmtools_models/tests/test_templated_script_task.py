@@ -1,3 +1,4 @@
+import allure
 import os
 import sys
 from unittest import TestCase
@@ -14,6 +15,8 @@ from idmtools_test.utils.decorators import windows_only, linux_only
 
 @pytest.mark.tasks
 @pytest.mark.smoke
+@allure.story("Templated Script")
+@allure.suite("idmtools_models")
 class TestTemplatedScriptTask(TestCase):
 
     def setUp(self) -> None:

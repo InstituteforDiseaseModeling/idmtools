@@ -1,3 +1,4 @@
+import allure
 import os
 import sys
 import pytest
@@ -17,6 +18,8 @@ from idmtools_test.utils.utils import del_folder
 @pytest.mark.skip
 @pytest.mark.tasks
 @pytest.mark.r
+@allure.story("COMPS")
+@allure.story("SSMT")
 class TestRExperiment(ITestWithPersistence):
 
     def setUp(self) -> None:

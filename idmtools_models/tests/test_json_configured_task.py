@@ -1,3 +1,4 @@
+import allure
 import json
 from dataclasses import dataclass, field
 from unittest import TestCase
@@ -17,6 +18,8 @@ class ExampleExtendedJSONConfiguredTask(JSONConfiguredTask):
 
 @pytest.mark.tasks
 @pytest.mark.smoke
+@allure.story("JSONConfiguredTask")
+@allure.suite("idmtools_models")
 class TestJSONConfiguredTask(TestCase):
 
     def setUp(self) -> None:

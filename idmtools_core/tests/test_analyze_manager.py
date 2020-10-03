@@ -1,4 +1,6 @@
 import copy
+
+import allure
 import unittest
 from typing import Any
 import pytest
@@ -16,6 +18,8 @@ from idmtools_test.utils.test_task import TestTask
 @pytest.mark.analysis
 @pytest.mark.smoke
 @pytest.mark.serial
+@allure.story("Analyzers")
+@allure.suite("idmtools_core")
 class TestAnalyzeManager(unittest.TestCase):
     class TestAnalyzer(IAnalyzer):
         def __init__(self, working_dir=None):

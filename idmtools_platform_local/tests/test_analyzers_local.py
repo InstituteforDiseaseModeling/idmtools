@@ -1,3 +1,4 @@
+import allure
 import os
 import time
 from functools import partial
@@ -19,7 +20,6 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 param_a = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
-
 
 
 class AddAnalyzer(IAnalyzer):
@@ -49,6 +49,9 @@ class AddAnalyzer(IAnalyzer):
 @pytest.mark.analysis
 @pytest.mark.docker
 @pytest.mark.serial
+@allure.story("LocalPlatform")
+@allure.story("Analyzers")
+@allure.suite("idmtools_platform_local")
 class TestAnalyzersLocal(ITestWithPersistence):
 
     @classmethod

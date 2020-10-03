@@ -1,3 +1,4 @@
+import allure
 import pickle
 import unittest
 
@@ -12,6 +13,9 @@ from idmtools_test.utils.test_task import TestTask
 
 @pytest.mark.smoke
 @pytest.mark.serial
+@allure.story("Core")
+@allure.story("Cache")
+@allure.suite("idmtools_core")
 class TestPersistenceServices(ITestWithPersistence):
 
     def test_persist_retrieve_platform(self):

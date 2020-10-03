@@ -1,3 +1,4 @@
+import allure
 import json
 import os
 
@@ -13,6 +14,8 @@ from idmtools.analysis.analyze_manager import AnalyzeManager
 
 @pytest.mark.comps
 @pytest.mark.ssmt
+@allure.story("COMPS")
+@allure.story("SSMT")
 class TestSSMTWorkItem(ITestWithPersistence):
 
     def setUp(self) -> None:

@@ -1,4 +1,6 @@
 import copy
+
+import allure
 import os
 import unittest.mock
 from functools import partial
@@ -34,6 +36,8 @@ setA = partial(param_update, param="a")
 
 
 @pytest.mark.smoke
+@allure.story("Core")
+@allure.suite("idmtools_core")
 class TestCopy(ITestWithPersistence):
 
     def setUp(self):

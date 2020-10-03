@@ -13,8 +13,9 @@ help:
 clean: ## Clean most common outputs(Logs, Test Results, etc)
 	$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
 	$(MAKEALL) --parallel clean
-	$(CLDIR) --file-patterns "**/*.log,./dev_scripts/.allure_*/**.json,*.pyi" --dir-patterns "./.allure_results/*,./.*_reports"
-	$(PDR) -wd "docs" -ex "make clean"
+	$(MAKE) stop-allure
+	-$(CLDIR) --file-patterns "**/*.log,,*.pyi" --dir-patterns "./dev_scripts/.allure_reports,./dev_scripts/.allure_results,./.*_reports"
+	-$(PDR) -wd "docs" -ex "make clean"
 
 clean-all: ## Clean most common outputs(Logs, Test Results, etc) as well as local install information. Running this requires a new call to setup-dev or setup-dev-no-docker
 	$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
@@ -30,7 +31,6 @@ setup-dev-no-docker: ## Setup packages in dev mode minus docker
 
 lint: ## check style with flake8
 	flake8 --ignore=E501,W291 --exclude="venv**/**,examples/**,workflow/**,docs/**,*/tests/**,idmtools_test/**, idmtools_platform_comps/prototypes/**"
-
 
 test: ## Run our tests
 	$(MAKEALL) --parallel test
@@ -62,7 +62,7 @@ aggregate-html-reports: ## Aggregate html test reports into one directory
 	$(PDR) -wd '.html_reports' -ex 'python -m http.server 8001'
 
 stop-allure: ## Stop Allure
-	$(PDR) -wd dev_scripts -ex "docker-compose -f allure.yml up -d allure"
+	$(PDR) -wd dev_scripts -ex "docker-compose -f allure.yml down"
 
 start-allure: ## start the allue docker report server
 	-mkdir ./dev_scripts/.allure_results

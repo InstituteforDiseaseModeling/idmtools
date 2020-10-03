@@ -1,9 +1,8 @@
+import allure
 import os
 from functools import partial
 from operator import itemgetter
-
 import pytest
-
 from idmtools.assets import AssetCollection
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType
@@ -24,6 +23,9 @@ param_a = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="
 @pytest.mark.docker
 @pytest.mark.python
 @pytest.mark.serial
+@allure.story("LocalPlatform")
+@allure.story("Python")
+@allure.suite("idmtools_platform_local")
 class TestPythonSimulation(ITestWithPersistence):
 
     def setUp(self) -> None:
