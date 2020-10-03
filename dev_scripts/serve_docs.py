@@ -28,4 +28,3 @@ server.watch('docs/*.txt', shell('make html', cwd='docs'), delay=5)
 server.watch('docs/*.py', shell('make html', cwd='docs'), delay=5)
 webbrowser.open("http://localhost:8000")
 server.serve(root='docs/_build/html', port=args.port)
-
