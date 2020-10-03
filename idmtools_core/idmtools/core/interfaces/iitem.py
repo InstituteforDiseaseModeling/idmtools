@@ -1,13 +1,17 @@
-import typing
 from dataclasses import dataclass, field, fields
+from typing import List, Callable, TYPE_CHECKING
 from uuid import UUID
-
 from idmtools.utils.hashing import hash_obj, ignore_fields_in_dataclass_on_pickle
+
+if TYPE_CHECKING:
+    from idmtools.entities import IPlatform
 
 
 @dataclass(repr=False)
 class IItem:
     _uid: UUID = field(default=None, metadata={"md": True})
+    __pre_creation_hooks: List[Callable[['IItem', 'IPlatform'], None]] = field(default_factory=list, metadata={"md": True})
+    __post_creation_hooks: List[Callable[['IItem', 'IPlatform'], None]] = field(default_factory=list, metadata={"md": True})
 
     @property
     def uid(self):
@@ -86,4 +90,4 @@ class IItem:
     # endregion
 
 
-IItemList = typing.List[IItem]
+IItemList = List[IItem]
