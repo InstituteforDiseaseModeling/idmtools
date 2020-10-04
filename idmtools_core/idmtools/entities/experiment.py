@@ -4,14 +4,13 @@ from dataclasses import dataclass, field, InitVar, fields
 from logging import getLogger, DEBUG
 from types import GeneratorType
 from typing import NoReturn, Set, Union, Iterator, Type, Dict, Any, List, TYPE_CHECKING, Generator
-
 from tqdm import tqdm
-
 from idmtools.assets import AssetCollection, Asset
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType, EntityStatus
 from idmtools.core.interfaces.entity_container import EntityContainer
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
+from idmtools.core.interfaces.iitem import IItem
 from idmtools.core.interfaces.inamed_entity import INamedEntity
 from idmtools.core.logging import SUCCESS, NOTICE
 from idmtools.entities.itask import ITask
@@ -79,7 +78,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
         self.__simulations.parent = self
 
     def post_creation(self, platform: 'IPlatform') -> None:
-        pass
+        IItem.post_creation(self, platform)
 
     @property
     def status(self):

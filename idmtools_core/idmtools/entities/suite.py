@@ -1,6 +1,7 @@
 from typing import NoReturn, Type, TYPE_CHECKING, Dict
 from abc import ABC
 from dataclasses import dataclass, field, fields
+from idmtools.core.interfaces.iitem import IItem
 from idmtools.core.interfaces.inamed_entity import INamedEntity
 from idmtools.core import ItemType, EntityContainer, EntityStatus
 
@@ -44,10 +45,10 @@ class Suite(INamedEntity, ABC):
         display(self, suite_table_display)
 
     def pre_creation(self, platform: 'IPlatform'):
-        pass
+        IItem.pre_creation(self, platform)
 
     def post_creation(self, platform: 'IPlatform'):
-        pass
+        IItem.post_creation(self, platform)
 
     def __repr__(self):
         return f"<Suite {self.uid} - {len(self.experiments)} experiments>"

@@ -48,6 +48,7 @@ class IEntity(IItem, metaclass=ABCMeta):
 
         """
         self.status = EntityStatus.CREATED
+        super().post_creation(platform)
 
     @classmethod
     def from_id(cls, item_id: Union[str, UUID], platform: 'IPlatform' = None, **kwargs) -> 'IEntity':  # noqa E821
@@ -68,8 +69,7 @@ class IEntity(IItem, metaclass=ABCMeta):
                 raise ValueError("You have to specify a platform to load the item from")
             platform = CURRENT_PLATFORM
         if cls.item_type is None:
-            raise EnvironmentError("ItemType is None. This is most likely a badly derived IEntity "
-                                   "that doesn't run set the default item type on the class")
+            raise EnvironmentError("ItemType is None. This is most likely a badly derived IEntity that doesn't run set the default item type on the class")
         return platform.get_item(item_id, cls.item_type, **kwargs)
 
     @property

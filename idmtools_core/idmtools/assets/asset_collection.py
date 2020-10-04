@@ -9,6 +9,7 @@ from idmtools.assets import TAssetFilterList
 from idmtools.assets.errors import DuplicatedAssetError
 from idmtools.core import FilterMode, ItemType
 from idmtools.core.interfaces.ientity import IEntity
+from idmtools.core.interfaces.iitem import IItem
 from idmtools.utils.entities import get_default_tags
 from idmtools.utils.file import scan_directory
 from idmtools.utils.filters.asset_filters import default_asset_file_filter
@@ -408,9 +409,7 @@ class AssetCollection(IEntity):
             self.tags.update(get_default_tags())
         else:
             self.tags = get_default_tags()
-
-    def post_creation(self, platform: 'IPlatform') -> None:
-        pass
+        IItem.pre_creation(self, platform)
 
     def set_tags(self, tags: Dict[str, Any]):
         self.tags = tags
