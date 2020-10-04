@@ -9,6 +9,8 @@ from idmtools.entities.simulation import Simulation
 from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
 
 
+AssetizableItem = Union[Experiment, Simulation, IWorkflowItem]
+
 @dataclass(repr=False)
 class AssetizeOutput(SSMTWorkItem):
     file_patterns: List[str] = field(default=list)
@@ -52,26 +54,28 @@ class AssetizeOutput(SSMTWorkItem):
             self.run(platform=platform)
 
     def __are_all_dependencies_created(self) -> bool:
-        all_created = True
         for item_type in ['related_experiments', 'related_simulations', 'related_work_items']:
-            for item in getattr(self, item_type):
-                if item.status not in [EntityStatus.CREATED, EntityStatus.RUNNING, EntityStatus.COMMISSIONING, EntityStatus.SUCCEEDED]:
-                    all_created = False
-                    break
-            if all_created is False:
-                break
-        return all_created
+            for items in getattr(self, item_type):
+                for item in items:
+                    if item.status not in [EntityStatus.CREATED, EntityStatus.RUNNING, EntityStatus.COMMISSIONING, EntityStatus.SUCCEEDED]:
+                        return False
+        return True
 
-    def run_after(self, item: Union[Experiment, Simulation, IWorkflowItem]):
-        if isinstance(item, Experiment):
-            self.related_experiments.append(item)
-        elif isinstance(item, Simulation):
-            self.related_simulations.append(item)
-        elif isinstance(item, IWorkflowItem):
-            self.related_work_items.append(item)
+    def run_after(self, item: Union[AssetizableItem, List[AssetizableItem]]):
+        if not isinstance(item, list):
+            items_to_add = [item]
         else:
-            raise ValueError("We can only assetize the output of experiments, simulations, and workitems")
+            items_to_add = item
+        for i in items_to_add:
+            if isinstance(i, Experiment):
+                self.related_experiments.append(item)
+            elif isinstance(i, Simulation):
+                self.related_simulations.append(item)
+            elif isinstance(i, IWorkflowItem):
+                self.related_work_items.append(item)
+            else:
+                raise ValueError("We can only assetize the output of experiments, simulations, and workitems")
 
-        # we call after we know the item has an id
-        hook = partial(AssetizeOutput.__create_after_other_items_have_been_created, self)
-        item.add_post_creation_hook(hook)
+            # we call after we know the item has an id
+            hook = partial(AssetizeOutput.__create_after_other_items_have_been_created, self)
+            i.add_post_creation_hook(hook)
