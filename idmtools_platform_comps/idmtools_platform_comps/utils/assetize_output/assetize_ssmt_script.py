@@ -8,6 +8,7 @@ import uuid
 import hashlib
 
 from io import BytesIO
+from tqdm import tqdm
 from typing import Union, BinaryIO
 import os
 import argparse
@@ -70,19 +71,7 @@ def gather_files(directory, file_patterns, assets, prefix=None):
     return files
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser("Assetize Output script")
-    parser.add_argument("--file-pattern", action='append', help="File Pattern to Assetize")
-    #parser.add_argument("--exclude-pattern", action='append', help="File Pattern to Assetize")
-    parser.add_argument("--assets", default=False, action='store_true', help="Include Assets")
-
-    args = parser.parse_args()
-
-
-    # load the workitem
-    client = Client()
-    client.login(os.environ['COMPS_SERVER'])
-    wi = WorkItem.get(os.environ['COMPS_WORKITEM_GUID'])
+def gather_files_from_related(wi):
     files = set()
     futures = []
     pool = ThreadPoolExecutor()
@@ -102,9 +91,12 @@ if __name__ == "__main__":
             pass
         futures.append(pool.submit(gather_files, wi.working_directory, args.file_pattern, False))
 
-    for future in as_completed(futures):
+    for future in tqdm(as_completed(futures), total=len(futures), desc="Filtering relations for files"):
         files.update(future.result())
+    return files
 
+
+def create_asset_collection(files):
     ac = AssetCollection()
     ac_map = dict()
     for file in files:
@@ -130,4 +122,23 @@ if __name__ == "__main__":
         print(f"Saving {new_files} assets to comps")
         ac2.save()
         ac = ac2
+    return ac
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser("Assetize Output script")
+    parser.add_argument("--file-pattern", action='append', help="File Pattern to Assetize")
+    # TODO Exlcudes
+    # TODO tags
+    #parser.add_argument("--exclude-pattern", action='append', help="File Pattern to Assetize")
+    parser.add_argument("--assets", default=False, action='store_true', help="Include Assets")
+
+    args = parser.parse_args()
+
+    # load the workitem
+    client = Client()
+    client.login(os.environ['COMPS_SERVER'])
+    wi = WorkItem.get(os.environ['COMPS_WORKITEM_GUID'])
+    files = gather_files_from_related(wi)
+    ac = create_asset_collection(files)
     print(ac.id)
