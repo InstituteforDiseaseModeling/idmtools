@@ -16,7 +16,7 @@ class AssetizeOutput(SSMTWorkItem):
     def __post_init__(self):
         super().__post_init__()
 
-    def create_command(self):
+    def create_command(self) -> str:
         command = "python3 assetize_output.py "
         for experiment in self.related_experiments:
             command += f"--experiment {experiment.id} "
@@ -27,8 +27,12 @@ class AssetizeOutput(SSMTWorkItem):
         for wi in self.related_work_items:
             command += f"--work-item {wi.id} "
 
+        return command
+
     def pre_creation(self, platform: IPlatform) -> None:
         super().pre_creation(platform)
+        if not self.__are_all_dependencies_created():
+            raise ValueError("Ensure all dependent items are in a create state before attempting to create the Assetize Watcher")
 
     def __create_after_other_items_have_been_created(self, item, platform):
         """
@@ -42,6 +46,12 @@ class AssetizeOutput(SSMTWorkItem):
             None
         """
         # Loops through items we are waiting for ids and check if they are not in created state
+        all_created = self.__are_all_dependencies_created()
+        if all_created:
+            # Run without waiting so we just create
+            self.run(platform=platform)
+
+    def __are_all_dependencies_created(self) -> bool:
         all_created = True
         for item_type in ['related_experiments', 'related_simulations', 'related_work_items']:
             for item in getattr(self, item_type):
@@ -50,8 +60,7 @@ class AssetizeOutput(SSMTWorkItem):
                     break
             if all_created is False:
                 break
-        if all_created:
-            self.run(platform=platform)
+        return all_created
 
     def run_after(self, item: Union[Experiment, Simulation, IWorkflowItem]):
         if isinstance(item, Experiment):
