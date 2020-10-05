@@ -12,6 +12,7 @@ from idmtools.entities.iplatform import IPlatform
 from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools.entities.simulation import Simulation
 from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
+from idmtools.core.enums import ItemType
 
 
 EntityFilterFunc = Callable[[CommissionableEntity], bool]
@@ -49,7 +50,7 @@ class AssetizeOutput(SSMTWorkItem):
             command += f' --asset-tag "{name}={value}"'
 
         if self.no_simulation_prefix:
-            command += f' --no-simulation-prefix'
+            command += ' --no-simulation-prefix'
         else:
             command += f' --simulation-prefix-format-str "{self.simulation_prefix_format_str}"'
 
@@ -57,7 +58,7 @@ class AssetizeOutput(SSMTWorkItem):
             command += f' --work_item_prefix_format_str "{self.work_item_prefix_format_str}"'
 
         if self.include_assets:
-            command += f' --assets'
+            command += ' --assets'
 
         for pre_run_func in self.pre_run_functions:
             command += f' --pre-run-func {pre_run_func.__name__}'
@@ -66,7 +67,7 @@ class AssetizeOutput(SSMTWorkItem):
             command += f' --entity-filter-func {self.entity_filter_function.__name__}'
 
         if self.verbose:
-            command += f' --verbose'
+            command += ' --verbose'
 
         return command
 
@@ -104,9 +105,24 @@ class AssetizeOutput(SSMTWorkItem):
         return new_source
 
     def clear_exclude_patterns(self):
+        """
+        Clear Exclude Patterns will remove all current rules.
+
+        Returns:
+            None
+        """
         self.exclude_patterns = []
 
     def pre_creation(self, platform: IPlatform) -> None:
+        """
+        Pre-Creation
+
+        Args:
+            platform: Platform
+
+        Returns:
+
+        """
         super().pre_creation(platform)
         self.__ensure_all_dependencies_created(platform)
         if len(self.asset_tags) == 0:
@@ -141,12 +157,35 @@ class AssetizeOutput(SSMTWorkItem):
                         item.parent.run(platform=platform)
 
     def total_items_watched(self) -> int:
+        """
+        Returns the number of items watched
+
+        Returns:
+            Total number of items watched
+        """
         total = 0
         for item_type in ['related_experiments', 'related_simulations', 'related_work_items']:
             total += len(getattr(self, item_type))
         return total
 
+    def run_after_by_id(self, item_id: str, item_type: ItemType, platform: IPlatform = None):
+        if item_type not in [ItemType.EXPERIMENT, ItemType.SIMULATION, ItemType.WORKFLOW_ITEM]:
+            raise ValueError("Currently only Experiment, Simuation, and WorktforlItems can be assetize")
+        p = super()._check_for_platform_from_context(platform)
+        item = platform.get_item(item_id=item_id, item_type=item_type)
+        if item:
+            self.run_after(item)
+        raise FileNotFoundError(f"Cannot find the item with {item_id} of type {item_type}")
+
     def run_after(self, item: Union[AssetizableItem, List[AssetizableItem]]):
+        """
+        Add item ti run after
+        Args:
+            item:
+
+        Returns:
+
+        """
         if not isinstance(item, list):
             items_to_add = [item]
         else:
@@ -162,14 +201,35 @@ class AssetizeOutput(SSMTWorkItem):
                 raise ValueError("We can only assetize the output of experiments, simulations, and workitems")
 
     def wait(self, wait_on_done_progress: bool = True, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None):
+        """
+
+        Args:
+            wait_on_done_progress:
+            timeout:
+            refresh_interval:
+            platform:
+
+        Returns:
+
+        """
         # wait on related items before we wait on our item
         p = super()._check_for_platform_from_context(platform)
-        opts = dict(wait_on_done_progress=wait_on_done_progress, timeout=timeout, refresh_interval=refresh_interval, platform=platform)
+        opts = dict(wait_on_done_progress=wait_on_done_progress, timeout=timeout, refresh_interval=refresh_interval, platform=p)
         self.__wait_on_children(**opts)
 
         super().wait(**opts)
 
     def __wait_on_children(self, **opts):
+        """
+        Wait on children implementation
+
+        Loops through the relations and ensure all are done before waiting on ourselve
+        Args:
+            **opts:
+
+        Returns:
+
+        """
         for item_type in ['related_experiments', 'related_simulations', 'related_work_items']:
             items = getattr(self, item_type)
             for item in items:
@@ -178,3 +238,5 @@ class AssetizeOutput(SSMTWorkItem):
                 # this should only be sim in this branch
                 else:
                     item.parent.wait(**opts)
+
+        super().wait(**opts)
