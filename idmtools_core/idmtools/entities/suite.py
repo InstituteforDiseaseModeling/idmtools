@@ -3,7 +3,7 @@ from abc import ABC
 from dataclasses import dataclass, field, fields
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.core.interfaces.inamed_entity import INamedEntity
-from idmtools.core import ItemType, EntityContainer, EntityStatus
+from idmtools.core import ItemType, EntityContainer
 from idmtools.core.interfaces.irunnable_entity import IRunnableEntity
 
 if TYPE_CHECKING:
