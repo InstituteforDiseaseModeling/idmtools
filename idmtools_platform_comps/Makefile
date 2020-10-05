@@ -18,7 +18,7 @@ help:
 
 clean: ## Clean most of the temp-data from the project
 	$(CLDIR) --file-patterns "*.py[co],*.done,*.log,**/.coverage" \
-		--dir-patterns "**/__pycache__,**/htmlcov,**/.pytest_cache" --directories "dist,build"
+		--dir-patterns "**/__pycache__,**/htmlcov,**/.pytest_cache,**/tests/output_*" --directories "dist,build,tests/output"
 
 clean-all: clean ## Deleting package info hides plugins so we only want to do that for packaging
 	$(CLDIR) --dir-patterns "**/*.egg-info/"
