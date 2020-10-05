@@ -6,11 +6,6 @@ PY?=python
 PDS=$(PY) ../dev_scripts/
 PDR=$(PDS)run.py
 CLDIR=$(PDS)clean_dir.py
-TEST_EXTRA_OPTS?=
-TEST_REPORT ?= test_results.xml
-HTML_TEST_REPORT ?= comps.test_results.html
-TEST_COMMAND = DOCKER_REPO=docker-staging NO_SPINNER=1 cd tests && py.test --junitxml=$(TEST_REPORT) --html=$(HTML_TEST_REPORT) --self-contained-html $(TEST_EXTRA_OPTS)
-COVERAGE_OPTS := --cov-config=.coveragerc --cov-branch --cov-append --cov=idmtools --cov=idmtoools_cli --cov=idmtools_models --cov=idmtools_platform_comps
 
 
 help:
@@ -27,10 +22,10 @@ lint: ## check style with flake8
 	flake8 --ignore=E501,W291 $(PACKAGE_NAME) tests
 
 test: ## Run our tests
-	$(TEST_COMMAND) -m "not comps and not docker"
+	$(MAKE) -C tests test
 
 test-all: ## Run all our tests
-	$(TEST_COMMAND) -n 8 -m "not serial"
+	$(MAKE) -C tests test-all
 	# $(FULL_TEST_CMD) -m "serial"' # No serial tests at moment
 
 test-failed: ## Run only previously failed tests
