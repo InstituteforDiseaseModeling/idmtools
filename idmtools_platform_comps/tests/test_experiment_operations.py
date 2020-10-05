@@ -127,17 +127,21 @@ class TestExperimentOperations(unittest.TestCase):
             self.assertEqual(5, len(assets))
             totals = defaultdict(int)
             for asset in assets:
+
                 out_dir = os.path.join(os.path.dirname(__file__), 'output')
                 os.makedirs(out_dir, exist_ok=True)
                 name = os.path.join(out_dir, asset.filename)
                 asset.download_to_path(name)
-                with open(name, 'rb') as din:
-                    content = din.read()
-                    md5_hash = hashlib.md5()
-                    md5_hash.update(content)
-                    self.assertEqual(asset.checksum, uuid.UUID(md5_hash.hexdigest()))
-                totals[asset.filename] += 1
-                os.remove(name)
+                try:
+                    with open(name, 'rb') as din:
+                        content = din.read()
+                        md5_hash = hashlib.md5()
+                        md5_hash.update(content)
+                        self.assertEqual(asset.checksum, uuid.UUID(md5_hash.hexdigest()))
+                    totals[asset.filename] += 1
+                # ensure we always delete file after test
+                finally:
+                    os.remove(name)
             # self.assertEqual(4, totals['idmtools_metadata.json'])
             self.assertEqual(4, totals['config.json'])
             self.assertEqual(1, totals['model1.py'])
