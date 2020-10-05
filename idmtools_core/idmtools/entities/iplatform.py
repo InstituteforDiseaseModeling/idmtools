@@ -11,6 +11,7 @@ from idmtools.core import CacheEnabled, UnknownItemException, EntityContainer, U
 from idmtools.core.enums import ItemType, EntityStatus
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.core.interfaces.iitem import IItem
+from idmtools.core.interfaces.irunnable_entity import IRunnableEntity
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
@@ -651,7 +652,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             time.sleep(refresh_interval)
         raise TimeoutError(f"Timeout of {timeout} seconds exceeded")
 
-    def wait_till_done(self, item: Union[Experiment, IWorkflowItem, Suite], timeout: int = 60 * 60 * 24,
+    def wait_till_done(self, item: IRunnableEntity, timeout: int = 60 * 60 * 24,
                        refresh_interval: int = 5, progress: bool = True):
         """
         Wait for the experiment to be done.
@@ -722,7 +723,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             failed_warning['failed_warning'] = True
         return item.done
 
-    def wait_till_done_progress(self, item: Union[Experiment, IWorkflowItem, Suite], timeout: int = 60 * 60 * 24,
+    def wait_till_done_progress(self, item: IRunnableEntity, timeout: int = 60 * 60 * 24,
                                 refresh_interval: int = 5):
         """
         Wait on an item to complete with progress bar

@@ -1,8 +1,6 @@
 import os
-
 import pytest
 import unittest
-
 from idmtools.core import EntityStatus
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
@@ -54,14 +52,39 @@ class TestAssetizeOutput(unittest.TestCase):
         ao.pre_creation(None)
         self.assertEqual(1, len(ao.file_patterns))
         self.assertEqual("**", ao.file_patterns[0])
+        self.assertEqual(ao.create_command(), 'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --exclude-pattern "StdErr.txt" --exclude-pattern "StdOut.txt" --exclude-pattern "WorkOrder.json" --simulation-prefix-format-str "{simulation.id}"')
+        ao.verbose = True
+        self.assertEqual(ao.create_command(), 'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --exclude-pattern "StdErr.txt" --exclude-pattern "StdOut.txt" --exclude-pattern "WorkOrder.json" --simulation-prefix-format-str "{simulation.id}" --verbose')
+        ao.clear_exclude_patterns()
+        self.assertEqual(ao.create_command(), 'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --simulation-prefix-format-str "{simulation.id}" --verbose')
+
+        def pre_run_dummy():
+            pass
+
+        def entity_filter_dummy(item):
+            return True
+
+        def another_pre_run_dummy():
+            pass
+        ao.pre_run_functions.append(pre_run_dummy)
+        ao.entity_filter_function = entity_filter_dummy
+        ao.pre_creation(None)
+        self.assertEqual(len(ao.asset_files), 3)
+        self.assertIn("pre_run.py", [f.filename for f in ao.asset_files])
+        self.assertIn("entity_filter_func.py", [f.filename for f in ao.asset_files])
+        self.assertEqual(ao.create_command(), 'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --simulation-prefix-format-str "{simulation.id}" --pre-run-func pre_run_dummy --entity-filter-func entity_filter_dummy --verbose')
+
+        ao.pre_run_functions.append(another_pre_run_dummy)
+        self.assertEqual(ao.create_command(), 'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --simulation-prefix-format-str "{simulation.id}" --pre-run-func pre_run_dummy --pre-run-func another_pre_run_dummy --entity-filter-func entity_filter_dummy --verbose')
 
     def test_comps_simple(self):
         platform = Platform("COMPS2")
         task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"), parameters=dict(a=1))
         e = Experiment.from_task(task=task)
-        ao = AssetizeOutput()
+        ao = AssetizeOutput(verbose=True)
         ao.run_after(e)
-        e.run(wait_until_done=True)
         ao.run(wait_on_done=True)
 
         self.assertTrue(e.succeeded)
+        self.assertTrue(ao.succeeded)
+
