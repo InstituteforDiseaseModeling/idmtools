@@ -1,7 +1,10 @@
 import glob
+import sys
 from logging import getLogger, DEBUG
 import humanfriendly
 import re
+from COMPS.Data.Simulation import SimulationState
+from COMPS.Data.WorkItem import WorkItemState
 from concurrent.futures._base import as_completed
 from concurrent.futures.thread import ThreadPoolExecutor
 import uuid
@@ -60,7 +63,7 @@ def gather_files(directory: str, file_patterns: List[str], exclude_patterns: Lis
 
     # Now strip file that match exclude patterns. We do this after since the regular expressions here are a bit more expensive, so a we are at the
     # minimum possible files we must scan as this point. We did possible calculate extra md5s here
-    return set([f for f in file_list if is_file_excluded(f[0], exclude_patterns)])
+    return set([f for f in file_list if not is_file_excluded(f[0], exclude_patterns)])
 
 
 def is_file_excluded(file_details: str, exclude_patterns: List[Pattern]) -> bool:
@@ -142,7 +145,7 @@ def gather_files_from_related(work_item: WorkItem, file_patterns: List[str], exc
     for simulation in simulations:
         if entity_filter_func(simulation):
             if logger.isEnabledFor(DEBUG):
-                logger.debug(f'Loading outputs from Smulation {simulation.id}')
+                logger.debug(f'Loading outputs from Simulation {simulation.id} with status of {simulation.state}')
             prefix = simulation_prefix_format_str.format(simulation=simulation) if simulation_prefix_format_str else None
             futures.append(pool.submit(gather_files, directory=simulation.hpc_jobs[0].working_directory, file_patterns=file_patterns, exclude_patterns=exclude_patterns_compiles, assets=assets, prefix=prefix))
 
@@ -193,7 +196,7 @@ def create_asset_collection(file_list: SetOfAssets, asset_tags: Dict[str, str]):
 
     """
     asset_collection = AssetCollection()
-    asset_collection.tags = asset_tags
+    asset_collection.set_tags(asset_tags)
     # Maps checksum to AssetCollectionFile and the path on disk to file
     asset_collection_map: Dict[uuid.UUID, Tuple[AssetCollectionFile, str]] = dict()
     for file in file_list:
@@ -219,10 +222,32 @@ def create_asset_collection(file_list: SetOfAssets, asset_tags: Dict[str, str]):
             else:
                 ac2.add_asset(asset_details[0])
         user_logger.info(f"Saving {new_files} totaling {humanfriendly.format_size(total_to_upload)} assets to comps")
-        asset_collection.tags = asset_tags
+        asset_collection.set_tags(asset_tags)
         ac2.save()
         asset_collection = ac2
     return asset_collection
+
+
+def ensure_items_are_ready(work_item: WorkItem):
+    experiments: List[Experiment] = work_item.get_related_experiments()
+    for experiment in experiments:
+        simulations: List[Simulation] = experiment.get_simulations()
+        for simulation in simulations:
+            logger.debug(f'Loading outputs from Simulation {simulation.id} with status of {simulation.state}')
+            if simulation.state not in [SimulationState.Failed, SimulationState.Canceled, SimulationState.Succeeded]:
+                user_logger.info(f"Pausing work until {simulation.id} is done")
+                sys.exit(206)
+    work_items: List[WorkItem] = work_item.get_related_work_items()
+
+    for simulation in work_item.get_related_simulations():
+        if simulation.state not in [SimulationState.Failed, SimulationState.Canceled, SimulationState.Succeeded]:
+            user_logger.info(f"Pausing work until {simulation.id} is done")
+            sys.exit(206)
+
+    for related_work_item in work_items:
+        if related_work_item.state not in [WorkItemState.Succeeded, WorkItemState.Canceled, WorkItemState.Failed]:
+            user_logger.info(f"Pausing work until {related_work_item.id} is done")
+            sys.exit(206)
 
 
 def get_argument_parser():
@@ -275,13 +300,20 @@ if __name__ == "__main__":
     client = Client()
     client.login(os.environ['COMPS_SERVER'])
     wi = WorkItem.get(os.environ['COMPS_WORKITEM_GUID'])
+    asset_tags = dict()
+    for tag in args.asset_tag:
+        name, value = tag.split("=")
+        asset_tags[name] = value
+
+    ensure_items_are_ready(wi)
     files = gather_files_from_related(
         wi, file_patterns=args.file_pattern, exclude_patterns=args.exclude_pattern if args.exclude_pattern else [], assets=args.assets,
         work_item_prefix_format_str=args.work_item_prefix_format_str,
         simulation_prefix_format_str=args.simulation_prefix_format_str if not args.no_simulation_prefix else None,
         entity_filter_func=entity_filter_func
     )
-    ac = create_asset_collection(files, asset_tags=args.asset_tags)
-    with open('asset_collection.id') as o:
+
+    ac = create_asset_collection(files, asset_tags=asset_tags)
+    with open('asset_collection.id', 'w') as o:
         user_logger.info(ac.id)
         o.write(str(ac.id))

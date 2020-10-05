@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from logging import getLogger
 from COMPS.Data.CommissionableEntity import CommissionableEntity
 from functools import partial
-from typing import List, Union, Callable
+from typing import List, Union, Callable, Dict
 from idmtools.core import EntityStatus
 from idmtools.core.interfaces.irunnable_entity import IRunnableEntity
 from idmtools.entities.experiment import Experiment
@@ -34,6 +34,7 @@ class AssetizeOutput(SSMTWorkItem):
     work_item_prefix_format_str: str = field(default=None)
     pre_run_functions: List[Callable] = field(default_factory=list)
     entity_filter_function: EntityFilterFunc = field(default=None)
+    asset_tags: Dict[str, str] = field(default_factory=dict)
 
     def __post_init__(self):
         super().__post_init__()
@@ -46,6 +47,9 @@ class AssetizeOutput(SSMTWorkItem):
 
         for pattern in self.exclude_patterns:
             command += f' --exclude-pattern "{pattern}"'
+
+        for name, value in self.asset_tags.items():
+            command += f' --asset-tag "{name}={value}"'
 
         if self.no_simulation_prefix:
             command += f' --no-simulation-prefix'
@@ -108,6 +112,13 @@ class AssetizeOutput(SSMTWorkItem):
     def pre_creation(self, platform: IPlatform) -> None:
         super().pre_creation(platform)
         self.__ensure_all_dependencies_created(platform)
+        if len(self.asset_tags) == 0:
+            for experiment in self.related_experiments:
+                self.asset_tags['AssetizedOutputfromFromExperiment'] = str(experiment.id)
+            for simulation in self.related_simulations:
+                self.asset_tags['AssetizedOutputfromFromSimulation'] = str(simulation.id)
+            for work_item in self.related_work_items:
+                self.asset_tags['AssetizedOutputfromFromWorkItem'] = str(work_item.id)
         if self.total_items_watched() == 0:
             raise ValueError("You must specify at least one item to watch")
 
@@ -157,6 +168,11 @@ class AssetizeOutput(SSMTWorkItem):
         # wait on related items before we wait on our item
         p = super()._check_for_platform_from_context(platform)
         opts = dict(wait_on_done_progress=wait_on_done_progress, timeout=timeout, refresh_interval=refresh_interval, platform=platform)
+        self.__wait_on_children(**opts)
+
+        super().wait(**opts)
+
+    def __wait_on_children(self, **opts):
         for item_type in ['related_experiments', 'related_simulations', 'related_work_items']:
             items = getattr(self, item_type)
             for item in items:
@@ -164,6 +180,4 @@ class AssetizeOutput(SSMTWorkItem):
                     item.wait(**opts)
                 # this should only be sim in this branch
                 else:
-                    item.parent.run(**opts)
-
-        super().wait(**opts)
+                    item.parent.wait(**opts)

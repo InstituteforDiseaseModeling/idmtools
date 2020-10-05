@@ -6,6 +6,7 @@ from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_platform_comps.utils.assetize_output.assetize_output import AssetizeOutput
+from idmtools_platform_comps.utils.assetize_output.assetize_ssmt_script import strs_to_regular_expressions, is_file_excluded
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.test_task import TestTask
 
@@ -21,17 +22,25 @@ class TestAssetizeOutput(unittest.TestCase):
         self.assertEqual(ao.related_experiments[0], e)
 
     @pytest.mark.smoke
-    def test_experiment_precreate_fails_if_not_all_items_created(self):
-        e = Experiment.from_task(task=TestTask())
-        e2 = Experiment.from_task(task=TestTask())
-
-        e.simulations[0].status = EntityStatus.CREATED
-        ao = AssetizeOutput()
-        ao.run_after([e, e2])
-        self.assertEqual(2, len(ao.related_experiments))
-        with self.assertRaises(ValueError) as er:
-            ao.pre_creation(None)
-        self.assertEqual(er.exception.args[0], "Ensure all dependent items are in a create state before attempting to create the Assetize Watcher")
+    def test_compile_expressions(self):
+        patterns = ['StdOut.txt', 'StdErr.txt', '*.log']
+        dummy_files = [
+            'ABc/StdOut.txt',
+            'b.py',
+            'ABc/stdOut.txt',
+            'ABc/stderr.txt',
+            'ABc/123/stdout.txt',
+            'ABc/123/stdout.err',
+            'ABc/123/StdErr.err',
+            'comps.log',
+            'logs/idmtools.log'
+        ]
+        compiled_patterns = strs_to_regular_expressions(patterns)
+        filtered_list = [f for f in dummy_files if not is_file_excluded(f, compiled_patterns)]
+        self.assertEqual(len(filtered_list), 3)
+        self.assertIn('b.py', filtered_list)
+        self.assertIn('ABc/123/stdout.err', filtered_list)
+        self.assertIn('ABc/123/StdErr.err', filtered_list)
 
     @pytest.mark.smoke
     def test_experiment_precreate_fails_if_no_watched_items(self):
