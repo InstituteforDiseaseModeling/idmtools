@@ -4,6 +4,7 @@ from dataclasses import dataclass, field, fields
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.core.interfaces.inamed_entity import INamedEntity
 from idmtools.core import ItemType, EntityContainer, EntityStatus
+from idmtools.core.interfaces.irunnable_entity import IRunnableEntity
 
 if TYPE_CHECKING:
     from idmtools.entities.iplatform import IPlatform
@@ -11,7 +12,7 @@ if TYPE_CHECKING:
 
 
 @dataclass(repr=False)
-class Suite(INamedEntity, ABC):
+class Suite(INamedEntity, ABC, IRunnableEntity):
     """
     Class that represents a generic suite (a collection of experiments).
 

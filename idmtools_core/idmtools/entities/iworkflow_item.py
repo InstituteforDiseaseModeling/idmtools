@@ -6,12 +6,14 @@ from idmtools.assets.file_list import FileList
 from idmtools.core import ItemType
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.core.interfaces.inamed_entity import INamedEntity
+from idmtools.core.interfaces.irunnable_entity import IRunnableEntity
+
 if TYPE_CHECKING:
     from idmtools.entities.iplatform import IPlatform
 
 
 @dataclass
-class IWorkflowItem(IAssetsEnabled, INamedEntity, ABC):
+class IWorkflowItem(IAssetsEnabled, INamedEntity, IRunnableEntity, ABC):
     """
     Interface of idmtools work item
     """

@@ -12,6 +12,7 @@ from idmtools.core.interfaces.entity_container import EntityContainer
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.core.interfaces.inamed_entity import INamedEntity
+from idmtools.core.interfaces.irunnable_entity import IRunnableEntity
 from idmtools.core.logging import SUCCESS, NOTICE
 from idmtools.entities.itask import ITask
 from idmtools.entities.platform_requirements import PlatformRequirements
@@ -37,7 +38,7 @@ SUPPORTED_SIM_TYPE = Union[
 
 
 @dataclass(repr=False)
-class Experiment(IAssetsEnabled, INamedEntity):
+class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
     """
     Class that represents a generic experiment.
     This class needs to be implemented for each model type with specifics.
