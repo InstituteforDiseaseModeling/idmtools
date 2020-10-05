@@ -26,7 +26,7 @@ user_logger = getLogger("user")
 @dataclass(repr=False)
 class AssetizeOutput(SSMTWorkItem):
     file_patterns: List[str] = field(default_factory=list)
-    exclude_patterns: List[str] = field(default_factory=lambda: ["StdErr.txt", "StdOut.txt", "WorkOrder.json"])
+    exclude_patterns: List[str] = field(default_factory=lambda: ["StdErr.txt", "StdOut.txt", "WorkOrder.json", "*.log"])
     include_assets: bool = field(default=False)
     simulation_prefix_format_str: str = field(default="{simulation.id}")
     no_simulation_prefix: bool = field(default=False)

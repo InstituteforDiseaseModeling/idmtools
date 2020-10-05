@@ -120,12 +120,13 @@ def gather_files_from_related(work_item: WorkItem, file_patterns: List[str], exc
                     i = 0
                     while not entity_filter_func(simulations[i]) and i < len(simulations):
                         i += 1
-                    simulation = simulations[i]
-                    if logger.isEnabledFor(DEBUG):
-                        logger.debug(f'Loading assets for {experiment.name} from simulation {simulation.id}')
-                    # create prefix from the format var
-                    prefix = simulation_prefix_format_str.format(simulation=simulation, experiment=experiment) if simulation_prefix_format_str else None
-                    futures.append(pool.submit(gather_files, directory=simulation.hpc_jobs[0].working_directory, file_patterns=file_patterns, exclude_patterns=exclude_patterns_compiles, assets=assets, prefix=prefix))
+                    if i < len(simulations):
+                        simulation = simulations[i]
+                        if logger.isEnabledFor(DEBUG):
+                            logger.debug(f'Loading assets for {experiment.name} from simulation {simulation.id}')
+                        # create prefix from the format var
+                        prefix = simulation_prefix_format_str.format(simulation=simulation, experiment=experiment) if simulation_prefix_format_str else None
+                        futures.append(pool.submit(gather_files, directory=simulation.hpc_jobs[0].working_directory, file_patterns=file_patterns, exclude_patterns=exclude_patterns_compiles, assets=assets, prefix=prefix))
                 # Loop through each simulation and queue it up for file matching
                 for simulation in simulations:
                     if entity_filter_func(simulation):
