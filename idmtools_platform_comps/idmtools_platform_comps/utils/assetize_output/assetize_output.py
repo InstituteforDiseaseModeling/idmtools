@@ -172,7 +172,7 @@ class AssetizeOutput(SSMTWorkItem):
         if item_type not in [ItemType.EXPERIMENT, ItemType.SIMULATION, ItemType.WORKFLOW_ITEM]:
             raise ValueError("Currently only Experiment, Simuation, and WorktforlItems can be assetize")
         p = super()._check_for_platform_from_context(platform)
-        item = platform.get_item(item_id=item_id, item_type=item_type)
+        item = p.get_item(item_id=item_id, item_type=item_type)
         if item:
             self.run_after(item)
         raise FileNotFoundError(f"Cannot find the item with {item_id} of type {item_type}")

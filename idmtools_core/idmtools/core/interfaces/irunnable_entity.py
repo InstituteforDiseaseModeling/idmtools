@@ -9,7 +9,6 @@ from idmtools.core.interfaces.ientity import IEntity
 
 if TYPE_CHECKING:
     from idmtools.entities.iplatform import IPlatform
-    from idmtools.core.interfaces.iitem import IItem
 
 runnable_hook = Callable[['IRunnableEntity', 'IPlatform'], None]
 logger = getLogger(__name__)
@@ -118,6 +117,6 @@ class IRunnableEntity(IEntity, metaclass=ABCMeta):
             opts['refresh_interval'] = refresh_interval
         p = super()._check_for_platform_from_context(platform)
         if wait_on_done_progress:
-            self.platform.wait_till_done_progress(self, **opts)
+            p.wait_till_done_progress(self, **opts)
         else:
-            self.platform.wait_till_done(self, **opts)
+            p.wait_till_done(self, **opts)

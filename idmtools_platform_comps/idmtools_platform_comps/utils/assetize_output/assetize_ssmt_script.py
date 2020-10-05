@@ -15,7 +15,6 @@ import argparse
 from COMPS import Client
 from COMPS.Data import Experiment, QueryCriteria, AssetCollection, AssetCollectionFile, WorkItem, Simulation, CommissionableEntity
 
-
 logger = getLogger(__name__)
 user_logger = getLogger('user')
 # Our Asset Tuple we use to gather data on files
@@ -262,7 +261,7 @@ def get_argument_parser():
     parser.add_argument("--work-item-prefix-format-str", default=None, help="Format for prefix of workitem outputs. Defaults to None. Useful when combining outputs of multiple work-items")
     parser.add_argument("--assets", default=False, action='store_true', help="Include Assets")
     parser.add_argument("--verbose", default=False, action="store_true", help="Verbose logging")
-    parser.add_argument("--pre-run-func", default=None,  action='append', help="List of function to run before starting analysis. Useful to load packages up in docker container before run")
+    parser.add_argument("--pre-run-func", default=None, action='append', help="List of function to run before starting analysis. Useful to load packages up in docker container before run")
     parser.add_argument("--entity-filter-func", default=None, help="Name of function that can be used to filter items")
 
     return parser
@@ -278,6 +277,7 @@ if __name__ == "__main__":
         os.environ['IDM_TOOLS_CONSOLE_LOGGING'] = '1'
         # Import idmtools here to enable logging
         from idmtools import __version__
+
         logger.debug(f"Using idmtools {__version__}")
         logger.debug(f"Args: {args}")
     else:
@@ -285,6 +285,7 @@ if __name__ == "__main__":
         from idmtools import __version__
     if args.pre_run_func:
         import pre_run
+
         for pre_run_func in args.pre_run_func:
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f"Calling PreRunFunc: {pre_run_func}")
@@ -295,7 +296,9 @@ if __name__ == "__main__":
         import entity_filter_func
         entity_filter_func = getattr(entity_filter_func, args.entity_filter_func)
     else:
-        entity_filter_func = lambda x: True
+        def default_filter_func():
+            return True
+        entity_filter_func = default_filter_func
 
     # load the work item
     client = Client()

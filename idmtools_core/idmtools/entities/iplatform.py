@@ -24,6 +24,7 @@ from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.relation_type import RelationType
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.suite import Suite
+from idmtools.assets.asset_collection import AssetCollection
 from idmtools.services.platforms import PlatformPersistService
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
 from tqdm import tqdm
@@ -179,8 +180,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item_type]
         return getattr(self, interface).get(item_id, **kwargs)
 
-    def get_item(self, item_id: Union[str, UUID], item_type: ItemType = None,
-                 force: bool = False, raw: bool = False, **kwargs) -> Any:
+    def get_item(self, item_id: Union[str, UUID], item_type: ItemType = None, force: bool = False, raw: bool = False, **kwargs) -> Union[Experiment, Suite, Simulation, IWorkflowItem, AssetCollection, None]:
         """
         Retrieve an object from the platform.
         This function is cached; force allows you to force the refresh of the cache.
