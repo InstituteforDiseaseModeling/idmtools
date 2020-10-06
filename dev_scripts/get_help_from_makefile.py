@@ -27,7 +27,6 @@ if __name__ == '__main__':
     parser.add_argument("-f", "--file", default=[], action="append", help="Path to makefile")
     args = parser.parse_args()
 
-
     if args.file:
         help_items = []
         print(args.file)
