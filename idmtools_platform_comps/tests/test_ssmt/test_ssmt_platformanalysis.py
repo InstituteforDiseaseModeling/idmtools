@@ -23,6 +23,7 @@ from node_csv_analyzer import NodeCSVAnalyzer  # noqa
 @allure.story("Analyzers")
 @allure.story("PlatformAnalysis")
 @allure.story("SSMT")
+@allure.suite("idmtools_platform_comps")
 class TestPlatformAnalysis(ITestWithPersistence):
 
     def setUp(self):

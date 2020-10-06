@@ -416,4 +416,6 @@ stub_out
 .*_reports/
 .*_results/
 /**/tests/assets/
+/**/tests/reports/
 *.test_results.html
+allure_report.zip

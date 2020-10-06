@@ -73,6 +73,9 @@ start-allure: ## start the allue docker report server
 	$(PDR) -wd dev_scripts -ex "docker-compose -f allure.yml up -d allure"
 	$(IPY) "print('Once tests have finished, your test report will be available at http://localhost:5050/allure-docker-service/latest-report. To clean results, use http://localhost:5050/allure-docker-service/clean-results')"
 
+allure-report: ## Download report as zip
+	$(IPY) "from urllib.request import urlretrieve; urlretrieve('http://localhost:5050/allure-docker-service/report/export', 'allure_report.zip')"
+
 ## Run smoke tests with reports to Allure server(Comment moved until https://github.com/tqdm/py-make/issues/11 is resolves)
 test-smoke-allure: start-allure
 	$(PDS)run_pymake_on_all.py --env "TEST_EXTRA_OPTS=--alluredir=../../.allure_results" test-smoke

@@ -28,6 +28,7 @@ def param_update(simulation, param, value):
 @pytest.mark.long
 @allure.story("COMPS")
 @allure.story("SSMT")
+@allure.suite("idmtools_platform_comps")
 class TestVisToolsWorkItem(unittest.TestCase):
 
     def generate_sim(self):

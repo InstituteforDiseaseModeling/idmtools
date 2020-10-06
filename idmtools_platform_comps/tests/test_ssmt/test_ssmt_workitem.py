@@ -16,6 +16,7 @@ from idmtools.analysis.analyze_manager import AnalyzeManager
 @pytest.mark.ssmt
 @allure.story("COMPS")
 @allure.story("SSMT")
+@allure.suite("idmtools_platform_comps")
 class TestSSMTWorkItem(ITestWithPersistence):
 
     def setUp(self) -> None:
