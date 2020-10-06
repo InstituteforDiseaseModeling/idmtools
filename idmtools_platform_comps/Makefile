@@ -1,119 +1,13 @@
-.PHONY: clean lint test coverage dist release-staging release-staging-release-commit release-staging-minor
-IPY=python -c
-MV ?= mv
 PACKAGE_NAME=idmtools_platform_comps
-PY?=python
-PDS=$(PY) ../dev_scripts/
-PDR=$(PDS)run.py
-CLDIR=$(PDS)clean_dir.py
-TEST_EXTRA_OPTS?=
-TEST_REPORT ?= test_results.xml
-HTML_TEST_REPORT ?= comps.test_results.html
-TEST_COMMAND = DOCKER_REPO=docker-staging NO_SPINNER=1 cd tests && py.test --junitxml=$(TEST_REPORT) --html=$(HTML_TEST_REPORT) --self-contained-html $(TEST_EXTRA_OPTS)
-COVERAGE_OPTS := --cov-config=.coveragerc --cov-branch --cov-append --cov=idmtools --cov=idmtoools_cli --cov=idmtools_models --cov=idmtools_platform_comps
+include $(abspath ../dev_scripts/package_general.mk)
 
 
-help:
-	$(PDS)get_help_from_makefile.py
-
-clean: ## Clean most of the temp-data from the project
-	$(CLDIR) --file-patterns "*.py[co],*.done,*.log,**/.coverage" \
-		--dir-patterns "**/__pycache__,**/htmlcov,**/.pytest_cache,**/tests/output_*" --directories "dist,build,tests/output"
-
-clean-all: clean ## Deleting package info hides plugins so we only want to do that for packaging
-	$(CLDIR) --dir-patterns "**/*.egg-info/"
-
-lint: ## check style with flake8
-	flake8 --ignore=E501,W291 $(PACKAGE_NAME) tests
-
-test: ## Run our tests
-	$(TEST_COMMAND) -m "not comps and not docker"
-
-test-all: ## Run all our tests
-	$(TEST_COMMAND) -n 8 -m "not serial"
-	# $(FULL_TEST_CMD) -m "serial"' # No serial tests at moment
-
-test-failed: ## Run only previously failed tests
-	$(TEST_COMMAND) --lf
-
-test-long: ## Run any tests that takes more than 30s
-	$(TEST_COMMAND) -m "long"
-
-test-no-long: ## Run any tests that takes less than 30s
-	$(TEST_COMMAND) -m "not long"
-
-test-comps: ## Run our comps tests
-	$(TEST_COMMAND) -m "comps"
-
-test-docker: ## Run our docker tests
-	$(TEST_COMMAND) -m "docker"
-
-test-python: ## Run our python tests
-	$(TEST_COMMAND) -m "python"
-
-test-smoke: ## Run smoke tests
-	$(TEST_COMMAND) -n 8 -m "smoke and not serial"
-
-test-ssmt: ## Run our ssmt tests
-	$(TEST_COMMAND) -m "ssmt"
-
-coverage-report:  ## Generate HTML report from coverage. Requires running coverage run first(coverage, coverage-smoke, coverage-all)
-	coverage report -m
-	coverage html -i
-
-## View coverage report (Comment out https://github.com/tqdm/py-make/issues/11)
-coverage-report-view: coverage-report
-	$(PDS)/launch_dir_in_browser.py htmlcov/index.html
-
-coverage: clean ## Generate a code-coverage report
-	# We have to run in our tests folder to use the proper config
-	$(TEST_COMMAND) $(COVERAGE_OPTS) -n 12 -m "not comps and not docker"
-	$(MV) tests/.coverage .coverage
-
-coverage-smoke: clean ## Generate a code-coverage report
-	# We have to run in our tests folder to use the proper config
-	$(TEST_COMMAND) $(COVERAGE_OPTS) -n 12 -m "smoke"
-	$(MV) tests/.coverage .coverage
-
-coverage-all: ## Generate a code-coverage report using all tests
-	# We have to run in our tests folder to use the proper config
-	$(TEST_COMMAND) $(COVERAGE_OPTS)  -n 12
-	mv tests/.coverage .coverage
+help: 
+	$(PDS)get_help_from_makefile.py -f ../dev_scripts/package_general.mk -f ./Makefile
 
 # Release related rules
 ssmt-image: ## Build SSMT Docker image
-	cd ssmt_image && $(MAKE) docker
+	$(MAKE) -C ssmt_image docker
 
 ssmt-image-release: ## Push image to staging
-	cd ssmt_image && $(MAKE) docker-release-staging
-
-dist: clean ## build our package
-	python setup.py sdist
-
-release-staging: dist ## perform a release to staging
-	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/idm-pypi-staging/ dist/*
-
-bump-release: ## bump the release version.
-	bump2version release --commit
-
-# Use before release-staging-release-commit to confirm next version.
-bump-release-dry-run: ## bump the release version. (dry run)
-	bump2version release --dry-run --allow-dirty --verbose
-
-bump-patch: ## bump the patch version
-	bump2version patch --commit
-
-bump-minor: ## bump the minor version
-	bump2version minor --commit
-
-bump-major: ## bump the major version
-	bump2version major --commit
-
-bump-patch-dry-run: ## bump the patch version(dry run)
-	bump2version patch --dry-run --allow-dirty --verbose
-
-bump-minor-dry-run: ## bump the minor version(dry run)
-	bump2version minor --dry-run --allow-dirty --verbose
-
-bump-major-dry-run: ## bump the major version(dry run)
-	bump2version major --dry-run --allow-dirty --verbose
+	$(MAKE) -C ssmt_image  docker-release-staging

@@ -12,4 +12,5 @@ except:  # noqa E722
 arg = sys.argv[1]
 if not arg.startswith("http"):
     arg = "file://" + pathname2url(os.path.abspath(arg))
+print(f"Launching {arg}")
 webbrowser.open(arg)

@@ -1,31 +1,33 @@
 .PHONY: clean lint test coverage dist release-staging release-staging-release-commit release-staging-minor changelog start-allure
 MKDIR ?= mkdir
 MV ?= mv
+RM ?= rm
 IPY=python -c
 PY=python
 PDS=$(PY) dev_scripts/
 MAKEALL=$(PDS)run_pymake_on_all.py
 PDR=$(PDS)run.py
 CLDIR=$(PDS)clean_dir.py
+COVERAGE_PATH=tests/$(COVERAGE_PATH)
 
 help:
 	$(PDS)get_help_from_makefile.py
 
 clean: ## Clean most common outputs(Logs, Test Results, etc)
-	$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
+	-$(RM) -rf **/$(COVERAGE_PATH) *.log *.pyi  dev_scripts/.allure_reports dev_scripts/.allure_results
 	$(MAKEALL) --parallel clean
 	$(MAKE) stop-allure
 	-$(CLDIR) --file-patterns "**/*.log,*.pyi" --dir-patterns "./dev_scripts/.allure_reports,./dev_scripts/.allure_results,./.*_reports"
 	-$(PDR) -wd "docs" -ex "make clean"
 
 clean-all: ## Clean most common outputs(Logs, Test Results, etc) as well as local install information. Running this requires a new call to setup-dev or setup-dev-no-docker
-	$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/*.coverage', recursive=True)]"
+	$(IPY) "import os, glob; [os.remove(i) for i in glob.glob('**/$(COVERAGE_PATH)', recursive=True)]"
 	$(MAKEALL) --parallel clean-all
 	$(CLDIR) --file-patterns "**/*.buildlog"
 
 setup-dev: ## Setup packages in dev mode
 	python dev_scripts/bootstrap.py
-	cd idmtools_platform_local && $(MAKE) docker
+	$(MAKE) -C idmtools_platform_local docker
 
 setup-dev-no-docker: ## Setup packages in dev mode minus docker
 	python dev_scripts/bootstrap.py
@@ -59,7 +61,7 @@ test-smoke: ## Run our smoke tests
 
 aggregate-html-reports: ## Aggregate html test reports into one directory
 	$(PDS)aggregate_reports.py
-	@+$(IPY) "print('Serving documentation @ server at http://localhost:8001 . Ctrl + C Will Stop Server')"
+	-echo Serving documentation @ server at http://localhost:8001 . Ctrl + C Will Stop Server
 	$(PDR) -wd '.html_reports' -ex 'python -m http.server 8001'
 
 stop-allure: ## Stop Allure
@@ -83,14 +85,14 @@ test-all-allure: start-allure
 
 coverage: ## Generate a code-coverage report
 	$(MAKEALL) "coverage-all"
-	coverage combine idmtools_cli/.coverage idmtools_core/.coverage idmtools_models/.coverage idmtools_platform_comps/.coverage idmtools_platform_local/.coverage
+	coverage combine idmtools_cli/$(COVERAGE_PATH) idmtools_core/$(COVERAGE_PATH) idmtools_models/$(COVERAGE_PATH) idmtools_platform_comps/$(COVERAGE_PATH) idmtools_platform_local/$(COVERAGE_PATH)
 	coverage report -m
 	coverage html -i
 	$(PDS)launch_dir_in_browser.py htmlcov/index.html
 
 coverage-smoke: ## Generate a code-coverage report
 	$(MAKEALL) "coverage-smoke"
-	coverage combine idmtools_cli/.coverage idmtools_core/.coverage idmtools_models/.coverage idmtools_platform_comps/.coverage idmtools_platform_local/.coverage
+	coverage combine idmtools_cli/$(COVERAGE_PATH) idmtools_core/$(COVERAGE_PATH) idmtools_models/$(COVERAGE_PATH) idmtools_platform_comps/$(COVERAGE_PATH) idmtools_platform_local/$(COVERAGE_PATH)
 	coverage report -m
 	coverage html -i
 	$(PDS)launch_dir_in_browser.py htmlcov/index.html
@@ -107,7 +109,6 @@ packages-changes-since-last-verison: ## Get list of versions since last release 
 linux-dev-env: ## Runs docker dev env
 	$(PDR) -w 'dev_scripts/linux-test-env' -ex 'docker-compose build linuxtst'
 	$(PDR) -w 'dev_scripts/linux-test-env' -ex 'docker-compose run --rm linuxtst'
-
 
 changelog: ## Generate partial changelog
 	$(PDS)changelog.py
