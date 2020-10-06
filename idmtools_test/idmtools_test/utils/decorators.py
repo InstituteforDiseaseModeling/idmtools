@@ -4,6 +4,10 @@ import time
 import unittest
 from functools import wraps
 from typing import Callable, Union, Any, Optional
+import pytest
+from idmtools import IdmConfigParser
+from idmtools_test import COMMON_INPUT_PATH
+from idmtools_test.utils.utils import is_global_configuration_enabled
 
 # The following decorators are used to control test
 # To allow for different use cases(dev, test, packaging, etc)
@@ -15,7 +19,7 @@ from typing import Callable, Union, Any, Optional
 # This currently is any comps related test
 # test-docker run any tests that depend on docker locally(Mostly local runn)
 # test-all runs all tests
-from idmtools_test import COMMON_INPUT_PATH
+
 
 linux_only = unittest.skipIf(
     not platform.system() in ["Linux", "Darwin"], 'No Tests that are meant for linux'
@@ -25,6 +29,7 @@ windows_only = unittest.skipIf(
     platform.system() in ["Linux", "Darwin"], 'No Tests that are meant for Windows'
 )
 
+skip_if_global_configuration_is_enabled = pytest.mark.skipif(is_global_configuration_enabled(), reason=f"Either {IdmConfigParser.get_global_configuration_name()} is set or the environment variable 'IDMTOOLS_CONFIG_FILE' is set")
 # this is mainly for docker in docker environments but also applies to environments
 # where you must use the local ip address for connectivity vs localhost
 skip_api_host = unittest.skipIf(os.getenv("API_HOST", None) is not None, "API_HOST is defined")

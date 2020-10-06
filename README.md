@@ -31,6 +31,7 @@
   - [First Time Setup](#first-time-setup)
   - [Installing from a Pull Request](#installing-from-a-pull-request)
   - [General Use](#general-use)
+  - [Tips](#tips)
   - [IDE/Runtime Setup](#ideruntime-setup)
   - [Running smoke tests or all tests from Github Actions](#running-smoke-tests-or-all-tests-from-github-actions)
   - [Running specific tests from the command line](#running-specific-tests-from-the-command-line)
@@ -153,6 +154,7 @@ Here are a list of common commands
 
 ```bash
 setup-dev   -   Setup dev environment(assumes you already have a virtualenv)
+setup-dev-no-docker -   Setup dev environment(assumes you already have a virtualenv) exlcuding docker builds for the local platform
 clean       -   Clean up temporary files
 clean-all   -   Deep clean project
 lint        -   Lint package and tests
@@ -162,6 +164,12 @@ coverage    -   Run tests and generate coverage report that is shown in browser
 ```
 
 Some packages have unique build related commands, specifically the local platform. Use `make help` to identify specific commands
+
+## Tips
+
+* Use `dev-watch` make rule to autorun linter and tests in response to local changes
+* When a specific test fails, you `test-failed` rule to run only previously failed tested
+* Use `build-docs-server` to build documents and serve locally with live-reload of documentation as you edit files
 
 ## IDE/Runtime Setup
 

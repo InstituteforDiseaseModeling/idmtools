@@ -43,7 +43,8 @@ extensions = [
     'sphinxcontrib.napoleon',
     'sphinx.ext.todo',
     'plantweb.directive',
-    'sphinxcontrib.programoutput'
+    'sphinxcontrib.programoutput',
+    'sphinx_copybutton'
 ]
 
 plantuml = 'plantweb'
@@ -199,8 +200,10 @@ html_static_path = ['_static']
 html_context = {
     'css_files': [
         '_static/theme_overrides.css',
+        '_static/copy_button.css'
     ]
 }
+html_js_files = ['show_block_by_os.js']
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
 # directly to the root of the docs.

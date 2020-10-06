@@ -1,3 +1,5 @@
+import urllib
+
 import sys
 from logging import getLogger
 from typing import List, Optional
@@ -110,7 +112,9 @@ def get_help_version_url(help_path, url_template: str = 'https://docs.idmod.org/
         Path to url
     """
     from idmtools import __version__
+
     from urllib import parse
+
     if version is None:
         if "nightly" in __version__:
             version = "latest"
