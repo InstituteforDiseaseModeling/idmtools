@@ -1,5 +1,3 @@
-import urllib
-
 import sys
 from logging import getLogger
 from typing import List, Optional

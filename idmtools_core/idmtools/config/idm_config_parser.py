@@ -7,8 +7,6 @@ from configparser import ConfigParser
 from logging import getLogger
 from typing import Any, Dict
 
-from idmtools.core.logging import VERBOSE
-
 from idmtools.utils.info import get_help_version_url
 
 default_config = 'idmtools.ini'
@@ -160,7 +158,7 @@ class IdmConfigParser:
         # init logging here as this is our most likely entry-point into an idmtools "application"
         ini_file = cls._find_config(dir_path, file_name)
 
-        from idmtools.core.logging import setup_logging, VERBOSE
+        from idmtools.core.logging import VERBOSE
 
         if "IDMTOOLS_CONFIG_FILE" in os.environ:
             if not os.path.exists(os.environ["IDMTOOLS_CONFIG_FILE"]):
