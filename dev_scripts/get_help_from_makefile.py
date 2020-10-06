@@ -17,12 +17,13 @@ def parse_help_from_make(filename):
         help = sorted(help, key=lambda x: x[0])
         return help
 
+
 def print_help(help_items):
     print("\n".join([f'{x[0].strip().ljust(20)}:{x[1].strip()}' for x in help_items]))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("-f","--file", default=[], action="append", help="Path to makefile")
+    parser.add_argument("-f", "--file", default=[], action="append", help="Path to makefile")
     args = parser.parse_args()
 
 
@@ -35,4 +36,3 @@ if __name__ == '__main__':
         help_items = parse_help_from_make(f'{os.path.join(os.getcwd(), "Makefile")}')
 
     print_help(help_items)
-
