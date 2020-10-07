@@ -13,13 +13,9 @@ class TestPlatformAnalysis(TestCase):
     def test_basic_functionality(self):
         platform = Platform('Test')
         platform_analysis = PlatformAnalysis(platform=platform, analyzers=[SampleAnalyzer], experiment_ids=['3f46b433-1c8b-400f-a0df-f252c8a47329'])
-        command, temp_dir = platform_analysis._prep_analyze()
+        command = platform_analysis._prep_analyze()
 
         self.assertEqual(command, 'python platform_analysis_bootstrap.py --experiment-ids 3f46b433-1c8b-400f-a0df-f252c8a47329 --analyzers download_analyzer.DownloadAnalyzer --block test')
-        # confirm analyzer was pickled
-        self.assertTrue(os.path.exists(temp_dir))
-        analyzer_pickle = os.path.join(temp_dir, 'analyzer_args.pkl')
-        self.assertTrue(os.path.exists(analyzer_pickle))
 
         self.assertEqual(len(platform_analysis.additional_files), 4)
         asset_names = [f.filename for f in platform_analysis.additional_files]
@@ -35,7 +31,7 @@ class TestPlatformAnalysis(TestCase):
     def test_verbose_command(self):
         platform = Platform('Test')
         platform_analysis = PlatformAnalysis(platform=platform, analyzers=[SampleAnalyzer], experiment_ids=['3f46b433-1c8b-400f-a0df-f252c8a47329'], verbose=True)
-        command, temp_dir = platform_analysis._prep_analyze()
+        command = platform_analysis._prep_analyze()
 
         self.assertEqual(command, 'python platform_analysis_bootstrap.py --experiment-ids 3f46b433-1c8b-400f-a0df-f252c8a47329 --analyzers download_analyzer.DownloadAnalyzer --block test --verbose')
 
@@ -44,7 +40,7 @@ class TestPlatformAnalysis(TestCase):
         f.write("$*")
         platform = Platform('Test')
         platform_analysis = PlatformAnalysis(platform=platform, analyzers=[SampleAnalyzer], experiment_ids=['3f46b433-1c8b-400f-a0df-f252c8a47329'], verbose=True, wrapper_shell_script=f.name)
-        command, temp_dir = platform_analysis._prep_analyze()
+        command = platform_analysis._prep_analyze()
 
         self.assertEqual(command, f'/bin/bash {os.path.basename(f.name)} python platform_analysis_bootstrap.py --experiment-ids 3f46b433-1c8b-400f-a0df-f252c8a47329 --analyzers download_analyzer.DownloadAnalyzer --block test --verbose')
 
@@ -54,13 +50,11 @@ class TestPlatformAnalysis(TestCase):
         def pre_run():
             print('Hello World')
         platform_analysis = PlatformAnalysis(platform=platform, analyzers=[SampleAnalyzer], experiment_ids=['3f46b433-1c8b-400f-a0df-f252c8a47329'], pre_run_func=pre_run)
-        command, temp_dir = platform_analysis._prep_analyze()
+        command = platform_analysis._prep_analyze()
 
         self.assertEqual(command, 'python platform_analysis_bootstrap.py --experiment-ids 3f46b433-1c8b-400f-a0df-f252c8a47329 --analyzers download_analyzer.DownloadAnalyzer --pre-run-func pre_run --block test')
-        # confirm analyzer was pickled
-        self.assertTrue(os.path.exists(temp_dir))
-        analyzer_pickle = os.path.join(temp_dir, 'analyzer_args.pkl')
-        self.assertTrue(os.path.exists(analyzer_pickle))
-
-        pre_run_pickle = os.path.join(temp_dir, 'pre_run.py')
-        self.assertTrue(os.path.exists(pre_run_pickle))
+        asset_names = [f.filename for f in platform_analysis.additional_files]
+        self.assertIn("platform_analysis_bootstrap.py", asset_names)
+        self.assertIn("download_analyzer.py", asset_names)
+        self.assertIn("analyzer_args.pkl", asset_names)
+        self.assertIn("pre_run.py", asset_names)
