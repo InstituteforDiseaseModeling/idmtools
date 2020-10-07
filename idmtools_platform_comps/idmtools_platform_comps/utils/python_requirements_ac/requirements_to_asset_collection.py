@@ -44,6 +44,13 @@ class RequirementsToAssetCollection:
             raise ValueError(
                 "Impossible to proceed without either requirements path or with package list or local wheels!")
 
+        if self.platform is None:
+            # Try to detect platform
+            from idmtools.core.context import get_current_platform
+            p = get_current_platform()
+            if p is not None:
+                self.platform = p
+
         self.requirements_path = os.path.abspath(self.requirements_path) if self.requirements_path else None
         self.pkg_list = self.pkg_list or []
         self.local_wheels = [os.path.abspath(whl) for whl in self.local_wheels] if self.local_wheels else []

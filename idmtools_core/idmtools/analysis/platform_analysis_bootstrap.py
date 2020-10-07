@@ -2,24 +2,40 @@
 This script is executed as entrypoint in the docker SSMT worker.
 Its role is to collect the experiment ids and analyzers and run the analysis.
 """
+import argparse
 import os
 import pickle
 import sys
 from pydoc import locate
-from idmtools.core import ItemType
-from idmtools.core.platform_factory import Platform
-from idmtools.analysis.analyze_manager import AnalyzeManager
+
 
 sys.path.append(os.path.dirname(__file__))
 
 if __name__ == "__main__":
-    if len(sys.argv) < 4:
-        raise Exception(
-            "The script needs to be called with `python platform_analysis_bootstrap.py <experiment_ids> <analyzers> "
-            "platform_block.\n{}".format(" ".join(sys.argv)))
+    parser = argparse.ArgumentParser("PlatformAnalysis bootstrap")
+    parser.add_argument("--experiment-ids", help="A comma separated list of experiments to analyze")
+    parser.add_argument("--analyzers", help="Commas separated list of analyzers")
+    parser.add_argument("--block", help="Configuration block to use")
+    parser.add_argument("--verbose", default=False, action="store_true", help="Verbose logging")
+    parser.add_argument("--pre-run-func", default=None, help="List of function to run before starting analysis. Useful to load packages up in docker container before run")
+
+    args = parser.parse_args()
+    if args.verbose:
+        # enable verbose logging before we load idmtools
+        os.environ['IDM_TOOLS_DEBUG'] = '1'
+        os.environ['IDM_TOOLS_CONSOLE_LOGGING'] = '1'
+
+    # delay loading idmtools so we can change log level through environment
+    from idmtools.core import ItemType
+    from idmtools.core.platform_factory import Platform
+    from idmtools.analysis.analyze_manager import AnalyzeManager
+
+    if args.pre_run_func:
+        import pre_run
+        getattr(pre_run, args.pre_run_func)()
 
     # Get the experiments, analyzers and platform
-    experiments = sys.argv[1].split(",")
+    experiments = args.experiment_ids.split(",")
     experiment_ids = []
     for experiment in experiments:
         experiment_tuple = (experiment, ItemType.EXPERIMENT)
@@ -30,7 +46,7 @@ if __name__ == "__main__":
 
     # Create analyzers
     analyzers = []
-    for analyzer in sys.argv[2].split(","):
+    for analyzer in args.analyzers.split(","):
         A = locate(analyzer)
         a = A(**analyzer_config[analyzer])
         analyzers.append(a)
@@ -39,7 +55,6 @@ if __name__ == "__main__":
         raise Exception("Not all analyzers could be found...\n{}".format(",".join(analyzers)))
 
     # get platform
-    block = sys.argv[3]
-    platform = Platform(block)
+    platform = Platform(args.block)
     am = AnalyzeManager(platform=platform, ids=experiment_ids, analyzers=analyzers)
     am.analyze()
