@@ -16,7 +16,7 @@ current_path = os.path.dirname(__file__)
 
 if __name__ == "__main__":
     platform = Platform('BELEGOST')
-    wi = SSMTWorkItem(item_name=os.path.split(sys.argv[0])[1], command=command, asset_files=asset_files, user_files=user_files)
+    wi = SSMTWorkItem(item_name=os.path.split(sys.argv[0])[1], command=command, asset_files=asset_files)
 
     wi.run(True, platform=platform)
 
