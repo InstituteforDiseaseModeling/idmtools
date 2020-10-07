@@ -97,7 +97,7 @@ class PlatformAnalysis:
             config_path = IdmConfigParser.get_config_path()
             if config_path and os.path.exists(config_path):
                 if logger.isEnabledFor(DEBUG):
-                    logger.debug(f"Adding {config_path} ini")
+                    logger.debug(f"Adding config file: {config_path}")
                 self.additional_files.add_file(config_path)
 
         if self.wrapper_shell_script:
