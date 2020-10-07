@@ -3,7 +3,7 @@ from typing import List, Callable
 import inspect
 import os
 import pickle
-from logging import getLogger
+from logging import getLogger, DEBUG
 from idmtools.assets import Asset
 from idmtools.assets.file_list import FileList
 from idmtools.config import IdmConfigParser
@@ -96,7 +96,9 @@ class PlatformAnalysis:
             # look for one from idmtools.
             config_path = IdmConfigParser.get_config_path()
             if config_path and os.path.exists(IdmConfigParser.get_config_path()):
-                self.additional_files.add_file(IdmConfigParser.get_config_path())
+                if logger.isEnabledFor(DEBUG):
+                    logger.debug(f"Adding {config_path} ini")
+                self.additional_files.add_file(config_path)
 
         if self.wrapper_shell_script:
             self.additional_files.add_file(os.path.join(self.wrapper_shell_script))
