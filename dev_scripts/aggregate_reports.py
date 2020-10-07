@@ -11,4 +11,3 @@ for file in glob.glob(join(base_directory, "**", "*.test_results.html"), recursi
     if os.path.exists(dest_path):
         os.remove(dest_path)
     os.rename(file, dest_path)
-
