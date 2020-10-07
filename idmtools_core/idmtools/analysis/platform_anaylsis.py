@@ -95,9 +95,9 @@ class PlatformAnalysis:
         else:
             # look for one from idmtools.
             config_path = IdmConfigParser.get_config_path()
-            if config_path and os.path.exists(IdmConfigParser.get_config_path()):
+            if config_path and os.path.exists(config_path):
                 if logger.isEnabledFor(DEBUG):
-                    logger.debug(f"Adding {config_path} ini")
+                    logger.debug(f"Adding config file: {config_path}")
                 self.additional_files.add_file(config_path)
 
         if self.wrapper_shell_script:
@@ -129,7 +129,7 @@ class PlatformAnalysis:
         if self.pre_run_func:
             command += f" --pre-run-func {self.pre_run_func.__name__}"
         # Add platform
-        command += " --block {}".format(IdmConfigParser._block)
+        command += " --block {}".format(self.platform._config_block)
         if self.verbose:
             command += " --verbose"
         return command
