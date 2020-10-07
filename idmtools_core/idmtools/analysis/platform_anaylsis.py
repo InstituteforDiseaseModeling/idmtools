@@ -95,7 +95,7 @@ class PlatformAnalysis:
         else:
             # look for one from idmtools.
             config_path = IdmConfigParser.get_config_path()
-            if config_path and os.path.exists(IdmConfigParser.get_config_path()):
+            if config_path and os.path.exists(config_path):
                 if logger.isEnabledFor(DEBUG):
                     logger.debug(f"Adding {config_path} ini")
                 self.additional_files.add_file(config_path)
