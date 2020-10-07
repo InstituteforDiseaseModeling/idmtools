@@ -138,6 +138,6 @@ for line in execute(["pip", "install", "-r", "requirements.txt"], cwd=join(base_
 
 # dev idmtools ini
 dev_idmtools_ini = join(base_directory, "examples", "idmtools.ini")
-if os.path.exists:
+if not os.path.exists(dev_idmtools_ini):
     logger.critical("Placing development ini in examples. This will redirect all request to production to staging!")
-shutil.copy(join(script_dir, "examples_idmtools.ini"), join(base_directory, "examples", "idmtools.ini"))
+    shutil.copy(join(script_dir, "examples_idmtools.ini"), join(base_directory, "examples", "idmtools.ini"))
