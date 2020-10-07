@@ -99,7 +99,7 @@ class PlatformAnalysis:
         self.additional_files.add_file(os.path.join(dir_path, "platform_analysis_bootstrap.py"))
         # check if user gave us an override to idmtools config
         if self.idmtools_config:
-            self.additional_files.add_file(os.path.join(os.getcwd(), "idmtools.ini"))
+            self.additional_files.add_file(self.idmtools_config)
         else:
             # look for one from idmtools.
             if os.path.exists(IdmConfigParser.get_config_path()):
