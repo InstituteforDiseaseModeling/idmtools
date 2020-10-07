@@ -41,7 +41,6 @@ class TestAssets(unittest.TestCase):
         self.assertEqual(a.filename, "a.txt")
         self.assertEqual(a.relative_path, "2")
 
-    @pytest.mark.skip(reason="Coming in 1.6.0")
     def test_create_asset_absolute_path_and_content_fails(self):
         with self.assertRaises(ValueError) as e:
             a = Asset(absolute_path=os.path.join(self.base_path, "d.txt"), content="blah")
