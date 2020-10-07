@@ -53,7 +53,7 @@ class FileList:
         """
         # If already present -> bypass
         for f in self.files:
-            if os.path.abspath(f.absolute_path) == os.path.abspath(path):
+            if f.absolute_path and os.path.abspath(f.absolute_path) == os.path.abspath(path):
                 return
 
         if os.path.isdir(path):
