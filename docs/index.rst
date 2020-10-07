@@ -2,7 +2,7 @@
 Welcome to |IT_s|
 =================
 
-|IT_l| is a collection of Python scripts and utilities created to streamline user interactions with
+|IT_s| is a collection of Python scripts and utilities created to streamline user interactions with
 disease models. This framework provides the user with tools necessary to complete projects, starting
 from the creation of input files (if required), to calibration of the model to data, to commissioning
 and running simulations, through the analysis of results. Modelers can use |IT_s| to run models
