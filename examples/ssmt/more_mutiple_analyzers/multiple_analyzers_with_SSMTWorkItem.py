@@ -13,7 +13,6 @@ asset_files = FileList(root='analyzers')
 # load idmtools.ini to comps2 workitem which is needed for Platform
 user_files = FileList()
 current_path = os.path.dirname(__file__)
-user_files.add_file(os.path.join(current_path, "idmtools.ini"))
 
 if __name__ == "__main__":
     platform = Platform('BELEGOST')
