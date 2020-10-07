@@ -156,6 +156,7 @@ class IdmConfigParser:
             None
         """
         # init logging here as this is our most likely entry-point into an idmtools "application"
+
         ini_file = cls._find_config(dir_path, file_name)
 
         from idmtools.core.logging import VERBOSE
