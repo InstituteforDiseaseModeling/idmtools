@@ -47,7 +47,7 @@ except ImportError:
     console_handler.setLevel(console_log_level)
     logger.addHandler(console_handler)
 
-script_dir = abspath(join(dirname(__file__)))
+script_dir = abspath(dirname(__file__))
 base_directory = abspath(join(script_dir, '..'))
 
 default_install = ['test']
