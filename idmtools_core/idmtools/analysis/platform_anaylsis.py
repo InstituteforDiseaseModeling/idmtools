@@ -132,7 +132,7 @@ class PlatformAnalysis:
         return command
 
     def __pickle_analyzers(self, args_dict):
-        self.additional_files.add_file(Asset(filename='analyzer_args.pkl', content=pickle.dumps(args_dict)))
+        self.additional_files.add_asset_file(Asset(filename='analyzer_args.pkl', content=pickle.dumps(args_dict)))
 
     def __pickle_pre_run(self):
         source = inspect.getsource(self.pre_run_func).splitlines()
@@ -144,7 +144,7 @@ class PlatformAnalysis:
         for line in source:
             new_source.append(replace_expr.sub("", line))
 
-        self.additional_files.add_file(Asset(filename="pre_run.py", content="\n".join(new_source)))
+        self.additional_files.add_asset_file(Asset(filename="pre_run.py", content="\n".join(new_source)))
 
     def validate_args(self):
         if self.analyzers_args is None:
