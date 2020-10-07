@@ -1,12 +1,10 @@
 import re
-
-import shutil
 from typing import List, Callable
 import inspect
 import os
 import pickle
-import tempfile
 from logging import getLogger
+from idmtools.assets import Asset
 from idmtools.assets.file_list import FileList
 from idmtools.config import IdmConfigParser
 from idmtools.entities import IAnalyzer
@@ -68,12 +66,12 @@ class PlatformAnalysis:
             if isinstance(file, str):
                 new_add_files.add_file(file)
             else:
-                new_add_files.add_file(file)
+                new_add_files.add_asset_file(file)
         additional_files = new_add_files
         return additional_files
 
     def analyze(self, check_status=True):
-        command, temp_dir = self._prep_analyze()
+        command = self._prep_analyze()
 
         logger.debug(f"Command: {command}")
         from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
@@ -87,19 +85,13 @@ class PlatformAnalysis:
             self.platform.wait_till_done(self.wi)
         logger.debug(f"Status: {self.wi.status}")
 
-        # remove temp directory
-        try:
-            shutil.rmtree(temp_dir)
-        except PermissionError:
-            pass
-
     def _prep_analyze(self):
         # Add the platform_analysis_bootstrap.py file to the collection
         dir_path = os.path.dirname(os.path.realpath(__file__))
         self.additional_files.add_file(os.path.join(dir_path, "platform_analysis_bootstrap.py"))
         # check if user gave us an override to idmtools config
         if self.idmtools_config:
-            self.additional_files.add_file(os.path.join(os.getcwd(), "idmtools.ini"))
+            self.additional_files.add_file(self.idmtools_config)
         else:
             # look for one from idmtools.
             if os.path.exists(IdmConfigParser.get_config_path()):
@@ -112,11 +104,10 @@ class PlatformAnalysis:
         a_args = zip(self.analyzers, self.analyzers_args)
         for a, g in a_args:
             args_dict[f"{inspect.getmodulename(inspect.getfile(a))}.{a.__name__}"] = g
-        temp_dir = tempfile.mkdtemp()
         if self.pre_run_func:
-            self.__pickle_pre_run(temp_dir)
+            self.__pickle_pre_run()
         # save pickle file as a temp file
-        self.__pickle_analyzers(temp_dir, args_dict)
+        self.__pickle_analyzers(args_dict)
 
         # Add all the analyzers files
         for a in self.analyzers:
@@ -138,19 +129,12 @@ class PlatformAnalysis:
         command += " --block {}".format(IdmConfigParser._block)
         if self.verbose:
             command += " --verbose"
-        return command, temp_dir
+        return command
 
-    def __pickle_analyzers(self, temp_dir, args_dict):
-        temp_file = os.path.join(temp_dir, "analyzer_args.pkl")
-        file = open(temp_file, 'wb')
-        pickle.dump(args_dict, file)
-        file.close()
-        # Add analyzer args pickle as additional file
-        self.additional_files.add_file(temp_file)
+    def __pickle_analyzers(self, args_dict):
+        self.additional_files.add_file(Asset(filename='analyzer_args.pkl', content=pickle.dumps(args_dict)))
 
-    def __pickle_pre_run(self, temp_dir):
-        temp_file = os.path.join(temp_dir, "pre_run.py")
-        file = open(temp_file, 'w')
+    def __pickle_pre_run(self):
         source = inspect.getsource(self.pre_run_func).splitlines()
         space_base = 0
         while source[0][space_base] == " ":
@@ -159,9 +143,8 @@ class PlatformAnalysis:
         new_source = []
         for line in source:
             new_source.append(replace_expr.sub("", line))
-        file.write("\n".join(new_source))
-        file.close()
-        self.additional_files.add_file(temp_file)
+
+        self.additional_files.add_file(Asset(filename="pre_run.py", content="\n".join(new_source)))
 
     def validate_args(self):
         if self.analyzers_args is None:
