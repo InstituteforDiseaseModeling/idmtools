@@ -129,7 +129,7 @@ class PlatformAnalysis:
         if self.pre_run_func:
             command += f" --pre-run-func {self.pre_run_func.__name__}"
         # Add platform
-        command += " --block {}".format(IdmConfigParser._block)
+        command += " --block {}".format(self.platform._config_block)
         if self.verbose:
             command += " --verbose"
         return command

@@ -248,7 +248,7 @@ class IdmConfigParser:
             A configuration value as a string.
         """
         if not cls.found_ini():
-            return None
+            return fallback
 
         if section:
             return cls._config.get(section, option, fallback=fallback)

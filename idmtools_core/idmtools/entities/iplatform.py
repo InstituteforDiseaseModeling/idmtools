@@ -76,6 +76,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     _assets: IPlatformAssetCollectionOperations = field(default=None, repr=False, init=False, compare=False)
     #: Controls what platform should do we re-running experiments by default
     _regather_assets_on_modify: bool = field(default=False, repr=False, init=False, compare=False)
+    # store the config block used to create platform
+    _config_block: str = field(default=None)
 
     @staticmethod
     def get_caller():

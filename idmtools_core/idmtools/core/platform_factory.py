@@ -68,6 +68,7 @@ class Platform:
 
         platform = cls._create_from_block(block, missing_ok=missing_ok, **kwargs)
         set_current_platform(platform)
+        platform._config_block = block
         return platform
 
     @classmethod
