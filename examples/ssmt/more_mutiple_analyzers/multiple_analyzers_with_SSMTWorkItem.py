@@ -10,10 +10,6 @@ command = "python Assets/analyzer_file.py"
 # load everything including analyzers from local 'analyzers' dir to comps's Assets dir in workitem
 asset_files = FileList(root='analyzers')
 
-# load idmtools.ini to comps2 workitem which is needed for Platform
-user_files = FileList()
-current_path = os.path.dirname(__file__)
-
 if __name__ == "__main__":
     platform = Platform('BELEGOST')
     wi = SSMTWorkItem(item_name=os.path.split(sys.argv[0])[1], command=command, asset_files=asset_files)
