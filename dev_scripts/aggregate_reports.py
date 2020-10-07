@@ -12,9 +12,3 @@ for file in glob.glob(join(base_directory, "**", "*.test_results.html"), recursi
         os.remove(dest_path)
     os.rename(file, dest_path)
 
-asset_dest = join(dest_directory, "assets")
-for file in glob.glob(join(base_directory, "**", "tests", "assets", "*"), recursive=True):
-    dest_path = join(asset_dest, basename(file))
-    if os.path.exists(dest_path):
-        os.remove(dest_path)
-    os.rename(file, dest_path)
