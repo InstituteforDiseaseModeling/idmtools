@@ -6,6 +6,8 @@ import os
 from configparser import ConfigParser
 from logging import getLogger
 from typing import Any, Dict
+
+from idmtools.core.logging import VERBOSE
 from idmtools.utils.info import get_help_version_url
 
 default_config = 'idmtools.ini'
@@ -17,6 +19,7 @@ user_logger = getLogger('user')
 
 def initialization(error=False, force=False):
     # store default value
+    # store default value
     oerror = error
 
     def wrap(func):
@@ -24,7 +27,8 @@ def initialization(error=False, force=False):
             if 'error' in kwargs:
                 ferror = kwargs.pop('error')
             elif os.getenv("IDMTOOLS_ERROR_NO_CONFIG", None) is not None:
-                user_logger.warning("Using IDMTOOLS_ERROR_NO_CONFIG environment variable to control behaviour of missing ini file")
+                user_logger.warning(
+                    "Using IDMTOOLS_ERROR_NO_CONFIG environment variable to control behaviour of missing ini file")
                 ferror = os.getenv("IDMTOOLS_ERROR_NO_CONFIG").lower() in ["1", "y", "t", "true", "yes"]
             else:
                 ferror = oerror
@@ -155,9 +159,7 @@ class IdmConfigParser:
             None
         """
         # init logging here as this is our most likely entry-point into an idmtools "application"
-        ini_file = cls._find_config(dir_path, file_name)
-
-        from idmtools.core.logging import VERBOSE
+        from idmtools.core.logging import setup_logging, VERBOSE
 
         if "IDMTOOLS_CONFIG_FILE" in os.environ:
             if not os.path.exists(os.environ["IDMTOOLS_CONFIG_FILE"]):
@@ -172,8 +174,9 @@ class IdmConfigParser:
                     ini_file = global_config
         if ini_file is None:
             # We use print since logger isn't configured
-            print(f"/!\\ WARNING: File '{file_name}' Not Found! For details on how to configure idmtools, see {get_help_version_url('configuration.html')} for details on how to configure idmtools.")
-            cls._init_logging()
+            print(
+                f"/!\\ WARNING: File '{file_name}' Not Found! For details on how to configure idmtools, see {get_help_version_url('configuration.html')} for details on how to configure idmtools.")
+
             return
 
         cls._config_path = ini_file
@@ -187,12 +190,6 @@ class IdmConfigParser:
             if not cls._config.has_section(section=lowercase_version):
                 cls._config._sections[lowercase_version] = cls._config._sections[section]
 
-        cls._init_logging()
-        user_logger.log(VERBOSE, "INI File Used: {}".format(ini_file))
-
-    @classmethod
-    def _init_logging(cls):
-        from idmtools.core.logging import setup_logging
         # setup logging
         try:
             log_config = cls.get_section('Logging')
@@ -201,6 +198,7 @@ class IdmConfigParser:
         except ValueError:
             log_config = dict(level='INFO', log_filename='idmtools.log', console='off')
         setup_logging(**log_config)
+        user_logger.log(VERBOSE, "INI File Used: {}".format(ini_file))
 
         if platform.system() == "Darwin":
             # see https://bugs.python.org/issue27126
@@ -253,11 +251,6 @@ class IdmConfigParser:
             A configuration value as a string.
         """
         if not cls.found_ini():
-            return fallback
-
-        if cls._config is None:
-            if fallback is None:
-                user_logger.warning("No Configuration file defined. Please define a fallback value")
             return fallback
 
         if section:
@@ -341,7 +334,6 @@ class IdmConfigParser:
             None
         """
         if cls.found_ini():
-            from idmtools.core.logging import VERBOSE
             block_details = cls.get_section(block)
             user_logger.log(VERBOSE, f"\n[{block}]")
             user_logger.log(VERBOSE, json.dumps(block_details, indent=3))
