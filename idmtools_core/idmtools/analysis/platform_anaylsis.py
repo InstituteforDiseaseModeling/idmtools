@@ -66,7 +66,7 @@ class PlatformAnalysis:
             if isinstance(file, str):
                 new_add_files.add_file(file)
             else:
-                new_add_files.add_file(file)
+                new_add_files.add_asset_file(file)
         additional_files = new_add_files
         return additional_files
 
