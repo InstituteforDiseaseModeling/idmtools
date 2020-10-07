@@ -115,6 +115,8 @@ class Platform:
                 if not listener:
                     setup_logging()
         except ValueError as e:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f"Checking aliases for {block.upper()}")
             # attempt alias load
             if block.upper() in cls._aliases:
                 if logger.isEnabledFor(DEBUG):
