@@ -18,7 +18,7 @@ from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 # In order to run the experiment, we need to create a `Platform` and an `ExperimentManager`.
 # The `Platform` defines where we want to run our simulation.
 # You can easily switch platforms by changing the Platform to for example 'Local'
-with platform('COMPS2'):
+with platform('BELEGOST'):
     base_task = JSONConfiguredPythonTask(
         script_path=os.path.join("inputs", "csv_inputs", "Assets", "model1.py"),
         # set default parameters

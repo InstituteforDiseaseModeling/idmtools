@@ -7,7 +7,7 @@ command = "python Assets/Hello_model.py"
 asset_files = FileList(root='Assets')
 
 if __name__ == "__main__":
-    platform = Platform('COMPS2')
+    platform = Platform('BELEGOST')
     wi = SSMTWorkItem(item_name=wi_name, command=command, asset_files=asset_files)
     wi.run(True, platform=platform)
 

@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+import shutil
+
 import logging
 import os
 import subprocess
@@ -45,7 +47,8 @@ except ImportError:
     console_handler.setLevel(console_log_level)
     logger.addHandler(console_handler)
 
-base_directory = abspath(join(dirname(__file__), '..'))
+script_dir = abspath(dirname(__file__))
+base_directory = abspath(join(script_dir, '..'))
 
 default_install = ['test']
 data_class_default = default_install
@@ -132,3 +135,9 @@ for package, extras in packages.items():
 
 for line in execute(["pip", "install", "-r", "requirements.txt"], cwd=join(base_directory, 'docs')):
     process_output(line)
+
+# dev idmtools ini
+dev_idmtools_ini = join(base_directory, "examples", "idmtools.ini")
+if not os.path.exists(dev_idmtools_ini):
+    logger.critical("Placing development ini in examples. This will redirect all request to production to staging!")
+    shutil.copy(join(script_dir, "examples_idmtools.ini"), join(base_directory, "examples", "idmtools.ini"))
