@@ -136,9 +136,9 @@ class TestPlatformAnalysis(ITestWithPersistence):
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
         if test_with_new_code:
-            self.assertEqual(execution['Command'], f"/bin/bash {os.path.basename(wrapper)} python platform_analysis_bootstrap.py --experiment-ids {experiment_id} --analyzers csv_analyzer.CSVAnalyzer --block comps2")
+            self.assertEqual(execution['Command'], f"/bin/bash {os.path.basename(wrapper)} python platform_analysis_bootstrap.py --experiment-ids {experiment_id} --analyzers csv_analyzer.CSVAnalyzer --block COMPS2")
         else:
-            self.assertEqual(execution['Command'], f"python platform_analysis_bootstrap.py --experiment-ids {experiment_id} --analyzers csv_analyzer.CSVAnalyzer --block comps2")
+            self.assertEqual(execution['Command'], f"python platform_analysis_bootstrap.py --experiment-ids {experiment_id} --analyzers csv_analyzer.CSVAnalyzer --block COMPS2")
 
     @pytest.mark.comps
     def test_ssmt_seir_model_analysis(self):
@@ -175,9 +175,9 @@ class TestPlatformAnalysis(ITestWithPersistence):
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
         if test_with_new_code:
-            self.assertEqual(execution['Command'], f"/bin/bash {os.path.basename(wrapper)} python platform_analysis_bootstrap.py --experiment-ids {exp_id} --analyzers infectiousness_csv_analyzer.InfectiousnessCSVAnalyzer,node_csv_analyzer.NodeCSVAnalyzer --block comps2")
+            self.assertEqual(execution['Command'], f"/bin/bash {os.path.basename(wrapper)} python platform_analysis_bootstrap.py --experiment-ids {exp_id} --analyzers infectiousness_csv_analyzer.InfectiousnessCSVAnalyzer,node_csv_analyzer.NodeCSVAnalyzer --block COMPS2")
         else:
-            self.assertEqual(execution['Command'], f"python platform_analysis_bootstrap.py --experiment-ids {exp_id} --analyzers infectiousness_csv_analyzer.InfectiousnessCSVAnalyzer,node_csv_analyzer.NodeCSVAnalyzer --block comps2")
+            self.assertEqual(execution['Command'], f"python platform_analysis_bootstrap.py --experiment-ids {exp_id} --analyzers infectiousness_csv_analyzer.InfectiousnessCSVAnalyzer,node_csv_analyzer.NodeCSVAnalyzer --block COMPS2")
 
     @pytest.mark.comps
     def test_ssmt_seir_model_analysis_single_script(self):
@@ -218,9 +218,9 @@ class TestPlatformAnalysis(ITestWithPersistence):
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
         if test_with_new_code:
-            self.assertEqual(execution['Command'], f"/bin/bash {os.path.basename(wrapper)} python platform_analysis_bootstrap.py --experiment-ids {exp_id} --analyzers custom_csv_analyzer.InfectiousnessCSVAnalyzer,custom_csv_analyzer.NodeCSVAnalyzer --block comps2")
+            self.assertEqual(execution['Command'], f"/bin/bash {os.path.basename(wrapper)} python platform_analysis_bootstrap.py --experiment-ids {exp_id} --analyzers custom_csv_analyzer.InfectiousnessCSVAnalyzer,custom_csv_analyzer.NodeCSVAnalyzer --block COMPS2")
         else:
-            self.assertEqual(execution['Command'], "python platform_analysis_bootstrap.py --experiment-ids " + exp_id + " --analyzers custom_csv_analyzer.InfectiousnessCSVAnalyzer,custom_csv_analyzer.NodeCSVAnalyzer --block comps2")
+            self.assertEqual(execution['Command'], "python platform_analysis_bootstrap.py --experiment-ids " + exp_id + " --analyzers custom_csv_analyzer.InfectiousnessCSVAnalyzer,custom_csv_analyzer.NodeCSVAnalyzer --block COMPS2")
 
     @pytest.mark.skipif(not os.path.exists(comps_local_package) or not os.path.exists(core_local_package), reason=f"To run this, you need both {comps_local_package} and {core_local_package}. You can create these files by running pymake dist in each package directory")
     def test_using_newest_code(self):
@@ -262,7 +262,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
         worker_order = json.load(open(os.path.join(file_path, "WorkOrder.json"), 'r'))
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
-        self.assertEqual(execution['Command'], f'/bin/bash {os.path.basename(wrapper)} python platform_analysis_bootstrap.py --experiment-ids {experiment_id} --analyzers simple_analyzer.SimpleAnalyzer --pre-run-func pre_load_func --block comps2')
+        self.assertEqual(execution['Command'], f'/bin/bash {os.path.basename(wrapper)} python platform_analysis_bootstrap.py --experiment-ids {experiment_id} --analyzers simple_analyzer.SimpleAnalyzer --pre-run-func pre_load_func --block COMPS2')
 
         with open(os.path.join(file_path, "stdout.txt"), 'r') as fin:
             stdout_contents = fin.read()
