@@ -25,6 +25,7 @@ if sys.platform == "win32" and 'VIRTUAL_ENV' in os.environ:
 # To use simply run
 # python bootstrap.py
 
+script_dir = abspath(dirname(__file__))
 base_directory = abspath(join(dirname(__file__), '..'))
 
 default_install = ['test']
@@ -148,7 +149,7 @@ if __name__ == "__main__":
         logging.addLevelName(15, 'VERBOSE')
         logging.addLevelName(35, 'SUCCESS')
         logging.addLevelName(50, 'CRITICAL')
-    except (ImportError, ModuleError):
+    except ImportError:
         console_handler = logging.StreamHandler(stream=sys.stdout)
         console_handler.setFormatter(log_formatter)
         console_handler.setLevel(console_log_level)
