@@ -116,7 +116,7 @@ def install_base_environment(pip_url):
     for line in execute(["pip", "uninstall", "-y", "py-make"], ignore_error=True):
         process_output(line)
 
-    for line in execute(["pip", "install", "idm-buildtools~=1.0.0", f"--index-url={pip_url}"]):
+    for line in execute(["pip", "install", "idm-buildtools~=1.0.1", f"--index-url={pip_url}"]):
         process_output(line)
 
 
