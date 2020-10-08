@@ -57,13 +57,11 @@ class Asset:
         if self.absolute_path and self._content is not None:
             raise ValueError("Absolute Path and Content are mutually exclusive. Please provide only one of the options")
         elif self.absolute_path and not os.path.exists(self.absolute_path):
-            raise FileNotFoundError(f"Cannot find specified asset: {self.absolute_path}​​​​​")
+            raise FileNotFoundError(f"Cannot find specified asset: {self.absolute_path}")
         elif self.absolute_path and os.path.isdir(self.absolute_path) and not self.persisted:
             raise ValueError("Asset cannot be a directory!")
-        elif not self.absolute_path and (not self.filename or (
-                self.filename and not self._checksum and self._content is None and not self.persisted)):
-            raise ValueError(
-                "Impossible to create the asset without either absolute path, filename and content, or filename and checksum!")
+        elif not self.absolute_path and (not self.filename or (self.filename and not self._checksum and self._content is None and not self.persisted)):
+            raise ValueError("Impossible to create the asset without either absolute path, filename and content, or filename and checksum!")
 
     def __repr__(self):
         return f"<Asset: {os.path.join(self.relative_path, self.filename)} from {self.absolute_path}>"

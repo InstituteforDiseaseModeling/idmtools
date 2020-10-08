@@ -15,4 +15,3 @@ The configuration of |IT_s| is set in the idmtools.ini file. This file is normal
 Below is an example configuration file:
 
 .. literalinclude:: ../examples/idmtools.ini
-

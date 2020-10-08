@@ -21,7 +21,6 @@ extras = {
     'test': extra_require_files['build'] + extra_require_files['dev'],
     # to support notebooks we need docker
     'notebooks': ['docker==4.0.1'],
-
     'packaging': extra_require_files['build'],
     'idm': ['idmtools_platform_comps', 'idmtools_cli', 'idmtools_models'],
     # our full install include all common plugins
