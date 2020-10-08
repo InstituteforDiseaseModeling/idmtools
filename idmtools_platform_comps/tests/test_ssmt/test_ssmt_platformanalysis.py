@@ -11,6 +11,7 @@ from idmtools_platform_comps import __version__ as platform_comps_version
 from idmtools import __version__ as core_version
 from idmtools.analysis.platform_anaylsis import PlatformAnalysis
 from idmtools.core.platform_factory import Platform
+from idmtools_test.utils.decorators import run_in_temp_dir
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools.core import ItemType
 
@@ -58,8 +59,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
         self.input_file_path = analyzer_path
 
     # Test SimpleAnalyzer with SSMTAnalysis which analyzes python experiment's results
-    @pytest.mark.smoke
-    def test_ssmt_workitem_python_simple_analyzer(self):
+    def do_simple_python_analysis(self, platform):
         experiment_id = '9311af40-1337-ea11-a2be-f0921c167861'  # comps2 exp id
         # experiment_id = 'de07f612-69ed-ea11-941f-0050569e0ef3'  # idmtvapp17
         extra_args = dict()
@@ -68,7 +68,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
             wrapper = write_wrapper_script()
             extra_args['wrapper_shell_script'] = wrapper
             extra_args['asset_files'] = [core_local_package, comps_local_package]
-        analysis = PlatformAnalysis(platform=self.platform,
+        analysis = PlatformAnalysis(platform=platform,
                                     experiment_ids=[experiment_id],
                                     analyzers=[SimpleAnalyzer],
                                     analyzers_args=[{'filenames': ['config.json']}],
@@ -81,7 +81,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
         # verify workitem result
         local_output_path = "output"
         out_filenames = ["output/aggregated_config.json", "WorkOrder.json"]
-        self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
+        platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
 
         file_path = os.path.join(local_output_path, wi.id)
         self.assertTrue(os.path.exists(os.path.join(file_path, "output", "aggregated_config.json")))
@@ -90,9 +90,18 @@ class TestPlatformAnalysis(ITestWithPersistence):
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
         if test_with_new_code:
-            self.assertEqual(execution['Command'], f"/bin/bash {os.path.basename(wrapper)} python platform_analysis_bootstrap.py --experiment-ids {experiment_id} --analyzers simple_analyzer.SimpleAnalyzer --block comps2")
+            self.assertEqual(execution['Command'], f"/bin/bash {os.path.basename(wrapper)} python platform_analysis_bootstrap.py --experiment-ids {experiment_id} --analyzers simple_analyzer.SimpleAnalyzer --block {platform._config_block}")
         else:
-            self.assertEqual(execution['Command'], f"python platform_analysis_bootstrap.py --experiment-ids {experiment_id} --analyzers simple_analyzer.SimpleAnalyzer --block comps2")
+            self.assertEqual(execution['Command'], f"python platform_analysis_bootstrap.py --experiment-ids {experiment_id} --analyzers simple_analyzer.SimpleAnalyzer --block {platform._config_block}")
+
+    @pytest.mark.smoke
+    def test_ssmt_workitem_python_simple_analyzer_using_alias(self):
+        self.do_simple_python_analysis(self.platform)
+
+    @run_in_temp_dir
+    def test_ssmt_using_aliases(self):
+        p = Platform("BAYESIAN")
+        self.do_simple_python_analysis(self.platform)
 
     # Test CSVAnalyzer with SSMTAnalysis which analyzes python experiment's results
     def test_ssmt_workitem_python_csv_analyzer(self):
