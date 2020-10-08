@@ -6,14 +6,15 @@ from dataclasses import dataclass, field
 from logging import getLogger
 from COMPS.Data.CommissionableEntity import CommissionableEntity
 from typing import List, Union, Callable, Dict
+
+from idmtools.assets import Asset
 from idmtools.core.interfaces.irunnable_entity import IRunnableEntity
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform import IPlatform
 from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools.entities.simulation import Simulation
 from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
-from idmtools.core.enums import ItemType
-
+from idmtools.core.enums import ItemType, EntityStatus
 
 EntityFilterFunc = Callable[[CommissionableEntity], bool]
 AssetizableItem = Union[Experiment, Simulation, IWorkflowItem]
@@ -37,6 +38,7 @@ class AssetizeOutput(SSMTWorkItem):
     def __post_init__(self):
         super().__post_init__()
         self.item_name = "Assetize Output"
+        # we need all our items as true entities, so convert them to entities
 
     def create_command(self) -> str:
         command = "python3 Assets/assetize_ssmt_script.py "
@@ -73,24 +75,16 @@ class AssetizeOutput(SSMTWorkItem):
 
     def __pickle_pre_run(self):
         if self.pre_run_functions:
-            temp_dir = tempfile.mkdtemp()
-            temp_file = os.path.join(temp_dir, "pre_run.py")
-            file = open(temp_file, 'w')
+            source = ""
             for function in self.pre_run_functions:
                 new_source = self.__format_function_source(function)
-                file.write("\n".join(new_source))
-            file.close()
-            self.asset_files.add_file(temp_file)
+                source += "\n\n" + "\n".join(new_source)
+            self.asset_files.add_asset_file(Asset(filename='pre_run.py', content=source))
 
     def __pickle_filter_func(self):
         if self.entity_filter_function:
-            temp_dir = tempfile.mkdtemp()
-            temp_file = os.path.join(temp_dir, "entity_filter_func.py")
-            file = open(temp_file, 'w')
             new_source = self.__format_function_source(self.entity_filter_function)
-            file.write("\n".join(new_source))
-            file.close()
-            self.asset_files.add_file(temp_file)
+            self.asset_files.add_asset_file(Asset(filename='entity_filter_func.py', content="\n".join(new_source)))
 
     @staticmethod
     def __format_function_source(function):
@@ -124,7 +118,16 @@ class AssetizeOutput(SSMTWorkItem):
 
         """
         super().pre_creation(platform)
+        for prop, item_type in [('related_experiments', ItemType.EXPERIMENT), ('related_simulations', ItemType.SIMULATION), ('related_work_items', ItemType.WORKFLOW_ITEM)]:
+            new_items = []
+            for id in getattr(self, prop):
+                if isinstance(id, str):
+                    new_items.append(platform.get_item(id, item_type))
+                else:
+                    new_items.append(id)
+            setattr(self, prop, new_items)
         self.__ensure_all_dependencies_created(platform)
+
         if len(self.asset_tags) == 0:
             for experiment in self.related_experiments:
                 self.asset_tags['AssetizedOutputfromFromExperiment'] = str(experiment.id)
@@ -230,13 +233,15 @@ class AssetizeOutput(SSMTWorkItem):
         Returns:
 
         """
+
         for item_type in ['related_experiments', 'related_simulations', 'related_work_items']:
             items = getattr(self, item_type)
             for item in items:
-                if isinstance(item, IRunnableEntity):
-                    item.wait(**opts)
-                # this should only be sim in this branch
-                else:
-                    item.parent.wait(**opts)
+                if item.status not in [EntityStatus.SUCCEEDED, EntityStatus.FAILED]:
+                    if isinstance(item, IRunnableEntity):
+                        item.wait(**opts)
+                    # this should only be sim in this branch
+                    else:
+                        item.parent.wait(**opts)
 
         super().wait(**opts)

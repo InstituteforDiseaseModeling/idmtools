@@ -4,7 +4,7 @@ from logging import getLogger, DEBUG
 import humanfriendly
 import re
 from COMPS.Data.Simulation import SimulationState
-from COMPS.Data.WorkItem import WorkItemState
+from COMPS.Data.WorkItem import WorkItemState, RelationType
 from concurrent.futures._base import as_completed
 from concurrent.futures.thread import ThreadPoolExecutor
 import uuid
@@ -202,7 +202,7 @@ def create_asset_collection(file_list: SetOfAssets, asset_tags: Dict[str, str]):
     for file in file_list:
         fn = os.path.basename(file[1])
         acf = AssetCollectionFile(file_name=fn, relative_path=file[1].replace(fn, "").strip("/"), md5_checksum=file[2])
-        asset_collection_map[file[2]] = (acf, file[0])
+        asset_collection_map[file[2]] = (acf, file[0], file[3])
         asset_collection.add_asset(acf)
 
     # do initial save to see what assets are in comps
@@ -216,7 +216,7 @@ def create_asset_collection(file_list: SetOfAssets, asset_tags: Dict[str, str]):
         for checksum, asset_details in asset_collection_map.items():
             if checksum in missing_files:
                 new_files += 1
-                total_to_upload += asset_details[3]
+                total_to_upload += asset_details[2]
                 acf = AssetCollectionFile(file_name=asset_details[0].file_name, relative_path=asset_details[0].relative_path)
                 ac2.add_asset(acf, asset_details[1])
             else:
@@ -296,7 +296,7 @@ if __name__ == "__main__":
         import entity_filter_func
         entity_filter_func = getattr(entity_filter_func, args.entity_filter_func)
     else:
-        def default_filter_func():
+        def default_filter_func(x):
             return True
         entity_filter_func = default_filter_func
 
@@ -321,3 +321,5 @@ if __name__ == "__main__":
     with open('asset_collection.id', 'w') as o:
         user_logger.info(ac.id)
         o.write(str(ac.id))
+
+    wi.add_related_asset_collection(ac.id, RelationType.Created)

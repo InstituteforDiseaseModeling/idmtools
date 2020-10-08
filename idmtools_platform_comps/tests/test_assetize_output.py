@@ -97,3 +97,6 @@ class TestAssetizeOutput(unittest.TestCase):
         self.assertTrue(e.succeeded)
         self.assertTrue(ao.succeeded)
 
+    def test_experiment(self):
+        ao = AssetizeOutput(related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'])
+        ao.run(wait_on_done=True, platform=Platform("COMPS2"))
