@@ -141,6 +141,16 @@ class TestAssetizeOutput(unittest.TestCase):
         filelist = [f.filename for f in ac]
         self.assertEqual(1, len(filelist))
 
+        with self.subTest("test_workitem_prefix"):
+
+            ao2 = AssetizeOutput(related_work_items=['a6d11db7-1603-e911-80ca-f0921c167866', ao], file_patterns=["*.txt"], verbose=True, work_item_prefix_format_str="{work_item.name}")
+            ac = ao2.run(wait_on_done=True, platform=Platform("COMPS2"))
+            self.assertTrue(ao2.succeeded)
+            self.assertIsNotNone(ac)
+
+            self.assertEqual(ac, ao2.asset_collection)
+            filelist = [f.filename for f in ac]
+            self.assertEqual(4, len(filelist))
 
     def test_filter_ac(self):
         ao = AssetizeOutput(related_asset_collections=['2b53af74-2b4a-e711-80c1-f0921c167860'], file_patterns=["**/libvectorstats.dll"], verbose=True)
