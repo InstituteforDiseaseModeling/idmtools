@@ -2,9 +2,9 @@
 from idmtools.assets import AssetCollection, Asset
 from idmtools.core.platform_factory import Platform
 
-with Platform("COMPS2") as platform:
+with Platform("BELEGOST") as platform:
     # first we start by loading our existing asset collection
-    existing_ac = AssetCollection.from_id("98d329b5-95d6-ea11-a2c0-f0921c167862")
+    existing_ac = AssetCollection.from_id("41c1b14d-0a04-eb11-a2c7-c4346bcb1553")  # comps asset id
     # now we want to add one file to it. Since asset collection on the server our immutable, what we can do is the following
     #
     # create a new asset collection object

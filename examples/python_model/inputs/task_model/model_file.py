@@ -4,7 +4,7 @@ import ast
 import inspect
 
 dir_path = os.path.dirname(__file__)  # working
-sys.path.append(os.path.join(dir_path, "lib", "site-packages"))  # Need to site-packages level!!!
+sys.path.append(os.path.join(dir_path, "site-packages"))  # Need to site-packages level!!!
 
 import astor
 

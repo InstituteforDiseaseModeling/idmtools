@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import argparse
+import shutil
 import logging
 import os
 import subprocess
@@ -119,6 +120,11 @@ def install_base_environment(pip_url):
     for line in execute(["pip", "install", "idm-buildtools~=1.0.1", f"--index-url={pip_url}"]):
         process_output(line)
 
+    dev_idmtools_ini = join(base_directory, "examples", "idmtools.ini")
+    if not os.path.exists(dev_idmtools_ini):
+        logger.critical("Placing development ini in examples. This will redirect all request to production to staging!")
+        shutil.copy(join(script_dir, "examples_idmtools.ini"), join(base_directory, "examples", "idmtools.ini"))
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Bootstrap the development environment")
@@ -142,7 +148,7 @@ if __name__ == "__main__":
         logging.addLevelName(15, 'VERBOSE')
         logging.addLevelName(35, 'SUCCESS')
         logging.addLevelName(50, 'CRITICAL')
-    except ImportError:
+    except (ImportError, ModuleError):
         console_handler = logging.StreamHandler(stream=sys.stdout)
         console_handler.setFormatter(log_formatter)
         console_handler.setLevel(console_log_level)

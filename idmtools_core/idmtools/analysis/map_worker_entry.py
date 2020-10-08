@@ -51,6 +51,8 @@ def _get_mapped_data_for_item(item: IEntity, analyzers: TAnalyzerList, cache: Ca
 
     """
     # determine which analyzers (and by extension, which filenames) are applicable to this item
+    # ensure item has a platform
+    item.platform = platform
     try:
         analyzers_to_use = [a for a in analyzers if a.filter(item)]
         analyzer_uids = [a.uid for a in analyzers]

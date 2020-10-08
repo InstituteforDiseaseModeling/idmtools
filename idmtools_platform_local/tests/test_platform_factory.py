@@ -41,6 +41,8 @@ class TestPlatformFactory(ITestWithPersistence):
         kwargs = {key: members[key] for key in keys if not key.startswith('_')}
 
         platform2 = Platform('Local', **kwargs)
+        # override this to make only part unique the same
+        platform2._config_block = platform._config_block
         self.assertEqual(platform, platform2)
         del platform
         del platform2

@@ -413,6 +413,7 @@ docs/idmtools_platform*.rst
 /**/tests/.test_platform/
 /**/.test_platform/
 stub_out
+examples/idmtools.ini
 .*_reports/
 .*_results/
 /**/tests/assets/
