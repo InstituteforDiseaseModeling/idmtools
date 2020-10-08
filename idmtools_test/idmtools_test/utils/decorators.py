@@ -1,3 +1,7 @@
+import shutil
+
+import tempfile
+
 import os
 import platform
 import time
@@ -194,3 +198,22 @@ def dump_function_input_for_test(output_directory: Union[str, Callable[[str, Cal
         return wrapper
 
     return decorate
+
+
+def run_in_temp_dir(func):
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        current_dir = os.getcwd()
+        temp_dir = tempfile.mkdtemp()
+        try:
+            os.chdir(temp_dir)
+            func(*args, **kwargs)
+        finally:
+            os.chdir(current_dir)
+            try:
+                shutil.rmtree(temp_dir)
+            except:
+                pass
+
+    return wrapper

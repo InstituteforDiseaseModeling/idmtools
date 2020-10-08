@@ -68,6 +68,7 @@ class Platform:
 
         platform = cls._create_from_block(block, missing_ok=missing_ok, **kwargs)
         set_current_platform(platform)
+        platform._config_block = block
         return platform
 
     @classmethod
@@ -114,6 +115,8 @@ class Platform:
                 if not listener:
                     setup_logging()
         except ValueError as e:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f"Checking aliases for {block.upper()}")
             # attempt alias load
             if block.upper() in cls._aliases:
                 if logger.isEnabledFor(DEBUG):
