@@ -40,7 +40,7 @@ test_with_new_code = os.environ.get("TEST_WITH_PACKAGES", 'n').lower() in ['1', 
 @functools.lru_cache(1)
 def write_wrapper_script():
     f = tempfile.NamedTemporaryFile(suffix='.sh', mode='w', delete=False)
-    f.write(shell_script)
+    f.write(shell_script.replace("\r\n", "\n"))
     f.flush()
     return f.name
 
