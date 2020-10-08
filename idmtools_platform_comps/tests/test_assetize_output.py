@@ -17,7 +17,7 @@ class TestAssetizeOutput(unittest.TestCase):
     def test_experiment_can_be_watched(self):
         e = Experiment.from_task(task=TestTask())
         ao = AssetizeOutput()
-        ao.run_after(e)
+        ao.from_items(e)
         self.assertEqual(1, len(ao.related_experiments))
         self.assertEqual(ao.related_experiments[0], e)
 
@@ -55,7 +55,7 @@ class TestAssetizeOutput(unittest.TestCase):
         e = Experiment.from_task(task=TestTask())
         e.simulations[0].status = EntityStatus.CREATED
         ao = AssetizeOutput()
-        ao.run_after(e)
+        ao.from_items(e)
         self.assertEqual(1, len(ao.related_experiments))
         self.assertEqual(ao.related_experiments[0], e)
         ao.pre_creation(None)
@@ -91,7 +91,7 @@ class TestAssetizeOutput(unittest.TestCase):
         task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"), parameters=dict(a=1))
         e = Experiment.from_task(task=task)
         ao = AssetizeOutput(verbose=True)
-        ao.run_after(e)
+        ao.from_items(e)
         ao.run(wait_on_done=True)
 
         self.assertTrue(e.succeeded)
@@ -106,6 +106,39 @@ class TestAssetizeOutput(unittest.TestCase):
 
         self.assertEqual(ac, ao.asset_collection)
         filelist = [f.filename for f in ac]
+        self.assertEqual(9, len(filelist))
+
+    def test_simulation(self):
+        ao = AssetizeOutput(related_simulations=['9d11af40-1337-ea11-a2be-f0921c167861'], file_patterns=["**/*.csv"], verbose=True)
+        ac = ao.run(wait_on_done=True, platform=Platform("COMPS2"))
+
+        self.assertTrue(ao.succeeded)
+        self.assertIsNotNone(ac)
+
+        self.assertEqual(ac, ao.asset_collection)
+        filelist = [f.filename for f in ac]
+        self.assertEqual(3, len(filelist))
+
+    def test_workitem(self):
+        ao = AssetizeOutput(related_work_items=['a6d11db7-1603-e911-80ca-f0921c167866'], file_patterns=["*.png"], verbose=True)
+        ac = ao.run(wait_on_done=True, platform=Platform("COMPS2"))
+
+        self.assertTrue(ao.succeeded)
+        self.assertIsNotNone(ac)
+
+        self.assertEqual(ac, ao.asset_collection)
+        filelist = [f.filename for f in ac]
+        self.assertEqual(1, len(filelist))
 
 
+    def test_filter_ac(self):
+        ao = AssetizeOutput(related_asset_collections=['2b53af74-2b4a-e711-80c1-f0921c167860'], file_patterns=["**/libvectorstats.dll"], verbose=True)
+        ac = ao.run(wait_on_done=True, platform=Platform("COMPS2"))
+
+        self.assertTrue(ao.succeeded)
+        self.assertIsNotNone(ac)
+
+        self.assertEqual(ac, ao.asset_collection)
+        filelist = [f.filename for f in ac]
+        self.assertEqual(1, len(filelist))
 

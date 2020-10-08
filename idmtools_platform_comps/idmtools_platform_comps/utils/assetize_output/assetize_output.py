@@ -2,15 +2,15 @@ import re
 import inspect
 import os
 from dataclasses import dataclass, field
-from logging import getLogger
+from logging import getLogger, DEBUG
 from COMPS.Data.CommissionableEntity import CommissionableEntity
 from typing import List, Union, Callable, Dict
-
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core.interfaces.irunnable_entity import IRunnableEntity
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform import IPlatform
 from idmtools.entities.iworkflow_item import IWorkflowItem
+from idmtools.entities.relation_type import RelationType
 from idmtools.entities.simulation import Simulation
 from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
 from idmtools.core.enums import ItemType, EntityStatus
@@ -20,28 +20,50 @@ AssetizableItem = Union[Experiment, Simulation, IWorkflowItem]
 logger = getLogger(__name__)
 user_logger = getLogger("user")
 
+WI_PROPERTY_MAP = dict(
+    related_experiments=ItemType.EXPERIMENT,
+    related_simulations=ItemType.SIMULATION,
+    related_work_items=ItemType.WORKFLOW_ITEM,
+    related_asset_collections=ItemType.ASSETCOLLECTION
+)
+
 
 @dataclass(repr=False)
 class AssetizeOutput(SSMTWorkItem):
+    #: List of glob patterns. See https://docs.python.org/3.7/library/glob.html for details on the patterns
     file_patterns: List[str] = field(default_factory=list)
+    # Exclude patterns.
     exclude_patterns: List[str] = field(default_factory=lambda: ["StdErr.txt", "StdOut.txt", "WorkOrder.json", "*.log"])
+    #: Include Assets directories. This allows patterns to also include items from the assets directory
     include_assets: bool = field(default=False)
+    #: Formatting pattern for directory names. Simulations tend to have similar outputs so Assetize puts those in directories using the simulation id by default as the directory name
     simulation_prefix_format_str: str = field(default="{simulation.id}")
-    no_simulation_prefix: bool = field(default=False)
-    verbose: bool = field(default=False)
+    #: WorkFlowItem outputs will not have a folder prefix by default. If you are assetizing multiple work items, you may want to set this to "{workflow_item.id}"
     work_item_prefix_format_str: str = field(default=None)
+    #: Simulations outputs will not have a folder. Useful when you are assetizing a single simulation
+    no_simulation_prefix: bool = field(default=False)
+    #: Enable verbose
+    verbose: bool = field(default=False)
+    #: Python Functions that will be ran before Assetizing script. The function must be named
     pre_run_functions: List[Callable] = field(default_factory=list)
+    #: Python Function to filter entities. This Function should receive a Comps CommissionableEntity. Return True if item should be assetize, False otherwise
     entity_filter_function: EntityFilterFunc = field(default=None)
+    # Dictionary of tags to apply to the results asset collection
     asset_tags: Dict[str, str] = field(default_factory=dict)
     #: The asset collection created by Assetize
     asset_collection: AssetCollection = field(default=None)
 
     def __post_init__(self):
         super().__post_init__()
-        self.item_name = "Assetize Output"
         # we need all our items as true entities, so convert them to entities
 
     def create_command(self) -> str:
+        """
+        Builds our command line for the SSMT Job
+
+        Returns:
+            Command string
+        """
         command = "python3 Assets/assetize_ssmt_script.py "
         for pattern in self.file_patterns:
             command += f'--file-pattern "{pattern}"'
@@ -75,20 +97,41 @@ class AssetizeOutput(SSMTWorkItem):
         return command
 
     def __pickle_pre_run(self):
+        """
+        Pickles the pre run functions
+
+        Returns:
+
+        """
         if self.pre_run_functions:
             source = ""
             for function in self.pre_run_functions:
                 new_source = self.__format_function_source(function)
-                source += "\n\n" + "\n".join(new_source)
+                source += "\n\n" + new_source
             self.asset_files.add_asset_file(Asset(filename='pre_run.py', content=source))
 
     def __pickle_filter_func(self):
+        """
+        Pickle Filter Function
+
+        Returns:
+
+        """
         if self.entity_filter_function:
             new_source = self.__format_function_source(self.entity_filter_function)
-            self.asset_files.add_asset_file(Asset(filename='entity_filter_func.py', content="\n".join(new_source)))
+            self.asset_files.add_asset_file(Asset(filename='entity_filter_func.py', content=new_source))
 
     @staticmethod
-    def __format_function_source(function):
+    def __format_function_source(function: Callable) -> str:
+        """
+        Formats the function source. Functions could be indented.
+
+        Args:
+            function: Function to format
+
+        Returns:
+            Formatted function
+        """
         source = inspect.getsource(function).splitlines()
         space_base = 0
         while source[0][space_base] == " ":
@@ -97,7 +140,7 @@ class AssetizeOutput(SSMTWorkItem):
         new_source = []
         for line in source:
             new_source.append(replace_expr.sub("", line))
-        return new_source
+        return "\n".join(new_source)
 
     def clear_exclude_patterns(self):
         """
@@ -119,23 +162,15 @@ class AssetizeOutput(SSMTWorkItem):
 
         """
         super().pre_creation(platform)
-        for prop, item_type in [('related_experiments', ItemType.EXPERIMENT), ('related_simulations', ItemType.SIMULATION), ('related_work_items', ItemType.WORKFLOW_ITEM)]:
-            new_items = []
-            for id in getattr(self, prop):
-                if isinstance(id, str):
-                    new_items.append(platform.get_item(id, item_type))
-                else:
-                    new_items.append(id)
-            setattr(self, prop, new_items)
+
+        if self.name is None:
+            self.item_name = self.__generate_name()
+
+        self.__convert_ids_to_items(platform)
         self.__ensure_all_dependencies_created(platform)
 
         if len(self.asset_tags) == 0:
-            for experiment in self.related_experiments:
-                self.asset_tags['AssetizedOutputfromFromExperiment'] = str(experiment.id)
-            for simulation in self.related_simulations:
-                self.asset_tags['AssetizedOutputfromFromSimulation'] = str(simulation.id)
-            for work_item in self.related_work_items:
-                self.asset_tags['AssetizedOutputfromFromWorkItem'] = str(work_item.id)
+            self.__generate_tags()
         if self.total_items_watched() == 0:
             raise ValueError("You must specify at least one item to watch")
 
@@ -149,16 +184,86 @@ class AssetizeOutput(SSMTWorkItem):
         self.command = self.create_command()
         user_logger.info("Creating Watcher")
 
+    def __generate_tags(self):
+        """
+        Add the defaults tags to the WorkItem
+
+        Returns:
+            None
+        """
+        for experiment in self.related_experiments:
+            self.asset_tags['AssetizedOutputfromFromExperiment'] = str(experiment.id)
+        for simulation in self.related_simulations:
+            self.asset_tags['AssetizedOutputfromFromSimulation'] = str(simulation.id)
+        for work_item in self.related_work_items:
+            self.asset_tags['AssetizedOutputfromFromWorkItem'] = str(work_item.id)
+        for ac in self.related_asset_collections:
+            self.asset_tags['AssetizedOutputfromAssetCollection'] = str(ac.id)
+
+    def __generate_name(self) -> str:
+        """
+        Generate Automatic name for the WorkItem
+
+        Returns:
+            Return generated name
+        """
+        total_items = 0
+        name = None
+        first_item_type = None
+        for prop, item_type in WI_PROPERTY_MAP.items():
+            item_type_count = len(getattr(self, prop))
+            total_items += len(getattr(self, prop))
+            # get first item as we iterate through
+            if name is None and item_type_count:
+                item = getattr(self, prop)
+                name = item[0].id if hasattr(item[0], 'id') else item[0]
+                first_item_type = item_type
+
+        if total_items > 1:
+            return "Assetize outputs"
+
+        return f"Assetize outputs for {str(first_item_type).replace('ItemType.', '').lower().capitalize()} {name}"
+
+    def __convert_ids_to_items(self, platform):
+        """
+        Convert our ids to items
+
+        Args:
+            platform: Platform object
+
+        Returns:
+            None
+        """
+
+        for prop, item_type in WI_PROPERTY_MAP.items():
+            new_items = []
+            for id in getattr(self, prop):
+                if isinstance(id, str):
+                    new_items.append(platform.get_item(id, item_type))
+                else:
+                    new_items.append(id)
+            setattr(self, prop, new_items)
+
     def __ensure_all_dependencies_created(self, platform: IPlatform):
-        for item_type in ['related_experiments', 'related_simulations', 'related_work_items']:
+        """
+        Ensures all items we are watching
+        Args:
+            platform:
+
+        Returns:
+
+        """
+        for item_type in WI_PROPERTY_MAP.keys():
             items = getattr(self, item_type)
             for item in items:
                 if item.status is None:
                     if isinstance(item, IRunnableEntity):
                         item.run(platform=platform)
                     # this should only be sim in this branch
-                    else:
+                    elif isinstance(item, Simulation):
                         item.parent.run(platform=platform)
+                    elif isinstance(item, AssetCollection):
+                        platform.create_items(item)
 
     def total_items_watched(self) -> int:
         """
@@ -168,7 +273,7 @@ class AssetizeOutput(SSMTWorkItem):
             Total number of items watched
         """
         total = 0
-        for item_type in ['related_experiments', 'related_simulations', 'related_work_items']:
+        for item_type in WI_PROPERTY_MAP.keys():
             total += len(getattr(self, item_type))
         return total
 
@@ -178,14 +283,15 @@ class AssetizeOutput(SSMTWorkItem):
         p = super()._check_for_platform_from_context(platform)
         item = p.get_item(item_id=item_id, item_type=item_type)
         if item:
-            self.run_after(item)
+            self.from_items(item)
         raise FileNotFoundError(f"Cannot find the item with {item_id} of type {item_type}")
 
-    def run_after(self, item: Union[AssetizableItem, List[AssetizableItem]]):
+    def from_items(self, item: Union[AssetizableItem, List[AssetizableItem]]):
         """
-        Add item ti run after
+        Add items to load assets from
+
         Args:
-            item:
+            item: Item or list of items to watch.
 
         Returns:
 
@@ -205,6 +311,19 @@ class AssetizeOutput(SSMTWorkItem):
                 raise ValueError("We can only assetize the output of experiments, simulations, and workitems")
 
     def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None, wait_on_done_progress: bool = True, wait_on_done: bool = True, **run_opts) -> Union[AssetCollection, None]:
+        """
+        Run the AssetizeOutput
+
+        Args:
+            wait_until_done: Wait until Done will wait for the workitem to complet
+            platform: Platform Object
+            wait_on_done_progress: When set to true, a progress bar will be shown from the item
+            wait_on_done: Wait for item to be done. This will first wait on any dependencies
+            **run_opts: Additional options to pass to Run on platform
+
+        Returns:
+            AssetCollection created if item succeeds
+        """
         p = super()._check_for_platform_from_context(platform)
         p.run_items(self, wait_on_done_progress=wait_on_done_progress, **run_opts)
         if wait_until_done or wait_on_done:
@@ -212,15 +331,16 @@ class AssetizeOutput(SSMTWorkItem):
 
     def wait(self, wait_on_done_progress: bool = True, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None) -> Union[AssetCollection, None]:
         """
+        Waits on Assetize Workitem to finish. This first waits on any dependent items to finish(Experiment/Simulation/WorkItems)
 
         Args:
-            wait_on_done_progress:
-            timeout:
-            refresh_interval:
-            platform:
+            wait_on_done_progress: When set to true, a progress bar will be shown from the item
+            timeout: Timeout for waiting on item. If none, wait will be forever
+            refresh_interval: How often to refresh progress
+            platform: Platform
 
         Returns:
-
+            AssetCollection created if item succeeds
         """
         # wait on related items before we wait on our item
         p = super()._check_for_platform_from_context(platform)
@@ -231,7 +351,7 @@ class AssetizeOutput(SSMTWorkItem):
         if self.status == EntityStatus.SUCCEEDED:
             # If we succeeded, get our AC
             comps_workitem = self.get_platform_object(force=True)
-            acs = comps_workitem.get_related_asset_collections()
+            acs = comps_workitem.get_related_asset_collections(RelationType.Created)
             self.asset_collection = AssetCollection.from_id(acs[0].id, platform=p)
             return self.asset_collection
 
@@ -247,14 +367,24 @@ class AssetizeOutput(SSMTWorkItem):
 
         """
 
-        for item_type in ['related_experiments', 'related_simulations', 'related_work_items']:
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Wait on items being watched to finish running")
+        for item_type in WI_PROPERTY_MAP.keys():
             items = getattr(self, item_type)
             for item in items:
+                # The only two done states in idmtools are SUCCEEDED and FAILED
                 if item.status not in [EntityStatus.SUCCEEDED, EntityStatus.FAILED]:
+                    # We only can wait on Experiments and Workitems. For simulations, we use the parent
                     if isinstance(item, IRunnableEntity):
                         item.wait(**opts)
-                    # this should only be sim in this branch
-                    else:
+                    # user simulation's parent to wait
+                    elif isinstance(item, Simulation):
+                        if item.parent is None:
+                            if item.parent_id:
+                                item.parent = Experiment.from_id(item.parent_id)
+                            else:
+                                raise ValueError(f"Cannot determine simulation {item.id}'s parent and item still in progress. Please wait on it to complete before AssetizingOutputs")
                         item.parent.wait(**opts)
-
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f"Done waiting on items watching. Now waiting on Assetize Outputs: {self.id}")
         super().wait(**opts)

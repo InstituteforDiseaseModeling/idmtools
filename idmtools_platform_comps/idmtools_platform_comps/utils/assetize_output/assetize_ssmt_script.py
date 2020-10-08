@@ -1,11 +1,13 @@
+import fnmatch
 import glob
+import traceback
 import sys
 from logging import getLogger, DEBUG
 import humanfriendly
 import re
 from COMPS.Data.Simulation import SimulationState
 from COMPS.Data.WorkItem import WorkItemState, RelationType
-from concurrent.futures._base import as_completed
+from concurrent.futures._base import as_completed, Future
 from concurrent.futures.thread import ThreadPoolExecutor
 import uuid
 from tqdm import tqdm
@@ -23,9 +25,16 @@ AssetTuple = Tuple[str, str, uuid.UUID, int]
 SetOfAssets = Set[AssetTuple]
 # Define our function that can be used as callbacks for filtering entities
 EntityFilterFunc = Callable[[CommissionableEntity.CommissionableEntity], bool]
+# Store the Done State
+DONE_STATE = [SimulationState.Failed, SimulationState.Canceled, SimulationState.Succeeded]
+HPC_JOBS_QUERY = QueryCriteria().select_children('hpc_jobs')
 
 
-def gather_files(directory: str, file_patterns: List[str], exclude_patterns: List[Pattern] = None, assets: bool = False, prefix: str = None) -> SetOfAssets:
+class NoFileFound(Exception):
+    doc_link: str = "assetize_outputs#no_files_found"
+
+
+def gather_files(directory: str, file_patterns: List[str], exclude_patterns: List[str] = None, assets: bool = False, prefix: str = None) -> SetOfAssets:
     """
     Gather file_list
 
@@ -72,18 +81,18 @@ def gather_files(directory: str, file_patterns: List[str], exclude_patterns: Lis
     return result
 
 
-def is_file_excluded(file_details: str, exclude_patterns: List[Pattern]) -> bool:
+def is_file_excluded(filename: str, exclude_patterns: List[str]) -> bool:
     """
 
     Args:
-        file_details: File to filter
+        filename: File to filter
         exclude_patterns: List of file patterns to exclude
 
     Returns:
         True is file is excluded
     """
     for pattern in exclude_patterns:
-        if pattern.match(file_details):
+        if fnmatch.fnmatch(filename, pattern):
             return True
     return False
 
@@ -97,8 +106,8 @@ def gather_files_from_related(work_item: WorkItem, file_patterns: List[str], exc
         file_patterns: List of File Patterns
         exclude_patterns: List of Exclude patterns
         assets: Should items be gathered from Assets Directory
-        simulation_prefix_format_str: Format prefix format string for Simulations
-        work_item_prefix_format_str: Format prefix format string for WorkItem
+        simulation_prefix_format_str: Format string for prefix of Simulations
+        work_item_prefix_format_str: Format string for prefix of WorkItem
 
     Returns:
         Set of File Tuples in format Filename, Destination Name, and Checksum
@@ -107,8 +116,44 @@ def gather_files_from_related(work_item: WorkItem, file_patterns: List[str], exc
     # Setup threading work using a future list and a ThreadPoolExecutor
     futures = []
     pool = ThreadPoolExecutor()
-    exclude_patterns_compiles = strs_to_regular_expressions(exclude_patterns)
+    if logger.isEnabledFor(DEBUG):
+        logger.debug("Filtering experiments")
+    filter_experiments(assets, entity_filter_func, exclude_patterns, file_patterns, futures, pool, simulation_prefix_format_str, work_item)
+    if logger.isEnabledFor(DEBUG):
+        logger.debug("Filtering simulations")
+    filter_simulations_files(assets, entity_filter_func, exclude_patterns, file_patterns, futures, pool, simulation_prefix_format_str, work_item)
+    if logger.isEnabledFor(DEBUG):
+        logger.debug("Filtering workitems")
+    filter_work_items_files(assets, entity_filter_func, exclude_patterns, file_patterns, futures, pool, work_item, work_item_prefix_format_str)
 
+    if logger.isEnabledFor(DEBUG):
+        logger.debug("Waiting on filtering to complete")
+    # Now wait until scanning items has completed
+    for future in tqdm(as_completed(futures), total=len(futures), desc="Filtering relations for files"):
+        file_list.update(future.result())
+
+    if logger.isEnabledFor(DEBUG):
+        logger.debug(f"Total Files found: {len(file_list)}")
+    return file_list
+
+
+def filter_experiments(assets: bool, entity_filter_func: EntityFilterFunc, exclude_patterns_compiles: List, file_patterns: List[str], futures: List[Future], pool: ThreadPoolExecutor, simulation_prefix_format_str: str, work_item: WorkItem):
+    """
+    Filter Experiments outputs using our patterns
+
+    Args:
+        assets: Assets to filter
+        entity_filter_func: Function to filter functions
+        exclude_patterns_compiles: List of patterns to exclude
+        file_patterns: File patterns to match
+        futures: Future queue
+        pool: Pool to execute jobs on
+        simulation_prefix_format_str: Format string for prefix of Simulations
+        work_item: Parent WorkItem
+
+    Returns:
+
+    """
     # Start with experiments since they are the most complex portion
     experiments: List[Experiment] = work_item.get_related_experiments()
     for experiment in experiments:
@@ -118,60 +163,140 @@ def gather_files_from_related(work_item: WorkItem, file_patterns: List[str], exc
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f'Loading simulations for filter on {experiment.name}/{experiment.id}')
             # Fetch simulations with the hpc_jobs criteria. This allows us to lookup the directory
-            simulations = experiment.get_simulations(QueryCriteria().select_children('hpc_jobs'))
+            simulations = experiment.get_simulations(HPC_JOBS_QUERY)
             if len(simulations) > 0:
-                # If we should gather assets, use the first simulation. It means we will duplicate some work, but the set will filter out duplicated
-                if assets:
-                    # find the first simulation we can use to gather assets from
-                    i = 0
-                    while not entity_filter_func(simulations[i]) and i < len(simulations):
-                        i += 1
-                    if i < len(simulations):
-                        simulation = simulations[i]
-                        if logger.isEnabledFor(DEBUG):
-                            logger.debug(f'Loading assets for {experiment.name} from simulation {simulation.id}')
-                        # create prefix from the format var
-                        prefix = simulation_prefix_format_str.format(simulation=simulation, experiment=experiment) if simulation_prefix_format_str else None
-                        futures.append(pool.submit(gather_files, directory=simulation.hpc_jobs[0].working_directory, file_patterns=file_patterns, exclude_patterns=exclude_patterns_compiles, assets=assets, prefix=prefix))
+                filter_experiment_assets(work_item, assets, entity_filter_func, exclude_patterns_compiles, experiment, file_patterns, futures, pool, simulation_prefix_format_str, simulations)
                 # Loop through each simulation and queue it up for file matching
-                for simulation in simulations:
-                    if entity_filter_func(simulation):
-                        if logger.isEnabledFor(DEBUG):
-                            logger.debug(f'Loading outputs from Simulation {simulation.id} with status of {simulation.state}')
-                        # create prefix from the format var
-                        prefix = simulation_prefix_format_str.format(simulation=simulation) if simulation_prefix_format_str else None
-                        if logger.isEnabledFor(DEBUG):
-                            logger.debug(f"Prefix: {prefix}")
-                            logger.debug(f"HPC Jobs: {simulation.hpc_jobs}")
-                        # When loading simulations, we always exclude Assets. This are some edge cases we could be missing here
-                        # When simulations do not have the same AssetCollections throughout. For now, we will document this as a limitation until it is needed
-                        futures.append(pool.submit(gather_files, directory=simulation.hpc_jobs[0].working_directory, file_patterns=file_patterns, exclude_patterns=exclude_patterns_compiles, assets=False, prefix=prefix))
+                filter_simulation_list(assets, entity_filter_func, exclude_patterns_compiles, file_patterns, futures, pool, simulation_prefix_format_str, simulations, work_item, experiment=experiment)
 
+
+def get_simulation_prefix(parent_workitem: WorkItem, simulation: Simulation, simulation_prefix_format_str: str, experiment: Experiment = None) -> str:
+    """
+    Get Simulation Prefix
+
+    Args:
+        parent_workitem: Parent workitem
+        simulation: Simulation to form
+        simulation_prefix_format_str: Prefix format string
+        experiment: Optional experiment to be used with the
+
+    Returns:
+        Name of the simulation
+    """
+    prefix = simulation_prefix_format_str.format(simulation=simulation, experiment=experiment, parent_workitem=parent_workitem) if simulation_prefix_format_str else None
+    return prefix
+
+
+def filter_experiment_assets(work_item: WorkItem, assets: bool, entity_filter_func: EntityFilterFunc, exclude_patterns_compiles: List, experiment: Experiment, file_patterns: List[str], futures: List[Future], pool: ThreadPoolExecutor, simulation_prefix_format_str: str, simulations: List[Simulation]):
+    """
+    Filter experiment assets. This method uses the first simulation to gather experiment assets
+
+    Args:
+        work_item: Parent Workitem
+        assets: Whether assets should be matched
+        entity_filter_func: Entity Filter Function
+        exclude_patterns_compiles: List of files to exclude
+        experiment: Experiment
+        file_patterns: File patterns to filter
+        futures: List of futures
+        pool: Pool to submit search jobs to
+        simulation_prefix_format_str: Format string for simulation
+        simulations: List of simulations
+
+    Returns:
+
+    """
+    # If we should gather assets, use the first simulation. It means we will duplicate some work, but the set will filter out duplicated
+    if assets:
+        # find the first simulation we can use to gather assets from
+        i = 0
+        while not entity_filter_func(simulations[i]) and i < len(simulations):
+            i += 1
+        if i < len(simulations):
+            simulation = simulations[i]
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f'Loading assets for {experiment.name} from simulation {simulation.id}')
+            # create prefix from the format var
+            prefix = get_simulation_prefix(work_item, simulation, simulation_prefix_format_str, experiment)
+            futures.append(pool.submit(gather_files, directory=simulation.hpc_jobs[0].working_directory, file_patterns=file_patterns, exclude_patterns=exclude_patterns_compiles, assets=assets, prefix=prefix))
+
+
+def filter_simulations_files(assets: bool, entity_filter_func: EntityFilterFunc, exclude_patterns_compiles: List, file_patterns: List[str], futures: List[Future], pool: ThreadPoolExecutor, simulation_prefix_format_str: str, work_item: WorkItem):
+    """
+    Filter Simulations files
+
+    Args:
+        assets: Whether assets should be matched
+        entity_filter_func: Entity Filter Function
+        exclude_patterns_compiles: List of files to exclude
+        file_patterns: File patterns to filter
+        futures: List of futures
+        pool: Pool to submit search jobs to
+        simulation_prefix_format_str: Format string for simulation
+        work_item:
+
+    Returns:
+
+    """
     # Here we loop through simulations directly added by user. We do not
     simulations: List[Simulation] = work_item.get_related_simulations()
+    filter_simulation_list(assets, entity_filter_func, exclude_patterns_compiles, file_patterns, futures, pool, simulation_prefix_format_str, simulations, work_item)
+
+
+def filter_simulation_list(assets: bool, entity_filter_func: EntityFilterFunc, exclude_patterns_compiles: List, file_patterns: List[str], futures: List[Future], pool: ThreadPoolExecutor, simulation_prefix_format_str: str, simulations: List[Simulation], work_item: WorkItem,
+                           experiment: Experiment = None):
+    """
+    Filter simulations list. This method is used for experiments and simulations
+    Args:
+        assets: Whether assets should be matched
+        entity_filter_func: Entity Filter Function
+        exclude_patterns_compiles: List of files to exclude
+        file_patterns: File patterns to filter
+        futures: List of futures
+        pool: Pool to submit search jobs to
+        simulation_prefix_format_str: Format string for simulation
+        simulations: List of simulations
+        work_item: Parent workitem
+        experiment: Optional experiment.
+
+    Returns:
+
+    """
     for simulation in simulations:
         if entity_filter_func(simulation):
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f'Loading outputs from Simulation {simulation.id} with status of {simulation.state}')
-            prefix = simulation_prefix_format_str.format(simulation=simulation) if simulation_prefix_format_str else None
+            prefix = get_simulation_prefix(parent_workitem=work_item, experiment=experiment, simulation=simulation, simulation_prefix_format_str=simulation_prefix_format_str)
+            if simulation.hpc_jobs is None:
+                simulation = simulation.get(simulation.id, HPC_JOBS_QUERY)
             futures.append(pool.submit(gather_files, directory=simulation.hpc_jobs[0].working_directory, file_patterns=file_patterns, exclude_patterns=exclude_patterns_compiles, assets=assets, prefix=prefix))
 
+
+def filter_work_items_files(assets: bool, entity_filter_func: EntityFilterFunc, exclude_patterns_compiles: List, file_patterns: List[str], futures: List[Future], pool: ThreadPoolExecutor, work_item: WorkItem, work_item_prefix_format_str: str):
+    """
+    Filter work items files
+
+    Args:
+        assets: Whether assets should be matched
+        entity_filter_func: Entity Filter Function
+        exclude_patterns_compiles: List of files to exclude
+        file_patterns: File patterns to filter
+        futures: List of futures
+        pool: Pool to submit search jobs to
+        work_item: WorkItem
+        work_item_prefix_format_str: WorkItemPrefix
+
+    Returns:
+
+    """
     # Here we loop through workitems
     work_items: List[WorkItem] = work_item.get_related_work_items()
     for related_work_item in work_items:
         if entity_filter_func(related_work_item):
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f'Loading outputs from WorkItem {related_work_item.name} - {related_work_item.id}')
-            prefix = work_item_prefix_format_str.format(work_item=related_work_item) if work_item_prefix_format_str else None
-            futures.append(pool.submit(gather_files, directory=related_work_item.working_directory, afile_patterns=file_patterns, exclude_patterns=exclude_patterns_compiles, assets=assets, prefix=prefix))
-
-    # Now wait until scanning items has completed
-    for future in tqdm(as_completed(futures), total=len(futures), desc="Filtering relations for files"):
-        file_list.update(future.result())
-
-    if logger.isEnabledFor(DEBUG):
-        logger.debug(f"Total Files found: {len(file_list)}")
-    return file_list
+            prefix = work_item_prefix_format_str.format(work_item=related_work_item, parent_work_item=work_item) if work_item_prefix_format_str else None
+            futures.append(pool.submit(gather_files, directory=related_work_item.working_directory, file_patterns=file_patterns, exclude_patterns=exclude_patterns_compiles, assets=assets, prefix=prefix))
 
 
 def strs_to_regular_expressions(exclude_patterns: List[str], ignore_case: bool = True) -> List[Pattern]:
@@ -192,7 +317,7 @@ def strs_to_regular_expressions(exclude_patterns: List[str], ignore_case: bool =
     return exclude_patterns_compiles
 
 
-def create_asset_collection(file_list: SetOfAssets, asset_tags: Dict[str, str]):
+def create_asset_collection(file_list: SetOfAssets, ac_files: List[AssetCollectionFile], asset_tags: Dict[str, str]):
     """
 
     Args:
@@ -211,6 +336,10 @@ def create_asset_collection(file_list: SetOfAssets, asset_tags: Dict[str, str]):
         acf = AssetCollectionFile(file_name=fn, relative_path=file[1].replace(fn, "").strip("/"), md5_checksum=file[2])
         asset_collection_map[file[2]] = (acf, file[0], file[3])
         asset_collection.add_asset(acf)
+
+    # add files from acs
+    for ac in ac_files:
+        asset_collection.add_asset(ac)
 
     # do initial save to see what assets are in comps
     missing_files = asset_collection.save(return_missing_files=True)
@@ -236,18 +365,26 @@ def create_asset_collection(file_list: SetOfAssets, asset_tags: Dict[str, str]):
 
 
 def ensure_items_are_ready(work_item: WorkItem):
+    """
+    Ensure items are done. This leverages COMPS sleeping to pause creation of Asset Collections until item is in a done state
+    Args:
+        work_item:
+
+    Returns:
+
+    """
     experiments: List[Experiment] = work_item.get_related_experiments()
     for experiment in experiments:
         simulations: List[Simulation] = experiment.get_simulations()
         for simulation in simulations:
             logger.debug(f'Loading outputs from Simulation {simulation.id} with status of {simulation.state}')
-            if simulation.state not in [SimulationState.Failed, SimulationState.Canceled, SimulationState.Succeeded]:
+            if simulation.state not in DONE_STATE:
                 user_logger.info(f"Pausing work until {simulation.id} is done")
                 sys.exit(206)
     work_items: List[WorkItem] = work_item.get_related_work_items()
 
     for simulation in work_item.get_related_simulations():
-        if simulation.state not in [SimulationState.Failed, SimulationState.Canceled, SimulationState.Succeeded]:
+        if simulation.state not in DONE_STATE:
             user_logger.info(f"Pausing work until {simulation.id} is done")
             sys.exit(206)
 
@@ -274,14 +411,63 @@ def get_argument_parser():
     return parser
 
 
-def assetize_error_handler(exctype, value, traceback):
-    with open("error_reason.txt", 'w') as err_out:
-        err_out.write(        traceback.format_stack)
+def assetize_error_handler(exctype, value: Exception, tb):
+    """
+    Global exception handler. This will write our errors in a nice format
 
-    if exctype == KeyboardInterrupt:
-        print "Handler code goes here"
-    else:
-        sys.__excepthook__(exctype, value, traceback)
+    Args:
+        exctype: Type of exception
+        value: Value of the exception
+        traceback: Traceback
+
+    Returns:
+        None
+    """
+    import pprint
+    if exctype is NoFileFound:
+        from idmtools.utils.info import get_help_version_url
+        print(f"No files were found. Check your patterns match the data from related item. For more details, see {get_help_version_url(value.doc_link)}")
+    with open("error_reason.json", 'w') as err_out:
+        output_error = dict(type=exctype.__name__, args=list(value.args), tb=traceback.format_tb(tb))
+        if hasattr(value, 'doc_link'):
+            output_error['doc_link'] = value.doc_link
+        pprint.pprint(output_error, err_out)
+
+    # Call native exception manager
+    sys.__excepthook__(exctype, value, tb)
+
+
+def filter_ac_files(patterns, exclude_patterns) -> List[AssetCollectionFile]:
+    """
+    Filter Asset Collection File
+
+    Args:
+        patterns: File patterns
+        exclude_patterns: Exclude patterns
+
+    Returns:
+
+    """
+    if logger.isEnabledFor(DEBUG):
+        logger.debug('Filtering asset collections')
+    relates_acs: List[AssetCollection] = wi.get_related_asset_collections(relation_type=RelationType.DependsOn)
+    filtered_ac_files = set()
+    for ac in relates_acs:
+        ac = ac.get(ac.id, QueryCriteria().select_children("assets"))
+        for file in ac.assets:
+            file_path = get_asset_file_path(file)
+            for pattern in patterns:
+                if fnmatch.fnmatch(file_path, pattern):
+                    filtered_ac_files.add(file)
+                    # break out of pattern loop since there was a match
+                    break
+
+    return [f for f in filtered_ac_files if not is_file_excluded(get_asset_file_path(f), exclude_patterns)]
+
+
+def get_asset_file_path(file):
+    return os.path.join(file.relative_path, file.file_name) if file.relative_path else file.file_name
+
 
 if __name__ == "__main__":
     parser = get_argument_parser()
@@ -310,10 +496,15 @@ if __name__ == "__main__":
     # set a default filter function that returns true if none are set
     if args.entity_filter_func:
         import entity_filter_func
+
         entity_filter_func = getattr(entity_filter_func, args.entity_filter_func)
     else:
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Setting default filter function")
+
         def default_filter_func(x):
             return True
+
         entity_filter_func = default_filter_func
 
     # load the work item
@@ -321,11 +512,15 @@ if __name__ == "__main__":
     client.login(os.environ['COMPS_SERVER'])
     wi = WorkItem.get(os.environ['COMPS_WORKITEM_GUID'])
     asset_tags = dict()
-    for tag in args.asset_tag:
-        name, value = tag.split("=")
-        asset_tags[name] = value
-
+    if args.asset_tag:
+        for tag in args.asset_tag:
+            name, value = tag.split("=")
+            asset_tags[name] = value
+    # register our error handler
+    sys.excepthook = assetize_error_handler
+    # Run a check that all our dependencies have been loaded
     ensure_items_are_ready(wi)
+    # Gather all our files
     files = gather_files_from_related(
         wi, file_patterns=args.file_pattern, exclude_patterns=args.exclude_pattern if args.exclude_pattern else [], assets=args.assets,
         work_item_prefix_format_str=args.work_item_prefix_format_str,
@@ -333,7 +528,12 @@ if __name__ == "__main__":
         entity_filter_func=entity_filter_func
     )
 
-    ac = create_asset_collection(files, asset_tags=asset_tags)
+    ac_files = filter_ac_files(args.file_pattern, args.exclude_pattern)
+
+    if len(files) == 0 and len(ac_files) == 0:
+        raise NoFileFound("No files found for related items")
+    ac = create_asset_collection(files, ac_files, asset_tags=asset_tags)
+
     with open('asset_collection.id', 'w') as o:
         user_logger.info(ac.id)
         o.write(str(ac.id))
