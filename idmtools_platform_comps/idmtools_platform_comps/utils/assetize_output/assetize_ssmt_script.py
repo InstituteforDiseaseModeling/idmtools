@@ -1,11 +1,10 @@
-import fnmatch
 import glob
+from pathlib import PurePath
 import pprint
 import traceback
 import sys
 from logging import getLogger, DEBUG
 import humanfriendly
-import re
 from COMPS.Data.Simulation import SimulationState
 from COMPS.Data.WorkItem import WorkItemState, RelationType
 from concurrent.futures._base import as_completed, Future
@@ -13,7 +12,7 @@ from concurrent.futures.thread import ThreadPoolExecutor
 import uuid
 from tabulate import tabulate
 from tqdm import tqdm
-from typing import List, Tuple, Set, Dict, Callable, Pattern
+from typing import List, Tuple, Set, Dict, Callable
 import os
 import argparse
 from COMPS import Client
@@ -94,7 +93,7 @@ def is_file_excluded(filename: str, exclude_patterns: List[str]) -> bool:
         True is file is excluded
     """
     for pattern in exclude_patterns:
-        if fnmatch.fnmatch(filename, pattern):
+        if PurePath(filename.lower()).match(pattern.lower()):
             return True
     return False
 
@@ -301,24 +300,6 @@ def filter_work_items_files(assets: bool, entity_filter_func: EntityFilterFunc, 
             futures.append(pool.submit(gather_files, directory=related_work_item.working_directory, file_patterns=file_patterns, exclude_patterns=exclude_patterns_compiles, assets=assets, prefix=prefix))
 
 
-def strs_to_regular_expressions(exclude_patterns: List[str], ignore_case: bool = True) -> List[Pattern]:
-    """
-    Convert a list strings to regular expressions. The function assumes the strings are not true regular expressions, but instead are wildcards
-
-    Args:
-        exclude_patterns: Exclude patterns
-        ignore_case: Should the regular expression ignore case?
-
-    Returns:
-        List of Regular Expressions
-    """
-    exclude_patterns_compiles: List[Pattern] = []
-    for pattern in exclude_patterns:
-        pattern_str = f'.*{pattern.replace("*", ".*")}.*'
-        exclude_patterns_compiles.append(re.compile(pattern_str, re.IGNORECASE if ignore_case else None))
-    return exclude_patterns_compiles
-
-
 def create_asset_collection(file_list: SetOfAssets, ac_files: List[AssetCollectionFile], asset_tags: Dict[str, str]):
     """
 
@@ -459,7 +440,7 @@ def filter_ac_files(patterns, exclude_patterns) -> List[AssetCollectionFile]:
         for file in ac.assets:
             file_path = get_asset_file_path(file)
             for pattern in patterns:
-                if fnmatch.fnmatch(file_path, pattern):
+                if PurePath(file_path).match(pattern):
                     filtered_ac_files.add(file)
                     # break out of pattern loop since there was a match
                     break
