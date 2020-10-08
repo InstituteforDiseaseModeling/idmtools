@@ -31,6 +31,7 @@ def run_example_CommandTask(ac_id):
     experiment = Experiment.from_task(task, name="run_example_CommandTask", assets=common_assets)
     experiment.run(wait_until_done=True)
 
+
 def run_pip_list():
     command = "Assets\\run.bat"
     task = CommandTask(command=command)
@@ -40,6 +41,7 @@ def run_pip_list():
     # create experiment from task
     experiment = Experiment.from_task(task, name="run_pip_list", assets=ac)
     experiment.run(wait_until_done=True)
+
 
 def run_example_task_from_template(ac_id):
     common_assets = AssetCollection.from_id(ac_id, as_copy=True)
@@ -56,8 +58,8 @@ def run_example_task_from_template(ac_id):
 
 
 if __name__ == '__main__':
-    platform = Platform('COMPS2')
-    ac_id = "743df90e-2f57-ea11-a2bf-f0921c167862"
+    platform = Platform('BELEGOST')
+    ac_id = "6af9a874-1304-eb11-a2c7-c4346bcb1553"
     if ac_id:
         run_example_CommandTask(ac_id)
         run_example_PythonTask(ac_id)
