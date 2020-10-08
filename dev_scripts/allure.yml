@@ -8,5 +8,5 @@ services:
     ports:
       - "5050:5050"
     volumes:
-      - ../.allure_results:/app/allure-results
+      - ./.allure_results:/app/allure-results
       - ./.allure_reports:/app/default-reports

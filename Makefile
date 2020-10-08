@@ -78,12 +78,12 @@ allure-report: ## Download report as zip
 
 ## Run smoke tests with reports to Allure server(Comment moved until https://github.com/tqdm/py-make/issues/11 is resolves)
 test-smoke-allure: start-allure
-	$(PDS)run_pymake_on_all.py --env "TEST_EXTRA_OPTS=--alluredir=../../.allure_results" test-smoke
+	$(PDS)run_pymake_on_all.py --env "TEST_EXTRA_OPTS=--alluredir=../../dev_scripts/.allure_results" test-smoke
 	$(PDS)launch_dir_in_browser.py http://localhost:5050/allure-docker-service/latest-report
 
  ## Run smoke tests with reports to Allure server(Comment moved until https://github.com/tqdm/py-make/issues/11 is resolves)
 test-all-allure: start-allure
-	$(PDS)run_pymake_on_all.py --env "TEST_EXTRA_OPTS=--alluredir=../../.allure_results" test-all
+	$(PDS)run_pymake_on_all.py --env "TEST_EXTRA_OPTS=--alluredir=../../dev_scripts/.allure_results" test-all
 	$(PDS)launch_dir_in_browser.py http://localhost:5050/allure-docker-service/latest-report
 
 coverage: ## Generate a code-coverage report
