@@ -8,7 +8,7 @@ PDS=$(PY) dev_scripts/
 MAKEALL=$(PDS)run_pymake_on_all.py
 PDR=$(PDS)run.py
 CLDIR=$(PDS)clean_dir.py
-COVERAGE_PATH=tests/$(COVERAGE_PATH)
+COVERAGE_PATH=tests/.coverage
 
 help:
 	$(PDS)get_help_from_makefile.py
