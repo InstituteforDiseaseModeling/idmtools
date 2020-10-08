@@ -1,5 +1,4 @@
 import re
-import tempfile
 import inspect
 import os
 from dataclasses import dataclass, field
@@ -7,7 +6,7 @@ from logging import getLogger
 from COMPS.Data.CommissionableEntity import CommissionableEntity
 from typing import List, Union, Callable, Dict
 
-from idmtools.assets import Asset
+from idmtools.assets import Asset, AssetCollection
 from idmtools.core.interfaces.irunnable_entity import IRunnableEntity
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform import IPlatform
@@ -34,6 +33,8 @@ class AssetizeOutput(SSMTWorkItem):
     pre_run_functions: List[Callable] = field(default_factory=list)
     entity_filter_function: EntityFilterFunc = field(default=None)
     asset_tags: Dict[str, str] = field(default_factory=dict)
+    #: The asset collection created by Assetize
+    asset_collection: AssetCollection = field(default=None)
 
     def __post_init__(self):
         super().__post_init__()
@@ -203,7 +204,7 @@ class AssetizeOutput(SSMTWorkItem):
             else:
                 raise ValueError("We can only assetize the output of experiments, simulations, and workitems")
 
-    def wait(self, wait_on_done_progress: bool = True, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None):
+    def wait(self, wait_on_done_progress: bool = True, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None) -> Union[AssetCollection, None]:
         """
 
         Args:
@@ -221,6 +222,12 @@ class AssetizeOutput(SSMTWorkItem):
         self.__wait_on_children(**opts)
 
         super().wait(**opts)
+        if self.status == EntityStatus.SUCCEEDED:
+            # If we succeeded, get our AC
+            comps_workitem = self.get_platform_object(force=True)
+            acs = comps_workitem.get_related_asset_collections()
+            self.asset_collection = AssetCollection.from_id(acs[0].id, platform=p)
+            return self.asset_collection
 
     def __wait_on_children(self, **opts):
         """
