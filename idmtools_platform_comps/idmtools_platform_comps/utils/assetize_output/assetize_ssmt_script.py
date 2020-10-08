@@ -1,5 +1,6 @@
 import fnmatch
 import glob
+import pprint
 import traceback
 import sys
 from logging import getLogger, DEBUG
@@ -10,6 +11,7 @@ from COMPS.Data.WorkItem import WorkItemState, RelationType
 from concurrent.futures._base import as_completed, Future
 from concurrent.futures.thread import ThreadPoolExecutor
 import uuid
+from tabulate import tabulate
 from tqdm import tqdm
 from typing import List, Tuple, Set, Dict, Callable, Pattern
 import os
@@ -407,6 +409,7 @@ def get_argument_parser():
     parser.add_argument("--verbose", default=False, action="store_true", help="Verbose logging")
     parser.add_argument("--pre-run-func", default=None, action='append', help="List of function to run before starting analysis. Useful to load packages up in docker container before run")
     parser.add_argument("--entity-filter-func", default=None, help="Name of function that can be used to filter items")
+    parser.add_argument("--dry-run", default=False, action="store_true", help="Find files, but don't add")
 
     return parser
 
@@ -423,7 +426,6 @@ def assetize_error_handler(exctype, value: Exception, tb):
     Returns:
         None
     """
-    import pprint
     if exctype is NoFileFound:
         from idmtools.utils.info import get_help_version_url
         print(f"No files were found. Check your patterns match the data from related item. For more details, see {get_help_version_url(value.doc_link)}")
@@ -467,6 +469,24 @@ def filter_ac_files(patterns, exclude_patterns) -> List[AssetCollectionFile]:
 
 def get_asset_file_path(file):
     return os.path.join(file.relative_path, file.file_name) if file.relative_path else file.file_name
+
+
+def print_results(ac_files, files):
+    all_files = []
+    for file in files:
+        all_files.append(dict(filename=file[0], destname=file[1], filesize=file[3]))
+    total_file_size = sum([f[3] for f in files])
+    for af in ac_files:
+        fn = get_asset_file_path(af)
+        all_files.append(dict(filename=fn, destname=fn, filesize=af._length))
+    with open("file_list.json", 'w') as flist:
+        pprint.pprint(all_files, flist)
+    header = all_files[0].keys()
+    rows = [x.values() for x in sorted(all_files, key=lambda x: x['destname'])]
+    with open("file_list.html", "w") as html_list:
+        html_list.write(tabulate(rows, header, tablefmt='html'))
+
+    print(f'Total asset collection size: {humanfriendly.format_size(total_file_size)}')
 
 
 if __name__ == "__main__":
@@ -528,14 +548,17 @@ if __name__ == "__main__":
         entity_filter_func=entity_filter_func
     )
 
-    ac_files = filter_ac_files(args.file_pattern, args.exclude_pattern)
-
+    ac_files: List[AssetCollectionFile] = filter_ac_files(args.file_pattern, args.exclude_pattern)
     if len(files) == 0 and len(ac_files) == 0:
         raise NoFileFound("No files found for related items")
-    ac = create_asset_collection(files, ac_files, asset_tags=asset_tags)
 
-    with open('asset_collection.id', 'w') as o:
-        user_logger.info(ac.id)
-        o.write(str(ac.id))
+    if args.dry_run:
+        print_results(ac_files, files)
+    else:
+        ac = create_asset_collection(files, ac_files, asset_tags=asset_tags)
 
-    wi.add_related_asset_collection(ac.id, RelationType.Created)
+        with open('asset_collection.id', 'w') as o:
+            user_logger.info(ac.id)
+            o.write(str(ac.id))
+
+        wi.add_related_asset_collection(ac.id, RelationType.Created)

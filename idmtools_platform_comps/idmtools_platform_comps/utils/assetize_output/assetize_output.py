@@ -52,6 +52,7 @@ class AssetizeOutput(SSMTWorkItem):
     asset_tags: Dict[str, str] = field(default_factory=dict)
     #: The asset collection created by Assetize
     asset_collection: AssetCollection = field(default=None)
+    dry_run: bool = field(default=False)
 
     def __post_init__(self):
         super().__post_init__()
@@ -93,6 +94,9 @@ class AssetizeOutput(SSMTWorkItem):
 
         if self.verbose:
             command += ' --verbose'
+
+        if self.dry_run:
+            command += ' --dry-run'
 
         return command
 
@@ -352,8 +356,9 @@ class AssetizeOutput(SSMTWorkItem):
             # If we succeeded, get our AC
             comps_workitem = self.get_platform_object(force=True)
             acs = comps_workitem.get_related_asset_collections(RelationType.Created)
-            self.asset_collection = AssetCollection.from_id(acs[0].id, platform=p)
-            return self.asset_collection
+            if acs:
+                self.asset_collection = AssetCollection.from_id(acs[0].id, platform=p)
+                return self.asset_collection
 
     def __wait_on_children(self, **opts):
         """

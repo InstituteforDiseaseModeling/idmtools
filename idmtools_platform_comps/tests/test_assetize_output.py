@@ -163,3 +163,10 @@ class TestAssetizeOutput(unittest.TestCase):
         filelist = [f.filename for f in ac]
         self.assertEqual(1, len(filelist))
 
+    def test_dry_run(self):
+        ao = AssetizeOutput(related_simulations=['9d11af40-1337-ea11-a2be-f0921c167861'], related_asset_collections=['2b53af74-2b4a-e711-80c1-f0921c167860'], verbose=True, dry_run=True)
+        ac = ao.run(wait_on_done=True, platform=Platform("COMPS2"))
+
+        self.assertTrue(ao.succeeded)
+        self.assertIsNone(ac)
+
