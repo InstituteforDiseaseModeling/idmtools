@@ -98,11 +98,14 @@ class TestAssetizeOutput(unittest.TestCase):
         self.assertTrue(ao.succeeded)
 
     def test_experiment(self):
-        ao = AssetizeOutput(related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'])
+        ao = AssetizeOutput(related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'], file_patterns=["**/a.csv"], verbose=True)
         ac = ao.run(wait_on_done=True, platform=Platform("COMPS2"))
 
+        self.assertTrue(ao.succeeded)
+        self.assertIsNotNone(ac)
+
         self.assertEqual(ac, ao.asset_collection)
-        filelist = []
+        filelist = [f.filename for f in ac]
 
 
 

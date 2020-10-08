@@ -44,7 +44,9 @@ def gather_files(directory: str, file_patterns: List[str], exclude_patterns: Lis
     # Loop through our patterns
     for pattern in file_patterns:
         # User glob to search each directory using the pattern. We also do full recursion here
-        for file in glob.glob(os.path.join(directory, pattern), recursive=True):
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f'Looking for files with pattern {pattern} in {directory}')
+        for file in glob.iglob(os.path.join(directory, pattern), recursive=True):
             # Ensure it is a file and not a directory
             if os.path.isfile(file):
                 # Create our shortname. This will remove the base directory from the file. Eg
@@ -62,7 +64,12 @@ def gather_files(directory: str, file_patterns: List[str], exclude_patterns: Lis
 
     # Now strip file that match exclude patterns. We do this after since the regular expressions here are a bit more expensive, so a we are at the
     # minimum possible files we must scan as this point. We did possible calculate extra md5s here
-    return set([f for f in file_list if not is_file_excluded(f[0], exclude_patterns)])
+    if logger.isEnabledFor(DEBUG):
+        logger.debug(f"File count before excluding: {len(file_list)} in {directory}")
+    result = set([f for f in file_list if not is_file_excluded(f[0], exclude_patterns)])
+    if logger.isEnabledFor(DEBUG):
+        logger.debug(f"File count after excluding: {len(file_list)} in {directory}")
+    return result
 
 
 def is_file_excluded(file_details: str, exclude_patterns: List[Pattern]) -> bool:
@@ -266,6 +273,15 @@ def get_argument_parser():
 
     return parser
 
+
+def assetize_error_handler(exctype, value, traceback):
+    with open("error_reason.txt", 'w') as err_out:
+        err_out.write(        traceback.format_stack)
+
+    if exctype == KeyboardInterrupt:
+        print "Handler code goes here"
+    else:
+        sys.__excepthook__(exctype, value, traceback)
 
 if __name__ == "__main__":
     parser = get_argument_parser()
