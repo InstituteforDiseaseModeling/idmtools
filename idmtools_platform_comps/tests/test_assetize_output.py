@@ -108,6 +108,17 @@ class TestAssetizeOutput(unittest.TestCase):
         filelist = [f.filename for f in ac]
         self.assertEqual(9, len(filelist))
 
+    def test_experiment_sim_prefix(self):
+        ao = AssetizeOutput(related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'], simulation_prefix_format_str="{simulation.state}/{simulation.id}", file_patterns=["**/a.csv"], verbose=True)
+        ac = ao.run(wait_on_done=True, platform=Platform("COMPS2"))
+
+        self.assertTrue(ao.succeeded)
+        self.assertIsNotNone(ac)
+
+        self.assertEqual(ac, ao.asset_collection)
+        filelist = [f.filename for f in ac]
+        self.assertEqual(9, len(filelist))
+
     def test_simulation(self):
         ao = AssetizeOutput(related_simulations=['9d11af40-1337-ea11-a2be-f0921c167861'], file_patterns=["**/*.csv"], verbose=True)
         ac = ao.run(wait_on_done=True, platform=Platform("COMPS2"))
