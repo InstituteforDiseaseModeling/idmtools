@@ -80,7 +80,7 @@ class AssetizeOutput(SSMTWorkItem):
             command += f' --simulation-prefix-format-str "{self.simulation_prefix_format_str}"'
 
         if self.work_item_prefix_format_str:
-            command += f' --work_item_prefix_format_str "{self.work_item_prefix_format_str}"'
+            command += f' --work-item-prefix-format-str "{self.work_item_prefix_format_str}"'
 
         if self.include_assets:
             command += ' --assets'
