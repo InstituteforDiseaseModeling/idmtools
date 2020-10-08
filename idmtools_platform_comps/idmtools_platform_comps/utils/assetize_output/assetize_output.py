@@ -204,6 +204,12 @@ class AssetizeOutput(SSMTWorkItem):
             else:
                 raise ValueError("We can only assetize the output of experiments, simulations, and workitems")
 
+    def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None, wait_on_done_progress: bool = True, wait_on_done: bool = True, **run_opts) -> Union[AssetCollection, None]:
+        p = super()._check_for_platform_from_context(platform)
+        p.run_items(self, wait_on_done_progress=wait_on_done_progress, **run_opts)
+        if wait_until_done or wait_on_done:
+            return self.wait(wait_on_done_progress=wait_on_done_progress, platform=p)
+
     def wait(self, wait_on_done_progress: bool = True, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None) -> Union[AssetCollection, None]:
         """
 
