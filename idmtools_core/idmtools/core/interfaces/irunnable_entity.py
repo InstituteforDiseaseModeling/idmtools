@@ -29,6 +29,7 @@ class IRunnableEntity(IEntity, metaclass=ABCMeta):
         Returns:
 
         """
+
         for hook in self.__pre_run_hooks:
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f'Calling pre-create hook named {hook.__name__ if hasattr(hook, "__name__") else str(hook)}')
@@ -108,6 +109,9 @@ class IRunnableEntity(IEntity, metaclass=ABCMeta):
         Returns:
 
         """
+        # If done, exit
+        if self.status in [EntityStatus.SUCCEEDED, EntityStatus.FAILED]:
+            return
         if self.status not in [EntityStatus.CREATED, EntityStatus.RUNNING]:
             raise ValueError("The item cannot be waited for if it is not in Running/Created state")
         opts = dict()
