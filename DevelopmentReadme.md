@@ -59,32 +59,6 @@ Include the following in your patch:
 4) Run `docker login docker-staging.packages.idmod.org`
 5) Then run `python dev_scripts/bootstrap.py`. This will install all the tools.
 
-## Overview of Development Environment
-
-After the first install almost everything you need as a developer is part of the makefiles. There is a Makefile is every project directory. There is also a makefile at the top-level of the project.
-
-To use the makefiles you can explore the available commands by running `make help`. On Windows, use `pymake help`
-
-Here are a list of common commands
-
-```bash
-setup-dev   -   Setup dev environment(assumes you already have a virtualenv)
-setup-dev-no-docker -   Setup dev environment(assumes you already have a virtualenv) exlcuding docker builds for the local platform
-clean       -   Clean up temporary files
-clean-all   -   Deep clean project
-lint        -   Lint package and tests
-test        -   Run Unit tests
-test-all    -   Run Tests that require docker and external systems
-coverage    -   Run tests and generate coverage report that is shown in browser
-```
-
-Some packages have unique build related commands, specifically the local platform. Use `make help` to identify specific commands
-
-## Run test/linting on code change
-
-There is a utility command to run linting and tests on code changes. It runs within each package directory. For example, changes to
-files in `idmtools_core` will run the `make lint` and `make test-smoke` tests within the idmtools_core directory. The jobs at most once every 10 seconds.
-
 ## Start coding
 
 -   Create a branch to identify the issue you would like to work on. If you're submitting a bug or documentation fix, branch off of the latest ".x" branch.
@@ -111,6 +85,32 @@ files in `idmtools_core` will run the `make lint` and `make test-smoke` tests wi
 - [Committing as you go](https://dont-be-afraid-to-commit.readthedocs.io/en/latest/git/commandlinegit.html#commit-your-changes)
 - Run `pymake lint` or `make lint` before opening a PR and fix all linting errors
 - [Create a pull request](https://help.github.com/en/articles/creating-a-pull-request)
+
+## Overview of Development Environment
+
+After the first install almost everything you need as a developer is part of the makefiles. There is a Makefile is every project directory. There is also a makefile at the top-level of the project.
+
+To use the makefiles you can explore the available commands by running `make help`. On Windows, use `pymake help`
+
+Here are a list of common commands
+
+```bash
+setup-dev   -   Setup dev environment(assumes you already have a virtualenv)
+setup-dev-no-docker -   Setup dev environment(assumes you already have a virtualenv) exlcuding docker builds for the local platform
+clean       -   Clean up temporary files
+clean-all   -   Deep clean project
+lint        -   Lint package and tests
+test        -   Run Unit tests
+test-all    -   Run Tests that require docker and external systems
+coverage    -   Run tests and generate coverage report that is shown in browser
+```
+
+Some packages have unique build related commands, specifically the local platform. Use `make help` to identify specific commands
+
+## Run test/linting on code change
+
+There is a utility command to run linting and tests on code changes. It runs within each package directory. For example, changes to
+files in `idmtools_core` will run the `make lint` and `make test-smoke` tests within the idmtools_core directory. The jobs at most once every 10 seconds.
 
 ## IDE/Runtime Setup
 
