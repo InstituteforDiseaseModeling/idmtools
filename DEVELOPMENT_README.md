@@ -191,6 +191,8 @@ dynamically through the `make test` commands.
 Here are a list of jobs related to test from the makefile.
 
 ```bash
+coverage            :Generate a code-coverage report
+coverage-all        :Generate a code-coverage report using all tests
 coverage-report     :Generate HTML report from coverage. Requires running coverage run first(coverage, coverage-smoke, coverage-all)
 coverage-smoke      :Generate a code-coverage report
 test                :Run default set of tests which exclude comps and docker tests
@@ -211,6 +213,7 @@ The root also has additional jobs at the root. Those jobs are
 ```
 aggregate-html-reports:Aggregate html test reports into one directory
 allure-report       :Download report as zip
+coverage-report     :Generate coverage report for tests already ran
 start-allure        :start the allue docker report server
 stop-allure         :Stop Allure
 test-all-allure     :Run all tests and enable allure
