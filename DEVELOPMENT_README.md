@@ -88,7 +88,7 @@ Include the following in your patch:
 
 ## Overview of Development Environment
 
-After the first install almost everything you need as a developer is part of the makefiles. There is a Makefile is every project directory. There is also a makefile at the top-level of the project.
+After the first install almost everything you need as a developer is part of the makefiles. Within each project directory, there is a Makefile that contains all the development related tasks. There is also a makefile at the top-level of the project.
 
 To use the makefiles you can explore the available commands by running `make help`. On Windows, use `pymake help`
 
@@ -110,7 +110,7 @@ Some packages have unique build related commands, specifically the local platfor
 ## Run test/linting on code change
 
 There is a utility command to run linting and tests on code changes. It runs within each package directory. For example, changes to
-files in `idmtools_core` will run the `make lint` and `make test-smoke` tests within the idmtools_core directory. The jobs at most once every 10 seconds.
+files in `idmtools_core` will run the `make lint` and `make test-smoke` tests within the idmtools_core directory. The jobs run at most once every 10 seconds. This limits how often the jobs will be executed.
 
 ## IDE/Runtime Setup
 
@@ -177,7 +177,7 @@ make serve-docs
 # Test
 
 The following section is an overview of test for idmtools. All tests are located under the `tests` folder in each package folder. 
-Test are written to be ran my `py.test`. The test are partially confiured through the pytest.ini. Additional test configuration happens
+Test are written to be ran my `py.test`. The test are partially configured through the pytest.ini. Additional test configuration happens
 dynamically through the `make test` commands. 
 
 Here are a list of jobs related to test from the makefile.

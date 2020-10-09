@@ -145,10 +145,10 @@ bump-minor-dry-run: ## bump the minor version(dry run)
 bump-major-dry-run: ## bump the major version(dry run)
 	$(MAKEALL) bump-major-dry-run
 
-build-docs: ## build docs(only works on linux at moment due to make.bat not running by default)
+build-docs: ## build docs
 	$(PDR) -wd 'docs' -ex 'make html'
 
-build-docs-server: build-docs ## builds docs and launch a webserver
+build-docs-server: build-docs ## builds docs and launch a webserver and watches for changes to documentation
 	$(PDS)serve_docs.py
 
 dev-watch: ## Run lint on any python code changes
