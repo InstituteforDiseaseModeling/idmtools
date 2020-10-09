@@ -35,7 +35,7 @@ setup-dev-no-docker: ## Setup packages in dev mode minus docker
 lint: ## check style with flake8
 	flake8 --ignore=E501,W291 --exclude="venv**/**,examples/**,workflow/**,docs/**,*/tests/**,idmtools_test/**, idmtools_platform_comps/prototypes/**"
 
-test: ## Run our tests
+test: ## Run default set of tests which exclude comps and docker tests
 	$(MAKEALL) --parallel test
 
 test-all: ## Run all our tests
@@ -81,12 +81,12 @@ allure-report: ## Download report as zip
 	$(IPY) "from urllib.request import urlretrieve; urlretrieve('http://localhost:5050/allure-docker-service/report/export', 'allure_report.zip')"
 
 ## Run smoke tests with reports to Allure server(Comment moved until https://github.com/tqdm/py-make/issues/11 is resolves)
-test-smoke-allure: start-allure
+test-smoke-allure: start-allure ## Run smoke tests and enable allure
 	$(PDS)run_pymake_on_all.py --env "TEST_EXTRA_OPTS=--alluredir=../../dev_scripts/.allure_results" test-smoke
 	$(PDS)launch_dir_in_browser.py http://localhost:5050/allure-docker-service/latest-report
 
  ## Run smoke tests with reports to Allure server(Comment moved until https://github.com/tqdm/py-make/issues/11 is resolves)
-test-all-allure: start-allure
+test-all-allure: start-allure ## Run all tests and enable allure
 	$(PDS)run_pymake_on_all.py --env "TEST_EXTRA_OPTS=--alluredir=../../dev_scripts/.allure_results" test-all
 	$(PDS)launch_dir_in_browser.py http://localhost:5050/allure-docker-service/latest-report
 

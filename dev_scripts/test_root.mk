@@ -36,7 +36,7 @@ mv-serial-reports: ## Moves report to serial folder
 	$(MV) $(REPORT_DIR)/$(TEST_REPORT) $(REPORT_DIR)/serial.$(TEST_REPORT)
 	$(MV) $(REPORT_DIR)/$(HTML_TEST_REPORT) $(REPORT_DIR)/serial.$(HTML_TEST_REPORT)
 
-test: ## Run our tests
+test: ## Run default set of tests which exclude comps and docker tests
 	-mkdir reports
 	$(TEST_COMMAND) -m "not comps and not docker"
 
