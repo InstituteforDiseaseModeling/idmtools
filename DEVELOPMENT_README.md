@@ -153,8 +153,7 @@ The directories that should be added as source roots are
    beforehand using `docker login docker-staging.packages.idmod.org`
 2. Docker image not found
    Rerun the `pymake setup-dev` or `make setup-dev` on unix systems
-3. Check build logs Detailed Build Logs are located within in package and tests directory withing the package with the name make.buildlog. You can also increase the console log level to DEBUG by setting the environment variable BUILD_DEBUG to 1
-
+  
 # Documentation
 
 The following section documents how to build and edit the documentation.
