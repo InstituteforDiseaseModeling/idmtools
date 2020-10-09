@@ -9,6 +9,7 @@ from idmtools.core.platform_factory import Platform
 
 
 @pytest.mark.smoke
+@pytest.mark.serial
 class TestPlatformAnalysis(TestCase):
     def test_basic_functionality(self):
         platform = Platform('Test')

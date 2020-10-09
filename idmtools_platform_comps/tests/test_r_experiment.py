@@ -1,3 +1,4 @@
+import allure
 import os
 import sys
 import pytest
@@ -13,6 +14,9 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 @pytest.mark.tasks
 @pytest.mark.r
+@allure.story("COMPS")
+@allure.story("RTask")
+@allure.suite("idmtools_platform_comps")
 class TestRExperiment(ITestWithPersistence):
 
     def setUp(self) -> None:

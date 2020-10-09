@@ -13,8 +13,7 @@ clean: ## Clean most of the temp-data from the project
 	$(CLDIR) --file-patterns "*.py[co],*.done,*.log,**/.coverage" \
 		--dir-patterns "**/__pycache__,**/htmlcov,**/.pytest_cache" --directories "dist,build"
 
-clean-all:  ## Deleting package info hides plugins so we only want to do that for packaging
-	@make clean
+clean-all: clean ## Deleting package info hides plugins so we only want to do that for packaging
 	$(CLDIR) --dir-patterns "**/*.egg-info/"
 # Dev and test related rules
 
@@ -49,12 +48,10 @@ coverage-all: ## Generate a code-coverage report
 	@+$(IPY) "print('No Tests')"
 
 # Release related rules
-dist: ## build our package
-	@make clean
+dist: clean ## build our package
 	python setup.py sdist
 
-release-staging: ## perform a release to staging
-	@make dist
+release-staging: dist ## perform a release to staging
 	twine upload --verbose --repository-url https://packages.idmod.org/api/pypi/idm-pypi-staging/ dist/*
 
 bump-release: ## bump the release version.

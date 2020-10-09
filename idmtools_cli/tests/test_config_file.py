@@ -1,12 +1,14 @@
+import allure
 import unittest
-
 import pytest
 from click.testing import CliRunner
-
 from idmtools_cli.cli.config_file import config
 
 
 @pytest.mark.smoke
+@allure.story("CLI")
+@allure.story("Configuration")
+@allure.suite("idmtools_cli")
 class TestConfigFile(unittest.TestCase):
 
     def test_slugify(self):

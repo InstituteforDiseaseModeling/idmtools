@@ -1,3 +1,4 @@
+import allure
 from typing import Dict
 from unittest import TestCase
 
@@ -16,6 +17,8 @@ def print_sweep(simulation: Simulation, value) -> Dict:
 
 @pytest.mark.tasks
 @pytest.mark.smoke
+@allure.story("Sweeps")
+@allure.suite("idmtools_core")
 class TestTemplatedSimulation(TestCase):
 
     def test_generator(self):

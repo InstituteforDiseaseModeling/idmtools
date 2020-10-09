@@ -2,7 +2,7 @@
 Local platform
 ==============
 
-To run simulations and experiments on the local platform you must have met the installation prerequisites. For more information, see :doc:`installation`. In addition, the Docker client must be running. For more information, see :ref:`docker-client` section in :doc:`dev-installation`.
+To run simulations and experiments on the local platform you must have met the installation prerequisites. For more information, see :doc:`../installation`. In addition, the Docker client must be running. For more information, see :ref:`docker-client` section in :doc:`../dev-installation`.
 
 Verify local platform is running
 ````````````````````````````````
@@ -35,7 +35,7 @@ And, you must include the following block in the ``idmtools.ini`` file::
 
 .. note::
 
-    You should be able to use most of the included examples, see :doc:`cli-examples`, on local platform except for those that use :py:class:`~idmtools.entities.iworkflow_item.IWorkflowItem` or :py:class:`~idmtools.entities.suite.Suite` Python classes.
+    You should be able to use most of the included examples, see :doc:`../cli/cli-examples`, on local platform except for those that use :py:class:`~idmtools.entities.iworkflow_item.IWorkflowItem` or :py:class:`~idmtools.entities.suite.Suite` Python classes.
 
 View simulations and experiments
 ````````````````````````````````

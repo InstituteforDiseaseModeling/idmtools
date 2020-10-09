@@ -1,3 +1,4 @@
+import allure
 import os
 import unittest
 from unittest import TestCase
@@ -7,6 +8,9 @@ from idmtools.utils.gitrepo import GitRepo
 
 
 @pytest.mark.smoke
+@allure.story("CLI")
+@allure.story("Examples Command")
+@allure.suite("idmtools_core")
 class TestGithubUrlParse(TestCase):
 
     def setUp(self) -> None:

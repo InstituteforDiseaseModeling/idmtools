@@ -1,10 +1,9 @@
+import allure
 import ast
 import json
 import os
 import unittest
-from datetime import date, timedelta
 import pytest
-
 from idmtools.assets import AssetCollection, Asset
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
@@ -27,6 +26,9 @@ def param_update(simulation, param, value):
 
 @pytest.mark.comps
 @pytest.mark.long
+@allure.story("COMPS")
+@allure.story("SSMT")
+@allure.suite("idmtools_platform_comps")
 class TestVisToolsWorkItem(unittest.TestCase):
 
     def generate_sim(self):

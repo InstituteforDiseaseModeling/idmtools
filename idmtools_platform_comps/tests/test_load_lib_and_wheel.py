@@ -1,3 +1,4 @@
+import allure
 import os
 import sys
 from pathlib import Path
@@ -20,6 +21,10 @@ sys.path.insert(0, model_path)
 
 @pytest.mark.comps
 @pytest.mark.python
+@allure.story("COMPS")
+@allure.story("Python")
+@allure.story("Requirements to Asset Collection")
+@allure.suite("idmtools_platform_comps")
 class TestLoadLibWheel(ITestWithPersistence):
 
     def setUp(self) -> None:

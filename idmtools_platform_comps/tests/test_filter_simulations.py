@@ -1,8 +1,7 @@
+import allure
 import os
 import unittest
 from functools import partial
-
-import pytest
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType, EntityStatus
 from idmtools.core.platform_factory import Platform
@@ -16,6 +15,10 @@ from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 
+@allure.story("COMPS")
+@allure.story("Python")
+@allure.story("Filtering")
+@allure.suite("idmtools_platform_comps")
 class TestSimulations(ITestWithPersistence):
 
     def _run_create_test_experiments(self):

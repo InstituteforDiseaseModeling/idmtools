@@ -10,7 +10,7 @@ The configuration of |IT_s| is set in the idmtools.ini file. This file is normal
 
    common-parameters
    logging
-   wizard
+   cli/wizard
 
 Below is an example configuration file:
 

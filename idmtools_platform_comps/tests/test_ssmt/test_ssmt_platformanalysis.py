@@ -1,11 +1,9 @@
 import functools
-
 import tempfile
-
+import allure
 import json
 import os
 import sys
-
 import pytest
 from idmtools_platform_comps import __version__ as platform_comps_version
 from idmtools import __version__ as core_version
@@ -48,6 +46,11 @@ def write_wrapper_script():
 
 @pytest.mark.comps
 @pytest.mark.ssmt
+@allure.story("COMPS")
+@allure.story("Analyzers")
+@allure.story("PlatformAnalysis")
+@allure.story("SSMT")
+@allure.suite("idmtools_platform_comps")
 class TestPlatformAnalysis(ITestWithPersistence):
 
     def setUp(self):

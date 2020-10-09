@@ -1,3 +1,4 @@
+import allure
 import itertools
 import os
 import sys
@@ -17,6 +18,9 @@ model_path = os.path.abspath(os.path.join("..", "..", "examples", "python_model"
 
 
 @pytest.mark.smoke
+@pytest.mark.serial
+@allure.story("Entities")
+@allure.suite("idmtools_core")
 class TestAddingSimulationsToExistingExperiment(unittest.TestCase):
     def setUp(self):
         self.platform = Platform("TestExecute", missing_ok=True, default_missing=dict(type='TestExecute'))
