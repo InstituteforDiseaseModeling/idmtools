@@ -162,7 +162,7 @@ The following section documents how to build and edit the documentation.
 
 The documentation is built using Sphinx from the rst files in the `docs` folder. The documentation is a series of linked
 documents and generated documents from the python code. `index.rst` is the entry point into the documentation. For details
-on the formatting of documentation, see the `Sphinx <https://www.sphinx-doc.org/en/stable/>`__ docs
+on the formatting of documentation, see the [Sphinx](https://www.sphinx-doc.org/en/stable/) docs
 
 ## Reload Documentation on change
 
