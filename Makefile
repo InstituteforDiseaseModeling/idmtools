@@ -89,19 +89,19 @@ test-all-allure: start-allure ## Run all tests and enable allure
 	$(PDS)run_pymake_on_all.py --env "TEST_EXTRA_OPTS=--alluredir=../../dev_scripts/.allure_results" test-all
 	$(PDS)launch_dir_in_browser.py http://localhost:5050/allure-docker-service/latest-report
 
-coverage: ## Generate a code-coverage report
-	$(MAKEALL) "coverage-all"
+coverage-report: ## Generate coverage report for tests already ran
 	coverage combine idmtools_cli/$(COVERAGE_PATH) idmtools_core/$(COVERAGE_PATH) idmtools_models/$(COVERAGE_PATH) idmtools_platform_comps/$(COVERAGE_PATH) idmtools_platform_local/$(COVERAGE_PATH)
 	coverage report -m
 	coverage html -i
 	$(PDS)launch_dir_in_browser.py htmlcov/index.html
 
+coverage: ## Run all tests and then generate a coverage report
+	$(MAKEALL) "coverage-all"
+	$(MAKE) coverage-report
+
 coverage-smoke: ## Generate a code-coverage report
 	$(MAKEALL) "coverage-smoke"
-	coverage combine idmtools_cli/$(COVERAGE_PATH) idmtools_core/$(COVERAGE_PATH) idmtools_models/$(COVERAGE_PATH) idmtools_platform_comps/$(COVERAGE_PATH) idmtools_platform_local/$(COVERAGE_PATH)
-	coverage report -m
-	coverage html -i
-	$(PDS)launch_dir_in_browser.py htmlcov/index.html
+	$(MAKE) coverage-report
 
 dist: ## build our package
 	$(MAKEALL) --parallel dist
