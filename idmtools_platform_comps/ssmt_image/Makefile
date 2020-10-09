@@ -12,9 +12,9 @@ clean-all: clean ## Deleting package info hides plugins so we only want to do th
 	docker rmi idmtools_comps_ssmt_worker
 
 docker: ## Build our docker image using the local pypi
-	$(PDR) -w '../../idmtools_core' -ex 'pymake dist'
-	$(PDR) -w '../../idmtools_models' -ex 'pymake dist'
-	$(PDR) -w '../../idmtools_platform_comps' -ex 'pymake dist'
+	$(MAKE) -C ../../idmtools_core dist
+	$(MAKE) -C ../../idmtools_models dist
+	$(MAKE) -C ../../idmtools_platform_comps dist
 	python build_docker_image.py
 
 docker-release-staging: docker
