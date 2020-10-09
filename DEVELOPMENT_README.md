@@ -171,7 +171,7 @@ build-docs          :build docs
 build-docs-server   :builds docs and launch a webserver and watches for changes to documentation
 ```
 
-See the next section for details on `build-docs-server `
+See the next section for details on `build-docs-server`
 
 ## Reload Documentation on change
 
