@@ -10,7 +10,7 @@ echo "install idmtools ..."
 LOCAL_PATH="$(realpath $(dirname '$0')/)"
 echo ${LOCAL_PATH}
 pip install py-make
-pymake setup-dev
+make setup-dev
 
 echo "pip list..."
 pip list
@@ -20,7 +20,7 @@ python dev_scripts/create_auth_token_args.py --comps_url "$1" --username "$2" --
 #python dev_scripts/create_auth_token_args.py --comps_url "https://comps2.idmod.org" --username "shchen" --password "Password123"
 
 echo "run all tests..."
-pymake test-all
+make test-all
 
 echo "deactivate..."
 deactivate
