@@ -1,3 +1,4 @@
+import allure
 import os
 import time
 from functools import partial
@@ -47,6 +48,10 @@ class AddAnalyzer(IAnalyzer):
 
 @pytest.mark.analysis
 @pytest.mark.docker
+@pytest.mark.serial
+@allure.story("LocalPlatform")
+@allure.story("Analyzers")
+@allure.suite("idmtools_platform_local")
 class TestAnalyzersLocal(ITestWithPersistence):
 
     @classmethod

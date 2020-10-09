@@ -11,9 +11,9 @@ with open('README.md') as readme_file:
 with open('requirements.txt') as requirements_file:
     requirements = requirements_file.read().split("\n")
 
-build_requirements = ['flake8', 'coverage', 'py-make', 'bump2version']
+build_requirements = ['flake8', 'coverage', 'bump2version']
 setup_requirements = []
-test_requirements = ['pytest', 'pytest-runner', 'numpy==1.16.4', 'xmlrunner', 'pytest-timeout', 'pytest-cache'] + build_requirements
+test_requirements = ['pytest', 'pytest-runner', 'xmlrunner', 'pytest-timeout', 'pytest-cache'] + build_requirements
 
 extras = {
     'test': test_requirements,

@@ -1,3 +1,4 @@
+import allure
 import pytest
 from idmtools_test.utils.confg_local_runner_test import config_local_test, patch_db, reset_local_broker
 from idmtools_test.utils.decorators import linux_only
@@ -15,6 +16,9 @@ from unittest import TestCase
 @linux_only
 @patch_db
 @pytest.mark.local_platform_internals
+@allure.story("LocalPlatform")
+@allure.story("Local Task")
+@allure.suite("idmtools_platform_local")
 class TestTasks(TestCase):
 
     @classmethod

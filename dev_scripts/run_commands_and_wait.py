@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import errno
 from functools import wraps
 

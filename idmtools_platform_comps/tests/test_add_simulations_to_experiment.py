@@ -1,3 +1,4 @@
+import allure
 import os
 
 import pytest
@@ -12,6 +13,9 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 
 @pytest.mark.comps
+@allure.story("COMPS")
+@allure.story("Modify Experiments")
+@allure.suite("idmtools_platform_comps")
 class TestAddSimulationsToExperiment(ITestWithPersistence):
 
     def setUp(self) -> None:

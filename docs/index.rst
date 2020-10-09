@@ -38,17 +38,17 @@ Exact workflows for using |IT_s| is user-dependent, and can include any of the t
 
    installation
    configuration
-   platforms
+   platforms/platforms
    create-sims
    parameter-sweeps
    reports
-   analyzers
+   analyzers/analyzers
    plots   
    reference
    recipes_index
-   cli_index
+   cli/cli_index
    glossary
-   changelog
+   changelog/changelog
 
 
 

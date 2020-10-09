@@ -1,3 +1,4 @@
+import allure
 import unittest
 
 import pytest
@@ -6,6 +7,8 @@ from idmtools.entities.suite import Suite
 
 
 @pytest.mark.smoke
+@allure.story("Entities")
+@allure.suite("idmtools_core")
 class TestSuite(unittest.TestCase):
 
     def setUp(self):

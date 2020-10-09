@@ -10,7 +10,7 @@ with open('README.md', encoding='utf-8') as readme_file:
 with open('requirements.txt') as requirements_file:
     requirements = requirements_file.read().split("\n")
 
-build_requirements = ['flake8', 'coverage', 'py-make', 'bump2version', 'twine']
+build_requirements = ['flake8', 'coverage', 'bump2version', 'twine']
 test_requirements = ['pytest', 'pytest-runner', 'matplotlib', 'pytest-timeout', 'pytest-cache'] + build_requirements
 
 extras = dict(test=test_requirements, dev=['Pympler'], packaging=build_requirements)

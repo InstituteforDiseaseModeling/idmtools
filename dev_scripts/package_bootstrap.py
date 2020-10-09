@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import subprocess
 from os.path import abspath, dirname
 

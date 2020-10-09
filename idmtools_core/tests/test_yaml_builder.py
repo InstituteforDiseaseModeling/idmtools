@@ -1,3 +1,4 @@
+import allure
 import os
 from functools import partial
 
@@ -21,6 +22,8 @@ setD = partial(param_update, param="d")
 
 
 @pytest.mark.smoke
+@allure.story("Sweeps")
+@allure.suite("idmtools_core")
 class TestYamlBuilder(ITestWithPersistence):
 
     def setUp(self):

@@ -1,8 +1,8 @@
+import allure
 import json
 import os
 import unittest
 from functools import partial
-
 import pytest
 from idmtools.assets import Asset, AssetCollection
 from idmtools.assets.errors import DuplicatedAssetError
@@ -13,6 +13,9 @@ from idmtools_test import COMMON_INPUT_PATH
 
 @pytest.mark.assets
 @pytest.mark.smoke
+@allure.story("Entities")
+@allure.story("Assets")
+@allure.suite("idmtools_core")
 class TestAssets(unittest.TestCase):
 
     def setUp(self) -> None:

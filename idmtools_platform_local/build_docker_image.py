@@ -19,7 +19,6 @@ IMAGE_NAME = 'idmtools/local_workers'
 BASE_IMAGE_NAME = f'{DOCKER_REPO}/{IMAGE_NAME}'
 
 base_version = open('VERSION').read().strip()
-
 if len(sys.argv) == 2 and sys.argv[-1] == "--proper":
     print("Please be sure you are logged into the docker-production.packages.idmod.org Docker Repo")
 
@@ -27,7 +26,6 @@ if len(sys.argv) == 2 and sys.argv[-1] == "--proper":
     if 'bamboo_UserArtifactory' in os.environ:
         username = os.environ['bamboo_UserArtifactory']
     else:
-        print("Username:")
         username = input('Username:')
     if 'bamboo_PasswordArtifactory' in os.environ:
         password = os.environ['bamboo_PasswordArtifactory']

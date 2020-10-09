@@ -12,7 +12,7 @@ with open('README.md') as readme_file:
 with open('requirements.txt') as requirements_file:
     requirements = requirements_file.read().split("\n")
 
-build_requirements = ['flake8', 'coverage', 'py-make', 'bump2version', 'twine']
+build_requirements = ['flake8', 'coverage', 'bump2version', 'twine']
 setup_requirements = []
 test_requirements = ['pytest', 'pytest-runner', 'pytest-timeout', 'pytest-cache'] + build_requirements
 

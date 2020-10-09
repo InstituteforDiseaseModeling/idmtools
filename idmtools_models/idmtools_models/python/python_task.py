@@ -1,6 +1,4 @@
 import os
-import subprocess
-import tempfile
 from dataclasses import dataclass, field
 from logging import getLogger
 from typing import Set, List, Type, Union
@@ -54,29 +52,6 @@ class PythonTask(ITask):
     @command.setter
     def command(self, command):
         self._command = command
-
-    def retrieve_python_dependencies(self):
-        """
-        Retrieve the Pypi libraries associated with the given model script.
-        Notes:
-            This function scan recursively through the whole  directory where the model file is contained.
-            This function relies on pipreqs being installed on the system to provide dependencies list.
-
-        Returns:
-            List of libraries required by the script
-        """
-        model_folder = os.path.dirname(self.script_path)
-
-        # Store the pipreqs file in a temporary directory
-        with tempfile.TemporaryDirectory() as tmpdir:
-            reqs_file = os.path.join(tmpdir, "reqs.txt")
-            subprocess.run(['pipreqs', '--savepath', reqs_file, model_folder], stderr=subprocess.DEVNULL)
-
-            # Reads through the reqs file to get the libraries
-            with open(reqs_file, 'r') as fp:
-                extra_libraries = [line.strip() for line in fp.readlines()]
-
-        return extra_libraries
 
     def gather_common_assets(self) -> AssetCollection:
         """

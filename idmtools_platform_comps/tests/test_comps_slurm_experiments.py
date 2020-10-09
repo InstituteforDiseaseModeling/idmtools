@@ -1,18 +1,16 @@
+import allure
 import json
 import os
 from functools import partial
 from typing import Any, Dict
-
 import pytest
 from COMPS.Data import Experiment as COMPSExperiment
 from COMPS.Data import QueryCriteria
-
 from idmtools import __version__
 from idmtools.assets import AssetCollection
 from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
-from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
@@ -38,6 +36,10 @@ class setParam:
 
 @pytest.mark.comps
 @pytest.mark.python
+@allure.story("COMPS")
+@allure.story("Python")
+@allure.story("COMPS-Slurm")
+@allure.suite("idmtools_platform_comps")
 class TestCOMPSSlurmExperiment(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
@@ -45,6 +47,7 @@ class TestCOMPSSlurmExperiment(ITestWithPersistence):
         self.platform = Platform('SLURM')
 
     @pytest.mark.long
+    @allure.story("Sweeps")
     def test_sweeps_with_partial_comps_in_slurm(self):
         model_path = os.path.join(COMMON_INPUT_PATH, "python", "model1.py")
         e = Experiment(name=self.case_name,

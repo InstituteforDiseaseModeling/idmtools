@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import argparse
 from COMPS import Client
 from COMPS.CredentialPrompt import CredentialPrompt

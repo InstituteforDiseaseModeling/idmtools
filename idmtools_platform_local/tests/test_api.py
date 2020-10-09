@@ -1,4 +1,5 @@
 # flake8: noqa E402
+import allure
 import os
 import time
 import unittest.mock
@@ -20,6 +21,10 @@ from idmtools_test.utils.local_platform import create_test_data
 
 @pytest.mark.docker
 @pytest.mark.local_platform_internals
+@pytest.mark.serial
+@allure.story("LocalPlatform")
+@allure.story("Local API")
+@allure.suite("idmtools_platform_local")
 class TestAPI(unittest.TestCase):
 
     @classmethod
