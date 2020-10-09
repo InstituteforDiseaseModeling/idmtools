@@ -146,7 +146,6 @@ class TestAssetizeOutput(unittest.TestCase):
             ac = ao2.run(wait_on_done=True, platform=Platform("COMPS2"))
             self.assertTrue(ao2.succeeded)
             self.assertIsNotNone(ac)
-
             self.assertEqual(ac, ao2.asset_collection)
             filelist = [f.filename for f in ac]
             self.assertEqual(4, len(filelist))
