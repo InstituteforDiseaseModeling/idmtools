@@ -255,7 +255,7 @@ python dev_scripts/run_all.py -sd 'tests' --exec "py.test -k 'batch'"
 ```
 To run a specific test, cd to the project directories test folder and run
 ```bash
-py.test test_emod.py::TestLocalPlatformEMOD::test_duplicated_eradication
+py.test test_templated_simulation.py::TestTemplatedSimulation::test_generator
 ```
 
 In addition, you can rerun just the failed test using either the top-level `pymake test-failed` rule or by using the `--lf` switch on py.test
