@@ -1,5 +1,4 @@
 import getpass
-
 import allure
 import unittest
 import pytest

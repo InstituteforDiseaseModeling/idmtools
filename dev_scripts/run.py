@@ -1,5 +1,5 @@
+#!/usr/bin/env python
 import shutil
-
 import argparse
 import logging
 import os

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from shutil import which
 import argparse
 import os
