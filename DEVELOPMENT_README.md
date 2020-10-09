@@ -57,7 +57,7 @@ Include the following in your patch:
    On Unix(Mac/Linux) you can use venv or virtualenv
 3) Activate the virtualenv
 4) Run `docker login docker-staging.packages.idmod.org`
-5) Then run `python dev_scripts/bootstrap.py`. This will install all the tools.
+5) Then run `python dev_scripts/bootstrap.py`. This will install all the tools. A note about bootstrap.py. It adds a configuration to the examples folder which points all examples to staging environments. This is so when in dev/test mode, examples can be ran in a non-production environments.
 
 ## Start coding
 
