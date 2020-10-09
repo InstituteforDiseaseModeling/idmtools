@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
 # This script should be executed from the root directory of the repo
+import glob
 import webbrowser
 import argparse
 import os
-from formic.formic import FileSet
 from livereload import Server, shell
 
 
@@ -16,7 +16,7 @@ root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 os.chdir(root_dir)
 server = Server()
 dirs_to_watch = set()
-for filepath in FileSet(include="**.rst"):
+for filepath in glob.iglob("**.rst", recursive=True):
     if 'idmtools_' not in filepath:
         d = os.path.dirname(filepath)
         if d not in dirs_to_watch:
