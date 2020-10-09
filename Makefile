@@ -70,7 +70,11 @@ stop-allure: ## Stop Allure
 start-allure: ## start the allue docker report server
 	-$(MKDIR) ./dev_scripts/.allure_results
 	-$(MKDIR) ./dev_scripts/.allure_reports
+ifeq ($(OS),Windows_NT)
 	$(PDR) -wd dev_scripts -ex "docker-compose -f allure.yml up -d allure"
+else
+	cd ./dev_scripts/; MY_USER=$(shell id -u):$(shell id -g)  docker-compose -f allure.yml up -d allure
+endif
 	$(IPY) "print('Once tests have finished, your test report will be available at http://localhost:5050/allure-docker-service/latest-report. To clean results, use http://localhost:5050/allure-docker-service/clean-results')"
 
 allure-report: ## Download report as zip

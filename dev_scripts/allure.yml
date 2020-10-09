@@ -2,6 +2,7 @@ version: '3'
 services:
   allure:
     image: "frankescobar/allure-docker-service"
+    user: "${MY_USER-1000:1000}"
     environment:
       CHECK_RESULTS_EVERY_SECONDS: 1
       KEEP_HISTORY: 1
