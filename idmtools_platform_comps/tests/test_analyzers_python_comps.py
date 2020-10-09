@@ -1,3 +1,4 @@
+import allure
 import os
 import sys
 from functools import partial
@@ -26,6 +27,9 @@ sys.path.insert(0, analyzer_path)
 @pytest.mark.analysis
 @pytest.mark.python
 @pytest.mark.comps
+@allure.story("COMPS")
+@allure.story("Analyzers")
+@allure.suite("idmtools_platform_comps")
 class TestAnalyzeManagerPythonComps(ITestWithPersistence):
 
     def setUp(self) -> None:

@@ -1,3 +1,4 @@
+import allure
 import tempfile
 from shutil import copyfile
 
@@ -14,6 +15,9 @@ from idmtools_test.utils.utils import captured_output
 
 
 @pytest.mark.smoke
+@pytest.mark.serial
+@allure.story("Configuration")
+@allure.suite("idmtools_core")
 class TestConfig(ITestWithPersistence):
 
     def setUp(self):
@@ -37,6 +41,7 @@ class TestConfig(ITestWithPersistence):
 
     @pytest.mark.comps
     @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
+    @pytest.mark.serial
     def test_simple_comps_platform_use_config(self, mock_login):
         platform = Platform("COMPS2")
         self.assertEqual(platform.endpoint, 'https://comps2.idmod.org')
@@ -45,6 +50,7 @@ class TestConfig(ITestWithPersistence):
 
     @pytest.mark.comps
     @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
+    @pytest.mark.serial
     def test_simple_comps_platform_use_code(self, mock_login):
         platform = Platform("COMPS2", endpoint='https://abc', environment='Bayesian')
         self.assertEqual(platform.endpoint, 'https://abc')
@@ -81,6 +87,7 @@ class TestConfig(ITestWithPersistence):
 
     @pytest.mark.comps
     @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
+    @pytest.mark.serial
     def test_idmtools_ini_option(self, login_mock):
         config_file = IdmConfigParser.get_config_path()
         self.assertEqual(os.path.basename(config_file), 'idmtools.ini')
@@ -131,6 +138,7 @@ class TestConfig(ITestWithPersistence):
 
     @pytest.mark.comps
     @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
+    @pytest.mark.serial
     @skip_if_global_configuration_is_enabled
     def test_idmtools_path(self, login_mock):
         IdmConfigParser(os.path.join(COMMON_INPUT_PATH, "configuration"), "idmtools_test.ini")
@@ -175,6 +183,7 @@ class TestConfig(ITestWithPersistence):
 
     @pytest.mark.comps
     @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
+    @pytest.mark.serial
     def test_idmtools_values(self, login_mock):
         Platform('COMPS')
         max_workers = IdmConfigParser.get_option(None, 'max_workers')

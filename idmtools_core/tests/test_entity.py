@@ -1,10 +1,10 @@
 import copy
+import pickle
 from functools import partial
 from unittest.mock import MagicMock
-import pickle
+import allure
 import unittest
 from dataclasses import dataclass, field, fields
-
 import pytest
 from idmtools.builders import SimulationBuilder
 from idmtools.core.interfaces.ientity import IEntity
@@ -36,6 +36,8 @@ def bad_function_signature(arg1):
 
 
 @pytest.mark.smoke
+@allure.story("Entities")
+@allure.suite("idmtools_core")
 class TestEntity(ITestWithPersistence):
 
     def test_hashing(self):

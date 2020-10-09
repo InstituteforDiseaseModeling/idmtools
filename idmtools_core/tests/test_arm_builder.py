@@ -1,3 +1,4 @@
+import allure
 import itertools
 from functools import partial
 
@@ -14,6 +15,8 @@ setB = partial(JSONConfiguredTask.set_parameter_sweep_callback, param="b")
 
 
 @pytest.mark.smoke
+@allure.story("Sweeps")
+@allure.suite("idmtools_core")
 class TestArmBuilder(ITestWithPersistence):
 
     def setUp(self):

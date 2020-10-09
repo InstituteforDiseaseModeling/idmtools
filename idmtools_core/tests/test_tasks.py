@@ -1,3 +1,4 @@
+import allure
 import os
 from unittest import TestCase
 
@@ -9,6 +10,8 @@ from idmtools.entities.simulation import Simulation
 
 @pytest.mark.tasks
 @pytest.mark.smoke
+@allure.story("Tasks")
+@allure.suite("idmtools_core")
 class TestTasks(TestCase):
 
     def test_command_requires_command(self):

@@ -1,3 +1,4 @@
+import allure
 import os
 import unittest
 import pytest
@@ -8,6 +9,9 @@ from idmtools_models.json_configured_task import JSONConfiguredTask
 
 @pytest.mark.comps
 @pytest.mark.smoke
+@allure.story("COMPS")
+@allure.story("Reload Simulations")
+@allure.suite("idmtools_platform_comps")
 class TestConfigTask(unittest.TestCase):
     def test_reload_from_simulation_task1(self):
         with Platform("COMPS2") as p:

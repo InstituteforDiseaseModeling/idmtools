@@ -1,12 +1,9 @@
+import allure
 import tempfile
-
 import os
-
 import unittest
 import dataclasses
-
 import pytest
-
 from idmtools import IdmConfigParser
 from idmtools.core import CacheEnabled
 from idmtools.core.platform_factory import Platform
@@ -17,6 +14,9 @@ from idmtools_platform_comps.comps_platform import COMPSPlatform
 from idmtools_platform_comps.plugin_info import COMPSPlatformSpecification
 
 
+@allure.story("COMPS")
+@allure.story("Plugins")
+@allure.suite("idmtools_platform_comps")
 class TestCompsPlugin(unittest.TestCase):
     @pytest.mark.smoke
     def test_comps_in_entrypoints(self):
@@ -65,7 +65,7 @@ class TestCompsPlugin(unittest.TestCase):
             self.assertTrue(platform.are_requirements_met(PlatformRequirements.PYTHON))
             self.assertTrue(platform.are_requirements_met(PlatformRequirements.WINDOWS))
 
-    @pytest.mark.comp
+    @pytest.mark.comps
     def test_platform_aliases(self):
         from idmtools.core.platform_factory import Platform
         org_directory = os.getcwd()

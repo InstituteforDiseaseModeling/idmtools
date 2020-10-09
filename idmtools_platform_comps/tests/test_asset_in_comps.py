@@ -1,3 +1,4 @@
+import allure
 import json
 import os
 import unittest
@@ -19,6 +20,9 @@ from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id,
 
 @pytest.mark.comps
 @pytest.mark.assets
+@allure.story("COMPS")
+@allure.story("Assets")
+@allure.suite("idmtools_platform_comps")
 class TestAssetsInComps(unittest.TestCase):
 
     def setUp(self) -> None:

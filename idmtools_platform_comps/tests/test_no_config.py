@@ -1,3 +1,4 @@
+import allure
 import io
 import os
 import tempfile
@@ -9,6 +10,9 @@ from idmtools.entities.experiment import Experiment
 
 
 @pytest.mark.smoke
+@allure.story("COMPS")
+@allure.story("Configuration")
+@allure.suite("idmtools_platform_comps")
 class TestNoConfig(unittest.TestCase):
 
     @classmethod
