@@ -152,12 +152,12 @@ build-docs-server: build-docs ## builds docs and launch a webserver
 	$(PDS)serve_docs.py
 
 dev-watch: ## Run lint on any python code changes
-	$(PDS)run_commands_and_wait.py --command 'watchmedo shell-command --drop --wait --interval 10 --patterns="*.py" --ignore-pattern="*/tests/.test_platform/*" --recursive --command="pymake --ignore-errors lint"' \
-        --command 'watchmedo shell-command --patterns="*.py" --ignore-pattern="*/tests/.test_platform/*" --drop --interval 10 --recursive --command="pymake test-smoke";;;idmtools_core' \
-        --command 'watchmedo shell-command --patterns="*.py" --ignore-pattern="*/tests/.test_platform/*" --drop --interval 10 --recursive --command="pymake test-smoke";;;idmtools_models' \
-        --command 'watchmedo shell-command --patterns="*.py" --ignore-pattern="*/tests/.test_platform/*" --drop --interval 10 --recursive --command="pymake test-smoke";;;idmtools_platform_comps' \
-        --command 'watchmedo shell-command --patterns="*.py" --ignore-pattern="*/tests/.test_platform/*" --drop --interval 10 --recursive --command="pymake test-smoke";;;idmtools_platform_local' \
-        --command 'watchmedo shell-command --patterns="*.py" --ignore-pattern="*/tests/.test_platform/*" --drop --interval 10 --recursive --command="pymake test-smoke";;;idmtools_cli'
+	$(PDS)run_commands_and_wait.py --command 'watchmedo shell-command --drop --wait --interval 10 --patterns="*.py" --ignore-pattern="*/tests/.test_platform/*" --recursive --command="$(MAKE) --ignore-errors lint"' \
+        --command 'watchmedo shell-command --patterns="*.py" --ignore-pattern="*/tests/.test_platform/*" --drop --interval 10 --recursive --command="$(MAKE) test-smoke";;;idmtools_core' \
+        --command 'watchmedo shell-command --patterns="*.py" --ignore-pattern="*/tests/.test_platform/*" --drop --interval 10 --recursive --command="$(MAKE) test-smoke";;;idmtools_models' \
+        --command 'watchmedo shell-command --patterns="*.py" --ignore-pattern="*/tests/.test_platform/*" --drop --interval 10 --recursive --command="$(MAKE) test-smoke";;;idmtools_platform_comps' \
+        --command 'watchmedo shell-command --patterns="*.py" --ignore-pattern="*/tests/.test_platform/*" --drop --interval 10 --recursive --command="$(MAKE) test-smoke";;;idmtools_platform_local' \
+        --command 'watchmedo shell-command --patterns="*.py" --ignore-pattern="*/tests/.test_platform/*" --drop --interval 10 --recursive --command="$(MAKE) test-smoke";;;idmtools_cli'
 
 generate-stubs: ## Generate python interfaces. Useful to identify what the next version should be by comparing to previous runs
 	$(PDS)make_stub_files.py  -c dev_scripts/stub.cfg
