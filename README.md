@@ -225,7 +225,7 @@ In addition, you can rerun just the failed test using either the top-level `pyma
     ```
 2. Restart
 3. 
-   a. If you do a Linux istro installed already through WSL run the following command in a powershell windows
+   a. If you do a Linux Distro installed already through WSL run the following command in a powershell windows
        ```powershell
        wsl --set-version <Distro> 2
        ```
@@ -242,8 +242,8 @@ In addition, you can rerun just the failed test using either the top-level `pyma
    Idmtools currently does not prompt users for docker credentials. Because of this you must login
    beforehand using `docker login docker-staging.packages.idmod.org`
 2. Docker image not found
-   Rerun the `pymake setup-dev`
-3. Check build logs Detailed Build Logs are located within in package and tests directoery withing the package with the name make.buildlog. You can also increase the console log level to DEBUG by setting the environment variable BUILD_DEBUG to 1
+   Rerun the `pymake setup-dev` or `make setup-dev` on unix systems
+3. Check build logs Detailed Build Logs are located within in package and tests directory withing the package with the name make.buildlog. You can also increase the console log level to DEBUG by setting the environment variable BUILD_DEBUG to 1
 
 # Reporting an Issue
 
