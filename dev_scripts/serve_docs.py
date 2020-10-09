@@ -16,6 +16,7 @@ root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 os.chdir(root_dir)
 server = Server()
 dirs_to_watch = set()
+# Find all the directories within docs to watch
 for filepath in glob.iglob("**.rst", recursive=True):
     if 'idmtools_' not in filepath:
         d = os.path.dirname(filepath)
