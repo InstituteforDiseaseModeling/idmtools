@@ -1,3 +1,29 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [How to contribute to idmtools](#how-to-contribute-to-idmtools)
+- [Development Guide](#development-guide)
+  - [Submitting patches](#submitting-patches)
+  - [First time setup](#first-time-setup)
+  - [Overview of Development Environment](#overview-of-development-environment)
+  - [Run test/linting on code change](#run-testlinting-on-code-change)
+  - [Start coding](#start-coding)
+  - [IDE/Runtime Setup](#ideruntime-setup)
+  - [WSL2 on Windows Setup(Experimental)](#wsl2-on-windows-setupexperimental)
+  - [Troubleshooting the Development Environment](#troubleshooting-the-development-environment)
+- [Documentation](#documentation)
+  - [Editing the Documentation](#editing-the-documentation)
+  - [Reload Documentation on change](#reload-documentation-on-change)
+- [Test](#test)
+  - [Test Reports](#test-reports)
+  - [Running smoke tests or all tests from Github Actions](#running-smoke-tests-or-all-tests-from-github-actions)
+  - [Running specific tests from the command line](#running-specific-tests-from-the-command-line)
+  - [Installing from a Pull Request](#installing-from-a-pull-request)
+  - [Installing From Development Branch(or other specific branch)](#installing-from-development-branchor-other-specific-branch)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # How to contribute to idmtools
 
 Thank you for considering contributing to idmtools!
