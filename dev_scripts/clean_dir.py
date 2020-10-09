@@ -27,6 +27,7 @@ def clean_package_dir(glob_file_patterns, glob_delete_patterns, delete_directori
             except FileNotFoundError:
                 pass
 
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--file-patterns', help='CSV separated list of glob patterns of files to delete')
