@@ -14,8 +14,8 @@ help:
 	$(PDS)get_help_from_makefile.py
 
 clean: ## Clean most common outputs(Logs, Test Results, etc)
-	$(MAKEALL) --parallel clean
-	$(MAKE) stop-allure
+	-$(MAKE) stop-allure
+	-$(MAKEALL) --parallel clean
 	-$(CLDIR) --file-patterns "**/*.log,*.pyi" --dir-patterns "./dev_scripts/.allure_*,./.*_reports"
 	-$(PDR) -wd "docs" -ex "make clean"
 	-$(RM) -rf **/$(COVERAGE_PATH) *.log *.pyi  dev_scripts/.allure_reports dev_scripts/.allure_results
