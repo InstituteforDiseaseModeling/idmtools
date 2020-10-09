@@ -164,13 +164,22 @@ The documentation is built using Sphinx from the rst files in the `docs` folder.
 documents and generated documents from the python code. `index.rst` is the entry point into the documentation. For details
 on the formatting of documentation, see the [Sphinx](https://www.sphinx-doc.org/en/stable/) docs
 
+There are two make jobs related to documentation
+
+```bash
+build-docs          :build docs
+build-docs-server   :builds docs and launch a webserver and watches for changes to documentation
+```
+
+See the next section for details on `build-docs-server `
+
 ## Reload Documentation on change
 
 You can use the `make build-docs-server` feature to automatically. This runs a local python documentation server running at
 http://localhost:8000. Any changes you make to the python files or rst files, the documentation will be reloaded in the browser.
 
 ```bash
-make serve-docs
+make build-docs-server 
 ```
 
 # Test
