@@ -13,8 +13,7 @@ COVERAGE_PATH=tests/.coverage
 help:
 	$(PDS)get_help_from_makefile.py
 
-clean: ## Clean most common outputs(Logs, Test Results, etc)
-	-$(MAKE) stop-allure
+clean: stop-allure ## Clean most common outputs(Logs, Test Results, etc)
 	-$(MAKEALL) --parallel clean
 	-$(CLDIR) --file-patterns "**/*.log,*.pyi" --dir-patterns "./dev_scripts/.allure_*,./.*_reports"
 	-$(PDR) -wd "docs" -ex "make clean"
@@ -65,7 +64,7 @@ aggregate-html-reports: ## Aggregate html test reports into one directory
 	$(PDR) -wd '.html_reports' -ex 'python -m http.server 8001'
 
 stop-allure: ## Stop Allure
-	$(PDR) -wd dev_scripts -ex "docker-compose -f allure.yml down"
+	$(PDR) -wd dev_scripts -ex "docker-compose -f allure.yml down -v"
 
 start-allure: ## start the allue docker report server
 	-$(MKDIR) ./dev_scripts/.allure_results
