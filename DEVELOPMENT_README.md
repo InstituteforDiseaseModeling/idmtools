@@ -139,11 +139,11 @@ The directories that should be added as source roots are
        ```powershell
        wsl --set-version <Distro> 2
        ```
-       You most likely want to run the following command ss well to ensure wsl2 is default going forward
+       You most likely want to run the following command as well to ensure wsl2 is default going forward
        ```powershell
        wsl --set-default-version 2
        ```
-   b. If you do not yet have a copy of linux installed through WSL, see  https://docs.microsoft.com/en-us/windows/wsl/install-win10#install-your-linux-distribution-of-choice
+   b. If you do not yet have a copy of linux installed through WSL, see https://docs.microsoft.com/en-us/windows/wsl/install-win10#install-your-linux-distribution-of-choice
 
 
 ## Troubleshooting the Development Environment
