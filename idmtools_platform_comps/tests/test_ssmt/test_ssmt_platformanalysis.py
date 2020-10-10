@@ -5,6 +5,8 @@ import json
 import os
 import sys
 import pytest
+
+from idmtools.assets import AssetCollection
 from idmtools_platform_comps import __version__ as platform_comps_version
 from idmtools import __version__ as core_version
 from idmtools.analysis.platform_anaylsis import PlatformAnalysis
@@ -71,12 +73,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
             wrapper = write_wrapper_script()
             extra_args['wrapper_shell_script'] = wrapper
             extra_args['asset_files'] = [core_local_package, comps_local_package]
-        analysis = PlatformAnalysis(platform=platform,
-                                    experiment_ids=[experiment_id],
-                                    analyzers=[SimpleAnalyzer],
-                                    analyzers_args=[{'filenames': ['config.json']}],
-                                    analysis_name=self.case_name,
-                                    tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}, **extra_args)
+        analysis = PlatformAnalysis(platform=platform, experiment_ids=[experiment_id], analyzers=[SimpleAnalyzer], analyzers_args=[{'filenames': ['config.json']}], analysis_name=self.case_name, tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}, **extra_args)
 
         analysis.analyze(check_status=True)
         wi = analysis.get_work_item()
@@ -116,12 +113,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
             wrapper = write_wrapper_script()
             extra_args['wrapper_shell_script'] = write_wrapper_script()
             extra_args['asset_files'] = [core_local_package, comps_local_package]
-        analysis = PlatformAnalysis(platform=self.platform,
-                                    experiment_ids=[experiment_id],
-                                    analyzers=[CSVAnalyzer],
-                                    analyzers_args=[{'filenames': ['output/c.csv'], 'parse': True}],
-                                    analysis_name=self.case_name,
-                                    tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}, **extra_args)
+        analysis = PlatformAnalysis(platform=self.platform, experiment_ids=[experiment_id], analyzers=[CSVAnalyzer], analyzers_args=[{'filenames': ['output/c.csv'], 'parse': True}], analysis_name=self.case_name, tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}, **extra_args)
 
         analysis.analyze(check_status=True)
         wi = analysis.get_work_item()
@@ -155,12 +147,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
             wrapper = write_wrapper_script()
             extra_args['wrapper_shell_script'] = wrapper
             extra_args['asset_files'] = [core_local_package, comps_local_package]
-        analysis = PlatformAnalysis(platform=self.platform,
-                                    experiment_ids=[exp_id],
-                                    analyzers=[InfectiousnessCSVAnalyzer, NodeCSVAnalyzer],
-                                    analyzers_args=[filenames, filenames_2],
-                                    analysis_name=self.case_name,
-                                    tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}, **extra_args)
+        analysis = PlatformAnalysis(platform=self.platform, experiment_ids=[exp_id], analyzers=[InfectiousnessCSVAnalyzer, NodeCSVAnalyzer], analyzers_args=[filenames, filenames_2], analysis_name=self.case_name, tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}, **extra_args)
 
         analysis.analyze(check_status=True)
         wi = analysis.get_work_item()
@@ -198,12 +185,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
             wrapper = write_wrapper_script()
             extra_args['wrapper_shell_script'] = wrapper
             extra_args['asset_files'] = [core_local_package, comps_local_package]
-        analysis = PlatformAnalysis(platform=self.platform,
-                                    experiment_ids=[exp_id],
-                                    analyzers=analyzers,
-                                    analyzers_args=[filenames, filenames_2],
-                                    analysis_name=self.case_name,
-                                    tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}, **extra_args)
+        analysis = PlatformAnalysis(platform=self.platform, experiment_ids=[exp_id], analyzers=analyzers, analyzers_args=[filenames, filenames_2], analysis_name=self.case_name, tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}, **extra_args)
 
         analysis.analyze(check_status=True)
         wi = analysis.get_work_item()
@@ -243,14 +225,8 @@ class TestPlatformAnalysis(ITestWithPersistence):
 
         # load_idmtools = RequirementsToAssetCollection(local_wheels=)
         # ac_id = load_idmtools.run()
-        analysis = PlatformAnalysis(platform=self.platform,
-                                    experiment_ids=[experiment_id],
-                                    asset_files=[core_local_package, comps_local_package],
-                                    analyzers=[SimpleAnalyzer],
-                                    analyzers_args=[{'filenames': ['config.json']}],
-                                    wrapper_shell_script=wrapper,
-                                    pre_run_func=pre_load_func,
-                                    analysis_name=self.case_name)
+        analysis = PlatformAnalysis(platform=self.platform, experiment_ids=[experiment_id], analyzers=[SimpleAnalyzer], analyzers_args=[{'filenames': ['config.json']}], analysis_name=self.case_name, asset_files=AssetCollection([core_local_package, comps_local_package]), pre_run_func=pre_load_func,
+                                    wrapper_shell_script=wrapper)
 
         analysis.analyze(check_status=True)
         wi = analysis.get_work_item()

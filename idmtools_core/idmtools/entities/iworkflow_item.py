@@ -57,7 +57,7 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, IRunnableEntity, ABC):
         if self.name is None:
             raise ValueError("Name is required")
 
-        if user_files and not isinstance(item_name, property):
+        if user_files and not isinstance(user_files, property):
             # user property since it can convert file lists
             self.user_files = user_files
 

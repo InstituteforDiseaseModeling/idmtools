@@ -1,5 +1,5 @@
 import re
-from typing import List, Callable
+from typing import List, Callable, Union
 import inspect
 import os
 import pickle
@@ -16,7 +16,8 @@ user_logger = getLogger('user')
 
 class PlatformAnalysis:
 
-    def __init__(self, platform: IPlatform, experiment_ids: List['str'], analyzers: List[IAnalyzer], analyzers_args=None, analysis_name: str = 'WorkItem Test', tags=None, additional_files=None, asset_collection_id=None, asset_files=FileList(), wait_till_done: bool = True,
+    def __init__(self, platform: IPlatform, experiment_ids: List['str'], analyzers: List[IAnalyzer], analyzers_args=None, analysis_name: str = 'WorkItem Test', tags=None, additional_files: Union[FileList, AssetCollection, List[str]] = None, asset_collection_id=None,
+                 asset_files: Union[FileList, AssetCollection, List[str]] = None, wait_till_done: bool = True,
                  idmtools_config: str = None, pre_run_func: Callable = None, wrapper_shell_script: str = None, verbose: bool = False):
         """
 
@@ -44,11 +45,15 @@ class PlatformAnalysis:
         self.analysis_name = analysis_name
         self.tags = tags
         if isinstance(additional_files, list):
-            additional_files = self.__files_to_filelist(additional_files)
+            additional_files = AssetCollection(additional_files)
+        elif isinstance(additional_files, FileList):
+            additional_files = additional_files.to_asset_collection()
         self.additional_files = additional_files or FileList()
         self.asset_collection_id = asset_collection_id
         if isinstance(asset_files, list):
-            asset_files = self.__files_to_filelist(asset_files)
+            asset_files = AssetCollection(asset_files)
+        elif isinstance(asset_files, FileList):
+            asset_files = asset_files.to_asset_collection()
         self.asset_files = asset_files
         self.wi = None
         self.wait_till_done = wait_till_done
@@ -60,22 +65,12 @@ class PlatformAnalysis:
 
         self.validate_args()
 
-    def __files_to_filelist(self, additional_files):
-        new_add_files = FileList()
-        for file in additional_files:
-            if isinstance(file, str):
-                new_add_files.add_file(file)
-            else:
-                new_add_files.add_asset_file(file)
-        additional_files = new_add_files
-        return additional_files
-
     def analyze(self, check_status=True):
         command = self._prep_analyze()
 
         logger.debug(f"Command: {command}")
         from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
-        ac = AssetCollection.from_id(self.asset_collection_id)
+        ac = AssetCollection.from_id(self.asset_collection_id, platform=self.platform)
         ac.add_assets(self.asset_files.to_asset_collection())
         self.wi = SSMTWorkItem(name=self.analysis_name, command=command, tags=self.tags, transient_assets=self.additional_files, assets=ac, related_experiments=self.experiment_ids)
 

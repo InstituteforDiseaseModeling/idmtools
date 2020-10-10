@@ -6,7 +6,6 @@ from typing import Any, Dict, List, Tuple, Type, Optional
 from uuid import UUID
 from COMPS.Data import QueryCriteria, WorkItem as COMPSWorkItem, WorkItemFile
 from COMPS.Data.WorkItem import RelationType, WorkerOrPluginKey
-
 from idmtools.assets import AssetCollection
 from idmtools.core import ItemType
 from idmtools.entities import Suite
@@ -70,7 +69,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         wi = COMPSWorkItem(name=work_item.name,
                            worker=WorkerOrPluginKey(work_item.work_item_type, work_item.plugin_key),
                            environment_name=self.platform.environment,
-                           asset_collection_id=work_item.asset_collection_id)
+                           asset_collection_id=work_item.assets.id if len(work_item.assets) else None)
 
         # Set tags
         wi.set_tags({})
@@ -251,7 +250,8 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         obj.uid = work_item.id
         if work_item.asset_collection_id:
             obj.assets = AssetCollection.from_id(work_item.asset_collection_id, platform=self.platform)
-        obj.transient_assets = work_item.files
+        if work_item.files:
+            obj.transient_assets = self.platform._assets.to_entity(work_item.files)
         obj.tags = work_item.tags
         obj.status = convert_comps_workitem_status(work_item.state)
         return obj

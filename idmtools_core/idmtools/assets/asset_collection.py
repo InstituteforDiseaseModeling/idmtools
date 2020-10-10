@@ -33,7 +33,7 @@ class AssetCollection(IEntity):
     #: ItemType so platform knows how to handle item properly
     item_type: ItemType = field(default=ItemType.ASSETCOLLECTION, compare=False)
 
-    def __init__(self, assets: Union[TAssetList, 'AssetCollection'] = None, tags=None):
+    def __init__(self, assets: Union[List[str], TAssetList, 'AssetCollection'] = None, tags=None):
         """
         A constructor.
 

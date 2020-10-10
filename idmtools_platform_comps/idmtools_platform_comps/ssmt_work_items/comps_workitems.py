@@ -3,6 +3,7 @@ from logging import getLogger, DEBUG
 from dataclasses import dataclass, field, InitVar
 from uuid import UUID
 from idmtools.assets.file_list import FileList
+from idmtools.entities import CommandLine
 from idmtools.entities.command_task import CommandTask
 from idmtools_platform_comps.ssmt_work_items.icomps_workflowitem import ICOMPSWorkflowItem
 
@@ -76,7 +77,7 @@ class SSMTWorkItem(ICOMPSWorkflowItem):
 
     @property
     def command(self) -> str:
-        return self.task.command
+        return str(self.task.command)
 
     @command.setter
     def command(self, value: str):
@@ -87,7 +88,7 @@ class SSMTWorkItem(ICOMPSWorkflowItem):
             None
         """
         warnings.warn("Setting commands via command alias will be deprecated in 1.7.0. Set on task, task.command", DeprecationWarning)
-        self.task.command = value
+        self.task.command = CommandLine(value)
 
 
 @dataclass

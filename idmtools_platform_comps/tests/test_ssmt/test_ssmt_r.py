@@ -38,18 +38,18 @@ class TestRExperiment(ITestWithPersistence):
         ac_lib_path = os.path.join(COMMON_INPUT_PATH, "r", "ncov_analysis")
 
         # load assets to COMPS's assets
-        asset_files = AssetCollection.from_directory(ac_lib_path, relative_path="ncov_analysis", recursive=True)
-        asset_files.add_path(ac_lib_path, relative_path="ncov_analysis", recursive=True)
-        asset_files.add_asset(os.path.join(data_path, "Kudos to DXY.cn Last update_ 01_25_2020,  11_30 am (EST) - Line-list.csv"))
+        assets = AssetCollection.from_directory(ac_lib_path, relative_path="ncov_analysis", recursive=True)
+        assets.add_path(ac_lib_path, relative_path="ncov_analysis", recursive=True)
+        assets.add_asset(os.path.join(data_path, "Kudos to DXY.cn Last update_ 01_25_2020,  11_30 am (EST) - Line-list.csv"))
 
         # load local "input" folder simtools.ini to current dir in Comps workitem
-        user_files = AssetCollection()
-        user_files.add_asset(os.path.join(self.input_file_path, "idmtools.ini"))
+        transient_assets = AssetCollection()
+        transient_assets.add_asset(os.path.join(self.input_file_path, "idmtools.ini"))
 
         self.tags = {'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}
         # RScript to run from /usr/bin on COMPS SSMT Docker server
         command = "/usr/bin/Rscript Assets/ncov_analysis/individual_dynamics_estimates/estimate_incubation_period.R"
-        wi = SSMTWorkItem(name=self.case_name, command=command, assets=asset_files, transient_assets=user_files, tags=self.tags, docker_image="ubuntu18.04_r3.5.0")
+        wi = SSMTWorkItem(name=self.case_name, command=command, assets=assets, transient_assets=transient_assets, tags=self.tags, docker_image="ubuntu18.04_r3.5.0")
         wi.run(True, platform=self.platform)
 
         # verify workitem result

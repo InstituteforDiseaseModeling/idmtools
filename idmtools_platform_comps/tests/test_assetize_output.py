@@ -13,6 +13,11 @@ from idmtools_test.utils.test_task import TestTask
 
 @pytest.mark.comps
 class TestAssetizeOutput(unittest.TestCase):
+    def setUp(self) -> None:
+        super().setUp()
+        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        self.platform = Platform("COMPS2")
+
     @pytest.mark.smoke
     def test_experiment_can_be_watched(self):
         e = Experiment.from_task(task=TestTask())
@@ -88,8 +93,8 @@ class TestAssetizeOutput(unittest.TestCase):
     def test_comps_simple(self):
         platform = Platform("COMPS2")
         task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"), parameters=dict(a=1))
-        e = Experiment.from_task(task=task)
-        ao = AssetizeOutput(verbose=True)
+        e = Experiment.from_task(name=self.case_name, task=task)
+        ao = AssetizeOutput(name=self.case_name, verbose=True)
         ao.from_items(e)
         ao.run(wait_on_done=True)
 
@@ -97,7 +102,7 @@ class TestAssetizeOutput(unittest.TestCase):
         self.assertTrue(ao.succeeded)
 
     def test_experiment(self):
-        ao = AssetizeOutput(related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'], file_patterns=["**/a.csv"], verbose=True)
+        ao = AssetizeOutput(name=self.case_name, related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'], file_patterns=["**/a.csv"], verbose=True)
         ac = ao.run(wait_on_done=True, platform=Platform("COMPS2"))
 
         self.assertTrue(ao.succeeded)
@@ -108,7 +113,7 @@ class TestAssetizeOutput(unittest.TestCase):
         self.assertEqual(9, len(filelist))
 
     def test_experiment_sim_prefix(self):
-        ao = AssetizeOutput(related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'], simulation_prefix_format_str="{simulation.state}/{simulation.id}", file_patterns=["**/a.csv"], verbose=True)
+        ao = AssetizeOutput(name=self.case_name, related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'], simulation_prefix_format_str="{simulation.state}/{simulation.id}", file_patterns=["**/a.csv"], verbose=True)
         ac = ao.run(wait_on_done=True, platform=Platform("COMPS2"))
 
         self.assertTrue(ao.succeeded)
@@ -119,7 +124,7 @@ class TestAssetizeOutput(unittest.TestCase):
         self.assertEqual(9, len(filelist))
 
     def test_simulation(self):
-        ao = AssetizeOutput(related_simulations=['9d11af40-1337-ea11-a2be-f0921c167861'], file_patterns=["**/*.csv"], verbose=True)
+        ao = AssetizeOutput(name=self.case_name, related_simulations=['9d11af40-1337-ea11-a2be-f0921c167861'], file_patterns=["**/*.csv"], verbose=True)
         ac = ao.run(wait_on_done=True, platform=Platform("COMPS2"))
 
         self.assertTrue(ao.succeeded)
@@ -130,7 +135,7 @@ class TestAssetizeOutput(unittest.TestCase):
         self.assertEqual(3, len(filelist))
 
     def test_workitem(self):
-        ao = AssetizeOutput(related_work_items=['a6d11db7-1603-e911-80ca-f0921c167866'], file_patterns=["*.png"], verbose=True)
+        ao = AssetizeOutput(name=self.case_name, related_work_items=['a6d11db7-1603-e911-80ca-f0921c167866'], file_patterns=["*.png"], verbose=True)
         ac = ao.run(wait_on_done=True, platform=Platform("COMPS2"))
 
         self.assertTrue(ao.succeeded)
@@ -142,7 +147,7 @@ class TestAssetizeOutput(unittest.TestCase):
 
         with self.subTest("test_workitem_prefix"):
 
-            ao2 = AssetizeOutput(related_work_items=['a6d11db7-1603-e911-80ca-f0921c167866', ao], file_patterns=["**.txt"], exclude_patterns=['WorkOrder.json'], verbose=True, work_item_prefix_format_str="{work_item.name}")
+            ao2 = AssetizeOutput(name=self.case_name, related_work_items=['a6d11db7-1603-e911-80ca-f0921c167866', ao], file_patterns=["**.txt"], exclude_patterns=['WorkOrder.json'], verbose=True, work_item_prefix_format_str="{work_item.name}")
             ac = ao2.run(wait_on_done=True, platform=Platform("COMPS2"))
             self.assertTrue(ao2.succeeded)
             self.assertIsNotNone(ac)
@@ -152,7 +157,7 @@ class TestAssetizeOutput(unittest.TestCase):
             self.assertEqual(4, len(filelist))
 
     def test_filter_ac(self):
-        ao = AssetizeOutput(related_asset_collections=['2b53af74-2b4a-e711-80c1-f0921c167860'], file_patterns=["**/libvectorstats.dll"], verbose=True)
+        ao = AssetizeOutput(name=self.case_name, related_asset_collections=['2b53af74-2b4a-e711-80c1-f0921c167860'], file_patterns=["**/libvectorstats.dll"], verbose=True)
         ac = ao.run(wait_on_done=True, platform=Platform("COMPS2"))
 
         self.assertTrue(ao.succeeded)
@@ -163,7 +168,7 @@ class TestAssetizeOutput(unittest.TestCase):
         self.assertEqual(1, len(filelist))
 
     def test_dry_run(self):
-        ao = AssetizeOutput(related_simulations=['9d11af40-1337-ea11-a2be-f0921c167861'], related_asset_collections=['2b53af74-2b4a-e711-80c1-f0921c167860'], verbose=True, dry_run=True)
+        ao = AssetizeOutput(name=self.case_name, related_simulations=['9d11af40-1337-ea11-a2be-f0921c167861'], related_asset_collections=['2b53af74-2b4a-e711-80c1-f0921c167860'], verbose=True, dry_run=True)
         ac = ao.run(wait_on_done=True, platform=Platform("COMPS2"))
 
         self.assertTrue(ao.succeeded)

@@ -7,7 +7,7 @@ from typing import Type, Union, List, TYPE_CHECKING, Optional
 from uuid import UUID
 
 import humanfriendly
-from COMPS.Data import AssetCollection as COMPSAssetCollection, QueryCriteria, AssetCollectionFile, SimulationFile, OutputFileMetadata
+from COMPS.Data import AssetCollection as COMPSAssetCollection, QueryCriteria, AssetCollectionFile, SimulationFile, OutputFileMetadata, WorkItemFile
 
 from idmtools.assets import AssetCollection, Asset
 from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
@@ -134,7 +134,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         asset_collection.platform_id = self.platform.uid
         return ac
 
-    def to_entity(self, asset_collection: Union[COMPSAssetCollection, SimulationFile, List[SimulationFile], OutputFileMetadata], **kwargs) \
+    def to_entity(self, asset_collection: Union[COMPSAssetCollection, SimulationFile, List[SimulationFile], OutputFileMetadata, List[WorkItemFile]], **kwargs) \
             -> AssetCollection:
         """
         Convert COMPS Asset Collection or Simulation File to IDM Asset Collection
@@ -152,16 +152,16 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         if isinstance(asset_collection, COMPSAssetCollection):
             ac.uid = asset_collection.id
             ac.tags = asset_collection.tags
+        elif isinstance(asset_collection, list) and len(asset_collection):
+            if isinstance(asset_collection[0], (SimulationFile, WorkItemFile)):
+                for file in asset_collection:
+                    ac.add_asset(self.__simulation_file_to_asset(ac, file))
+            else:
+                raise ValueError("Unknown asset list")
         assets = asset_collection.assets if isinstance(asset_collection, COMPSAssetCollection) else asset_collection
         # if we have just one, make it a list
         if isinstance(asset_collection, SimulationFile):
-            asset = Asset(filename=asset_collection.file_name, checksum=asset_collection.md5_checksum)
-            asset.is_simulation_file = True
-            asset.persisted = True
-            asset.length = asset_collection.length
-            if asset.uri:
-                asset.download_generator_hook = partial(get_file_as_generator, asset_collection)
-            ac.add_asset(asset)
+            ac.add_asset(self.__simulation_file_to_asset(ac, asset_collection))
         if assets:
             # add items to asset collection
             for asset in assets:
@@ -178,3 +178,21 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
                 ac.assets.append(a)
 
         return ac
+
+    def __simulation_file_to_asset(self, ac: AssetCollection, asset_collection: Union[SimulationFile, WorkItemFile]):
+        """
+        Converts a Simulation File to an Asset
+        Args:
+            ac: Asset Collection to add file
+            asset_collection:
+
+        Returns:
+
+        """
+        asset = Asset(filename=asset_collection.file_name, checksum=asset_collection.md5_checksum)
+        asset.is_simulation_file = True
+        asset.persisted = True
+        asset.length = asset_collection.length
+        if asset.uri:
+            asset.download_generator_hook = partial(get_file_as_generator, asset_collection)
+        return asset
