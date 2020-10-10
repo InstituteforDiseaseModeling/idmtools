@@ -99,6 +99,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
         self.do_simple_python_analysis(self.platform)
 
     @run_in_temp_dir
+    @pytest.mark.serial
     def test_ssmt_using_aliases(self):
         p = Platform("BAYESIAN")
         self.do_simple_python_analysis(self.platform)
