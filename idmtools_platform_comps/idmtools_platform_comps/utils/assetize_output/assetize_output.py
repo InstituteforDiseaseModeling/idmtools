@@ -98,6 +98,9 @@ class AssetizeOutput(SSMTWorkItem):
         if self.dry_run:
             command += ' --dry-run'
 
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f'Command: {command}')
+
         return command
 
     def __pickle_pre_run(self):
