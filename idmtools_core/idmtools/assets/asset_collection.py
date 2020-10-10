@@ -70,6 +70,8 @@ class AssetCollection(IEntity):
         Returns:
             AssetCollection
         """
+        if item_id is None:
+            raise ValueError("You must specify an id")
         item = super(AssetCollection, cls).from_id(item_id, platform, **kwargs)
         return AssetCollection(item) if as_copy else item
 

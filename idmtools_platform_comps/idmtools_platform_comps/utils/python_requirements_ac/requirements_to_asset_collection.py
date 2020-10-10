@@ -213,7 +213,7 @@ class RequirementsToAssetCollection:
         tags = {MD5_KEY.format(self._os_target): self.checksum}
 
         user_logger.info("Converting Python Packages to an Asset Collection. This may take some time for large dependency lists")
-        wi = SSMTWorkItem(name=wi_name, command=command, transient_assets=AssetCollection(assets=[Asset(MODEL_CREATE_AC)]), tags=tags, related_experiments=[exp_id])
+        wi = SSMTWorkItem(name=wi_name, command=command, transient_assets=AssetCollection([MODEL_CREATE_AC]), tags=tags, related_experiments=[exp_id])
 
         wi.run(wait_on_done=True, platform=self.platform)
 
