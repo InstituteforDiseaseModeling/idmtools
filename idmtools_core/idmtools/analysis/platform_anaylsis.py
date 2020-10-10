@@ -110,7 +110,7 @@ class PlatformAnalysis:
 
         # Add all the analyzers files
         for a in self.analyzers:
-            self.additional_files.add_asset(inspect.getfile(a))
+            self.additional_files.add_or_replace_asset(inspect.getfile(a))
         # Create the command
         command = ''
         if self.wrapper_shell_script:
