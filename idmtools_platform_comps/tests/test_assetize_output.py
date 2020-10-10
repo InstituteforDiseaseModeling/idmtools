@@ -55,6 +55,7 @@ class TestAssetizeOutput(unittest.TestCase):
         self.assertEqual(er.exception.args[0], "You must specify at least one item to watch")
 
     @pytest.mark.smoke
+    @pytest.mark.serial
     def test_experiment_default_pattern_if_none_specified(self):
         e = Experiment.from_task(task=TestTask())
         e.simulations[0].status = EntityStatus.CREATED
