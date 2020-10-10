@@ -30,7 +30,7 @@ jobs:
             local:
               - 'idmtools_local_platform/**'
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
-        uses: setup-python@main
+        uses: actions/setup-python@main
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
