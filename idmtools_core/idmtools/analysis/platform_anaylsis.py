@@ -4,7 +4,7 @@ import inspect
 import os
 import pickle
 from logging import getLogger, DEBUG
-from idmtools.assets import Asset
+from idmtools.assets import Asset, AssetCollection
 from idmtools.assets.file_list import FileList
 from idmtools.config import IdmConfigParser
 from idmtools.entities import IAnalyzer
@@ -75,9 +75,9 @@ class PlatformAnalysis:
 
         logger.debug(f"Command: {command}")
         from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
-        self.wi = SSMTWorkItem(item_name=self.analysis_name, command=command, tags=self.tags,
-                               user_files=self.additional_files, asset_collection_id=self.asset_collection_id,
-                               asset_files=self.asset_files, related_experiments=self.experiment_ids)
+        ac = AssetCollection.from_id(self.asset_collection_id)
+        ac.add_assets(self.asset_files.to_asset_collection())
+        self.wi = SSMTWorkItem(name=self.analysis_name, command=command, tags=self.tags, transient_assets=self.additional_files,  assets=ac, related_experiments=self.experiment_ids)
 
         # Run the workitem
         self.platform.run_items(self.wi)

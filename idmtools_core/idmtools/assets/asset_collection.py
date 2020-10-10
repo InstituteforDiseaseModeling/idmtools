@@ -251,7 +251,7 @@ class AssetCollection(IEntity):
         for asset in assets:
             self.add_asset(asset, fail_on_duplicate, fail_on_deep_comparison)
 
-    def add_or_replace_asset(self, asset: Asset, fail_on_deep_comparison: bool = False):
+    def add_or_replace_asset(self, asset: Union[Asset, str], fail_on_deep_comparison: bool = False):
         """
         Add or replaces an asset in a collection
 
@@ -263,14 +263,14 @@ class AssetCollection(IEntity):
             None.
         """
         self.is_editable(True)
-        index = self.find_index_of_asset(asset)
+        tasset = Asset(asset) if isinstance(asset, str) else asset
+        index = self.find_index_of_asset(tasset)
         if index is not None:
-            if fail_on_deep_comparison and not asset.deep_equals(self.assets[index]):
-                fn = f"{asset.relative_path}/{asset.filename}" if asset.relative_path else asset.filename
-                raise ValueError(f"Contents of file {fn} being replaced differs. To prevent unexpected behaviour, please review script or disable deep checks")
-            self.assets[index] = asset
+            if fail_on_deep_comparison and not tasset.deep_equals(self.assets[index]):
+                raise ValueError(f"Contents of file {asset.short_remote_path()} being replaced differs. To prevent unexpected behaviour, please review script or disable deep checks")
+            self.assets[index] = tasset
         else:
-            self.assets.append(asset)
+            self.assets.append(tasset)
 
     def get_one(self, **kwargs):
         """

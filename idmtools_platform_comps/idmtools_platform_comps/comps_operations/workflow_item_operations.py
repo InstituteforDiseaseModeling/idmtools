@@ -61,21 +61,13 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         Returns:
             Created platform item and the UUID of said item
         """
-        # Collect asset files
-        if not work_item.asset_collection_id:
-            # Create a collection with everything that is in asset_files
-            if len(work_item.asset_files.files) > 0:
-                if logger.isEnabledFor(DEBUG):
-                    logger.debug("Uploading assets for Workitem")
-                ac = AssetCollection(assets=work_item.asset_files)
-                self.platform.create_items([ac])
-                work_item.asset_collection_id = ac.uid
+        self.send_assets(work_item)
 
         if logger.isEnabledFor(DEBUG):
-            logger.debug(f"Creating workitem {work_item.item_name} of type {work_item.work_item_type}, "
+            logger.debug(f"Creating workitem {work_item.name} of type {work_item.work_item_type}, "
                          f"{work_item.plugin_key} in {self.platform.environment}")
         # Create a WorkItem
-        wi = COMPSWorkItem(name=work_item.item_name,
+        wi = COMPSWorkItem(name=work_item.name,
                            worker=WorkerOrPluginKey(work_item.work_item_type, work_item.plugin_key),
                            environment_name=self.platform.environment,
                            asset_collection_id=work_item.asset_collection_id)
@@ -94,7 +86,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         wi.add_work_order(data=json.dumps(wo).encode('utf-8'))
 
         # Add additional files
-        for af in work_item.user_files:
+        for af in work_item.transient_assets:
             wi_file = WorkItemFile(af.filename, "input")
             # Either the file has an absolute path or content
             if af.absolute_path:
@@ -207,9 +199,11 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
 
                 Returns: None
                 """
-        # for asset in workflow_item.assets:
-        #     workflow_item.add_file(workitemfile=WorkItemFile(asset.filename, 'input'), data=asset.bytes)
-        pass
+        # Collect asset files
+        if len(workflow_item.assets):
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Uploading assets for Workitem")
+            self.platform._assets.create(workflow_item.assets)
 
     def list_assets(self, workflow_item: IWorkflowItem, **kwargs) -> List[str]:
         """
@@ -250,14 +244,14 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
             IDMTools workflow item
                 """
         # Creat a workflow item
-        obj = GenericWorkItem()
+        obj = GenericWorkItem(name=work_item.name)
 
         # Set its correct attributes
-        obj.item_name = work_item.name
         obj.platform = self.platform
         obj.uid = work_item.id
-        obj.asset_collection_id = work_item.asset_collection_id
-        obj.user_files = work_item.files
+        if work_item.asset_collection_id:
+            obj.assets = AssetCollection.from_id(work_item.asset_collection_id, platform=self.platform)
+        obj.transient_assets = work_item.files
         obj.tags = work_item.tags
         obj.status = convert_comps_workitem_status(work_item.state)
         return obj

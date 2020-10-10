@@ -1,3 +1,5 @@
+from uuid import UUID
+
 import re
 import inspect
 import os
@@ -6,6 +8,7 @@ from logging import getLogger, DEBUG
 from COMPS.Data.CommissionableEntity import CommissionableEntity
 from typing import List, Union, Callable, Dict
 from idmtools.assets import Asset, AssetCollection
+from idmtools.assets.file_list import FileList
 from idmtools.core.interfaces.irunnable_entity import IRunnableEntity
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform import IPlatform
@@ -54,8 +57,9 @@ class AssetizeOutput(SSMTWorkItem):
     asset_collection: AssetCollection = field(default=None)
     dry_run: bool = field(default=False)
 
-    def __post_init__(self):
-        super().__post_init__()
+    def __post_init__(self, item_name: str, asset_collection_id: UUID, asset_files: FileList, user_files: FileList, command: str):
+        # Set command to nothing here for now. Eventually this will go away after 1.7.0
+        super().__post_init__(item_name, asset_collection_id, asset_files, user_files, command='assetize_ssmt_script.py')
         # we need all our items as true entities, so convert them to entities
 
     def create_command(self) -> str:
@@ -115,7 +119,7 @@ class AssetizeOutput(SSMTWorkItem):
             for function in self.pre_run_functions:
                 new_source = self.__format_function_source(function)
                 source += "\n\n" + new_source
-            self.asset_files.add_asset_file(Asset(filename='pre_run.py', content=source))
+            self.assets.add_or_replace_asset(Asset(filename='pre_run.py', content=source))
 
     def __pickle_filter_func(self):
         """
@@ -126,7 +130,7 @@ class AssetizeOutput(SSMTWorkItem):
         """
         if self.entity_filter_function:
             new_source = self.__format_function_source(self.entity_filter_function)
-            self.asset_files.add_asset_file(Asset(filename='entity_filter_func.py', content=new_source))
+            self.assets.add_or_replace_asset(Asset(filename='entity_filter_func.py', content=new_source))
 
     @staticmethod
     def __format_function_source(function: Callable) -> str:
@@ -171,7 +175,7 @@ class AssetizeOutput(SSMTWorkItem):
         super().pre_creation(platform)
 
         if self.name is None:
-            self.item_name = self.__generate_name()
+            self.name = self.__generate_name()
 
         self.__convert_ids_to_items(platform)
         self.__ensure_all_dependencies_created(platform)
@@ -185,10 +189,10 @@ class AssetizeOutput(SSMTWorkItem):
             logger.info("No file pattern specified. Setting to default pattern '**' to assetize all outputs")
             self.file_patterns.append("**")
         current_dir = os.path.abspath(os.path.dirname(__file__))
-        self.asset_files.add_file(os.path.join(current_dir, 'assetize_ssmt_script.py'))
+        self.assets.add_or_replace_asset(os.path.join(current_dir, 'assetize_ssmt_script.py'))
         self.__pickle_pre_run()
         self.__pickle_filter_func()
-        self.command = self.create_command()
+        self.task.command = self.create_command()
         user_logger.info("Creating Watcher")
 
     def __generate_tags(self):

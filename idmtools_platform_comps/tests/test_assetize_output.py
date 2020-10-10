@@ -77,9 +77,9 @@ class TestAssetizeOutput(unittest.TestCase):
         ao.pre_run_functions.append(pre_run_dummy)
         ao.entity_filter_function = entity_filter_dummy
         ao.pre_creation(None)
-        self.assertEqual(len(ao.asset_files), 3)
-        self.assertIn("pre_run.py", [f.filename for f in ao.asset_files])
-        self.assertIn("entity_filter_func.py", [f.filename for f in ao.asset_files])
+        self.assertEqual(len(ao.assets), 3)
+        self.assertIn("pre_run.py", [f.filename for f in ao.assets])
+        self.assertIn("entity_filter_func.py", [f.filename for f in ao.assets])
         self.assertEqual(ao.create_command(), 'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --asset-tag "AssetizedOutputfromFromExperiment=095565e833818aab3340e802512c32ff" --simulation-prefix-format-str "{simulation.id}" --pre-run-func pre_run_dummy --entity-filter-func entity_filter_dummy --verbose')
 
         ao.pre_run_functions.append(another_pre_run_dummy)
