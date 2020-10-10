@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         os: [self-hosted]
-        python-version: [3.6.12, 3.7.5, 3.8.2]
+        python-version: [3.6.12, 3.7.5, 3.8.5]
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
