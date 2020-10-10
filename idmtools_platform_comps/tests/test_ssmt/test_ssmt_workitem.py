@@ -291,7 +291,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
 
         wi = self.platform.get_item(wi_id, ItemType.WORKFLOW_ITEM, columns=cols, load_children=children)
         self.assertIsNotNone(wi.name)
-        self.assertIsNotNone(wi.asset_collection.id)
+        self.assertIsNotNone(wi.assets.id)
         self.assertIsNotNone(wi.tags)
         self.assertIsNotNone(wi.transient_assets)
 
@@ -302,6 +302,6 @@ class TestSSMTWorkItem(ITestWithPersistence):
         children = []
 
         wi = self.platform.get_item(wi_id, ItemType.WORKFLOW_ITEM, columns=cols, load_children=children)
-        self.assertIsNone(wi.asset_collection.id)
+        self.assertIsNone(wi.assets.id)
         self.assertIsNone(wi.tags)
         self.assertEqual(len(wi.transient_assets), 0)
