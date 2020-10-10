@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import argparse
 import os
 import signal
@@ -5,39 +6,52 @@ import subprocess
 import sys
 from os.path import abspath, join, dirname
 
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 base_directory = abspath(join(dirname(__file__), '..'))
 modules = ['idmtools_core', 'idmtools_cli', 'idmtools_platform_comps', 'idmtools_platform_local',
            'idmtools_models', 'idmtools_test']
 
 
-def run_command_on_all(idm_modules: List[str], command: str, parallel: bool = False, subdir: Optional[str] = None):
+def run_command_on_all(idm_modules: List[str], command: str, parallel: bool = False, subdir: Optional[str] = None,
+                       env_override: Dict[str, str] = None):
     processes = []
+
+    if env_override is None:
+        env_override = dict()
 
     def signal_handler(sig, frame):
         print('Stopping running processes')
+
         for p in processes:
-            print(f'Trying to kill {p.pid}')
-            p.kill()
-            p.terminate()
-            p.wait()
+            if os.name != "nt":
+                os.killpg(os.getpgid(p.pid), signal.SIGTERM)
+            else:
+                os.kill(os.getpid(), signal.CTRL_BREAK_EVENT)
+
         sys.exit(0)
 
     if os.name != 'nt':
         # register signal handler to stop on ctrl c and ctrl k
         signal.signal(signal.SIGINT, signal_handler)
         signal.signal(signal.SIGTSTP, signal_handler)
+    else:
+        signal.signal(signal.SIGINT, signal_handler)
+        signal.signal(signal.SIGBREAK, signal_handler)
     for module in idm_modules:
         wd = join(base_directory, module)
         if subdir:
             wd = join(wd, subdir)
         print(f'Running {command} in {wd}')
-        p = subprocess.Popen(f'{command}', cwd=wd, shell=True)
-        if parallel:
-            processes.append(p)
-        else:
+        if len(env_override):
+            print(f"Extra Environment vars {env_override}")
+        current_env = dict(os.environ)
+        current_env.update(env_override)
+        p = subprocess.Popen(f'{command}', cwd=wd, shell=True, env=current_env)
+        processes.append(p)
+        if not parallel:
             p.wait()
+            processes.pop()
     if parallel:
         print('Waiting to finish')
         [p.wait() for p in processes]
@@ -51,6 +65,7 @@ if __name__ == '__main__':
         parser.add_argument(f'--no-{module.replace("_", "-")}', default=False, action='store_false',
                             help=f'Disable running {module}')
     parser.add_argument('-sd', '--sub-dir', default=None, help='Subdirectory within module to use as working directory')
+    parser.add_argument('--env', action="append", default=[], help="Environment variables in the form of NAME=val")
     parser.add_argument('-ex', '--exec', help='command to run')
     args = parser.parse_args()
 
@@ -59,7 +74,15 @@ if __name__ == '__main__':
         if not getattr(args, f'no_{module}'):
             args.modules.append(module)
 
+    env_override = dict()
+    for v in args.env:
+        if "=" not in v:
+            print(f"No value specified in environment line {v}")
+            sys.exit(-1)
+        else:
+            name = v[:v.index("=")]
+            env_override[name] = v[v.index("=") + 1:]
     print(f'Running on {args.modules}')
     if args.parallel:
         print('Running in Parallel')
-    run_command_on_all(args.modules, args.exec, args.parallel, args.sub_dir)
+    run_command_on_all(args.modules, args.exec, args.parallel, args.sub_dir, env_override)

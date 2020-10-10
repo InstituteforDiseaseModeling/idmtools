@@ -1,3 +1,4 @@
+import allure
 import itertools
 import os
 import sys
@@ -17,6 +18,9 @@ model_path = os.path.abspath(os.path.join("..", "..", "examples", "python_model"
 
 
 @pytest.mark.smoke
+@pytest.mark.serial
+@allure.story("Entities")
+@allure.suite("idmtools_core")
 class TestAddingSimulationsToExistingExperiment(unittest.TestCase):
     def setUp(self):
         self.platform = Platform("TestExecute", missing_ok=True, default_missing=dict(type='TestExecute'))
@@ -45,6 +49,20 @@ class TestAddingSimulationsToExistingExperiment(unittest.TestCase):
 
         self.assertTrue(exp.succeeded)
         self.assertEqual(10, len(exp.simulations))
+
+    def test_empty_experiment_template(self):
+        base_task = JSONConfiguredPythonTask(script_path=model_path, python_path=sys.executable)
+        builder = SimulationBuilder()
+        exp = Experiment.from_builder(builder, base_task=base_task)
+        with self.assertRaises(ValueError) as er:
+            exp.run(wait_until_done=True)
+        self.assertTrue(er.exception.args[0], 'You cannot run an empty experiment')
+
+    def test_empty_experiment_list(self):
+        exp = Experiment()
+        with self.assertRaises(ValueError) as er:
+            exp.run(wait_until_done=True)
+        self.assertTrue(er.exception.args[0], 'You cannot run an empty experiment')
 
     def test_adding_manual_simulation(self):
         base_task = JSONConfiguredPythonTask(script_path=model_path, python_path=sys.executable)

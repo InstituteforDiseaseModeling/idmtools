@@ -11,15 +11,13 @@ from idmtools.assets import Asset
 from idmtools.core import ItemType
 from idmtools.entities.experiment import Experiment
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
-from idmtools_platform_comps.comps_platform import COMPSPlatform
+from idmtools_platform_comps.comps_platform import COMPSPlatform, SLURM_ENVS
 
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 REQUIREMENT_FILE = 'requirements_updated.txt'
 MODEL_LOAD_LIB = "install_requirements.py"
 MODEL_CREATE_AC = 'create_asset_collection.py'
 MD5_KEY = 'idmtools-requirements-md5-{}'
-# We use this to track os. It would be nice to do that in server
-SLURM_ENVS = ['calculon', 'slurmstage', "slurmdev"]
 logger = getLogger(__name__)
 user_logger = getLogger("user")
 
@@ -45,6 +43,13 @@ class RequirementsToAssetCollection:
         if not any([self.requirements_path, self.pkg_list, self.local_wheels]):
             raise ValueError(
                 "Impossible to proceed without either requirements path or with package list or local wheels!")
+
+        if self.platform is None:
+            # Try to detect platform
+            from idmtools.core.context import get_current_platform
+            p = get_current_platform()
+            if p is not None:
+                self.platform = p
 
         self.requirements_path = os.path.abspath(self.requirements_path) if self.requirements_path else None
         self.pkg_list = self.pkg_list or []
@@ -186,8 +191,8 @@ class RequirementsToAssetCollection:
         experiment.add_asset(Asset(REQUIREMENT_FILE))
         experiment.tags = {MD5_KEY.format(self._os_target): self.checksum}
         self.add_wheels_to_assets(experiment)
-        user_logger.info("Run install of python requirements through Experiment")
-        experiment.run(wait_until_done=True, platform=self.platform)
+        user_logger.info("Run install of python requirements on COMPS. To view the details, see the experiment below")
+        experiment.run(wait_until_done=True, platform=self.platform, use_short_path=True)
 
         if experiment.succeeded:
             return experiment
@@ -211,7 +216,7 @@ class RequirementsToAssetCollection:
         user_files = FileList(root=CURRENT_DIRECTORY, files_in_root=[MODEL_CREATE_AC])
         tags = {MD5_KEY.format(self._os_target): self.checksum}
 
-        user_logger.info("Create workitem to create AssetCollection from output of install")
+        user_logger.info("Converting Python Packages to an Asset Collection. This may take some time for large dependency lists")
         wi = SSMTWorkItem(item_name=wi_name, command=command, user_files=user_files, tags=tags,
                           related_experiments=[exp_id])
 

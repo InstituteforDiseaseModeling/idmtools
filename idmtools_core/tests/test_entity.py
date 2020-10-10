@@ -1,8 +1,9 @@
 import copy
+
+import allure
 import pickle
 import unittest
 from dataclasses import dataclass, field, fields
-
 import pytest
 from idmtools.builders import SimulationBuilder
 from idmtools.core.interfaces.ientity import IEntity
@@ -28,6 +29,8 @@ def _custom_post_setstate(o):
 
 
 @pytest.mark.smoke
+@allure.story("Entities")
+@allure.suite("idmtools_core")
 class TestEntity(ITestWithPersistence):
 
     def test_hashing(self):

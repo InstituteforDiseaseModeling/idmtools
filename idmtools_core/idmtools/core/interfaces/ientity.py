@@ -19,7 +19,7 @@ class IEntity(IItem, metaclass=ABCMeta):
     #: ID of the platform
     platform_id: UUID = field(default=None, compare=False, metadata={"md": True})
     #: Platform
-    _platform: 'IPlatform' = field(default=None, compare=False, metadata={"pickle_ignore": True})  # noqa E821
+    _platform: 'IPlatform' = field(default=None, compare=False, metadata={"pickle_ignore": False})  # noqa E821
     #: Parent id
     parent_id: UUID = field(default=None, metadata={"md": True})
     #: Parent object

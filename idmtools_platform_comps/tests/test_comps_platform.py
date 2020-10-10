@@ -1,9 +1,10 @@
 import copy
+
+import allure
 import json
 import os
 import unittest
 from os import path
-
 import pytest
 from idmtools.builders import SimulationBuilder
 from idmtools.core import EntityStatus
@@ -20,6 +21,8 @@ current_directory = path.dirname(path.realpath(__file__))
 
 
 @pytest.mark.comps
+@allure.story("COMPS")
+@allure.suite("idmtools_platform_comps")
 class TestCOMPSPlatform(ITestWithPersistence):
     def setUp(self) -> None:
         super().setUp()
@@ -170,9 +173,10 @@ class TestCOMPSPlatform(ITestWithPersistence):
     def test_experiment_name(self):  # zdu: no metadata file any more
         model_path = os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py")
         task = JSONConfiguredPythonTask(script_path=model_path, envelope="parameters")
-        e = Experiment.from_task(task, name=self.case_name + "_test/\\:'?<>*|name1")
+        e = Experiment.from_task(task, name="test/\\:'?<>*\|name1()δ`")
         e.run(wait_until_done=True)
-        name_expected = self.case_name + "_test_________name1"
+        self.assertTrue(e.succeeded)
+        name_expected = 'test__________name1___'
         self.assertEqual(e.name, name_expected)
         self.assertIsNone(e.simulations[0].name)
 

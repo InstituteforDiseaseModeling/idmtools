@@ -1,7 +1,7 @@
 # Takes a demographic.json file generated from DemographicsGenerator and makes an
 # InputData Request to generate climate files using the COMPS LD Workers
 # Saves to output directory
-
+import allure
 import os
 import json
 import unittest
@@ -17,6 +17,8 @@ output_path = os.path.join(current_dir, 'output')
 intermediate_dir = os.path.join(current_dir, 'inputs')
 
 
+@allure.story("COMPS")
+@allure.story("SSMT")
 class InputDataWorkItemTests(ITestWithPersistence):
 
     def setUp(self):

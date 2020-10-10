@@ -1,15 +1,16 @@
+import allure
 import os
 import tempfile
 from random import random
 from unittest import TestCase
-
 import gc
-
 import pytest
 from idmtools.core import CacheEnabled
 
 
 @pytest.mark.smoke
+@allure.story("Cache")
+@allure.suite("idmtools_core")
 class TestCacheEnabled(TestCase):
     def test_cache_works(self):
         c = CacheEnabled()

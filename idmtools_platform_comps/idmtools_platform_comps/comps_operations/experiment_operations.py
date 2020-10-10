@@ -76,7 +76,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
     def platform_create(self, experiment: Experiment, num_cores: Optional[int] = None,
                         executable_path: Optional[str] = None,
                         command_arg: Optional[str] = None, priority: Optional[str] = None,
-                        check_command: bool = True, **kwargs) -> COMPSExperiment:
+                        check_command: bool = True, use_short_path: bool = False, **kwargs) -> COMPSExperiment:
         """
         Create Experiment on the COMPS Platform
 
@@ -87,6 +87,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             command_arg: Command Argument
             priority: Priority of command
             check_command: Run task hooks on item
+            use_short_path: When set to true, simulation roots will be set to "$COMPS_PATH(USER)
             **kwargs: Keyword arguments used to expand functionality. At moment these are usually not used
 
         Returns:
@@ -100,12 +101,12 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         # Define the subdirectory
         subdirectory = experiment.name[0:self.platform.MAX_SUBDIRECTORY_LENGTH] + '_' + timestamp()
 
-        if experiment.name != "install custom requirements":
-            simulation_root = self.platform.simulation_root
-        else:
-            index = self.platform.simulation_root.rindex('\\')
-            simulation_root = self.platform.simulation_root[0:index]    # shorten simulation_root
+        if use_short_path:
+            logger.debug("Setting Simulation Root to $COMPS_PATH(USER)")
+            simulation_root = "$COMPS_PATH(USER)"
             subdirectory = 'rac' + '_' + timestamp()    # also shorten subdirectory
+        else:
+            simulation_root = self.platform.simulation_root
 
         # Get the experiment command line
         exp_command: CommandLine = self._get_experiment_command_line(check_command, experiment)

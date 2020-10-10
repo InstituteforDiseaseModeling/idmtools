@@ -1,3 +1,4 @@
+import allure
 import http.server
 import io
 import os
@@ -24,6 +25,10 @@ def check_port_is_open(port):
 
 @pytest.mark.docker
 @pytest.mark.local_platform_internals
+@pytest.mark.serial
+@allure.story("LocalPlatform")
+@allure.story("Service Manager")
+@allure.suite("idmtools_platform_local")
 class TestServiceManager(unittest.TestCase):
 
     @classmethod
@@ -36,6 +41,16 @@ class TestServiceManager(unittest.TestCase):
         sm.get_network()
         sm.get('redis')
         check_port_is_open(6379)
+        sm.stop_services()
+
+    def test_create_redis_custom_port(self):
+        config = get_test_local_env_overrides()
+        config['redis_port'] = 6399
+        sm = DockerServiceManager(self.client, **config)
+        sm.cleanup(True)
+        sm.get_network()
+        sm.get('redis')
+        check_port_is_open(6399)
         sm.stop_services()
 
     @pytest.mark.timeout(60)

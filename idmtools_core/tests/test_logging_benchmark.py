@@ -1,3 +1,4 @@
+import allure
 import concurrent
 import os
 import sys
@@ -24,6 +25,8 @@ LOG_TESTS_TO_RUN = 50000 if getattr(sys, 'gettrace', None) is None else 5000
 
 
 @skip
+@allure.story("Core")
+@allure.suite("idmtools_core")
 class TestLoggingBenchmark(TestCase):
     @classmethod
     def setUpClass(cls) -> None:

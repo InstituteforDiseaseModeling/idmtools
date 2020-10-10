@@ -1,8 +1,8 @@
+import allure
 import json
 import os
 import unittest
 from functools import partial
-
 import pytest
 from idmtools.assets import Asset, AssetCollection
 from idmtools.assets.errors import DuplicatedAssetError
@@ -13,6 +13,9 @@ from idmtools_test import COMMON_INPUT_PATH
 
 @pytest.mark.assets
 @pytest.mark.smoke
+@allure.story("Entities")
+@allure.story("Assets")
+@allure.suite("idmtools_core")
 class TestAssets(unittest.TestCase):
 
     def setUp(self) -> None:
@@ -41,11 +44,10 @@ class TestAssets(unittest.TestCase):
         self.assertEqual(a.filename, "a.txt")
         self.assertEqual(a.relative_path, "2")
 
-    def test_creat_asset_absolute_path_and_content(self):
-        a = Asset(absolute_path=os.path.join(self.base_path, "d.txt"), content="blah")
-        self.assertEqual(a.content, "blah")
-        self.assertEqual(a.filename, "d.txt")
-        self.assertEqual(a.relative_path, "")
+    def test_create_asset_absolute_path_and_content_fails(self):
+        with self.assertRaises(ValueError) as e:
+            a = Asset(absolute_path=os.path.join(self.base_path, "d.txt"), content="blah")
+        self.assertEqual(e.exception.args[0], "Absolute Path and Content are mutually exclusive. Please provide only one of the options")
 
     def test_creat_asset_content_filename(self):
         a = Asset(filename='test', content="blah")
@@ -304,6 +306,11 @@ class TestAssets(unittest.TestCase):
         b = Asset(relative_path="1", filename="a.txt", absolute_path=os.path.join(COMMON_INPUT_PATH, 'files', 'hello.txt'))
         self.assertEqual(a, b)
         self.assertTrue(a.deep_equals(b))
+
+    def test_asset_directory_fails(self):
+        with self.assertRaises(ValueError) as ex:
+            a = Asset(os.path.abspath(os.path.dirname(__file__)))
+        self.assertEqual(ex.exception.args[0], "Asset cannot be a directory!")
 
 
 

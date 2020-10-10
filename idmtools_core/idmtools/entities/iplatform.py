@@ -76,6 +76,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     _assets: IPlatformAssetCollectionOperations = field(default=None, repr=False, init=False, compare=False)
     #: Controls what platform should do we re-running experiments by default
     _regather_assets_on_modify: bool = field(default=False, repr=False, init=False, compare=False)
+    # store the config block used to create platform
+    _config_block: str = field(default=None)
 
     @staticmethod
     def get_caller():
@@ -586,16 +588,18 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         idm_item = self.get_item(item_id, item_type, raw=False)
         return self.get_files(idm_item, files, output)
 
-    def are_requirements_met(self, requirements: Set[PlatformRequirements]) -> bool:
+    def are_requirements_met(self, requirements: Union[PlatformRequirements, Set[PlatformRequirements]]) -> bool:
         """
         Does the platform support the list of requirements
 
         Args:
-            requirements: Requirements
+            requirements: Requirements should be a list of PlatformRequirements or a single PlatformRequirements
 
         Returns:
             True if all the requirements are supported
         """
+        if isinstance(requirements, PlatformRequirements):
+            requirements = [requirements]
         return all([x in self._platform_supports for x in requirements])
 
     def is_task_supported(self, task: ITask) -> bool:

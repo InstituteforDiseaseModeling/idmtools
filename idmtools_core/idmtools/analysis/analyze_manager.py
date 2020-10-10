@@ -353,8 +353,9 @@ class AnalyzeManager(CacheEnabled):
                     logger.debug(f"Finalizing {item_id}")
                     item = self._items[item_id]
                     item_result = self.cache.get(item_id)
+                    item.platform = self.platform
                     item_data_for_analyzer[item] = item_result.get(analyzer.uid, None)
-                finalize_results[analyzer.uid] = worker_pool.apply_async(analyzer.reduce, (item_data_for_analyzer,))
+                finalize_results[analyzer.uid] = worker_pool.apply_async(analyzer.reduce, (item_data_for_analyzer, ))
 
             # wait for results and clean up multiprocessing
             worker_pool.close()

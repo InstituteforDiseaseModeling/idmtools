@@ -1,0 +1,13 @@
+[run]
+branch = True
+source =
+    ../
+    ../../idmtools_platform_local
+    ../../idmtools_platform_comps
+    ../../idmtools_core
+    ../../idmtools_cli
+    idmtools
+    idmtools_cli
+    idmtools_platform_comps
+omit = */test*
+    */setup.py

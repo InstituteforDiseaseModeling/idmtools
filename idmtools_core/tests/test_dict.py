@@ -1,3 +1,4 @@
+import allure
 import unittest
 
 import pytest
@@ -8,6 +9,8 @@ from idmtools_test.utils.test_task import TestTask
 
 
 @pytest.mark.smoke
+@allure.story("Tags")
+@allure.suite("idmtools_core")
 class TestDictionary(ITestWithPersistence):
 
     def test_dict(self):

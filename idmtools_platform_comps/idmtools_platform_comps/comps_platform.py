@@ -34,8 +34,9 @@ class COMPSPriority(Enum):
 
 op_defaults = dict(default=None, compare=False, metadata=dict(pickle_ignore=True))
 
-supported_types = [PlatformRequirements.DOCKER, PlatformRequirements.PYTHON, PlatformRequirements.SHELL,
-                   PlatformRequirements.NativeBinary, PlatformRequirements.WINDOWS]
+# We use this to track os. It would be nice to do that in server
+SLURM_ENVS = ['calculon', 'slurmstage', "slurmdev"]
+supported_types = [PlatformRequirements.PYTHON, PlatformRequirements.SHELL, PlatformRequirements.NativeBinary]
 
 
 @dataclass(repr=False)
@@ -84,6 +85,11 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         self.supported_types = {ItemType.EXPERIMENT, ItemType.SIMULATION, ItemType.SUITE, ItemType.ASSETCOLLECTION,
                                 ItemType.WORKFLOW_ITEM}
         super().__post_init__()
+        # set platform requirements based on environment
+        if self.environment.lower() in SLURM_ENVS:
+            self._platform_supports.append(PlatformRequirements.LINUX)
+        else:
+            self._platform_supports.append(PlatformRequirements.WINDOWS)
 
     def __init_interfaces(self):
         self._login()

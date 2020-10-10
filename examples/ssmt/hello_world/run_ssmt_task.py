@@ -8,11 +8,11 @@ user_files = FileList(root='files')
 tags = {'test': 123}
 
 if __name__ == "__main__":
-    with Platform('COMPS2'):
+    with Platform('BELEGOST'):
 
         # If docker_image is defined within idmtools.ini, it It will use this docker image.
         # If docker_image is not defined in idmtools.ini, it will use the default docker image based on platform:
-        # 'COMPS' case uses production docker image and 'COMPS2' case (and all others) uses the staging docker image.
+        # 'COMPS' case uses production docker image and 'COMPS' case (and all others) uses the staging docker image.
         wi = SSMTWorkItem(item_name=wi_name, command=command, user_files=user_files, tags=tags)
 
         # Or user can use his won docker image like this

@@ -15,18 +15,16 @@ for file_prefix in ['', 'dev_', 'build_']:
     with open(f'{filename}.txt') as requirements_file:
         extra_require_files[file_prefix.strip("_") if file_prefix else filename] = requirements_file.read().split("\n")
 
-
-version = '1.5.0+nightly'
+version = '1.5.1+nightly'
 
 extras = {
     'test': extra_require_files['build'] + extra_require_files['dev'],
     # to support notebooks we need docker
     'notebooks': ['docker==4.0.1'],
     'packaging': extra_require_files['build'],
-    'idm': ['idmtools_platform_comps', 'idmtools_cli', 'idmtools_models', 'emodpy'],
+    'idm': ['idmtools_platform_comps', 'idmtools_cli', 'idmtools_models'],
     # our full install include all common plugins
-    'full': ['idmtools_platform_comps', 'idmtools_platform_local', 'idmtools_cli', 'idmtools_models',
-             'emodpy']
+    'full': ['idmtools_platform_comps', 'idmtools_platform_local', 'idmtools_cli', 'idmtools_models']
 }
 
 authors = [

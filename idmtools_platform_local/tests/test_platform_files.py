@@ -1,3 +1,4 @@
+import allure
 import os
 
 import pytest
@@ -14,6 +15,9 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 @pytest.mark.docker
 @pytest.mark.local_platform_internals
+@allure.story("LocalPlatform")
+@allure.story("Outputs")
+@allure.suite("idmtools_platform_local")
 class TestPlatformSimulations(ITestWithPersistence):
 
     def setUp(self) -> None:
@@ -21,6 +25,7 @@ class TestPlatformSimulations(ITestWithPersistence):
 
     @pytest.mark.long
     @restart_local_platform(silent=True, **get_test_local_env_overrides())
+    @pytest.mark.serial
     def test_fetch_simulation_files(self):
         platform = Platform('Local')
 
