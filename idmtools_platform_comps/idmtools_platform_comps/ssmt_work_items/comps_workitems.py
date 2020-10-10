@@ -107,6 +107,6 @@ class VisToolsWorkItem(ICOMPSWorkflowItem):
     Idm VisToolsWorkItem
     """
 
-    def __post_init__(self,item_name: str, asset_collection_id: UUID, asset_files: FileList, user_files: FileList):
+    def __post_init__(self, item_name: str, asset_collection_id: UUID, asset_files: FileList, user_files: FileList):
         super().__post_init__(item_name, asset_collection_id, asset_files, user_files)
         self.work_item_type = self.work_item_type or 'VisTools'

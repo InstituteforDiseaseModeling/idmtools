@@ -202,7 +202,6 @@ class RequirementsToAssetCollection:
             exp_id: the Experiment id (which installed requirements)
         Returns: work item created
         """
-        from idmtools.assets.file_list import FileList
         from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
 
         md5_str = self.checksum

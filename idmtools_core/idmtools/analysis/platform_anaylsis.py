@@ -77,7 +77,7 @@ class PlatformAnalysis:
         from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
         ac = AssetCollection.from_id(self.asset_collection_id)
         ac.add_assets(self.asset_files.to_asset_collection())
-        self.wi = SSMTWorkItem(name=self.analysis_name, command=command, tags=self.tags, transient_assets=self.additional_files,  assets=ac, related_experiments=self.experiment_ids)
+        self.wi = SSMTWorkItem(name=self.analysis_name, command=command, tags=self.tags, transient_assets=self.additional_files, assets=ac, related_experiments=self.experiment_ids)
 
         # Run the workitem
         self.platform.run_items(self.wi)

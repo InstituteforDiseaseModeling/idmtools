@@ -125,18 +125,18 @@ class FileList:
 
                     # add the file
                     self.add_file(os.path.join(root, f), relative_path=f_relative_path)
-                    
+
     def to_asset_collection(self):
         ac = AssetCollection()
         ac.assets = self.files
         return ac
-    
+
     @staticmethod
     def from_asset_collection(asset_collection: AssetCollection) -> FileList:
         fl = FileList()
         fl.files = [asset_collection.assets]
         return fl
-                
+
     def __len__(self):
         return len(self.files)
 
