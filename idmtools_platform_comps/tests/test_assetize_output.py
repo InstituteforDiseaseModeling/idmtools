@@ -16,7 +16,6 @@ class TestAssetizeOutput(unittest.TestCase):
     def setUp(self) -> None:
         super().setUp()
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
-        self.platform = Platform("COMPS2")
 
     @pytest.mark.smoke
     def test_experiment_can_be_watched(self):
@@ -59,6 +58,7 @@ class TestAssetizeOutput(unittest.TestCase):
     def test_experiment_default_pattern_if_none_specified(self):
         e = Experiment.from_task(task=TestTask())
         e.simulations[0].status = EntityStatus.CREATED
+        e.uid = '095565e833818aab3340e802512c32ff'
         ao = AssetizeOutput()
         ao.from_items(e)
         self.assertEqual(1, len(ao.related_experiments))
@@ -66,6 +66,7 @@ class TestAssetizeOutput(unittest.TestCase):
         ao.pre_creation(None)
         self.assertEqual(1, len(ao.file_patterns))
         self.assertEqual("**", ao.file_patterns[0])
+        print(e.id)
         self.assertEqual(ao.create_command(), 'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --exclude-pattern "StdErr.txt" --exclude-pattern "StdOut.txt" --exclude-pattern "WorkOrder.json" --exclude-pattern "*.log" --asset-tag "AssetizedOutputfromFromExperiment=095565e833818aab3340e802512c32ff" --simulation-prefix-format-str "{simulation.id}"')
         ao.verbose = True
         self.assertEqual(ao.create_command(), 'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --exclude-pattern "StdErr.txt" --exclude-pattern "StdOut.txt" --exclude-pattern "WorkOrder.json" --exclude-pattern "*.log" --asset-tag "AssetizedOutputfromFromExperiment=095565e833818aab3340e802512c32ff" --simulation-prefix-format-str "{simulation.id}" --verbose')
