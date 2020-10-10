@@ -84,20 +84,18 @@ class PlatformAnalysis:
     def _prep_analyze(self):
         # Add the platform_analysis_bootstrap.py file to the collection
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        self.additional_files.add_asset(os.path.join(dir_path, "platform_analysis_bootstrap.py"))
+        self.additional_files.add_or_replace_asset(os.path.join(dir_path, "platform_analysis_bootstrap.py"))
         # check if user gave us an override to idmtools config
         if self.idmtools_config:
-            self.additional_files.add_file(self.idmtools_config)
+            self.additional_files.add_or_replace_asset(self.idmtools_config)
         else:
             # look for one from idmtools.
             config_path = IdmConfigParser.get_config_path()
             if config_path and os.path.exists(config_path):
                 if logger.isEnabledFor(DEBUG):
                     logger.debug(f"Adding config file: {config_path}")
-                self.additional_files.add_asset(config_path)
+                self.additional_files.add_or_replace_asset(config_path)
 
-        if self.wrapper_shell_script:
-            self.additional_files.add_asset(os.path.join(self.wrapper_shell_script))
         # build analyzer args dict
         args_dict = {}
         a_args = zip(self.analyzers, self.analyzers_args)
@@ -114,7 +112,7 @@ class PlatformAnalysis:
         # Create the command
         command = ''
         if self.wrapper_shell_script:
-            self.additional_files.add_asset(self.wrapper_shell_script)
+            self.additional_files.add_or_replace_asset(self.wrapper_shell_script)
             command += f'{self.shell_script_binary} {os.path.basename(self.wrapper_shell_script)} '
         command += "python platform_analysis_bootstrap.py"
         # Add the experiments
@@ -131,7 +129,7 @@ class PlatformAnalysis:
         return command
 
     def __pickle_analyzers(self, args_dict):
-        self.additional_files.add_asset(Asset(filename='analyzer_args.pkl', content=pickle.dumps(args_dict)))
+        self.additional_files.add_or_replace_asset(Asset(filename='analyzer_args.pkl', content=pickle.dumps(args_dict)))
 
     def __pickle_pre_run(self):
         source = inspect.getsource(self.pre_run_func).splitlines()
@@ -143,7 +141,7 @@ class PlatformAnalysis:
         for line in source:
             new_source.append(replace_expr.sub("", line))
 
-        self.additional_files.add_asset(Asset(filename="pre_run.py", content="\n".join(new_source)))
+        self.additional_files.add_or_replace_asset(Asset(filename="pre_run.py", content="\n".join(new_source)))
 
     def validate_args(self):
         if self.analyzers_args is None:
