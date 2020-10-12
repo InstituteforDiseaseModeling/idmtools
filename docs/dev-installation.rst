@@ -53,12 +53,12 @@ Install |IT_s|
 
               Enter the following::
 
-                pip install py-make
+                pip install idm-buildtools --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
                 pymake setup-dev
 
               You can also use the following if you are **not** going to develop or test using the Local Platform::
 
-                pip install py-make
+                pip install py-make --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
                 pymake setup-dev-no-docker
 
         .. container:: linux

@@ -6,7 +6,7 @@ docker stop idmtools_workers idmtools_redis idmtools_postgres || true
 docker rm idmtools_workers idmtools_redis idmtools_postgres || true
 # setup our idmtools virtualenv
 mkvirtualenv -p /usr/local/bin/python3.7 idmtools
-pip install py-make
+pip install idm-buildtools
 cd /idmtools
 # clean in case our host is windows and there are already built files
 make clean-all
