@@ -1,6 +1,6 @@
 backoff~=1.10.0
 click~=7.0
-colorama~=0.4.1
+colorama~=0.4.4
 docker~=4.3.1
 dramatiq[redis, watch]~=1.9.0
 gevent~=20.9.0
