@@ -18,11 +18,12 @@ logger = getLogger(__name__)
 #    a) Pre-Creation hooks
 
 if TYPE_CHECKING:
+    from idmtools.entities.iplatform import IPlatform
     from idmtools.entities.simulation import Simulation
     from idmtools.entities.iworkflow_item import IWorkflowItem  # noqa: F401
 
 TTaskParent = Union['Simulation', 'IWorkflowItem']  # noqa: F821
-TTaskHook = Callable[[TTaskParent], NoReturn]
+TTaskHook = Callable[[TTaskParent, 'IPlatform'], NoReturn]
 
 
 @dataclass
@@ -101,11 +102,12 @@ class ITask(metaclass=ABCMeta):
             requirement = PlatformRequirements[requirement.lower()]
         self.platform_requirements.add(requirement)
 
-    def pre_creation(self, parent: Union['Simulation', 'IWorkflowItem']):  # noqa: F821
+    def pre_creation(self, parent: Union['Simulation', 'IWorkflowItem'], platform: 'IPlatform'):  # noqa: F821
         """
         Optional Hook called at the time of creation of task. Can be used to setup simulation and experiment level hooks
         Args:
-            parent:
+            parent: Parent of Item
+            platform: Platform executing the task. Useful for querying platform before execution
 
         Returns:
 
@@ -113,18 +115,19 @@ class ITask(metaclass=ABCMeta):
         if self.command is None:
             logger.error('Command is not defined')
             raise ValueError("Command is required for on task when preparing an experiment")
-        [hook(parent) for hook in self.__pre_creation_hooks]
+        [hook(parent, platform) for hook in self.__pre_creation_hooks]
 
-    def post_creation(self, parent: Union['Simulation', 'IWorkflowItem']):  # noqa: F821
+    def post_creation(self, parent: Union['Simulation', 'IWorkflowItem'], platform: 'IPlatform'):  # noqa: F821
         """
         Optional Hook called at the  after creation task. Can be used to setup simulation and experiment level hooks
         Args:
-            parent:
+            parent: Parent of Item
+            platform: Platform executing the task. Useful for querying platform before execution
 
         Returns:
 
         """
-        [hook(parent) for hook in self.__post_creation_hooks]
+        [hook(parent, platform) for hook in self.__post_creation_hooks]
 
     @abstractmethod
     def gather_common_assets(self) -> AssetCollection:

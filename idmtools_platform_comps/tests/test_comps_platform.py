@@ -82,19 +82,19 @@ class TestCOMPSPlatform(ITestWithPersistence):
         experiment.builder = self.builder
 
         # Create experiment on platform
-        experiment.pre_creation()
+        experiment.pre_creation(self.platform)
         self.platform.create_items(items=[experiment])
 
         for simulation_batch in experiment.batch_simulations(batch_size=10):
             # Create the simulations on the platform
             for simulation in simulation_batch:
-                simulation.pre_creation()
+                simulation.pre_creation(self.platform)
 
             ids = self.platform.create_items(items=simulation_batch)
 
             for uid, simulation in zip(ids, simulation_batch):
                 simulation.uid = uid
-                simulation.post_creation()
+                simulation.post_creation(self.platform)
 
                 experiment.simulations.append(simulation.metadata)
                 experiment.simulations.set_status(EntityStatus.CREATED)

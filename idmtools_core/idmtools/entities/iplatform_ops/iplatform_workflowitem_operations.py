@@ -56,7 +56,7 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
         Returns:
             NoReturn
         """
-        workflow_item.pre_creation()
+        workflow_item.pre_creation(self.platform)
 
     def post_create(self, workflow_item: IWorkflowItem, **kwargs) -> NoReturn:
         """
@@ -69,7 +69,7 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
         Returns:
             NoReturn
         """
-        workflow_item.post_creation()
+        workflow_item.post_creation(self.platform)
 
     def create(self, workflow_item: IWorkflowItem, do_pre: bool = True, do_post: bool = True, **kwargs) -> Any:
         """

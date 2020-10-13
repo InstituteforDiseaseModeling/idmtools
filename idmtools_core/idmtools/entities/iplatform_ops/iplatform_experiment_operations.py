@@ -47,7 +47,7 @@ class IPlatformExperimentOperations(ABC):
         Returns:
             NoReturn
         """
-        experiment.pre_creation()
+        experiment.pre_creation(self.platform)
 
     def post_create(self, experiment: Experiment, **kwargs) -> NoReturn:
         """
@@ -60,7 +60,7 @@ class IPlatformExperimentOperations(ABC):
         Returns:
             NoReturn
         """
-        experiment.post_creation()
+        experiment.post_creation(self.platform)
 
     def create(self, experiment: Experiment, do_pre: bool = True, do_post: bool = True, **kwargs) -> \
             Union[Experiment]:

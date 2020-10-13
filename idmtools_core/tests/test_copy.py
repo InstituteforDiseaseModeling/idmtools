@@ -53,7 +53,7 @@ class TestCopy(ITestWithPersistence):
         e.simulations[0].assets.add_asset(Asset(absolute_path=os.path.join(COMMON_INPUT_PATH, 'files', "config.json")))
 
         # test deepcopy of experiment
-        e.pre_creation()
+        e.pre_creation(None)
         ep = copy.deepcopy(e)
         self.assertEqual(len(ep.assets.assets), 1)
         ep.assets = copy.deepcopy(e.assets)
@@ -81,7 +81,7 @@ class TestCopy(ITestWithPersistence):
 
         self.assertEqual(len(ts.builders), 1)
         self.assertEqual(len(e.simulations), 30)
-        e.pre_creation()
+        e.pre_creation(None)
         self.assertEqual(len(e.assets.assets), 1)
 
         # test deepcopy of experiment
@@ -100,7 +100,7 @@ class TestCopy(ITestWithPersistence):
     def test_deepcopy_simulation(self):
         sim = Simulation.from_task(JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, 'python_experiments', "model.py")))
 
-        sim.pre_creation()
+        sim.pre_creation(None)
         self.assertEqual(len(sim.assets.assets), 1)
 
         # test deepcopy of simulation

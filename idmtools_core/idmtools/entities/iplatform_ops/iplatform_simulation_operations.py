@@ -40,7 +40,7 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         Returns:
             NoReturn
         """
-        simulation.pre_creation()
+        simulation.pre_creation(self.platform)
 
     def post_create(self, simulation: Simulation, **kwargs) -> NoReturn:
         """
@@ -53,7 +53,7 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         Returns:
             NoReturn
         """
-        simulation.post_creation()
+        simulation.post_creation(self.platform)
 
     def create(self, simulation: Simulation, do_pre: bool = True, do_post: bool = True, **kwargs) -> Any:
         """

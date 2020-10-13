@@ -41,7 +41,7 @@ class IEntity(IItem, metaclass=ABCMeta):
         """
         self.tags.update(tags)
 
-    def post_creation(self) -> None:
+    def post_creation(self, platform: 'IPlatform') -> None:
         """
         Post creation hook for object
         Returns:

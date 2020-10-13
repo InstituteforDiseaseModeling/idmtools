@@ -1,6 +1,5 @@
 from dataclasses import dataclass, field
 from typing import List, Callable, Type
-
 from idmtools.assets import AssetCollection
 from idmtools.entities.itask import ITask
 from idmtools.registry.task_specification import TaskSpecification

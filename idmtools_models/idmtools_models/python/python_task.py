@@ -1,7 +1,7 @@
 import os
 from dataclasses import dataclass, field
 from logging import getLogger
-from typing import Set, List, Type, Union
+from typing import Set, List, Type, Union, TYPE_CHECKING
 
 from idmtools.assets import Asset, AssetCollection
 from idmtools.entities import CommandLine
@@ -10,6 +10,8 @@ from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.simulation import Simulation
 from idmtools.registry.task_specification import TaskSpecification
+if TYPE_CHECKING:
+    from idmtools.entities.iplatform import IPlatform
 
 logger = getLogger(__name__)
 
@@ -94,12 +96,13 @@ class PythonTask(ITask):
 
         logger.debug("Reload from simulation")
 
-    def pre_creation(self, parent: Union[Simulation, IWorkflowItem]):
+    def pre_creation(self, parent: Union[Simulation, IWorkflowItem], platform: 'IPlatform'):
         """
         Called before creation of parent
 
         Args:
             parent: Parent
+            platform: Platform Python Task is being executed on
 
         Returns:
             None

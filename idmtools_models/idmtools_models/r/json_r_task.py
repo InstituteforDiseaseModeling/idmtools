@@ -1,11 +1,13 @@
 from dataclasses import dataclass, field
-from typing import Optional, List, Type, Union
+from typing import Optional, List, Type, Union, TYPE_CHECKING
 from idmtools.assets import AssetCollection
 from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools.entities.simulation import Simulation
 from idmtools.registry.task_specification import TaskSpecification
 from idmtools_models.json_configured_task import JSONConfiguredTask
 from idmtools_models.r.r_task import RTask
+if TYPE_CHECKING:
+    from idmtools.entities.iplatform import IPlatform
 
 
 @dataclass
@@ -39,13 +41,13 @@ class JSONConfiguredRTask(JSONConfiguredTask, RTask):
         JSONConfiguredTask.reload_from_simulation(self, simulation, **kwargs)
         RTask.reload_from_simulation(self, simulation, **kwargs)
 
-    def pre_creation(self, parent: Union[Simulation, IWorkflowItem]):
-        JSONConfiguredTask.pre_creation(self, parent)
-        RTask.pre_creation(self, parent)
+    def pre_creation(self, parent: Union[Simulation, IWorkflowItem], platform: 'IPlatform'):
+        JSONConfiguredTask.pre_creation(self, parent, platform)
+        RTask.pre_creation(self, parent, platform)
 
-    def post_creation(self, parent: Union[Simulation, IWorkflowItem]):
-        JSONConfiguredTask.post_creation(self, parent)
-        RTask.post_creation(self, parent)
+    def post_creation(self, parent: Union[Simulation, IWorkflowItem], platform: 'IPlatform'):
+        JSONConfiguredTask.post_creation(self, parent, platform)
+        RTask.post_creation(self, parent, platform)
 
 
 class JSONConfiguredRTaskSpecification(TaskSpecification):

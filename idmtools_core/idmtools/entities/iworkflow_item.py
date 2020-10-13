@@ -62,7 +62,7 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, ABC):
         """
         self.user_files = FileList()
 
-    def pre_creation(self) -> None:
+    def pre_creation(self, platform: 'IPlatform') -> None:
         """
         Called before the actual creation of the entity.
         """

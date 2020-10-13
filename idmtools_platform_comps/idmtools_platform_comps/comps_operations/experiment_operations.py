@@ -170,7 +170,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
                 if not regather_common_assets:
                     user_logger.warning(
                         f"Not gathering common assets again since experiment exists on platform. If you need to add additional common assets, see {get_doc_base_url()}cookbook/asset_collections.html#modifying-asset-collection")
-                experiment.pre_creation(regather_common_assets)
+                experiment.pre_creation(self.platform, gather_assets=regather_common_assets)
                 self.send_assets(experiment)
         return experiment
 
@@ -195,7 +195,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             if check_command:
                 task = platform_task_hooks(sim.task, self.platform)
             # run pre-creation in case task use it to produce the command line dynamically
-            task.pre_creation(sim)
+            task.pre_creation(sim, self.platform)
             exp_command = task.command
         elif isinstance(experiment.simulations, ExperimentParentIterator) and isinstance(experiment.simulations.items,
                                                                                          TemplatedSimulations):
@@ -206,7 +206,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             if check_command:
                 task = platform_task_hooks(task, self.platform)
             # run pre-creation in case task use it to produce the command line dynamically
-            task.pre_creation(Simulation(task=task))
+            task.pre_creation(Simulation(task=task), self.platform)
             exp_command = task.command
         else:
             if logger.isEnabledFor(DEBUG):
@@ -215,7 +215,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             if check_command:
                 task = platform_task_hooks(task, self.platform)
             # run pre-creation in case task use it to produce the command line dynamically
-            task.pre_creation(experiment.simulations[0])
+            task.pre_creation(experiment.simulations[0], self.platform)
             exp_command = task.command
         return exp_command
 

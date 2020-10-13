@@ -1,7 +1,7 @@
 import os
 from dataclasses import field, dataclass
 from logging import getLogger
-from typing import Type, Union
+from typing import Type, Union, TYPE_CHECKING
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core.docker_task import DockerTask
 from idmtools.entities import CommandLine
@@ -10,6 +10,9 @@ from idmtools.entities.simulation import Simulation
 from idmtools.registry.task_specification import TaskSpecification
 
 logger = getLogger(__name__)
+
+if TYPE_CHECKING:
+    from idmtools.entities.iplatform import IPlatform
 
 
 @dataclass
@@ -76,12 +79,13 @@ class RTask(DockerTask):
         """
         return self.transient_assets
 
-    def pre_creation(self, parent: Union[Simulation, IWorkflowItem]):
+    def pre_creation(self, parent: Union[Simulation, IWorkflowItem], platform: 'IPlatform'):
         """
         Called before creation of parent
 
         Args:
             parent: Parent
+            platform: Platform R Task is executing on
 
         Returns:
             None
