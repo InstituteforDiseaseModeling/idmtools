@@ -14,7 +14,7 @@ logger = getLogger(__name__)
 user_logger = getLogger('user')
 
 
-class PlatformAnalysisBootstrap:
+class PlatformAnalysis:
 
     def __init__(self, platform: IPlatform, experiment_ids: List['str'], analyzers: List[Type[IAnalyzer]], analyzers_args=None, analysis_name: str = 'WorkItem Test', tags=None, additional_files: Union[FileList, AssetCollection, List[str]] = None, asset_collection_id=None,
                  asset_files: Union[FileList, AssetCollection, List[str]] = None, wait_till_done: bool = True,
