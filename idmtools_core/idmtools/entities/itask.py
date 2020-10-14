@@ -61,8 +61,10 @@ class ITask(metaclass=ABCMeta):
     def command(self, value: Union[str, CommandLine]):
         if isinstance(value, property):
             self._command = None
+        elif isinstance(value, str):
+            self._command = CommandLine(value)
         else:
-            self._command = CommandLine(value) if isinstance(value, str) else value
+            self._command = value
 
     @property
     def metadata_fields(self):
