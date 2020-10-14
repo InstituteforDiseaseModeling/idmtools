@@ -1,7 +1,9 @@
 from dataclasses import dataclass, field
-from typing import Optional, Type, Union, TYPE_CHECKING
+from typing import Optional, Type, Union, TYPE_CHECKING, Set
 from idmtools.assets import AssetCollection
+from idmtools.entities.itask import ITask
 from idmtools.entities.iworkflow_item import IWorkflowItem
+from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.simulation import Simulation
 from idmtools.registry.task_specification import TaskSpecification
 from idmtools_models.json_configured_task import JSONConfiguredTask
@@ -16,9 +18,8 @@ class JSONConfiguredPythonTask(JSONConfiguredTask, PythonTask):
     configfile_argument: Optional[str] = field(default="--config")
 
     def __post_init__(self):
-        super().__post_init__()
-        if self.configfile_argument is not None:
-            self.command.add_option(self.configfile_argument, self.config_file_name)
+        JSONConfiguredTask.__post_init__(self)
+        PythonTask.__post_init__(self)
 
     def gather_common_assets(self):
         """
@@ -72,6 +73,8 @@ class JSONConfiguredPythonTask(JSONConfiguredTask, PythonTask):
         """
         JSONConfiguredTask.pre_creation(self, parent, platform)
         PythonTask.pre_creation(self, parent, platform)
+        if self.configfile_argument is not None:
+            self.command.add_option(self.configfile_argument, self.config_file_name)
 
     def post_creation(self, parent: Union[Simulation, IWorkflowItem], platform: 'IPlatform'):
         """

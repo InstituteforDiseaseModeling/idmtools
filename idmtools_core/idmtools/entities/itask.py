@@ -52,8 +52,6 @@ class ITask(metaclass=ABCMeta):
 
         self.__pre_creation_hooks = []
         self.__post_creation_hooks = []
-        if self.command is None or isinstance(self.command, property):
-            self._command = None
 
     @property
     def command(self):
@@ -62,8 +60,9 @@ class ITask(metaclass=ABCMeta):
     @command.setter
     def command(self, value: Union[str, CommandLine]):
         if isinstance(value, property):
-            pass
-        self._command = CommandLine(value) if isinstance(value, str) else value
+            self._command = None
+        else:
+            self._command = CommandLine(value) if isinstance(value, str) else value
 
     @property
     def metadata_fields(self):
