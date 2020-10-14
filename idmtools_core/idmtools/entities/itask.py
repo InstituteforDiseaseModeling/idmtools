@@ -52,6 +52,8 @@ class ITask(metaclass=ABCMeta):
 
         self.__pre_creation_hooks = []
         self.__post_creation_hooks = []
+        if self.command is None or isinstance(self.command, property):
+            self._command = None
 
     @property
     def command(self):
