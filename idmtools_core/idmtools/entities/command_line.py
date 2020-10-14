@@ -16,7 +16,7 @@ class CommandLine:
 
     def __init__(self, executable=None, *args, **kwargs):
         # If there is a space in executable, we probably need to split it
-        if " " in executable:
+        if executable and " " in executable:
             parts = executable.split(" ")
             executable = parts[0]
             if args:
