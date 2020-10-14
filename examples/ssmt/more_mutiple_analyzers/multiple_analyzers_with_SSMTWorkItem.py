@@ -13,6 +13,3 @@ if __name__ == "__main__":
     wi = SSMTWorkItem(name=os.path.split(sys.argv[0])[1], command=command, assets=AssetCollection.from_directory("analyzers"))
 
     wi.run(True, platform=platform)
-
-
-
