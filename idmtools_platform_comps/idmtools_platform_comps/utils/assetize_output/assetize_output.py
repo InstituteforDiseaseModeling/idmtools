@@ -10,6 +10,7 @@ from typing import List, Union, Callable, Dict
 from idmtools.assets import Asset, AssetCollection
 from idmtools.assets.file_list import FileList
 from idmtools.core.interfaces.irunnable_entity import IRunnableEntity
+from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform import IPlatform
 from idmtools.entities.iworkflow_item import IWorkflowItem
@@ -55,11 +56,13 @@ class AssetizeOutput(SSMTWorkItem):
     asset_tags: Dict[str, str] = field(default_factory=dict)
     #: The asset collection created by Assetize
     asset_collection: AssetCollection = field(default=None)
+    #: Enables running jobs without creating assets. It instead produces a file list of what would be includes in the final assets
     dry_run: bool = field(default=False)
 
     def __post_init__(self, item_name: str, asset_collection_id: UUID, asset_files: FileList, user_files: FileList, command: str):
         # Set command to nothing here for now. Eventually this will go away after 1.7.0
-        super().__post_init__(item_name, asset_collection_id, asset_files, user_files, command='assetize_ssmt_script.py')
+        self.task = CommandTask(command="assetize_ssmt_script.py")
+        super().__post_init__(item_name, asset_collection_id, asset_files, user_files, "")
         # we need all our items as true entities, so convert them to entities
 
     def create_command(self) -> str:

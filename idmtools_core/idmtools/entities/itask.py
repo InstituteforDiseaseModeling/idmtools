@@ -45,16 +45,23 @@ class ITask(metaclass=ABCMeta):
     transient_assets: AssetCollection = field(default_factory=AssetCollection)
 
     # log to add to items to track provisioning of task
-    _task_log: Logger = field(default_factory=lambda: getLogger(__name__), compare=False,
-                              metadata=dict(pickle_ignore=True))
+    _task_log: Logger = field(default_factory=lambda: getLogger(__name__), compare=False, metadata=dict(pickle_ignore=True))
 
     def __post_init__(self):
         self._task_log = getLogger(f'{self.__class__.__name__ }_{time.time()}')
-        if isinstance(self.command, str):
-            self.command = CommandLine(self.command)
 
         self.__pre_creation_hooks = []
         self.__post_creation_hooks = []
+
+    @property
+    def command(self):
+        return self._command
+
+    @command.setter
+    def command(self, value: Union[str, CommandLine]):
+        if isinstance(value, property):
+            pass
+        self._command = CommandLine(value) if isinstance(value, str) else value
 
     @property
     def metadata_fields(self):

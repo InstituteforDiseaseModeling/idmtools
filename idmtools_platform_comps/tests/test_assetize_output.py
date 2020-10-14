@@ -176,3 +176,16 @@ class TestAssetizeOutput(unittest.TestCase):
         self.assertTrue(ao.succeeded)
         self.assertIsNone(ac)
 
+    def test_simulation_include_assets(self):
+        ao = AssetizeOutput(name=self.case_name, related_experiments=['874586c5-860a-eb11-a2c2-f0921c167862'], file_patterns=["**/*.py"], verbose=True, include_assets=True)
+        ac = ao.run(wait_on_done=True, platform=Platform("COMPS2"))
+
+        self.assertTrue(ao.succeeded)
+        self.assertIsNotNone(ac)
+
+        self.assertEqual(ac, ao.asset_collection)
+        filelist = [f.filename for f in ac]
+        self.assertEqual(60, len(filelist))
+        py_files = [f for f in ac if f.filename.endswith('.py')]
+        self.assertEqual(60, len(py_files))
+

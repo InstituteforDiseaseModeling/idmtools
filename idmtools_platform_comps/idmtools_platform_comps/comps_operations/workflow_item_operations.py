@@ -147,7 +147,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         """
         work_item.get_platform_object().commission()
         user_logger.info(
-            f"\nThe running experiment can be viewed at {self.platform.endpoint}/#explore/"
+            f"\nThe running WorkItem can be viewed at {self.platform.endpoint}/#explore/"
             f"WorkItems?filters=ID={work_item.uid}\n"
         )
 

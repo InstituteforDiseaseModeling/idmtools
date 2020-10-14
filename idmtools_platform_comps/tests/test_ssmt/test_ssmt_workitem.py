@@ -6,6 +6,7 @@ from idmtools.analysis.download_analyzer import DownloadAnalyzer
 from idmtools.assets import AssetCollection
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
+from idmtools.entities.command_task import CommandTask
 from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools.analysis.analyze_manager import AnalyzeManager
@@ -305,3 +306,10 @@ class TestSSMTWorkItem(ITestWithPersistence):
         self.assertIsNone(wi.assets.id)
         self.assertIsNone(wi.tags)
         self.assertEqual(len(wi.transient_assets), 0)
+
+    def test_workitem_task(self):
+        command = "python hello.py"
+        task = CommandTask(command=command, transient_assets=AssetCollection([os.path.join(self.input_file_path, "hello.py")]))
+        wi = SSMTWorkItem(task=task, name=self.case_name, tags=self.tags)
+        wi.run(wait_on_done=True)
+        self.assertTrue(wi.succeeded)

@@ -1,5 +1,5 @@
 import re
-from typing import List, Callable, Union
+from typing import List, Callable, Union, Type
 import inspect
 import os
 import pickle
@@ -14,9 +14,9 @@ logger = getLogger(__name__)
 user_logger = getLogger('user')
 
 
-class PlatformAnalysis:
+class PlatformAnalysisBootstrap:
 
-    def __init__(self, platform: IPlatform, experiment_ids: List['str'], analyzers: List[IAnalyzer], analyzers_args=None, analysis_name: str = 'WorkItem Test', tags=None, additional_files: Union[FileList, AssetCollection, List[str]] = None, asset_collection_id=None,
+    def __init__(self, platform: IPlatform, experiment_ids: List['str'], analyzers: List[Type[IAnalyzer]], analyzers_args=None, analysis_name: str = 'WorkItem Test', tags=None, additional_files: Union[FileList, AssetCollection, List[str]] = None, asset_collection_id=None,
                  asset_files: Union[FileList, AssetCollection, List[str]] = None, wait_till_done: bool = True,
                  idmtools_config: str = None, pre_run_func: Callable = None, wrapper_shell_script: str = None, verbose: bool = False):
         """

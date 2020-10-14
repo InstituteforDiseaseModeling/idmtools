@@ -15,6 +15,14 @@ class CommandLine:
     _args: List[Any] = field(default_factory=list)
 
     def __init__(self, executable=None, *args, **kwargs):
+        # If there is a space in executable, we probably need to split it
+        if " " in executable:
+            parts = executable.split(" ")
+            executable = parts[0]
+            if args:
+                args = parts[1:] + args
+            else:
+                args = parts[1:]
         self._executable = executable
         self._options = kwargs or {}
         self._args = args or []
