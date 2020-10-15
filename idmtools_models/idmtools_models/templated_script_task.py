@@ -211,7 +211,7 @@ class TemplatedScriptTask(ITask):
         else:
             sn += self.script_path
         # set the command line to the rendered script
-        self.command = CommandLine(sn)
+        self.command = CommandLine.from_string(sn)
         # set any extra arguments
         if self.extra_command_arguments:
             self.command.add_argument(self.extra_command_arguments)

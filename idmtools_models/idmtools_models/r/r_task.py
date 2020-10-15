@@ -33,8 +33,7 @@ class RTask(DockerTask):
         cmd_str = f'{self.r_path} ./Assets/{os.path.basename(self.script_path)}'
         if self._command:
             if isinstance(self._command, str):
-                self._command = CommandLine(cmd_str)
-            self._command._executable = cmd_str
+                self._command = CommandLine.from_string(cmd_str)
             self._task_log.info('Setting command line to %s', cmd_str)
 
         return self._command
@@ -47,7 +46,7 @@ class RTask(DockerTask):
         super().__post_init__()
         cmd_str = f'{self.r_path} ./Assets/{os.path.basename(self.script_path)}'
         self._task_log.info('Setting command line to %s', cmd_str)
-        self.command = CommandLine(cmd_str)
+        self.command = CommandLine.from_string(cmd_str)
 
     def reload_from_simulation(self, simulation: Simulation, **kwargs):
         logger.debug("Reload from simulation")

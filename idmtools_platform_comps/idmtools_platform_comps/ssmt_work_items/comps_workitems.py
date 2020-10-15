@@ -88,7 +88,7 @@ class SSMTWorkItem(ICOMPSWorkflowItem):
             None
         """
         warnings.warn("Setting commands via command alias will be deprecated in 1.7.0. Set on task, task.command", DeprecationWarning)
-        self.task.command = CommandLine(value)
+        self.task.command = CommandLine.from_string(value)
 
 
 @dataclass

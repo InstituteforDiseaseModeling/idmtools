@@ -18,7 +18,7 @@ user_logger = getLogger('user')
 
 def create_config_before_provisioning(simulation: Simulation, platform: IPlatform):
     # set the command dynamically
-    simulation.task.task.command = CommandLine(command_format_str.format(**simulation.task.config))
+    simulation.task.task.command = CommandLine.from_string(command_format_str.format(**simulation.task.config))
     user_logger.info(f"Set command for simulation to: {simulation.task.task.command}")
 
 
