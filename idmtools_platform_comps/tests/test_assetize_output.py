@@ -1,4 +1,6 @@
 import os
+
+import allure
 import pytest
 import unittest
 from idmtools.core import EntityStatus
@@ -12,6 +14,7 @@ from idmtools_test.utils.test_task import TestTask
 
 
 @pytest.mark.comps
+@allure.feature("AssetizeOutputs")
 class TestAssetizeOutput(unittest.TestCase):
     def setUp(self) -> None:
         super().setUp()

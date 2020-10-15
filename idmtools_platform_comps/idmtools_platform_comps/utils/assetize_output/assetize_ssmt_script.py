@@ -34,7 +34,7 @@ JOB_CONFIG = None
 
 
 class NoFileFound(Exception):
-    doc_link: str = "assetize_outputs#no_files_found"
+    doc_link: str = "platforms/comps/assetize_output.html#errors"
 
 
 def gather_files(directory: str, file_patterns: List[str], exclude_patterns: List[str] = None, assets: bool = False, prefix: str = None) -> SetOfAssets:
