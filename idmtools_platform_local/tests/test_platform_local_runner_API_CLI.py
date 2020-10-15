@@ -70,7 +70,7 @@ class TestLocalRunnerCLI(ITestWithPersistence):
             # self.assertEqual(simulations[0]['status'], s.status.value) # wait for bug fix
             self.assertEqual(simulation['tags'], s.tags)
             self.assertEqual(simulation['data_path'], '/data/' + str(self.pe.uid) + '/' + str(s.uid))
-            self.assertEqual(simulation['extra_details']['command'], 'python ./Assets/model1.py')
+            self.assertEqual(simulation['extra_details']['command'], 'python Assets/model1.py')
 
             # Also test get_one with simulation id filter
             simulation = SimulationsClient.get_one(str(s.uid))
@@ -87,7 +87,7 @@ class TestLocalRunnerCLI(ITestWithPersistence):
             self.assertEqual(simulation['experiment_id'], str(self.pe.uid))
             self.assertEqual(simulation['tags'], s.tags)
             self.assertEqual(simulation['data_path'], '/data/' + str(self.pe.uid) + '/' + str(s.uid))
-            self.assertEqual(simulation['extra_details']['command'], 'python ./Assets/model1.py')
+            self.assertEqual(simulation['extra_details']['command'], 'python Assets/model1.py')
 
         # Test 3: get_all simulations with experiment id as only filter
         simulations = SimulationsClient.get_all(experiment_id=str(self.pe.uid))
