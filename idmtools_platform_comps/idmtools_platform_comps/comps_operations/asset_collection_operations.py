@@ -125,7 +125,8 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
                         relative_path=asset.relative_path,
                         md5_checksum=cksum
                     ))
-            user_logger.info(f"Uploading {len(missing_files)} files/{humanfriendly.format_size(total_size)}")
+            if os.getenv('IDMTOOLS_SUPPRESS_OUTPUT', None) is None:
+                user_logger.info(f"Uploading {len(missing_files)} files/{humanfriendly.format_size(total_size)}")
             ac2.save()
             ac = ac2
         asset_collection.uid = ac.id

@@ -70,7 +70,7 @@ try:
     @click.option('--wait/--no-wait', default=True, help="Wait on item to finish")
     @click.option('--include-assets/--no-include-assets', default=False, help="Scan common assets of WorkItems and Experiments when filtering")
     @click.option('--verbose/--no-verbose', default=True, help="Enable verbose output in worker")
-    @click.option('--json/--no-json', default=True, help="Outputs File list as JSON when used with dry run")
+    @click.option('--json/--no-json', default=False, help="Outputs File list as JSON when used with dry run")
     @click.option('--simulation-prefix-format-str', default=None, help="Simulation Prefix Format str. Defaults to '{simulation.id}'. For no prefix, pass a empty string")
     @click.option('--work-item-prefix-format-str', default=None, help="WorfkItem Prefix Format str. Defaults to ''")
     @click.option('--tag', default=[], type=(str, str), multiple=True, help="Tags to add the created asset collection as pairs")
