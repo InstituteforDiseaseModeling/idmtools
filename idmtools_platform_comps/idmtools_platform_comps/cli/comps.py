@@ -120,7 +120,8 @@ try:
                     file = json_parser.loads(file)
                     user_logger.info(tabulate.tabulate([x.values() for x in file], file[0].keys()))
             else:
-                user_logger.info(ao.asset_collection.id)
+                user_logger.info(f"Created {ao.asset_collection.id}")
+                user_logger.info(f"It can be viewed at {p.get_asset_collection_link(ao.asset_collection)}")
                 user_logger.info("Items in Asset Collection")
                 user_logger.info("-------------------------")
                 for asset in ao.asset_collection:
