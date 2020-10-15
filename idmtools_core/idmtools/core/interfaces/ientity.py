@@ -133,20 +133,22 @@ class IEntity(IItem, metaclass=ABCMeta):
         else:
             self._platform = self.platform_id = None
 
-    def get_platform_object(self, force: bool = False, **kwargs):
+    def get_platform_object(self, force: bool = False, platform: 'IPlatform' = None, **kwargs):
         """
         Get the platform representation of an object
 
         Args:
             force: Force reload of platform object
+            platform: Allow passing platform object to fetch
             **kwargs: Optional args used for specific platform behaviour
 
         Returns:
             Platform Object
         """
+        if platform:
+            self.platform = platform
         if not self.platform:
             raise NoPlatformException("The object has no platform set...")
-
         if self._platform_object is None or force:
             self._platform_object = self.platform.get_item(self.uid, self.item_type, raw=True, force=force, **kwargs)
         return self._platform_object

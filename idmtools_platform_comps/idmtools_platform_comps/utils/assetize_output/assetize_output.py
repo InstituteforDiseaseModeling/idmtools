@@ -291,10 +291,10 @@ class AssetizeOutput(SSMTWorkItem):
                     elif isinstance(item, AssetCollection):
                         platform.create_items(item)
                 if item_type in [ItemType.SIMULATION, ItemType.WORKFLOW_ITEM, ItemType.EXPERIMENT]:
-                    po = item.get_platform_object()
+                    po = item.get_platform_object(platform=platform)
                     if item_type in [ItemType.SIMULATION, ItemType.EXPERIMENT]:
                         if item_type == ItemType.SIMULATION and po.configuration is None or po.configuration.environment_name is None:
-                            po = item.parent.get_platform_object()
+                            po = item.parent.get_platform_object(platform=platform)
                         if po.configuration is None:
                             user_logger.warning(f"Cannot determine environment of item of type {item_type} with id of {item.id}. Running assetize against items in other environments will result in an error")
                         elif po.configuration.environment_name.lower() != platform.environment.lower():
