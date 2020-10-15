@@ -197,7 +197,7 @@ class TemplatedScriptTask(ITask):
 
         Args:
             parent: Parent object
-
+            platform: Platform item is being ran on
         Returns:
 
         """
@@ -207,7 +207,7 @@ class TemplatedScriptTask(ITask):
         else:
             sn = ''
         if self.template_is_common:
-            sn += f'Assets{self.path_sep}{self.script_path}'
+            sn += platform.join_path(platform.common_asset_path, self.script_path)
         else:
             sn += self.script_path
         # set the command line to the rendered script

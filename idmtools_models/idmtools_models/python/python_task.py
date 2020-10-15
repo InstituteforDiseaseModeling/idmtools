@@ -88,9 +88,10 @@ class PythonTask(ITask):
         Raise:
             ValueError if script name is not provided
         """
-        self.command = CommandLine.from_string(f'{self.python_path} ./Assets/{os.path.basename(self.script_path)}')
+
         if self.script_path is None:
             raise ValueError("Script name is required")
+        self.command = CommandLine.from_string(f'{self.python_path} {platform.join_path(platform.common_asset_path, os.path.basename(self.script_path))}')
 
 
 class PythonTaskSpecification(TaskSpecification):

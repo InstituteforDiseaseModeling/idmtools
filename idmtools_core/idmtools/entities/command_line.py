@@ -1,3 +1,4 @@
+import re
 import shlex
 from typing import TypeVar, Dict, Any, List
 from dataclasses import dataclass, field
@@ -32,7 +33,7 @@ class CommandLine:
 
     @property
     def executable(self) -> str:
-        return self._executable
+        return self._executable.replace('/', "\\") if self.is_windows else self._executable
 
     @executable.setter
     def executable(self, executable):
@@ -56,17 +57,30 @@ class CommandLine:
                 options.extend([k, value])  # otherwise let join (below) add a space
 
         if self.is_windows:
-            return ' '.join([f'"{self.__quote_windows(s)}"' for s in options if s])
+            return ' '.join([self.__quote_windows(s) for s in options if s])
         else:
             return ' '.join([shlex.quote(s) for s in options if s])
 
-    def __quote_windows(self, s):
-        return s.replace('"', '""')
+    @staticmethod
+    def __quote_windows(s):
+        """
+        Quote a parameter for windows command line
+
+        Args:
+            s:
+
+        Returns:
+
+        """
+        n = s.replace('"', '""')
+        if re.search(r'(["\s])', s):
+            return f'"{n}"'
+        return n
 
     @property
     def arguments(self):
         if self.is_windows:
-            return ' '.join([f'"{self.__quote_windows(s)}"' for s in self._args if s])
+            return ' '.join([self.__quote_windows(s) for s in self._args if s])
         else:
             return ' '.join([shlex.quote(s) for s in self._args if s])
 

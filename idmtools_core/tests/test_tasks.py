@@ -4,6 +4,7 @@ from unittest import TestCase
 
 import pytest
 from idmtools.assets import Asset, AssetCollection
+from idmtools.core.platform_factory import Platform
 from idmtools.entities import CommandLine
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.simulation import Simulation
@@ -75,6 +76,7 @@ class TestTasks(TestCase):
             simulation.tags['a'] = 12
         task.add_pre_creation_hook(update_sim)
         sim = Simulation(task=task)
-        task.pre_creation(sim, 'a')
+        p = Platform('Test')
+        task.pre_creation(sim, Platform('Test'))
         self.assertEqual(sim.tags['a'], 12)
-        self.assertEqual(platform_item, 'a')
+        self.assertEqual(platform_item, p)

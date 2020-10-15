@@ -3,6 +3,7 @@ from abc import ABCMeta
 from dataclasses import dataclass
 from dataclasses import fields, field
 from functools import partial
+from pathlib import PureWindowsPath, PurePath
 from itertools import groupby
 from logging import getLogger, DEBUG
 from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set, Iterator, Callable
@@ -65,6 +66,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     - Commissioning
     - File handling
     """
+    #: Maps the platform types to idmtools types
     platform_type_map: Dict[Type, ItemType] = field(default=None, repr=False, init=False)
     _object_cache_expiration: 'int' = field(default=60, repr=False, init=False)
 
@@ -80,6 +82,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     _regather_assets_on_modify: bool = field(default=False, repr=False, init=False, compare=False)
     # store the config block used to create platform
     _config_block: str = field(default=None)
+    #: Defines the path to common assets
+    _common_asset_path: str = field(default="Assets", repr=True, init=False, compare=False)
 
     @staticmethod
     def get_caller():
@@ -808,6 +812,39 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             True or false
         """
         return self._regather_assets_on_modify
+
+    def is_windows_platform(self) -> bool:
+        """
+        Returns is the arget platform is a windows system
+        """
+
+        return self.are_requirements_met(PlatformRequirements.WINDOWS)
+
+    @property
+    def common_asset_path(self):
+        return self._common_asset_path
+
+    @common_asset_path.setter
+    def common_asset_path(self, value):
+        if not isinstance(value, property):
+            logger.warning("Cannot set common asset path")
+
+    def join_path(self, *args) -> str:
+        """
+        Join path using platform rules
+
+        Args:
+            *args:List of paths to join
+
+        Returns:
+            Joined path as string
+        """
+        if len(args) < 2:
+            raise ValueError("at least two items required to join")
+        if self.is_windows_platform():
+            return str(PureWindowsPath(*args))
+        else:
+            return str(PurePath(*args))
 
 
 TPlatform = TypeVar("TPlatform", bound=IPlatform)

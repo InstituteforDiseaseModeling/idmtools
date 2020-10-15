@@ -1,8 +1,13 @@
 from dataclasses import dataclass, field
-from typing import List, Callable, Type
+from typing import List, Callable, Type, Union, TYPE_CHECKING
 from idmtools.assets import AssetCollection
 from idmtools.entities.itask import ITask
 from idmtools.registry.task_specification import TaskSpecification
+
+if TYPE_CHECKING:
+    from idmtools.entities.iplatform import IPlatform
+    from idmtools.entities.iworkflow_item import IWorkflowItem
+    from idmtools.entities.simulation import Simulation
 
 
 @dataclass()
@@ -51,6 +56,10 @@ class CommandTask(ITask):
 
     def reload_from_simulation(self, simulation: 'Simulation'):  # noqa: F821
         pass
+
+    def pre_creation(self, parent: Union['Simulation', 'IWorkflowItem'], platform: 'IPlatform'):
+        if platform.is_windows_platform():
+            self.command.is_windows = True
 
 
 class CommandTaskSpecification(TaskSpecification):

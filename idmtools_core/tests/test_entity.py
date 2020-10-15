@@ -8,6 +8,7 @@ from dataclasses import dataclass, field, fields
 import pytest
 from idmtools.builders import SimulationBuilder
 from idmtools.core.interfaces.ientity import IEntity
+from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.suite import Suite
@@ -130,7 +131,7 @@ class TestEntity(ITestWithPersistence):
 
         a = DummyClass()
         a.add_hook(s)
-        s.pre_creation(None)
+        s.pre_creation(Platform('Test'))
         self.assertEqual(globals()['abc'], 1)
 
     def test_post_creation_allow_partials(self):
@@ -149,7 +150,7 @@ class TestEntity(ITestWithPersistence):
 
         a = DummyClass()
         a.add_hook(s)
-        s.post_creation(None)
+        s.post_creation(Platform('Test'))
         self.assertEqual(globals()['abc'], 1)
 
     def test_post_creation_only_two_args(self):

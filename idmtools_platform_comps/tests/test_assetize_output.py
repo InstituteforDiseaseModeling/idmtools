@@ -16,6 +16,7 @@ class TestAssetizeOutput(unittest.TestCase):
     def setUp(self) -> None:
         super().setUp()
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        self.platform = Platform("COMPS2")
 
     @pytest.mark.smoke
     def test_experiment_can_be_watched(self):
@@ -50,7 +51,7 @@ class TestAssetizeOutput(unittest.TestCase):
         ao = AssetizeOutput()
         self.assertEqual(0, len(ao.related_experiments))
         with self.assertRaises(ValueError) as er:
-            ao.pre_creation(None)
+            ao.pre_creation(self.platform)
         self.assertEqual(er.exception.args[0], "You must specify at least one item to watch")
 
     @pytest.mark.smoke
@@ -63,7 +64,7 @@ class TestAssetizeOutput(unittest.TestCase):
         ao.from_items(e)
         self.assertEqual(1, len(ao.related_experiments))
         self.assertEqual(ao.related_experiments[0], e)
-        ao.pre_creation(None)
+        ao.pre_creation(self.platform)
         self.assertEqual(1, len(ao.file_patterns))
         self.assertEqual("**", ao.file_patterns[0])
         print(e.id)
@@ -83,7 +84,8 @@ class TestAssetizeOutput(unittest.TestCase):
             pass
         ao.pre_run_functions.append(pre_run_dummy)
         ao.entity_filter_function = entity_filter_dummy
-        ao.pre_creation(None)
+        
+        ao.pre_creation(self.platform)
         self.assertEqual(len(ao.assets), 3)
         self.assertIn("pre_run.py", [f.filename for f in ao.assets])
         self.assertIn("entity_filter_func.py", [f.filename for f in ao.assets])
@@ -93,7 +95,7 @@ class TestAssetizeOutput(unittest.TestCase):
         self.assertEqual(ao.create_command(), 'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --asset-tag "AssetizedOutputfromFromExperiment=095565e833818aab3340e802512c32ff" --simulation-prefix-format-str "{simulation.id}" --pre-run-func pre_run_dummy --pre-run-func another_pre_run_dummy --entity-filter-func entity_filter_dummy --verbose')
 
     def test_comps_simple(self):
-        platform = Platform("COMPS2")
+        platform = self.platform
         task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"), parameters=dict(a=1))
         e = Experiment.from_task(name=self.case_name, task=task)
         ao = AssetizeOutput(name=self.case_name, verbose=True)
@@ -103,9 +105,20 @@ class TestAssetizeOutput(unittest.TestCase):
         self.assertTrue(e.succeeded)
         self.assertTrue(ao.succeeded)
 
+    def test_experiment_all(self):
+        ao = AssetizeOutput(name=self.case_name, related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'], verbose=True)
+        ac = ao.run(wait_on_done=True, platform=self.platform)
+
+        self.assertTrue(ao.succeeded)
+        self.assertIsNotNone(ac)
+
+        self.assertEqual(ac, ao.asset_collection)
+        filelist = [f.filename for f in ac]
+        self.assertEqual(36, len(filelist))
+
     def test_experiment(self):
         ao = AssetizeOutput(name=self.case_name, related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'], file_patterns=["**/a.csv"], verbose=True)
-        ac = ao.run(wait_on_done=True, platform=Platform("COMPS2"))
+        ac = ao.run(wait_on_done=True, platform=self.platform)
 
         self.assertTrue(ao.succeeded)
         self.assertIsNotNone(ac)
@@ -116,7 +129,7 @@ class TestAssetizeOutput(unittest.TestCase):
 
     def test_experiment_sim_prefix(self):
         ao = AssetizeOutput(name=self.case_name, related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'], simulation_prefix_format_str="{simulation.state}/{simulation.id}", file_patterns=["**/a.csv"], verbose=True)
-        ac = ao.run(wait_on_done=True, platform=Platform("COMPS2"))
+        ac = ao.run(wait_on_done=True, platform=self.platform)
 
         self.assertTrue(ao.succeeded)
         self.assertIsNotNone(ac)
@@ -127,7 +140,7 @@ class TestAssetizeOutput(unittest.TestCase):
 
     def test_simulation(self):
         ao = AssetizeOutput(name=self.case_name, related_simulations=['9d11af40-1337-ea11-a2be-f0921c167861'], file_patterns=["**/*.csv"], verbose=True)
-        ac = ao.run(wait_on_done=True, platform=Platform("COMPS2"))
+        ac = ao.run(wait_on_done=True, platform=self.platform)
 
         self.assertTrue(ao.succeeded)
         self.assertIsNotNone(ac)
@@ -138,7 +151,7 @@ class TestAssetizeOutput(unittest.TestCase):
 
     def test_workitem(self):
         ao = AssetizeOutput(name=self.case_name, related_work_items=['a6d11db7-1603-e911-80ca-f0921c167866'], file_patterns=["*.png"], verbose=True)
-        ac = ao.run(wait_on_done=True, platform=Platform("COMPS2"))
+        ac = ao.run(wait_on_done=True, platform=self.platform)
 
         self.assertTrue(ao.succeeded)
         self.assertIsNotNone(ac)
@@ -150,7 +163,7 @@ class TestAssetizeOutput(unittest.TestCase):
         with self.subTest("test_workitem_prefix"):
 
             ao2 = AssetizeOutput(name=self.case_name, related_work_items=['a6d11db7-1603-e911-80ca-f0921c167866', ao], file_patterns=["**.txt"], exclude_patterns=['WorkOrder.json'], verbose=True, work_item_prefix_format_str="{work_item.name}")
-            ac = ao2.run(wait_on_done=True, platform=Platform("COMPS2"))
+            ac = ao2.run(wait_on_done=True, platform=self.platform)
             self.assertTrue(ao2.succeeded)
             self.assertIsNotNone(ac)
 
@@ -160,7 +173,7 @@ class TestAssetizeOutput(unittest.TestCase):
 
     def test_filter_ac(self):
         ao = AssetizeOutput(name=self.case_name, related_asset_collections=['2b53af74-2b4a-e711-80c1-f0921c167860'], file_patterns=["**/libvectorstats.dll"], verbose=True)
-        ac = ao.run(wait_on_done=True, platform=Platform("COMPS2"))
+        ac = ao.run(wait_on_done=True, platform=self.platform)
 
         self.assertTrue(ao.succeeded)
         self.assertIsNotNone(ac)
@@ -171,14 +184,14 @@ class TestAssetizeOutput(unittest.TestCase):
 
     def test_dry_run(self):
         ao = AssetizeOutput(name=self.case_name, related_simulations=['9d11af40-1337-ea11-a2be-f0921c167861'], related_asset_collections=['2b53af74-2b4a-e711-80c1-f0921c167860'], verbose=True, dry_run=True)
-        ac = ao.run(wait_on_done=True, platform=Platform("COMPS2"))
+        ac = ao.run(wait_on_done=True, platform=self.platform)
 
         self.assertTrue(ao.succeeded)
         self.assertIsNone(ac)
 
     def test_simulation_include_assets(self):
         ao = AssetizeOutput(name=self.case_name, related_experiments=['874586c5-860a-eb11-a2c2-f0921c167862'], file_patterns=["**/*.py"], verbose=True, include_assets=True)
-        ac = ao.run(wait_on_done=True, platform=Platform("COMPS2"))
+        ac = ao.run(wait_on_done=True, platform=self.platform)
 
         self.assertTrue(ao.succeeded)
         self.assertIsNotNone(ac)

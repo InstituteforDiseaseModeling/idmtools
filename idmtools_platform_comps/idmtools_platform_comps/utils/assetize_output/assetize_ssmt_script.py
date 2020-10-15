@@ -1,6 +1,6 @@
 import glob
+import json
 from pathlib import PurePath
-import pprint
 import traceback
 import sys
 from logging import getLogger, DEBUG
@@ -30,6 +30,8 @@ EntityFilterFunc = Callable[[CommissionableEntity.CommissionableEntity], bool]
 DONE_STATE = [SimulationState.Failed, SimulationState.Canceled, SimulationState.Succeeded]
 HPC_JOBS_QUERY = QueryCriteria().select_children('hpc_jobs')
 
+JOB_CONFIG = None
+
 
 class NoFileFound(Exception):
     doc_link: str = "assetize_outputs#no_files_found"
@@ -54,11 +56,17 @@ def gather_files(directory: str, file_patterns: List[str], exclude_patterns: Lis
     # Loop through our patterns
     for pattern in file_patterns:
         # User glob to search each directory using the pattern. We also do full recursion here
+
+        sd = os.path.join(directory, pattern)
         if logger.isEnabledFor(DEBUG):
-            logger.debug(f'Looking for files with pattern {pattern} in {directory}')
-        for file in glob.iglob(os.path.join(directory, pattern), recursive=True):
+            logger.debug(f'Looking for files with pattern {sd}')
+        for file in glob.iglob(sd, recursive=True):
             # Ensure it is a file and not a directory
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f'{file} matching pattern. Is Dir: {os.path.isdir(file)}. Is Link: {os.path.islink(file)}')
             if os.path.isfile(file):
+                if logger.isEnabledFor(DEBUG):
+                    logger.debug(f'Found file {file}')
                 # Create our shortname. This will remove the base directory from the file. Eg
                 # If are scanning C:\ABC\, the file C:\ABC\DEF\123.txt will be DEF\123.txt
                 short_name = file.replace(directory + os.path.sep, "")
@@ -411,10 +419,11 @@ def assetize_error_handler(exctype, value: Exception, tb):
         from idmtools.utils.info import get_help_version_url
         print(f"No files were found. Check your patterns match the data from related item. For more details, see {get_help_version_url(value.doc_link)}")
     with open("error_reason.json", 'w') as err_out:
-        output_error = dict(type=exctype.__name__, args=list(value.args), tb=traceback.format_tb(tb))
+        output_error = dict(type=exctype.__name__, args=list(value.args), tb=traceback.format_tb(tb), job_config=JOB_CONFIG)
+        output_error['tb'] = [t.strip() for t in output_error['tb']]
         if hasattr(value, 'doc_link'):
             output_error['doc_link'] = value.doc_link
-        pprint.pprint(output_error, err_out)
+        json.dump(output_error, err_out, indent=4, sort_keys=True)
 
     # Call native exception manager
     sys.__excepthook__(exctype, value, tb)
@@ -461,7 +470,7 @@ def print_results(ac_files, files):
         fn = get_asset_file_path(af)
         all_files.append(dict(filename=fn, destname=fn, filesize=af._length))
     with open("file_list.json", 'w') as flist:
-        pprint.pprint(all_files, flist)
+        json.dump(all_files, flist, indent=4, sort_keys=True)
     header = all_files[0].keys()
     rows = [x.values() for x in sorted(all_files, key=lambda x: x['destname'])]
     with open("file_list.html", "w") as html_list:
@@ -473,6 +482,8 @@ def print_results(ac_files, files):
 if __name__ == "__main__":
     parser = get_argument_parser()
     args = parser.parse_args()
+
+    JOB_CONFIG = vars(args)
 
     if args.verbose:
         # set to debug before loading idmtools
@@ -521,6 +532,8 @@ if __name__ == "__main__":
     sys.excepthook = assetize_error_handler
     # Run a check that all our dependencies have been loaded
     ensure_items_are_ready(wi)
+    if "**" in args.file_pattern:
+        args.file_pattern = ["**"]
     # Gather all our files
     files = gather_files_from_related(
         wi, file_patterns=args.file_pattern, exclude_patterns=args.exclude_pattern if args.exclude_pattern else [], assets=args.assets,

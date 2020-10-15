@@ -1,4 +1,5 @@
 import json
+import os
 import typing
 from dataclasses import dataclass, field
 from logging import getLogger, DEBUG
@@ -146,10 +147,11 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         Returns: None
         """
         work_item.get_platform_object().commission()
-        user_logger.info(
-            f"\nThe running WorkItem can be viewed at {self.platform.endpoint}/#explore/"
-            f"WorkItems?filters=ID={work_item.uid}\n"
-        )
+        if os.getenv('IDMTOOLS_SUPPRESS_OUTPUT', None) is None:
+            user_logger.info(
+                f"\nThe running WorkItem can be viewed at {self.platform.endpoint}/#explore/"
+                f"WorkItems?filters=ID={work_item.uid}\n"
+            )
 
     def get_parent(self, work_item: IWorkflowItem, **kwargs) -> Any:
         """

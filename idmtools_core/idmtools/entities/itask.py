@@ -122,9 +122,12 @@ class ITask(metaclass=ABCMeta):
         Returns:
 
         """
+
         if self.command is None:
             logger.error('Command is not defined')
             raise ValueError("Command is required for on task when preparing an experiment")
+        if platform.is_windows_platform():
+            self.command.is_windows = True
         [hook(parent, platform) for hook in self.__pre_creation_hooks]
 
     def post_creation(self, parent: Union['Simulation', 'IWorkflowItem'], platform: 'IPlatform'):  # noqa: F821

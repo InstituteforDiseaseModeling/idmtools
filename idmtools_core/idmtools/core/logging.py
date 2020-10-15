@@ -43,6 +43,11 @@ class IDMQueueHandler(QueueHandler):
             pass
 
 
+class PrintHandler(logging.Handler):
+    def handle(self, record: logging.LogRecord) -> None:
+        print(record.message)
+
+
 def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'idmtools.log',
                   console: Union[str, bool] = False) -> QueueListener:
     """
@@ -124,11 +129,17 @@ def setup_handlers(level, log_filename, console: bool = False):
     logging.root.addHandler(queue_handler)
     logging.getLogger('user').addHandler(queue_handler)
 
-    if console or os.getenv('IDM_TOOLS_CONSOLE_LOGGING', 'F').lower() in ['1', 'y', 't', 'yes', 'true', 'on']:
-        coloredlogs.install(level=level, milliseconds=True, stream=sys.stdout)
+    # Use print based output. Mainly for test of CLI commands
+    if os.getenv('IDMTOOLS_USE_PRINT_OUTPUT', 'F').lower() not in ['1', 'y', 't', 'yes', 'true', 'on']:
+        if console or os.getenv('IDM_TOOLS_CONSOLE_LOGGING', 'F').lower() in ['1', 'y', 't', 'yes', 'true', 'on']:
+            coloredlogs.install(level=level, milliseconds=True, stream=sys.stdout)
+        else:
+            # install colored logs for user logger only
+            coloredlogs.install(logger=getLogger('user'), level=VERBOSE, fmt='%(message)s', stream=sys.stdout)
     else:
-        # install colored logs for user logger only
-        coloredlogs.install(logger=getLogger('user'), level=VERBOSE, fmt='%(message)s')
+        handler = PrintHandler(level=VERBOSE)
+        handler.setLevel(VERBOSE)
+        getLogger('user').addHandler(handler)
     handlers = logging.root.handlers
     return file_handler
 

@@ -1,3 +1,4 @@
+import copy
 from uuid import UUID
 
 import re
@@ -31,13 +32,15 @@ WI_PROPERTY_MAP = dict(
     related_asset_collections=ItemType.ASSETCOLLECTION
 )
 
+DEFAULT_EXCLUDES = ["StdErr.txt", "StdOut.txt", "WorkOrder.json", "*.log"]
+
 
 @dataclass(repr=False)
 class AssetizeOutput(SSMTWorkItem):
     #: List of glob patterns. See https://docs.python.org/3.7/library/glob.html for details on the patterns
     file_patterns: List[str] = field(default_factory=list)
     # Exclude patterns.
-    exclude_patterns: List[str] = field(default_factory=lambda: ["StdErr.txt", "StdOut.txt", "WorkOrder.json", "*.log"])
+    exclude_patterns: List[str] = field(default_factory=lambda: copy.copy(DEFAULT_EXCLUDES))
     #: Include Assets directories. This allows patterns to also include items from the assets directory
     include_assets: bool = field(default=False)
     #: Formatting pattern for directory names. Simulations tend to have similar outputs so Assetize puts those in directories using the simulation id by default as the directory name
@@ -196,7 +199,8 @@ class AssetizeOutput(SSMTWorkItem):
         self.__pickle_pre_run()
         self.__pickle_filter_func()
         self.task.command = self.create_command()
-        user_logger.info("Creating Watcher")
+        if os.getenv('IDMTOOLS_SUPPRESS_OUTPUT', None) is None:
+            user_logger.info("Creating Watcher")
 
     def __generate_tags(self):
         """
@@ -362,7 +366,7 @@ class AssetizeOutput(SSMTWorkItem):
         self.__wait_on_children(**opts)
 
         super().wait(**opts)
-        if self.status == EntityStatus.SUCCEEDED:
+        if self.status == EntityStatus.SUCCEEDED and not self.dry_run:
             # If we succeeded, get our AC
             comps_workitem = self.get_platform_object(force=True)
             acs = comps_workitem.get_related_asset_collections(RelationType.Created)

@@ -24,9 +24,9 @@ class TestPythonTask(TestCase):
         fpath = os.path.join(COMMON_INPUT_PATH, "python", "model1.py")
         task = PythonTask(script_path=fpath)
         task.gather_all_assets()
-        task.pre_creation(None, None)
+        task.pre_creation(None, Platform("Test"))
 
-        self.assertEqual(str(task.command), f'python ./Assets/model1.py')
+        self.assertEqual(str(task.command), f'python Assets/model1.py')
         self.validate_common_assets(fpath, task)
 
     def validate_common_assets(self, fpath, task):
@@ -64,9 +64,9 @@ class TestPythonTask(TestCase):
         fpath = os.path.join(COMMON_INPUT_PATH, "python", "model1.py")
         task = JSONConfiguredPythonTask(script_path=fpath)
         task.gather_all_assets()
-        task.pre_creation(None, None)
+        task.pre_creation(None, Platform("Test"))
 
-        self.assertEqual(str(task.command), f'python ./Assets/model1.py --config config.json')
+        self.assertEqual(str(task.command), f'python Assets/model1.py --config config.json')
         self.validate_common_assets(fpath, task)
         self.validate_json_transient_assets(task)
 
@@ -80,9 +80,9 @@ class TestPythonTask(TestCase):
         # here we test a script that may have no config
         task = JSONConfiguredPythonTask(script_path=fpath, configfile_argument=None)
         task.gather_all_assets()
-        task.pre_creation(None, None)
+        task.pre_creation(None, Platform("Test"))
 
-        self.assertEqual(str(task.command), f'python ./Assets/model1.py')
+        self.assertEqual(str(task.command), f'python Assets/model1.py')
         self.validate_common_assets(fpath, task)
         self.validate_json_transient_assets(task)
 
@@ -96,9 +96,9 @@ class TestPythonTask(TestCase):
         fpath = os.path.join(COMMON_INPUT_PATH, "python", "model1.py")
         task = JSONConfiguredPythonTask(script_path=fpath, configfile_argument=None, python_path='python3.8')
         task.gather_all_assets()
-        task.pre_creation(None, None)
+        task.pre_creation(None, Platform("Test"))
 
-        self.assertEqual(str(task.command), f'python3.8 ./Assets/model1.py')
+        self.assertEqual(str(task.command), f'python3.8 Assets/model1.py')
         self.validate_common_assets(fpath, task)
         self.validate_json_transient_assets(task)
 
