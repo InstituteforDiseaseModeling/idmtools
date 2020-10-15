@@ -1,6 +1,5 @@
 import copy
 from uuid import UUID
-
 import re
 import inspect
 import os
@@ -32,7 +31,13 @@ WI_PROPERTY_MAP = dict(
     related_asset_collections=ItemType.ASSETCOLLECTION
 )
 
+# Default list of ignored files
 DEFAULT_EXCLUDES = ["StdErr.txt", "StdOut.txt", "WorkOrder.json", "*.log"]
+
+
+# Error thrown when user tries to assetize across Comps Environments
+class CrossEnvironmentAssetizeNotSupport(Exception):
+    pass
 
 
 @dataclass(repr=False)
@@ -184,7 +189,7 @@ class AssetizeOutput(SSMTWorkItem):
             self.name = self.__generate_name()
 
         self.__convert_ids_to_items(platform)
-        self.__ensure_all_dependencies_created(platform)
+        self.__ensure_all_dependencies_created_and_in_proper_env(platform)
 
         if len(self.asset_tags) == 0:
             self.__generate_tags()
@@ -255,14 +260,17 @@ class AssetizeOutput(SSMTWorkItem):
 
         for prop, item_type in WI_PROPERTY_MAP.items():
             new_items = []
-            for id in getattr(self, prop):
-                if isinstance(id, str):
-                    new_items.append(platform.get_item(id, item_type, force=True))
-                else:
-                    new_items.append(id)
+            for item in getattr(self, prop):
+                if isinstance(item, str):
+                    item = platform.get_item(item, item_type, force=True)
+                if item_type in [ItemType.WORKFLOW_ITEM, ItemType.SIMULATION, ItemType.EXPERIMENT]:
+                    ri = item.get_platform_object()
+                    if not hasattr(ri, 'configuration') or ri.configuration is None:
+                        item = platform.get_item(item, item_type)
+                new_items.append(item)
             setattr(self, prop, new_items)
 
-    def __ensure_all_dependencies_created(self, platform: IPlatform):
+    def __ensure_all_dependencies_created_and_in_proper_env(self, platform: IPlatform):
         """
         Ensures all items we are watching
         Args:
@@ -271,8 +279,8 @@ class AssetizeOutput(SSMTWorkItem):
         Returns:
 
         """
-        for item_type in WI_PROPERTY_MAP.keys():
-            items = getattr(self, item_type)
+        for work_prop, item_type in WI_PROPERTY_MAP.items():
+            items = getattr(self, work_prop)
             for item in items:
                 if item.status is None:
                     if isinstance(item, IRunnableEntity):
@@ -282,6 +290,15 @@ class AssetizeOutput(SSMTWorkItem):
                         item.parent.run(platform=platform)
                     elif isinstance(item, AssetCollection):
                         platform.create_items(item)
+                if item_type in [ItemType.SIMULATION, ItemType.WORKFLOW_ITEM, ItemType.EXPERIMENT]:
+                    po = item.get_platform_object()
+                    if item_type == ItemType.SIMULATION and po.configuration is None or po.configuration.environment_name is None:
+                        po = item.parent.get_platform_object()
+
+                    if po.configuration is None:
+                        user_logger.warning(f"Cannot determine environment of item of type {item_type} with id of {item.id}. Running assetize against items in other environments will result in an error")
+                    elif po.configuration.environment_name.lower() != platform.environment.lower():
+                        raise CrossEnvironmentAssetizeNotSupport(f"You cannot assetize between environment. In this case, the {item_type.value} {item.id} is in {po.configuration.environment_name} but you are running your workitem in {platform.environment}")
 
     def total_items_watched(self) -> int:
         """
@@ -299,7 +316,8 @@ class AssetizeOutput(SSMTWorkItem):
         if item_type not in [ItemType.EXPERIMENT, ItemType.SIMULATION, ItemType.WORKFLOW_ITEM]:
             raise ValueError("Currently only Experiment, Simuation, and WorktforlItems can be assetize")
         p = super()._check_for_platform_from_context(platform)
-        item = p.get_item(item_id=item_id, item_type=item_type)
+        extra = dict()
+        item = p.get_item(item_id=item_id, item_type=item_type, **extra)
         if item:
             self.from_items(item)
         raise FileNotFoundError(f"Cannot find the item with {item_id} of type {item_type}")

@@ -46,7 +46,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
             COMPSWorkItem
         """
         columns = columns or ["id", "name", "state"]
-        load_children = load_children if load_children is not None else ["tags"]
+        load_children = load_children if load_children is not None else ["tags", "configuration"]
         query_criteria = query_criteria or QueryCriteria().select(columns).select_children(load_children)
         return COMPSWorkItem.get(workflow_item_id, query_criteria=query_criteria)
 

@@ -7,7 +7,7 @@ from idmtools.core import EntityStatus
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
-from idmtools_platform_comps.utils.assetize_output.assetize_output import AssetizeOutput
+from idmtools_platform_comps.utils.assetize_output.assetize_output import AssetizeOutput, CrossEnvironmentAssetizeNotSupport
 from idmtools_platform_comps.utils.assetize_output.assetize_ssmt_script import is_file_excluded
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.test_task import TestTask
@@ -129,6 +129,13 @@ class TestAssetizeOutput(unittest.TestCase):
         self.assertEqual(ac, ao.asset_collection)
         filelist = [f.filename for f in ac]
         self.assertEqual(9, len(filelist))
+
+    def test_experiment_cross_environment_fail(self):
+        ao = AssetizeOutput(name=self.case_name, related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'], file_patterns=["**/a.csv"], verbose=True)
+        with self.assertRaises(CrossEnvironmentAssetizeNotSupport) as err:
+            ac = ao.run(wait_on_done=True, platform=Platform("SLURM2"))
+
+        self.assertEqual("'You cannot assetize between environment. In this case, the Experiment 9311af40-1337-ea11-a2be-f0921c167861 is in Bayesian but you are running your workitem in SlurmStage'")
 
     def test_experiment_sim_prefix(self):
         ao = AssetizeOutput(name=self.case_name, related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'], simulation_prefix_format_str="{simulation.state}/{simulation.id}", file_patterns=["**/a.csv"], verbose=True)
