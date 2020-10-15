@@ -217,9 +217,10 @@ class JSONConfiguredTask(ITask):
             if self.command_line_argument not in self.command.arguments:
                 # check if we should add filename with arg?
                 if self.command_line_argument_no_filename:
-                    self.command.add_argument(self.command_line_argument)
+                    self.command._args.insert(0, self.command_line_argument)
                 else:
-                    self.command.add_option(self.command_line_argument, self.config_file_name)
+                    self.command._args.insert(0, self.command_line_argument)
+                    self.command._args.insert(1, self.config_file_name)
 
     def __repr__(self):
         return f"<JSONConfiguredTask config:{self.config_file_name} parameters: {self.parameters}"

@@ -62,7 +62,7 @@ class ITask(metaclass=ABCMeta):
         if isinstance(value, property):
             self._command = None
         elif isinstance(value, str):
-            self._command = CommandLine(value)
+            self._command = CommandLine.from_string(value)
         else:
             self._command = value
 

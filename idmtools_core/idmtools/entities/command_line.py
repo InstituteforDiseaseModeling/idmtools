@@ -1,3 +1,4 @@
+import shlex
 from typing import TypeVar, Dict, Any, List
 from dataclasses import dataclass, field
 
@@ -16,16 +17,9 @@ class CommandLine:
 
     def __init__(self, executable=None, *args, **kwargs):
         # If there is a space in executable, we probably need to split it
-        if " " in executable:
-            parts = executable.split(" ")
-            executable = parts[0]
-            if args:
-                args = parts[1:] + args
-            else:
-                args = parts[1:]
         self._executable = executable
         self._options = kwargs or {}
-        self._args = args or []
+        self._args = list(args) or []
 
     @property
     def executable(self) -> str:
@@ -64,6 +58,12 @@ class CommandLine:
 
     def __str__(self):
         return self.cmd
+
+    @staticmethod
+    def from_string(command) -> 'CommandLine':
+        parts = shlex.split(command)
+        arguments = parts[1:] if len(parts) > 1else []
+        return CommandLine(parts[0], *arguments)
 
 
 TCommandLine = TypeVar("TCommandLine", bound=CommandLine)

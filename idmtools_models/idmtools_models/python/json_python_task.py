@@ -73,8 +73,6 @@ class JSONConfiguredPythonTask(JSONConfiguredTask, PythonTask):
         """
         JSONConfiguredTask.pre_creation(self, parent, platform)
         PythonTask.pre_creation(self, parent, platform)
-        if self.configfile_argument is not None:
-            self.command.add_option(self.configfile_argument, self.config_file_name)
 
     def post_creation(self, parent: Union[Simulation, IWorkflowItem], platform: 'IPlatform'):
         """
