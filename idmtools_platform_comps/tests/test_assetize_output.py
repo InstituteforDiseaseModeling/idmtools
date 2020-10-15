@@ -57,12 +57,13 @@ class TestAssetizeOutput(unittest.TestCase):
             ao.pre_creation(self.platform)
         self.assertEqual(er.exception.args[0], "You must specify at least one item to watch")
 
+    # Skip this test until it can be rewritten using actual experiments or mocking some internal functions. At moment, it fails because it tries to retrieve the task from COMPS and it does not exist
     @pytest.mark.smoke
     @pytest.mark.serial
     def test_experiment_default_pattern_if_none_specified(self):
-        e = Experiment.from_task(task=TestTask())
+        exp_id = "9311af40-1337-ea11-a2be-f0921c167861"
+        e = Experiment.from_id(f'{exp_id}', platform=self.platform)
         e.simulations[0].status = EntityStatus.CREATED
-        e.uid = '095565e833818aab3340e802512c32ff'
         ao = AssetizeOutput()
         ao.from_items(e)
         self.assertEqual(1, len(ao.related_experiments))
@@ -71,11 +72,11 @@ class TestAssetizeOutput(unittest.TestCase):
         self.assertEqual(1, len(ao.file_patterns))
         self.assertEqual("**", ao.file_patterns[0])
         print(e.id)
-        self.assertEqual(ao.create_command(), 'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --exclude-pattern "StdErr.txt" --exclude-pattern "StdOut.txt" --exclude-pattern "WorkOrder.json" --exclude-pattern "*.log" --asset-tag "AssetizedOutputfromFromExperiment=095565e833818aab3340e802512c32ff" --simulation-prefix-format-str "{simulation.id}"')
+        self.assertEqual(ao.create_command(), f'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --exclude-pattern "StdErr.txt" --exclude-pattern "StdOut.txt" --exclude-pattern "WorkOrder.json" --exclude-pattern "*.log" --asset-tag "AssetizedOutputfromFromExperiment={exp_id}" --simulation-prefix-format-str "{{simulation.id}}"')
         ao.verbose = True
-        self.assertEqual(ao.create_command(), 'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --exclude-pattern "StdErr.txt" --exclude-pattern "StdOut.txt" --exclude-pattern "WorkOrder.json" --exclude-pattern "*.log" --asset-tag "AssetizedOutputfromFromExperiment=095565e833818aab3340e802512c32ff" --simulation-prefix-format-str "{simulation.id}" --verbose')
+        self.assertEqual(ao.create_command(), f'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --exclude-pattern "StdErr.txt" --exclude-pattern "StdOut.txt" --exclude-pattern "WorkOrder.json" --exclude-pattern "*.log" --asset-tag "AssetizedOutputfromFromExperiment={exp_id}" --simulation-prefix-format-str "{{simulation.id}}" --verbose')
         ao.clear_exclude_patterns()
-        self.assertEqual(ao.create_command(), 'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --asset-tag "AssetizedOutputfromFromExperiment=095565e833818aab3340e802512c32ff" --simulation-prefix-format-str "{simulation.id}" --verbose')
+        self.assertEqual(ao.create_command(), f'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --asset-tag "AssetizedOutputfromFromExperiment={exp_id}" --simulation-prefix-format-str "{{simulation.id}}" --verbose')
 
         def pre_run_dummy():
             pass
@@ -92,18 +93,17 @@ class TestAssetizeOutput(unittest.TestCase):
         self.assertEqual(len(ao.assets), 3)
         self.assertIn("pre_run.py", [f.filename for f in ao.assets])
         self.assertIn("entity_filter_func.py", [f.filename for f in ao.assets])
-        self.assertEqual(ao.create_command(), 'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --asset-tag "AssetizedOutputfromFromExperiment=095565e833818aab3340e802512c32ff" --simulation-prefix-format-str "{simulation.id}" --pre-run-func pre_run_dummy --entity-filter-func entity_filter_dummy --verbose')
+        self.assertEqual(ao.create_command(), f'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --asset-tag "AssetizedOutputfromFromExperiment={exp_id}" --simulation-prefix-format-str "{{simulation.id}}" --pre-run-func pre_run_dummy --entity-filter-func entity_filter_dummy --verbose')
 
         ao.pre_run_functions.append(another_pre_run_dummy)
-        self.assertEqual(ao.create_command(), 'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --asset-tag "AssetizedOutputfromFromExperiment=095565e833818aab3340e802512c32ff" --simulation-prefix-format-str "{simulation.id}" --pre-run-func pre_run_dummy --pre-run-func another_pre_run_dummy --entity-filter-func entity_filter_dummy --verbose')
+        self.assertEqual(ao.create_command(), f'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --asset-tag "AssetizedOutputfromFromExperiment={exp_id}" --simulation-prefix-format-str "{{simulation.id}}" --pre-run-func pre_run_dummy --pre-run-func another_pre_run_dummy --entity-filter-func entity_filter_dummy --verbose')
 
     def test_comps_simple(self):
-        platform = self.platform
         task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"), parameters=dict(a=1))
         e = Experiment.from_task(name=self.case_name, task=task)
         ao = AssetizeOutput(name=self.case_name, verbose=True)
         ao.from_items(e)
-        ao.run(wait_on_done=True)
+        ao.run(wait_on_done=True, platform=self.platform)
 
         self.assertTrue(e.succeeded)
         self.assertTrue(ao.succeeded)
@@ -135,7 +135,7 @@ class TestAssetizeOutput(unittest.TestCase):
         with self.assertRaises(CrossEnvironmentAssetizeNotSupport) as err:
             ac = ao.run(wait_on_done=True, platform=Platform("SLURM2"))
 
-        self.assertEqual("'You cannot assetize between environment. In this case, the Experiment 9311af40-1337-ea11-a2be-f0921c167861 is in Bayesian but you are running your workitem in SlurmStage'")
+        self.assertEqual('You cannot assetize between environment. In this case, the Experiment 9311af40-1337-ea11-a2be-f0921c167861 is in Bayesian but you are running your workitem in SlurmStage', err.exception.args[0])
 
     def test_experiment_sim_prefix(self):
         ao = AssetizeOutput(name=self.case_name, related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'], simulation_prefix_format_str="{simulation.state}/{simulation.id}", file_patterns=["**/a.csv"], verbose=True)

@@ -37,7 +37,7 @@ DEFAULT_EXCLUDES = ["StdErr.txt", "StdOut.txt", "WorkOrder.json", "*.log"]
 
 # Error thrown when user tries to assetize across Comps Environments
 class CrossEnvironmentAssetizeNotSupport(Exception):
-    pass
+    doc_link: str = "platforms/comps/assetize_output.html#errors"
 
 
 @dataclass(repr=False)
@@ -263,10 +263,6 @@ class AssetizeOutput(SSMTWorkItem):
             for item in getattr(self, prop):
                 if isinstance(item, str):
                     item = platform.get_item(item, item_type, force=True)
-                if item_type in [ItemType.WORKFLOW_ITEM, ItemType.SIMULATION, ItemType.EXPERIMENT]:
-                    ri = item.get_platform_object()
-                    if not hasattr(ri, 'configuration') or ri.configuration is None:
-                        item = platform.get_item(item, item_type)
                 new_items.append(item)
             setattr(self, prop, new_items)
 
@@ -291,6 +287,7 @@ class AssetizeOutput(SSMTWorkItem):
                     elif isinstance(item, AssetCollection):
                         platform.create_items(item)
                 if item_type in [ItemType.SIMULATION, ItemType.WORKFLOW_ITEM, ItemType.EXPERIMENT]:
+                    fail = False
                     po = item.get_platform_object(platform=platform)
                     if item_type in [ItemType.SIMULATION, ItemType.EXPERIMENT]:
                         if item_type == ItemType.SIMULATION and po.configuration is None or po.configuration.environment_name is None:
@@ -298,10 +295,12 @@ class AssetizeOutput(SSMTWorkItem):
                         if po.configuration is None:
                             user_logger.warning(f"Cannot determine environment of item of type {item_type} with id of {item.id}. Running assetize against items in other environments will result in an error")
                         elif po.configuration.environment_name.lower() != platform.environment.lower():
-                            raise CrossEnvironmentAssetizeNotSupport(f"You cannot assetize between environment. In this case, the {item_type.value} {item.id} is in {po.configuration.environment_name} but you are running your workitem in {platform.environment}")
+                            fail = True
                     elif item_type == ItemType.WORKFLOW_ITEM:
                         if po.environment_name.lower() != platform.environment.lower():
-                            raise CrossEnvironmentAssetizeNotSupport(f"You cannot assetize between environment. In this case, the {item_type.value} {item.id} is in {po.configuration.environment_name} but you are running your workitem in {platform.environment}")
+                            fail = True
+                    if fail:
+                        raise CrossEnvironmentAssetizeNotSupport(f"You cannot assetize between environment. In this case, the {item_type.value} {item.id} is in {po.configuration.environment_name} but you are running your workitem in {platform.environment}")
 
     def total_items_watched(self) -> int:
         """
