@@ -1,9 +1,7 @@
 from dataclasses import dataclass, field
-from typing import Optional, Type, Union, TYPE_CHECKING, Set
+from typing import Optional, Type, Union, TYPE_CHECKING
 from idmtools.assets import AssetCollection
-from idmtools.entities.itask import ITask
 from idmtools.entities.iworkflow_item import IWorkflowItem
-from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.simulation import Simulation
 from idmtools.registry.task_specification import TaskSpecification
 from idmtools_models.json_configured_task import JSONConfiguredTask
