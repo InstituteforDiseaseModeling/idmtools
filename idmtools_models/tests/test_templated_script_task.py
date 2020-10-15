@@ -72,7 +72,7 @@ class TestTemplatedScriptTask(TestCase):
         Returns:
 
         """
-        cmd = 'python -c "import os; print(os.environ)"'
+        cmd = "python -c 'import os; print(os.environ)'"
         task = CommandTask(cmd)
         template = """
         set PYTHONPATH=%CWD%\\Assets\\l

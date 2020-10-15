@@ -212,6 +212,8 @@ class TemplatedScriptTask(ITask):
             sn += self.script_path
         # set the command line to the rendered script
         self.command = CommandLine.from_string(sn)
+        if self.path_sep != "/":
+            self.command.executable = self.command.executable.replace("/", self.path_sep)
         # set any extra arguments
         if self.extra_command_arguments:
             other_command = CommandLine.from_string(self.extra_command_arguments)
