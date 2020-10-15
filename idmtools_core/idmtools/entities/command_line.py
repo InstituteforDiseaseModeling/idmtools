@@ -48,15 +48,15 @@ class CommandLine:
             else:
                 options.extend([k, value])  # otherwise let join (below) add a space
 
-        return shlex.join(options)
+        return ' '.join([shlex.quote(s) for s in options if s])
 
     @property
     def arguments(self):
-        return shlex.join(self._args)
+        return ' '.join([shlex.quote(s) for s in self._args if s]).strip()
 
     @property
     def cmd(self):
-        return ' '.join([self._executable, self.options, self.arguments])
+        return ' '.join([self._executable, self.options, self.arguments]).strip()
 
     def __str__(self):
         return self.cmd
@@ -73,7 +73,7 @@ class CommandLine:
         Returns:
             CommandLine object from string
         """
-        parts = shlex.split(command)
+        parts = shlex.split(command.replace("\\", "/"))
         arguments = parts[1:] if len(parts) > 1else []
         cl = CommandLine(parts[0], *arguments)
         return cl
