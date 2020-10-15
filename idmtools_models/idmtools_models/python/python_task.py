@@ -31,7 +31,8 @@ class PythonTask(ITask):
             # don't error if we can't find script. Maybe it is in the asset collection? but warn user
             logger.warning(f'Cannot find script at {self.script_path}. If script does not exist in Assets '
                            f'as {os.path.basename(self.script_path)}, execution could fail')
-        self.command = CommandLine('')
+        if self.command is None:
+            self.command = CommandLine('')
 
     def gather_common_assets(self) -> AssetCollection:
         """
