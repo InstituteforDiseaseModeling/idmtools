@@ -149,8 +149,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         work_item.get_platform_object().commission()
         if os.getenv('IDMTOOLS_SUPPRESS_OUTPUT', None) is None:
             user_logger.info(
-                f"\nThe running WorkItem can be viewed at {self.platform.endpoint}/#explore/"
-                f"WorkItems?filters=ID={work_item.uid}\n"
+                f"\nThe running WorkItem can be viewed at {self.platform.get_workitem_link(work_item)}\n"
             )
 
     def get_parent(self, work_item: IWorkflowItem, **kwargs) -> Any:

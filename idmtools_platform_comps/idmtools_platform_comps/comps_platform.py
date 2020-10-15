@@ -5,6 +5,9 @@ import logging
 # fix for comps weird import
 import os
 
+from idmtools.assets import AssetCollection
+from idmtools.entities.iworkflow_item import IWorkflowItem
+
 handlers = copy.copy(logging.getLogger().handlers)
 from COMPS import Client
 logging.root.handlers = handlers
@@ -113,3 +116,9 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
     def post_setstate(self):
         self.__init_interfaces()
+
+    def get_workitem_link(self, work_item: IWorkflowItem):
+        return f"{self.endpoint}/#explore/WorkItems?filters=ID={work_item.uid}"
+
+    def get_asset_collection_link(self, asset_collection: AssetCollection):
+        return f"{self.endpoint}/#explore/AssetCollections?filters=ID={asset_collection.uid}"

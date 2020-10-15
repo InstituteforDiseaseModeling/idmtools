@@ -9,6 +9,7 @@ import json as json_parser
 logger = getLogger(__name__)
 user_logger = getLogger('user')
 try:
+
     class StaticCredentialPrompt(CredentialPrompt):
         def __init__(self, comps_url, username, password):
             if (comps_url is None) or (username is None) or (password is None):
@@ -28,6 +29,7 @@ try:
     from idmtools.core.platform_factory import Platform
     import click
     from idmtools_platform_comps.utils.assetize_output.assetize_output import AssetizeOutput, DEFAULT_EXCLUDES
+    from idmtools_platform_comps.comps_platform import COMPSPlatform
 
     @click.group(help="Commands related to managing the local platform")
     @click.argument('config-block')
@@ -69,13 +71,20 @@ try:
     @click.option('--include-assets/--no-include-assets', default=False, help="Scan common assets of WorkItems and Experiments when filtering")
     @click.option('--verbose/--no-verbose', default=True, help="Enable verbose output in worker")
     @click.option('--json/--no-json', default=True, help="Outputs File list as JSON when used with dry run")
+    @click.option('--simulation-prefix-format-str', default=None, help="Simulation Prefix Format str. Defaults to '{simulation.id}'. For no prefix, pass a empty string")
+    @click.option('--work-item-prefix-format-str', default=None, help="WorfkItem Prefix Format str. Defaults to ''")
+    @click.option('--tag', default=[], type=(str, str), multiple=True, help="Tags to add the created asset collection as pairs")
+    @click.option('--name', default=None, help="Name of AssetizeWorkitem. If not provided, one will be generated")
     @click.pass_context
-    def assetize_outputs(ctx: click.Context, pattern, exclude_pattern, experiment, simulation, work_item, asset_collection, dry_run, wait, include_assets, verbose, json):
+    def assetize_outputs(ctx: click.Context, pattern, exclude_pattern, experiment, simulation, work_item, asset_collection, dry_run, wait, include_assets, verbose, json, simulation_prefix_format_str, work_item_prefix_format_str, tag, name):
         from idmtools.utils.info import get_help_version_url
         if json:
             os.environ['IDMTOOLS_SUPPRESS_OUTPUT'] = '1'
-        p = Platform(ctx.obj['config_block'])
+
+        p: COMPSPlatform = Platform(ctx.obj['config_block'])
         ao = AssetizeOutput()
+        if name:
+            ao.name = name
         if pattern:
             ao.file_patterns = list(pattern)
         if exclude_pattern:
@@ -87,7 +96,20 @@ try:
         ao.include_assets = include_assets
         ao.dry_run = dry_run
         ao.verbose = verbose
-        ao.run(wait_on_done=wait, platform=p)
+        if simulation_prefix_format_str is not None:
+            if simulation_prefix_format_str.strip() == "":
+                ao.no_simulation_prefix = True
+            else:
+                ao.simulation_prefix_format_str = simulation_prefix_format_str
+        if work_item_prefix_format_str is not None:
+            ao.work_item_prefix_format_str = work_item_prefix_format_str
+        if tag:
+            for name, value in tag:
+                ao.asset_tags[name] = value
+        ao.run(wait_until_done=False, platform=p)
+        user_logger.info(f"Item can be viewed at {p.get_workitem_link(ao)}")
+        if wait:
+            ao.wait(wait_on_done_progress=wait)
         if ao.succeeded:
             if ao.dry_run:
                 file = p.get_files(ao, ['file_list.json'])
@@ -99,7 +121,11 @@ try:
                     user_logger.info(tabulate.tabulate([x.values() for x in file], file[0].keys()))
             else:
                 user_logger.info(ao.asset_collection.id)
-        else:
+                user_logger.info("Items in Asset Collection")
+                user_logger.info("-------------------------")
+                for asset in ao.asset_collection:
+                    user_logger.info(asset.short_remote_path())
+        elif ao.failed:
             user_logger.error("Assetized failed. Check logs in COMPS")
             if ao.failed:
                 try:
