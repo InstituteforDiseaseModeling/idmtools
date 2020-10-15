@@ -51,6 +51,7 @@ class TestRTask(TestCase):
         fpath = os.path.join(COMMON_INPUT_PATH, "r", "model1.R")
         task = JSONConfiguredRTask(script_path=fpath, image_name='r-base:3.6.1')
         task.gather_all_assets()
+        task.pre_creation(None, None)
 
         self.assertEqual(str(task.command), f'Rscript ./Assets/model1.R --config config.json')
         self.validate_common_assets(fpath, task)

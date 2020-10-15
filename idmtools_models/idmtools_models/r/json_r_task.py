@@ -15,9 +15,8 @@ class JSONConfiguredRTask(JSONConfiguredTask, RTask):
     configfile_argument: Optional[str] = field(default="--config", metadata={"md": True})
 
     def __post_init__(self):
-        super().__post_init__()
-        if self.configfile_argument is not None:
-            self.command.add_option(self.configfile_argument, self.config_file_name)
+        JSONConfiguredTask.__post_init__(self)
+        RTask.__post_init__(self)
 
     def gather_common_assets(self):
         """
@@ -42,8 +41,8 @@ class JSONConfiguredRTask(JSONConfiguredTask, RTask):
         RTask.reload_from_simulation(self, simulation, **kwargs)
 
     def pre_creation(self, parent: Union[Simulation, IWorkflowItem], platform: 'IPlatform'):
-        JSONConfiguredTask.pre_creation(self, parent, platform)
         RTask.pre_creation(self, parent, platform)
+        JSONConfiguredTask.pre_creation(self, parent, platform)
 
     def post_creation(self, parent: Union[Simulation, IWorkflowItem], platform: 'IPlatform'):
         JSONConfiguredTask.post_creation(self, parent, platform)

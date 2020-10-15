@@ -30,11 +30,11 @@ class JSONConfiguredTask(ITask):
     config_file_name: str = field(default="config.json", metadata={"md": True})
     # is the config file a common asset or a transient. We default ot transient
     is_config_common: bool = field(default=False)
-    command_line_argument: str = field(default=None)
+    configfile_argument: str = field(default=None)
     # If command_line_argument is set, defines if we pass the filename after the argument
     # for example, if the argument is --config and the config file name is config.json we would run the command as
     # cmd --config config.json
-    command_line_argument_no_filename: bool = field(default=True)
+    command_line_argument_no_filename: bool = field(default=False)
 
     def __post_init__(self):
         super().__post_init__()
@@ -212,15 +212,15 @@ class JSONConfiguredTask(ITask):
             logger.info('Found envelope name. Adding tag envelope')
             parent.tags['task_envelope'] = self.envelope
         # Ensure our command line argument is added if configured
-        if self.command_line_argument:
+        if self.configfile_argument:
             logger.debug('Adding command_line_argument to command')
-            if self.command_line_argument not in self.command.arguments:
+            if self.configfile_argument not in self.command.arguments:
                 # check if we should add filename with arg?
                 if self.command_line_argument_no_filename:
-                    self.command._args.insert(0, self.command_line_argument)
+                    self.command.add_argument(self.configfile_argument)
                 else:
-                    self.command._args.insert(0, self.command_line_argument)
-                    self.command._args.insert(1, self.config_file_name)
+                    self.command.add_argument(self.configfile_argument)
+                    self.command.add_argument(self.config_file_name)
 
     def __repr__(self):
         return f"<JSONConfiguredTask config:{self.config_file_name} parameters: {self.parameters}"
