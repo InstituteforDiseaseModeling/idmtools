@@ -58,6 +58,7 @@ class CommandTask(ITask):
         pass
 
     def pre_creation(self, parent: Union['Simulation', 'IWorkflowItem'], platform: 'IPlatform'):
+        super().pre_creation(parent, platform)
         if platform.is_windows_platform():
             self.command.is_windows = True
 
