@@ -1,17 +1,31 @@
 import json
 import os
 import unittest
-
+from logging import DEBUG
 import allure
 import pytest
-os.environ['IDMTOOLS_USE_PRINT_OUTPUT'] = '1'
-os.environ['IDMTOOLS_HIDE_DEV_WARNING'] = '1'
+from idmtools.core.logging import setup_handlers
 from idmtools_test.utils.cli import run_command, get_subcommands_from_help_result
 
 
 @pytest.mark.comps
 @allure.story("CLI")
 class TestCompsCLI(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        # Setup logging for cli
+        os.environ['IDMTOOLS_USE_PRINT_OUTPUT'] = '1'
+        os.environ['IDMTOOLS_HIDE_DEV_WARNING'] = '1'
+        setup_handlers(level=DEBUG, log_filename='idmtools.log')
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        # Reset Logging
+        del os.environ['IDMTOOLS_USE_PRINT_OUTPUT']
+        del os.environ['IDMTOOLS_HIDE_DEV_WARNING']
+        setup_handlers(level=DEBUG, log_filename='idmtools.log')
+
     @allure.feature("AssetizeOutputs")
     def test_assetize_subcommand_exists(self):
         result = run_command('comps', '--help')
