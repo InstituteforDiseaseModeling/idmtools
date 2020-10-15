@@ -14,6 +14,8 @@ class CommandLine:
     _options: Dict[str, Any] = field(default_factory=dict)
     #: Arguments for the command
     _args: List[Any] = field(default_factory=list)
+    # Use shlex to format output
+    format_output: bool = field(default=True)
 
     def __init__(self, executable=None, *args, **kwargs):
         # If there is a space in executable, we probably need to split it
@@ -46,24 +48,35 @@ class CommandLine:
             else:
                 options.extend([k, value])  # otherwise let join (below) add a space
 
-        return ' '.join(options)
+        return shlex.join(options)
 
     @property
     def arguments(self):
-        return ' '.join(self._args)
+        return shlex.join(self._args)
 
     @property
     def cmd(self):
-        return ' '.join(filter(None, [self.executable, self.options, self.arguments]))
+        return ' '.join([self._executable, self.options, self.arguments])
 
     def __str__(self):
         return self.cmd
 
     @staticmethod
-    def from_string(command) -> 'CommandLine':
+    def from_string(command: str, format_output: bool = True) -> 'CommandLine':
+        """
+        Creates a command line object from string
+
+        Args:
+            command: Command
+            format_output: Should we use shlex to format the command line on render?
+
+        Returns:
+            CommandLine object from string
+        """
         parts = shlex.split(command)
         arguments = parts[1:] if len(parts) > 1else []
-        return CommandLine(parts[0], *arguments)
+        cl = CommandLine(parts[0], *arguments)
+        return cl
 
 
 TCommandLine = TypeVar("TCommandLine", bound=CommandLine)
