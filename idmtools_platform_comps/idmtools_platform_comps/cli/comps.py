@@ -107,7 +107,8 @@ try:
             for name, value in tag:
                 ao.asset_tags[name] = value
         ao.run(wait_until_done=False, platform=p)
-        user_logger.info(f"Item can be viewed at {p.get_workitem_link(ao)}")
+        if not json:
+            user_logger.info(f"Item can be viewed at {p.get_workitem_link(ao)}")
         if wait:
             ao.wait(wait_on_done_progress=wait)
         if ao.succeeded:
