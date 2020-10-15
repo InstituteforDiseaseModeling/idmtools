@@ -69,8 +69,8 @@ class JSONConfiguredPythonTask(JSONConfiguredTask, PythonTask):
             :meth:`idmtools_models.json_configured_task.JSONConfiguredTask.pre_creation`
             :meth:`idmtools_models.python.python_task.PythonTask.pre_creation`
         """
-        JSONConfiguredTask.pre_creation(self, parent, platform)
         PythonTask.pre_creation(self, parent, platform)
+        JSONConfiguredTask.pre_creation(self, parent, platform)
 
     def post_creation(self, parent: Union[Simulation, IWorkflowItem], platform: 'IPlatform'):
         """
