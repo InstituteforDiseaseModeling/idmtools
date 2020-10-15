@@ -14,6 +14,7 @@ class CommandLine:
     _options: Dict[str, Any] = field(default_factory=dict)
     #: Arguments for the command
     _args: List[Any] = field(default_factory=list)
+    is_windows: bool = field(default=False)
 
     def __init__(self, executable=None, *args, **kwargs):
         # If there is a space in executable, we probably need to split it
@@ -54,11 +55,20 @@ class CommandLine:
             else:
                 options.extend([k, value])  # otherwise let join (below) add a space
 
-        return ' '.join([shlex.quote(s) for s in options if s])
+        if self.is_windows:
+            return ' '.join([f'"{self.__quote_windows(s)}"' for s in options if s])
+        else:
+            return ' '.join([shlex.quote(s) for s in options if s])
+
+    def __quote_windows(self, s):
+        return s.replace('"', '""')
 
     @property
     def arguments(self):
-        return ' '.join([shlex.quote(s) for s in self._args if s]).strip()
+        if self.is_windows:
+            return ' '.join([f'"{self.__quote_windows(s)}"' for s in self._args if s])
+        else:
+            return ' '.join([shlex.quote(s) for s in self._args if s])
 
     @property
     def cmd(self):

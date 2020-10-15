@@ -214,6 +214,7 @@ class TemplatedScriptTask(ITask):
         self.command = CommandLine.from_string(sn)
         if self.path_sep != "/":
             self.command.executable = self.command.executable.replace("/", self.path_sep)
+            self.command.is_windows = True
         # set any extra arguments
         if self.extra_command_arguments:
             other_command = CommandLine.from_string(self.extra_command_arguments)
