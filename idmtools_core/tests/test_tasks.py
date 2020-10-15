@@ -4,6 +4,7 @@ from unittest import TestCase
 
 import pytest
 from idmtools.assets import Asset, AssetCollection
+from idmtools.entities import CommandLine
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.simulation import Simulation
 
@@ -22,6 +23,11 @@ class TestTasks(TestCase):
     def test_command_init_from_str_(self):
         example_command, task = self.get_ls_command_task()
         self.assertEqual(task.command.cmd, example_command)
+
+    def test_command_line_from_str(self):
+        cmd = "ls -al"
+        cl = CommandLine(cmd)
+        self.assertEqual(cl.cmd, cmd)
 
     @staticmethod
     def get_ls_command_task():

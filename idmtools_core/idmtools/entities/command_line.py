@@ -14,14 +14,20 @@ class CommandLine:
     _options: Dict[str, Any] = field(default_factory=dict)
     #: Arguments for the command
     _args: List[Any] = field(default_factory=list)
-    # Use shlex to format output
-    format_output: bool = field(default=True)
 
     def __init__(self, executable=None, *args, **kwargs):
         # If there is a space in executable, we probably need to split it
         self._executable = executable
         self._options = kwargs or {}
         self._args = list(args) or []
+        # check if user is providing a full command line
+        if executable and " " in executable:
+            other = self.from_string(executable)
+            self._executable = other._executable
+            if other._args:
+                self._args += other._args
+            if other.options:
+                self._options += other._options
 
     @property
     def executable(self) -> str:
@@ -56,19 +62,18 @@ class CommandLine:
 
     @property
     def cmd(self):
-        return ' '.join([self._executable, self.options, self.arguments]).strip()
+        return ' '.join(filter(None, [self._executable.strip(), self.options.strip(), self.arguments.strip()]))
 
     def __str__(self):
         return self.cmd
 
     @staticmethod
-    def from_string(command: str, format_output: bool = True) -> 'CommandLine':
+    def from_string(command: str) -> 'CommandLine':
         """
         Creates a command line object from string
 
         Args:
             command: Command
-            format_output: Should we use shlex to format the command line on render?
 
         Returns:
             CommandLine object from string
