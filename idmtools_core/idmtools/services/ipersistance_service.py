@@ -25,7 +25,7 @@ class IPersistenceService(metaclass=ABCMeta):
         while retries < 5:
 
             try:
-                cache = diskcache.FanoutCache(os.path.join(cls.cache_directory, 'disk_cache', cls.cache_name), timeout=default_timeout, shards=cpu_count()*2)
+                cache = diskcache.FanoutCache(os.path.join(cls.cache_directory, 'disk_cache', cls.cache_name), timeout=default_timeout, shards=cpu_count() * 2)
                 return cache
             except sqlite3.OperationalError:
                 retries += 1
