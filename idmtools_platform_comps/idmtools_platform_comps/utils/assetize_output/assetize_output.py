@@ -257,7 +257,7 @@ class AssetizeOutput(SSMTWorkItem):
             new_items = []
             for id in getattr(self, prop):
                 if isinstance(id, str):
-                    new_items.append(platform.get_item(id, item_type))
+                    new_items.append(platform.get_item(id, item_type,force=True))
                 else:
                     new_items.append(id)
             setattr(self, prop, new_items)

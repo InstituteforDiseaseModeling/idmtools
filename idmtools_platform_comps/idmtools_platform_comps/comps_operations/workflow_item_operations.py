@@ -201,7 +201,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
                 Returns: None
                 """
         # Collect asset files
-        if len(workflow_item.assets):
+        if workflow_item.assets and len(workflow_item.assets):
             if logger.isEnabledFor(DEBUG):
                 logger.debug("Uploading assets for Workitem")
             self.platform._assets.create(workflow_item.assets)
