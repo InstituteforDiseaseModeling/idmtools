@@ -14,7 +14,7 @@ base_task.common_assets.add_asset("model.py")
 base_task.config = dict(a=1,b=1)
 
 # define a template for our commands
-command_template = "python3 Assets/model.py --a {a} --b {b}"
+command_template = "python Assets/model.py --a {a} --b {b}"
 
 
 # Define a function that renders our command line as we build simulations
