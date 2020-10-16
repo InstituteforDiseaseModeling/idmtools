@@ -4,9 +4,7 @@ from dataclasses import dataclass, field, InitVar, fields
 from logging import getLogger, DEBUG
 from types import GeneratorType
 from typing import NoReturn, Set, Union, Iterator, Type, Dict, Any, List, TYPE_CHECKING, Generator
-
-from tqdm import tqdm
-
+from idmtools import IdmConfigParser
 from idmtools.assets import AssetCollection, Asset
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType, EntityStatus
@@ -171,7 +169,10 @@ class Experiment(IAssetsEnabled, INamedEntity):
                     logger.debug("Using all tasks to gather assts")
                 task_class = self.__simulations[0].task.__class__
                 self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
-                pbar = tqdm(self.__simulations, desc="Discovering experiment assets from tasks")
+                pbar = self.__simulations
+                if not IdmConfigParser.is_progress_bar_disabled():
+                    from tqdm import tqdm
+                    pbar = tqdm(self.__simulations, desc="Discovering experiment assets from tasks", units="Simulations")
                 for sim in pbar:
                     # don't gather assets from simulations that have been provisioned
                     if sim.status is None:

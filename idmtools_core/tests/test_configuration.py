@@ -7,6 +7,7 @@ import unittest.mock
 import os
 import pytest
 from idmtools.config import IdmConfigParser
+from idmtools.core import TRUTHY_VALUES
 from idmtools.core.platform_factory import Platform
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.decorators import skip_if_global_configuration_is_enabled
@@ -112,7 +113,7 @@ class TestConfig(ITestWithPersistence):
             self.assertIn("WARNING: File 'idmtools_NotExist.ini' Not Found!", out.getvalue())
 
     # enable config only through special file
-    @pytest.mark.skipif(not all([os.environ.get("TEST_GLOBAL_CONFIG", 'n').lower() in ['1', 'y', 'yes', 't', 'true'], os.environ.get('IDMTOOLS_CONFIG_FILE', None) is None, not os.path.exists(IdmConfigParser.get_global_configuration_name())]), reason="Either the environment variable TEST_GLOBAL_CONFIG is not set to true, you already have a global configuration, or IDMTOOLS_CONFIG_FILE is set")
+    @pytest.mark.skipif(not all([os.environ.get("TEST_GLOBAL_CONFIG", 'n').lower() in TRUTHY_VALUES, os.environ.get('IDMTOOLS_CONFIG_FILE', None) is None, not os.path.exists(IdmConfigParser.get_global_configuration_name())]), reason="Either the environment variable TEST_GLOBAL_CONFIG is not set to true, you already have a global configuration, or IDMTOOLS_CONFIG_FILE is set")
     def test_global_configuration(self):
         copyfile(os.path.join(os.path.dirname(__file__), "idmtools.ini"), IdmConfigParser.get_global_configuration_name())
         IdmConfigParser.ensure_init(dir_path=tempfile.gettempdir(), force=True)

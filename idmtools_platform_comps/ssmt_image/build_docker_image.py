@@ -116,7 +116,7 @@ def build_image(username, password, disable_keyring_load, disable_keyring_save):
     p = subprocess.Popen(" ".join(cmd), cwd=os.path.abspath(os.path.dirname(__file__)), shell=True)
     p.wait()
     if p.returncode == 0:
-        logger.info(f"Tagging image")
+        logger.info("Tagging image")
         os.system(f'docker tag {DOCKER_REPO}/{IMAGE_NAME}:{version} {DOCKER_REPO}/{IMAGE_NAME}:{version[:-2]}')
     sys.exit(p.returncode)
 

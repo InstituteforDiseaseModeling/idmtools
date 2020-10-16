@@ -7,7 +7,7 @@ from logging import getLogger
 from math import floor
 from typing import List, Any, Dict, Container, NoReturn, TYPE_CHECKING
 from uuid import UUID
-from tqdm import tqdm
+from idmtools import IdmConfigParser
 from idmtools.assets import Asset, json, AssetCollection
 from idmtools.core import ItemType
 from idmtools.core.docker_task import DockerTask
@@ -133,7 +133,13 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
 
         """
-        for simulation in tqdm(experiment.simulations, desc="Running Simulations"):
+        if IdmConfigParser.is_progress_bar_disabled():
+            prog_items = experiment.simulations
+        else:
+            from tqdm import tqdm
+            prog_items = tqdm(experiment.simulations, desc="Running Simulations", unit='simulation')
+
+        for simulation in prog_items:
             # if the task is docker, build the extra config
             if simulation.task.is_docker:
                 self._run_docker_sim(experiment.uid, simulation.uid, simulation.task)
@@ -219,8 +225,8 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         Run a docker based simulation
 
         Args:
-            experiment: Experiment to run
-            simulation: Simulation to run
+            experiment_uid: Experiment to run
+            simulation_uid: Simulation to run
 
         Returns:
 

@@ -5,10 +5,7 @@ import unicodedata
 from dataclasses import dataclass, field
 from datetime import datetime, timezone, timedelta
 from typing import Optional, Type
-
-from tqdm import tqdm
-
-from idmtools import __version__ as idmtools_version
+from idmtools import __version__ as idmtools_version, IdmConfigParser
 from idmtools.assets import AssetCollection, json
 from idmtools.core.logging import getLogger
 from idmtools.entities.itask import ITask
@@ -81,11 +78,13 @@ class DockerTask(ITask):
                 build_config.update(extra_build_args)
             logger.debug(f"Build configuration used: {str(build_config)}")
             self.__image_built = True
-            prog = tqdm(
-                desc='Building docker image',
-                total=10,
-                bar_format='Building Docker Image: |{bar}| {percentage:3.0f}% [{n_fmt}/{total_fmt}] [{elapsed}] {desc}'
-            )
+            if not IdmConfigParser.is_progress_bar_disabled():
+                from tqdm import tqdm
+                prog = tqdm(
+                    desc='Building docker image',
+                    total=10,
+                    bar_format='Building Docker Image: |{bar}| {percentage:3.0f}% [{n_fmt}/{total_fmt}] [{elapsed}] {desc}'
+                )
             try:
                 build_step = None
                 # regular expression to grab progress
@@ -106,21 +105,25 @@ class DockerTask(ITask):
                                 try:
                                     step = int(grps.group(1))
                                     total_steps = int(grps.group(2))
-                                    prog.n = step
-                                    prog.total = total_steps
+                                    if prog:
+                                        prog.n = step
+                                        prog.total = total_steps
                                     line = grps.group(3)
                                 except:  # noqa E722
                                     pass
-                                prog.set_description(line)
+                                if prog:
+                                    prog.set_description(line)
                                 build_step = line
                             # update build step with output
                             elif build_step:
                                 if len(line) > 40:
                                     line = line[:40]
-                                prog.set_description(f'{build_step}: {line}')
+                                if prog:
+                                    prog.set_description(f'{build_step}: {line}')
                     elif 'status' in line:
                         line = line['status'].strip()
-                        prog.set_description(line)
+                        if prog:
+                            prog.set_description(line)
 
                 logger.info('Build Successful)')
             except BuildError as e:
@@ -128,7 +131,8 @@ class DockerTask(ITask):
                 logger.info(f'Build log: {e.build_log}')
                 sys.exit(-1)
             finally:
-                prog.close()
+                if prog:
+                    prog.close()
 
     def reload_from_simulation(self, simulation: 'Simulation'):  # noqa E821
         pass

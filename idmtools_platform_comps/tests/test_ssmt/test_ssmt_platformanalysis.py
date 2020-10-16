@@ -11,7 +11,7 @@ from idmtools.analysis.platform_anaylsis import PlatformAnalysis
 from idmtools.core.platform_factory import Platform
 from idmtools_test.utils.decorators import run_in_temp_dir
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-from idmtools.core import ItemType
+from idmtools.core import ItemType, TRUTHY_VALUES
 
 analyzer_path = os.path.join(os.path.dirname(__file__), "..", "inputs")
 sys.path.insert(0, analyzer_path)
@@ -33,7 +33,7 @@ pip install Assets/{comps_package_filename} --index-url=https://packages.idmod.o
 $*
 """
 # When enabled, ssmt tests will attempt to upload packages from local environment and install before run. You need to rebuild the the packages when code changes using pymake dist in the idmtools_core and ./idmtools_platform_comps directories
-test_with_new_code = os.environ.get("TEST_WITH_PACKAGES", 'n').lower() in ['1', 'y', 'yes', 't', 'true', 'on']
+test_with_new_code = os.environ.get("TEST_WITH_PACKAGES", 'n').lower() in TRUTHY_VALUES
 
 
 @functools.lru_cache(1)

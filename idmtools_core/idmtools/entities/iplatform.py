@@ -7,6 +7,7 @@ from itertools import groupby
 from logging import getLogger, DEBUG
 from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set, Iterator, Callable
 from uuid import UUID
+from idmtools import IdmConfigParser
 from idmtools.core import CacheEnabled, UnknownItemException, EntityContainer, UnsupportedPlatformType
 from idmtools.core.enums import ItemType, EntityStatus
 from idmtools.core.interfaces.ientity import IEntity
@@ -25,7 +26,6 @@ from idmtools.entities.simulation import Simulation
 from idmtools.entities.suite import Suite
 from idmtools.services.platforms import PlatformPersistService
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
-from tqdm import tqdm
 logger = getLogger(__name__)
 user_logger = getLogger('user')
 
@@ -618,7 +618,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     def __wait_till_callback(
             self, item: Union[Experiment, IWorkflowItem, Suite],
-            callback: Callable[[Union[Experiment, IWorkflowItem, Suite]], bool], timeout: int = 60 * 60 * 24,
+            callback: Union[partial, Callable[[Union[Experiment, IWorkflowItem, Suite]], bool]], timeout: int = 60 * 60 * 24,
             refresh_interval: int = 5
     ):
         """
@@ -675,7 +675,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             self.__wait_till_callback(item, lambda e: e.done, timeout, refresh_interval)
 
     @staticmethod
-    def __wait_until_done_progress_callback(item: Union[Experiment, IWorkflowItem], progress_bar: tqdm,
+    def __wait_until_done_progress_callback(item: Union[Experiment, IWorkflowItem], progress_bar: 'tqdm',  # noqa: F821
                                             child_attribute: str = 'simulations',
                                             done_states: List[EntityStatus] = None, failed_warning: Dict[str, bool] = False) -> bool:
         """
@@ -743,13 +743,15 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             :meth:`idmtools.entities.iplatform.IPlatform.__wait_till_callback`
         """
         child_attribute = 'simulations'
-        if isinstance(item, Experiment):
-            prog = tqdm([], total=len(item.simulations), desc="Waiting on Experiment to Finish running")
-        elif isinstance(item, Suite):
-            prog = tqdm([], total=len(item.experiments), desc="Waiting on Suite to Finish running")
-            child_attribute = 'experiments'
-        else:
-            prog = None
+        prog = None
+        # check that the user has not disable progress bars
+        if not IdmConfigParser.is_progress_bar_disabled():
+            from tqdm import tqdm
+            if isinstance(item, Experiment):
+                prog = tqdm([], total=len(item.simulations), desc="Waiting on Experiment to Finish running", unit="simulations")
+            elif isinstance(item, Suite):
+                prog = tqdm([], total=len(item.experiments), desc="Waiting on Suite to Finish running", unit="experiments")
+                child_attribute = 'experiments'
 
         failed_warning = dict(failed_warning=False)
         self.__wait_till_callback(

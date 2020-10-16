@@ -4,8 +4,9 @@ from pathlib import Path
 import json
 import os
 from configparser import ConfigParser
-from logging import getLogger
+from logging import getLogger, DEBUG
 from typing import Any, Dict
+from idmtools.core import TRUTHY_VALUES
 from idmtools.utils.info import get_help_version_url
 
 default_config = 'idmtools.ini'
@@ -239,17 +240,26 @@ class IdmConfigParser:
 
     @classmethod
     @initialization(error=False)
-    def get_option(cls, section: str = None, option: str = None, force=False, fallback=None) -> str:
+    def get_option(cls, section: str = None, option: str = None, fallback=None, environment_first: bool = True) -> str:
         """
         Get configuration value based on the INI section and option.
 
         Args:
             section: The INI section name.
             option: The INI field name.
+            fallback: Fallback value
+            environment_first: Try to load from environment var first. Default to True. Environment variable names are in form IDMTOOLS_SECTION_OPTION
 
         Returns:
             A configuration value as a string.
         """
+        if environment_first:
+            evn_name = "_".join(filter(None, ["IDMTOOLS", section.upper(), option.upper()]))
+            value = os.environ.get(evn_name, None)
+            if value:
+                if logger.isEnabledFor(DEBUG):
+                    logger.debug(f"Loaded option from environment var {evn_name}")
+                return value
         if not cls.found_ini():
             return fallback
 
@@ -262,6 +272,16 @@ class IdmConfigParser:
             return cls._config.get(section, option, fallback=fallback)
         else:
             return cls._config.get(cls._block, option, fallback=fallback)
+
+    @classmethod
+    def is_progress_bar_disabled(cls) -> bool:
+        """
+        Are progress bars disabled
+
+        Returns:
+            Return is progress bars should be enabled
+        """
+        return all([x.lower() not in TRUTHY_VALUES for x in [IdmConfigParser.get_option(None, "DISABLE_PROGRESS_BAR", 'f')]])
 
     @classmethod
     def ensure_init(cls, dir_path: str = '.', file_name: str = default_config, error: bool = False,

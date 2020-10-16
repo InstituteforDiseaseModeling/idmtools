@@ -8,6 +8,7 @@ from multiprocessing import Queue
 from signal import SIGINT, signal, SIGTERM
 from typing import NoReturn, Union
 import coloredlogs as coloredlogs
+from idmtools.core import TRUTHY_VALUES
 
 listener = None
 logging_queue = None
@@ -70,7 +71,7 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
     if type(level) is str:
         level = logging.getLevelName(level)
     if type(console) is str:
-        console = console.lower() in ['1', 'y', 'yes', 'on', 'true', 't']
+        console = console.lower() in TRUTHY_VALUES
 
     # get a file handler
     root = logging.getLogger()
@@ -101,7 +102,7 @@ def setup_handlers(level, log_filename, console: bool = False):
     global logging_queue, handlers
     # We only one to do this setup once per process. Having the logging_queue setup help prevent that issue
     # get a file handler
-    if os.getenv('IDM_TOOLS_DEBUG', '0') in ['1', 'y', 't', 'yes', 'true', 'on'] or level == logging.DEBUG:
+    if os.getenv('IDM_TOOLS_DEBUG', '0') in TRUTHY_VALUES or level == logging.DEBUG:
         # Enable detailed logging format
         format_str = '%(asctime)s.%(msecs)d %(pathname)s:%(lineno)d %(funcName)s [%(levelname)s] (%(process)d,%(thread)d) - %(message)s'
     else:
@@ -124,7 +125,7 @@ def setup_handlers(level, log_filename, console: bool = False):
     logging.root.addHandler(queue_handler)
     logging.getLogger('user').addHandler(queue_handler)
 
-    if console or os.getenv('IDM_TOOLS_CONSOLE_LOGGING', 'F').lower() in ['1', 'y', 't', 'yes', 'true', 'on']:
+    if console or os.getenv('IDM_TOOLS_CONSOLE_LOGGING', 'F').lower() in TRUTHY_VALUES:
         coloredlogs.install(level=level, milliseconds=True, stream=sys.stdout)
     else:
         # install colored logs for user logger only

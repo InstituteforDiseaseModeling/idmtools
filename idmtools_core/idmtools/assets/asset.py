@@ -1,15 +1,12 @@
 import io
-
 import os
 from dataclasses import dataclass, field, InitVar
 from io import BytesIO
 from logging import getLogger, DEBUG
 from typing import TypeVar, Union, List, Callable, Any, Optional, Generator, BinaryIO
-
 import backoff
 import requests
-from tqdm import tqdm
-
+from idmtools import IdmConfigParser
 from idmtools.utils.hashing import calculate_md5, calculate_md5_stream
 
 logger = getLogger(__name__)
@@ -199,7 +196,8 @@ class Asset:
 
         """
         gen = self.download_generator()
-        if progress:
+        if progress and not IdmConfigParser.is_progress_bar_disabled():
+            from tqdm import tqdm
             gen = tqdm(gen, total=self.length)
 
         try:

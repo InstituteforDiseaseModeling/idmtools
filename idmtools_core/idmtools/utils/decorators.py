@@ -110,7 +110,8 @@ def cache_for(ttl=datetime.timedelta(minutes=1)):
         @wraps(func)
         def wrapped(*args, **kw):
             # if we are testing, disable caching of functions as it complicates test-all setups
-            if os.getenv('TESTING', '0').lower() in ['1', 'y', 'true', 'yes', 'on']:
+            from idmtools.core import TRUTHY_VALUES
+            if os.getenv('TESTING', '0').lower() in TRUTHY_VALUES:
                 return func(*args, **kw)
 
             nonlocal time
