@@ -164,6 +164,10 @@ class TestConfig(ITestWithPersistence):
         local_type = idm.get_option("Custom_Local", 'type')
         self.assertEqual(str(local_type), "Local")
 
+    def test_load_item_config_environment(self):
+        os.environ['IDMTOOLS_TEST_ENV_CONFIG'] = "!"
+        self.assertEqual(IdmConfigParser.get_option("test_env_config"), "!")
+
     @skip_if_global_configuration_is_enabled
     def test_no_idmtools(self):
         IdmConfigParser(file_name="idmtools_NotExist.ini")
