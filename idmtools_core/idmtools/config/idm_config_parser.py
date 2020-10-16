@@ -255,7 +255,7 @@ class IdmConfigParser:
             A configuration value as a string.
         """
         if environment_first:
-            evn_name = "_".join(filter(None, ["IDMTOOLS", section.upper(), option.upper()]))
+            evn_name = "_".join(filter(None, ["IDMTOOLS", section, option])).upper()
             value = os.environ.get(evn_name, None)
             if value:
                 if logger.isEnabledFor(DEBUG):
