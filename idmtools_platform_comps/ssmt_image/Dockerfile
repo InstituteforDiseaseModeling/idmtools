@@ -1,17 +1,26 @@
-FROM docker-production.packages.idmod.org/comps/ssmt/ubuntu18.04_ssmt_base:latest
+FROM ubuntu:18.04
 
 # Install dependencies
-RUN apt-get update && \
-    apt-get install -y \
-    xz-utils \
-    llvm \
-    # r packages to support analysis in R
-    r-base \
-    # clean up temporary data
-    && apt-get clean && \
-    mkdir -p /root/.pip && \
-    rm -rf /var/lib/apt/lists/*
+RUN apt-get update
 
+# set the timezone - do this before installing python
+RUN export DEBIAN_FRONTEND=noninteractive && apt-get install -y tzdata
+RUN ln -fs /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
+RUN dpkg-reconfigure --frontend noninteractive tzdata
+
+# install Python3
+RUN apt-get install -y python3-pip
+RUN apt-get install -y python3-dev
+RUN apt-get install -y python3-setuptools
+
+# r packages to support analysis in R
+RUN apt-get install -y xz-utils llvm r-base \
+    # clean up temporary data
+    && mkdir -p /root/.pip
+
+#    && apt-get clean && \     <--- We do this at the end of this file
+#    mkdir -p /root/.pip && \
+#    rm -rf /var/lib/apt/lists/*    <--- We do this at the end of this file
 
 # add requirements file
 ADD requirements.txt /tmp/
@@ -19,16 +28,19 @@ ADD requirements.txt /tmp/
 ADD pip.conf /etc/pip.conf
 
 COPY .depends/* /tmp/
-RUN bash -c "pip install /tmp/*.gz --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple"
+
+RUN bash -c "pip3 install /tmp/*.gz --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple"
 
 # make the PIP index configurable so we can build against staging, production, or a local PyPI server
 ARG SSMT_VERSION
 
 # Install the packages
 RUN pip3 install --upgrade pip --index-url=https://pypi.python.org/simple && \
-    pip3 install -r /tmp/requirements.txt --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple && \
+    pip3 install dataclasses && \
+    pip3 install -r /tmp/requirements.txt && \
     rm -rf /root/.cache
     # To make this effective, we need to collapse this to one layer....... so don't do it for now
     # remove stuff we needed for pip but don't want in our final image
     # apt-get remove build-essential
 
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
