@@ -721,7 +721,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             elif isinstance(item, Suite) and child.done:
                 done += 1
         # check if we need to update the progress bar
-        if done > progress_bar.last_print_n:
+        if hasattr(progress_bar, 'last_print_n') and done > progress_bar.last_print_n:
             progress_bar.update(done - progress_bar.last_print_n)
         # Alert user to failing simulations so they can stop execution if wanted
         if isinstance(item, Experiment) and item.any_failed and not failed_warning['failed_warning']:
@@ -748,14 +748,15 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             :meth:`idmtools.entities.iplatform.IPlatform.__wait_till_callback`
         """
         child_attribute = 'simulations'
-        prog = None
+        # set prog to list
+        prog = []
         # check that the user has not disable progress bars
         if not IdmConfigParser.is_progress_bar_disabled():
             from tqdm import tqdm
             if isinstance(item, Experiment):
-                prog = tqdm([], total=len(item.simulations), desc="Waiting on Experiment to Finish running", unit="simulations")
+                prog = tqdm([], total=len(item.simulations), desc="Waiting on Experiment to Finish running", unit="simulation")
             elif isinstance(item, Suite):
-                prog = tqdm([], total=len(item.experiments), desc="Waiting on Suite to Finish running", unit="experiments")
+                prog = tqdm([], total=len(item.experiments), desc="Waiting on Suite to Finish running", unit="experiment")
                 child_attribute = 'experiments'
 
         failed_warning = dict(failed_warning=False)

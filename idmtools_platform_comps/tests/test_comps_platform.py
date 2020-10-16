@@ -8,7 +8,9 @@ from os import path
 import pytest
 from idmtools.builders import SimulationBuilder
 from idmtools.core import EntityStatus
+from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
+from idmtools.entities.simulation import Simulation
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_platform_comps.comps_platform import COMPSPlatform
 from idmtools_test import COMMON_INPUT_PATH
@@ -107,6 +109,20 @@ class TestCOMPSPlatform(ITestWithPersistence):
 
         # Start experiment
         assure_running_then_wait_til_done(self, experiment)
+
+    def test_multiple_executables(self):
+        experiment = Experiment(name=self.case_name)
+        experiment.simulations.append(Simulation.from_task(CommandTask(command="python --version")))
+        experiment.simulations.append(Simulation.from_task(CommandTask(command="python --help")))
+        experiment.run(wait_on_done=True, platform=self.platform)
+        self.assertTrue(experiment.succeeded)
+
+        sim0 = experiment.simulations[0].get_platform_object()
+        self.assertIsNone(sim0.configuration)
+        sim1 = experiment.simulations[1].get_platform_object()
+        self.assertIsNotNone(sim1.configuration)
+        self.assertEqual(sim1.configuration.simulation_input_args, "--help")
+        self.assertEqual(sim1.configuration.executable_path, "python")
 
     @pytest.mark.long
     def test_status_retrieval_succeeded(self):

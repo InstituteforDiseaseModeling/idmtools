@@ -170,7 +170,7 @@ class IdmConfigParser:
                 if os.path.exists(global_config):
                     ini_file = global_config
         if ini_file is None:
-            if os.environ.get('IDMTOOLS_NO_CONFIG_WARNING', None) is None:
+            if IdmConfigParser.get_option("NO_CONFIG_WARNING", fallback="F").lower() not in TRUTHY_VALUES:
                 # We use print since logger isn't configured unless there is an override(cli)
                 print(f"/!\\ WARNING: File '{file_name}' Not Found! For details on how to configure idmtools, see {get_help_version_url('configuration.html')} for details on how to configure idmtools.")
             cls._init_logging()
