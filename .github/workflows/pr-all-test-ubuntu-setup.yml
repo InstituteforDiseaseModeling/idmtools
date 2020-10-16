@@ -36,12 +36,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           pip install idm-buildtools flake8 wheel --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
-      - name: Run setup-dev
-        # only run if full install for core, local changes, or models
-        if: steps.filter.outputs.core == 'true' ||  steps.filter.outputs.local == 'true' ||  steps.filter.outputs.models == 'true'
-        run: |
-          make setup-dev
-      - name: Run setup-dev
+      - name: Run setup-dev-no-docker
         # only run if core, local, models wasn't changed
         if: steps.filter.outputs.core == 'false' &&  steps.filter.outputs.local == 'false' &&  steps.filter.outputs.models == 'false'
         run: |
@@ -87,7 +82,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           pip install idm-buildtools flake8 wheel --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
-      - name: Run setup-dev
+      - name: Run setup-dev-no-docker
         run: |
           make setup-dev-no-docker
       - name: login to comps2
@@ -137,7 +132,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           pip install idm-buildtools flake8 wheel --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
-      - name: Run setup-dev
+      - name: Run setup-dev-no-docker
         run: |
           make setup-dev-no-docker
       - name: login to comps2
@@ -187,7 +182,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           pip install idm-buildtools flake8 wheel --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
-      - name: Run setup-dev
+      - name: Run setup-dev-no-docker
         run: |
           make setup-dev-no-docker
       - name: login to comps2
