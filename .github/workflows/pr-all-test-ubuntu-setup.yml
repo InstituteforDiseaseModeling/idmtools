@@ -239,10 +239,10 @@ jobs:
         run: |
           pip install idm-buildtools flake8 wheel --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
       - name: Run setup-dev
-          # only run if full install for core, local changes, or models
-          if: steps.filter.outputs.core == 'true' ||  steps.filter.outputs.local == 'true' ||  steps.filter.outputs.models == 'true'
-          run: |
-            make setup-dev
+        # only run if full install for core, local changes, or models
+        if: steps.filter.outputs.core == 'true' ||  steps.filter.outputs.local == 'true' ||  steps.filter.outputs.models == 'true'
+        run: |
+          make setup-dev
       - name: login to comps2
         run: |
           python dev_scripts/create_auth_token_args.py --username $COMPS_USER --password $COMPS_PASSWORD
