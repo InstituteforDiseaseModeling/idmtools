@@ -33,8 +33,6 @@ jobs:
         uses: actions/setup-python@v2.1.4
         with:
           python-version: ${{ matrix.python-version }}
-          architecture: x64
-          platform: linux
       - name: Install Python dependencies
         run: |
           pip install idm-buildtools flake8 wheel --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
