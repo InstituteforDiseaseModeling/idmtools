@@ -3,6 +3,11 @@ import copy
 import json
 import logging
 # fix for comps weird import
+import os
+
+from idmtools.assets import AssetCollection
+from idmtools.entities.iworkflow_item import IWorkflowItem
+
 handlers = copy.copy(logging.getLogger().handlers)
 from COMPS import Client
 logging.root.handlers = handlers
@@ -77,10 +82,13 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     _suites: CompsPlatformSuiteOperations = field(**op_defaults, repr=False, init=False)
     _workflow_items: CompsPlatformWorkflowItemOperations = field(**op_defaults, repr=False, init=False)
     _assets: CompsPlatformAssetCollectionOperations = field(**op_defaults, repr=False, init=False)
+    _skip_login: bool = field(default=False, repr=False)
 
     def __post_init__(self):
-        print("\nUser Login:")
-        print(json.dumps({"endpoint": self.endpoint, "environment": self.environment}, indent=3))
+        # check if we should do output. Mainly command line that want to be piped don't output this
+        if os.getenv('IDMTOOLS_SUPPRESS_OUTPUT', None) is None:
+            print("\nUser Login:")
+            print(json.dumps({"endpoint": self.endpoint, "environment": self.environment}, indent=3))
         self.__init_interfaces()
         self.supported_types = {ItemType.EXPERIMENT, ItemType.SIMULATION, ItemType.SUITE, ItemType.ASSETCOLLECTION,
                                 ItemType.WORKFLOW_ITEM}
@@ -92,7 +100,8 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             self._platform_supports.append(PlatformRequirements.WINDOWS)
 
     def __init_interfaces(self):
-        self._login()
+        if not self._skip_login:
+            self._login()
         self._experiments = CompsPlatformExperimentOperations(platform=self)
         self._simulations = CompsPlatformSimulationOperations(platform=self)
         self._suites = CompsPlatformSuiteOperations(platform=self)
@@ -107,3 +116,9 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
     def post_setstate(self):
         self.__init_interfaces()
+
+    def get_workitem_link(self, work_item: IWorkflowItem):
+        return f"{self.endpoint}/#explore/WorkItems?filters=ID={work_item.uid}"
+
+    def get_asset_collection_link(self, asset_collection: AssetCollection):
+        return f"{self.endpoint}/#explore/AssetCollections?filters=ID={asset_collection.uid}"

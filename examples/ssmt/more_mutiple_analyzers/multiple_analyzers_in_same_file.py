@@ -47,10 +47,7 @@ if __name__ == "__main__":
     platform = Platform('BELEGOST')
     analyzers = [ExampleAnalyzer, ExampleAnalyzer2]
     experiment_id = "40c1b14d-0a04-eb11-a2c7-c4346bcb1553"  # comps exp id
-    analysis = PlatformAnalysis(platform, experiment_ids=[experiment_id],
-                                analyzers=analyzers,
-                                analyzers_args=[{'filenames': ['output/result.json']}, {'filenames': ['config.json']}],
-                                analysis_name=os.path.split(sys.argv[0])[1])
+    analysis = PlatformAnalysis(platform, experiment_ids=[experiment_id], analyzers=analyzers, analyzers_args=[{'filenames': ['output/result.json']}, {'filenames': ['config.json']}], analysis_name=os.path.split(sys.argv[0])[1])
     analysis.analyze(check_status=True)
     wi = analysis.get_work_item()
     print(wi)

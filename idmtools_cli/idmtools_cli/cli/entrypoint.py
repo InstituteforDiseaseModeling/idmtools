@@ -1,9 +1,9 @@
 import logging
+from idmtools import IdmConfigParser
+from idmtools.core.logging import setup_logging
 import click
 from click_plugins import with_plugins
 from pkg_resources import iter_entry_points
-from idmtools import IdmConfigParser
-from idmtools.core.logging import setup_logging
 from idmtools_cli.iplatform_cli import IPlatformCLI
 
 # Decorator for CLI functions that will require a platform object passed down to them

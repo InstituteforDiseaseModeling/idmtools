@@ -1,6 +1,8 @@
+from uuid import UUID
 import json
 from abc import ABC
 from dataclasses import field, dataclass
+from idmtools.assets.file_list import FileList
 from idmtools.entities.iworkflow_item import IWorkflowItem
 
 
@@ -10,13 +12,13 @@ class ICOMPSWorkflowItem(IWorkflowItem, ABC):
     Interface of idmtools work item
     """
 
-    item_name: str = field(default="Idm WorkItem Test")
+    name: str = field(default="idmtools workflow item")
     work_order: dict = field(default_factory=lambda: {})
     work_item_type: str = field(default=None)
     plugin_key: str = field(default="1.0.0.0_RELEASE")
 
-    def __post_init__(self):
-        super().__post_init__()
+    def __post_init__(self, item_name: str, asset_collection_id: UUID, asset_files: FileList, user_files: FileList):
+        super().__post_init__(item_name, asset_collection_id, asset_files, user_files)
         self.work_order = self.work_order or {}
 
     def __repr__(self):

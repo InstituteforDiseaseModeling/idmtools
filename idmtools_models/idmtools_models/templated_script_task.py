@@ -197,7 +197,7 @@ class TemplatedScriptTask(ITask):
 
         Args:
             parent: Parent object
-
+            platform: Platform item is being ran on
         Returns:
 
         """
@@ -207,15 +207,22 @@ class TemplatedScriptTask(ITask):
         else:
             sn = ''
         if self.template_is_common:
-            sn += f'Assets{self.path_sep}{self.script_path}'
+            sn += platform.join_path(platform.common_asset_path, self.script_path)
         else:
             sn += self.script_path
         # set the command line to the rendered script
-        self.command = CommandLine(sn)
+        self.command = CommandLine.from_string(sn)
+        if self.path_sep != "/":
+            self.command.executable = self.command.executable.replace("/", self.path_sep)
+            self.command.is_windows = True
         # set any extra arguments
         if self.extra_command_arguments:
-            self.command.add_argument(self.extra_command_arguments)
-        # run base precreation
+            other_command = CommandLine.from_string(self.extra_command_arguments)
+            self.command._args.append(other_command.executable)
+            if other_command._options:
+                self.command._args += other_command._options
+            if other_command._args:
+                self.command._args += other_command._args
         super().pre_creation(parent, platform)
 
 

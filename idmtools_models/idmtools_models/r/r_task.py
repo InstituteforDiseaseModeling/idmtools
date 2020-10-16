@@ -19,35 +19,12 @@ if TYPE_CHECKING:
 class RTask(DockerTask):
     script_path: str = field(default=None, metadata={"md": True})
     r_path: str = field(default='Rscript', metadata={"md": True})
-    extra_libraries: list = field(default_factory=lambda: [], compare=False, metadata={"md": True})
-
-    @property
-    def command(self):
-        """
-        Update executable with new python_path
-        Returns: re-build command
-        """
-        if self.script_path is None:
-            return None
-
-        cmd_str = f'{self.r_path} ./Assets/{os.path.basename(self.script_path)}'
-        if self._command:
-            if isinstance(self._command, str):
-                self._command = CommandLine(cmd_str)
-            self._command._executable = cmd_str
-            self._task_log.info('Setting command line to %s', cmd_str)
-
-        return self._command
-
-    @command.setter
-    def command(self, command):
-        self._command = command
 
     def __post_init__(self):
         super().__post_init__()
         cmd_str = f'{self.r_path} ./Assets/{os.path.basename(self.script_path)}'
         self._task_log.info('Setting command line to %s', cmd_str)
-        self.command = CommandLine(cmd_str)
+        self.command = CommandLine.from_string(cmd_str)
 
     def reload_from_simulation(self, simulation: Simulation, **kwargs):
         logger.debug("Reload from simulation")
@@ -95,6 +72,8 @@ class RTask(DockerTask):
         """
         if self.script_path is None:
             raise ValueError("Script name is required")
+
+        self.command = CommandLine.from_string(f'{self.r_path} {platform.join_path(platform.common_asset_path, os.path.basename(self.script_path))}')
 
 
 class RTaskSpecification(TaskSpecification):

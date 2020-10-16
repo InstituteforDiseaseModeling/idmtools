@@ -19,7 +19,7 @@ TEST_EXTRA_OPTS?=
 DOCKER_REPO?=docker-staging
 NO_SPINNER?=1
 PARALLEL_TEST_COUNT?=8
-TEST_COMMAND =  py.test --junitxml=$(REPORT_DIR)/$(TEST_REPORT) --html=$(REPORT_DIR)/$(HTML_TEST_REPORT) --self-contained-html $(TEST_EXTRA_OPTS)
+TEST_COMMAND =  py.test --timeout=360 --junitxml=$(REPORT_DIR)/$(TEST_REPORT) --html=$(REPORT_DIR)/$(HTML_TEST_REPORT) --self-contained-html $(TEST_EXTRA_OPTS)
 COVERAGE_OPTS := --cov-config=.coveragerc --cov-branch --cov-append --cov=idmtools --cov=idmtoools_cli --cov=idmtools_models --cov=idmtools_platform_comps --cov=idmtools_platform_local --cov=../../idmtools_cli/
 
 

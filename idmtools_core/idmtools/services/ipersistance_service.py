@@ -1,5 +1,6 @@
 import os
 import logging
+import time
 from multiprocessing import cpu_count
 
 import diskcache
@@ -14,12 +15,21 @@ class IPersistenceService(metaclass=ABCMeta):
 
     @classmethod
     def _open_cache(cls):
+        import sqlite3
         cache_directory = os.path.join(cls.cache_directory, 'disk_cache', cls.cache_name)
         os.makedirs(cache_directory, exist_ok=True)
         # the more the cpus, the more likely we are to encounter a scaling issue. Let's try to scale with that up to
         # one second. above one second, we are introducing to much lag in processes
-        default_timeout = min(max(0.1, cpu_count() * 0.0125), 1)
-        return diskcache.Cache(os.path.join(cls.cache_directory, 'disk_cache', cls.cache_name), timeout=default_timeout)
+        default_timeout = min(max(0.25, cpu_count() * 0.025 * 2), 2)
+        retries = 0
+        while retries < 5:
+
+            try:
+                cache = diskcache.FanoutCache(os.path.join(cls.cache_directory, 'disk_cache', cls.cache_name), timeout=default_timeout, shards=cpu_count() * 2)
+                return cache
+            except sqlite3.OperationalError:
+                retries += 1
+                time.sleep(0.1)
 
     @classmethod
     def retrieve(cls, uid):

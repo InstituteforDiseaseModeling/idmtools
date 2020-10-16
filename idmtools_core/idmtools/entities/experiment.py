@@ -10,7 +10,9 @@ from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType, EntityStatus
 from idmtools.core.interfaces.entity_container import EntityContainer
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
+from idmtools.core.interfaces.iitem import IItem
 from idmtools.core.interfaces.inamed_entity import INamedEntity
+from idmtools.core.interfaces.irunnable_entity import IRunnableEntity
 from idmtools.core.logging import SUCCESS, NOTICE
 from idmtools.entities.itask import ITask
 from idmtools.entities.platform_requirements import PlatformRequirements
@@ -36,7 +38,7 @@ SUPPORTED_SIM_TYPE = Union[
 
 
 @dataclass(repr=False)
-class Experiment(IAssetsEnabled, INamedEntity):
+class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
     """
     Class that represents a generic experiment.
     This class needs to be implemented for each model type with specifics.
@@ -77,7 +79,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
         self.__simulations.parent = self
 
     def post_creation(self, platform: 'IPlatform') -> None:
-        pass
+        IItem.post_creation(self, platform)
 
     @property
     def status(self):
@@ -393,7 +395,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
         p = super()._check_for_platform_from_context(platform)
         return p._experiments.list_assets(self, children, **kwargs)
 
-    def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None, regather_common_assets: bool = None,
+    def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None, regather_common_assets: bool = None, wait_on_done_progress: bool = True,
             **run_opts) -> NoReturn:
         """
         Runs an experiment on a platform
@@ -403,6 +405,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
             platform: Platform object to use. If not specified, we first check object for platform object then the current context
             regather_common_assets: Triggers gathering of assets for *existing* experiments. If not provided, we use the platforms default behaviour. See platform details for performance implications of this. For most platforms, it should be ok but for others, it could decrease performance when assets are not changing.
               It is important to note that when using this feature, ensure the previous simulations have finished provisioning. Failure to do so can lead to unexpected behaviour
+            wait_on_done_progress: Should experiment status be shown when waiting
             **run_opts: Options to pass to the platform
 
         Returns:
@@ -420,29 +423,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
         run_opts['regather_common_assets'] = regather_common_assets
         p.run_items(self, **run_opts)
         if wait_until_done:
-            self.wait()
-
-    def wait(self, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None):
-        """
-        Wait on an experiment to finish running
-
-        Args:
-            timeout: Timeout to wait
-            refresh_interval: How often to refresh object
-            platform: Platform. If not specified, we try to determine this from context
-
-        Returns:
-
-        """
-        if self.status not in [EntityStatus.CREATED, EntityStatus.RUNNING]:
-            raise ValueError("The experiment cannot be waited for if it is not in Running/Created state")
-        opts = dict()
-        if timeout:
-            opts['timeout'] = timeout
-        if refresh_interval:
-            opts['refresh_interval'] = refresh_interval
-        p = super()._check_for_platform_from_context(platform)
-        p.wait_till_done_progress(self, **opts)
+            self.wait(wait_on_done_progress=wait_on_done_progress)
 
     def to_dict(self):
         result = dict()

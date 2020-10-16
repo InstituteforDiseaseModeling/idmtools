@@ -13,4 +13,4 @@ Use the ``block`` command to start the wizard that will guide you through the cr
 
 Here is a demo of the command in action
 
-.. image:: images/config-wizard.svg
+.. image:: /images/config-wizard.svg

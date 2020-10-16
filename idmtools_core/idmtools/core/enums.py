@@ -1,4 +1,4 @@
-from enum import Enum, auto
+from enum import Enum
 
 TRUTHY_VALUES = ['1', 'y', 'yes', 'on', 'true', 't']
 
@@ -20,8 +20,11 @@ class FilterMode(Enum):
 
 
 class ItemType(Enum):
-    SUITE = auto()
-    EXPERIMENT = auto()
-    SIMULATION = auto()
-    WORKFLOW_ITEM = auto()  # On Comps this is workitems
-    ASSETCOLLECTION = auto()
+    SUITE = "Suite"
+    EXPERIMENT = "Experiment"
+    SIMULATION = "Simulation"
+    WORKFLOW_ITEM = "WorkItem"  # On Comps this is workitems
+    ASSETCOLLECTION = "Asset Collection"
+
+    def __str__(self):
+        return str(self.value)

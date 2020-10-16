@@ -420,9 +420,9 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         cli = self._detect_command_line_from_simulation(parent, comps_sim)
         # if we could not find task, set it now, otherwise rebuild the cli
         if simulation.task is None:
-            simulation.task = CommandTask(CommandLine(cli))
+            simulation.task = CommandTask(CommandLine.from_string(cli))
         else:
-            simulation.task.command = CommandLine(cli)
+            simulation.task.command = CommandLine.from_string(cli)
 
     @staticmethod
     def __load_metadata_from_simulation(simulation) -> Dict[str, Any]:

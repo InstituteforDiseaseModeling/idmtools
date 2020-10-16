@@ -31,29 +31,8 @@ class PythonTask(ITask):
             # don't error if we can't find script. Maybe it is in the asset collection? but warn user
             logger.warning(f'Cannot find script at {self.script_path}. If script does not exist in Assets '
                            f'as {os.path.basename(self.script_path)}, execution could fail')
-        self.command = CommandLine()
-
-    @property
-    def command(self):
-        """
-        Update executable with new python_path
-        Returns: re-build command
-        """
-        if self.script_path is None:
-            return None
-
-        cmd_str = f'{self.python_path} ./Assets/{os.path.basename(self.script_path)}'
-        if self._command:
-            if isinstance(self._command, str):
-                self._command = CommandLine(cmd_str)
-            self._command._executable = cmd_str
-            self._task_log.info('Setting command line to %s', cmd_str)
-
-        return self._command
-
-    @command.setter
-    def command(self, command):
-        self._command = command
+        if self.command is None:
+            self.command = CommandLine('')
 
     def gather_common_assets(self) -> AssetCollection:
         """
@@ -110,8 +89,10 @@ class PythonTask(ITask):
         Raise:
             ValueError if script name is not provided
         """
+
         if self.script_path is None:
             raise ValueError("Script name is required")
+        self.command = CommandLine.from_string(f'{self.python_path} {platform.join_path(platform.common_asset_path, os.path.basename(self.script_path))}')
 
 
 class PythonTaskSpecification(TaskSpecification):

@@ -1,10 +1,10 @@
 import re
-from typing import List, Callable
+from typing import List, Callable, Union, Type
 import inspect
 import os
 import pickle
 from logging import getLogger, DEBUG
-from idmtools.assets import Asset
+from idmtools.assets import Asset, AssetCollection
 from idmtools.assets.file_list import FileList
 from idmtools.config import IdmConfigParser
 from idmtools.entities import IAnalyzer
@@ -16,7 +16,8 @@ user_logger = getLogger('user')
 
 class PlatformAnalysis:
 
-    def __init__(self, platform: IPlatform, experiment_ids: List['str'], analyzers: List[IAnalyzer], analyzers_args=None, analysis_name: str = 'WorkItem Test', tags=None, additional_files=None, asset_collection_id=None, asset_files=FileList(), wait_till_done: bool = True,
+    def __init__(self, platform: IPlatform, experiment_ids: List['str'], analyzers: List[Type[IAnalyzer]], analyzers_args=None, analysis_name: str = 'WorkItem Test', tags=None, additional_files: Union[FileList, AssetCollection, List[str]] = None, asset_collection_id=None,
+                 asset_files: Union[FileList, AssetCollection, List[str]] = None, wait_till_done: bool = True,
                  idmtools_config: str = None, pre_run_func: Callable = None, wrapper_shell_script: str = None, verbose: bool = False):
         """
 
@@ -44,12 +45,16 @@ class PlatformAnalysis:
         self.analysis_name = analysis_name
         self.tags = tags
         if isinstance(additional_files, list):
-            additional_files = self.__files_to_filelist(additional_files)
-        self.additional_files = additional_files or FileList()
+            additional_files = AssetCollection(additional_files)
+        elif isinstance(additional_files, FileList):
+            additional_files = additional_files.to_asset_collection()
+        self.additional_files: AssetCollection = additional_files or AssetCollection()
         self.asset_collection_id = asset_collection_id
         if isinstance(asset_files, list):
-            asset_files = self.__files_to_filelist(asset_files)
-        self.asset_files = asset_files
+            asset_files = AssetCollection(asset_files)
+        elif isinstance(asset_files, FileList):
+            asset_files = asset_files.to_asset_collection()
+        self.asset_files: AssetCollection = asset_files or AssetCollection()
         self.wi = None
         self.wait_till_done = wait_till_done
         self.idmtools_config = idmtools_config
@@ -60,24 +65,15 @@ class PlatformAnalysis:
 
         self.validate_args()
 
-    def __files_to_filelist(self, additional_files):
-        new_add_files = FileList()
-        for file in additional_files:
-            if isinstance(file, str):
-                new_add_files.add_file(file)
-            else:
-                new_add_files.add_asset_file(file)
-        additional_files = new_add_files
-        return additional_files
-
     def analyze(self, check_status=True):
         command = self._prep_analyze()
 
         logger.debug(f"Command: {command}")
         from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
-        self.wi = SSMTWorkItem(item_name=self.analysis_name, command=command, tags=self.tags,
-                               user_files=self.additional_files, asset_collection_id=self.asset_collection_id,
-                               asset_files=self.asset_files, related_experiments=self.experiment_ids)
+
+        ac = AssetCollection.from_id(self.asset_collection_id, platform=self.platform) if self.asset_collection_id else AssetCollection()
+        ac.add_assets(self.asset_files)
+        self.wi = SSMTWorkItem(name=self.analysis_name, command=command, tags=self.tags, transient_assets=self.additional_files, assets=ac, related_experiments=self.experiment_ids)
 
         # Run the workitem
         self.platform.run_items(self.wi)
@@ -88,20 +84,18 @@ class PlatformAnalysis:
     def _prep_analyze(self):
         # Add the platform_analysis_bootstrap.py file to the collection
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        self.additional_files.add_file(os.path.join(dir_path, "platform_analysis_bootstrap.py"))
+        self.additional_files.add_or_replace_asset(os.path.join(dir_path, "platform_analysis_bootstrap.py"))
         # check if user gave us an override to idmtools config
         if self.idmtools_config:
-            self.additional_files.add_file(self.idmtools_config)
+            self.additional_files.add_or_replace_asset(self.idmtools_config)
         else:
             # look for one from idmtools.
             config_path = IdmConfigParser.get_config_path()
             if config_path and os.path.exists(config_path):
                 if logger.isEnabledFor(DEBUG):
                     logger.debug(f"Adding config file: {config_path}")
-                self.additional_files.add_file(config_path)
+                self.additional_files.add_or_replace_asset(config_path)
 
-        if self.wrapper_shell_script:
-            self.additional_files.add_file(os.path.join(self.wrapper_shell_script))
         # build analyzer args dict
         args_dict = {}
         a_args = zip(self.analyzers, self.analyzers_args)
@@ -114,11 +108,11 @@ class PlatformAnalysis:
 
         # Add all the analyzers files
         for a in self.analyzers:
-            self.additional_files.add_file(inspect.getfile(a))
+            self.additional_files.add_or_replace_asset(inspect.getfile(a))
         # Create the command
         command = ''
         if self.wrapper_shell_script:
-            self.additional_files.add_file(self.wrapper_shell_script)
+            self.additional_files.add_or_replace_asset(self.wrapper_shell_script)
             command += f'{self.shell_script_binary} {os.path.basename(self.wrapper_shell_script)} '
         command += "python platform_analysis_bootstrap.py"
         # Add the experiments
@@ -135,7 +129,7 @@ class PlatformAnalysis:
         return command
 
     def __pickle_analyzers(self, args_dict):
-        self.additional_files.add_asset_file(Asset(filename='analyzer_args.pkl', content=pickle.dumps(args_dict)))
+        self.additional_files.add_or_replace_asset(Asset(filename='analyzer_args.pkl', content=pickle.dumps(args_dict)))
 
     def __pickle_pre_run(self):
         source = inspect.getsource(self.pre_run_func).splitlines()
@@ -147,7 +141,7 @@ class PlatformAnalysis:
         for line in source:
             new_source.append(replace_expr.sub("", line))
 
-        self.additional_files.add_asset_file(Asset(filename="pre_run.py", content="\n".join(new_source)))
+        self.additional_files.add_or_replace_asset(Asset(filename="pre_run.py", content="\n".join(new_source)))
 
     def validate_args(self):
         if self.analyzers_args is None:

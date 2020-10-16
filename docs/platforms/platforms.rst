@@ -36,6 +36,6 @@ You use the :py:class:`~idmtools.core.platform_factory.Platform` class whether y
 For additional information about configuring idmtools.ini, see :doc:`../configuration`.
 
 .. toctree::
-
+   platforms-comps
    platforms-local
    platforms-plugin

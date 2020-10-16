@@ -3,11 +3,9 @@ import os
 from dataclasses import dataclass, field
 from logging import getLogger, DEBUG
 from typing import List
-
 from COMPS.Data import QueryCriteria
 from COMPS.Data.AssetCollection import AssetCollection as COMPSAssetCollection
-
-from idmtools.assets import Asset
+from idmtools.assets import Asset, AssetCollection
 from idmtools.core import ItemType
 from idmtools.entities.experiment import Experiment
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
@@ -204,7 +202,6 @@ class RequirementsToAssetCollection:
             exp_id: the Experiment id (which installed requirements)
         Returns: work item created
         """
-        from idmtools.assets.file_list import FileList
         from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
 
         md5_str = self.checksum
@@ -213,12 +210,10 @@ class RequirementsToAssetCollection:
 
         wi_name = "wi to create ac"
         command = f"python {MODEL_CREATE_AC} {exp_id} {md5_str} {self.platform.endpoint} {self._os_target}"
-        user_files = FileList(root=CURRENT_DIRECTORY, files_in_root=[MODEL_CREATE_AC])
         tags = {MD5_KEY.format(self._os_target): self.checksum}
 
         user_logger.info("Converting Python Packages to an Asset Collection. This may take some time for large dependency lists")
-        wi = SSMTWorkItem(item_name=wi_name, command=command, user_files=user_files, tags=tags,
-                          related_experiments=[exp_id])
+        wi = SSMTWorkItem(name=wi_name, command=command, transient_assets=AssetCollection([os.path.join(CURRENT_DIRECTORY, MODEL_CREATE_AC)]), tags=tags, related_experiments=[exp_id])
 
         wi.run(wait_on_done=True, platform=self.platform)
 

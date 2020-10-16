@@ -60,7 +60,6 @@ class TestPlatformFactory(ITestWithPersistence):
     @pytest.mark.comps
     @pytest.mark.timeout(60)
     @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
-    @pytest.mark.serial
     @allure.story("COMPS")
     @allure.story("Configuration")
     def test_create_from_block(self, mock_login):
@@ -76,7 +75,6 @@ class TestPlatformFactory(ITestWithPersistence):
     @pytest.mark.comps
     @pytest.mark.timeout(60)
     @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
-    @pytest.mark.serial
     @allure.story("COMPS")
     @allure.story("Configuration")
     def test_platform_factory(self, mock_login):
@@ -90,7 +88,6 @@ class TestPlatformFactory(ITestWithPersistence):
 
     @pytest.mark.comps
     @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
-    @pytest.mark.serial
     @allure.story("COMPS")
     @allure.story("Configuration")
     def test_COMPSPlatform(self, mock_login):

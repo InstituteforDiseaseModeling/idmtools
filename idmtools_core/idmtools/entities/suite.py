@@ -1,8 +1,10 @@
 from typing import NoReturn, Type, TYPE_CHECKING, Dict
 from abc import ABC
 from dataclasses import dataclass, field, fields
+from idmtools.core.interfaces.iitem import IItem
 from idmtools.core.interfaces.inamed_entity import INamedEntity
-from idmtools.core import ItemType, EntityContainer, EntityStatus
+from idmtools.core import ItemType, EntityContainer
+from idmtools.core.interfaces.irunnable_entity import IRunnableEntity
 
 if TYPE_CHECKING:
     from idmtools.entities.iplatform import IPlatform
@@ -10,7 +12,7 @@ if TYPE_CHECKING:
 
 
 @dataclass(repr=False)
-class Suite(INamedEntity, ABC):
+class Suite(INamedEntity, ABC, IRunnableEntity):
     """
     Class that represents a generic suite (a collection of experiments).
 
@@ -44,10 +46,10 @@ class Suite(INamedEntity, ABC):
         display(self, suite_table_display)
 
     def pre_creation(self, platform: 'IPlatform'):
-        pass
+        IItem.pre_creation(self, platform)
 
     def post_creation(self, platform: 'IPlatform'):
-        pass
+        IItem.post_creation(self, platform)
 
     def __repr__(self):
         return f"<Suite {self.uid} - {len(self.experiments)} experiments>"
@@ -71,47 +73,6 @@ class Suite(INamedEntity, ABC):
             True if all experiments have succeeded, False otherwise
         """
         return all([s.succeeded for s in self.experiments])
-
-    def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None,  # noqa: F821
-            **run_opts) -> NoReturn:
-        """
-        Runs an experiment on a platform
-
-        Args:
-            wait_until_done: Whether we should wait on experiment to finish running as well. Defaults to False
-            platform: Platform object to use. If not specified, we first check object for platform object then the
-            current context
-            **run_opts: Options to pass to the platform
-
-        Returns:
-            None
-        """
-        p = self._check_for_platform_from_context(platform)
-        p.run_items(self, **run_opts)
-        if wait_until_done:
-            self.wait()
-
-    def wait(self, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None):
-        """
-        Wait on an experiment to finish running
-
-        Args:
-            timeout: Timeout to wait
-            refresh_interval: How often to refresh object
-            platform: Platform. If not specified, we try to determine this from context
-
-        Returns:
-
-        """
-        if self.status not in [EntityStatus.CREATED, EntityStatus.RUNNING]:
-            raise ValueError("The experiment cannot be waited for if it is not in Running/Created state")
-        opts = dict()
-        if timeout:
-            opts['timeout'] = timeout
-        if refresh_interval:
-            opts['refresh_interval'] = refresh_interval
-        p = self._check_for_platform_from_context(platform)
-        p.wait_till_done_progress(self, **opts)
 
     def to_dict(self) -> Dict:
         result = dict()

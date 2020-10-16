@@ -66,6 +66,7 @@ class TestCompsPlugin(unittest.TestCase):
             self.assertTrue(platform.are_requirements_met(PlatformRequirements.WINDOWS))
 
     @pytest.mark.comps
+    @pytest.mark.serial
     def test_platform_aliases(self):
         from idmtools.core.platform_factory import Platform
         org_directory = os.getcwd()
