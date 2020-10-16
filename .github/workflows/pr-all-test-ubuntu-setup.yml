@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         os: [self-hosted, linux]
-        python-version: [3.6, 3.7, 3.8]
+        python-version: [3.6.12, 3.7.9, 3.8.6]
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
@@ -30,7 +30,7 @@ jobs:
             local:
               - 'idmtools_local_platform/**'
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
-        uses: actions/setup-python@main
+        uses: actions/setup-python@v2.1.4
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
@@ -66,8 +66,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ self-hosted, linux ]
-        python-version: [ 3.6, 3.7, 3.8 ]
+        os: [ self-linux ]
+        python-version: [ 3.6.12, 3.7.9, 3.8.6 ]
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
@@ -81,7 +81,7 @@ jobs:
             cli:
               - 'idmtools_cli/**'
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
-        uses: actions/setup-python@main
+        uses: actions/setup-python@v2.1.4
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
@@ -110,8 +110,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ self-hosted, linux ]
-        python-version: [ 3.6, 3.7, 3.8 ]
+        os: [ self-linux ]
+        python-version: [ 3.6.12, 3.7.9, 3.8.6 ]
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
@@ -131,7 +131,7 @@ jobs:
             local:
               - 'idmtools_local_platform/**'
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
-        uses: actions/setup-python@main
+        uses: actions/setup-python@v2.1.4
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
@@ -160,8 +160,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ self-hosted, linux ]
-        python-version: [ 3.6, 3.7, 3.8 ]
+        os: [ self-linux ]
+        python-version: [ 3.6.12, 3.7.9, 3.8.6 ]
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
@@ -181,7 +181,7 @@ jobs:
             local:
               - 'idmtools_local_platform/**'
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
-        uses: actions/setup-python@main
+        uses: actions/setup-python@v2.1.4
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
@@ -210,8 +210,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ self-hosted, linux, docker ]
-        python-version: [ 3.6, 3.7, 3.8 ]
+        os: [ self-docker ]
+        python-version: [ 3.6.12, 3.7.9, 3.8.6 ]
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
@@ -231,7 +231,7 @@ jobs:
             local:
               - 'idmtools_local_platform/**'
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
-        uses: actions/setup-python@main
+        uses: actions/setup-python@v2.1.4
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
