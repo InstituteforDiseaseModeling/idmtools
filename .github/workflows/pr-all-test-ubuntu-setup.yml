@@ -26,9 +26,9 @@ jobs:
             models:
               - 'idmtools_models/**'
             comps:
-              - 'idmtools_comps_platform/**'
+              - 'idmtools_platform_comps/**'
             local:
-              - 'idmtools_local_platform/**'
+              - 'idmtools_platform_local/**'
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2.1.4
         with:
@@ -126,9 +126,9 @@ jobs:
             models:
               - 'idmtools_models/**'
             comps:
-              - 'idmtools_comps_platform/**'
+              - 'idmtools_platform_comps/**'
             local:
-              - 'idmtools_local_platform/**'
+              - 'idmtools_platform_local/**'
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2.1.4
         with:
@@ -176,9 +176,9 @@ jobs:
             models:
               - 'idmtools_models/**'
             comps:
-              - 'idmtools_comps_platform/**'
+              - 'idmtools_platform_comps/**'
             local:
-              - 'idmtools_local_platform/**'
+              - 'idmtools_platform_local/**'
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2.1.4
         with:
@@ -226,9 +226,9 @@ jobs:
             models:
               - 'idmtools_models/**'
             comps:
-              - 'idmtools_comps_platform/**'
+              - 'idmtools_platform_comps/**'
             local:
-              - 'idmtools_local_platform/**'
+              - 'idmtools_platform_local/**'
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2.1.4
         with:
