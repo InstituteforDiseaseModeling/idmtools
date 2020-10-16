@@ -9,7 +9,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [self-hosted, linux]
+        os: [self-linux]
         python-version: [3.6.12, 3.7.9, 3.8.6]
     steps:
       - name: Check out Git repository
@@ -34,6 +34,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
+          platform: linux
       - name: Install Python dependencies
         run: |
           pip install idm-buildtools flake8 wheel --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
