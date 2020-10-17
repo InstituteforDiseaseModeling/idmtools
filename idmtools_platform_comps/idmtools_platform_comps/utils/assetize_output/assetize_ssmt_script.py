@@ -106,7 +106,7 @@ def is_file_excluded(filename: str, exclude_patterns: List[str]) -> bool:
     return False
 
 
-def gather_files_from_related(work_item: WorkItem, file_patterns: List[str], exclude_patterns: List[str], assets: bool, simulation_prefix_format_str: str, work_item_prefix_format_str: str, entity_filter_func: EntityFilterFunc) -> SetOfAssets:
+def gather_files_from_related(work_item: WorkItem, file_patterns: List[str], exclude_patterns: List[str], assets: bool, simulation_prefix_format_str: str, work_item_prefix_format_str: str, entity_filter_func: EntityFilterFunc) -> SetOfAssets:  # pragma: no cover
     """
     Gather files from different related entities
 
@@ -146,7 +146,7 @@ def gather_files_from_related(work_item: WorkItem, file_patterns: List[str], exc
     return file_list
 
 
-def filter_experiments(assets: bool, entity_filter_func: EntityFilterFunc, exclude_patterns_compiles: List, file_patterns: List[str], futures: List[Future], pool: ThreadPoolExecutor, simulation_prefix_format_str: str, work_item: WorkItem):
+def filter_experiments(assets: bool, entity_filter_func: EntityFilterFunc, exclude_patterns_compiles: List, file_patterns: List[str], futures: List[Future], pool: ThreadPoolExecutor, simulation_prefix_format_str: str, work_item: WorkItem):  # pragma: no cover
     """
     Filter Experiments outputs using our patterns
 
@@ -196,7 +196,7 @@ def get_simulation_prefix(parent_workitem: WorkItem, simulation: Simulation, sim
     return prefix
 
 
-def filter_experiment_assets(work_item: WorkItem, assets: bool, entity_filter_func: EntityFilterFunc, exclude_patterns_compiles: List, experiment: Experiment, file_patterns: List[str], futures: List[Future], pool: ThreadPoolExecutor, simulation_prefix_format_str: str, simulations: List[Simulation]):
+def filter_experiment_assets(work_item: WorkItem, assets: bool, entity_filter_func: EntityFilterFunc, exclude_patterns_compiles: List, experiment: Experiment, file_patterns: List[str], futures: List[Future], pool: ThreadPoolExecutor, simulation_prefix_format_str: str, simulations: List[Simulation]):  # pragma: no cover
     """
     Filter experiment assets. This method uses the first simulation to gather experiment assets
 
@@ -230,7 +230,7 @@ def filter_experiment_assets(work_item: WorkItem, assets: bool, entity_filter_fu
             futures.append(pool.submit(gather_files, directory=simulation.hpc_jobs[0].working_directory, file_patterns=file_patterns, exclude_patterns=exclude_patterns_compiles, assets=assets, prefix=prefix))
 
 
-def filter_simulations_files(assets: bool, entity_filter_func: EntityFilterFunc, exclude_patterns_compiles: List, file_patterns: List[str], futures: List[Future], pool: ThreadPoolExecutor, simulation_prefix_format_str: str, work_item: WorkItem):
+def filter_simulations_files(assets: bool, entity_filter_func: EntityFilterFunc, exclude_patterns_compiles: List, file_patterns: List[str], futures: List[Future], pool: ThreadPoolExecutor, simulation_prefix_format_str: str, work_item: WorkItem):  # pragma: no cover
     """
     Filter Simulations files
 
@@ -253,7 +253,7 @@ def filter_simulations_files(assets: bool, entity_filter_func: EntityFilterFunc,
 
 
 def filter_simulation_list(assets: bool, entity_filter_func: EntityFilterFunc, exclude_patterns_compiles: List, file_patterns: List[str], futures: List[Future], pool: ThreadPoolExecutor, simulation_prefix_format_str: str, simulations: List[Simulation], work_item: WorkItem,
-                           experiment: Experiment = None):
+                           experiment: Experiment = None):  # pragma: no cover
     """
     Filter simulations list. This method is used for experiments and simulations
     Args:
@@ -281,7 +281,7 @@ def filter_simulation_list(assets: bool, entity_filter_func: EntityFilterFunc, e
             futures.append(pool.submit(gather_files, directory=simulation.hpc_jobs[0].working_directory, file_patterns=file_patterns, exclude_patterns=exclude_patterns_compiles, assets=assets, prefix=prefix))
 
 
-def filter_work_items_files(assets: bool, entity_filter_func: EntityFilterFunc, exclude_patterns_compiles: List, file_patterns: List[str], futures: List[Future], pool: ThreadPoolExecutor, work_item: WorkItem, work_item_prefix_format_str: str):
+def filter_work_items_files(assets: bool, entity_filter_func: EntityFilterFunc, exclude_patterns_compiles: List, file_patterns: List[str], futures: List[Future], pool: ThreadPoolExecutor, work_item: WorkItem, work_item_prefix_format_str: str):  # pragma: no cover
     """
     Filter work items files
 
@@ -308,7 +308,7 @@ def filter_work_items_files(assets: bool, entity_filter_func: EntityFilterFunc, 
             futures.append(pool.submit(gather_files, directory=related_work_item.working_directory, file_patterns=file_patterns, exclude_patterns=exclude_patterns_compiles, assets=assets, prefix=prefix))
 
 
-def create_asset_collection(file_list: SetOfAssets, ac_files: List[AssetCollectionFile], asset_tags: Dict[str, str]):
+def create_asset_collection(file_list: SetOfAssets, ac_files: List[AssetCollectionFile], asset_tags: Dict[str, str]):  # pragma: no cover
     """
 
     Args:
@@ -355,7 +355,7 @@ def create_asset_collection(file_list: SetOfAssets, ac_files: List[AssetCollecti
     return asset_collection
 
 
-def ensure_items_are_ready(work_item: WorkItem):
+def ensure_items_are_ready(work_item: WorkItem):  # pragma: no cover
     """
     Ensure items are done. This leverages COMPS sleeping to pause creation of Asset Collections until item is in a done state
     Args:
@@ -403,7 +403,7 @@ def get_argument_parser():
     return parser
 
 
-def assetize_error_handler(exctype, value: Exception, tb):
+def assetize_error_handler(exctype, value: Exception, tb):  # pragma: no cover
     """
     Global exception handler. This will write our errors in a nice format
 
@@ -462,6 +462,16 @@ def get_asset_file_path(file):
 
 
 def print_results(ac_files, files):
+    """
+    Print Results
+
+    Args:
+        ac_files: Ac Files
+        files: Files
+
+    Returns:
+
+    """
     all_files = []
     for file in files:
         all_files.append(dict(filename=file[0], destname=file[1], filesize=file[3]))
@@ -479,7 +489,7 @@ def print_results(ac_files, files):
     print(f'Total asset collection size: {humanfriendly.format_size(total_file_size)}')
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     parser = get_argument_parser()
     args = parser.parse_args()
 

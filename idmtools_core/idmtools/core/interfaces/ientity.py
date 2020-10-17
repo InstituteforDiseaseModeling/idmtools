@@ -2,12 +2,11 @@ from abc import ABCMeta
 from dataclasses import dataclass, field
 from typing import NoReturn, List, Any, Dict, Union, TYPE_CHECKING
 from uuid import UUID
-
 from idmtools.core import EntityStatus, ItemType, NoPlatformException
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.services.platforms import PlatformPersistService
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
 
 

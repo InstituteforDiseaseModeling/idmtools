@@ -7,7 +7,7 @@ from typing import NoReturn, TYPE_CHECKING
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.entities.ianalyzer import TAnalyzerList
 from diskcache import Cache
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
 
 logger = getLogger(__name__)

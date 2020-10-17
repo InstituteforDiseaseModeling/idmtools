@@ -3,11 +3,10 @@ from inspect import signature
 from logging import getLogger, DEBUG
 from typing import List, Callable, TYPE_CHECKING, NoReturn
 from abc import ABCMeta
-
 from idmtools.core import EntityStatus
 from idmtools.core.interfaces.ientity import IEntity
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
 
 runnable_hook = Callable[['IRunnableEntity', 'IPlatform'], None]

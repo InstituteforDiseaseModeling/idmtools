@@ -17,7 +17,7 @@ logger = getLogger(__name__)
 # 1. Create Suite(If Suite)
 #    a) Pre-Creation hooks
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
     from idmtools.entities.simulation import Simulation
     from idmtools.entities.iworkflow_item import IWorkflowItem  # noqa: F401

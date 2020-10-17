@@ -4,7 +4,7 @@ from logging import getLogger, DEBUG
 from typing import List, Callable, TYPE_CHECKING
 from uuid import UUID
 from idmtools.utils.hashing import hash_obj, ignore_fields_in_dataclass_on_pickle
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
 
 logger = getLogger(__name__)

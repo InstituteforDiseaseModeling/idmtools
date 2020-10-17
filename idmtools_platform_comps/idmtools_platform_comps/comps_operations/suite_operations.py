@@ -5,7 +5,7 @@ from COMPS.Data import Suite as COMPSSuite, QueryCriteria, Experiment as COMPSEx
 from idmtools.entities import Suite
 from idmtools.entities.iplatform_ops.iplatform_suite_operations import IPlatformSuiteOperations
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools_platform_comps.comps_platform import COMPSPlatform
 
 

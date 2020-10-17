@@ -17,13 +17,12 @@ from idmtools.core.logging import SUCCESS, NOTICE
 from idmtools.entities.itask import ITask
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.templated_simulation import TemplatedSimulations
-from idmtools.registry.experiment_specification import ExperimentPluginSpecification, get_model_impl, \
-    get_model_type_impl
+from idmtools.registry.experiment_specification import ExperimentPluginSpecification, get_model_impl, get_model_type_impl
 from idmtools.registry.plugin_specification import get_description_impl
 from idmtools.utils.collections import ExperimentParentIterator
 from idmtools.utils.entities import get_default_tags
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
     from idmtools.entities.simulation import Simulation  # noqa: F401
 

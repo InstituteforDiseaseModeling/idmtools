@@ -21,7 +21,7 @@ from idmtools_platform_local.client.simulations_client import SimulationsClient
 from idmtools_platform_local.platform_operations.uitils import local_status_to_common, ExperimentDict, SimulationDict, \
     download_lp_file
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools_platform_local.local_platform import LocalPlatform
 
 logger = getLogger(__name__)

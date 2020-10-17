@@ -2,12 +2,11 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, List, Type, NoReturn, TYPE_CHECKING
 from uuid import UUID
-
 from idmtools.assets import AssetCollection
 from idmtools.core import CacheEnabled
 from idmtools.entities.iplatform_ops.utils import batch_create_items
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
 
 

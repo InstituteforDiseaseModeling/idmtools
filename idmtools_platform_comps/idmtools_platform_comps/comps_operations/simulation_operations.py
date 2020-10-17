@@ -24,7 +24,7 @@ from idmtools.entities.simulation import Simulation
 from idmtools.utils.json import IDMJSONEncoder
 from idmtools_platform_comps.utils.general import convert_comps_status, get_asset_for_comps_item, clean_experiment_name
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools_platform_comps.comps_platform import COMPSPlatform
 
 logger = getLogger(__name__)

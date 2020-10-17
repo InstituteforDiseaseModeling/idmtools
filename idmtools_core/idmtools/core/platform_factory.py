@@ -1,16 +1,14 @@
 import json
-
 import os
 from contextlib import contextmanager
 from dataclasses import fields
 from logging import getLogger, DEBUG
 from typing import Dict, Any, TYPE_CHECKING
-
 from idmtools.config import IdmConfigParser
 from idmtools.core.context import set_current_platform, remove_current_platform
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
 
 logger = getLogger(__name__)

@@ -5,15 +5,13 @@ from functools import partial
 from logging import getLogger, DEBUG
 from typing import Type, Union, List, TYPE_CHECKING, Optional
 from uuid import UUID
-
 import humanfriendly
 from COMPS.Data import AssetCollection as COMPSAssetCollection, QueryCriteria, AssetCollectionFile, SimulationFile, OutputFileMetadata, WorkItemFile
-
 from idmtools.assets import AssetCollection, Asset
 from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
 from idmtools_platform_comps.utils.general import get_file_as_generator
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools_platform_comps.comps_platform import COMPSPlatform
 
 logger = getLogger(__name__)

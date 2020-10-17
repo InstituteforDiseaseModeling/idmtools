@@ -20,10 +20,9 @@ from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools.utils.collections import ExperimentParentIterator
 from idmtools.utils.json import IDMJSONEncoder
 from idmtools_platform_local.client.simulations_client import SimulationsClient
-from idmtools_platform_local.platform_operations.uitils import local_status_to_common, SimulationDict, ExperimentDict, \
-    download_lp_file
+from idmtools_platform_local.platform_operations.uitils import local_status_to_common, SimulationDict, ExperimentDict, download_lp_file
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools_platform_local.local_platform import LocalPlatform
 
 logger = getLogger(__name__)

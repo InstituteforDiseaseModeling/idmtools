@@ -14,7 +14,7 @@ from idmtools.core.logging import VERBOSE, SUCCESS
 from idmtools.entities.ianalyzer import IAnalyzer
 from idmtools.utils.command_line import animation
 from idmtools.utils.language import on_off, verbose_timedelta
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
 
 logger = getLogger(__name__)

@@ -4,7 +4,6 @@ from abc import ABC
 from dataclasses import dataclass, field, fields, InitVar
 from typing import NoReturn, Dict, Any, TYPE_CHECKING
 from uuid import UUID
-
 from idmtools.assets import AssetCollection
 from idmtools.assets.file_list import FileList
 from idmtools.core import ItemType
@@ -13,7 +12,7 @@ from idmtools.core.interfaces.inamed_entity import INamedEntity
 from idmtools.core.interfaces.irunnable_entity import IRunnableEntity
 from idmtools.entities.itask import ITask
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
 
 

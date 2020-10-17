@@ -7,7 +7,7 @@ from uuid import UUID, uuid4
 from idmtools.core import EntityStatus, UnknownItemException
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools_test.utils.test_platform import TestPlatform
 
 logger = getLogger(__name__)
