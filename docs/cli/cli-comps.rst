@@ -10,8 +10,8 @@ The COMPS platform related commands can be accessed with either ``idmtools comps
 
 You can login to a comps environment by using the ``idmtools comps CONFIG_BLOCK login`` command. See the help below:
 
-.. command-output:: idmtools comps login --help
+.. command-output:: idmtools comps CONFIG_BLOCK login --help
 
 You can assetize outputs from the CLI by running ``idmtools comps CONFIG_BLOCK assetize-outputs``:
 
-.. command-output:: idmtools comps login --help
+.. command-output:: idmtools comps CONFIG_BLOCK login --help
