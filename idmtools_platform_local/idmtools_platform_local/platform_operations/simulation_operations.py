@@ -5,10 +5,8 @@ from functools import partial
 from logging import getLogger, DEBUG
 from typing import Dict, List, Set, Union, Iterator, Optional, TYPE_CHECKING
 from uuid import UUID
-
 from docker.models.containers import Container
 from tqdm import tqdm
-
 from idmtools.assets import Asset, json, AssetCollection
 from idmtools.core import ItemType
 from idmtools.core.task_factory import TaskFactory
@@ -20,7 +18,7 @@ from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools.utils.collections import ExperimentParentIterator
 from idmtools.utils.json import IDMJSONEncoder
 from idmtools_platform_local.client.simulations_client import SimulationsClient
-from idmtools_platform_local.platform_operations.uitils import local_status_to_common, SimulationDict, ExperimentDict, download_lp_file
+from idmtools_platform_local.platform_operations.utils import local_status_to_common, SimulationDict, ExperimentDict, download_lp_file
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools_platform_local.local_platform import LocalPlatform

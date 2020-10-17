@@ -1,7 +1,7 @@
 from collections import defaultdict
 
 import os
-from logging import getLogger
+from logging import getLogger, DEBUG
 import stat
 import click
 import pyperclip
@@ -31,7 +31,9 @@ def version(no_plugins: bool):
             module_name = str(spec.get_type().__module__)
             if module_name:
                 module_name = module_name.split(".")[0]
-        except Exception:
+        except Exception as e:
+            if logger.isEnabledFor(DEBUG):
+                logger.exception(e)
             module_name = 'Unknown Module'
         if plugin_map[name].get_version():
             module_map[module_name][name] = plugin_map[name].get_version()
