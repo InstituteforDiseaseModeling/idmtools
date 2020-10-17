@@ -755,7 +755,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             from tqdm import tqdm
             if isinstance(item, Experiment):
                 prog = tqdm([], total=len(item.simulations), desc="Waiting on Experiment to Finish running", unit="simulation")
-                child_attribute ='simulations'
+                child_attribute = 'simulations'
             elif isinstance(item, Suite):
                 prog = tqdm([], total=len(item.experiments), desc="Waiting on Suite to Finish running", unit="experiment")
                 child_attribute = 'experiments'
