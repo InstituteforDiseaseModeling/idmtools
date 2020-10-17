@@ -17,8 +17,10 @@ See the :ref:`Cookbook <Cookbook Assetize Outputs>` for examples of Assetizing o
 
 Also review the class details :class:`idmtools_platform_comps.utils.assetize_output.assetize_output.AssetizeOutput`
 
+You can also run this command from the CLI. For details, see :ref:`COMPS CLI reference<COMPS CLI>`
 Errors
 ------
 
 NoFileFound - This means the patterns you specified resulted in no files found. Review your patterns.
 CrossEnvironmentAssetizeNotSupport - This occurs when you attempt to assestize an item in a COMPS environment that does not match that of the workitem. Use the same environment for your workitem as you did for your original item
+AtLeastOneItemToWatch - You cannot run assetize without linking at least one item

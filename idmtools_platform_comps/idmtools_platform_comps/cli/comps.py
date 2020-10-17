@@ -31,10 +31,15 @@ try:
     from idmtools_platform_comps.utils.assetize_output.assetize_output import AssetizeOutput, DEFAULT_EXCLUDES
     from idmtools_platform_comps.comps_platform import COMPSPlatform
 
-    @click.group(help="Commands related to managing the local platform")
+    @click.group(short_help="COMPS Related Commands")
     @click.argument('config-block')
     @click.pass_context
     def comps(ctx: click.Context, config_block):
+        """
+        Commands related to managing the COMPS platform
+
+        CONFIG_BLOCK - Name of configuration section or alias to load COMPS connection information from
+        """
         ctx.obj = dict(config_block=config_block)
 
     @comps.command(help="Login to COMPS")
@@ -106,6 +111,8 @@ try:
         if tag:
             for name, value in tag:
                 ao.asset_tags[name] = value
+        if ao.total_items_watched() == 0:
+            user_logger.error("You must specify at least one item to assetize")
         ao.run(wait_until_done=False, platform=p)
         if not json:
             user_logger.info(f"Item can be viewed at {p.get_workitem_link(ao)}")

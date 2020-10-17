@@ -40,6 +40,10 @@ class CrossEnvironmentAssetizeNotSupport(Exception):
     doc_link: str = "platforms/comps/assetize_output.html#errors"
 
 
+class AtLeastOneItemToWatch(Exception):
+    doc_link: str = "platforms/comps/assetize_output.html#errors"
+
+
 @dataclass(repr=False)
 class AssetizeOutput(SSMTWorkItem):
     #: List of glob patterns. See https://docs.python.org/3.7/library/glob.html for details on the patterns
@@ -194,7 +198,7 @@ class AssetizeOutput(SSMTWorkItem):
         if len(self.asset_tags) == 0:
             self.__generate_tags()
         if self.total_items_watched() == 0:
-            raise ValueError("You must specify at least one item to watch")
+            raise AtLeastOneItemToWatch("You must specify at least one item to watch")
 
         if len(self.file_patterns) == 0:
             logger.info("No file pattern specified. Setting to default pattern '**' to assetize all outputs")
