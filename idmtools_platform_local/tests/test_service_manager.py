@@ -109,6 +109,11 @@ class TestServiceManager(unittest.TestCase):
         self.assertEqual(worker_container.status, 'running')
         sm.cleanup(True)
 
+    def test_detect_changes(self):
+        pl = DockerServiceManager(self.client, workers_mem_limit="4g", **get_test_local_env_overrides())
+        pl.create_services()
+        pl.cleanup(True)
+
     # skip this test in docker in docker tests since the port binding is actually on the true host
     @linux_only
     @skip_api_host
