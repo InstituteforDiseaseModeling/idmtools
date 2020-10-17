@@ -15,7 +15,7 @@ from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.common_experiments import wait_on_experiment_and_check_all_sim_status
-from idmtools_test.utils.decorators import restart_local_platform
+from idmtools_test.utils.decorators import ensure_local_platform_running
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
@@ -55,7 +55,6 @@ class AddAnalyzer(IAnalyzer):
 class TestAnalyzersLocal(ITestWithPersistence):
 
     @classmethod
-    @restart_local_platform(silent=True, stop_before=True, stop_after=False)
     def setUpClass(cls) -> None:
         cls.platform = Platform('Local')
 
@@ -76,7 +75,7 @@ class TestAnalyzersLocal(ITestWithPersistence):
 
     @pytest.mark.timeout(60)
     @pytest.mark.long
-    @restart_local_platform(silent=True, stop_before=False, stop_after=True)
+    @ensure_local_platform_running()
     def test_AddAnalyzer(self):
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         analyzers = [AddAnalyzer()]
