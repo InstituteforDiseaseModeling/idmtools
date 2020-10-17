@@ -106,7 +106,7 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
     return listener
 
 
-def setup_handlers(level, log_filename, console: bool = False, file_level: str = 'DEBUG'):
+def setup_handlers(level, log_filename, console: bool = False, file_level: int = logging.DEBUG):
     global logging_queue, handlers
     from idmtools import IdmConfigParser
     # We only one to do this setup once per process. Having the logging_queue setup help prevent that issue
@@ -119,11 +119,11 @@ def setup_handlers(level, log_filename, console: bool = False, file_level: str =
     formatter = logging.Formatter(format_str)
     try:
         file_handler = RotatingFileHandler(log_filename, maxBytes=(2 ** 20) * 10, backupCount=5)
-        file_handler.setLevel()
+        file_handler.setLevel(file_level)
         file_handler.setFormatter(formatter)
     except PermissionError:
         file_handler = logging.StreamHandler(sys.stdout)
-        file_handler.setLevel(logging.getLevelName(file_level))
+        file_handler.setLevel(file_level)
         file_handler.setFormatter(formatter)
         logging.warning(f"Could not open the log file '{log_filename}'. Using Console output instead")
         # disable normal logging
