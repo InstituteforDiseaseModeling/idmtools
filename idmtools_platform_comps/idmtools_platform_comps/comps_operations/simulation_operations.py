@@ -213,10 +213,6 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             logger.info(f'Overriding cores for sim to {num_cores}')
             comps_configuration['max_cores'] = num_cores
             comps_configuration['min_cores'] = num_cores
-        if 'max_cores' in kwargs and kwargs['max_cores'] is not None and kwargs['max_cores'] != comps_exp_config.max_cores:
-            comps_configuration['max_cores'] = kwargs['max_cores']
-        if 'min_cores' in kwargs and kwargs['min_cores'] is not None and kwargs['min_cores'] != comps_exp_config.min_cores:
-            comps_configuration['min_cores'] = kwargs['min_cores']
         if priority is not None and priority != comps_exp_config.priority:
             logger.info(f'Overriding priority for sim to {priority}')
             comps_configuration['priority'] = priority
