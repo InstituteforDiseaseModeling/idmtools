@@ -15,6 +15,7 @@ from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.common_experiments import wait_on_experiment_and_check_all_sim_status
+from idmtools_test.utils.confg_local_runner_test import get_test_local_env_overrides
 from idmtools_test.utils.decorators import ensure_local_platform_running
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
@@ -73,9 +74,9 @@ class TestAnalyzersLocal(ITestWithPersistence):
 
         cls.exp_id = e.uid
 
-    @pytest.mark.timeout(60)
+    @pytest.mark.timeout(90)
     @pytest.mark.long
-    @ensure_local_platform_running()
+    @ensure_local_platform_running(**get_test_local_env_overrides())
     def test_AddAnalyzer(self):
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         analyzers = [AddAnalyzer()]
