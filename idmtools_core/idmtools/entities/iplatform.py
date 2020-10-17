@@ -747,19 +747,20 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             :meth:`idmtools.entities.iplatform.IPlatform.wait_till_done`
             :meth:`idmtools.entities.iplatform.IPlatform.__wait_till_callback`
         """
-        child_attribute = 'simulations'
         # set prog to list
         prog = []
         # check that the user has not disable progress bars
+        child_attribute = None
         if not IdmConfigParser.is_progress_bar_disabled():
             from tqdm import tqdm
             if isinstance(item, Experiment):
                 prog = tqdm([], total=len(item.simulations), desc="Waiting on Experiment to Finish running", unit="simulation")
+                child_attribute ='simulations'
             elif isinstance(item, Suite):
                 prog = tqdm([], total=len(item.experiments), desc="Waiting on Suite to Finish running", unit="experiment")
                 child_attribute = 'experiments'
-            else:
-                child_attribute = None
+        else:
+            child_attribute = None
 
         failed_warning = dict(failed_warning=False)
         self.__wait_till_callback(

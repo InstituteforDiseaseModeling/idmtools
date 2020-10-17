@@ -173,7 +173,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
                 pbar = self.__simulations
                 if not IdmConfigParser.is_progress_bar_disabled():
                     from tqdm import tqdm
-                    pbar = tqdm(self.__simulations, desc="Discovering experiment assets from tasks", units="Simulations")
+                    pbar = tqdm(self.__simulations, desc="Discovering experiment assets from tasks", unit="simulation")
                 for sim in pbar:
                     # don't gather assets from simulations that have been provisioned
                     if sim.status is None:

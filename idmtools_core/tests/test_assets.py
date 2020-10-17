@@ -4,6 +4,8 @@ import os
 import unittest
 from functools import partial
 import pytest
+from tqdm import tqdm
+
 from idmtools.assets import Asset, AssetCollection
 from idmtools.assets.errors import DuplicatedAssetError
 from idmtools.core import FilterMode
@@ -312,6 +314,17 @@ class TestAssets(unittest.TestCase):
             a = Asset(os.path.abspath(os.path.dirname(__file__)))
         self.assertEqual(ex.exception.args[0], "Asset cannot be a directory!")
 
+    @pytest.mark.timeout(15)
+    def test_large_asset_merge_speed(self):
+        assets1 = AssetCollection()
+        assets2 = AssetCollection()
+
+        for i in tqdm(range(3000)):
+            assets1.add_asset(Asset(content=f"{i}", filename=f"{i}"))
+
+        for i in tqdm(range(3001, 6000)):
+            assets2.add_asset(Asset(content=f"{i}", filename=f"{i}"))
+        assets1.add_assets(assets2)
 
 
 if __name__ == '__main__':

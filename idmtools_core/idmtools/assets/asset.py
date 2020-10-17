@@ -41,6 +41,8 @@ class Asset:
     _checksum: Optional[str] = field(default=None, init=False)
 
     def __post_init__(self, content, checksum):
+        # Cache of our assset key
+        self._key = None
         self._content = None if isinstance(content, property) else content
         self._checksum = checksum if not isinstance(checksum, property) else None
         self.filename = self.filename or (os.path.basename(self.absolute_path) if self.absolute_path else None)
@@ -83,12 +85,22 @@ class Asset:
         return os.path.splitext(self.filename)[1].lstrip('.').lower()
 
     @property
+    def filename(self):
+        return self._filename or ""
+
+    @filename.setter
+    def filename(self, filename):
+        self._filename = filename if not isinstance(filename, property) and filename else None
+        self._key = None
+
+    @property
     def relative_path(self):
         return self._relative_path or ""
 
     @relative_path.setter
     def relative_path(self, relative_path):
         self._relative_path = relative_path.strip(" \\/") if not isinstance(relative_path, property) and relative_path else None
+        self._key = None
 
     @property
     def bytes(self):
@@ -151,7 +163,9 @@ class Asset:
     def __key(self):
         # We only care to check if filename and relative path is same. Goal here is not identical check but rather that
         # two files don't exist in same remote path
-        return self.filename, self.relative_path
+        if self._key is None:
+            self._key = self.filename, self.relative_path
+        return self._key
 
     def __hash__(self):
         return hash(self.__key())

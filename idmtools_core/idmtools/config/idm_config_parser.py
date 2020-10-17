@@ -282,7 +282,7 @@ class IdmConfigParser:
         Returns:
             Return is progress bars should be enabled
         """
-        return all([x.lower() not in TRUTHY_VALUES for x in [IdmConfigParser.get_option(None, "DISABLE_PROGRESS_BAR", 'f')]])
+        return all([x.lower() in TRUTHY_VALUES for x in [IdmConfigParser.get_option(None, "DISABLE_PROGRESS_BAR", 'f')]])
 
     @classmethod
     def ensure_init(cls, dir_path: str = '.', file_name: str = default_config, error: bool = False,
