@@ -195,10 +195,10 @@ class IdmConfigParser:
         # setup logging
         try:
             log_config = cls.get_section('Logging')
-            valid_options = ['level', 'log_filename', 'console']
+            valid_options = ['level', 'log_filename', 'console', "file_level"]
             log_config = {k: v for k, v in log_config.items() if k in valid_options}
         except ValueError:
-            log_config = dict(level='INFO', log_filename='idmtools.log', console='off')
+            log_config = dict(level='INFO', log_filename='idmtools.log', console='off', file_level='DEBUG')
         setup_logging(**log_config)
 
         if platform.system() == "Darwin":
