@@ -2,11 +2,9 @@ import allure
 import os
 import sys
 from functools import partial
-
 import pandas as pd
 import pytest
 from COMPS.Data import Experiment as COMPSExperiment
-
 from idmtools.analysis.analyze_manager import AnalyzeManager
 from idmtools.analysis.download_analyzer import DownloadAnalyzer
 from idmtools.builders import SimulationBuilder

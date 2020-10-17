@@ -246,6 +246,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         self.assertTrue(os.path.exists(os.path.join(file_path, "output", "population.json")))
         self.assertTrue(os.path.exists(os.path.join(file_path, "WorkOrder.json")))
 
+    @pytest.mark.serial
     def test_csv_analyzer_analyze_work_item_output(self):
         # to COMPS's assets
         asset_files = AssetCollection()
