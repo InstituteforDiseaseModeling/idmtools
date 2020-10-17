@@ -170,7 +170,11 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         if config is None:
             if asset_collection_id and isinstance(asset_collection_id, str):
                 asset_collection_id = uuid.UUID(asset_collection_id)
-            config = self.get_simulation_config_from_simulation(simulation, num_cores, priority, asset_collection_id, **kwargs)
+            kwargs['num_cores'] = num_cores
+            kwargs['priority'] = priority
+            kwargs['asset_collection_id'] = asset_collection_id
+            kwargs.update(simulation._platform_kwargs)
+            config = self.get_simulation_config_from_simulation(simulation, **kwargs)
         if simulation.name:
             simulation.name = clean_experiment_name(simulation.name)
         s = COMPSSimulation(
@@ -184,8 +188,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         simulation._platform_object = s
         return s
 
-    @staticmethod
-    def get_simulation_config_from_simulation(simulation: Simulation, num_cores: int = None, priority: str = None,
+    def get_simulation_config_from_simulation(self, simulation: Simulation, num_cores: int = None, priority: str = None,
                                               asset_collection_id: UUID = None, **kwargs) -> \
             Configuration:
         """
@@ -210,11 +213,17 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             logger.info(f'Overriding cores for sim to {num_cores}')
             comps_configuration['max_cores'] = num_cores
             comps_configuration['min_cores'] = num_cores
+        if 'max_cores' in kwargs and kwargs['max_cores'] is not None and kwargs['max_cores'] != comps_exp_config.max_cores:
+            comps_configuration['max_cores'] = kwargs['max_cores']
+        if 'min_cores' in kwargs and kwargs['min_cores'] is not None and kwargs['min_cores'] != comps_exp_config.min_cores:
+            comps_configuration['min_cores'] = kwargs['min_cores']
         if priority is not None and priority != comps_exp_config.priority:
             logger.info(f'Overriding priority for sim to {priority}')
             comps_configuration['priority'] = priority
         if comps_exp_config.executable_path != simulation.task.command.executable:
             logger.info(f'Overriding executable_path for sim to {simulation.task.command.executable}')
+            from idmtools_platform_comps.utils.python_version import platform_task_hooks
+            platform_task_hooks(simulation.task, self.platform)
             comps_configuration['executable_path'] = simulation.task.command.executable
         sim_task = simulation.task.command.arguments + " " + simulation.task.command.options
         if comps_exp_config.simulation_input_args != sim_task:

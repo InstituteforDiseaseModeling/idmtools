@@ -18,6 +18,8 @@ from idmtools_test.utils.common_experiments import wait_on_experiment_and_check_
 from idmtools_test.utils.comps import assure_running_then_wait_til_done, setup_test_with_platform_and_simple_sweep
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools.utils.filter_simulations import FilterItem
+from idmtools_test.utils.utils import get_case_name
+from COMPS.Data.Priority import Priority
 
 current_directory = path.dirname(path.realpath(__file__))
 
@@ -29,7 +31,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
     def setUp(self) -> None:
         super().setUp()
         self.platform: COMPSPlatform = None
-        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         setup_test_with_platform_and_simple_sweep(self)
 
     @pytest.mark.assets
@@ -111,18 +113,34 @@ class TestCOMPSPlatform(ITestWithPersistence):
         assure_running_then_wait_til_done(self, experiment)
 
     def test_multiple_executables(self):
-        experiment = Experiment(name=self.case_name)
+        # test platform hooks(rename python3)
+        # test ordering is maintained
+        # test that we can override take at task label
+        # test num cores
+        # test priority override
+        experiment = Experiment(name=self.case_name, gather_common_assets_from_task=True)
         experiment.simulations.append(Simulation.from_task(CommandTask(command="python --version")))
         experiment.simulations.append(Simulation.from_task(CommandTask(command="python --help")))
+        experiment.simulations.items[1]._platform_kwargs['num_cores'] = 2
+        experiment.simulations.items[1]._platform_kwargs['priority'] = Priority.Highest
         experiment.run(wait_on_done=True, platform=self.platform)
         self.assertTrue(experiment.succeeded)
 
+        exp_raw = experiment.get_platform_object()
+        self.assertEqual(exp_raw.configuration.simulation_input_args, "--version ")
+        self.assertEqual(exp_raw.configuration.executable_path, "python3")
+        # because of ordering, we have to check both items
         sim0 = experiment.simulations[0].get_platform_object()
-        self.assertIsNone(sim0.configuration)
         sim1 = experiment.simulations[1].get_platform_object()
+        self.assertIsNotNone(sim0.configuration)
         self.assertIsNotNone(sim1.configuration)
-        self.assertEqual(sim1.configuration.simulation_input_args, "--help")
-        self.assertEqual(sim1.configuration.executable_path, "python")
+        self.assertIsNone(sim0.configuration.simulation_input_args)
+        self.assertIsNone(sim0.configuration.executable_path)
+        self.assertEqual(sim1.configuration.simulation_input_args, "--help ")
+        self.assertEqual(sim1.configuration.executable_path, "python3")
+        self.assertEqual(sim1.configuration.min_cores, 2)
+        self.assertEqual(sim1.configuration.max_cores, 2)
+        self.assertEqual(sim1.configuration.priority, Priority.Highest)
 
     @pytest.mark.long
     def test_status_retrieval_succeeded(self):
@@ -132,8 +150,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
     @pytest.mark.long
     def test_status_retrieval_failed(self):
         experiment = self.get_working_model_experiment(script='failing_model.py')
-        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform,
-                                                    expected_status=EntityStatus.FAILED)
+        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform, expected_status=EntityStatus.FAILED)
 
     @pytest.mark.long
     def test_status_retrieval_mixed(self):

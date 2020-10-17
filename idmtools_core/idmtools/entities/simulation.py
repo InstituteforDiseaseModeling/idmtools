@@ -35,6 +35,8 @@ class Simulation(IAssetsEnabled, INamedEntity):
     __replace_task_with_proxy: bool = field(default=True, init=False, compare=False)
     #: Ensure we don't gather assets twice
     __assets_gathered: bool = field(default=False)
+    #: Extra arguments to pass on creation to platform
+    _platform_kwargs: dict = field(default_factory=dict)
 
     @property
     def experiment(self) -> 'Experiment':  # noqa: F821
