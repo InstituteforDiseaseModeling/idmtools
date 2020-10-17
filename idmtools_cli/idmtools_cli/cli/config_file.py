@@ -22,8 +22,9 @@ FIELD_BLACKLIST = ['platform_type_map', 'supported_types', 'plugin_key', 'docker
               help="Path to the idmtools.ini file",
               default=os.path.join(os.getcwd(), "idmtools.ini"),
               type=click.Path(dir_okay=False, file_okay=True, exists=False, writable=True, resolve_path=True))
+@cli.option("--global-config/--no-global-config", default=False, help="Allow generating config in the platform default global location")
 @click.pass_context
-def config(ctx, config_path):
+def config(ctx, config_path, global_config):
     """
     Contains commands related to the creation of idmtools.ini
 
@@ -32,6 +33,9 @@ def config(ctx, config_path):
      - Add a configuration block
     """
     ctx.ensure_object(dict)
+    if global_config:
+        from idmtools import IdmConfigParser
+        config_path = IdmConfigParser.get_global_configuration_name()
 
     # Create a config parser and read the file if it exist
     # The comment prefixes and allow_no_value is a truck to keep the comments even while editing
