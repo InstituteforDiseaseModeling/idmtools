@@ -7,7 +7,7 @@ from idmtools.core import EntityStatus
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
-from idmtools_platform_comps.utils.assetize_output.assetize_output import AssetizeOutput, CrossEnvironmentAssetizeNotSupport
+from idmtools_platform_comps.utils.assetize_output.assetize_output import AssetizeOutput, CrossEnvironmentAssetizeNotSupport, AtLeastOneItemToWatch
 from idmtools_platform_comps.utils.assetize_output.assetize_ssmt_script import is_file_excluded
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.test_task import TestTask
@@ -53,7 +53,7 @@ class TestAssetizeOutput(unittest.TestCase):
     def test_experiment_precreate_fails_if_no_watched_items(self):
         ao = AssetizeOutput()
         self.assertEqual(0, len(ao.related_experiments))
-        with self.assertRaises(ValueError) as er:
+        with self.assertRaises(AtLeastOneItemToWatch) as er:
             ao.pre_creation(self.platform)
         self.assertEqual(er.exception.args[0], "You must specify at least one item to watch")
 
