@@ -707,7 +707,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         if done_states is None:
             done_states = [EntityStatus.FAILED, EntityStatus.SUCCEEDED]
         # if we do not have a progress bar, return items state
-        if progress_bar is None:
+        if child_attribute is None:
             return item.status in done_states if isinstance(item, IWorkflowItem) else item.done
 
         # if we do have a progress bar, update it
@@ -758,6 +758,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             elif isinstance(item, Suite):
                 prog = tqdm([], total=len(item.experiments), desc="Waiting on Suite to Finish running", unit="experiment")
                 child_attribute = 'experiments'
+            else:
+                child_attribute = None
 
         failed_warning = dict(failed_warning=False)
         self.__wait_till_callback(
