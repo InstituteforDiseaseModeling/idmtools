@@ -49,7 +49,7 @@ class PrintHandler(logging.Handler):
 
 
 def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'idmtools.log',
-                  console: Union[str, bool] = False) -> QueueListener:
+                  console: Union[str, bool] = False, file_level: str = 'DEBUG') -> QueueListener:
     """
     Set up logging.
 
@@ -58,6 +58,7 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
             from logging or an int that represent that level.
         log_filename: Name of file to log messages to.
         console: When set to True or the strings "1", "y", "yes", or "on", console logging will be enabled.
+        file_level: Level for logging in file
 
     Returns:
         Returns the ``QueueListener`` created that writes the log messages. In advanced scenarios with
@@ -74,6 +75,8 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
 
     if type(level) is str:
         level = logging.getLevelName(level)
+    if type(file_level):
+        file_level = logging.getLevelName(file_level)
     if type(console) is str:
         console = console.lower() in ['1', 'y', 'yes', 'on', 'true', 't']
 
@@ -85,7 +88,7 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
     user.setLevel(logging.DEBUG)
 
     if logging_queue is None:
-        file_handler = setup_handlers(level, log_filename, console)
+        file_handler = setup_handlers(level, log_filename, console, file_level)
 
         # see https://docs.python.org/3/library/logging.handlers.html#queuelistener
         # setup file logger handler that rotates after 10 mb of logging and keeps 5 copies
@@ -114,7 +117,7 @@ def setup_handlers(level, log_filename, console: bool = False, file_level: str =
     formatter = logging.Formatter(format_str)
     try:
         file_handler = RotatingFileHandler(log_filename, maxBytes=(2 ** 20) * 10, backupCount=5)
-        file_handler.setLevel(logging.getLevelName(file_level))
+        file_handler.setLevel()
         file_handler.setFormatter(formatter)
     except PermissionError:
         file_handler = logging.StreamHandler(sys.stdout)
