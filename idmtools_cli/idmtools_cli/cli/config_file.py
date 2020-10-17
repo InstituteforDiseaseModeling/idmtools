@@ -22,7 +22,7 @@ FIELD_BLACKLIST = ['platform_type_map', 'supported_types', 'plugin_key', 'docker
               help="Path to the idmtools.ini file",
               default=os.path.join(os.getcwd(), "idmtools.ini"),
               type=click.Path(dir_okay=False, file_okay=True, exists=False, writable=True, resolve_path=True))
-@cli.option("--global-config/--no-global-config", default=False, help="Allow generating config in the platform default global location")
+@click.option("--global-config/--no-global-config", default=False, help="Allow generating config in the platform default global location")
 @click.pass_context
 def config(ctx, config_path, global_config):
     """
