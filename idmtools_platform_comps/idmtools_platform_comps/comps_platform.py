@@ -8,9 +8,9 @@ import os
 from idmtools.assets import AssetCollection
 from idmtools.entities.iworkflow_item import IWorkflowItem
 
-handlers = copy.copy(logging.getLogger().handlers)
+HANDLERS = copy.copy(logging.getLogger().handlers)
 from COMPS import Client
-logging.root.handlers = handlers
+logging.root.handlers = HANDLERS
 from dataclasses import dataclass, field
 from functools import partial
 from typing import List

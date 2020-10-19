@@ -106,11 +106,11 @@ class Platform:
         platform_type = None
         is_alias = False
         try:
-            section = IdmConfigParser.get_section(block, error=not missing_ok)
+            section = IdmConfigParser.get_section(block)
             if not section and missing_ok:
                 # its possible our logger is not setup
-                from idmtools.core.logging import setup_logging, listener
-                if not listener:
+                from idmtools.core.logging import setup_logging, LISTENER
+                if not LISTENER:
                     setup_logging()
         except ValueError as e:
             if logger.isEnabledFor(DEBUG):

@@ -497,8 +497,8 @@ if __name__ == "__main__":  # pragma: no cover
 
     if args.verbose:
         # set to debug before loading idmtools
-        os.environ['IDM_TOOLS_DEBUG'] = '1'
-        os.environ['IDM_TOOLS_CONSOLE_LOGGING'] = '1'
+        os.environ['IDMTOOLS_LOGGING_LEVEL'] = 'DEBUG'
+        os.environ['IDMTOOLS_LOGGING_CONSOLE'] = 'on'
         # Import idmtools here to enable logging
         from idmtools import __version__
 

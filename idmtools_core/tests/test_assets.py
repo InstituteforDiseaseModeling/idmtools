@@ -5,7 +5,6 @@ import unittest
 from functools import partial
 import pytest
 from tqdm import tqdm
-
 from idmtools.assets import Asset, AssetCollection
 from idmtools.assets.errors import DuplicatedAssetError
 from idmtools.core import FilterMode
