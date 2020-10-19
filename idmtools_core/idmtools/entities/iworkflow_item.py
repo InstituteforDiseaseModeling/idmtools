@@ -70,7 +70,7 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, IRunnableEntity, ABC):
             self.asset_collection_id = asset_collection_id
 
         if self.task is None:
-            warnings.warn("In 1.7.0, all workitems require a Task")
+            warnings.warn("In 1.7.0, all work items require a Task")
 
         self.tags = self.tags or {}
 

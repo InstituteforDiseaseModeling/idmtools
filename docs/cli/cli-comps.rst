@@ -14,4 +14,4 @@ You can login to a comps environment by using the ``idmtools comps CONFIG_BLOCK 
 
 You can assetize outputs from the CLI by running ``idmtools comps CONFIG_BLOCK assetize-outputs``:
 
-.. command-output:: idmtools comps CONFIG_BLOCK login --help
+.. command-output:: idmtools comps CONFIG_BLOCK assetize-outputs --help
