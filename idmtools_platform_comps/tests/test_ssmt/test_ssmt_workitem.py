@@ -30,7 +30,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
     # "hello.py" will run in comps's workitem worker like running it in local:
     # python hello.py
     def test_ssmt_workitem_python(self):
-        command = "python hello.py"
+        command = "python3 hello.py"
         user_files = AssetCollection()
         user_files.add_asset(os.path.join(self.input_file_path, "hello.py"))
 
@@ -52,7 +52,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
         self.assertEqual(execution['Command'],
-                         "python hello.py")
+                         "python3 hello.py")
 
     # test using SSMTWormItem to run PopulationAnalyzer in comps's SSMT DockerWorker
     @pytest.mark.smoke
@@ -69,7 +69,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
 
         experiment_id = "8bb8ae8f-793c-ea11-a2be-f0921c167861"  # COMPS2 exp
         # experiment_id = "18553481-1f42-ea11-941b-0050569e0ef3"  # idmtvapp17 exp
-        command = "python Assets/run_population_analyzer.py " + experiment_id
+        command = "python3 Assets/run_population_analyzer.py " + experiment_id
         wi = SSMTWorkItem(item_name=self.case_name, command=command, assets=asset_files, transient_assets=transient_assets, tags=self.tags)
         wi.run(wait_on_done=True)
 
@@ -88,7 +88,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
             print(worker_order)
             self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
             execution = worker_order['Execution']
-            self.assertEqual(execution['Command'], "python Assets/run_population_analyzer.py " + experiment_id)
+            self.assertEqual(execution['Command'], "python3 Assets/run_population_analyzer.py " + experiment_id)
 
     # test using SSMTWormItem to run multiple analyzers in comps's SSMT DockerWorker
     def test_ssmt_workitem_multiple_analyzers(self):
@@ -107,7 +107,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
 
         experiment_id = "8bb8ae8f-793c-ea11-a2be-f0921c167861"  # COMPS2 exp
         # experiment_id = "18553481-1f42-ea11-941b-0050569e0ef3"  # idmtvapp17 exp
-        command = "python run_multiple_analyzers.py " + experiment_id
+        command = "python3 run_multiple_analyzers.py " + experiment_id
         wi = SSMTWorkItem(item_name=self.case_name, command=command, transient_assets=transient_assets, tags=self.tags)
         wi.run(wait_on_done=True)
 
@@ -130,7 +130,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
             print(worker_order)
             self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
             execution = worker_order['Execution']
-            self.assertEqual(execution['Command'], "python run_multiple_analyzers.py " + experiment_id)
+            self.assertEqual(execution['Command'], "python3 run_multiple_analyzers.py " + experiment_id)
 
     # test using SSMTWormItem to run multiple experiments in comps's SSMT DockerWorker
     @pytest.mark.skip("need emodpy")
@@ -150,7 +150,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         transient_assets = AssetCollection()
         transient_assets.add_asset(os.path.join(self.input_file_path, "idmtools.ini"))
 
-        command = "python Assets/run_multiple_exps.py " + exp_id1 + " " + exp_id2
+        command = "python3 Assets/run_multiple_exps.py " + exp_id1 + " " + exp_id2
         wi = SSMTWorkItem(name=self.case_name, command=command, assets=asset_files, transient_assets=transient_assets, tags=self.tags)
         wi.run(wait_on_done=True)
 
@@ -169,7 +169,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
             print(worker_order)
             self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
             execution = worker_order['Execution']
-            self.assertEqual(execution['Command'], "python Assets/run_multiple_exps.py " + exp_id1 + " " + exp_id2)
+            self.assertEqual(execution['Command'], "python3 Assets/run_multiple_exps.py " + exp_id1 + " " + exp_id2)
 
     @pytest.mark.comps
     def test_ssmt_seir_model_analysis_single_script(self):
@@ -180,7 +180,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         transient_assets.add_asset(os.path.join(self.input_file_path, 'run_multiple_analyzers_single_script.py'))
         transient_assets.add_asset(os.path.join(self.input_file_path, 'idmtools.ini'))
 
-        command = "python run_multiple_analyzers_single_script.py " + exp_id
+        command = "python3 run_multiple_analyzers_single_script.py " + exp_id
         wi = SSMTWorkItem(name=self.case_name, command=command, transient_assets=transient_assets, tags=self.tags)
         wi.run(True, platform=self.platform)
 
@@ -202,7 +202,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
             print(worker_order)
             self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
             execution = worker_order['Execution']
-            self.assertEqual(execution['Command'], "python run_multiple_analyzers_single_script.py "+ exp_id)
+            self.assertEqual(execution['Command'], "python3 run_multiple_analyzers_single_script.py "+ exp_id)
 
     def test_get_files(self):
         wi_id = '5e2fc03d-2162-ea11-a2bf-f0921c167862'  # comps2 wi_id
@@ -259,7 +259,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
 
         experiment_id = '9311af40-1337-ea11-a2be-f0921c167861'  # staging comps2 exp id
         # experiment_id = 'de07f612-69ed-ea11-941f-0050569e0ef3'  # idmtvapp17
-        command = "python Assets/run_csv_analyzer.py " + experiment_id
+        command = "python3 Assets/run_csv_analyzer.py " + experiment_id
         wi = SSMTWorkItem(name=self.case_name, command=command, assets=asset_files, transient_assets=transient_assets, tags=self.tags)
         wi.run(wait_on_done=True)
         local_output_path = "output"
@@ -309,7 +309,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         self.assertEqual(len(wi.transient_assets), 0)
 
     def test_workitem_task(self):
-        command = "python hello.py"
+        command = "python3 hello.py"
         task = CommandTask(command=command, transient_assets=AssetCollection([os.path.join(self.input_file_path, "hello.py")]))
         wi = SSMTWorkItem(task=task, name=self.case_name, tags=self.tags)
         wi.run(wait_on_done=True)

@@ -209,7 +209,7 @@ class RequirementsToAssetCollection:
             logger.debug(f'md5_str: {md5_str}')
 
         wi_name = "wi to create ac"
-        command = f"python {MODEL_CREATE_AC} {exp_id} {md5_str} {self.platform.endpoint} {self._os_target}"
+        command = f"python3 {MODEL_CREATE_AC} {exp_id} {md5_str} {self.platform.endpoint} {self._os_target}"
         tags = {MD5_KEY.format(self._os_target): self.checksum}
 
         user_logger.info("Converting Python Packages to an Asset Collection. This may take some time for large dependency lists")
