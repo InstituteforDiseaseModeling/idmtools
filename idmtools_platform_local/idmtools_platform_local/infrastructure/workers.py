@@ -5,10 +5,8 @@ import requests
 from dataclasses import dataclass
 from logging import getLogger, DEBUG
 from typing import Dict
-
 from docker.errors import ImageNotFound
 from docker.models.containers import Container
-
 from idmtools.core.system_information import get_system_information
 from idmtools_platform_local.client.healthcheck_client import HealthcheckClient
 from idmtools_platform_local.infrastructure.base_service_container import BaseServiceContainer
@@ -76,9 +74,11 @@ class WorkersContainer(BaseServiceContainer):
             docker_socket: dict(bind='/var/run/docker.sock', mode='rw')
         }
         environment = [f'REDIS_URL=redis://idmtools_redis:{self.redis_port}',
+                       'IDMTOOLS_NO_CONFIG_WARNING=1',
                        f'HOST_DATA_PATH={data_dir}',
-                       'SQLALCHEMY_DATABASE_URI='
-                       f'postgresql+psycopg2://idmtools:idmtools@idmtools_postgres:{self.postgres_port}/idmtools']
+                       f'SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://idmtools:idmtools@idmtools_postgres:{self.postgres_port}/idmtools',
+                       'IDMTOOLS_LOGGING_LOG_FILENAME='  # disable logging to file in container
+                       ]
 
         if platform.system() in ["Linux", "Darwin"]:
             environment.append(f'CURRENT_UID={self.run_as}')
