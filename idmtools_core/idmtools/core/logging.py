@@ -48,7 +48,7 @@ class PrintHandler(logging.Handler):
         print(record.message)
 
 
-def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'idmtools.log',
+def setup_logging(level: Union[int, str] = logging.WARN, filename: str = 'idmtools.log',
                   console: Union[str, bool] = False, file_level: str = 'DEBUG', force: bool = False) -> QueueListener:
     """
     Set up logging.
@@ -56,7 +56,7 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
     Args:
         level: Log level. Default to warning. This should be either a string that matches a log level
             from logging or an int that represent that level.
-        log_filename: Name of file to log messages to. If set to empty string, file logging is disabled
+        filename: Name of file to log messages to. If set to empty string, file logging is disabled
         console: When set to True or the strings "1", "y", "yes", or "on", console logging will be enabled.
         file_level: Level for logging in file
         force: Force setup, even if we have done it once
@@ -89,7 +89,10 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
         user.setLevel(logging.DEBUG)
 
         if LOGGING_NAME is None or force:
-            file_handler = setup_handlers(level, log_filename, console, file_level)
+            filename = filename.strip()
+            if filename == "-1":
+                filename = ""
+            file_handler = setup_handlers(level, filename, console, file_level)
 
             # see https://docs.python.org/3/library/logging.handlers.html#queuelistener
             # setup file logger handler that rotates after 10 mb of logging and keeps 5 copies
@@ -108,13 +111,13 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
     return None
 
 
-def setup_handlers(level: int, log_filename, console: bool = False, file_level: int = None):
+def setup_handlers(level: int, filename, console: bool = False, file_level: int = None):
     """
     Setup Handlers for Global and user Loggers
 
     Args:
         level: Level for the common logger
-        log_filename: Log filename. Set to "" to disable file based logging
+        filename: Log filename. Set to "" to disable file based logging
         console: Enable console based logging only
         file_level: File Level logging
 
@@ -128,7 +131,7 @@ def setup_handlers(level: int, log_filename, console: bool = False, file_level: 
     exclude_logging_classes()
     reset_logging_handlers()
     file_handler = None
-    if len(log_filename):
+    if len(filename):
         if level == logging.DEBUG:
             # Enable detailed logging format
             format_str = '%(asctime)s.%(msecs)d %(pathname)s:%(lineno)d %(funcName)s [%(levelname)s] (%(process)d,%(thread)d) - %(message)s'
@@ -136,11 +139,11 @@ def setup_handlers(level: int, log_filename, console: bool = False, file_level: 
             format_str = '%(asctime)s.%(msecs)d %(pathname)s:%(lineno)d %(funcName)s [%(levelname)s] - %(message)s'
         formatter = logging.Formatter(format_str)
         # set the logging to either common level or the filelevel
-        file_handler = set_file_logging(file_level if file_level else level, formatter, log_filename)
+        file_handler = set_file_logging(file_level if file_level else level, formatter, filename)
 
-    if console or len(log_filename) == 0:
+    if console or len(filename) == 0:
         coloredlogs.install(level=level, milliseconds=True, stream=sys.stdout)
-    setup_user_logger(console or len(log_filename) == 0)
+    setup_user_logger(console or len(filename) == 0)
     return file_handler
 
 
@@ -167,20 +170,20 @@ def setup_user_logger(console: bool):
         getLogger('user').addHandler(handler)
 
 
-def set_file_logging(file_level: int, formatter: logging.Formatter, log_filename: str):
+def set_file_logging(file_level: int, formatter: logging.Formatter, filename: str):
     """
     Set File Logging
 
     Args:
         file_level: File Level
         formatter: Formatter
-        log_filename: Log Filename
+        filename: Log Filename
 
     Returns:
         Return File handler
     """
     global LOGGING_NAME
-    file_handler = create_file_handler(file_level, formatter, log_filename)
+    file_handler = create_file_handler(file_level, formatter, filename)
     if file_handler is None:
         # We had an issue creating filehandler, so let's try using default name + pids
         for i in range(64):  # We go to 64. This is a reasonable max id for any computer we might actually run item.
@@ -198,9 +201,9 @@ def set_file_logging(file_level: int, formatter: logging.Formatter, log_filename
     return file_handler
 
 
-def create_file_handler(file_level, formatter, log_filename):
+def create_file_handler(file_level, formatter, filename):
     try:
-        file_handler = RotatingFileHandler(log_filename, maxBytes=(2 ** 20) * 10, backupCount=5)
+        file_handler = RotatingFileHandler(filename, maxBytes=(2 ** 20) * 10, backupCount=5)
         file_handler.setLevel(file_level)
         file_handler.setFormatter(formatter)
     except PermissionError:

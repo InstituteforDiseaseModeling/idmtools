@@ -24,7 +24,7 @@ class TestCompsCLI(unittest.TestCase):
         # Reset Logging
         del os.environ['IDMTOOLS_LOGGING_USER_PRINT']
         del os.environ['IDMTOOLS_HIDE_DEV_WARNING']
-        setup_logging(level=DEBUG, log_filename='idmtools.log', force=True)
+        setup_logging(level=DEBUG, filename='idmtools.log', force=True)
 
     @allure.feature("AssetizeOutputs")
     def test_assetize_subcommand_exists(self):

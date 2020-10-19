@@ -77,7 +77,7 @@ class WorkersContainer(BaseServiceContainer):
                        'IDMTOOLS_NO_CONFIG_WARNING=1',
                        f'HOST_DATA_PATH={data_dir}',
                        f'SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://idmtools:idmtools@idmtools_postgres:{self.postgres_port}/idmtools',
-                       'IDMTOOLS_LOGGING_LOG_FILENAME='  # disable logging to file in container
+                       'IDMTOOLS_LOGGING_FILENAME=-1'  # disable logging to file in container
                        ]
 
         if platform.system() in ["Linux", "Darwin"]:
