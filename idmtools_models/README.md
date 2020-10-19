@@ -27,4 +27,3 @@ test        -   Run All tests
 coverage    -   Run tests and generate coverage report that is shown in browser
 ```
 On Windows, you can use `pymake` instead of `make`
-

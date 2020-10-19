@@ -114,7 +114,7 @@ class PlatformAnalysis:
         if self.wrapper_shell_script:
             self.additional_files.add_or_replace_asset(self.wrapper_shell_script)
             command += f'{self.shell_script_binary} {os.path.basename(self.wrapper_shell_script)} '
-        command += "python platform_analysis_bootstrap.py"
+        command += "python3 platform_analysis_bootstrap.py"
         # Add the experiments
         command += f' --experiment-ids {",".join(self.experiment_ids)}'
         # Add the analyzers
