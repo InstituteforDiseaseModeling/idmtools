@@ -48,6 +48,7 @@ class WorkersContainer(BaseServiceContainer):
     container_name: str = 'idmtools_workers'
     data_volume_name: str = os.getenv("IDMTOOLS_WORKERS_DATA_MOUNT_BY_VOLUMENAME", None)
     config_prefix: str = 'workers_'
+    enable_singularity_support: bool = False
 
     def __post_init__(self):
         system_info = get_system_information()
@@ -93,10 +94,11 @@ class WorkersContainer(BaseServiceContainer):
         container_config = self.get_common_config(container_name=self.container_name, image=self.image,
                                                   port_bindings=port_bindings, network=self.network,
                                                   mem_reservation=self.mem_reservation, volumes=worker_volumes,
-                                                  mem_limit=self.mem_limit, environment=environment,
+                                                  mem_limit=self.mem_limit, environment=environment, privileged=self.enable_singularity_support,
                                                   links=dict(idmtools_redis='redis', idmtools_postgres='postgres')
                                                   )
-
+        if self.enable_singularity_support:
+            container_config['cap_add'] = ['SYS_ADMIN']
         if logger.isEnabledFor(DEBUG):
             logger.debug(f"Worker Config: {container_config}")
         return container_config

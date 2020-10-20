@@ -1,5 +1,6 @@
 import os
 import shlex
+import stat
 import subprocess
 from logging import DEBUG
 import sys
@@ -33,8 +34,15 @@ def run_task(command: str, current_job: 'JobStatus', experiment_uuid: str, simul
             logger.info('Executing %s from working directory %s', command, simulation_path)
             err.write(f"{command}\n")
 
+            parts = shlex.split(command)
+            fp = os.path.join(simulation_path, parts[0])
+            if os.path.exists(fp):
+                logger.debug(f"Ensuring Execute permission on file: {fp}")
+                st = os.stat(fp)
+                os.chmod(fp, st.st_mode | stat.S_IEXEC)
+
             # Run our task
-            p = subprocess.Popen(shlex.split(command), cwd=simulation_path, shell=False, stdout=out, stderr=err)
+            p = subprocess.Popen(parts, cwd=simulation_path, shell=False, stdout=out, stderr=err)
             # store the pid in case we want to cancel later
             logger.info(f"Process id: {p.pid}")
             current_job.extra_details['pid'] = p.pid
