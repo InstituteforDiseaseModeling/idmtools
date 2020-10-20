@@ -76,7 +76,6 @@ class TestAnalyzersLocal(ITestWithPersistence):
 
     @pytest.mark.timeout(90)
     @pytest.mark.long
-    @ensure_local_platform_running(**get_test_local_env_overrides())
     def test_AddAnalyzer(self):
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         analyzers = [AddAnalyzer()]

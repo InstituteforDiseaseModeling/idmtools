@@ -71,19 +71,23 @@ def run_test_in_n_seconds(n: int, print_elapsed_time: bool = False) -> Callable:
 
 
 def ensure_local_platform_running(silent=True, dump_logs=True, **kwargs):
-    import docker
-    client = docker.from_env()
-    from idmtools_platform_local.infrastructure.service_manager import DockerServiceManager
     from idmtools_platform_local.cli.utils import get_service_info
     if silent:
         os.environ['NO_SPINNER'] = '1'
-    args = (client,)
-    sm = DockerServiceManager(*args, **kwargs)
+
+    opts = kwargs
 
     def decorate(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            sm.create_services()
+            from idmtools.core.platform_factory import Platform
+            platform = Platform('Local', **opts)
+            if len(args):
+                args = list(args)
+                args.insert(1, platform)
+                args = tuple(args)
+            else:
+                args = (platform)
             result = None
             try:
                 result = func(*args, **kwargs)

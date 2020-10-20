@@ -14,7 +14,7 @@ from idmtools_platform_local.internals.workers.database import reset_db
 
 api_host = os.getenv('API_HOST', 'localhost')
 os.environ['SQLALCHEMY_DATABASE_URI'] = f'postgresql+psycopg2://idmtools:idmtools@{api_host}/idmtools'
-from idmtools_test.utils.confg_local_runner_test import config_local_test, patch_broker, reset_local_broker
+from idmtools_test.utils.confg_local_runner_test import config_local_test, patch_broker, reset_local_broker, get_test_local_env_overrides
 from idmtools_platform_local.infrastructure.service_manager import DockerServiceManager
 from idmtools_test.utils.local_platform import create_test_data
 
@@ -29,7 +29,7 @@ class TestAPI(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        sm = DockerServiceManager(docker.from_env())
+        sm = DockerServiceManager(docker.from_env(), **get_test_local_env_overrides())
         sm.cleanup(delete_data=True, tear_down_brokers=True)
         sm.get_network()
         sm.get('postgres')

@@ -110,7 +110,7 @@ class TestServiceManager(unittest.TestCase):
         sm.cleanup(True)
 
     def test_detect_changes(self):
-        pl = DockerServiceManager(self.client, workers_mem_limit="4g", **get_test_local_env_overrides())
+        pl = DockerServiceManager(self.client, workers_mem_limit="1g", **get_test_local_env_overrides())
         pl.create_services()
         pl.cleanup(True)
 
