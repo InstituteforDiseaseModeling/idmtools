@@ -106,7 +106,7 @@ class TestConfig(ITestWithPersistence):
     def test_non_standard_name_fails_when_not_found(self):
         with self.assertRaises(ValueError) as err:
             IdmConfigParser(file_name="idmtools_does_not_exist.ini")
-        self.assertEqual(err.exception.args[0], "The configuration file ./idmtools_does_not_exist.ini was not found!")
+        self.assertIn("idmtools_does_not_exist.ini was not found!", err.exception.args[0])
 
     @skip_if_global_configuration_is_enabled
     @run_in_temp_dir
