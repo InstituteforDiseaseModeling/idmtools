@@ -1,5 +1,6 @@
 import glob
 import json
+from collections import defaultdict
 from pathlib import PurePath
 import traceback
 import sys
@@ -34,6 +35,10 @@ JOB_CONFIG = None
 
 
 class NoFileFound(Exception):
+    doc_link: str = "platforms/comps/assetize_output.html#errors"
+
+
+class DuplicateAsset(Exception):
     doc_link: str = "platforms/comps/assetize_output.html#errors"
 
 
@@ -479,6 +484,38 @@ def print_results(ac_files, files):
     print(f'Total asset collection size: {humanfriendly.format_size(total_file_size)}')
 
 
+def ensure_no_duplicates(ac_files, files):
+    """
+    Ensure no duplicates are in asset
+    Args:
+        ac_files: Ac files
+        files: Simulation/Experiment/Workitem files
+
+    Returns:
+
+    """
+    dest_paths = defaultdict(int)
+    for file in ac_files:
+        fn = os.path.join(file.relative_path, file.file_name) if file.relative_path else file.file_name
+        dest_paths[fn] += 1
+    for file in files:
+        dest_paths[file[1]] += 1
+    # we should have one count for all items(1). If we have more than one count, than there are duplicates
+    if len(set(dest_paths.keys())) > 1:
+        duplicate_assets = [x for x, count in dest_paths.items() if count > 1]
+        error_files = []
+        # match up to assets
+        for asset in ac_files:
+            fn = os.path.join(asset.relative_path, asset.file_name) if asset.relative_path else asset.file_name
+            if fn in duplicate_assets:
+                error_files.append(f'{fn} from Asset Collections')
+        for file in files:
+            if file[1] in duplicate_assets:
+                error_files.append(f'{file[1]}<{file[0]}> from Experiment, Simulation, or WorkItem')
+        nl = "\n"
+        raise DuplicateAsset(f"The following assets have duplicate destination paths:{nl} {nl.join(sorted(error_files))}")
+
+
 if __name__ == "__main__":
     parser = get_argument_parser()
     args = parser.parse_args()
@@ -545,6 +582,8 @@ if __name__ == "__main__":
     ac_files: List[AssetCollectionFile] = filter_ac_files(args.file_pattern, args.exclude_pattern)
     if len(files) == 0 and len(ac_files) == 0:
         raise NoFileFound("No files found for related items")
+
+    ensure_no_duplicates(ac_files, files)
 
     if args.dry_run:
         print_results(ac_files, files)

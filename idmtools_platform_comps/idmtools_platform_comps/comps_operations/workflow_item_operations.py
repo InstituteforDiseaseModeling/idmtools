@@ -244,7 +244,8 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
             IDMTools workflow item
                 """
         # Creat a workflow item
-        obj = GenericWorkItem(name=work_item.name)
+        # Eventually it would be nice to put the actual command here, but this requires fetching the work-order which is a bit to much overhead
+        obj = GenericWorkItem(name=work_item.name, command="")
 
         # Set its correct attributes
         obj.platform = self.platform

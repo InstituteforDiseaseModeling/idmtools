@@ -119,6 +119,16 @@ class TestAssetizeOutput(unittest.TestCase):
         filelist = [f.filename for f in ac]
         self.assertEqual(36, len(filelist))
 
+    def test_experiment_duplicate_error(self):
+        ao = AssetizeOutput(name=self.case_name, related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'], no_simulation_prefix=True)
+        ao.run(wait_on_done=True, platform=self.platform)
+
+        self.assertTrue(ao.failed)
+        error_info = ao.fetch_error(print_error=False)
+        self.assertIsInstance(error_info, dict)
+        self.assertEqual(error_info["type"], "DuplicateAsset")
+        self.assertEqual(error_info["doc_link"], "platforms/comps/assetize_output.html#errors")
+
     def test_experiment(self):
         ao = AssetizeOutput(name=self.case_name, related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'], file_patterns=["**/a.csv"], verbose=True)
         ac = ao.run(wait_on_done=True, platform=self.platform)

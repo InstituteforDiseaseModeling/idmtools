@@ -1,4 +1,5 @@
 import copy
+import json
 from uuid import UUID
 import re
 import inspect
@@ -16,6 +17,7 @@ from idmtools.entities.iplatform import IPlatform
 from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools.entities.relation_type import RelationType
 from idmtools.entities.simulation import Simulation
+from idmtools.utils.info import get_help_version_url
 from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
 from idmtools.core.enums import ItemType, EntityStatus
 
@@ -431,3 +433,30 @@ class AssetizeOutput(SSMTWorkItem):
         if logger.isEnabledFor(DEBUG):
             logger.debug(f"Done waiting on items watching. Now waiting on Assetize Outputs: {self.id}")
         super().wait(**opts)
+
+    def fetch_error(self, print_error: bool = True) -> Union[Dict]:
+        """
+        Fetches the error from a WorkItem
+
+        Args:
+            print_error: Should error be printed. If false, error will be returned
+
+        Returns:
+            Error info
+        """
+        if self.status != EntityStatus.FAILED:
+            raise ValueError("You cannot fetch error if the items is not in a failed state")
+
+        try:
+            file = self.platform.get_files(self, ['error_reason.json'])
+            file = file['error_reason.json'].decode('utf-8')
+            file = json.loads(file)
+            if print_error:
+                user_logger.error(f'Error from server: {file["args"][0]}')
+                if 'doc_link' in file:
+                    user_logger.error(get_help_version_url(file['doc_link']))
+                else:
+                    user_logger.error(user_logger.error('\n'.join(file['tb'])))
+            return file
+        except Exception as e:
+            logger.exception(e)
