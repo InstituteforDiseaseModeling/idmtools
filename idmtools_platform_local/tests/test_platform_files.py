@@ -25,7 +25,7 @@ class TestPlatformSimulations(ITestWithPersistence):
     @ensure_local_platform_running(silent=True, **get_test_local_env_overrides())
     @pytest.mark.serial
     def test_fetch_simulation_files(self):
-        platform = Platform('Local')
+        platform = Platform('Local', **get_test_local_env_overrides())
 
         task = PythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "realpath_verify.py"))
         pe = Experiment.from_task(task, name=self.case_name, tags={"string_tag": "test", "number_tag": 123},

@@ -57,7 +57,7 @@ class TestAnalyzersLocal(ITestWithPersistence):
 
     @classmethod
     def setUpClass(cls) -> None:
-        cls.platform = Platform('Local')
+        cls.platform = Platform('Local', **get_test_local_env_overrides())
 
         builder = SimulationBuilder()
         # Sweep parameter "a"

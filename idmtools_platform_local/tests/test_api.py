@@ -30,7 +30,7 @@ class TestAPI(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         sm = DockerServiceManager(docker.from_env())
-        sm.cleanup(delete_data=True,tear_down_brokers=True)
+        sm.cleanup(delete_data=True, tear_down_brokers=True)
         sm.get_network()
         sm.get('postgres')
         sm.wait_on_ports_to_open(['postgres_port'])
