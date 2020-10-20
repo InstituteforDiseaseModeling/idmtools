@@ -501,7 +501,7 @@ def ensure_no_duplicates(ac_files, files):
     for file in files:
         dest_paths[file[1]] += 1
     # we should have one count for all items(1). If we have more than one count, than there are duplicates
-    if len(set(dest_paths.values())) > 1:
+    if any([x > 1 for x in set(dest_paths.values())]):
         duplicate_assets = [x for x, count in dest_paths.items() if count > 1]
         error_files = []
         # match up to assets
