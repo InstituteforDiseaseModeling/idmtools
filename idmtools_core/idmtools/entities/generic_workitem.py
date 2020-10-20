@@ -12,7 +12,7 @@ class GenericWorkItem(IWorkflowItem):
     Idm GenericWorkItem
     """
     def __post_init__(self, item_name: str, asset_collection_id: UUID, asset_files: FileList, user_files: FileList, command: str):
-        self.task = CommandTask(command=command)
+        self.task = CommandTask(command="See workorder.json")
         super().__post_init__(item_name, asset_collection_id, asset_files, user_files)
 
     def __hash__(self):
