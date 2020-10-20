@@ -82,7 +82,6 @@ try:
     @click.option('--name', default=None, help="Name of AssetizeWorkitem. If not provided, one will be generated")
     @click.pass_context
     def assetize_outputs(ctx: click.Context, pattern, exclude_pattern, experiment, simulation, work_item, asset_collection, dry_run, wait, include_assets, verbose, json, simulation_prefix_format_str, work_item_prefix_format_str, tag, name):
-        from idmtools.utils.info import get_help_version_url
         if json:
             os.environ['IDMTOOLS_SUPPRESS_OUTPUT'] = '1'
 
@@ -137,17 +136,7 @@ try:
         elif ao.failed:
             user_logger.error("Assetized failed. Check logs in COMPS")
             if ao.failed:
-                try:
-                    file = p.get_files(ao, ['error_reason.json'])
-                    file = file['error_reason.json'].decode('utf-8')
-                    file = json_parser.loads(file)
-                    user_logger.error(f'Error from server: {file["args"][0]}')
-                    if 'doc_link' in file:
-                        user_logger.error(get_help_version_url(file['doc_link']))
-                    else:
-                        user_logger.error(user_logger.error('\n'.join(file['tb'])))
-                except Exception as e:
-                    logger.exception(e)
+                ao.fetch_error()
             sys.exit(-1)
 
 except ImportError as e:

@@ -102,7 +102,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
     @pytest.mark.serial
     def test_ssmt_using_aliases(self):
         p = Platform("BAYESIAN")
-        self.do_simple_python_analysis(self.platform)
+        self.do_simple_python_analysis(p)
 
     # Test CSVAnalyzer with SSMTAnalysis which analyzes python experiment's results
     def test_ssmt_workitem_python_csv_analyzer(self):

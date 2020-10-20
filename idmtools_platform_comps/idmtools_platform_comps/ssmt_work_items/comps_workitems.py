@@ -20,11 +20,12 @@ class SSMTWorkItem(ICOMPSWorkflowItem):
     command: InitVar[str] = None
 
     def __post_init__(self, item_name: str, asset_collection_id: UUID, asset_files: FileList, user_files: FileList, command: str):
-        super().__post_init__(item_name, asset_collection_id, asset_files, user_files)
         if command and not self.task:
             self.task = CommandTask(command)
         else:
             user_logger.warning("You provided both a task and a command. Only using the task")
+        super().__post_init__(item_name, asset_collection_id, asset_files, user_files)
+
         self.work_item_type = self.work_item_type or 'DockerWorker'
 
     def get_base_work_order(self):
