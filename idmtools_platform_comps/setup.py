@@ -42,10 +42,16 @@ setup(
     name='idmtools_platform_comps',
     packages=find_packages(),
     test_suite='tests',
-    entry_points=dict(idmtools_platform=  # noqa: E251
-                      ["idmtools_platform_comps = idmtools_platform_comps.plugin_info:COMPSPlatformSpecification",
-                       "idmtools_platform_ssmt = idmtools_platform_comps.plugin_info:SSMTPlatformSpecification"]
-                      ),
+
+    entry_points="""
+[idmtools_platform]
+idmtools_platform_comps = idmtools_platform_comps.plugin_info:COMPSPlatformSpecification
+idmtools_platform_ssmt = idmtools_platform_comps.plugin_info:SSMTPlatformSpecification
+[idmtools_cli.cli_plugins]
+comps_subcommand=idmtools_platform_comps.cli.comps:comps
+[console_scripts]
+comps-cli=idmtools_platform_comps.cli.comps:comps
+""",
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
     version='1.5.1+nightly'

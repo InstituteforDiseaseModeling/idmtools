@@ -13,7 +13,7 @@ from idmtools.core.platform_factory import Platform
 class TestPlatformAnalysis(TestCase):
     def test_basic_functionality(self):
         platform = Platform('Test')
-        platform_analysis = PlatformAnalysis(platform=platform, analyzers=[SampleAnalyzer], experiment_ids=['3f46b433-1c8b-400f-a0df-f252c8a47329'])
+        platform_analysis = PlatformAnalysis(platform=platform, experiment_ids=['3f46b433-1c8b-400f-a0df-f252c8a47329'], analyzers=[SampleAnalyzer])
         command = platform_analysis._prep_analyze()
 
         self.assertEqual(command, 'python platform_analysis_bootstrap.py --experiment-ids 3f46b433-1c8b-400f-a0df-f252c8a47329 --analyzers download_analyzer.DownloadAnalyzer --block Test')
@@ -31,7 +31,7 @@ class TestPlatformAnalysis(TestCase):
 
     def test_verbose_command(self):
         platform = Platform('Test')
-        platform_analysis = PlatformAnalysis(platform=platform, analyzers=[SampleAnalyzer], experiment_ids=['3f46b433-1c8b-400f-a0df-f252c8a47329'], verbose=True)
+        platform_analysis = PlatformAnalysis(platform=platform, experiment_ids=['3f46b433-1c8b-400f-a0df-f252c8a47329'], analyzers=[SampleAnalyzer], verbose=True)
         command = platform_analysis._prep_analyze()
 
         self.assertEqual(command, 'python platform_analysis_bootstrap.py --experiment-ids 3f46b433-1c8b-400f-a0df-f252c8a47329 --analyzers download_analyzer.DownloadAnalyzer --block Test --verbose')
@@ -40,7 +40,7 @@ class TestPlatformAnalysis(TestCase):
         f = tempfile.NamedTemporaryFile(suffix='.sh', mode='w', delete=False)
         f.write("$*")
         platform = Platform('Test')
-        platform_analysis = PlatformAnalysis(platform=platform, analyzers=[SampleAnalyzer], experiment_ids=['3f46b433-1c8b-400f-a0df-f252c8a47329'], verbose=True, wrapper_shell_script=f.name)
+        platform_analysis = PlatformAnalysis(platform=platform, experiment_ids=['3f46b433-1c8b-400f-a0df-f252c8a47329'], analyzers=[SampleAnalyzer], wrapper_shell_script=f.name, verbose=True)
         command = platform_analysis._prep_analyze()
 
         self.assertEqual(command, f'/bin/bash {os.path.basename(f.name)} python platform_analysis_bootstrap.py --experiment-ids 3f46b433-1c8b-400f-a0df-f252c8a47329 --analyzers download_analyzer.DownloadAnalyzer --block Test --verbose')
@@ -50,7 +50,7 @@ class TestPlatformAnalysis(TestCase):
 
         def pre_run():
             print('Hello World')
-        platform_analysis = PlatformAnalysis(platform=platform, analyzers=[SampleAnalyzer], experiment_ids=['3f46b433-1c8b-400f-a0df-f252c8a47329'], pre_run_func=pre_run)
+        platform_analysis = PlatformAnalysis(platform=platform, experiment_ids=['3f46b433-1c8b-400f-a0df-f252c8a47329'], analyzers=[SampleAnalyzer], pre_run_func=pre_run)
         command = platform_analysis._prep_analyze()
 
         self.assertEqual(command, 'python platform_analysis_bootstrap.py --experiment-ids 3f46b433-1c8b-400f-a0df-f252c8a47329 --analyzers download_analyzer.DownloadAnalyzer --pre-run-func pre_run --block Test')

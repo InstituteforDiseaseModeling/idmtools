@@ -16,9 +16,8 @@ class JSONConfiguredPythonTask(JSONConfiguredTask, PythonTask):
     configfile_argument: Optional[str] = field(default="--config")
 
     def __post_init__(self):
-        super().__post_init__()
-        if self.configfile_argument is not None:
-            self.command.add_option(self.configfile_argument, self.config_file_name)
+        JSONConfiguredTask.__post_init__(self)
+        PythonTask.__post_init__(self)
 
     def gather_common_assets(self):
         """
@@ -70,8 +69,8 @@ class JSONConfiguredPythonTask(JSONConfiguredTask, PythonTask):
             :meth:`idmtools_models.json_configured_task.JSONConfiguredTask.pre_creation`
             :meth:`idmtools_models.python.python_task.PythonTask.pre_creation`
         """
-        JSONConfiguredTask.pre_creation(self, parent, platform)
         PythonTask.pre_creation(self, parent, platform)
+        JSONConfiguredTask.pre_creation(self, parent, platform)
 
     def post_creation(self, parent: Union[Simulation, IWorkflowItem], platform: 'IPlatform'):
         """

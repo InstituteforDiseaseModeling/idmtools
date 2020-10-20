@@ -48,7 +48,7 @@ There are three ways to choose which ssmt docker image to use in your script:
 
 1. specify docker_image in SSMTWorkItem creation, for example,
 ```bash
-   wi = SSMTWorkItem(item_name=wi_name, command=command, docker_image='my_test_ssmt_docker_image')
+   wi = SSMTWorkItem(name=wi_name, command=command, docker_image='my_test_ssmt_docker_image')
 ```   
 2. define docker_image in your idmtools.ini, for example:
 ```bash

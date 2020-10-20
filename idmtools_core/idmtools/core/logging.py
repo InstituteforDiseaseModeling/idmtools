@@ -43,8 +43,13 @@ class IDMQueueHandler(QueueHandler):
             pass
 
 
+class PrintHandler(logging.Handler):
+    def handle(self, record: logging.LogRecord) -> None:
+        print(record.message)
+
+
 def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'idmtools.log',
-                  console: Union[str, bool] = False) -> QueueListener:
+                  console: Union[str, bool] = False, file_level: str = 'DEBUG') -> QueueListener:
     """
     Set up logging.
 
@@ -53,6 +58,7 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
             from logging or an int that represent that level.
         log_filename: Name of file to log messages to.
         console: When set to True or the strings "1", "y", "yes", or "on", console logging will be enabled.
+        file_level: Level for logging in file
 
     Returns:
         Returns the ``QueueListener`` created that writes the log messages. In advanced scenarios with
@@ -69,6 +75,8 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
 
     if type(level) is str:
         level = logging.getLevelName(level)
+    if type(file_level):
+        file_level = logging.getLevelName(file_level)
     if type(console) is str:
         console = console.lower() in ['1', 'y', 'yes', 'on', 'true', 't']
 
@@ -80,7 +88,7 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
     user.setLevel(logging.DEBUG)
 
     if logging_queue is None:
-        file_handler = setup_handlers(level, log_filename, console)
+        file_handler = setup_handlers(level, log_filename, console, file_level)
 
         # see https://docs.python.org/3/library/logging.handlers.html#queuelistener
         # setup file logger handler that rotates after 10 mb of logging and keeps 5 copies
@@ -97,7 +105,7 @@ def setup_logging(level: Union[int, str] = logging.WARN, log_filename: str = 'id
     return listener
 
 
-def setup_handlers(level, log_filename, console: bool = False):
+def setup_handlers(level, log_filename, console: bool = False, file_level: int = logging.DEBUG):
     global logging_queue, handlers
     # We only one to do this setup once per process. Having the logging_queue setup help prevent that issue
     # get a file handler
@@ -107,9 +115,17 @@ def setup_handlers(level, log_filename, console: bool = False):
     else:
         format_str = '%(asctime)s.%(msecs)d %(pathname)s:%(lineno)d %(funcName)s [%(levelname)s] - %(message)s'
     formatter = logging.Formatter(format_str)
-    file_handler = RotatingFileHandler(log_filename, maxBytes=(2 ** 20) * 10, backupCount=5)
-    file_handler.setLevel(logging.DEBUG)
-    file_handler.setFormatter(formatter)
+    try:
+        file_handler = RotatingFileHandler(log_filename, maxBytes=(2 ** 20) * 10, backupCount=5)
+        file_handler.setLevel(file_level)
+        file_handler.setFormatter(formatter)
+    except PermissionError:
+        file_handler = logging.StreamHandler(sys.stdout)
+        file_handler.setLevel(file_level)
+        file_handler.setFormatter(formatter)
+        logging.warning(f"Could not open the log file '{log_filename}'. Using Console output instead")
+        # disable normal logging
+        console = False
     exclude_logging_classes()
     logging_queue = Queue()
     try:
@@ -124,11 +140,17 @@ def setup_handlers(level, log_filename, console: bool = False):
     logging.root.addHandler(queue_handler)
     logging.getLogger('user').addHandler(queue_handler)
 
-    if console or os.getenv('IDM_TOOLS_CONSOLE_LOGGING', 'F').lower() in ['1', 'y', 't', 'yes', 'true', 'on']:
-        coloredlogs.install(level=level, milliseconds=True, stream=sys.stdout)
+    # Use print based output. Mainly for test of CLI commands
+    if os.getenv('IDMTOOLS_USE_PRINT_OUTPUT', 'F').lower() not in ['1', 'y', 't', 'yes', 'true', 'on']:
+        if console or os.getenv('IDM_TOOLS_CONSOLE_LOGGING', 'F').lower() in ['1', 'y', 't', 'yes', 'true', 'on']:
+            coloredlogs.install(level=level, milliseconds=True, stream=sys.stdout)
+        else:
+            # install colored logs for user logger only
+            coloredlogs.install(logger=getLogger('user'), level=VERBOSE, fmt='%(message)s', stream=sys.stdout)
     else:
-        # install colored logs for user logger only
-        coloredlogs.install(logger=getLogger('user'), level=VERBOSE, fmt='%(message)s')
+        handler = PrintHandler(level=VERBOSE)
+        handler.setLevel(VERBOSE)
+        getLogger('user').addHandler(handler)
     handlers = logging.root.handlers
     return file_handler
 

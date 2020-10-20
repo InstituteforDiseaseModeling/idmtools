@@ -1,15 +1,20 @@
-import typing
 from dataclasses import dataclass, field, fields
+from inspect import signature
+from logging import getLogger, DEBUG
+from typing import List, Callable, TYPE_CHECKING
 from uuid import UUID
-
 from idmtools.utils.hashing import hash_obj, ignore_fields_in_dataclass_on_pickle
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from idmtools.entities.iplatform import IPlatform
+
+logger = getLogger(__name__)
 
 
 @dataclass(repr=False)
 class IItem:
     _uid: UUID = field(default=None, metadata={"md": True})
+    __pre_creation_hooks: List[Callable[['IItem', 'IPlatform'], None]] = field(default_factory=list, metadata={"md": True})
+    __post_creation_hooks: List[Callable[['IItem', 'IPlatform'], None]] = field(default_factory=list, metadata={"md": True})
 
     @property
     def uid(self):
@@ -54,7 +59,10 @@ class IItem:
         Returns:
 
         """
-        pass
+        for hook in self.__pre_creation_hooks:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f'Calling pre-create hook named {hook.__name__ if hasattr(hook, "__name__") else str(hook)}')
+            hook(self, platform)
 
     def post_creation(self, platform: 'IPlatform') -> None:
         """
@@ -66,7 +74,38 @@ class IItem:
         Returns:
 
         """
-        pass
+        for hook in self.__post_creation_hooks:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f'Calling pre-create hook named {hook.__name__ if hasattr(hook, "__name__") else str(hook)}')
+            hook(self, platform)
+
+    def add_pre_creation_hook(self, hook: Callable[['IItem', 'IPlatform'], None]):
+        """
+        Adds a hook function to be called before an item is created
+
+        Args:
+            hook: Hook function. This should have two arguments, the item and the platform
+
+        Returns:
+            None
+        """
+        if len(signature(hook).parameters) != 2:
+            raise ValueError("Pre creation hooks should have 2 arguments. The first argument will be the item, the second the platform")
+        self.__pre_creation_hooks.append(hook)
+
+    def add_post_creation_hook(self, hook: Callable[['IItem', 'IPlatform'], None]):
+        """
+        Adds a hook function to be called after an item is created
+
+        Args:
+            hook: Hook function. This should have two arguments, the item and the platform
+
+        Returns:
+            None
+        """
+        if len(signature(hook).parameters) != 2:
+            raise ValueError("Post creation hooks should have 2 arguments. The first argument will be the item, the second the platform")
+        self.__post_creation_hooks.append(hook)
 
     def post_setstate(self):
         """
@@ -100,4 +139,4 @@ class IItem:
     # endregion
 
 
-IItemList = typing.List[IItem]
+IItemList = List[IItem]

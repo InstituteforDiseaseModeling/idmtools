@@ -1,7 +1,10 @@
+import os
 import allure
 import unittest
 import pytest
 from click.testing import CliRunner
+os.environ['IDMTOOLS_USE_PRINT_OUTPUT'] = '1'
+os.environ['IDMTOOLS_HIDE_DEV_WARNING'] = '1'
 from idmtools_cli.cli.config_file import config
 
 

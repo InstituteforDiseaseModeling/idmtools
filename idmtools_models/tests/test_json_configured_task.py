@@ -12,7 +12,7 @@ from idmtools_models.json_configured_task import JSONConfiguredTask
 
 @dataclass
 class ExampleExtendedJSONConfiguredTask(JSONConfiguredTask):
-    command: CommandLine = field(default=CommandLine("python -m json.tool --infile my_config.json"))
+    command: CommandLine = field(default=CommandLine.from_string("python -m json.tool --infile my_config.json"))
     config_file_name: str = field(default='my_config.json')
 
 

@@ -351,9 +351,9 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
             cli = self._detect_command_line_from_simulation(dict_sim)
             # if we could not find task, set it now, otherwise rebuild the cli
             if sim.task is None:
-                sim.task = CommandTask(CommandLine(cli))
+                sim.task = CommandTask(CommandLine.from_string(cli))
             else:
-                sim.task.command = CommandLine(cli)
+                sim.task.command = CommandLine.from_string(cli)
             # call task load options(load configs from files, etc)
             sim.task.reload_from_simulation(sim)
         else:

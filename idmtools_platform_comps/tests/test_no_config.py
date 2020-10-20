@@ -13,6 +13,7 @@ from idmtools.entities.experiment import Experiment
 @allure.story("COMPS")
 @allure.story("Configuration")
 @allure.suite("idmtools_platform_comps")
+@pytest.mark.serial
 class TestNoConfig(unittest.TestCase):
 
     @classmethod

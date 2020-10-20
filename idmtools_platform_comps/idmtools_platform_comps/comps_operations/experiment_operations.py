@@ -220,9 +220,10 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         return exp_command
 
     def post_create(self, experiment: Experiment, **kwargs) -> NoReturn:
-        user_logger.log(SUCCESS, f"\nThe created experiment can be viewed at {self.platform.endpoint}/#explore/"
-                                 f"Simulations?filters=ExperimentId={experiment.uid}\nSimulations are still being created\n"
-                        )
+        if os.getenv('IDMTOOLS_SUPPRESS_OUTPUT', None) is None:
+            user_logger.log(SUCCESS, f"\nThe created experiment can be viewed at {self.platform.endpoint}/#explore/"
+                                     f"Simulations?filters=ExperimentId={experiment.uid}\nSimulations are still being created\n"
+                            )
 
     def post_run_item(self, experiment: Experiment, **kwargs):
         """

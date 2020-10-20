@@ -7,6 +7,7 @@ from functools import partial
 
 import pytest
 from idmtools.assets import Asset
+from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
@@ -100,7 +101,7 @@ class TestCopy(ITestWithPersistence):
     def test_deepcopy_simulation(self):
         sim = Simulation.from_task(JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, 'python_experiments', "model.py")))
 
-        sim.pre_creation(None)
+        sim.pre_creation(Platform('Test'))
         self.assertEqual(len(sim.assets.assets), 1)
 
         # test deepcopy of simulation

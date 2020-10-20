@@ -3,7 +3,6 @@ import os
 import sys
 from unittest import TestCase
 import pytest
-
 from idmtools.assets import Asset
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.command_task import CommandTask
@@ -23,7 +22,8 @@ class TestTemplatedScriptTask(TestCase):
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
 
-    def get_simplate_template(self):
+    @staticmethod
+    def get_simple_template():
         """"""
         simple_template = """
     ECHO OFF
@@ -40,7 +40,7 @@ class TestTemplatedScriptTask(TestCase):
         Returns:
 
         """
-        simple_template = self.get_simplate_template()
+        simple_template = self.get_simple_template()
         for is_common in [False, True]:
             task = TemplatedScriptTask(
                 script_path="example.bat",
@@ -50,7 +50,7 @@ class TestTemplatedScriptTask(TestCase):
             )
             task.gather_common_assets()
             task.gather_transient_assets()
-            task.pre_creation(None, None)
+            task.pre_creation(None, Platform("Test"))
 
             self.assertEqual(1 if is_common else 0, task.common_assets.count)
             self.assertEqual(0 if is_common else 1, task.transient_assets.count)
@@ -82,7 +82,7 @@ class TestTemplatedScriptTask(TestCase):
         wrapper_task = get_script_wrapper_windows_task(task, template_content=template)
         wrapper_task.gather_common_assets()
         wrapper_task.gather_transient_assets()
-        wrapper_task.pre_creation(None, None)
+        wrapper_task.pre_creation(None, Platform("Test"))
 
         self.assertEqual(1, wrapper_task.common_assets.count)
         self.assertEqual(0, wrapper_task.transient_assets.count)
@@ -151,7 +151,6 @@ echo Hello
         """
         cmd = f"\"{sys.executable}\" -c \"import os; print(os.environ)\""
         task = CommandTask(cmd)
-
         with Platform("TestExecute", missing_ok=True, default_missing=dict(type='TestExecute')):
             wrapper_task = get_script_wrapper_unix_task(task, template_content=LINUX_PYTHON_PATH_WRAPPER)
             experiment = Experiment.from_task(wrapper_task, name=self.case_name)

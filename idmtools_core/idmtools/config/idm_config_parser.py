@@ -169,8 +169,9 @@ class IdmConfigParser:
                 if os.path.exists(global_config):
                     ini_file = global_config
         if ini_file is None:
-            # We use print since logger isn't configured
-            print(f"/!\\ WARNING: File '{file_name}' Not Found! For details on how to configure idmtools, see {get_help_version_url('configuration.html')} for details on how to configure idmtools.")
+            if os.environ.get('IDMTOOLS_NO_CONFIG_WARNING', None) is None:
+                # We use print since logger isn't configured unless there is an override(cli)
+                print(f"/!\\ WARNING: File '{file_name}' Not Found! For details on how to configure idmtools, see {get_help_version_url('configuration.html')} for details on how to configure idmtools.")
             cls._init_logging()
             return
 
@@ -194,10 +195,10 @@ class IdmConfigParser:
         # setup logging
         try:
             log_config = cls.get_section('Logging')
-            valid_options = ['level', 'log_filename', 'console']
+            valid_options = ['level', 'log_filename', 'console', "file_level"]
             log_config = {k: v for k, v in log_config.items() if k in valid_options}
         except ValueError:
-            log_config = dict(level='INFO', log_filename='idmtools.log', console='off')
+            log_config = dict(level='INFO', log_filename='idmtools.log', console='off', file_level='DEBUG')
         setup_logging(**log_config)
 
         if platform.system() == "Darwin":
@@ -206,7 +207,7 @@ class IdmConfigParser:
 
         # Do import locally to prevent load error
         from idmtools import __version__
-        if "+nightly" in __version__:
+        if "+nightly" in __version__ and os.getenv('IDMTOOLS_HIDE_DEV_WARNING', None) is None:
             user_logger.warning(f"You are using a development version of idmtools, version {__version__}!")
 
     @classmethod

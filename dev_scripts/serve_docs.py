@@ -17,7 +17,7 @@ os.chdir(root_dir)
 server = Server()
 dirs_to_watch = set()
 # Find all the directories within docs to watch
-for filepath in glob.iglob("**.rst", recursive=True):
+for filepath in glob.glob("**/*.rst", recursive=True):
     if 'idmtools_' not in filepath:
         d = os.path.dirname(filepath)
         if d not in dirs_to_watch:
@@ -26,6 +26,6 @@ for filepath in glob.iglob("**.rst", recursive=True):
 server.watch('docs/__static/*', shell('make html', cwd='docs'), delay=5)
 server.watch('docs/images/*', shell('make html', cwd='docs'), delay=5)
 server.watch('docs/*.txt', shell('make html', cwd='docs'), delay=5)
-server.watch('docs/*.py', shell('make html', cwd='docs'), delay=5)
+server.watch('*.py', shell('make html', cwd='docs'), delay=5)
 webbrowser.open("http://localhost:8000")
 server.serve(root='docs/_build/html', port=args.port)

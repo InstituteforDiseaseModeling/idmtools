@@ -172,6 +172,7 @@ class IPlatformExperimentOperations(ABC):
         Returns:
 
         """
+        experiment.pre_run(self.platform)
         # ensure the item is created before running
         if experiment.status is None:
             self.create(experiment, **kwargs)
@@ -198,6 +199,7 @@ class IPlatformExperimentOperations(ABC):
 
         """
         experiment.status = EntityStatus.RUNNING
+        experiment.post_run(self.platform)
 
     def run_item(self, experiment: Experiment, **kwargs):
         """

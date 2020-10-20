@@ -175,11 +175,12 @@ class Platform:
         # Display block info
         try:
             from idmtools.core.logging import VERBOSE
-            if is_alias:
-                user_logger.log(VERBOSE, f"\n[{block}]")
-                user_logger.log(VERBOSE, json.dumps(section, indent=3))
-            else:
-                IdmConfigParser.display_config_block_details(block)
+            if os.getenv('IDMTOOLS_SUPPRESS_OUTPUT', None) is None:
+                if is_alias:
+                    user_logger.log(VERBOSE, f"\n[{block}]")
+                    user_logger.log(VERBOSE, json.dumps(section, indent=3))
+                else:
+                    IdmConfigParser.display_config_block_details(block)
         except ValueError:
             if missing_ok:
                 pass

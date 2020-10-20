@@ -3,6 +3,7 @@ from abc import ABCMeta
 from dataclasses import dataclass
 from dataclasses import fields, field
 from functools import partial
+from pathlib import PureWindowsPath, PurePath
 from itertools import groupby
 from logging import getLogger, DEBUG
 from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set, Iterator, Callable
@@ -11,6 +12,7 @@ from idmtools.core import CacheEnabled, UnknownItemException, EntityContainer, U
 from idmtools.core.enums import ItemType, EntityStatus
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.core.interfaces.iitem import IItem
+from idmtools.core.interfaces.irunnable_entity import IRunnableEntity
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
@@ -23,6 +25,7 @@ from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.relation_type import RelationType
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.suite import Suite
+from idmtools.assets.asset_collection import AssetCollection
 from idmtools.services.platforms import PlatformPersistService
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
 from tqdm import tqdm
@@ -63,6 +66,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     - Commissioning
     - File handling
     """
+    #: Maps the platform types to idmtools types
     platform_type_map: Dict[Type, ItemType] = field(default=None, repr=False, init=False)
     _object_cache_expiration: 'int' = field(default=60, repr=False, init=False)
 
@@ -78,6 +82,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     _regather_assets_on_modify: bool = field(default=False, repr=False, init=False, compare=False)
     # store the config block used to create platform
     _config_block: str = field(default=None)
+    #: Defines the path to common assets
+    _common_asset_path: str = field(default="Assets", repr=True, init=False, compare=False)
 
     @staticmethod
     def get_caller():
@@ -180,8 +186,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item_type]
         return getattr(self, interface).get(item_id, **kwargs)
 
-    def get_item(self, item_id: Union[str, UUID], item_type: ItemType = None,
-                 force: bool = False, raw: bool = False, **kwargs) -> Any:
+    def get_item(self, item_id: Union[str, UUID], item_type: ItemType = None, force: bool = False, raw: bool = False, **kwargs) -> Union[Experiment, Suite, Simulation, IWorkflowItem, AssetCollection, None]:
         """
         Retrieve an object from the platform.
         This function is cached; force allows you to force the refresh of the cache.
@@ -653,7 +658,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             time.sleep(refresh_interval)
         raise TimeoutError(f"Timeout of {timeout} seconds exceeded")
 
-    def wait_till_done(self, item: Union[Experiment, IWorkflowItem, Suite], timeout: int = 60 * 60 * 24,
+    def wait_till_done(self, item: IRunnableEntity, timeout: int = 60 * 60 * 24,
                        refresh_interval: int = 5, progress: bool = True):
         """
         Wait for the experiment to be done.
@@ -724,7 +729,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             failed_warning['failed_warning'] = True
         return item.done
 
-    def wait_till_done_progress(self, item: Union[Experiment, IWorkflowItem, Suite], timeout: int = 60 * 60 * 24,
+    def wait_till_done_progress(self, item: IRunnableEntity, timeout: int = 60 * 60 * 24,
                                 refresh_interval: int = 5):
         """
         Wait on an item to complete with progress bar
@@ -807,6 +812,39 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             True or false
         """
         return self._regather_assets_on_modify
+
+    def is_windows_platform(self) -> bool:
+        """
+        Returns is the arget platform is a windows system
+        """
+
+        return self.are_requirements_met(PlatformRequirements.WINDOWS)
+
+    @property
+    def common_asset_path(self):
+        return self._common_asset_path
+
+    @common_asset_path.setter
+    def common_asset_path(self, value):
+        if not isinstance(value, property):
+            logger.warning("Cannot set common asset path")
+
+    def join_path(self, *args) -> str:
+        """
+        Join path using platform rules
+
+        Args:
+            *args:List of paths to join
+
+        Returns:
+            Joined path as string
+        """
+        if len(args) < 2:
+            raise ValueError("at least two items required to join")
+        if self.is_windows_platform():
+            return str(PureWindowsPath(*args))
+        else:
+            return str(PurePath(*args))
 
 
 TPlatform = TypeVar("TPlatform", bound=IPlatform)
