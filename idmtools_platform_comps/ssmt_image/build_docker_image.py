@@ -12,6 +12,7 @@ from getpass import getpass
 import requests
 from requests.auth import HTTPBasicAuth
 import keyring
+from natsort import natsorted
 
 
 logger = getLogger(__name__)
@@ -87,7 +88,7 @@ def get_latest_image_version_from_registry(username, password):
     response = requests.get(url, auth=auth)
     logger.debug(f"Return Code: {response.status_code}")
     if response.status_code == 200:
-        images = sorted(response.json()['tags'], reverse=True)
+        images = natsorted(response.json()['tags'], reverse=True)
         images = [i for i in images if len(i) > 6]
         logger.debug(f"Images: {images}")
         last_version = images[0]
@@ -126,7 +127,7 @@ if "__main__" == __name__:
     parser.add_argument("--username", default=None, help="Docker Production Username")
     parser.add_argument("--password", default=None, help="Docker Production Password")
     parser.add_argument("--disable-keyring-load", default=False, help="Disable loading password from keyring")
-    parser.add_argument("--disable-keyring-save", default=False, help="Disable loading password from keyring")
+    parser.add_argument("--disable-keyring-save", default=False, help="Disable saving password to keyring after user prompts")
     parser.add_argument("--verbose", default=False, help="Enable Debug logging")
     parser.add_argument("--debug", default=False, help="Enable Debug logging")
     args = parser.parse_args()
