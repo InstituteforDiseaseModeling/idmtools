@@ -23,10 +23,10 @@ class TestSingularity(ITestWithPersistence):
     @ensure_local_platform_running(silent=True, **defaults)
     def test_singularity_hello_world(self, platform):
         task = TemplatedScriptTask(script_path="hello.sh", template="""#!/usr/bin/env bash
-singularity pull --name hello.simg shub://vsoch/hello-world
+singularity pull --name hello.simg docker://alpine
 sleep 1
 dir
-singularity exec ./hello.simg ls /
+singularity exec ./hello.simg ls -l
 """)
         experiment = Experiment.from_task(task)
         experiment.run(wait_on_done=True, platform=platform)
