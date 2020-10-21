@@ -30,3 +30,4 @@
 .. |exe_l| replace:: EMOD executable (Eradication.exe)
 .. |exe_s| replace:: Eradication.exe
 .. |linux_binary| replace:: Eradication binary
+.. |dev_install| replace:: https://github.com/InstituteforDiseaseModeling/idmtools#development-environment-setup

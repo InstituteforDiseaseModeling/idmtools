@@ -2,7 +2,7 @@
 Local platform
 ==============
 
-To run simulations and experiments on the local platform you must have met the installation prerequisites. For more information, see :doc:`../installation`. In addition, the Docker client must be running. For more information, see :ref:`docker-client` section in :doc:`../dev-installation`.
+To run simulations and experiments on the local platform you must have met the installation prerequisites. For more information, see :doc:`../installation`. In addition, the Docker client must be running. For more information, see |dev_install|.
 
 Verify local platform is running
 ````````````````````````````````
