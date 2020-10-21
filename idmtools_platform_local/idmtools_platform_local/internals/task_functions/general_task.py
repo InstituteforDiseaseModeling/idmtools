@@ -38,10 +38,10 @@ def run_task(command: str, current_job: 'JobStatus', experiment_uuid: str, simul
             fp = os.path.join(simulation_path, parts[0])
             if os.path.exists(fp):
                 logger.debug(f"Ensuring Execute permission on file: {fp}")
-                st = os.stat(fp)
                 try:
+                    st = os.stat(fp)
                     os.chmod(fp, st.st_mode | stat.S_IEXEC)
-                except OSError:
+                except (OSError, PermissionError):
                     if logger.isEnabledFor(DEBUG):
                         logger.debug(f"Could not set execute permission on {fp}. Falling back to executing with bash")
                     # most likely windows host. We can try to run it using another method
