@@ -55,7 +55,7 @@ def item_batch_worker_thread(create_func: Callable, items: Union[List]) -> List:
 
 def batch_create_items(items: Union[Iterable, Generator], batch_worker_thread_func: Callable[[List], List] = None,
                        create_func: Callable[..., Any] = None, display_progress: bool = True,
-                       progress_description: str = "Commissioning items", **kwargs):
+                       progress_description: str = "Commissioning items", unit: str = None, **kwargs):
     """
     Batch create items. You must specify either batch_worker_thread_func or create_func
 
@@ -65,6 +65,7 @@ def batch_create_items(items: Union[Iterable, Generator], batch_worker_thread_fu
         create_func: Optional Create function
         display_progress: Enable progress bar
         progress_description: Description to show in progress bar
+        unit: Unit for progress bar
         **kwargs:
 
     Returns:
@@ -79,7 +80,7 @@ def batch_create_items(items: Union[Iterable, Generator], batch_worker_thread_fu
 
     if display_progress and not IdmConfigParser.is_progress_bar_disabled():
         from tqdm import tqdm
-        prog = tqdm(desc="Initializing objects for creation")
+        prog = tqdm(desc="Initializing objects for creation", unit=unit)
     else:
         prog = None
 

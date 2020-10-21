@@ -251,7 +251,8 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         results = batch_create_items(
             simulations,
             batch_worker_thread_func=thread_func,
-            progress_description="Creating Simulations on Comps"
+            progress_description="Creating Simulations on Comps",
+            unit="simulation"
         )
         # Always commission again
         try:
