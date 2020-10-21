@@ -39,7 +39,13 @@ def run_task(command: str, current_job: 'JobStatus', experiment_uuid: str, simul
             if os.path.exists(fp):
                 logger.debug(f"Ensuring Execute permission on file: {fp}")
                 st = os.stat(fp)
-                os.chmod(fp, st.st_mode | stat.S_IEXEC)
+                try:
+                    os.chmod(fp, st.st_mode | stat.S_IEXEC)
+                except PermissionError:
+                    if logger.isEnabledFor(DEBUG):
+                        logger.debug(f"Could not set execute permission on {fp}. Falling back to executing with bash")
+                    # most likely windows host. We can try to run it using another method
+                    parts.insert(0, "/bin/bash")
 
             # Run our task
             p = subprocess.Popen(parts, cwd=simulation_path, shell=False, stdout=out, stderr=err)
