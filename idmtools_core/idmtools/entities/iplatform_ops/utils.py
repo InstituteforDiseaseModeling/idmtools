@@ -80,7 +80,8 @@ def batch_create_items(items: Union[Iterable, Generator], batch_worker_thread_fu
 
     if display_progress and not IdmConfigParser.is_progress_bar_disabled():
         from tqdm import tqdm
-        prog = tqdm(desc="Initializing objects for creation", unit=unit)
+        extra_args = dict(unit=unit) if unit else dict()
+        prog = tqdm(desc="Initializing objects for creation", **extra_args)
     else:
         prog = None
 
