@@ -42,7 +42,7 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
             List of tuples containing the create object and id of item that was created
         """
         return batch_create_items(workflow_items, create_func=self.create, display_progress=display_progress,
-                                  progress_description="Creating Suites", **kwargs)
+                                  progress_description="Creating WorkItems", unit="workitem", **kwargs)
 
     def pre_create(self, workflow_item: IWorkflowItem, **kwargs) -> NoReturn:
         """

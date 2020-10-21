@@ -105,7 +105,7 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
             List of tuples containing the create object and id of item that was created
         """
         return batch_create_items(sims, create_func=self.create, display_progress=display_progress,
-                                  progress_description="Commissioning Simulations",
+                                  progress_description="Commissioning Simulations", unit="simulation",
                                   **kwargs)
 
     @abstractmethod

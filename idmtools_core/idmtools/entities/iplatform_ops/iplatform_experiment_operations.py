@@ -115,7 +115,7 @@ class IPlatformExperimentOperations(ABC):
             List of tuples containing the create object and id of item that was created
         """
         return batch_create_items(experiments, create_func=self.create, display_progress=display_progress,
-                                  progress_description="Creating Experiments",
+                                  progress_description="Creating Experiments", unit="experiment",
                                   **kwargs)
 
     @abstractmethod

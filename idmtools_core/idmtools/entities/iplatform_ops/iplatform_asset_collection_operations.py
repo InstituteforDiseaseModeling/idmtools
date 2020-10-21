@@ -92,7 +92,7 @@ class IPlatformAssetCollectionOperations(CacheEnabled, ABC):
             List of tuples containing the create object and id of item that was created
         """
         return batch_create_items(asset_collections, create_func=self.create, display_progress=display_progress,
-                                  progress_description="Uploading Assets", **kwargs)
+                                  progress_description="Uploading Assets", unit="asset collection", **kwargs)
 
     @abstractmethod
     def get(self, asset_collection_id: UUID, **kwargs) -> Any:
