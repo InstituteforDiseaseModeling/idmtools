@@ -5,6 +5,7 @@ import sys
 from getpass import getpass
 import requests
 from requests.auth import HTTPBasicAuth
+from natsort import natsorted
 
 base_version = open('../VERSION').read().strip()
 BASE_REPO = 'packages.idmod.org'
@@ -25,7 +26,7 @@ else:
 auth = HTTPBasicAuth(username=username, password=password)
 response = requests.get(f'https://{BASE_REPO}/artifactory/api/docker/{REPO_KEY}/v2/{IMAGE_NAME}/tags/list', auth=auth)
 if response.status_code == 200:
-    images = sorted(response.json()['tags'], reverse=True)
+    images = natsorted(response.json()['tags'], reverse=True)
     images = [i for i in images if len(i) > 6]
     last_version = images[0]
     if base_version in last_version:
