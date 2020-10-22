@@ -5,7 +5,7 @@ from uuid import UUID
 from idmtools.core.enums import EntityStatus, ItemType
 from idmtools.entities.iplatform_ops.utils import batch_create_items
 from idmtools.entities.suite import Suite
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
 
 
@@ -41,7 +41,7 @@ class IPlatformSuiteOperations(ABC):
             List of tuples containing the create object and id of item that was created
         """
         return batch_create_items(suites, create_func=self.create, display_progress=display_progress,
-                                  progress_description="Creating Suites",
+                                  progress_description="Creating Suites", unit="suite",
                                   **kwargs)
 
     def pre_create(self, suite: Suite, **kwargs) -> NoReturn:

@@ -8,6 +8,20 @@ import pandas as pd
 from idmtools.entities.simulation import Simulation
 
 
+def get_case_name(name: str):
+    """
+    Add prefix from environment var to names of experiments
+    Args:
+        name:
+
+    Returns:
+
+    """
+    if os.environ.get("IDMTOOLS_TEST_PREFIX", None):
+        return f'{os.environ["IDMTOOLS_TEST_PREFIX"]}.{name}'
+    return name
+
+
 def del_folder(path: str):
     """
     Delete Folder

@@ -21,4 +21,4 @@ def cli(debug):
     IdmConfigParser()
     # init config by just calling config parser
     if debug:
-        setup_logging(console=True, level=logging.DEBUG)
+        setup_logging(console=True, level=logging.DEBUG, force=True)

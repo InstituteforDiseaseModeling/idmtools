@@ -9,6 +9,7 @@ from click._compat import strip_ansi
 from sqlalchemy.exc import OperationalError
 
 from idmtools.core.platform_factory import Platform
+from idmtools_test.utils.confg_local_runner_test import get_test_local_env_overrides
 from idmtools_test.utils.decorators import restart_local_platform
 
 api_host = os.getenv('API_HOST', 'localhost')
@@ -26,9 +27,9 @@ from idmtools_test.utils.local_platform import create_test_data
 class TestLocalCLIBasic(unittest.TestCase):
 
     @classmethod
-    @restart_local_platform(silent=True, stop_after=False)
+    @restart_local_platform(silent=True, stop_after=False, **get_test_local_env_overrides())
     def setUpClass(cls):
-        platform = Platform('Local')
+        platform = Platform('Local', **get_test_local_env_overrides())
         retries = 0
         while retries < 10:
             try:
@@ -39,7 +40,7 @@ class TestLocalCLIBasic(unittest.TestCase):
                 retries += 1
 
     @classmethod
-    @restart_local_platform(silent=True, stop_before=False)
+    @restart_local_platform(silent=True, stop_before=False, **get_test_local_env_overrides())
     def tearDownClass(cls) -> None:
         pass
 

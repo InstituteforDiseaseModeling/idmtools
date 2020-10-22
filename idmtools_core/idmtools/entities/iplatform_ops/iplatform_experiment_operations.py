@@ -6,14 +6,13 @@ from logging import getLogger
 from types import GeneratorType
 from typing import Type, Any, NoReturn, Tuple, List, Dict, Iterator, Union, TYPE_CHECKING
 from uuid import UUID
-
 from idmtools.assets import Asset
 from idmtools.core.enums import EntityStatus, ItemType
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.utils import batch_create_items
 
 logger = getLogger(__name__)
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
 
 
@@ -116,7 +115,7 @@ class IPlatformExperimentOperations(ABC):
             List of tuples containing the create object and id of item that was created
         """
         return batch_create_items(experiments, create_func=self.create, display_progress=display_progress,
-                                  progress_description="Creating Experiments",
+                                  progress_description="Creating Experiments", unit="experiment",
                                   **kwargs)
 
     @abstractmethod

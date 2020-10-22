@@ -4,7 +4,7 @@ from dataclasses import dataclass, field, InitVar, fields
 from logging import getLogger, DEBUG
 from types import GeneratorType
 from typing import NoReturn, Set, Union, Iterator, Type, Dict, Any, List, TYPE_CHECKING, Generator
-from tqdm import tqdm
+from idmtools import IdmConfigParser
 from idmtools.assets import AssetCollection, Asset
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType, EntityStatus
@@ -17,13 +17,12 @@ from idmtools.core.logging import SUCCESS, NOTICE
 from idmtools.entities.itask import ITask
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.templated_simulation import TemplatedSimulations
-from idmtools.registry.experiment_specification import ExperimentPluginSpecification, get_model_impl, \
-    get_model_type_impl
+from idmtools.registry.experiment_specification import ExperimentPluginSpecification, get_model_impl, get_model_type_impl
 from idmtools.registry.plugin_specification import get_description_impl
 from idmtools.utils.collections import ExperimentParentIterator
 from idmtools.utils.entities import get_default_tags
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
     from idmtools.entities.simulation import Simulation  # noqa: F401
 
@@ -171,7 +170,10 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
                     logger.debug("Using all tasks to gather assts")
                 task_class = self.__simulations[0].task.__class__
                 self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
-                pbar = tqdm(self.__simulations, desc="Discovering experiment assets from tasks")
+                pbar = self.__simulations
+                if not IdmConfigParser.is_progress_bar_disabled():
+                    from tqdm import tqdm
+                    pbar = tqdm(self.__simulations, desc="Discovering experiment assets from tasks", unit="simulation")
                 for sim in pbar:
                     # don't gather assets from simulations that have been provisioned
                     if sim.status is None:
@@ -392,7 +394,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         p = super()._check_for_platform_from_context(platform)
         return p._experiments.list_assets(self, children, **kwargs)
 
-    def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None, regather_common_assets: bool = None, wait_on_done_progress: bool = True,
+    def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None, regather_common_assets: bool = None, wait_on_done_progress: bool = True, wait_on_done: bool = False,
             **run_opts) -> NoReturn:
         """
         Runs an experiment on a platform
@@ -403,6 +405,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
             regather_common_assets: Triggers gathering of assets for *existing* experiments. If not provided, we use the platforms default behaviour. See platform details for performance implications of this. For most platforms, it should be ok but for others, it could decrease performance when assets are not changing.
               It is important to note that when using this feature, ensure the previous simulations have finished provisioning. Failure to do so can lead to unexpected behaviour
             wait_on_done_progress: Should experiment status be shown when waiting
+            wait_on_done: extra name for backward compatibility for wait_until_done
             **run_opts: Options to pass to the platform
 
         Returns:
@@ -419,7 +422,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
             user_logger.warning("You are modifying and existing experiment by using a template without gathering common assets. Ensure your Template configuration is the same as existing experiments or enable gathering of new common assets through regather_common_assets.")
         run_opts['regather_common_assets'] = regather_common_assets
         p.run_items(self, **run_opts)
-        if wait_until_done:
+        if wait_until_done or wait_on_done:
             self.wait(wait_on_done_progress=wait_on_done_progress)
 
     def to_dict(self):

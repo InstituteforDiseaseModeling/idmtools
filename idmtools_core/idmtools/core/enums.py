@@ -1,5 +1,7 @@
 from enum import Enum
 
+TRUTHY_VALUES = ['1', 'y', 'yes', 'on', 'true', 't']
+
 
 class EntityStatus(Enum):
     COMMISSIONING = 'commissioning'

@@ -1,15 +1,15 @@
 import allure
 import tempfile
 from shutil import copyfile
-
 import io
 import unittest.mock
 import os
 import pytest
 from idmtools.config import IdmConfigParser
+from idmtools.core import TRUTHY_VALUES
 from idmtools.core.platform_factory import Platform
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools_test.utils.decorators import skip_if_global_configuration_is_enabled
+from idmtools_test.utils.decorators import skip_if_global_configuration_is_enabled, run_in_temp_dir
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import captured_output
 
@@ -103,16 +103,23 @@ class TestConfig(ITestWithPersistence):
         print(not_exist)
 
     @skip_if_global_configuration_is_enabled
+    def test_non_standard_name_fails_when_not_found(self):
+        with self.assertRaises(ValueError) as err:
+            IdmConfigParser(file_name="idmtools_does_not_exist.ini")
+        self.assertIn("idmtools_does_not_exist.ini was not found!", err.exception.args[0])
+
+    @skip_if_global_configuration_is_enabled
+    @run_in_temp_dir
     def test_no_idmtools_common(self):
         with captured_output() as (out, err):
-            IdmConfigParser(file_name="idmtools_NotExist.ini")
+            IdmConfigParser(file_name="idmtools.ini")
             IdmConfigParser.ensure_init()
             max_workers = IdmConfigParser.get_option("COMMON", 'max_workers')
             self.assertIsNone(max_workers)
-            self.assertIn("WARNING: File 'idmtools_NotExist.ini' Not Found!", out.getvalue())
+            self.assertIn("WARNING: File 'idmtools.ini' Not Found!", out.getvalue())
 
     # enable config only through special file
-    @pytest.mark.skipif(not all([os.environ.get("TEST_GLOBAL_CONFIG", 'n').lower() in ['1', 'y', 'yes', 't', 'true'], os.environ.get('IDMTOOLS_CONFIG_FILE', None) is None, not os.path.exists(IdmConfigParser.get_global_configuration_name())]), reason="Either the environment variable TEST_GLOBAL_CONFIG is not set to true, you already have a global configuration, or IDMTOOLS_CONFIG_FILE is set")
+    @pytest.mark.skipif(not all([os.environ.get("TEST_GLOBAL_CONFIG", 'n').lower() in TRUTHY_VALUES, os.environ.get('IDMTOOLS_CONFIG_FILE', None) is None, not os.path.exists(IdmConfigParser.get_global_configuration_name())]), reason="Either the environment variable TEST_GLOBAL_CONFIG is not set to true, you already have a global configuration, or IDMTOOLS_CONFIG_FILE is set")
     def test_global_configuration(self):
         copyfile(os.path.join(os.path.dirname(__file__), "idmtools.ini"), IdmConfigParser.get_global_configuration_name())
         IdmConfigParser.ensure_init(dir_path=tempfile.gettempdir(), force=True)
@@ -122,7 +129,7 @@ class TestConfig(ITestWithPersistence):
             os.remove(IdmConfigParser.get_global_configuration_name())
 
     def test_has_idmtools_common(self):
-        IdmConfigParser(file_name="idmtools_NotExist.ini")
+        IdmConfigParser(file_name="idmtools.ini")
         IdmConfigParser.ensure_init(force=True)
         max_workers = IdmConfigParser.get_option("COMMON", 'max_workers')
         self.assertEqual(int(max_workers), 16)
@@ -163,19 +170,13 @@ class TestConfig(ITestWithPersistence):
         local_type = idm.get_option("Custom_Local", 'type')
         self.assertEqual(str(local_type), "Local")
 
-    @skip_if_global_configuration_is_enabled
-    def test_no_idmtools(self):
-        IdmConfigParser(file_name="idmtools_NotExist.ini")
-        self.assertIsNone(IdmConfigParser.get_config_path())
+    def test_load_item_config_environment(self):
+        os.environ['IDMTOOLS_TEST_ENV_CONFIG'] = "!"
+        self.assertEqual(IdmConfigParser.get_option("test_env_config"), "!")
 
-        with self.assertRaises(ValueError) as context:
-            IdmConfigParser(file_name="idmtools_NotExist.ini")
-            IdmConfigParser.view_config_file()
-        self.assertIn('Config file NOT FOUND or IS Empty!', context.exception.args[0])
-
-    @skip_if_global_configuration_is_enabled
+    @run_in_temp_dir
     def test_no_idmtools_values(self):
-        IdmConfigParser(file_name="idmtools_NotExist.ini")
+        IdmConfigParser(file_name="idmtools.ini")
         max_workers = IdmConfigParser.get_option(None, 'max_workers')
         batch_size = IdmConfigParser.get_option(None, 'batch_size')
         self.assertIsNone(max_workers)

@@ -11,7 +11,6 @@ from logging import getLogger
 from threading import Lock
 from typing import List, Dict, Any, Type, TYPE_CHECKING, Optional
 from uuid import UUID, uuid4
-
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core import EntityStatus
 from idmtools.core.task_factory import TaskFactory
@@ -23,7 +22,7 @@ from idmtools.entities.simulation import Simulation
 from idmtools.utils.file import file_contents_to_generator
 from idmtools.utils.json import IDMJSONEncoder
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools_test.utils.test_execute_platform import TestExecutePlatform
 
 current_directory = os.path.dirname(os.path.realpath(__file__))

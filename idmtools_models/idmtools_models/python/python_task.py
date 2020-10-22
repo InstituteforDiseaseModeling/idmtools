@@ -2,7 +2,6 @@ import os
 from dataclasses import dataclass, field
 from logging import getLogger
 from typing import Set, List, Type, Union, TYPE_CHECKING
-
 from idmtools.assets import Asset, AssetCollection
 from idmtools.entities import CommandLine
 from idmtools.entities.itask import ITask
@@ -10,7 +9,7 @@ from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.simulation import Simulation
 from idmtools.registry.task_specification import TaskSpecification
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
 
 logger = getLogger(__name__)

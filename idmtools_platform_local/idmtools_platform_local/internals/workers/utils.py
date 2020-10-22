@@ -1,6 +1,6 @@
 import os
 from logging import getLogger
-
+from sqlalchemy import func
 from idmtools_platform_local.internals.data.job_status import JobStatus
 from idmtools_platform_local.internals.workers.database import get_session, get_or_create
 from idmtools_platform_local.status import Status
@@ -26,6 +26,7 @@ def create_or_update_status(uuid, data_path=None, tags=None, status=Status.creat
     if extra_details is not None:
         job_status.extra_details = extra_details
 
+    job_status.updated = func.now()
     session.add(job_status)
     if autocommit:
         session.commit()

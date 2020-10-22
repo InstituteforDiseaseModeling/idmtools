@@ -70,6 +70,43 @@ def run_test_in_n_seconds(n: int, print_elapsed_time: bool = False) -> Callable:
     return decorator
 
 
+def ensure_local_platform_running(silent=True, dump_logs=True, **kwargs):
+    from idmtools_platform_local.cli.utils import get_service_info
+    if silent:
+        os.environ['NO_SPINNER'] = '1'
+
+    opts = kwargs
+
+    def decorate(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            from idmtools.core.platform_factory import Platform
+            platform = Platform('Local', **opts)
+            if len(args):
+                args = list(args)
+                args.insert(1, platform)
+                args = tuple(args)
+            else:
+                args = (platform)
+            result = None
+            try:
+                result = func(*args, **kwargs)
+            except Exception:
+                raise
+            finally:
+                if dump_logs:
+                    try:
+                        info = get_service_info(sm, diff=False, logs=True)
+                        print(info)
+                    except:  # noqa E722
+                        pass
+            return result
+
+        return wrapper
+
+    return decorate
+
+
 def restart_local_platform(silent=True, stop_before=True, stop_after=True, dump_logs=True, *args, **kwargs):
     import docker
     client = docker.from_env()

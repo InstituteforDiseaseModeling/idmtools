@@ -7,7 +7,7 @@ from idmtools.assets import Asset, AssetCollection
 from idmtools.entities.itask import ITask
 from idmtools.entities.simulation import Simulation
 from idmtools.registry.task_specification import TaskSpecification
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
 
 TJSONConfigKeyType = Union[str, int, float]

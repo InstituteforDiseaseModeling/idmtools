@@ -4,8 +4,9 @@ from pathlib import Path
 import json
 import os
 from configparser import ConfigParser
-from logging import getLogger
+from logging import getLogger, DEBUG
 from typing import Any, Dict
+from idmtools.core import TRUTHY_VALUES
 from idmtools.utils.info import get_help_version_url
 
 default_config = 'idmtools.ini'
@@ -15,20 +16,10 @@ logger = getLogger(__name__)
 user_logger = getLogger('user')
 
 
-def initialization(error=False, force=False):
-    # store default value
-    oerror = error
-
+def initialization(force=False):
     def wrap(func):
         def wrapped_f(*args, **kwargs):
-            if 'error' in kwargs:
-                ferror = kwargs.pop('error')
-            elif os.getenv("IDMTOOLS_ERROR_NO_CONFIG", None) is not None:
-                user_logger.warning("Using IDMTOOLS_ERROR_NO_CONFIG environment variable to control behaviour of missing ini file")
-                ferror = os.getenv("IDMTOOLS_ERROR_NO_CONFIG").lower() in ["1", "y", "t", "true", "yes"]
-            else:
-                ferror = oerror
-            IdmConfigParser.ensure_init(error=ferror, force=force)
+            IdmConfigParser.ensure_init(force=force)
             value = func(*args, **kwargs)
             return value
 
@@ -57,9 +48,13 @@ class IdmConfigParser:
         Returns:
             An :class:`IdmConfigParser` instance.
         """
+
         if not cls._instance:
             cls._instance = super(IdmConfigParser, cls).__new__(cls)
             cls._instance._load_config_file(dir_path, file_name)
+            # Only error when a user overrides the filename for idmtools.ini
+            if (dir_path != "." or file_name != default_config) and not cls.found_ini():
+                raise ValueError(f"The configuration file {os.path.join(dir_path, file_name)} was not found!")
         return cls._instance
 
     @classmethod
@@ -169,7 +164,7 @@ class IdmConfigParser:
                 if os.path.exists(global_config):
                     ini_file = global_config
         if ini_file is None:
-            if os.environ.get('IDMTOOLS_NO_CONFIG_WARNING', None) is None:
+            if os.getenv("IDMTOOLS_NO_CONFIG_WARNING", "F").lower() not in TRUTHY_VALUES:
                 # We use print since logger isn't configured unless there is an override(cli)
                 print(f"/!\\ WARNING: File '{file_name}' Not Found! For details on how to configure idmtools, see {get_help_version_url('configuration.html')} for details on how to configure idmtools.")
             cls._init_logging()
@@ -187,18 +182,19 @@ class IdmConfigParser:
                 cls._config._sections[lowercase_version] = cls._config._sections[section]
 
         cls._init_logging()
-        user_logger.log(VERBOSE, "INI File Used: {}".format(ini_file))
+        if IdmConfigParser.get_option("NO_PRINT_CONFIG_USED", fallback="F").lower() not in TRUTHY_VALUES and IdmConfigParser.get_option("SUPPRESS_OUTPUT", fallback="F").lower() not in TRUTHY_VALUES:
+            user_logger.log(VERBOSE, "INI File Used: {}".format(ini_file))
 
     @classmethod
     def _init_logging(cls):
         from idmtools.core.logging import setup_logging
-        # setup logging
-        try:
-            log_config = cls.get_section('Logging')
-            valid_options = ['level', 'log_filename', 'console', "file_level"]
-            log_config = {k: v for k, v in log_config.items() if k in valid_options}
-        except ValueError:
-            log_config = dict(level='INFO', log_filename='idmtools.log', console='off', file_level='DEBUG')
+        # set up default log values
+        log_config = dict(level='INFO', filename='idmtools.log', console='off', file_level=None)
+        # try to fetch options from config file and from environment vars
+        for key in log_config.keys():
+            value = cls.get_option("logging", key, fallback=None)
+            if value is not None:
+                log_config[key] = value
         setup_logging(**log_config)
 
         if platform.system() == "Darwin":
@@ -211,7 +207,7 @@ class IdmConfigParser:
             user_logger.warning(f"You are using a development version of idmtools, version {__version__}!")
 
     @classmethod
-    @initialization(error=True)
+    @initialization()
     def get_section(cls, section: str = None, error: bool = True) -> Dict[str, str]:
         """
         Retrieve INI section values (call directly from platform creation).
@@ -226,12 +222,9 @@ class IdmConfigParser:
         Raises:
             ValueError: If the block doesn't exist
         """
-        if not cls.found_ini():
-            return {}
-
         original_case_section = section
         lower_case_section = section.lower()
-        if not cls.has_section(section=lower_case_section) and error:
+        if (not cls.found_ini() or not cls.has_section(section=lower_case_section)) and error:
             raise ValueError(f"Block '{original_case_section}' doesn't exist!")
 
         section_item = cls._config.items(lower_case_section)
@@ -239,18 +232,27 @@ class IdmConfigParser:
         return dict(section_item)
 
     @classmethod
-    @initialization(error=False)
-    def get_option(cls, section: str = None, option: str = None, force=False, fallback=None) -> str:
+    @initialization()
+    def get_option(cls, section: str = None, option: str = None, fallback=None, environment_first: bool = True) -> str:
         """
         Get configuration value based on the INI section and option.
 
         Args:
             section: The INI section name.
             option: The INI field name.
+            fallback: Fallback value
+            environment_first: Try to load from environment var first. Default to True. Environment variable names are in form IDMTOOLS_SECTION_OPTION
 
         Returns:
             A configuration value as a string.
         """
+        if environment_first:
+            evn_name = "_".join(filter(None, ["IDMTOOLS", section, option])).upper()
+            value = os.environ.get(evn_name, None)
+            if value:
+                if logger.isEnabledFor(DEBUG):
+                    logger.debug(f"Loaded option from environment var {evn_name}")
+                return value
         if not cls.found_ini():
             return fallback
 
@@ -262,11 +264,20 @@ class IdmConfigParser:
         if section:
             return cls._config.get(section, option, fallback=fallback)
         else:
-            return cls._config.get(cls._block, option, fallback=fallback)
+            return cls._config.get("COMMON", option, fallback=fallback)
 
     @classmethod
-    def ensure_init(cls, dir_path: str = '.', file_name: str = default_config, error: bool = False,
-                    force: bool = False) -> None:
+    def is_progress_bar_disabled(cls) -> bool:
+        """
+        Are progress bars disabled
+
+        Returns:
+            Return is progress bars should be enabled
+        """
+        return all([x.lower() in TRUTHY_VALUES for x in [IdmConfigParser.get_option(None, "DISABLE_PROGRESS_BAR", 'f')]])
+
+    @classmethod
+    def ensure_init(cls, dir_path: str = '.', file_name: str = default_config, force: bool = False) -> None:
         """
         Verify that the INI file loaded and a configparser instance is available.
 
@@ -274,7 +285,6 @@ class IdmConfigParser:
             dir_path: The directory to search for the INI configuration file.
             file_name: The configuration file name to search for.
             force: Force reload of everything
-            error: Throws error if idmtools.ini cannot be found
 
         Returns:
             None
@@ -288,11 +298,8 @@ class IdmConfigParser:
         if cls._instance is None:
             cls(dir_path, file_name)
 
-        if error and not cls.found_ini():
-            raise ValueError("Config file NOT FOUND or IS Empty!")
-
     @classmethod
-    @initialization(error=False)
+    @initialization()
     def get_config_path(cls) -> str:
         """
         Check which INI configuration file is being used.
@@ -303,7 +310,7 @@ class IdmConfigParser:
         return cls._config_path
 
     @classmethod
-    @initialization(error=True)
+    @initialization()
     def display_config_path(cls) -> None:
         """
         Display the INI file path being used.
@@ -314,7 +321,7 @@ class IdmConfigParser:
         user_logger.info(cls.get_config_path())
 
     @classmethod
-    @initialization(error=True)
+    @initialization()
     def view_config_file(cls) -> None:
         """
         Display the INI file being used.
@@ -322,11 +329,14 @@ class IdmConfigParser:
         Returns:
             None
         """
-        user_logger.info("View Config INI: \n{}".format(cls._config_path))
-        user_logger.info('-' * len(cls._config_path), '\n')
-        with open(cls._config_path) as f:
-            read_data = f.read()
-            user_logger.info(read_data)
+        if cls._config_path is None:
+            user_logger.warning("No configuration fouind")
+        else:
+            user_logger.info("View Config INI: \n{}".format(cls._config_path))
+            user_logger.info('-' * len(cls._config_path), '\n')
+            with open(cls._config_path) as f:
+                read_data = f.read()
+                user_logger.info(read_data)
 
     @classmethod
     def display_config_block_details(cls, block):
@@ -346,7 +356,7 @@ class IdmConfigParser:
             user_logger.log(VERBOSE, json.dumps(block_details, indent=3))
 
     @classmethod
-    @initialization(error=False)
+    @initialization()
     def has_section(cls, section: str) -> bool:
         """
         Does the config contain a section

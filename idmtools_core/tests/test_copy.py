@@ -1,10 +1,8 @@
 import copy
-
 import allure
 import os
 import unittest.mock
 from functools import partial
-
 import pytest
 from idmtools.assets import Asset
 from idmtools.core.platform_factory import Platform

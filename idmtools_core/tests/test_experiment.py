@@ -13,6 +13,7 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
+from idmtools_test.utils.utils import captured_output
 
 model_path = os.path.abspath(os.path.join("..", "..", "examples", "python_model", "inputs", "simple_python", "model.py"))
 
@@ -49,6 +50,13 @@ class TestAddingSimulationsToExistingExperiment(unittest.TestCase):
 
         self.assertTrue(exp.succeeded)
         self.assertEqual(10, len(exp.simulations))
+        with captured_output() as out:
+            exp.display()
+            self.assertIn(f"{exp.id} - JSONConfiguredPythonTask SimulationBuilder / Sim count 10", out[0].getvalue())
+            for i, sim in enumerate(exp.simulations):
+                if i > 4:
+                    break
+                self.assertIn(f"{sim.id} | - Run_Number:{sim.tags['Run_Number']}", out[0].getvalue())
 
     def test_empty_experiment_template(self):
         base_task = JSONConfiguredPythonTask(script_path=model_path, python_path=sys.executable)

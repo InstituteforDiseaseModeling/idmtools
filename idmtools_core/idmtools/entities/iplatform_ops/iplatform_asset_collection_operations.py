@@ -2,12 +2,11 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, List, Type, NoReturn, TYPE_CHECKING
 from uuid import UUID
-
 from idmtools.assets import AssetCollection
 from idmtools.core import CacheEnabled
 from idmtools.entities.iplatform_ops.utils import batch_create_items
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
 
 
@@ -93,7 +92,7 @@ class IPlatformAssetCollectionOperations(CacheEnabled, ABC):
             List of tuples containing the create object and id of item that was created
         """
         return batch_create_items(asset_collections, create_func=self.create, display_progress=display_progress,
-                                  progress_description="Uploading Assets", **kwargs)
+                                  progress_description="Uploading Assets", unit="asset collection", **kwargs)
 
     @abstractmethod
     def get(self, asset_collection_id: UUID, **kwargs) -> Any:

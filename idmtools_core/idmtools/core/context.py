@@ -2,7 +2,7 @@ from logging import getLogger
 from typing import TYPE_CHECKING
 
 logger = getLogger(__name__)
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     # The current platform
     from idmtools.entities.iplatform import IPlatform
 

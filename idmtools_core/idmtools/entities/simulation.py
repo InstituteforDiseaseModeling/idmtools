@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field, fields
 from logging import getLogger, DEBUG
 from typing import List, Union, Mapping, Any, Type, TypeVar, Dict, TYPE_CHECKING
-
 from idmtools.assets import AssetCollection, Asset
 from idmtools.core import ItemType, NoTaskFound
 from idmtools.core.enums import EntityStatus
@@ -11,7 +10,7 @@ from idmtools.core.interfaces.inamed_entity import INamedEntity
 from idmtools.entities.task_proxy import TaskProxy
 from idmtools.utils.language import get_qualified_class_name_from_obj
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.itask import ITask
     from idmtools.entities.iplatform import IPlatform
     from idmtools.entities.experiment import Experiment
@@ -35,6 +34,8 @@ class Simulation(IAssetsEnabled, INamedEntity):
     __replace_task_with_proxy: bool = field(default=True, init=False, compare=False)
     #: Ensure we don't gather assets twice
     __assets_gathered: bool = field(default=False)
+    #: Extra arguments to pass on creation to platform
+    _platform_kwargs: dict = field(default_factory=dict)
 
     @property
     def experiment(self) -> 'Experiment':  # noqa: F821

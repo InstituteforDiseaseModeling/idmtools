@@ -6,7 +6,7 @@ from idmtools.core.interfaces.inamed_entity import INamedEntity
 from idmtools.core import ItemType, EntityContainer
 from idmtools.core.interfaces.irunnable_entity import IRunnableEntity
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
     from idmtools.entities.experiment import Experiment
 

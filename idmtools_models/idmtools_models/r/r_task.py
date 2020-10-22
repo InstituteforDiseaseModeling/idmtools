@@ -11,7 +11,7 @@ from idmtools.registry.task_specification import TaskSpecification
 
 logger = getLogger(__name__)
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
 
 

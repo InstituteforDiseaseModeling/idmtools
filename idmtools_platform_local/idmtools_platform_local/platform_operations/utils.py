@@ -1,7 +1,7 @@
 from logging import getLogger, DEBUG
 from typing import TYPE_CHECKING, Generator
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools.core import EntityStatus
 
 logger = getLogger(__name__)

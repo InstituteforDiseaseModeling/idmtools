@@ -15,7 +15,7 @@ from idmtools.utils.file import scan_directory
 from idmtools.utils.filters.asset_filters import default_asset_file_filter
 from idmtools.utils.info import get_doc_base_url
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
 
 user_logger = getLogger('user')

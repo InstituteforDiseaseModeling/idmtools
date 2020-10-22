@@ -13,7 +13,7 @@ from idmtools.analysis.platform_anaylsis import PlatformAnalysis
 from idmtools.core.platform_factory import Platform
 from idmtools_test.utils.decorators import run_in_temp_dir
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-from idmtools.core import ItemType
+from idmtools.core import ItemType, TRUTHY_VALUES
 
 analyzer_path = os.path.join(os.path.dirname(__file__), "..", "inputs")
 sys.path.insert(0, analyzer_path)
@@ -35,7 +35,7 @@ pip install Assets/{comps_package_filename} --index-url=https://packages.idmod.o
 $*
 """
 # When enabled, ssmt tests will attempt to upload packages from local environment and install before run. You need to rebuild the the packages when code changes using pymake dist in the idmtools_core and ./idmtools_platform_comps directories
-test_with_new_code = os.environ.get("TEST_WITH_PACKAGES", 'n').lower() in ['1', 'y', 'yes', 't', 'true', 'on']
+test_with_new_code = os.environ.get("TEST_WITH_PACKAGES", 'n').lower() in TRUTHY_VALUES
 
 
 @functools.lru_cache(1)
@@ -90,9 +90,9 @@ class TestPlatformAnalysis(ITestWithPersistence):
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
         if test_with_new_code:
-            self.assertEqual(execution['Command'], f"/bin/bash {os.path.basename(wrapper)} python platform_analysis_bootstrap.py --experiment-ids {experiment_id} --analyzers simple_analyzer.SimpleAnalyzer --block {platform._config_block}")
+            self.assertEqual(execution['Command'], f"/bin/bash {os.path.basename(wrapper)} python3 platform_analysis_bootstrap.py --experiment-ids {experiment_id} --analyzers simple_analyzer.SimpleAnalyzer --block {platform._config_block}")
         else:
-            self.assertEqual(execution['Command'], f"python platform_analysis_bootstrap.py --experiment-ids {experiment_id} --analyzers simple_analyzer.SimpleAnalyzer --block {platform._config_block}")
+            self.assertEqual(execution['Command'], f"python3 platform_analysis_bootstrap.py --experiment-ids {experiment_id} --analyzers simple_analyzer.SimpleAnalyzer --block {platform._config_block}")
 
     @pytest.mark.smoke
     def test_ssmt_workitem_python_simple_analyzer_using_alias(self):
@@ -132,9 +132,9 @@ class TestPlatformAnalysis(ITestWithPersistence):
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
         if test_with_new_code:
-            self.assertEqual(execution['Command'], f"/bin/bash {os.path.basename(wrapper)} python platform_analysis_bootstrap.py --experiment-ids {experiment_id} --analyzers csv_analyzer.CSVAnalyzer --block COMPS2")
+            self.assertEqual(execution['Command'], f"/bin/bash {os.path.basename(wrapper)} python3 platform_analysis_bootstrap.py --experiment-ids {experiment_id} --analyzers csv_analyzer.CSVAnalyzer --block COMPS2")
         else:
-            self.assertEqual(execution['Command'], f"python platform_analysis_bootstrap.py --experiment-ids {experiment_id} --analyzers csv_analyzer.CSVAnalyzer --block COMPS2")
+            self.assertEqual(execution['Command'], f"python3 platform_analysis_bootstrap.py --experiment-ids {experiment_id} --analyzers csv_analyzer.CSVAnalyzer --block COMPS2")
 
     @pytest.mark.comps
     def test_ssmt_seir_model_analysis(self):
@@ -166,9 +166,9 @@ class TestPlatformAnalysis(ITestWithPersistence):
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
         if test_with_new_code:
-            self.assertEqual(execution['Command'], f"/bin/bash {os.path.basename(wrapper)} python platform_analysis_bootstrap.py --experiment-ids {exp_id} --analyzers infectiousness_csv_analyzer.InfectiousnessCSVAnalyzer,node_csv_analyzer.NodeCSVAnalyzer --block COMPS2")
+            self.assertEqual(execution['Command'], f"/bin/bash {os.path.basename(wrapper)} python3 platform_analysis_bootstrap.py --experiment-ids {exp_id} --analyzers infectiousness_csv_analyzer.InfectiousnessCSVAnalyzer,node_csv_analyzer.NodeCSVAnalyzer --block COMPS2")
         else:
-            self.assertEqual(execution['Command'], f"python platform_analysis_bootstrap.py --experiment-ids {exp_id} --analyzers infectiousness_csv_analyzer.InfectiousnessCSVAnalyzer,node_csv_analyzer.NodeCSVAnalyzer --block COMPS2")
+            self.assertEqual(execution['Command'], f"python3 platform_analysis_bootstrap.py --experiment-ids {exp_id} --analyzers infectiousness_csv_analyzer.InfectiousnessCSVAnalyzer,node_csv_analyzer.NodeCSVAnalyzer --block COMPS2")
 
     @pytest.mark.comps
     def test_ssmt_seir_model_analysis_single_script(self):
@@ -204,9 +204,9 @@ class TestPlatformAnalysis(ITestWithPersistence):
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
         if test_with_new_code:
-            self.assertEqual(execution['Command'], f"/bin/bash {os.path.basename(wrapper)} python platform_analysis_bootstrap.py --experiment-ids {exp_id} --analyzers custom_csv_analyzer.InfectiousnessCSVAnalyzer,custom_csv_analyzer.NodeCSVAnalyzer --block COMPS2")
+            self.assertEqual(execution['Command'], f"/bin/bash {os.path.basename(wrapper)} python3 platform_analysis_bootstrap.py --experiment-ids {exp_id} --analyzers custom_csv_analyzer.InfectiousnessCSVAnalyzer,custom_csv_analyzer.NodeCSVAnalyzer --block COMPS2")
         else:
-            self.assertEqual(execution['Command'], "python platform_analysis_bootstrap.py --experiment-ids " + exp_id + " --analyzers custom_csv_analyzer.InfectiousnessCSVAnalyzer,custom_csv_analyzer.NodeCSVAnalyzer --block COMPS2")
+            self.assertEqual(execution['Command'], "python3 platform_analysis_bootstrap.py --experiment-ids " + exp_id + " --analyzers custom_csv_analyzer.InfectiousnessCSVAnalyzer,custom_csv_analyzer.NodeCSVAnalyzer --block COMPS2")
 
     @pytest.mark.skipif(not os.path.exists(comps_local_package) or not os.path.exists(core_local_package), reason=f"To run this, you need both {comps_local_package} and {core_local_package}. You can create these files by running pymake dist in each package directory")
     def test_using_newest_code(self):
@@ -242,7 +242,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
         worker_order = json.load(open(os.path.join(file_path, "WorkOrder.json"), 'r'))
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
-        self.assertEqual(execution['Command'], f'/bin/bash {os.path.basename(wrapper)} python platform_analysis_bootstrap.py --experiment-ids {experiment_id} --analyzers simple_analyzer.SimpleAnalyzer --pre-run-func pre_load_func --block COMPS2')
+        self.assertEqual(execution['Command'], f'/bin/bash {os.path.basename(wrapper)} python3 platform_analysis_bootstrap.py --experiment-ids {experiment_id} --analyzers simple_analyzer.SimpleAnalyzer --pre-run-func pre_load_func --block COMPS2')
 
         with open(os.path.join(file_path, "stdout.txt"), 'r') as fin:
             stdout_contents = fin.read()

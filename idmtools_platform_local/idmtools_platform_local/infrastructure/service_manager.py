@@ -45,6 +45,7 @@ class DockerServiceManager:
     workers_mem_limit: str = None
     workers_mem_reservation: str = '64m'
     run_as: Optional[str] = field(default=None)
+    enable_singularity_support: bool = False
 
     _services: Dict[str, BaseServiceContainer] = None
 

@@ -1,5 +1,4 @@
 import datetime
-
 import sqlalchemy
 from sqlalchemy import Enum, Column, String, DateTime, func, Index
 from sqlalchemy.dialects.postgresql import JSON
@@ -21,7 +20,7 @@ class JobStatus(Base):
     tags = Column(JSON, default=[])
     extra_details = Column(JSON, default={})
     created = Column(DateTime(timezone=True), default=datetime.datetime.utcnow, server_default=func.now())
-    updated = Column(DateTime(timezone=True), onupdate=func.now())
+    updated = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
     def to_dict(self, as_experiment=True):
         result = {k: v for k, v in self.__dict__.items() if k[0] != "_"}

@@ -2,7 +2,6 @@ import logging
 import os
 from multiprocessing import cpu_count
 from typing import List
-
 import backoff
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
@@ -19,7 +18,7 @@ engine = None
 default_url = "postgresql+psycopg2://idmtools:idmtools@idmtools_postgres/idmtools"
 
 
-def create_db(engine):
+def create_db(engine):  # pragma: no cover
     from idmtools_platform_local.internals.data import Base
     logger.info("Creating database schema")
 
@@ -33,7 +32,7 @@ def create_db(engine):
     create_all()
 
 
-def get_session() -> Session:
+def get_session() -> Session:  # pragma: no cover
     global session_factory
     if session_factory is None:
         logger.debug('Connecting to postgres with URI %s', os.getenv('SQLALCHEMY_DATABASE_URI', default_url))
@@ -43,7 +42,7 @@ def get_session() -> Session:
     return session_factory()
 
 
-def get_db() -> Engine:
+def get_db() -> Engine:  # pragma: no cover
     global engine
     if engine is None:
         engine = create_engine(os.getenv('SQLALCHEMY_DATABASE_URI', default_url), echo=SQLALCHEMY_ECHO,
@@ -51,14 +50,14 @@ def get_db() -> Engine:
     return engine
 
 
-def reset_db():
+def reset_db():  # pragma: no cover
     global engine
     logger.debug("Resetting db")
     engine = None
     engine = get_db()
 
 
-def get_or_create(session: Session, model, filter_args: List[str], **model_args):
+def get_or_create(session: Session, model, filter_args: List[str], **model_args):  # pragma: no cover
     instance = session.query(model).filter_by(**{k: v for k, v in model_args.items() if k in filter_args}).first()
     if instance:
         return instance

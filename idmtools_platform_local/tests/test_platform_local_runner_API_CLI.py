@@ -5,9 +5,7 @@ import subprocess
 import unittest
 from functools import partial
 from operator import itemgetter
-
 import pytest
-
 from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment

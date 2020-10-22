@@ -22,8 +22,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.verbose:
         # enable verbose logging before we load idmtools
-        os.environ['IDM_TOOLS_DEBUG'] = '1'
-        os.environ['IDM_TOOLS_CONSOLE_LOGGING'] = '1'
+        os.environ['IDMTOOLS_LOGGING_LEVEL'] = 'DEBUG'
+        os.environ['IDMTOOLS_LOGGING_CONSOLE'] = '1'
 
     # delay loading idmtools so we can change log level through environment
     from idmtools.core import ItemType

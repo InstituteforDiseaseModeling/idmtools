@@ -26,26 +26,46 @@ class LocalPlatform(IPlatform):
     Represents the platform allowing to run simulations locally.
     """
 
+    #: Directory where data for local platform such as files and postgres data will be stored
     host_data_directory: str = field(default=get_data_directory(), metadata={"help": "Where to store the local platform files"})
+    #: Name of the docker network to use
     network: str = field(default='idmtools')
-    redis_image: str = field(default='redis:5.0.4-alpine')
+    #: What redis image should we use
+    redis_image: str = field(default='redis:5.0.9-alpine')
+    #: Port for redis to bind to
     redis_port: int = field(default=6379)
+    #: Runtime. Defaults to runc, but can be set to nvidia-docker
     runtime: Optional[str] = field(default=None)
+    #: Memory limit for redis
     redis_mem_limit: str = field(default='128m')
+    #: How much memory should redis preallocate
     redis_mem_reservation: str = field(default='64m')
-    postgres_image: str = field(default='postgres:11.4')
+    #: Postgres image to use
+    postgres_image: str = field(default='postgres:11.9')
+    #: Postgres memory limit
     postgres_mem_limit: str = field(default='64m')
+    #: How much memory should postgres reserve
     postgres_mem_reservation: str = field(default='32m')
+    #: What port should postgres listen to
     postgres_port: Optional[str] = field(default=5432)
+    #: Memory limit for workers
     workers_mem_limit: str = field(default='16g', metadata={"help": "Memory limits for the workers (16g = 16 Gigabytes)"})
+    #: How much memory should the workers pre-allocate
     workers_mem_reservation: str = field(default='128m')
+    #: Workers image to use. Defaults to version compatible with current idmtools version
     workers_image: str = field(default=None)
+    #: Workers UI port
     workers_ui_port: int = field(default=5000)
+    #: Heartbeat timeout
     heartbeat_timeout: int = field(default=15)
+    #: Default timeout when talking to local platform
     default_timeout: int = field(default=45, metadata={"help": "Timeout (in seconds) when communicating with the local platform"})
+    #: Launch experiments created in the browser
     launch_created_experiments_in_browser: bool = field(default=False)
-    # allows user to specify auto removal of docker worker containers
+    #: allows user to specify auto removal of docker worker containers
     auto_remove_worker_containers: bool = field(default=True)
+    #: Enables singularity support. This requires elevated privileges on docker and should only be used when using singularity within workflows. This feature is in BETA so it may be unstable
+    enable_singularity_support: bool = field(default=False)
 
     # We use this to manage our docker containers
     _sm: Optional[DockerServiceManager] = field(**op_defaults, repr=False, init=False)

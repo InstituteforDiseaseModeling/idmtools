@@ -6,7 +6,7 @@ from idmtools.entities.simulation import Simulation
 from idmtools.registry.task_specification import TaskSpecification
 from idmtools_models.json_configured_task import JSONConfiguredTask
 from idmtools_models.r.r_task import RTask
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
 
 

@@ -5,10 +5,8 @@ import requests
 from dataclasses import dataclass
 from logging import getLogger, DEBUG
 from typing import Dict
-
 from docker.errors import ImageNotFound
 from docker.models.containers import Container
-
 from idmtools.core.system_information import get_system_information
 from idmtools_platform_local.client.healthcheck_client import HealthcheckClient
 from idmtools_platform_local.infrastructure.base_service_container import BaseServiceContainer
@@ -50,6 +48,7 @@ class WorkersContainer(BaseServiceContainer):
     container_name: str = 'idmtools_workers'
     data_volume_name: str = os.getenv("IDMTOOLS_WORKERS_DATA_MOUNT_BY_VOLUMENAME", None)
     config_prefix: str = 'workers_'
+    enable_singularity_support: bool = False
 
     def __post_init__(self):
         system_info = get_system_information()
@@ -76,9 +75,11 @@ class WorkersContainer(BaseServiceContainer):
             docker_socket: dict(bind='/var/run/docker.sock', mode='rw')
         }
         environment = [f'REDIS_URL=redis://idmtools_redis:{self.redis_port}',
+                       'IDMTOOLS_NO_CONFIG_WARNING=1',
                        f'HOST_DATA_PATH={data_dir}',
-                       'SQLALCHEMY_DATABASE_URI='
-                       f'postgresql+psycopg2://idmtools:idmtools@idmtools_postgres:{self.postgres_port}/idmtools']
+                       f'SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://idmtools:idmtools@idmtools_postgres:{self.postgres_port}/idmtools',
+                       'IDMTOOLS_LOGGING_FILENAME=-1'  # disable logging to file in container
+                       ]
 
         if platform.system() in ["Linux", "Darwin"]:
             environment.append(f'CURRENT_UID={self.run_as}')
@@ -93,10 +94,11 @@ class WorkersContainer(BaseServiceContainer):
         container_config = self.get_common_config(container_name=self.container_name, image=self.image,
                                                   port_bindings=port_bindings, network=self.network,
                                                   mem_reservation=self.mem_reservation, volumes=worker_volumes,
-                                                  mem_limit=self.mem_limit, environment=environment,
+                                                  mem_limit=self.mem_limit, environment=environment, privileged=self.enable_singularity_support,
                                                   links=dict(idmtools_redis='redis', idmtools_postgres='postgres')
                                                   )
-
+        if self.enable_singularity_support:
+            container_config['cap_add'] = ['SYS_ADMIN']
         if logger.isEnabledFor(DEBUG):
             logger.debug(f"Worker Config: {container_config}")
         return container_config

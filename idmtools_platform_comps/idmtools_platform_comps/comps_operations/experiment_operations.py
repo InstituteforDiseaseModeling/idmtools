@@ -23,7 +23,7 @@ from idmtools.utils.info import get_doc_base_url
 from idmtools.utils.time import timestamp
 from idmtools_platform_comps.utils.general import clean_experiment_name, convert_comps_status
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools_platform_comps.comps_platform import COMPSPlatform
 
 logger = getLogger(__name__)
