@@ -414,6 +414,8 @@ class AnalyzeManager(CacheEnabled):
         # Before we initialize processes, ensure no warning about config are set
         if 'IDMTOOLS_NO_PRINT_CONFIG_USED' not in os.environ:
             os.environ['IDMTOOLS_NO_PRINT_CONFIG_USED'] = "1"
+            os.environ['IDMTOOLS_HIDE_DEV_WARNING'] = "1"
+            os.environ['IDMTOOLS_NO_CONFIG_WARNING'] = "1"
         else:
             no_print_config_exists = True
         # Create the worker pool
@@ -440,6 +442,8 @@ class AnalyzeManager(CacheEnabled):
 
         if not no_print_config_exists:
             del os.environ['IDMTOOLS_NO_PRINT_CONFIG_USED']
+            del os.environ['IDMTOOLS_HIDE_DEV_WARNING']
+            del os.environ['IDMTOOLS_NO_CONFIG_WARNING']
 
         if self.verbose:
             total_time = time.time() - start_time
