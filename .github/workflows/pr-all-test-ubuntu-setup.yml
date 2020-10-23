@@ -224,6 +224,7 @@ jobs:
         run: |
           pip install idm-buildtools flake8 wheel --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
       - name: Run setup-dev-no-docker
+        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
         run: |
           make setup-dev-no-docker
       - name: login to comps2
