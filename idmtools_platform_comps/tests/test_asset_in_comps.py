@@ -1,3 +1,4 @@
+import allure
 import json
 import os
 import unittest
@@ -19,11 +20,15 @@ from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id,
 
 @pytest.mark.comps
 @pytest.mark.assets
+@allure.story("COMPS")
+@allure.story("Assets")
+@allure.suite("idmtools_platform_comps")
 class TestAssetsInComps(unittest.TestCase):
 
     def setUp(self) -> None:
         self.base_path = os.path.abspath(os.path.join(COMMON_INPUT_PATH, "assets", "collections"))
         self.platform: COMPSPlatform = None
+        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         setup_test_with_platform_and_simple_sweep(self)
 
     def _run_and_test_experiment(self, experiment):

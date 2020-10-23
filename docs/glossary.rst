@@ -41,7 +41,7 @@ as information relevant to using |IT_s|.
         An iterative process in which simulations are run repeatedly using different values of the parameter(s) of choice. This process enables the modeler to determine what a parameter’s “best” value or range of values.
 
     platform
-        The computing resource on which the simulation runs. See :doc:`platforms` for
+        The computing resource on which the simulation runs. See :doc:`platforms/platforms` for
         more information on those that are currently supported. 
 
     simulation

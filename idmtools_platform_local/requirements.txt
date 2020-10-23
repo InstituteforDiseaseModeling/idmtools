@@ -1,10 +1,10 @@
 backoff~=1.10.0
 click~=7.0
-colorama~=0.4.1
+colorama~=0.4.4
 docker~=4.3.1
 dramatiq[redis, watch]~=1.9.0
-gevent~=20.6.2
-idmtools~=1.5.1
+gevent~=20.9.0
+idmtools~=1.6.0
 requests~=2.24.0
 stringcase~=1.2.0
 tabulate~=0.8.7

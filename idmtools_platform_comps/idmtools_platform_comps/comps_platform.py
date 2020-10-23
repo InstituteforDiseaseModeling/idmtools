@@ -3,9 +3,14 @@ import copy
 import json
 import logging
 # fix for comps weird import
-handlers = copy.copy(logging.getLogger().handlers)
+import os
+
+from idmtools.assets import AssetCollection
+from idmtools.entities.iworkflow_item import IWorkflowItem
+
+HANDLERS = copy.copy(logging.getLogger().handlers)
 from COMPS import Client
-logging.root.handlers = handlers
+logging.root.handlers = HANDLERS
 from dataclasses import dataclass, field
 from functools import partial
 from typing import List
@@ -34,8 +39,9 @@ class COMPSPriority(Enum):
 
 op_defaults = dict(default=None, compare=False, metadata=dict(pickle_ignore=True))
 
-supported_types = [PlatformRequirements.DOCKER, PlatformRequirements.PYTHON, PlatformRequirements.SHELL,
-                   PlatformRequirements.NativeBinary, PlatformRequirements.WINDOWS]
+# We use this to track os. It would be nice to do that in server
+SLURM_ENVS = ['calculon', 'slurmstage', "slurmdev"]
+supported_types = [PlatformRequirements.PYTHON, PlatformRequirements.SHELL, PlatformRequirements.NativeBinary]
 
 
 @dataclass(repr=False)
@@ -76,17 +82,26 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     _suites: CompsPlatformSuiteOperations = field(**op_defaults, repr=False, init=False)
     _workflow_items: CompsPlatformWorkflowItemOperations = field(**op_defaults, repr=False, init=False)
     _assets: CompsPlatformAssetCollectionOperations = field(**op_defaults, repr=False, init=False)
+    _skip_login: bool = field(default=False, repr=False)
 
     def __post_init__(self):
-        print("\nUser Login:")
-        print(json.dumps({"endpoint": self.endpoint, "environment": self.environment}, indent=3))
+        # check if we should do output. Mainly command line that want to be piped don't output this
+        if os.getenv('IDMTOOLS_SUPPRESS_OUTPUT', None) is None:
+            print("\nUser Login:")
+            print(json.dumps({"endpoint": self.endpoint, "environment": self.environment}, indent=3))
         self.__init_interfaces()
         self.supported_types = {ItemType.EXPERIMENT, ItemType.SIMULATION, ItemType.SUITE, ItemType.ASSETCOLLECTION,
                                 ItemType.WORKFLOW_ITEM}
         super().__post_init__()
+        # set platform requirements based on environment
+        if self.environment.lower() in SLURM_ENVS:
+            self._platform_supports.append(PlatformRequirements.LINUX)
+        else:
+            self._platform_supports.append(PlatformRequirements.WINDOWS)
 
     def __init_interfaces(self):
-        self._login()
+        if not self._skip_login:
+            self._login()
         self._experiments = CompsPlatformExperimentOperations(platform=self)
         self._simulations = CompsPlatformSimulationOperations(platform=self)
         self._suites = CompsPlatformSuiteOperations(platform=self)
@@ -101,3 +116,9 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
     def post_setstate(self):
         self.__init_interfaces()
+
+    def get_workitem_link(self, work_item: IWorkflowItem):
+        return f"{self.endpoint}/#explore/WorkItems?filters=ID={work_item.uid}"
+
+    def get_asset_collection_link(self, asset_collection: AssetCollection):
+        return f"{self.endpoint}/#explore/AssetCollections?filters=ID={asset_collection.uid}"

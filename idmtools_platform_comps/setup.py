@@ -10,7 +10,7 @@ with open('README.md', encoding='utf-8') as readme_file:
 with open('requirements.txt') as requirements_file:
     requirements = requirements_file.read().split("\n")
 
-build_requirements = ['flake8', 'coverage', 'py-make', 'bump2version', 'twine']
+build_requirements = ['flake8', 'coverage', 'bump2version', 'twine', "natsort"]
 test_requirements = ['pytest', 'pytest-runner', 'matplotlib', 'pytest-timeout', 'pytest-cache'] + build_requirements
 
 extras = dict(test=test_requirements, dev=['Pympler'], packaging=build_requirements)
@@ -42,11 +42,17 @@ setup(
     name='idmtools_platform_comps',
     packages=find_packages(),
     test_suite='tests',
-    entry_points=dict(idmtools_platform=  # noqa: E251
-                      ["idmtools_platform_comps = idmtools_platform_comps.plugin_info:COMPSPlatformSpecification",
-                       "idmtools_platform_ssmt = idmtools_platform_comps.plugin_info:SSMTPlatformSpecification"]
-                      ),
+
+    entry_points="""
+[idmtools_platform]
+idmtools_platform_comps = idmtools_platform_comps.plugin_info:COMPSPlatformSpecification
+idmtools_platform_ssmt = idmtools_platform_comps.plugin_info:SSMTPlatformSpecification
+[idmtools_cli.cli_plugins]
+comps_subcommand=idmtools_platform_comps.cli.comps:comps
+[console_scripts]
+comps-cli=idmtools_platform_comps.cli.comps:comps
+""",
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='1.5.1'
+    version='1.6.0'
 )

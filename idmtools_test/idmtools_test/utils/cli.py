@@ -31,7 +31,7 @@ def invoke_command(*args, start_command=None, mix_stderr: bool = True):
     return result
 
 
-def run_command(*args: List[str], start_command: List[str] = None, base_command: str = None, mix_stderr: bool = True) -> Result:
+def run_command(*args: str, start_command: List[str] = None, base_command: str = None, mix_stderr: bool = True) -> Result:
     if start_command is None:
         start_command = []
     if base_command:

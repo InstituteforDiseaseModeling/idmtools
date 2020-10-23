@@ -1,8 +1,8 @@
+import allure
 import os
 import sys
 from unittest import TestCase
 import pytest
-
 from idmtools.assets import Asset
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.command_task import CommandTask
@@ -14,13 +14,16 @@ from idmtools_test.utils.decorators import windows_only, linux_only
 
 @pytest.mark.tasks
 @pytest.mark.smoke
+@allure.story("Templated Script")
+@allure.suite("idmtools_models")
 class TestTemplatedScriptTask(TestCase):
 
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
 
-    def get_simplate_template(self):
+    @staticmethod
+    def get_simple_template():
         """"""
         simple_template = """
     ECHO OFF
@@ -37,7 +40,7 @@ class TestTemplatedScriptTask(TestCase):
         Returns:
 
         """
-        simple_template = self.get_simplate_template()
+        simple_template = self.get_simple_template()
         for is_common in [False, True]:
             task = TemplatedScriptTask(
                 script_path="example.bat",
@@ -47,7 +50,7 @@ class TestTemplatedScriptTask(TestCase):
             )
             task.gather_common_assets()
             task.gather_transient_assets()
-            task.pre_creation(None)
+            task.pre_creation(None, Platform("Test"))
 
             self.assertEqual(1 if is_common else 0, task.common_assets.count)
             self.assertEqual(0 if is_common else 1, task.transient_assets.count)
@@ -79,7 +82,7 @@ class TestTemplatedScriptTask(TestCase):
         wrapper_task = get_script_wrapper_windows_task(task, template_content=template)
         wrapper_task.gather_common_assets()
         wrapper_task.gather_transient_assets()
-        wrapper_task.pre_creation(None)
+        wrapper_task.pre_creation(None, Platform("Test"))
 
         self.assertEqual(1, wrapper_task.common_assets.count)
         self.assertEqual(0, wrapper_task.transient_assets.count)
@@ -90,6 +93,8 @@ class TestTemplatedScriptTask(TestCase):
         self.assertTrue(str(wrapper_task.command).endswith(cmd))
 
     @windows_only
+    @pytest.mark.timeout(20)
+    @pytest.mark.serial
     def test_wrapper_script_execute(self):
         """
         This tests The ScriptWrapperScriptTask as well as the TemplatedScriptTask
@@ -120,7 +125,7 @@ echo Hello
                         # check for echo
                         self.assertIn('Hello', content)
                         # check for python path
-                        self.assertIn(f'{os.getcwd()}\\Assets\\;', content)
+                        self.assertIn(os.path.join(os.getcwd(), ".test_platform", experiment.id, sim.id, 'Assets'), content)
 
             with self.subTest("test_wrapper_script_execute_wrapper_reload"):
                 experiment_reload = Experiment.from_id(experiment.uid, load_task=True)
@@ -134,6 +139,8 @@ echo Hello
                 self.assertIn("wrapper.bat", str(task.command))
 
     @linux_only
+    @pytest.mark.timeout(20)
+    @pytest.mark.serial
     def test_wrapper_script_execute_linux(self):
         """
         This tests The ScriptWrapperScriptTask as well as the TemplatedScriptTask
@@ -144,9 +151,8 @@ echo Hello
         """
         cmd = f"\"{sys.executable}\" -c \"import os; print(os.environ)\""
         task = CommandTask(cmd)
-
         with Platform("TestExecute", missing_ok=True, default_missing=dict(type='TestExecute')):
-            wrapper_task = get_script_wrapper_unix_task(task)
+            wrapper_task = get_script_wrapper_unix_task(task, template_content=LINUX_PYTHON_PATH_WRAPPER)
             experiment = Experiment.from_task(wrapper_task, name=self.case_name)
             experiment.run(wait_until_done=True)
             self.assertTrue(experiment.succeeded)
@@ -159,7 +165,7 @@ echo Hello
                         # check for echo
                         self.assertIn('Running', content)
                         # check for python path
-                        self.assertIn(f'{os.getcwd()}/Assets:', content)
+                        self.assertIn(f'{os.path.join(os.getcwd(), ".test_platform", experiment.id, sim.id)}/Assets', content)
 
             with self.subTest("test_wrapper_script_execute_wrapper_reload"):
                 experiment_reload = Experiment.from_id(experiment.uid, load_task=True)
@@ -173,6 +179,7 @@ echo Hello
                 self.assertIn("wrapper.sh", str(task.command))
 
     @pytest.mark.comps
+    @pytest.mark.timeout(60)
     def test_wrapper_script_execute_comps(self):
         """
         This tests The ScriptWrapperScriptTask as well as the TemplatedScriptTask

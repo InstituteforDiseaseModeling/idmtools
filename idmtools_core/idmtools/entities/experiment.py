@@ -4,26 +4,25 @@ from dataclasses import dataclass, field, InitVar, fields
 from logging import getLogger, DEBUG
 from types import GeneratorType
 from typing import NoReturn, Set, Union, Iterator, Type, Dict, Any, List, TYPE_CHECKING, Generator
-
-from tqdm import tqdm
-
+from idmtools import IdmConfigParser
 from idmtools.assets import AssetCollection, Asset
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType, EntityStatus
 from idmtools.core.interfaces.entity_container import EntityContainer
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
+from idmtools.core.interfaces.iitem import IItem
 from idmtools.core.interfaces.inamed_entity import INamedEntity
+from idmtools.core.interfaces.irunnable_entity import IRunnableEntity
 from idmtools.core.logging import SUCCESS, NOTICE
 from idmtools.entities.itask import ITask
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.templated_simulation import TemplatedSimulations
-from idmtools.registry.experiment_specification import ExperimentPluginSpecification, get_model_impl, \
-    get_model_type_impl
+from idmtools.registry.experiment_specification import ExperimentPluginSpecification, get_model_impl, get_model_type_impl
 from idmtools.registry.plugin_specification import get_description_impl
 from idmtools.utils.collections import ExperimentParentIterator
 from idmtools.utils.entities import get_default_tags
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
     from idmtools.entities.simulation import Simulation  # noqa: F401
 
@@ -38,7 +37,7 @@ SUPPORTED_SIM_TYPE = Union[
 
 
 @dataclass(repr=False)
-class Experiment(IAssetsEnabled, INamedEntity):
+class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
     """
     Class that represents a generic experiment.
     This class needs to be implemented for each model type with specifics.
@@ -78,8 +77,8 @@ class Experiment(IAssetsEnabled, INamedEntity):
             self.gather_common_assets_from_task = isinstance(self.simulations.items, EntityContainer)
         self.__simulations.parent = self
 
-    def post_creation(self) -> None:
-        pass
+    def post_creation(self, platform: 'IPlatform') -> None:
+        IItem.post_creation(self, platform)
 
     @property
     def status(self):
@@ -130,11 +129,12 @@ class Experiment(IAssetsEnabled, INamedEntity):
         from idmtools.utils.display import display, experiment_table_display
         display(self, experiment_table_display)
 
-    def pre_creation(self, gather_assets=True) -> None:
+    def pre_creation(self, platform: 'IPlatform', gather_assets=True) -> None:
         """
         Experiment pre_creation callback
 
         Args:
+            platform: Platform experiment is being created on
             gather_assets: Determines if an experiment will try to gather the common assets or defer. It most cases, you want this enabled but when modifying existing experiments you may want to disable if there are new assets and the platform has performance hits to determine those assets
 
         Returns:
@@ -151,6 +151,8 @@ class Experiment(IAssetsEnabled, INamedEntity):
         # if it is a template, set task type on experiment
         if gather_assets:
             if isinstance(self.simulations.items, TemplatedSimulations):
+                if len(self.simulations.items) == 0:
+                    raise ValueError("You cannot run an empty experiment")
                 if logger.isEnabledFor(DEBUG):
                     logger.debug("Using Base task from template for experiment level assets")
                 self.simulations.items.base_task.gather_common_assets()
@@ -161,18 +163,25 @@ class Experiment(IAssetsEnabled, INamedEntity):
                     task_class = self.simulations.items.base_task.__class__
                     self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
             elif self.gather_common_assets_from_task and isinstance(self.simulations.items, List):
+                if len(self.simulations.items) == 0:
+                    raise ValueError("You cannot run an empty experiment")
                 if logger.isEnabledFor(DEBUG):
                     logger.debug("Using first task for task type")
                     logger.debug("Using all tasks to gather assts")
                 task_class = self.__simulations[0].task.__class__
                 self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
-                pbar = tqdm(self.__simulations, desc="Discovering experiment assets from tasks")
+                pbar = self.__simulations
+                if not IdmConfigParser.is_progress_bar_disabled():
+                    from tqdm import tqdm
+                    pbar = tqdm(self.__simulations, desc="Discovering experiment assets from tasks", unit="simulation")
                 for sim in pbar:
                     # don't gather assets from simulations that have been provisioned
                     if sim.status is None:
                         assets = sim.task.gather_common_assets()
                         if assets is not None:
                             self.assets.add_assets(assets, fail_on_duplicate=True, fail_on_deep_comparison=True)
+            elif isinstance(self.simulations.items, List) and len(self.simulations.items) == 0:
+                raise ValueError("You cannot run an empty experiment")
 
         self.tags.update(get_default_tags())
 
@@ -385,7 +394,7 @@ class Experiment(IAssetsEnabled, INamedEntity):
         p = super()._check_for_platform_from_context(platform)
         return p._experiments.list_assets(self, children, **kwargs)
 
-    def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None, regather_common_assets: bool = None,
+    def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None, regather_common_assets: bool = None, wait_on_done_progress: bool = True, wait_on_done: bool = False,
             **run_opts) -> NoReturn:
         """
         Runs an experiment on a platform
@@ -395,6 +404,8 @@ class Experiment(IAssetsEnabled, INamedEntity):
             platform: Platform object to use. If not specified, we first check object for platform object then the current context
             regather_common_assets: Triggers gathering of assets for *existing* experiments. If not provided, we use the platforms default behaviour. See platform details for performance implications of this. For most platforms, it should be ok but for others, it could decrease performance when assets are not changing.
               It is important to note that when using this feature, ensure the previous simulations have finished provisioning. Failure to do so can lead to unexpected behaviour
+            wait_on_done_progress: Should experiment status be shown when waiting
+            wait_on_done: extra name for backward compatibility for wait_until_done
             **run_opts: Options to pass to the platform
 
         Returns:
@@ -411,30 +422,8 @@ class Experiment(IAssetsEnabled, INamedEntity):
             user_logger.warning("You are modifying and existing experiment by using a template without gathering common assets. Ensure your Template configuration is the same as existing experiments or enable gathering of new common assets through regather_common_assets.")
         run_opts['regather_common_assets'] = regather_common_assets
         p.run_items(self, **run_opts)
-        if wait_until_done:
-            self.wait()
-
-    def wait(self, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None):
-        """
-        Wait on an experiment to finish running
-
-        Args:
-            timeout: Timeout to wait
-            refresh_interval: How often to refresh object
-            platform: Platform. If not specified, we try to determine this from context
-
-        Returns:
-
-        """
-        if self.status not in [EntityStatus.CREATED, EntityStatus.RUNNING]:
-            raise ValueError("The experiment cannot be waited for if it is not in Running/Created state")
-        opts = dict()
-        if timeout:
-            opts['timeout'] = timeout
-        if refresh_interval:
-            opts['refresh_interval'] = refresh_interval
-        p = super()._check_for_platform_from_context(platform)
-        p.wait_till_done_progress(self, **opts)
+        if wait_until_done or wait_on_done:
+            self.wait(wait_on_done_progress=wait_on_done_progress)
 
     def to_dict(self):
         result = dict()

@@ -1,3 +1,7 @@
+import difflib
+import io
+import json
+import tarfile
 import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -10,6 +14,7 @@ from docker import DockerClient
 from docker.models.containers import Container
 
 logger = getLogger(__name__)
+user_logger = getLogger('user')
 
 
 @dataclass
@@ -104,11 +109,10 @@ class BaseServiceContainer(ABC):
                 logger.debug(f"Creating {self.__class__.__name__}")
             container = self.create(spinner)
         else:
-            self.ensure_container_is_running(container)
+            self.ensure_container_is_running(container, spinner)
         return container
 
-    @staticmethod
-    def ensure_container_is_running(container: Container) -> Container:
+    def ensure_container_is_running(self, container: Container, spinner=None) -> Container:
         """
         Ensures is running
         Args:
@@ -121,7 +125,69 @@ class BaseServiceContainer(ABC):
             logger.debug(f"Restarting container: {container.name}")
             container.start()
             container.reload()
+        else:
+            # validate config matched what we expect
+            if self.has_different_config(container):
+                self.stop(remove=True, container=container)
+                container = self.create(spinner)
         return container
+
+    def has_different_config(self, container, show_diff: bool = True):
+        """
+        Detect if the config is difference that running container
+
+        Args:
+            container: Container
+            show_diff: Should we diplay diff
+
+        Returns:
+
+        """
+        running_config = self.get_running_config(container)
+        current_config = json.dumps(self.get_configuration(), indent=4, sort_keys=True)
+        if current_config != running_config:
+            if show_diff:
+                lines = difflib.unified_diff(running_config.split("\n"), current_config.split("\n"))
+                user_logger.info(f"Configuration changed for {self.container_name}\n")
+                user_logger.info("\n".join(lines))
+            return True
+        return False
+
+    def get_running_config(self, container):
+        """
+        Fetches the config used to start a container
+        Args:
+            container:
+
+        Returns:
+
+        """
+        stream, stat = container.get_archive("/local_config.json")
+        file_obj = io.BytesIO()
+        for i in stream:
+            file_obj.write(i)
+        file_obj.seek(0)
+        tar = tarfile.open(mode='r', fileobj=file_obj)
+        running_config = tar.extractfile('local_config.json').read().decode("utf-8")
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f"Running Config for {self.container_name}.\n{running_config}")
+        return running_config
+
+    @staticmethod
+    def copy_config_to_container(container: Container, config: dict):
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Copying config used to create container to container")
+        file_like_object = io.BytesIO(initial_bytes=json.dumps(config, indent=4, sort_keys=True).encode('utf-8'))
+        tar_memory = io.BytesIO()
+        tar = tarfile.open(fileobj=tar_memory, mode='w')
+        try:
+            ti = tarfile.TarInfo('local_config.json')
+            ti.size = len(file_like_object.getvalue())
+            tar.addfile(ti, file_like_object)
+        finally:
+            tar.close()
+        tar_memory.seek(0)
+        container.put_archive("/", tar_memory.read())
 
     def create(self, spinner=None) -> Container:
         retries = 0
@@ -138,6 +204,7 @@ class BaseServiceContainer(ABC):
                 logger.debug(f'{self.container_name}: {container.status}: {container.id}')
                 if container.status in ['failed']:
                     raise EnvironmentError(f"Could not start {self.__class__.__name__}")
+                self.copy_config_to_container(container, container_config)
                 return container
             except APIError as e:
                 retries += 1
@@ -189,15 +256,17 @@ class BaseServiceContainer(ABC):
             time.sleep(sleep_interval)
             container.reload()
 
-    def stop(self, remove=False):
-        container = self.get()
+    def stop(self, remove=False, container: Container = None):
+        if container is None:
+            container = self.get()
         if container:
             container.stop()
             if remove:
                 container.remove()
 
-    def restart(self):
-        container = self.get()
+    def restart(self, container: Container = None):
+        if container is None:
+            container = self.get()
         if container:
             container.restart()
 

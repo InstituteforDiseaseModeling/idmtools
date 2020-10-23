@@ -1,0 +1,306 @@
+# run setup-dev to install packages and run smoke test
+# trigger by push or pull_request with commit message: "Run smoke test!"
+
+name: "pr-all-test-ubuntu-setup"
+on: [pull_request]
+
+jobs:
+  pr-test-core-linux:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [self-linux]
+        python-version: ['3.6.x', '3.7.x', '3.8.x']
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          base: dev
+          filters: |
+            core:
+              - 'idmtools_core/**'
+            cli:
+              - 'idmtools_cli/**'
+            models:
+              - 'idmtools_models/**'
+            comps:
+              - 'idmtools_platform_comps/**'
+            local:
+              - 'idmtools_platform_local/**'
+      - uses: actions/cache@v2
+        if: steps.filter.outputs.core == 'true'
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/*_requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
+        if: steps.filter.outputs.core == 'true'
+        uses: actions/setup-python@v2.1.4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Python dependencies
+        if: steps.filter.outputs.core == 'true'
+        run: |
+          pip install idm-buildtools flake8 wheel --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+      - name: Run setup-dev-no-docker
+        # only run if core, local, models wasn't changed
+        if: steps.filter.outputs.core == 'true'
+        run: |
+          make setup-dev-no-docker
+      - name: login to comps2
+        if: steps.filter.outputs.core == 'true'
+        run: |
+          python dev_scripts/create_auth_token_args.py --username $COMPS_USER --password $COMPS_PASSWORD
+      - name: run idmtools_core smoke tests
+        # only run if core changed
+        if: steps.filter.outputs.core == 'true'
+        run: |
+          cd idmtools_core
+          make test-all
+      - name: Upload idmtools_core smoke test results
+        uses: actions/upload-artifact@v2
+        if: failure() && steps.filter.outputs.core == 'true'
+        with:
+          name: idmtools_core_test_results
+          path: idmtools_core/tests/reports/
+  pr-test-cli-linux:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ self-linux ]
+        python-version: [ 3.6.12, 3.7.9, 3.8.6 ]
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          base: dev
+          filters: |
+            core:
+              - 'idmtools_core/**'
+            cli:
+              - 'idmtools_cli/**'
+      - uses: actions/cache@v2
+        if: steps.filter.outputs.core == 'true' ||  steps.filter.outputs.cli == 'true'
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/*_requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
+        if: steps.filter.outputs.core == 'true' ||  steps.filter.outputs.cli == 'true'
+        uses: actions/setup-python@v2.1.4
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+      - name: Install Python dependencies
+        if: steps.filter.outputs.core == 'true' ||  steps.filter.outputs.cli == 'true'
+        run: |
+          pip install idm-buildtools flake8 wheel --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+      - name: Run setup-dev-no-docker
+        if: steps.filter.outputs.core == 'true' ||  steps.filter.outputs.cli == 'true'
+        run: |
+          make setup-dev-no-docker
+      - name: login to comps2
+        if: steps.filter.outputs.core == 'true' ||  steps.filter.outputs.cli == 'true'
+        run: |
+          python dev_scripts/create_auth_token_args.py --username $COMPS_USER --password $COMPS_PASSWORD
+      - name: run idmtools_cli smoke tests
+        # only run if core or cli changed
+        if: steps.filter.outputs.core == 'true' ||  steps.filter.outputs.cli == 'true'
+        run: |
+          cd idmtools_cli
+          make test-all
+      - name: Upload idmtools_cli smoke test results
+        uses: actions/upload-artifact@v2
+        if: failure() && (steps.filter.outputs.core == 'true' ||  steps.filter.outputs.cli == 'true')
+        with:
+          name: idmtools_cli_test_results
+          path: idmtools_cli/tests/reports/
+  pr-test-models-linux:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ self-linux ]
+        python-version: [ 3.6.12, 3.7.9, 3.8.6 ]
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          base: dev
+          filters: |
+            core:
+              - 'idmtools_core/**'
+            cli:
+              - 'idmtools_cli/**'
+            models:
+              - 'idmtools_models/**'
+            comps:
+              - 'idmtools_platform_comps/**'
+            local:
+              - 'idmtools_platform_local/**'
+      - uses: actions/cache@v2
+        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.models == 'true'
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/*_requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2.1.4
+        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.models == 'true'
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+      - name: Install Python dependencies
+        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.models == 'true'
+        run: |
+          pip install idm-buildtools flake8 wheel --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+      - name: Run setup-dev-no-docker
+        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.models == 'true'
+        run: |
+          make setup-dev-no-docker
+      - name: login to comps2
+        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.models == 'true'
+        run: |
+          python dev_scripts/create_auth_token_args.py --username $COMPS_USER --password $COMPS_PASSWORD
+      - name: run idmtools_models tests
+        # only run if core changed
+        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.models == 'true'
+        run: |
+          cd idmtools_models
+          make test-all
+      - name: Upload idmtools_models smoke test results
+        uses: actions/upload-artifact@v2
+        if: failure() && (steps.filter.outputs.core == 'true' || steps.filter.outputs.models == 'true')
+        with:
+          name: idmtools_models_test_results
+          path: idmtools_models/tests/results/
+  pr-test-comps-linux:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ self-linux ]
+        python-version: [ 3.6.12, 3.7.9, 3.8.6 ]
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          base: dev
+          filters: |
+            core:
+              - 'idmtools_core/**'
+            cli:
+              - 'idmtools_cli/**'
+            models:
+              - 'idmtools_models/**'
+            comps:
+              - 'idmtools_platform_comps/**'
+            local:
+              - 'idmtools_platform_local/**'
+      - uses: actions/cache@v2
+        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/*_requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
+        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
+        uses: actions/setup-python@v2.1.4
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+      - name: Install Python dependencies
+        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
+        run: |
+          pip install idm-buildtools flake8 wheel --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+      - name: Run setup-dev-no-docker
+        run: |
+          make setup-dev-no-docker
+      - name: login to comps2
+        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
+        run: |
+          python dev_scripts/create_auth_token_args.py --username $COMPS_USER --password $COMPS_PASSWORD
+      - name: run idmtools_platform_comps tests
+        # only run if core, comps, or models changed
+        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
+        run: |
+          cd idmtools_platform_comps
+          make test-all
+      - name: Upload idmtools_platform_comps test results
+        uses: actions/upload-artifact@v2
+        if: failure() && (steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true')
+        with:
+          name: idmtools_platform_comps_test_results
+          path: idmtools_platform_comps/tests/results/
+  pr-test-local-linux:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ self-docker ]
+        python-version: [ 3.6.12, 3.7.9, 3.8.6 ]
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          base: dev
+          filters: |
+            core:
+              - 'idmtools_core/**'
+            cli:
+              - 'idmtools_cli/**'
+            models:
+              - 'idmtools_models/**'
+            comps:
+              - 'idmtools_platform_comps/**'
+            local:
+              - 'idmtools_platform_local/**'
+      - uses: actions/cache@v2
+        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/*_requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
+        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
+        uses: actions/setup-python@v2.1.4
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+      - name: Install Python dependencies
+        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
+        run: |
+          pip install idm-buildtools flake8 wheel --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+      - name: Run setup-dev
+        # only run if full install for core, local changes, or models
+        if: steps.filter.outputs.core == 'true' ||  steps.filter.outputs.local == 'true' ||  steps.filter.outputs.models == 'true'
+        run: |
+          make setup-dev
+      - name: login to comps2
+        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
+        run: |
+          python dev_scripts/create_auth_token_args.py --username $COMPS_USER --password $COMPS_PASSWORD
+      - name: run idmtools_platform_local smoke tests
+        # only run if core and comps changed
+        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.local == 'true' || steps.filter.outputs.models == 'true'
+        run: |
+          cd idmtools_platform_local
+           make test-all
+      - name: Upload idmtools_platform_local smoke test results
+        uses: actions/upload-artifact@v2
+        if: failure() && (steps.filter.outputs.core == 'true' || steps.filter.outputs.local == 'true' || steps.filter.outputs.models == 'true')
+        with:
+          name: idmtools_platform_local_test_results
+          path: idmtools_platform_local/tests/results/

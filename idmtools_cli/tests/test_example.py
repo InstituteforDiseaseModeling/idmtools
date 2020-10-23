@@ -1,13 +1,18 @@
+import allure
 import os
 import unittest
-
 import pytest
 from click.testing import CliRunner
+os.environ['IDMTOOLS_LOGGING_USER_PRINT'] = '1'
+os.environ['IDMTOOLS_HIDE_DEV_WARNING'] = '1'
 from idmtools_cli.cli.gitrepo import gitrepo, get_plugins_examples, validate
 from idmtools_test.utils.cli import get_subcommands_from_help_result, run_command
 
 
 @pytest.mark.smoke
+@allure.story("CLI")
+@allure.story("Examples Command")
+@allure.suite("idmtools_cli")
 class TestExample(unittest.TestCase):
 
     def setUp(self) -> None:
@@ -49,7 +54,7 @@ class TestExample(unittest.TestCase):
         # because of weirdness in testing, the log output even when set to stdout appears as stderr. We workaround by capturing both independently
         result = run_command('gitrepo', 'repos', mix_stderr=False)
         # Check for special public repo
-        self.assertIn('https://github.com/InstituteforDiseaseModeling/EMOD', result.stderr)
+        self.assertIn('https://github.com/InstituteforDiseaseModeling/EMOD', result.stdout)
 
     def test_validate(self):
         choice_set = {1, 2, 3, 4, 5, 6, 7, 8, 'all'}

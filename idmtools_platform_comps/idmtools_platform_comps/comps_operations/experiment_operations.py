@@ -23,7 +23,7 @@ from idmtools.utils.info import get_doc_base_url
 from idmtools.utils.time import timestamp
 from idmtools_platform_comps.utils.general import clean_experiment_name, convert_comps_status
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools_platform_comps.comps_platform import COMPSPlatform
 
 logger = getLogger(__name__)
@@ -76,7 +76,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
     def platform_create(self, experiment: Experiment, num_cores: Optional[int] = None,
                         executable_path: Optional[str] = None,
                         command_arg: Optional[str] = None, priority: Optional[str] = None,
-                        check_command: bool = True, **kwargs) -> COMPSExperiment:
+                        check_command: bool = True, use_short_path: bool = False, **kwargs) -> COMPSExperiment:
         """
         Create Experiment on the COMPS Platform
 
@@ -87,6 +87,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             command_arg: Command Argument
             priority: Priority of command
             check_command: Run task hooks on item
+            use_short_path: When set to true, simulation roots will be set to "$COMPS_PATH(USER)
             **kwargs: Keyword arguments used to expand functionality. At moment these are usually not used
 
         Returns:
@@ -100,12 +101,12 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         # Define the subdirectory
         subdirectory = experiment.name[0:self.platform.MAX_SUBDIRECTORY_LENGTH] + '_' + timestamp()
 
-        if experiment.name != "install custom requirements":
-            simulation_root = self.platform.simulation_root
-        else:
-            index = self.platform.simulation_root.rindex('\\')
-            simulation_root = self.platform.simulation_root[0:index]    # shorten simulation_root
+        if use_short_path:
+            logger.debug("Setting Simulation Root to $COMPS_PATH(USER)")
+            simulation_root = "$COMPS_PATH(USER)"
             subdirectory = 'rac' + '_' + timestamp()    # also shorten subdirectory
+        else:
+            simulation_root = self.platform.simulation_root
 
         # Get the experiment command line
         exp_command: CommandLine = self._get_experiment_command_line(check_command, experiment)
@@ -169,7 +170,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
                 if not regather_common_assets:
                     user_logger.warning(
                         f"Not gathering common assets again since experiment exists on platform. If you need to add additional common assets, see {get_doc_base_url()}cookbook/asset_collections.html#modifying-asset-collection")
-                experiment.pre_creation(regather_common_assets)
+                experiment.pre_creation(self.platform, gather_assets=regather_common_assets)
                 self.send_assets(experiment)
         return experiment
 
@@ -194,7 +195,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             if check_command:
                 task = platform_task_hooks(sim.task, self.platform)
             # run pre-creation in case task use it to produce the command line dynamically
-            task.pre_creation(sim)
+            task.pre_creation(sim, self.platform)
             exp_command = task.command
         elif isinstance(experiment.simulations, ExperimentParentIterator) and isinstance(experiment.simulations.items,
                                                                                          TemplatedSimulations):
@@ -205,7 +206,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             if check_command:
                 task = platform_task_hooks(task, self.platform)
             # run pre-creation in case task use it to produce the command line dynamically
-            task.pre_creation(Simulation(task=task))
+            task.pre_creation(Simulation(task=task), self.platform)
             exp_command = task.command
         else:
             if logger.isEnabledFor(DEBUG):
@@ -214,14 +215,15 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             if check_command:
                 task = platform_task_hooks(task, self.platform)
             # run pre-creation in case task use it to produce the command line dynamically
-            task.pre_creation(experiment.simulations[0])
+            task.pre_creation(experiment.simulations[0], self.platform)
             exp_command = task.command
         return exp_command
 
     def post_create(self, experiment: Experiment, **kwargs) -> NoReturn:
-        user_logger.log(SUCCESS, f"\nThe created experiment can be viewed at {self.platform.endpoint}/#explore/"
-                                 f"Simulations?filters=ExperimentId={experiment.uid}\nSimulations are still being created\n"
-                        )
+        if os.getenv('IDMTOOLS_SUPPRESS_OUTPUT', None) is None:
+            user_logger.log(SUCCESS, f"\nThe created experiment can be viewed at {self.platform.endpoint}/#explore/"
+                                     f"Simulations?filters=ExperimentId={experiment.uid}\nSimulations are still being created\n"
+                            )
 
     def post_run_item(self, experiment: Experiment, **kwargs):
         """

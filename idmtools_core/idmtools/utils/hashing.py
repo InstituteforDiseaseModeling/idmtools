@@ -163,7 +163,6 @@ def calculate_md5(filename: str, chunk_size: int = 8192) -> str:
 
     """
     with open(filename, "rb") as f:
-
         return calculate_md5_stream(f, chunk_size)
 
 

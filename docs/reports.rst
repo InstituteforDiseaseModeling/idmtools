@@ -7,11 +7,11 @@ configuration of the model itself. |IT_s| is itself agnostic to the output
 format when running simulations.  However, the analysis framework expects
 simulation output in CSV, JSON, XLSX, or TXT to be automatically loaded to a
 Python object. All other formats are loaded as a raw binary stream. For more
-information, see :doc:`analyzers`. 
+information, see :doc:`analyzers/analyzers`.
 
 If you are running simulations on |COMPS_s|, the configuration of the
 ``idmtools.ini`` file will determine where output files can be found. 
-For more information, see :doc:`wizard` 
+For more information, see :doc:`cli/wizard`
 
 .. include:: reuse/comps_note.txt
 

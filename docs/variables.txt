@@ -18,7 +18,6 @@
 .. |IDM_s| replace:: IDM
 .. |EMOD_l| replace:: Epidemiological MODeling software (EMOD)
 .. |EMOD_s| replace:: EMOD
-.. |IT_l| replace:: IDM Modeling Tools
 .. |IT_s| replace:: idmtools
 .. |Python_IT| replace:: Python 3.6, 3.7, or 3.8 64-bit
 .. |SSMT_l| replace:: Server-Side Modeling Tools (SSMT)
@@ -31,3 +30,4 @@
 .. |exe_l| replace:: EMOD executable (Eradication.exe)
 .. |exe_s| replace:: Eradication.exe
 .. |linux_binary| replace:: Eradication binary
+.. |dev_install| replace:: https://github.com/InstituteforDiseaseModeling/idmtools#development-environment-setup

@@ -6,6 +6,8 @@ import pluggy
 from idmtools.registry import PluginSpecification
 from idmtools.registry.plugin_specification import PLUGIN_REFERENCE_NAME
 from idmtools.registry.utils import load_plugin_map
+from idmtools.utils.decorators import SingletonMixin
+
 if typing.TYPE_CHECKING:
     from idmtools.entities.iplatform import IPlatform
 example_configuration_spec = pluggy.HookspecMarker(PLUGIN_REFERENCE_NAME)
@@ -72,7 +74,7 @@ class PlatformSpecification(PluginSpecification, ABC):
         return {}
 
 
-class PlatformPlugins:
+class PlatformPlugins(SingletonMixin):
     def __init__(self, strip_all: bool = True) -> None:
         """
         Initialize the Platform Registry. When strip all is false, the full plugin name will be used for names in map

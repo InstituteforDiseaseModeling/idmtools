@@ -1,3 +1,4 @@
+import allure
 import hashlib
 import json
 import os
@@ -25,10 +26,11 @@ cache = dc.Cache(os.getcwd() if os.getenv("CACHE_FIXTURES", "No").lower()[0] in 
 
 
 @cache.memoize(expire=300)
-def setup_command_no_asset(platform: str = 'COMPS2'):
+def setup_command_no_asset(case_name, platform: str = 'COMPS2'):
     bt = CommandTask("Assets\\hello_world.bat")
     experiment = Experiment.from_task(
         bt,
+        name=case_name,
         tags=dict(
             test_type='No Assets'
         )
@@ -42,9 +44,9 @@ def setup_command_no_asset(platform: str = 'COMPS2'):
 
 
 @cache.memoize(expire=300)
-def setup_python_model_1(platform: str = 'COMPS2'):
+def setup_python_model_1(case_name, platform: str = 'COMPS2'):
     platform = Platform(platform)
-    e = get_model1_templated_experiment("TestExperimentOperations")
+    e = get_model1_templated_experiment(case_name)
     builder = SimulationBuilder()
     builder.add_sweep_definition(
         JSONConfiguredPythonTask.set_parameter_partial("a"),
@@ -68,6 +70,8 @@ def setup_python_model_1(platform: str = 'COMPS2'):
 
 @pytest.mark.comps
 @pytest.mark.smoke
+@allure.story("COMPS")
+@allure.suite("idmtools_platform_comps")
 class TestExperimentOperations(unittest.TestCase):
 
     def setUp(self) -> None:
@@ -75,7 +79,7 @@ class TestExperimentOperations(unittest.TestCase):
         self.platform = Platform("COMPS2")
 
     def test_no_assets(self):
-        setup_command_no_asset("COMPS2")
+        setup_command_no_asset(self.case_name, "COMPS2")
 
         # Ensure login is called
         with platform("COMPS2"):
@@ -100,11 +104,12 @@ class TestExperimentOperations(unittest.TestCase):
                 self.assertEqual('No Assets', e.tags['test_type'])
 
             # check empty asset collection
-            self.assertEquals(0, idm_experiment.assets.count)
+            self.assertEqual(0, idm_experiment.assets.count)
             self.assertIsNone(idm_experiment.assets.id)
-            self.assertEquals(1, idm_experiment.simulation_count)
-            self.assertEquals(0, idm_experiment.simulations[0].assets.count)
+            self.assertEqual(1, idm_experiment.simulation_count)
+            self.assertEqual(0, idm_experiment.simulations[0].assets.count)
 
+    @allure.story("Assets")
     def test_list_assets(self):
         """
         Test that the list assets with children
@@ -114,7 +119,7 @@ class TestExperimentOperations(unittest.TestCase):
         Returns:
 
         """
-        eid = setup_python_model_1('COMPS2')
+        eid = setup_python_model_1(self.case_name, 'COMPS2')
 
         e_p: Experiment = Experiment.from_id(eid)
         with self.subTest("test_list_assets_and_download_children"):
@@ -122,17 +127,21 @@ class TestExperimentOperations(unittest.TestCase):
             self.assertEqual(5, len(assets))
             totals = defaultdict(int)
             for asset in assets:
+
                 out_dir = os.path.join(os.path.dirname(__file__), 'output')
                 os.makedirs(out_dir, exist_ok=True)
                 name = os.path.join(out_dir, asset.filename)
                 asset.download_to_path(name)
-                with open(name, 'rb') as din:
-                    content = din.read()
-                    md5_hash = hashlib.md5()
-                    md5_hash.update(content)
-                    self.assertEqual(asset.checksum, uuid.UUID(md5_hash.hexdigest()))
-                totals[asset.filename] += 1
-                os.remove(name)
+                try:
+                    with open(name, 'rb') as din:
+                        content = din.read()
+                        md5_hash = hashlib.md5()
+                        md5_hash.update(content)
+                        self.assertEqual(asset.checksum, uuid.UUID(md5_hash.hexdigest()))
+                    totals[asset.filename] += 1
+                # ensure we always delete file after test
+                finally:
+                    os.remove(name)
             # self.assertEqual(4, totals['idmtools_metadata.json'])
             self.assertEqual(4, totals['config.json'])
             self.assertEqual(1, totals['model1.py'])

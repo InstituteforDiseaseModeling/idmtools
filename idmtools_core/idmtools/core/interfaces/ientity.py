@@ -2,12 +2,11 @@ from abc import ABCMeta
 from dataclasses import dataclass, field
 from typing import NoReturn, List, Any, Dict, Union, TYPE_CHECKING
 from uuid import UUID
-
 from idmtools.core import EntityStatus, ItemType, NoPlatformException
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.services.platforms import PlatformPersistService
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
 
 
@@ -19,7 +18,7 @@ class IEntity(IItem, metaclass=ABCMeta):
     #: ID of the platform
     platform_id: UUID = field(default=None, compare=False, metadata={"md": True})
     #: Platform
-    _platform: 'IPlatform' = field(default=None, compare=False, metadata={"pickle_ignore": True})  # noqa E821
+    _platform: 'IPlatform' = field(default=None, compare=False, metadata={"pickle_ignore": False})  # noqa E821
     #: Parent id
     parent_id: UUID = field(default=None, metadata={"md": True})
     #: Parent object
@@ -41,13 +40,14 @@ class IEntity(IItem, metaclass=ABCMeta):
         """
         self.tags.update(tags)
 
-    def post_creation(self) -> None:
+    def post_creation(self, platform: 'IPlatform') -> None:
         """
         Post creation hook for object
         Returns:
 
         """
         self.status = EntityStatus.CREATED
+        super().post_creation(platform)
 
     @classmethod
     def from_id(cls, item_id: Union[str, UUID], platform: 'IPlatform' = None, **kwargs) -> 'IEntity':  # noqa E821
@@ -68,8 +68,7 @@ class IEntity(IItem, metaclass=ABCMeta):
                 raise ValueError("You have to specify a platform to load the item from")
             platform = CURRENT_PLATFORM
         if cls.item_type is None:
-            raise EnvironmentError("ItemType is None. This is most likely a badly derived IEntity "
-                                   "that doesn't run set the default item type on the class")
+            raise EnvironmentError("ItemType is None. This is most likely a badly derived IEntity that doesn't run set the default item type on the class")
         return platform.get_item(item_id, cls.item_type, **kwargs)
 
     @property
@@ -133,20 +132,22 @@ class IEntity(IItem, metaclass=ABCMeta):
         else:
             self._platform = self.platform_id = None
 
-    def get_platform_object(self, force: bool = False, **kwargs):
+    def get_platform_object(self, force: bool = False, platform: 'IPlatform' = None, **kwargs):
         """
         Get the platform representation of an object
 
         Args:
             force: Force reload of platform object
+            platform: Allow passing platform object to fetch
             **kwargs: Optional args used for specific platform behaviour
 
         Returns:
             Platform Object
         """
+        if platform:
+            self.platform = platform
         if not self.platform:
             raise NoPlatformException("The object has no platform set...")
-
         if self._platform_object is None or force:
             self._platform_object = self.platform.get_item(self.uid, self.item_type, raw=True, force=force, **kwargs)
         return self._platform_object

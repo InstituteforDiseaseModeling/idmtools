@@ -7,7 +7,7 @@ from logging import getLogger
 from math import floor
 from typing import List, Any, Dict, Container, NoReturn, TYPE_CHECKING
 from uuid import UUID
-from tqdm import tqdm
+from idmtools import IdmConfigParser
 from idmtools.assets import Asset, json, AssetCollection
 from idmtools.core import ItemType
 from idmtools.core.docker_task import DockerTask
@@ -18,10 +18,10 @@ from idmtools.entities.simulation import Simulation
 from idmtools.utils.json import IDMJSONEncoder
 from idmtools_platform_local.client.experiments_client import ExperimentsClient
 from idmtools_platform_local.client.simulations_client import SimulationsClient
-from idmtools_platform_local.platform_operations.uitils import local_status_to_common, ExperimentDict, SimulationDict, \
+from idmtools_platform_local.platform_operations.utils import local_status_to_common, ExperimentDict, SimulationDict, \
     download_lp_file
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools_platform_local.local_platform import LocalPlatform
 
 logger = getLogger(__name__)
@@ -133,7 +133,13 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
 
         """
-        for simulation in tqdm(experiment.simulations, desc="Running Simulations"):
+        if IdmConfigParser.is_progress_bar_disabled():
+            prog_items = experiment.simulations
+        else:
+            from tqdm import tqdm
+            prog_items = tqdm(experiment.simulations, desc="Running Simulations", unit='simulation')
+
+        for simulation in prog_items:
             # if the task is docker, build the extra config
             if simulation.task.is_docker:
                 self._run_docker_sim(experiment.uid, simulation.uid, simulation.task)
@@ -219,8 +225,8 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
         Run a docker based simulation
 
         Args:
-            experiment: Experiment to run
-            simulation: Simulation to run
+            experiment_uid: Experiment to run
+            simulation_uid: Simulation to run
 
         Returns:
 

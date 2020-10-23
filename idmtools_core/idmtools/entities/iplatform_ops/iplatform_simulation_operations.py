@@ -40,7 +40,7 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         Returns:
             NoReturn
         """
-        simulation.pre_creation()
+        simulation.pre_creation(self.platform)
 
     def post_create(self, simulation: Simulation, **kwargs) -> NoReturn:
         """
@@ -53,7 +53,7 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         Returns:
             NoReturn
         """
-        simulation.post_creation()
+        simulation.post_creation(self.platform)
 
     def create(self, simulation: Simulation, do_pre: bool = True, do_post: bool = True, **kwargs) -> Any:
         """
@@ -105,7 +105,7 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
             List of tuples containing the create object and id of item that was created
         """
         return batch_create_items(sims, create_func=self.create, display_progress=display_progress,
-                                  progress_description="Commissioning Simulations",
+                                  progress_description="Commissioning Simulations", unit="simulation",
                                   **kwargs)
 
     @abstractmethod

@@ -1,0 +1,15 @@
+{
+    "WorkItem_Type": "ImageBuilderWorker",
+    "Build": {
+        "Type": "singularity",
+		"Input": "docker://idmod/covasim",
+	    "Flags": {
+            "--section": ["all"]
+        },
+        "Output": "covasim.sif",
+        "Tags": {"covasim image": "covasim.sif",  "idmtools": "idmtools test"},
+		"AdditionalMounts": [ "/shared" ],
+        "StaticEnvironment": { "FOO": "BAR" }
+    }
+}
+

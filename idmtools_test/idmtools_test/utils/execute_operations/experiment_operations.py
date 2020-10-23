@@ -9,7 +9,6 @@ from logging import getLogger, DEBUG
 from threading import Lock
 from typing import Any, List, Type, Dict, Union, TYPE_CHECKING, Optional
 from uuid import UUID, uuid4
-
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core import EntityStatus, ItemType
 from idmtools.entities.experiment import Experiment
@@ -17,7 +16,7 @@ from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPla
 from idmtools.utils.file import file_contents_to_generator
 from idmtools.utils.json import IDMJSONEncoder
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools_test.utils.test_execute_platform import TestExecutePlatform
 
 logger = getLogger(__name__)
@@ -214,7 +213,7 @@ class TestExecutePlatformExperimentOperation(IPlatformExperimentOperations):
         return experiment
 
     def platform_modify_experiment(self, experiment: Experiment, regather_common_assets: bool = False, **kwargs) -> Experiment:
-        experiment.pre_creation(regather_common_assets)
+        experiment.pre_creation(self.platform, gather_assets=regather_common_assets)
         EXPERIMENTS_LOCK.acquire()
         self.experiments[experiment.uid] = experiment
         EXPERIMENTS_LOCK.release()

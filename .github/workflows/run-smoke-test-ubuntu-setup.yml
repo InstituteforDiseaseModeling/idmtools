@@ -22,7 +22,7 @@ jobs:
           architecture: x64
       - name: Install Python dependencies
         run: |
-          pip install py-make flake8
+          pip install idm-buildtools flake8 wheel --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
       - name: Run setup-dev
         env:
           bamboo_UserArtifactory: ${{ secrets.PYPI_STAGING_USERNAME }}

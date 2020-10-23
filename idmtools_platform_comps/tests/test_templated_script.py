@@ -1,3 +1,4 @@
+import allure
 import os
 import pytest
 from idmtools.core.platform_factory import Platform
@@ -10,6 +11,9 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 @pytest.mark.comps
 @pytest.mark.wrapper
 @pytest.mark.smoke
+@allure.story("COMPS")
+@allure.story("Templated Script")
+@allure.suite("idmtools_platform_comps")
 class TestWrapperTask(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
@@ -29,7 +33,7 @@ class TestWrapperTask(ITestWithPersistence):
 
         # wrap the script
         wrapper_task = get_script_wrapper_windows_task(task, template_content=template)
-        experiment = Experiment.from_task(wrapper_task)
+        experiment = Experiment.from_task(wrapper_task, self.case_name)
         experiment.run(platform=self.platform, wait_until_done=True)
 
         self.assertTrue(experiment.succeeded)

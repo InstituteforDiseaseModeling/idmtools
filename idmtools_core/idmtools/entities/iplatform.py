@@ -3,14 +3,17 @@ from abc import ABCMeta
 from dataclasses import dataclass
 from dataclasses import fields, field
 from functools import partial
+from pathlib import PureWindowsPath, PurePath
 from itertools import groupby
 from logging import getLogger, DEBUG
 from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set, Iterator, Callable
 from uuid import UUID
+from idmtools import IdmConfigParser
 from idmtools.core import CacheEnabled, UnknownItemException, EntityContainer, UnsupportedPlatformType
 from idmtools.core.enums import ItemType, EntityStatus
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.core.interfaces.iitem import IItem
+from idmtools.core.interfaces.irunnable_entity import IRunnableEntity
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
@@ -23,9 +26,9 @@ from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.relation_type import RelationType
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.suite import Suite
+from idmtools.assets.asset_collection import AssetCollection
 from idmtools.services.platforms import PlatformPersistService
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
-from tqdm import tqdm
 logger = getLogger(__name__)
 user_logger = getLogger('user')
 
@@ -63,6 +66,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     - Commissioning
     - File handling
     """
+    #: Maps the platform types to idmtools types
     platform_type_map: Dict[Type, ItemType] = field(default=None, repr=False, init=False)
     _object_cache_expiration: 'int' = field(default=60, repr=False, init=False)
 
@@ -76,6 +80,10 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     _assets: IPlatformAssetCollectionOperations = field(default=None, repr=False, init=False, compare=False)
     #: Controls what platform should do we re-running experiments by default
     _regather_assets_on_modify: bool = field(default=False, repr=False, init=False, compare=False)
+    # store the config block used to create platform
+    _config_block: str = field(default=None)
+    #: Defines the path to common assets
+    _common_asset_path: str = field(default="Assets", repr=True, init=False, compare=False)
 
     @staticmethod
     def get_caller():
@@ -178,8 +186,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item_type]
         return getattr(self, interface).get(item_id, **kwargs)
 
-    def get_item(self, item_id: Union[str, UUID], item_type: ItemType = None,
-                 force: bool = False, raw: bool = False, **kwargs) -> Any:
+    def get_item(self, item_id: Union[str, UUID], item_type: ItemType = None, force: bool = False, raw: bool = False, **kwargs) -> Union[Experiment, Suite, Simulation, IWorkflowItem, AssetCollection, None]:
         """
         Retrieve an object from the platform.
         This function is cached; force allows you to force the refresh of the cache.
@@ -586,16 +593,18 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         idm_item = self.get_item(item_id, item_type, raw=False)
         return self.get_files(idm_item, files, output)
 
-    def are_requirements_met(self, requirements: Set[PlatformRequirements]) -> bool:
+    def are_requirements_met(self, requirements: Union[PlatformRequirements, Set[PlatformRequirements]]) -> bool:
         """
         Does the platform support the list of requirements
 
         Args:
-            requirements: Requirements
+            requirements: Requirements should be a list of PlatformRequirements or a single PlatformRequirements
 
         Returns:
             True if all the requirements are supported
         """
+        if isinstance(requirements, PlatformRequirements):
+            requirements = [requirements]
         return all([x in self._platform_supports for x in requirements])
 
     def is_task_supported(self, task: ITask) -> bool:
@@ -614,7 +623,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     def __wait_till_callback(
             self, item: Union[Experiment, IWorkflowItem, Suite],
-            callback: Callable[[Union[Experiment, IWorkflowItem, Suite]], bool], timeout: int = 60 * 60 * 24,
+            callback: Union[partial, Callable[[Union[Experiment, IWorkflowItem, Suite]], bool]], timeout: int = 60 * 60 * 24,
             refresh_interval: int = 5
     ):
         """
@@ -649,7 +658,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             time.sleep(refresh_interval)
         raise TimeoutError(f"Timeout of {timeout} seconds exceeded")
 
-    def wait_till_done(self, item: Union[Experiment, IWorkflowItem, Suite], timeout: int = 60 * 60 * 24,
+    def wait_till_done(self, item: IRunnableEntity, timeout: int = 60 * 60 * 24,
                        refresh_interval: int = 5, progress: bool = True):
         """
         Wait for the experiment to be done.
@@ -671,7 +680,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             self.__wait_till_callback(item, lambda e: e.done, timeout, refresh_interval)
 
     @staticmethod
-    def __wait_until_done_progress_callback(item: Union[Experiment, IWorkflowItem], progress_bar: tqdm,
+    def __wait_until_done_progress_callback(item: Union[Experiment, IWorkflowItem], progress_bar: 'tqdm',  # noqa: F821
                                             child_attribute: str = 'simulations',
                                             done_states: List[EntityStatus] = None, failed_warning: Dict[str, bool] = False) -> bool:
         """
@@ -698,7 +707,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         if done_states is None:
             done_states = [EntityStatus.FAILED, EntityStatus.SUCCEEDED]
         # if we do not have a progress bar, return items state
-        if progress_bar is None:
+        if child_attribute is None:
             return item.status in done_states if isinstance(item, IWorkflowItem) else item.done
 
         # if we do have a progress bar, update it
@@ -712,7 +721,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             elif isinstance(item, Suite) and child.done:
                 done += 1
         # check if we need to update the progress bar
-        if done > progress_bar.last_print_n:
+        if hasattr(progress_bar, 'last_print_n') and done > progress_bar.last_print_n:
             progress_bar.update(done - progress_bar.last_print_n)
         # Alert user to failing simulations so they can stop execution if wanted
         if isinstance(item, Experiment) and item.any_failed and not failed_warning['failed_warning']:
@@ -720,7 +729,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             failed_warning['failed_warning'] = True
         return item.done
 
-    def wait_till_done_progress(self, item: Union[Experiment, IWorkflowItem, Suite], timeout: int = 60 * 60 * 24,
+    def wait_till_done_progress(self, item: IRunnableEntity, timeout: int = 60 * 60 * 24,
                                 refresh_interval: int = 5):
         """
         Wait on an item to complete with progress bar
@@ -738,14 +747,20 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             :meth:`idmtools.entities.iplatform.IPlatform.wait_till_done`
             :meth:`idmtools.entities.iplatform.IPlatform.__wait_till_callback`
         """
-        child_attribute = 'simulations'
-        if isinstance(item, Experiment):
-            prog = tqdm([], total=len(item.simulations), desc="Waiting on Experiment to Finish running")
-        elif isinstance(item, Suite):
-            prog = tqdm([], total=len(item.experiments), desc="Waiting on Suite to Finish running")
-            child_attribute = 'experiments'
+        # set prog to list
+        prog = []
+        # check that the user has not disable progress bars
+        child_attribute = None
+        if not IdmConfigParser.is_progress_bar_disabled():
+            from tqdm import tqdm
+            if isinstance(item, Experiment):
+                prog = tqdm([], total=len(item.simulations), desc="Waiting on Experiment to Finish running", unit="simulation")
+                child_attribute = 'simulations'
+            elif isinstance(item, Suite):
+                prog = tqdm([], total=len(item.experiments), desc="Waiting on Suite to Finish running", unit="experiment")
+                child_attribute = 'experiments'
         else:
-            prog = None
+            child_attribute = None
 
         failed_warning = dict(failed_warning=False)
         self.__wait_till_callback(
@@ -803,6 +818,39 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             True or false
         """
         return self._regather_assets_on_modify
+
+    def is_windows_platform(self) -> bool:
+        """
+        Returns is the arget platform is a windows system
+        """
+
+        return self.are_requirements_met(PlatformRequirements.WINDOWS)
+
+    @property
+    def common_asset_path(self):
+        return self._common_asset_path
+
+    @common_asset_path.setter
+    def common_asset_path(self, value):
+        if not isinstance(value, property):
+            logger.warning("Cannot set common asset path")
+
+    def join_path(self, *args) -> str:
+        """
+        Join path using platform rules
+
+        Args:
+            *args:List of paths to join
+
+        Returns:
+            Joined path as string
+        """
+        if len(args) < 2:
+            raise ValueError("at least two items required to join")
+        if self.is_windows_platform():
+            return str(PureWindowsPath(*args))
+        else:
+            return str(PurePath(*args))
 
 
 TPlatform = TypeVar("TPlatform", bound=IPlatform)

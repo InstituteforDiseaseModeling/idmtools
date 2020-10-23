@@ -1,3 +1,4 @@
+import allure
 import itertools
 import os
 import sys
@@ -12,11 +13,15 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
+from idmtools_test.utils.utils import captured_output
 
 model_path = os.path.abspath(os.path.join("..", "..", "examples", "python_model", "inputs", "simple_python", "model.py"))
 
 
 @pytest.mark.smoke
+@pytest.mark.serial
+@allure.story("Entities")
+@allure.suite("idmtools_core")
 class TestAddingSimulationsToExistingExperiment(unittest.TestCase):
     def setUp(self):
         self.platform = Platform("TestExecute", missing_ok=True, default_missing=dict(type='TestExecute'))
@@ -45,6 +50,27 @@ class TestAddingSimulationsToExistingExperiment(unittest.TestCase):
 
         self.assertTrue(exp.succeeded)
         self.assertEqual(10, len(exp.simulations))
+        with captured_output() as out:
+            exp.display()
+            self.assertIn(f"{exp.id} - JSONConfiguredPythonTask SimulationBuilder / Sim count 10", out[0].getvalue())
+            for i, sim in enumerate(exp.simulations):
+                if i > 4:
+                    break
+                self.assertIn(f"{sim.id} | - Run_Number:{sim.tags['Run_Number']}", out[0].getvalue())
+
+    def test_empty_experiment_template(self):
+        base_task = JSONConfiguredPythonTask(script_path=model_path, python_path=sys.executable)
+        builder = SimulationBuilder()
+        exp = Experiment.from_builder(builder, base_task=base_task)
+        with self.assertRaises(ValueError) as er:
+            exp.run(wait_until_done=True)
+        self.assertTrue(er.exception.args[0], 'You cannot run an empty experiment')
+
+    def test_empty_experiment_list(self):
+        exp = Experiment()
+        with self.assertRaises(ValueError) as er:
+            exp.run(wait_until_done=True)
+        self.assertTrue(er.exception.args[0], 'You cannot run an empty experiment')
 
     def test_adding_manual_simulation(self):
         base_task = JSONConfiguredPythonTask(script_path=model_path, python_path=sys.executable)

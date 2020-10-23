@@ -1,9 +1,10 @@
 from typing import Dict, Set
 from idmtools.registry import PluginSpecification
 from idmtools.registry.experiment_specification import ExperimentPlugins
+from idmtools.utils.decorators import SingletonMixin
 
 
-class MasterPluginRegistry:
+class MasterPluginRegistry(SingletonMixin):
     def __init__(self) -> None:
         from idmtools.registry.platform_specification import PlatformPlugins
         from idmtools.registry.task_specification import TaskPlugins

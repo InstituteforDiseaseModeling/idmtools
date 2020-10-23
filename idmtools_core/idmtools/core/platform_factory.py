@@ -1,16 +1,14 @@
 import json
-
 import os
 from contextlib import contextmanager
 from dataclasses import fields
 from logging import getLogger, DEBUG
 from typing import Dict, Any, TYPE_CHECKING
-
 from idmtools.config import IdmConfigParser
 from idmtools.core.context import set_current_platform, remove_current_platform
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
 
 logger = getLogger(__name__)
@@ -68,6 +66,7 @@ class Platform:
 
         platform = cls._create_from_block(block, missing_ok=missing_ok, **kwargs)
         set_current_platform(platform)
+        platform._config_block = block
         return platform
 
     @classmethod
@@ -107,13 +106,15 @@ class Platform:
         platform_type = None
         is_alias = False
         try:
-            section = IdmConfigParser.get_section(block, error=not missing_ok)
+            section = IdmConfigParser.get_section(block)
             if not section and missing_ok:
                 # its possible our logger is not setup
-                from idmtools.core.logging import setup_logging, listener
-                if not listener:
+                from idmtools.core.logging import setup_logging, LISTENER
+                if not LISTENER:
                     setup_logging()
         except ValueError as e:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f"Checking aliases for {block.upper()}")
             # attempt alias load
             if block.upper() in cls._aliases:
                 if logger.isEnabledFor(DEBUG):
@@ -172,11 +173,12 @@ class Platform:
         # Display block info
         try:
             from idmtools.core.logging import VERBOSE
-            if is_alias:
-                user_logger.log(VERBOSE, f"\n[{block}]")
-                user_logger.log(VERBOSE, json.dumps(section, indent=3))
-            else:
-                IdmConfigParser.display_config_block_details(block)
+            if os.getenv('IDMTOOLS_SUPPRESS_OUTPUT', None) is None:
+                if is_alias:
+                    user_logger.log(VERBOSE, f"\n[{block}]")
+                    user_logger.log(VERBOSE, json.dumps(section, indent=3))
+                else:
+                    IdmConfigParser.display_config_block_details(block)
         except ValueError:
             if missing_ok:
                 pass

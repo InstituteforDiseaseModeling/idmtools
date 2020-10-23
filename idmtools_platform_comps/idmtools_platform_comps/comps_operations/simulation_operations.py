@@ -24,7 +24,7 @@ from idmtools.entities.simulation import Simulation
 from idmtools.utils.json import IDMJSONEncoder
 from idmtools_platform_comps.utils.general import convert_comps_status, get_asset_for_comps_item, clean_experiment_name
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools_platform_comps.comps_platform import COMPSPlatform
 
 logger = getLogger(__name__)
@@ -170,7 +170,11 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         if config is None:
             if asset_collection_id and isinstance(asset_collection_id, str):
                 asset_collection_id = uuid.UUID(asset_collection_id)
-            config = self.get_simulation_config_from_simulation(simulation, num_cores, priority, asset_collection_id, **kwargs)
+            kwargs['num_cores'] = num_cores
+            kwargs['priority'] = priority
+            kwargs['asset_collection_id'] = asset_collection_id
+            kwargs.update(simulation._platform_kwargs)
+            config = self.get_simulation_config_from_simulation(simulation, **kwargs)
         if simulation.name:
             simulation.name = clean_experiment_name(simulation.name)
         s = COMPSSimulation(
@@ -184,8 +188,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         simulation._platform_object = s
         return s
 
-    @staticmethod
-    def get_simulation_config_from_simulation(simulation: Simulation, num_cores: int = None, priority: str = None,
+    def get_simulation_config_from_simulation(self, simulation: Simulation, num_cores: int = None, priority: str = None,
                                               asset_collection_id: UUID = None, **kwargs) -> \
             Configuration:
         """
@@ -215,6 +218,8 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             comps_configuration['priority'] = priority
         if comps_exp_config.executable_path != simulation.task.command.executable:
             logger.info(f'Overriding executable_path for sim to {simulation.task.command.executable}')
+            from idmtools_platform_comps.utils.python_version import platform_task_hooks
+            platform_task_hooks(simulation.task, self.platform)
             comps_configuration['executable_path'] = simulation.task.command.executable
         sim_task = simulation.task.command.arguments + " " + simulation.task.command.options
         if comps_exp_config.simulation_input_args != sim_task:
@@ -246,7 +251,8 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         results = batch_create_items(
             simulations,
             batch_worker_thread_func=thread_func,
-            progress_description="Creating Simulations on Comps"
+            progress_description="Creating Simulations on Comps",
+            unit="simulation"
         )
         # Always commission again
         try:
@@ -420,9 +426,9 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         cli = self._detect_command_line_from_simulation(parent, comps_sim)
         # if we could not find task, set it now, otherwise rebuild the cli
         if simulation.task is None:
-            simulation.task = CommandTask(CommandLine(cli))
+            simulation.task = CommandTask(CommandLine.from_string(cli))
         else:
-            simulation.task.command = CommandLine(cli)
+            simulation.task.command = CommandLine.from_string(cli)
 
     @staticmethod
     def __load_metadata_from_simulation(simulation) -> Dict[str, Any]:

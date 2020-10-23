@@ -1,4 +1,5 @@
 import json
+import os
 import typing
 from dataclasses import dataclass, field
 from logging import getLogger, DEBUG
@@ -6,12 +7,14 @@ from typing import Any, Dict, List, Tuple, Type, Optional
 from uuid import UUID
 from COMPS.Data import QueryCriteria, WorkItem as COMPSWorkItem, WorkItemFile
 from COMPS.Data.WorkItem import RelationType, WorkerOrPluginKey
-
 from idmtools.assets import AssetCollection
 from idmtools.core import ItemType
+from idmtools.entities import Suite
+from idmtools.entities.experiment import Experiment
 from idmtools.entities.generic_workitem import GenericWorkItem
 from idmtools.entities.iplatform_ops.iplatform_workflowitem_operations import IPlatformWorkflowItemOperations
 from idmtools.entities.iworkflow_item import IWorkflowItem
+from idmtools.entities.simulation import Simulation
 from idmtools_platform_comps.utils.general import convert_comps_workitem_status
 
 if typing.TYPE_CHECKING:
@@ -42,7 +45,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         Returns:
             COMPSWorkItem
         """
-        columns = columns or ["id", "name", "state"]
+        columns = columns or ["id", "name", "state", "environment_name"]
         load_children = load_children if load_children is not None else ["tags"]
         query_criteria = query_criteria or QueryCriteria().select(columns).select_children(load_children)
         return COMPSWorkItem.get(workflow_item_id, query_criteria=query_criteria)
@@ -58,24 +61,16 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         Returns:
             Created platform item and the UUID of said item
         """
-        # Collect asset files
-        if not work_item.asset_collection_id:
-            # Create a collection with everything that is in asset_files
-            if len(work_item.asset_files.files) > 0:
-                if logger.isEnabledFor(DEBUG):
-                    logger.debug("Uploading assets for Workitem")
-                ac = AssetCollection(assets=work_item.asset_files)
-                self.platform.create_items([ac])
-                work_item.asset_collection_id = ac.uid
+        self.send_assets(work_item)
 
         if logger.isEnabledFor(DEBUG):
-            logger.debug(f"Creating workitem {work_item.item_name} of type {work_item.work_item_type}, "
+            logger.debug(f"Creating workitem {work_item.name} of type {work_item.work_item_type}, "
                          f"{work_item.plugin_key} in {self.platform.environment}")
         # Create a WorkItem
-        wi = COMPSWorkItem(name=work_item.item_name,
+        wi = COMPSWorkItem(name=work_item.name,
                            worker=WorkerOrPluginKey(work_item.work_item_type, work_item.plugin_key),
                            environment_name=self.platform.environment,
-                           asset_collection_id=work_item.asset_collection_id)
+                           asset_collection_id=work_item.assets.id if len(work_item.assets) else None)
 
         # Set tags
         wi.set_tags({})
@@ -91,7 +86,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         wi.add_work_order(data=json.dumps(wo).encode('utf-8'))
 
         # Add additional files
-        for af in work_item.user_files:
+        for af in work_item.transient_assets:
             wi_file = WorkItemFile(af.filename, "input")
             # Either the file has an absolute path or content
             if af.absolute_path:
@@ -111,27 +106,32 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         # Sets the related experiments
         if work_item.related_experiments:
             for exp_id in work_item.related_experiments:
-                wi.add_related_experiment(exp_id, RelationType.DependsOn)
+                i = exp_id.id if isinstance(exp_id, Experiment) else exp_id
+                wi.add_related_experiment(i, RelationType.DependsOn)
 
         # Sets the related simulations
         if work_item.related_simulations:
             for sim_id in work_item.related_simulations:
-                wi.add_related_simulation(sim_id, RelationType.DependsOn)
+                i = sim_id.id if isinstance(sim_id, Simulation) else sim_id
+                wi.add_related_simulation(i, RelationType.DependsOn)
 
         # Sets the related suites
         if work_item.related_suites:
             for suite_id in work_item.related_suites:
-                wi.add_related_suite(suite_id, RelationType.DependsOn)
+                i = suite_id.id if isinstance(suite_id, Suite) else suite_id
+                wi.add_related_suite(i, RelationType.DependsOn)
 
         # Sets the related work items
         if work_item.related_work_items:
             for wi_id in work_item.related_work_items:
-                wi.add_related_work_item(wi_id, RelationType.DependsOn)
+                i = wi_id.id if isinstance(wi_id, IWorkflowItem) else wi_id
+                wi.add_related_work_item(i, RelationType.DependsOn)
 
         # Sets the related asset collection
         if work_item.related_asset_collections:
             for ac_id in work_item.related_asset_collections:
-                wi.add_related_asset_collection(ac_id, RelationType.DependsOn)
+                i = ac_id.id if isinstance(ac_id, AssetCollection) else ac_id
+                wi.add_related_asset_collection(i, RelationType.DependsOn)
 
         # Set the ID back in the object
         work_item.uid = wi.id
@@ -147,10 +147,10 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         Returns: None
         """
         work_item.get_platform_object().commission()
-        user_logger.info(
-            f"\nThe running experiment can be viewed at {self.platform.endpoint}/#explore/"
-            f"WorkItems?filters=ID={work_item.uid}\n"
-        )
+        if os.getenv('IDMTOOLS_SUPPRESS_OUTPUT', None) is None:
+            user_logger.info(
+                f"\nThe running WorkItem can be viewed at {self.platform.get_workitem_link(work_item)}\n"
+            )
 
     def get_parent(self, work_item: IWorkflowItem, **kwargs) -> Any:
         """
@@ -199,9 +199,11 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
 
                 Returns: None
                 """
-        # for asset in workflow_item.assets:
-        #     workflow_item.add_file(workitemfile=WorkItemFile(asset.filename, 'input'), data=asset.bytes)
-        pass
+        # Collect asset files
+        if workflow_item.assets and len(workflow_item.assets):
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Uploading assets for Workitem")
+            self.platform._assets.create(workflow_item.assets)
 
     def list_assets(self, workflow_item: IWorkflowItem, **kwargs) -> List[str]:
         """
@@ -242,14 +244,16 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
             IDMTools workflow item
                 """
         # Creat a workflow item
-        obj = GenericWorkItem()
+        # Eventually it would be nice to put the actual command here, but this requires fetching the work-order which is a bit to much overhead
+        obj = GenericWorkItem(name=work_item.name, command="")
 
         # Set its correct attributes
-        obj.item_name = work_item.name
         obj.platform = self.platform
         obj.uid = work_item.id
-        obj.asset_collection_id = work_item.asset_collection_id
-        obj.user_files = work_item.files
+        if work_item.asset_collection_id:
+            obj.assets = AssetCollection.from_id(work_item.asset_collection_id, platform=self.platform)
+        if work_item.files:
+            obj.transient_assets = self.platform._assets.to_entity(work_item.files)
         obj.tags = work_item.tags
         obj.status = convert_comps_workitem_status(work_item.state)
         return obj

@@ -7,7 +7,7 @@ from idmtools.entities.itask import ITask
 from idmtools.registry import PluginSpecification
 from idmtools.registry.plugin_specification import PLUGIN_REFERENCE_NAME
 from idmtools.registry.utils import load_plugin_map
-
+from idmtools.utils.decorators import SingletonMixin
 
 example_configuration_spec = pluggy.HookspecMarker(PLUGIN_REFERENCE_NAME)
 get_task_spec = pluggy.HookspecMarker(PLUGIN_REFERENCE_NAME)
@@ -55,7 +55,7 @@ class TaskSpecification(PluginSpecification, ABC):
         pass
 
 
-class TaskPlugins:
+class TaskPlugins(SingletonMixin):
     def __init__(self, strip_all: bool = True) -> None:
         """
         Initialize the Task Registry. When strip all is false, the full plugin name will be used for names in map

@@ -1,10 +1,7 @@
 import os
-import subprocess
-import tempfile
 from dataclasses import dataclass, field
 from logging import getLogger
-from typing import Set, List, Type, Union
-
+from typing import Set, List, Type, Union, TYPE_CHECKING
 from idmtools.assets import Asset, AssetCollection
 from idmtools.entities import CommandLine
 from idmtools.entities.itask import ITask
@@ -12,6 +9,8 @@ from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.simulation import Simulation
 from idmtools.registry.task_specification import TaskSpecification
+if TYPE_CHECKING:  # pragma: no cover
+    from idmtools.entities.iplatform import IPlatform
 
 logger = getLogger(__name__)
 
@@ -31,52 +30,8 @@ class PythonTask(ITask):
             # don't error if we can't find script. Maybe it is in the asset collection? but warn user
             logger.warning(f'Cannot find script at {self.script_path}. If script does not exist in Assets '
                            f'as {os.path.basename(self.script_path)}, execution could fail')
-        self.command = CommandLine()
-
-    @property
-    def command(self):
-        """
-        Update executable with new python_path
-        Returns: re-build command
-        """
-        if self.script_path is None:
-            return None
-
-        cmd_str = f'{self.python_path} ./Assets/{os.path.basename(self.script_path)}'
-        if self._command:
-            if isinstance(self._command, str):
-                self._command = CommandLine(cmd_str)
-            self._command._executable = cmd_str
-            self._task_log.info('Setting command line to %s', cmd_str)
-
-        return self._command
-
-    @command.setter
-    def command(self, command):
-        self._command = command
-
-    def retrieve_python_dependencies(self):
-        """
-        Retrieve the Pypi libraries associated with the given model script.
-        Notes:
-            This function scan recursively through the whole  directory where the model file is contained.
-            This function relies on pipreqs being installed on the system to provide dependencies list.
-
-        Returns:
-            List of libraries required by the script
-        """
-        model_folder = os.path.dirname(self.script_path)
-
-        # Store the pipreqs file in a temporary directory
-        with tempfile.TemporaryDirectory() as tmpdir:
-            reqs_file = os.path.join(tmpdir, "reqs.txt")
-            subprocess.run(['pipreqs', '--savepath', reqs_file, model_folder], stderr=subprocess.DEVNULL)
-
-            # Reads through the reqs file to get the libraries
-            with open(reqs_file, 'r') as fp:
-                extra_libraries = [line.strip() for line in fp.readlines()]
-
-        return extra_libraries
+        if self.command is None:
+            self.command = CommandLine('')
 
     def gather_common_assets(self) -> AssetCollection:
         """
@@ -119,12 +74,13 @@ class PythonTask(ITask):
 
         logger.debug("Reload from simulation")
 
-    def pre_creation(self, parent: Union[Simulation, IWorkflowItem]):
+    def pre_creation(self, parent: Union[Simulation, IWorkflowItem], platform: 'IPlatform'):
         """
         Called before creation of parent
 
         Args:
             parent: Parent
+            platform: Platform Python Task is being executed on
 
         Returns:
             None
@@ -132,8 +88,10 @@ class PythonTask(ITask):
         Raise:
             ValueError if script name is not provided
         """
+
         if self.script_path is None:
             raise ValueError("Script name is required")
+        self.command = CommandLine.from_string(f'{self.python_path} {platform.join_path(platform.common_asset_path, os.path.basename(self.script_path))}')
 
 
 class PythonTaskSpecification(TaskSpecification):

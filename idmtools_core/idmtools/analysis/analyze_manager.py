@@ -14,7 +14,7 @@ from idmtools.core.logging import VERBOSE, SUCCESS
 from idmtools.entities.ianalyzer import IAnalyzer
 from idmtools.utils.command_line import animation
 from idmtools.utils.language import on_off, verbose_timedelta
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
 
 logger = getLogger(__name__)
@@ -353,8 +353,9 @@ class AnalyzeManager(CacheEnabled):
                     logger.debug(f"Finalizing {item_id}")
                     item = self._items[item_id]
                     item_result = self.cache.get(item_id)
+                    item.platform = self.platform
                     item_data_for_analyzer[item] = item_result.get(analyzer.uid, None)
-                finalize_results[analyzer.uid] = worker_pool.apply_async(analyzer.reduce, (item_data_for_analyzer,))
+                finalize_results[analyzer.uid] = worker_pool.apply_async(analyzer.reduce, (item_data_for_analyzer, ))
 
             # wait for results and clean up multiprocessing
             worker_pool.close()
@@ -409,6 +410,14 @@ class AnalyzeManager(CacheEnabled):
         if self.verbose:
             self._print_configuration(n_items, n_processes)
 
+        no_print_config_exists = False
+        # Before we initialize processes, ensure no warning about config are set
+        if 'IDMTOOLS_NO_PRINT_CONFIG_USED' not in os.environ:
+            os.environ['IDMTOOLS_NO_PRINT_CONFIG_USED'] = "1"
+            os.environ['IDMTOOLS_HIDE_DEV_WARNING'] = "1"
+            os.environ['IDMTOOLS_NO_CONFIG_WARNING'] = "1"
+        else:
+            no_print_config_exists = True
         # Create the worker pool
         worker_pool = Pool(n_processes,
                            initializer=pool_worker_initializer,
@@ -423,12 +432,18 @@ class AnalyzeManager(CacheEnabled):
         # Call the analyzer reduce methods
 
         finalize_results = self._run_and_wait_for_reducing(worker_pool=worker_pool)
+
         for analyzer in self.analyzers:
             analyzer.results = finalize_results[analyzer.uid].get()
 
         logger.debug("Destroying analyzers")
         for analyzer in self.analyzers:
             analyzer.destroy()
+
+        if not no_print_config_exists:
+            del os.environ['IDMTOOLS_NO_PRINT_CONFIG_USED']
+            del os.environ['IDMTOOLS_HIDE_DEV_WARNING']
+            del os.environ['IDMTOOLS_NO_CONFIG_WARNING']
 
         if self.verbose:
             total_time = time.time() - start_time

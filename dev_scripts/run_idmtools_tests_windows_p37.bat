@@ -3,7 +3,7 @@ if exist C:\idmtools_venv_37 rd /s /q C:\idmtools_venv_37
 call "C:\idmtools_venv_37\Scripts\activate"
 echo "Virtual Environment Activated"
 
-pip install py-make
+pip install idm-buildtools --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
 pymake setup-dev
 
 echo "auto Login"
