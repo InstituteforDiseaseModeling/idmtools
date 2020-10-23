@@ -1,19 +1,16 @@
 import tempfile
-
 import os
-
 import unittest
 import dataclasses
-
+from unittest import mock
 import pytest
-
 from idmtools import IdmConfigParser
 from idmtools.core import CacheEnabled
 from idmtools.entities.iplatform import IPlatform
-from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.registry.platform_specification import PlatformPlugins
 from idmtools_platform_comps.comps_platform import COMPSPlatform
 from idmtools_platform_comps.plugin_info import COMPSPlatformSpecification
+from idmtools_platform_comps.utils.package_version import IDM_DOCKER_PROD, fetch_versions_from_server, get_latest_ssmt_image_version_from_artifactory
 
 
 class TestCompsPlugin(unittest.TestCase):
