@@ -33,6 +33,7 @@ from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
 #   }
 # }
 
+
 @dataclass(repr=False)
 class SingularityBuildWorkItem(SSMTWorkItem):
     #: Path to definition file
@@ -57,7 +58,7 @@ class SingularityBuildWorkItem(SSMTWorkItem):
     asset_collection: AssetCollection = field(default=None)
 
     #: Additional Mounts
-    additional_mounts: List[str] = field(default_factory=None)
+    additional_mounts: List[str] = field(default_factory=list)
 
     #: Environment vars for remote build
     environment_variables: Dict[str, str] = field(default_factory=dict)
