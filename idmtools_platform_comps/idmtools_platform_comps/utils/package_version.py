@@ -46,25 +46,6 @@ def get_latest_package_version_from_pypi(pkg_name, display_all=False):
     return all_releases
 
 
-def get_latest_version_from_site(pkg_url, display_all=False):
-    """
-    Utility to get the latest version for a given package name
-    Args:
-        pkg_url: package name given
-        display_all: determine if output all package releases
-    Returns: the latest version of ven package
-    """
-    all_releases = fetch_versions_from_server(pkg_url)
-
-    if display_all:
-        print(all_releases)
-
-    release_versions = [ver for ver in all_releases if not parse(ver).is_prerelease]
-    latest_version = release_versions[0]
-
-    return latest_version
-
-
 def get_latest_package_version_from_artifactory(pkg_name, base_version: Optional[str] = None, display_all=False):
     """
     Utility to get the latest version for a given package name
