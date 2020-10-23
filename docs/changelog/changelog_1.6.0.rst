@@ -7,11 +7,9 @@ Bugs
 ----
 * `#0300 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/300>`_ - Canceling simulations using cli's Restful api throws Internal server error (Local Platform)
 * `#0462 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/462>`_ - Redis port configuration not working (Local Platform)
-* `#0967 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/967>`_ - Detect Change to Configuration on Local Platform
 * `#0988 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/988>`_ - Fix issues with multi-threading and requests on mac in python 3.7 or lower
-* `#1104 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1104>`_ - Run AnalyzeManager output multiple "INI File Used:..."
-* `#1110 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1110>`_ - few analyzer tests always failed in windows with make test-all
-* `#1111 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1111>`_ - miss class file path in log if log level in simtools.ini change to info level
+* `#1104 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1104>`_ - Run AnalyzeManager outputs ini file used multiple times
+* `#1111 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1111>`_ - File path missing in logger messages when level set to INFO
 * `#1154 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1154>`_ - Add option for experiment run in COMPS to use the minimal execution path
 * `#1156 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1156>`_ - COMPS should dynamically add Windows and LINUX Requirements based on environments
 * `#1195 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1195>`_ - PlatformAnalysis should support aliases as well
@@ -22,7 +20,8 @@ Bugs
 
 CLI
 ---
-* `#1237 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1237>`_ - Add ability to suppress outputs for CLI commands that might generate pipeable output
+* `#1167 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1167>`_ - idmtools config CLI command should have option to use global path
+* `#1237 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1237>`_ - Add ability to suppress outputs for CLI commands that might generate pipe-able output
 * `#1234 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1234>`_ - Add AssetizeOutputs as COMPS Cli command
 * `#1236 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1236>`_ - Add COMPS Login command to CLI
 
@@ -86,9 +85,8 @@ User Experience
 * `#1127 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1127>`_ - IDMtools install should not include emodpy, emodapi, etc when installing with idmtools[full]
 * `#1141 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1141>`_ - Add warning when user is using a development version of idmtools
 * `#1160 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1160>`_ - get_script_wrapper_unix_task should use default template that adds assets to python path
-* `#1167 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1167>`_ - idmtools config should have option to use global path
 * `#1200 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1200>`_ - Log idmtools core version when in debug mode
-* `#1240 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1240>`_ - Give better unit for progress bars
+* `#1240 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1240>`_ - Give clear units for progress bars
 * `#1241 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1241>`_ - Support disabling progress bars with environment variable or config
 
 
