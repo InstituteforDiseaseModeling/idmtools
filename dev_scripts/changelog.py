@@ -149,8 +149,8 @@ section_template = '''
 
 final_out = ''
 for release, contents in release_notes_final.items():
-    release_file = os.path.join(DOCS_DIR, f'changelog_{release}.rst')
-    if not os.path.exists(release_file) and release != 'Development':
+    release_file = os.path.join(DOCS_DIR, 'changelog', f'changelog_{release}.rst')
+    if not os.path.exists(release_file):
         final_out = release_templates.format(**dict(release=release, release_under='=' * len(release)))
         scontents = sorted(contents.keys())
         for section in scontents:
@@ -168,7 +168,7 @@ with open(cl_name, 'w') as out:
     out.write("Changelog\n")
     out.write("=========\n")
     out.write("\n.. toctree::\n\n")
-    files = sorted(list(glob.glob(os.path.join(DOCS_DIR, 'changelog_*.rst'))))
+    files = sorted(list(glob.glob(os.path.join(DOCS_DIR, 'changelog', 'changelog_*.rst'))))
     for file in files:
         rf = release_expr.match(file)
         if rf:
