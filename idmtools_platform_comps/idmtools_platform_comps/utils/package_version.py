@@ -107,6 +107,7 @@ def fetch_versions_from_server(pkg_url: str) -> List[str]:
     return all_releases
 
 
+@functools.lru_cache(3)
 def get_latest_version_from_site(pkg_url, base_version: Optional[str] = None, display_all=False):
     """
     Utility to get the latest version for a given package name
@@ -129,9 +130,10 @@ def get_latest_version_from_site(pkg_url, base_version: Optional[str] = None, di
 
     if base_version:
         # only use the longest match latest
-        version_compatible_portion = base_version[:3]
+        version_compatible_portion = ".".join(base_version.split(".")[:2])
+
         for ver in release_versions:
-            if ver[:3] == version_compatible_portion:
+            if ".".join(ver.split('.')[:2]) == version_compatible_portion:
                 return ver
         return None
     else:
