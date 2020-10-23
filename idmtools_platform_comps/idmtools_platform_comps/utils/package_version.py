@@ -37,6 +37,19 @@ def get_latest_package_version_from_pypi(pkg_name, display_all=False):
         return None
 
     all_releases = sorted(releases, key=parse_version, reverse=True)
+    return all_releases
+
+
+def get_latest_version_from_site(pkg_url, base_version: Optional[str] = None, display_all=False):
+    """
+    Utility to get the latest version for a given package name
+    Args:
+        pkg_url: package name given
+        base_version: Optional base version. Versions above this will not be added.
+        display_all: determine if output all package releases
+    Returns: the latest version of ven package
+    """
+    all_releases = fetch_versions_from_server(pkg_url)
 
     if display_all:
         print(all_releases)
@@ -52,12 +65,13 @@ def get_latest_package_version_from_artifactory(pkg_name, display_all=False):
     Utility to get the latest version for a given package name
     Args:
         pkg_name: package name given
+        base_version: Optional base version. Versions above this will not be added.
         display_all: determine if output all package releases
     Returns: the latest version of ven package
     """
     pkg_path = 'https://packages.idmod.org/artifactory/list/idm-pypi-production/'
     pkg_url = os.path.join(pkg_path, pkg_name)
-    return get_latest_version_from_site(pkg_url, display_all)
+    return get_latest_version_from_site(pkg_url, base_version, display_all)
 
 
 def get_latest_ssmt_image_version_from_artifactory(pkg_name='comps_ssmt_worker', display_all=False):
@@ -93,6 +107,20 @@ def get_latest_version_from_site(pkg_url, display_all=False):
     releases = [v for v in releases if not v.startswith('.')]
 
     all_releases = sorted(releases, key=parse_version, reverse=True)
+    return all_releases
+
+
+def get_latest_version_from_site(pkg_url, base_version: Optional[str] = None, display_all=False):
+    """
+    Fetch all versions from server
+
+    Args:
+        pkg_url: package name given
+        base_version: Optional base version. Versions above this will not be added.
+        display_all: determine if output all package releases
+    Returns: the latest version of ven package
+    """
+    all_releases = fetch_versions_from_server(pkg_url)
 
     if display_all:
         print(all_releases)
