@@ -1,16 +1,19 @@
 import tempfile
+
 import os
+
 import unittest
 import dataclasses
-from unittest import mock
+
 import pytest
+
 from idmtools import IdmConfigParser
 from idmtools.core import CacheEnabled
 from idmtools.entities.iplatform import IPlatform
+from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.registry.platform_specification import PlatformPlugins
 from idmtools_platform_comps.comps_platform import COMPSPlatform
 from idmtools_platform_comps.plugin_info import COMPSPlatformSpecification
-from idmtools_platform_comps.utils.package_version import IDM_DOCKER_PROD, fetch_versions_from_server, get_latest_ssmt_image_version_from_artifactory
 
 
 class TestCompsPlugin(unittest.TestCase):
@@ -68,25 +71,3 @@ class TestCompsPlugin(unittest.TestCase):
             print(f'Set working directory to {org_directory}')
             os.chdir(org_directory)
             IdmConfigParser.clear_instance()
-
-    def test_get_ssmt_versions(self):
-        url = os.path.join(IDM_DOCKER_PROD, 'comps_ssmt_worker')
-        versions = fetch_versions_from_server(url)
-        prev_major = None
-        pre_minor = None
-        for ver in versions:
-            parts = ver.split(".")
-            if prev_major and prev_major and prev_major <= int(parts[0]) and pre_minor <= int(parts[1]):
-                self.assertGreaterEqual(prev_major, int(parts[0]))
-                self.assertGreaterEqual(pre_minor, int(parts[1]))
-            prev_major = int(parts[0])
-            pre_minor = int(parts[1])
-
-    #
-    def test_get_next_ssmt_version(self):
-        test_versions = ['1.6.0.1', '1.5.1.7', '1.5.1.6', '1.5.0.2', '1.4.0.0', '1.3.0.0', '1.2.2.0', '1.2.0.0', '1.1.0.2', '1.1.0.0', '1.0.1.0', '1.0.0', '1.0.0.0']
-        with mock.patch('idmtools_platform_comps.utils.package_version.fetch_versions_from_server', return_value=test_versions) as mocK_fetch:
-            self.assertEqual(get_latest_ssmt_image_version_from_artifactory(base_version="1.5.1.1"), "1.5.1.7")
-            self.assertEqual(get_latest_ssmt_image_version_from_artifactory(base_version="1.5.1.7"), "1.5.1.7")
-            self.assertEqual(get_latest_ssmt_image_version_from_artifactory(base_version="1.6.0.0"), "1.6.0.1")
-            self.assertEqual(get_latest_ssmt_image_version_from_artifactory(base_version="1.1.0.0"), "1.1.0.2")

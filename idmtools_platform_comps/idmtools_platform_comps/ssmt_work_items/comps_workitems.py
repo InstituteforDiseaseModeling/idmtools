@@ -50,7 +50,6 @@ class SSMTWorkItem(ICOMPSWorkflowItem):
         SSMT_STAGING_IMAGE = 'docker-staging.packages.idmod.org/idmtools/comps_ssmt_worker'
 
         from idmtools_platform_comps.utils.package_version import get_latest_ssmt_image_version_from_artifactory
-        from idmtools_platform_comps import __version__
 
         # Determine the default ssmt docker image
         if "comps.idmod.org" in self.platform.endpoint.lower():
@@ -58,7 +57,7 @@ class SSMTWorkItem(ICOMPSWorkflowItem):
         else:
             ssmt_image = SSMT_STAGING_IMAGE
 
-        release = get_latest_ssmt_image_version_from_artifactory(base_version=__version__)
+        release = get_latest_ssmt_image_version_from_artifactory()
 
         docker_image = f'{ssmt_image}:{release}'
         if logger.isEnabledFor(DEBUG):
