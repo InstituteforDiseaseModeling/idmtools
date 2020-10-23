@@ -162,7 +162,7 @@ for release, contents in release_notes_final.items():
         with open(release_file, 'w') as out:
             out.write(final_out)
 
-cl_name = os.path.join(DOCS_DIR, 'changelog.rst')
+cl_name = os.path.join(DOCS_DIR, 'changelog', 'changelog.rst')
 with open(cl_name, 'w') as out:
     out.write("=========\n")
     out.write("Changelog\n")
