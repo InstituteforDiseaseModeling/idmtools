@@ -60,6 +60,15 @@ def get_latest_package_version_from_artifactory(pkg_name, display_all=False):
     return get_latest_version_from_site(pkg_url, display_all)
 
 
+def get_latest_docker_image_from_artifactory(image_path="idmtools", display_all=False):
+    pkg_path = f'https://packages.idmod.org/artifactory/list/docker-production/{image_path}/'
+    return get_latest_version_from_site(pkg_path, display_all)
+
+
+def get_docker_manifest(image_path="idmtools", display_all=False):
+    pkg_path = f'https://packages.idmod.org/artifactory/list/docker-production/{image_path}/'
+
+
 def get_latest_ssmt_image_version_from_artifactory(pkg_name='comps_ssmt_worker', display_all=False):
     """
     Utility to get the latest version for a given package name
