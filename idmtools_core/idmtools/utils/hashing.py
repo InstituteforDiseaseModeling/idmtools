@@ -166,17 +166,24 @@ def calculate_md5(filename: str, chunk_size: int = 8192) -> str:
         return calculate_md5_stream(f, chunk_size)
 
 
-def calculate_md5_stream(stream: Union[io.BytesIO, BinaryIO], chunk_size: int = 8192, ):
+def calculate_md5_stream(stream: Union[io.BytesIO, BinaryIO], chunk_size: int = 8192, hash_type: str = 'md5', file_hash=None):
     """
     Calculate md5 on stream
     Args:
         chunk_size:
         stream:
+        hash_type: Hash function
+        file_hash: File hash
 
     Returns:
         md5 of stream
     """
-    file_hash = hashlib.md5()
+    if file_hash is None:
+        if hasattr(hashlib, hash_type):
+            file_hash = getattr(hashlib, hash_type)()
+    else:
+        raise ValueError(f"Could not find hash function {hash_type}")
+
     while True:
         chunk = stream.read(chunk_size)
         if not chunk:

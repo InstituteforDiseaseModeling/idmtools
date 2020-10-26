@@ -23,8 +23,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
     platform: 'COMPSPlatform'  # noqa F821
     platform_type: Type = field(default=COMPSAssetCollection)
 
-    def get(self, asset_collection_id: UUID, load_children: Optional[List[str]] = None,
-            query_criteria: Optional[QueryCriteria] = None, **kwargs) -> COMPSAssetCollection:
+    def get(self, asset_collection_id: UUID, load_children: Optional[List[str]] = None, query_criteria: Optional[QueryCriteria] = None, **kwargs) -> COMPSAssetCollection:
         """
         Get an asset collection by id
 
