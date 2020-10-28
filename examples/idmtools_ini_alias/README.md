@@ -1,3 +1,8 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+undefined
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 There are 2 cases for platform config:
 1. With idmtools.ini file
 2. Without idmtools.ini file
