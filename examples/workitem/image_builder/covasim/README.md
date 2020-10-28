@@ -44,7 +44,7 @@ The example folder contains the following:
 - `inputs/sim.py`: the model simulation script that will be run on the
   cluster
 
-- `output/`: folder where simulation outputs will be downloaded to.
+- `outputs/`: folder where simulation outputs will be downloaded to.
 
 
 <!-- Refs -->
