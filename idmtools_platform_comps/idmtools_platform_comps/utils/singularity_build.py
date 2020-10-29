@@ -200,6 +200,8 @@ class SingularityBuildWorkItem(InputDataWorkItem):
                 ac = sbi.platform._assets.to_entity(ac[0])
                 if IdmConfigParser.is_output_enabled():
                     logger.log(SUCCESS, f'Found existing container in {ac.id}')
+            else:
+                ac = None
 
         return ac
 
