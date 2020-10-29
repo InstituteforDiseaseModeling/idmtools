@@ -2,12 +2,12 @@ import os
 import unittest
 import allure
 import pytest
-
 from idmtools.assets import Asset
 from idmtools.core.platform_factory import Platform
 from idmtools_platform_comps.utils.package_version import get_docker_manifest, get_digest_from_docker_hub
 from idmtools_platform_comps.utils.singularity_build import SingularityBuildWorkItem
 from idmtools_test import COMMON_INPUT_PATH
+from idmtools_test.utils.decorators import linux_only
 
 
 @pytest.mark.comps
@@ -45,23 +45,23 @@ class TestSingularityBuild(unittest.TestCase):
     @pytest.mark.skip
     def test_get_ssmt_manifest_latest(self):
         manifest, tag = get_docker_manifest("idmtools/comps_ssmt_worker")
-        self.assertEqual(tag, "'idmtools/comps_ssmt_worker:1.6.0.1'")
+        self.assertEqual(tag, "idmtools/comps_ssmt_worker:1.6.0.1")
         self.assertIsInstance(manifest, dict)
 
     def test_docker_fetch_version_tag(self):
         sbi = SingularityBuildWorkItem()
         sbi.image_url = "docker://docker-production.packages.idmod.org/idm/dtk-ubuntu-py3.7-mpich3.3-runtime:20.04.09"
         getattr(sbi, '_SingularityBuildWorkItem__add_tags')()
-        self.assertIn("docker_digest", sbi.image_tags)
-        self.assertEqual(sbi.image_tags['docker_digest'], 'sha256:d0fd5396c017aa2b1da9022bb9e9ce420317b2bb36c3c3b4986da13b0c9755b9')
+        self.assertIn("digest", sbi.image_tags)
+        self.assertEqual(sbi.image_tags['digest'], 'sha256:d0fd5396c017aa2b1da9022bb9e9ce420317b2bb36c3c3b4986da13b0c9755b9')
         self.assertEqual(sbi.image_tags['image_url'], 'docker://docker-production.packages.idmod.org/idm/dtk-ubuntu-py3.7-mpich3.3-runtime:20.04.09')
 
     def test_docker_fetch_version_from_dockerhub(self):
         sbi = SingularityBuildWorkItem()
         sbi.image_url = "docker://alpine:3.12.1"
         getattr(sbi, '_SingularityBuildWorkItem__add_tags')()
-        self.assertIn("docker_digest", sbi.image_tags)
-        self.assertEqual(sbi.image_tags['docker_digest'], 'sha256:d7342993700f8cd7aba8496c2d0e57be0666e80b4c441925fc6f9361fa81d10e')
+        self.assertIn("digest", sbi.image_tags)
+        self.assertEqual(sbi.image_tags['digest'], 'sha256:d7342993700f8cd7aba8496c2d0e57be0666e80b4c441925fc6f9361fa81d10e')
         self.assertEqual(sbi.image_tags['image_url'], 'docker://alpine:3.12.1')
         js = sbi._prep_workorder_before_create()
         self.assertIsInstance(js, dict)
@@ -75,6 +75,8 @@ class TestSingularityBuild(unittest.TestCase):
         self.assertTrue(sbi.succeeded)
         self.assertIsNotNone(sbi.asset_collection)
 
+    # because of new lines on python files, we have to make this different on different platforms
+    @linux_only
     def test_singularity_context_basic(self):
         sbi = self.get_alpine_simple_builder()
         self.assertEqual(sbi.context_checksum(), "sha256:1066d04968886be732aa5155c45458dbf42141de4175c721cf99fcff71c0ff4a")
