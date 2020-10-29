@@ -85,17 +85,27 @@ def get_latest_ssmt_image_version_from_artifactory(pkg_name='comps_ssmt_worker',
     return get_latest_version_from_site(pkg_url, base_version, display_all)
 
 
-def get_docker_manifest(image_path="idmtools", repo_base=IDM_DOCKER_PROD):
+def get_docker_manifest(image_path="idmtools/comps_ssmt_worker", repo_base=IDM_DOCKER_PROD):
+    """
+    Get docker manifest from IDM Artifactory. It mimics latest even when user has no latest tag degined
+
+    Args:
+        image_path:
+        repo_base:
+
+    Returns:
+
+    """
     if ":" not in image_path:
         image_path += ":latest"
 
     path, tag = image_path.split(":")
     if tag == "latest":
-        url = f"/".join([IDM_DOCKER_PROD, path])
+        url = "/".join([IDM_DOCKER_PROD, path])
         response = requests.get(url)
         content = response.text
-        lines = [l.split(">") for l in content.split("\n") if "<a href" in l and "pre" not in l]
-        lines = {l[1].replace("/</a", ''): datetime.strptime(l[2].strip(" -"), '%d-%b-%Y %H:%M') for l in lines}
+        lines = [link.split(">") for link in content.split("\n") if "<a href" in link and "pre" not in link]
+        lines = {item_date[1].replace("/</a", ''): datetime.strptime(item_date[2].strip(" -"), '%d-%b-%Y %H:%M') for item_date in lines}
         tag = list(sorted(lines.items(), key=operator.itemgetter(1), reverse=True))[0][0]
         image_path = ":".join([path, tag])
     final_path = "/".join([path, tag, "manifest.json"])
@@ -157,6 +167,7 @@ def fetch_versions_from_server(pkg_url: str) -> List[str]:
 def get_latest_version_from_site(pkg_url, base_version: Optional[str] = None, display_all=False):
     """
     Utility to get the latest version for a given package name
+
     Args:
         pkg_url: package name given
         base_version: Optional base version. Versions above this will not be added.

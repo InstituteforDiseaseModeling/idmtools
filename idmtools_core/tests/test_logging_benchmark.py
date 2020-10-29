@@ -1,5 +1,6 @@
 import allure
 import concurrent
+import allure
 import os
 import sys
 import threading

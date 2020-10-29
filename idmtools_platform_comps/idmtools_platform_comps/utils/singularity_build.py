@@ -3,19 +3,21 @@ import io
 import json
 import os
 from dataclasses import dataclass, field, InitVar
-from typing import List, Dict, NoReturn, Union
+from typing import List, Dict, NoReturn, Union, Optional, TYPE_CHECKING
 from urllib.parse import urlparse
 from uuid import UUID
-
 from COMPS.Data import QueryCriteria
-
-from idmtools.assets import AssetCollection
+from jinja2 import Environment
+from idmtools.assets import AssetCollection, Asset
 from idmtools.assets.file_list import FileList
 from idmtools.core import EntityStatus
 from idmtools.entities.relation_type import RelationType
 from idmtools.utils.hashing import calculate_md5_stream
 from idmtools_platform_comps.ssmt_work_items.comps_workitems import InputDataWorkItem
 from idmtools_platform_comps.utils.package_version import get_docker_manifest, get_digest_from_docker_hub
+
+if TYPE_CHECKING:
+    from idmtools.entities.iplatform import IPlatform
 
 SB_BASE_WORKER_PATH = os.path.join(os.path.dirname(__file__), 'base_singularity_work_order.json')
 
@@ -24,6 +26,12 @@ SB_BASE_WORKER_PATH = os.path.join(os.path.dirname(__file__), 'base_singularity_
 class SingularityBuildWorkItem(InputDataWorkItem):
     #: Path to definition file
     definition_file: str = field(default=None)
+    #: definition content. Alternative to file
+    definition_content: str = field(default=None)
+    #: Enables Jinja parsing of the definition file or content
+    is_template: bool = field(default=False)
+    #: template_args
+    template_args: Dict[str, str] = field(default_factory=dict)
     #: Image Url
     image_url: InitVar[str] = None
     #: Destination image name
@@ -50,8 +58,11 @@ class SingularityBuildWorkItem(InputDataWorkItem):
     disable_default_tags: bool = field(default=None)
 
     #: loaded if url is docker://. Used to determine if we need to re-run a build
-    __docker_digest: Dict[str, str] = field(default=None)
-    __docker_tag: str = field(default=None)
+    __digest: Dict[str, str] = field(default=None)
+    __image_tag: str = field(default=None)
+
+    #: rendered template. We have to store so it is calculated before RUN which means outside our normal pre-create hooks
+    __rendered_template: str = field(default=None)
 
     def __post_init__(self, item_name: str, asset_collection_id: UUID, asset_files: FileList, user_files: FileList, image_url: str):
         if self.name is None:
@@ -70,25 +81,43 @@ class SingularityBuildWorkItem(InputDataWorkItem):
 
     @image_url.setter
     def image_url(self, value: str):
+        """
+        Set the image url
+
+        Args:
+            value: Value to set value to
+
+        Returns:
+
+        """
         url_info = urlparse(value)
         if url_info.scheme == "docker":
             if "packages.idmod.org" in value:
-                full_manifest, self.__docker_tag = get_docker_manifest(url_info.path)
-                self.__docker_digest = full_manifest['config']['digest']
+                full_manifest, self.__image_tag = get_docker_manifest(url_info.path)
+                self.__digest = full_manifest['config']['digest']
             else:
-                self.__docker_tag = url_info.netloc + ":latest" if ":" not in value else url_info.netloc
+                self.__image_tag = url_info.netloc + ":latest" if ":" not in value else url_info.netloc
                 image, tag = url_info.netloc.split(":")
-                self.__docker_digest = get_digest_from_docker_hub(image, tag)
+                self.__digest = get_digest_from_docker_hub(image, tag)
             if self.fix_permissions:
-                self.__docker_digest += "--fix-perms"
+                self.__digest += "--fix-perms"
             if self.name is None:
-                self.name = f"Load Singularity image from Docker {self.__docker_tag}"
+                self.name = f"Load Singularity image from Docker {self.__image_tag}"
         # TODO how to do this for shub
         self._image_url = value
 
     def context_checksum(self) -> str:
-        file_hash = hashlib.sha256()
+        """
+        Calculate the context checksum of a singularity build
 
+        The context is the checksum of all the assets defined for input, the singularity definition file
+
+        Returns:
+
+        """
+        file_hash = hashlib.sha256()
+        # ensure our template is set
+        self.__add_common_assets()
         for asset in sorted(self.assets + self.transient_assets, key=lambda a: a.short_remote_path()):
             if asset.absolute_path:
                 with open(asset.absolute_path, mode='rb') as ain:
@@ -105,29 +134,58 @@ class SingularityBuildWorkItem(InputDataWorkItem):
             item.write(contents.encode('utf-8'))
             item.seek(0)
             calculate_md5_stream(item, file_hash=file_hash)
-        if self.definition_file and os.path.exists(self.definition_file):
-            with open(self.definition_file, mode='rb') as ain:
-                calculate_md5_stream(ain, file_hash=file_hash)
-        return file_hash.hexdigest()
+        return f'sha256:{file_hash.hexdigest()}'
+
+    def render_template(self) -> Optional[str]:
+        if self.is_template:
+            # We don't allow re-running template rendering
+            if self.__rendered_template is None:
+                contents = None
+                # try from file first
+                if self.definition_file:
+                    with open(self.definition_file, mode='r') as ain:
+                        contents = ain.read()
+                elif self.definition_content:
+                    contents = self.definition_content
+
+                if contents:
+                    env = Environment()
+                    template = env.from_string(contents)
+                    self.__rendered_template = template.render(env=os.environ, sbi=self, **self.template_args)
+            return self.__rendered_template
+        return None
 
     @staticmethod
     def find_existing_container(sbi: 'SingularityBuildWorkItem'):
-        if sbi.__docker_digest:
-            ac = sbi.platform._assets.get(None, query_criteria=QueryCriteria().where_tag(['type=singularity', f'docker_digest={sbi.__docker_digest}']))
-            return ac if ac else None
-        return None
+        """
+        Find existing container
+
+        Args:
+            sbi:
+
+        Returns:
+
+        """
+        ac = None
+        qc = QueryCriteria().where_tag(['type=singularity']).select_children('assets')
+        if sbi.__digest:
+            qc.where_tag([f'digest={sbi.__digest}'])
+        elif sbi.definition_file or sbi.definition_content:
+            qc.where_tag([f'build_context={sbi.context_checksum()}'])
+        if len(qc.tag_filters) > 1:
+            ac = sbi.platform._assets.get(None, query_criteria=qc)
+        return sbi.platform._assets.to_entity(ac[0]) if ac else None
 
     def __add_tags(self):
         self.image_tags['type'] = 'singularity'
         if not self.disable_default_tags:
-            if self.__docker_digest and isinstance(self.__docker_digest, str):
-                self.image_tags['docker_digest'] = self.__docker_digest
-                self.image_tags['docker_from'] = self.__docker_tag
+            if self.__digest and isinstance(self.__digest, str):
+                self.image_tags['digest'] = self.__digest
+                self.image_tags['image_from'] = self.__image_tag
                 if self.image_name is None:
-                    self.image_name = self.__docker_tag.strip(" /").replace(":", "_").replace("/", "_") + ".sif"
+                    self.image_name = self.__image_tag.strip(" /").replace(":", "_").replace("/", "_") + ".sif"
             elif self.definition_file:
                 self.image_tags['build_context'] = self.context_checksum()
-
             if self.image_url:
                 self.image_tags['image_url'] = self.image_url
 
@@ -137,7 +195,7 @@ class SingularityBuildWorkItem(InputDataWorkItem):
         self.__add_tags()
         self.load_work_order(SB_BASE_WORKER_PATH)
         if self.definition_file:
-            self.work_order['Build']['Input'] = os.path.basename(self.definition_file)
+            self.work_order['Build']['Input'] = "Assets/Singularity.def"
         else:
             self.work_order['Build']['Input'] = self.image_url
         if len(self.environment_variables):
@@ -157,9 +215,27 @@ class SingularityBuildWorkItem(InputDataWorkItem):
 
     def pre_creation(self, platform: 'IPlatform') -> None:
         super(SingularityBuildWorkItem, self).pre_creation(platform)
+        self.__add_common_assets()
         self._prep_workorder_before_create()
 
+    def __add_common_assets(self):
+        if self.definition_file:
+            opts = dict(content=self.__rendered_template) if self.is_template else dict(absolute_path=self.definition_file)
+            self.assets.add_or_replace_asset(Asset(filename="Singularity.def", **opts))
+        elif self.definition_content:
+            opts = dict(content=self.__rendered_template if self.is_template else self.definition_content)
+            self.assets.add_or_replace_asset(Asset(filename="Singularity.def", **opts))
+
     def __fetch_finished_asset_collection(self, platform: 'IPlatform') -> Union[AssetCollection, None]:
+        """
+        Fetch the Singularity asset collection we created
+
+        Args:
+            platform: Platform to fetch from.
+
+        Returns:
+            Asset Collection or None
+        """
         comps_workitem = self.get_platform_object(force=True)
         acs = comps_workitem.get_related_asset_collections(RelationType.Created)
         if acs:
@@ -188,6 +264,8 @@ class SingularityBuildWorkItem(InputDataWorkItem):
             super().run(**opts)
         else:
             self.asset_collection = ac
+            # how do we get id for original work item from AC?
+            self.status = EntityStatus.SUCCEEDED
 
     def wait(self, wait_on_done_progress: bool = True, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None) -> Union[AssetCollection, None]:
         """

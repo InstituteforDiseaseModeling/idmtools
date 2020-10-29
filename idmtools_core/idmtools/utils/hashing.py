@@ -181,8 +181,8 @@ def calculate_md5_stream(stream: Union[io.BytesIO, BinaryIO], chunk_size: int = 
     if file_hash is None:
         if hasattr(hashlib, hash_type):
             file_hash = getattr(hashlib, hash_type)()
-    else:
-        raise ValueError(f"Could not find hash function {hash_type}")
+        else:
+            raise ValueError(f"Could not find hash function {hash_type}")
 
     while True:
         chunk = stream.read(chunk_size)
