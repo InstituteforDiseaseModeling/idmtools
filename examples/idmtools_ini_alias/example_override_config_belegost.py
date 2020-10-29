@@ -13,9 +13,9 @@ with Platform('Belegost',
               priority='Normal',
               simulation_root=os.path.join('$COMPS_PATH(USER)', 'my_output'),
               node_group='emod_a',
-              num_cores='1',
-              num_retries='0',
-              exclusive='False'):
+              num_cores=1,
+              num_retries=0,
+              exclusive=False):
 
     # The last step is to call run() on the ExperimentManager to run the simulations.
     experiment.run(True)
