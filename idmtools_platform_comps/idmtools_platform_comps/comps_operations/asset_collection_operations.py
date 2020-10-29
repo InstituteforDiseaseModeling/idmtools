@@ -7,7 +7,7 @@ from typing import Type, Union, List, TYPE_CHECKING, Optional
 from uuid import UUID
 import humanfriendly
 from COMPS.Data import AssetCollection as COMPSAssetCollection, QueryCriteria, AssetCollectionFile, SimulationFile, OutputFileMetadata, WorkItemFile
-
+from tqdm import tqdm
 from idmtools import IdmConfigParser
 from idmtools.assets import AssetCollection, Asset
 from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
@@ -129,7 +129,20 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
                     ))
             if IdmConfigParser.is_output_enabled():
                 user_logger.info(f"Uploading {len(missing_files)} files/{humanfriendly.format_size(total_size)}")
-            ac2.save()
+            callback = None
+            prog = None
+            if not IdmConfigParser.is_progress_bar_disabled():
+                prog = tqdm(desc="Uploading files", unit='file', total=len(missing_files))
+
+                def update_progress(total_files_uploaded):
+                    prog.n = total_files_uploaded
+                    prog.display()
+
+                callback = update_progress
+            ac2.save(upload_files_callback=callback)
+            if callback:
+                callback(len(missing_files))
+                prog.close()
             ac = ac2
         asset_collection.uid = ac.id
         asset_collection._platform_object = asset_collection
