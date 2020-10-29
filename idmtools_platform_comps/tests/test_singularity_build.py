@@ -25,6 +25,7 @@ class TestSingularityBuild(unittest.TestCase):
         self.assertIsInstance(manifest, dict)
         self.assertEqual(manifest['config']['digest'], 'sha256:d0fd5396c017aa2b1da9022bb9e9ce420317b2bb36c3c3b4986da13b0c9755b9')
 
+    # we can't do this everytime since latest changes
     @pytest.mark.skip
     def test_get_docker_manifest_latest(self):
         manifest, tag = get_docker_manifest("idm/dtk-ubuntu-py3.7-mpich3.3-runtime:latest")
@@ -32,6 +33,7 @@ class TestSingularityBuild(unittest.TestCase):
         self.assertEqual(manifest['config']['digest'], 'sha256:d0fd5396c017aa2b1da9022bb9e9ce420317b2bb36c3c3b4986da13b0c9755b9')
         self.assertEqual(tag, "idm/dtk-ubuntu-py3.7-mpich3.3-runtime:20.04.09")
 
+    # we can't do this everytime since latest changes
     @pytest.mark.skip
     def test_get_dockerhub_latest(self):
         manifest = get_digest_from_docker_hub("alpine", "latest")
