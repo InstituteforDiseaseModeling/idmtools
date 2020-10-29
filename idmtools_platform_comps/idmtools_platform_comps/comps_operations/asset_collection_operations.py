@@ -171,13 +171,13 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         elif isinstance(asset_collection, list) and len(asset_collection):
             if isinstance(asset_collection[0], (SimulationFile, WorkItemFile)):
                 for file in asset_collection:
-                    ac.add_asset(self.__simulation_file_to_asset(ac, file))
+                    ac.add_asset(self.__simulation_file_to_asset(file))
             else:
                 raise ValueError("Unknown asset list")
         assets = asset_collection.assets if isinstance(asset_collection, COMPSAssetCollection) else asset_collection
         # if we have just one, make it a list
         if isinstance(asset_collection, SimulationFile):
-            ac.add_asset(self.__simulation_file_to_asset(ac, asset_collection))
+            ac.add_asset(self.__simulation_file_to_asset(asset_collection))
         if assets:
             # add items to asset collection
             for asset in assets:
@@ -195,11 +195,10 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
 
         return ac
 
-    def __simulation_file_to_asset(self, ac: AssetCollection, asset_collection: Union[SimulationFile, WorkItemFile]):
+    def __simulation_file_to_asset(self, asset_collection: Union[SimulationFile, WorkItemFile]):
         """
         Converts a Simulation File to an Asset
         Args:
-            ac: Asset Collection to add file
             asset_collection:
 
         Returns:
