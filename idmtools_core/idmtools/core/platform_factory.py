@@ -173,7 +173,7 @@ class Platform:
         # Display block info
         try:
             from idmtools.core.logging import VERBOSE
-            if os.getenv('IDMTOOLS_SUPPRESS_OUTPUT', None) is None:
+            if IdmConfigParser.is_output_enabled():
                 if is_alias:
                     user_logger.log(VERBOSE, f"\n[{block}]")
                     user_logger.log(VERBOSE, json.dumps(section, indent=3))

@@ -8,6 +8,8 @@ from dataclasses import dataclass, field
 from logging import getLogger, DEBUG
 from COMPS.Data.CommissionableEntity import CommissionableEntity
 from typing import List, Union, Callable, Dict
+
+from idmtools import IdmConfigParser
 from idmtools.assets import Asset, AssetCollection
 from idmtools.assets.file_list import FileList
 from idmtools.core.interfaces.irunnable_entity import IRunnableEntity
@@ -210,7 +212,7 @@ class AssetizeOutput(SSMTWorkItem):
         self.__pickle_pre_run()
         self.__pickle_filter_func()
         self.task.command = self.create_command()
-        if os.getenv('IDMTOOLS_SUPPRESS_OUTPUT', None) is None:
+        if IdmConfigParser.is_output_enabled():
             user_logger.info("Creating Watcher")
 
     def __generate_tags(self):

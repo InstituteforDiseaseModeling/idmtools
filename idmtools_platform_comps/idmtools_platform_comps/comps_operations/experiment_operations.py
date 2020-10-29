@@ -10,6 +10,7 @@ from COMPS.Data import Experiment as COMPSExperiment, QueryCriteria, Configurati
     Simulation as COMPSSimulation
 from COMPS.Data.Simulation import SimulationState
 
+from idmtools import IdmConfigParser
 from idmtools.assets import AssetCollection, Asset
 from idmtools.core import ItemType, EntityStatus
 from idmtools.core.experiment_factory import experiment_factory
@@ -220,7 +221,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         return exp_command
 
     def post_create(self, experiment: Experiment, **kwargs) -> NoReturn:
-        if os.getenv('IDMTOOLS_SUPPRESS_OUTPUT', None) is None:
+        if IdmConfigParser.is_output_enabled():
             user_logger.log(SUCCESS, f"\nThe created experiment can be viewed at {self.platform.endpoint}/#explore/"
                                      f"Simulations?filters=ExperimentId={experiment.uid}\nSimulations are still being created\n"
                             )

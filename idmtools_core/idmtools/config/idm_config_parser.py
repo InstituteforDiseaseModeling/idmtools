@@ -277,6 +277,16 @@ class IdmConfigParser:
         return all([x.lower() in TRUTHY_VALUES for x in [IdmConfigParser.get_option(None, "DISABLE_PROGRESS_BAR", 'f')]])
 
     @classmethod
+    def is_output_enabled(cls) -> bool:
+        """
+        Is output enabled
+
+        Returns:
+            Return if output should be disabled
+        """
+        return not any([x.lower() in TRUTHY_VALUES for x in [IdmConfigParser.get_option(None, "SUPPRESS_OUTPUT", 'f')]])
+
+    @classmethod
     def ensure_init(cls, dir_path: str = '.', file_name: str = default_config, force: bool = False) -> None:
         """
         Verify that the INI file loaded and a configparser instance is available.

@@ -7,6 +7,8 @@ from typing import Type, Union, List, TYPE_CHECKING, Optional
 from uuid import UUID
 import humanfriendly
 from COMPS.Data import AssetCollection as COMPSAssetCollection, QueryCriteria, AssetCollectionFile, SimulationFile, OutputFileMetadata, WorkItemFile
+
+from idmtools import IdmConfigParser
 from idmtools.assets import AssetCollection, Asset
 from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
 from idmtools_platform_comps.utils.general import get_file_as_generator
@@ -122,7 +124,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
                         relative_path=asset.relative_path,
                         md5_checksum=cksum
                     ))
-            if os.getenv('IDMTOOLS_SUPPRESS_OUTPUT', None) is None:
+            if IdmConfigParser.is_output_enabled():
                 user_logger.info(f"Uploading {len(missing_files)} files/{humanfriendly.format_size(total_size)}")
             ac2.save()
             ac = ac2

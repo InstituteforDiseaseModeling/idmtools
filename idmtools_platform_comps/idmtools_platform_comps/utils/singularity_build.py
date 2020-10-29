@@ -3,14 +3,18 @@ import io
 import json
 import os
 from dataclasses import dataclass, field, InitVar
+from logging import getLogger, DEBUG
 from typing import List, Dict, NoReturn, Union, Optional, TYPE_CHECKING
 from urllib.parse import urlparse
 from uuid import UUID
 from COMPS.Data import QueryCriteria
 from jinja2 import Environment
+
+from idmtools import IdmConfigParser
 from idmtools.assets import AssetCollection, Asset
 from idmtools.assets.file_list import FileList
 from idmtools.core import EntityStatus
+from idmtools.core.logging import SUCCESS
 from idmtools.entities.relation_type import RelationType
 from idmtools.utils.hashing import calculate_md5_stream
 from idmtools_platform_comps.ssmt_work_items.comps_workitems import InputDataWorkItem
@@ -20,6 +24,9 @@ if TYPE_CHECKING:
     from idmtools.entities.iplatform import IPlatform
 
 SB_BASE_WORKER_PATH = os.path.join(os.path.dirname(__file__), 'base_singularity_work_order.json')
+
+logger = getLogger(__name__)
+user_logger = getLogger('user')
 
 
 @dataclass(repr=False)
@@ -68,6 +75,7 @@ class SingularityBuildWorkItem(InputDataWorkItem):
         if self.name is None:
             self.name = "Singularity build"
         self.work_item_type = 'ImageBuilderWorker'
+        self._image_url = None
         super().__post_init__(item_name, asset_collection_id, asset_files, user_files)
 
         self.image_url = image_url if isinstance(image_url, str) else None
@@ -134,12 +142,23 @@ class SingularityBuildWorkItem(InputDataWorkItem):
             item.write(contents.encode('utf-8'))
             item.seek(0)
             calculate_md5_stream(item, file_hash=file_hash)
+
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f'Context: sha256:{file_hash.hexdigest()}')
         return f'sha256:{file_hash.hexdigest()}'
 
     def render_template(self) -> Optional[str]:
+        """
+        Render template. Only applies when is_template is True. When true, it renders the template using Jinja to a cache value
+
+        Returns:
+            Rendered Template
+        """
         if self.is_template:
             # We don't allow re-running template rendering
             if self.__rendered_template is None:
+                if logger.isEnabledFor(DEBUG):
+                    logger.debug("Rendering template")
                 contents = None
                 # try from file first
                 if self.definition_file:
@@ -156,27 +175,41 @@ class SingularityBuildWorkItem(InputDataWorkItem):
         return None
 
     @staticmethod
-    def find_existing_container(sbi: 'SingularityBuildWorkItem'):
+    def find_existing_container(sbi: 'SingularityBuildWorkItem') -> Optional[AssetCollection]:
         """
         Find existing container
 
         Args:
-            sbi:
+            sbi: SingularityBuildWorkItem to find existing container matching config
 
         Returns:
-
+            Existing Asset Collection
         """
         ac = None
-        qc = QueryCriteria().where_tag(['type=singularity']).select_children('assets')
-        if sbi.__digest:
-            qc.where_tag([f'digest={sbi.__digest}'])
-        elif sbi.definition_file or sbi.definition_content:
-            qc.where_tag([f'build_context={sbi.context_checksum()}'])
-        if len(qc.tag_filters) > 1:
-            ac = sbi.platform._assets.get(None, query_criteria=qc)
-        return sbi.platform._assets.to_entity(ac[0]) if ac else None
+        if not sbi.force:  # don't search if it is going to be forced
+            qc = QueryCriteria().where_tag(['type=singularity']).select_children('assets')
+            if sbi.__digest:
+                qc.where_tag([f'digest={sbi.__digest}'])
+            elif sbi.definition_file or sbi.definition_content:
+                qc.where_tag([f'build_context={sbi.context_checksum()}'])
+            if len(qc.tag_filters) > 1:
+                if logger.isEnabledFor(DEBUG):
+                    logger.debug("Searching for existing containers")
+                ac = sbi.platform._assets.get(None, query_criteria=qc)
+            if ac:
+                ac = sbi.platform._assets.to_entity(ac[0])
+                if IdmConfigParser.is_output_enabled():
+                    logger.log(SUCCESS, f'Found existing container in {ac.id}')
+
+        return ac
 
     def __add_tags(self):
+        """
+        Add default tags to the asset collection to be created
+
+        Returns:
+            None
+        """
         self.image_tags['type'] = 'singularity'
         if not self.disable_default_tags:
             if self.__digest and isinstance(self.__digest, str):
@@ -189,8 +222,12 @@ class SingularityBuildWorkItem(InputDataWorkItem):
             if self.image_url:
                 self.image_tags['image_url'] = self.image_url
 
-    def _prep_workorder_before_create(self):
+    def _prep_workorder_before_create(self) -> Dict[str, str]:
         """
+        Prep work order before creation
+
+        Returns:
+
         """
         self.__add_tags()
         self.load_work_order(SB_BASE_WORKER_PATH)
@@ -214,11 +251,25 @@ class SingularityBuildWorkItem(InputDataWorkItem):
         return self.work_order
 
     def pre_creation(self, platform: 'IPlatform') -> None:
+        """
+        Pre-Creation item
+
+        Args:
+            platform: Platform object
+
+        Returns:
+
+        """
         super(SingularityBuildWorkItem, self).pre_creation(platform)
         self.__add_common_assets()
         self._prep_workorder_before_create()
 
     def __add_common_assets(self):
+        """
+        Add common assets which in this case is the singularity definition file
+        Returns:
+
+        """
         if self.definition_file:
             opts = dict(content=self.__rendered_template) if self.is_template else dict(absolute_path=self.definition_file)
             self.assets.add_or_replace_asset(Asset(filename="Singularity.def", **opts))
@@ -260,16 +311,18 @@ class SingularityBuildWorkItem(InputDataWorkItem):
         opts = dict(wait_on_done_progress=wait_on_done_progress, wait_until_done=wait_until_done, wait_on_done=wait_on_done, platform=p)
         self.platform = p
         ac = self.find_existing_container(self)
-        if ac is None:
+        if ac is None or self.force:
             super().run(**opts)
         else:
+            # Set id to None
+            self.uid = None
             self.asset_collection = ac
             # how do we get id for original work item from AC?
             self.status = EntityStatus.SUCCEEDED
 
     def wait(self, wait_on_done_progress: bool = True, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None) -> Union[AssetCollection, None]:
         """
-        Waits on Singularity Build Workitem to finish and fetches the resulting asset collection
+        Waits on Singularity Build Work item to finish and fetches the resulting asset collection
 
         Args:
             wait_on_done_progress: When set to true, a progress bar will be shown from the item
