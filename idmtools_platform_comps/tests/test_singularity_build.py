@@ -8,6 +8,7 @@ from idmtools_platform_comps.utils.package_version import get_docker_manifest, g
 from idmtools_platform_comps.utils.singularity_build import SingularityBuildWorkItem
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.decorators import linux_only
+from idmtools_test.utils.utils import get_case_name
 
 
 @pytest.mark.comps
@@ -16,7 +17,7 @@ class TestSingularityBuild(unittest.TestCase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         self.platform = Platform("SlurmStage")
 
     def test_get_docker_manifest(self):
@@ -49,7 +50,7 @@ class TestSingularityBuild(unittest.TestCase):
         self.assertIsInstance(manifest, dict)
 
     def test_docker_fetch_version_tag(self):
-        sbi = SingularityBuildWorkItem()
+        sbi = SingularityBuildWorkItem(name=self.case_name)
         sbi.image_url = "docker://docker-production.packages.idmod.org/idm/dtk-ubuntu-py3.7-mpich3.3-runtime:20.04.09"
         getattr(sbi, '_SingularityBuildWorkItem__add_tags')()
         self.assertIn("digest", sbi.image_tags)
@@ -57,7 +58,7 @@ class TestSingularityBuild(unittest.TestCase):
         self.assertEqual(sbi.image_tags['image_url'], 'docker://docker-production.packages.idmod.org/idm/dtk-ubuntu-py3.7-mpich3.3-runtime:20.04.09')
 
     def test_docker_fetch_version_from_dockerhub(self):
-        sbi = SingularityBuildWorkItem()
+        sbi = SingularityBuildWorkItem(name=self.case_name)
         sbi.image_url = "docker://alpine:3.12.1"
         getattr(sbi, '_SingularityBuildWorkItem__add_tags')()
         self.assertIn("digest", sbi.image_tags)
@@ -101,6 +102,7 @@ class TestSingularityBuild(unittest.TestCase):
         sing_dir = os.path.join(COMMON_INPUT_PATH, 'singularity', 'alpine_template')
         def_file = os.path.join(sing_dir, 'Singularity.jinja')
         sbi = SingularityBuildWorkItem(
+            name=self.case_name,
             definition_file=def_file, is_template=True,
             template_args=dict(python_version='3.8.6', packages=['numpy', 'pandas', 'requests'])
         )

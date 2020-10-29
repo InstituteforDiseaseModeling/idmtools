@@ -1,7 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
-from typing import NoReturn
-
+from typing import NoReturn, Union
 from idmtools.assets import TAsset, TAssetList
 from idmtools.assets.asset_collection import AssetCollection
 
@@ -31,5 +30,5 @@ class IAssetsEnabled(metaclass=ABCMeta):
         for asset in assets:
             self.assets.add_asset(asset, fail_on_duplicate)
 
-    def add_asset(self, asset: 'TAsset' = None, fail_on_duplicate: bool = True) -> NoReturn:
+    def add_asset(self, asset: Union[str, 'TAsset'] = None, fail_on_duplicate: bool = True) -> NoReturn:
         self.assets.add_asset(asset, fail_on_duplicate)
