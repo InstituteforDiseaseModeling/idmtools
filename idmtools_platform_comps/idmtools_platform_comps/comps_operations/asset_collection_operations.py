@@ -25,7 +25,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
     platform: 'COMPSPlatform'  # noqa F821
     platform_type: Type = field(default=COMPSAssetCollection)
 
-    def get(self, asset_collection_id: UUID, load_children: Optional[List[str]] = None, query_criteria: Optional[QueryCriteria] = None, **kwargs) -> COMPSAssetCollection:
+    def get(self, asset_collection_id: Optional[UUID], load_children: Optional[List[str]] = None, query_criteria: Optional[QueryCriteria] = None, **kwargs) -> COMPSAssetCollection:
         """
         Get an asset collection by id
 
@@ -39,7 +39,10 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
             COMPSAssetCollection
         """
         children = load_children if load_children is not None else ["assets", "tags"]
+        if asset_collection_id is None and query_criteria is None:
+            raise ValueError("You cannot query for all asset collections. Please specify a query criteria or an id")
         query_criteria = query_criteria or QueryCriteria().select_children(children)
+
         return COMPSAssetCollection.get(id=asset_collection_id, query_criteria=query_criteria)
 
     def platform_create(self, asset_collection: AssetCollection, **kwargs) -> COMPSAssetCollection:
