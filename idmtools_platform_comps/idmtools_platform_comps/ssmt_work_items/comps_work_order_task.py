@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from idmtools.assets import AssetCollection
 from idmtools.entities.itask import ITask
+from idmtools.entities.simulation import Simulation
 from idmtools_platform_comps.ssmt_work_items.work_order import IWorkOrder
 
 
@@ -14,5 +15,5 @@ class CompsWorkOrderTask(ITask):
     def gather_transient_assets(self) -> AssetCollection:
         pass
 
-    def reload_from_simulation(self, simulation: 'Simulation'):
+    def reload_from_simulation(self, simulation: Simulation):
         pass
