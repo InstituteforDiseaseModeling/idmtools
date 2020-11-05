@@ -4,4 +4,4 @@ try: # since cli is not required but we always try to load file, wrap in try exc
     from idmtools_platform_comps.comps_cli import CompsCLI
 except ImportError:
     pass
-__version__ = "1.6.0.0"
+__version__ = "1.6.0+nightly.0"
