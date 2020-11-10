@@ -1,16 +1,16 @@
 from dataclasses import dataclass, field, fields
 from logging import getLogger, DEBUG
-from typing import List, Callable, NoReturn, Union, Mapping, Any, Type, TypeVar, Dict, TYPE_CHECKING
-
+from typing import List, Union, Mapping, Any, Type, TypeVar, Dict, TYPE_CHECKING
 from idmtools.assets import AssetCollection, Asset
 from idmtools.core import ItemType, NoTaskFound
 from idmtools.core.enums import EntityStatus
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
+from idmtools.core.interfaces.iitem import IItem
 from idmtools.core.interfaces.inamed_entity import INamedEntity
 from idmtools.entities.task_proxy import TaskProxy
 from idmtools.utils.language import get_qualified_class_name_from_obj
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.itask import ITask
     from idmtools.entities.iplatform import IPlatform
     from idmtools.entities.experiment import Experiment
@@ -30,12 +30,12 @@ class Simulation(IAssetsEnabled, INamedEntity):
     task: 'ITask' = field(default=None)  # noqa: F821
     #: Item Type. Should not be changed from Simulation
     item_type: ItemType = field(default=ItemType.SIMULATION, compare=False)
-    #: List of hooks that we can modify to add additional behaviour before creation of simulations
-    pre_creation_hooks: List[Callable[[], NoReturn]] = field(default_factory=lambda: [Simulation.gather_assets])
     #: Control whether we should replace the task with a proxy after creation
     __replace_task_with_proxy: bool = field(default=True, init=False, compare=False)
     #: Ensure we don't gather assets twice
     __assets_gathered: bool = field(default=False)
+    #: Extra arguments to pass on creation to platform
+    _platform_kwargs: dict = field(default_factory=dict)
 
     @property
     def experiment(self) -> 'Experiment':  # noqa: F821
@@ -51,7 +51,19 @@ class Simulation(IAssetsEnabled, INamedEntity):
     def __hash__(self):
         return id(self.uid)
 
-    def pre_creation(self):
+    def pre_creation(self, platform: 'IPlatform'):
+        """
+
+        Runs before a simulation is created server side
+
+        Args:
+            platform: Platform the item is being executed on
+
+        Returns:
+
+        """
+        # skip the IItem created function
+        IItem.pre_creation(self, platform)
         if self.task is None:
             msg = 'Task is required for simulations'
             user_logger.error(msg)
@@ -59,14 +71,9 @@ class Simulation(IAssetsEnabled, INamedEntity):
 
         if logger.isEnabledFor(DEBUG):
             logger.debug('Calling task pre creation')
-        self.task.pre_creation(self)
+        self.task.pre_creation(self, platform)
 
-        # Call all of our hooks
-        for x in self.pre_creation_hooks:
-            if logger.isEnabledFor(DEBUG):
-                logger.debug(f'Calling simulation pre-create hook named '
-                             f'{x.__name__ if hasattr(x, "__name__") else str(x)}')
-            x(self)
+        self.gather_assets()
 
         if self.__class__ is not Simulation:
             # Add a tag to keep the Simulation class name
@@ -82,12 +89,22 @@ class Simulation(IAssetsEnabled, INamedEntity):
                 logger.debug(f'Setting Simulation Tag "task_type" to "{tn}"')
             self.tags["task_type"] = tn
 
-    def post_creation(self) -> None:
+    def post_creation(self, platform: 'IPlatform') -> None:
+        """
+        Called after a simulation is created
+
+        Args:
+            platform: Platform simulation is being executed on
+
+        Returns:
+
+        """
         if logger.isEnabledFor(DEBUG):
             logger.debug('Calling task post creation')
         if self.task is not None and not isinstance(self.task, TaskProxy):
-            self.task.post_creation(self)
+            self.task.post_creation(self, self.platform)
 
+        IItem.post_creation(self, platform)
         if self.__replace_task_with_proxy or (self.parent and self.parent._Experiment__replace_task_with_proxy):
             if logger.isEnabledFor(DEBUG):
                 logger.debug('Replacing task with proxy')

@@ -11,8 +11,8 @@ from io import BytesIO
 from logging import getLogger
 from typing import BinaryIO, Dict, NoReturn, Optional, Union, Any
 from docker.models.containers import Container
-from tqdm import tqdm
-
+from idmtools import IdmConfigParser
+from idmtools.core import TRUTHY_VALUES
 from idmtools.core.system_information import get_data_directory
 from idmtools.utils.decorators import ParallelizeDecorator
 from idmtools_platform_local.infrastructure.postgres import PostgresContainer
@@ -67,7 +67,7 @@ class DockerIO:
                 pass
 
     def cleanup(self, delete_data: bool = True,
-                shallow_delete: bool = os.getenv('SHALLOW_DELETE', '0').lower() in ['1', 'y', 'yes', 'on']) -> NoReturn:
+                shallow_delete: bool = os.getenv('SHALLOW_DELETE', '0').lower() in TRUTHY_VALUES) -> NoReturn:
         """
         Stops the running services, removes local data, and removes network. You can optionally disable the deleting
         of local data
@@ -171,7 +171,12 @@ class DockerIO:
                                    files: Dict[str, Dict[str, Any]],
                                    join_on_copy: bool = True):
         results = []
-        for dest_path, sub_files in tqdm(files.items(), desc="Copying Assets to Local Platform"):
+        if IdmConfigParser.is_progress_bar_disabled():
+            prog_items = files.items()
+        else:
+            from tqdm import tqdm
+            prog_items = tqdm(files.items(), desc="Copying Assets to Local Platform", unit='file')
+        for dest_path, sub_files in prog_items:
             for fn in sub_files:
                 results.append(self.copy_to_container(container, destination_path=dest_path, **fn))
 

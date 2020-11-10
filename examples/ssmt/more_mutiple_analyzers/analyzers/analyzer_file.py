@@ -44,8 +44,8 @@ class ExampleAnalyzer2(IAnalyzer):
 
 
 if __name__ == "__main__":
-    platform = Platform('COMPS2')
+    platform = Platform('BELEGOST')
     analyzers = [ExampleAnalyzer(filenames=["output/result.json"]), ExampleAnalyzer2(filenames=["config.json"])]
-    exp_id = "11052582-83da-e911-a2be-f0921c167861"  # COMPS2 exp_id
+    exp_id = "40c1b14d-0a04-eb11-a2c7-c4346bcb1553"  # COMPS exp_id
     am = AnalyzeManager(platform, ids=[(exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
     am.analyze()

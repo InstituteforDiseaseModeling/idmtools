@@ -1,11 +1,10 @@
+import allure
 import os
 import sys
 from functools import partial
-
 import pandas as pd
 import pytest
 from COMPS.Data import Experiment as COMPSExperiment
-
 from idmtools.analysis.analyze_manager import AnalyzeManager
 from idmtools.analysis.download_analyzer import DownloadAnalyzer
 from idmtools.builders import SimulationBuilder
@@ -26,6 +25,9 @@ sys.path.insert(0, analyzer_path)
 @pytest.mark.analysis
 @pytest.mark.python
 @pytest.mark.comps
+@allure.story("COMPS")
+@allure.story("Analyzers")
+@allure.suite("idmtools_platform_comps")
 class TestAnalyzeManagerPythonComps(ITestWithPersistence):
 
     def setUp(self) -> None:
@@ -60,6 +62,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         return exp_id
 
     @pytest.mark.long
+    @pytest.mark.serial
     def test_download_analyzer(self):
         # step1: test with 1 experiment
         output_folder = "output_test_download_analyzer"
@@ -88,6 +91,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
                 self.assertTrue(os.path.exists(os.path.join(output_folder, str(simulation.id), "config.json")))
                 self.assertTrue(os.path.exists(os.path.join(output_folder, str(simulation.id), "result.json")))
 
+    @pytest.mark.serial
     def test_analyzer_filter_sims(self):
         exp_id = '69cab2fe-a252-ea11-a2bf-f0921c167862'  # comps2
         # then run SimFilterAnalyzer to analyze the sims tags
@@ -109,6 +113,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         self.assertTrue(df['value'].values[1:5].size == 4)
         self.assertTrue(df['value'].values[1:5].all() == '2')
 
+    @pytest.mark.serial
     def test_analyzer_filter_sims_by_id(self):
         exp_id = '69cab2fe-a252-ea11-a2bf-f0921c167862'  # comps2
         output_folder = "output_test_analyzer_filter_sims_by_id"
@@ -133,6 +138,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
 
     # test analyzer with parameter: analyze_failed_items=True
     # note: when this flag to True, it does not mean analyzer only on failed simulations, it also on succeeded sims
+    @pytest.mark.serial
     def test_analyzer_with_failed_sims(self):
         experiment_id = 'c3e4ef50-ee63-ea11-a2bf-f0921c167862'  # staging experiment includes 5 sims with 3 failed sims
         filenames = ["stdErr.txt"]
@@ -166,6 +172,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
     # test analyzer with only succeeded simulations
     # note: experiment can have failed sims, but analyzer only analyzes succeeded sims
     @pytest.mark.smoke
+    @pytest.mark.serial
     def test_analyzer_with_succeeded_sims(self):
         experiment_id = 'c3e4ef50-ee63-ea11-a2bf-f0921c167862'  # staging experiment includes 5 sims with 3 failed sims
         output_folder = "output_test_analyzer_with_succeeded_sims"

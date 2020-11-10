@@ -1,3 +1,4 @@
+import allure
 import os
 import unittest
 from functools import partial
@@ -19,6 +20,9 @@ setA = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
 
 @pytest.mark.comps
 @pytest.mark.long
+@allure.story("COMPS")
+@allure.story("Outputs")
+@allure.suite("idmtools_platform_comps")
 class TestRetrieval(ITestWithPersistence):
     @classmethod
     def setUpClass(cls) -> None:

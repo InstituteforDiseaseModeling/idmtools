@@ -1,9 +1,12 @@
+import allure
 import pytest
 import unittest
-
 from idmtools_test.utils.cli import run_command
 
 
+@allure.story("CLI")
+@allure.story("Version")
+@allure.suite("idmtools_cli")
 class TestSystemInfoBasics(unittest.TestCase):
 
     @pytest.mark.smoke

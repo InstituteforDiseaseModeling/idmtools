@@ -1,12 +1,11 @@
+import allure
 import os
 import re
 import subprocess
 import unittest
 from functools import partial
 from operator import itemgetter
-
 import pytest
-
 from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
@@ -24,6 +23,10 @@ param_a_update = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, 
 
 @pytest.mark.docker
 @pytest.mark.local_platform_cli
+@pytest.mark.serial
+@allure.story("LocalPlatform")
+@allure.story("CLI")
+@allure.suite("idmtools_platform_local")
 class TestLocalRunnerCLI(ITestWithPersistence):
 
     @classmethod
@@ -65,7 +68,7 @@ class TestLocalRunnerCLI(ITestWithPersistence):
             # self.assertEqual(simulations[0]['status'], s.status.value) # wait for bug fix
             self.assertEqual(simulation['tags'], s.tags)
             self.assertEqual(simulation['data_path'], '/data/' + str(self.pe.uid) + '/' + str(s.uid))
-            self.assertEqual(simulation['extra_details']['command'], 'python ./Assets/model1.py')
+            self.assertEqual(simulation['extra_details']['command'], 'python Assets/model1.py')
 
             # Also test get_one with simulation id filter
             simulation = SimulationsClient.get_one(str(s.uid))
@@ -82,7 +85,7 @@ class TestLocalRunnerCLI(ITestWithPersistence):
             self.assertEqual(simulation['experiment_id'], str(self.pe.uid))
             self.assertEqual(simulation['tags'], s.tags)
             self.assertEqual(simulation['data_path'], '/data/' + str(self.pe.uid) + '/' + str(s.uid))
-            self.assertEqual(simulation['extra_details']['command'], 'python ./Assets/model1.py')
+            self.assertEqual(simulation['extra_details']['command'], 'python Assets/model1.py')
 
         # Test 3: get_all simulations with experiment id as only filter
         simulations = SimulationsClient.get_all(experiment_id=str(self.pe.uid))

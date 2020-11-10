@@ -1,15 +1,12 @@
 import io
-
 import os
 from dataclasses import dataclass, field, InitVar
 from io import BytesIO
 from logging import getLogger, DEBUG
 from typing import TypeVar, Union, List, Callable, Any, Optional, Generator, BinaryIO
-
 import backoff
 import requests
-from tqdm import tqdm
-
+from idmtools import IdmConfigParser
 from idmtools.utils.hashing import calculate_md5, calculate_md5_stream
 
 logger = getLogger(__name__)
@@ -32,7 +29,7 @@ class Asset:
     #: The content of the file. Optional if **absolute_path** is given.
     content: InitVar[Any] = None
     _content: bytes = field(default=None, init=False)
-    _length: Optional[int] = field(default=None)
+    _length: Optional[int] = field(default=None, init=False)
     #: Persisted tracks if item has been saved
     persisted: bool = field(default=False)
     #: Handler to api
@@ -41,22 +38,28 @@ class Asset:
     download_generator_hook: Callable = field(default=None, metadata=dict(exclude_from_metadata=True))
     #: Checksum of asset. Only required for existing assets
     checksum: InitVar[Any] = None
-    _checksum: Optional[str] = field(default=None)
+    _checksum: Optional[str] = field(default=None, init=False)
 
     def __post_init__(self, content, checksum):
-        self.content = content
+        # Cache of our assset key
+        self._key = None
+        self._content = None if isinstance(content, property) else content
         self._checksum = checksum if not isinstance(checksum, property) else None
         self.filename = self.filename or (os.path.basename(self.absolute_path) if self.absolute_path else None)
         # populate absolute path for conditions where user does not supply info
-        if not self._checksum and self.content is None and not self.absolute_path and self.filename and not self.persisted:
+        if not self._checksum and self._content is None and not self.absolute_path and self.filename and not self.persisted:
             # try relative path
-            if self.relative_path and os.path.exists(os.path.join(self.relative_path, self.filename)):
-                self.absolute_path = os.path.join(self.relative_path, self.filename)
+            if self.relative_path and os.path.exists(self.short_remote_path()):
+                self.absolute_path = os.path.abspath(self.short_remote_path())
             else:
                 self.absolute_path = os.path.abspath(self.filename)
-        if self.absolute_path and not os.path.exists(self.absolute_path) and self.content is None:
+        if self.absolute_path and self._content is not None:
+            raise ValueError("Absolute Path and Content are mutually exclusive. Please provide only one of the options")
+        elif self.absolute_path and not os.path.exists(self.absolute_path):
             raise FileNotFoundError(f"Cannot find specified asset: {self.absolute_path}")
-        elif not self.absolute_path and (not self.filename or (self.filename and not self._checksum and self.content is None and not self.persisted)):
+        elif self.absolute_path and os.path.isdir(self.absolute_path) and not self.persisted:
+            raise ValueError("Asset cannot be a directory!")
+        elif not self.absolute_path and (not self.filename or (self.filename and not self._checksum and self._content is None and not self.persisted)):
             raise ValueError("Impossible to create the asset without either absolute path, filename and content, or filename and checksum!")
 
     def __repr__(self):
@@ -82,12 +85,22 @@ class Asset:
         return os.path.splitext(self.filename)[1].lstrip('.').lower()
 
     @property
+    def filename(self):
+        return self._filename or ""
+
+    @filename.setter
+    def filename(self, filename):
+        self._filename = filename if not isinstance(filename, property) and filename else None
+        self._key = None
+
+    @property
     def relative_path(self):
         return self._relative_path or ""
 
     @relative_path.setter
     def relative_path(self, relative_path):
         self._relative_path = relative_path.strip(" \\/") if not isinstance(relative_path, property) and relative_path else None
+        self._key = None
 
     @property
     def bytes(self):
@@ -150,7 +163,9 @@ class Asset:
     def __key(self):
         # We only care to check if filename and relative path is same. Goal here is not identical check but rather that
         # two files don't exist in same remote path
-        return self.filename, self.relative_path
+        if self._key is None:
+            self._key = self.filename, self.relative_path
+        return self._key
 
     def __hash__(self):
         return hash(self.__key())
@@ -195,7 +210,8 @@ class Asset:
 
         """
         gen = self.download_generator()
-        if progress:
+        if progress and not IdmConfigParser.is_progress_bar_disabled():
+            from tqdm import tqdm
             gen = tqdm(gen, total=self.length)
 
         try:
@@ -220,10 +236,7 @@ class Asset:
         """
 
         if os.path.isdir(dest):
-            if self.relative_path:
-                path = os.path.join(dest, self.relative_path, self.filename)
-            else:
-                path = os.path.join(dest, self.filename)
+            path = os.path.join(dest, self.short_remote_path())
             path = path.replace("\\", os.path.sep)
             os.makedirs(os.path.dirname(path), exist_ok=True)
         else:
@@ -248,6 +261,19 @@ class Asset:
             elif self.content is not None:
                 self._checksum = calculate_md5_stream(io.BytesIO(self.bytes))
         return self._checksum
+
+    def short_remote_path(self) -> str:
+        """
+        Returns the short remote path. This is the join of the relative path and filename
+
+        Returns:
+            Remote Path + Filename
+        """
+        if self.relative_path:
+            path = os.path.join(self.relative_path, self.filename)
+        else:
+            path = os.path.join(self.filename)
+        return path
 
 
 TAsset = TypeVar("TAsset", bound=Asset)

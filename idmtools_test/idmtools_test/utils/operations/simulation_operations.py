@@ -5,11 +5,10 @@ from threading import Lock
 from typing import List, Dict, Any, Type, TYPE_CHECKING
 from uuid import UUID, uuid4
 import numpy as np
-
 from idmtools.assets import Asset
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
 from idmtools.entities.simulation import Simulation
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools_test.utils.test_platform import TestPlatform
 current_directory = os.path.dirname(os.path.realpath(__file__))
 data_path = os.path.abspath(os.path.join(current_directory, "..", "..", "data"))

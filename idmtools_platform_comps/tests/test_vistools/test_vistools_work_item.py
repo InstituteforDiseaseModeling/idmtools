@@ -1,10 +1,9 @@
+import allure
 import ast
 import json
 import os
 import unittest
-from datetime import date, timedelta
 import pytest
-
 from idmtools.assets import AssetCollection, Asset
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
@@ -27,6 +26,9 @@ def param_update(simulation, param, value):
 
 @pytest.mark.comps
 @pytest.mark.long
+@allure.story("COMPS")
+@allure.story("SSMT")
+@allure.suite("idmtools_platform_comps")
 class TestVisToolsWorkItem(unittest.TestCase):
 
     def generate_sim(self):
@@ -68,8 +70,7 @@ class TestVisToolsWorkItem(unittest.TestCase):
         node_type = 'Points'
         data = {"SimulationId": "" + cls.sim_id + "", "NodesRepresentation": node_type}
         tags = {'idmtools': "vistool test", 'WorkItem type': 'VisTools', 'SimulationId': cls.sim_id}
-        cls.wi = VisToolsWorkItem(item_name="test_vistools_work_item.py", tags=tags, work_order=data,
-                                  related_simulations=[cls.sim_id])
+        cls.wi = VisToolsWorkItem(name="test_vistools_work_item.py", tags=tags, work_order=data, related_simulations=[cls.sim_id])
         cls.wi.run(wait_on_done=True)
 
     def setUp(self):

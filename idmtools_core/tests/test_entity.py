@@ -1,12 +1,16 @@
 import copy
 import pickle
+from functools import partial
+from unittest.mock import MagicMock
+import allure
 import unittest
 from dataclasses import dataclass, field, fields
-
 import pytest
 from idmtools.builders import SimulationBuilder
 from idmtools.core.interfaces.ientity import IEntity
+from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
+from idmtools.entities.simulation import Simulation
 from idmtools.entities.suite import Suite
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
@@ -27,7 +31,14 @@ def _custom_post_setstate(o):
     o.ignore = 5
 
 
+# Used to test pre/post creation hooks
+def bad_function_signature(arg1):
+    pass
+
+
 @pytest.mark.smoke
+@allure.story("Entities")
+@allure.suite("idmtools_core")
 class TestEntity(ITestWithPersistence):
 
     def test_hashing(self):
@@ -96,6 +107,129 @@ class TestEntity(ITestWithPersistence):
         s.experiments.append(Experiment.from_task(TestTask(), name='t1'))
         s.experiments.append(Experiment.from_task(TestTask(), name='t2'))
         self.assertEqual(len(s.experiments), 2)
+
+    def test_pre_creation_only_two_args(self):
+        with self.assertRaises(ValueError) as m:
+
+            s = Simulation(task=TestTask())
+            s.add_pre_creation_hook(bad_function_signature)
+        self.assertEqual(m.exception.args[0], 'Pre creation hooks should have 2 arguments. The first argument will be the item, the second the platform')
+
+    def test_pre_creation_allow_partials(self):
+
+        s = Simulation(task=TestTask())
+        globals()['abc'] = 0
+
+        class DummyClass:
+            def hook_func(self, item, platform):
+                globals()['abc'] += 1
+                pass
+
+            def add_hook(self, sim: Simulation):
+                hook = partial(DummyClass.hook_func, self)
+                sim.add_pre_creation_hook(hook)
+
+        a = DummyClass()
+        a.add_hook(s)
+        s.pre_creation(Platform('Test'))
+        self.assertEqual(globals()['abc'], 1)
+
+    def test_post_creation_allow_partials(self):
+
+        s = Simulation(task=TestTask())
+        globals()['abc'] = 0
+
+        class DummyClass:
+            def hook_func(self, item, platform):
+                globals()['abc'] += 1
+                pass
+
+            def add_hook(self, sim: Simulation):
+                hook = partial(DummyClass.hook_func, self)
+                sim.add_post_creation_hook(hook)
+
+        a = DummyClass()
+        a.add_hook(s)
+        s.post_creation(Platform('Test'))
+        self.assertEqual(globals()['abc'], 1)
+
+    def test_post_creation_only_two_args(self):
+        with self.assertRaises(ValueError) as m:
+
+            s = Simulation()
+            s.add_post_creation_hook(bad_function_signature)
+        self.assertEqual(m.exception.args[0], 'Post creation hooks should have 2 arguments. The first argument will be the item, the second the platform')
+
+    def test_simulation_pre_creation_hooks(self):
+        fake_platform = MagicMock()
+        s = Simulation(task=TestTask())
+
+        def inc_count(item, platform):
+            self.assertEqual(s, item)
+            self.assertEqual(platform, fake_platform)
+        s.add_pre_creation_hook(inc_count)
+        s.pre_creation(fake_platform)
+
+    def test_simulation_post_creation_hooks(self):
+        fake_platform = MagicMock()
+        s = Simulation(task=TestTask())
+
+        def inc_count(item, platform):
+            self.assertEqual(s, item)
+            self.assertEqual(platform, fake_platform)
+        s.add_post_creation_hook(inc_count)
+        s.post_creation(fake_platform)
+
+    def test_experiment_pre_creation_hooks(self):
+        fake_platform = MagicMock()
+        e = Experiment()
+        e.simulations.append(Simulation(task=TestTask()))
+
+        def inc_count(item, platform):
+            self.assertEqual(e, item)
+            self.assertEqual(platform, fake_platform)
+
+        e.add_pre_creation_hook(inc_count)
+        e.pre_creation(fake_platform)
+
+    def test_experiment_post_creation_hooks(self):
+        fake_platform = MagicMock()
+        e = Experiment()
+
+        def inc_count(item, platform):
+            self.assertEqual(e, item)
+            self.assertEqual(platform, fake_platform)
+
+        e.add_post_creation_hook(inc_count)
+        e.post_creation(fake_platform)
+
+    def test_suite_pre_creation_hooks(self):
+        fake_platform = MagicMock()
+        e = Experiment()
+        e.simulations.append(Simulation(task=TestTask()))
+        s = Suite()
+        s.experiments.append(e)
+
+        def inc_count(item, platform):
+            self.assertEqual(s, item)
+            self.assertEqual(platform, fake_platform)
+
+        s.add_pre_creation_hook(inc_count)
+        s.pre_creation(fake_platform)
+
+    def test_suite_post_creation_hooks(self):
+        fake_platform = MagicMock()
+        e = Experiment()
+        s = Suite()
+        s.experiments.append(e)
+
+        def inc_count(item, platform):
+            self.assertEqual(s, item)
+            self.assertEqual(platform, fake_platform)
+
+        s.add_post_creation_hook(inc_count)
+        s.post_creation(fake_platform)
+
 
 
 if __name__ == '__main__':

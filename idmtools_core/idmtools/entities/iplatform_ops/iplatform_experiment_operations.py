@@ -6,14 +6,13 @@ from logging import getLogger
 from types import GeneratorType
 from typing import Type, Any, NoReturn, Tuple, List, Dict, Iterator, Union, TYPE_CHECKING
 from uuid import UUID
-
 from idmtools.assets import Asset
 from idmtools.core.enums import EntityStatus, ItemType
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.utils import batch_create_items
 
 logger = getLogger(__name__)
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
 
 
@@ -47,7 +46,7 @@ class IPlatformExperimentOperations(ABC):
         Returns:
             NoReturn
         """
-        experiment.pre_creation()
+        experiment.pre_creation(self.platform)
 
     def post_create(self, experiment: Experiment, **kwargs) -> NoReturn:
         """
@@ -60,7 +59,7 @@ class IPlatformExperimentOperations(ABC):
         Returns:
             NoReturn
         """
-        experiment.post_creation()
+        experiment.post_creation(self.platform)
 
     def create(self, experiment: Experiment, do_pre: bool = True, do_post: bool = True, **kwargs) -> \
             Union[Experiment]:
@@ -116,7 +115,7 @@ class IPlatformExperimentOperations(ABC):
             List of tuples containing the create object and id of item that was created
         """
         return batch_create_items(experiments, create_func=self.create, display_progress=display_progress,
-                                  progress_description="Creating Experiments",
+                                  progress_description="Creating Experiments", unit="experiment",
                                   **kwargs)
 
     @abstractmethod
@@ -172,6 +171,7 @@ class IPlatformExperimentOperations(ABC):
         Returns:
 
         """
+        experiment.pre_run(self.platform)
         # ensure the item is created before running
         if experiment.status is None:
             self.create(experiment, **kwargs)
@@ -198,6 +198,7 @@ class IPlatformExperimentOperations(ABC):
 
         """
         experiment.status = EntityStatus.RUNNING
+        experiment.post_run(self.platform)
 
     def run_item(self, experiment: Experiment, **kwargs):
         """

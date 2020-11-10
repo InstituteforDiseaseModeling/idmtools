@@ -1,12 +1,17 @@
+import os
+import allure
 import unittest
-
 import pytest
 from click.testing import CliRunner
-
+os.environ['IDMTOOLS_LOGGING_USER_PRINT'] = '1'
+os.environ['IDMTOOLS_HIDE_DEV_WARNING'] = '1'
 from idmtools_cli.cli.config_file import config
 
 
 @pytest.mark.smoke
+@allure.story("CLI")
+@allure.story("Configuration")
+@allure.suite("idmtools_cli")
 class TestConfigFile(unittest.TestCase):
 
     def test_slugify(self):

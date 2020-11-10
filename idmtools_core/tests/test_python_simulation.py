@@ -1,3 +1,4 @@
+import allure
 import io
 import os
 import unittest.mock
@@ -27,20 +28,18 @@ class setParam:
 
 
 @pytest.mark.smoke
+@allure.story("JSONConfiguredTask")
+@allure.story("Python")
+@allure.suite("idmtools_core")
 class TestPythonSimulation(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
 
-    def test_retrieve_extra_libraries(self):
-        ps = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model.py"))
-        dependencies_str = ' '.join([str(elem) for elem in ps.retrieve_python_dependencies()])
-        self.assertTrue("numpy" in dependencies_str)
-
     def test_add_task_tag(self):
         ps = Simulation(task=JSONConfiguredTask(parameters={"a": 1}, envelope="config", command="ls"))
         # The tag for type is added at runtime during the pre_creation event
-        ps.pre_creation()
+        ps.pre_creation(None)
         self.assertEqual(ps.tags.get('task_type'), 'idmtools_models.json_configured_task.JSONConfiguredTask')
 
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
@@ -81,7 +80,7 @@ class TestPythonSimulation(ITestWithPersistence):
         ac = self.create_functions_asset_collection()
         sp = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
         pe = Experiment.from_task(name=self.case_name, task=JSONConfiguredPythonTask(script_path=sp), assets=ac)
-        pe.pre_creation()
+        pe.pre_creation(None)
         assets_to_find = [
             Asset(relative_path='MyExternalLibrary', filename="functions.py",
                   absolute_path=os.path.join(COMMON_INPUT_PATH, "python", "Assets", "MyExternalLibrary", "functions.py")),
@@ -107,7 +106,7 @@ class TestPythonSimulation(ITestWithPersistence):
         sp = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
         pe = Experiment.from_task(name=self.case_name, task=JSONConfiguredPythonTask(script_path=sp))
         pe.add_assets(ac)
-        pe.pre_creation()
+        pe.pre_creation(None)
         assets_to_find = [
             Asset(relative_path='MyExternalLibrary', filename="functions.py",
                   absolute_path=os.path.join(COMMON_INPUT_PATH, "python", "Assets", "MyExternalLibrary", "functions.py")),

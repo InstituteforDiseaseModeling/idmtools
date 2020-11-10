@@ -1,6 +1,9 @@
+import allure
 import os
 from unittest import TestCase
 import pytest
+
+from idmtools.core.platform_factory import Platform
 from idmtools_models.r.json_r_task import JSONConfiguredRTask
 from idmtools_models.r.r_task import RTask
 from idmtools_test import COMMON_INPUT_PATH
@@ -8,6 +11,8 @@ from idmtools_test import COMMON_INPUT_PATH
 
 @pytest.mark.tasks
 @pytest.mark.smoke
+@allure.story("RTask")
+@allure.suite("idmtools_models")
 class TestRTask(TestCase):
 
     def validate_common_assets(self, fpath, task):
@@ -40,16 +45,18 @@ class TestRTask(TestCase):
         fpath = os.path.join(COMMON_INPUT_PATH, "r", "model1.R")
         task = RTask(script_path=fpath, image_name='r-base:3.6.1')
         task.gather_all_assets()
+        task.pre_creation(None, Platform("Test"))
 
-        self.assertEqual(str(task.command), f'Rscript ./Assets/model1.R')
+        self.assertEqual(str(task.command), f'Rscript Assets/model1.R')
         self.validate_common_assets(fpath, task)
 
     def test_json_r_argument(self):
         fpath = os.path.join(COMMON_INPUT_PATH, "r", "model1.R")
         task = JSONConfiguredRTask(script_path=fpath, image_name='r-base:3.6.1')
         task.gather_all_assets()
+        task.pre_creation(None, Platform("Test"))
 
-        self.assertEqual(str(task.command), f'Rscript ./Assets/model1.R --config config.json')
+        self.assertEqual(str(task.command), f'Rscript Assets/model1.R --config config.json')
         self.validate_common_assets(fpath, task)
         self.validate_json_transient_assets(task)
 
@@ -57,8 +64,9 @@ class TestRTask(TestCase):
         fpath = os.path.join(COMMON_INPUT_PATH, "r", "model1.R")
         task = JSONConfiguredRTask(script_path=fpath, configfile_argument=None, image_name='r-base:3.6.1')
         task.gather_all_assets()
+        task.pre_creation(None, Platform("Test"))
 
-        self.assertEqual(str(task.command), f'Rscript ./Assets/model1.R')
+        self.assertEqual(str(task.command), f'Rscript Assets/model1.R')
         self.validate_common_assets(fpath, task)
         self.validate_json_transient_assets(task)
 
@@ -67,7 +75,8 @@ class TestRTask(TestCase):
         task = JSONConfiguredRTask(script_path=fpath, configfile_argument=None, image_name='r-base:3.6.1',
                                    r_path='/usr/custom/Rscript')
         task.gather_all_assets()
+        task.pre_creation(None, Platform("Test"))
 
-        self.assertEqual(str(task.command), f'/usr/custom/Rscript ./Assets/model1.R')
+        self.assertEqual(str(task.command), f'/usr/custom/Rscript Assets/model1.R')
         self.validate_common_assets(fpath, task)
         self.validate_json_transient_assets(task)

@@ -1,7 +1,6 @@
+import os
 from typing import NoReturn
 from colorama import init as color_init
-from idmtools_cli.cli.entrypoint import cli
-from idmtools_cli.iplatform_cli import PlatformCLIPlugins
 
 
 def main() -> NoReturn:
@@ -12,6 +11,8 @@ def main() -> NoReturn:
     Returns:
         None
     """
+    os.environ['IDMTOOLS_NO_CONFIG_WARNING'] = '1'
+    from idmtools_cli.cli.entrypoint import cli
     start()
     cli()
 
@@ -30,6 +31,7 @@ def start() -> NoReturn:
     Returns:
         None
     """
+    from idmtools_cli.iplatform_cli import PlatformCLIPlugins
     color_init()
     import idmtools_cli.cli.init  # noqa: F401
     import idmtools_cli.cli.experiment  # noqa: F401

@@ -11,7 +11,7 @@ from idmtools.registry.task_specification import TaskSpecification
 
 @dataclass(repr=False)
 class TestTask(ITask):
-    command: CommandLine = field(default=CommandLine('echo this is a test'), metadata={"md": True})
+    command: CommandLine = field(default=CommandLine.from_string('echo this is a test'), metadata={"md": True})
     parameters: dict = field(default_factory=lambda: {}, metadata={"md": True})
     common_asset_paths: list = field(default_factory=lambda: [])
 
@@ -46,7 +46,7 @@ class TestTask(ITask):
 
     def gather_transient_assets(self) -> AssetCollection:
         if not self.transient_assets.has_asset(filename="config.json"):
-            self.transient_assets.add_asset(Asset("config.json", content=json.dumps(self.parameters)))
+            self.transient_assets.add_asset(Asset(filename="config.json", content=json.dumps(self.parameters)))
         return self.transient_assets
 
     def reload_from_simulation(self, simulation: 'Simulation'):

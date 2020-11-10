@@ -10,7 +10,12 @@ class ITestWithPersistence(unittest.TestCase):
 
     def setUp(self) -> None:
         self.data_dir = os.path.join(self.current_directory, "data")
-        os.makedirs(self.data_dir, exist_ok=True)
+        try:
+            os.makedirs(self.data_dir, exist_ok=True)
+        except FileExistsError:
+            # Very Very Very rarely, high thread counts, we hit this error
+            pass
+
         IPersistenceService.cache_directory = self.data_dir
 
     def tearDown(self) -> None:

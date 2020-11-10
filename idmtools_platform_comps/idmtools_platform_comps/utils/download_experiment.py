@@ -3,9 +3,7 @@ import stat
 import sys
 from concurrent.futures._base import as_completed
 from concurrent.futures.thread import ThreadPoolExecutor
-
-from tqdm import tqdm
-
+from idmtools import IdmConfigParser
 from idmtools.core.context import get_current_platform
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
@@ -95,5 +93,10 @@ def download_experiment(experiment: Experiment, destination: str):
             os.symlink("../Assets", os.path.join(sim_path, "Assets"))
 
     write_experiment_script(experiment, destination)
-    for future in tqdm(as_completed(futures), total=len(futures)):
+    if IdmConfigParser.is_progress_bar_disabled():
+        items = as_completed(futures)
+    else:
+        from tqdm import tqdm
+        items = tqdm(as_completed(futures), total=len(futures), unit="files")
+    for future in items:
         pass

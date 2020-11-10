@@ -5,10 +5,8 @@ from functools import partial
 from logging import getLogger, DEBUG
 from typing import Dict, List, Set, Union, Iterator, Optional, TYPE_CHECKING
 from uuid import UUID
-
 from docker.models.containers import Container
 from tqdm import tqdm
-
 from idmtools.assets import Asset, json, AssetCollection
 from idmtools.core import ItemType
 from idmtools.core.task_factory import TaskFactory
@@ -20,10 +18,9 @@ from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools.utils.collections import ExperimentParentIterator
 from idmtools.utils.json import IDMJSONEncoder
 from idmtools_platform_local.client.simulations_client import SimulationsClient
-from idmtools_platform_local.platform_operations.uitils import local_status_to_common, SimulationDict, ExperimentDict, \
-    download_lp_file
+from idmtools_platform_local.platform_operations.utils import local_status_to_common, SimulationDict, ExperimentDict, download_lp_file
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools_platform_local.local_platform import LocalPlatform
 
 logger = getLogger(__name__)
@@ -104,11 +101,11 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         if isinstance(sims, ExperimentParentIterator) and isinstance(sims.items, (TemplatedSimulations, list)):
             sims_i = sims.items
             for simulation in sims_i:
-                simulation.pre_creation()
+                simulation.pre_creation(self.platform)
                 final_sims.append(simulation)
         elif isinstance(sims, (list, Iterator)):
             for simulation in sims:
-                simulation.pre_creation()
+                simulation.pre_creation(self.platform)
                 final_sims.append(simulation)
         else:
             raise ValueError("Needs to be one a list, ParentIterator of TemplatedSimulations or list")
@@ -126,7 +123,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
                 final_sims[i].uid = ids[i]
                 path = "/".join(["/data", parent_uid, simulation.uid])
                 items.update(self._assets_to_copy_multiple_list(path, simulation.assets))
-                simulation.post_creation()
+                simulation.post_creation(self.platform)
         # copy files to container
         result = self.platform._do.copy_multiple_to_container(worker, items)
         if not result:

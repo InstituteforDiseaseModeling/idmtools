@@ -17,12 +17,13 @@ logger = getLogger(__name__)
 # 1. Create Suite(If Suite)
 #    a) Pre-Creation hooks
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
+    from idmtools.entities.iplatform import IPlatform
     from idmtools.entities.simulation import Simulation
     from idmtools.entities.iworkflow_item import IWorkflowItem  # noqa: F401
 
 TTaskParent = Union['Simulation', 'IWorkflowItem']  # noqa: F821
-TTaskHook = Callable[[TTaskParent], NoReturn]
+TTaskHook = Callable[[TTaskParent, 'IPlatform'], NoReturn]
 
 
 @dataclass
@@ -44,16 +45,26 @@ class ITask(metaclass=ABCMeta):
     transient_assets: AssetCollection = field(default_factory=AssetCollection)
 
     # log to add to items to track provisioning of task
-    _task_log: Logger = field(default_factory=lambda: getLogger(__name__), compare=False,
-                              metadata=dict(pickle_ignore=True))
+    _task_log: Logger = field(default_factory=lambda: getLogger(__name__), compare=False, metadata=dict(pickle_ignore=True))
 
     def __post_init__(self):
         self._task_log = getLogger(f'{self.__class__.__name__ }_{time.time()}')
-        if isinstance(self.command, str):
-            self.command = CommandLine(self.command)
 
         self.__pre_creation_hooks = []
         self.__post_creation_hooks = []
+
+    @property
+    def command(self):
+        return self._command
+
+    @command.setter
+    def command(self, value: Union[str, CommandLine]):
+        if isinstance(value, property):
+            self._command = None
+        elif isinstance(value, str):
+            self._command = CommandLine.from_string(value)
+        else:
+            self._command = value
 
     @property
     def metadata_fields(self):
@@ -101,30 +112,35 @@ class ITask(metaclass=ABCMeta):
             requirement = PlatformRequirements[requirement.lower()]
         self.platform_requirements.add(requirement)
 
-    def pre_creation(self, parent: Union['Simulation', 'IWorkflowItem']):  # noqa: F821
+    def pre_creation(self, parent: Union['Simulation', 'IWorkflowItem'], platform: 'IPlatform'):  # noqa: F821
         """
         Optional Hook called at the time of creation of task. Can be used to setup simulation and experiment level hooks
         Args:
-            parent:
+            parent: Parent of Item
+            platform: Platform executing the task. Useful for querying platform before execution
 
         Returns:
 
         """
+
         if self.command is None:
             logger.error('Command is not defined')
             raise ValueError("Command is required for on task when preparing an experiment")
-        [hook(parent) for hook in self.__pre_creation_hooks]
+        if platform.is_windows_platform():
+            self.command.is_windows = True
+        [hook(parent, platform) for hook in self.__pre_creation_hooks]
 
-    def post_creation(self, parent: Union['Simulation', 'IWorkflowItem']):  # noqa: F821
+    def post_creation(self, parent: Union['Simulation', 'IWorkflowItem'], platform: 'IPlatform'):  # noqa: F821
         """
         Optional Hook called at the  after creation task. Can be used to setup simulation and experiment level hooks
         Args:
-            parent:
+            parent: Parent of Item
+            platform: Platform executing the task. Useful for querying platform before execution
 
         Returns:
 
         """
-        [hook(parent) for hook in self.__post_creation_hooks]
+        [hook(parent, platform) for hook in self.__post_creation_hooks]
 
     @abstractmethod
     def gather_common_assets(self) -> AssetCollection:

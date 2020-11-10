@@ -1,9 +1,17 @@
+import shutil
+
+import tempfile
+
 import os
 import platform
 import time
 import unittest
 from functools import wraps
 from typing import Callable, Union, Any, Optional
+import pytest
+from idmtools import IdmConfigParser
+from idmtools_test import COMMON_INPUT_PATH
+from idmtools_test.utils.utils import is_global_configuration_enabled
 
 # The following decorators are used to control test
 # To allow for different use cases(dev, test, packaging, etc)
@@ -15,7 +23,7 @@ from typing import Callable, Union, Any, Optional
 # This currently is any comps related test
 # test-docker run any tests that depend on docker locally(Mostly local runn)
 # test-all runs all tests
-from idmtools_test import COMMON_INPUT_PATH
+
 
 linux_only = unittest.skipIf(
     not platform.system() in ["Linux", "Darwin"], 'No Tests that are meant for linux'
@@ -25,6 +33,7 @@ windows_only = unittest.skipIf(
     platform.system() in ["Linux", "Darwin"], 'No Tests that are meant for Windows'
 )
 
+skip_if_global_configuration_is_enabled = pytest.mark.skipif(is_global_configuration_enabled(), reason=f"Either {IdmConfigParser.get_global_configuration_name()} is set or the environment variable 'IDMTOOLS_CONFIG_FILE' is set")
 # this is mainly for docker in docker environments but also applies to environments
 # where you must use the local ip address for connectivity vs localhost
 skip_api_host = unittest.skipIf(os.getenv("API_HOST", None) is not None, "API_HOST is defined")
@@ -59,6 +68,43 @@ def run_test_in_n_seconds(n: int, print_elapsed_time: bool = False) -> Callable:
         return wrapper
 
     return decorator
+
+
+def ensure_local_platform_running(silent=True, dump_logs=True, **kwargs):
+    from idmtools_platform_local.cli.utils import get_service_info
+    if silent:
+        os.environ['NO_SPINNER'] = '1'
+
+    opts = kwargs
+
+    def decorate(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            from idmtools.core.platform_factory import Platform
+            platform = Platform('Local', **opts)
+            if len(args):
+                args = list(args)
+                args.insert(1, platform)
+                args = tuple(args)
+            else:
+                args = (platform)
+            result = None
+            try:
+                result = func(*args, **kwargs)
+            except Exception:
+                raise
+            finally:
+                if dump_logs:
+                    try:
+                        info = get_service_info(sm, diff=False, logs=True)
+                        print(info)
+                    except:  # noqa E722
+                        pass
+            return result
+
+        return wrapper
+
+    return decorate
 
 
 def restart_local_platform(silent=True, stop_before=True, stop_after=True, dump_logs=True, *args, **kwargs):
@@ -189,3 +235,22 @@ def dump_function_input_for_test(output_directory: Union[str, Callable[[str, Cal
         return wrapper
 
     return decorate
+
+
+def run_in_temp_dir(func):
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        current_dir = os.getcwd()
+        temp_dir = tempfile.mkdtemp()
+        try:
+            os.chdir(temp_dir)
+            func(*args, **kwargs)
+        finally:
+            os.chdir(current_dir)
+            try:
+                shutil.rmtree(temp_dir)
+            except:
+                pass
+
+    return wrapper

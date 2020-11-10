@@ -2,7 +2,7 @@ import os
 from dataclasses import dataclass, field
 from functools import partial
 from logging import getLogger, DEBUG
-from typing import List, Callable, Type, Dict, Any, Union
+from typing import List, Callable, Type, Dict, Any, Union, TYPE_CHECKING
 from jinja2 import Environment
 from idmtools.assets import AssetCollection, Asset
 from idmtools.entities import CommandLine
@@ -10,22 +10,50 @@ from idmtools.entities.itask import ITask
 from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools.entities.simulation import Simulation
 from idmtools.registry.task_specification import TaskSpecification
+if TYPE_CHECKING:  # pragma: no cover
+    from idmtools.entities.iplatform import IPlatform
 
 logger = getLogger(__name__)
-WINDOWS_DEFAULT_WRAPPER = """
-set PYTHONPATH=%cd%\\Assets\\;%PYTHONPATH%
-%*
+
+LINUX_DICT_TO_ENVIRONMENT = """{% for key, value in vars.items() %}
+export {{key}}="{{value}}"
+{% endfor %}
 """
-LINUX_DEFAULT_WRAPPER = """
-export PYTHONPATH=$(pwd)/Assets/:$PYTHONPATH
-%*
+
+WINDOWS_DICT_TO_ENVIRONMENT = """{% for key, value in vars.items() %}
+set {{key}}="{{value}}"
+{% endfor %}
 """
+
+# Define our common windows templates
+WINDOWS_BASE_WRAPPER = """echo Running %*
+%*"""
+WINDOWS_PYTHON_PATH_WRAPPER = """set PYTHONPATH=%cd%\\Assets\\site-packages\\;%cd%\\Assets\\;%PYTHONPATH%
+{}""".format(WINDOWS_BASE_WRAPPER)
+WINDOWS_DICT_TO_ENVIRONMENT = WINDOWS_DICT_TO_ENVIRONMENT + WINDOWS_BASE_WRAPPER
+
+# Define our linux common scripts
+LINUX_BASE_WRAPPER = """echo Running $@
+\"$@\"
+"""
+LINUX_PYTHON_PATH_WRAPPER = """export PYTHONPATH=$(pwd)/Assets/site-packages:$(pwd)/Assets/:$PYTHONPATH
+{}""".format(LINUX_BASE_WRAPPER)
+LINUX_DICT_TO_ENVIRONMENT = LINUX_DICT_TO_ENVIRONMENT + LINUX_BASE_WRAPPER
 
 
 @dataclass()
 class TemplatedScriptTask(ITask):
     """
     Defines a task to run a script using a template. Best suited to shell scripts
+
+    Examples:
+        In this example, we add modify the Python Path using TemplatedScriptTask and LINUX_PYTHON_PATH_WRAPPER
+
+        .. literalinclude:: ../examples/cookbook/python/python-path/python-path.py
+
+        In this example, we modify environment variable using TemplatedScriptTask and LINUX_DICT_TO_ENVIRONMENT
+
+        .. literalinclude:: ../examples/cookbook/environment/variables/environment-vars.py
     """
     #: Name of script
     script_path: str = field(default=None, metadata={"md": True})
@@ -163,13 +191,13 @@ class TemplatedScriptTask(ITask):
             # set filtered assets back to parent
             simulation.parent.assets = new_assets
 
-    def pre_creation(self, parent: Union[Simulation, IWorkflowItem]):
+    def pre_creation(self, parent: Union[Simulation, IWorkflowItem], platform: 'IPlatform'):
         """
         Before creating simulation, we need to set our command line
 
         Args:
             parent: Parent object
-
+            platform: Platform item is being ran on
         Returns:
 
         """
@@ -179,16 +207,23 @@ class TemplatedScriptTask(ITask):
         else:
             sn = ''
         if self.template_is_common:
-            sn += f'Assets{self.path_sep}{self.script_path}'
+            sn += platform.join_path(platform.common_asset_path, self.script_path)
         else:
             sn += self.script_path
         # set the command line to the rendered script
-        self.command = CommandLine(sn)
+        self.command = CommandLine.from_string(sn)
+        if self.path_sep != "/":
+            self.command.executable = self.command.executable.replace("/", self.path_sep)
+            self.command.is_windows = True
         # set any extra arguments
         if self.extra_command_arguments:
-            self.command.add_argument(self.extra_command_arguments)
-        # run base precreation
-        super().pre_creation(parent)
+            other_command = CommandLine.from_string(self.extra_command_arguments)
+            self.command._args.append(other_command.executable)
+            if other_command._options:
+                self.command._args += other_command._options
+            if other_command._args:
+                self.command._args += other_command._args
+        super().pre_creation(parent, platform)
 
 
 @dataclass()
@@ -255,25 +290,26 @@ class ScriptWrapperTask(ITask):
         else:
             logger.warning("Unable to load subtask")
 
-    def pre_creation(self, parent: Union[Simulation, IWorkflowItem]):
+    def pre_creation(self, parent: Union[Simulation, IWorkflowItem], platform: 'IPlatform'):
         """
         Before creation, create the true command by adding the wrapper name
 
         Args:
-            parent:
+            parent: Parent Task
+            platform: Platform Templated Task is executing on
 
         Returns:
 
         """
-        self.task.pre_creation(parent)
+        self.task.pre_creation(parent, platform)
         # get command from wrapper command and add to wrapper script as item we call as argument to script
         self.template_script_task.extra_command_arguments = str(self.task.command)
-        self.template_script_task.pre_creation(parent)
+        self.template_script_task.pre_creation(parent, platform)
         self.command = self.template_script_task.command
 
-    def post_creation(self, parent: Union[Simulation, IWorkflowItem]):
-        self.task.post_creation(parent)
-        self.template_script_task.post_creation(parent)
+    def post_creation(self, parent: Union[Simulation, IWorkflowItem], platform: 'IPlatform'):
+        self.task.post_creation(parent, platform)
+        self.template_script_task.post_creation(parent, platform)
 
     def __getattr__(self, item):
         if item not in self.__dict__:
@@ -301,6 +337,7 @@ def get_script_wrapper_task(task: ITask, wrapper_script_name: str, template_cont
         ScriptWrapperTask wrapping the task
 
     See Also:
+        :class:`idmtools_models.templated_script_task.TemplatedScriptTask`
         :func:`idmtools_models.templated_script_task.get_script_wrapper_windows_task`
         :func:`idmtools_models.templated_script_task.get_script_wrapper_unix_task`
     """
@@ -318,18 +355,13 @@ def get_script_wrapper_task(task: ITask, wrapper_script_name: str, template_cont
 
 
 def get_script_wrapper_windows_task(task: ITask, wrapper_script_name: str = 'wrapper.bat',
-                                    template_content: str = WINDOWS_DEFAULT_WRAPPER,
+                                    template_content: str = WINDOWS_DICT_TO_ENVIRONMENT,
                                     template_file: str = None, template_is_common: bool = True,
                                     variables: Dict[str, Any] = None) -> ScriptWrapperTask:
     """
     Get wrapper script task for windows platforms
 
-    The default content wraps a bash script that adds the assets directory to the python path
-
-    .. code-block:: batch
-
-        set PYTHONPATH=%cd%/Assets/;%PYTHONPATH%
-        %*
+    The default content wraps a another task with a batch script that exports the variables to the run environment defined in variables. To modify python path, use WINDOWS_PYTHON_PATH_WRAPPER
 
     You can adapt this script to modify any pre-scripts you need or call others scripts in succession
 
@@ -345,6 +377,7 @@ def get_script_wrapper_windows_task(task: ITask, wrapper_script_name: str = 'wra
         ScriptWrapperTask
 
     See Also::
+        :class:`idmtools_models.templated_script_task.TemplatedScriptTask`
         :func:`idmtools_models.templated_script_task.get_script_wrapper_task`
         :func:`idmtools_models.templated_script_task.get_script_wrapper_unix_task`
     """
@@ -352,18 +385,13 @@ def get_script_wrapper_windows_task(task: ITask, wrapper_script_name: str = 'wra
                                    variables, "\\")
 
 
-def get_script_wrapper_unix_task(task: ITask, wrapper_script_name: str = 'wrapper.sh', template_content: str = None,
+def get_script_wrapper_unix_task(task: ITask, wrapper_script_name: str = 'wrapper.sh', template_content: str = LINUX_DICT_TO_ENVIRONMENT,
                                  template_file: str = None, template_is_common: bool = True,
                                  variables: Dict[str, Any] = None):
     """
         Get wrapper script task for unix platforms
 
-        The default content wraps a bash script that adds the assets directory to the python path
-
-        .. code-block:: bash
-
-            set PYTHONPATH=$(pwd)/Assets/:$PYTHONPATH
-            %*
+        The default content wraps a another task with a bash script that exports the variables to the run environment defined in variables. To modify python path, you can use LINUX_PYTHON_PATH_WRAPPER
 
         You can adapt this script to modify any pre-scripts you need or call others scripts in succession
 
@@ -379,6 +407,7 @@ def get_script_wrapper_unix_task(task: ITask, wrapper_script_name: str = 'wrappe
             ScriptWrapperTask
 
         See Also:
+        :class:`idmtools_models.templated_script_task.TemplatedScriptTask`
         :func:`idmtools_models.templated_script_task.get_script_wrapper_task`
         :func:`idmtools_models.templated_script_task.get_script_wrapper_windows_task`
         """

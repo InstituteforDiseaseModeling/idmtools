@@ -1,3 +1,4 @@
+import allure
 import json
 from dataclasses import dataclass, field
 from unittest import TestCase
@@ -11,12 +12,14 @@ from idmtools_models.json_configured_task import JSONConfiguredTask
 
 @dataclass
 class ExampleExtendedJSONConfiguredTask(JSONConfiguredTask):
-    command: CommandLine = field(default=CommandLine("python -m json.tool --infile my_config.json"))
+    command: CommandLine = field(default=CommandLine.from_string("python -m json.tool --infile my_config.json"))
     config_file_name: str = field(default='my_config.json')
 
 
 @pytest.mark.tasks
 @pytest.mark.smoke
+@allure.story("JSONConfiguredTask")
+@allure.suite("idmtools_models")
 class TestJSONConfiguredTask(TestCase):
 
     def setUp(self) -> None:
@@ -75,6 +78,7 @@ class TestJSONConfiguredTask(TestCase):
         self.assertDictEqual(json.loads(task.transient_assets.assets[0].content), dict(test=values))
 
     @pytest.mark.timeout(60)
+    @pytest.mark.serial
     def test_reload_from_simulation_task(self):
         with Platform("TestExecute", missing_ok=True, default_missing=dict(type='TestExecute')) as p:
             task = ExampleExtendedJSONConfiguredTask(parameters=dict(a=1, b=2, c=3))

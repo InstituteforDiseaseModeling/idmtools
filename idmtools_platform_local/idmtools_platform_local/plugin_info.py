@@ -50,6 +50,9 @@ postgres_port = 5432
 # This setting controls whether to remove docker based worker containers
 # You might want this to troubleshoot containers after failures in execiton
 auto_remove_worker_containers = False
+# Enables singularity support. This requires elevated privileges for the worker containers and should only be used when using singularity
+# Warning this is a BETA Feature!
+enable_singularity_support = False
 """
 
 

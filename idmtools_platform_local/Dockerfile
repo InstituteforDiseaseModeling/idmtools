@@ -1,4 +1,4 @@
-FROM python:3.7.5
+FROM python:3.7.9
 ARG S6_VERSION
 ENV S6_VERSION=${S6_VERSION:-v1.21.7.0} \
     S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
@@ -13,13 +13,15 @@ RUN apt-get update \
     gnupg2 \
     software-properties-common \
     # install docker-cli
-    && curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add - \
+    && curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - \
     && add-apt-repository \
     "deb [arch=amd64] https://download.docker.com/linux/debian \
     $(lsb_release -cs) \
     stable" \
+    && wget -O- http://neuro.debian.net/lists/xenial.us-ca.full | tee /etc/apt/sources.list.d/neurodebian.sources.list \
+    && apt-key adv --recv-keys --keyserver hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9 \
     && apt-get update \
-    && apt-get install -y --no-install-recommends docker-ce-cli nginx \
+    && apt-get install -y --no-install-recommends docker-ce-cli nginx singularity-container \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && useradd -s /bin/bash idmtools \

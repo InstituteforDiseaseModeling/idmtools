@@ -28,7 +28,7 @@ jobs:
           python -m pip install --upgrade pip
       - name: Install Python dependencies
         run: |
-          pip install py-make flake8 coloredlogs wheel
+          pip install idm-buildtools flake8 coloredlogs wheel --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
       - name: Install dataclass
         if: ${{ matrix.python-version }} == 3.6
         run: |

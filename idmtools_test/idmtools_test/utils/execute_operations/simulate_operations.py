@@ -11,7 +11,6 @@ from logging import getLogger
 from threading import Lock
 from typing import List, Dict, Any, Type, TYPE_CHECKING, Optional
 from uuid import UUID, uuid4
-
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core import EntityStatus
 from idmtools.core.task_factory import TaskFactory
@@ -23,7 +22,7 @@ from idmtools.entities.simulation import Simulation
 from idmtools.utils.file import file_contents_to_generator
 from idmtools.utils.json import IDMJSONEncoder
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools_test.utils.test_execute_platform import TestExecutePlatform
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
@@ -44,14 +43,20 @@ def run_simulation(simulation_id: Simulation, command: str, parent_uid: UUID, ex
             open(os.path.join(simulation_path, "StdErr.txt"), "w") as err:
         try:
             cmd = str(command)
+            print(cmd)
+            print(execute_directory)
+            if cmd.startswith(execute_directory):
+                cmd = cmd.replace(execute_directory, "")
             logger.info('Executing %s from working directory %s', cmd, simulation_path)
             err.write(f"{cmd}\n")
 
-            os.chdir(simulation_path)
             # Run our task
             if sys.platform in ['win32', 'cygwin']:
                 cmd = shlex.split(cmd.replace("\\", "/"))
-                cmd[0] = os.path.abspath(cmd[0])
+                if os.path.exists(os.path.join(simulation_path, cmd[0])):
+                    cmd[0] = os.path.join(simulation_path, cmd[0])
+                else:
+                    cmd[0] = os.path.abspath(cmd[0])
                 cmd = subprocess.list2cmdline(cmd)
             else:
                 cmd = shlex.split(cmd.replace("\\", "/"))
@@ -61,6 +66,8 @@ def run_simulation(simulation_id: Simulation, command: str, parent_uid: UUID, ex
                 except:
                     pass
             logger.info(cmd)
+            if cmd[0].endswith(".sh"):
+                cmd.insert(0, "/bin/bash")
             p = subprocess.Popen(
                 cmd,
                 cwd=simulation_path,
@@ -322,8 +329,12 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
             # load the assets
             ac = AssetCollection()
             for dict_asset in dict_sim['assets']:
+                if dict_asset['absolute_path'] is None:
+                    if dict_asset['relative_path']:
+                        dict_asset['absolute_path'] = os.path.join(sim_path, dict_asset['relative_path'], dict_asset['filename'])
+                    else:
+                        dict_asset['absolute_path'] = os.path.join(sim_path, dict_asset['filename'])
                 asset = Asset(**dict_asset)
-                asset.absolute_path = os.path.join(sim_path, asset.filename)
                 asset.persisted = True
                 asset.download_generator_hook = partial(file_contents_to_generator, asset.absolute_path)
                 ac.add_asset(asset)
@@ -339,9 +350,9 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
             cli = self._detect_command_line_from_simulation(dict_sim)
             # if we could not find task, set it now, otherwise rebuild the cli
             if sim.task is None:
-                sim.task = CommandTask(CommandLine(cli))
+                sim.task = CommandTask(CommandLine.from_string(cli))
             else:
-                sim.task.command = CommandLine(cli)
+                sim.task.command = CommandLine.from_string(cli)
             # call task load options(load configs from files, etc)
             sim.task.reload_from_simulation(sim)
         else:
@@ -350,8 +361,6 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
 
         # load assets
         return sim
-
-
 
     def _detect_command_line_from_simulation(self, dict_sim):
         if 'task' in dict_sim and 'command' in dict_sim['task']:

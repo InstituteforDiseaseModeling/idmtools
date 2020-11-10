@@ -1,13 +1,16 @@
 import copy
+
+import allure
 import json
 import os
 import unittest
 from os import path
-
 import pytest
 from idmtools.builders import SimulationBuilder
 from idmtools.core import EntityStatus
+from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
+from idmtools.entities.simulation import Simulation
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_platform_comps.comps_platform import COMPSPlatform
 from idmtools_test import COMMON_INPUT_PATH
@@ -15,15 +18,20 @@ from idmtools_test.utils.common_experiments import wait_on_experiment_and_check_
 from idmtools_test.utils.comps import assure_running_then_wait_til_done, setup_test_with_platform_and_simple_sweep
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools.utils.filter_simulations import FilterItem
+from idmtools_test.utils.utils import get_case_name
+from COMPS.Data.Priority import Priority
 
 current_directory = path.dirname(path.realpath(__file__))
 
 
 @pytest.mark.comps
+@allure.story("COMPS")
+@allure.suite("idmtools_platform_comps")
 class TestCOMPSPlatform(ITestWithPersistence):
     def setUp(self) -> None:
         super().setUp()
         self.platform: COMPSPlatform = None
+        self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         setup_test_with_platform_and_simple_sweep(self)
 
     @pytest.mark.assets
@@ -78,19 +86,19 @@ class TestCOMPSPlatform(ITestWithPersistence):
         experiment.builder = self.builder
 
         # Create experiment on platform
-        experiment.pre_creation()
+        experiment.pre_creation(self.platform)
         self.platform.create_items(items=[experiment])
 
         for simulation_batch in experiment.batch_simulations(batch_size=10):
             # Create the simulations on the platform
             for simulation in simulation_batch:
-                simulation.pre_creation()
+                simulation.pre_creation(self.platform)
 
             ids = self.platform.create_items(items=simulation_batch)
 
             for uid, simulation in zip(ids, simulation_batch):
                 simulation.uid = uid
-                simulation.post_creation()
+                simulation.post_creation(self.platform)
 
                 experiment.simulations.append(simulation.metadata)
                 experiment.simulations.set_status(EntityStatus.CREATED)
@@ -104,6 +112,36 @@ class TestCOMPSPlatform(ITestWithPersistence):
         # Start experiment
         assure_running_then_wait_til_done(self, experiment)
 
+    def test_multiple_executables(self):
+        # test platform hooks(rename python3)
+        # test ordering is maintained
+        # test that we can override take at task label
+        # test num cores
+        # test priority override
+        experiment = Experiment(name=self.case_name, gather_common_assets_from_task=True)
+        experiment.simulations.append(Simulation.from_task(CommandTask(command="python --version")))
+        experiment.simulations.append(Simulation.from_task(CommandTask(command="python --help")))
+        experiment.simulations.items[1]._platform_kwargs['num_cores'] = 2
+        experiment.simulations.items[1]._platform_kwargs['priority'] = Priority.Highest
+        experiment.run(wait_on_done=True, platform=self.platform)
+        self.assertTrue(experiment.succeeded)
+
+        exp_raw = experiment.get_platform_object()
+        self.assertEqual(exp_raw.configuration.simulation_input_args, "--version ")
+        self.assertEqual(exp_raw.configuration.executable_path, "python3")
+        # because of ordering, we have to check both items
+        sim0 = experiment.simulations[0].get_platform_object()
+        sim1 = experiment.simulations[1].get_platform_object()
+        self.assertIsNotNone(sim0.configuration)
+        self.assertIsNotNone(sim1.configuration)
+        self.assertIsNone(sim0.configuration.simulation_input_args)
+        self.assertIsNone(sim0.configuration.executable_path)
+        self.assertEqual(sim1.configuration.simulation_input_args, "--help ")
+        self.assertEqual(sim1.configuration.executable_path, "python3")
+        self.assertEqual(sim1.configuration.min_cores, 2)
+        self.assertEqual(sim1.configuration.max_cores, 2)
+        self.assertEqual(sim1.configuration.priority, Priority.Highest)
+
     @pytest.mark.long
     def test_status_retrieval_succeeded(self):
         experiment = self.get_working_model_experiment()
@@ -112,8 +150,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
     @pytest.mark.long
     def test_status_retrieval_failed(self):
         experiment = self.get_working_model_experiment(script='failing_model.py')
-        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform,
-                                                    expected_status=EntityStatus.FAILED)
+        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform, expected_status=EntityStatus.FAILED)
 
     @pytest.mark.long
     def test_status_retrieval_mixed(self):
@@ -121,7 +158,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
         task = JSONConfiguredPythonTask(script_path=model_path)
         builder = SimulationBuilder()
         builder.add_sweep_definition(JSONConfiguredPythonTask.set_parameter_partial('P'), range(3))
-        experiment = Experiment.from_builder(builder, task, name='Mixed Model')
+        experiment = Experiment.from_builder(builder, task, name=self.case_name)
         experiment.run(wait_until_done=True)
         self.assertTrue(experiment.done)
         self.assertFalse(experiment.succeeded)
@@ -157,7 +194,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
         task = JSONConfiguredPythonTask(script_path=model_path)
         builder = SimulationBuilder()
         builder.add_sweep_definition(JSONConfiguredPythonTask.set_parameter_partial('P'), range(3))
-        experiment = Experiment.from_builder(builder, task, name='Mixed Model')
+        experiment = Experiment.from_builder(builder, task, name=self.case_name)
         experiment.run(wait_until_done=True)
         self.assertTrue(experiment.done)
         self.assertFalse(experiment.succeeded)
@@ -169,9 +206,10 @@ class TestCOMPSPlatform(ITestWithPersistence):
     def test_experiment_name(self):  # zdu: no metadata file any more
         model_path = os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py")
         task = JSONConfiguredPythonTask(script_path=model_path, envelope="parameters")
-        e = Experiment.from_task(task, name="test/\\:'?<>*|name1")
+        e = Experiment.from_task(task, name="test/\\:'?<>*|name1()δ`")
         e.run(wait_until_done=True)
-        name_expected = "test_________name1"
+        self.assertTrue(e.succeeded)
+        name_expected = 'test_________name1___'
         self.assertEqual(e.name, name_expected)
         self.assertIsNone(e.simulations[0].name)
 
@@ -181,10 +219,10 @@ class TestCOMPSPlatform(ITestWithPersistence):
         name = ""
         s = ['/', '\\', ':', "'", '"', '?', '<', '>', '*', '|', "\0"]
         exp_name = name.join(s)
-        experiment = Experiment.from_task(task, name="name" + exp_name + "test")
+        experiment = Experiment.from_task(task, name=self.case_name + "_name" + exp_name + "test")
         experiment.simulations[0].name = "test/\\:'?<>*|sim1"
         experiment.run(wait_until_done=True)
-        name_expected = "name___________test"
+        name_expected = self.case_name + "_name___________test"
         self.assertEqual(experiment.name, name_expected)
         self.assertEqual(experiment.simulations[0].name, "test_________sim1")
 

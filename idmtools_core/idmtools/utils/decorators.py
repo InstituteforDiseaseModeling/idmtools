@@ -2,6 +2,7 @@ import datetime
 import importlib
 import importlib.util
 import os
+import threading
 from concurrent.futures import Executor, as_completed
 from concurrent.futures.thread import ThreadPoolExecutor
 from functools import wraps
@@ -41,66 +42,17 @@ def optional_decorator(decorator: Callable, condition: Union[bool, Callable[[], 
     return decorate_in
 
 
-class SingletonDecorator:
-    """
-    Wraps a class in a singleton decorator.
+class SingletonMixin(object):
+    __singleton_lock = threading.Lock()
+    __singleton_instance = None
 
-    Example:
-        In the below example, we would print out *99* since *z* is referring to the same object as *x*::
-
-            class Thing:
-                y = 14
-            Thing = SingletonDecorator(Thing)
-            x = Thing()
-            x.y = 99
-            z = Thing()
-            print(z.y)
-    """
-
-    def __init__(self, klass):
-        self.klass = klass
-        self.instance = None
-
-    def __call__(self, *args, **kwds):
-        if self.instance is None:
-            self.instance = self.klass(*args, **kwds)
-
-        return self.instance
-
-
-class LoadOnCallSingletonDecorator:
-    """
-    Additional class decorator that creates a singleton instance only when a method or attribute is accessed.
-    This is useful for expensive tasks like loading plugin factories that should only be executed when finally
-    needed and not on declaration.
-
-    Examples:
-        ::
-
-            import time
-            class ExpensiveFactory:
-                def __init__():
-                    time.sleep(1000)
-                    self.items = ['a', 'b', 'c']
-                def get_items():
-                    return self.items
-
-            ExpensiveFactory = LoadOnCallSingletonDecorator(ExpensiveFactory)
-            ExpensiveFactory.get_items()
-    """
-
-    def __init__(self, klass):
-        self.instance = SingletonDecorator(klass)
-        self.created = False
-
-    def __getattr__(self, item):
-        self.ensure_created()
-        return getattr(self.instance, item)
-
-    def ensure_created(self):
-        if not self.created:
-            self.instance = self.instance()
-            self.created = True
+    @classmethod
+    def instance(cls):
+        if not cls.__singleton_instance:
+            with cls.__singleton_lock:
+                if not cls.__singleton_instance:
+                    cls.__singleton_instance = cls()
+        return cls.__singleton_instance
 
 
 def cache_for(ttl=datetime.timedelta(minutes=1)):
@@ -110,7 +62,8 @@ def cache_for(ttl=datetime.timedelta(minutes=1)):
         @wraps(func)
         def wrapped(*args, **kw):
             # if we are testing, disable caching of functions as it complicates test-all setups
-            if os.getenv('TESTING', '0').lower() in ['1', 'y', 'true', 'yes', 'on']:
+            from idmtools.core import TRUTHY_VALUES
+            if os.getenv('TESTING', '0').lower() in TRUTHY_VALUES:
                 return func(*args, **kw)
 
             nonlocal time

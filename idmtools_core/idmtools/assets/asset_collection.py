@@ -2,17 +2,21 @@ import copy
 import os
 from dataclasses import dataclass, field
 from logging import getLogger
-from typing import List, NoReturn, TypeVar, Union, Any, Dict
+from typing import List, NoReturn, TypeVar, Union, Any, Dict, TYPE_CHECKING
 from uuid import UUID
 from idmtools.assets import Asset, TAssetList
 from idmtools.assets import TAssetFilterList
 from idmtools.assets.errors import DuplicatedAssetError
 from idmtools.core import FilterMode, ItemType
 from idmtools.core.interfaces.ientity import IEntity
+from idmtools.core.interfaces.iitem import IItem
 from idmtools.utils.entities import get_default_tags
 from idmtools.utils.file import scan_directory
 from idmtools.utils.filters.asset_filters import default_asset_file_filter
 from idmtools.utils.info import get_doc_base_url
+
+if TYPE_CHECKING:  # pragma: no cover
+    from idmtools.entities.iplatform import IPlatform
 
 user_logger = getLogger('user')
 
@@ -29,7 +33,7 @@ class AssetCollection(IEntity):
     #: ItemType so platform knows how to handle item properly
     item_type: ItemType = field(default=ItemType.ASSETCOLLECTION, compare=False)
 
-    def __init__(self, assets: Union[TAssetList, 'AssetCollection'] = None, tags=None):
+    def __init__(self, assets: Union[List[str], TAssetList, 'AssetCollection'] = None, tags=None):
         """
         A constructor.
 
@@ -66,6 +70,8 @@ class AssetCollection(IEntity):
         Returns:
             AssetCollection
         """
+        if item_id is None:
+            raise ValueError("You must specify an id")
         item = super(AssetCollection, cls).from_id(item_id, platform, **kwargs)
         return AssetCollection(item) if as_copy else item
 
@@ -247,7 +253,7 @@ class AssetCollection(IEntity):
         for asset in assets:
             self.add_asset(asset, fail_on_duplicate, fail_on_deep_comparison)
 
-    def add_or_replace_asset(self, asset: Asset, fail_on_deep_comparison: bool = False):
+    def add_or_replace_asset(self, asset: Union[Asset, str], fail_on_deep_comparison: bool = False):
         """
         Add or replaces an asset in a collection
 
@@ -259,14 +265,14 @@ class AssetCollection(IEntity):
             None.
         """
         self.is_editable(True)
-        index = self.find_index_of_asset(asset)
+        tasset = Asset(asset) if isinstance(asset, str) else asset
+        index = self.find_index_of_asset(tasset)
         if index is not None:
-            if fail_on_deep_comparison and not asset.deep_equals(self.assets[index]):
-                fn = f"{asset.relative_path}/{asset.filename}" if asset.relative_path else asset.filename
-                raise ValueError(f"Contents of file {fn} being replaced differs. To prevent unexpected behaviour, please review script or disable deep checks")
-            self.assets[index] = asset
+            if fail_on_deep_comparison and not tasset.deep_equals(self.assets[index]):
+                raise ValueError(f"Contents of file {asset.short_remote_path()} being replaced differs. To prevent unexpected behaviour, please review script or disable deep checks")
+            self.assets[index] = tasset
         else:
-            self.assets.append(asset)
+            self.assets.append(tasset)
 
     def get_one(self, **kwargs):
         """
@@ -288,19 +294,6 @@ class AssetCollection(IEntity):
             return next(filter(lambda a: all(getattr(a, k) == kwargs.get(k) for k in kwargs), self.assets))
         except StopIteration:
             return None
-
-    def delete(self, **kwargs) -> NoReturn:
-        """
-        Delete an asset based on keywords attributes
-
-        Args:
-            **kwargs: Filter for the asset to delete.
-        """
-        user_logger.warning(
-            "delete will be changing behaviour to deletion of AssetCollection in a future release. Use the remove method going forward to remove an asset from an AssetCollection",
-            PendingDeprecationWarning
-        )
-        self.remove(**kwargs)
 
     def remove(self, **kwargs) -> NoReturn:
         """
@@ -413,14 +406,12 @@ class AssetCollection(IEntity):
                 return idx
         return None
 
-    def pre_creation(self) -> None:
+    def pre_creation(self, platform: 'IPlatform') -> None:
         if self.tags:
             self.tags.update(get_default_tags())
         else:
             self.tags = get_default_tags()
-
-    def post_creation(self) -> None:
-        pass
+        IItem.pre_creation(self, platform)
 
     def set_tags(self, tags: Dict[str, Any]):
         self.tags = tags

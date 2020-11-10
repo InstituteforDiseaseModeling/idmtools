@@ -1,27 +1,14 @@
 import os
 import sys
-from hashlib import md5
-
 from COMPS import Client
 from COMPS.Data import AssetCollectionFile, QueryCriteria
 from COMPS.Data import Experiment
 from COMPS.Data.AssetCollection import AssetCollection
+from idmtools.utils.hashing import calculate_md5
 
 MD5_KEY = 'idmtools-requirements-md5-{}'
 AC_FILE = 'ac_info.txt'
 LIBRARY_ROOT_PREFIX = 'L'
-
-
-def calculate_md5(file_path) -> str:
-    """
-    Calculate and md5
-    """
-    if os.path.exists(file_path):
-        with open(file_path, 'rb') as f:
-            md5calc = md5()
-            md5calc.update(f.read())
-            md5_checksum_str = md5calc.hexdigest()
-        return md5_checksum_str
 
 
 def build_asset_file_list(prefix=LIBRARY_ROOT_PREFIX):
@@ -60,7 +47,7 @@ def get_first_simulation_of_experiment(exp_id):
     return comps_sim
 
 
-def main():
+def main():  # pragma: no cover
     print(sys.argv)
 
     if len(sys.argv) < 4:
@@ -143,5 +130,5 @@ def main():
     sys.stdout.flush()
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     main()

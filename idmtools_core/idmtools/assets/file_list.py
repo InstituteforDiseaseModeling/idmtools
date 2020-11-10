@@ -1,6 +1,8 @@
+from distutils.filelist import FileList
+from typing import List
 import os
 import re
-from idmtools.assets import Asset as AssetFile
+from idmtools.assets import Asset, AssetCollection
 from idmtools.utils.local_os import LocalOS
 
 
@@ -17,7 +19,7 @@ class FileList:
         :param root: The dir all files_in_root are relative to.
         :param files_in_root: The listed files
         """
-        self.files = []
+        self.files: List[Asset] = []
         self.ignore_missing = ignore_missing
         self.max_depth = max_depth
 
@@ -53,7 +55,7 @@ class FileList:
         """
         # If already present -> bypass
         for f in self.files:
-            if os.path.abspath(f.absolute_path) == os.path.abspath(path):
+            if f.absolute_path and os.path.abspath(f.absolute_path) == os.path.abspath(path):
                 return
 
         if os.path.isdir(path):
@@ -62,7 +64,7 @@ class FileList:
         absolute_path = os.path.abspath(path)
         file_name = os.path.basename(path)
         try:
-            af = AssetFile(filename=file_name, relative_path=relative_path, absolute_path=absolute_path)
+            af = Asset(filename=file_name, relative_path=relative_path, absolute_path=absolute_path)
             self.add_asset_file(af)
         except Exception as e:
             if not self.ignore_missing:
@@ -123,6 +125,17 @@ class FileList:
 
                     # add the file
                     self.add_file(os.path.join(root, f), relative_path=f_relative_path)
+
+    def to_asset_collection(self):
+        ac = AssetCollection()
+        ac.assets = self.files
+        return ac
+
+    @staticmethod
+    def from_asset_collection(asset_collection: AssetCollection) -> FileList:
+        fl = FileList()
+        fl.files = [asset_collection.assets]
+        return fl
 
     def __len__(self):
         return len(self.files)

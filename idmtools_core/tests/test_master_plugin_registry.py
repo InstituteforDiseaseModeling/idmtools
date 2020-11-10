@@ -1,11 +1,13 @@
 from unittest import TestCase
-
+import allure
 import pytest
 from idmtools.registry.master_plugin_registry import MasterPluginRegistry
 from idmtools.utils.info import get_packages_from_pip
 
 
 @pytest.mark.smoke
+@allure.story("Plugins")
+@allure.suite("idmtools_core")
 class TestMasterPluginRegistry(TestCase):
     def test_get_plugins(self):
         """

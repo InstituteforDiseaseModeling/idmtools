@@ -1,12 +1,11 @@
 from concurrent.futures import as_completed, Future
+from concurrent.futures.process import ProcessPoolExecutor
 from concurrent.futures.thread import ThreadPoolExecutor
 from functools import partial
 from logging import getLogger, DEBUG
+from os import cpu_count
 from typing import List, Union, Generator, Iterable, Callable, Any
-
 from more_itertools import chunked
-from tqdm import tqdm
-
 from idmtools.core import EntityContainer
 from idmtools.entities.templated_simulation import TemplatedSimulations
 
@@ -56,7 +55,7 @@ def item_batch_worker_thread(create_func: Callable, items: Union[List]) -> List:
 
 def batch_create_items(items: Union[Iterable, Generator], batch_worker_thread_func: Callable[[List], List] = None,
                        create_func: Callable[..., Any] = None, display_progress: bool = True,
-                       progress_description: str = "Commissioning items", **kwargs):
+                       progress_description: str = "Commissioning items", unit: str = None, **kwargs):
     """
     Batch create items. You must specify either batch_worker_thread_func or create_func
 
@@ -66,6 +65,7 @@ def batch_create_items(items: Union[Iterable, Generator], batch_worker_thread_fu
         create_func: Optional Create function
         display_progress: Enable progress bar
         progress_description: Description to show in progress bar
+        unit: Unit for progress bar
         **kwargs:
 
     Returns:
@@ -78,13 +78,27 @@ def batch_create_items(items: Union[Iterable, Generator], batch_worker_thread_fu
     # Consider values from the block that Platform uses
     _batch_size = int(IdmConfigParser.get_option(None, "batch_size", fallback=16))
 
-    if display_progress:
-        prog = tqdm(desc="Initializing objects for creation")
+    if display_progress and not IdmConfigParser.is_progress_bar_disabled():
+        from tqdm import tqdm
+        extra_args = dict(unit=unit) if unit else dict()
+        prog = tqdm(desc="Initializing objects for creation", **extra_args)
+    else:
+        prog = None
 
     if EXECUTOR is None:
-        _max_workers = int(IdmConfigParser.get_option(None, "max_workers", fallback=16))
+        _workers_per_cpu = IdmConfigParser.get_option(None, "workers_per_cpu", fallback=None)
+        if _workers_per_cpu:
+            _max_workers = int(_workers_per_cpu) * cpu_count()
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f"workers set by cpu: {_workers_per_cpu} * {cpu_count()}")
+        else:
+            _max_workers = int(IdmConfigParser.get_option(None, "max_workers", fallback=16))
         logger.info(f'Creating {_max_workers} Platform Workers')
-        EXECUTOR = ThreadPoolExecutor(max_workers=_max_workers)
+        default_pool_executor = IdmConfigParser.get_option(None, "default_pool_executor", fallback="thread").lower()
+        if default_pool_executor == "process":
+            EXECUTOR = ProcessPoolExecutor(max_workers=_max_workers)
+        else:
+            EXECUTOR = ThreadPoolExecutor(max_workers=_max_workers)
 
     if batch_worker_thread_func is None:
 
@@ -107,7 +121,7 @@ def batch_create_items(items: Union[Iterable, Generator], batch_worker_thread_fu
         i = items.items
     else:
         i = items
-    if display_progress:
+    if display_progress and not IdmConfigParser.is_progress_bar_disabled():
         if hasattr(items, '__len__'):
             prog.total = len(items)
     for chunk in chunked(i, _batch_size):
@@ -117,15 +131,15 @@ def batch_create_items(items: Union[Iterable, Generator], batch_worker_thread_fu
                 c.parent = parent
         if logger.isEnabledFor(DEBUG):
             logger.debug(f"Submitting chunk: {len(chunk)}")
-        if display_progress:
+        if display_progress and not IdmConfigParser.is_progress_bar_disabled():
             prog.update(len(chunk))
         futures.append(EXECUTOR.submit(batch_worker_thread_func, chunk))
 
     results = []
-    if display_progress:
+    if display_progress and not IdmConfigParser.is_progress_bar_disabled():
         prog.set_description(progress_description)
         prog.reset(total)
-        results = show_progress_of_batch(prog, futures, progress_description, total)
+        results = show_progress_of_batch(prog, futures)
     else:
         for future in futures:
             results.extend(future.result())
@@ -133,15 +147,13 @@ def batch_create_items(items: Union[Iterable, Generator], batch_worker_thread_fu
     return results
 
 
-def show_progress_of_batch(pbar: tqdm, futures: List[Future], progress_description: str, total: int) -> List:
+def show_progress_of_batch(progress_bar: 'tqdm', futures: List[Future]) -> List:  # noqa: F821
     """
     Show progress bar for batch
 
     Args:
-        pbar: Progress bar
+        progress_bar: Progress bar
         futures: List of futures that are still running/queued
-        progress_description: Progress description
-        total: Total items being loaded(since we are loading in batches)
 
     Returns:
 
@@ -149,6 +161,6 @@ def show_progress_of_batch(pbar: tqdm, futures: List[Future], progress_descripti
     results = []
     for future in as_completed(futures):
         result = future.result()
-        pbar.update(len(result))
+        progress_bar.update(len(result))
         results.extend(future.result())
     return results

@@ -2,12 +2,11 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Type, Any, List, Tuple, Dict, NoReturn, TYPE_CHECKING
 from uuid import UUID
-
 from idmtools.assets import Asset
 from idmtools.core import CacheEnabled
 from idmtools.entities.iplatform_ops.utils import batch_create_items
 from idmtools.entities.iworkflow_item import IWorkflowItem
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
 
 
@@ -43,7 +42,7 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
             List of tuples containing the create object and id of item that was created
         """
         return batch_create_items(workflow_items, create_func=self.create, display_progress=display_progress,
-                                  progress_description="Creating Suites", **kwargs)
+                                  progress_description="Creating WorkItems", unit="workitem", **kwargs)
 
     def pre_create(self, workflow_item: IWorkflowItem, **kwargs) -> NoReturn:
         """
@@ -56,7 +55,7 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
         Returns:
             NoReturn
         """
-        workflow_item.pre_creation()
+        workflow_item.pre_creation(self.platform)
 
     def post_create(self, workflow_item: IWorkflowItem, **kwargs) -> NoReturn:
         """
@@ -69,7 +68,7 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
         Returns:
             NoReturn
         """
-        workflow_item.post_creation()
+        workflow_item.post_creation(self.platform)
 
     def create(self, workflow_item: IWorkflowItem, do_pre: bool = True, do_post: bool = True, **kwargs) -> Any:
         """

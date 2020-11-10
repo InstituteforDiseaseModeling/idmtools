@@ -1,6 +1,6 @@
 """
 This script is to create AnalyzerManager and do analyzer.
-If you want to run it locally, just run as "python run_analysis.py expid"
+If you want to run it locally, just run as "python3 run_analysis.py expid"
 If you want to run it from ssmt, you will call this file from run_ssmt_analysis.py as example
 """
 import os
