@@ -128,7 +128,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
             ac2.save()
             ac = ac2
         asset_collection.uid = ac.id
-        asset_collection._platform_object = asset_collection
+        asset_collection._platform_object = ac
         asset_collection.platform = self.platform
         asset_collection.platform_id = self.platform.uid
         return ac
