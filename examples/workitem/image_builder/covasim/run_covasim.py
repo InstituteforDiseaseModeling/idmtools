@@ -21,7 +21,7 @@ if __name__ == "__main__":
     here = os.path.dirname(__file__)
 
     # Create a platform to run the workitem
-    platform = Platform("SLURM2")  # staging SLURMStage
+    platform = Platform("CALCULON", node_group="idm_abcd")
 
     # create commandline input for the task
     command = CommandLine("singularity exec ./Assets/covasim.sif python3 sim.py")
@@ -30,8 +30,8 @@ if __name__ == "__main__":
     task.transient_assets.add_asset(os.path.join("inputs", "sim.py"))
 
     # add covasim.sif's assetcollection to experiment level(Assets dir)
-    # 0cfbc30b-920d-eb11-a2c2-f0921c167862 assetcollection id in stage which created from create_covasim_sif_ac.py
-    common_assets = AssetCollection.from_id("0cfbc30b-920d-eb11-a2c2-f0921c167862", as_copy=True)
+    # c2448012-5c19-eb11-a2dd-c4346bcb7271 assetcollection id in CALCULON which created from create_covasim_sif_ac.py
+    common_assets = AssetCollection.from_id("c2448012-5c19-eb11-a2dd-c4346bcb7271", as_copy=True)
     task.common_assets = common_assets
 
     # create Experiment from task
