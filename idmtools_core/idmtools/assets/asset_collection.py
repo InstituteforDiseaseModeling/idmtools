@@ -181,7 +181,7 @@ class AssetCollection(IEntity):
         if self.platform_id:
             if error:
                 raise ValueError(
-                    f"You cannot modify an already provisioned Asset Collection. If you want to modify an existing AssetCollection see the recipe {get_doc_base_url()}cookbook/asset_collections.html#modifying-asset-collection")
+                    f"You cannot modify an already provisioned Asset Collection. If you want to modify an existing AssetCollection see the recipe {get_doc_base_url()}cookbook/assets.html#modifying-asset-collection")
             return False
         return True
 
