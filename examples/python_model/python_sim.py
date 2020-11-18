@@ -42,6 +42,7 @@ task = JSONConfiguredPythonTask(script_path=os.path.join("inputs", "python_model
 # now let's use this task to create a TemplatedSimulation builder. This will build new simulations from sweep builders
 # we will define later. We can also use it to manipulate the base_task or the base_simulation
 ts = TemplatedSimulations(base_task=task)
+ts.base_simulation.name = "sim name"
 # We can define common metadata like tags across all the simulations using the base_simulation object
 ts.base_simulation.tags['tag1'] = 1
 

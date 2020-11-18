@@ -18,7 +18,7 @@ class TestSingularityBuild(unittest.TestCase):
     def setUp(self) -> None:
         super().setUp()
         self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
-        self.platform = Platform("SlurmStage")
+        self.platform = Platform("Slurm")
 
     def test_get_docker_manifest(self):
         manifest, tag = get_docker_manifest("idm/dtk-ubuntu-py3.7-mpich3.3-runtime:20.04.09")
@@ -96,6 +96,22 @@ class TestSingularityBuild(unittest.TestCase):
 
     def test_singularity_from_definition(self):
         sbi = self.get_alpine_simple_builder()
+        sbi.run(wait_until_done=True, platform=self.platform)
+        self.assertTrue(sbi.succeeded)
+        self.assertIsNotNone(sbi.asset_collection)
+
+    def test_singularity_from_definition_ubuntu_container(self):
+        sing_dir = os.path.join(COMMON_INPUT_PATH, 'singularity', 'ubuntu_container')
+        def_file = os.path.join(sing_dir, 'singularity.def')
+        sbi = SingularityBuildWorkItem(name=self.case_name, definition_file=def_file)
+        sbi.run(wait_until_done=True, platform=self.platform)
+        self.assertTrue(sbi.succeeded)
+        self.assertIsNotNone(sbi.asset_collection)
+
+    def test_singularity_from_definition_ubuntu_container(self):
+        sing_dir = os.path.join(COMMON_INPUT_PATH, 'singularity', 'ubuntu_container')
+        def_file = os.path.join(sing_dir, 'singularity.def')
+        sbi = SingularityBuildWorkItem(name=self.case_name, definition_file=def_file)
         sbi.run(wait_until_done=True, platform=self.platform)
         self.assertTrue(sbi.succeeded)
         self.assertIsNotNone(sbi.asset_collection)
