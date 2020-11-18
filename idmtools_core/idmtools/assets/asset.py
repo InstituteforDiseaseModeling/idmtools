@@ -3,6 +3,7 @@ import os
 from dataclasses import dataclass, field, InitVar
 from io import BytesIO
 from logging import getLogger, DEBUG
+from pathlib import PosixPath
 from typing import TypeVar, Union, List, Callable, Any, Optional, Generator, BinaryIO
 import backoff
 import requests
@@ -269,11 +270,12 @@ class Asset:
         Returns:
             Remote Path + Filename
         """
+
         if self.relative_path:
-            path = os.path.join(self.relative_path, self.filename)
+            path = PosixPath(self.relative_path).joinpath(self.filename)
         else:
-            path = os.path.join(self.filename)
-        return path
+            path = PosixPath(self.filename)
+        return str(path)
 
 
 TAsset = TypeVar("TAsset", bound=Asset)
