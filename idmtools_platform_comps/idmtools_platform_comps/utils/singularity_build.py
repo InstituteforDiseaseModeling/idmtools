@@ -65,7 +65,7 @@ class SingularityBuildWorkItem(InputDataWorkItem):
     #: Don't include default tags
     disable_default_tags: bool = field(default=None)
     # ID that is added to work item and then results collection that can be used to tied the items together
-    run_id: uuid.UUID = field(default=uuid.uuid4)
+    run_id: uuid.UUID = field(default_factory=uuid.uuid4)
 
     #: loaded if url is docker://. Used to determine if we need to re-run a build
     __digest: Dict[str, str] = field(default=None)
