@@ -1,0 +1,14 @@
+Bootstrap: localimage
+From: Assets/ubuntu.sif
+
+%post
+    pip3 install numba==0.48.0
+    cd /opt
+    git clone https://github.com/InstituteforDiseaseModeling/covasim.git
+    cd covasim
+
+    /usr/bin/python3 setup.py develop full
+    /usr/bin/python3 -m site
+
+%runscript
+    echo Please specify a command. The default command for this container prints this message
