@@ -181,10 +181,13 @@ try:
     @click.option('--workitem-tag', default=[], type=(str, str), multiple=True, help="Extra Tags as Value Pairs for the WorkItem")
     @click.option('--name', default=None, help="Name of WorkItem. If not provided, one will be generated")
     @click.option('--force/--no-force', default=False, help="Force build, ignoring build context")
+    @click.option('--image-name', default=None, help="Name of resulting image")
     @click.pass_context
-    def build(ctx: click.Context, common_input, common_inputs_glob, transient_input, transient_inputs_glob, definition_file, wait, tag, workitem_tag, name, force):
+    def build(ctx: click.Context, common_input, common_inputs_glob, transient_input, transient_inputs_glob, definition_file, wait, tag, workitem_tag, name, force, image_name: str):
         p: COMPSPlatform = Platform(ctx.obj['config_block'])
-        sb = SingularityBuildWorkItem(definition_file=definition_file, name=name, force=force)
+        if image_name and image_name.endswith(".sif"):
+            image_name = f'{image_name}.sif'
+        sb = SingularityBuildWorkItem(definition_file=definition_file, name=name, force=force, image_name=image_name)
 
         if tag:
             for name, value in tag:
@@ -215,10 +218,13 @@ try:
     @click.option('--workitem-tag', default=[], type=(str, str), multiple=True, help="Extra Tags as Value Pairs for the WorkItem")
     @click.option('--name', default=None, help="Name of WorkItem. If not provided, one will be generated")
     @click.option('--force/--no-force', default=False, help="Force build, ignoring build context")
+    @click.option('--image-name', default=None, help="Name of resulting image")
     @click.pass_context
-    def pull(ctx: click.Context, image_url, wait, tag, workitem_tag, name, force):
+    def pull(ctx: click.Context, image_url, wait, tag, workitem_tag, name, force, image_name: str):
         p: COMPSPlatform = Platform(ctx.obj['config_block'])
-        sb = SingularityBuildWorkItem(image_url=image_url, force=force)
+        if image_name and image_name.endswith(".sif"):
+            image_name = f'{image_name}.sif'
+        sb = SingularityBuildWorkItem(image_url=image_url, force=force, image_name=image_name)
         sb.name = f"Pulling {image_url}" if name is None else name
 
         if tag:
