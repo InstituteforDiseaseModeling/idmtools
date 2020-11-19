@@ -198,8 +198,8 @@ class SingularityBuildWorkItem(InputDataWorkItem):
                 ac = sbi.platform._assets.get(None, query_criteria=qc)
             if ac:
                 ac = sbi.platform._assets.to_entity(ac[0])
-                if IdmConfigParser.is_output_enabled():
-                    logger.log(SUCCESS, f'Found existing container in {ac.id}')
+                if logger.isEnabledFor(DEBUG):
+                    logger.debug(f'Found existing container in {ac.id}')
             else:
                 ac = None
 
@@ -293,6 +293,9 @@ class SingularityBuildWorkItem(InputDataWorkItem):
         acs = comps_workitem.get_related_asset_collections(RelationType.Created)
         if acs:
             self.asset_collection = AssetCollection.from_id(acs[0].id, platform=platform if platform else self.platform)
+            if IdmConfigParser.is_output_enabled():
+                user_logger.log(SUCCESS, f"Created Singularity image as Asset Collection: {self.asset_collection.id}")
+                user_logger.log(SUCCESS, f"View AC at {self.platform.get_asset_collection_link(self.asset_collection)}")
             return self.asset_collection
         return None
 
@@ -314,13 +317,17 @@ class SingularityBuildWorkItem(InputDataWorkItem):
         self.platform = p
         ac = self.find_existing_container(self)
         if ac is None or self.force:
-            super().run(**opts)
+            return super().run(**opts)
         else:
+            if IdmConfigParser.is_output_enabled():
+                user_logger.log(SUCCESS, f"Existing build of image found with Asset Collection ID of {ac.id}")
+                user_logger.log(SUCCESS, f"View AC at {self.platform.get_asset_collection_link(ac)}")
             # Set id to None
             self.uid = None
             self.asset_collection = ac
             # how do we get id for original work item from AC?
             self.status = EntityStatus.SUCCEEDED
+            return self.asset_collection
 
     def wait(self, wait_on_done_progress: bool = True, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None) -> Union[AssetCollection, None]:
         """
@@ -342,3 +349,4 @@ class SingularityBuildWorkItem(InputDataWorkItem):
         super().wait(**opts)
         if self.status == EntityStatus.SUCCEEDED:
             return self.__fetch_finished_asset_collection(p)
+        return None
