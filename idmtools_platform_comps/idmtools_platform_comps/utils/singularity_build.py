@@ -236,9 +236,13 @@ class SingularityBuildWorkItem(InputDataWorkItem):
         self.image_tags['type'] = 'singularity'
 
         if not self.disable_default_tags:
-            # set the run id on the workitem and resulting tags
-            self.tags['run_id'] = str(self.run_id)
-            self.image_tags['run_id'] = str(self.run_id)
+            # allow users to override run id using only the tag
+            if 'run_id' in self.tags:
+                self.run_id = self.tags['run_id']
+            else:
+                # set the run id on the workitem and resulting tags
+                self.tags['run_id'] = str(self.run_id)
+            self.image_tags['run_id'] = self.tags['run_id']
             # Check for the digest
             if self.__digest and isinstance(self.__digest, str):
                 self.image_tags['digest'] = self.__digest
