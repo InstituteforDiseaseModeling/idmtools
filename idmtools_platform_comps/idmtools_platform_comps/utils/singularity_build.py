@@ -132,7 +132,7 @@ class SingularityBuildWorkItem(InputDataWorkItem):
                     calculate_md5_stream(ain, file_hash=file_hash)
             else:
                 item = io.BytesIO()
-                item.write(asset.bytes)
+                item.write(json.dumps([asset.filename, asset.relative_path, asset.checksum], sort_keys=True).encode('utf-8') if asset.persisted else asset.bytes)
                 item.seek(0)
                 calculate_md5_stream(item, file_hash=file_hash)
 
