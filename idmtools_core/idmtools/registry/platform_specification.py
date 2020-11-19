@@ -85,7 +85,7 @@ class PlatformPlugins(SingletonMixin):
         self._plugins = typing.cast(typing.Dict[str, PlatformSpecification],
                                     load_plugin_map('idmtools_platform', PlatformSpecification, strip_all))
         self._aliases: typing.Dict[str, typing.Tuple[PlatformSpecification, typing.Dict]] = dict()
-        for name, spec in self._plugins.items():
+        for _name, spec in self._plugins.items():
             for alias, details in spec.get_configuration_aliases().items():
                 if alias.upper() in self._aliases or alias.upper() in self._plugins:
                     logger.debug(f"Conflicting alias found: {alias.upper()} from {spec.get_name()}")

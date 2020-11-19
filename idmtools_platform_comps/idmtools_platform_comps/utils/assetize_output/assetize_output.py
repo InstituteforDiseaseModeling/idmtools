@@ -304,9 +304,8 @@ class AssetizeOutput(SSMTWorkItem):
                             user_logger.warning(f"Cannot determine environment of item of type {item_type} with id of {item.id}. Running assetize against items in other environments will result in an error")
                         elif po.configuration.environment_name.lower() != platform.environment.lower():
                             fail = True
-                    elif item_type == ItemType.WORKFLOW_ITEM:
-                        if po.environment_name.lower() != platform.environment.lower():
-                            fail = True
+                    elif item_type == ItemType.WORKFLOW_ITEM and po.environment_name.lower() != platform.environment.lower():
+                        fail = True
                     if fail:
                         raise CrossEnvironmentAssetizeNotSupport(f"You cannot assetize between environment. In this case, the {item_type.value} {item.id} is in {po.configuration.environment_name} but you are running your workitem in {platform.environment}")
 

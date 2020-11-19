@@ -67,7 +67,7 @@ class PythonTask(ITask):
         # check experiment level assets for items
         if simulation.parent.assets:
             new_assets = AssetCollection()
-            for i, asset in enumerate(simulation.parent.assets.assets):
+            for _i, asset in enumerate(simulation.parent.assets.assets):
                 if asset.filename != self.script_path and asset.absolute_path != self.script_path:
                     new_assets.add_asset(asset)
             simulation.parent.assets = new_assets

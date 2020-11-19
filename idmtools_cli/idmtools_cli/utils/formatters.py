@@ -80,7 +80,7 @@ def max_width(string: str, cols: int, separator='\n'):
 
                 chunks = schunk(word, cols)
                 for i, chunk in enumerate(chunks):
-                    if not (i + 1) == len(chunks):
+                    if i + 1 != len(chunks):
                         _row[_row_i] += chunk
                         _row[_row_i] = _row[_row_i].rstrip()
                         _row.append('')

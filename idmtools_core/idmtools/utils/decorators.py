@@ -55,7 +55,10 @@ class SingletonMixin(object):
         return cls.__singleton_instance
 
 
-def cache_for(ttl=datetime.timedelta(minutes=1)):
+def cache_for(ttl=None):
+    if ttl is None:
+        ttl = datetime.timedelta(minutes=1)
+
     def wrap(func):
         time, value = None, None
 

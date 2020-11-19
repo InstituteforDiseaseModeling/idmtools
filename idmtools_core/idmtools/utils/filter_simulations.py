@@ -7,7 +7,7 @@ from idmtools.entities.iplatform import IPlatform
 class FilterItem:
 
     @staticmethod
-    def filter_item(platform: IPlatform, item: IEntity, skip_sims=[], max_simulations: int = None, **kwargs):
+    def filter_item(platform: IPlatform, item: IEntity, skip_sims=None, max_simulations: int = None, **kwargs):
         """
         Filter simulations from Experiment or Suite, by default it filter status with Succeeded.
         If user wants to filter by other status, it also can be done, for example:
@@ -32,7 +32,10 @@ class FilterItem:
         Returns: list of simulation ids
         """
 
-        def match_tags(sim: IEntity, tags: dict = {}):
+        if skip_sims is None:
+            skip_sims = []
+
+        def match_tags(sim: IEntity, tags=None):
             """
             Check if simulation match tags
             Args:
@@ -41,6 +44,8 @@ class FilterItem:
 
             Returns: bool True/False
             """
+            if tags is None:
+                tags = {}
             for k, v in tags.items():
                 if k not in sim.tags or sim.tags[k] != v:
                     return False
@@ -71,8 +76,7 @@ class FilterItem:
         return [s.uid for s in sims_final]
 
     @classmethod
-    def filter_item_by_id(cls, platform: IPlatform, item_id: UUID, item_type: ItemType = ItemType.EXPERIMENT,
-                          skip_sims=[], max_simulations: int = None, **kwargs):
+    def filter_item_by_id(cls, platform: IPlatform, item_id: UUID, item_type: ItemType = ItemType.EXPERIMENT, skip_sims=None, max_simulations: int = None, **kwargs):
         """
         Filter simulations from Experiment or Suite
         Args:
@@ -85,6 +89,8 @@ class FilterItem:
 
         Returns: list of simulation ids
         """
+        if skip_sims is None:
+            skip_sims = []
         if item_type not in [ItemType.EXPERIMENT, ItemType.SUITE]:
             raise ValueError("This method only supports Experiment and Suite types!")
 

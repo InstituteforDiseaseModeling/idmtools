@@ -269,7 +269,7 @@ class RequirementsToAssetCollection:
         comment_list = []
         if self.requirements_path:
             with open(self.requirements_path, 'r') as fd:
-                for cnt, line in enumerate(fd):
+                for _cnt, line in enumerate(fd):
                     line = line.strip()
                     if line == '':
                         continue
@@ -294,7 +294,7 @@ class RequirementsToAssetCollection:
         for k, v in has_version_dict.items():
             update_req_list.append(f'{k}=={v[0][1]}')
 
-        for k, v in missing_version_dict.items():
+        for k in missing_version_dict.keys():
             latest = self.get_latest_version(k)
             update_req_list.append(f"{k}=={latest}")
 

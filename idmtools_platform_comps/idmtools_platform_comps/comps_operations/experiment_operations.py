@@ -289,15 +289,13 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             logger.debug(f'Commissioning experiment: {experiment.uid}')
         # commission only if rules we have items in created or none.
         # TODO add new status to entity status to track commissioned as well instead of raw comps
-        if any([s.status in [None, EntityStatus.CREATED] for s in experiment.simulations]):
-            # now check comps status
-            if any([s.get_platform_object().state in [SimulationState.Created] for s in experiment.simulations]):
-                po = experiment.get_platform_object()
-                po.commission()
-                # for now, we update here in the comps objects to refelect the new state
-                for sim in experiment.simulations:
-                    spo = sim.get_platform_object()
-                    spo._state = SimulationState.CommissionRequested
+        if any([s.status in [None, EntityStatus.CREATED] for s in experiment.simulations]) and any([s.get_platform_object().state in [SimulationState.Created] for s in experiment.simulations]):
+            po = experiment.get_platform_object()
+            po.commission()
+            # for now, we update here in the comps objects to reflect the new state
+            for sim in experiment.simulations:
+                spo = sim.get_platform_object()
+                spo._state = SimulationState.CommissionRequested
 
     def send_assets(self, experiment: Experiment, **kwargs):
         """

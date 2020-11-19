@@ -100,7 +100,7 @@ class FileList:
 
         else:
             # Walk through the path
-            for root, subdirs, files in os.walk(path):
+            for root, _subdirs, files in os.walk(path):
                 # Little safety to not go too deep
                 depth = root[len(path) + len(os.path.sep):].count(os.path.sep)
                 if depth > self.max_depth:

@@ -5,7 +5,7 @@ import glob
 import webbrowser
 import argparse
 import os
-from livereload import Server, shell
+from livereload import Server, shell  # noqa: I900
 
 
 parser = argparse.ArgumentParser("Serves and autobuilds the docs")

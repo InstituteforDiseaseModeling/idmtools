@@ -32,7 +32,7 @@ def fatal_code(e: Exception) -> bool:
         True is exception is a request and status code matches 404
     """
     if isinstance(e, RequestException):
-        return 404 == e.response.status_code
+        return e.response.status_code == 404
     return False
 
 
@@ -162,8 +162,7 @@ def get_file_as_generator(file: Union[SimulationFile, AssetCollectionFile, Asset
         header = {}
     response = Client.get(url[i:], headers=header, stream=True)
 
-    for chunk in response.iter_content(chunk_size=chunk_size):
-        yield chunk
+    yield from response.iter_content(chunk_size=chunk_size)
 
 
 class Workitem(object):

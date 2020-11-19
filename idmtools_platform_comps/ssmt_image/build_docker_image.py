@@ -38,7 +38,7 @@ def get_dependency_packages():
 
     """
     os.makedirs(os.path.abspath('.depends'), exist_ok=True)
-    for root, dirs, files in os.walk(os.path.join(LOCAL_PACKAGE_DIR, '.depends')):
+    for root, _dirs, files in os.walk(os.path.join(LOCAL_PACKAGE_DIR, '.depends')):
         for file in files:
             os.remove(os.path.join(root, file))
     for package in ['idmtools_core', 'idmtools_models', 'idmtools_platform_comps']:
@@ -122,7 +122,7 @@ def build_image(username, password, disable_keyring_load, disable_keyring_save):
     sys.exit(p.returncode)
 
 
-if "__main__" == __name__:
+if __name__ == "__main__":
     parser = argparse.ArgumentParser("Build SSMT Image")
     parser.add_argument("--username", default=None, help="Docker Production Username")
     parser.add_argument("--password", default=None, help="Docker Production Password")

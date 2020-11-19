@@ -2,6 +2,7 @@ import os
 import shutil
 import tempfile
 import time
+from contextlib import suppress
 from dataclasses import dataclass, field
 from multiprocessing import current_process, cpu_count
 from logging import getLogger, DEBUG
@@ -62,12 +63,9 @@ class CacheEnabled:
     def cleanup_cache(self):
         # Only delete and close the cache if the owner thread ends
         # Avoid deleting and closing when a child thread ends
-        try:
+        with suppress(AttributeError):
             if current_process().name != 'MainProcess':
                 return
-        # On Linux, there is no MainProcess name like windows
-        except AttributeError:
-            pass
 
         if self._cache is not None:
             self._cache.close()
@@ -80,7 +78,7 @@ class CacheEnabled:
                         shutil.rmtree(self._cache_directory)
                         time.sleep(0.15)
                         break
-                    except (IOError, PermissionError):
+                    except IOError:
                         # we don't use logger here because it could be destroyed
                         print(f"Could not delete cache {self._cache_directory}")
                         retries += 1

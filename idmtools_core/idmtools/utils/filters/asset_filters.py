@@ -55,7 +55,7 @@ def file_extension_is(asset: 'TAsset', extensions: 'List[str]') -> 'bool':
     return asset.extension in extensions
 
 
-def asset_in_directory(asset: 'TAsset', directories: 'List[str]', base_path: str = os.getcwd()) -> 'bool':
+def asset_in_directory(asset: 'TAsset', directories: 'List[str]', base_path: str = None) -> 'bool':
     """
     Restrict filtering to assets within a given directory.
     This filter is not strict and simply checks if the directory portion is present in the assets absolute path.
@@ -65,7 +65,8 @@ def asset_in_directory(asset: 'TAsset', directories: 'List[str]', base_path: str
         directories: List of directory portions to include.
         base_path: base_path
     """
-
+    if base_path is None:
+        base_path = os.getcwd()
     norm_base_path = os.path.abspath(base_path)
     norm_dirs = [f"{os.sep}{d}{os.sep}" for d in directories]
     norm_asset_absolute_path = os.path.abspath(asset.absolute_path)

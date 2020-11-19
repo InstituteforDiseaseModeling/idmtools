@@ -73,7 +73,7 @@ class IdmConfigParser:
 
     @classmethod
     @initialization
-    def retrieve_settings(cls, section: str = None, field_type: Dict[str, str] = {}) -> Dict[str, str]:
+    def retrieve_settings(cls, section: str = None, field_type=None) -> Dict[str, str]:
         """
         Retrieve INI configuration values (to be used when updating platform fields). Call from each platform.
 
@@ -85,6 +85,8 @@ class IdmConfigParser:
             The configuration values as a dictionary.
         """
         # retrieve THIS platform config settings
+        if field_type is None:
+            field_type = {}
         field_config = cls.get_section(section)
 
         # update field types
@@ -138,7 +140,7 @@ class IdmConfigParser:
         return ini_file
 
     @classmethod
-    def _load_config_file(cls, dir_path: str = os.getcwd(), file_name: str = default_config):
+    def _load_config_file(cls, dir_path: str = None, file_name: str = default_config):
         """
         Find and then load the INI configuration file and parse it with :class:`IdmConfigParser`.
 
@@ -149,6 +151,8 @@ class IdmConfigParser:
         Returns:
             None
         """
+        if dir_path is None:
+            dir_path = os.getcwd()
         # init logging here as this is our most likely entry-point into an idmtools "application"
         from idmtools.core.logging import VERBOSE
 
