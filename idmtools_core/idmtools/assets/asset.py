@@ -3,7 +3,7 @@ import os
 from dataclasses import dataclass, field, InitVar
 from io import BytesIO
 from logging import getLogger, DEBUG
-from pathlib import PosixPath
+from pathlib import PurePosixPath
 from typing import TypeVar, Union, List, Callable, Any, Optional, Generator, BinaryIO
 import backoff
 import requests
@@ -272,9 +272,9 @@ class Asset:
         """
 
         if self.relative_path:
-            path = PosixPath(self.relative_path).joinpath(self.filename)
+            path = PurePosixPath(self.relative_path).joinpath(self.filename)
         else:
-            path = PosixPath(self.filename)
+            path = PurePosixPath(self.filename)
         return str(path)
 
 
