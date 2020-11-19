@@ -169,11 +169,11 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
             ac.uid = asset_collection.id
             ac.tags = asset_collection.tags
         elif isinstance(asset_collection, list) and len(asset_collection):
-            if isinstance(asset_collection[0], (SimulationFile, WorkItemFile)):
+            if not isinstance(asset_collection[0], (SimulationFile, WorkItemFile)):
+                raise ValueError("Unknown asset list")
+            else:
                 for file in asset_collection:
                     ac.add_asset(self.__simulation_file_to_asset(file))
-            else:
-                raise ValueError("Unknown asset list")
         assets = asset_collection.assets if isinstance(asset_collection, COMPSAssetCollection) else asset_collection
         # if we have just one, make it a list
         if isinstance(asset_collection, SimulationFile):

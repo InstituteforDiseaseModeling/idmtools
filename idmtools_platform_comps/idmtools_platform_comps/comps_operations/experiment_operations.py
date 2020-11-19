@@ -162,11 +162,8 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
 
         """
-        if experiment.status is not None and experiment.assets.is_editable():
-            # trigger precreate just to be sure
-            if not regather_common_assets:
-                user_logger.warning(
-                    f"Not gathering common assets again since experiment exists on platform. If you need to add additional common assets, see {get_doc_base_url()}cookbook/asset_collections.html#modifying-asset-collection")
+        if experiment.status is not None and experiment.assets.is_editable() and not regather_common_assets:
+            user_logger.warning(f"Not gathering common assets again since experiment exists on platform. If you need to add additional common assets, see {get_doc_base_url()}cookbook/asset_collections.html#modifying-asset-collection")
             experiment.pre_creation(self.platform, gather_assets=regather_common_assets)
             self.send_assets(experiment)
         return experiment

@@ -119,11 +119,10 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         caller = cls.get_caller()
 
         # Action based on the caller
-        if caller in CALLER_LIST:
-            return super().__new__(cls)
+        if caller not in CALLER_LIST:
+            raise ValueError("Please use Factory to create Platform! For example: \n    platform = Platform('COMPS', **kwargs)")
         else:
-            raise ValueError(
-                "Please use Factory to create Platform! For example: \n    platform = Platform('COMPS', **kwargs)")
+            return super().__new__(cls)
 
     def __post_init__(self) -> NoReturn:
         """
