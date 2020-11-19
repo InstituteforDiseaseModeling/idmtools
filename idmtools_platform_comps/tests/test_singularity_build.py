@@ -96,7 +96,7 @@ class TestSingularityBuild(unittest.TestCase):
 
     def test_singularity_from_definition(self):
         sbi = self.get_alpine_simple_builder()
-        sbi.run(wait_until_done=True, platform=self.platform)
+        sbi.run(wait_until_done=True)
         self.assertTrue(sbi.succeeded)
         self.assertIsNotNone(sbi.asset_collection)
 

@@ -13,7 +13,7 @@ from jinja2 import Environment
 from idmtools import IdmConfigParser
 from idmtools.assets import AssetCollection, Asset
 from idmtools.assets.file_list import FileList
-from idmtools.core import EntityStatus
+from idmtools.core import EntityStatus, NoPlatformException
 from idmtools.core.logging import SUCCESS
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.relation_type import RelationType
@@ -190,16 +190,22 @@ class SingularityBuildWorkItem(InputDataWorkItem):
         return None
 
     @staticmethod
-    def find_existing_container(sbi: 'SingularityBuildWorkItem') -> Optional[AssetCollection]:
+    def find_existing_container(sbi: 'SingularityBuildWorkItem', platform: 'IPlatform' = None) -> Optional[AssetCollection]:
         """
         Find existing container
 
         Args:
             sbi: SingularityBuildWorkItem to find existing container matching config
+            platform: Platform To load the object from
 
         Returns:
             Existing Asset Collection
         """
+        if platform is None:
+            from idmtools.core.context import CURRENT_PLATFORM
+            if CURRENT_PLATFORM is None:
+                raise NoPlatformException("No Platform defined on object, in current context, or passed to run")
+            platform = CURRENT_PLATFORM
         ac = None
         if not sbi.force:  # don't search if it is going to be forced
             qc = QueryCriteria().where_tag(['type=singularity']).select_children('assets')
@@ -210,9 +216,9 @@ class SingularityBuildWorkItem(InputDataWorkItem):
             if len(qc.tag_filters) > 1:
                 if logger.isEnabledFor(DEBUG):
                     logger.debug("Searching for existing containers")
-                ac = sbi.platform._assets.get(None, query_criteria=qc)
+                ac = platform._assets.get(None, query_criteria=qc)
             if ac:
-                ac = sbi.platform._assets.to_entity(ac[0])
+                ac = platform._assets.to_entity(ac[0])
                 if logger.isEnabledFor(DEBUG):
                     logger.debug(f'Found existing container in {ac.id}')
             else:
@@ -335,8 +341,7 @@ class SingularityBuildWorkItem(InputDataWorkItem):
         """
         p = super()._check_for_platform_from_context(platform)
         opts = dict(wait_on_done_progress=wait_on_done_progress, wait_until_done=wait_until_done, wait_on_done=wait_on_done, platform=p, wait_progress_desc=f"Waiting for build of Singularity container: {self.name}")
-        self.platform = p
-        ac = self.find_existing_container(self)
+        ac = self.find_existing_container(self, platform=p)
         if ac is None or self.force:
             super().run(**opts)
             return self.asset_collection
