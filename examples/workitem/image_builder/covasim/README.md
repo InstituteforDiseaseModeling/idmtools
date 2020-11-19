@@ -22,18 +22,12 @@ with Singularity installed.
    ```
    pip install idmtools[idm] 
    ```
-2. Install [Covasim from PyPi] (optional, only used for local
-   development support)
-
-   ```
-   pip install covasim
-   ```
-3. Create assetcollection for covasim.sif
+2. Create assetcollection of covasim.sif from idm covasim image in docker hub
 
    ```
    python create_covasim_sif_ac.py
    ```
-4. Create simulations with covasim image
+3. Create simulations with covasim image
 
    ```
    python run_covasim.py
@@ -42,15 +36,17 @@ with Singularity installed.
 ### Folder Contents
 
 The example folder contains the following:
-- `run.py`: the script that needs to be run by the user to submit the
-  job to the cluster
+- `create_covasim_sif_ac.py`: the script that is executed on the Calculon
+  cluster and will create assetcollection of covasim.sif image which used for run_sim.py
+  
+- `run_vocasim.py`: the script that needs to be run by the user to submit the
+  job to the Calculon cluster
 - `inputs/sim.py`: the model simulation script that will be run on the
   cluster
-- `inputs/run.sh`: the actual script that is executed on the SLURM
-  cluster and will run `sim.py`
-- `output/`: folder where simulation outputs will be downloaded to.
+
+- `outputs/`: folder where simulation outputs will be downloaded to.
 
 
 <!-- Refs -->
 [Covasim]: https://github.com/InstituteforDiseaseModeling/covasim
-[Covasim from PyPi]: https://pypi.org/project/covasim
+[idm Covasim from docker hub]: https://hub.docker.com/search?q=covasim&type=image

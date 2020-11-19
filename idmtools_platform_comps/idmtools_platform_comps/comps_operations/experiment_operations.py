@@ -5,11 +5,9 @@ from itertools import tee
 from logging import getLogger, DEBUG
 from typing import List, Type, Generator, NoReturn, Optional, TYPE_CHECKING
 from uuid import UUID
-
 from COMPS.Data import Experiment as COMPSExperiment, QueryCriteria, Configuration, Suite as COMPSSuite, \
     Simulation as COMPSSimulation
 from COMPS.Data.Simulation import SimulationState
-
 from idmtools import IdmConfigParser
 from idmtools.assets import AssetCollection, Asset
 from idmtools.core import ItemType, EntityStatus

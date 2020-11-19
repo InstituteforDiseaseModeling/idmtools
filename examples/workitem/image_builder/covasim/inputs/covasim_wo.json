@@ -8,7 +8,6 @@
         },
         "Output": "covasim.sif",
         "Tags": {"covasim image": "covasim.sif",  "idmtools": "idmtools test"},
-		"AdditionalMounts": [ "/shared" ],
         "StaticEnvironment": { "FOO": "BAR" }
     }
 }
