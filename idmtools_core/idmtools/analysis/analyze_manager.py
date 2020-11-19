@@ -347,8 +347,6 @@ class AnalyzeManager(CacheEnabled):
         with self.cache.transact():
             for analyzer in self.analyzers:
                 item_data_for_analyzer = {}
-                items = self.cache.iterkeys()
-                logger.debug(str([i for i in items]))
                 for item_id in self.cache:
                     logger.debug(f"Finalizing {item_id}")
                     item = self._items[item_id]

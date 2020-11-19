@@ -3,6 +3,7 @@ import os
 from dataclasses import dataclass, field, InitVar
 from io import BytesIO
 from logging import getLogger, DEBUG
+from pathlib import PurePosixPath
 from typing import TypeVar, Union, List, Callable, Any, Optional, Generator, BinaryIO
 import backoff
 import requests
@@ -41,7 +42,7 @@ class Asset:
     _checksum: Optional[str] = field(default=None, init=False)
 
     def __post_init__(self, content, checksum):
-        # Cache of our assset key
+        # Cache of our asset key
         self._key = None
         self._content = None if isinstance(content, property) else content
         self._checksum = checksum if not isinstance(checksum, property) else None
@@ -269,11 +270,12 @@ class Asset:
         Returns:
             Remote Path + Filename
         """
+
         if self.relative_path:
-            path = os.path.join(self.relative_path, self.filename)
+            path = PurePosixPath(self.relative_path).joinpath(self.filename)
         else:
-            path = os.path.join(self.filename)
-        return path
+            path = PurePosixPath(self.filename)
+        return str(path)
 
 
 TAsset = TypeVar("TAsset", bound=Asset)

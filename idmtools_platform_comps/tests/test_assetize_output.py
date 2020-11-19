@@ -108,6 +108,27 @@ class TestAssetizeOutput(unittest.TestCase):
         self.assertTrue(e.succeeded)
         self.assertTrue(ao.succeeded)
 
+    def test_simulations_tags_prefix(self):
+        """
+        Confirm that we can use tags in the prefix format str
+
+        Returns:
+
+        """
+        task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"), parameters=dict(a=1))
+        e = Experiment.from_task(name=self.case_name, task=task)
+        e.simulations.items[0].tags['index'] = 1
+        ao = AssetizeOutput(name=self.case_name, verbose=True, simulation_prefix_format_str='{simulation.tags["index"]}')
+        ao.from_items(e)
+        ao.run(wait_on_done=True, platform=self.platform)
+
+        self.assertTrue(e.succeeded)
+        self.assertTrue(ao.succeeded)
+        #
+        assets = [a.short_remote_path().replace("\\", '/') for a in ao.asset_collection]
+        self.assertIn('1/config.json', assets)
+        self.assertIn('1/output/result.json', assets)
+
     def test_experiment_all(self):
         ao = AssetizeOutput(name=self.case_name, related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'], verbose=True)
         ac = ao.run(wait_on_done=True, platform=self.platform)
